@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S18-B — the conveyor arm's producer, its door, and the improvement verdict · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-B.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s18-b--the-conveyor-arms-producer-its-door-and-the-improvement-verdict">S18-B — the <code>conveyor</code> arm's producer, its door, and the improvement verdict</h1>
+<p>Third commit of lane <code>s18-kata-improvement</code>. S18-A built the trend (step 2); this builds <strong>steps 1, 3 and 4</strong>: the producer, the arm's door, and the loop that records a verdict. Migration <strong><code>0034_s18_kata_arm.sql</code></strong>.</p>
+<h2 id="what-the-conveyor-arm-is-exactly">What "the conveyor arm" is, exactly</h2>
+<p>A <code>conveyor</code> run measures <strong>the tenant's own <code>capability_agent</code></strong> against the suite. Per case, one <code>benchmark.case.produce</code> job invokes <code>agent.run</code> with the instance's <strong>problem statement</strong> and takes the agent's final text as the patch; the patch is then graded exactly as a <code>gold</code> patch is — one <code>batch/v1</code> Job applies it and runs the instance's tests.</p>
+<p>⛔ <strong>Known limitation, recorded rather than hidden:</strong> the agent has no repository tool. It answers from the problem statement alone, so this arm measures the conveyor's <em>reasoning over a description of the bug</em>, not its ability to read and edit a checkout. That is a real measurement of a real configuration — and it is weaker than the <code>baseline</code> arm, which fetches the source — but nobody should read a low <code>conveyor</code> rate as "the conveyor cannot fix bugs" until the agent has a repository. The producer's module documentation and this paragraph are the two places that say so. The same holds for the prompt: the arm sends no <code>prompt_ref</code> (see §Session 2), so it measures the model over the producer's instruction, not the agent's configured prompt.</p>
+<h2 id="the-pieces">The pieces</h2>
+<p><strong>The producer</strong> (<code>apps/server/src/benchmark_producer.rs</code>, job kind <code>benchmark.case.produce</code>). One job, one case, one <code>agent.run</code> — a tick may not make a model call (CONTRACT §19's "one bounded tick"), so the driver enqueues and moves on. It reads the instance through <code>producer_instances_tx</code>, which carries no <code>gold_patch</code>, no <code>test_patch</code> and no <code>fail_to_pass</code>: the answer key is never in the model's context (S18 §8 trap 1). A typed refusal, an empty reply or an over-cap patch is <code>produce_status='no_attempt'</code>, which the graded denominator withholds — never a model failure.</p>
+<p><strong>The door</strong> (<code>benchmark_runs.start</code>). <code>arm='conveyor'</code> now requires a subject: a capability agent (an active one, resolved in the caller's tenant; a missing or non-active one is <code>409 arm_not_ready</code> <strong>before the first case</strong>, S18 §5) and records <code>subject_version</code> at start, so the run pins the version it measured (S18 §3) instead of joining a row an edit would have moved. A <code>procedure</code> subject is refused with <code>arm_not_ready</code>: a procedure run is card-scoped and a benchmark instance is not a card, so that producer needs a mapping that does not exist — the same honest refusal S17 gives the <code>baseline</code> arm.</p>
+<p><strong>The verdict</strong> (job kind <code>benchmark.improvement.run</code>, enqueued by <code>benchmark_runs.start</code> when it is given a <code>baseline_run_id</code>). It observes with <code>benchmark_runs.get</code> and judges with <code>benchmark_runs.compare</code> — the two actions a person reading screen 14 calls, never a private path (S18 §9.1) — and records <code>keep | revert | inconclusive</code> on the candidate run with the p-value in the note. The rule is S18 §10 Q3: significant (p &lt; 0.05) and positive is <code>keep</code>, significant and negative is <code>revert</code>, everything else is <code>inconclusive</code>. It never starts a second candidate (Q4) and never promotes (Q2).</p>
+<p><strong>Liveness.</strong> A producer that keeps failing must not hold a run live for ever: <code>benchmark_case.attempts</code> is spent by each producer job and, at <code>MAX_PRODUCE_ATTEMPTS</code> (3), the driver writes <code>no_attempt</code> itself. The reaper only catches a <em>dead</em> driver, not a live one that never finishes.</p>
+<h2 id="what-is-not-built">What is NOT built</h2>
+<ul>
+<li><strong>The procedure producer</strong> — refused at the door with a reason (above), not silently broken.</li>
+<li><strong>Screen 14 itself.</strong> Its data contract is already declared — <code>docs/plans/slices/S12-ui-buildout.md</code> row 14 names <code>benchmark_runs.trend</code> plus the candidate controls, exactly what this lane serves — so building it is S12's work, not a missing S18 deliverable.</li>
+<li><strong>The <code>baseline</code> arm</strong> — still refused; <code>baseline.py</code> has no build step in any slice plan.</li>
+<li><strong>A live producer run</strong> — ✅ closed by session 2 (below).</li>
+</ul>
+<h2 id="session-2--the-live-path-was-dead-and-is-now-proved-2026-11-09">Session 2 — the live path was dead, and is now proved (2026-11-09)</h2>
+<p>⛔ <strong>The producer could not produce.</strong> <code>produce()</code> called <code>invoke(..., action:"agent.run")</code>, but <code>agent.run</code>'s handler refuses a direct invocation by construction — an internal action holds the invocation transaction and no pool (<code>crates/actions/src/workflow/agent.rs:231</code>; the same defect class <code>procedure_agent</code> fixed for <code>procedure.step</code>). Every <code>conveyor</code> case was therefore written <code>no_attempt</code>, and the arm measured nothing. The missing test was the only thing that would show it.</p>
+<p>The fix: <code>run_step</code> — the one seam <code>procedure.step</code> and <code>workflow.node</code> already share — is now <code>pub</code>, and the producer drives it with its explicit, tool-less step input, carrying the agent row's <code>max_turns</code>/<code>timeout_ms</code>. No action, scope, event, table or lock entry moved (<strong>277 actions · 305 ops</strong>). Two limitations are recorded rather than hidden: the arm is <strong>tool-less</strong>, and it sends <strong>no <code>prompt_ref</code></strong> — <code>agent@1</code> requires procedure/capability sources a benchmark run has no facts for, so the ledger must not claim a prompt the loop never applied (<code>inference_call.prompt_ref</code> is NULL; the call is <code>caller_kind='agent_run'</code>, <code>run_id = &lt;benchmark_run id&gt;</code> — no FK).</p>
+<p>Proof: <code>apps/server/tests/benchmark_producer.rs</code>, <strong>5/5</strong>, each property a way the producer could lie — one real model call carrying the problem statement and none of the answer key; an empty reply is <code>no_attempt</code>; a 4xx is <code>no_attempt</code> and not a retried job; a 5xx is a retryable <code>JobFailure</code> with the attempt spent; a re-delivery replays the idempotency key and buys no second call. Reversal: with the old <code>invoke</code> call restored, 4/5 fail (the happy path records <code>no_attempt</code>). Regressions: <code>agent_run</code> 1/1, <code>procedure_agent</code> 1/1, <code>benchmark_jobs</code> 8/8; fmt clean; clippy <code>-D warnings</code> on both touched crates; <code>--check-lock</code> exit 0.</p>
+<h2 id="gate">Gate</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>rbuild -- test -p conveyor-api --test benchmark_arm</code></td>
+<td><strong>2/2</strong> — the suite-subject 422, the retired-agent 409, the procedure 409, the foreign-baseline 422, and the active-agent 201 with <code>subject_version: 1</code> + one enqueued improvement job</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>rbuild -- test -p conveyor-api --test benchmark_trend</code></td>
+<td><strong>2/2</strong> (unchanged)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>rbuild -- test -p conveyor-server --test benchmark_jobs</code></td>
+<td><strong>8/8</strong> — the driver's existing arms still behave, with the new partition in place</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>rbuild -- test -p conveyor-actions --test registry --test parity_http_mcp</code></td>
+<td><strong>8/8</strong> and <strong>4/4</strong> at <strong>277</strong> actions</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>rbuild -- run -p conveyor-server -- --print-openapi --write-lock</code> → <code>--check-lock</code></td>
+<td><strong>305 ops</strong>, 6 operation hashes changed (the views that gained fields); <code>--check-lock</code> <strong>exit 0</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>rbuild -- fmt --all -- --check</code></td>
+<td>clean</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S18-B.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

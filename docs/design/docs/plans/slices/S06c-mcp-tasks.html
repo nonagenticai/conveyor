@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S06c — MCP tasks · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06c-mcp-tasks.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s06c--mcp-tasks">S06c — MCP tasks</h1>
+<p>Programme project: S06c · issues none yet</p>
+<p><strong>BUILT 2026-11-09.</strong> <code>projects.execute</code> (task-capable), the run ↔︎ task mapping in <code>crates/actions/src/mcp/tasks.rs</code>, the three hooks in <code>mcp.rs</code>, <code>enable_tasks()</code> in <code>get_info</code>, and migration <code>0023_s06c_mcp_tasks.sql</code> — which holds the slice's two indexes: <code>uq_run_project_live</code> (<code>(tenant_id, project_id) WHERE card_id IS NULL AND status live</code>) and <code>approval_project_idx</code> (<code>(tenant_id, project_id)</code>), the project-scoped approval listing this slice reads. No table, no new event.</p>
+<p>Build records / deviations, all deliberate:</p>
+<ul>
+<li><strong>The task id IS the run id.</strong> <code>projects.execute</code> is create-or-return and answers <strong>200</strong> on both paths (one representation); only the creating call enqueues <code>run.execute</code> and emits <code>run.created</code>.</li>
+<li><strong><code>run.execute</code> needed no change</strong>: it was already card-agnostic (queued → running, never terminal). The REAPER did: <code>store::run::reap_dead_runs_tx</code> now requires <code>r.card_id IS NOT NULL</code> (trap 10).</li>
+<li><strong><code>tasks/update</code> invokes <code>approvals.decide</code></strong> — the gate's own state machine, events, run resume and the <code>(approval_id, approver_id)</code> unique index all apply. A repeated answer is a replay (<code>decision_by_tx</code>).</li>
+<li><strong><code>on_behalf_of</code> is not resolved to a human</strong>: George's 2026-11-09 ruling says the conveyor need not know whether an answer is human or agent, so the decision records the authenticated agent principal (<code>decided_by_kind='agent'</code>). The <code>_meta</code> is accepted and ignored.</li>
+<li><strong>A blank-reason rejection leaves the gate open</strong> (proven); the slice's "sets <code>statusMessage</code>" is not persisted — there is no task table to persist it into, and the next <code>tasks/get</code> still reports <code>input_required</code>. Recorded as a deviation, not hidden.</li>
+<li><strong>One <code>-32602</code></strong> for non-uuid, unknown, cross-tenant, expired and card-scoped ids (trap 7).</li>
+<li><strong>Agent tools</strong>: <code>projects.execute</code> joins <code>AGENT_TOOLS</code>, plus <code>runs.cancel</code>/<code>runs.finish</code> (a task must be cancellable and completable by the platform that runs it). ⚠️ The build-order lines' <code>cargo test -p conveyor-actions mcp_tasks</code> matches <strong>0 tests</strong> (it filters test NAMES, not binaries); the real target is <code>--test mcp_tasks_contract</code>. Tests: <code>crates/api/tests/mcp_tasks.rs</code> (the §7 property table over the real transport), <code>crates/actions/tests/mcp_tasks_contract.rs</code> (the wire seed and the single task-capable action), <code>crates/store/tests/transitions.rs</code> (create-or-return + the index).</li>
+</ul>
+<p>Adds the MCP tasks extension (SEP-2663) to the conveyor's existing <code>/mcp</code> surface. S06b gives the agent a licence principal and a tool list; this slice gives it a durable task for a project that can run for days and stop to ask a human a question. <code>mcp_server</code> keeps its own task runtime for coding/care-bus/builder; the conveyor serves only its own lifecycle.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>At the end, an MCP client that declares <code>io.modelcontextprotocol/tasks</code> calls <code>projects.execute</code>, receives <code>resultType:"task"</code>, polls <code>tasks/get</code> through a project that waits on an approval, answers it with <code>tasks/update</code>, and reads a terminal result — with no Python service in the path and no new table.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S04: <code>/mcp</code> (rmcp 3.9.0) serves the action registry; <code>call_tool</code> invokes the same engine as HTTP.</li>
+<li>S06b: licence bearer → <code>app_user(kind='agent')</code>; every tool carries <code>_meta.operation</code>; <code>approvals.request</code>.</li>
+<li>S06: <code>run</code>, <code>approval</code>, <code>approval_decision</code>; <code>runs.create|start|finish|cancel</code>, <code>approvals.list|decide</code>.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — <code>enable_tasks()</code>; <code>get_task</code>/<code>update_task</code>/<code>cancel_task</code> backed by Postgres; <code>projects.execute</code>; a project execution run; run↔︎task and approval↔︎input-request mapping; idempotent answers; cancel; TTL; actor provenance; the protocol tests.</p>
+<p><strong>OUT</strong> — the agent's client-side support for tasks on an <strong>external</strong> MCP server (separate plan: today its gate is <code>auth_kind=none</code>, <code>agent/.../connectors/runtime.rs:743-757</code>); decommissioning <code>mcp_server</code>; SSE/push; a progress percentage (none exists and none is added); any new table.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rmcp-3.9.0/src/model/task.rs</code>, <code>src/model/mrtr.rs</code>, <code>src/handler/server.rs</code></td>
+<td><code>Task</code>, <code>DetailedTask</code>, <code>TaskPayload</code>, <code>InputRequests</code>, <code>CallToolResponse::Task</code>, the three hooks, <code>validate_tasks_capability</code></td>
+<td>the types and the gating</td>
+<td>the in-memory <code>TaskManager</code> (Postgres is the store)</td>
+</tr>
+<tr>
+<td><code>nonagenticai_mcp_server/src/tasks/{extension,mapping,models}.py</code></td>
+<td>the wire shapes, status map, <code>-32602</code> rule</td>
+<td>the contract, exactly</td>
+<td>its run store and driver</td>
+</tr>
+<tr>
+<td><code>nonagenticai_mcp_server/src/storage/task_inputs.py</code></td>
+<td>idempotent update, reject-needs-reason, tombstone</td>
+<td>the lenient semantics</td>
+<td>the SQL</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/mcp_client/tasks.rs</code></td>
+<td>the client's status set and <code>-32602</code>→<code>lost</code></td>
+<td>the client's expectations</td>
+<td>the platform binding</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/mcp.rs</code></td>
+<td><code>ServerHandler for McpServer</code>, <code>call_tool</code>, <code>tool_json</code>, <code>service</code></td>
+<td>the existing composition</td>
+<td>the polling channel</td>
+</tr>
+<tr>
+<td><code>crates/store/src/run.rs</code>, <code>crates/store/src/approval.rs</code>, <code>crates/actions/src/control/runs.rs</code></td>
+<td>run lifecycle, <code>uq_run_live</code>, <code>open_gate_tx</code>, <code>runs.cancel</code></td>
+<td>the state machine</td>
+<td>a second lease</td>
+</tr>
+</tbody>
+</table>
+<p>Pinned: <code>nonagenticai_mcp_server</code> @ <code>dd2cabf</code>, <code>agent</code> @ <code>83b8de7</code>. Re-capture before building.</p>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>crates/actions/src/mcp.rs                   enable_tasks(); call_tool → CallToolResponse::Task for a
+                                            task-capable action; get_task/update_task/cancel_task
+crates/actions/src/mcp/tasks.rs             run ↔ Task/DetailedTask; approval ↔ InputRequest; actor; -32602
+crates/actions/src/board/projects.rs        projects.execute
+crates/actions/src/spec.rs                  ActionSpec.task_capable (default false)
+crates/actions-derive/src/lib.rs            the `task = true` attribute
+crates/store/src/run.rs                     create_project_execution_tx; the live-execution index
+crates/store/src/approval.rs                decide idempotent per (approval, approver); void_project_pending_tx
+apps/server/src/worker.rs                   run.execute accepts a card-less run and leaves it running
+crates/api/tests/mcp_tasks.rs               protocol tests with a declaring client
+crates/actions/tests/mcp_tasks_contract.rs  wire shapes and the negative rules</code></pre>
+<p>No tables. <code>projects.execute</code> is the only new action; there is no new event.</p>
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>request</th>
+<th>response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tools/call</code> <code>projects.execute</code></td>
+<td><code>{project_id}</code></td>
+<td><code>{resultType:"task", taskId:&lt;run uuid&gt;, status:"working", createdAt, lastUpdatedAt, ttlMs:604800000, pollIntervalMs:5000, statusMessage}</code></td>
+</tr>
+<tr>
+<td><code>tasks/get</code></td>
+<td><code>{taskId}</code></td>
+<td>base task fields + <code>inputRequests</code> (one per pending approval, key = approval uuid) or <code>result</code></td>
+</tr>
+<tr>
+<td><code>tasks/update</code></td>
+<td><code>{taskId, inputResponses:{&lt;approval uuid&gt;:{action:"accept"|"decline"|"cancel", content:{decision:"approved"|"rejected", reason?, comment?}}}, _meta:{"ai.nonagentic/actor":…}}</code></td>
+<td><code>{resultType:"complete"}</code></td>
+</tr>
+<tr>
+<td><code>tasks/cancel</code></td>
+<td><code>{taskId}</code></td>
+<td><code>{resultType:"complete"}</code></td>
+</tr>
+</tbody>
+</table>
+<p>Status map, in this order: a terminal run maps directly (<code>succeeded</code>→<code>completed</code>, <code>failed</code>→<code>completed</code> with <code>isError:true</code>, <code>cancelled</code>→<code>cancelled</code>); otherwise a pending approval in the project → <code>input_required</code>; otherwise <code>queued</code>/<code>running</code> → <code>working</code>. <code>failed</code> is never emitted as a task status.</p>
+<p>Every <code>GetTaskResult</code> also carries <code>statusMessage</code> from the run and, in <code>_meta["ai.nonagentic/conveyor"]</code>, the project id, the run id and the last events on <code>run:&lt;id&gt;</code> — the shape the agent's relay already reads for fr projects, under the conveyor's own key. A terminal task carries the tool-shaped <code>result</code> instead: <code>structuredContent {run_id, project_id, status, result, error}</code>, with <code>isError</code> true for <code>failed</code> and <code>cancelled</code>.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Baseline and compose. <code>source ~/.cargo/env &amp;&amp; cargo test --workspace</code>; <code>lsof -nP -iTCP:8930 -sTCP:LISTEN</code> is empty; <code>docker compose up -d db</code>.</li>
+<li><code>ActionSpec.task_capable</code> + the derive attribute + the four manual <code>ActionSpec</code> literals. <code>cargo test -p conveyor-actions --test duplicate</code></li>
+<li><code>create_project_execution_tx</code> + the partial unique index <code>(tenant_id, project_id) WHERE card_id IS NULL AND status IN ('queued','running','waiting_approval')</code>; <code>cargo test -p conveyor-store run</code>.</li>
+<li><code>projects.execute</code> (create-or-return the live execution run, enqueue <code>run.execute</code>). <code>cargo test -p conveyor-actions projects</code>.</li>
+<li><code>run.execute</code> accepts a card-less run and marks it <code>running</code>; it never completes it. <code>cargo test -p conveyor-server worker</code>.</li>
+<li><code>enable_tasks()</code> in <code>get_info</code>; the three hooks return the task from Postgres, not <code>-32601</code>. <code>cargo test -p conveyor-actions --test mcp_tasks_contract</code></li>
+<li><code>tasks.rs</code>: run→<code>Task</code>/<code>DetailedTask</code>; <code>GetTaskResult</code>; the <code>-32602 task not found</code> rule for non-uuid, unknown, cross-tenant and expired ids. <code>cargo test -p conveyor-actions mcp_tasks</code></li>
+<li><code>inputRequests</code> from pending approvals of the project; key = approval id; <code>requestedSchema</code> with <code>decision</code> enum <code>["approved","rejected"]</code> plus <code>reason</code>/<code>comment</code>. <code>cargo test -p conveyor-actions mcp_tasks input_requests</code></li>
+<li><code>tasks/update</code> → <code>approvals.decide</code>; idempotent per <code>(approval, approver)</code>; unknown keys ignored; a reject with no non-blank reason leaves the approval pending and sets <code>statusMessage</code>. <code>cargo test -p conveyor-actions mcp_tasks update</code></li>
+<li><code>tasks/cancel</code> → <code>runs.cancel</code> + <code>void_project_pending_tx</code>, so card-level gates are not orphaned. <code>cargo test -p conveyor-actions mcp_tasks cancel</code></li>
+<li>Actor: <code>on_behalf_of</code> that resolves to a human member writes <code>decided_by_kind='human'</code> with <code>via={channel:'agent', agent:&lt;principal&gt;, job}</code>; otherwise the agent principal, <code>decided_by_kind='agent'</code>. <code>cargo test -p conveyor-actions mcp_tasks actor</code></li>
+<li>TTL: 7 days from <code>run.created_at</code>; recomputed on read; expired → <code>-32602</code>. <code>cargo test -p conveyor-actions mcp_tasks ttl</code></li>
+<li>Protocol tests with a client that declares the extension at <code>initialize</code>; a second client that does not gets <code>-32021</code>. <code>cargo test -p conveyor-api --test mcp_tasks</code></li>
+<li>Wire-contract tests: task result shape, status map, <code>inputRequests</code>, terminal <code>structuredContent</code>, <code>isError</code>. <code>cargo test -p conveyor-actions --test mcp_tasks_contract</code></li>
+<li>Regenerate the served-spec lock (one new action). <code>cargo run -q -p conveyor-server -- --print-openapi --write-lock</code></li>
+<li>Gate (§7) and clippy.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env
+cargo test -p conveyor-store run
+cargo test -p conveyor-actions projects
+cargo test -p conveyor-actions --test mcp_tasks_contract
+cargo test -p conveyor-api --test mcp_tasks
+cargo test -p conveyor-api --test approval_dual
+cargo test -p conveyor-actions --test parity_http_mcp
+cargo clippy --workspace --all-targets -- -D warnings
+cargo run -q -p conveyor-server -- --print-openapi --check-lock
+# no task-capable action beyond projects.execute
+test &quot;$(grep -c &#39;task_capable: true&#39; crates/actions/src/board/projects.rs)&quot; -eq 1</code></pre>
+<p>Property table:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>extension advertised</td>
+<td><code>initialize</code> returns <code>io.modelcontextprotocol/tasks</code> in <code>capabilities.extensions</code></td>
+</tr>
+<tr>
+<td>b</td>
+<td>start</td>
+<td><code>tools/call projects.execute</code> returns <code>resultType:"task"</code> with a uuid <code>taskId</code></td>
+</tr>
+<tr>
+<td>c</td>
+<td>wait</td>
+<td>a pending approval appears as <code>inputRequests</code>, keyed by the approval id</td>
+</tr>
+<tr>
+<td>d</td>
+<td>answer</td>
+<td><code>tasks/update</code> decides it; the next <code>tasks/get</code> is <code>working</code></td>
+</tr>
+<tr>
+<td>e</td>
+<td>terminal</td>
+<td>the run's terminal status maps as §5, with <code>isError</code> on failure</td>
+</tr>
+<tr>
+<td>f</td>
+<td>idempotent</td>
+<td>the same update twice writes one <code>approval_decision</code></td>
+</tr>
+<tr>
+<td>g</td>
+<td>reject rule</td>
+<td>a reject with a blank reason leaves the input open</td>
+</tr>
+<tr>
+<td>h</td>
+<td>cancel</td>
+<td><code>tasks/cancel</code> voids the project's pending approvals</td>
+</tr>
+<tr>
+<td>i</td>
+<td>tenancy</td>
+<td>a task id from another tenant is <code>-32602</code>, zero mutations</td>
+</tr>
+<tr>
+<td>j</td>
+<td>durability</td>
+<td>a server restart mid-wait still answers <code>tasks/get</code></td>
+</tr>
+<tr>
+<td>k</td>
+<td>no worker held</td>
+<td>a one-hour wait leases no job row</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>Terminal precedence.</strong> Check the run first; a stale pending approval must not revive a finished task.</li>
+<li><strong><code>failed</code> never on the wire.</strong> A failed run is <code>completed</code> + <code>isError:true</code> — the agent maps that to failure.</li>
+<li><strong><code>uq_run_live</code> does not dedupe NULLs.</strong> A project execution has <code>card_id IS NULL</code>, so the live-execution index must be its own partial unique index, not a check-then-insert.</li>
+<li><strong><code>runs.create</code> derives the project from the card.</strong> <code>projects.execute</code> writes the run directly; do not route it through the card path.</li>
+<li><strong>Approvals are project-, card- or run-scoped.</strong> <code>inputRequests</code> lists by <code>project_id</code>, not <code>run_id</code>, or card-level gates are invisible.</li>
+<li><strong><code>open_gate_tx</code> needs a running run.</strong> It is for the engine's gate, not for <code>approvals.request</code> (S06b) or a project task's input.</li>
+<li><strong><code>-32602</code> for every ownership failure.</strong> Non-uuid, unknown, cross-tenant, expired — one code, one message, no oracle.</li>
+<li><strong>The client must declare the extension.</strong> rmcp refuses a task result to a client that did not; the test client must declare it at <code>initialize</code>, not just send the header.</li>
+<li><strong><code>tasks/update</code> is lenient.</strong> Unknown keys and terminal replays ack; a strict 4xx breaks the agent's retry.</li>
+<li><strong>The reaper must skip project executions.</strong> <code>run.execute</code> reaps dead card runs to <code>crashed</code>; a project run is long-lived by design.</li>
+<li><strong><code>_meta</code> only.</strong> rmcp flattens a task and drops unknown top-level fields; <code>ai.nonagentic/conveyor</code> goes in <code>_meta</code>, never beside <code>taskId</code>.</li>
+<li><strong>The protocol version is <code>2026-07-28</code>.</strong> A client negotiating an older version does not get the methods.</li>
+<li><strong><code>statusMessage</code> is not progress.</strong> There is no percentage and none is added: the card list can be empty or reordered, so a computed percent would be a second, false state beside the run's.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li><strong>Task = project execution run.</strong> The run state machine is already the task lifecycle; no table, no second store.</li>
+<li><strong>Input = approval.</strong> One primitive; the answer is <code>approvals.decide</code>, not a second response channel.</li>
+<li><strong><code>projects.execute</code> is the only task-capable action.</strong> Everything else returns a normal tool result.</li>
+<li><strong>No decommissioning of <code>mcp_server</code>.</strong> It keeps its task runtime for other backends; the conveyor owns only its own project lifecycle.</li>
+<li><strong>Polling remains the fallback.</strong> S06b's path still works when the client cannot run tasks; the methods are additive.</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Does a human's relayed answer record as human or agent?</td>
+<td>human when <code>on_behalf_of</code> resolves; <code>via</code> names the agent</td>
+</tr>
+<tr>
+<td>2</td>
+<td>One live execution per project, or several?</td>
+<td>one; a second <code>projects.execute</code> returns the same task</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Is <code>statusMessage</code> free text or a typed phase?</td>
+<td>free text from the run, populated by S13</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Does the conveyor emit <code>ai.nonagentic/conveyor</code>?</td>
+<td>yes; the agent adds the key in its own plan</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Should <code>runs.list</code> gain a <code>project_id</code> filter?</td>
+<td>yes, in this slice — the task's activity needs it</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S06c-mcp-tasks.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

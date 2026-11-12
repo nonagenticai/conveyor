@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S18-A — benchmarkruns.trend: the kata loop's read half · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-A.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s18-a--benchmark_runstrend-the-kata-loops-read-half">S18-A — <code>benchmark_runs.trend</code>: the kata loop's read half</h1>
+<p>Lane <code>s18-kata-improvement</code>, branch off <code>lane/train-2026-11-09</code> @ <strong><code>008f8f8</code></strong> (276 actions · <code>AGENT_TOOLS</code> 43 · <code>served-spec.lock.json</code> 304 ops). This session builds <strong>S18 build-order step 2 only</strong>. Steps 1 (the <code>conveyor</code>-arm producer) and 3 (the <code>improvement</code> job) are <strong>not built</strong>, and §"What step 1 must decide" says why.</p>
+<p><strong>Landed:</strong> <code>aa82894</code> on <code>lane/s18-kata-improvement</code>, pushed. <strong>No PR was opened</strong> — the lane's one PR opens when the S18 unit is complete (LANE-WORKFLOW), and no CI run was spent on this slice.</p>
+<h2 id="why-this-lane">Why this lane</h2>
+<p>S18 was the only slice in <code>00-INDEX.md</code> that was <code>plan written</code> + nothing built + unblocked. The claim was checked, not assumed: <code>git ls-remote --heads origin</code> carried no S18 branch, <code>gh pr list --state merged</code> was empty, <code>git log --all --grep=S18</code> found nothing, and the lease table had no S18 row. S17's substrate was already in place — <code>benchmark_run.subject_kind</code>/<code>capability_agent_id</code>/ <code>procedure_id</code>/<code>control_ok</code>, <code>benchmark_suite.baseline_run_id</code> + <code>promote_baseline_tx</code>, the k8s-Job driver, and <code>domain::benchmark::mcnemar</code>. <code>grep -rn trend crates/ apps/</code> returned <strong>zero</strong>.</p>
+<h2 id="what-was-built">What was built</h2>
+<p><strong><code>benchmark_runs.trend</code></strong> (<code>crates/actions/src/benchmark/trend.rs</code>) — internal, <code>benchmarks:read</code>, read-only, idempotent:</p>
+<ul>
+<li>input <code>{suite_id, arm?, limit?}</code> → output <code>{baseline_run_id?, points[]}</code>;</li>
+<li>each point is a <code>succeeded</code> run of that suite: <code>run_id</code>, <code>arm</code>, <code>subject_kind</code>, <code>subject_id</code>, <code>subject_version</code>, <code>label</code>, <code>started_at</code>, <code>n_graded</code>, <code>n_resolved</code>, <code>rate</code>, <code>control_ok</code>, <code>direction</code>, <code>vs_baseline</code>;</li>
+<li><code>rate</code> is <code>n_resolved / n_graded</code>, and <strong>absent</strong> when nothing was graded — never <code>0.0</code> for "no data";</li>
+<li><code>vs_baseline</code> is <code>CompareView</code>, the exact type <code>benchmark_runs.compare</code> already serves.</li>
+</ul>
+<p><strong>One comparison, two callers.</strong> <code>benchmark_runs_compare</code>'s body was extracted into <code>benchmark::compare_two_tx</code> (<code>crates/actions/src/benchmark/mod.rs</code>) and the compare handler now calls it too. A trend point can therefore never disagree with what a person reading <code>benchmark_runs.compare</code> gets — the McNemar call, the suite rule, the missed-control rule and the oracle/prompt rule have exactly one owner.</p>
+<p><strong>S18 §9.4 is enforced before any number is computed.</strong> <code>vs_baseline</code> exists only when the point <strong>and</strong> the promoted baseline are both <code>conveyor</code> runs and the baseline itself reached <code>succeeded</code>. A <code>gold</code>/<code>empty</code>/<code>baseline</code> point, a non-conveyor baseline, a partial baseline, a different oracle or prompt, and a control that missed all produce a point that is <strong>displayed with <code>comparable:false</code> and the reason</strong> — never dropped, never averaged. That refusal is the whole instrument: plotting a control against the capability baseline is the visual form of the comparison CONTRACT §19 refuses.</p>
+<h2 id="deviations-from-s18-5-each-deliberate">Deviations from S18 §5, each deliberate</h2>
+<ol type="1">
+<li><strong><code>direction</code> is a sibling of <code>vs_baseline</code>, not a member.</strong> <code>CompareView</code> is the compare action's own type and gains no field; the screen reads <code>point.direction</code> (<code>candidate_better | baseline_better | unchanged</code>, absent when not comparable) instead of re-deriving it from <code>a_only</code>/<code>b_only</code>.</li>
+<li><strong><code>subject_id</code> / <code>subject_version</code> are optional.</strong> A <code>suite</code> subject has no id. More sharply: <strong><code>subject_version</code> is always absent today</strong>, because <code>benchmark_run</code> has no version column and nothing writes one at start. A live join would report a <code>capability_agent</code>'s <em>current</em> optimistic-concurrency counter — which any edit bumps — as if a past run had measured it. <code>subject_id</code> is the pin; the version number is step 1's to record.</li>
+<li><strong>Only <code>succeeded</code> runs are points.</strong> A queued/running run has no number; a failed one has a partial denominator that would read as a regression never measured.</li>
+<li><strong><code>limit</code> is capped at 100</strong>, below the shared envelope's 200: each point costs three queries inside one 30 s transaction.</li>
+</ol>
+<h2 id="what-step-1-must-decide-carried-not-guessed">What step 1 must decide (carried, not guessed)</h2>
+<ul>
+<li><strong>Where the <code>conveyor</code> arm's patch lives.</strong> <code>domain::run::Run</code> has no output field, and a patch is a run <em>product</em>, not a run <em>state</em>. S18 §3 requires the producer to be a consumer of the public surface, so the patch needs a home an action writes and another action reads — an S09 document is the obvious candidate, and it is the shape <code>benchmark_case.log_document_id</code> already uses.</li>
+<li><strong>Where the improvement job records <code>keep | revert | inconclusive</code>.</strong> <code>benchmark_run</code> has no verdict column and S18 ships no table and no event, so today there is nowhere honest to write it. A column on <code>benchmark_run</code> (a migration) or an <code>benchmark_run.changed</code> payload the plan forbids are the two real options; this needs an owner ruling, not an implementation choice.</li>
+<li><strong>The run must pin the subject's version at start</strong>, so <code>subject_version</code> can stop being absent.</li>
+</ul>
+<h2 id="observed-not-fixed-other-lanes">Observed, not fixed (other lanes)</h2>
+<ul>
+<li><code>00-INDEX.md:449</code> says S11 is "steps 1–9 built, step 10 next". <strong>Step 10 is built</strong>: all seven <code>procedures.*</code>/<code>procedure_runs.start</code> actions are registered, in <code>AGENT_TOOLS</code>, parity-tested (<code>parity_http_mcp.rs:4076</code>) and in the lock (7 procedure ops). The row is stale.</li>
+<li>S17's row claims the gold/empty/<strong>baseline</strong> arms. <code>benchmark_runs.start</code> refuses the <code>baseline</code> arm at <code>crates/actions/src/benchmark/runs.rs</code> — its <code>baseline.py</code> producer has no build step in any slice plan. Source for a port: <code>$HOME/Movies/conveyor-bench</code>.</li>
+</ul>
+<h2 id="gate">Gate</h2>
+<p>Run on m1 through <code>rbuild</code>; every line below was executed, not projected.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>rbuild -- test -p conveyor-api --test benchmark_trend</code></td>
+<td><strong>2 passed / 0 failed</strong> (0.63 s) — the exact p-value <code>0.0078125</code>, the arm refusal, the oracle refusal, the missed control, the empty baseline, the suite scoping</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>rbuild -- check -p conveyor-actions -p conveyor-api --all-targets</code></td>
+<td>exit 0, <strong>zero compiler warnings</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>rbuild -- test -p conveyor-actions</code> (the whole crate, every target)</td>
+<td><strong>exit 0</strong>, no failure in any binary — <code>registry</code> <strong>8/8</strong>, <code>parity_http_mcp</code> <strong>4/4</strong>, <code>workflow_runs</code> <strong>4/4</strong> (the one that was red at an older base)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>rbuild -- fmt --all -- --check</code></td>
+<td>first pass red on two of this lane's own lines and one refactor line; all three fixed — <strong>final pass silent, whole workspace clean</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>rbuild -- clippy -p conveyor-actions -p conveyor-api --all-targets -- -D warnings</code></td>
+<td>first pass <strong>exit 101</strong> — two real findings in the new test (<code>too_many_arguments</code> 8/7, <code>needless_lifetimes</code>), both fixed by bundling the run spec; <strong>final pass exit 0</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>rbuild -- run -p conveyor-server -- --print-openapi --write-lock</code> (on m1) → rsync back</td>
+<td><strong>304 → 305 ops</strong>, one line changed; <code>benchmark_runs.trend</code> present in the lock</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>rbuild -- run -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>exit 0</strong> on the copied-back lock</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S18-A.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

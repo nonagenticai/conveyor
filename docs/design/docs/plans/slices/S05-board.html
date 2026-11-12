@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S05 — Board · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S05-board.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s05--board">S05 — Board</h1>
+<p>Programme project: S05 · issues none yet</p>
+<p><strong>Gate (SPEC §8 S5):</strong> replay a board export; two-client race; 1k-card load.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p><code>project → board → list → card</code> plus satellites, on one action registry, one comment store, one membership model, one outbox. The 280-flow board↔︎project lookup becomes a foreign key.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S03: <code>project</code>, <code>board</code>, <code>list</code>, <code>card</code>, <code>card_type</code>, <code>catalogue_entry</code> (incl. the project_type row's <code>meta.matrix</code>), <code>domain::board::may_move</code>, <code>card.version</code>.</li>
+<li>S04: <code>ActionSpec</code> derive, registry, <code>POST /api/actions/{name}/invocations</code>, OpenAPI + MCP projection.</li>
+<li>S02: <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>/api/events</code> SSE with <code>Last-Event-ID</code> replay.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — the 9 tables of §2.5; 39 actions; read projections; SSE <code>board:{id}</code>/<code>card:{id}</code>; the webhook emitter; the export/import CLI.</p>
+<p><strong>OUT</strong> — attachments and card-level memberships (SPEC §2: no table, route or action); claims, assignee and stopwatch writes (S06, contract §4); webhook <code>delivery</code> rows (a job); the UI (S12).</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kanban/docs/openapi.json</code> (PLANKA <strong>2.0.0-rc.4</strong>, <strong>67 paths</strong>)</td>
+<td><code>Card</code>,<code>List</code>,<code>Board</code>,<code>Label</code>,<code>Comment</code>,<code>Task*</code>,<code>CustomField*</code>,<code>BoardMembership</code>,<code>Webhook</code></td>
+<td>field shapes</td>
+<td>external ids as keys</td>
+</tr>
+<tr>
+<td>live <code>kanban</code> schema (33 tables, <code>50-schema-inventory.md</code>)</td>
+<td>columns, FKs, indexes</td>
+<td>constraints</td>
+<td>row data (test only)</td>
+</tr>
+<tr>
+<td><code>30-rm-planka-mcp-n8n.md</code> §2</td>
+<td>identity correction; <code>{event,data,prevData,user}</code></td>
+<td>event names; comma-separated <code>events</code></td>
+<td>instance-admin scoping</td>
+</tr>
+<tr>
+<td><code>20-fr.md</code> <code>cards</code>,<code>kanban</code>,<code>decompositions</code>,<code>projects</code></td>
+<td>fr's board surface</td>
+<td>comment/member consolidation</td>
+<td>the card-state split</td>
+</tr>
+<tr>
+<td><code>40-live-state.md</code></td>
+<td><strong>4 boards, 12 lists, 5 cards, 3 webhooks, 0 tasks</strong></td>
+<td>the test-data warning</td>
+<td>usage inference</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>migrations/0004_board.sql · crates/store/src/board/{list,card,comment,task,custom_field,label,webhook}.rs
+crates/api/src/board.rs · crates/actions/src/board/*.rs · apps/server/src/export.rs
+crates/api/tests/{position,race_move,webhook_shape,sse_board}.rs
+tests/fixtures/board/{v1-recording,v1-1000}.json · tests/load/board.js</code></pre>
+<p><code>tests/load/board.js</code> (k6): 20 rps for 60 s on <code>GET /api/boards/{id}/cards?limit=200</code> with <code>authorization: Bearer ${__ENV.DEV_AUTH_TOKEN}</code> (CONTRACT §10), threshold p95 ≤ 120 ms.</p>
+<p><strong>Tables</strong> — §2.5 verbatim, nothing added or retyped: <code>board_membership</code>, <code>label</code>, <code>card_label</code>, <code>comment</code>, <code>task_list</code>, <code>task</code>, <code>custom_field</code>, <code>custom_field_value</code>, <code>webhook_subscription</code>.</p>
+<p><strong>Custom fields.</strong> Planka is group → field → value. The group is <strong>dropped as an entity</strong>: <code>custom_field.group_name</code> + <code>group_position</code> carry it. It is board data, not vocabulary — no <code>catalogue_entry</code> row. <code>kind ∈ text|number|date|select|checkbox</code>, validated in the domain.</p>
+<p><strong>Comments and memberships.</strong> One <code>comment</code> table. Board membership only: one <code>role ∈ owner|admin|member|viewer</code> with <code>can_comment</code>, <code>watching</code>; Planka's <code>editor|viewer</code> maps <code>editor→member</code>. <code>project_manager</code>/<code>board_subscription</code> fold into that row. A card's assignee is <code>card.assignee_id</code>; no card-membership table.</p>
+<p><strong>Actions</strong> (all <code>POST /api/actions/{name}/invocations</code>):</p>
+<table>
+<thead>
+<tr>
+<th>actions</th>
+<th>input → output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>projects.create</code> <code>.get</code> <code>.close</code></td>
+<td><code>ProjectCreateIn{title,project_type_code?,description?,problem_statement?,desired_outcome?,repo_url?,programme_id?,key?}</code> → <code>ProjectOut</code>; absent <code>key</code> is server-derived (slug of <code>title</code>, uppercased, collision-suffixed); mcp maps <code>project_type</code>→<code>project_type_code</code>, <code>repository_url</code>→<code>repo_url</code>, <code>id</code>→<code>result.project_id</code>; <code>IdIn</code> → <code>ProjectView</code>; <code>ProjectCloseIn{id,reason?}</code> → <code>ProjectView</code></td>
+</tr>
+<tr>
+<td><code>boards.get</code> <code>.set_member</code></td>
+<td><code>IdIn</code> → <code>BoardView{board,lists+card_count,labels,fields,members}</code> (no cards); <code>BoardMemberIn</code> → <code>BoardMemberOut</code></td>
+</tr>
+<tr>
+<td><code>lists.create</code> <code>.update</code> <code>.move</code></td>
+<td><code>ListCreateIn</code>, <code>ListUpdateIn</code>, <code>ListMoveIn</code> → <code>ListOut</code></td>
+</tr>
+<tr>
+<td><code>cards.create</code> <code>.get</code> <code>.move</code> <code>.update</code> <code>.archive</code> <code>.unarchive</code> <code>.duplicate</code></td>
+<td><code>CardCreateIn{board_id,list_id,name,description?,card_type_code,due_at?,parent_card_id?}</code> → <code>CardOut</code>; <code>IdIn</code> → <code>CardView</code>; <code>CardsMoveIn{id,list_id,after_id?}</code> → <code>CardOut</code>; <code>CardUpdateIn{id,name?,description?,due_at?,due_done?}</code> → <code>CardOut</code>; <code>IdIn</code> → 204 (archive); <code>IdIn</code> → <code>CardOut</code> (unarchive); <code>CardDuplicateIn{id,list_id?,name?}</code> → <code>CardOut</code></td>
+</tr>
+<tr>
+<td><code>cards.comment</code> <code>comments.update</code> <code>.delete</code></td>
+<td><code>CardsCommentIn{id,body}</code> → <code>CommentOut</code>; <code>CommentUpdateIn{id,body}</code> → <code>CommentOut</code>; <code>IdIn</code> → 204</td>
+</tr>
+<tr>
+<td><code>task_lists.*</code> <code>tasks.*</code></td>
+<td><code>TaskListIn</code> → <code>TaskListOut</code>; <code>TaskIn</code>, <code>TaskUpdateIn</code> → <code>TaskOut</code></td>
+</tr>
+<tr>
+<td><code>custom_fields.*</code></td>
+<td><code>CustomFieldCreateIn{board_id,name,kind,group_name?,options?}</code>, <code>CustomFieldUpdateIn{id,…}</code> → <code>CustomFieldOut</code>; <code>CustomFieldValueIn{card_id,custom_field_id,content}</code> → <code>CustomFieldValueOut</code></td>
+</tr>
+<tr>
+<td><code>labels.*</code> <code>cards.add_label</code> <code>.remove_label</code></td>
+<td><code>LabelIn</code> → <code>LabelOut</code>; <code>CardLabelIn</code> → <code>CardOut</code></td>
+</tr>
+<tr>
+<td><code>webhooks.*</code></td>
+<td><code>WebhookCreateIn</code> → <code>WebhookOut</code> (secret returned once); <code>.test</code> → <code>WebhookDeliveryOut</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Read projections:</strong> <code>GET /api/projects[/{id}]</code>, <code>/api/boards/{id}</code>, <code>/api/boards/{id}/cards?cursor=&amp;limit=</code> (max 200), <code>/api/boards/{id}/webhooks</code>, <code>/api/cards/{id}[/comments]</code>.</p>
+<p><strong>UI surface declared for S12</strong> (declaration only, no UI code): <code>board</code> and <code>card cockpit</code> — <code>boards.get</code> + <code>GET /api/boards/{id}/cards</code>; <code>cards.get</code> (+ <code>/api/cards/{id}/comments</code>, tasks and field values inside <code>CardView</code>); project list over <code>GET /api/projects</code>; webhook settings over <code>GET /api/boards/{id}/webhooks</code>. All subscribe to <code>board:{id}</code>.</p>
+<p><strong>SSE.</strong> Every mutation writes its <code>event</code> row in-tx with <code>topic='board:&lt;board_id&gt;'</code>; card events carry <code>aggregate_type='card'</code>, <code>aggregate_id=card_id</code>. <code>card:{id}</code> is <strong>resolved</strong> to topic <code>board:&lt;board&gt;</code> plus <code>AND aggregate_id = &lt;card_id&gt;</code>. No second row, no payload filtering.</p>
+<p>S05 ships <code>cards.move</code>/<code>cards.archive</code>, so <code>card.moved</code>/<code>card.archived</code> are S05's (the emitter owns the name); it adds these 13:</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>emitter</th>
+<th>payload keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>card.created</code></td>
+<td><code>cards.create</code>, <code>cards.duplicate</code></td>
+<td>card_id, list_id, position</td>
+</tr>
+<tr>
+<td><code>card.updated</code></td>
+<td><code>cards.update</code>, <code>cards.add_label</code>/<code>remove_label</code></td>
+<td>card_id, changed[]</td>
+</tr>
+<tr>
+<td><code>card.unarchived</code></td>
+<td><code>cards.unarchive</code></td>
+<td>card_id, list_id</td>
+</tr>
+<tr>
+<td><code>comment.created</code></td>
+<td><code>cards.comment</code></td>
+<td>comment_id, card_id</td>
+</tr>
+<tr>
+<td><code>comment.updated</code></td>
+<td><code>comments.update</code></td>
+<td>comment_id, card_id</td>
+</tr>
+<tr>
+<td><code>comment.deleted</code></td>
+<td><code>comments.delete</code></td>
+<td>comment_id, card_id</td>
+</tr>
+<tr>
+<td><code>task_list.changed</code></td>
+<td><code>task_lists.*</code></td>
+<td>task_list_id, card_id, op</td>
+</tr>
+<tr>
+<td><code>task.changed</code></td>
+<td><code>tasks.*</code></td>
+<td>task_id, task_list_id, op</td>
+</tr>
+<tr>
+<td><code>custom_field.changed</code></td>
+<td><code>custom_fields.create|update|delete</code></td>
+<td>custom_field_id, board_id, op</td>
+</tr>
+<tr>
+<td><code>custom_field_value.changed</code></td>
+<td><code>custom_fields.set_value|clear_value</code></td>
+<td>card_id, custom_field_id</td>
+</tr>
+<tr>
+<td><code>label.changed</code></td>
+<td><code>labels.*</code></td>
+<td>label_id, board_id, op</td>
+</tr>
+<tr>
+<td><code>board_member.changed</code></td>
+<td><code>boards.set_member</code></td>
+<td>board_id, user_id, role</td>
+</tr>
+<tr>
+<td><code>webhook.changed</code></td>
+<td><code>webhooks.*</code></td>
+<td>webhook_id, board_id, op</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Webhook emitter.</strong> Body <code>{event, data, prevData, user}</code>; <code>data</code>/<code>prevData</code> are the <code>*Out</code> representation, <code>user{id,name}</code> the actor. <strong><code>event</code> is the internal register type</strong> (<code>card.created</code>, <code>card.updated</code>, <code>card.moved</code>, <code>card.archived</code>, <code>card.unarchived</code>, <code>comment.created|updated|deleted</code>, <code>task_list.changed</code>, <code>task.changed</code>, <code>custom_field.changed</code>, <code>custom_field_value.changed</code>, <code>label.changed</code>, <code>board_member.changed</code>, <code>webhook.changed</code>) and <code>data</code>/<code>prevData</code> use the <code>*Out</code> field names (<code>list_id</code>, not <code>listId</code>). Planka's camelCase vocabulary (<code>cardCreate</code>/<code>cardUpdate</code>/<code>cardData.listId</code>) was <code>UNVERIFIED</code> (fork not local) and is <strong>not</strong> emitted; if S14 finds an external consumer that requires it, the mapping is a cutover adapter, not a second emitter. <code>events[]</code>/<code>excluded_events[]</code> select the subscription; one <code>job(kind='webhook.deliver', dedupe_key=&lt;event&gt;:&lt;subscription&gt;)</code> per subscription, drained with <code>Authorization: Bearer &lt;secret&gt;</code>, 15 s timeout, 3 attempts.</p>
+<p><strong>The 280 flows, as one query.</strong> <code>cards.move</code> loads the card, both lists and <code>project.project_type_code</code>, then:</p>
+<pre class="sql"><code>SELECT e.meta -&gt; &#39;matrix&#39; -&gt; $card_type_code -&gt;&gt; $from_kind
+  FROM catalogue_entry e
+ WHERE e.tenant_id=$1 AND e.kind=&#39;project_type&#39; AND e.code=$project_type_code AND e.is_active</code></pre>
+<p>The value is the allowed to-kind array (S03's <code>&lt;card_type&gt; → &lt;from_kind&gt; → [&lt;to_kind&gt;]</code>). Absent row, type, from-kind, or a kind not in the array ⇒ <code>409 card-move-not-allowed</code>. The lookup lives in <code>domain::board::may_move</code>, cached per <code>(tenant, project_type_code)</code>.</p>
+<p><strong>The board export</strong> (<code>board-export/v1</code>). Planka holds five <code>[agent-contract-test]</code> cards, so a dump cannot be evidence. The export is a <strong>defined, key-referenced format</strong>:</p>
+<pre class="json"><code>{&quot;format&quot;:&quot;board-export/v1&quot;,&quot;source&quot;:&quot;fixture|planka&quot;,&quot;project&quot;:{&quot;key&quot;:&quot;…&quot;},
+ &quot;boards&quot;:[{&quot;board&quot;:{…},&quot;lists&quot;:[{&quot;key&quot;:&quot;…&quot;,&quot;kind&quot;:&quot;intake&quot;,&quot;position&quot;:1024}],&quot;labels&quot;:[],&quot;custom_fields&quot;:[],&quot;members&quot;:[],
+  &quot;cards&quot;:[{&quot;key&quot;:&quot;…&quot;,&quot;list_key&quot;:&quot;…&quot;,&quot;position&quot;:1024,&quot;name&quot;:&quot;…&quot;,&quot;archived_at&quot;:null,&quot;labels&quot;:[],
+            &quot;comments&quot;:[{&quot;key&quot;:&quot;…&quot;,&quot;author&quot;:&quot;…&quot;,&quot;body&quot;:&quot;…&quot;}],
+            &quot;task_lists&quot;:[{&quot;name&quot;:&quot;…&quot;,&quot;tasks&quot;:[{&quot;name&quot;:&quot;…&quot;,&quot;done&quot;:false}]}],
+            &quot;custom_field_values&quot;:{}}]}]}</code></pre>
+<p>Two committed fixtures, emitted by the CLI: <code>v1-recording.json</code> (1 board, 5 lists, 20 cards, 30 comments, 40 tasks, 6 fields, openapi shapes) by <code>conveyor admin fixture board --cards 20 --lists 5 --comments 30 --tasks 40 --fields 6 --seed 7 --out tests/fixtures/board/v1-recording.json</code>, and <code>v1-1000.json</code> (1,000 cards / 10 lists) by <code>conveyor admin fixture board --cards 1000 --lists 10 --seed 42 --out tests/fixtures/board/v1-1000.json</code>. Replay uses the <strong>real actions</strong>, not SQL: <code>conveyor admin import board</code>; <code>conveyor admin export board</code> re-exports; <code>conveyor admin diff board &lt;a&gt; &lt;b&gt;</code> prints deltas, non-zero exit on any. Four subcommands: <code>fixture|import|export|diff</code>.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Preflight: <code>cargo test --workspace</code>; <code>lsof -nP -iTCP:8930 -sTCP:LISTEN</code> empty; <code>docker compose up -d db</code>.</li>
+<li><code>0004_board.sql</code>: 9 tables, FKs, §2.5 indexes, <code>ENABLE</code>+<code>FORCE</code> RLS, policies. <code>conveyor-server -- migrate</code>, twice.</li>
+<li><code>store/src/board/</code>: <code>_tx</code> functions, <code>tenant_id</code> first. <code>cargo test -p conveyor-store</code>.</li>
+<li>Positions: midpoint, append <code>max+1024</code>, board advisory lock. <code>cargo test -p conveyor-api --test position</code>.</li>
+<li>Matrix loader + cache + <code>may_move</code>. <code>cargo test -p conveyor-domain matrix</code>.</li>
+<li><code>projects.*</code>, <code>boards.get</code> (4) — <code>projects.create</code> also creates the board and five lists from <code>catalogue_entry(kind='board_template')</code>.</li>
+<li><code>lists.*</code> (3) — a <code>kind</code> edit that would strand a live card is 409. <code>cargo test -p conveyor-domain list_kind</code>.</li>
+<li><code>cards.create|get|update|archive|unarchive|duplicate</code> (6): <code>If-Match</code>, <code>201+ETag</code>, 412 body = current card.</li>
+<li>Read projections + cursors; <code>EXPLAIN</code> each on a 1,000-card board, assert the index.</li>
+<li><code>cards.move</code> + <code>card.moved</code> + 409. <code>cargo test -p conveyor-api --test race_move</code>.</li>
+<li>Comments (3) + <code>GET /api/cards/{id}/comments</code>. <code>cargo test -p conveyor-actions comments</code>.</li>
+<li>Tasks: <code>task_lists.*</code>, <code>tasks.*</code> (7). <code>cargo test -p conveyor-actions tasks</code>.</li>
+<li>Custom fields (5), kind validation, upsert <code>(card_id, custom_field_id)</code>. <code>cargo test -p conveyor-domain custom_field</code>.</li>
+<li>Labels (3) + <code>cards.add_label|remove_label</code> + <code>boards.set_member</code>. <code>cargo test -p conveyor-actions labels</code>.</li>
+<li>SSE: topic parse, <code>card:{id}</code> resolution, 200/topic replay, 15 s keepalive. <code>cargo test -p conveyor-api --test sse_board</code>.</li>
+<li>Webhook CRUD + <code>webhook.deliver</code>. <code>cargo test -p conveyor-api --test webhook_shape</code>.</li>
+<li><code>admin fixture|import|export|diff board</code>, as §5. <code>cargo run -p conveyor-server -- admin diff board --help</code></li>
+<li>Gate (§7); <code>cargo clippy --workspace --all-targets -- -D warnings</code>; lock refresh.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+command -v k6 || brew install k6   # k6 is not installed (CONTRACT §16)
+docker compose up -d db &amp;&amp; cargo run -p conveyor-server -- migrate --dev-seed
+CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- serve &amp;
+trap &#39;kill %1 2&gt;/dev/null || true&#39; EXIT
+API=http://127.0.0.1:8930
+F=tests/fixtures/board/v1-1000.json
+T=$(psql &quot;$DATABASE_URL&quot; -tAc &quot;select id from tenant where slug=&#39;dev-a&#39;&quot;)   # pinned to dev-a: `dev:alice` is its principal (`tenant` has no RLS)
+B=$(cargo run -q -p conveyor-server -- admin import board --file $F --tenant $T | jq -r .board_id)
+cargo run -p conveyor-server -- admin export board --board $B &gt; /tmp/out.json
+cargo run -p conveyor-server -- admin diff board $F /tmp/out.json
+k6 run -e BASE_URL=$API -e BOARD_ID=$B -e DEV_AUTH_TOKEN=dev:alice tests/load/board.js   # the script sends `authorization: Bearer ${__ENV.DEV_AUTH_TOKEN}` (CONTRACT §10)
+cargo test -p conveyor-api --test position --test webhook_shape --test race_move --test sse_board
+test -z &quot;$(psql &quot;$DATABASE_URL&quot; -tAc &quot;select tablename from pg_tables where schemaname=&#39;public&#39; and tablename in (&#39;card_membership&#39;,&#39;attachment&#39;)&quot;)&quot;   # property (f): neither table exists (catalog read, no RLS)</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>replay fidelity</td>
+<td>1,000 cards/10 lists: every card, list, position, label, comment, task and field value matches; <code>admin diff</code> prints zero deltas</td>
+</tr>
+<tr>
+<td>b</td>
+<td>one winner</td>
+<td>two clients move one card with the same <code>If-Match</code>: one 200, one <strong>412 with the current representation</strong>; <code>version</code> +1</td>
+</tr>
+<tr>
+<td>c</td>
+<td>1k load</td>
+<td><code>GET /api/boards/{id}/cards?limit=200</code> p95 <strong>≤ 120 ms</strong> at 20 rps; 1,000 cards in 5 pages <strong>≤ 500 ms</strong>, no sort in Rust</td>
+</tr>
+<tr>
+<td>d</td>
+<td>webhook shape</td>
+<td><code>{event,data,prevData,user}</code> exactly; <code>event</code> is the register type (<code>card.moved</code>), <code>data.list_id</code> the new lane and <code>prevData.list_id</code> the old. Planka's <code>cardUpdate</code>/<code>listId</code> spelling is a deferred cutover adapter (S14), not the emitter's vocabulary</td>
+</tr>
+<tr>
+<td>e</td>
+<td>SSE</td>
+<td>a second client on <code>board:{id}</code> gets <code>card.moved</code> <strong>≤ 200 ms</strong> after the mover's 200, live and on replay</td>
+</tr>
+<tr>
+<td>f</td>
+<td>no second store</td>
+<td><code>\dt</code> shows one <code>comment</code>, one <code>board_membership</code>; no <code>card_membership</code>, no <code>attachment</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>The Planka fork is not on this machine.</strong> Port from the openapi (2.0.0-rc.4, 67 paths) + live <code>kanban</code> schema only. The per-event <code>data</code> envelope, <code>List.type</code> transitions and position seeding are <code>UNVERIFIED</code> — measure, never guess.</li>
+<li><strong><code>position numeric</code> midpoints.</strong> <code>(a+b)/2</code>, append <code>max+1024</code>, never float; floats degrade after ~50 halvings and need the renumber job nobody writes.</li>
+<li><strong><code>list.kind</code> ≠ Planka's <code>List.type</code>.</strong> Measured enum <code>active|closed|archive|trash</code> has no <code>intake</code>/<code>waiting</code>/<code>done</code>. The export carries <strong>our</strong> <code>kind</code>; import maps <code>closed|trash → archive</code> and infers nothing. <code>Card.isClosed</code> → <code>archived_at</code>.</li>
+<li><strong>Attachments and card memberships are OUT</strong> (SPEC §2); <code>Card.coverAttachmentId</code> has no target column. <strong>One role enum, not three</strong> — no <code>project_manager</code>, <code>board_subscription</code> or <code>user_roles</code> on this path.</li>
+<li><strong>A webhook fires on the event, never a second write path.</strong> A mutation that forgets its <code>event</code> row loses webhook and SSE — assert <code>event_count = 1</code> in every action test.</li>
+<li><strong>Cursor pagination, never OFFSET</strong> — concurrent drags skip and duplicate rows.</li>
+<li><strong>Event-name drift.</strong> The names are <code>card.moved</code>/<code>card.archived</code>, not <code>cards.moved</code>; S05 owns them because it ships the actions. <code>commentsTotal</code> is a query, not a column.</li>
+<li><strong>Duplicate copies labels, tasks and field values — never comments</strong> (a copied thread is false history). <strong>The live Planka DB is five test cards</strong>; no gate reads it as evidence.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S5-D1</td>
+<td><code>board-export/v1</code>, key references, recorded + generated fixtures</td>
+<td>uuids make a diff meaningless; live DB is test data</td>
+</tr>
+<tr>
+<td>S5-D2</td>
+<td>zero REST write routes; every write is an action</td>
+<td>one write path makes audit, idempotency and webhooks unskippable</td>
+</tr>
+<tr>
+<td>S5-D3</td>
+<td><code>custom_field_group</code> dropped into two columns</td>
+<td>the group is a label, never joined</td>
+</tr>
+<tr>
+<td>S5-D4</td>
+<td><code>card:{id}</code> = board topic + <code>aggregate_id</code> filter</td>
+<td>one outbox row, no fan-out duplication</td>
+</tr>
+<tr>
+<td>S5-D5</td>
+<td><code>projects.create</code> creates the default board and lists</td>
+<td>no <code>boards.create</code> exists, and a board-less project is unusable</td>
+</tr>
+<tr>
+<td>S5-D6</td>
+<td><code>cards.create</code> accepts any non-archive list</td>
+<td>birth is not a transition; the matrix has no from-state</td>
+</tr>
+<tr>
+<td>S5-D7</td>
+<td>webhooks drained by a job from <code>event</code></td>
+<td>a synchronous POST couples the mutation to a third party</td>
+</tr>
+<tr>
+<td>S5-D8</td>
+<td><code>assignee_id</code>, <code>stopwatch_*</code> never written here</td>
+<td>contract §4: the claim is S06's conditional UPDATE</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Full Planka event vocabulary or the proved subset?</td>
+<td>subset; rest <code>UNVERIFIED</code> until measured</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Label colour free text or the 20 named colours?</td>
+<td>free text, seed the 20</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Multi-select: <code>ids[]</code> batch or N calls?</td>
+<td>N calls until S12 measures a need</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Export archived cards?</td>
+<td>no — archives are history and would make every diff permanent</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S05-board.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

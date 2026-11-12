@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 1 — budgeted compile + the role component — evidence · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-BUDGET.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-1--budgeted-compile--the-role-component--evidence">S21 step 1 — budgeted compile + the role component — evidence</h1>
+<p>Measured 2026-11-09 on mini3; every Rust command through <code>rbuild</code> on m1 (CONTRACT §16). Lane <code>s21-message-construction</code>, joining the D27 seam that <code>s13-agent-inference-nodes</code> built.</p>
+<h2 id="built">Built</h2>
+<ul>
+<li><code>migrations/0031_s21_prompt_budget.sql</code> — <code>prompt.budget_chars</code> and <code>prompt_section.budget_chars</code> (nullable = unbounded, <code>&gt; 0</code> by CHECK) and <code>'role'</code> added to <code>prompt_section.source_kind</code>. Grants are re-applied by <code>migrate</code> (0030's rule); no grant block.</li>
+<li><code>crates/domain/src/prompt.rs</code> — <code>PromptSource::Role</code>; <code>PromptSection.budget_chars</code> and <code>PromptDefinition.budget_chars</code>; <code>CapabilityFacts.intended_role</code>; two refusals, <code>SectionOverBudget { kind, measured, limit }</code> and <code>PromptOverBudget { measured, limit }</code>. <code>compile()</code> stable-sorts sections by <strong>trust rank</strong> (instructions → procedure → capability/role → knowledge → project/card), measures each rendered block (heading included, <code>.chars().count()</code>) against its section ceiling, measures the joined text against the prompt ceiling, and only then hashes. <strong>Nothing is truncated</strong>: both errors carry the measured size, and <code>budget = measured</code> compiles while <code>measured - 1</code> refuses.</li>
+<li><code>crates/store/src/prompt.rs</code> — the recipe read carries both budget columns; <code>read_capability</code> reads <code>capability_agent.params</code> and exposes <code>params-&gt;&gt;'role'</code> as <code>intended_role</code> (empty when the binding declares none). <code>params</code> is existing editable config on <code>capability_agents.create|update</code>, so no action schema and no served-spec hash moves.</li>
+<li><code>crates/store/src/seed.rs</code> — <code>agent@1</code> gains the optional <code>role</code> section and is ordered <code>system, procedure, capability, role, knowledge, project_card</code>. Additive: an existing tenant's row is never rewritten.</li>
+<li><code>crates/actions/src/prompt/mod.rs</code> — <code>PromptError::BudgetExceeded { reference, section, measured, limit }</code>, mapped to <code>409 capability_not_ready</code> with field <code>prompt_ref</code>, code <code>prompt_over_budget</code>, and a detail naming the section (or the whole prompt) and both numbers.</li>
+<li>No new action, scope, route, event or table. The served spec and <code>served-spec.lock.json</code> are untouched (the last settling lane writes the lock).</li>
+</ul>
+<h2 id="evidence">Evidence</h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rbuild -- test -p conveyor-domain prompt::</code></td>
+<td><strong>6 passed / 0 failed</strong> — every source renders in trust order; a missing required source refuses by name; a required role with no declared role refuses; the section budget boundary; the prompt budget boundary; byte-identical hashing</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-store --lib</code></td>
+<td><strong>37 passed / 0 failed</strong> — including <code>embedded_migrations_are_exactly_the_s0_set</code>, now <strong>1…31</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-store --test prompt_catalogue</code></td>
+<td><strong>4 passed / 0 failed</strong> — the seeded <code>agent@1</code> lists the six kinds in trust order; the budget round-trips; a <code>budget_chars = 0</code> insert is refused by <code>prompt_budget_chars_positive</code> / <code>prompt_section_budget_chars_positive</code></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test prompt_compile</code></td>
+<td><strong>4 passed / 0 failed</strong> — the two original refusals, an over-budget whole-prompt recipe through <code>compile_for_audit</code> with its <code>409 prompt_over_budget</code> mapping (at the measured size it compiles), and a section-budget recipe proving the refusal names the section and the detail says "the system section"</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test procedure_agent_resolved</code></td>
+<td><strong>1 passed / 0 failed</strong> — a real <code>procedure.step</code> → <code>agent.run</code> compile; the binding's <code>params = {"role": "resolver"}</code> renders <code>## Role\nrole: resolver</code>; the ledger still records <code>agent@1</code> + a 64-char hash</td>
+</tr>
+<tr>
+<td><code>rbuild -- clippy -p conveyor-domain -p conveyor-store -p conveyor-actions --all-targets -- -D warnings</code></td>
+<td>exit <strong>0</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- fmt -p conveyor-domain -p conveyor-store -p conveyor-actions -- --check</code></td>
+<td>clean for every file this lane touched; the remaining diffs are peer files (<code>eval/**</code>, <code>parity_http_mcp.rs</code>, <code>registry.rs</code>, <code>n8n_migration.rs</code>, and <code>seed.rs</code>'s new tenancy/benchmark blocks)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs-each-fired-then-restored">Reversal proofs (each fired, then restored)</h2>
+<ol type="1">
+<li><strong>Section budget removed</strong> (<code>&amp;&amp; false</code> on the ceiling check) → <code>an_over_budget_section_refuses_with_its_measured_size_never_truncates</code> <strong>FAILED</strong>.</li>
+<li><strong>Prompt budget removed</strong> → <code>an_over_budget_prompt_refuses_with_the_measured_total_never_truncates</code> <strong>FAILED</strong>.</li>
+<li><strong>Role render arm deleted</strong> (<code>PromptSource::Role =&gt; None</code>) → <code>every_source_renders_into_its_own_labelled_block_in_trust_order</code> <strong>FAILED</strong> (the required-role refusal still passes, correctly: the source is absent either way).</li>
+<li><strong>Trust sort removed</strong> → the same trust-order test <strong>FAILED</strong> (the recipe lists project/card before role and knowledge).</li>
+</ol>
+<h2 id="independent-audit">Independent audit</h2>
+<p>A fresh <code>validator-deep</code> that wrote none of this returned <strong>YES</strong> across the six claims (domain compile/trust order/budget/role, store round-trip + CHECKs, actions mapping, clippy). Its two non-blocking findings were closed before handoff:</p>
+<ul>
+<li>the heading-inclusive measurement was not pinned by a mutation, so a future refactor could have measured only the body and silently loosened every section budget. The domain test now asserts <code>measured</code> byte-for-byte against <code>body + "## Project and card\n"</code>;</li>
+<li>the <code>Some(section)</code> arm of the action mapping was unasserted. <code>prompt_compile</code> now has a section-budget case that proves <code>section == Some(System)</code> and the detail names the section.</li>
+</ul>
+<p>Re-measured after both fixes: domain prompt <strong>6/6</strong>, <code>prompt_compile</code> <strong>4/4</strong>, clippy clean.</p>
+<h2 id="found-on-the-way">Found on the way</h2>
+<p><code>crates/store/src/migrate.rs</code>'s <code>embedded_migrations_are_exactly_the_s0_set</code> expected the embedded set to end at <strong>29</strong> while <code>0030_prompt_catalogue.sql</code> was already on disk and embedded — a red test in the shared tree since the prompt-catalogue session updated <code>s07_schema.rs</code> only. Both ledger lists now carry <strong>30</strong> and <strong>31</strong>.</p>
+<h2 id="remaining-for-s21-not-built-here">Remaining for S21 (not built here)</h2>
+<ul>
+<li>the <code>plan</code> projection over the step DSL (§6) — a later step by the slice's own words;</li>
+<li>tenant-authored recipes (open question 4) — needs a CRUD surface and its audit gate;</li>
+<li>memory selection (open question 3) — <code>PromptFacts</code> carries no recalled items yet.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-BUDGET.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

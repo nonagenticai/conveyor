@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S15 step 12 — capability readiness — evidence · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S15-READINESS.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s15-step-12--capability-readiness--evidence">S15 step 12 — capability readiness — evidence</h1>
+<p>Measured 2026-11-09 on mini3; every Rust command through <code>rbuild</code> on m1 (CONTRACT §16).</p>
+<h2 id="built">Built</h2>
+<ul>
+<li><code>crates/actions/src/capability/readiness.rs</code> — one computation, <code>capability_readiness_tx</code> (<code>domain::capability::Readiness</code> blockers): capability exists and is <code>active</code>; exactly one active <code>capability_agent</code>; its <code>prompt_ref</code> is an <strong>active</strong> catalogue pin (absent or retired is a blocker); every <code>allowed_actions</code> entry is registered; every <strong>required</strong> knowledge pack resolves to at least one leaf. <code>readiness_fields</code> maps the blockers to <code>FieldError</code> <strong>once</strong>.</li>
+<li>Both surfaces consume that one mapping: <code>capabilities.get</code> returns <code>{ready, blocking[]}</code> and <code>procedure_runs.start</code>'s <code>ensure_start_ready</code> refuses <code>409 capability_not_ready</code> with the same array in <code>errors[]</code>.</li>
+<li>The guard's own vocabulary is deleted (it had <code>no_active_agent</code>, <code>unknown_action</code>, <code>bad_prompt_ref</code>, <code>knowledge_pack_unavailable</code>, …). The stable codes are now the domain's: <code>capability_missing</code>, <code>capability_not_active</code>, <code>agent_missing</code>, <code>agent_ambiguous</code>, <code>action_not_registered</code>, <code>pack_not_published</code>, <code>pack_unavailable</code>, <code>knowledge_not_configured</code>, <code>prompt_unresolved</code>.</li>
+<li><code>prompt_ref</code> resolvability is a readiness fact (row k amended), read from the tenant's catalogue (<code>store::prompt::get_prompt_tx</code>, S13's <code>0030</code>); <code>prompt_unresolved</code> is the executor's own code.</li>
+<li>The empty-leaves defect: <code>pack_leaves</code> returns <code>Ok(vec![])</code> for a published-but-empty pack; the old guard passed it. <code>pack_state</code> now treats emptiness as <code>pack_not_published</code> (CONTRACT §17's "no resolvable leaves").</li>
+<li>No new action, scope, event or migration. Live registry <strong>266 actions</strong> · <code>AGENT_TOOLS</code> <strong>40</strong>.</li>
+</ul>
+<h2 id="evidence">Evidence</h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rbuild -- test -p conveyor-domain readiness</code></td>
+<td><strong>6 passed / 0 failed</strong> (2 are this lane's)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test capability</code></td>
+<td><strong>9 passed / 0 failed</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test run_capability</code></td>
+<td><strong>3 passed / 0 failed</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-api --test capability_readiness</code></td>
+<td><strong>3 passed / 0 failed</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-api --test capability_readiness -- --ignored</code></td>
+<td><strong>1 passed / 0 failed</strong> — the live missing-pack case against the real <code>strata_rag</code> (<code>mini3.local:8092</code>, compose <code>strata</code> profile up; the tenant token sealed under the test KEK)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test registry</code></td>
+<td><strong>8 passed / 0 failed</strong> at <code>EXPECTED: [&amp;str; 266]</code></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test parity_http_mcp</code></td>
+<td><strong>4 passed / 0 failed</strong> when run before S20 registered <code>eval_runs.regrade</code>; the same binary is now red only on that action's missing sample (<code>missing ["eval_runs.regrade"]</code>, S20's lane — <code>capabilities.get</code>'s sample is present and passed)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --lib readiness</code></td>
+<td><strong>1 passed / 0 failed</strong> (the pack decision table)</td>
+</tr>
+<tr>
+<td>scoped <code>clippy -- -D warnings</code> (domain lib+tests; actions lib + the two targets; api target)</td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td><code>rustfmt --edition 2024 --check</code> on every file this lane touched</td>
+<td>clean</td>
+</tr>
+</tbody>
+</table>
+<p>The live case proves exactly row j's first clause: <code>capabilities.bind_knowledge</code> pins <code>capability-design@999</code> as <code>required</code> → <code>capabilities.get</code> reports <code>ready:false</code> with <code>pack_not_published</code> → <code>procedure_runs.start</code> is <code>409 capability_not_ready</code> with the same code and <strong>zero</strong> <code>run</code>/<code>run_step</code> rows.</p>
+<h2 id="reversal-proofs">Reversal proofs</h2>
+<ol type="1">
+<li><strong>Empty leaves.</strong> Deleting the <code>Ok(leaves) if leaves.is_empty()</code> arm from <code>pack_state</code> fails the unit test (<code>left: None</code>, <code>right: Some(NotPublished)</code>); restored.</li>
+<li><strong>Unregistered action.</strong> Deleting the <code>ActionNotRegistered</code> push fails <code>readiness_reports_each_blocking_fact</code> (GET), and on the start path <code>run_capability</code> returns <strong>201</strong> — the run started — instead of <code>409</code>; restored.</li>
+</ol>
+<h2 id="carried-proof--the-0020-cataloguecapability-move-on-a-pre-existing-row">Carried proof — the <code>0020</code> catalogue→capability move on a pre-existing row</h2>
+<p>A dedicated ephemeral <code>postgres:18</code> container (no volume, removed afterwards; the compose dev DB was not touched): <code>scripts/db-roles.sql</code>, the <code>_sqlx_migrations</code> table, then all migrations <code>0001</code>–<code>0030</code> applied in filename order. A <code>catalogue_entry(kind='capability', code='legacy_move_probe', label='Legacy Probe', meta='{"description":"from the old vocabulary"}')</code> row was inserted, then the exact move block from <code>migrations/0020_capability.sql:134-145</code> was executed:</p>
+<pre><code>--- moved capability row
+       code        |    label     |       description       | status | meta
+-------------------+--------------+-------------------------+--------+------
+ legacy_move_probe | Legacy Probe | from the old vocabulary | active | {}
+(1 row)
+--- catalogue rows left with kind=capability
+ remaining
+-----------
+         0
+(1 row)</code></pre>
+<p>The description was lifted out of <code>meta</code>, the status mapped from <code>is_active</code>, and the catalogue row was deleted. (The sqlx ordering itself is already proven by the fresh-DB ledger tests.)</p>
+<h2 id="external-reds-attributed-by-name-not-this-lane">External reds, attributed by name (not this lane)</h2>
+<ul>
+<li>Workspace <code>clippy --workspace --all-targets -- -D warnings</code> stops on <code>crates/actions/tests/approval_expired.rs:87</code> (<code>explicit_auto_deref</code>) — another lane's test.</li>
+<li>Crate-wide <code>cargo fmt --check</code> stops on the tenancy lane's invite test; every file this lane touched is rustfmt-clean by direct check.</li>
+<li><code>--check-lock</code> exits 1: <strong>changed <code>POST /api/actions/capabilities.get/invocations</code></strong> (this lane's output schema + timeout) and <strong>added six <code>/api/platform|tenants</code> routes</strong> (the tenancy lane, in flight). No other action drifted. The lock on disk is 287 ops, sha256 <code>47550345fe643d35361f32cc07d7e7c9208a068f3f238b407a8c6da333846fd9</code>, with <code>capabilities.get</code> still at <code>070d0c0a…</code>; the last settling lane writes it, which will make it <strong>293</strong>.</li>
+<li><code>parity_http_mcp</code> is now red on <strong><code>eval_runs.regrade</code> with no sample</strong> — S20's action, registered mid-gate; the set-equality assertion fails before any sample runs. This lane's <code>capabilities.get</code> sample is present and passed in the same binary.</li>
+<li>The api crate was transiently unbuildable during this gate (<code>platform.rs</code> E0308) and the actions crate once after (<code>eval::runs::{RegradeIn,RegradeOut}</code>); both were peers' in-flight edits, both resolved by their owners, and neither is this lane's change.</li>
+</ul>
+<h2 id="known-limits">Known limits</h2>
+<ul>
+<li>Readiness is a LIVE external check for required packs: <code>capabilities.get</code> holds its transaction across up to one <code>pack_leaves</code> call per required binding (the start guard already did). The action budget is 30 s (raised from 15 s to match <code>procedure_runs.start</code>); a tenant with many required packs would need a bounded loop, not a larger timeout.</li>
+<li><code>blocking[]</code> is the GET's field name; the 409 carries the identical <code>Vec&lt;FieldError&gt;</code> in the API-wide <code>errors[]</code> envelope (CCR 1, S15 §13). There is one producing function.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S15-READINESS.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

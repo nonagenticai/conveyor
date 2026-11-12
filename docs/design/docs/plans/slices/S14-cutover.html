@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S14 — Cutover · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S14-cutover.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><p>⚠️ <strong>Amended 2026-11-09 (process model).</strong> The start path is <code>projects.create</code> (the fr webhook is retired, not re-pointed); the Redis bus is part of the deployed stack (<code>conveyor-redis</code>, no PVC); the trace-diff source is the process trace (<code>run_step</code>), and the <code>workflow</code> table is dropped by <code>0034</code> after this slice's dump. The decommission order is unchanged.</p>
+<h1 id="s14--cutover">S14 — Cutover</h1>
+<p>Programme project: S14 · issues #18, #44</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>At the end, <code>conveyor</code> is the only live conveyor service: created (the programme's first git step), deployed, seeded, rehearsed against the frozen old system, switched at the <strong>agent's conveyor registration</strong>, proven by a real <code>agent</code> task, and fr / requirements_management / Planka decommissioned — each dumped first, with a timed rollback rehearsed.</p>
+<h2 id="2-starting-state--preconditions-are-executable-not-asserted">2. Starting state — preconditions are executable, not asserted</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Precondition</th>
+<th>Check — paste output into <code>R0-preflight.txt</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>S13 closed</td>
+<td><code>ssh -i ~/.ssh/deploy-key admin@192.0.2.10 "sudo -u postgres psql -d n8n -Atc 'select count(*) from workflow_entity where \"activeVersionId\" is not null'"</code> → <code>0</code> — <strong>S13's close deactivates every flow it replaces, so 0 is produced there, not here</strong>; <code>parity/n8n-dispositions.tsv</code> (S13's deliverable) has 348 rows</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>S06b closed</td>
+<td><code>docs/evidence/S06b-agent-task.md</code> exists with a <code>run_id</code>, a project id and one decided approval, plus the imported tool keys (<code>projects.create</code>, not <code>tool.*</code>)</td>
+</tr>
+<tr>
+<td>P3</td>
+<td><code>parity.yaml</code> signed</td>
+<td>`yq -r '[.[]</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>Old system frozen (D8)</td>
+<td><code>docs/cutover/freeze-log.md</code> exists, its freeze date is set, and every fr/RM/<code>kanban</code> commit merged since has a disposition (<code>absorbed</code> / <code>not-applicable</code> / <code>dropped</code>)</td>
+</tr>
+<tr>
+<td>P5</td>
+<td>8930 free</td>
+<td>local: <code>lsof -nP -iTCP:8930 -sTCP:LISTEN</code> → empty (measured free 2026-11-07). In-cluster: <code>kubectl get svc -A -o json | jq -r '.items[].spec.ports[]?.port' | grep -x 8930</code> → empty</td>
+</tr>
+<tr>
+<td>P6</td>
+<td>Disk</td>
+<td><code>df -h /srv/backups</code> on master ≥ 3× the three dumps; doubt ⇒ STOP, never prune</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ P2 is the <strong>local</strong> S06b evidence. The <strong>live</strong> <code>agent</code> task against the deployed conveyor is S14's gate (§7), not its precondition — do not start S14 believing the agent path is already proven.</p>
+<p>⚠️ <strong>P2 proves S06b's tool contract, not the one live at T0.</strong> The agent platform is developed in parallel on another machine. Before step 14, import the deployed conveyor's <code>/mcp</code> tool list into a scratch tenant and diff the resulting op keys and schemas against S06b's evidence. A difference is a cutover decision to record, never a silent pass — the agent platform is stranded by a renamed tool or a changed schema, not by a 500.</p>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN:</strong> archived-repo decision; repo + CI; namespace/service/DB/roles/PgBouncer/secret; ImagePolicy; ingress; Keycloak realm/clients; licence; <code>migrate --seed</code>; rehearsals R1–R4; cutover T0; the agent's conveyor registration; decommission of <code>fr</code>/<code>requirements</code>/<code>kanban</code>; dump + restore test; rollback rehearsal and runbook.</p>
+<p><strong>OUT:</strong> data migration (D7 — nothing is copied; the conveyor starts empty); <code>mcp_server</code> (stays as the gateway for the agent platform's other backends; only its <code>fr</code> toolkit retires); <code>agent</code> (it changes only its conveyor registration and credential); <code>licenses</code>/<code>billing_service</code>/<code>coding-*</code> (external, D12/D14); the <code>n8n</code> deployment's removal (flows retired at S13; the idle process stays, see §9.9); <code>kata-n8n</code>.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SPEC.md</code> §4.5, §8 S14, §9, §11 R7/R9/R11</td>
+<td>the channel contract, the cutover order, the three risks</td>
+<td>the sequence and gates</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>01-CONTRACT.md</code> §2, §9, §10, §13, §14</td>
+<td>roles, licence, compose/port rules, "no <code>git init</code> before repo creation"</td>
+<td>the values in §5</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>02-source-map/40-live-state.md</code></td>
+<td>Loki <code>24h</code>; n8n 348/332; Planka test-only; fr 86 domain tables (90 relations)</td>
+<td>the evidence classes</td>
+<td>"no traffic" as proof</td>
+</tr>
+<tr>
+<td><code>02-source-map/30-rm-planka-mcp-n8n.md</code> §2, §3</td>
+<td>the old <code>mcp_server</code> channel (historical, superseded); Planka namespace <code>kanban</code></td>
+<td>the <code>fr</code> toolkit's retirement</td>
+<td>the HMAC channel (D19 retires it)</td>
+</tr>
+<tr>
+<td><code>$HOME/Movies/gitops-production</code> @ <code>c269b5c96ade</code> (read-only)</td>
+<td><code>scripts/new-rust-target.sh</code>, <code>.github/workflows/rust-service.yml</code>; <code>services/{fr,mcp,pgbouncer,cloudflared-apps}</code>, <code>istio/app-hosts/</code>, <code>flux-system/image-automation.yaml</code>, <code>policies/cross-namespace/</code></td>
+<td>shapes and current values</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor</code> (archived)</td>
+<td>measured 2026-11-07: <code>archived=true</code>, <code>pushed_at 2026-10-29</code></td>
+<td>the name conflict</td>
+<td>its content (dead)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables--the-values-fixed-here">5. Deliverables — the values, fixed here</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>repo</td>
+<td><code>nonagenticai/conveyor</code> <strong>after</strong> the archived repo is renamed (§9.1)</td>
+</tr>
+<tr>
+<td>namespace / service</td>
+<td><code>conveyor</code> / <code>conveyor.conveyor.svc.cluster.local:8930</code></td>
+</tr>
+<tr>
+<td>host (D16)</td>
+<td><code>conveyor.nonagentic.ai</code> — a <strong>new</strong> host; <code>fr.nonagentic.ai</code> is not re-pointed</td>
+</tr>
+<tr>
+<td>DB</td>
+<td><code>conveyor</code>; <code>conveyor_migrate</code> owns the schema; <code>conveyor_runtime</code> is <code>NOSUPERUSER NOBYPASSRLS</code></td>
+</tr>
+<tr>
+<td>URLs</td>
+<td><code>DATABASE_URL</code> → <code>pgbouncer.pgbouncer.svc.cluster.local:6432</code>; <code>DATABASE_MIGRATE_URL</code> → <code>postgres.example.com:5432</code></td>
+</tr>
+<tr>
+<td>PgBouncer</td>
+<td><code>conveyor = host=postgres.example.com port=5432 dbname=conveyor pool_size=12</code> (fr's shape)</td>
+</tr>
+<tr>
+<td>Keycloak (D13)</td>
+<td>realm <code>conveyor</code>; <code>conveyor-web</code> public PKCE; <code>conveyor-backend</code> confidential service account</td>
+</tr>
+<tr>
+<td>licence</td>
+<td><code>app_key=conveyor</code>; <code>GET /licenses/active?tenant_id=&amp;app_key=conveyor</code>; synced into <code>app_licence</code></td>
+</tr>
+<tr>
+<td>ingress</td>
+<td><code>conveyor-public-vs</code> in <code>istio/app-hosts/virtualservices.yaml</code>, gateway <code>n8n-gateway</code>, → <code>:8930</code>; host added to <code>cloudflared-apps/configmap.yaml</code>; <code>dns-ensure</code> creates the CNAME (≤10 min)</td>
+</tr>
+<tr>
+<td><strong>channel value 1</strong></td>
+<td><code>MCP_FR_BASE_URL</code>: <code>http://fr-backend.fr.svc.cluster.local:8888</code> → <strong><code>http://conveyor.conveyor.svc.cluster.local:8930</code></strong></td>
+</tr>
+<tr>
+<td><strong>channel value 2</strong></td>
+<td><code>MCP_FR_CHANNEL_SECRET</code> (mcp) = <code>FR_MCP_CHANNEL_SECRET</code> (conveyor) — one value, two names; rotated at T0</td>
+</tr>
+<tr>
+<td>andon</td>
+<td><code>POST /api/actions/andon.engage/invocations</code> and <code>…/andon.release/invocations</code> (S06's two actions — there is no separate <code>/api/andon</code> route) + an <code>andon_state</code> row the engine reads</td>
+</tr>
+<tr>
+<td>port</td>
+<td><strong>8930</strong> (never 8000)</td>
+</tr>
+</tbody>
+</table>
+<p>Also delivered: <code>docs/cutover/freeze-log.md</code>, <code>docs/cutover/rollback.md</code>, <code>docs/cutover/evidence/R0..R7-*</code> (<code>.md</code>, except the parity record <code>R5-parity-final.txt</code>), <code>docs/cutover/fixtures/</code> (recorded payloads).</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li><strong>Name decision (day 1).</strong> <code>GH_SHIM=off gh api repos/nonagenticai/conveyor</code> → <code>archived=true</code>; rename: <code>GH_SHIM=off gh repo rename conveyor-archive -R nonagenticai/conveyor --yes</code>. George authorises (deleting forfeits history). ⚠️ If an archived rename is refused (<strong>UNVERIFIED</strong>): unarchive → rename → re-archive. Verify 404.</li>
+<li><strong>Create the repo</strong> (the programme's first <code>gh repo create</code>; contract §13 — no local <code>git init</code> before it). Run <code>new-rust-target.sh nonagenticai/conveyor --name-ok</code> with <code>REGISTRY_USERNAME</code>/<code>REGISTRY_PASSWORD</code> exported and <code>GH_SHIM=off</code>, after a <code>--dry-run</code>. <code>--name-ok</code> because the name lacks <code>-rs</code>; no <code>--source</code>. Then clone, copy the local docs tree in, commit, push.</li>
+<li><strong>CI wiring.</strong> <code>.github/workflows/ci.yml</code> calls <code>rust-service.yml@main</code> with <code>image_name: conveyor</code>, <code>deploy_namespace: conveyor</code>, <code>working_directory: "."</code>, <code>cargo_package: ""</code> (empty ⇒ <code>--workspace</code>), <code>rust_toolchain: "1.99.0"</code> (default 1.98.0 — pass it). Green CI + image in <code>registry.example.com:5000</code>.</li>
+<li><strong>Database + roles</strong>, direct on the primary (<code>postgres.example.com</code>, never through PgBouncer): <code>sudo -u postgres psql -v ON_ERROR_STOP=1 -c "create role conveyor_migrate login password '…'; create role conveyor_runtime login nosuperuser nobypassrls password '…'; create database conveyor owner conveyor_migrate;"</code> New DB, new user — never another service's role (D1).</li>
+<li><strong>Deploy shape.</strong> <code>services/conveyor/{namespace,deployment,service,networkpolicy,secrets.sops.yaml,kustomization}.yaml</code>; <code>migrate</code> as an explicit pre-rollout step; PgBouncer stanza; ImageRepository + ImagePolicy in <code>flux-system/image-automation.yaml</code>; AuthorizationPolicies <code>mcp → conveyor:8930</code> and <code>conveyor → mcp:8033</code> (<strong>measured 2026-11-07</strong>: <code>services/mcp/deployment.yaml</code> containerPort <code>8033</code>; the external driver is <code>8036</code>). A missing cross-ns object is a silent refusal. Check: <code>kubectl -n conveyor get networkpolicy,deploy,svc</code>.</li>
+<li><strong>Ingress.</strong> <code>conveyor-public-vs</code> copying <code>fr-public-vs</code> (no oauth2-proxy; the app does its own OIDC) plus the cloudflared host. Do <strong>not</strong> add the host to <code>AUTH_REQUIRED_HOSTS</code> in <code>envoy-filters/ext-authz-enforce.yaml</code>. Gate: <code>curl -sf https://conveyor.nonagentic.ai/health</code>.</li>
+<li><strong>Identity + licence.</strong> Realm <code>conveyor</code> + both clients via the Keycloak admin REST at <strong><code>https://auth.nonagentic.ai/admin/realms</code></strong> (fr already calls <code>/admin/realms/{realm}/users/{id}</code>, measured 2026-11-07); the <code>conveyor</code> app row is <code>POST /apps</code> (<code>operation_id=create_app</code>, 201) and the tenant licence is <code>POST /licenses/user/{subject_id}</code> (<code>create_user_license</code>) in <code>licenses</code> — <strong>measured from <code>$HOME/Movies/licenses/main.py</code></strong>; then one <code>app_licence</code> sync from <code>GET /licenses/active?tenant_id=&amp;app_key=conveyor</code>. Also create <strong>one Keycloak test user</strong> in the <code>conveyor</code> realm (a real principal with a membership in the cutover tenant) — S12's e2e suite logs in with it (<code>E2E_USER</code>/<code>E2E_PASS</code>), because dev-auth is refused in production. Check: <code>curl -s -H "Authorization: Bearer $KC_TOKEN" https://auth.nonagentic.ai/admin/realms/conveyor | jq -e '.realm=="conveyor"'</code>.</li>
+<li><strong>Seed</strong> — <code>migrate --seed</code>, idempotent, no hand-written SQL: the S07 catalogue (re-count: card types 293, project-type↔︎card-type 282, capabilities 68, phases 32, WIP limits 26, project types 26 — <code>count(*)</code> first, <code>40-live-state.md</code> shows estimates), the card-type × phase × list matrix derived from the 280 retired flows, one tenant, the first <code>super_admin</code> from its Keycloak <code>sub</code>, and the licence sync. No operational data (D7).</li>
+<li><strong>Rehearsal R1 — real conveyor, n8n still executing</strong> (SPEC §9). Drive one card intake → active → <code>waiting_approval</code> → done on the new app while <code>n8n</code> is live; approval answered over the MCP channel. Evidence <code>R1-live-n8n.md</code>: card id, run id, approval id, one 204, and proof no request reached fr/RM/Planka. Check: <code>curl -sf localhost:8930/api/actions/cards.create -X POST -H "authorization: Bearer $TOK" -H 'content-type: application/json' -d '{"input":{"board_id":"…","name":"R1 card","card_type_code":"…"}}' | jq -e '.id'</code>, then the same card's <code>run</code> and <code>approval</code> ids appear in <code>GET /api/actions/runs.list</code>.</li>
+<li><strong>Rehearsal R2 — replay.</strong> Replay <code>docs/cutover/fixtures/</code> (bodies recorded in S00) through <code>POST /api/actions/{name}/invocations</code>; every fixture must be accepted or rejected for the <em>declared</em> schema reason. Evidence <code>R2-replay.md</code> (one line per fixture). Check: <code>for f in docs/cutover/fixtures/*.json; do printf '%s %s\n' "$(jq -r .action "$f")" "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H "authorization: Bearer $TOK" -H 'content-type: application/json' "localhost:8930/api/actions/$(jq -r .action "$f")/invocations" -d @"$f")"; done &gt; docs/cutover/evidence/R2-codes.txt</code> and then <code>! grep -qE ' (0[0-9]{2}|5[0-9]{2})$' docs/cutover/evidence/R2-codes.txt</code> — one <code>&lt;action&gt; &lt;code&gt;</code> per line, and an unreachable target or a server fault cannot be read as a declared refusal.</li>
+<li><strong>Rehearsal R3 — in-app engine.</strong> Execute the S13 re-authored procedures/workflows and diff the execution trace against the retired flows. Evidence <code>R3-inapp-engine.md</code>. Check: <code>cargo test -p conveyor-workflow --test trace_diff</code>.</li>
+<li><strong>Rehearsal R4 — rollback drill, timed.</strong> Switch the agent's conveyor registration, run an agent task, switch back, run again; record wall-clock minutes (<code>R4-rollback.md</code>; target ≤ 15 min). A drill needing a code change has failed. Check: <code>S=$(date +%s); &lt;switch + task + switch back&gt;; echo $(( ($(date +%s)-S)/60 )) min</code> and the number is in the file.</li>
+<li><strong>T0 — freeze, dump, final parity.</strong> Engage andon; scale <code>fr</code>, <code>requirements</code>, <code>kanban</code> deployments to 0; then `D=/srv/backups/pg/cutover-<date>; sudo -u postgres mkdir -p "<span class="math inline">$D"; for db in fr requirements_api kanban; do
+sudo -u postgres pg_dump -Fc -d "$</span>db" -f "<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>/</mi></mrow><annotation encoding="application/x-tex">D/</annotation></semantics></math>db.dump" &amp;&amp; sudo -u postgres pg_restore --list "<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>/</mi></mrow><annotation encoding="application/x-tex">D/</annotation></semantics></math>db.dump"
+<blockquote>
+<p>/dev/null &amp;&amp; sha256sum "<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>/</mi></mrow><annotation encoding="application/x-tex">D/</annotation></semantics></math>db.dump"; done<code>, then </code>rsync "$D/"<code>to</code>mf1:/srv/backups/pg/cutover-<date>/<code>. Then the final parity pass (§7) as </code>R5-parity-final.txt<code>. The nightly </code>pg_dumpall` is <strong>not</strong> a substitute.</p>
+</blockquote></li>
+<li><strong>T0 — switch the agent's registration.</strong> One change in <code>agent</code>: the conveyor external MCP system's <code>base_url</code> moves to the deployed conveyor and its credential becomes the tenant's conveyor licence. <code>mcp_server</code> needs no change at T0; its <code>fr</code> toolkit is deleted after the live task passes. Merge, then <code>kubectl -n conveyor rollout status deploy/conveyor</code>, then the live <code>agent</code> task (gate). Re-import the deployed <code>/mcp</code> tool list into a scratch tenant and diff the op keys and schemas against S06b's evidence (a difference is a recorded cutover decision). Evidence <code>R6-agent-task.md</code>.</li>
+<li><strong>T+14 — decommission.</strong> Only if no rollback: probe list (§7) green, dumps restore-tested into a scratch database, then <code>kubectl delete ns fr requirements kanban</code>; <code>dropdb fr requirements_api kanban</code> + <code>drop role</code>; remove the pgbouncer stanzas, VirtualService, cloudflared host, ImagePolicies; archive the fr / requirements_management repos. <strong>Kept:</strong> the three dumps + sha256 on master and mf1, <code>docs/cutover/</code>, the freeze log, the <code>planka-private</code> image digest (90 days). Evidence <code>R7-decommission.md</code>.</li>
+<li><strong>Rollback runbook</strong> (<code>docs/cutover/rollback.md</code>, written before T0, exercised in R4): restore = scale the three namespaces back to 1, revert the T0 commit (the registration), <code>rollout status</code>, run a live agent task. Writes made in the conveyor after T0 are <strong>not</strong> migrated back (R9, no data migration either direction) — say so in the runbook. Check: <code>test -s docs/cutover/rollback.md &amp;&amp; grep -q 'not migrated back' docs/cutover/rollback.md</code>.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cd $HOME/Movies/conveyor
+# Export before running; nothing here hard-codes a credential or a host.
+#   export KUBECONFIG=&lt;the k3s kubeconfig&gt;       BASE=https://conveyor.nonagentic.ai
+#   export TOK=&lt;super_admin bearer&gt;              CARD=&lt;a seeded active card id&gt;
+#   export C=$HOME/Movies/gitops-production
+#   export E2E_USER=&lt;the Keycloak test user&gt;     E2E_PASS=&lt;its password&gt;   (S12&#39;s suite logs in with real OIDC
+#                                                                          here: dev-auth is refused in production)
+
+# 1. Parity (R5). S00 §7 makes `acceptance` a typed REFERENCE — `test:&lt;crate&gt;::&lt;name&gt;`,
+#    `e2e:&lt;spec&gt;::&lt;name&gt;`, `probe:&lt;METHOD&gt; &lt;path&gt;` — not a shell command, so run each KIND
+#    rather than piping the strings into a shell (that would exit 127 on the first item).
+test -z &quot;$(yq -r &#39;.[] | select(.status == &quot;used&quot;) | select((.acceptance // &quot;&quot;) | test(&quot;^(test|e2e|probe):&quot;) | not) | .id&#39; parity/parity.yaml)&quot;
+cargo test --workspace                                     # every test:&lt;crate&gt;::&lt;name&gt;
+npx playwright install chromium                                          # a clean host has no browser (S12 §6 step 0)
+BASE_URL=&quot;$BASE&quot; npx playwright test -c apps/web/playwright.config.ts   # every e2e:&lt;spec&gt;::&lt;name&gt;, against the deployed app (S12&#39;s config skips its webServer when BASE_URL is set)
+yq -r &#39;.[] | select(.status == &quot;used&quot;) | .acceptance | select(test(&quot;^probe:&quot;)) | sub(&quot;^probe:&quot;; &quot;&quot;)&#39; parity/parity.yaml \
+  | while read -r m p; do printf &#39;%s %s %s\n&#39; &quot;$(curl -s -o /dev/null -w &#39;%{http_code}&#39; -H &quot;authorization: Bearer $TOK&quot; -X &quot;$m&quot; &quot;$BASE$p&quot;)&quot; &quot;$m&quot; &quot;$p&quot;; done \
+  &gt; docs/cutover/evidence/R5-probes.txt
+test &quot;$(yq &#39;[.[] | select(.status == &quot;used&quot;) | select(.acceptance // &quot;&quot; | test(&quot;^probe:&quot;))] | length&#39; parity/parity.yaml)&quot; \
+     -eq &quot;$(wc -l &lt; docs/cutover/evidence/R5-probes.txt | tr -d &#39; &#39;)&quot;     # one row per probe acceptance; empty only when there are none
+! grep -qE &#39;^(0[0-9][0-9]|5[0-9][0-9]) &#39; docs/cutover/evidence/R5-probes.txt   # no connect failure (000) and no 5xx
+# R5-parity-final.txt still records pass/fail per parity id — the probes above prove reachability,
+# the per-item expectation lives in that file.
+
+# 2. The new app is alive.
+test &quot;$(curl -s -o /dev/null -w &#39;%{http_code}&#39; &quot;$BASE/health&quot;)&quot; = 200
+
+# 3. Andon on the new app (S06 §5.2): `andon.engage {reason}`, `andon.release {}` — andon is
+#    per-tenant singleton state, so there is no id to pass. The 409 is on `runs.create`.
+test &quot;$(curl -s -o /tmp/andon-engage.json -w &#39;%{http_code}&#39; -X POST &quot;$BASE/api/actions/andon.engage/invocations&quot; -H &quot;content-type: application/json&quot; \
+      -H &quot;authorization: Bearer $TOK&quot; -d &#39;{&quot;input&quot;:{&quot;reason&quot;:&quot;cutover gate&quot;}}&#39;)&quot; = 200 &amp;&amp; jq -e . /tmp/andon-engage.json &gt;/dev/null
+test &quot;$(curl -s -o /dev/null -w &#39;%{http_code}&#39; -X POST &quot;$BASE/api/actions/runs.create/invocations&quot; -H &quot;content-type: application/json&quot; \
+      -H &quot;authorization: Bearer $TOK&quot; -d &quot;{\&quot;input\&quot;:{\&quot;card_id\&quot;:\&quot;$CARD\&quot;}}&quot;)&quot; = 409
+test &quot;$(curl -s -o /tmp/andon-release.json -w &#39;%{http_code}&#39; -X POST &quot;$BASE/api/actions/andon.release/invocations&quot; -H &quot;content-type: application/json&quot; \
+      -H &quot;authorization: Bearer $TOK&quot; -d &#39;{&quot;input&quot;:{}}&#39;)&quot; = 200 &amp;&amp; jq -e . /tmp/andon-release.json &gt;/dev/null
+
+# 4. The legacy n8n deployment still exists and this gauge still tracks it (idle, not decommissioned).
+test -n &quot;$(kubectl -n n8n get deploy n8n-worker -o name)&quot;
+
+# 5. No path still reaches fr / RM / Planka — object absence, not belief.
+test -z &quot;$(kubectl get ns fr requirements kanban --ignore-not-found -o name)&quot;   # prints nothing
+! kubectl get svc,deploy -A | grep -qE &#39;fr-backend|requirements|kanban&#39;               # no match
+! grep -qE &#39;^(fr|kanban|requirements)&#39; &quot;$C/clusters/strato/services/pgbouncer/pgbouncer.ini&quot;
+! grep -rq &#39;fr.nonagentic.ai&#39; &quot;$C/clusters/strato/services/cloudflared-apps/configmap.yaml&quot; \
+      &quot;$C/clusters/strato/istio/app-hosts/&quot;
+test &quot;$(curl -s -o /dev/null -w &#39;%{http_code}&#39; https://fr.nonagentic.ai/health)&quot; != 200   # from OUTSIDE the cluster
+
+# 6. Manual evidence that must be on disk before this gate is green.
+for f in R1-live-n8n.md R2-replay.md R3-inapp-engine.md R4-rollback.md R5-parity-final.txt R6-agent-task.md; do test -s &quot;docs/cutover/evidence/$f&quot; || { echo &quot;missing evidence: $f&quot; &gt;&amp;2; exit 1; }; done
+test -s docs/cutover/evidence/R6-agent-task.md   # one real `agent` task end to end: projects.create →
+                                                 # pending-approval → approved through `mcp_server` →
+                                                 # approval.closed → run `succeeded`; project id on
+                                                 # `external_ref`; one activity row
+test -s docs/cutover/evidence/R4-rollback.md     # rollback executed once, timed, ≤ 15 min</code></pre>
+<p>Loki is a <strong>24 h sample</strong>: it can never prove completeness. Only object absence does.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>The archived repo owns the name.</strong> <code>gh repo create</code> returns 422 while <code>nonagenticai/conveyor</code> exists (measured <code>archived=true</code>, <code>pushed_at 2026-10-29</code>). Rename, do not delete.</li>
+<li><strong><code>fr.nonagentic.ai</code> is still live and serving.</strong> D16 keeps the host with the old app until decommission; there is no DNS switch. Re-pointing it early is a split-brain, not a cutover.</li>
+<li><strong>Stranding the agent platform.</strong> One URL + one secret under two names; the MAC is over <strong>raw bytes</strong>, so a re-serialising proxy 401s everything (±300 s skew likewise). Use the in-cluster URL, not the Cloudflare host.</li>
+<li><strong>Deleting a DB before its dump.</strong> D7 discards the data; it does not license dropping a database that was never dumped and restore-tested.</li>
+<li><strong><code>pg_dumpall</code> runs on master</strong> (02:40 UTC, retain 3) — it is not a cutover dump, and a <code>dropdb</code> on master propagates to mf1's streaming standby the moment it commits.</li>
+<li><strong>The freeze is a rule, not a mood.</strong> A "quick fix" to fr/RM/Planka during S14 goes in <code>freeze-log.md</code> and is absorbed or dropped.</li>
+<li><strong>The ext_authz allowlist is an enumeration</strong> — do not add the conveyor host to <code>AUTH_REQUIRED_HOSTS</code>.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li>The archived repo is <strong>renamed to <code>conveyor-archive</code></strong>, never deleted; George authorises, the session executes with <code>GH_SHIM=off</code>.</li>
+<li>Warm window = <strong>14 days</strong>; the <strong>point of no return is <code>dropdb</code></strong>, not the switch — scaling and re-pointing are reversible, dropping is not.</li>
+<li>Cutover is <strong>host-parallel</strong>: <code>conveyor.nonagentic.ai</code> is new; <code>fr.nonagentic.ai</code> is retired only at decommission.</li>
+<li>The channel base URL is the <strong>in-cluster</strong> service address; the secret is <strong>rotated at T0</strong> and both names are changed in one commit.</li>
+<li>A pre-deletion dump is mandatory evidence (three <code>-Fc</code> dumps, restore-tested) even though D7 discards the data.</li>
+<li>Rehearsal evidence is numbered <code>R1</code>–<code>R4</code>, cutover <code>R5</code>–<code>R7</code>, under <code>docs/cutover/evidence/</code>.</li>
+<li>The andon gate is the conveyor's <code>andon_state</code>; it does <strong>not</strong> rely on the fr UI, which is gone.</li>
+<li>Freeze date = the SPEC approval date (2026-11-07); <code>freeze-log.md</code> starts there.</li>
+<li>The legacy <code>n8n</code> deployment stays idle, undecommissioned (flows died at S13; DB dumped at T+14).</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<ol type="1">
+<li><strong>Who gives the T0 go?</strong> Default: George, in writing, after R1–R4 are green.</li>
+<li><strong>14 or 30 days warm?</strong> Default 14.</li>
+<li><strong>Old repos archived or deleted?</strong> Default archive; deletion is a separate, later decision.</li>
+<li><strong>First <code>super_admin</code></strong> — default <code>georgedekker</code>'s Keycloak subject.</li>
+<li><strong>Licence minting path</strong> — resolved 2026-11-07 from <code>$HOME/Movies/licenses/main.py</code>: register the app with <code>POST /apps</code> (<code>create_app</code>, 201), mint the tenant licence with <code>POST /licenses/user/{subject_id}</code> (<code>create_user_license</code>), and sync from <code>GET /licenses/active</code> (<code>get_active_license</code>). Step 7 executes exactly that.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S14-cutover.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

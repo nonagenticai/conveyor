@@ -1,0 +1,162 @@
+# architecture_baseline_harvest — the baseline architecture as a document (v4 P-W4-4).
+#
+# Content sources: seed/catalogue.json (card_type architecture_baseline_harvest: outputs and the
+# READY/DOING/QA/DONE acceptance names) and
+# n8n-designs/design/choices/v4/capabilities/architecture.yaml (text, phase, sections, repo_required
+# and the inspect.criteria the QA stage judges by). The card changes no code: it records the
+# repository's architecture and binds every element to the files that realise it. v4 makes a
+# repository mandatory here — with none there is nothing to harvest.
+card_type: architecture_baseline_harvest
+capability: architecture
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: architecture_baseline_harvest
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: architecture_baseline_harvest.ready
+    title: Architecture baseline harvest — definition of ready
+    definition_of_ready: {checks: [repository_present]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline covers only the baseline's seven sections — context, components, interfaces, data_stores, deployment, code_bindings and risks — and nothing the card does not ask for."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: architecture_baseline_harvest.doing
+    title: Architecture baseline harvest — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every component, interface and data store recorded in the baseline names the repository file and symbol it was read from."}
+      - {name: every_cited_source_exists, text: "Every repository path the baseline cites exists at the commit the card fixed, and the symbol named is in that file."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id, reviewed_artifact_id]
+
+  - key: architecture_baseline_harvest.qa
+    title: Architecture baseline harvest — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, every_component_bound, bindings_cite_repo, deployment_says_its_source, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "The baseline records no component, interface or data store that no cited repository file shows."}
+      - {name: every_component_bound, text: "Every component in components has a line in code_bindings with at least one repository path."}
+      - {name: bindings_cite_repo, text: "Every code binding cites a repository file read at the commit the flow fixed."}
+      - {name: deployment_says_its_source, text: "deployment says it describes the repository's deployment files, not the running system."}
+      - {name: capability_acceptance_met, text: "The baseline meets every acceptance statement the architecture_baseline_harvest card type declares."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id, published_artifact_id]
+
+  - key: architecture_baseline_harvest.done
+    title: Architecture baseline harvest — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The baseline published for the estate to read is the version QA approved; no section changed after review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: architecture_baseline_harvest.system
+    title: Architecture baseline harvest — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: architecture_baseline_harvest.READY
+    list: ready
+    title: Architecture baseline harvest — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: architecture_baseline_harvest
+        sop: architecture_baseline_harvest.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_baseline_harvest.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_baseline_harvest.DOING
+    list: doing
+    title: Architecture baseline harvest — doing
+    outputs: [draft_artifact_id, reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_baseline_harvest.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_baseline_harvest.QA
+    list: qa
+    title: Architecture baseline harvest — QA
+    outputs: [reviewed_artifact_id, published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_baseline_harvest.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_baseline_harvest.DONE
+    list: done
+    title: Architecture baseline harvest — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_baseline_harvest, sop: architecture_baseline_harvest.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_baseline_harvest.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

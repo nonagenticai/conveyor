@@ -1,0 +1,41 @@
+sequenceDiagram
+  autonumber
+  actor P as Person or channel
+  participant API as API
+  participant WF as Workflow
+  participant B as Job binding
+  participant PC as Prompt compiler
+  participant KM as Knowledge and memory
+  participant L as Laya (L1)
+  participant R as inference-router (L2)
+  participant BR as Tool broker
+  participant G as Approval gate
+  participant EV as Evidence
+  P->>API: start a run for a card and binding
+  API->>WF: enqueue the run
+  WF->>B: check the pinned release_hash
+  alt stale or retired binding
+    B-->>WF: 409 job_binding_stale
+    WF-->>P: refused before any model call
+  else pinned release
+    WF->>PC: compile the step
+    PC->>KM: knowledge pins and episodic memory
+    KM-->>PC: selected sources and prompt_sha256
+    opt procedure executor
+      PC-->>WF: PDDL action
+      WF->>BR: tools.call when the step names a tool
+      BR-->>WF: status, data, checks, next
+    end
+    opt internal_agent executor
+      PC-->>R: generation over the compiled prompt
+      R-->>WF: draft artefact only
+      WF->>L: decide the configured option set
+      L-->>WF: answer and confidence
+    end
+    opt gate requires approval
+      WF->>G: request the gate
+      G-->>WF: approval and approval_decision
+    end
+    WF->>EV: run, step, tool_call and inference_call rows
+    WF-->>P: terminal result
+  end

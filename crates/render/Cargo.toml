@@ -1,0 +1,28 @@
+[package]
+name = "conveyor-render"
+description = "Pure model -> SVG / PNG / PDF / XMI (S08)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# CONTRACT §1: `render` depends on `domain` and nothing else internal. Everything below is a
+# pure library — no sqlx, no axum, no clock, no filesystem read at runtime.
+conveyor-domain = { path = "../domain" }
+fontdb = { workspace = true }
+quick-xml = { workspace = true }
+resvg = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+svg2pdf = { workspace = true }
+thiserror = { workspace = true }
+ttf-parser = { workspace = true }
+usvg = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+# The golden and round-trip tests only need a temp dir to write `GOLDEN_UPDATE=1` output.
+tempfile = "3.15.0"

@@ -1,0 +1,56 @@
+{
+  "input": {
+    "key": "katas.open",
+    "title": "katas.open — open a kata on a card, re-authored",
+    "definition": {
+      "schema": 1,
+      "nodes": [
+        {
+          "id": "card",
+          "kind": "action",
+          "action": "cards.get",
+          "input_template": { "id": "{{card.id}}" }
+        },
+        {
+          "id": "board",
+          "kind": "action",
+          "action": "boards.get",
+          "input_template": { "id": "{{steps.1.output.card.board_id}}" }
+        },
+        {
+          "id": "coach_runs",
+          "kind": "action",
+          "action": "runs.list",
+          "input_template": { "card_id": "{{card.id}}", "limit": 1 }
+        },
+        {
+          "id": "has_previous",
+          "kind": "condition",
+          "predicate": { "op": "empty", "left": "{{steps.3.output.items}}" }
+        },
+        {
+          "id": "export",
+          "kind": "action",
+          "action": "workflow_traces.export",
+          "input_template": { "run_id": "{{run.inputs.source_run_id}}" }
+        },
+        {
+          "id": "comment",
+          "kind": "action",
+          "action": "cards.comment",
+          "input_template": {
+            "id": "{{card.id}}",
+            "body": "katas.open: card read for {{run.inputs.symptom}}"
+          }
+        }
+      ],
+      "edges": [
+        { "from": "card", "to": "board" },
+        { "from": "board", "to": "coach_runs" },
+        { "from": "coach_runs", "to": "has_previous" },
+        { "from": "has_previous", "to": "export", "when": "true" },
+        { "from": "has_previous", "to": "comment", "when": "false" }
+      ]
+    }
+  }
+}

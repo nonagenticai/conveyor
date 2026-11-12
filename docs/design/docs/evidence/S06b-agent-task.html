@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S06b — agent task evidence (local) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S06b-agent-task.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s06b--agent-task-evidence-local">S06b — agent task evidence (local)</h1>
+<p><strong>Date:</strong> 2026-11-09T04:38Z · <strong>Session:</strong> <code>conveyor-agent-mcp-interface</code> · <strong>Tree:</strong> <code>$HOME/Movies/conveyor</code> (no <code>.git</code>; the file set below is the whole change) · <strong>Owner:</strong> georgedekker</p>
+<p>This is the <strong>local</strong> evidence <code>docs/plans/slices/S14-cutover.md:27</code> (P2) names. It proves the conveyor-side contract over the real <code>/mcp</code> HTTP surface with a licence principal. It does <strong>not</strong> run the <code>agent</code> app — its plan records "no code written" and this build has no conveyor registration — and it does <strong>not</strong> execute the agent's <code>mcp-import</code>. Both, and the live task against a deployed conveyor, are S14's gate (<code>S14-cutover.md:33-34</code>).</p>
+<h2 id="files">Files</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/api/tests/mcp_agent.rs</code></td>
+<td><strong>new</strong> — the two proofs below</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/control/approvals.rs</code></td>
+<td><code>approvals.request</code> now assigns the <code>meta</code> it builds (<code>description</code>, <code>proposed_answer</code>, <code>allowed_decisions</code>) into <code>NewApproval</code>; before this they were discarded, violating S06b §5's table</td>
+</tr>
+<tr>
+<td><code>docs/evidence/S06b-agent-task.md</code></td>
+<td>this file</td>
+</tr>
+</tbody>
+</table>
+<p>Untouched: every S11 path (<code>crates/store/src/run.rs</code>, <code>procedure*</code>, <code>crates/actions/src/procedure/</code>, <code>apps/server/src/worker.rs</code>, <code>migrations/0015–0017</code>), <code>crates/actions/tests/support/mod.rs</code>, <code>crates/api/tests/machine_login.rs</code>, migrations, <code>served-spec.lock.json</code>.</p>
+<h2 id="what-was-run">What was run</h2>
+<p>The licence is a stub <code>POST /license/introspect</code> (the contract in <code>crates/auth/src/machine.rs:130,154-171</code>, the same shape <code>machine_login.rs</code> uses). Sessions are real HTTP against a bound loopback server and a real Postgres (<code>support::Pg::fresh</code>).</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>cargo test -p conveyor-auth</code></td>
+<td><strong>35 passed</strong>, 0 failed</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>cargo test -p conveyor-actions --test mcp_meta</code></td>
+<td><strong>1 passed</strong> (<code>every_tool_carries_its_operation</code>)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>cargo test -p conveyor-actions approvals</code></td>
+<td><strong>0 tests matched</strong> — see "A vacuous gate line"</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>cargo test -p conveyor-api --test approval_dual</code></td>
+<td><strong>3 passed</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>cargo test -p conveyor-api --test machine_login</code></td>
+<td><strong>6 passed</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>cargo test -p conveyor-api --test mcp_agent scopes</code></td>
+<td><strong>1 passed</strong> (<code>scopes_are_the_agent_allowlist_and_admin_and_viewer_bracket_it</code>)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>cargo test -p conveyor-api --test mcp_agent</code></td>
+<td><strong>2 passed</strong></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>cargo clippy --workspace --all-targets -- -D warnings</code></td>
+<td><strong>green</strong> (0 warnings)</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>cargo run -q -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>exit 0</strong> — the served document still matches its lock</td>
+</tr>
+</tbody>
+</table>
+<p>Line 3 is not evidence; line 4–7 are. The approval action path is covered by <code>approval_dual</code> (dual control, <code>decided_by_kind</code> derived from the actor), <code>machine_login</code> (agent request/decide over MCP) and <code>mcp_agent</code> (the lifecycle, below).</p>
+<h3 id="the-receipt-verbatim-from---nocapture">The receipt (verbatim, from <code>--nocapture</code>)</h3>
+<pre><code>S06B-RECEIPT {&quot;agent_tools&quot;:9,&quot;approval_id&quot;:&quot;01a1be97-4249-764a-8c44-4909e7bd5124&quot;,&quot;approval_meta&quot;:{&quot;allowed_decisions&quot;:[&quot;approve&quot;,&quot;reject&quot;],&quot;description&quot;:&quot;Which of the two designs should this follow?&quot;,&quot;proposed_answer&quot;:&quot;the first&quot;},&quot;base_url&quot;:&quot;http://127.0.0.1:64914&quot;,&quot;decided_by_kind&quot;:&quot;agent&quot;,&quot;decision&quot;:&quot;approve&quot;,&quot;project_id&quot;:&quot;01a1be97-4232-7b70-ab79-62267ed638fa&quot;,&quot;run_id&quot;:null,&quot;run_id_reason&quot;:&quot;no run-creating action is on the agent allowlist (AGENT_TOOLS has runs.list only); S14 P2 owns the agent task&#39;s run&quot;,&quot;via&quot;:{&quot;channel&quot;:&quot;mcp&quot;}}</code></pre>
+<h3 id="mutation-control-the-assertion-bites">Mutation control (the assertion bites)</h3>
+<p>With <code>meta: Value::Object(meta)</code> reverted to an empty map, test 7 fails at the meta assertion and prints <code>{}</code>: <code>assertion left == right failed: S06b §5: the description goes into approval.meta; {}</code>. Restored, it passes. The assertion is therefore load-bearing, not decorative.</p>
+<h2 id="properties-7">Properties (§7)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>verdict</th>
+<th>evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>tool key: every tool carries <code>_meta.operation</code> = its action name</td>
+<td><strong>PROVEN</strong></td>
+<td><code>mcp_meta</code> (1/1); <code>mcp_agent</code> reads <code>_meta.operation</code> from <code>tools/list</code> for every one of the agent's 9 tools and fails on a tool that lacks it. Note: the key rides the <strong>tool definition</strong>, not the call result (the result carries <code>structuredContent</code>); that is the shape the agent's importer reads (<code>mcp_import.rs:199-211</code>).</td>
+</tr>
+<tr>
+<td>b</td>
+<td>import: the agent's <code>mcp-import</code> yields <code>projects.create</code>, not <code>tool.*</code></td>
+<td><strong>NOT PROVEN</strong></td>
+<td>the agent's importer is not executed here. (a) proves the conveyor-side precondition: the operation key is an <code>object.verb</code>, never absent. Live import remains S14 §7.</td>
+</tr>
+<tr>
+<td>c</td>
+<td>machine auth: a licence for tenant A cannot act for tenant B</td>
+<td><strong>PROVEN</strong></td>
+<td><code>machine_login::the_licence_names_the_tenant_even_when_the_principal_also_belongs_to_another</code></td>
+</tr>
+<tr>
+<td>d</td>
+<td>JWT rule: a JWT-shaped token is never retried as a licence</td>
+<td><strong>PROVEN</strong></td>
+<td><code>machine_login::a_jwt_shaped_token_is_never_retried_as_a_licence</code> (stub hits = 0)</td>
+</tr>
+<tr>
+<td>e</td>
+<td>attribution: <code>decided_by_kind='agent'</code>, <code>via</code> names the licence principal</td>
+<td><strong>PROVEN</strong></td>
+<td><code>mcp_agent</code> SQL: <code>decided_by_kind='agent'</code>, <code>via={"channel":"mcp"}</code></td>
+</tr>
+<tr>
+<td>f</td>
+<td>escalation: <code>approvals.request</code> opens an approval with NULL <code>run_id</code> and is decidable</td>
+<td><strong>PROVEN</strong></td>
+<td><code>mcp_agent</code>: pending with <code>run_id: null</code>, then <code>approvals.decide</code> succeeds</td>
+</tr>
+<tr>
+<td>g</td>
+<td>end to end: create, progress, decide, close; evidence contains run id, project id, one decision</td>
+<td><strong>PARTIAL</strong></td>
+<td>create → <code>projects.get</code> + <code>events.list</code> → request → decide → <code>projects.close</code> → <code>projects.get</code> shows <code>closed</code>, all over <code>/mcp</code> as a licence principal. <strong><code>run_id</code> is <code>null</code></strong>: no run-creating action is on the agent allowlist (<code>AGENT_TOOLS</code> has only <code>runs.list</code>; <code>runs.create</code> needs a card; <code>cards.create</code> is outside the allowlist). See "Open".</td>
+</tr>
+<tr>
+<td>h</td>
+<td>no middleman: no <code>X-MCP-Binding</code>, no <code>mcp.mcp.svc</code></td>
+<td><strong>PARTIAL</strong></td>
+<td>the local path is <code>http://127.0.0.1:&lt;ephemeral&gt;</code> and <code>support::Mcp</code> sends exactly <code>authorization</code>, <code>accept</code>, <code>content-type</code>, <code>mcp-session-id</code> (<code>support/mod.rs:643-683</code>) — no binding header. The deployed path is S14's live gate.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="licence">Licence</h2>
+<p>Measured 2026-11-09:</p>
+<ul>
+<li><code>conveyor</code> is a <strong>bundle</strong> key in licences, not a registered app: <code>seed_apps.py</code> has no conveyor row, and <code>POST /internal/tenants/{id}/bundle-token?app=conveyor</code> refuses (<code>app_not_in_bundle</code> / <code>no_app_licence</code>). Registering the app + issuer + grant is a write to a shared service and is not in this unit.</li>
+<li><code>origin</code> carries <code>lane/agent-bundle-conveyor</code>, tip <code>72e67b0 "lane: start"</code> (2026-11-09 05:08:48 +0100). The owner reports the licences update for the agent's direct connection is landing; <strong>at the time of this evidence the lane carries no code</strong>, so a real <code>app_key=conveyor</code> mint was neither available nor attempted.</li>
+<li>This proof does not depend on it: the server's own introspection path is exercised end to end against a stub.</li>
+</ul>
+<h2 id="open">Open</h2>
+<ol type="1">
+<li><strong><code>run_id</code> (S14 P2 vs the agent allowlist).</strong> <code>S14-cutover.md:27</code> requires a <code>run_id</code> in this evidence. The agent cannot create one: <code>runs.create</code> needs a card, <code>cards.create</code> is outside <code>AGENT_TOOLS</code>, and <code>runs.list</code> is all the allowlist has. Either P2's <code>run_id</code> means the agent platform's task run (live, S14), or S06b needs a run-creating action — an owner/spec decision. Recorded as <code>null</code>; not fabricated.</li>
+<li><strong>The vacuous gate line.</strong> <code>S06b-...md:132</code> runs <code>cargo test -p conveyor-actions approvals</code>, which matches 0 tests in this tree. Either point it at <code>crates/api/tests/approval_dual.rs</code> + <code>mcp_agent</code> or delete it; a line that cannot fail is not a gate.</li>
+<li><strong>The agent app.</strong> Properties (b) and (h)'s deployed half, and the live task, need <code>agent</code>'s MCP client and its conveyor registration — S14 §7.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S06b-agent-task.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,176 @@
+# dependency_refactoring — remove or reduce one dependency and open a PR (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type dependency_refactoring: outputs, acceptance and
+# definition_of_done pr_merged) and n8n-designs/design/choices/v4/capabilities/refactoring.yaml
+# (text "refactoring scoped to resolving, reducing or removing dependencies", phase execution, proof
+# package_upgrade, test_files none, inspect criteria removes_the_item / preserves_behaviour /
+# manifests_consistent). The card carries one confirmed item of kind dependency from
+# structure_analysis (v4 P-W3-2).
+#
+# ⚠ this is the one refactoring type whose proof is package_upgrade, not suite_only: the header of
+# v4 refactoring.yaml says library_ and dependency_refactoring MAY change manifests and lockfiles.
+# Two consequences shape this file. diff_only_planned_files admits manifests and lockfiles as
+# planned files while still refusing a touched test (R233: test_files none, computed gates
+# no_test_file_planned, no_test_changed). And QA takes v4's manifests_consistent in place of its
+# siblings' change_is_minimal, because a removal that leaves the lockfile disagreeing with the
+# manifest has not removed the dependency — it has hidden it from one of the two.
+card_type: dependency_refactoring
+capability: refactoring
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: dependency_refactoring
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: dependency_refactoring.ready
+    title: Dependency refactoring — definition of ready
+    definition_of_ready: {checks: [source_item_located, planned_files_exist]}
+    definition_of_done: {checks: [workspace_imported]}
+    acceptance_criteria:
+      - {name: planned_files_exist, text: "Every manifest, lockfile and source file the removal plan names exists in the imported workspace, and the manifest that pins the package the item names is one of them. A package that arrives only through a transitive dependency has no entry of its own to remove and needs a different plan, so that case is named at READY rather than discovered at install time."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: dependency_refactoring.doing
+    title: Dependency refactoring — definition of doing
+    definition_of_ready: {checks: [workspace_imported]}
+    definition_of_done: {checks: [suite_green_after, item_gone_at_location]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff touches only the manifests, lockfiles and source files the plan named, and it changes no test file. For this type a manifest and a lockfile in the diff are expected and a test file is not: the removal is proved by the tests the diff left alone, so a test rewritten to stop calling the package is the removal failing quietly."}
+      - {name: suite_green_before, text: "The whole suite is green on the base revision with the dependency still installed, so the green after the removal is measured against a build that had the package and used it."}
+      - {name: suite_green_after, text: "The whole suite is green after the removal, from a fresh install of the diff's manifests and lockfile — not from the tree the workspace already had, because a package left in an installed environment stays importable and hides the call the diff was supposed to stop making."}
+      - {name: item_gone_at_location, text: "The dependency the item named is gone or reduced at the place the item named it: the manifest no longer requires it, or requires the smaller set the item lists; the lockfile no longer resolves it; and no source file the plan touched still imports, requires or calls into it."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: dependency_refactoring.qa
+    title: Dependency refactoring — definition of QA
+    definition_of_ready: {checks: [item_gone_at_location]}
+    definition_of_done: {checks: [change_preserves_behaviour, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: change_preserves_behaviour, text: "Every test that exercised the code which used the package passes unchanged, so what that code produced through the package is still produced without it — same result, same error, on the same inputs."}
+      - {name: change_removes_item, text: "A fresh install from the final manifests and lockfile brings in neither the package the item named nor a transitive copy of it, and searching the sources finds no remaining import, require or call into it — the dependency is absent from the resolved tree, not merely absent from one manifest line."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the dependency_refactoring card type declares is true of the final diff and of the fix report QA reviews."}
+      - {name: removes_the_item, text: "The diff removes the dependency the card's item names — removed or reduced, whichever the item asks for — and leaves no second entry point to it through another package, a re-export or a vendored copy."}
+      - {name: preserves_behaviour, text: "Removing the dependency changes no observable behaviour: every call site the diff rewrote returns what the library call returned, including its error cases, and no caller outside the diff needed a change."}
+      - {name: manifests_consistent, text: "Manifest and lock files agree on every changed package version, and the lockfile is regenerated from the manifest rather than hand-edited, so a fresh install resolves exactly the tree QA read and the same tree on a second machine."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: dependency_refactoring.done
+    title: Dependency refactoring — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request carrying the dependency removal is squash-merged, and the merge sha is recorded on the card; the manifest and lockfile at that sha are the ones QA installed from."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: dependency_refactoring.system
+    title: Dependency refactoring — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: dependency_refactoring.READY
+    list: ready
+    title: Dependency refactoring — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: dependency_refactoring
+        sop: dependency_refactoring.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: dependency_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: dependency_refactoring.DOING
+    list: doing
+    title: Dependency refactoring — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: dependency_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: dependency_refactoring.QA
+    list: qa
+    title: Dependency refactoring — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: dependency_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: dependency_refactoring.DONE
+    list: done
+    title: Dependency refactoring — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: dependency_refactoring, sop: dependency_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: dependency_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

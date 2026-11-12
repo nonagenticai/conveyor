@@ -1,0 +1,44 @@
+{
+  "key": "s13.fixture.b",
+  "title": "S13 fixture B: wip.pull, re-authored",
+  "definition": {
+    "schema": 1,
+    "nodes": [
+      {
+        "id": "act",
+        "kind": "condition",
+        "predicate": {"op": "eq", "left": "{{run.inputs.act}}", "right": true}
+      },
+      {
+        "id": "resolve_project",
+        "kind": "action",
+        "action": "projects.get",
+        "input_template": {"id": "{{run.project_id}}"}
+      },
+      {
+        "id": "conveyor_board",
+        "kind": "condition",
+        "predicate": {"op": "eq", "left": "{{run.inputs.conveyor_board}}", "right": true}
+      },
+      {
+        "id": "get_board",
+        "kind": "action",
+        "action": "boards.get",
+        "input_template": {"id": "{{run.inputs.board_id}}"}
+      },
+      {
+        "id": "unused",
+        "kind": "action",
+        "action": "cards.get",
+        "input_template": {"id": "{{card.id}}"}
+      }
+    ],
+    "edges": [
+      {"from": "act", "to": "resolve_project", "when": "true"},
+      {"from": "act", "to": "unused", "when": "false"},
+      {"from": "resolve_project", "to": "conveyor_board"},
+      {"from": "conveyor_board", "to": "get_board", "when": "true"},
+      {"from": "conveyor_board", "to": "unused", "when": "false"}
+    ]
+  }
+}

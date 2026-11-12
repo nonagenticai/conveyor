@@ -1,0 +1,11 @@
+{
+  "run_id": "0917093013f5",
+  "subset": "verified50-v1",
+  "label": "control-empty",
+  "n": 50,
+  "counts": {
+    "unresolved": 50
+  },
+  "resolved": 0,
+  "resolved_rate": 0.0
+}

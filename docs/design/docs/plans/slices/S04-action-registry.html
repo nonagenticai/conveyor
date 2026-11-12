@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S04 — Action registry · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S04-action-registry.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s04--action-registry">S04 — Action registry</h1>
+<p>Programme project: S04 · issues #13</p>
+<p><strong>Gate (SPEC §8 S4):</strong> 20 actions identical over HTTP and MCP.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>One declaration per invocable operation, from which manifest, operation, MCP tool and route are generated, so HTTP and MCP cannot diverge. It replaces the 24 node packages and fr's 88 capability declarations; later slices add actions, never a surface.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S02: <code>begin_scoped</code>, <code>audit_event</code>, <code>action_invocation</code>, <code>idempotency_key</code>, <code>event</code>, <code>/api/me</code>.</li>
+<li>S03: the 14 domain aggregates and transitions.</li>
+<li><code>crates/actions</code> is empty.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — <code>ActionSpec</code> + <code>#[action]</code>; the compile-time registry and boot assertion; <code>GET /api/actions</code>; <code>POST /api/actions/{name}/invocations</code> with idempotency, timeout, audit, outbox; <code>rmcp</code> at <code>/mcp</code>; the OpenAPI fold and lock; <code>openapiv3</code> ingest; <code>migrations/0003_action_registry.sql</code>; 16 internal + 4 <code>fixtures.*</code> actions.</p>
+<p><strong>OUT</strong> — domain actions (<code>cards.move</code>, …) are S05–S11's; <code>kind: workflow</code> (S13); channel-<code>mcp</code> delivery rows (S06); the signed <code>mcp_server</code> channel (S06-α).</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>20-fr</code> registry</td>
+<td><code>Capability</code> fields, <code>derive-{openapi,mcp,router}.ts</code>, <code>registry.ts</code></td>
+<td>field set, closed <code>effect</code>/<code>confirm</code>/<code>tenancy</code> vocabularies, <code>assertRegistryConsistent</code>, <code>served-spec.lock.json</code>, <code>specExempt</code></td>
+<td>Zod, <code>legacyHandler</code>, <code>frozen</code></td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/runtime/catalog.rs</code></td>
+<td><code>OpDef</code>, <code>PinnedCatalog::from_rows</code>, <code>effective_level</code>, <code>outputs</code></td>
+<td>one catalogue; a compiled row beats a stored one</td>
+<td><code>OpSource::Template</code></td>
+</tr>
+<tr>
+<td><code>30</code> §4 node resources</td>
+<td>14 fr resource names</td>
+<td>the action-name vocabulary</td>
+<td><code>_legacy</code></td>
+</tr>
+</tbody>
+</table>
+<p>Pinned 2026-11-07 (<code>git -C $HOME/Movies/&lt;repo&gt; rev-parse origin/main</code>, read-only): <code>agent</code> <code>83b8de7e</code>, <code>fr</code> <code>4a579e91</code> (source map: <code>6f7c5097</code>).</p>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>crates/actions-derive/src/lib.rs
+crates/actions/src/{spec,registry,invoke,mcp,openapi,lock,ingest}.rs
+crates/actions/tests/{registry,parity_http_mcp,idempotency,timeout,ingest_diff,external_actions}.rs
+crates/actions/tests/fixtures/external/openapi.json          # the four fixture operations
+crates/{api,store}/src/actions.rs · migrations/0003_action_registry.sql · served-spec.lock.json</code></pre>
+<p><code>crates/actions-derive</code> is a 10th workspace member (<code>proc-macro = true</code>, CONTRACT §1): a proc macro cannot live in a normal crate, and a hand-written registry would name each schema twice — the drift surface.</p>
+<h3 id="51-the-declaration">5.1 The declaration</h3>
+<pre class="rust"><code>pub struct ActionSpec {
+    pub name: &amp;&#39;static str,        // &lt;plural resource&gt;.&lt;verb&gt;, exactly one dot
+    pub version: u32,              // not part of the name
+    pub kind: ActionKind,          // Internal | External | Workflow
+    pub input: fn() -&gt; Schema,     // schemars
+    pub output: fn() -&gt; Schema,    // schemars
+    pub scopes: &amp;&#39;static [Scope],
+    pub idempotent: bool,
+    pub timeout_ms: u32,           // default 30_000
+    pub effect: Effect,            // Read | Write | Destructive
+    pub confirm: Confirm,          // None | Card | CardTyped
+    pub tenancy: Tenancy,          // Self | Tenant | Project | Platform
+    pub handler: HandlerRef,
+}</code></pre>
+<p><code>#[action(name, version, kind, scopes, idempotent, timeout_ms, effect, confirm, tenancy)]</code> on <code>async fn(Json&lt;In&gt;) -&gt; Result&lt;Json&lt;Out&gt;, AppError&gt;</code> emits, <strong>from the same tokens</strong>, the spec value and an <code>inventory::submit!</code>; <code>conveyor_actions::openapi::fold</code> turns the same <code>ActionSpec</code> into the path item at <code>/api/actions/&lt;name&gt;/invocations</code> and <code>api::app</code> adds the literal route. The per-action <code>#[utoipa::path]</code> route proved impractical; the fold is the allowed alternative, and the single source is still the <code>ActionSpec</code>.</p>
+<p>Each projection reads the same value: manifest every field (ETag); operation <code>name</code>/<code>input()</code>/<code>output()</code>/<code>effect</code>/<code>scopes</code>; MCP tool the same with <code>.</code>→<code>_</code>; route <code>handler</code>/<code>timeout_ms</code>/<code>tenancy</code>/<code>idempotent</code>. The gate proves it: one <code>spec_hash</code> per action equals manifest, <code>$ref</code>-resolved operation and MCP tool.</p>
+<p><strong>16 internal</strong> (<code>kind: internal</code>):</p>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>input → output</th>
+<th>scope</th>
+<th>idempotent</th>
+<th>timeout</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>actions.list</code></td>
+<td><code>{}</code> → <code>ActionManifest</code></td>
+<td><code>actions:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>actions.describe</code></td>
+<td><code>{name}</code> → <code>ActionSpecView</code></td>
+<td><code>actions:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>me.get</code></td>
+<td><code>{}</code> → <code>MeView</code></td>
+<td><code>me:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>tenants.get</code></td>
+<td><code>{}</code> → <code>TenantView</code></td>
+<td><code>tenants:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>tenants.update_settings</code></td>
+<td><code>{settings}</code> → <code>TenantView</code></td>
+<td><code>tenants:write</code></td>
+<td>no</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>members.list</code></td>
+<td><code>PageIn</code> → <code>Page&lt;MemberView&gt;</code></td>
+<td><code>members:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>members.set_role</code></td>
+<td><code>{user_id,role}</code> → <code>MemberView</code></td>
+<td><code>members:write</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>departments.list</code></td>
+<td><code>{}</code> → <code>[DepartmentOut]</code></td>
+<td><code>departments:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>departments.create</code></td>
+<td><code>{name,parent_id?}</code> → <code>DepartmentOut</code></td>
+<td><code>departments:write</code></td>
+<td>no</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>audit.list</code></td>
+<td><code>{since?} + PageIn</code> → <code>Page&lt;AuditView&gt;</code></td>
+<td><code>audit:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>jobs.list</code></td>
+<td><code>{status?} + PageIn</code> → <code>Page&lt;JobView&gt;</code></td>
+<td><code>jobs:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>jobs.retry</code></td>
+<td><code>{id}</code> → <code>JobView</code></td>
+<td><code>jobs:write</code></td>
+<td>no</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>schedules.list</code></td>
+<td><code>{}</code> → <code>[ScheduleOut]</code></td>
+<td><code>schedules:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>schedules.upsert</code></td>
+<td><code>{kind,cron,enabled}</code> → <code>ScheduleOut</code></td>
+<td><code>schedules:write</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>events.list</code></td>
+<td><code>{topics?} + PageIn</code> → <code>Page&lt;EventView&gt;</code></td>
+<td><code>events:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td><code>licences.get</code></td>
+<td><code>{}</code> → <code>LicenceView</code></td>
+<td><code>licences:read</code></td>
+<td>yes</td>
+<td>30 s</td>
+</tr>
+</tbody>
+</table>
+<p><strong>S11 adds two scopes</strong> to the vocabulary (the <code>procedures.*</code> actions are S11's, not this slice's): a read is open to every role, a write is <code>member</code>/<code>admin</code>/<code>owner</code> plus the synthetic tenant-admin <code>kata_executor</code> (S11 CCR 5) — a procedure is work on the tenant's own board, not platform administration.</p>
+<table>
+<thead>
+<tr>
+<th>scope</th>
+<th>granted to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>procedures:read</code></td>
+<td>every role</td>
+</tr>
+<tr>
+<td><code>procedures:write</code></td>
+<td><code>member</code>/<code>admin</code>/<code>owner</code>/<code>kata_executor</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>ActionManifest = {actions: [{name, version, kind, spec_hash, scopes, idempotent, timeout_ms}], generated_at}</code> — the shape <code>GET /api/actions</code> returns and <code>actions.list</code> projects, so consumers (S12/S13/S14 gates) can assert <code>.actions[]</code> without guessing; <code>ETag</code>/<code>If-None-Match</code> wraps it (304 on a match).</p>
+<p><strong>Four external</strong> (<code>kind: external</code>), ingested from <code>crates/actions/tests/fixtures/external/openapi.json</code> and served by the <code>external_actions.rs</code> stub at <code>CONVEYOR_EXTERNAL_FIXTURES_URL</code>:</p>
+<table>
+<thead>
+<tr>
+<th>action · in → out</th>
+<th>stub behaviour</th>
+<th>proves</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fixtures.echo</code> · <code>{message}</code> → <code>{message,service}</code></td>
+<td>200</td>
+<td>happy path; HTTP/MCP parity</td>
+</tr>
+<tr>
+<td><code>fixtures.slow</code> · <code>{delay_ms}</code> → <code>{waited_ms}</code></td>
+<td>sleeps 600 ms then 200; <code>timeout_ms=200</code> pinned at ingest</td>
+<td>timeout: rollback + the <code>outcome='timeout'</code> row</td>
+</tr>
+<tr>
+<td><code>fixtures.fail</code> · <code>{status}</code> → <code>{status}</code></td>
+<td>returns the requested 404/422</td>
+<td>4xx → RFC 9457 <code>action-external-refused</code>, never a 500</td>
+</tr>
+<tr>
+<td><code>fixtures.timeout</code> · <code>{}</code> → <code>{status}</code></td>
+<td>returns <strong>504</strong> every time</td>
+<td>5xx → <code>502 action-upstream-failed</code>; five in 30 s open the breaker (<code>503 action-circuit-open</code>, no upstream call)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-registry">5.2 Registry</h3>
+<ul>
+<li><strong>Compile-time:</strong> <code>inventory</code> collected once into <code>Registry</code>; <code>assert_registry_consistent</code> runs in <code>serve</code>, <code>worker</code> and every test, failing on a duplicate <code>name</code>, an MCP-form collision (<code>cards.move</code> vs <code>cards_move</code>), an MCP name outside <code>^[a-z0-9_]{1,64}$</code>, a handler-less internal action, or an unknown <code>Scope</code>.</li>
+<li><strong>DB:</strong> <code>action_registry</code> verbatim from §2.14, <code>kind ∈ {external, workflow}</code> only; <code>spec_version</code> + <code>schema_hash</code> pin the ingest, <code>timeout_ms</code> and <code>idempotent</code> override it. The ingester refuses an external name that already exists compiled (<code>action-name-conflict</code>).</li>
+<li><strong>Enable/disable is <code>approved_at</code>.</strong> The highest <strong>approved</strong> <code>spec_version</code> per <code>(tenant_id, name)</code> serves; a refresh writes an unapproved row alongside.</li>
+<li><strong>Startup fails if the DB names an action the binary lacks</strong> — an approved <code>workflow</code> row with no handler, or an <code>external</code> row whose <code>service</code> is unconfigured: exit 1 before bind.</li>
+</ul>
+<h3 id="53-invocation-and-mcp">5.3 Invocation and MCP</h3>
+<ul>
+<li><code>POST /api/actions/&lt;literal name&gt;/invocations</code> → <code>{input}</code> → <code>{output}</code>. A <code>spec_exempt</code> fallback at <code>/api/actions/{name}/invocations</code> returns <code>action-not-found</code>.</li>
+<li><code>Idempotency-Key</code> scoped <code>(tenant_id, &lt;action name&gt;, key)</code>, claimed by <code>INSERT … ON CONFLICT DO NOTHING</code>; the loser replays the winner's status and body.</li>
+<li><strong>One transaction</strong> writes the mutation, <code>action_invocation</code> and <code>audit_event</code> (<code>record(&amp;mut PgConnection)</code>) — S04 declares no events, so it writes no outbox row (S05+ actions add their own <code>event</code> in the same transaction); <code>SET LOCAL statement_timeout = &lt;timeout_ms&gt;</code> + <code>tokio::time::timeout</code>.</li>
+<li>A timeout rolls that transaction back and cannot record itself: a <strong>separate</strong> short transaction writes <code>action_invocation(outcome='timeout')</code> + <code>audit_event(status='error')</code>.</li>
+<li><code>kind: external</code> goes through a per-action circuit breaker (5 failures/30 s); the four fixture services are unauthenticated (a real service's credential is S09's), so no tenant token is sent; <code>kind: workflow</code> returns <code>501</code> until S13.</li>
+<li><strong>MCP:</strong> <code>rmcp</code> streamable HTTP at <code>/mcp</code>, one session per tenant; <code>tools/list</code> comes from the same <code>Registry</code>, scope-filtered so a refused tool is <strong>absent</strong>. Credentials fail closed: an unresolvable tenant is 401; a JWT-shaped bearer that fails verification is never retried as a licence token.</li>
+<li><strong><code>nonagenticai_mcp_server</code> is not this server</strong> — it is the agent gateway; the conveyor sits behind it through S06-α's HMAC channel (SPEC §4.5).</li>
+</ul>
+<h3 id="54-openapi-and-external-ingest">5.4 OpenAPI and external ingest</h3>
+<p><code>openapi()</code> folds a literal path item per action into the spec built from the <code>OpenApiRouter</code> exports. <code>--print-openapi --write-lock</code> regenerates <code>served-spec.lock.json</code> (per-operation sha256 of the <code>$ref</code>-resolved operation); <code>--check-lock</code> exits 1 on any added, removed or changed operation.</p>
+<p><code>openapiv3</code> reads a service's <code>openapi.json</code>, derives <code>kind: external</code> actions (<code>operationId</code> → <code>&lt;resource&gt;.&lt;verb&gt;</code> where parseable, else <code>(tag, path, method)</code>), stores <code>spec</code> + <code>schema_hash</code>. A refresh diffs: added-optional auto-approves; a removed or retyped input field, a newly required one, a removed output field or path/method is <strong>breaking</strong> — refused (<code>422</code>, exit 2) until <code>conveyor admin actions approve &lt;name&gt; --version &lt;n&gt;</code>.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Preflight: <code>cargo test --workspace</code>; <code>lsof -nP -iTCP:8930 -sTCP:LISTEN</code> empty; <code>docker compose up -d db</code>. Never 8000.</li>
+<li><code>crates/actions-derive</code>: <code>proc-macro = true</code>, attribute parser; reject a non-<code>&lt;plural&gt;.&lt;verb&gt;</code> name at expansion. <code>cargo test -p conveyor-actions-derive name_grammar</code></li>
+<li>Emit spec + <code>inventory::submit!</code> + the <code>openapi::fold</code> path item + the literal route; <code>cargo expand -p conveyor-actions</code>, read one end to end.</li>
+<li><code>spec.rs</code> + <code>registry.rs</code>: vocabularies, <code>validate_name</code>, <code>from_inventory</code>, <code>assert_registry_consistent</code> (six checks: name grammar, duplicate, MCP collision, MCP charset, handler-less, unknown scope), <code>spec_hash</code>. <code>cargo test -p conveyor-actions spec::vocabularies</code></li>
+<li>The 16 internal actions over S02/S03 store calls. <code>cargo test -p conveyor-actions --test registry</code></li>
+<li><code>invoke.rs</code>: tenancy scope → idempotency claim → deadline → tx composition. <code>cargo test -p conveyor-actions --test idempotency</code></li>
+<li><code>store/src/actions.rs</code>: the five <code>_tx</code> helpers (idempotency claim/finish, invocation, audit, event), none opening a transaction. <code>cargo test -p conveyor-store actions_tx</code></li>
+<li><code>migrations/0003_action_registry.sql</code> from §2.14; RLS <code>ENABLE</code>+<code>FORCE</code>+policy; grants. <code>cargo run -p conveyor-server -- migrate &amp;&amp; cargo run -p conveyor-server -- migrate</code></li>
+<li><code>api/src/actions.rs</code>: manifest with <code>If-None-Match</code> → 304, plus the fallback. <code>cargo test -p conveyor-api manifest_304</code></li>
+<li><code>mcp.rs</code>: <code>/mcp</code> session, per-tenant, scoped <code>tools/list</code>, <code>tools/call</code> → <code>invoke</code>. <code>cargo test -p conveyor-actions --test parity_http_mcp</code></li>
+<li><code>openapi.rs</code> + <code>lock.rs</code> + <code>ingest.rs</code>: the fold, <code>--check-lock</code>, load/diff/approve; fixtures for a live <code>coding-*</code> spec and a removed-field one, plus the four <code>fixtures.*</code> operations. <code>cargo test -p conveyor-actions --test ingest_diff &amp;&amp; cargo test -p conveyor-actions --test external_actions</code></li>
+<li>Boot wiring before <code>TcpListener::bind</code>; <code>cargo clippy --workspace --all-targets -- -D warnings</code>; <code>cargo run -p conveyor-server -- --print-openapi --check-lock</code> into <code>rust-service.yml</code>.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+B=http://127.0.0.1:8930
+docker compose up -d db &amp;&amp; cargo run -p conveyor-server -- migrate --dev-seed   # the DB and the dev principals (S02)
+cargo test -p conveyor-actions
+cargo run -p conveyor-server -- --print-openapi --check-lock          # exit 0
+! CONVEYOR_TEST_DUPLICATE=members.set_role cargo run -p conveyor-server -- serve   # exit 1, before bind
+CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- serve &amp;
+trap &#39;kill %1 2&gt;/dev/null || true&#39; EXIT
+sleep 2
+curl -s -X POST $B/api/actions/members.set_role/invocations -H &#39;content-type: application/json&#39; -H &#39;If-Match: &quot;1&quot;&#39; \
+  -H &#39;authorization: Bearer dev:alice&#39; -d &#39;{&quot;input&quot;:{}}&#39; | jq -e &#39;.type and .errors&#39;   # RFC 9457: required fields missing
+kill %1 2&gt;/dev/null || true</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>HTTP and MCP cannot diverge</td>
+<td>all 20 (16 internal + 4 <code>fixtures.*</code>) both ways; stripping <code>request_id</code>/<code>duration_ms</code>, <code>http.body == mcp.structuredContent</code></td>
+</tr>
+<tr>
+<td>b</td>
+<td>one value, three projections</td>
+<td><code>spec_hash</code>: manifest == resolved operation == MCP tool</td>
+</tr>
+<tr>
+<td>c</td>
+<td>duplicates fail closed</td>
+<td>exit 1 on a duplicate name, an MCP collision, an out-of-charset name</td>
+</tr>
+<tr>
+<td>d</td>
+<td>schema-invalid input</td>
+<td>RFC 9457 with populated <code>errors[]</code>, never a 500</td>
+</tr>
+<tr>
+<td>e</td>
+<td>idempotent replay</td>
+<td>two identical POSTs, one key: same status and body, one <code>action_invocation</code></td>
+</tr>
+<tr>
+<td>f</td>
+<td>the lock catches drift; breaking ingest refused</td>
+<td>a renamed field makes <code>--check-lock</code> exit 1 naming the operation; the removed-field fixture exits 2 (<code>422</code>) while the approved version serves</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>Four artifacts drifting is the fr lesson.</strong> Any projection reading a <em>second</em> source is the bug.</li>
+<li><strong><code>Router::merge</code> drops the second crate's paths from the spec</strong> — routes work, the contract loses them. Only <code>OpenApiRouter::merge</code>.</li>
+<li><strong>MCP tool names are not action names.</strong> <code>.</code>→<code>_</code> is not injective and the charset is narrower; assert the mapping at boot.</li>
+<li><strong>A timeout is the caller's, never the handler's.</strong> A handler that swallows cancellation leaves a query running; <code>statement_timeout</code> belts <code>tokio::time::timeout</code>.</li>
+<li><strong>Idempotency and the mutation must share a transaction.</strong> Committed before, the key replays rolled-back work; after, the window races.</li>
+<li><strong>Circular actions.</strong> Carry <code>invocation_depth</code>, hard limit 8, then <code>409 action-recursion-limit</code>; else A→B→A recurses until the pool is gone.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S4-D1</td>
+<td><code>crates/actions-derive</code> is a 10th member (§5)</td>
+<td>a proc macro needs its own crate</td>
+</tr>
+<tr>
+<td>S4-D2</td>
+<td>one literal route per action + a <code>spec_exempt</code> fallback</td>
+<td>one operation per path; uniform errors</td>
+</tr>
+<tr>
+<td>S4-D3</td>
+<td>enable/disable is <code>approved_at</code></td>
+<td>§2.14 has no <code>enabled</code> column</td>
+</tr>
+<tr>
+<td>S4-D4</td>
+<td>an external name colliding with any name is refused at ingest</td>
+<td>one namespace, no precedence</td>
+</tr>
+<tr>
+<td>S4-D5</td>
+<td>idempotency scope is the action name</td>
+<td>contract §5's <code>action_or_route</code></td>
+</tr>
+<tr>
+<td>S4-D6</td>
+<td>scope-filtered MCP tools; a refused tool is absent</td>
+<td>fail-closed, not noisy</td>
+</tr>
+<tr>
+<td>S4-D7</td>
+<td><code>kind: workflow</code> → 501 until S13</td>
+<td>enum now, engine later</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Is <code>GET /api/actions</code> role-filtered?</td>
+<td>yes — an uncallable manifest is a second contract</td>
+</tr>
+<tr>
+<td>2</td>
+<td>One 30 s default, or 10 s for external?</td>
+<td>30 s compiled, 10 s at ingest</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Generated TS client committed or CI artefact?</td>
+<td>CI artefact; the lock is committed</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S04-action-registry.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

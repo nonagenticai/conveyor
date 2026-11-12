@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S15 steps 6–13 — knowledge, memory, wiring, readiness — evidence · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S15-RUNTIME.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s15-steps-613--knowledge-memory-wiring-readiness--evidence">S15 steps 6–13 — knowledge, memory, wiring, readiness — evidence</h1>
+<p>Measured 2026-11-09 on mini3; every Rust command through <code>rbuild</code> on m1 (CONTRACT §16).</p>
+<h2 id="harness--real-strata_rag-not-a-stub">Harness — real <code>strata_rag</code> (not a stub)</h2>
+<p><code>compose.yaml</code> profile <code>strata</code>: <code>strata-db</code> (pgvector pg18, :5440) + <code>strata-rag</code> (built from <code>../strata_rag</code>, :8092). <code>scripts/strata/providers.toml</code> — dev defaults, embed/rerank → <code>mlx-api-text.example.com:9131</code>, no chat.</p>
+<pre><code>docker compose --profile strata up -d --wait strata-db strata-rag   # exit 0
+GET /health -&gt; {&quot;db&quot;:&quot;ok&quot;,&quot;embed&quot;:&quot;ok&quot;,&quot;rerank&quot;:&quot;ok&quot;,&quot;chat&quot;:&quot;unconfigured&quot;,&quot;laya&quot;:&quot;unconfigured&quot;}
+POST /api/stores {kind:leaf}            -&gt; 200 id
+POST /api/stores/{id}/documents         -&gt; 201, chunk_count 1
+POST /api/query  leaf_ids=[id], metadata={capability:design} -&gt; 1 tenant hit</code></pre>
+<p>A parentless <code>router</code> cannot be ingested into; the tenant memory store is a parentless <strong>leaf</strong>.</p>
+<p>The consolidation sequence was measured against the real service: two runs of one <code>source_id</code> → query returns 2 → <code>DELETE /api/sources/&lt;source&gt;?except_run=run-2</code> → <code>{"deleted":1,"kept":1}</code> → query returns 1. ⚠️ A prune whose <code>except_run</code> carries <strong>no</strong> document is refused (<code>empty_sync_run</code>, <code>deleted:0</code>); the job ingests the new digest first, which is what makes the guard pass.</p>
+<h2 id="built-and-proven">Built and proven</h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rbuild -- test -p conveyor-domain memory</code></td>
+<td><strong>7 passed / 0 failed</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-store --test memory</code></td>
+<td><strong>3 passed / 0 failed</strong> (two-tenant RLS; same-card supersede; digest covers rows once)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test run_capability</code></td>
+<td><strong>3 passed / 0 failed</strong> (no_active_agent → zero run/run_step rows; unknown_action; ready run records capability/agent ids)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-server --test memory_consolidate</code></td>
+<td><strong>1 passed / 0 failed</strong> (digest header, stamps, prune <code>except_run</code>, replay no-op)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test procedure_start</code></td>
+<td>6 passed / 0 failed</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test procedure_step --test procedure_cancel</code></td>
+<td>14 + 2 passed / 0 failed</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-server --test run_retry</code></td>
+<td>4 passed / 0 failed</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-server --test prune</code></td>
+<td>13 passed / 0 failed</td>
+</tr>
+<tr>
+<td><code>rbuild -- check -p conveyor-server -p conveyor-store</code></td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td><code>rbuild -- clippy -p conveyor-domain --all-targets -- -D warnings</code></td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td><code>rbuild -- clippy -p conveyor-actions -p conveyor-server --lib -- -D warnings</code></td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test registry</code></td>
+<td><strong>8 passed / 0 failed</strong> (EXPECTED 243, internal/external 230/13, AGENT_TOOLS 36)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test parity_http_mcp</code></td>
+<td><strong>4 passed / 0 failed</strong> — every one of 243 actions on HTTP+MCP</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-api --lib</code></td>
+<td>29 passed / 0 failed (registry 243 + every action documented)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-api --test portfolio_roundtrip</code></td>
+<td>2 passed / 0 failed (scope count 63)</td>
+</tr>
+<tr>
+<td><code>rbuild -- run -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>exit 0 at 264 ops</strong>, sha256 <code>9d1150b19c164aee…</code></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <code>--write-lock</code> writes on <strong>m1</strong>; the file must be copied back explicitly (<code>rsync m1:&lt;slot&gt;/src/served-spec.lock.json</code>). <code>rbuild --copy-back &lt;file&gt;</code> appends <code>/</code> and expects a directory — it failed for a single file. ⚠️ Workspace-wide <code>fmt</code>/<code>clippy</code> remained red on peer files during this pass (<code>apps/server/tests/common/mod.rs</code>, <code>eval_*</code>, <code>store/src/seed.rs</code>, <code>crates/store/tests/capability.rs</code>, <code>apps/server/src/eval_runner.rs</code>) and, at one point, <code>crates/auth/src/authn.rs</code> (web-ui RBAC mid-edit). None is in this lane.</p>
+<p>Landed: <code>domain/src/memory.rs</code>, <code>store/src/memory.rs</code>, <code>actions/src/integrations/strata.rs</code>, <code>actions/src/procedure/runs.rs</code> (resolution + <code>409 capability_not_ready</code>), <code>store/src/run.rs</code> (terminal-transition enqueue), <code>apps/server/src/memory_consolidate.rs</code> + worker arm, <code>actions/src/board/events.rs</code> 26 → 28 (<code>memory.recorded</code>, <code>knowledge.bound</code>), <code>crates/actions/tests/run_capability.rs</code>, <code>apps/server/tests/memory_consolidate.rs</code>, <code>crates/store/tests/memory.rs</code>, <code>compose.yaml</code>, <code>scripts/strata/**</code>.</p>
+<h2 id="registered">Registered</h2>
+<p><code>crates/actions/src/knowledge/query.rs</code> (<code>knowledge.query</code>) and <code>crates/actions/src/memory/</code> (<code>memory.remember</code>, <code>memory.recall</code>) — 243 actions · 63 scopes · 264 served-spec ops. <code>AGENT_TOOLS</code> 36: <code>knowledge.query</code> and <code>memory.recall</code> added; the writes stay off the global list and are reachable only through a run's <code>allowed_actions</code> (CONTRACT §17).</p>
+<h2 id="open">Open</h2>
+<ul>
+<li><code>capabilities.get</code> <code>{ready, blocking[]}</code> and the <code>capability_agents</code> caps refusal wait on the S15 owner's step-5 handlers (not built; it keeps step 5).</li>
+<li>The catalogue → capability data move is unproven on a pre-existing DB (fresh-DB harness only).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S15-RUNTIME.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

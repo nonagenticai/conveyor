@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>10 — Agent / platform patterns source map · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-source-map/10-agent-patterns.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="10--agent--platform-patterns-source-map">10 — Agent / platform patterns source map</h1>
+<p>Slice plans cite this instead of re-reading the sources. Verified 2026-11-07 at the SHAs below. Symbols and paths, never line numbers.</p>
+<hr />
+<h2 id="agent">agent</h2>
+<p><code>repo: $HOME/Movies/agent · sha: 83b8de7ef365d99dd15700248c92797bd19bda4e · slices: [S02, S03, S04, S06, S06-α, S10]</code></p>
+<p>Measured 2026-11-07. <strong>Every path in the table below is relative to <code>crates/agent-api/</code></strong> — <code>src/tenancy.rs</code> is <code>crates/agent-api/src/tenancy.rs</code>, <code>migrations/0001_tenancy.sql</code> is <code>crates/agent-api/migrations/0001_tenancy.sql</code>.</p>
+<p>Shape: workspace <code>members = ["crates/agent-api", "crates/agent-model"]</code> — <strong>2 crates only</strong>, plus <code>web/</code> (SvelteKit). Migrations at <code>crates/agent-api/migrations/</code>; <strong>no root <code>migrations/</code></strong>. The 8-crate workspace is not copied from here.</p>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>symbols</th>
+<th>mechanism</th>
+<th>carry / do-not-carry</th>
+<th>trap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/tenancy.rs</code></td>
+<td><code>begin_scoped</code>, <code>set_tenant</code>, <code>lock_tenant_row</code>, <code>TenantCtx</code>, <code>JobCtx</code>, <code>Member</code>, <code>SaInTenant</code>, <code>JobMember</code>, <code>SuperAdmin</code>, <code>JobRequires&lt;R: RoleMarker&gt;</code>, <code>ACTIVE_TENANT_HEADER</code></td>
+<td><code>begin_scoped</code> opens a tx then <code>SELECT set_config('app.current_tenant', $1, true)</code> — bind-param <code>SET LOCAL</code>, dies at COMMIT, PgBouncer-safe.</td>
+<td><strong>Carry</strong> <code>begin_scoped</code>/<code>set_tenant</code>, extractor-as-typestate, <code>lock_tenant_row</code> first in lock order. <strong>Skip</strong> <code>ACTIVE_TENANT_HEADER</code>/<code>resolve()</code> — CONTRACT §9 forbids a client-supplied tenant.</td>
+<td><code>set_tenant</code> on a pool conn then a <em>new</em> tx leaves no scope: RLS returns zero rows, reading as empty, not denied. <code>lock_tenant_row</code> before member rows or the audit FK deadlocks (40P01).</td>
+</tr>
+<tr>
+<td><code>migrations/0001_tenancy.sql</code></td>
+<td><code>tenants</code>, <code>users</code>, <code>app_current_tenant()</code>, <code>agent_auth_user(p_sub)</code>, role <code>agent_app</code>, policies <code>tenant_isolation</code>/<code>tenant_self</code></td>
+<td>GUC wrapped in a function, used as the <code>tenant_id</code> DEFAULT <strong>and</strong> inside <code>CREATE POLICY ... USING (...) WITH CHECK (...)</code>. <code>NOLOGIN NOSUPERUSER NOBYPASSRLS</code>; <code>REVOKE ALL ON _sqlx_migrations</code>.</td>
+<td><strong>Carry</strong> function-not-raw-read, the DEFAULT, <code>NOBYPASSRLS</code>, the revoke, <code>SECURITY DEFINER SET search_path</code>. <strong>Skip</strong> <code>tenant_self</code>.</td>
+<td>The role is created in a <code>DO</code> block that swallows <code>insufficient_privilege</code> with <code>RAISE NOTICE</code> → migrate passes with <strong>no runtime role</strong>, so every grant is a no-op. A <code>FOR ALL</code> policy without <code>WITH CHECK</code> lets writes escape.</td>
+</tr>
+<tr>
+<td><code>src/auth.rs</code></td>
+<td><code>Verifier { audience, client_id, issuers }</code>, <code>unverified_iss</code>, <code>JwksCache</code>, <code>Caller</code>, <code>Role</code> (8), <code>RoleSet::effective(view_as)</code>, <code>require_super_admin</code>, <code>JWKS_TTL</code> 600 s, <code>JWKS_MIN_REFRESH</code> 30 s</td>
+<td>Unverified <code>iss</code> only selects a trusted entry; unlisted is 401 <strong>before any fetch</strong>. Per-issuer cache, then validate with <code>iss</code> pinned there. Person token needs <code>aud</code> <strong>and</strong> <code>azp == client_id</code>. Roles from <code>resource_access</code>, never <code>realm_access</code>.</td>
+<td><strong>Carry</strong> the pin, per-issuer caches, the <code>azp</code> check, <code>RoleSet::effective</code> = intersection. <strong>Trim</strong> to one realm (D13) — keep the mechanism, not the breadth.</td>
+<td><code>azp</code> is the only cross-app replay guard: realm clients have <code>fullScopeAllowed</code>, so another app's token already carries your <code>aud</code> and roles. <code>JWKS_MIN_REFRESH</code> is a <em>negative</em> floor — without it an unknown <code>kid</code> re-fetches per request.</td>
+</tr>
+<tr>
+<td><code>src/licensing/gate.rs</code></td>
+<td><code>VerdictGate</code>, trait <code>LicenceGate</code>, <code>check_request</code>, <code>lookup</code>, <code>evaluate</code>, <code>GATE_MARK</code>, <code>MAX_AGE_SECONDS</code></td>
+<td>Total function over <code>(Option&lt;Verdict&gt;, Reading)</code>: no verdict, stale, unavailable and unknown status all refuse. Exempt <strong>routes</strong>: <code>/api/license/status</code>, <code>/api/me*</code>, <code>/api/platform/*</code>.</td>
+<td><strong>Carry</strong> exhaustive decision, fail-closed on <em>absent</em> data, one <code>RequireLicence</code>. <strong>Skip</strong> the synchronous licences call — CONTRACT §9 syncs <code>app_licence</code>.</td>
+<td>Fail-closed lives in the match: a <code>_ =&gt; allow</code> arm is invisible in review, hence the exhaustiveness test. Dropping <code>counted</code>/<code>GATE_MARK</code> makes an outage look quiet.</td>
+</tr>
+<tr>
+<td><code>src/sse_hub.rs</code> + <code>src/conversations/hub.rs</code></td>
+<td><code>Bridge</code>, <code>Subscription</code> (Drop), <code>frames</code>, <code>to_event(&amp;Frame, id_of)</code>, <code>KEEPALIVE</code> 15 s, <code>MAX_REPLAY</code> 200; trait <code>EventHub</code>, <code>LocalHub</code>, <code>feed(...)</code></td>
+<td>15 s keepalive, bounded <code>Last-Event-ID</code> replay, slow clients closed by an acquisition budget, unsubscribe via <code>Drop</code>; <code>feed</code> filters by tenant/job/conversation.</td>
+<td><strong>Carry the framing</strong> and the <code>EventHub</code> trait + <code>feed</code> filter. <strong>Do not carry the transports</strong> — <code>sse_hub.rs</code> is a <strong>Redis pub/sub</strong> bridge; SPEC §4 forbids Redis. Rebuild on <code>pg_notify</code>.</td>
+<td>A hub swap that bypasses <code>feed</code> removes the tenant filter — a cross-tenant leak, not a delivery bug. <code>LocalHub</code> is per replica: a frame on pod A never reaches a client on pod B.</td>
+</tr>
+<tr>
+<td><code>src/provision/outbox.rs</code> + <code>migrations/0035_provision_outbox.sql</code></td>
+<td><code>OutboxRow</code>, <code>backoff(attempts, entropy)</code>, <code>finish</code>, <code>spawn_drainer</code>, <code>CLAIM</code>, <code>BATCH</code> 10, <code>BACKOFF_CAP_SECS</code> 900; SQL <code>provision_outbox</code>, <code>provision_status</code>, <code>provision_claim(batch, lease_s, ops)</code></td>
+<td>Enqueue in the mutation tx; claim via SQL function with <code>lease_until</code>+<code>lease_token</code>; send <strong>outside</strong> the tx; <code>finish</code> records outcome. <code>id uuid DEFAULT uuidv7()</code> is the Idempotency-Key.</td>
+<td><strong>Carry</strong> the status vocabulary, the lease pair, partial indexes, <code>backoff</code> taking injected <code>entropy</code>. <strong>Skip</strong> the <code>target</code>/<code>op</code> CHECKs.</td>
+<td>The unique index covers <code>pending</code> only: a row stuck <code>in_flight</code> after a crash blocks nothing, and re-enqueue creates a second live row — <code>superseded</code> is what makes re-enqueue safe. <code>last_error</code> has a 2000 CHECK; truncate in Rust.</td>
+</tr>
+<tr>
+<td><code>migrations/0034_audit.sql</code> + <code>src/audit/</code></td>
+<td><code>audit_event</code>, <code>platform_audit</code>, <code>Actor</code>, <code>Event</code>, <code>record(conn, actor, e)</code>, <code>record_alone</code>, <code>checked</code>, <code>scrub.rs</code>, <code>vocab.rs</code>, <code>MAX_DETAILS_BYTES</code> 8 KiB</td>
+<td>Append-only by <strong>GRANT</strong> (<code>REVOKE ALL</code>, then <code>SELECT, INSERT</code>). <code>action</code>/<code>status</code> CHECKed, action vocabulary whitelisted in Rust, details scrubbed, 8 KiB cap. <code>record</code> takes <code>&amp;mut PgConnection</code> to join the caller's tx.</td>
+<td><strong>Carry all of it</strong> — the GRANT rule, CHECKs, whitelist, scrubber, cap. <strong>Skip</strong> <code>platform_audit</code> unless the single impersonation path needs it.</td>
+<td><code>record</code> vs <code>record_alone</code> <em>is</em> the guarantee: <code>record_alone</code> in a mutation leaves an audit row for a rolled-back change. The <code>action</code> regex rejects uppercase/hyphens — derived ids must match before insert.</td>
+</tr>
+<tr>
+<td><code>src/lease.rs</code> + <code>migrations/0190_b8_worker_lease.sql</code></td>
+<td><code>TTL_SECS</code> 600, <code>owner()</code>, <code>spawn_sweep</code>; SQL <code>validation_grid_claim/renew/release</code>, CHECK <code>((lease_owner IS NULL) = (lease_until IS NULL))</code></td>
+<td><code>owner()</code> = <code>&lt;HOSTNAME or "api"&gt;:&lt;uuid&gt;</code> per process start, so a restarted pod's predecessor lease expires at TTL and is swept. Claim is one conditional <code>UPDATE ... RETURNING 1</code> in <code>SELECT EXISTS</code>, <code>SECURITY DEFINER</code>.</td>
+<td><strong>Carry</strong> the conditional-UPDATE shape, paired-null CHECK, <code>search_path</code> pin. <strong>Skip</strong> the sweep's resume targets.</td>
+<td>Only ~63 lines because <strong>none of the logic is Rust</strong>. <code>owner()</code> is per <strong>process</strong>, so two concurrent handlers both think they hold it; fence by <code>lease_token</code> in the row.</td>
+</tr>
+<tr>
+<td><code>src/runtime/catalog.rs</code> + <code>src/runtime/orchestrator.rs</code></td>
+<td>trait <code>OperationCatalog</code> (<code>get</code>/<code>keys</code>/<code>outputs</code>), <code>PinnedCatalog::from_rows</code>, <code>OpDef { key, object, verb, variant, side_effect, identity_level, idempotency, verify_read, confirm_back, builtin, inputs, outputs, error_states, source }</code>, <code>effective_level</code>; trait <code>ProcedureSource</code>, <code>designed_phases</code>, <code>choose</code>, <code>outside_grant</code>, <code>failure_reason</code></td>
+<td>One catalogue, no second trait; a compiled row beats the static built-in, and a row with no identity level is <strong>skipped</strong> ("not an operation" is data). Procedures are chosen from the pinned design and expanded to <code>Phase</code>s; refusal is a first-class return.</td>
+<td><strong>Carry</strong> the <code>OpDef</code> field set (the action-registry schema), single-catalogue rule, <code>effective_level</code> = the stricter, <code>outputs</code> allow-list. <strong>Skip</strong> <code>OpSource::Template</code>. <strong>Copy the procedure shape only</strong> (D10).</td>
+<td>Defaults point safe: unset <code>side_effect</code> becomes <code>P</code>, never <code>R</code> — "an unknown effect is never treated as a read". <code>outside_grant</code> + <code>identity_level</code> is the authorization checkpoint; an expander without it drops the check.</td>
+</tr>
+<tr>
+<td><code>src/mcp_client/client.rs</code> + <code>creds.rs</code></td>
+<td><code>McpCredentials</code>, <code>BINDING_HEADER</code>, <code>header_safe</code>, trait <code>TenantCredentials</code>, <code>CredentialCache</code>, <code>flight(tenant)</code>, <code>RefreshingClient</code>; <code>PRODUCT</code>, <code>ensure</code>, <code>refresh_binding</code>, <code>jwt_life</code>, <code>ROTATE_AFTER_REFUSALS</code> 2, <code>MAX_SSE_EVENT_SIZE</code> 16 MiB</td>
+<td>Per-tenant cache with single-flight fetch; one 401 triggers exactly one refresh; two refusals in <code>REFUSAL_WINDOW</code> rotate the binding. Credentials AAD-bound to tenant + purpose + binding.</td>
+<td><strong>Carry</strong> cache+single-flight, refusal-then-rotate, AAD binding, the SSE size guard. <strong>Change</strong> <code>PRODUCT = "agent"</code> (compile-time) or conveyor requests the wrong licence.</td>
+<td><code>jwt_life</code> reads <code>exp</code> and <strong>ignores opaque tokens</strong> — the same shape rule as fr's licence gate. An unconditional 401 retry loop exhausts <code>mcp_server</code>'s session budget.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="template-rust-service">template-rust-service</h2>
+<p><code>repo: $HOME/Movies/template-rust-service · sha: 0c7396a0130b3ed27904c03cce49d5415648f66f · slices: [S02, S04, S14]</code></p>
+<p>Measured 2026-11-07. <strong>Every path in the table below is relative to the repo root</strong> — <code>src/lib.rs</code> is <code>$HOME/Movies/template-rust-service/src/lib.rs</code>.</p>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>symbols</th>
+<th>mechanism</th>
+<th>carry / do-not-carry</th>
+<th>trap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Cargo.toml</code> + <code>rust-toolchain.toml</code></td>
+<td>tokio 1.53.3, axum 0.8.9, sqlx 0.9.0 (<code>runtime-tokio</code>, <code>tls-rustls</code>, <code>postgres</code>, <code>migrate</code>, <code>macros</code>, <code>json</code>), utoipa 6.0.0, utoipa-axum 0.3.0, clap 4.6.7, thiserror 2.0.21, serde 1.0.229, tower-http 0.7.1; toolchain 1.99.0</td>
+<td><code>macros</code> exists <strong>only</strong> for <code>sqlx::migrate!</code>; <code>query!</code> is forbidden (needs a DB at build time).</td>
+<td><strong>Carry</strong> the version set as <code>[workspace.dependencies]</code>.</td>
+<td><code>sqlx::migrate!("./migrations")</code> resolves against the <strong>defining crate's</strong> manifest dir — in a workspace that becomes <code>crates/store/migrations</code>, silently. The toolchain string exists in three places with no check.</td>
+</tr>
+<tr>
+<td><code>Dockerfile</code></td>
+<td>builder <code>registry.example.com:5000/library/debian:12-slim</code> + rustup; runtime debian, uid/gid 65532; <code>HEALTHCHECK</code> on <code>${BIND_ADDR##*:}/health</code></td>
+<td>The mirror has no glibc Rust image, so debian + rustup keeps builder and runtime on one glibc. <code>cmake</code>/<code>perl</code> for <code>aws-lc-sys</code>.</td>
+<td><strong>Carry</strong> the base reasoning, non-root, cache mounts. <strong>Change</strong> to <code>cargo build --release --locked -p &lt;server&gt;</code>.</td>
+<td>Without <code>-p</code> a workspace build compiles every member, so any crate's error blocks the service image.</td>
+</tr>
+<tr>
+<td><code>src/lib.rs</code> + <code>src/db.rs</code></td>
+<td><code>AppState</code>, <code>ApiDoc</code>, <code>api_router() -&gt; OpenApiRouter&lt;AppState&gt;</code>, <code>app(state)</code>, <code>openapi()</code>; <code>MIGRATOR</code>, <code>connect</code> (10 conns, 5 s acquire), <code>migrate</code></td>
+<td><code>OpenApiRouter::with_openapi(...).routes(routes!(...))</code> then <code>split_for_parts()</code> — served router and spec are one object, so a handler without <code>#[utoipa::path]</code> does not compile in. Embedded migrator.</td>
+<td><strong>Carry</strong> the wiring and the migrator. <strong>Change:</strong> each crate exports its own <code>OpenApiRouter&lt;AppState&gt;</code>, merged in the composition root; the pool size is a default, not a measurement for <code>serve</code> + <code>worker</code> + scheduler.</td>
+<td><code>Router::merge</code> merges routes only, silently dropping the second crate's paths from the spec — use <code>OpenApiRouter::merge</code>. <code>info.version</code> comes from whichever crate declares <code>ApiDoc</code>; pin it. The migrator takes a <strong>session</strong> advisory lock: <code>DATABASE_MIGRATE_URL</code> must bypass PgBouncer or two replicas race.</td>
+</tr>
+<tr>
+<td><code>src/tenant.rs</code></td>
+<td><code>TenantId(pub String)</code>, <code>impl FromRequestParts&lt;S&gt;</code>, <code>TENANT_HEADER</code>, <code>TenantHeader</code> (<code>IntoParams</code>, <code>parameter_in = Header</code>)</td>
+<td>Trusts an edge-set header; validates non-empty, ≤128, <code>[A-Za-z0-9_-]</code>. <code>TenantHeader</code> is a separate struct whose only job is to put the header in OpenAPI.</td>
+<td><strong>Carry the two-struct pattern</strong> (utoipa cannot derive params from an extractor). <strong>Do not carry the trust model</strong> — CONTRACT §9: tenant from membership.</td>
+<td><code>String</code> makes an invalid uuid a downstream 500. Conveyor must parse to <code>Uuid</code> <strong>in the extractor</strong> so the type carries the invariant.</td>
+</tr>
+<tr>
+<td><code>src/config.rs</code> + <code>src/error.rs</code> + <code>src/main.rs</code></td>
+<td><code>Config::from_env/from_lookup</code>, <code>AppError</code> (<code>IntoResponse</code>), <code>Cli { print_openapi }</code>, <code>serve()</code></td>
+<td><code>from_lookup</code> takes an injectable closure so config is testable without process env. <code>--print-openapi</code> exits before env/DB — this is what <code>target_openapi_cmd</code> runs.</td>
+<td><strong>Carry</strong> <code>from_lookup</code> and <code>--print-openapi</code>. <strong>Replace</strong> the error body with RFC 9457 <code>problem+json</code> (CONTRACT §5). <strong>Change:</strong> <code>migrate</code> becomes a subcommand.</td>
+<td>Swapping the error renderer is not local: every rejection type must funnel into one converter or clients see two contracts. Implicit migrate means replicas race the migrator each deploy.</td>
+</tr>
+<tr>
+<td><code>tests/db.rs</code> + <code>tests/http.rs</code></td>
+<td><code>Server { url, container }</code>, <code>impl Drop</code>, <code>env_url()</code>, <code>TEST_PG_REGISTRY</code>; <code>state()</code> (<code>connect_lazy</code> on <code>127.0.0.1:1</code>), <code>app(state()).oneshot(...)</code></td>
+<td><code>TEST_DATABASE_URL</code> → <code>DATABASE_URL</code> → ephemeral <code>postgres:18</code> container → <strong>fail, never skip</strong>. A lazy pool at a dead port proves the health path touches no DB; <code>oneshot</code> drives the real router with no socket.</td>
+<td><strong>Carry</strong> the fail-never-skip ladder and the lazy-pool HTTP test. <strong>Change</strong> to one container per <strong>test binary</strong>.</td>
+<td><code>Drop</code> does not run on abort, so containers leak. <code>connect_lazy</code> succeeds against a dead host, so a handler that <em>does</em> query hangs to the acquire timeout — it looks like a slow test.</td>
+</tr>
+<tr>
+<td><code>parity.toml</code> + <code>parity/requests.jsonl</code></td>
+<td><code>source_repos</code>, <code>source_shas</code>, <code>source_openapi</code>, <code>target_openapi_cmd</code>, <code>requests_file</code>, <code>[[upstreams]] { name, env, fixtures }</code></td>
+<td>Sources pinned by <strong>SHA</strong>, never a branch; the target spec is produced by the binary; JSONL replays; each upstream a named fixture table.</td>
+<td><strong>Carry</strong> as <code>parity.yaml</code> (SPEC §5.2); sources = fr + RM + Planka fork, SHAs pinned at freeze (D8).</td>
+<td>The three source arrays must stay index-aligned and nothing checks it. A branch name in <code>source_shas</code> silently compares against whatever moved.</td>
+</tr>
+</tbody>
+</table>
+<p><code>scripts/rename.sh</code> is <strong>not runnable</strong>: it needs <code>git ls-files</code> and this directory is not a repo (CONTRACT §13). Use <code>gitops-production/scripts/new-rust-target.sh</code> later.</p>
+<hr />
+<h2 id="strata_rag">strata_rag</h2>
+<p><code>repo: $HOME/Movies/strata_rag · sha: b9426c38591b8543530b558e00fa0ccc52a11465 · slices: [S02, S07]</code></p>
+<p>Measured 2026-11-07. <strong>Every path in the table below is relative to the repo root</strong> — <code>src/tenant.rs</code> is <code>&lt;repo&gt;/src/tenant.rs</code>.</p>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>symbols</th>
+<th>mechanism</th>
+<th>carry / do-not-carry</th>
+<th>trap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/tenant.rs</code></td>
+<td><code>Tenant(Uuid)</code>, <code>new</code>, <code>parse</code>, <code>id</code>, <code>FromStr</code>, <code>resolve_tenant(scope: Option&lt;TokenScope&gt;, asked: Option&lt;Tenant&gt;)</code></td>
+<td>Newtype validated at construction; <code>resolve_tenant</code> makes the token <strong>scope</strong> win over any requested tenant and errors on mismatch.</td>
+<td><strong>Carry</strong> the newtype and the precedence rule — authenticated scope beats a requested tenant, disagreement is an error. CONTRACT §9's concrete shape.</td>
+<td>A <code>pub</code> field gives back the invalid state the type prevents. <code>parse</code> rejecting nil matters: nil is a valid Postgres uuid that matches nothing, silently.</td>
+</tr>
+<tr>
+<td><code>src/store_providers.rs</code></td>
+<td><code>is_empty(conn, store)</code>, <code>check_retag</code>, <code>put_store_providers_tx(...)</code></td>
+<td>The <code>_tx</code> convention — takes a connection, opens no transaction of its own, so the caller composes. <code>check_retag</code> is a precondition read in the same tx as the write.</td>
+<td><strong>Carry the <code>_tx</code> naming, absolutely</strong> (<code>claim_card_tx</code>): it makes "does this commit?" answerable at the call site.</td>
+<td>One <code>_tx</code> method that calls <code>db.begin()</code> internally deadlocks against the caller's open tx on the same row.</td>
+</tr>
+<tr>
+<td><code>src/metrics.rs</code></td>
+<td><code>METRICS_PATH</code>, <code>handle() -&gt; &amp;'static PrometheusHandle</code> (OnceLock), <code>describe()</code>, <code>RequestCtx</code>, <code>record_stages</code>, <code>LATENCY_BUCKETS</code>, <code>OUTBOX_COUNT_TIMEOUT</code> 1 s</td>
+<td>One <code>OnceLock</code> handle; a per-request context accumulates timings and emits once, so instrumentation is one object passed down.</td>
+<td><strong>Carry</strong> the OnceLock handle, per-request context, explicit buckets, and <strong>a timeout on any gauge that queries the DB</strong>.</td>
+<td>A DB-querying scrape endpoint without a timeout turns a slow database into "service down" while it serves fine — hence <code>OUTBOX_COUNT_TIMEOUT</code>.</td>
+</tr>
+<tr>
+<td><code>tests/common/mod.rs</code></td>
+<td><code>TestDb</code>, <code>Server</code>, <code>IMAGE = "pgvector/pgvector"</code>, <code>TAG = "0.8.7-pg18"</code>, <code>SERVER: OnceCell</code>, <code>CONTAINER_ID: OnceLock</code>, <code>remove_shared_container()</code> (atexit)</td>
+<td><strong>One container per test binary</strong>, one <strong>fresh database per test</strong>; <code>TEST_DATABASE_URL</code> short-circuits. The handle sits in a static so Rust never drops it — removal is an atexit hook shelling <code>docker rm -f -v</code> by recorded id, with retries under a unique name.</td>
+<td><strong>Carry the whole pattern.</strong> The template's per-run container is the degenerate case.</td>
+<td>Three measured traps: (1) <code>Drop</code> never runs for a static, so without atexit every run leaks a container; (2) per-<strong>test</strong> containers spawn dozens of concurrent <code>docker run</code>s and overload the Docker VM; (3) a container that fails to start is unreachable by handle — only the recorded name cleans it up.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-this-map-does-not-cover">What this map does not cover</h2>
+<ul>
+<li><strong><code>agent</code>'s other 143 migrations and ~40 modules</strong> (<code>platform</code>, <code>iam</code>, <code>signup</code>, <code>channels</code>, <code>turn</code>, …) — mapped by §5.2 row only.</li>
+<li><strong><code>agent-model</code></strong> and <strong><code>agent/web/</code></strong> — the <code>OperationRow</code>/<code>kind</code> types the catalogue parses (replaced by the <code>#[action]</code> derive) and the SvelteKit UI (the conveyor's is Rust, D5).</li>
+<li><strong><code>orchestrator.rs</code> internals</strong> — read for shape only; procedures are redesigned (D10).</li>
+<li><strong>Template CI workflow and <code>scripts/</code> beyond <code>rename.sh</code></strong> — the gitops <code>rust-service.yml</code> archetype is the authority.</li>
+<li><strong><code>strata_rag</code> pgvector schema / HNSW / search</strong> — S07's own map.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/02-source-map/10-agent-patterns.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

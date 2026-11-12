@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S02 — Skeleton · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S02-skeleton.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><p>⚠️ <strong>Amended 2026-11-09 (process model).</strong> <code>process.step</code> remains the one step driver (S11's <code>procedure.step</code> is renamed by <code>0033</code>); the <code>workflow.node</code> and <code>workflow.start</code> job kinds retire with the DAG. The <code>event</code> outbox gains <code>bus_stream_id text null</code> and <code>published_at timestamptz null</code> (migration <code>0033</code>); a relay in <code>apps/server</code> publishes unpublished rows to Redis Streams (topics <code>work.requested|succeeded|failed</code>, <code>tool.call|response</code>, <code>dead.letter</code>; consumer groups <code>process|tool</code>; dead letter after 5 deliveries). Compose gains a Redis service for dev/test. The bus is a nudge — Postgres <code>run</code>/<code>run_step</code>/<code>event</code> are the record and re-deliver after a Redis loss (SPEC §5.6, CONTRACT §7/§21).</p>
+<h1 id="s02--skeleton">S02 — Skeleton</h1>
+<p>Programme project: S02 · issues #12</p>
+<p><strong>Gate (SPEC §8 S2):</strong> two tenants isolated (including RLS); login works.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>A ten-member workspace (eight crates + two apps) and one binary (<code>serve | migrate | worker | admin</code>) over Postgres 18: eleven platform tables, forced RLS, OIDC/dev auth, a fail-closed licence gate, a fenced job runner, a replaying SSE stream.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li><code>conveyor</code> is docs-only — no <code>Cargo.toml</code>, <code>crates/</code> or git repo. CONTRACT §13: <code>scripts/rename.sh</code> cannot run (<code>git ls-files</code>), so the workspace is hand-built from the template's patterns; no <code>.git</code>, <code>.github</code> or <code>new-rust-target.sh</code> this slice.</li>
+<li>S00 wrote <code>parity.yaml</code>, which S02 ignores. S01 recorded the UI ADR; <code>apps/web</code> is reserved but empty.</li>
+<li><code>template-rust-service@0c7396a</code>, <code>agent@83b8de7</code>, <code>strata_rag@b9426c3</code> read locally.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — workspace, toolchain, <code>.dockerignore</code>, <code>compose.yaml</code>; <code>migrations/0001_platform.sql</code> (11 tables, RLS forced, roles, policies); <code>crates/store</code> pool/scope/migrator/outbox/jobs/audit/idempotency; <code>crates/auth</code> JWKS + dev principal + licence extractor; <code>crates/api</code> health, request id, problem+json, <code>/api/events</code>, <code>/metrics</code>; <code>apps/server</code> subcommands and <code>--print-openapi</code>.</p>
+<p><strong>OUT</strong> — domain aggregates and tables (S03); action registry (S04); board/run/approval endpoints (S03–S06); the Keycloak realm (S14; S02 consumes <code>CONVEYOR_OIDC_ISSUER</code> only); the licences service (D12); cluster deploy and pgbouncer config (S14); pgvector/search (S07); the UI (S12); <code>.github/</code> and git (CONTRACT §13).</p>
+<p><strong>UI surface declared for S12</strong> (contract §11 — declaration only, no UI code): <code>shell/login</code> — sign in through OIDC, sign out, tenant switch, and the <code>/api/me</code> read model (principal, memberships, active tenant).</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry (symbols)</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent</code> <code>crates/agent-api/src/tenancy.rs</code></td>
+<td>tenant-first tx scope</td>
+<td><code>begin_scoped</code>, <code>set_tenant</code>, <code>lock_tenant_row</code>, <code>TenantCtx</code>, <code>JobCtx</code>; tenant row locked first</td>
+<td><code>ACTIVE_TENANT_HEADER</code> — CONTRACT §9 forbids a client-supplied tenant</td>
+</tr>
+<tr>
+<td><code>agent</code> <code>crates/agent-api/migrations/0001_tenancy.sql</code></td>
+<td>the policy, function and grants</td>
+<td><code>app_current_tenant()</code>, <code>DEFAULT app_current_tenant()</code>, <code>tenant_isolation</code>, <code>NOBYPASSRLS</code>, <code>REVOKE ALL ON _sqlx_migrations</code></td>
+<td>the <code>DO</code> block swallowing <code>insufficient_privilege</code> — passes with no runtime role</td>
+</tr>
+<tr>
+<td><code>agent</code> <code>crates/agent-api/src/auth.rs</code>, <code>crates/agent-api/src/licensing/gate.rs</code></td>
+<td>JWKS cache and refusal paths</td>
+<td><code>JwksCache</code>, <code>unverified_iss</code>, <code>Verifier</code>, <code>JWKS_TTL</code> 600 s, <code>JWKS_MIN_REFRESH</code> 30 s, <code>VerdictGate</code>; <code>aud</code>+<code>azp</code>; exhaustive refusal</td>
+<td>8-role breadth, <code>resource_access</code>, synchronous licences call</td>
+</tr>
+<tr>
+<td><code>agent</code> <code>crates/agent-api/src/sse_hub.rs</code>, <code>crates/agent-api/src/conversations/hub.rs</code></td>
+<td>replay ring and keepalive</td>
+<td><code>Subscription</code>, <code>to_event</code>, <code>KEEPALIVE</code> 15 s, <code>MAX_REPLAY</code> 200, <code>Drop</code> unsubscribe</td>
+<td>the Redis pub/sub bridge (SPEC §4)</td>
+</tr>
+<tr>
+<td><code>agent</code> <code>crates/agent-api/src/provision/outbox.rs</code>, <code>crates/agent-api/migrations/0035_provision_outbox.sql</code></td>
+<td>claim SQL and lease fencing</td>
+<td><code>OutboxRow</code>, claim SQL, <code>lease_until</code>/<code>lease_token</code>, send outside the tx</td>
+<td><code>target</code>/<code>op</code> CHECKs, supersede column</td>
+</tr>
+<tr>
+<td><code>agent</code> <code>crates/agent-api/migrations/0034_audit.sql</code>, <code>crates/agent-api/src/audit/</code></td>
+<td>append-only grant, scrub</td>
+<td><code>record(&amp;mut conn, …)</code>, <code>vocab</code>, <code>scrub</code>, <code>MAX_DETAILS_BYTES</code>; <code>GRANT SELECT, INSERT</code> only</td>
+<td><code>platform_audit</code></td>
+</tr>
+<tr>
+<td><code>template-rust-service</code> <code>Cargo.toml</code>, <code>rust-toolchain.toml</code>, <code>src/{lib,db,tenant,config,error,main}.rs</code></td>
+<td>OpenApiRouter, AppState, two-struct OpenAPI</td>
+<td>version set; <code>OpenApiRouter</code>, <code>AppState</code>, <code>from_lookup</code>, <code>--print-openapi</code>; two-struct OpenAPI pattern</td>
+<td><code>query!</code>, <code>Router::merge</code>, trusted tenant header, template error body</td>
+</tr>
+<tr>
+<td>template <code>Dockerfile</code>, <code>.dockerignore</code>, <code>tests/{db,http}.rs</code></td>
+<td>non-root image, test ladder</td>
+<td>non-root 65532; fail-never-skip ladder</td>
+<td>per-run container</td>
+</tr>
+<tr>
+<td><code>strata_rag</code> <code>src/tenant.rs</code>, <code>src/metrics.rs</code>, <code>tests/common/mod.rs</code></td>
+<td>tenant newtype, metrics, cleanup</td>
+<td><code>Tenant(Uuid)</code>, <code>OnceLock</code> metrics, atexit container cleanup</td>
+<td>token scopes</td>
+</tr>
+<tr>
+<td><code>fr@6f7c509</code> <code>backend/src/lib/licence-introspect.ts</code>, <code>backend/src/lib/require-fr-license.ts</code>, <code>backend/src/workers/</code></td>
+<td>positive-only cache, timer inventory</td>
+<td><code>looksLikeJwt</code> (three non-empty dots), positive-only cache; the 14 <code>setInterval</code> names, as job kinds</td>
+<td>the Redis cache, the timers</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>Cargo.toml  rust-toolchain.toml  .dockerignore  Dockerfile  compose.yaml
+migrations/0001_platform.sql
+scripts/db-roles.sql                 # superuser only
+crates/{domain,store,api,actions,actions-derive,auth,render,workflow}/   # actions|actions-derive|render|workflow: empty stubs
+apps/server/{src,tests}/             # bin `conveyor`
+apps/web/                            # Cargo.toml + empty src/lib.rs, zero deps</code></pre>
+<p><code>[workspace.dependencies]</code> — exact pins; every crate is <code>#![forbid(unsafe_code)]</code>, edition 2024, toolchain 1.99.0:</p>
+<pre class="toml"><code>[workspace.dependencies]
+tokio = &quot;1.53.3&quot;
+axum = &quot;0.8.9&quot;
+sqlx = { version = &quot;0.9.0&quot;, features = [&quot;runtime-tokio&quot;, &quot;tls-rustls&quot;, &quot;postgres&quot;, &quot;migrate&quot;, &quot;macros&quot;, &quot;json&quot;] }
+utoipa = &quot;6.0.0&quot;
+utoipa-axum = &quot;0.3.0&quot;
+clap = &quot;4.6.7&quot;
+thiserror = &quot;2.0.21&quot;
+serde = &quot;1.0.229&quot;
+serde_json = &quot;1.0.154&quot;
+tower = &quot;0.5&quot;
+tower-http = &quot;0.7.1&quot;
+# also: uuid, tracing, tracing-subscriber, metrics, metrics-exporter-prometheus</code></pre>
+<p><strong>Tables</strong> — exactly data-architecture §2.1/§2.2, column for column: <code>tenant</code>, <code>app_user</code>, <code>membership</code>, <code>department</code>, <code>event</code>, <code>job</code>, <code>schedule</code>, <code>audit_event</code>, <code>action_invocation</code>, <code>idempotency_key</code>, <code>app_licence</code>. No others.</p>
+<p><code>migrations/0001_platform.sql</code> — envelope (the eleven bodies are §2.1/§2.2 verbatim):</p>
+<pre class="sql"><code>CREATE FUNCTION app_current_tenant() RETURNS uuid LANGUAGE sql STABLE
+  AS $$ SELECT nullif(current_setting(&#39;app.current_tenant&#39;, true), &#39;&#39;)::uuid $$;
+ALTER TABLE membership ENABLE ROW LEVEL SECURITY;
+ALTER TABLE membership FORCE  ROW LEVEL SECURITY;          -- owner included
+CREATE POLICY tenant_isolation ON membership FOR ALL
+  USING (tenant_id = app_current_tenant())
+  WITH CHECK (tenant_id = app_current_tenant());           -- forged writes refused
+-- tenant_id uuid NOT NULL DEFAULT app_current_tenant()
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO conveyor_runtime;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO conveyor_runtime;
+REVOKE ALL ON _sqlx_migrations FROM conveyor_runtime;
+REVOKE UPDATE, DELETE ON audit_event FROM conveyor_runtime;  -- append-only by GRANT</code></pre>
+<p>Roles are superuser-created (<code>scripts/db-roles.sql</code> locally, DBA in S14): <code>conveyor_migrate LOGIN</code> (owner) and <code>conveyor_runtime LOGIN NOSUPERUSER NOBYPASSRLS</code>. <code>migrate</code> <strong>asserts</strong> <code>rolsuper = false AND rolbypassrls = false</code> and aborts otherwise.</p>
+<p><code>sqlx::migrate!</code> lives in <code>crates/store/src/migrate.rs</code> and must read <strong><code>sqlx::migrate!("../../migrations")</code></strong>: the macro resolves against the <em>defining crate's</em> manifest dir, so a bare <code>"./migrations"</code> silently means <code>crates/store/migrations</code>. A unit test asserts the embedded set is exactly <code>[(1, "platform")]</code>. <code>migrate</code> re-applies the grant block afterwards: a later table is otherwise invisible to the runtime role.</p>
+<p><strong>Endpoints:</strong> <code>GET /health</code>, <code>/health/live</code> (no DB), <code>/health/ready</code> (<code>SELECT 1</code> through the runtime pool), <code>/metrics</code>, <code>/api/me</code>, <code>/api/events?topics=…</code>. <code>/api</code> is one <code>OpenApiRouter</code> built with <code>.routes(...)</code>; <code>--print-openapi</code> emits its document and exits before config/DB. (A second crate's paths must be folded with <code>OpenApiRouter::merge</code>, never <code>Router::merge</code>; only <code>/mcp</code> uses plain <code>Router::merge</code>, outside the document.)</p>
+<p><strong>Env:</strong></p>
+<pre class="bash"><code>APP_ENV
+BIND_ADDR=0.0.0.0:8930
+DATABASE_URL                  # pgbouncer 127.0.0.1:6439, runtime role
+DATABASE_MIGRATE_URL          # direct :5439, owner
+DATABASE_LISTEN_URL           # direct :5439
+CONVEYOR_DEV_AUTH
+CONVEYOR_OIDC_ISSUER
+CONVEYOR_OIDC_AUDIENCE=conveyor
+CONVEYOR_OIDC_CLIENT_ID
+LICENCES_BASE_URL
+APP_KEY=conveyor
+JOB_LEASE_SECS=60</code></pre>
+<p><strong>Tenancy.</strong> <code>TenantId</code> wraps a private <code>Uuid</code>, parsed in the extractor (never a <code>String</code>), so an invalid uuid is a <code>401</code>, not a <code>500</code>. <code>begin_scoped</code> opens a tx then <code>SELECT set_config('app.current_tenant', $1, true)</code>; a session-level <code>SET</code> never appears. Every <code>store</code> function takes <code>TenantId</code> as its first argument after the connection: an unscoped query is a compile error.</p>
+<p><strong>Auth.</strong> One realm (<code>conveyor</code>); unlisted <code>iss</code> rejected before any JWKS fetch; per-issuer cache 600 s with a 30 s negative floor. <code>CONVEYOR_DEV_AUTH=1</code> accepts <code>Authorization: Bearer dev:&lt;login&gt;</code> <strong>or the <code>conveyor_dev=&lt;login&gt;</code> cookie</strong> (the browser transport), both resolved through <code>membership</code> to exactly one <code>(app_user, tenant)</code> — zero or several is a 401; <code>migrate --dev-seed</code> creates <strong><code>dev-a</code>/<code>alice</code></strong> and <strong><code>dev-b</code>/<code>bob</code></strong>, so <code>dev:alice</code> IS the dev-a principal (CONTRACT §10); startup exits non-zero if set with <code>APP_ENV=production</code>. Licence tokens are non-JWT; a JWT-shaped token that fails verification is a hard <code>401</code>, never retried as a licence token. <code>RequireLicence</code> reads <code>app_licence</code> only — absent, stale or unknown refuse — refreshed by <code>licence.sync</code>; core requests never call the licences service.</p>
+<p><strong>Jobs.</strong> Claim is <code>FOR UPDATE SKIP LOCKED</code> + fenced <code>lease_token</code> (data-arch §4 SQL); a stale token completes nothing. <code>schedule</code> materialises under <code>pg_advisory_xact_lock(hashtext('conveyor:schedule'))</code>. Kinds: <code>event.prune</code> (90 d, batched, per tenant — RLS forbids a cross-tenant delete), <code>job.prune</code>, <code>idempotency.sweep</code>, <code>licence.sync</code>.</p>
+<p><strong>SSE.</strong> <code>Last-Event-ID</code> is <code>event.seq</code>; replay is <code>seq &gt; $last AND topic = ANY($topics) ORDER BY seq LIMIT 500</code> in the subscriber's tenant scope; 15 s keepalive; a bounded channel closes a slow client with <code>resync</code>. <code>pg_notify('conveyor_event', seq::text)</code> is a <strong>doorbell</strong>: the listener holds a dedicated <strong>direct</strong> connection (<code>DATABASE_LISTEN_URL</code>) because <code>LISTEN</code> is session-scoped and PgBouncer is transaction-pooled, and each subscriber re-queries its own rows, so no cross-tenant read path exists.</p>
+<p><code>compose.yaml</code>: service <code>db</code> (Postgres 18 + pgvector, <code>127.0.0.1:5439</code>), <code>pgbouncer</code> on 6439, <code>app</code> on 8930 — <strong>same port inside and outside</strong>. That is a real mechanism, not a wish: <code>db</code> starts as <code>command: ["postgres", "-p", "5439"]</code> (the image defaults to 5432) and pgbouncer's <code>listen_port</code> is 6439 inside the container. Integration tests start their <strong>own</strong> ephemeral container on a random host port (one per binary, fresh database each test); <code>TEST_DATABASE_URL</code> short-circuits; a container that cannot start fails, never skips.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Preflight: docker up, ports 8930/5439/6439 free, no <code>.git</code>. Never 8000.</li>
+<li>Root <code>Cargo.toml</code>, <code>rust-toolchain.toml</code>, ten members with <code>#![forbid(unsafe_code)]</code>.</li>
+<li><code>crates/domain</code>: <code>TenantId</code>, <code>Id</code>, <code>Version</code>; nil rejected.</li>
+<li><code>migrations/0001_platform.sql</code> + <code>scripts/db-roles.sql</code>; apply roles as superuser, then the migration once.</li>
+<li><code>crates/store</code>: pool (10 conns, 5 s acquire), <code>migrate.rs</code>, <code>begin_scoped</code>.</li>
+<li><code>apps/server/tests/rls.rs</code> — the two-tenant gate as the runtime role, with the superuser control.</li>
+<li><code>crates/auth</code>: <code>from_lookup</code>, <code>JwksCache</code>, <code>Principal</code>, dev principal, production refusal.</li>
+<li><code>crates/api</code>: <code>ApiError</code> → problem+json, <code>X-Request-Id</code>, health, <code>/metrics</code> (OnceLock, 1 s gauge timeout).</li>
+<li><code>apps/server</code>: clap subcommands (<code>serve | migrate | worker | admin</code>); <code>--print-openapi</code> emits the merged paths and exits before config/DB. <code>migrate --dev-seed</code> inserts the two dev tenants <code>dev-a</code>/<code>dev-b</code> with one user each — <code>alice</code> in <code>dev-a</code>, <code>bob</code> in <code>dev-b</code> (idempotent; refused when <code>APP_ENV=production</code>) — so <code>Bearer dev:alice</code> is a dev-a request. Every later gate that reads <code>select id from tenant where slug='dev-a'</code> depends on this. The <strong>catalogue</strong> seed (<code>migrate --seed --tenant &lt;slug&gt;</code>) is S07's; S02 does not implement it.</li>
+<li>Outbox writer + <code>/api/events</code>.</li>
+<li>Direct-pool listener; prove with <code>pg_notify</code> and <code>curl -N</code>.</li>
+<li>Job claim/finish/poller + <code>worker</code> subcommand; kill test.</li>
+<li>Schedule materialiser; two concurrent runs ⇒ one job.</li>
+<li>Prune and sync kinds with seeded <code>schedule</code> rows.</li>
+<li>Audit + idempotency stores; append-only proven by a failing <code>UPDATE</code>.</li>
+<li><code>RequireLicence</code> + <code>licence.sync</code> against a local HTTP stub.</li>
+<li><code>apps/web</code> placeholder; fmt + clippy.</li>
+<li>Docker build; <code>compose up app</code>; full gate.</li>
+</ol>
+<p>Commands, in step order (from <code>$HOME/Movies/conveyor</code>):</p>
+<pre class="bash"><code>source ~/.cargo/env                       # cargo/rustc are NOT on PATH (measured 2026-11-07)
+# 1
+rustc --version &amp;&amp; docker info &amp;&amp; for p in 8930 5439 6439; do lsof -nP -iTCP:$p -sTCP:LISTEN; done || true; test ! -e .git
+# 2
+cargo check --workspace
+# 3
+cargo test -p conveyor-domain
+# 4 — roles as superuser; migration is step 5&#39;s command
+psql &quot;$DATABASE_MIGRATE_URL&quot; -v ON_ERROR_STOP=1 -f scripts/db-roles.sql
+# 5
+cargo run -p conveyor-server -- migrate
+# 6
+cargo test -p conveyor-server --test rls -- --nocapture
+# 7
+cargo test -p conveyor-auth
+# 8
+cargo test -p conveyor-api
+# 9
+cargo run -p conveyor-server -- --print-openapi | jq -e &#39;.paths&#39;
+# 10
+cargo test -p conveyor-server --test events
+# 11
+psql &quot;$DATABASE_LISTEN_URL&quot; -c &quot;select pg_notify(&#39;conveyor_event&#39;,&#39;1&#39;)&quot; &amp;&amp; curl -sN localhost:8930/api/events -H &#39;authorization: Bearer dev:alice&#39;
+# `/api/events` is licence-gated: run `migrate --dev-seed` first (it seeds an active app_licence row)
+# 12
+cargo test -p conveyor-store --test jobs
+# 13
+cargo test -p conveyor-store --test schedule
+# 14
+cargo test -p conveyor-server --test prune
+# 15
+cargo test -p conveyor-store --test audit_idempotency
+# 16
+cargo test -p conveyor-auth --test licence
+# 17
+cargo fmt --check &amp;&amp; cargo clippy --workspace --all-targets -- -D warnings
+# 18
+cargo build --release --locked -p conveyor-server &amp;&amp; docker compose up -d app &amp;&amp; curl -sf localhost:8930/health/ready</code></pre>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env
+cd $HOME/Movies/conveyor
+cargo fmt --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+cargo run -p conveyor-server -- --print-openapi | jq -e &#39;.paths[&quot;/api/events&quot;]&#39;
+cargo run -p conveyor-server -- migrate
+docker compose up -d --build &amp;&amp; curl -sf localhost:8930/health/ready   # --build: a bare `up` tests the stale image</code></pre>
+<table>
+<thead>
+<tr>
+<th>gate</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Two tenants isolated</td>
+<td>as <code>conveyor_runtime</code> scoped to A, <code>count(*) FROM event</code> returns 0 of B's rows; <code>INSERT … tenant_id=&lt;B&gt;</code> fails <code>WITH CHECK</code>; <strong>superuser</strong> sees both (RLS, not an empty table); <strong>owner</strong> also sees 0 (proves <code>FORCE</code>)</td>
+</tr>
+<tr>
+<td>Login works</td>
+<td><code>Bearer dev:alice</code> → 200 <code>/api/me</code>; with <code>APP_ENV=production</code> the process exits non-zero</td>
+</tr>
+<tr>
+<td>Job survives a kill</td>
+<td><code>JOB_LEASE_SECS=2</code>; <code>kill -9</code> mid-handler; restart ⇒ row reclaimed on lease expiry, <code>attempts</code> increments, stale token writes nothing</td>
+</tr>
+<tr>
+<td>SSE replay</td>
+<td>three events; reconnect with <code>Last-Event-ID: &lt;e1.seq&gt;</code> ⇒ e2, e3 once each in <code>seq</code> order; B's events absent</td>
+</tr>
+<tr>
+<td>Audit append-only</td>
+<td><code>UPDATE audit_event</code> as runtime ⇒ permission denied</td>
+</tr>
+<tr>
+<td>Licence fail-closed</td>
+<td>no row ⇒ 403 problem+json; unknown status ⇒ 403</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>RLS owner bypass.</strong> Without <code>FORCE ROW LEVEL SECURITY</code> the owner reads everything, so an owner-role test passes while production leaks. Superusers bypass even with FORCE — run the test as <code>conveyor_runtime</code> and print <code>current_user</code>. A <code>FOR ALL</code> policy without <code>WITH CHECK</code> lets a forged <code>tenant_id</code> write.</li>
+<li><strong><code>sqlx::migrate!</code> path.</strong> Resolves against the defining crate's manifest dir → <code>crates/store/migrations</code>. Point it at <code>../../migrations</code> and assert the embedded set.</li>
+<li><strong>LISTEN vs PgBouncer.</strong> Session-scoped; transaction pooling returns the connection between statements. Use a dedicated direct pool.</li>
+<li><strong><code>pg_notify</code> payload limit is 8,000 bytes.</strong> Send <code>seq::text</code> only; a JSON payload fails exactly when events get large.</li>
+<li><strong><code>set_config</code> must be transaction-local.</strong> A session <code>SET</code> survives COMMIT and poisons the next client of that backend (measured here).</li>
+<li><strong>Ports.</strong> 8930/5439/6439 free locally 2026-11-07; re-check before binding and in-cluster at S14. Never 8000.</li>
+<li><strong><code>.dockerignore</code>.</strong> Without <code>target/</code>, <code>.git/</code>, <code>.env*</code> the context is multi-GB and secrets enter the image.</li>
+<li><strong>Pooler vs migrator.</strong> sqlx takes a <strong>session</strong> advisory lock; through a transaction pooler it cannot exclude a second replica. <code>DATABASE_MIGRATE_URL</code> is direct; <code>migrate</code> is never implicit in <code>serve</code>.</li>
+<li><strong><code>Router::merge</code> vs <code>OpenApiRouter::merge</code>.</strong> Plain merge drops the second crate's paths from the document while the routes still serve.</li>
+<li><strong>R6 — Redis removal.</strong> Nothing here may add Redis: rate limits and caches are in-process or Postgres advisory locks; the only cache whose TTL matters is the licence cache. A measured need is a contract change.</li>
+<li><strong>R8 — auth/tenancy is the highest-bug-surface area.</strong> <code>TenantId</code> is typed into the store layer (a missing scope is a compile error), RLS is forced, and the isolation test runs as the runtime role with a superuser positive control — a passing test as the owner proves nothing.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S2-D1</td>
+<td><code>TenantId</code> lives in <code>crates/domain</code>, re-exported as <code>auth::TenantId</code></td>
+<td>keeps <code>store → domain</code>; a store→auth edge inverts the chain</td>
+</tr>
+<tr>
+<td>S2-D2</td>
+<td>Roles created by a superuser; <code>migrate</code> asserts them</td>
+<td>the swallowed-<code>DO</code> failure is otherwise invisible</td>
+</tr>
+<tr>
+<td>S2-D3</td>
+<td>Prune loops per tenant in scoped transactions</td>
+<td>no <code>BYPASSRLS</code> role exists to leak across tenants</td>
+</tr>
+<tr>
+<td>S2-D4</td>
+<td><code>pg_notify</code> is a doorbell; subscribers re-query their own scope</td>
+<td>seq-only payload plus RLS leaves no cross-tenant read path</td>
+</tr>
+<tr>
+<td>S2-D5</td>
+<td>Migrations at root <code>migrations/</code>, embedded via <code>../../migrations</code></td>
+<td>CONTRACT §2/SPEC §5.2, guarded by the embedded-set test</td>
+</tr>
+<tr>
+<td>S2-D6</td>
+<td>Dev principals resolve through <code>membership</code>, never a header</td>
+<td>CONTRACT §9: tenant comes from membership</td>
+</tr>
+<tr>
+<td>S2-D7</td>
+<td><code>apps/web</code> is a dependency-free placeholder</td>
+<td>S1 owns the stack; S12 builds it</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Run PgBouncer locally?</td>
+<td>yes, 6439 — pooling constraints are the point</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Image tag for compose and tests</td>
+<td><code>pgvector/pgvector:0.8.7-pg18</code> — exists (2026-11-07): amd64 <code>sha256:2547711f871f</code>, arm64 <code>sha256:ed9dc4e391eb</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Dev tenants for the gate</td>
+<td><strong>closed — it is a deliverable, not a question</strong>: <code>migrate --dev-seed</code> inserts <code>dev-a</code>/<code>dev-b</code>, one user each (step 9)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Slug case</td>
+<td>lowercased in Rust, plain <code>text</code> unique, no <code>citext</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Extensions in <code>0001</code></td>
+<td>none; S07 adds <code>vector</code> and <code>pg_trgm</code></td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S02-skeleton.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

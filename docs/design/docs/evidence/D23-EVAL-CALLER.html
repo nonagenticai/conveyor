@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>D23's amendment — the eval caller kind: an eval's model calls are attributable · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/D23-EVAL-CALLER.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="d23s-amendment--the-eval-caller-kind-an-evals-model-calls-are-attributable">D23's amendment — the <code>eval</code> caller kind: an eval's model calls are attributable</h1>
+<p>Lane <code>s18-kata-improvement</code> (second commit), migration <strong><code>0033_d23_eval_caller.sql</code></strong>.</p>
+<h2 id="why">Why</h2>
+<p>S19 §9 specified it and S19-C's own report noted it was unbuilt: an eval's model calls went through the ordinary engine but carried <strong>no join key</strong>, so they either never reached <code>inference_call</code> or (as the judge did) were invisible to it entirely. The consequence was concrete: <code>eval_runs.report</code>'s cost had to be priced from the usage the runner happened to copy onto <code>eval_case_result</code>/<code>judge_usage</code>, and <code>inference_usage.report</code> could not see eval traffic at all. The measurement instrument was absent from the ledger everything else is measured by.</p>
+<h2 id="what-changed">What changed</h2>
+<ul>
+<li><strong><code>migrations/0033_d23_eval_caller.sql</code></strong> — <code>caller_kind</code> gains <code>eval</code>; <code>eval_run_id uuid</code> is a new column; the <code>inference_call_join_key</code> CHECK accepts <code>eval_run_id</code>, so CONTRACT §18's "whose call was this" stays answerable; a new <code>inference_call_eval_join</code> CHECK makes the key <strong>required</strong> for <code>eval</code> and <strong>forbidden</strong> for every other kind; a partial index serves the per-eval read.</li>
+<li><strong><code>conveyor_domain::inference::CallerKind::Eval</code></strong> — <code>ALL</code> 5 → 6; <code>as_str</code>/<code>parse</code> follow, so <code>inference_calls.list</code>'s <code>caller_kind</code> filter accepts it with no new validation code.</li>
+<li><strong>The engine</strong> — <code>UsageContext</code> and <code>CaptureRow</code> carry <code>eval_run_id</code>; the ledger insert binds it.</li>
+<li><strong>The eval runner</strong> — both invoke sites now pass a <code>UsageContext</code> naming <code>Eval</code> + <code>eval_run_id</code>: the <strong>subject</strong> call (<code>eval.entry_action</code>, <code>prompt_ref = eval:&lt;action&gt;</code>) and the <strong>judge</strong> call (<code>completions.create</code>, <code>prompt_ref = eval_judge</code>). The engine still records only when the action declares <code>captures_usage</code>, so a subject that is itself a <code>procedure</code> or <code>agent.run</code> is unaffected — its own inner calls keep their own kinds.</li>
+<li><strong>The reads</strong> — <code>InferenceCallView.eval_run_id</code>, <code>InferenceCallsListIn.eval_run_id</code>, and the store's keyset filter.</li>
+</ul>
+<h2 id="proof">Proof</h2>
+<p><code>crates/store/tests/s16_schema.rs::the_eval_caller_kind_requires_and_owns_its_join_key</code> asserts the three limbs against the schema itself, not against a Rust convention: <code>eval</code> <strong>with</strong> its key is accepted, <code>eval</code> <strong>without</strong> it is <code>23514</code>, and any other kind carrying one is <code>23514</code>. Each limb runs in its own transaction — a refused <code>INSERT</code> aborts the transaction it ran in, so a second negative probe on the same one answers <code>25P02</code> instead of exercising the CHECK (the first draft of this test made exactly that mistake, and it failed).</p>
+<p>Green: <code>conveyor-store --test s16_schema</code> <strong>2/2</strong>, <code>--test s16_capture</code> <strong>4/4</strong>, <code>--test s16_prune</code> <strong>2/2</strong>, <code>--test inference_</code> <strong>3/3</strong>, <code>--test prompt_audit</code> <strong>3/3</strong>; <code>conveyor-store --lib</code> <strong>37/37</strong> (the embedded migration set now ends at <code>0033</code>).</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<p>The amendment makes eval calls <em>attributable</em>; it does not move <code>eval_runs.report</code>'s cost onto the ledger. That report still prices the recorded <code>usage</code>/<code>judge_usage</code> on the result row, which is the same number by construction once the judge's call is captured. Switching the report to a ledger join is a separate change and is not needed for the ledger to be complete.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/D23-EVAL-CALLER.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+# Allowlist for scripts/ci/no-private-refs.sh — a security decision, not a convenience.
+#
+# One rule per line, `path/glob:pattern  # justification`. The glob matches the repo-relative
+# path; the pattern is an ERE matched against the whole `git grep` hit (`path:line:text`).
+# Blank lines and `#` comments are ignored. A justification is mandatory in review.
+#
+# ⛔ Do NOT add an entry to keep a real internal hostname, address or private repository path in
+# a public tree. Remove it. An entry is only for a string that *looks* private but is not (e.g. a
+# documented loopback example, or a term that collides with a pattern).
+#
+# No entries today on purpose: every current hit is real and is the cleanup session's to scrub
+# (see #54). The guard is expected to fail until that scrub lands.
+#
+# The three rules below are NOT a scrub exemption — they cover the redaction machinery itself,
+# which necessarily spells the patterns out (same reason this guard excludes its own script):
+# a page generator has to name `*.internal` to redact it, and its checker has to assert it.
+docs/design/scripts/build-docs.py:re\.compile          # the redaction rules, not a reference
+docs/design/scripts/check-docs.cjs:\.internal hostname # the assertion label, not a reference
+docs/design/studio.css:agent-avatar\.internal          # CSS class name, not a hostname

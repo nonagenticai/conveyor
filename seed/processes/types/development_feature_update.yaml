@@ -1,0 +1,167 @@
+# development_feature_update — enhance an existing feature (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type development_feature_update: outputs and
+# acceptance) and n8n-designs/design/choices/v4/capabilities/development.yaml (text "enhancement
+# of an existing feature", phase execution, proof acceptance_test, item_kinds [update], tdd_link
+# true, inspect criteria). The card arrives from a gap_analysis gap of kind update, so READY
+# proves the existing feature's location and DOING proves the enhancement's test failed first.
+card_type: development_feature_update
+capability: development
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: development_feature_update
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: development_feature_update.ready
+    title: Feature update — definition of ready
+    definition_of_ready: {checks: [current_location_exists, planned_files_exist]}
+    definition_of_done: {checks: [workspace_imported]}
+    acceptance_criteria:
+      - {name: current_location_exists, text: "The card names the route, component or function that carries the existing feature, and it exists at the imported revision."}
+      - {name: planned_files_exist, text: "Every file the plan names exists at the imported revision, or the plan explains why the enhancement adds it."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: development_feature_update.doing
+    title: Feature update — definition of doing
+    definition_of_ready: {checks: [workspace_imported]}
+    definition_of_done: {checks: [failed_before_on_new_test_only, suite_green_after]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff touches only the files the plan named for the enhancement."}
+      - {name: acceptance_test_added, text: "The diff adds a test for the enhancement, or un-marks the tests-first test that already states it."}
+      - {name: failed_before_on_new_test_only, text: "The new test fails on the base revision and only it fails."}
+      - {name: suite_green_after, text: "The full suite, with the feature's existing tests unchanged, is green after the update."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: development_feature_update.qa
+    title: Feature update — definition of QA
+    definition_of_ready: {checks: [acceptance_test_added]}
+    definition_of_done: {checks: [change_meets_acceptance, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: change_meets_acceptance, text: "The change makes the gap's acceptance sentence true without widening the feature's existing contract."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the development feature update card type declares is true of the enhanced feature."}
+      - {name: meets_acceptance, text: "The diff makes the gap's acceptance sentence true."}
+      - {name: acceptance_test_targets_gap, text: "The diff adds a test, or un-marks a tests-first test, that checks the gap's acceptance sentence."}
+      - {name: existing_behaviour_kept, text: "The feature's behaviour outside the gap stays as it was."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: development_feature_update.done
+    title: Feature update — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request is squash-merged and the enhancement's merge sha is recorded on the card."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: development_feature_update.system
+    title: Feature update — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: development_feature_update.READY
+    list: ready
+    title: Feature update — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: development_feature_update
+        sop: development_feature_update.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_feature_update.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: development_feature_update.DOING
+    list: doing
+    title: Feature update — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_feature_update.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: development_feature_update.QA
+    list: qa
+    title: Feature update — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_feature_update.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: development_feature_update.DONE
+    list: done
+    title: Feature update — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: development_feature_update, sop: development_feature_update.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_feature_update.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

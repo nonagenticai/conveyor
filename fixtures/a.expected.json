@@ -1,0 +1,42 @@
+{
+  "fixture": "a",
+  "workflow_key": "cap.analysis.consult",
+  "provenance": {
+    "execution_id": 1218441,
+    "projection_sha256": "sha256:1390e87f78d068d5708dbd02878b819a541b218f24e90c685e3e45478e21ce49",
+    "flow": "fixtures/a.flow.json"
+  },
+  "steps": [
+    {
+      "position": 1,
+      "node_id": "project",
+      "old_node_id": "Project",
+      "effect": "projects.get",
+      "outcome": "succeeded"
+    },
+    {
+      "position": 2,
+      "node_id": "brief",
+      "old_node_id": "Brief",
+      "effect": "requirements.get",
+      "outcome": "succeeded"
+    },
+    {
+      "position": 3,
+      "node_id": "project_type_card_types",
+      "old_node_id": "Project type card types",
+      "effect": "catalogues.list",
+      "outcome": "succeeded"
+    },
+    {
+      "position": 4,
+      "node_id": "agent_consult",
+      "old_node_id": "Agent consult",
+      "effect": "agent.run",
+      "outcome": "succeeded"
+    }
+  ],
+  "end_state": {
+    "terminal_effect": "agent.run"
+  }
+}

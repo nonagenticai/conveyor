@@ -1,0 +1,90 @@
+flow	old_node	mapping
+conveyor.start	fr project.created	trigger:hook POST /api/hooks/conveyor.start
+conveyor.start	Validate	delta: the hook route validates its own {tenant_id, project_id, inputs}; fr's event contract is not ported
+conveyor.start	Valid?	delta: the hook's typed 4xx is the validation answer
+conveyor.start	Get project	projects.get
+conveyor.start	Project checks	projects.get + condition:project_ok
+conveyor.start	Project ok?	condition:project_ok
+conveyor.start	Get board	boards.get
+conveyor.start	Start decision	cards.list (intake) + condition:intake_empty
+conveyor.start	Create?	condition:intake_empty
+conveyor.start	Create card	cards.create
+conveyor.start	Set card fields	cards.create (fields on create)
+conveyor.start	Created	delta: no separate verification; the card id/version feed the move
+conveyor.start	Route answer	delta: the hook answers 202 (a durable run); refusals are the run's typed errors
+conveyor.start	Accepted 200	delta: 202 Accepted (async start)
+conveyor.start	Invalid 400	delta: typed action refusal on the run
+conveyor.start	Refused 409	delta: typed action refusal on the run
+conveyor.start	Unavailable 503	delta: the hook answers 503 only when its secret is unset
+conveyor.start	Info box 1	note: not an effect (S13 section 5.4)
+conveyor.start	Info box 2	note: not an effect (S13 section 5.4)
+conveyor.start	Info box 3	note: not an effect (S13 section 5.4)
+conveyor.start	Resume?	delta: the intake-empty skip is the resume branch (no second start card)
+conveyor.start	Move to READY	cards.move (to active)
+conveyor.start	Moved	delta: the move is the last effect; no separate verification
+conveyor.start	Restart?	delta: the restart branch is not ported (the conveyor project model has no fr restart request)
+conveyor.start	Project type	delta: the project type is on projects.get
+conveyor.start	Restart plan	delta: restart/archive branches are not ported
+conveyor.start	Restart ok?	delta: restart/archive branches are not ported
+conveyor.start	Archive?	delta: restart/archive branches are not ported
+conveyor.start	Archive card	delta: restart/archive branches are not ported
+conveyor.start	Archived	delta: restart/archive branches are not ported
+conveyor.start	Set phase	delta: restart/archive branches are not ported
+conveyor.start	Restart card	delta: restart/archive branches are not ported
+wip.pull	Webhook	trigger:schedule wip.pull (payload names the board)
+wip.pull	Event filter	delta: the schedule replaces the Planka event filter
+wip.pull	Act?	delta: the schedule fires the job; no per-event guard
+wip.pull	Resolve project	delta: the schedule payload names the board
+wip.pull	Conveyor board?	delta: every conveyor board is a conveyor board
+wip.pull	Get board	board::pull (reads the intake and active lanes by kind)
+wip.pull	Select pulls	board::pull::wip_pull (WIP cap; delta: no requires graph, structural classes or kata exclusion)
+wip.pull	Move to READY	cards.move (per selected card, through the action)
+wip.pull	Info box 1	note: not an effect (S13 section 5.4)
+wip.pull	Info box 2	note: not an effect (S13 section 5.4)
+wip.pull	Info box 3	note: not an effect (S13 section 5.4)
+wip.pull	Link check	delta: no RM board link; the payload's board id is resolved in-tenant
+wip.pull	Card now	delta: the move reads the card in its own transaction
+wip.pull	Still in TODO?	delta: the re-entrancy guard is the move precondition (_version); a concurrent move is a 412 and is counted skipped
+ask_fr	When executed by another workflow	trigger:procedure_runs.start (procedure:ask_fr)
+ask_fr	Ask object	delta: the procedure start input carries the question
+ask_fr	Raise ask	gate:human_approval (the conveyor's own approval)
+ask_fr	Comment block	cards.comment (the ask)
+ask_fr	Wait for answer	the gate parks the run waiting_approval
+ask_fr	Read answer	delta: the answer is the approval decision (approvals.list), not an fr read
+ask_fr	Answer	delta: the approval records the decision; the final comment records completion
+ask_fr	Resolve project	delta: the procedure is card-scoped; no project resolution
+ask_fr	Context	delta: the procedure run's inputs are the context
+ask_fr	Info box 1	note: not an effect (S13 section 5.4)
+ask_fr	Info box 2	note: not an effect (S13 section 5.4)
+ask_fr	Info box 3	note: not an effect (S13 section 5.4)
+ask_fr	Answer final?	delta: the re-ask loop is a second run by the caller (a procedure is linear)
+ask_fr	Re-ask	delta: not ported; the caller re-invokes
+err.card	Error Trigger	trigger:run.failed -> workflow.start err.card
+err.card	Failure	delta: the run's error_class and run_id are the trigger payload
+err.card	Card flow failure?	delta: the enqueue helper only starts err.card for a card-scoped run
+err.card	Read execution	delta: the failed run id is the trigger input; the trace is S13's run_step
+err.card	Resolve card	cards.get
+err.card	Resolve project	delta: the board is read from the card (boards.get)
+err.card	Blocked list	boards.get lane index 2 (the waiting lane)
+err.card	Move to BLOCKED	cards.move (waiting)
+err.card	Comment flow_error	cards.comment
+err.card	Coach block (flow_error)	delta: not ported as a child run; uq_run_live refuses a second live run on the card; the coach is a separate run started by its own trigger
+err.card	Log only (loop or no execution)	delta: a project-scoped run is not enqueued at all
+err.card	Info box 1	note: not an effect (S13 section 5.4)
+err.card	Info box 2	note: not an effect (S13 section 5.4)
+err.card	Info box 3	note: not an effect (S13 section 5.4)
+kata.open	Webhook	trigger:hook POST /api/hooks/katas.open
+kata.open	Input	delta: the hook body schema validates the inputs
+kata.open	Card	cards.get
+kata.open	Check Card	delta: cards.get's 404 is the check
+kata.open	Board	boards.get
+kata.open	Card list	delta: the lane name/phase is not read; the card carries its lane
+kata.open	Coach runs	runs.list (card)
+kata.open	Derive	delta: a previous coach run is detected by runs.list being non-empty
+kata.open	Need execution?	condition:has_previous
+kata.open	Get execution	delta: workflow_traces.export on the export branch
+kata.open	From execution	delta: the inputs come from the hook body (symptom, source_run_id)
+kata.open	Run coach	delta: not ported as a child run; uq_run_live refuses a second live run on the card; the kata executor starts the coach as its own run
+kata.open	Fail reason	delta: a node failure fails the run with its typed error
+kata.open	Comment failure	cards.comment (success comment; a failure is the run's error)
+kata.open	Stop (failed)	delta: on_error fail (the default)

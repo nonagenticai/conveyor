@@ -1,0 +1,18 @@
+stateDiagram-v2
+  state "Hot rows - card" as Hot
+  state "Cold digest - one per card" as Digest
+  state "Lesson candidate" as Cand
+  state "Reviewed lesson" as Reviewed
+  state "Promoted knowledge" as Promoted
+  [*] --> Hot: observation, claim or verdict
+  Hot --> Hot: successor - original retained
+  Hot --> Digest: consolidate
+  Digest --> Digest: rebuild - dry-run diff
+  Hot --> Cand: propose lesson
+  Cand --> Reviewed: person and at least two evidence refs
+  Cand --> Rejected: one ref or unsupported
+  Reviewed --> Promoted: source or pack release
+  Promoted --> [*]
+  Rejected --> [*]
+  note right of Hot: hot wins on conflict; rows are not rebuildable
+  note right of Digest: the digest is rebuildable; omissions stay visible

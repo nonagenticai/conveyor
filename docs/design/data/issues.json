@@ -1,0 +1,662 @@
+{
+  "issues": [
+    {
+      "number": 52,
+      "title": "T0 \u2014 the organisation spine: industry, job catalogue, immutable release, binding",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/52",
+      "updatedAt": "2026-11-12T12:45:06Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "title": "design: live build surface \u2014 programme, snapshot, feedback",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/51",
+      "updatedAt": "2026-11-12T12:44:47Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 49,
+      "title": "publish the SPEC_V2 studio design pack at conveyor.nonagentic.ai/design",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/49",
+      "updatedAt": "2026-11-12T13:24:33Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 46,
+      "title": "S19: the Tier-3 per-case LLM auditor",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/46",
+      "updatedAt": "2026-11-12T07:07:52Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S19",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 45,
+      "title": "S18: the real improvement-loop proof at one deployed revision",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/45",
+      "updatedAt": "2026-11-12T07:07:50Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "S18",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 44,
+      "title": "S14: rewrite the cutover plan for independent deployment and coexistence",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/44",
+      "updatedAt": "2026-11-12T07:07:49Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 43,
+      "title": "S12: hillclimb and inference-usage screens with their specs",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/43",
+      "updatedAt": "2026-11-12T07:07:47Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 42,
+      "title": "S12: eval report and sign-off screens with their specs",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/42",
+      "updatedAt": "2026-11-12T07:11:12Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 41,
+      "title": "S12: measurement UI \u2014 eval report, paging, benchmark arms",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/41",
+      "updatedAt": "2026-11-12T07:11:10Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 39,
+      "title": "delivery: skills conform to 03-DELIVERY, add the sweep routine and two enforcement guards",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/39",
+      "updatedAt": "2026-11-12T07:04:20Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "title": "docs: land SPEC V2 \u2014 the organisational operating model",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/38",
+      "updatedAt": "2026-11-12T13:12:14Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 33,
+      "title": "docs: record the docs-only CI gate and prove it with a documentation PR",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/33",
+      "updatedAt": "2026-11-11T10:30:25Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 32,
+      "title": "CI cost: merge-run tree equality (deferred, measurement-gated)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/32",
+      "updatedAt": "2026-11-11T07:43:55Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "title": "CI capacity: measure the arc-large CPU ceiling and correct the stale hp1 doc",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/31",
+      "updatedAt": "2026-11-11T10:32:21Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "title": "CI cost: caller switches to nextest over a shared per-job Postgres",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/30",
+      "updatedAt": "2026-11-11T10:28:04Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 29,
+      "title": "CI cost: archetype path gate, merge-base diff, and the service-consumer knobs",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/29",
+      "updatedAt": "2026-11-11T07:50:30Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "title": "docs \u2014 reconcile the audit's contradiction table and stale slice statuses",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/28",
+      "updatedAt": "2026-11-12T07:20:42Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "title": "CI/ARC \u2014 the archetype rebuild (owned by its own session; do not touch)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/27",
+      "updatedAt": "2026-11-11T10:32:38Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "title": "train \u2014 post-#9 queue sweep and merged-branch cleanup",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/26",
+      "updatedAt": "2026-11-12T07:19:41Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "title": "S21 \u2014 tenant recipe authoring and memory selection into the compiled prompt",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/25",
+      "updatedAt": "2026-11-11T06:43:26Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S21",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "title": "S20 \u2014 the climb cost/quality narrative and the cost-goal controls",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/24",
+      "updatedAt": "2026-11-12T07:09:06Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S20",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "title": "S19 \u2014 one ledger-derived accounting model and the Tier-3 auditor",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/23",
+      "updatedAt": "2026-11-12T07:08:38Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "S19",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "title": "S18 \u2014 executor-backed producers and the real improvement loop",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/22",
+      "updatedAt": "2026-11-12T07:08:37Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S18",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "title": "S17 \u2014 live sandbox lifecycle and the gold/empty controls",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/21",
+      "updatedAt": "2026-11-12T07:09:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S17",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "title": "S16 \u2014 ledger coverage, compiled prompt identity, audit sources and retention",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/20",
+      "updatedAt": "2026-11-12T07:09:11Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S16",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "title": "S15 \u2014 live strata proof and native memory provenance",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/19",
+      "updatedAt": "2026-11-11T06:44:47Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S15",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "title": "S14 \u2014 independent deployment, native acceptance, and one release-SHA receipt",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/18",
+      "updatedAt": "2026-11-12T07:08:35Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "title": "S13 \u2014 the stage editor and the retirement-gate cleanup (W4/W5 done)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/17",
+      "updatedAt": "2026-11-11T06:44:46Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S13",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "title": "S12 \u2014 finish the UI: remaining screens and measurement",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/16",
+      "updatedAt": "2026-11-12T07:08:34Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "title": "S11 \u2014 step 10: MCP projection and the served-spec lock",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/15",
+      "updatedAt": "2026-11-11T06:46:23Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "S11",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "title": "S06 \u2014 one shared decision boundary; Telegram sender identity",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/14",
+      "updatedAt": "2026-11-11T06:46:22Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S06",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "title": "S04 \u2014 the external action execution contract (import \u2192 invoke \u2192 restart)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/13",
+      "updatedAt": "2026-11-11T06:43:07Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S04",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "title": "S02 \u2014 prove long-job lease/recovery under two workers",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/12",
+      "updatedAt": "2026-11-11T06:43:06Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S02",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "delivery: issue-driven work queue + skills (one unit = one issue = one PR)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/10",
+      "updatedAt": "2026-11-11T07:42:18Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    }
+  ]
+}

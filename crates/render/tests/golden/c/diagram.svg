@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1122.52" height="793.7" viewBox="0 0 1122.52 793.7" font-family="DejaVu Sans">
+<rect x="0" y="0" width="1122.52" height="793.7" fill="#ffffff"/>
+<g id="v-00000000-0000-0000-0000-0000000000e5" transform="translate(231.26, 201.85) scale(1)">
+<path id="c-00000000-0000-0000-0000-0000000000e3" d="M 258 150 L 162 90" fill="none" stroke="#334155" stroke-width="1.5"/>
+<path d="M 162 90 L 169.87 102.88 L 177.03 91.43 z" fill="#ffffff" stroke="#334155" stroke-width="1.35"/>
+<path id="c-00000000-0000-0000-0000-0000000000e4" d="M 570 90 L 570 60 L 410 150" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="6 4"/>
+<path d="M 410 150 L 425.08 149.26 L 418.46 137.5 z" fill="#334155"/>
+<g id="e-00000000-0000-0000-0000-0000000000d1">
+<rect x="0" y="0" width="180" height="90" rx="6" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="90" y="48.2" text-anchor="middle" font-size="12" fill="#0f172a">Entity</text>
+<text x="90" y="84" text-anchor="middle" font-size="9" fill="#64748b">class</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000d2">
+<rect x="240" y="150" width="180" height="90" rx="6" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="330" y="198.2" text-anchor="middle" font-size="12" fill="#0f172a">Model</text>
+<text x="330" y="234" text-anchor="middle" font-size="9" fill="#64748b">class</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000d3">
+<rect x="480" y="150" width="180" height="90" rx="6" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="570" y="198.2" text-anchor="middle" font-size="12" fill="#0f172a">Revision</text>
+<text x="570" y="234" text-anchor="middle" font-size="9" fill="#64748b">class</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000d4">
+<rect x="0" y="300" width="180" height="90" rx="6" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="90" y="348.2" text-anchor="middle" font-size="12" fill="#0f172a">Store</text>
+<text x="90" y="384" text-anchor="middle" font-size="9" fill="#64748b">interface</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000d5">
+<rect x="240" y="300" width="180" height="90" rx="6" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="330" y="348.2" text-anchor="middle" font-size="12" fill="#0f172a">Status</text>
+<text x="330" y="384" text-anchor="middle" font-size="9" fill="#64748b">enumeration</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000d6">
+<rect x="480" y="0" width="180" height="90" rx="6" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="570" y="48.2" text-anchor="middle" font-size="12" fill="#0f172a">Renderer</text>
+<text x="570" y="84" text-anchor="middle" font-size="9" fill="#64748b">component</text>
+</g>
+</g>
+</svg>

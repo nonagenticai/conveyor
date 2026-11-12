@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Conveyor</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body></body>
+  <script type="module">
+    import init from "/pkg/conveyor-web.js";
+    // cargo-leptos names the binary `conveyor-web.wasm`; wasm-bindgen's default URL guesses
+    // `conveyor-web_bg.wasm`. Pass the real path explicitly.
+    init({ module_or_path: "/pkg/conveyor-web.wasm" });
+  </script>
+</html>

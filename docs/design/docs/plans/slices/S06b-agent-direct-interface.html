@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S06b — Agent direct interface · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06b-agent-direct-interface.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s06b--agent-direct-interface">S06b — Agent direct interface</h1>
+<p>Programme project: S06b · issues none yet</p>
+<p>Supersedes <code>S06a-mcp-server-channel.md</code> (SPEC D18 → <strong>D19</strong>, 2026-11-08). S06a's HMAC channel, text grammar and shared secret are not built and are not carried forward.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>The <code>agent</code> app operates the conveyor over the conveyor's <strong>own</strong> <code>/mcp</code> surface. At the end, one real agent task creates a project, reads its progress, answers an approval and closes the project — with the decision recorded as <code>decided_by_kind='agent'</code> — and no component called <code>nonagenticai_mcp_server</code> is in the path.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S04: <code>/mcp</code> (rmcp streamable HTTP) serves the same action registry as HTTP, parity-tested (<code>crates/actions/tests/parity_http_mcp.rs</code>).</li>
+<li>S05: <code>projects.create|get|close</code>, <code>cards.get</code>. S06: <code>runs.list</code>, <code>approvals.list|decide</code>, <code>events.list</code>.</li>
+<li>S02: JWT/dev authentication, membership resolution, identity.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — the four gaps that stop the existing <code>/mcp</code> from being consumable by <code>agent</code>: the tool key, machine authentication, principal attribution, and an approval-request action. Also the agent-side registration contract (implemented in <code>agent</code>, gated here).</p>
+<p><strong>OUT</strong> — the <code>fr</code> toolkit in <code>nonagenticai_mcp_server</code> (retires with fr at S14); the agent's task/elicitation extension for <em>external</em> MCP servers (<strong>S06c</strong>; v1 polls until it lands); the conveyor's copilot surface (S10); every other fr caller (S13). No HMAC channel is built.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/actions/src/mcp.rs</code></td>
+<td><code>tool_json</code>, the <code>_meta</code> block</td>
+<td>the tool shape</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>crates/auth/src/{authn,principal,licence}.rs</code></td>
+<td><code>authenticate</code>, <code>Principal</code>, <code>Session</code>, the entitlement verdict</td>
+<td>the fail-closed rule and the JWT-shape rule</td>
+<td>the entitlement check's coupling to requests</td>
+</tr>
+<tr>
+<td><code>crates/store/src/approval.rs</code></td>
+<td><code>insert_approval_tx</code> (nullable <code>run_id</code>), <code>open_gate_tx</code></td>
+<td><code>insert_approval_tx</code></td>
+<td><code>open_gate_tx</code> (requires a running run)</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/mcp.rs</code>, <code>crates/api/src/actions.rs</code></td>
+<td>the three <code>actor_kind: "user"</code> sites</td>
+<td>the one field</td>
+<td>the literal</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/connectors/routes/mcp_import.rs</code></td>
+<td><code>_meta.operation</code>, <code>inputSchema</code>, <code>outputSchema</code>, <code>readOnlyHint</code></td>
+<td>the import contract</td>
+<td>the agent's internals</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/mcp_client/external.rs</code></td>
+<td>the module doc</td>
+<td>"no tasks on an external endpoint"</td>
+<td>the task path</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/migrations/0093_connector_instances.sql</code></td>
+<td><code>connector_instance</code>, <code>connector_credential</code></td>
+<td>per-tenant credential custody</td>
+<td>a new credential store</td>
+</tr>
+</tbody>
+</table>
+<p>Pinned: <code>agent</code> @ <code>83b8de7</code>, <code>nonagenticai_mcp_server</code> @ <code>dd2cabf</code>. Re-capture both before building.</p>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>crates/actions/src/mcp.rs                  _meta.operation; actor_kind from the principal (2 sites)
+crates/auth/src/machine.rs                 licence bearer → tenant + agent principal (new)
+crates/auth/src/principal.rs               Principal.kind ∈ human | agent | service
+crates/auth/src/authn.rs                   resolve a machine principal before the membership check
+crates/actions/src/control/approvals.rs    approvals.request (insert_approval_tx)
+crates/api/src/actions.rs                  actor_kind from the principal (1 site)
+crates/api/tests/mcp_agent.rs              end-to-end over /mcp
+crates/actions/tests/mcp_meta.rs           every tool names its operation
+docs/evidence/S06b-agent-task.md           the one real task</code></pre>
+<p><strong><code>_meta.operation</code>.</strong> The agent names an imported op from <code>_meta.operation</code> when it is a valid <code>object.verb</code>, and otherwise from the tool name as <code>tool.&lt;snake&gt;</code> (<code>mcp_import.rs:199-211</code>). Every conveyor tool must carry <code>"operation": spec.name</code> next to <code>x-action-name</code>.</p>
+<p><strong>Machine authentication.</strong> <code>authenticate</code> today accepts dev-auth or an OIDC JWT and then requires exactly one membership (<code>authn.rs:41-65</code>). Add a licence branch: a non-JWT bearer is verified against the licences service (<code>GET /licenses/active?tenant_id=&amp;app_key=conveyor</code> is not it — the entitlement sync is S02's; this is introspection of the presented token) behind a short-TTL cache, resolving <code>(tenant, app_key, subject)</code>. A JWT-shaped token that fails JWT verification is <strong>never</strong> retried as a licence token. Resolve the subject to an <code>app_user(kind='agent')</code> and a membership scoped to the tool list below.</p>
+<p><strong><code>approvals.request</code>.</strong></p>
+<table>
+<thead>
+<tr>
+<th>field</th>
+<th>type</th>
+<th>rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td>uuid</td>
+<td>required unless <code>card_id</code> is given</td>
+</tr>
+<tr>
+<td><code>card_id</code></td>
+<td>uuid?</td>
+<td>optional</td>
+</tr>
+<tr>
+<td><code>run_id</code></td>
+<td>uuid?</td>
+<td>optional; must belong to the same tenant</td>
+</tr>
+<tr>
+<td><code>gate</code></td>
+<td>text</td>
+<td>required, from <code>catalogue_entry(kind='gate')</code></td>
+</tr>
+<tr>
+<td><code>kind</code></td>
+<td>text</td>
+<td>required; the approval's vocabulary</td>
+</tr>
+<tr>
+<td><code>description</code>, <code>proposed_answer</code></td>
+<td>text</td>
+<td>into <code>meta</code></td>
+</tr>
+<tr>
+<td><code>allowed_decisions</code>, <code>required_decisions</code>, <code>expires_at</code></td>
+<td>jsonb/int/timestamptz?</td>
+<td>optional</td>
+</tr>
+</tbody>
+</table>
+<p>Output <code>ApprovalOut {id, status, gate, kind, project_id, card_id, run_id, expires_at, version}</code>. Uses <code>insert_approval_tx</code>; <code>open_gate_tx</code> is wrong here because it requires a <code>running</code> run.</p>
+<p><strong>Licence verification is on the request path, so it is cached and fail-closed.</strong> A verified licence is held for the licence's TTL, capped at 60 s; an unreachable licences service refuses (<code>503 licence_unavailable</code>, no principal) and never admits. The cache is keyed by the token's hash, never by tenant, so a revoked token cannot ride another tenant's entry.</p>
+<blockquote>
+<p><strong>S06d supersedes the list mechanism, not the capability.</strong> The names below became the <strong>MCP channel's compiled default</strong> in <code>crates/actions/src/channel.rs</code> (<code>MCP_DEFAULT_ACTIONS</code>); the tenant-admin may now add or remove them through <code>channels.policy_set</code>. The machine floor (<code>ActionSpec::machine_forbidden</code>) still refuses every eval sign-off, held-out read and administrative action, so a stored grant can never widen what this section calls the wall.</p>
+</blockquote>
+<p><strong>Tool set exposed to the agent principal:</strong> <code>projects.create|get|close</code> (S06c adds <code>projects.execute</code>), <code>runs.list|create|cancel|finish</code>, <code>approvals.list|decide|request</code>, <code>boards.get</code>, <code>cards.create|get</code>, <code>events.list</code>, <code>procedure_runs.start</code> and <code>procedures.create|get|list|update|publish|retire</code> (2026-11-09: the agent platform runs project work and installs the improvements it designs; the membership role is the synthetic tenant-admin <code>kata_executor</code>, and the allowlist remains the authorization). The list is <code>AGENT_TOOLS</code>; workflows (S13) and knowledge (S15) authoring arrive with their slices.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Re-capture <code>agent</code>/<code>mcp_server</code> SHAs; record them in §4. <code>git -C $HOME/Movies/agent rev-parse HEAD</code>.</li>
+<li><code>_meta.operation</code> + <code>crates/actions/tests/mcp_meta.rs</code>; assert every registered action's tool carries it. <code>cargo test -p conveyor-actions --test mcp_meta</code></li>
+<li><code>Principal.kind</code> + propagation through <code>Session</code>; compile fails until every construction site supplies it. <code>cargo test -p conveyor-auth</code></li>
+<li>Machine authenticator + cache; the JWT-shape rule; negative tests (JWT-shaped token, wrong tenant, expired, unknown app). <code>cargo test -p conveyor-auth machine</code></li>
+<li>Wire it into <code>authenticate</code> before membership resolution; one membership, scoped role. <code>cargo test -p conveyor-auth</code></li>
+<li><code>approvals.request</code> + action registration + audit/invocation row. <code>cargo test -p conveyor-api --test approval_dual --test mcp_agent</code> ⚠️ Corrected 2026-11-09: this line said <code>cargo test -p conveyor-actions approvals</code>, which matches <strong>0 tests</strong> in this workspace — a gate line that cannot fail. The action's real coverage is <code>approval_dual</code> (dual control and the derived <code>decided_by_kind</code>) and <code>mcp_agent</code> (the licence-principal lifecycle).</li>
+<li>Attribution: the three <code>actor_kind</code> sites read the principal; update <code>crates/api/tests/approval_dual.rs</code>. <code>cargo test -p conveyor-api --test approval_dual</code></li>
+<li>Tool scoping test: the agent principal sees exactly §5's tools; an admin sees more; a viewer sees fewer. <code>cargo test -p conveyor-api --test mcp_agent scopes</code></li>
+<li>End-to-end over <code>/mcp</code> against a local <code>agent</code> (registration: external MCP system, <code>base_url</code>, licence credential): create → poll → approve/reject → close. <code>cargo test -p conveyor-api --test mcp_agent</code></li>
+<li>Regenerate the served-spec lock (new action). <code>cargo run -q -p conveyor-server -- --print-openapi --write-lock</code></li>
+<li>Gate (§7) + clippy.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env
+cargo test -p conveyor-auth
+cargo test -p conveyor-actions --test mcp_meta
+cargo test -p conveyor-api --test approval_dual
+cargo test -p conveyor-api --test mcp_agent
+cargo clippy --workspace --all-targets -- -D warnings
+# the served document matches its lock (regenerated in step 10)
+cargo run -q -p conveyor-server -- --print-openapi --check-lock
+# the agent task&#39;s evidence exists
+test -s docs/evidence/S06b-agent-task.md</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>tool key</td>
+<td>every MCP tool carries <code>_meta.operation</code> = its action name</td>
+</tr>
+<tr>
+<td>b</td>
+<td>import</td>
+<td>the agent's <code>mcp-import</code> yields <code>projects.create</code>-style keys, not <code>tool.*</code></td>
+</tr>
+<tr>
+<td>c</td>
+<td>machine auth</td>
+<td>a licence for tenant A cannot act for tenant B: <code>403</code>/<code>unknown-sender</code>, zero mutations</td>
+</tr>
+<tr>
+<td>d</td>
+<td>JWT rule</td>
+<td>a JWT-shaped token that fails verification is never retried as a licence</td>
+</tr>
+<tr>
+<td>e</td>
+<td>attribution</td>
+<td><code>approval_decision.decided_by_kind='agent'</code>, <code>via</code> names the licence principal</td>
+</tr>
+<tr>
+<td>f</td>
+<td>escalation</td>
+<td><code>approvals.request</code> opens an approval with a NULL <code>run_id</code> and is decidable</td>
+</tr>
+<tr>
+<td>g</td>
+<td>end to end</td>
+<td>one real agent task: create, progress, decide, close; evidence file contains run id, project id, one decision</td>
+</tr>
+<tr>
+<td>h</td>
+<td>no middleman</td>
+<td>the task's evidence shows no <code>X-MCP-Binding</code> header and no <code>mcp.mcp.svc</code> host</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong><code>_meta</code> is the only channel</strong> — rmcp flattens task/result payloads and drops unknown top-level fields. The operation key must live in <code>_meta</code>, not in a sibling object.</li>
+<li><strong>One membership</strong> — <code>authenticate</code> rejects 0 or &gt;1 memberships. A licence that resolves to several tenants must choose the tenant from the licence, never from a header.</li>
+<li><strong>JWT shape</strong> — a JWT-shaped token that fails verification must not fall through to licence introspection; otherwise a revoked credential becomes a valid one.</li>
+<li><strong><code>open_gate_tx</code> needs a running run</strong> — a standalone escalation with <code>run_id IS NULL</code> must use <code>insert_approval_tx</code>.</li>
+<li><strong><code>uq_appr_pending</code> includes <code>run_id</code></strong> — nullable, so multiple standalone approvals do not collide; do not "fix" it by adding a second index.</li>
+<li><strong>Tool scoping is the authorization</strong> — <code>/mcp</code> filters by role; an agent principal with <code>admin</code> would see every action. The membership role must be the scoped one.</li>
+<li><strong>Do not rebuild the HMAC channel</strong> — if a later session finds S06a text describing it, that plan is superseded; the seam is <code>/mcp</code>.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li><strong>MCP, not REST.</strong> The wire, the import and the schemas exist on both sides; REST is a fallback only for a tool that cannot be expressed over MCP.</li>
+<li><strong>The conveyor's <code>/mcp</code> is the agent interface.</strong> <code>mcp_server</code> remains the gateway for coding, care-bus and builder tools, and its <code>fr</code> toolkit retires at cutover.</li>
+<li><strong>Licence bearer, introspected.</strong> One licence per tenant carries the tenant; an OIDC service account would hit the one-membership rule for every tenant it acts for.</li>
+<li><strong>Polling is the fallback; S06c adds MCP tasks.</strong> The agent's task extension is platform-server-only (<code>external.rs:8</code>), so <code>projects.get</code> + <code>approvals.list</code> inside a durable job step ships first. <strong>S06c</strong> implements SEP-2663 in the conveyor (<code>projects.execute</code>, <code>tasks/get|update|cancel</code>) and the agent's external-task client; the polling path stays as the fallback for a client that cannot run tasks.</li>
+<li><strong>Typed results, not <code>_meta</code> blobs.</strong> The fr-specific <code>_meta["ai.nonagentic/fr"]</code> shape is not reproduced.</li>
+</ol>
+<p><strong>CONTRACT-CHANGE REQUEST:</strong> <code>01-CONTRACT §8</code> states the two MCP surfaces "must never be conflated" and that "a token on <code>/mcp</code> is not a substitute for the signed channel". D19 makes <code>/mcp</code> the agent interface. Proposal: one surface, with the consumer boundary stated (agent = licence principal; other consumers = their own principal). No slice may act on this until the contract is amended.</p>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Does the agent need push in v1?</td>
+<td>No — polling is the fallback; <strong>S06c</strong> adds MCP tasks for the long-running project</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Who mints the conveyor licence?</td>
+<td>The agent's licence-minting path, extended to <code>app_key=conveyor</code> (today <code>BundleToken</code> is platform-only)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Is the <code>fr</code> toolkit retired now or at cutover?</td>
+<td>At cutover, with fr</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Does <code>approvals.request</code> need an <code>allowed_decisions</code> vocabulary?</td>
+<td>Reuse <code>catalogue_entry(kind='gate')</code>; do not invent one</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Should the agent see <code>events.list</code> or an SSE topic?</td>
+<td><code>events.list</code>; SSE is a later optimization</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S06b-agent-direct-interface.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

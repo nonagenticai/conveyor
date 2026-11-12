@@ -1,0 +1,161 @@
+# plateau_planning_analysis — the stable intermediate states between the current and the future
+# state (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (the type's inputs/outputs/acceptance) and
+# n8n-designs/design/choices/v4/capabilities/analysis.yaml (text, phase, sections, inspect
+# criteria). This is a document archetype: the four sections are current_state, future_state,
+# plateaus (ordered, each one a stable state) and transition_risks.
+card_type: plateau_planning_analysis
+capability: analysis
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: plateau_planning_analysis
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: plateau_planning_analysis.ready
+    title: Plateau planning — definition of ready
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [outline_confirmed]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline's sections, plateaus and sources stay inside the current state and the future state the card names."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: plateau_planning_analysis.doing
+    title: Plateau planning — definition of doing
+    definition_of_ready: {checks: [outline_confirmed]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every claim about the current state, the future state or a plateau cites the source it rests on — code, the gap analysis or the brief."}
+      - {name: every_cited_source_exists, text: "Every cited source exists and says what the claim says it says."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: plateau_planning_analysis.qa
+    title: Plateau planning — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "The document states nothing about the system that its cited sources do not support."}
+      - {name: capability_acceptance_met, text: "The document is true of every acceptance statement the plateau planning analysis card type declares."}
+      - {name: plateaus_are_stable, text: "Every plateau describes a state the system can run in and be released at."}
+      - {name: plateaus_reach_future_state, text: "The plateaus, in order, lead from current_state to future_state with no step left out."}
+      - {name: transition_risks_per_move, text: "transition_risks names the risks of each move between plateaus, or says a move has none."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id]
+
+  - key: plateau_planning_analysis.done
+    title: Plateau planning — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The document published to the card is the exact revision QA reviewed; no section was edited after the review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: plateau_planning_analysis.system
+    title: Plateau planning — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: plateau_planning_analysis.READY
+    list: ready
+    title: Plateau planning — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: plateau_planning_analysis
+        sop: plateau_planning_analysis.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: plateau_planning_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: plateau_planning_analysis.DOING
+    list: doing
+    title: Plateau planning — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: plateau_planning_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: plateau_planning_analysis.QA
+    list: qa
+    title: Plateau planning — QA
+    outputs: [reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: plateau_planning_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: plateau_planning_analysis.DONE
+    list: done
+    title: Plateau planning — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: plateau_planning_analysis, sop: plateau_planning_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: plateau_planning_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

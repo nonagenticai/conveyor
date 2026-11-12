@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S10 — Copilot / AG-UI · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S10-copilot-ag-ui.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s10--copilot--ag-ui">S10 — Copilot / AG-UI</h1>
+<p>Programme project: S10 · issues none yet</p>
+<p><strong>Gate (SPEC §8 S10):</strong> a scripted agent session passes.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>An agent operates the app through the S04 registry: the tool list is a <strong>projection</strong> of <code>ActionSpec</code>s filtered by the caller's scopes, a destructive tool call becomes an S06 <code>approval</code>, and the conversation is two tables plus an SSE stream. fr's 46-file AG-UI surface becomes a query, a proposal shape and a turn runner — not a second action system.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S04: <code>ActionSpec</code>, <code>Registry</code>, scoped MCP <code>tools/list</code> at <code>/mcp</code>, invocation route, <code>action_invocation</code>, idempotency.</li>
+<li>S06: <code>approval</code> + <code>approval_decision</code>, <code>approvals.decide</code>, SSE <code>approval:{id}</code> with <code>Last-Event-ID</code> replay.</li>
+<li>S02/S03: outbox <code>event</code>, <code>audit_event</code>, tenant RLS; <code>approval.run_id</code> is nullable.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — <code>conversation</code> + <code>conversation_turn</code> (§2.11 verbatim); the turn runner; the agent-surface projection and coverage test; proposals as S06 approvals; the execution job; SSE <code>conversation:{id}</code> with replay; <code>completions.create</code>; AG-UI adapter only on S0 evidence; screens as data requirements (S12 renders).</p>
+<p><strong>OUT</strong> — <code>inference-router</code> (D14); <code>/mcp</code> transport and scope filtering (S04); the approval state machine (S06); fr's 34 <code>agui/actions/</code> modules, <code>agent-core</code>, <code>HeuristicIntentResolver</code>; the agent's tool contract and principal (S06b); chat UI rendering (S12, contract §11).</p>
+<p><strong>UI surface declared for S12</strong> (declaration only, no UI code): <code>copilot conversation</code> — the turn stream over SSE <code>conversation:{id}</code> with <code>Last-Event-ID</code> replay, the proposal card (<code>approval_pending</code> → <code>approvals.decide</code>), and the read models <code>conversation_turn</code> + <code>approval</code>; routes <code>POST /api/copilot/conversations</code>, <code>POST …/{id}/turns</code>, <code>GET …/turns</code>.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>02-source-map/20-fr.md</code> §AG-UI (<code>fr</code> <code>6f7c5097</code>)</td>
+<td><code>registry.ts</code>, <code>register-all-actions.ts</code> (<code>ACTION_MODULE_LOADERS</code>), <code>agent-surface.ts</code> (<code>PROJECT_AGENT_ACTIONS/CORE/SEARCHABLE</code>, <code>PROJECT_BINDING</code>, <code>SurfaceRefusal</code>), <code>rbac.ts</code>, <code>coverage-check.ts</code>, <code>proposal-shape.ts</code>, <code>routes/agui*</code></td>
+<td>the surface model, the proposal shape, RBAC-as-filter, <code>coverage-check</code> as a build gate</td>
+<td>the 34 action modules, the second registry, per-module approval metadata</td>
+</tr>
+<tr>
+<td><code>02-source-map/20-fr.md</code> §<code>agent-core</code></td>
+<td><code>agentCore</code>, <code>setIntentResolver</code>, <code>session-store</code></td>
+<td>session = ordered turns</td>
+<td><code>HeuristicIntentResolver</code></td>
+</tr>
+<tr>
+<td><code>02-source-map/10-agent-patterns.md</code> §<code>runtime/catalog.rs</code> (<code>agent</code> <code>83b8de7e</code>)</td>
+<td><code>OpDef</code>, <code>PinnedCatalog::from_rows</code>, <code>effective_level</code></td>
+<td>one catalogue; a declaration beats a stored row</td>
+<td><code>OpSource::Template</code></td>
+</tr>
+<tr>
+<td><code>02-source-map/10-agent-patterns.md</code> §<code>sse_hub.rs</code>/<code>conversations/hub.rs</code></td>
+<td><code>KEEPALIVE</code> 15 s, <code>MAX_REPLAY</code> 200, <code>EventHub</code>, <code>feed</code> tenant filter</td>
+<td>framing and the filter</td>
+<td>the Redis bridge, <code>LocalHub</code></td>
+</tr>
+<tr>
+<td><code>02-source-map/10-agent-patterns.md</code> §<code>mcp_client</code></td>
+<td>client-side cache, refusal-rotate</td>
+<td>—</td>
+<td>not used; <code>/mcp</code> is the server side</td>
+</tr>
+</tbody>
+</table>
+<p>AG-UI event names — <strong>measured 2026-11-07</strong> in <code>fr/backend/src/agui/protocol.types.ts</code> (<code>AguiEventSchema</code>, <code>z.discriminatedUnion('type', …)</code>): eight types, <code>tool_call</code>, <code>tool_result</code>, <code>tool_error</code>, <code>approval_pending</code>, <code>approval_resolved</code>, <code>stream_delta</code>, <code>error</code>, <code>done</code> (snake_case, no dots). Step 15 captures golden frames and pins each payload shape; the <em>names</em> are no longer open.</p>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>migrations/0011_copilot.sql
+crates/domain/src/copilot.rs · crates/store/src/copilot.rs
+crates/actions/src/{agent_surface,external/inference}.rs
+crates/api/src/copilot/{mod,conversations,turns,proposal,agui}.rs
+crates/store/src/jobs/kind/copilot.rs
+crates/api/tests/{copilot_session,copilot_surface,copilot_replay,copilot_turn,copilot_proposal,copilot_approve,copilot_reap,agui_parity}.rs   # copilot_replay = replay of a recorded proposal/approval sequence (§7 d)
+crates/actions/tests/copilot_coverage.rs</code></pre>
+<h3 id="51-tables--02-data-architecture-211-verbatim-two-only">5.1 Tables — <code>02-DATA-ARCHITECTURE §2.11</code> verbatim, two only</h3>
+<p><code>conversation</code> · <code>conversation_turn</code>; tool calls stay in <code>action_invocation</code>, referenced from <code>turn.meta</code>. One partial unique index is added: <code>uq_approval_copilot_turn</code> on <code>approval (tenant_id, (meta-&gt;&gt;'turn_id')) where kind='copilot.action' and status='pending'</code> — <code>(tenant_id, run_id, gate)</code> cannot help.</p>
+<h3 id="52-the-surface-not-a-fork">5.2 The surface, not a fork</h3>
+<table>
+<thead>
+<tr>
+<th>fr construct</th>
+<th>becomes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PROJECT_AGENT_ACTIONS</code></td>
+<td><code>agent_surface(principal)</code> = registry actions where <code>scopes ⊆ principal.scopes</code> ∧ <code>kind ∈ {internal, external}</code> ∧ <code>tenancy</code> satisfiable</td>
+</tr>
+<tr>
+<td><code>PROJECT_AGENT_CORE</code> / <code>SEARCHABLE</code></td>
+<td><code>AgentHints.tier</code>, a defaulted <code>ActionSpec</code> field declared with the action</td>
+</tr>
+<tr>
+<td><code>PROJECT_BINDING</code> / <code>SurfaceRefusal</code></td>
+<td>the projection <strong>omits</strong>; <code>/mcp</code> answers <code>action-not-found</code>, never <code>403</code> (S04-D6)</td>
+</tr>
+<tr>
+<td><code>rbac.ts</code></td>
+<td>the S04 <code>Scope</code> check — no copilot authorization module</td>
+</tr>
+<tr>
+<td><code>coverage-check.ts</code></td>
+<td><code>crates/actions/tests/copilot_coverage.rs</code>: every mutating UI operation resolves to an action name or the declared transport exemption.</td>
+</tr>
+</tbody>
+</table>
+<p><code>GET /api/copilot/actions</code> returns that set plus <code>AgentHints</code>. The chat transport is a route, not an action — it is the channel, and streaming does not fit an invocation. That exemption is declared and asserted.</p>
+<h3 id="53-proposals">5.3 Proposals</h3>
+<p>A tool call whose action has <code>effect = destructive</code>, <code>confirm != none</code>, or <code>AgentHints.proposal_required</code> is not executed: the turn ends <code>outcome='proposed'</code> and the same transaction creates an approval through S06's <code>approval::create_tx</code> (<code>kind='copilot.action'</code>, <code>run_id</code> NULL, <code>requested_by</code> = caller) — one event owner.</p>
+<pre class="json"><code>{&quot;proposal_id&quot;:&quot;&lt;approval_id&gt;&quot;,&quot;conversation_id&quot;:&quot;…&quot;,&quot;turn_id&quot;:&quot;…&quot;,&quot;action&quot;:&quot;cards.move&quot;,
+ &quot;effect&quot;:&quot;destructive&quot;,&quot;input&quot;:{&quot;id&quot;:&quot;…&quot;,&quot;list_id&quot;:&quot;…&quot;,&quot;_version&quot;:7},
+ &quot;diff&quot;:[{&quot;path&quot;:&quot;/list_id&quot;,&quot;from&quot;:&quot;&lt;active&gt;&quot;,&quot;to&quot;:&quot;&lt;done&gt;&quot;}],
+ &quot;summary&quot;:&quot;Move CARD-12 from Active to Done&quot;,&quot;expires_at&quot;:&quot;…&quot;,&quot;decide_via&quot;:[&quot;web&quot;,&quot;telegram&quot;,&quot;mcp&quot;]}</code></pre>
+<p><code>input</code> is the exact action input, schema-validated, pinning the version observed at proposal time (contract §3): a card that moved underneath yields <code>412</code>, never a silent overwrite. Execution is <code>copilot.proposal.execute</code>: one conditional <code>UPDATE … WHERE status='approved' AND meta-&gt;&gt;'executed_invocation_id' IS NULL RETURNING</code>, <code>Idempotency-Key: proposal:&lt;approval_id&gt;</code>, under the proposer's re-checked scopes.</p>
+<h3 id="54-conversations">5.4 Conversations</h3>
+<p><code>conversation</code> is per user (project optional). The assistant turn is inserted at start (<code>meta.status='streaming'</code>) and updated to terminal in one transaction that also writes <code>conversation_turn.created</code>. Its <code>meta</code> is the record:</p>
+<pre class="json"><code>{&quot;status&quot;:&quot;completed|proposed|refused|failed|interrupted&quot;,
+ &quot;model&quot;:{&quot;action&quot;:&quot;completions.create&quot;,&quot;model&quot;:&quot;…&quot;,&quot;request_id&quot;:&quot;…&quot;},
+ &quot;tool_calls&quot;:[{&quot;action&quot;:&quot;cards.move&quot;,&quot;invocation_id&quot;:&quot;…&quot;,&quot;outcome&quot;:&quot;ok&quot;}],
+ &quot;error&quot;:{&quot;type&quot;:&quot;/problems/inference-unavailable&quot;,&quot;status&quot;:503,&quot;detail&quot;:&quot;…&quot;}}</code></pre>
+<p><code>seq</code> is allocated under <code>SELECT … FOR UPDATE</code> on the conversation row; <code>uq (conversation_id, seq)</code> is the backstop. SSE <code>GET /api/events?topics=conversation:{id}</code> streams deltas live; only committed turns are durable, so <code>Last-Event-ID</code> replays <code>event.seq &gt; last</code>, and a mid-turn reconnect receives the turn once. <code>copilot.turn.reap</code> (60 s) marks a <code>streaming</code> turn older than 300 s <code>interrupted</code>.</p>
+<h3 id="55-the-mcp-channel-and-model-access">5.5 The MCP channel and model access</h3>
+<p><code>/mcp</code> (S04) is the machine channel; the copilot UI is the web channel; both call the same action and, for a proposal, the same <code>approvals.decide</code>. This is D17: <strong>channels are equivalent</strong> — a decision over Telegram, web or MCP closes the identical approval row and unlocks the identical execution job.</p>
+<p>The <code>/mcp</code> surface this slice completes (S04's transport, S10's agent-surface projection) serves machine consumers <strong>by principal</strong>. The <code>agent</code> app is one of them: it calls this surface with a licence bearer and acts as <code>app_user(kind='agent')</code> (SPEC D19, slice S06b). There is one MCP surface; do not build a second agent-facing gateway.</p>
+<p>The conveyor does not absorb <code>inference-router</code> (D14). <code>completions.create</code> is <code>kind: external</code> (<code>scopes: [models:invoke]</code>, 60 s timeout, per-action circuit breaker, tenant licence token). If it is down, times out, or the breaker is open, the turn ends <code>failed</code> with an RFC 9457 problem and <strong>zero</strong> tool invocations: the assistant never emits a fabricated tool call or a heuristic substitute. <strong>S16 adds one declaration to this action</strong> — <code>captures_usage = true</code> — and the engine then writes an <code>inference_call</code> row with <code>caller_kind='copilot'</code> and <code>conversation_turn_id</code> in the same transaction as the invocation's bookkeeping (CONTRACT §18). No handler parses <code>usage</code>, and nothing in the turn runner changes.</p>
+<h3 id="56-ag-ui-wire-contract">5.6 AG-UI wire contract</h3>
+<p>Kept only if S0's <code>agui*</code> parity rows (with ingress counts on <code>/api/agui*</code>, <code>agui-session</code>, <code>agui-threads</code>) show a live consumer: then <code>agui.rs</code> serializes the same turn events into fr's wire names, golden fixtures replayed against the native stream; otherwise native SSE only, no adapter, <code>parity.yaml</code> carrying the <code>dropped</code> rows.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Preflight: <code>cargo test --workspace</code>; <code>lsof -nP -iTCP:8930 -sTCP:LISTEN</code> empty; <code>docker compose up -d db</code>.</li>
+<li><code>yq '[.[] | select(.surface|test("agui";"i"))]' parity.yaml</code> — no live row ⇒ native SSE.</li>
+<li><code>0011_copilot.sql</code>: two tables, RLS, <code>uq_approval_copilot_turn</code>; <code>cargo run -p conveyor-server -- migrate</code> twice.</li>
+<li>Domain: conversation transitions, turn seq, proposal validation; <code>cargo test -p conveyor-domain copilot</code>.</li>
+<li>Store: <code>append_turn_tx</code>, <code>turn_seq_tx</code>, <code>claim_proposal_execution_tx</code>, <code>turns_page</code>; <code>cargo test -p conveyor-store copilot</code>.</li>
+<li><code>AgentHints</code> + defaulted derive argument + <code>agent_surface</code>; <code>cargo test -p conveyor-actions agent_surface</code>.</li>
+<li><code>GET /api/copilot/actions</code>; equality with <code>/mcp</code> <code>tools/list</code> for a high- and low-scope principal; <code>cargo test -p conveyor-api --test copilot_surface</code>.</li>
+<li><code>completions.create</code> + breaker + tenant token; fixture transcript; <code>cargo test -p conveyor-actions --lib inference</code>. ⚠️ Corrected 2026-11-09: this line said <code>cargo test -p conveyor-actions external_inference</code> — a filter, not a target, and it matches <strong>0 tests</strong>. The two inference tests are <code>--lib</code> tests.</li>
+<li>Turn runner: model → validate → invoke or propose → repeat (max 8 rounds); <code>cargo test -p conveyor-api --test copilot_turn</code>.</li>
+<li>Proposal path through <code>approval::create_tx</code> + terminal turn, one transaction; <code>cargo test -p conveyor-api --test copilot_proposal</code>.</li>
+<li><code>copilot.proposal.execute</code> + <code>copilot.proposal.sweep</code>; <code>cargo test -p conveyor-api --test copilot_approve</code>.</li>
+<li>SSE <code>conversation:{id}</code> (keepalive, <code>MAX_REPLAY</code> 200, <code>Last-Event-ID</code>) + <code>copilot.turn.reap</code>; <code>cargo test -p conveyor-api --test copilot_replay --test copilot_reap</code>.</li>
+<li>Coverage test; <code>cargo test -p conveyor-actions --test copilot_coverage</code>.</li>
+<li>AG-UI adapter or its recorded absence; fixtures; <code>cargo test -p conveyor-api --test agui_parity</code>.</li>
+<li>Gate (§7), <code>cargo clippy --workspace --all-targets -- -D warnings</code>, <code>cargo run -p conveyor-server -- --print-openapi --check-lock</code>.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-api --test copilot_session --test copilot_surface --test copilot_replay --test copilot_turn
+cargo test -p conveyor-api --test copilot_proposal --test copilot_approve --test copilot_reap --test agui_parity
+cargo test -p conveyor-actions --test copilot_coverage
+cargo clippy --workspace --all-targets -- -D warnings</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>scripted session</td>
+<td>open conversation → "move card C to Done" → proposal frame + pending approval, zero <code>action_invocation</code></td>
+</tr>
+<tr>
+<td>b</td>
+<td>approval gates execution</td>
+<td>approve as an authorized member → exactly one <code>action_invocation</code>, card moved, turn <code>outcome='completed'</code> with <code>tool_calls[0].invocation_id</code></td>
+</tr>
+<tr>
+<td>c</td>
+<td>approving twice</td>
+<td>second <code>approvals.decide</code> is a no-op/<code>409</code>; invocation count 1; key replay returns the first body</td>
+</tr>
+<tr>
+<td>d</td>
+<td>replay</td>
+<td>disconnect after the user turn, reconnect with <code>Last-Event-ID</code>: the turn arrives once, no duplicate <code>seq</code> or invocation</td>
+</tr>
+<tr>
+<td>e</td>
+<td>scope-absent tool</td>
+<td>low-scope principal's <code>/api/copilot/actions</code> <strong>and</strong> <code>/mcp</code> <code>tools/list</code> both omit it; calling it is <code>action-not-found</code>, not <code>403</code></td>
+</tr>
+<tr>
+<td>f</td>
+<td>inference outage</td>
+<td>breaker open ⇒ <code>503</code> problem+json, turn <code>failed</code>, zero <code>action_invocation</code>, no <code>cards.move</code></td>
+</tr>
+<tr>
+<td>g</td>
+<td>coverage</td>
+<td>every mutating UI operation maps to an action or the declared exemption; an injected unmapped operation fails by name</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>34 modules copied as code</strong> is the failure this slice prevents. Approval metadata, tier lists or tool descriptions outside <code>ActionSpec</code> are a second registry; the surface and coverage tests must fail on them.</li>
+<li><strong>A copilot that writes the DB directly.</strong> Every tool call goes through <code>invoke</code>; no <code>sqlx::query</code> in <code>crates/api/src/copilot</code>, and every executed tool has an <code>action_invocation</code> row.</li>
+<li><strong>Approving twice.</strong> Three layers: <code>WHERE status='pending'</code>, the execution claim, the idempotency key. Two workers, one effect.</li>
+<li><strong>A turn written outside the transaction that records the action.</strong> Record <code>invocation_id</code> only after the action commits; commit the terminal turn and its event together; a crash is <code>interrupted</code>, never a turn claiming an uncommitted move.</li>
+<li><strong>AG-UI ordering under retry.</strong> A model retry is an attempt inside one turn, not a new turn; event ids are <code>event.seq</code>, monotonic per conversation; a reordering client sees a turn before its results.</li>
+<li><strong>The proposal's <code>version</code> is the only defence against lost updates.</strong> Re-reading state at execution silently overwrites a concurrent <code>cards.move</code>.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S10-D1</td>
+<td>the agent surface is a registry query; <code>AgentHints</code> is a defaulted <code>ActionSpec</code> field</td>
+<td>one declaration → HTTP, MCP, copilot; no second table</td>
+</tr>
+<tr>
+<td>S10-D2</td>
+<td>a proposal is an <code>approval(kind='copilot.action')</code> created via S06's <code>approval::create_tx</code>; one pending per turn</td>
+<td>the gate exists; no proposal table</td>
+</tr>
+<tr>
+<td>S10-D3</td>
+<td>execution is a job with a conditional claim, <code>Idempotency-Key: proposal:&lt;id&gt;</code>, scopes re-checked</td>
+<td>restart-safe, exactly-once effect</td>
+</tr>
+<tr>
+<td>S10-D4</td>
+<td>turns are durable, deltas are not; the event commits with the terminal update</td>
+<td>replay never fabricates a partial turn</td>
+</tr>
+<tr>
+<td>S10-D5</td>
+<td><code>completions.create</code> is external (D14), fail closed, no heuristic resolver</td>
+<td>an unavailable router must not invent a tool call</td>
+</tr>
+<tr>
+<td>S10-D6</td>
+<td>chat transport routes are the declared coverage exemption</td>
+<td>the channel is not an operation</td>
+</tr>
+<tr>
+<td>S10-D7</td>
+<td>AG-UI is a serializer over the native stream, kept only on S0 evidence</td>
+<td>R3</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Does any live consumer use AG-UI today?</td>
+<td>No evidence ⇒ native SSE; adapter behind a flag until S14.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Who chooses the model?</td>
+<td><code>inference-router</code> by tenant policy; the turn records the model.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>How much history enters the prompt?</td>
+<td>Last 20 turns, 32k-token cap.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Is Telegram a copilot channel?</td>
+<td>No — proposals are decidable there (S06), conversation is web + MCP.</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S10-copilot-ag-ui.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

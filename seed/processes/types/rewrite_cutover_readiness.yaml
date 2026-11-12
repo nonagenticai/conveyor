@@ -1,0 +1,173 @@
+# rewrite_cutover_readiness — the G4 cutover evidence for a language rewrite: parity results true
+# on the pinned source shas, and a data-copy plan with its rollback and downtime; the cutover
+# itself is a session action, not this card's.
+#
+# Content sources: seed/catalogue.json (outputs, and the READY/DOING/QA/DONE acceptance names
+# parity_qa_released / parity_results_true_on_pinned_shas / data_copy_plan_present /
+# g4_evidence_complete / artifact_is_qa_version, plus definition_of_done asset_persisted) and
+# n8n-designs/design/choices/v4/capabilities/change_management.yaml (the four
+# rewrite_cutover_readiness inspect.criteria, written under R333 as Claude draft 2026-11-01 and
+# proven live at V-36). The type itself is enumerated only in
+# vendor/trigger_registry.md:139 — "collect the G4 cutover evidence for a language rewrite: parity
+# results true on the pinned source SHAs and a data-copy plan; the cutover itself is a session
+# action; upstream rewrite_parity_qa (added 2026-10-26, py2rust RS-D4, George 10-25)" — so there is
+# no v4 `card_types` block and no `sections` list. The deliverable's field names below
+# (plan_tables, data_copy.tables[].table/source_repo/order/row_count_check/checksum_check,
+# data_copy.steps/rollback/downtime, g4.parity_on_pinned_shas/g4.data_copy_plan) are read from the
+# live flows: ct.rewrite_cutover_readiness.ready 8e06408a, .doing 04263c7d, .qa 961b6b13,
+# .done 8e0a8f35.
+card_type: rewrite_cutover_readiness
+capability: change_management
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: rewrite_cutover_readiness
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: rewrite_cutover_readiness.ready
+    title: Rewrite cutover readiness — definition of ready
+    definition_of_ready: {checks: [parity_qa_released]}
+    definition_of_done: {checks: [draft_artifact_id]}
+    acceptance_criteria:
+      - {name: parity_qa_released, text: "The rewrite parity QA card for this project is released, so the parity results the readiness report will cite are final and no parity check is still open."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: rewrite_cutover_readiness.doing
+    title: Rewrite cutover readiness — definition of doing
+    definition_of_ready: {checks: [parity_qa_released]}
+    definition_of_done: {checks: [parity_results_true_on_pinned_shas, data_copy_plan_present]}
+    acceptance_criteria:
+      - {name: parity_results_true_on_pinned_shas, text: "Every parity result the report states — per source repository, per feature, pass or fail — is true on the source sha the rewrite plan pins, and the report names that sha."}
+      - {name: data_copy_plan_present, text: "The report holds a copy entry for every table of the plan and, for each table, the source repository that holds it today, how its row count is compared and how its checksum is compared; plus the steps in order, the rollback and the expected downtime. A rewrite that copies no table says so and still gives the steps, the rollback and the downtime."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: rewrite_cutover_readiness.qa
+    title: Rewrite cutover readiness — definition of QA
+    definition_of_ready: {checks: [parity_results_true_on_pinned_shas, data_copy_plan_present]}
+    definition_of_done: {checks: [g4_evidence_complete, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: g4_evidence_complete, text: "The report holds both G4 gates — parity true on the pinned source shas and a data-copy plan — each marked met, with the evidence that shows it and no gap left unnamed."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the rewrite_cutover_readiness card type declares is true of the report."}
+      - {name: copy_order_respects_references, text: "Every table is copied after the tables it refers to, so no copied row points at a row that is not there yet."}
+      - {name: every_table_has_both_comparisons, text: "Every table states a row-count check and a checksum check that can be run after the copy, and what result counts as equal."}
+      - {name: rollback_restores_the_old_services, text: "rollback says step by step how to bring the old services back and when they may be removed."}
+      - {name: downtime_is_stated, text: "downtime states how long the copy and the switch take and which services are unavailable meanwhile."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: rewrite_cutover_readiness.done
+    title: Rewrite cutover readiness — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The published readiness report is the version QA confirmed; no table entry, step, rollback line or downtime changed after review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: rewrite_cutover_readiness.system
+    title: Rewrite cutover readiness — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: rewrite_cutover_readiness.READY
+    list: ready
+    title: Rewrite cutover readiness — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: rewrite_cutover_readiness
+        sop: rewrite_cutover_readiness.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_cutover_readiness.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_cutover_readiness.DOING
+    list: doing
+    title: Rewrite cutover readiness — doing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_cutover_readiness.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_cutover_readiness.QA
+    list: qa
+    title: Rewrite cutover readiness — QA
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_cutover_readiness.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_cutover_readiness.DONE
+    list: done
+    title: Rewrite cutover readiness — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_cutover_readiness, sop: rewrite_cutover_readiness.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_cutover_readiness.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

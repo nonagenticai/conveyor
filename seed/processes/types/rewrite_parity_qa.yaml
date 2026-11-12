@@ -1,0 +1,174 @@
+# rewrite_parity_qa — prove a rewrite equals its sources at pinned shas: the schema diff equal, the
+# OpenAPI diff equal against the union of the source specs, and behaviour replay equal, with every
+# comparison computed and none judged (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type rewrite_parity_qa: outputs draft_artifact_id,
+# report_artifact_id, published_artifact_id; and the READY source_shas_pinned, DOING schema_diff_equal
+# / openapi_diff_equal_to_source_union / behaviour_replay_equal, QA parity_computed_without_judgement
+# and DONE artifact_is_qa_version acceptance) and
+# n8n-designs/design/choices/v4/capabilities/testing.yaml — the three rewrite_parity_qa
+# inspect.criteria (summary_covers_every_comparison, summary_counts_match_the_flow,
+# summary_claims_nothing_unmeasured), written as Claude draft 2026-11-01 under R333 because the
+# inspect map held no entry for the type and `cap.testing.inspect` therefore answered `no_criteria`,
+# which passes (R321(a)) — the gate could never fail on its own criteria.
+# ⚠️ The type has no `card_types` block in that file: its catalogue line is
+# vendor/trigger_registry.md:217 — "prove a rewrite equals its sources at pinned SHAs: schema-diff
+# equal, openapi-diff equal against the union of the source specs, behaviour replay/compare equal,
+# all computed with no judgement; upstream rewrite_slice (added 2026-10-26, py2rust RS-D4, George
+# 10-25)" — and the live flow `ct.rewrite_parity_qa.*` is the truth for its prompts, tools and slot
+# outputs (R352). The flow computes the comparisons and the findings; these SOPs judge the summary
+# the agent writes around them.
+card_type: rewrite_parity_qa
+capability: testing
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: rewrite_parity_qa
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: rewrite_parity_qa.ready
+    title: Rewrite parity QA — definition of ready
+    definition_of_ready: {checks: [rewrite_slice_released]}
+    definition_of_done: {checks: [source_shas_pinned]}
+    acceptance_criteria:
+      - {name: source_shas_pinned, text: "Every source the run compares against names one full commit sha that resolves in that source repository — never a branch, a tag, 'latest' or an abbreviated sha — and the source list is not empty, so a re-run of the card compares the rewrite against the same revisions."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: rewrite_parity_qa.doing
+    title: Rewrite parity QA — definition of doing
+    definition_of_ready: {checks: [source_shas_pinned]}
+    definition_of_done: {checks: [schema_diff_equal, openapi_diff_equal_to_source_union, behaviour_replay_equal]}
+    acceptance_criteria:
+      - {name: schema_diff_equal, text: "The schema comparison reports equal on the pinned shas: every table, column, type, nullability, default and key a source holds exists in the rewrite with the same definition, and the computed difference set is empty with no entry excused as known, cosmetic or pending."}
+      - {name: openapi_diff_equal_to_source_union, text: "The OpenAPI comparison runs against the union of every source's spec, not against one source picked as the reference, and its computed difference set is empty: every path, method, parameter, request and response the union declares is served by the rewrite's contract."}
+      - {name: behaviour_replay_equal, text: "The behaviour comparison replays the same recorded inputs through each source and through the rewrite and compares the outputs, and every replayed case is equal — no case dropped, skipped, or called equal because its difference is small."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: rewrite_parity_qa.qa
+    title: Rewrite parity QA — definition of QA
+    definition_of_ready: {checks: [schema_diff_equal, openapi_diff_equal_to_source_union, behaviour_replay_equal]}
+    definition_of_done: {checks: [parity_computed_without_judgement, summary_covers_every_comparison, summary_counts_match_the_flow, summary_claims_nothing_unmeasured]}
+    acceptance_criteria:
+      - {name: parity_computed_without_judgement, text: "Every equality result in the report is the one the flow computed on the pinned shas: the report adds no comparison and drops none, and it states no judgement — no 'small enough', 'known difference' or 'acceptable in practice' — that the computed difference sets do not already carry."}
+      - {name: summary_covers_every_comparison, text: "The summary reports each comparison the flow ran — the database schema, the API against the union of the source specs, and behaviour per source — and says for each one whether it is equal."}
+      - {name: summary_counts_match_the_flow, text: "Every number in the summary is the number the flow computed for these shas: compared items, equal items and, above all, the difference count, which is written as a number and not replaced by a percentage or by a zero-failure claim."}
+      - {name: summary_claims_nothing_unmeasured, text: "The summary claims no parity the run did not measure: no 'fully identical', 'equivalent' or 'no regression' wider than the three comparisons, and nothing about a behaviour that no replay exercised."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: rewrite_parity_qa.done
+    title: Rewrite parity QA — definition of done
+    definition_of_ready: {checks: [parity_computed_without_judgement]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The parity report published to the card is the revision QA confirmed on the same pinned shas: no comparison, count or summary sentence changed after the review, and every source still names the sha the run compared against."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: rewrite_parity_qa.system
+    title: Rewrite parity QA — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: rewrite_parity_qa.READY
+    list: ready
+    title: Rewrite parity QA — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: rewrite_parity_qa
+        sop: rewrite_parity_qa.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_parity_qa.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_parity_qa.DOING
+    list: doing
+    title: Rewrite parity QA — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_parity_qa.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_parity_qa.QA
+    list: qa
+    title: Rewrite parity QA — QA
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_parity_qa.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_parity_qa.DONE
+    list: done
+    title: Rewrite parity QA — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_parity_qa, sop: rewrite_parity_qa.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_parity_qa.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

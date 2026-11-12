@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S01 — UI spike: Leptos CSR (WASM) vs Leptos SSR · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S01-ui-spike.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s01--ui-spike-leptos-csr-wasm-vs-leptos-ssr">S01 — UI spike: Leptos CSR (WASM) vs Leptos SSR</h1>
+<p>Programme project: S01 · issues none yet</p>
+<p><strong>Executor:</strong> a fresh session, verbatim · <strong>Gate (SPEC §8 S1):</strong> the decision is recorded with the measured numbers.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>Decide by measurement whether S12 builds <code>conveyor</code>'s UI as Leptos CSR/WASM or Leptos SSR, and record it as an ADR. Evidence: eight numbers per stack from building both hard screens twice. Nothing else survives.</p>
+<p>SPEC §5.7, verbatim: "<strong>Leptos CSR is the prior</strong> — the app is authenticated with no SEO need, so SSR's win is weak and SSR hydration/double-fetch bugs are the known trap. SSR is chosen only if measured TTI exceeds 2 s or the auth flow forces cookie-based SSR. Dioxus only if the phase-2 flow editor forces it." Corollary this gate enforces: <strong>SSR must beat CSR on TTI or on auth; a tie, or a loss on both, is CSR.</strong></p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li><code>conveyor</code> is docs-only. Measured 2026-11-07: the root holds <code>docs/</code> only — no <code>Cargo.toml</code>, <code>crates/</code>, <code>apps/</code>, git history. SPEC §5.2 names <code>apps/web</code>; this slice leaves it unpopulated.</li>
+<li>No Rust UI precedent anywhere. <code>agent</code>, <code>strata_ingest</code>, <code>strata_rag</code>, <code>template-rust-service</code> are headless HTTP services; both frontends are SvelteKit (fr: SvelteKit 2.70, 195 <code>+page.svelte</code>).</li>
+<li>Measured 2026-11-07: <code>rustup target list --installed</code> lists only <code>aarch64-apple-darwin</code>; <code>cargo-leptos</code> and <code>trunk</code> are absent and <code>cargo leptos</code> exits <code>no such command</code>. Ports 8791/8801/8802 are free. <code>cargo</code>/<code>rustc</code> are not on PATH without <code>source ~/.cargo/env</code>; 1.98.0 is the default, 1.99.0 is installed.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong></p>
+<ul>
+<li>One fixture server (axum, ≤200 lines, no DB/docker) serving both screens.</li>
+<li><strong>Board:</strong> 500 cards in 10 lists; drag between lists (pointer + keyboard); an SSE move applied without losing scroll or an in-flight drag.</li>
+<li><strong>Chat:</strong> SSE token streaming, a tool-call card (name, arguments, collapsed result), 50-message history.</li>
+<li>Both screens <strong>twice</strong>: Leptos CSR (WASM, <code>hydrate</code>) and Leptos SSR (<code>leptos_axum</code>, render + hydration).</li>
+<li>Minimum auth: auth-code + PKCE against a local fixture OP (CSR token in memory; SSR HttpOnly cookie guard).</li>
+<li><code>spikes/web/RESULTS.md</code>, <code>docs/decisions/0001-ui-stack.md</code>.</li>
+</ul>
+<p><strong>OUT</strong> — real Keycloak and the <code>conveyor</code> realm (S2, D13); authz beyond one logged-in gate; styling fidelity and layout below 1280 px; every other screen (S12); i18n; adopting any DnD or virtual-list library; any change to the workspace, <code>apps/web</code> or <code>crates/*</code>.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<p>Read for requirements, not to port. fr pinned at <code>6f7c509792b3ca1fc1fb00c198aebcec83f0af29</code> (2026-11-07); <code>template-rust-service</code> at <code>0c7396a0130b3ed27904c03cce49d5415648f66f</code>. All paths verified 2026-11-07.</p>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fr/frontend/src/routes/(project)/projects/[id]/board/+page.svelte</code></td>
+<td>column layout, DnD, virtualisation</td>
+<td>10 columns, drag targets, live move</td>
+<td>the Svelte DnD library, Svelte stores</td>
+</tr>
+<tr>
+<td><code>fr/frontend/src/routes/(project)/projects/[id]/cards/[cardId]/</code></td>
+<td>the cockpit's card fields</td>
+<td>the field list</td>
+<td>the Svelte components, fr API client</td>
+</tr>
+<tr>
+<td><code>fr/frontend/src/lib/components/ProjectForm.svelte</code></td>
+<td>form state, validation, errors</td>
+<td>a validated-form shape</td>
+<td>Svelte bindings, Zod schemas</td>
+</tr>
+<tr>
+<td><code>fr/frontend/src/routes/chat/+page.svelte</code>, <code>.../chat/streamChat.ts</code></td>
+<td>SSE loop, message model, tool calls</td>
+<td>event names, ordering, history</td>
+<td>SvelteKit load/auth code</td>
+</tr>
+<tr>
+<td>SPEC §6</td>
+<td>list is state, no <code>state</code> column</td>
+<td>the board model the fixture mirrors</td>
+<td>— (requirement, not code)</td>
+</tr>
+<tr>
+<td><code>plans/02-source-map/10-agent-patterns.md</code> §template-rust-service</td>
+<td><code>OpenApiRouter</code>, <code>AppState</code></td>
+<td>axum wiring behind SSR (not sqlx)</td>
+<td>sqlx, the template DB layer</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>spikes/web/                 # throwaway, NOT a workspace member
+  Cargo.toml                # empty [workspace] table — opts out of any parent
+  fixture/src/main.rs       # ≤200 lines, axum only, port 8791
+  csr/                      # Leptos CSR, wasm32-unknown-unknown, static, :8801
+  ssr/                      # Leptos SSR + leptos_axum, :8802
+  RESULTS.md                # 8 metrics × 2 stacks + the command that produced each
+docs/decisions/0001-ui-stack.md</code></pre>
+<p>Fixture contract — deterministic, DB-free, <code>id:</code> monotonic:</p>
+<table>
+<thead>
+<tr>
+<th>route</th>
+<th>returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /api/boards/demo</code></td>
+<td><code>{lists:[10], cards:[500]}</code>; card <code>{id, list_id, title, position, version}</code></td>
+</tr>
+<tr>
+<td><code>GET /api/events?board=demo</code></td>
+<td><code>text/event-stream</code>; <code>event: card.moved</code> every <strong>2 s</strong>; honours <code>Last-Event-ID</code></td>
+</tr>
+<tr>
+<td><code>GET /api/chat/history</code> · <code>/api/chat/stream</code></td>
+<td>50 messages · <code>token</code> ×80 at 25 ms, then <code>tool_call</code>, then <code>done</code></td>
+</tr>
+<tr>
+<td><code>GET /health</code></td>
+<td><code>ok</code></td>
+</tr>
+</tbody>
+</table>
+<p>ADR skeleton (the only non-command block, per the brief): <code># 0001 — UI stack</code> · Status/Date · <code>## Context</code> · <code>## Options</code> (CSR, SSR) · <code>## Measured</code> (8 rows × 2 stacks) · <code>## Decision</code> · <code>## Consequences</code> · <code>## Revisit triggers</code>.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<p>Each step ≤1 day, each independently testable.</p>
+<ol type="1">
+<li>Toolchain and ports: <code>source ~/.cargo/env</code>; measure <code>rustc --version</code>, <code>rustup target list --installed</code>, <code>command -v cargo-leptos trunk</code>, <code>cargo leptos --help</code>, and <code>lsof -nP -iTCP:8791 -iTCP:8801 -iTCP:8802 -sTCP:LISTEN</code> (empty). Never 8000.</li>
+<li>Scaffold <code>spikes/web/Cargo.toml</code> with the empty <code>[workspace]</code> and three packages; pin <code>leptos</code>, <code>leptos_axum</code>, <code>leptos_router</code> to one minor in <code>[workspace.dependencies]</code>.</li>
+<li>Install the missing toolchain — <code>wasm32-unknown-unknown</code> and <code>cargo-leptos</code> — then confirm <code>cargo leptos --help</code> runs.</li>
+<li>Fixture board endpoints: <code>GET /api/boards/demo</code> returns 500 cards; <code>GET /api/events</code> emits monotonic <code>id:</code> 2 s apart.</li>
+<li>Fixture chat endpoints: 50-message history, 80 tokens then <code>tool_call</code> then <code>done</code>, and <code>/health</code>.</li>
+<li>Board, CSR: 500 cards from the fixture, unstyled.</li>
+<li>Board, CSR: drag between lists with pointer and keyboard; the move persists in fixture state.</li>
+<li>Board, SSR: same component tree; count board fetches per page load in the server log and record the double-fetch diff.</li>
+<li>Chat, CSR: streaming tokens, tool-call card, history.</li>
+<li>Chat, SSR: the same, server-rendered then hydrated.</li>
+<li>Auth fixture OP: <code>/authorize</code> code + <code>/token</code> PKCE S256.</li>
+<li>Auth wiring per stack: CSR bearer in memory, SSR HttpOnly cookie + CSRF; log out/in 3× and deep-link while logged out.</li>
+<li>Measurement: five runs per stack per §7; write <code>RESULTS.md</code> as you go.</li>
+<li>ADR from <code>RESULTS.md</code>: splice its 8 × 2 table into <code>## Measured</code>, then delete the spike; confirm <code>apps/web</code> is still absent.</li>
+</ol>
+<p>Commands for steps 2–14 (from <code>$HOME/Movies/conveyor</code>):</p>
+<pre class="bash"><code># 2 — three packages; the empty [workspace] opts out of any parent
+mkdir -p spikes/web/{fixture,csr,ssr}/src &amp;&amp; printf &#39;[workspace]\n[workspace.dependencies]\n&#39; &gt; spikes/web/Cargo.toml \
+  &amp;&amp; for p in fixture csr ssr; do printf &#39;[package]\nname = &quot;spike-%s&quot;\nversion = &quot;0.1.0&quot;\nedition = &quot;2024&quot;\n&#39; &quot;$p&quot; &gt; spikes/web/$p/Cargo.toml; done
+# 3 — install (wasm target and cargo-leptos were both absent 2026-11-07)
+source ~/.cargo/env &amp;&amp; rustup target add wasm32-unknown-unknown &amp;&amp; cargo install cargo-leptos --locked &amp;&amp; cargo leptos --help | head -5
+# 4 — board fixture (:8791)
+source ~/.cargo/env &amp;&amp; cargo run -p spike-fixture &amp; sleep 2; curl -s http://127.0.0.1:8791/api/boards/demo | jq &#39;.cards|length&#39;; curl -sN &#39;http://127.0.0.1:8791/api/events?board=demo&#39; | head -5
+# 5 — chat fixture
+curl -s http://127.0.0.1:8791/api/chat/history | jq &#39;length&#39;; curl -sN &#39;http://127.0.0.1:8791/api/chat/stream&#39; | head -5; curl -s http://127.0.0.1:8791/health
+# 6 — CSR build and serve (:8801) from its own target dir; the CSR site is static, so a file server is right
+source ~/.cargo/env &amp;&amp; CARGO_TARGET_DIR=/tmp/s1-csr cargo leptos build --release -p spike-csr \
+  &amp;&amp; (cd /tmp/s1-csr/site &amp;&amp; python3 -m http.server 8801 &amp;) &amp;&amp; sleep 2 \
+  &amp;&amp; npx -y playwright@1.49.1 screenshot --wait-for-selector=&#39;[data-card-id]&#39; http://127.0.0.1:8801/ /tmp/s1-board-csr.png
+# 7 — render smoke; the drag/keyboard assertion is the RESULTS row
+npx -y playwright@1.49.1 screenshot --wait-for-selector=&#39;[data-card-id]&#39; --wait-for-timeout=2000 http://127.0.0.1:8801/ /tmp/s1-board-drag.png
+# 8 — SSR build and serve (:8802) from its own target dir; python3 -m http.server would return the shell,
+#     never the server-rendered HTML (grep counts 0), so the SSR app runs the bin the build emits
+#     (bin/site paths under the target dir are UNVERIFIED until built: ls /tmp/s1-csr/site /tmp/s1-ssr/site /tmp/s1-ssr/release)
+source ~/.cargo/env &amp;&amp; CARGO_TARGET_DIR=/tmp/s1-ssr cargo leptos build --release -p spike-ssr \
+  &amp;&amp; (LEPTOS_SITE_ROOT=/tmp/s1-ssr/site LEPTOS_SITE_ADDR=127.0.0.1:8802 /tmp/s1-ssr/release/spike-ssr &amp;) &amp;&amp; sleep 2 \
+  &amp;&amp; curl -sf http://127.0.0.1:8802/ | grep -o &#39;data-card-id&#39; | wc -l
+# 9 — chat CSR
+npx -y playwright@1.49.1 screenshot --wait-for-selector=&#39;[data-message-id]&#39; http://127.0.0.1:8801/chat /tmp/s1-chat-csr.png
+# 10 — chat SSR
+curl -sf http://127.0.0.1:8802/chat | grep -o &#39;data-message-id&#39; | wc -l
+# 11 — fixture OP: expect 302
+curl -s -o /dev/null -w &#39;%{http_code}\n&#39; &#39;http://127.0.0.1:8791/authorize?response_type=code&amp;client_id=s1&amp;redirect_uri=http://127.0.0.1:8801/callback&amp;code_challenge=x&amp;code_challenge_method=S256&#39;
+# 12 — logged-out deep link: expect the login gate
+npx -y playwright@1.49.1 screenshot --wait-for-selector=&#39;[data-login]&#39; http://127.0.0.1:8801/projects/demo/board /tmp/s1-logged-out.png
+# 13 — one timed run; repeat five times per stack
+npx -y lighthouse@12 http://127.0.0.1:8801/ --only-categories=performance --throttling-method=simulate --throttling.cpuSlowdownMultiplier=4 --throttling.requestLatencyMs=150 --throttling.downloadThroughputKbps=1638.4 --throttling.uploadThroughputKbps=675 --output=json --output-path=/tmp/s1-csr-lh-1.json --chrome-flags=&#39;--headless=new&#39;
+# 14 — the ADR&#39;s ## Measured absorbs RESULTS.md&#39;s table BEFORE the spike is deleted
+test -f docs/decisions/0001-ui-stack.md &amp;&amp; grep -q &#39;^## Decision&#39; docs/decisions/0001-ui-stack.md \
+  &amp;&amp; { sed -n &#39;1,/^## Measured$/p&#39; docs/decisions/0001-ui-stack.md; echo; grep &#39;^|&#39; spikes/web/RESULTS.md; echo; sed -n &#39;/^## Decision$/,$p&#39; docs/decisions/0001-ui-stack.md; } &gt; /tmp/s1-adr.md \
+  &amp;&amp; test &quot;$(grep -cE &#39;^\| *[1-8] &#39; /tmp/s1-adr.md)&quot; -eq 16 \
+  &amp;&amp; mv /tmp/s1-adr.md docs/decisions/0001-ui-stack.md \
+  &amp;&amp; rm -rf spikes &amp;&amp; test ! -e spikes &amp;&amp; test ! -e apps/web &amp;&amp; echo S1-DONE</code></pre>
+<h2 id="7-gate">7. Gate</h2>
+<p>Executable; all must be true. The numbers the gate cites come from this measurement protocol: five runs, median plus min/max, same machine, same fixture, servers fresh per run. Browser work takes the <code>browser-testing</code> lease; one browser at a time. <strong>Variables used below:</strong> <code>$i</code> is the run index (<code>for i in 1 2 3 4 5</code>); <code>&lt;stack&gt;</code> is the spike package (<code>spike-csr</code> or <code>spike-ssr</code>), what <code>-p &lt;stack&gt;</code> names and the <code>s1-cold-&lt;stack&gt;</code> target dir encodes; <code>&lt;target&gt;</code> is the stack's step 6/8 build dir (<code>/tmp/s1-csr</code> or <code>/tmp/s1-ssr</code>).</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>metric</th>
+<th>how</th>
+<th>threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>TTI, throttled</strong></td>
+<td><code>npx -y lighthouse@12 http://127.0.0.1:8801/ --only-categories=performance --throttling-method=simulate --throttling.cpuSlowdownMultiplier=4 --throttling.requestLatencyMs=150 --throttling.downloadThroughputKbps=1638.4 --throttling.uploadThroughputKbps=675 --output=json --output-path=/tmp/s1-csr-lh-$i.json --chrome-flags='--headless=new'</code>. Decision number is interaction TTI: navigationStart → first drag that mutates membership (<code>performance.now()</code> in the drag handler). Lighthouse <code>interactive</code> may be <code>null</code> when WASM boot leaves no quiet window.</td>
+<td><strong>&gt;2000 ms fails CSR</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Bundle</strong></td>
+<td><code>find &lt;target&gt;/site -type f \( -name '*.wasm' -o -name '*.js' \) -exec sh -c 'gzip -9 -c "$1" | wc -c' _ {} \; | awk '{s+=$1} END {print s}'</code></td>
+<td>gzip-9 bytes; raw too</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>500-card first render</strong></td>
+<td>navigationStart → 500th <code>[data-card-id]</code>, p50 of 5</td>
+<td>all-at-once (decision row) + virtualised (sub-row), both stacks</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Drag frames</strong></td>
+<td>2 s CDP drag; rAF deltas + <code>longtask</code></td>
+<td>pass = ≥95 % ≤16.7 ms, 0 tasks &gt;50 ms; record p95</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>SSE → DOM</strong></td>
+<td>fixture stamps T at send; app marks <code>sse.&lt;id&gt;</code> on message, <code>sse-dom.&lt;id&gt;</code> in a MutationObserver; 30 events</td>
+<td>p50/p95; p95 ≤100 ms</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Memory, 5 min</strong></td>
+<td>CDP <code>Performance.getMetrics</code> (JSHeapUsedSize) + <code>Memory.getDOMCounters</code></td>
+<td>record MB + nodes; &gt;300 MB or &gt;3× card nodes is a signal</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Cold build</strong></td>
+<td><code>source ~/.cargo/env &amp;&amp; time CARGO_TARGET_DIR=/tmp/s1-cold-&lt;stack&gt; cargo leptos build --release -p &lt;stack&gt;</code> from empty</td>
+<td>record; &gt;10 min is a loop warning</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Auth</strong></td>
+<td>flow shape, round trips, deep-link while logged out, whether SSE needs a fetch-stream shim (<code>EventSource</code> cannot send <code>Authorization</code>)</td>
+<td>pass / <strong>forcing condition</strong>, not a race</td>
+</tr>
+</tbody>
+</table>
+<pre class="bash"><code>set -euo pipefail
+cd $HOME/Movies/conveyor
+test &quot;$(grep -cE &#39;^\| *[1-8] &#39; docs/decisions/0001-ui-stack.md)&quot; = 16   # 16: 8 metrics × 2 stacks
+test -f docs/decisions/0001-ui-stack.md &amp;&amp; grep -q &#39;^## Decision&#39; docs/decisions/0001-ui-stack.md
+grep -qE &#39;^## (Measured|Consequences)&#39; docs/decisions/0001-ui-stack.md
+test ! -e spikes &amp;&amp; echo SPIKE-GONE
+test ! -e apps/web &amp;&amp; echo APPS-WEB-STILL-EMPTY
+test &quot;$(find . -path &#39;*spikes*&#39; | wc -l)&quot; -eq 0                      # 0
+test -z &quot;$(git status --short 2&gt;/dev/null | grep spikes || true)&quot;      # 0 (repo may not exist yet, CONTRACT §13)
+test -z &quot;$(lsof -nP -iTCP:8791 -iTCP:8801 -iTCP:8802 -sTCP:LISTEN || true)&quot;   # empty</code></pre>
+<p>Plus: an SSR decision must quote a TTI &gt;2000 ms or the auth forcing condition, citing the <code>## Measured</code> row (which absorbed <code>RESULTS.md</code> before the spike was deleted — step 14). Ambiguous numbers mean repeat the spike, not adjudicate.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>SSR hydration double-fetch.</strong> A resource awaited in a component body runs on the server <em>and</em> again on hydration. Count board fetches per page load: 1 correct, 2 is the trap. Record raw, then fixed; say which number reached the ADR.</li>
+<li><strong>Auth cookie and the SSE edge.</strong> SSR needs HttpOnly cookie + session + CSRF; CSR/PKCE has no cookie, and <code>EventSource</code> cannot set <code>Authorization</code>, so CSR needs a fetch+<code>ReadableStream</code> shim — measure it as work, not as a CSR failure. A BFF for CSR auth is SSR with extra steps.</li>
+<li><strong>WASM size drives TTI.</strong> Measure <code>--release</code> + <code>wasm-opt</code>, never a dev build (~10× larger); serve built <code>dist/</code> from a static server — <code>trunk serve</code> injects live-reload and distorts both. Report gzip-9.</li>
+<li><strong>Version triad and axum wiring.</strong> <code>leptos</code>/<code>leptos_axum</code>/<code>leptos_router</code> must be one minor, or <code>leptos_routes</code>/<code>LeptosOptions</code> types mismatch into an opaque error; pin once in <code>[workspace.dependencies]</code>.</li>
+<li><strong>Fake SSE.</strong> A precomputed list with a sleep is honest; polling or cached replay is not. Prove pacing with <code>curl -sN</code> (monotonic <code>id:</code>, 2 s apart) and the DOM change with a MutationObserver count; "the handler fired" is not evidence.</li>
+<li><strong>TTI on unthrottled localhost.</strong> A 40 ms load measures the machine. Always 4× CPU / Slow 4G, throttle values printed beside the number.</li>
+<li><strong>All-at-once vs virtualised.</strong> Eager 500-card render beats windowing, so eager-CSR vs windowed-SSR wins the wrong race. Both stacks get both modes; decision row is all-at-once.</li>
+<li><strong>Spike joins the workspace.</strong> S2's root <code>Cargo.toml</code> auto-detects a nested crate without its own <code>[workspace]</code> (join or "multiple workspace roots"). Put the empty table in; still delete the spike.</li>
+<li><strong>SSR compiles twice.</strong> <code>ssr</code> on the server, <code>hydrate</code> in WASM; server-only deps (axum, sqlx, tokio) must sit behind <code>#[cfg(feature = "ssr")]</code>.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1-D1</td>
+<td>The ADR is the only durable artifact; the spike is deleted</td>
+<td>CONTRACT §11</td>
+</tr>
+<tr>
+<td>S1-D2</td>
+<td>All-at-once 500-card render is the decision configuration; virtualised is fallback</td>
+<td>worst case for both</td>
+</tr>
+<tr>
+<td>S1-D3</td>
+<td>TTI is the interaction number; Lighthouse <code>interactive</code> is supplementary</td>
+<td>WASM boot can leave no quiet window</td>
+</tr>
+<tr>
+<td>S1-D4</td>
+<td>Auth is a pass/forcing-condition, not a latency race</td>
+<td>the rule names auth as a forcing condition</td>
+</tr>
+<tr>
+<td>S1-D5</td>
+<td>Dioxus is out of scope</td>
+<td>SPEC §5.7 admits it only for the phase-2 editor</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Rust DnD library, or hand-rolled pointer events + keyboard?</td>
+<td>hand-rolled, no JS interop</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Fallback virtual list: hand-rolled windowing or JS via <code>wasm-bindgen</code>?</td>
+<td>hand-rolled</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Does the fixture OP prove enough for Keycloak?</td>
+<td>yes for mechanics; the real realm is S2's gate</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Is <code>cargo-leptos</code> acceptable in CI?</td>
+<td>yes; if cold build &gt;10 min, record <code>trunk</code> + manual axum wiring and let S2 decide</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Does SSR need an SSE relay?</td>
+<td>no; the browser connects to <code>/api/events</code> directly in both</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S01-ui-spike.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

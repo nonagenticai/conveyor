@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S17 core — measured evidence (steps 1–7) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S17-CORE.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s17-core--measured-evidence-steps-17">S17 core — measured evidence (steps 1–7)</h1>
+<p>Session <code>s17-benchmark-core</code>, 2026-11-09. Docs were already landed by <code>movies-01</code>; this lane built the pure measurement core and proved it against the frozen 2026-09-17 artefacts. Nothing here needs a cluster.</p>
+<h2 id="what-was-built">What was built</h2>
+<table>
+<thead>
+<tr>
+<th>file</th>
+<th>what</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/domain/src/benchmark/{mod,arm,mcnemar,specgen,parsers,grade}.rs</code></td>
+<td>arm identity, exact McNemar, the swebench 5.0.2 eval-script transform, 6 parser functions covering all 12 repos, the verdict ladder</td>
+</tr>
+<tr>
+<td><code>crates/domain/tests/benchmark_specgen.rs</code> + <code>tests/fixtures/benchmark/golden-eval-scripts.json</code></td>
+<td>50 golden eval scripts produced once by <code>swebench==5.0.2</code></td>
+</tr>
+<tr>
+<td><code>tools/seed-benchmark/</code> (standalone crate, not a workspace member)</td>
+<td>reads the pinned parquet, writes the hashed seed artifact</td>
+</tr>
+<tr>
+<td><code>seed/benchmark/verified50-v1.json</code> + <code>seed/benchmark/images-verified50-v1.lock.json</code></td>
+<td>the seed and its image lock</td>
+</tr>
+<tr>
+<td><code>migrations/0025_s17_benchmark.sql</code></td>
+<td>the four tables of DATA-ARCH §2.18 + RLS</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/benchmark_parity.rs</code> + <code>tests/fixtures/benchmark/2026-09-17/</code></td>
+<td>the 17 frozen runs (557 rows) and the parity gate</td>
+</tr>
+<tr>
+<td>ledger lists</td>
+<td><code>crates/store/src/migrate.rs</code>, <code>crates/store/tests/s07_schema.rs</code> (both end at 25)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-eval-script-oracle-one-time-development-only">The eval-script oracle (one-time, development only)</h2>
+<p>swebench 5.0.2's <code>make_test_spec</code> does <strong>not</strong> build the script from a spec table: it takes the dataset's <code>eval_script</code>, strips <code>#!/bin/bash</code>/<code>set -uxo pipefail</code>, inserts</p>
+<pre><code>SWEBENCH_TEST_EXIT_CODE=$?
+: &#39;&gt;&gt;&gt;&gt;&gt; End Test Output&#39;
+echo &quot;&gt;&gt;&gt;&gt;&gt; Test Exit Code: $SWEBENCH_TEST_EXIT_CODE&quot;</code></pre>
+<p>and re-adds the header (<code>swebench/harness/utils.py:215-245</code>, <code>types.py:44-49</code>). The golden fixture was produced with the old repo's own pinned environment, run once and never in the build or the image:</p>
+<pre class="bash"><code>cd ~/Movies/conveyor-bench
+UV_PROJECT_ENVIRONMENT=/tmp/s17-oracle-venv uv sync --frozen
+/tmp/s17-oracle-venv/bin/python - &lt;&lt;&#39;EOF&#39;
+import json, pyarrow.parquet as pq
+from swebench.harness.utils import make_test_spec
+ids = json.load(open(&#39;data/verified50-v1.json&#39;))
+rows = {r[&#39;instance_id&#39;]: r for r in pq.read_table(&#39;/tmp/s17-oracle/verified-78f471bf.parquet&#39;).to_pylist()
+        if r[&#39;instance_id&#39;] in set(ids)}
+json.dump([{&#39;instance_id&#39;: i, &#39;eval_script&#39;: make_test_spec(rows[i]).eval_script,
+            &#39;dataset_eval_script&#39;: rows[i][&#39;eval_script&#39;], &#39;log_parser&#39;: rows[i][&#39;log_parser&#39;], ...}
+           for i in ids], open(&#39;/tmp/s17-oracle/golden-eval-scripts.json&#39;, &#39;w&#39;))
+EOF</code></pre>
+<p>Dataset pinned at <code>SWE-bench/SWE-bench_Verified</code> @ <code>78f471bf655a3137b2e8a75af1501690ec009ec3</code> (parquet sha256 <code>030cfd7f2a704c4c0226e7f104c725a3b41230b1d3517f9c915ad7ea5be3fa25</code>, 6,304,616 bytes).</p>
+<h2 id="measured">Measured</h2>
+<table>
+<thead>
+<tr>
+<th>claim</th>
+<th>measurement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Golden eval scripts</td>
+<td><strong>50/50 byte-identical</strong> (<code>cargo test -p conveyor-domain --test benchmark_specgen</code>)</td>
+</tr>
+<tr>
+<td>Seed artifact</td>
+<td>50 instances, 760,354 bytes, <code>seed_sha256 27421012ad8bbd712228c8a0be14a02bf82093d8777cf88a1c72b7ec2118ea0a</code>, <code>image_lock_sha256 ed5d1fabc5b835012a4969a7e4df7a1bbd947860dbb3aa99e6ab0ca89e8cb8f6</code></td>
+</tr>
+<tr>
+<td>Seed determinism</td>
+<td>regenerated to <code>/tmp</code> and <code>cmp</code>-identical to the committed file</td>
+</tr>
+<tr>
+<td>Parity</td>
+<td><strong>555/555 graded rows</strong> across 17 banked runs, every row's <code>status</code>, <code>resolved</code>, four <code>tests_status</code> lists and <code>infra_failure</code> equal to <code>results.jsonl</code></td>
+</tr>
+<tr>
+<td>Ungraded rows</td>
+<td>2 rows (k8s API timeouts, <code>report</code> absent, empty log) — the sandbox driver's <code>infra_error</code>, outside the grader's set by construction</td>
+</tr>
+<tr>
+<td>Gold controls</td>
+<td><code>091615504508</code> 50/50, <code>091709203869</code> 50/50</td>
+</tr>
+<tr>
+<td>Empty controls</td>
+<td><code>09161555116e</code> 0/50, <code>0917093013f5</code> 0/50</td>
+</tr>
+<tr>
+<td>Early gold runs</td>
+<td><code>09161231d54b</code> 0/2 and <code>091612332af6</code> 0/50 — historical pre-fix runs, <strong>reproduced</strong>, not controls</td>
+</tr>
+<tr>
+<td>McNemar pair</td>
+<td><code>09180535e0cc</code> (conveyor-oracle-files+failing-test, 24) × <code>091719199e42</code> (qwen-oneshot-oracle-files+failing-test, 28) = both 22 · neither 20 · a-only 2 · b-only 6 · discordant 8 · <strong>p = 0.289</strong></td>
+</tr>
+<tr>
+<td>Refusal</td>
+<td><code>09171352d352</code> (oracle <code>files</code>) × <code>091719199e42</code> (<code>files+test</code>) = <code>comparable:false</code></td>
+</tr>
+<tr>
+<td>Unit vectors</td>
+<td><code>p = 0.180</code> (21/20/2/7 ⇒ 9 discordant) and <code>p = 0.289</code> (22/20/2/6 ⇒ 8)</td>
+</tr>
+<tr>
+<td>Migration</td>
+<td><code>_sqlx_migrations</code> row 25 <code>s17 benchmark</code> success; the four tables <code>relrowsecurity AND relforcerowsecurity</code> = <code>t</code> (compose <code>conveyor_dev</code>, mini3)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="gate--run-on-m1-through-rbuild-contract-16-mini3-refuses-local-cargo">Gate — run on m1 through <code>rbuild</code> (CONTRACT §16; mini3 refuses local cargo)</h2>
+<table>
+<thead>
+<tr>
+<th>step</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rbuild -- test --workspace --locked</code></td>
+<td><strong>615 passed · 0 failed · 3 ignored across 116 test binaries</strong> (detached run, exit 0); the only later source change was improve-01's whitespace-only <code>jwks.rs</code> reformat, after which <code>-p conveyor-auth</code> was re-run green</td>
+</tr>
+<tr>
+<td><code>rbuild -- clippy --workspace --all-targets -- -D warnings</code></td>
+<td>clean</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-domain --test benchmark_specgen</code></td>
+<td>3/3 (golden 50/50)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test benchmark_parity -- --nocapture</code></td>
+<td>2/2 (555/555 rows)</td>
+</tr>
+<tr>
+<td><code>rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td>210 ops, unchanged</td>
+</tr>
+<tr>
+<td>seed tool on m1 (clippy, fmt, run + <code>cmp</code>)</td>
+<td>clean; regenerated artifact byte-identical to the committed one</td>
+</tr>
+<tr>
+<td><code>rbuild -- fmt --all -- --check</code></td>
+<td><strong>green (exit 0, no diff)</strong> after improve-01 reformatted <code>crates/auth/src/jwks.rs</code> (whitespace-only, its file); <code>-p conveyor-auth</code> re-ran green afterwards (37 tests)</td>
+</tr>
+<tr>
+<td>RLS + ledger (local psql, compose <code>conveyor_dev</code>)</td>
+<td>four tables <code>t</code>/<code>t</code>; migration 25 success</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ The <code>psql</code> probes observe mini3's compose database, <strong>not</strong> the m1 throwaway test cluster the <code>test</code> commands run against; the slice's gate block now says so explicitly. <code>benchmark_rls</code> (steps 8–12) will make the app-level assertion a Rust test.</p>
+<h2 id="mutation-checks-a-test-must-be-able-to-fail">Mutation checks (a test must be able to fail)</h2>
+<table>
+<thead>
+<tr>
+<th>mutation</th>
+<th>expected</th>
+<th>observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>parse_log_pytest</code>: key <code>parts[1]</code> → <code>parts[0]</code> (also hits matplotlib)</td>
+<td>parity red</td>
+<td><strong>red — 2 failures</strong>, restored (cmp-identical)</td>
+</tr>
+<tr>
+<td>McNemar tail <code>0..=k</code> → <code>0..k</code></td>
+<td>both p-vectors red</td>
+<td><strong>red — 3 failures</strong>, restored</td>
+</tr>
+<tr>
+<td>arm comparability also requires the pipeline</td>
+<td>conveyor-vs-qwen pair refused</td>
+<td><strong>red — 2 failures</strong>, restored</td>
+</tr>
+<tr>
+<td>the <code>APPLY_PATCH_FAIL</code> early return disabled</td>
+<td>apply-failed ladder test red</td>
+<td><strong>red — 2 failures</strong>, restored</td>
+</tr>
+<tr>
+<td>eval-script insertion index <code>i + 2</code> → <code>i + 1</code></td>
+<td>golden 50/50 red</td>
+<td><strong>red — 2 failures</strong>, restored</td>
+</tr>
+</tbody>
+</table>
+<p>Every new test was shown able to fail before the gate was taken green.</p>
+<h2 id="not-in-this-lane">Not in this lane</h2>
+<p>Steps 8–12: <code>store::benchmark</code>, the eight actions/scopes/registry counts, <code>apps/server/src/sandbox.rs</code>, <code>benchmark.run.poll</code>/<code>benchmark.reap</code>, <code>--write-lock</code>. The <code>conveyor</code> arm and screen 14 are S18; screens are S12.</p>
+<h2 id="steps-812-session-2-2026-11-09--store-sandbox-driver-built-action-wiring-held-by-peers">Steps 8–12, session 2 (2026-11-09) — store, sandbox, driver built; action wiring held by peers</h2>
+<p>Landed and measured (all commands via <code>rbuild</code> on m1):</p>
+<table>
+<thead>
+<tr>
+<th>piece</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>store::benchmark</code></td>
+<td><code>benchmark_rls</code> green: seed created → same <code>seed_sha256</code> a no-op → different hash <code>SeedConflict</code>; grader projection returns answers, producer projection does not; run counters derived from cases (2/2/1); a finalised case refuses a second write; an over-cap patch refuses before the CHECK; the paired map spans both runs; promote sets <code>baseline_run_id</code>; tenant B sees nothing and a forged <code>tenant_id</code> is <code>42501</code>; owner sees 0 on all four (FORCE), superuser sees 1/2/2/4</td>
+</tr>
+<tr>
+<td><code>seed_benchmark</code> + <code>migrate --seed</code></td>
+<td>the artifact is embedded (same pattern as <code>seed/catalogue.json</code>) and the seed is idempotent per tenant</td>
+</tr>
+<tr>
+<td><code>apps/server/src/sandbox.rs</code></td>
+<td>fail-closed (<code>NotConfigured</code> without <code>SANDBOX_NAMESPACE</code>, <code>Credential</code> without a token); manifests carry <code>automountServiceAccountToken=false</code>, <code>enableServiceLinks=false</code>, the pull secret, the digest image, caps, the 1,000,000-byte ConfigMap cap and <code>POD_DEADLINE_S</code>; the node selector/toleration are env config (SPEC R12), never hardcoded; the runner script keeps swebench 5.0.2's four <code>GIT_APPLY_CMDS</code> in order (read from the pinned sdist, not memory)</td>
+</tr>
+<tr>
+<td><code>benchmark_worker::poll_with</code></td>
+<td>a stub Kubernetes API + the in-memory object store drive two ticks: tick 1 starts exactly 2 deterministic Jobs, tick 2 reads them Succeeded, grades both logs <code>unresolved</code>, stores 2 S09 documents, finishes the run with <code>control_ok = Some(false)</code></td>
+</tr>
+<tr>
+<td>clippy / fmt</td>
+<td><code>clippy -p conveyor-server -p conveyor-store --all-targets -D warnings</code> clean; fmt clean on every touched file</td>
+</tr>
+</tbody>
+</table>
+<p>Mutations (each restored afterwards): <code>automountServiceAccountToken=true</code> → manifest test red; gold <code>control_ok = Some(true)</code> → driver test red; the seed-conflict comparison disabled → RLS test red. The <code>job_name</code> test also caught a real collision — two UUIDv7 ids from the same millisecond share the leading 8 hex digits, so the name now uses 12 hex digits of SHA-256 over the full run id.</p>
+<p>Deviations and gaps recorded:</p>
+<ul>
+<li>The sandbox client uses the workspace <code>reqwest</code> instead of <code>kube</code> + <code>k8s-openapi</code> (five REST calls; no new dependency tree in a lock three lanes share). The wire behaviour and the manifest contract are unchanged.</li>
+<li>⛔ <strong>The <code>baseline</code> arm's producer has no build step in S17 §6.</strong> <code>baseline.py</code> (pinned system prompt, <code>raw.githubusercontent.com</code> source fetch, edit contract, difflib patch writer) is 569 lines and is not in the slice's deliverables; <code>benchmark_runs.start</code> refuses <code>baseline</code> with <code>409 arm_not_ready</code> until a producer port is planned. <code>gold</code> and <code>empty</code> — the two controls — are built.</li>
+<li><strong>Not landed at session end:</strong> the 8 actions' registration (<code>actions/src/lib.rs</code>, <code>spec.rs</code> 2 scopes, <code>actions-derive</code>, <code>registry.rs</code> counts, <code>api/src/lib.rs</code>, <code>portfolio_roundtrip</code>, <code>served-spec.lock.json</code>), the two <code>worker.rs</code> dispatch arms, the <code>benchmark.reap</code> schedule row, and the full S17 gate. The module code exists in <code>crates/actions/src/benchmark/{mod,runs,cases}.rs</code> and is unregistered — the shared files are leased by <code>s19-eval-build-a</code> (mid-pass) then <code>inference-ledger-prompt-audit</code> (S16), which agreed to hand over with measured counts and the lock hash.</li>
+</ul>
+<h2 id="steps-812-integration-2026-11-09-session-2-continued--parallel-with-s16s13-per-the-owner">Steps 8–12 integration (2026-11-09, session 2 continued — parallel with S16/S13 per the owner)</h2>
+<p>Landed after the shared-file window opened:</p>
+<ul>
+<li><strong>Actions registered.</strong> <code>pub mod benchmark;</code> (actions crate), <code>BenchmarksRead</code>/<code>BenchmarksWrite</code> (ranks: read = member+, write = member+ like <code>procedures:write</code>), the 8 action declarations, the derive wire table, and the parity samples. Counts moved from S16's 216/57 to <strong>224 actions (211 internal + 13 external) · 59 scopes · served-spec.lock 245 ops</strong> (<code>--check-lock</code> exit 0). <code>registry.rs</code> and <code>api/src/lib.rs</code> assert 224; <code>portfolio_roundtrip</code> asserts 59. At the time of writing, S13's <code>workflows.*</code> registration was landing on top (its lane re-derives the totals).</li>
+<li><strong>Two dispatch arms</strong> in <code>worker.rs</code> (<code>benchmark.run.poll</code>, <code>benchmark.reap</code>) and the <code>benchmark.reap</code> schedule row (<code>*/5 * * * *</code>, <code>DEFAULT_SCHEDULES</code> 15 → 16).</li>
+<li><strong>Parity samples</strong>: one per benchmark action, with a fixture suite + two graded runs (<code>benchmark_fixture</code>) and a per-round queued run for <code>benchmark_runs.cancel</code>. <code>SANDBOX_NAMESPACE</code> is set in the test so <code>start</code> queues rather than answering 503.</li>
+</ul>
+<p>Measured (m1/<code>rbuild</code>):</p>
+<table>
+<thead>
+<tr>
+<th>check</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>registry</code></td>
+<td>8/8 (224 actions, (211,13))</td>
+</tr>
+<tr>
+<td><code>parity_http_mcp</code></td>
+<td>4/4 — all 224 actions, HTTP and MCP</td>
+</tr>
+<tr>
+<td><code>benchmark_parity</code> / <code>benchmark_specgen</code></td>
+<td>2/2 (555/555) · 3/3 (golden 50/50)</td>
+</tr>
+<tr>
+<td><code>conveyor-domain --lib benchmark</code></td>
+<td>34/34</td>
+</tr>
+<tr>
+<td><code>benchmark_rls</code></td>
+<td>1/1</td>
+</tr>
+<tr>
+<td><code>benchmark_jobs</code> + <code>prune</code></td>
+<td>8/8 + 13/13</td>
+</tr>
+<tr>
+<td><code>clippy --workspace --all-targets -D warnings</code></td>
+<td>clean</td>
+</tr>
+<tr>
+<td>seed tool clippy + fmt</td>
+<td>clean; artifact regenerated from the pinned parquet and <strong>byte-identical</strong> (<code>seed_sha256 2742…ea0a</code>)</td>
+</tr>
+<tr>
+<td>compose <code>conveyor_dev</code> RLS probe</td>
+<td><code>benchmark_suite/instance/run/case</code> all <code>t</code> (enabled + forced)</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>Parallel-lane caveat, measured:</strong> the workspace-wide <code>fmt --all -- --check</code> and <code>cargo test --workspace --locked</code> were run while S19's runner lane and S13's workflow lane were mid-pass; their in-flight files (<code>domain/tests/eval_*</code>, <code>store/tests/eval_*</code>, <code>store/src/workflow/**</code>, <code>store/tests/workflow_publish.rs</code>) were the only fmt diffs, and S13's <code>workflows.*</code> registration was still landing in <code>registry.rs</code>. The S17 targets above are green on their own; the workspace-wide numbers must be re-taken once those lanes settle. Nothing in that red is an S17 file.</p>
+<h2 id="final-gate-record-2026-11-09-1425">Final gate record (2026-11-09 ~14:25)</h2>
+<p>Every S17 target is green: <code>registry</code> 8/8 (224 actions, (211,13)); <code>parity_http_mcp</code> 4/4 over all 224 actions on both transports; <code>benchmark_parity</code> 2/2 (<strong>555/555</strong> banked rows); <code>benchmark_specgen</code> 3/3 (golden <strong>50/50</strong>); <code>conveyor-domain --lib benchmark</code> 34/34; <code>benchmark_rls</code> 1/1; <code>benchmark_jobs</code> 8/8 (the stub-Kubernetes tick starts, grades, stores the log as an S09 document and finishes a gold control <code>control_ok=false</code>); <code>prune</code> 13/13 (the new <code>benchmark.reap</code> row included); <code>clippy --workspace --all-targets -D warnings</code> clean; <code>--check-lock</code> exit 0 at <strong>245</strong> ops; the seed artifact regenerated from the pinned parquet is byte-identical; the compose <code>conveyor_dev</code> probe reports <code>benchmark_suite/instance/run/case</code> all <code>t</code> (enabled + forced).</p>
+<p>⛔ <strong>The workspace-wide <code>cargo test --workspace --locked</code> could not be taken green — twice — because of live peer edits, measured at the time, in neither case an S17 file:</strong></p>
+<ol type="1">
+<li>14:12:56 — <code>crates/actions/src/workflow/{actions,mod,views}.rs</code> failed to compile against a snapshot taken before S13's derive-macro scope entry landed. S13 reports it fixed; a fresh <code>check --workspace</code> at ~14:16 was <strong>clean</strong>.</li>
+<li>14:17 — <code>crates/actions/src/eval/runs.rs:264</code> (S19-B's lane, mid-edit) fails <code>E0308</code> (<code>variant.as_str()</code> returns <code>String</code>, <code>find_run_tx</code> takes <code>&amp;str</code>; fixed by its owner).</li>
+<li>14:20 — <strong>compiled and ran</strong>. The only failing target is <code>parity_http_mcp</code>; at that instant its assertion named 13 actions without samples: S13's 6 <code>workflows.*</code> and S19-B's 7 <code>eval_runs.{start,get,list,cancel}</code> + <code>eval_results.{list,get,label}</code>. <strong>Every one of S17's 8 benchmark actions was present</strong> (never in the missing list). Cargo stops at the first failing target, so the binaries after <code>parity_http_mcp</code> did not run in that pass (they are covered individually above).</li>
+<li>14:35 — <strong>re-measured after S13 landed its six samples</strong>: the missing list is now exactly S19-B's 7 <code>eval_runs.*</code>/<code>eval_results.*</code>. S13's <code>workflows.*</code> samples are present and the lock is 258 ops (<code>--check-lock</code> 0). The one remaining workspace red is S19-B's fixture work — its own next session (an approved eval with a locked split, and a filled result slot). S17 contributes nothing to it. The last lane to settle owns the final workspace gate and the last <code>--write-lock</code>. S17's own targets above are green; this is the shared-tree cost, not an S17 defect.</li>
+</ol>
+<p><strong>Lock, final state (14:29):</strong> the live spec after the peer registrations is <strong>237 actions</strong>, and I regenerated <code>served-spec.lock.json</code> from it — <strong>258 operations</strong>, <code>--check-lock</code> exit 0, with 8 benchmark, 6 <code>workflows.*</code>, 4 <code>eval_runs.*</code> and 3 <code>eval_results.*</code> operations present. The 245-op figure above is this lane's own 224-action state; 258 is what the tree now holds.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S17-CORE.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

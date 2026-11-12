@@ -1,0 +1,12 @@
+{
+  "run_id": "09180535e0cc",
+  "subset": "verified50-v1",
+  "label": "grade",
+  "n": 50,
+  "counts": {
+    "unresolved": 26,
+    "resolved": 24
+  },
+  "resolved": 24,
+  "resolved_rate": 0.48
+}

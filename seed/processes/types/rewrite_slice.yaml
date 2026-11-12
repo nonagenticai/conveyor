@@ -1,0 +1,173 @@
+# rewrite_slice — port ONE slice of the confirmed rewrite plan to Rust and open a PR
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type rewrite_slice: outputs, acceptance and
+# definition_of_done pr_merged) and n8n-designs/design/choices/v4/capabilities/development.yaml —
+# the `inspect.criteria` block only, because rewrite_slice was never enumerated in that file's
+# `card_types`: it is live as `ct.rewrite_slice.*`, its RM card type carries capability
+# `development`, and the block was written as a Claude draft 2026-11-01 (V-36) after the map had no
+# entry and the inspect answered `no_criteria`, passing the gate vacuously.
+# vendor/trigger_registry.md:236 adds the doing-side proof: "Rust code for one slice of the confirmed
+# rewrite plan in the target repo, opened as a PR; done when the unified workspace test run
+# (pytest + nextest) is green and openapi-diff shows the slice's routes present and equal; upstream
+# rewrite_plan".
+#
+# ⚠ `planned_files_allowed` at READY is the plan-level form of the v4 `change_stays_in_the_slice`
+# criterion: the same boundary, checked before any code exists rather than in the diff.
+card_type: rewrite_slice
+capability: development
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: rewrite_slice
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: rewrite_slice.ready
+    title: Rewrite slice — definition of ready
+    definition_of_ready: {checks: [planned_files_allowed]}
+    definition_of_done: {checks: [workspace_imported]}
+    acceptance_criteria:
+      - {name: planned_files_allowed, text: "Every path the plan will write lies in the rewrite's target repository, under the slice's own source paths — the routes, modules and tests the confirmed rewrite plan assigns to this slice. The pinned source repositories are read-only here, so a plan that would edit one is refused before any code is written, and so is a plan that reaches into another slice's paths."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: rewrite_slice.doing
+    title: Rewrite slice — definition of doing
+    definition_of_ready: {checks: [workspace_imported]}
+    definition_of_done: {checks: [workspace_test_run_green, openapi_diff_slice_routes_present_and_equal]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff adds the slice's own source files and their tests and touches nothing else: no other slice's routes, and none of the shared plumbing the plan assigns to a later slice, even where the port would compile sooner with it."}
+      - {name: workspace_test_run_green, text: "The unified workspace run — pytest against the sources and nextest against the Rust workspace, with the ported slice's tests included — is green on the diff. Both halves are required: a slice whose tests pass in isolation but whose workspace run is red has not landed."}
+      - {name: openapi_diff_slice_routes_present_and_equal, text: "openapi-diff between the source specs and the ported service shows every route the slice names present, with the same method, same path and equal request and response shape. A named route that is missing, renamed, or differing in one field fails the check, and so does a route the slice did not name appearing in the target."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: rewrite_slice.qa
+    title: Rewrite slice — definition of QA
+    definition_of_ready: {checks: [workspace_test_run_green, openapi_diff_slice_routes_present_and_equal]}
+    definition_of_done: {checks: [change_meets_acceptance]}
+    acceptance_criteria:
+      - {name: change_meets_acceptance, text: "The slice's acceptance sentence in the confirmed rewrite plan is true of the ported code, and the test the diff adds is the one that shows it — not a test that checks something adjacent to the sentence."}
+      - {name: slice_ports_its_routes, text: "The diff adds or changes exactly the routes the slice names, with the method, path and request and response shape of the source."}
+      - {name: slice_acceptance_is_checked, text: "The diff adds a test that checks the slice's acceptance sentence and would fail if the ported route stopped behaving like the source — a test that only asserts the route answers is not enough."}
+      - {name: change_stays_in_the_slice, text: "The diff changes only the slice's own source paths and what they need; no other slice's routes are touched."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: rewrite_slice.done
+    title: Rewrite slice — definition of done
+    definition_of_ready: {checks: [change_meets_acceptance]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request that ports the slice is merged, and the merge sha is the diff QA checked — the workspace run and the openapi-diff results QA read still hold on it."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: rewrite_slice.system
+    title: Rewrite slice — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: rewrite_slice.READY
+    list: ready
+    title: Rewrite slice — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: rewrite_slice
+        sop: rewrite_slice.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_slice.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_slice.DOING
+    list: doing
+    title: Rewrite slice — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_slice.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_slice.QA
+    list: qa
+    title: Rewrite slice — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_slice.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_slice.DONE
+    list: done
+    title: Rewrite slice — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_slice, sop: rewrite_slice.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_slice.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

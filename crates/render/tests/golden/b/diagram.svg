@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1122.52" height="793.7" viewBox="0 0 1122.52 793.7" font-family="DejaVu Sans">
+<rect x="0" y="0" width="1122.52" height="793.7" fill="#ffffff"/>
+<g transform="translate(361.26, 72.85) scale(1)">
+<path id="r-00000000-0000-0000-0000-0000000000c7" d="M 256.77 276 L 143.23 372" fill="none" stroke="#334155" stroke-width="1.5"/>
+<path d="M 256.77 276 L 247.26 275.2 L 246.46 284.72 L 255.98 285.51 z" fill="#334155"/>
+<path id="r-00000000-0000-0000-0000-0000000000c8" d="M 256.77 186 L 143.23 90" fill="none" stroke="#334155" stroke-width="1.5"/>
+<path d="M 256.77 186 L 255.98 176.49 L 246.46 177.28 L 247.26 186.8 z" fill="#334155"/>
+<path id="r-00000000-0000-0000-0000-0000000000c9" d="M 116.61 558 L 283.39 276" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="6 4"/>
+<path d="M 283.39 276 L 270.71 284.18 L 282.33 291.06 z" fill="#334155"/>
+<path id="r-00000000-0000-0000-0000-0000000000ca" d="M 90 90 L 90 558" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="6 4"/>
+<path d="M 90 558 L 96.75 544.5 L 83.25 544.5 z" fill="#334155"/>
+<path id="r-00000000-0000-0000-0000-0000000000cb" d="M 283.39 558 L 116.61 276" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="6 4"/>
+<path d="M 116.61 276 L 117.67 291.06 L 129.29 284.18 z" fill="#334155"/>
+<g id="e-00000000-0000-0000-0000-0000000000c5">
+<rect x="0" y="0" width="180" height="90" rx="6" fill="#d5e8d4" stroke="#6a9c5a" stroke-width="1.5"/>
+<text x="90" y="48.2" text-anchor="middle" font-size="12" fill="#0f172a">conveyor-server image</text>
+<text x="90" y="84" text-anchor="middle" font-size="9" fill="#64748b">artifact</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000c1">
+<rect x="0" y="186" width="180" height="90" rx="6" fill="#d5e8d4" stroke="#6a9c5a" stroke-width="1.5"/>
+<text x="90" y="234.2" text-anchor="middle" font-size="12" fill="#0f172a">hp2</text>
+<text x="90" y="270" text-anchor="middle" font-size="9" fill="#64748b">node</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000c2">
+<rect x="220" y="186" width="180" height="90" rx="6" fill="#d5e8d4" stroke="#6a9c5a" stroke-width="1.5"/>
+<text x="310" y="234.2" text-anchor="middle" font-size="12" fill="#0f172a">strato-worker3</text>
+<text x="310" y="270" text-anchor="middle" font-size="9" fill="#64748b">node</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000c3">
+<rect x="0" y="372" width="180" height="90" rx="6" fill="#d5e8d4" stroke="#6a9c5a" stroke-width="1.5"/>
+<text x="90" y="420.2" text-anchor="middle" font-size="12" fill="#0f172a">containerd</text>
+<text x="90" y="456" text-anchor="middle" font-size="9" fill="#64748b">system_software</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000c4">
+<rect x="0" y="558" width="180" height="90" rx="6" fill="#d5e8d4" stroke="#6a9c5a" stroke-width="1.5"/>
+<text x="90" y="606.2" text-anchor="middle" font-size="12" fill="#0f172a">Registry API</text>
+<text x="90" y="642" text-anchor="middle" font-size="9" fill="#64748b">technology_service</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000c6">
+<rect x="220" y="558" width="180" height="90" rx="6" fill="#d5e8d4" stroke="#6a9c5a" stroke-width="1.5"/>
+<text x="310" y="606.2" text-anchor="middle" font-size="12" fill="#0f172a">CI runners</text>
+<text x="310" y="642" text-anchor="middle" font-size="9" fill="#64748b">technology_service</text>
+</g>
+</g>
+</svg>

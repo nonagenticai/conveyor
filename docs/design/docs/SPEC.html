@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>SPEC — conveyor: one Rust application · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="spec--conveyor-one-rust-application">SPEC — <code>conveyor</code>: one Rust application</h1>
+<p><strong>Repo:</strong> <code>nonagenticai/conveyor</code> · <strong>Namespace:</strong> <code>conveyor</code> · <strong>Host:</strong> <code>conveyor.nonagentic.ai</code> · <strong>Keycloak realm:</strong> <code>conveyor</code> · <strong>Licence app_key:</strong> <code>conveyor</code> · <strong>Port:</strong> 8930 (verify free locally and in-cluster before assigning) <strong>Date:</strong> 2026-11-07 · <strong>Status:</strong> draft for review · no code written <strong>On approval:</strong> this file becomes <code>docs/SPEC.md</code> in <code>nonagenticai/conveyor</code> (first commit) and is registered in <code>~/.claude/plans/program/INDEX.md</code>.</p>
+<hr />
+<h2 id="1-context">1. Context</h2>
+<p>The conveyor is spread across four applications, a package fleet and a flow engine. Every card event crosses at least three of them, and the latent bugs live at those seams, not inside any one app.</p>
+<p>Measured 2026-11-07 (read-only; <code>origin/main</code> and the live cluster):</p>
+<table>
+<thead>
+<tr>
+<th>System</th>
+<th>Shape</th>
+<th>Size</th>
+<th>Data</th>
+<th>API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>fr</strong></td>
+<td>SvelteKit 5 + Bun/TypeScript backend</td>
+<td>7,046 files; 658k LOC TS (backend 362k, frontend 96k, generated clients 198k); 108k LOC Svelte</td>
+<td><strong>86 domain tables</strong> (88 base tables, 90 relations incl. 2 <code>pg_stat_statements*</code> views), 224 migrations, Postgres via PgBouncer</td>
+<td>1,376 endpoint declarations over 548 paths, all <code>/api/...</code>; 785 served operations over 616 paths in <code>served-spec.lock.json</code></td>
+</tr>
+<tr>
+<td><strong>requirements_management</strong></td>
+<td>FastAPI + SQLAlchemy 2 async</td>
+<td>553 files, 150k PY LOC</td>
+<td><strong>57 domain tables</strong> (58 base incl. <code>alembic_version</code>), 82 Alembic revisions</td>
+<td>314 routes, mounted at <code>/requirements/...</code></td>
+</tr>
+<tr>
+<td><strong>Planka</strong> (<code>planka-private</code>, forked image)</td>
+<td>Node + its own React UI</td>
+<td>own namespace <code>kanban</code>, own DB + Redis</td>
+<td>card/list state — <strong>the system of record</strong> for work items</td>
+<td>REST, consumed by fr and by 317 n8n flows (312 active)</td>
+</tr>
+<tr>
+<td><strong>procedure_management</strong></td>
+<td>FastAPI, archived 2026-11-04</td>
+<td>239 PY files</td>
+<td>~13 tables (procedures, steps, PDL-style pre/postconditions)</td>
+<td>54 endpoints, <strong>no live consumer</strong></td>
+</tr>
+<tr>
+<td><strong>n8n nodes</strong></td>
+<td>24 <code>n8n-nodes-*</code> repos (<strong>8 cloned locally</strong>; the ninth local package, <code>license-validator</code>, is not one of the 24)</td>
+<td>TypeScript packages</td>
+<td>—</td>
+<td>wrap fr / RM / Planka / coding APIs</td>
+</tr>
+<tr>
+<td><strong>n8n flows</strong></td>
+<td>live DB</td>
+<td>348 workflows, 332 active — 280 card-type×list (276 active), 51 <code>cap.*</code> procedures, 10 <code>zz.*</code> (0 active), 7 other (5 active: <code>conveyor.start</code>, <code>ask_fr</code>, <code>wip.pull</code>, <code>kata.open</code>, <code>err.card</code>; 2 dead)</td>
+<td>—</td>
+<td>webhooks + executeWorkflow</td>
+</tr>
+</tbody>
+</table>
+<p>The failures this produces are structural, not local:</p>
+<ul>
+<li><strong>Identity is split.</strong> A card's state is in Planka, its lease and approvals are in fr, its project in RM. <strong>280 active flows</strong> — 276 of them the card-type×list matrix, 4 of them <code>cap.*</code> procedures — call <code>getProjectByPlankaBoard</code> on every event just to recover the project (measured 2026-11-07, <code>workflow_entity.nodes::text LIKE '%getProjectByPlankaBoard%'</code>; 284 rows include 4 inactive).</li>
+<li><strong>Duplicate stores.</strong> Two comment stores, two notification stores, three membership notions (Planka board members, fr <code>user_roles</code>, Keycloak claims), three tenant resolutions.</li>
+<li><strong>Stringly-typed contracts.</strong> 92 fr capability modules (21.5k LOC) exist largely to validate payloads that never had a type; n8n flows exchange JSON with no schema.</li>
+<li><strong>Schema history as archaeology.</strong> 224 fr migrations and 82 RM revisions encode decisions nobody can reconstruct; one fix often needs a migration in one system and a payload change in another.</li>
+</ul>
+<p>The conveyor works, but each fix is a cross-system change. Tenant ambiguity, card-state races, approval delivery and lease leaks are <strong>class</strong> problems under this architecture, not bugs to patch one at a time.</p>
+<h2 id="2-what-this-spec-proposes">2. What this spec proposes</h2>
+<p><strong>One repo, one service, one Postgres database, one binary</strong> (subcommands <code>serve</code>, <code>migrate</code>, <code>worker</code>, <code>admin</code>), in safe Rust on the estate's existing standard (<code>template-rust-service</code>: Rust 1.99, edition 2024, axum 0.8, sqlx 0.9, utoipa, Postgres).</p>
+<p>Absorbed:</p>
+<ul>
+<li><strong>fr entirely</strong> — backend and UI: tenant/workspace admin, projects, cards, leases, approvals, andon, runs, comms/multicast, notifications, documents, repositories, billing/metering display, licence gate, secrets, Copilot/AG-UI, <strong>the three operating channels (web app, Telegram, MCP)</strong>, and the machine API other apps use.</li>
+<li><strong>All of RM</strong> — requirements, catalogues, revisions, quality scoring, principles/ADRs, enterprise architecture (ArchiMate 3.2), UML 2.5.1 modelling, portfolio stakeholders, search, renders/exports. <strong>Not</strong> TOC, PM registers, project capabilities or deliverables — measured at zero usage by S00 and dropped (see D3's note).</li>
+<li><strong>The Planka features actually used</strong> — boards, lists, cards, labels, board memberships, comments, custom field values, webhooks, task lists, card moves, due dates, read-only stopwatch. <strong>Not</strong> attachments, <strong>not</strong> card-level memberships.</li>
+<li><strong>The n8n node packages</strong> — collapsed into one in-app <strong>action registry</strong> exposed over HTTP and MCP.</li>
+<li><strong>The procedure concepts</strong>, redesigned from scratch (no PDL preconditions/effects port).</li>
+<li><strong><code>conveyor-bench</code></strong> — the SWE-bench measurement harness, rewritten in Rust as part of this app (D24): the dataset is a hashed seed artifact, the grader is a parity-ported verdict engine, the sandbox is a k8s Job, and the old Python repo is frozen and archived. The benchmark is the kata improvement loop's instrument.</li>
+<li><strong>Later phase, same spec:</strong> n8n itself — an in-app <strong>process engine</strong> (capability → process → step → procedure/SOP → task/tool), a <strong>process-map view</strong> (the user-facing DAG) and a stage/map editor, re-authoring the 348 flows as retained regression fixtures (no retirement gate). Execution is an ordered list of steps; each step has a <strong>procedure (SOP)</strong> with definition of ready, definition of done, acceptance criteria and a laya/eval inspection (D28). The 280 card-type × list processes are a tenant-facing <strong>default catalogue</strong>, and tenant-defined capabilities/processes are first-class (D29). The n8n DAG is not the execution model (D30). <strong>Built 2026-11-10:</strong> the <strong>process is the top-level executor</strong>; the <strong>workflow engine is retained</strong> as the tool-sequence executor (owner ruling 2026-11-09) — a process <code>call</code> step resolves <code>child_process_key</code> process-first, workflow-second — and the default catalogue ships (70 type files / 280 processes / 350 SOPs).</li>
+</ul>
+<p>Not absorbed: <code>licenses</code>, <code>billing_service</code>, <code>inference-router</code>, <code>worker_management</code>, <code>artifacts</code>, the <code>coding-*</code> fleet, <strong><code>agent</code></strong> and <strong><code>nonagenticai_mcp_server</code></strong>. They stay external and are integrated by API; coding services keep their own action registry generated from their <code>openapi.json</code>.</p>
+<p>Two of those are live consumers of fr and are the reason the cutover is a contract change, not just a deploy: <code>agent</code> runs the conveyor's project lifecycle, and at cutover it reaches the conveyor over <strong>the conveyor's own MCP surface</strong> (§4.5). That surface is claimed and tested as a first-class cutover gate — the deployment must not silently break the agent platform — while state transitions remain status-guarded, not version-guarded (CONTRACT §3).</p>
+<h2 id="3-decisions-already-taken-george-2026-11-07">3. Decisions already taken (George, 2026-11-07)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Decision</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td>Build location</td>
+<td>New repo, new gitops deployment (new namespace, DB + DB user, image)</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>Parity target</td>
+<td>"The stuff we actually use", re-architected — old decisions need not be carried over</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>RM scope</td>
+<td><strong>All</strong> of RM, including ArchiMate/UML/TOC/PM — <strong>bounded by D2 and the S0 inventory; see the note under this table</strong></td>
+</tr>
+<tr>
+<td>D4</td>
+<td>fr scope</td>
+<td>Full backend and the API other apps use — not only the web UI</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>UI</td>
+<td><strong>Rust UI</strong>; spike first to choose Leptos SSR vs a WASM SPA</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>n8n</td>
+<td><strong>Later phase in this spec</strong> — an in-app <strong>process engine</strong>: capability → process → step → procedure (SOP) → task/tool. Execution is an ordered list of steps; each step has a <strong>procedure (SOP)</strong> with a definition of ready, a definition of done, acceptance criteria and an eval/inspection; the <strong>DAG is the user-facing process map</strong> of processes and participating capabilities, not the executor (D30). A stage/map editor in the Leptos app; <code>egui_xyflow</code> is not adopted. Amended 2026-11-09</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>Data</td>
+<td><strong>Fresh start, discard</strong> the old databases</td>
+</tr>
+<tr>
+<td>D8</td>
+<td>Cutover</td>
+<td>Full cutover when finished; old system <strong>frozen</strong> (bug fixes only) during the build</td>
+</tr>
+<tr>
+<td>D9</td>
+<td>Local-first</td>
+<td>Local = development and proof; CI is not the iteration loop</td>
+</tr>
+<tr>
+<td>D10</td>
+<td>Procedures</td>
+<td><strong>Redesign from scratch</strong></td>
+</tr>
+<tr>
+<td>D11</td>
+<td>API</td>
+<td><strong>No backwards compatibility</strong>; new paradigm; n8n node modules in scope</td>
+</tr>
+<tr>
+<td>D12</td>
+<td>Licences/billing</td>
+<td>Stay separate repos; the new app gets its own app-level licence; absorbing them is future work</td>
+</tr>
+<tr>
+<td>D13</td>
+<td>Identity</td>
+<td>Keep Keycloak; <strong>new realm</strong> dedicated to this app</td>
+</tr>
+<tr>
+<td>D14</td>
+<td>Adjacent services</td>
+<td>Not absorbed (worker_management, artifacts, coding-*)</td>
+</tr>
+<tr>
+<td>D15</td>
+<td>Name</td>
+<td><code>conveyor</code> for repo, namespace, host and realm</td>
+</tr>
+<tr>
+<td>D16</td>
+<td>Ingress host</td>
+<td><strong><code>conveyor.nonagentic.ai</code></strong> — a new host; <code>fr.nonagentic.ai</code> remains the old app's host; the conveyor coexists with it and never requires the old app to stop</td>
+</tr>
+<tr>
+<td>D17</td>
+<td>Channels</td>
+<td><strong>Web app, Telegram and MCP are all in scope</strong> as first-class channels — not a REST API with a web UI bolted on. S06d generalises them into one <strong>connector standard</strong> (see D28)</td>
+</tr>
+<tr>
+<td>D18</td>
+<td>Agent interface</td>
+<td><del><code>nonagenticai_mcp_server</code> is the permanent interface between the conveyor and the <code>agent</code> app</del> — <strong>SUPERSEDED by D19 (2026-11-08)</strong>. Its one surviving rule: <strong>a question is an approval</strong></td>
+</tr>
+<tr>
+<td>D19</td>
+<td>Agent interface</td>
+<td><strong><code>agent</code> calls the conveyor's own MCP surface (<code>/mcp</code>)</strong> — same wire, same action registry, no HMAC channel, no second gateway. <code>nonagenticai_mcp_server</code> remains the agent platform's tool gateway for every <strong>other</strong> backend (coding, care-bus, builder); its <code>fr</code> toolkit retires with fr at cutover. A licence bearer resolves to <code>app_user(kind='agent')</code>, and the decision records <code>decided_by_kind='agent'</code></td>
+</tr>
+<tr>
+<td>D20</td>
+<td>Capability, knowledge, memory</td>
+<td><strong>Capability is a first-class aggregate</strong> with a <code>CapabilityAgent</code> executor. <strong>Knowledge</strong> is procedural (the <code>capability → process → step → procedure (SOP) → action|gate</code> ontology, stored as <code>process</code>/<code>process_step</code>/<code>procedure</code>) and domain (<code>strata_rag</code> platform packs, one <code>capability</code> pack, pinned per capability). <strong>Memory</strong> is procedural (execution history: run/approval/invocation) and work-package (hot rows in the conveyor + cold consolidated digests in <code>strata_rag</code>). <code>strata</code> is never the system of record. <strong>Amended 2026-11-09:</strong> a capability is a <strong>knowledge area</strong>; within it, <strong>process agents</strong> (one per process/card type) hold the process domain knowledge and <strong>tool agents</strong> (one per toolset) make the tool calls. The process agent decides; the tool agent executes. <strong>A capability's kind is <code>system</code> (<code>project_management</code>, <code>kanban_coach</code>, <code>kata</code> — always present, not deletable) or <code>tenant</code> (defined per project type).</strong> A <strong>process</strong> is an ordered sequence of steps; every step has a <strong>procedure (SOP)</strong> — definition of ready, definition of done, acceptance criteria and an eval/inspection — and a process declares its <strong>user-facing outputs</strong>. The <strong>process map</strong> is the user-facing DAG (D30)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>D3 as executed (2026-11-08).</strong> D3 and D2 are read together, not in tension: D2 makes parity "the stuff we actually use", and §8's S0 gate drops zero-usage surface rather than porting it. S00 day 2 measured RM's TOC (<code>toc_trees</code>/<code>toc_nodes</code>/<code>toc_settings</code>, 0 rows, no consumer in any of the 348 flows) and its PM registers, capabilities and deliverables (<code>pm_*</code> all 0, no route) at <strong>zero usage</strong>, so those five tables and the 24 actions that existed only to serve them were dropped by migration <code>0011</code> (<code>docs/plans/02-DATA-ARCHITECTURE.md</code> §9). Everything else of RM stays: requirements, catalogues, revisions, quality scoring, principles/ADRs, ArchiMate 3.2, UML 2.5.1, models/views/validation, render/export, search, <strong>and <code>project_stakeholder</code> (21 live rows)</strong>. Reversing a drop would be a new migration from the old RM database, which stays read-only; the conveyor never imports it and never gates on the old system stopping.</p>
+<p>| D21 | Long-running work | <strong>The conveyor implements the MCP tasks extension (SEP-2663).</strong> A task is a <strong>project execution run</strong>; a pending approval is its <strong>input request</strong>; the answer is an approval decision. <code>projects.execute</code> starts it, <code>tasks/get</code> reports progress and asks, <code>tasks/update</code> answers, <code>tasks/cancel</code> cancels — so a project can wait days for a human at no worker cost. <code>mcp_server</code> keeps its own task runtime for its other backends | | D22 | Executor model | <strong>One executor slot, two kinds (amended 2026-11-09).</strong> A <code>run</code> is driven by a <strong>process</strong> (ordered steps; an <strong>agent step</strong> runs the internal <code>agent.run</code> loop under its <strong>process agent</strong>, a <strong>computed/tool step</strong> invokes an action executed by a <strong>tool agent</strong>, a <strong>gate</strong> parks the run), or by an <strong>external agent</strong> over <code>/mcp</code> + MCP tasks (D19/D21). A step's output is inspected by its SOP's <strong>judge</strong> (laya/eval) which accepts or rejects; a reject loops the step (bounded) or blocks the card → the coach. <code>capability_agent</code> (S15) is the one persisted spec: its rows carry the role (<code>process_agent</code> / <code>tool_agent</code>); the conveyor hosts no model and no second runtime and never depends on <code>agent</code> as a component. Caps, scope, prompt version and pre-run readiness are enforced and recorded. The copilot (S10) is an interactive surface, not a work executor | | D23 | Inference ledger and prompt audit | <strong>The conveyor records every model call it makes through its own invocation path — W7's coverage — and audits the prompts it runs</strong> (S16; amended 2026-11-12: a call that omits usage context, or whose capture fails, is logged and continues; the ledger never claims a row it did not write, and no total is inferred). <code>inference_call</code> holds one tenant-scoped row per invocation — model and served model, token counts, the two provider prompt-cache classes, latency, and the prompt's identity (<code>prompt_ref</code> + version + the rendered-prompt SHA-256), joined to <code>run</code>/<code>run_step</code>/<code>conversation_turn</code>, and carrying <strong>no prompt or response bodies</strong>: the router keeps the text, the conveyor keeps the key. <strong>Cache-hit is defined rather than assumed</strong> — <code>cache_read &gt; 0</code> is a hit, <code>cache_read = 0 ∧ cache_creation &gt; 0</code> is a <strong>write</strong> (a deliberate warm at ~1.25×, not a miss), neither is a miss, and a response without <code>usage</code> is <code>unknown</code>; the router has no response cache, so no other reading is available. The <strong>prompt audit</strong> follows the <code>claude-api</code> <code>prompt-audit</code> method — scope and target model, inventory, provenance, classification, the four anti-pattern groups, then a report of findings with confidence and a proposed diff — it <strong>proposes and never applies</strong>, and it runs as a procedure with one bounded <code>completions.create</code> call, not as a second runtime. <strong>Three things trigger it:</strong> a person or the kata (<code>prompt_audits.start</code>); a tenant-configured <strong>after N executions</strong> policy, enforced against the ledger itself <strong>at capture time</strong> — the Nth call recorded since the tenant's last audit starts the audit, and no separate counter exists that could drift from the calls it counts; and <strong>publishing a procedure</strong>, which checks the draft and refuses a <code>high</code>-confidence finding (<code>422 procedure_audit_findings</code>) unless the publisher acknowledges it, with the override recorded on the publish's audit event. Findings are the <strong>kata-executor's</strong> input — it reads <code>prompt_findings.list</code> and starts audits of its own — so the improvement loop and this audit are one loop, not two. Where the audit is less certain than publication requires: it <strong>proposes</strong>, and every transition of a finding is a person's | | D24 | Benchmark harness | <strong><code>conveyor-bench</code> is absorbed, not integrated: the conveyor owns the measurement loop in Rust and there is no Python in the product</strong> (S17/S18). The SWE-bench instrument's dataset is a <strong>hashed seed artifact</strong> (<code>seed/benchmark/&lt;slug&gt;.json</code>: the pinned 50-instance subset, its image lock, and the <code>eval_script</code> per instance) — not a runtime download, and the script is <strong>generated at seed time by the conveyor's own Rust port of swebench 5.0.2's <code>make_test_spec</code></strong>, pinned to the harness byte for byte by a golden test (the harness runs once in development as the oracle; no Python is in the build or the image). The <strong>grader is a parity port</strong> of the harness's verdict ladder and its per-repo log parsers: <code>resolved</code> is never computed by the producer or by a person. The <strong>sandbox is one k8s Job per case</strong> (untrusted patch, no service-account token, resource caps, pod deadline), driven by a single durable job. The arms are <code>gold</code>/<code>empty</code> (the controls that make a number publishable), <code>baseline</code> (the one-shot model control), and <code>conveyor</code> (the product, pinned to the <code>capability_agent</code>/<code>procedure</code> version it measured, which is S18 after S13/S15). Comparison is the harness's exact two-sided McNemar, refusing arms whose oracle or prompt differ. <strong>The kata continuous-improvement loop consumes it</strong>: a version-to-version delta, a promoted baseline, and a significant-regression flag, with the improvement iteration invoking the same actions a person would. The old repo's committed logs and results are the port's test oracle; nothing in the delivery requires a parity comparison, a freeze or an archive. | | D25 | Eval builder | <strong>The <code>build-eval</code> and <code>eval-audit</code> methods become a first-class aggregate, not a directory of files</strong> (S19). One <strong>eval</strong> measures <strong>one</strong> Claude-powered flow, and its subject is a <strong>registered action</strong> — <code>completions</code>, the copilot turn, a procedure, or a registered external action (<code>agent_run</code> declared and refused <code>409 subject_not_ready</code> until S13/S15) — invoked through the ordinary engine and never re-implemented. An eval is a <strong>versioned instrument</strong>: <code>eval_version</code> freezes its cases, metrics, graders, prices and harness paths under one digest, and a comparison across versions is refused, because scores taken before and after a grader change are not comparable. The method's <strong>two literal sign-offs are <code>approval</code> rows</strong> (<code>eval_inputs</code>, <code>eval_grading</code>) carrying the instrument digest, and <code>eval_runs.start</code> fails closed <code>409 eval_not_ready</code> naming every missing gate; an edit to the instrument <strong>voids</strong> its sign-off, and no sign-off action is agent-reachable — a sign-off a machine can give is not a sign-off. The runner is the durable <code>job</code> table: one job per <code>(case, rep)</code>, a hard per-case ceiling, jittered backoff with the attempt visible, strict-per-attempt scoring, and a <strong>failure class on every failed attempt in <code>eval_attempt_error</code>, which never occupies the <code>(case, rep)</code> slot</strong>. <strong>The answer key never reaches the subject</strong> — <code>expected</code> is write-only, and the subject-input type has no such field. <strong>Cost is derived from <code>inference_call</code> at read time, never stored</strong> (D23). The report is a screen; <code>eval_runs.export</code> emits the method's <code>results.jsonl</code>/<code>traces/</code> bundle for interop, never hand-rolled HTML, because case text is untrusted input | | D26 | Eval hillclimb | <strong>A climb is a sequence of <code>eval_run</code> variants over one version, and the held-out set is the only thing that makes its result credible</strong> (S20). A climb records its <strong>goal</strong> (<code>target</code>, <code>direction</code>, <code>hold[]</code>), its <strong>stopping condition</strong> (plateau at K ≥ 3 rounds, a round count, or manual), its <strong>delta set above the measured noise floor</strong>, and an optional spend ceiling; a round is analyze → apply → run → record and then <strong>returns to the caller</strong>, so the check-in cadence is a person's by default. The <strong>split is drawn at random, stratified by <code>tags[0]</code>, never by baseline score</strong>, and is fixed once: a train slice selected for low scores guarantees regression to the mean and a flat held-out number. The analyzer sees <strong>train transcripts only</strong> and the headline is test — enforced as <strong>access</strong> (<code>evals:approve</code> gates a test-split trace and an <code>agent</code> principal does not hold it), not as an instruction. After two rounds that do not clear the noise band the next round is a <strong>categorisation</strong> round (<code>artifact_gap \| grader_disagreement \| harness \| structural \| variance</code>), and a further content round is refused. A <code>goal.target = cost_usd</code> climb is the same loop under a quality guardrail, following the <code>cost-hillclimb</code> lever order. <strong>A grader fix never re-grades in place</strong>: <code>eval_runs.regrade</code> carries a finished run's <strong>stored</strong> outputs onto the eval's <strong>current version</strong> — a new run, one <code>eval.regrade</code> job per stored slot matched by <code>eval_case.ordinal</code>, never a second pipeline call and never a second count of the subject's tokens. It is <code>evals:approve</code> (it creates a run and can spend a judge call), it refuses the source's own version (<code>409 version_unchanged</code>), and because comparison refuses two versions, a grader change means <strong>regrade every arm, then compare new-vs-new</strong> | | D27 | Compiled prompts | <strong>A prompt is compiled at run time from the run's sources, not stored as a document</strong> (S21; owner ruling 2026-11-09). Prompts live in Postgres: <code>prompt</code> + <code>prompt_section</code> hold a versioned <strong>recipe</strong> — ordered sections over <code>system</code>, <code>procedure</code>, <code>capability</code>, <code>project_card</code> and <code>knowledge</code> — and <code>conveyor_domain::prompt::compile</code> renders it against the run's facts (the procedure/workflow and its step, the capability/agent, the project and card, the bound packs). A required source the surface lacks refuses <code>409 capability_not_ready</code> naming the pin and the section, <strong>before</strong> a model call. The compiled text is never stored: <code>inference_call.prompt_ref</code>/<code>prompt_version</code>/<code>prompt_sha256</code> name the recipe and the hash, and a source changing changes the next compile rather than a stored copy. All three surfaces — <code>agent.run</code>, the copilot and the prompt audit — resolve through the one catalogue. S21 extends this renderer to selection, budgeting and the <code>plan</code> projection; PDDL is evaluated as a validation representation, never adopted as the storage format | | D28 | The laya decision model | <strong>Every process step's output is judged before the step is done.</strong> The SOP names the judge — <strong>laya</strong> (the estate's TypeSafe AI decision service), an S19 eval, or a deterministic checker — and the acceptance criteria. The judge returns <code>accept</code> or <code>reject</code> with a probability/margin and the criteria evidence. A <strong>reject loops the step</strong> (bounded by the SOP/process); an exhausted loop <strong>blocks the card → the coach</strong>. A laya outage <strong>waits</strong> — it never fails open and is never counted as a reject — <strong>bounded</strong>: after <code>JUDGE_MAX_PARKS</code> (64) the step fails CLOSED with <code>judge_unavailable</code> and its ordinary <code>on_result</code> applies (<code>fail</code> — the default — fails the run, so the card goes BLOCKED and the coach is notified; <code>continue</code> skips the step); an unjudged output is never accepted. The verdict is recorded on the run step (<code>judge</code>: decision, probability/margin, criteria, output hash), so acceptance is auditable and replayable. The conveyor hosts no judge; <code>laya.judge</code> is an external action | | D29 | Tenant-defined capabilities and processes | <strong>The system capabilities are fixed; everything else is the tenant's.</strong> <code>project_management</code>, <code>kanban_coach</code> and <code>kata</code> are always present and cannot be deleted. Every other capability — with its process agents, tool agents, processes and process map — is authored per tenant and bound to project types. The 280 card-type × list processes are a <strong>default catalogue</strong> a tenant may instantiate, override or ignore, not a fixed system set. A process, its SOPs and its map are versioned; a run pins the versions it used. <strong>Built 2026-11-10:</strong> the default catalogue ships as 70 type files / 280 processes / 350 SOPs under <code>seed/processes/</code>, loaded by <code>crates/store/src/process_seed.rs</code>; a tenant may instantiate or override any of it. | | D30 | The process map | <strong>The DAG is the user-facing process map, not the executor.</strong> A project type carries a versioned map: nodes are processes, capabilities, phases or milestones; edges are flow. It is declarative — it cannot reorder a step — but the PM plans from it and the UI renders it with the project's live position (running, done, blocked). A prescribed sequence of external API calls is a process whose steps are tool calls, not a second execution model. <code>w2v</code>/media-production orchestration is a <strong>later capability</strong>, not a slice now; the tenant-defined model is what will carry it | | D31 | Connector standard | <strong>Web, Telegram and MCP are three instances of one interaction-connector class</strong> (S06d). A kind is a registry entry — typed config + schema, sealed-secret <strong>names</strong>, compiled default grants, and thin <code>authenticate</code>/<code>parse</code>/<code>send</code> functions; the core owns identity, the shared command grammar, multicast, first-response close and the delivery state. A binding stores config and secret names in Postgres; the tenant-admin configures it and its per-action grants through the web UI (<code>channels.kinds|bind|get|list|test|policy_*</code>). A pending approval is offered to every eligible channel (<code>interaction.dispatch</code>), the first decision resolves it, and the other recipients are expired with "superseded: resolved via <channel>". A machine channel can never be granted an eval sign-off, a held-out read, tenant/channel/member administration or workflow authoring. Adding a JSON gateway is a <code>webhook</code> binding and no code; a native API is one connector module. | | D32 | One identity, many tenants | <strong>A person holds a role per tenant; the request names the active tenant with <code>X-Active-Tenant</code>, resolved against the caller's own membership rows</strong> (distinct from D27's compiled prompts — split 2026-11-12). An absent header with more than one membership is a <code>400</code>, a tenant with no row is a <code>403</code>, and the role is the selected row's. There is no platform-wide super-admin shortcut: the absent row is the non-reputation proof. |</p>
+<h2 id="4-scope-boundaries">4. Scope boundaries</h2>
+<p><strong>Absorbed now:</strong> fr backend + UI; RM in full; Planka used-features; action registry (replacing the n8n nodes); app-level licences; the <code>conveyor</code> Keycloak realm; <strong>the inference ledger and the prompt audit (D23)</strong> — the conveyor's own tenant-scoped record of the model calls <em>it</em> makes, never a read of the router's or billing's databases; <strong>the benchmark harness (D24)</strong> — <code>conveyor-bench</code> rewritten in Rust as part of this app, with its dataset as a hashed seed artifact and no Python left in the product; <strong>the eval builder and its hillclimb (D25/D26)</strong> — the <code>claude-api</code> <code>build-eval</code>, <code>eval-audit</code>, <code>eval-hillclimb</code> and <code>cost-hillclimb</code> methods rewritten as an aggregate, its actions and its screens, with nothing absorbed from another service.</p>
+<p><strong>Absorbed later (same spec):</strong> the n8n process engine + a stage editor; the 348 flows re-authored as typed <strong>processes</strong> (stored as procedures) and computed handlers. The n8n <strong>graph editor</strong> is not carried; the workflow engine itself is <strong>retained</strong> as the tool-sequence executor (owner ruling 2026-11-09), and the DAG returns only as the process map (D30).</p>
+<p><strong>Never absorbed:</strong> <code>licenses</code>, <code>billing_service</code>, <code>inference-router</code>, <code>worker_management</code>, <code>artifacts</code>, <code>coding-*</code>.</p>
+<p><strong>Explicitly not carried over</strong> — this list is the point of the rewrite:</p>
+<ul>
+<li>Planka as a process/DB/Redis, and the board↔︎project lookup round-trip.</li>
+<li><code>planka_card_id</code> as card identity; leases stored apart from card state.</li>
+<li>Duplicate comment / notification / membership stores.</li>
+<li>The 224-migration accreted schema (one baseline instead).</li>
+<li>The three-realm Keycloak split, the licence-delegation maze, and fr's super-admin <code>X-Active-Tenant</code> impersonation path: one platform-admin impersonation path, explicitly audited. (<strong>D32</strong> returns <code>X-Active-Tenant</code> — not as fr's super-admin override but as a per-tenant role selector resolved against the caller's own membership rows.)</li>
+<li>Capability modules whose only job is validating untyped inbound payloads.</li>
+<li><code>setInterval</code> workers (durable job table instead).</li>
+<li>Redis as a state store — it returns only as the <strong>bus</strong>, the stage transport (§11 R6, §5.6; S13's <code>crates/bus</code>), never as the system of record.</li>
+<li>RM's <code>entity_version_history</code>, ~20 catalogue tables, <code>toc_trees/nodes</code> and the model/revision/publication/review/finding sprawl: one <code>revision</code> table, one <code>catalogue_entry(kind, code, label, meta)</code>, one <code>outline_node</code>, flattened models.</li>
+</ul>
+<h3 id="45-the-agent-interface--the-conveyors-own-mcp-surface-d19">4.5 The agent interface — the conveyor's own MCP surface (D19)</h3>
+<p><code>agent</code> reaches the conveyor over <strong><code>/mcp</code></strong> — the rmcp streamable-HTTP surface the app already serves from its action registry (§5.5), with the same tools, schemas and authorization as HTTP. <code>nonagenticai_mcp_server</code> remains the agent platform's tool gateway for every <strong>other</strong> backend; its <code>fr</code> toolkit retires with fr at cutover. There is no HMAC channel, no text command grammar and no second agent-facing gateway.</p>
+<p>The agent runs the whole lifecycle this way: it creates a project, starts one durable task, reads its progress, answers the approvals the work raises through that task, receives the final output and closes the project.</p>
+<table>
+<thead>
+<tr>
+<th>seam</th>
+<th>contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>agent → conveyor</td>
+<td>MCP <code>tools/call</code> over <code>/mcp</code>; <code>Authorization: Bearer &lt;licence&gt;</code>; the licence resolves the tenant and an <code>app_user(kind='agent')</code> with a membership scoped to the agent tool list</td>
+</tr>
+<tr>
+<td>tool naming</td>
+<td>every MCP tool carries <code>_meta.operation = &lt;action name&gt;</code>; the agent imports ops from that key, and without it the op is named <code>tool.&lt;snake&gt;</code></td>
+</tr>
+<tr>
+<td>tool set</td>
+<td><code>projects.create|get|close|execute</code>, <code>runs.list</code>, <code>approvals.list|decide|request</code>, <code>cards.get</code>, <code>events.list</code></td>
+</tr>
+<tr>
+<td>progress</td>
+<td><strong>MCP tasks (D21)</strong>: <code>projects.execute</code> returns a task handle; <code>tasks/get</code> reports status and presents each pending approval as an <code>elicitation/create</code> input request; <code>tasks/update</code> answers it; <code>tasks/cancel</code> cancels. Polling <code>projects.get</code> + <code>approvals.list</code> remains the fallback for a client that cannot run tasks</td>
+</tr>
+<tr>
+<td>escalation</td>
+<td><code>approvals.request</code> opens a gate (<code>run_id</code> nullable); a human answers in the web or Telegram channel, or through the task</td>
+</tr>
+<tr>
+<td>attribution</td>
+<td><code>approval_decision.decided_by_kind='agent'</code> and <code>via</code> name the licence principal; a human's answer relayed through the agent is recorded as <code>human</code> with <code>via</code> naming the agent</td>
+</tr>
+</tbody>
+</table>
+<p>Three rules survive from D18 and are not reopened: <strong>a question is an approval</strong> (one primitive, no second concept); <strong>the answer vocabulary is two verbs plus text</strong> (<code>approve</code> / <code>reject</code> with a note); and <strong>the agent is a first-class principal</strong>, not a borrowed human.</p>
+<p>Two consequences:</p>
+<ol type="1">
+<li><strong>S06b is the cutover gate.</strong> S14 depends on one real <code>agent</code> task completing over <code>/mcp</code> against the deployed conveyor; there is no other proof of the seam.</li>
+<li><strong>The tool surface is versioned as an external API (R11).</strong> Adding, renaming or removing a tool the agent uses is a contract change, not a refactor.</li>
+</ol>
+<h2 id="5-architecture">5. Architecture</h2>
+<h3 id="51-stack-and-standards">5.1 Stack and standards</h3>
+<p>Rust 1.99, edition 2024, axum 0.8, tokio, sqlx 0.9 (runtime queries only, embedded migrations), utoipa + utoipa-axum, <code>schemars</code>, tracing JSON, thiserror, serde, uuid v7, <code>metrics</code> + Prometheus exposition. <code>#![forbid(unsafe_code)]</code> in every workspace crate.</p>
+<p>Key crates: <code>rmcp</code> (MCP server), <code>openapiv3</code> (ingest external service specs), <code>progenitor</code> (generate the TS client), <code>openidconnect</code> (Keycloak OIDC), <code>object_store</code> (file bytes), <code>kube</code> (the benchmark sandbox's Job/ConfigMap/log client, S17), <code>resvg</code>/<code>usvg</code> (PNG), <code>svg2pdf</code> (PDF), <code>quick-xml</code> (XMI). ⚠️ <strong>PDF was <code>typst</code> in the first draft and is <code>svg2pdf</code></strong> (changed 2026-11-08, S08 Part B2): typst is a full typesetting engine that lays the page out a second time from a different input, so a PNG and a PDF of the same view could disagree and no test would catch it. <code>svg2pdf 0.13</code> consumes the <em>same</em> <code>usvg</code> tree <code>resvg</code> rasterises, so all three formats are encodings of one parse — and it removes ~130 crates from the build.</p>
+<h3 id="52-repository-layout">5.2 Repository layout</h3>
+<p>One repo, one binary, a Cargo workspace so boundaries are compiler-enforced:</p>
+<pre><code>crates/
+  domain/        pure aggregates, state machines, invariants — no IO, no sqlx
+  store/         queries + migrations + outbox (the ONLY crate that speaks SQL)
+  api/           axum routers, utoipa, problem+json errors
+  actions/       ActionSpec, #[action] derive, registry, invocation, MCP projection, external OpenAPI ingest
+  auth/          OIDC/JWKS, TenantId extractor, licence extractor, RLS context
+  render/        pure model → SVG / PNG / PDF / XMI / markdown
+  bus/           the care-bus port: envelope, Redis Streams, consumer groups, dead letter (S13)
+  workflow/      the RETAINED workflow engine: the tool-sequence executor a process `call` step falls back to
+                 (owner ruling 2026-11-09; the graph editor is not carried)
+apps/
+  server/        composition root: serve | migrate | worker | admin
+  web/           the Rust UI
+migrations/      one baseline + forward migrations</code></pre>
+<p>Modules, not crates (no independent version, splitting only adds friction): <code>jobs</code>, <code>realtime</code>, <code>search</code>, <code>integrations</code>, <code>benchmark</code> (the pure grader, parsers and arm rules, S17), <code>eval</code> (the instrument, the case runner, the graders and the climb rules, S19/S20) and <code>sandbox</code> (the k8s Job adapter in <code>apps/server</code>).</p>
+<p><strong>Reused, not reinvented.</strong> The primary reference is <strong><code>agent</code></strong> (<code>nonagenticai/agent</code>, ns <code>agent</code>) — 1,736 tracked files, 772 Rust files / 412k raw lines (~243k in <code>src</code>), 2 crates, 147 migrations, 3,767 test attributes. It already runs the exact platform pieces S2 needs, in this estate, under this cluster. <code>agent</code> stays a separate service; its <strong>patterns</strong> are copied, never linked.</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>What to take</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent/crates/agent-api/src/tenancy.rs</code> + <code>migrations/0001_tenancy.sql</code></td>
+<td><code>TenantCtx</code>/<code>JobCtx</code>; <code>set_config('app.current_tenant', …, true)</code> — transaction-local, PgBouncer-safe; RLS <code>ENABLE</code> + <code>tenant_isolation</code> policies; runtime role <code>NOSUPERUSER NOBYPASSRLS</code>; <code>SET LOCAL ROLE agent_platform</code> for cross-tenant reads</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/auth.rs</code></td>
+<td>Per-issuer JWKS caches (600 s TTL), trusted-issuer pinning, <code>aud</code>/<code>azp</code> checks, fail before key lookup</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/licensing/gate.rs</code></td>
+<td>Fail-closed licence verdict: no verdict, stale, unavailable or unknown status all refuse</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/sse_hub.rs</code>, <code>src/conversations/hub.rs</code></td>
+<td>SSE-only realtime: 15 s keepalive, <code>Last-Event-ID</code> replay, slow-client closure</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/provision/outbox.rs</code> + <code>migrations/0035_provision_outbox.sql</code></td>
+<td>Transactional outbox: enqueue in-tx, fenced drainer (<code>FOR UPDATE SKIP LOCKED</code>, <code>lease_until</code>/<code>lease_token</code>), send outside the transaction, uuidv7 as Idempotency-Key</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/migrations/0034_audit.sql</code> + <code>src/audit/</code></td>
+<td>Append-only <code>audit_event</code> (SELECT/INSERT only), vocabulary whitelist, secret/email scrubbing, size cap, fail-loud</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/lease.rs</code> + <code>migrations/0190_b8_worker_lease.sql</code></td>
+<td>Lease claim/renew/release with TTL and a sweep — the model for card claims and job leases</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/runtime/catalog.rs</code>, <code>src/runtime/orchestrator.rs</code></td>
+<td><code>OperationCatalog</code> / <code>PinnedCatalog</code>: the typed operation registry the action registry is modelled on</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/runtime/bus.rs</code> (ported from <code>care-bus-agents@96c608c</code>)</td>
+<td>The Redis Streams bus: one envelope <code>{id, topic, from, correlation_id, procedure, tenant_id, job, payload}</code>, <code>work.*</code>/<code>tool.*</code> topics, consumer groups <code>process|tool</code>, XACK/XAUTOCLAIM, dead letter after 5 deliveries, tenant scope. It is the stage transport (S13), never the system of record</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/mcp_client/client.rs</code>, <code>creds.rs</code>, <code>external.rs</code></td>
+<td>How a Rust service speaks MCP — the platform client (tasks) and the external-server client (plain calls); the client side of S06b's gate</td>
+</tr>
+<tr>
+<td><code>template-rust-service/src/tenant.rs</code>, <code>parity.toml</code></td>
+<td><code>TenantId</code> extractor + <code>TenantHeader</code> OpenAPI shape; the parity-contract model for <code>parity.yaml</code></td>
+</tr>
+<tr>
+<td><code>strata_rag</code> (<code>src/tenant.rs</code>, <code>src/store_providers.rs</code>, <code>src/metrics.rs</code>, <code>tests/</code>)</td>
+<td>Only the narrow pieces <code>agent</code> does not cover: pgvector patterns, Prometheus exposition, testcontainers Postgres</td>
+</tr>
+<tr>
+<td><code>strata_ingest</code> / <code>strata_rag</code> (the knowledge layer)</td>
+<td>The integration target for document ingestion, embeddings and retrieval — the conveyor does not absorb KAG</td>
+</tr>
+<tr>
+<td><code>fr/backend/src/capabilities/define.ts</code>, <code>derive-openapi.ts</code>, <code>derive-mcp.ts</code></td>
+<td>The action-registry shape fr already proved (one declaration → OpenAPI + MCP + handler)</td>
+</tr>
+<tr>
+<td><code>fr/backend/src/lib/licence-introspect.ts</code>, <code>require-fr-license.ts</code></td>
+<td>Licence-token shape rule (JWT-shaped tokens are never retried); central gate + single-flight cache + fail-closed</td>
+</tr>
+<tr>
+<td><code>requirements_management/src/main.py</code>, <code>src/routers/__init__.py</code></td>
+<td>Router composition and mount map for the RM domains being ported</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-data">5.3 Data</h3>
+<p>One Postgres 18 database <code>conveyor</code>, exclusive to this service, through PgBouncer (transaction pooling). Two roles, both this service's own (the house rule is one DB and one DB user <strong>per service</strong>, not one role): <code>conveyor_migrate</code> owns the schema and runs migrations; <code>conveyor_runtime</code> is <code>NOSUPERUSER NOBYPASSRLS</code> and is the only role the app queries as. Migrations run <strong>before rollout as the separate <code>migrate</code> subcommand</strong> with <code>DATABASE_MIGRATE_URL</code> pointing directly at Postgres (sqlx's migrator holds a session advisory lock); <code>serve</code> never migrates implicitly. <code>DATABASE_URL</code> points at PgBouncer.</p>
+<ul>
+<li><code>tenant_id</code> on every tenant-owned table. Enforcement is two-layer: the store API takes <code>TenantId</code> as a required argument (a missing scope is a compile error), and RLS is set per transaction with <strong><code>set_config('app.current_tenant', …, true)</code></strong> — transaction-local, never a session-level <code>SET</code>, which leaks through PgBouncer transaction pooling. This is <code>agent</code>'s exact mechanism (§5.2).</li>
+<li>Every state change writes an <strong><code>event</code> row in the same transaction</strong> (transactional outbox) and <code>pg_notify</code>s it. SSE fan-out, webhooks and n8n callbacks read from the outbox — never from a second write path.</li>
+<li><strong>One identity per work item.</strong> The card id is the card id everywhere; no external id is ever a primary key.</li>
+<li><code>audit_event</code> and <code>action_invocation</code> (actor, action, input hash, outcome, trace id) are written in the mutation transaction. Audit is structural, not a later feature.</li>
+</ul>
+<h3 id="54-auth-and-tenancy">5.4 Auth and tenancy</h3>
+<ul>
+<li>Keycloak realm <code>conveyor</code>; clients: public PKCE for the UI, confidential service account for the backend. Browser = auth-code + PKCE; APIs = bearer only.</li>
+<li>Humans: OIDC; authorization from the app's own <code>membership</code> table (role per tenant), not from realm claims. <code>super_admin</code> is the one platform role; impersonation is one explicit, audited path.</li>
+<li>One identity, many tenants (<strong>D32</strong>): a person may hold a role per tenant. The request names the active tenant with <code>X-Active-Tenant</code>, resolved against <strong>the caller's own membership rows</strong> — an absent header with more than one membership is a <code>400</code>, a tenant with no row is a <code>403</code>, and the role is the selected row's. There is no platform-wide super-admin shortcut: the absent row is the non-reputation proof.</li>
+<li>Machines: licence tokens (non-JWT bearer) resolved against the <code>licenses</code> service with a short-TTL local cache, <strong>fail-closed</strong> — keeping fr's shape rule: a JWT-shaped token that fails verification is never retried as a licence token.</li>
+<li>App-level licence: per-tenant <code>GET /licenses/active?tenant_id=&amp;app_key=conveyor</code>, synced into an <code>app_licence</code> table by a job and enforced by one <code>RequireLicence</code> extractor. Core requests never call the licensing service synchronously.</li>
+</ul>
+<h3 id="55-action-registry-replaces-the-n8n-nodes-and-frs-capability-modules">5.5 Action registry (replaces the n8n nodes and fr's capability modules)</h3>
+<p>Every operation the outside world can invoke is one <code>ActionSpec</code>: <code>name</code>, version, <code>kind: internal | external</code>, input schema, output schema, scopes, idempotent flag, timeout (the <code>workflow</code> kind is retained with the workflow engine, owner ruling 2026-11-09) — declared by a <code>#[action]</code> derive and registered at compile time. From that single declaration the app generates:</p>
+<ul>
+<li><code>GET /api/actions</code> (the manifest) and <code>POST /api/actions/{name}/invocations</code>,</li>
+<li>the OpenAPI document,</li>
+<li>the <strong>MCP tool list</strong> served by <code>rmcp</code> — the app is its own MCP server, no sidecar. This is the conveyor's MCP surface, and <code>agent</code> is a client of it (§4.5); <code>nonagenticai_mcp_server</code> remains the agent platform's gateway for its other backends,</li>
+<li>a generated TypeScript client for external consumers.</li>
+</ul>
+<p>External coding services register their <code>openapi.json</code>; <code>openapiv3</code> ingestion turns their operations into <code>kind: external</code> actions invoked through a tenant token, with timeout and circuit breaking, and normalized results. Schema refreshes are diffed; a breaking change needs an explicit approval.</p>
+<h3 id="56-realtime-and-jobs">5.6 Realtime and jobs</h3>
+<ul>
+<li><strong>SSE</strong> (<code>GET /api/events?topics=board:{id},run:{id}</code>) with <code>Last-Event-ID</code> replay. fr's realtime need is server→client invalidation; a WebSocket is added only if presence is later proven necessary.</li>
+<li>Durable <code>job</code> table with <code>FOR UPDATE SKIP LOCKED</code> pollers; one scheduler task materialises due <code>schedule</code> rows under an advisory lock. Handlers are idempotent on <code>(kind, dedupe_key)</code>. This replaces fr's 14 <code>setInterval</code> workers with restart-safe, observable runs.</li>
+<li><strong>Redis returns as the bus, not the system of record (2026-11-09).</strong> The care-bus port (from <code>agent-api/src/runtime/bus.rs</code>) carries stage work over Redis Streams with consumer groups, XACK/XAUTOCLAIM and a dead-letter stream; Postgres <code>run</code>/<code>run_step</code>/<code>event</code> remain the record, and the outbox re-delivers after a Redis loss. Caches stay in-process with explicit invalidation; the licence cache TTL is the only one that matters for correctness.</li>
+</ul>
+<h3 id="57-ui">5.7 UI</h3>
+<p>Rust, chosen by a <strong>spike</strong> (§8 S1) that builds the board (500 cards, drag, live updates) and the chat/copilot stream twice. Decision rule up front: <strong>Leptos CSR is the prior</strong> — the app is authenticated with no SEO need, so SSR's win is weak and SSR hydration/double-fetch bugs are the known trap. SSR is chosen only if measured TTI exceeds 2 s or the auth flow forces cookie-based SSR. Dioxus only if the phase-2 flow editor forces it. The <code>progenitor</code>-generated client is used either way.</p>
+<p>Screen order after the spike: shell/login → board → card cockpit (run + approvals) → run queue → requirements editor/revisions → trace/architecture → procedures → search → admin (actions, integrations, licences) → <strong>inference usage → prompt audit → benchmarks → improvement → evals → eval report → eval audit → eval hillclimb</strong> → process stages (the process screen) → process map (the user-facing DAG, 2026-11-09).</p>
+<h3 id="58-channels">5.8 Channels</h3>
+<p>The product is operated through <strong>three first-class channels</strong>, and every one of them lands on the same domain model, the same action registry and the same authorization:</p>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Inbound</th>
+<th>Outbound</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Web app</strong></td>
+<td>the Rust UI (auth-code + PKCE)</td>
+<td>the UI itself + SSE</td>
+</tr>
+<tr>
+<td><strong>Telegram</strong></td>
+<td>bot webhook (secret-token header), reply→decision conversion</td>
+<td>notification fan-out to chats/topics, first-response-counts</td>
+</tr>
+<tr>
+<td><strong>MCP</strong></td>
+<td>the app's own MCP server (<code>rmcp</code>): tenant-scoped tools over the action registry</td>
+<td>tool results + async events</td>
+</tr>
+</tbody>
+</table>
+<p>Channel behaviour is one module (<code>channel</code>), not per-channel copies: a message is a <code>delivery</code> row with a channel kind, a recipient set and a state machine; the reply path resolves to the same <code>approval</code>/<code>comment</code>/<code>card</code> mutation regardless of channel. This is the piece fr implements three times; it is written once here.</p>
+<p>Email and Teams fan-out are <strong>not</strong> in the in-scope list — they stay only if the S0 usage inventory shows them used.</p>
+<h3 id="59-deployment">5.9 Deployment</h3>
+<p>New namespace <code>conveyor</code>, DB + user <code>conveyor</code>, PgBouncer pool entry, ImagePolicy, ingress <code>conveyor.nonagentic.ai</code>, and the gitops <code>rust-service.yml</code> CI archetype. The repo starts from <code>template-rust-service</code> via <code>scripts/new-rust-target.sh</code> (owner <code>nonagenticai</code> → archetype CI). Local: <code>docker compose</code> with <code>postgres:18</code> + pgvector and the binary in dev-auth mode — the proof environment, not a second deployment target.</p>
+<h2 id="6-unified-domain-model">6. Unified domain model</h2>
+<p><code>Tenant 1—* Project 1—* Board 1—* List 1—* Card</code>; <code>Card *—1 CardType</code>, <code>*—* Label</code>, <code>1—* Comment / Task / Run</code>; <code>Requirement *—* Card</code> via <code>trace_link</code>; <code>Process 1—* ProcessStep</code>; <code>Run *—1 (Card | Project execution)</code> and references process/step; <code>Run 1—* Run</code> as a <strong>tree</strong> (<code>parent_run_id</code>, <code>step_id</code>, <code>depth ≤ 3</code>); <code>Approval *—1 Run</code>; <code>ArtifactRef</code> attaches to any aggregate.</p>
+<p><strong>The list is the card state.</strong> Lists carry <code>kind: intake | active | waiting | done | archive</code>; a card's lifecycle is <code>list_id</code> + <code>archived_at</code>, with no second <code>state</code> column. Execution state lives on <code>Run</code> (<code>queued → running → waiting_approval → running → succeeded | failed | cancelled</code>). The card-type × list rules validate moves in the domain layer. This kills fr's card-state/list disagreement class outright.</p>
+<p>A claim on a card is one conditional <code>UPDATE</code> (assignee + lease expiry + <code>version</code>), not a second lease store; lost updates are impossible because every mutation carries <code>If-Match</code>/version.</p>
+<p>Other state machines: <code>Approval pending → approved | rejected | expired | voided</code> (<code>voided</code> when <code>runs.cancel</code> withdraws a gate that will never be answered), at most one pending per <code>(run, gate)</code>; <code>Requirement draft → in_review → approved → superseded</code>; <code>Process (procedure) draft → published → retired</code>.</p>
+<p><strong>An approval is the one human-escalation primitive</strong> — approvals and questions are the same row (§4.5, D19). Each decision records the <em>kind</em> of decider, <code>decided_by_kind ∈ human | triage_agent | rule | agent</code>, plus a <code>via</code> blob naming the channel, so an agent's decision is auditable as an agent's and dual control can tell it from a person's. This is fr's mechanism carried forward, not a new one.</p>
+<p><strong>Processes, steps and SOPs (redesigned, amended 2026-11-09).</strong> A <strong>process</strong> is an ordered list of <strong>steps</strong>; a step is one of four kinds: an <strong>agent task</strong> (a process agent runs the bounded loop over its tools), a <strong>computed task</strong> (one action), a <strong>gate</strong> (an approval parks the run in <code>waiting_approval</code>), or a <strong>child-process call</strong> (a child run, depth ≤ 3). There are no executable predicates, loop nodes or general graph; a step's typed outcome is <code>continue | fail | retry</code>, bounded by <code>max_attempts</code>. <strong>Each step has a procedure (SOP)</strong> — a versioned definition of <strong>ready</strong> (inputs and preconditions), <strong>done</strong> (outputs and checks), <strong>acceptance criteria</strong>, and an <strong>eval/inspection</strong> of the output (the laya judge, an eval, or a deterministic checker; D28). A process declares its <strong>user-facing outputs</strong> — the deliverables a person sees when the process completes. One process per <code>(card_type, list)</code> — 70 × 4 = 280 — is the <strong>default catalogue</strong> (S13); a tenant may instantiate, override or design its own process for a project type (D29). <strong>As built (2026-11-10):</strong> the catalogue is 70 type files / 280 processes / 350 SOPs loaded from <code>seed/processes/</code> by <code>crates/store/src/process_seed.rs</code>; a type file's start process is applied alone (<code>apply_type</code>) and the whole catalogue together (<code>apply_all</code>), and the loader test applies the whole catalogue twice on a fresh database to prove publish validation and idempotency. <code>Run</code> is a <strong>tree</strong>: one live <strong>root</strong> run per card (one per project when card-less); a live parent may start child runs for a capability call or the coach, cancel cascades, and one live child exists per <code>(parent, step)</code> with one row per attempt.</p>
+<p><strong>The process map is the DAG (D30).</strong> A project type carries a versioned <strong>process map</strong> — nodes are processes, capabilities, phases or milestones, edges are flow — rendered for the user to show what is happening and which capabilities participate. It is <strong>declarative</strong>: it does not execute, and it cannot reorder a step; the PM plans from it, and the UI overlays the project's live position (running, done, blocked). A prescribed sequence of external API calls is a <strong>process whose steps are tool calls</strong>, not a second execution model.</p>
+<p><strong>Capability, knowledge and memory (D20, amended 2026-11-09).</strong> <code>Capability 1—* CapabilityAgent</code>; <code>Capability *—* Process</code> and <code>*—* CapabilityKnowledge</code>. A capability is a <strong>knowledge area</strong> with <code>kind ∈ system | tenant</code>: <code>project_management</code>, <code>kanban_coach</code> and <code>kata</code> are the built-in system capabilities (always present, not deletable); every other capability is tenant-defined per project type. Every process <strong>step</strong> has a <strong>procedure (SOP)</strong> — definition of ready, definition of done, acceptance criteria and an inspection — and a process declares its <strong>user-facing outputs</strong>. Its <code>CapabilityAgent</code> rows carry a <strong>role</strong>: a <strong>process agent</strong> (one per process / card type — the worker that owns the process domain knowledge) or a <strong>tool agent</strong> (one per toolset — the executor that makes the tool calls). Each row is the configured executor for its role (model reference, prompt, permitted actions, limits), and a <code>run</code> records which capability and which process agent actually executed. Knowledge is <strong>procedural</strong> (the <code>capability → process → step → procedure (SOP) → action|gate</code> ontology) and <strong>domain</strong> (<code>strata_rag</code> platform packs, one <code>capability</code> pack, pinned per capability). Memory is <strong>procedural</strong> (the execution history already in <code>run</code>/<code>approval</code>/<code>action_invocation</code>) and <strong>work-package</strong> (<code>work_package_memory</code> hot rows written with the run, consolidated into <code>strata_rag</code> as one digest per card). The full model is <code>docs/KNOWLEDGE-MEMORY.md</code>; <code>strata</code> is never the system of record and the conveyor never embeds or generates.</p>
+<p><strong>The executor model (D22, amended 2026-11-09).</strong> The <strong>process is the top-level executor</strong>; the <strong>workflow engine</strong> (<code>crates/workflow</code>, the <code>workflow</code> table) is <strong>retained</strong> as the tool-sequence executor (owner ruling 2026-11-09) — a <code>call</code> step resolves <code>child_process_key</code> process-first, workflow-second — and it is not a second top-level executor. A <code>run</code> is driven by a <strong>process</strong> (S11/S13): its <strong>agent steps</strong> run the internal bounded loop (<code>agent.run</code>) under the process agent, its <strong>computed steps</strong> invoke one action, its <strong>tool calls</strong> are executed by the tool agents, and a <strong>gate</strong> parks the run. An <strong>external agent</strong> over <code>/mcp</code> (D19) running a project as an MCP task (D21) remains the third executor kind. The persisted spec for the internal loop is <code>capability_agent</code> (role <code>process_agent</code>) — model, prompt, permitted actions, limits; the toolset pin is <code>capability_agent</code> (role <code>tool_agent</code>). The run's wiring resolves the process-agent row into the <code>agent.run</code> step input, which is what the loop reads; a step input may lower a cap, never raise it above the row, and no other stored or hard-coded source may supply these fields. The conveyor hosts no model, no embeddings and no second runtime, and does not depend on <code>agent</code>: an external executor is recorded by its principal (<code>action_invocation</code>), the task id (<code>run.external_ref</code>), and <code>approval_decision.decided_by_kind</code>/<code>via</code>. A <strong>run does not start</strong> when a required knowledge pack has no resolvable leaves, an <code>allowed_actions</code> entry is not a registered action, or the prompt does not resolve — <code>409 capability_not_ready</code> with <code>blocking[]</code>, before the first step. The copilot (S10) is an interactive, user-scoped surface over the same action registry; it is not a work executor and needs no <code>capability_agent</code>.</p>
+<p><strong>The inference ledger and the prompt audit (D23).</strong> <code>InferenceCall *—1 Run</code> (or <code>*—1 RunStep</code>, <code>*—1 ConversationTurn</code>), written by the engine whenever an external action that declares <code>captures_usage</code> returns a <code>usage</code> block; <code>PromptAudit 1—* PromptAuditFinding</code>, each finding carrying the <code>prompt-audit</code> skill's own columns — location, evidence, pattern (<code>1a</code>…<code>1f</code>, <code>2</code>, <code>3</code>, <code>4</code>), why obsolete, confidence, action, replacement. The audit reads the three prompt surfaces the conveyor owns — procedure step templates, every action's <code>description</code>, and the copilot's <code>SYSTEM_PROMPT</code> — plus <code>capability_agent.prompt_ref</code> once S15 lands, and it reports rather than edits: applying a rewrite is an ordinary <code>procedures.update</code> on a draft, decided by a person through <code>prompt_findings.decide</code>. Cache measurement is the evidence half of the same feature: the skill's Group 4 names "no token accounting" as the prerequisite for every other finding, and "cache-hostile ordering" is only visible as <code>cache_creation &gt; 0</code> with <code>cache_read ≈ 0</code> on a stable prefix — which is why the cache report groups by <code>prompt_sha</code> and not only by model and caller.</p>
+<p><strong>Triggers and the publish seam.</strong> A <code>PromptAudit</code> is created three ways: manually (<code>prompt_audits.start</code>), by the tenant's <em>after N executions</em> cadence (<code>tenant.settings.prompt_audit</code>, enforced <strong>at capture time</strong> by counting the tenant's <code>inference_call</code> rows since its last audit — the Nth-call event starts it), or by <code>procedures.publish</code> calling the synchronous <code>prompt_audits.check</code> on the draft it is publishing — where a <code>high</code>-confidence finding is refused with <code>422 procedure_audit_findings</code>, and <code>acknowledge_findings: true</code> overrides it into the publish's <code>audit_event</code>. Findings are the kata-executor's input, not a dead report.</p>
+<p><strong>The benchmark harness (D24).</strong> <code>BenchmarkSuite 1—* BenchmarkInstance</code>, <code>BenchmarkSuite 1—* BenchmarkRun 1—* BenchmarkCase</code>, and a run names the executor it measured (<code>capability_agent_id</code> or <code>process_id</code>, no FK — §2.17's RLS reason). A suite is an <strong>immutable instrument</strong>: its <code>dataset_revision</code>, <code>seed_sha256</code>, <code>image_lock_sha256</code>, <code>swebench_version</code> (the semantics the grader reproduces) and <code>parser_version</code> are its identity, and re-seeding a slug with different hashes is refused. An instance carries the problem statement and the oracle files the producer may see <strong>separately</strong> from the answers (<code>gold_patch</code>, <code>test_patch</code>, <code>FAIL_TO_PASS</code>, <code>PASS_TO_PASS</code>, <code>eval_script</code>), which only the grader reads; no action returns them and no benchmark action is grantable to a machine channel. A run is <code>arm × subject</code>: <code>gold</code>/<code>empty</code> are the controls, <code>baseline</code> is the one-shot model, and <code>conveyor</code> measures a pinned capability-agent or process version (S18). The grader is the only authority on <code>resolved</code> — the harness's verdict ladder, ported and proved against the banked logs — and comparison is the exact two-sided McNemar, refused when suite, oracle or prompt differ (the pipeline is what is compared, so it may differ). The benchmark is the kata improvement loop's measuring instrument: the loop proposes a candidate version, starts a run through the same action a person uses, compares it with the promoted baseline, and keeps or reverts.</p>
+<p><strong>The eval builder (D25).</strong> <code>Eval 1—* EvalVersion 1—* (EvalCase | EvalMetric)</code>, and <code>EvalRun *—1 EvalVersion 1—* (EvalCaseResult | EvalAttemptError | EvalTrace)</code>; <code>EvalAudit 1—* EvalAuditFinding</code>. An <strong>eval</strong> is one flow: its subject kind and entry action, its per-case extras, and how it is traced. A <strong>version</strong> is the frozen instrument — the case set, the metrics and one grader per metric (<code>programmatic | pairwise | rubric | human</code>), the token prices and the harness paths — under a single digest; <code>eval_run</code> names a version, and a comparison across versions, graders or splits is refused, because a score taken before a grader change is not comparable with one after it. The method's <strong>two literal sign-offs</strong> — <em>"do not proceed until the user has looked and said yes"</em> and <em>"would you have scored any of these differently?"</em> — are <code>approval</code> rows at <code>eval_inputs</code> and <code>eval_grading</code>, carrying the instrument digest so an edit <strong>voids</strong> the sign-off rather than leaving it quietly valid; <code>eval_runs.start</code> fails closed with <code>409 eval_not_ready</code> and names every missing gate. Signing is its own scope (<code>evals:approve</code>) and is absent from one machine-channel grant set (the S06d floor; the <code>AGENT_TOOLS</code> allowlist, renamed — not retired). The <strong>runner</strong> is the <code>job</code> table, one job per <code>(case, rep)</code>: a hard per-case wall-clock ceiling, jittered backoff with the attempt count visible, strict-per-attempt scoring, and a <strong>failure class on every failed attempt</strong> in <code>eval_attempt_error</code> — the <code>errors.jsonl</code> sidecar — which never occupies the <code>(case, rep)</code> slot, so a resume re-runs exactly what produced no output. A result carries <code>model</code> <strong>from the response</strong>, <code>usage</code>, and a <code>grade</code> object keyed by metric id; <code>status='truncated'</code> is counted and excluded from the mean, never scored as wrong. <strong>The answer key is structurally unreachable</strong>: <code>expected</code> is write-only, the subject-input type has no such field, and no answer-key action is agent-reachable. Cost is <strong>derived</strong> from <code>inference_call</code> at read time, and the report — a screen, not a generated page — computes every aggregate in Rust over the rows.</p>
+<p><strong>The eval hillclimb (D26).</strong> <code>EvalClimb *—1 EvalVersion</code>; a <strong>round</strong> is an <code>EvalRun</code> with <code>variant='v&lt;N&gt;'</code> carrying <code>change_md</code>, <code>change_patch</code>, a pre-registered prediction and a <code>summary.suspicious</code> flag. A climb records its goal (<code>target</code>, <code>direction</code>, <code>hold[]</code>), its stopping condition (plateau at K ≥ 3, a round count, or manual) and a <code>delta</code> set <strong>above the measured noise floor</strong> — a change whose best case sits inside the floor is kept or reverted by chance. The <strong>split belongs to the version</strong>: drawn at random, stratified by <code>tags[0]</code>, never by baseline score, fixed once. <strong>The analyzer sees train transcripts only and the headline is test</strong>, and that wall is <em>access</em>, not instruction — a test-split trace requires <code>evals:approve</code>, which an <code>agent</code> principal does not hold, so "the analyzer never read test" is a property of the permission model rather than a claim about its behaviour. <code>eval_climbs.round</code> runs one round and returns, because the method's check-in cadence is a person's; after two rounds that do not clear the band the next round must categorise (<code>artifact_gap | grader_disagreement | harness | structural | variance</code>) and a further content round is refused. Comparison reuses S17's exact two-sided McNemar — one implementation in the estate, so a published delta cannot come from a second, subtly different test — and <strong>spend is never a column</strong>: it is derived at read time from the same ledger model as the report — subject, judge and billed-failure calls, cache classes, explicit unknown/unpriced (W12).</p>
+<p><strong>Platform tables:</strong> <code>event</code>, <code>job</code>, <code>schedule</code>, <code>audit_event</code>, <code>action_invocation</code>, <code>idempotency_key</code>, <code>app_licence</code>.</p>
+<h2 id="7-api">7. API</h2>
+<ul>
+<li><code>/api/&lt;resource&gt;</code> — unversioned, per the house rule (never <code>/api/v1/&lt;resource&gt;</code>). No compatibility shims (D11); OpenAPI is the contract and clients are generated.</li>
+<li><code>GET /api/actions</code> + <code>POST /api/actions/{name}/invocations</code> for registry operations; <code>/mcp</code> for MCP; <code>/health</code>, <code>/health/live</code>, <code>/health/ready</code>.</li>
+<li>RFC 9457 problem+json errors, cursor pagination, <code>If-Match</code> on mutations, <code>Idempotency-Key</code> on POST, one request id in every response.</li>
+</ul>
+<h2 id="8-delivery-plan">8. Delivery plan</h2>
+<p>Each slice is proved locally (compose + real Postgres + integration tests) before it is called done. CI runs only when a slice integrates and when the repo merges.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Slice</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>S0</strong></td>
+<td><strong>Usage inventory</strong> — live usage from n8n DB, Planka webhooks/fields, fr/RM access logs, Keycloak clients → <code>parity.yaml</code></td>
+<td>The feature list is signed; zero-usage features are dropped, not ported</td>
+</tr>
+<tr>
+<td>S1</td>
+<td><strong>UI spike</strong>: Leptos SSR vs WASM SPA on board + chat</td>
+<td>Decision recorded with the measured numbers</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>Skeleton: workspace, compose, tenancy, migrations, audit, auth, job runner, SSE</td>
+<td>Two tenants isolated (incl. RLS); login works</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>Domain + schema: aggregates, state machines, ~60 tables</td>
+<td>Proptest on transitions; schema review</td>
+</tr>
+<tr>
+<td>S4</td>
+<td>Action registry: derive, OpenAPI, MCP, invocation/audit/idempotency, external ingest</td>
+<td>20 actions identical over HTTP and MCP</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>Board: projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE</td>
+<td>Replay a live board export; two-client race; 1k-card load</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>Conveyor control plane: claims, runs, approvals, andon, comms/multicast, notifications</td>
+<td>Golden card-type×list path; dual-control approval; retry</td>
+</tr>
+<tr>
+<td><strong>S06b</strong></td>
+<td><strong>Agent direct interface</strong> — <code>_meta.operation</code>, machine authenticator, principal kind, <code>approvals.request</code></td>
+<td>one real <code>agent</code> task over <code>/mcp</code>; <code>decided_by_kind='agent'</code>; a cross-tenant licence refused with zero mutations</td>
+</tr>
+<tr>
+<td><strong>S06c</strong></td>
+<td><strong>MCP tasks</strong> — the extension, <code>projects.execute</code>, a project execution run, approval-as-input-request</td>
+<td>a task waits through a pending approval, is answered, and reaches a terminal result; cross-tenant id is <code>-32602</code></td>
+</tr>
+<tr>
+<td>S7</td>
+<td>Requirements + catalogues + revisions + quality scoring + search</td>
+<td>Relevance eval set beats an agreed baseline</td>
+</tr>
+<tr>
+<td>S8</td>
+<td>Governance + modelling: principles/ADRs, ArchiMate, UML, views/diagrams, validation, render/export, portfolio stakeholders (<strong>TOC, registers, capabilities and deliverables dropped by the S00 verdicts</strong>)</td>
+<td>Golden SVG/PNG/PDF/XMI fixtures</td>
+</tr>
+<tr>
+<td>S9</td>
+<td>Documents, repositories, secrets, workers UI, reports/metrics, billing display</td>
+<td>Feature-list items green</td>
+</tr>
+<tr>
+<td>S10</td>
+<td>Copilot / AG-UI + tenant MCP interface</td>
+<td>Scripted agent session passes</td>
+</tr>
+<tr>
+<td>S11</td>
+<td><strong>Processes, steps and SOPs</strong> — ordered steps (agent, computed, gate, call), the per-step procedure (definition of ready/done, acceptance criteria, inspection), the process's user-facing outputs, actor/process-agent resolution</td>
+<td>Author → publish → execute a process run with a gate, a child call and a judged step</td>
+</tr>
+<tr>
+<td>S12</td>
+<td>UI build-out of every screen on the chosen stack</td>
+<td>Playwright click-through per feature-list item</td>
+</tr>
+<tr>
+<td>S13</td>
+<td><strong>Process engine + care-bus</strong> — the step executor, the run tree, the laya/eval judge wiring, the user-facing <strong>process map</strong> (the DAG view), the Redis Streams bus, <code>projects.create</code> absorbing the start, <code>wip.pull</code>/<code>err.card</code> as computed handlers, and the 348 flows re-authored as processes/handlers; the workflow engine is <strong>retained</strong> as the tool-sequence executor</td>
+<td>Execution-trace diff against the old flows; a child run under a live parent; a reject loops and a laya outage waits; a Redis loss re-delivers without a double outcome. <strong>Built 2026-11-10</strong> — migrations <code>0035_process_tree</code> and <code>0036_s19_output_grade</code>; the judge (<code>checker|laya|eval</code>) inside the step executor with a bounded park; the <code>call</code> step (process-first, workflow-second, child poll, <code>on_result</code>, cancel cascade, root-only <code>err.card</code>); <code>seed/processes/maps.yaml</code> (3 maps: <code>it</code>, <code>kata</code>, <code>py2rust</code>); <code>crates/bus</code>; the 70 type files / 280 processes / 350 SOPs catalogue. <strong>Outstanding:</strong> the tool-sequence <code>workflows/</code> files (no <code>coding_jobs</code>/<code>workspaces</code> action exists in this repo, so a sequence cannot name a registered action) and the n8n trace fixtures (no recordings in this repo)</td>
+</tr>
+<tr>
+<td>S14</td>
+<td>Independent deployment: deploy, seed, coexistence with fr / RM / Planka (<strong>rewrite: #44</strong>)</td>
+<td>the new product's own acceptance passes; the S06b agent run passes against the deployed conveyor; new-service rollback tested</td>
+</tr>
+<tr>
+<td>S15</td>
+<td><strong>Capability, knowledge and memory</strong> — capability aggregate, capability-agent, <code>strata</code> pack binding, work-package memory</td>
+<td>a pinned pack returns a cited hit; memory write → consolidate → recall by <code>source_id</code></td>
+</tr>
+<tr>
+<td>S16</td>
+<td><strong>Inference ledger and prompt audit</strong> (D23) — <code>inference_call</code> written inside the external call's bookkeeping transaction, the cache hit/write/miss report grouped by prompt, and the prompt audit over procedures, action descriptions, the copilot prompt and (later) <code>prompt_ref</code>, triggered manually <strong>or</strong> by a configured <em>after N executions</em> policy, and run against a draft <strong>at publish</strong></td>
+<td>a real <code>completions.create</code> call is captured with its cache class and join keys; an audit produces findings with the skill's columns and a proposed diff and a second run reproduces them; publishing a procedure with an unacknowledged high-confidence finding is refused; no finding can edit the surface it audits</td>
+</tr>
+<tr>
+<td>S17</td>
+<td><strong>Native benchmark harness</strong> (D24) — absorb <code>conveyor-bench</code>: the hashed seed artifact, the parity-ported grader (verdict ladder + 12 repo parsers), the k8s Job sandbox, the gold/empty/baseline arms, the single run driver, exact McNemar comparison and the promote/baseline control</td>
+<td>the banked eval logs reproduce the banked verdicts row for row; gold 50/50 and empty 0/50; the banked comparable pair reproduces 8 discordant / p = 0.289; one live sandbox Job produces a verdict and is deleted; no Python in the build or the image</td>
+</tr>
+<tr>
+<td>S18</td>
+<td><strong>Kata continuous improvement</strong> (D24) — the <code>conveyor</code> arm pinned to <code>capability_agent</code>/<code>procedure</code> versions, the promoted baseline, the trend read model, and the improvement job that starts → waits → compares → keeps or reverts</td>
+<td>a candidate version and its baseline compare with an exact McNemar delta; a significantly worse candidate is flagged; the improvement job performs the same calls a person would and records its verdict</td>
+</tr>
+<tr>
+<td>S19</td>
+<td><strong>Eval builder</strong> (D25) — the <code>build-eval</code> and <code>eval-audit</code> methods as an aggregate: the versioned instrument, the reviewed input set with a drawn split, the four grader kinds, the case runner with its four properties, the report, and the health audit with its oracle/null controls</td>
+<td>the two sign-offs are load-bearing (a start before them is <code>409 eval_not_ready</code>, an edit voids them); a failed attempt leaves its <code>(case, rep)</code> slot empty and a re-run fills it; oracle ≈100 % and null ≈0 % through the real runner and grader; a report recomputes from raw rows; no answer-key or sign-off action is agent-reachable</td>
+</tr>
+<tr>
+<td>S20</td>
+<td><strong>Eval hillclimb</strong> (D26) — the <code>eval-hillclimb</code> and <code>cost-hillclimb</code> loop: goal and guardrails, stopping condition, the round protocol, stall triage, and the paired comparison</td>
+<td>a two-round climb keeps one round and reverts the other with the reason recorded; a paired delta reproduces by hand and refuses across versions; a fourth content round against a wall is refused; a cost walk registers its adoption gates before round 1</td>
+</tr>
+<tr>
+<td>S21</td>
+<td><strong>Message construction</strong> (D27) — the compiled prompt taken from a fixed five-section renderer to run-time selection with budgets: the procedural, domain/capability/role and project/card components, the <code>plan</code> projection over the step DSL (PDDL evaluated, never adopted as the storage format), and the audit hook that names the compiled hash</td>
+<td>a required source missing refuses by name before a model call; identical recipe + facts compile byte-identically; an over-budget section refuses with its measured size, never truncates</td>
+</tr>
+</tbody>
+</table>
+<p>S8 is independent of the conveyor spine and can run in parallel once S2–S4 exist. ⚠️ <strong>Corrected 2026-11-09: this said S13 too.</strong> S13 <code>depends_on</code> includes <strong>S11</strong> (<code>docs/plans/00-INDEX.md</code>), because its <code>agent.run</code> takes the resolved <code>capability_agent</code> (D22/§17) and its flows are re-authored as processes — it is not parallel with the spine. The UI spike runs first because it changes S12's entire cost. <strong>S14 is blocked by three things beyond parity: S12 (the UI build-out), S13 (the native engine and its retained regression fixtures) and S06b (the <code>agent</code> → conveyor <code>/mcp</code> path is proven live).</strong> ⚠️ Corrected 2026-11-09: this said "two things" and omitted S12, which S14's own <code>depends_on</code> names. S06c is additive: S06b's polling path remains the fallback, so a client that cannot run tasks still works and S14 does not depend on it. S15 sits after S11 and is not a cutover precondition unless capability knowledge is in the cutover proof. <strong>S19 depends on S16</strong> — the token accounting it derives cost from is the ledger, and <code>eval-audit.md</code> names token accounting as the prerequisite for every other finding — and on <strong>S09</strong> for the object store its export and attachments use, and <strong>S20 depends on S19</strong>; neither is in S14's dependency set, and both may land after cutover without touching the native acceptance. ⚠️ <strong>Amended 2026-11-09:</strong> the process model supersedes the DAG, but S17/S18's subject pins stay <code>capability_agent</code> / <strong>process</strong> — the subject is the process (<code>process_id</code>); the old <code>procedure_id</code> pin migrates in <code>0035</code>, and a SOP is not a measured subject.</p>
+<h2 id="9-verification">9. Verification</h2>
+<p><strong>"What we actually use" is measured, not assumed.</strong> The S0 inventory draws on three independent sources: (1) ingress access logs — Istio access logging is already enabled (<code>clusters/strato/istio/telemetry-ingress-access-logs.yaml</code>, stdout → Alloy → Loki), so per-path counts can be derived without touching the frozen apps; (2) the n8n workflow DB — which operations the 280 card-type flows actually call; (3) the Planka feature table already measured. <code>parity.yaml</code> gets one ID per used feature, each with an executable acceptance test.</p>
+<p><strong>Per slice:</strong> local compose Postgres + the binary; integration tests against real Postgres; no mocked transport (behaviour tests only); proptests on state machines; <strong>rendered artefacts as checked-in golden bytes plus a SHA-256 manifest</strong> (<code>insta</code> for JSON schemas — a binary document in a <code>.snap</code> is unreadable in a diff and <code>insta accept</code> blesses changes nobody looked at); Playwright click-through for UI slices; k6 for board load.</p>
+<p><strong>Before cutover:</strong> replay recorded real payloads through the new action registry; run the real conveyor end-to-end against the new app while n8n still executes; then run it again on the in-app engine. Cutover is proven by a completed conveyor run, not by a green build.</p>
+<p><strong>The inference record (D23) is proved against a real call, not a fixture.</strong> S16's gate takes one <code>completions.create</code> through the router and asserts the <code>inference_call</code> row against the router's own response — the same <code>usage</code> numbers and a <code>cache_status</code> derived by the stated rule — then re-runs the prompt audit a second time and requires the findings to reproduce. A cache probe that never sees <code>cache_creation &gt; 0</code> (a prefix below the provider's minimum) must report <code>miss</code>, not <code>hit</code>: the definitions in D23 are what make the report falsifiable.</p>
+<p><strong>The eval (D25/D26) is proved by controls and by a refused start, not by a green run.</strong> S19's gate starts a run before either sign-off is decided and requires <code>409 eval_not_ready</code> naming the missing gate, then edits a case and requires the <em>inputs</em> sign-off to read void — that second line is what makes "the sign-offs are the product" falsifiable rather than decorative. Two controls go through the real runner and the real grader: an <strong>oracle</strong> (the reference answers) must score ≈100 % and a <strong>null</strong> (an empty output, then a constant answer) ≈0 %; a judge is fed an empty string, "I don't know" and a confident answer to the wrong question and must fail all three. An induced provider error must land in <code>eval_attempt_error</code> with a failure class and leave its <code>(case, rep)</code> <code>eval_case_result</code> row absent, so a re-run executes it — never a silent zero. A test-split trace is requested by an <code>agent</code> principal and must be refused. S20's gate requires a paired delta to reproduce by hand from the per-case rows and a comparison across versions to be refused, because the one number the loop publishes must be recomputable from the record and not from a second implementation of the arithmetic.</p>
+<h2 id="10-what-this-buys">10. What this buys</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Today</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Applications replaced</td>
+<td>fr + RM + Planka + procedure_management</td>
+<td><strong>1</strong> (agent and mcp_server remain separate; the conveyor absorbs <code>mcp_server</code>'s <code>fr</code> toolkit)</td>
+</tr>
+<tr>
+<td>Package fleet</td>
+<td>24 node repos</td>
+<td><strong>0</strong> (action registry)</td>
+</tr>
+<tr>
+<td>Databases</td>
+<td>3 (+ Redis)</td>
+<td><strong>1 Postgres + 1 Redis</strong> (the bus; never the record)</td>
+</tr>
+<tr>
+<td>Schemas</td>
+<td>86 + 57 + 33 domain tables (fr + RM + Planka), 306 migrations</td>
+<td>1 baseline, <strong>88 tables on disk today</strong> (65 with S15's capability/memory, plus S12's three RBAC tables, S16's three inference-ledger tables, S17's four benchmark tables, S19's ten eval tables, S20's climb and S21's two prompt tables); the process model takes it to <strong>89</strong> when <code>0033</code>/<code>0034</code> land (process/step/SOP + process_map, and S13's <code>workflow</code> drops at <code>0034</code>) — the original target was "~60" and S00 measured five of the 67 first planned as unused</td>
+</tr>
+<tr>
+<td>APIs</td>
+<td>1,376 + 314 + Planka REST</td>
+<td>one typed registry + OpenAPI</td>
+</tr>
+<tr>
+<td>Card state owners</td>
+<td>Planka (state) + fr (lease/approval) + RM (project)</td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td>Realtime stores</td>
+<td>fr WS + Planka webhooks + Redis</td>
+<td>one SSE stream fed by the outbox + the Redis bus (transport only)</td>
+</tr>
+<tr>
+<td>Languages</td>
+<td>TypeScript, Python, SQL, Svelte</td>
+<td><strong>Rust</strong> (+ SQL)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-risks">11. Risks</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td><strong>RM modelling/render/XMI</strong> — ArchiMate 3.2 + UML 2.5.1 validation, SVG/PDF rendering, XMI export. The largest unknown. Full XMI conformance is infeasible.</td>
+<td>Ship a scoped profile validated against actual consumers early in S8; <code>resvg</code> + <code>svg2pdf</code> on one <code>usvg</code> tree (all three formats are encodings of one parse), and vendored DejaVu faces embedded with <code>include_bytes!</code> — never reimplement cairosvg font handling, and never read the host's fonts.</td>
+</tr>
+<tr>
+<td>R2</td>
+<td><strong>Search without spaCy/scikit-learn.</strong></td>
+<td>Build an eval set from live queries first; FTS + <code>pg_trgm</code> first, pgvector second; ranking is explicit Rust rules. Trap: porting sklearn scoring one-to-one.</td>
+</tr>
+<tr>
+<td>R3</td>
+<td><strong>Copilot / AG-UI</strong> (12.7k LOC, still evolving).</td>
+<td>Port late (S10); keep the AG-UI wire contract if consumers depend on it.</td>
+</tr>
+<tr>
+<td>R4</td>
+<td><strong>n8n replacement</strong> — 348 flows, agent orchestration, LLM tool-calling loops. The n8n <strong>execution</strong> model does not fit: v4's macro/micro mantras are sequences of agents, and the one-live-run-per-card rule made child flows (the coach) impossible (measured 2026-11-09).</td>
+<td>S13 is its own phase; the <strong>process model</strong> (capability → process → step → SOP → task/tool) replaces execution; the DAG returns only as the user-facing <strong>process map</strong> (D30); flows re-authored as processes/handlers, not converted. The <strong>workflow engine is retained</strong> (owner ruling 2026-11-09) as the tool-sequence executor a process <code>call</code> step can name — never as a second top-level executor</td>
+</tr>
+<tr>
+<td>R5</td>
+<td><strong>Porting dead surface</strong> — 1,376 fr endpoints.</td>
+<td>S0 gates everything; zero-usage routes are dropped.</td>
+</tr>
+<tr>
+<td>R6</td>
+<td><strong>Redis returns as the bus</strong> (2026-11-09) — a second state store beside Postgres can drift or lose in-flight work.</td>
+<td>The bus is a nudge, never the record: <code>run</code>/<code>run_step</code>/<code>event</code> hold the truth, the outbox re-delivers after a Redis loss, handlers are idempotent on the envelope id and the natural key, and the stream has no PVC. Caches stay in-process.</td>
+</tr>
+<tr>
+<td>R7</td>
+<td><strong>Freeze drift</strong> — the old conveyor still gets bug fixes the new app must absorb.</td>
+<td>Keep a dated list of merged fixes on the frozen repos; review at each slice boundary.</td>
+</tr>
+<tr>
+<td>R8</td>
+<td><strong>Tenant/auth rewrite</strong> is the highest-bug-surface area.</td>
+<td>Tenant typed into the store layer; one authorization module; negative tests per role; only <code>SET LOCAL</code> under PgBouncer.</td>
+</tr>
+<tr>
+<td>R9</td>
+<td><strong>Big-bang cutover, no data migration</strong> — every integration cuts over at once.</td>
+<td>Freeze + S0 inventory + replay harness; run the conveyor against the new app before switching.</td>
+</tr>
+<tr>
+<td>R10</td>
+<td><strong>Porting fr's accreted model</strong> is the single biggest failure mode.</td>
+<td>Baseline schema built from the domain model, not from the 224 migrations; schema-review gate before S3 closes.</td>
+</tr>
+<tr>
+<td>R11</td>
+<td><strong>Breaking <code>agent</code> at cutover.</strong> It reaches the conveyor over <code>/mcp</code>; changing a tool name, its input/output schema, the licence principal, the approval vocabulary or the task methods and their payloads silently strands the agent platform.</td>
+<td>S06b's tool-contract test + one live agent task before S14; the tool surface and the task contract are versioned like an external API even though nothing else is.</td>
+</tr>
+<tr>
+<td>R12</td>
+<td><strong>The grading node is <code>hp1</code></strong> (owner decision 2026-11-09: a node selector plus a quota). The old harness pinned <code>worker1</code> for its 1.1–1.24 GB eval pods; worker1 was wiped 2026-11-01. <code>hp1</code> is not hp2 (CI capacity) and not mf1 (MinIO + the PG standby). The sandbox stays fail-closed (<code>503 benchmark_sandbox_not_configured</code>) until the first live run.</td>
+<td>The parser-parity check and all pure logic run without a cluster; the sandbox is fail-closed (<code>503 benchmark_sandbox_not_configured</code>). The node selector/taint is deployment config, recorded as <code>hp1</code>, never silently repointed.</td>
+</tr>
+<tr>
+<td>R13</td>
+<td><strong>Grader fidelity.</strong> The Rust port must reproduce swebench 5.0.2's verdicts for the 12 repos; a parser that differs silently changes a published score.</td>
+<td>The banked eval logs are the executable oracle: 50/50 verdict equality plus the gold 50/50 / empty 0/50 controls are build gates; an unparseable case is <code>infra_error</code>, never a charged <code>unresolved</code>.</td>
+</tr>
+<tr>
+<td>R14</td>
+<td><strong>The laya judge is external and its decision is load-bearing.</strong> A laya outage or a badly chosen threshold can stall or mis-accept every step.</td>
+<td>An outage <strong>waits</strong>, never fails open (D28); the verdict is recorded with its probability/margin and criteria, so a disputed acceptance is replayable; a tenant's threshold/criteria are versioned with the SOP; a judge that cannot decide is a typed block, never a silent accept.</td>
+</tr>
+<tr>
+<td>R15</td>
+<td><strong>Tenant-authored processes and SOPs can be wrong</strong> — a tenant can design a sequence that skips a required step or sets acceptance criteria it cannot verify.</td>
+<td>System capabilities (PM, coach, kata) are fixed and cannot be reordered (D29); a process publishes only with valid steps and SOPs; the 280 default catalogue is the safe starting point; a run pins its process/SOP versions, so a later edit cannot rewrite history.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="12-open-decisions-at-review">12. Open decisions at review</h2>
+<ol type="1">
+<li><strong>Port 8930</strong> — confirm free locally and in the cluster before the slice that binds it (the house rule: never 8000).</li>
+</ol>
+<p><em>Decided 2026-11-08: <code>mcp_server</code>'s long-term role is <strong>D19</strong> in §3 — the agent calls the conveyor's own MCP surface, and <code>mcp_server</code> remains the gateway for every other backend. D18 is superseded. A session that wants a second agent-facing gateway is proposing a change to a taken decision.</em></p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/SPEC.md</code> at build time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

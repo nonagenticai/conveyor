@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0003 — CI for a public repository: GitHub-hosted, self-contained, ghcr, Flux downstream · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0003-public-ci.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0003--ci-for-a-public-repository-github-hosted-self-contained-ghcr-flux-downstream">0003 — CI for a public repository: GitHub-hosted, self-contained, ghcr, Flux downstream</h1>
+<p>Status: Accepted · Date: 2026-11-12 · Issue: #54</p>
+<h2 id="decision">Decision</h2>
+<p><code>conveyor</code> is public. Its CI is <code>.github/workflows/ci-public.yml</code>, a <strong>self-contained</strong> workflow that runs <strong>only on GitHub-hosted <code>ubuntu-latest</code></strong>, references <strong>no repository secret</strong>, and ends at an image push to <code>ghcr.io/nonagenticai/conveyor</code>. Deployment is <strong>not</strong> in this repository: Flux in <code>gitops-production</code> watches the ghcr package through the existing <code>ImagePolicy conveyor</code>.</p>
+<p>Every job is gated on <code>if: ${{ !github.event.repository.private }}</code>, so the file is inert (jobs <em>skipped</em>, never red) while the repository is still private and activates with no edit at the flip.</p>
+<h2 id="context--what-was-measured-2026-11-12">Context — what was measured (2026-11-12)</h2>
+<table>
+<thead>
+<tr>
+<th>fact</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>current workflow</td>
+<td>one job: <code>uses: &lt;gitops repo&gt;/.github/workflows/rust-service.yml@main</code>, <code>secrets: inherit</code></td>
+</tr>
+<tr>
+<td>reusable-workflow visibility</td>
+<td>a public caller may call only <strong>public</strong> workflows → that job cannot resolve on a public repo</td>
+</tr>
+<tr>
+<td>org runner groups</td>
+<td><code>Default</code> and <code>amd64runners</code>, both <code>allows_public_repositories: false</code></td>
+</tr>
+<tr>
+<td>GitHub-hosted, public repo</td>
+<td>free and unlimited standard runners; measured probe: 4 vCPU, 86 GB free on <code>/</code>, zero queue wait</td>
+</tr>
+<tr>
+<td>private-repo billing</td>
+<td>the account's past "payments failed" 403 applied to <strong>private-repo</strong> minutes; public standard minutes are not billed (probe above succeeded)</td>
+</tr>
+<tr>
+<td>archetype private plumbing</td>
+<td>registry login, an internal registry host, an object-store-backed sccache, a Flux receiver token</td>
+</tr>
+<tr>
+<td>live deployment</td>
+<td>ns <code>conveyor</code>, two Deployments, all containers on the internal registry's <code>conveyor:latest</code>, updated by <code>ImagePolicy flux-system/conveyor</code> (tag <code>latest</code>)</td>
+</tr>
+<tr>
+<td>repo rulesets / branch protection</td>
+<td>403 "Upgrade … or make this repository public" — free once public</td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-github-hosted-and-why-the-arc-path-is-closed-rather-than-widened">Why GitHub-hosted, and why the ARC path is closed rather than widened</h2>
+<p>A fork pull request runs <strong>the workflow file from the PR's merge commit</strong>, so a fork can change <code>runs-on</code>. Any self-hosted runner group that accepts this repository therefore accepts arbitrary untrusted code from anyone on the internet, inside the estate's pod network. Flipping <code>allows_public_repositories</code> is not a checkbox; it is publishing the cluster. GitHub-hosted VMs are free for a public repo and are the only shape where an untrusted <code>cargo test</code> or <code>build.rs</code> never touches the estate. Nothing in CI needs a secret, a cluster credential or an internal host, so no isolation escape is needed either.</p>
+<h2 id="why-the-workflow-is-inline-not-a-reusable-archetype">Why the workflow is inline, not a reusable archetype</h2>
+<p>The estate rule is archetype-first. This is the one case where it cannot hold: a public repository cannot call a private reusable workflow, and publishing the archetype would publish the estate's addressing and deploy mechanics. The gates (fmt, clippy <code>-D warnings</code>, nextest + doctests, cargo audit, the image smoke) are copied step-for-step from <code>rust-library.yml</code>, with a header comment on each job naming its archetype counterpart. The private plumbing is dropped, not reimplemented.</p>
+<h2 id="why-ghcr--flux-downstream">Why ghcr + Flux downstream</h2>
+<p>The public workflow has <code>permissions: packages: write</code> and uses the automatic <code>github.token</code> — no stored credential. On a push to main it pushes <code>sha-&lt;7&gt;</code>, <code>main-&lt;6-digit run&gt;</code> and <code>latest</code>. Flux in <code>gitops-production</code> resolves <code>latest</code> (the mechanism the archetype's promote step used) and writes the digest into the two Deployments, exactly as it does for every other service. The cluster pulls anonymously because the package is public.</p>
+<p>The public CI therefore holds <strong>no</strong> cluster access: no kubeconfig, no receiver token, no registry credential. A merge to main still deploys, because the image tag is the only contract between the two repos, and that contract is one-way.</p>
+<h2 id="base-images">Base images</h2>
+<p><code>Dockerfile</code> takes <code>ARG BASE_IMAGE=docker.io/library/debian:12-slim@sha256:…</code> (digest-pinned) for all three stages. <strong>This is an exception to the estate's internal-mirror rule</strong>, and the only one: a public build cannot reach the mirror, and a digest pin gives the reproducibility the mirror was there to provide. An estate build can override it with <code>--build-arg</code> without touching the file.</p>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>The estate's <code>validate-no-upstream-refs</code> rule (no Docker Hub refs) cannot apply to this repo; its inverse does: <code>scripts/ci/no-private-refs.sh</code> fails CI if any internal hostname, tailnet address or private repository path is published. That script is the enforcement half of the "no IPs" rule; <code>gitleaks dir</code> is the credential half.</li>
+<li><code>rbuild --gate</code> no longer finds a <code>rust-service.yml</code> caller in this repo and will fall back to archetype defaults; its conveyor parity is a separate follow-up.</li>
+<li>The legacy <code>.github/workflows/ci.yml</code> stays until the flip (it is the only real CI while the repo is private), self-disables on a public repo, and is deleted by the flip session.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0003-public-ci.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

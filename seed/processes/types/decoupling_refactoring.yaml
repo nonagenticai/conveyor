@@ -1,0 +1,175 @@
+# decoupling_refactoring — cut one coupling across a module boundary and open a PR
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type decoupling_refactoring: outputs, acceptance and
+# definition_of_done pr_merged) and n8n-designs/design/choices/v4/capabilities/refactoring.yaml
+# (text "architectural refactoring scoped to coupling of repo", phase execution, proof suite_only,
+# test_files none, inspect criteria removes_the_item / preserves_behaviour / change_is_minimal — the
+# v4 removes_the_item is explicitly about "fewer imports or calls across the boundary", which is the
+# count this file's item_gone checks read). The card carries one confirmed item of kind coupling
+# from structure_analysis (v4 P-W3-2), a sibling of architecture_refactoring but narrower: the
+# subject is the edge between two modules, not the shape of either one.
+#
+# ⚠ proof is suite_only and R233 fixes test_files: none — no test file is planned or changed
+# (computed gates no_test_file_planned, no_test_changed). A cut edge is proved by the suite that did
+# not move; a test edited on either side of the boundary could mask an edge that was only re-routed.
+card_type: decoupling_refactoring
+capability: refactoring
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: decoupling_refactoring
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: decoupling_refactoring.ready
+    title: Decoupling refactoring — definition of ready
+    definition_of_ready: {checks: [source_item_located, planned_files_exist]}
+    definition_of_done: {checks: [workspace_imported]}
+    acceptance_criteria:
+      - {name: planned_files_exist, text: "Both sides of the boundary the plan names exist in the imported workspace — the module that reaches and the module it reaches into — or the plan says which side it will extract. A plan that cuts an edge between a module it has located and one it has not cannot afterwards show that the edge is gone rather than merely moved out of sight."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: decoupling_refactoring.doing
+    title: Decoupling refactoring — definition of doing
+    definition_of_ready: {checks: [workspace_imported]}
+    definition_of_done: {checks: [suite_green_after, item_gone_at_location]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff touches only the source files the plan named — the caller, the callee and whatever interface file the plan introduces — and it changes no test file. R233 makes the untouched tests the proof that the caller still gets what it used to, so an edited test is the hiding place for a coupling the diff failed to cut."}
+      - {name: suite_green_before, text: "The whole suite is green on the base revision before either side of the boundary moves, so the decoupling starts from a working system and a red afterwards names the cut rather than the state it inherited."}
+      - {name: suite_green_after, text: "The whole suite is green after the decoupling on the revision the diff produces, run whole, because the call the item removed may be reached from a package the plan never mentions and from a test that exercises the far side only."}
+      - {name: item_gone_at_location, text: "The edge across the boundary is gone at the paths the item named: the import, call or shared global the report counted no longer appears in the caller, and whatever the caller needed from the other side now arrives through the interface the plan defined — the same pair of modules, with fewer imports or calls between them, counted the way the report counted."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: decoupling_refactoring.qa
+    title: Decoupling refactoring — definition of QA
+    definition_of_ready: {checks: [item_gone_at_location]}
+    definition_of_done: {checks: [change_preserves_behaviour, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: change_preserves_behaviour, text: "Every test that covers either side of the boundary passes unchanged, and the caller still receives the same results from what is now a decoupled call — same success value, same error, on the same inputs it sent across the old edge."}
+      - {name: change_removes_item, text: "The count the item reported across that boundary is lower on the final revision — imports, calls or shared state, whichever the item counted — and re-reading both modules finds the removed edge absent, not re-exported, forwarded through a helper or rebuilt as a new import of the same target."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the decoupling_refactoring card type declares is true of the final diff and of the fix report QA reviews."}
+      - {name: removes_the_item, text: "The diff removes the coupling the card's item names: fewer imports or calls cross that boundary at the final revision than at the base, at the pair of paths the item named."}
+      - {name: preserves_behaviour, text: "Decoupling changes no observable behaviour: each module keeps the public surface a caller outside the pair uses, and every result crossing the new seam is the result the old direct call produced."}
+      - {name: change_is_minimal, text: "The diff changes only what cutting that one edge needs — no re-architecture of either module, no second boundary cut and no dependency swap the item does not name."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: decoupling_refactoring.done
+    title: Decoupling refactoring — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request carrying the decoupling is squash-merged, and the merge sha is recorded on the card against the revision QA counted the boundary on, so the edge that landed is the edge that was measured."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: decoupling_refactoring.system
+    title: Decoupling refactoring — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: decoupling_refactoring.READY
+    list: ready
+    title: Decoupling refactoring — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: decoupling_refactoring
+        sop: decoupling_refactoring.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: decoupling_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: decoupling_refactoring.DOING
+    list: doing
+    title: Decoupling refactoring — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: decoupling_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: decoupling_refactoring.QA
+    list: qa
+    title: Decoupling refactoring — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: decoupling_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: decoupling_refactoring.DONE
+    list: done
+    title: Decoupling refactoring — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: decoupling_refactoring, sop: decoupling_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: decoupling_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

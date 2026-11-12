@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S12 handoff — Connectors and the interaction inbox (S06d) · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/handoffs/S12-connectors.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s12-handoff--connectors-and-the-interaction-inbox-s06d">S12 handoff — Connectors and the interaction inbox (S06d)</h1>
+<p>The backend is built. This is what the web UI needs to consume; the actions are live and their payloads below are exact.</p>
+<h2 id="new-screen-appswebsrcscreensconnectorsrs-route-settingsconnectors">New screen: <code>apps/web/src/screens/connectors.rs</code>, route <code>/settings/connectors</code></h2>
+<p>Nav entry beside <strong>Roles &amp; permissions</strong>, gated on <code>ctx.has_action("channels.kinds")</code> (<code>channels:write</code> — admin only; member/viewer get <code>403</code>).</p>
+<h3 id="1-connector-list">1. Connector list</h3>
+<p><code>channels.list</code> → <code>{ bindings: [ChannelBindingAdminOut] }</code>. One row per binding:</p>
+<table>
+<thead>
+<tr>
+<th>field</th>
+<th>render</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>channel_kind</code></td>
+<td>the kind's <code>label</code> from <code>channels.kinds</code> (not the raw kind)</td>
+</tr>
+<tr>
+<td><code>route_key</code></td>
+<td>route selector</td>
+</tr>
+<tr>
+<td><code>active</code></td>
+<td>status pill</td>
+</tr>
+<tr>
+<td><code>inbound_url</code></td>
+<td>copy button (absolute = page origin + path) for the kinds that receive</td>
+</tr>
+<tr>
+<td><code>secrets_set</code></td>
+<td><code>{secretName: bool}</code> — show ✓/✗, <strong>never a value</strong></td>
+</tr>
+<tr>
+<td><code>config</code></td>
+<td>non-secret values only (chat id, endpoint URL, …)</td>
+</tr>
+</tbody>
+</table>
+<p>Row actions: <strong>Test connection</strong> → <code>channels.test {binding_id}</code> (queues a real delivery; show “queued — delivery <id>”), <strong>Edit</strong>, <strong>Disable/Remove</strong> → <code>channels.unbind {tenant_id, channel_kind, route_key}</code>.</p>
+<h3 id="2-addedit-connector">2. Add/edit connector</h3>
+<ol type="1">
+<li><code>channels.kinds</code> → <code>{ kinds: [{kind,label,can_send,can_receive,identity,config_schema, secret_fields,default_actions,instructions}] }</code>.</li>
+<li>Pick a kind → render <code>config_schema</code> as a form (generic JSON-Schema renderer; object with properties, <code>required</code>, types). <code>secret_fields</code> are <strong>secret names</strong>, not values: each gets a text input plus an inline “create secret” flow (<code>secrets.create {name, value}</code> — write-only, never echoed). <code>instructions</code> is the operator copy (Telegram: BotFather + <code>setWebhook</code> with the binding's <code>inbound_url</code>; webhook: the POST envelope).</li>
+<li>Save → <code>channels.bind {tenant_id, channel_kind, route_key, config}</code>. The response is the admin binding: show <code>inbound_url</code> and <code>secrets_set</code>; a 422 names the field and, for a missing secret, says to create it first.</li>
+<li><code>identity</code> values: <code>provisioned</code> (the backend creates the tenant service account), <code>credential</code> (MCP — no config; status is the licence principal), <code>human</code> (web — link to Roles &amp; permissions; no machine matrix).</li>
+</ol>
+<h3 id="3-authorization-matrix">3. Authorization matrix</h3>
+<p><code>channels.policy_get</code> → <code>{ channels: [ChannelPolicyChannel] }</code>, one card per <strong>machine</strong> kind (telegram, webhook, mcp; never web). Each card: <code>label</code>, <code>bound</code>, <code>bindings[]</code>, <code>identity</code>, <code>groups[]</code>; each group is <code>{resource, actions: [{action, default, allowed, overridden, grantable, denial}]}</code>.</p>
+<ul>
+<li>Render rows grouped by <code>resource</code>, sorted.</li>
+<li><code>allowed</code> drives the toggle; <code>default</code> gets a “default” chip; <code>overridden</code> gets “custom”.</li>
+<li><code>grantable: false</code> rows are disabled and show <code>denial</code> (“human sign-off”, “person-only”, “administration”, “workflow authoring”, “platform”).</li>
+<li>Save → <code>channels.policy_set {channel_kind, entries: [{action, allowed}]}</code> (send the complete override set for the card; omitted = compiled default). Reset → <code>channels.policy_reset {channel_kind}</code>. Render the response body; no optimistic state.</li>
+<li>Copy: “Telegram, webhook and MCP act as this tenant's machine identities. They can never sign off evals, read held-out traces, administer members/roles/invites/departments/channels/webhooks/secrets/licences, control board membership, or change these permissions.”</li>
+</ul>
+<h3 id="4-interaction-inbox--approval-detail">4. Interaction inbox / approval detail</h3>
+<ul>
+<li>The caller's own inbox is already <code>notifications.list</code> (one row per delivery, with <code>state</code> and <code>last_error</code>). Use it for the “my requests” view. <strong>The admin-wide dispatch ledger is not yet exposed as an action</strong> — an approval detail can say “offered to Telegram + web” only when the backend adds a read surface; do not invent one in the client. Flag it to this session as a follow-up if the screen needs it.</li>
+<li>Terminal delivery states to render: <code>delivered</code>, <code>failed</code>, and <strong><code>expired</code> with <code>last_error</code> starting <code>superseded: resolved via </code></strong> → “answered via <channel>”.</li>
+<li>Ordinary gates answer with <code>approvals.decide</code>; <strong>eval gates keep <code>eval_signoffs.decide</code></strong> (admin-only) and must not show a machine-channel answer control.</li>
+<li>Approval history: render <code>via.channel</code> and <code>via.sender_ref</code> (Telegram <code>tg:&lt;id&gt;</code>, webhook <code>mailto:…</code>) so a connector decision is attributable.</li>
+</ul>
+<h2 id="copypaste-action-inputs">Copy/paste action inputs</h2>
+<pre class="json"><code>channels.bind      {&quot;tenant_id&quot;:&quot;…&quot;,&quot;channel_kind&quot;:&quot;telegram&quot;,&quot;route_key&quot;:&quot;default&quot;,
+                    &quot;config&quot;:{&quot;chat_id&quot;:&quot;-100…&quot;,&quot;topic_id&quot;:null,
+                              &quot;bot_token_secret&quot;:&quot;telegram-token&quot;,
+                              &quot;incoming_secret&quot;:&quot;telegram-incoming&quot;}}
+channels.test      {&quot;binding_id&quot;:&quot;…&quot;}
+channels.policy_set{&quot;channel_kind&quot;:&quot;telegram&quot;,&quot;entries&quot;:[{&quot;action&quot;:&quot;cards.create&quot;,&quot;allowed&quot;:true}]}
+channels.policy_reset {&quot;channel_kind&quot;:&quot;telegram&quot;}</code></pre>
+<h2 id="states-to-handle">States to handle</h2>
+<ul>
+<li>403 for a non-admin (the nav item is hidden by <code>has_action</code>, but the route can be typed).</li>
+<li>Empty: “No connectors yet — add Telegram or a webhook.” Web and MCP cards still render.</li>
+<li>422 on bind: per-field <code>errors[]</code>, including <code>secret_not_found</code>.</li>
+<li>Test connection is asynchronous: the delivery is queued; poll the delivery row or show the id.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/handoffs/S12-connectors.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

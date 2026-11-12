@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S08 — Governance, modelling, render and export · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S08-governance-modelling.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s08--governance-modelling-render-and-export">S08 — Governance, modelling, render and export</h1>
+<p>Programme project: S08 · issues none yet</p>
+<!-- 2026-11-08: `project_capability`, `deliverable` and `register_item` were built by 0008 and DROPPED by
+migration 0011 — S00 day 2 measured zero usage (project_deliverables/project_milestones 0, pm_project_capabilities
+0, pm_resources/pm_risks/pm_benefits 0, and no matching operation in the 348 flows). Their 14 actions
+(`project_capabilities.*`, `deliverables.*`, `registers.*`) die with them. `project_stakeholder` STAYS (21 live
+rows). `tocs.*` (6), `toc_nodes.*` (4) and the `toc.changed` event also die — they are the API over S07's
+`outline`/`outline_node`. `programmes.*`, `stakeholders.*`, `portfolio.changed` and the whole modelling surface
+are untouched. -->
+
+<p><strong>Gate (SPEC §8 S8):</strong> golden SVG/PNG/PDF/XMI fixtures; Part A's round-trip is the governance floor.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>RM's governance surface lands on S03's spine — portfolio registers and TOC trees as actions over existing tables; its architecture surface on one flattened model shape for ArchiMate and UML. R1 closes by <strong>scoping</strong>: a curated profile validated against live RM data, fr's render map and n8n operations.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S03: <code>governed_asset</code>, <code>revision</code>, <code>catalogue_entry</code>, <code>trace_link</code>, <code>programme</code>, <code>project</code>; RLS + outbox.</li>
+<li>S07: <code>outline</code>/<code>outline_node</code> and the <code>principles.*</code>/<code>decisions.*</code> actions.</li>
+<li>S04: registry, invocation route, OpenAPI + MCP projection. S02: <code>job</code>, <code>event</code>, <code>audit_event</code>.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — the 11 tables of <code>02-DATA-ARCHITECTURE §2.8/§2.9</code>; Part A actions over them plus TOC and programmes; Part B profile, validation, render, XMI and four read-only computations.</p>
+<p><strong>OUT</strong> — UI (<strong>S12</strong>); model search (<strong>S07</strong>; model arm only if S0 proves use); project CRUD (<strong>S05</strong>); principle-conflict verdicts (<strong>S07</strong>); <code>architecture_containers</code> (<strong>dropped</strong> — it feeds fr's queue selector, replaced by S06's card-type×list); RM's change-set/review/publication split (<strong>dropped</strong>, §8.1); graph layout and OCL/Profile/SysML (<strong>out of v1</strong>).</p>
+<p><strong>UI surface declared for S12</strong>: <code>trace/architecture</code> — <code>model_views.get</code> + the rendered object, <code>models.traceability</code>/<code>trace_links.list</code>, <code>model_validation_run</code> findings, <code>tocs.graph</code>; SSE <code>model:{id}</code> on publish.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>02-source-map/30-rm-planka-mcp-n8n.md</code> §1 (RM local HEAD <code>9ee72ab4e178</code>, 5 behind <code>origin/main 191086942ce5</code> on 2026-11-07; re-check moved paths)</td>
+<td><code>architecture_*</code>, <code>modeling_*</code>, <code>uml_*</code>, <code>pm_*</code> routers</td>
+<td>element/relationship/view concepts, <code>registry.json</code></td>
+<td>five-table sprawl, containers, change sets</td>
+</tr>
+<tr>
+<td><code>requirements_management/src/data/archimate/3.2/registry.json</code></td>
+<td>kind codes, labels, edge hints</td>
+<td>labels/icons only</td>
+<td>as validation authority</td>
+</tr>
+<tr>
+<td>fr <code>library</code> screens — <code>fr@6f7c509 frontend/src/routes/(project)/projects/[id]/library/</code> (<code>architecture</code>, <code>pm</code>, <code>principles</code>, <code>decisions</code>, <code>requirements</code>, <code>workflows</code>)</td>
+<td>rendered element kinds</td>
+<td>render map as profile input</td>
+<td>fr's visual design</td>
+</tr>
+<tr>
+<td><code>40-live-state.md</code></td>
+<td>catalogue counts real; modelling counts unmeasured</td>
+<td>measure</td>
+<td>assumed model data</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<h3 id="51-part-a--ships-vs-reuses">5.1 Part A — ships vs reuses</h3>
+<table>
+<thead>
+<tr>
+<th>table</th>
+<th>owner</th>
+<th>S08 use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_stakeholder</code></td>
+<td><strong>S08 ships</strong></td>
+<td>stakeholders per project</td>
+</tr>
+<tr>
+<td><code>project_capability</code></td>
+<td><strong>S08 ships</strong></td>
+<td>capability coverage</td>
+</tr>
+<tr>
+<td><code>deliverable</code></td>
+<td><strong>S08 ships</strong></td>
+<td>deliverables + milestones, <code>kind_code</code> from <code>catalogue_entry</code></td>
+</tr>
+<tr>
+<td><code>register_item</code></td>
+<td><strong>S08 ships</strong></td>
+<td>one shape, <code>kind ∈ resource|risk|benefit</code></td>
+</tr>
+<tr>
+<td><code>programme</code></td>
+<td>S03</td>
+<td><code>programmes.*</code></td>
+</tr>
+<tr>
+<td><code>governed_asset</code> (<code>principle</code>,<code>adr</code>)</td>
+<td>S03</td>
+<td><strong>reused</strong>; S07 ships those actions</td>
+</tr>
+<tr>
+<td><code>outline</code> / <code>outline_node</code></td>
+<td><strong>S07</strong></td>
+<td><strong>reused</strong>; S08 ships TOC actions only</td>
+</tr>
+<tr>
+<td><code>catalogue_entry</code></td>
+<td>S03</td>
+<td>validates codes</td>
+</tr>
+<tr>
+<td><code>revision</code>, <code>trace_link</code></td>
+<td>S03</td>
+<td>model revisions; asset↔︎element traces</td>
+</tr>
+</tbody>
+</table>
+<p>The source map assigns <code>principles.py</code>/<code>decisions.py</code> to S08; S07 defines them, so S08 consumes (§9.4).</p>
+<h3 id="52-part-a-actions">5.2 Part A actions</h3>
+<table>
+<thead>
+<tr>
+<th>group</th>
+<th>actions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>programmes</td>
+<td><code>programmes.create/get/update/list</code> over S03's <code>programme</code></td>
+</tr>
+<tr>
+<td>stakeholders</td>
+<td><code>stakeholders.create/get/update/delete/list</code></td>
+</tr>
+<tr>
+<td>capabilities</td>
+<td><code>project_capabilities.create/update/delete/list</code></td>
+</tr>
+<tr>
+<td>deliverables</td>
+<td><code>deliverables.create/get/update/delete/list</code>; <code>kind_code</code> must resolve</td>
+</tr>
+<tr>
+<td>principles, ADRs</td>
+<td><strong>reused</strong> from S07: <code>principles.*</code>/<code>decisions.*</code> over <code>governed_asset</code>, kind fixed by declaration</td>
+</tr>
+<tr>
+<td>registers</td>
+<td><code>registers.create/get/update/delete/list</code>; <code>kind</code> required, kind fields in <code>meta</code></td>
+</tr>
+<tr>
+<td>TOC</td>
+<td><code>tocs.create/get/update/delete/list</code>, <code>tocs.graph</code>, <code>toc_nodes.create/update/move/delete</code></td>
+</tr>
+</tbody>
+</table>
+<p>Inputs are writable columns, never <code>tenant_id</code>; outputs the row + <code>etag</code>. <code>list</code> takes <code>{cursor,limit}</code>, <code>get</code> <code>{id}</code>, <code>move</code> <code>{id,parent_id,position}</code>.</p>
+<p>TOC: <code>outline.kind ∈ ('ltp','toc')</code>; <code>outline_node.edge_kind ∈ ('necessity','sufficiency','and','or', null)</code>. <code>toc_nodes.move</code> re-parents, re-positions and rejects cycles via a recursive ancestor walk in one transaction; <code>tocs.graph</code> returns the tree and a necessity/sufficiency roll-up. No new table or column.</p>
+<h3 id="53-part-b--seven-tables-28-verbatim">5.3 Part B — seven tables, §2.8 verbatim</h3>
+<table>
+<thead>
+<tr>
+<th>table</th>
+<th>key columns</th>
+<th>constraint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model</code></td>
+<td><code>language</code>, <code>language_version</code>, <code>title</code>, <code>head_revision</code>, <code>published_revision_id</code></td>
+<td><code>ix(tenant_id,project_id)</code></td>
+</tr>
+<tr>
+<td><code>model_element</code></td>
+<td><code>model_id</code>, <code>kind</code>, <code>name</code>, <code>documentation</code>, <code>parent_element_id</code>, <code>meta</code></td>
+<td><code>ix(tenant_id,model_id,kind)</code></td>
+</tr>
+<tr>
+<td><code>model_relationship</code></td>
+<td><code>model_id</code>, <code>kind</code>, <code>source_id</code>, <code>target_id</code>, <code>meta</code></td>
+<td><code>check(source_id&lt;&gt;target_id)</code></td>
+</tr>
+<tr>
+<td><code>model_view</code></td>
+<td><code>model_id</code>, <code>kind ∈ (diagram,archimate_view,uml_diagram)</code>, <code>name</code>, <code>meta</code></td>
+<td><code>ix(tenant_id,model_id)</code></td>
+</tr>
+<tr>
+<td><code>view_object</code></td>
+<td><code>view_id</code>, <code>element_id</code>, <code>parent_object_id</code>, <code>kind</code>, <code>bounds</code>, <code>style</code>, <code>label</code>, <code>position</code></td>
+<td><code>ix(tenant_id,view_id,position,id)</code></td>
+</tr>
+<tr>
+<td><code>view_connection</code></td>
+<td><code>view_id</code>, <code>relationship_id</code>, <code>source_object_id</code>, <code>target_object_id</code>, <code>bendpoints</code>, <code>style</code></td>
+<td><code>ix(tenant_id,view_id)</code></td>
+</tr>
+<tr>
+<td><code>model_validation_run</code></td>
+<td><code>model_id</code>, <code>revision_id</code>, <code>ruleset</code>, <code>ruleset_version</code>, <code>status</code>, <code>findings</code>, <code>content_hash</code></td>
+<td>retention 90 days</td>
+</tr>
+</tbody>
+</table>
+<p>All carry <code>tenant_id NOT NULL</code>, <code>FORCE</code> RLS, <code>created_at</code>/<code>updated_at</code>.</p>
+<h3 id="54-archimate-profile--conveyor-archimate-32-v1-30-element-kinds-11-relationship-kinds">5.4 ArchiMate profile — <code>conveyor-archimate-3.2-v1</code> (30 element kinds, 11 relationship kinds)</h3>
+<ul>
+<li><strong>Business (6):</strong> <code>business_actor</code>, <code>business_role</code>, <code>business_process</code>, <code>business_function</code>, <code>business_service</code>, <code>business_object</code></li>
+<li><strong>Application (4):</strong> <code>application_component</code>, <code>application_service</code>, <code>application_interface</code>, <code>data_object</code></li>
+<li><strong>Technology (4):</strong> <code>node</code>, <code>system_software</code>, <code>technology_service</code>, <code>artifact</code></li>
+<li><strong>Strategy (4):</strong> <code>resource</code>, <code>capability</code>, <code>course_of_action</code>, <code>value_stream</code></li>
+<li><strong>Motivation (7):</strong> <code>stakeholder</code>, <code>driver</code>, <code>assessment</code>, <code>goal</code>, <code>outcome</code>, <code>requirement</code>, <code>principle</code></li>
+<li><strong>Implementation &amp; Migration (3):</strong> <code>work_package</code>, <code>deliverable</code>, <code>gap</code></li>
+<li><strong>Composite (2):</strong> <code>grouping</code>, <code>location</code></li>
+<li><strong>Relationships (11):</strong> <code>composition</code>, <code>aggregation</code>, <code>assignment</code>, <code>realization</code>, <code>serving</code>, <code>access</code>, <code>influence</code>, <code>triggering</code>, <code>flow</code>, <code>specialization</code>, <code>association</code></li>
+</ul>
+<p><strong>OUT:</strong> physical layer (<code>equipment</code>, <code>facility</code>, <code>distribution_network</code>, <code>material</code>, <code>path</code>), collaborations, unused behaviour/event kinds (<code>business_interaction</code>, <code>application_process</code>, <code>technology_function</code>, <code>technology_interaction</code>, <code>communication_network</code>, …), <code>product</code>, <code>contract</code>, <code>representation</code>, <code>meaning</code>, <code>value</code>, <code>implementation_event</code>, <code>plateau</code>, junctions, and every 3.2 kind not listed.</p>
+<p><strong>Validated against three consumers</strong> — RM's live <code>architecture_elements</code>/<code>uml_elements</code> kinds, fr's kind→icon switch, n8n's <code>requirements</code> operations (actions, never elements). Every non-zero kind is in-profile or deferred; step 9 extracts, §7.2 tabulates.</p>
+<h3 id="55-uml-251-subset--conveyor-uml-251-v1-10-element-kinds-9-relationship-kinds">5.5 UML 2.5.1 subset — <code>conveyor-uml-2.5.1-v1</code> (10 element kinds, 9 relationship kinds)</h3>
+<ul>
+<li><strong>Elements:</strong> <code>class</code>, <code>interface</code>, <code>enumeration</code>, <code>datatype</code>, <code>package</code>, <code>component</code>, <code>object</code>, <code>actor</code>, <code>use_case</code>, <code>lifeline</code></li>
+<li><strong>Relationships:</strong> <code>association</code>, <code>aggregation</code>, <code>composition</code>, <code>generalization</code>, <code>realization</code>, <code>dependency</code>, <code>include</code>, <code>extend</code>, <code>message</code></li>
+<li><strong>Diagrams (5):</strong> class, package, component, use-case, sequence</li>
+</ul>
+<p><strong>OUT:</strong> activity/state-machine/deployment diagrams, combined fragments, multiplicity expressions, OCL, profiles/stereotypes beyond <code>meta.stereotype</code>.</p>
+<h3 id="56-rendering--as-built-2026-11-08">5.6 Rendering — as built (2026-11-08)</h3>
+<p>Revision + view → <code>crates/render</code> → <strong>SVG</strong>, then PNG and PDF from <em>that</em> SVG. <code>resvg 0.45.1</code> rasterises the <code>usvg</code> tree and <code>svg2pdf 0.13.0</code> converts the same tree, so all three formats are encodings of one parse and cannot disagree about the page. ⚠️ <strong>This replaces <code>typst</code></strong>, which was in this plan until B2: typst re-lays the page from different input (a second layout, and a class of bug no byte test can catch when the two paths never meet) and would have added ~130 crates to a workspace whose <code>target/</code> was already 24 GiB. XMI via <code>quick-xml</code>.</p>
+<p><strong>Determinism contract:</strong> fixed <code>(revision.content_hash, view.id, format, RENDERER_VERSION)</code> ⇒ byte-identical output, proved two ways — checked-in golden bytes, and rendering in <strong>two separate processes</strong> and comparing. SVG ids are <code>e-&lt;uuid&gt;</code> / <code>r-&lt;uuid&gt;</code> / <code>v-&lt;uuid&gt;</code> / <code>o-&lt;uuid&gt;</code> / <code>c-&lt;uuid&gt;</code> and markers <code>m-&lt;kind&gt;</code>, never counters or map order; collections sorted; no timestamp, hostname, path or hash iteration. The PDF carries no date and no file id (measured: <code>svg2pdf</code> writes exactly one document-info field, a constant <code>producer</code>).</p>
+<p><strong>Page:</strong> one view is one A4 landscape page — canvas <code>1122.52 × 793.70</code> px at 96 dpi. Those two decimals are load-bearing: it is <code>297 × 210 mm ÷ 25.4 × 96</code>, so the PDF page is exactly <code>841.89 × 595.28</code> pt (measured <code>MediaBox [0 0 841.89 595.275]</code>); rounding to 1123×794 makes the page 0.13 % oversize and a printer rescales. The diagram is fitted into a 24 px margin, centred, and never magnified above 1:1.</p>
+<p><strong>Fonts:</strong> the four DejaVu Sans 2.37 faces vendored at <code>crates/render/fonts/</code> (from RM's own vendored set) with <code>LICENSE</code> and <code>SHA256SUMS</code>, registered from <code>include_bytes!</code> into <code>usvg</code>'s <code>fontdb</code>. ⚠️ <strong>No mono face</strong> — the renderer draws labels and kind captions, never code, so <code>DejaVuSansMono.ttf</code> had no consumer. ⚠️ <strong>The original claim here — "<code>load_system_fonts()</code> does not exist" — is FALSE and is corrected:</strong> <code>fontdb</code>'s <code>fs</code> feature is enabled transitively by <code>svg2pdf</code>, so the function exists whatever this crate declares. Host fonts are kept out by two guards instead: <code>usvg</code>/<code>resvg</code> are pinned <code>default-features = false</code> (so usvg's <code>system-fonts</code> feature is off and the parser never scans the system itself), and a <strong>source-scan test</strong> in <code>crates/render/src/font.rs</code> fails if any production line calls <code>load_system_fonts</code> — the "CI grep" this section asked for, running in the gate. A second test asserts the database holds exactly the four vendored faces. A character outside the face's cmap is a refused render (<code>MissingGlyph</code>), never tofu.</p>
+<p><strong>Layout:</strong> authored geometry wins — a view's stored <code>view_object.bounds</code> and <code>view_connection.bendpoints</code> are drawn as stored, and a connector takes the <em>kind</em> of the relationship it names (so a composition gets its diamond). With no view (<code>view_id</code> absent) or a view with no objects, <code>crates/domain::model::layout</code> supplies kind-banded rows ordered by <code>(kind, id)</code> — not <code>(position, id)</code>, which this plan said and the model never had: <code>model_element</code> has no <code>position</code> column.</p>
+<h3 id="57-xmi">5.7 XMI</h3>
+<p>ArchiMate: Open Group 3.2 Model Exchange File Format subset over XMI 2.1. UML: XMI 2.5.1. Out-of-profile constructs increment <code>unsupported[]</code> and are skipped — never silently dropped, never fatal.</p>
+<p><strong>"Full conformance is infeasible" means:</strong> no MOF/EMOF completeness; no profile/stereotype definitions (UML Profiles, SysML, Archi specializations); no vendor extensions beyond <code>meta.archi</code>; no <code>Difference</code>/<code>Copy</code>/<code>Document</code> envelopes; no UML diagram interchange; unknown namespaces preserved as text.</p>
+<p><strong>Guarantees instead:</strong> (a) every in-profile element/relationship appears exactly once, with an XML id derived from its UUID — ⛔ <strong>prefixed, <code>e-&lt;uuid&gt;</code> / <code>r-&lt;uuid&gt;</code>, not the bare UUID this plan originally promised</strong>: an <code>xs:ID</code>/NCName may not start with a digit and a UUID usually does, so a bare one is not a legal XML id at all. RM's own exporters hit this and prefix (<code>_</code> in <code>tools/uml/xmi.py</code>, <code>id-</code> in <code>tools/architecture/exchange.py</code>); (b) re-import into a fresh model yields an identical canonical multiset of <code>(kind,name,documentation,parent-path)</code> and <code>(kind,source-path,target-path)</code> — ids are <em>not</em> part of the multiset, which is why a foreign id can be mapped without breaking the guarantee; (c) <strong>re-exporting what was imported is canonically equal to the first export</strong>, not byte-identical — ⚠️ this plan said "byte-identical" and that is unachievable: the store mints a fresh <code>uuidv7()</code> for every imported row (<code>NewElement</code> carries no id), so the <code>e-&lt;uuid&gt;</code> in the second export necessarily differs. Byte identity holds where it can: two exports of the <em>same</em> snapshot are identical; (d) <code>unsupported[]</code> is returned by the action and carried on the import's <code>model.created</code> event.</p>
+<p><strong>Ids on import.</strong> An id that strips to a UUID is preserved verbatim. Anything else — an Archi export writes <code>id-1a2b3c</code>, RM writes <code>_&lt;uuid&gt;</code> — is mapped through <code>Uuid::new_v5(CONVEYOR_XMI_NS, raw)</code>, so importing the same file twice yields the same ids <strong>within the document</strong> and a foreign document is importable at all. A duplicate id is refused (<code>422</code>); so is a <code>&lt;!DOCTYPE&gt;</code> (the parser never resolves an entity, and the document is untrusted input), a document over 1 MiB, and nesting deeper than 256.</p>
+<p><strong>What the codec deliberately does not carry</strong> (each is <em>reported</em>, never dropped in silence — measured against the pinned <code>archimate3_Model.xsd</code> and RM's own writers):</p>
+<table>
+<thead>
+<tr>
+<th>construct</th>
+<th>decision</th>
+<th>why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ArchiMate concept containment (<code>parent_element_id</code>)</td>
+<td>reported as <code>Unsupported{element}</code></td>
+<td><code>ElementType</code> extends <code>ConceptType</code> only — the 3.x exchange format has no nesting slot. RM reports the same loss as <code>CONCEPT-PARENT</code>. UML nests natively and round-trips.</td>
+</tr>
+<tr>
+<td>ArchiMate view kind other than <code>archimate_view</code></td>
+<td>exported as a diagram, kind change reported</td>
+<td>the format has one <code>Diagram</code> type</td>
+</tr>
+<tr>
+<td>UML diagrams</td>
+<td>carried in one <code>xmi:Extension extender="conveyor"</code></td>
+<td>no diagram interchange in this scope; bounds/label/position/bendpoints survive</td>
+</tr>
+<tr>
+<td><code>aggregation</code> / <code>composition</code> in UML</td>
+<td>both <code>uml:Association</code>, distinguished by <code>aggregation="shared"|"composite"</code> on the part end</td>
+<td>that is what UML means by them</td>
+</tr>
+<tr>
+<td><code>include</code> / <code>extend</code> / <code>message</code> in UML</td>
+<td>directed <code>packagedElement</code> with <code>client</code>/<code>supplier</code></td>
+<td>the model has no interaction layer; the kind stays in <code>xmi:type</code></td>
+</tr>
+<tr>
+<td>foreign constructs (<code>ownedAttribute</code>, <code>organizations</code>, …)</td>
+<td>ignored, not reported</td>
+<td><code>Unsupported.construct</code> is defined as element/relationship/view/object/connection only — a deliberate scope line</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ Two XML facts the implementation had to learn, recorded because both produced silent corruption first: <strong><code>quick-xml</code> 0.42 escapes attribute values itself</strong> (<code>Attribute::from</code> calls <code>escape_attribute</code>), so escaping by hand double-escapes (<code>&amp;amp;amp;</code>); and it emits <code>Event::GeneralRef</code> for entity references rather than folding them into <code>Text</code>, so an undefined entity must be refused explicitly. Also: matching attributes by local name is unsafe for UML — <code>xmi:type</code> and <code>type</code> both reduce to <code>type</code> on an <code>ownedEnd</code>; match the exact name first.</p>
+<h3 id="58-validation">5.8 Validation</h3>
+<p><code>models.validate</code> enqueues <code>job(kind='model.validate', dedupe_key='model:&lt;id&gt;:&lt;content_hash&gt;')</code> <strong>after commit</strong>; the job writes one <code>model_validation_run</code>. Checks: kind in-profile; relationship endpoints legal; parent/child legality; view connection's relationship exists; a <code>principle</code>/<code>requirement</code> element's <code>meta.governed_asset_id</code> resolves in-tenant with the same title. Findings: <code>[{code,severity,element_id?,relationship_id?,pointer,message}]</code>. Write-time: an out-of-profile <code>kind</code> is <code>422</code> problem+json, <code>type=/problems/model-profile-violation</code>, <code>errors[]</code> naming kind and profile version.</p>
+<h3 id="59-part-b-actions--35-all-on-28s-seven-tables-none-new">5.9 Part B actions — 35, all on §2.8's seven tables (none new)</h3>
+<table>
+<thead>
+<tr>
+<th>group</th>
+<th>actions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>models</td>
+<td><code>models.create/get/update/delete/list/publish/compare/validate/render/export_xmi/import_xmi</code></td>
+</tr>
+<tr>
+<td>elements</td>
+<td><code>model_elements.create/update/delete/list</code></td>
+</tr>
+<tr>
+<td>relationships</td>
+<td><code>model_relationships.create/update/delete/list</code></td>
+</tr>
+<tr>
+<td>views</td>
+<td><code>model_views.create/get/update/delete/list/generate</code></td>
+</tr>
+<tr>
+<td>view objects</td>
+<td><code>view_objects.create/update/delete</code></td>
+</tr>
+<tr>
+<td>view connections</td>
+<td><code>view_connections.create/update/delete</code></td>
+</tr>
+<tr>
+<td>read-only tools</td>
+<td><code>models.traceability</code>, <code>models.gaps</code>, <code>models.impact</code>, <code>models.completeness</code> — computations over <code>trace_link</code> + the model graph; no writes, no tables</td>
+</tr>
+</tbody>
+</table>
+<p>Part A is 33 + Part B 35 = the front-matter's 68; <code>import_xmi</code> creates a revision in one transaction.</p>
+<p><strong>As built (B2).</strong> The three exchange actions live in <code>crates/actions/src/model/exchange.rs</code> and reuse <code>model:read</code> / <code>model:write</code> — no new scope. Their payloads follow CONTRACT §6: <code>models.render</code> returns <code>content_b64</code> + <code>media_type</code> + <code>content_sha256</code> + <code>byte_len</code> (cap 8 MiB), <code>models.export_xmi</code> returns the <code>xml</code> text itself (cap 4 MiB), and <code>import_xmi</code> caps its input at <strong>1 MiB</strong> — the action request body is axum's 2 MiB default and JSON inflates, so a larger document would fail at the transport before reaching the codec. <code>import_xmi</code> writes a <strong>draft</strong> revision (<code>write_head_revision_tx</code>), never a published one: an import is not a publication, and publishing here would point <code>model.published_revision_id</code> at a graph nobody reviewed. (<code>models.compare</code> itself takes any two revision ids — it does not filter on status, so comparing the imported draft against the published revision is exactly how you see what the document would change.) <code>models.render</code> and <code>models.export_xmi</code> emit <code>model.exported</code>; <code>models.import_xmi</code> emits <code>model.created</code>.</p>
+<p><strong>Byte routes, not actions.</strong> <code>GET /api/models/{id}/render?view_id=&amp;format=</code> and <code>GET /api/models/{id}/xmi</code> serve the same bytes with the real media type and an <code>ETag</code> equal to their SHA-256. They exist because a browser <code>&lt;img&gt;</code>/download cannot POST an action or send a bearer header (the dev-auth cookie covers them) and they have no MCP projection. They call the same <code>conveyor_render</code> entry point, so a route and an action cannot disagree.</p>
+<h3 id="510-file-tree">5.10 File tree</h3>
+<pre><code>migrations/0008_s08_portfolio.sql · 0009_s08_models.sql · 0010_s08_retention.sql
+crates/domain/src/{portfolio,model,profile/{archimate,uml},validate}.rs
+crates/store/src/{portfolio,toc,model,view,validation,prune}.rs
+crates/actions/src/{portfolio,toc}/…, crates/actions/src/model/{models,elements,relationships,model_views,objects,connections,tools,exchange}.rs
+crates/render/src/{lib,ids,font,svg,png,pdf,xmi}.rs · crates/render/fonts/{4 faces,LICENSE,SHA256SUMS}
+crates/render/tests/{golden,xmi_roundtrip}.rs · crates/render/tests/fixtures/mod.rs
+crates/render/tests/golden/{a,b,c}/diagram.{svg,png,pdf} · crates/render/tests/golden/manifest.json
+crates/api/src/routes/models.rs (the two byte routes)
+crates/api/tests/{portfolio_roundtrip,toc_tree,model_profile,validation_job,architecture_tools,model_render}.rs</code></pre>
+<p>⚠️ Two deviations from the plan as written: the three exchange actions sit in <code>crates/actions/src/model/</code> (the crate's model family module, where the other 32 already are) rather than a top-level <code>exchange.rs</code>; and <code>crates/render</code> has <strong>no <code>layout.rs</code></strong> — <code>layout</code> lives in <code>crates/domain/src/model.rs</code> because <code>model_views.generate</code> needed it in B1, and the renderer draws what that function placed.</p>
+<h3 id="511-events">5.11 Events</h3>
+<p>Outbox rows, one per mutation, in its transaction (CONTRACT §7).</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>emitter</th>
+<th>payload keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>portfolio.changed</code></td>
+<td><code>programmes.*</code>, <code>stakeholders.*</code>, <code>project_capabilities.*</code>, <code>deliverables.*</code>, <code>registers.*</code></td>
+<td>entity, id, op</td>
+</tr>
+<tr>
+<td><code>toc.changed</code></td>
+<td><code>tocs.*</code>, <code>toc_nodes.*</code></td>
+<td>outline_id, node_id, op</td>
+</tr>
+<tr>
+<td><code>model.created</code></td>
+<td><code>models.create</code>, <code>models.import_xmi</code></td>
+<td>model_id, language</td>
+</tr>
+<tr>
+<td><code>model.published</code></td>
+<td><code>models.publish</code></td>
+<td>model_id, revision_id</td>
+</tr>
+<tr>
+<td><code>model.validated</code></td>
+<td><code>model.validate</code> job</td>
+<td>model_id, run_id, status</td>
+</tr>
+<tr>
+<td><code>model.exported</code></td>
+<td><code>models.render</code>, <code>models.export_xmi</code></td>
+<td>model_id, format</td>
+</tr>
+</tbody>
+</table>
+<h3 id="512-retention-producers-added-in-b2">5.12 Retention producers (added in B2)</h3>
+<p>§2.4's "model revisions keep the last 50" and §5.3's "<code>model_validation_run</code> kept 90 days" were rules with no producer — both tables grew without bound. B2 ships them as job kinds beside <code>event.prune</code>/<code>job.prune</code>: <code>model.prune</code> (<code>25 3 * * *</code>) and <code>validation.prune</code> (<code>35 3 * * *</code>), in <code>crates/store/src/prune.rs</code>, plus migration <code>0010</code> which re-creates <code>model_validation_run_revision_fk</code> as <code>ON DELETE SET NULL</code> — without it a revision prune fails the moment a validation run names a revision older than the 50th. <code>0009</code> is not edited: sqlx records a checksum per migration, so editing a shipped file breaks every migrated database.</p>
+<p>Three §6 rules elsewhere still have <strong>no producer</strong> (<code>action_invocation</code> 30 d, <code>run</code> + <code>run_step</code> 180 d, <code>delivery</code> 30 d) and are not S08's tables. They are named in <code>02-DATA-ARCHITECTURE §6</code> as the next maintenance lane — deliberately not absorbed here.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Preflight: <code>cargo test --workspace</code>; <code>docker compose up -d db</code>; <code>lsof -nP -iTCP:8930 -sTCP:LISTEN</code>; measure RM (<code>psql "$RM_READONLY_URL" -c "BEGIN READ ONLY; SELECT kind,count(*) FROM architecture_elements UNION ALL SELECT kind,count(*) FROM uml_elements GROUP BY 1; COMMIT;"</code>).</li>
+<li><code>0008_s08_portfolio.sql</code>: four tables, FKs, indexes, <code>FORCE</code> RLS; <code>cargo run -p conveyor-server -- migrate</code> twice (the binary re-applies the runtime grants; <code>sqlx migrate run</code> would not — CONTRACT §16).</li>
+<li>Domain + store: register <code>kind</code>, <code>kind_code</code> lookup; <code>cargo test -p conveyor-store portfolio</code>.</li>
+<li>Actions <code>programmes.*</code>, <code>stakeholders.*</code>, <code>project_capabilities.*</code>, <code>deliverables.*</code>, <code>registers.*</code>; <code>curl -s localhost:8930/api/actions | jq</code>.</li>
+<li>TOC actions on S07's tables: tree CRUD, move with cycle check, graph; <code>cargo test -p conveyor-api --test toc_tree</code>.</li>
+<li>Part A gate: scripted round-trip (S07 principle → ADR → TOC tree → register → deliverable → capability → stakeholder); assert <code>event</code> rows. <code>cargo test -p conveyor-api --test portfolio_roundtrip</code>.</li>
+<li><code>0009_s08_models.sql</code>: seven tables, indexes, RLS; migrate twice. <code>grep -c 'CREATE TABLE' migrations/0009_s08_models.sql</code> → 7.</li>
+<li><code>crates/domain/src/profile/</code>: const profiles + <code>validate::check</code>. <code>cargo test -p conveyor-domain profile</code>.</li>
+<li>Run the three consumer extracts; write §7.2; freeze <code>conveyor-archimate-3.2-v1</code>. <code>psql "$RM_READONLY_URL" -c "BEGIN READ ONLY; SELECT kind,count(*) FROM architecture_elements GROUP BY 1; COMMIT;" &gt; /tmp/rm-arch-kinds.tsv</code> (repeat for <code>uml_elements</code>; the fr library switch is the second extract).</li>
+<li>Model/element/relationship actions + write-time <code>422</code>; <code>cargo test -p conveyor-api --test model_profile</code>.</li>
+<li><code>models.publish</code> sets <code>revision.status='published'</code> + <code>published_revision_id</code> in one transaction; <code>models.compare</code>. <code>cargo test -p conveyor-api --test model_profile publish</code>.</li>
+<li>Views: <code>model_views.*</code>, <code>view_objects.*</code>, <code>view_connections.*</code>, <code>model_views.generate</code>; bounds parsed, never queried. <code>cargo test -p conveyor-api --test model_profile views</code>.</li>
+<li>SVG renderer, deterministic ids, embedded faces; model A renders. <code>cargo test -p conveyor-render --lib</code>. ⚠️ <strong>No <code>cargo insta</code></strong> — the goldens are checked-in bytes plus a SHA-256 manifest (see 14), because an <code>.snap</code> holding a binary document is unreadable in a diff and <code>insta accept</code> blesses changes nobody looked at.</li>
+<li>PNG and PDF from the same SVG; models A/B/C. First <code>GOLDEN_UPDATE=1 cargo test -p conveyor-render --test golden</code> to write <code>tests/golden/{a,b,c}/diagram.{svg,png,pdf}</code> + <code>manifest.json</code>, then the plain run asserts them.</li>
+<li>Byte-stability across <strong>processes</strong>: <code>GOLDEN_UPDATE=1 GOLDEN_DIR=/tmp/g1 …</code> and <code>…/tmp/g2 …</code> in two invocations, then <code>diff -r /tmp/g1 /tmp/g2</code> must be empty. Measured 2026-11-08: identical for all three formats, PDF included (<code>MediaBox [0 0 841.89 595.275]</code>, no <code>/CreationDate</code>).</li>
+<li>XMI export → import; <code>crates/render/tests/xmi_roundtrip.rs</code> asserts the canonical tuples, a byte-identical re-export, <code>unsupported[]</code>, and that DOCTYPE/duplicate ids are refused.</li>
+<li>Validation job post-commit; assert no run row inside a mutation transaction. <code>cargo test -p conveyor-api --test validation_job</code>. <em>(B1)</em></li>
+<li>Read-only tools; <code>cargo test -p conveyor-api --test architecture_tools</code>. <em>(B1)</em></li>
+<li>Retention: migration <code>0010</code>; <code>model_revision_prune</code>/<code>validation_run_prune</code>; worker arms; <code>DEFAULT_SCHEDULES</code> 8 → 10. <code>cargo test -p conveyor-server --test prune</code>; <code>cargo run -q -p conveyor-server -- migrate</code> twice.</li>
+<li>The three exchange actions + the two byte routes; regenerate <code>served-spec.lock.json</code> (<code>--print-openapi --write-lock</code>) — <strong>+5</strong> operations (3 POST action paths, 2 GET routes), 187 → 192. <code>cargo test -p conveyor-api --test model_render</code>.</li>
+<li>Gate, <code>cargo clippy --workspace --all-targets -- -D warnings</code>, <code>cargo fmt --check</code>; fill §7.2.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-api --test portfolio_roundtrip --test model_profile --test model_render
+cargo test -p conveyor-store --test s08_models --test s08_portfolio
+cargo test -p conveyor-render --test golden --test xmi_roundtrip
+cargo test -p conveyor-server --test prune
+# ⚠️ Corrected 2026-11-09: this block named three targets that do not exist — `toc_tree`, `validation_job`,
+# `architecture_tools`. The TOC round trip is inside `portfolio_roundtrip`; the model/architecture tools and the
+# validation job are `model_profile` (api) and `s08_models` (store); the portfolio aggregates are `s08_portfolio`.</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>Part A round-trip</td>
+<td>principle (S07) + ADR approved; TOC 5 nodes, subtree moved; register/deliverable/capability/stakeholder create→get→update→list; cross-tenant read 0</td>
+</tr>
+<tr>
+<td>b</td>
+<td>TOC legality</td>
+<td>cyclic move → <code>422</code>; <code>tocs.graph</code> edges equal stored <code>edge_kind</code></td>
+</tr>
+<tr>
+<td>c</td>
+<td>no double definition</td>
+<td><code>GET /api/actions</code> has no S08-owned <code>principles.*</code>/<code>decisions.*</code></td>
+</tr>
+<tr>
+<td>d</td>
+<td>golden fixtures</td>
+<td>3 models × SVG/PNG/PDF <strong>checked-in bytes + <code>manifest.json</code></strong> (not <code>insta</code>); rendering in two separate processes and <code>diff -r</code>-ing the trees is empty</td>
+</tr>
+<tr>
+<td>e</td>
+<td>profile rejection</td>
+<td>POST <code>model_elements{kind:"business_interaction"}</code> → <code>422</code>, problem+json names kind and profile version</td>
+</tr>
+<tr>
+<td>f</td>
+<td>XMI round-trip</td>
+<td>export A → import fresh → canonical multiset equal; re-export byte-identical; <code>unsupported[]=0</code> for A, non-empty for a document with an out-of-profile kind</td>
+</tr>
+<tr>
+<td>g</td>
+<td>validation post-commit</td>
+<td>dangling relationship → <code>status='findings'</code> naming its id; no run row inside the mutation tx</td>
+</tr>
+<tr>
+<td>h</td>
+<td>id determinism</td>
+<td>same view rendered after shuffled insertion order is byte-identical</td>
+</tr>
+<tr>
+<td>i</td>
+<td>retention (B2)</td>
+<td>51 revisions → 1 pruned, the published one survives; a 91-day-old validation run pruned, a 1-hour-old one not; the run survives with <code>revision_id IS NULL</code> when its revision is pruned</td>
+</tr>
+<tr>
+<td>j</td>
+<td>artefact parity (B2)</td>
+<td><code>models.render</code>'s base64 decodes to the bytes <code>GET …/render</code> returns, and their sha256 is the ETag</td>
+</tr>
+</tbody>
+</table>
+<p><strong>7.2 Completion record</strong> — filled 2026-11-08 (S08 Part B1). Every number below was measured; none is a planning estimate.</p>
+<table>
+<thead>
+<tr>
+<th>source</th>
+<th>kinds seen</th>
+<th>in profile</th>
+<th>deferred/dropped</th>
+<th>date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RM <code>architecture_elements</code>, <code>architecture_relationships</code>, <code>architecture_views</code>, <code>architecture_view_objects</code>, <code>architecture_view_connections</code></td>
+<td><strong>0 rows</strong> (<code>parity/evidence/rm-counts.tsv</code>)</td>
+<td>n/a</td>
+<td>n/a — nothing to defer</td>
+<td>2026-11-08</td>
+</tr>
+<tr>
+<td>RM <code>uml_elements</code>, <code>uml_relationships</code>, <code>modeling_*</code></td>
+<td><strong>0 rows</strong></td>
+<td>n/a</td>
+<td>n/a</td>
+<td>2026-11-08</td>
+</tr>
+<tr>
+<td>RM <code>archimate/3.2/registry.json</code> @ <code>9ee72ab</code></td>
+<td><strong>61 concepts / 11 relationships</strong></td>
+<td><strong>30 / 11</strong></td>
+<td><strong>31 concepts</strong>: physical 4, business 7, application 5, technology 9, motivation 3, implementation 2, other 1</td>
+<td>2026-11-08</td>
+</tr>
+<tr>
+<td>fr <code>lib/modeling/archimate.ts</code></td>
+<td>8 layers, <strong>11 relationship kinds</strong> (byte-identical to the registry's list)</td>
+<td>7 layers / 11 relationships</td>
+<td>the physical layer — 0 kinds in profile</td>
+<td>2026-11-08</td>
+</tr>
+<tr>
+<td>fr <code>lib/modeling/uml.ts</code> (<code>UML_KIND_LABEL</code>)</td>
+<td><strong>25 UML kinds</strong></td>
+<td><strong>10</strong></td>
+<td><strong>15</strong> — activity, state-machine and deployment constructs</td>
+<td>2026-11-08</td>
+</tr>
+<tr>
+<td>fr <code>lib/components/conformance/palette.ts</code></td>
+<td>2 element kinds (<code>application_component</code>, <code>artifact</code>)</td>
+<td>2</td>
+<td>none</td>
+<td>2026-11-08</td>
+</tr>
+<tr>
+<td>n8n <code>requirements</code> node operations (<code>parity/surfaces/n8n.txt</code>)</td>
+<td>66 operation lines</td>
+<td>n/a — actions, never elements</td>
+<td>the modelling operations land as <strong>actions</strong>, not model kinds</td>
+<td>2026-11-08</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Open question 1 closes on its own stated default.</strong> Every RM modelling table holds zero rows, so the profile was derived from the registry, fr's render map and the standard — not from live data. No live RM query was needed and none was run.</p>
+<p><strong>Open question 2 closes.</strong> fr renders architecture elements <strong>dynamically</strong> from <code>/api/assets/architecture/metamodel/concepts</code>; there is no kind→icon switch to extract (verified at both the current HEAD and the pinned SHA). The two static consumers are <code>archimate.ts</code> and <code>uml.ts</code>, both measured above. No fr kind falls outside the profile that is load-bearing there.</p>
+<p><strong>Frozen:</strong> <code>conveyor-archimate-3.2-v1</code> (30 element kinds + 11 relationship kinds) and <code>conveyor-uml-2.5.1-v1</code> (10 + 9, plus the five diagram kinds carried in <code>model_view.meta.diagram_kind</code>). Adding a kind later is a profile data change with a <code>ruleset_version</code> bump only when a rule's <em>meaning</em> changes.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>RM's table sprawl.</strong> <code>modeling_models</code>, <code>_model_revisions</code>, <code>_publications</code>, <code>_reviews</code>, <code>_change_sets</code>, <code>_validation_runs</code>, <code>_validation_findings</code>, <code>_trace_links</code> collapse to <code>model</code> + S03 <code>revision</code> + <code>model_validation_run(findings jsonb)</code> + S03 <code>trace_link</code>. Change set = one transaction; publication = <code>revision.status='published'</code>; review = S03 <code>approval</code>.</li>
+<li><strong><code>entity_version_history</code> has no <code>tenant_id</code>.</strong> Do not carry the table or its RLS carve-out; <code>revision</code> is tenant-scoped <code>NOT NULL</code>.</li>
+<li><strong>JSONB geometry, not hit-testing.</strong> <code>view_object.bounds</code> is allowed (§5: read whole with the view), but nothing may <code>WHERE bounds-&gt;&gt;…</code>; hit-testing, culling and overlap checks parse the rect in Rust. A measured hot predicate turns <code>bounds</code> into four generated numeric columns.</li>
+<li><strong>Fonts are a dependency.</strong> An empty container renders tofu and a base-image change silently changes every golden PNG. Vendor the faces, never call <code>load_system_fonts()</code>, fail on a missing glyph.</li>
+<li><strong>SVG ids must be deterministic.</strong> Map iteration or a counter renumbers per run and churns snapshots; ids derive from uuids, collections are ordered.</li>
+<li><strong>Validation inside the mutation transaction</strong> holds the model lock for a full graph check and could roll back a legal edit. Post-commit job keyed on <code>(model_id, content_hash)</code>.</li>
+<li><strong>Do not trust an XMI file.</strong> Disable DTD/external entities in <code>quick-xml</code>, cap size and depth; a duplicate <code>xmi:id</code> is <code>422</code>.</li>
+<li><strong>The registry is not the profile.</strong> <code>registry.json</code> says what ArchiMate permits; the profile says what this app accepts. Using the registry as validator makes the gate vacuous.</li>
+<li>⛔ <strong>An XML id may not start with a digit, and a UUID usually does.</strong> <code>xmi:id="&lt;uuid&gt;"</code> is not valid XMI — RM prefixes <code>_</code> and <code>id-</code> for exactly this reason. Every id is <code>e-</code>/<code>r-</code>/<code>v-</code>/<code>o-</code>/<code>c-</code> prefixed and stripped on import; a foreign id is mapped through UUID v5 so the file still imports deterministically.</li>
+<li>⛔ <strong>Deterministic bytes are not the same as a right picture.</strong> The first golden render was byte-stable and drew a view connection as a plain arrow because the renderer never resolved <code>relationship_id</code> to its kind. A golden test cannot catch that class of defect; only looking at the image (or asserting the marker) can. Assert the <em>semantics</em> you can — the composition marker, the two-layer colour, the connector's kind — not only the hash.</li>
+<li>⛔ <strong><code>svg2pdf</code> writes one document-info field and no date, but prove it.</strong> The determinism claim rests on <code>pdf.document_info(id).producer(TextStr("svg2pdf"))</code> being the only thing it sets — verified in 0.13.0's source, and measured by rendering in two processes. If it ever gains a timestamp, the PDF must become <em>normalised</em> in the contract; hand-editing PDF bytes is not an option, because changing them shifts every xref offset.</li>
+<li><strong><code>view_object.position</code> is <code>numeric → f64</code>.</strong> Sort by <code>(position, id)</code> and never print it into the document: a float's printed form would become part of the byte contract.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li><strong>One model shape, <code>language</code> discriminates</strong>; no per-language tables.</li>
+<li><strong>Profiles are curated and versioned</strong> — ArchiMate 30 + 11, UML 10 + 9 with five diagram kinds; <code>registry.json</code> supplies labels/icons/edge hints only.</li>
+<li><strong>Profile membership is decided by consumers</strong>: live RM data &gt; fr render map &gt; the standard.</li>
+<li><strong>Principles/ADRs stay S07's</strong>; S08 adds no action or table. A <code>principle</code>/<code>requirement</code> element carries <code>meta.governed_asset_id</code> — the asset owns the lifecycle, the element the drawing.</li>
+<li><strong>TOC tables stay S07's</strong>; S08 ships actions only.</li>
+<li><strong>Publication is a revision status</strong>; change sets are transactions; reviews reuse <code>approval</code>.</li>
+<li><strong>Rendering determinism is a contract</strong> keyed on <code>(content_hash, view, format, renderer_version)</code>.</li>
+<li><strong>XMI is profile-scoped with stated guarantees</strong>; unsupported constructs are reported, never a reason to widen the profile.</li>
+<li><strong>Portfolio registers are one table with <code>kind</code></strong>; deliverables and milestones one table with <code>kind_code</code>.</li>
+<li><strong><code>architecture_containers</code> is dropped</strong>; queue selection is S06's card-type×list.</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Are RM's <code>architecture_*</code>/<code>uml_*</code> tables non-empty?</td>
+<td>Measure at step 1; if empty, models are hand-authored; profile from fr's render map + registry</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Do fr's library screens render kinds beyond the profile? <code>UNVERIFIED</code></td>
+<td>Extract the switch at step 9; add the kind rather than render it nowhere</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Is a real graph layout needed?</td>
+<td>No — kind-banded deterministic rows</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Sequence-diagram fidelity</td>
+<td>Lifelines + ordered messages; combined fragments out</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ArchiMate XMI flavour</td>
+<td>Open Group 3.2 Exchange File Format; Archi 5.10 round-trip is a manual check</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S08-governance-modelling.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

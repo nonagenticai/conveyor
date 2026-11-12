@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>conveyor · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/README.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="conveyor">conveyor</h1>
+<p>The new conveyor: one Rust application (workspace in <code>crates/</code> and <code>apps/</code>), Postgres 18, Leptos web UI.</p>
+<ul>
+<li>Product spec: <code>docs/SPEC.md</code></li>
+<li>Plan index and slice statuses: <code>docs/plans/00-INDEX.md</code></li>
+<li>Delivery protocol: <code>docs/plans/03-DELIVERY.md</code></li>
+<li>Remaining-work audit: <code>docs/evidence/2026-11-10-plan-audit.md</code></li>
+</ul>
+<p>Work is claimed by a GitHub issue. The queue is <code>gh issue list --label unit --state open</code>; run the <code>issue-pickup</code> skill before creating a branch. One issue = one branch <code>issue/&lt;n&gt;-&lt;slug&gt;</code> = one PR.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>README.md</code> at build time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+# bug_analysis — find bugs and analyse their root cause (analysis capability).
+#
+# Content sources: seed/catalogue.json (the type's outputs and acceptance strings) and
+# n8n-designs/design/choices/v4/capabilities/analysis.yaml (bug_analysis text, phase `analysis`,
+# bug_analysis inspect.criteria). The card reports findings and creates no cards; the fixes are
+# planned from the report later (R150). Ladder: READY = readying + move; DOING/QA/DONE = four
+# agents (readying → doing → inspecting → releasing) + the move.
+card_type: bug_analysis
+capability: analysis
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: bug_analysis
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: bug_analysis.ready
+    title: Bug analysis — definition of ready
+    definition_of_ready: {checks: [scope_paths_exist]}
+    definition_of_done: {checks: [draft_artifact_id]}
+    acceptance_criteria:
+      - {name: scope_paths_exist, text: "Every path the card's title and description name exists in the workspace the container holds."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: bug_analysis.doing
+    title: Bug analysis — definition of doing
+    definition_of_ready: {checks: [scope_paths_exist]}
+    definition_of_done: {checks: [every_finding_cites_evidence, every_cited_location_exists]}
+    acceptance_criteria:
+      - {name: every_finding_cites_evidence, text: "Every finding names the tool run, failing test or code excerpt that shows the defect."}
+      - {name: every_cited_location_exists, text: "Every file, function and line span a finding cites exists in the workspace at the commit the card pins."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: bug_analysis.qa
+    title: Bug analysis — definition of QA
+    definition_of_ready: {checks: [every_cited_location_exists]}
+    definition_of_done: {checks: [every_confirmed_location_exists, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: every_confirmed_location_exists, text: "Every location of every confirmed finding still exists in the workspace when QA runs."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the bug_analysis card type carries is true of the report."}
+      - {name: findings_located, text: "Every confirmed finding names a file, a function (null at module level) and a line span."}
+      - {name: root_cause_explains_symptom, text: "Every confirmed finding's root cause is a cause in the code, not a restatement of its symptom."}
+      - {name: findings_in_card_scope, text: "Every finding lies inside the part of the repository the card's title and description name."}
+      - {name: no_style_only_findings, text: "No confirmed finding is a lint or style issue that does not change behaviour."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: bug_analysis.done
+    title: Bug analysis — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The published report is the version QA confirmed; no finding was edited after QA."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: bug_analysis.system
+    title: Bug analysis — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: bug_analysis.READY
+    list: ready
+    title: Bug analysis — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: bug_analysis
+        sop: bug_analysis.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: bug_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: bug_analysis.DOING
+    list: doing
+    title: Bug analysis — doing
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: bug_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: bug_analysis.QA
+    list: qa
+    title: Bug analysis — QA
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: bug_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: bug_analysis.DONE
+    list: done
+    title: Bug analysis — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: bug_analysis, sop: bug_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: bug_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

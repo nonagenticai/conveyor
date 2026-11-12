@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Conveyor studio — SPECV2 operating model · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="conveyor-studio--spec_v2-operating-model">Conveyor studio — SPEC_V2 operating model</h1>
+<p>Open <a href="https://github.com/nonagenticai/conveyor/blob/main/docs/design/studio.html">studio.html</a> directly in a browser. All assets and fonts are adjacent and local; no build, server or account is required. The pack is also published at <strong><a href="https://conveyor.nonagentic.ai/design/">https://conveyor.nonagentic.ai/design/</a></strong> from the conveyor app image (<code>/design</code> redirects to <code>/design/</code>); the browser-only path above remains the offline entry point.</p>
+<p>This revision aligns the studio design pack with <strong><code>docs/SPEC_V2.md</code></strong> (2026-11-11, draft for review). V1 (<code>docs/SPEC.md</code>) remains the build record and stays binding for the slices it defines. SPEC_V2 adds the organisation that works the conveyor and the work hierarchy that organisation needs; it states that no V2 code has been written. The studio therefore distinguishes three things on every screen:</p>
+<ul>
+<li><strong>V1 surfaces</strong> — implemented in the Rust app (projects, cards, runs, approvals, procedures, capabilities, knowledge/memory, evals, benchmarks, hillclimb, prompt audit, the ledger, secrets, channels, licences and billing). These carry no V2 badge and link to their existing pages.</li>
+<li><strong>V2 destinations</strong> — proposed aggregates and actions from SPEC_V2. Every new destination carries a <code>V2 · PROPOSED</code> ribbon naming the tables/actions it previews. There is no write path, no backend call and no claim that the aggregate exists.</li>
+<li><strong>Legacy study surfaces</strong> — the S12 surfaces V2 supersedes or reframes (the historical 92-entry job catalogue, the coding action catalogue, the TOC reasoning study). They remain reachable and are banner-labelled, never presented as the live model.</li>
+</ul>
+<h2 id="review-paths">Review paths</h2>
+<ol type="1">
+<li><strong>Portfolio → Plan.</strong> Open Portfolio: in-flight projects and programmes (a computed read model, no portfolio row), programme shared configuration, the typed project-dependency graph, the WSJF backlog, the PI cadence and per-project metering. Switch programme: the set re-scopes. Add a dependency that closes a cycle: it is refused. Open Plan: WBS, a frozen baseline against a computed forecast, the one six-kind register and controlled change. Approve a change without a rationale: <code>422 change_rationale_required</code>; with a rationale, a new baseline is drafted and existing run pins are unchanged.</li>
+<li><strong>Organisation → Jobs → binding → run.</strong> Open Jobs: the conveyor-owned catalogue (<code>job_key</code>, placement, anatomy), immutable releases and tenant-scoped bindings. Publish a draft release: a gate opens. Run against a stale release: <code>409 job_binding_stale</code> before any model call. Retire a binding: history keeps its pinned release. Open the Anatomy tab for the full release field set. The <code>Legacy import</code> tab explains why the 92 historical job seeds are import material, not the live model.</li>
+<li><strong>Decision ladder.</strong> Organisation → Approval policies: dual control refuses a self-approval. Decision ladder: L0 rule → L1 laya → L2 generation → L3 human; a generation result has no path to a state transition. Refinements &amp; laya config: a tenant refinement overrides a platform threshold or fail action, creates a new version and is itself a gated policy change; every decision row pins the policy, refinement and laya config versions it used.</li>
+<li><strong>Procedures → PKO → Authoring.</strong> Procedures: capability → procedure → step; SOP intake (single or batch), RDF/OWL/Turtle and BPMN/Visio/draw.io conversion, the PDDL action space, the relational PKO, knowledge-pack pairing and publish. An unreviewed SOP-derived procedure refuses publication; a PDDL step with an unknown PKO term refuses; a publish with an unpublished pack refuses <code>409 procedure_not_ready</code>. Authoring: a chat brief produces drafts only; a draft whose referenced asset is unpublished refuses <code>422 asset_dependency_unpublished</code>.</li>
+<li><strong>Run inspector and the tool estate.</strong> Execution room: the run pins its job binding and release hash, uses one of two executors (<code>procedure</code> or <code>internal_agent</code>), and the internal agent's prompt is compiled from four sources — knowledge, episodic memory, the PDDL request and the curated tool list. The Tools panel shows the tool version, credential alias and returned evidence; the call opens a <code>tool_call</code> row. Tools: toolkit versions, bindings and grants, effect ceilings, the call ledger, probes, BYO import, tool authoring, the MinIO adapter and credential profiles. A binding that tries to widen its grant gets <code>403 tool_effect_forbidden</code>; a failed probe unbinds new runs (<code>409 tool_not_ready</code>) while in-flight runs finish.</li>
+<li><strong>Improve.</strong> Coach: one interruption becomes exactly one coach card over the closed triage and remedy sets; a repeat signature escalates to a human. Kata queue: a kata without an instrument and success threshold is not opened; the six Gets steer the work; the kata is its own tenant. Lessons: promotion needs ≥ 2 independent evidence references and a person's review; one reference refuses. Adoption: the kata proposes, a person adopts; a training-only or regressed gain is reverted.</li>
+<li><strong>Operations.</strong> Incidents: an incident card with service, severity, detection/mitigation/ resolution and an evidence link. Runbooks: read verbs first; a destructive write needs a dry-run, the tenant's configured approvals (default human dual control) and a read-back. Executing without approval is refused. Postmortems are governed assets; a systemic finding becomes a kata candidate. The andon cord stops new runs, keeps the record and is released only by a person.</li>
+<li><strong>Measure and the retained knowledge path.</strong> The S17–S21 instruments remain: evaluation studio, benchmark harness, hillclimb lab and inference/prompt audit. Metering adds the tenant, department, programme, project, job, run, step and call levels with one derivation and billing reconciliation. The knowledge design, sources &amp; retrieval and memory explorer path is retained; procedural knowledge now pins the PKO release and organisational memory adds reviewed lessons.</li>
+<li><strong>Knowledge and memory workbench.</strong> Knowledge design: switch to Effective configuration, resolve a <code>department_conflict</code> at the job layer, compare Current/Draft and inspect the dependent jobs. Sources &amp; retrieval: inspect the original beside an extracted passage, see the seven distinct states and quality signals, run a retrieval test with expected evidence and save a missed case for review. Memory: inspect a claim, open Current/History/Derivation, correct by adding a successor, exclude from recall and rebuild the digest from a dry-run diff. Procedures: open a PKO term, follow its usage to procedure steps and refuse an invalid relation. Execution: open Explain context and see what was selected, excluded or truncated, with the reason and hash — never the compiled prompt text. Evals: compare memory disabled/current/candidate and replay with a time cutoff. Review &amp; release: the queue shows the reviewer, evidence and gate; nothing publishes itself.</li>
+</ol>
+<h2 id="operating-model--the-organisation-spine">Operating model — the organisation spine</h2>
+<p><strong>Industry → ordered department(s) → job</strong>, with an optional region sub-layer. A job sits in exactly one industry and one or more departments of that industry, primary first; a department from another industry is <code>422 department_industry_mismatch</code>. Knowledge compiles <strong>base → industry → department archetype → each department in declared order (with its region) → job</strong>. A sibling department that sets one key to a different value is a <code>department_conflict</code> compile error, resolved only by a job-layer row.</p>
+<p>The studio's first tenant is <code>nonagentic</code>, the first industry <code>software</code>, and the first department set is a real IT department — delivery, verification, operations, project office and improvement. AHTAPol (industry <code>health-technology-assessment</code>) and w2v (industry <code>media</code>) are separate tenants from the same model (D60).</p>
+<p>A job is <strong>configuration, not a loop</strong>. Its release carries:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+<th>Author</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>job_key</code></td>
+<td>stable position key, e.g. <code>software.delivery.backend_engineer</code></td>
+<td>conveyor (<code>job_catalogue</code>)</td>
+</tr>
+<tr>
+<td>placement</td>
+<td>industry, ordered departments, optional region</td>
+<td>conveyor (<code>job_catalogue</code>)</td>
+</tr>
+<tr>
+<td>charter</td>
+<td>purpose, outcomes, non-goals, escalation path</td>
+<td>conveyor (release instruction)</td>
+</tr>
+<tr>
+<td>capability binding</td>
+<td>one or more capabilities</td>
+<td>conveyor (<code>job_binding</code>)</td>
+</tr>
+<tr>
+<td><code>procedure_ref</code></td>
+<td>published procedure version(s), each pinning its PKO release</td>
+<td>conveyor (<code>procedure</code>)</td>
+</tr>
+<tr>
+<td>executor</td>
+<td><code>procedure | internal_agent</code> (D46)</td>
+<td>conveyor (<code>job_binding</code>)</td>
+</tr>
+<tr>
+<td><code>model_ref</code>, <code>params</code></td>
+<td>inference-router model and parameters</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td><code>prompt_recipe</code></td>
+<td>compiled-prompt recipe (<code>prompt_ref@version</code>)</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>knowledge pins</td>
+<td>layer kind pins + <code>capability</code> pack versions</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>memory policy</td>
+<td>recall scope, hot/cold, write rules</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>tool grants</td>
+<td>operation allowlist and per-call tool gate</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>tool binding</td>
+<td>pinned toolkit versions, effect ceiling, credential alias</td>
+<td>conveyor (<code>tool_binding</code>)</td>
+</tr>
+<tr>
+<td>decision options</td>
+<td>laya option sets and policies</td>
+<td>conveyor (<code>decision_*</code>)</td>
+</tr>
+<tr>
+<td>limits</td>
+<td>max iterations, timeout, token and cost budget</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>gates</td>
+<td>required approvals, dual control, evidence requirements</td>
+<td>conveyor (binding + tenant policy)</td>
+</tr>
+<tr>
+<td>authority</td>
+<td>what the job may do without a gate</td>
+<td>conveyor binding</td>
+</tr>
+<tr>
+<td>metrics</td>
+<td>computed from execution, never stored as opinion</td>
+<td>conveyor (read model)</td>
+</tr>
+</tbody>
+</table>
+<p>A <strong>release is immutable</strong> and pinned by a content hash. A <strong>binding</strong> is tenant-scoped and pins one immutable release (<code>release_hash</code> + frozen <code>release_snapshot</code> JSONB), the capability, the procedure or capability agent, and the executor kind. A release change is a new binding and a gate, never a silent update. A run against a retired binding, or a release that is not the binding's pin, is refused <code>409 job_binding_stale</code> before any model call. The check is internal — no catalogue call and no caller-declared hash.</p>
+<p><strong>Two executor kinds only (D46):</strong></p>
+<ul>
+<li><code>procedure</code> — a deterministic sequence of steps; each step is an action (PDDL), a tool call or a gate.</li>
+<li><code>internal_agent</code> — a step that needs generation over a compiled prompt. The prompt is assembled at run time from knowledge, episodic memory, the PDDL request and the curated tool list.</li>
+</ul>
+<p>There is no external executor. The agent platform is a user-interaction front end over MCP, not a runtime for conveyor jobs (D33). MCP and Telegram are channels, not executors.</p>
+<p><strong>Scale is a catalogue property.</strong> A thousand jobs is a thousand catalogue rows and bindings, not a thousand processes (D39). The catalogue is searchable by code/capability/department and paginated; a tenant activates the subset it needs.</p>
+<h2 id="work-model--portfolio-programme-project-plan">Work model — portfolio, programme, project, plan</h2>
+<p><strong>Tenant → portfolio (computed) / programme (shared config + dependency graph) → project → WBS / deliverable → work package (card) → run → step / attempt.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Meaning</th>
+<th>State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Portfolio</td>
+<td>every project and programme in flight for the tenant — a computed view, never a row</td>
+<td>none (read model)</td>
+</tr>
+<tr>
+<td>Programme</td>
+<td>a set of projects with shared configuration and project-level dependencies; carries the budget and cadence</td>
+<td><code>active | paused | closed</code></td>
+</tr>
+<tr>
+<td>Project</td>
+<td>a temporary endeavour with a charter and a baseline</td>
+<td><code>draft | active | paused | closed | archived</code></td>
+</tr>
+<tr>
+<td>WBS node</td>
+<td>phase, deliverable, work package or milestone</td>
+<td>open → accepted / cancelled</td>
+</tr>
+<tr>
+<td>Work package</td>
+<td>the card: one assignment, one owner, one list</td>
+<td>list + <code>archived_at</code></td>
+</tr>
+<tr>
+<td>Run</td>
+<td>one execution attempt</td>
+<td><code>queued → running → waiting_approval → running → succeeded | failed | cancelled</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Portfolio membership is derived</strong> from the tenant's configured in-flight statuses (default active and paused); closed and archived work is history.</li>
+<li><strong>Programme shared config</strong> (knowledge pins and packs, default job families, approval-policy defaults, budget envelope, cadence) is inherited by its projects. A project overrides a key only when the programme does not lock it; the lock set is tenant policy.</li>
+<li><strong>Project dependencies are edges</strong>: <code>project_dependency(from, to, kind ∈ blocks | needs | supersedes | informs, status)</code>, inside or across programmes. A cycle is refused at creation.</li>
+<li><strong>Project types select templates, gates and job families</strong>: delivery (PMP phases), architecture (TOGAF ADM A–H), improvement (kata six Gets), development (self-development path), operations (detect → triage → mitigate → resolve → postmortem) and setup/authoring.</li>
+<li><strong>Plan ≠ state ≠ execution.</strong> A card can move without answering its approval; a completed run does not close a project. A baseline is a frozen approved snapshot; a forecast is computed from current rows. Plan ≠ evidence: a WBS node is accepted only when its criteria are met by an artefact or run.</li>
+<li><strong>One generic register</strong> replaces five PM tables: <code>project_register_item(kind ∈ risk | issue | assumption | dependency | benefit | change)</code>. A change request carries a scope/schedule/cost/risk impact block and records the person's rationale; existing runs keep their pins.</li>
+<li><strong>Cadence</strong> is a <code>programme_cadence</code> row: PI planning materialises draft cards from the backlog by WSJF within WIP limits; a person approves the plan. The system demo requires every completed deliverable to exhibit evidence; inspect &amp; adapt produces lessons and kata candidates. <strong>WSJF is arithmetic</strong>: <code>(business_value + time_criticality + risk_reduction) / job_size</code>, four typed integer inputs; the score is computed, never stored.</li>
+<li><strong>Gates are approvals.</strong> A gate names its required decisions, approver kinds, evidence refs and expiry. Dual control is <code>required_decisions ≥ 2</code> with distinct approvers; the executor, assignee or requester cannot approve the gate that judges their work. A gate with no evidence is refused unless an override is recorded and counted. A gate that never refuses anything in a full programme cycle is flagged as broken, not healthy.</li>
+</ul>
+<h2 id="roles--meta-jobs-as-ordinary-jobs">Roles — meta-jobs as ordinary jobs</h2>
+<p>PM, kanban coach, kata facilitator, development projects and operations are <code>job_key</code>s using the same card, run, approval and event primitives. The authority matrix is data (<code>tenant_role_scope</code> plus the binding's <code>authority</code>), not branches in code.</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Charter</th>
+<th>Never</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PM</strong></td>
+<td>request → governed project; charter, WBS, baseline, staffing, gate routing, closure</td>
+<td>approve its own gates; change an approved baseline without a change request; do delivery work</td>
+</tr>
+<tr>
+<td><strong>Kanban coach</strong></td>
+<td>protect flow; one interruption = one coach card; closed triage/remedy sets</td>
+<td>do the work it unblocks; open a coach card about a coach card; retry the same signature beyond the policy cap</td>
+</tr>
+<tr>
+<td><strong>Kata</strong></td>
+<td>improve a named part of the system; prove it with an instrument; hand adoption to a person</td>
+<td>edit the instrument that judges it; approve its own adoption; measure on the training split only</td>
+</tr>
+<tr>
+<td><strong>Development</strong></td>
+<td>change the conveyor or a dependency repo through lane/PR/CI/review/merge/deploy/verify</td>
+<td>modify its own gates, approval policy or the instrument that measures it; force-push; merge red CI</td>
+</tr>
+<tr>
+<td><strong>Operations</strong></td>
+<td>detect, triage, mitigate, resolve and learn from incidents</td>
+<td>use cluster-admin; act without a card; perform a destructive action without the configured approvals</td>
+</tr>
+</tbody>
+</table>
+<p>Handoffs are cards, not messages. A question is an approval. Memory is written at handoff so a job does not depend on a conversation transcript. Escalation is bounded: card → parent WBS owner → PM → programme; the coach can escalate to a human at any point. The <strong>kata is its own tenant</strong> (D45), so its autonomy policy never inherits the target tenant's.</p>
+<h2 id="decision-ladder--rule--laya--generation--human">Decision ladder — rule → laya → generation → human</h2>
+<table>
+<thead>
+<tr>
+<th>Rung</th>
+<th>Mechanism</th>
+<th>Used for</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L0 Rule</strong></td>
+<td>deterministic Rust over typed facts</td>
+<td>state transitions, WIP limits, WSJF arithmetic, thresholds, policy checks, acceptance</td>
+<td>the row + <code>action_invocation</code></td>
+</tr>
+<tr>
+<td><strong>L1 System-1 (laya)</strong></td>
+<td>calibrated choice/score/noul over a finite option set</td>
+<td>triage, routing, job/capability selection, remedy, severity, priority band, gate pre-check</td>
+<td><code>decision</code> row with the answer, probabilities where the type provides them, and confidence</td>
+</tr>
+<tr>
+<td><strong>L2 Generation (LLM)</strong></td>
+<td>text/code/plan/report synthesis</td>
+<td>drafts, answers, patches, narratives, candidate procedures/prompts</td>
+<td><code>inference_call</code> + a draft artefact</td>
+</tr>
+<tr>
+<td><strong>L3 Human</strong></td>
+<td>approval</td>
+<td>every gate, override and irreversible action</td>
+<td><code>approval</code> + <code>approval_decision</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>The hard rule:</strong> L2 has no path to a state transition. A generated output is a draft artefact; applying it is an action, and the action's gate is L1/L3. The Rust type system enforces this; a prose recommendation from an LLM is displayed but never consumed by the engine.</p>
+<ul>
+<li><strong>Options are rows</strong> (<code>decision_option</code>), authored and versioned. <strong>Questions are rows</strong> (<code>decision_policy</code>) with <code>fire_when</code>, <code>min_confidence</code>, <code>fail_policy ∈ closed | open</code> and <code>action ∈ handover | block | annotate</code>. Safety gates fail closed; routing/quality gates fail open to a human or a note.</li>
+<li><strong>Configuration is per tenant, per case (D51).</strong> A platform <code>decision_policy</code> defines the case; a tenant's <code>decision_policy_refinement</code> overrides the threshold or rule, the fail action and, optionally, the laya inference config. Refinements are versioned and gated.</li>
+<li><strong>Laya inference is tenant-scoped.</strong> <code>laya_inference_config</code> pins model, params and timeout per tenant. Every decision records the policy, refinement and laya config versions it used, plus latency and input hash. Below threshold is an outcome — escalate or refuse per policy, never an error and never a silent pass. <code>Unavailable</code> is <code>gate_unavailable</code> and follows the fail policy.</li>
+<li><strong>Generation</strong> is an <code>inference_call</code> bound to a draft artefact with prompt identity, model, usage, derived cost and source trust order. Forbidden: tool selection, routing, state transitions, gate decisions, scoring a submission, approving.</li>
+<li><strong>Budgets</strong> are declared per run and job; exceeding one is <code>429 budget_exceeded</code> before the next call, never a silent truncation. Cost is derived at read time from the ledger.</li>
+</ul>
+<h2 id="procedures-sop-and-the-pko">Procedures, SOP and the PKO</h2>
+<p>A <strong>procedure</strong> is executable documentation: an ordered sequence of steps, each an action (PDDL), a tool call or a gate. Procedure design and management is first-class (D47).</p>
+<ul>
+<li><strong>SOP intake</strong> — a tenant supplies PDF, URL or another document, singly or as a batch. A customer document is untrusted input: it enters as <code>governed_asset(kind='sop_source')</code> with provenance, never as instructions to the system.</li>
+<li><strong>Conversion</strong> — the intake job harvests and curates the domain knowledge the SOP implies, then converts it into procedural knowledge (<strong>PKO</strong>) and a procedure draft whose steps are PDDL.</li>
+<li><strong>Two spaces, never mixed (D53).</strong> The action space is the PDDL step — actions with preconditions and effects over typed facts. The procedural knowledge space is the PKO — tasks, steps, roles, artefacts and constraints. A step references PKO terms; a PKO entity never contains an executable step.</li>
+<li><strong>PKO storage</strong> — relational, conveyor-owned and tenant-editable: an immutable <code>pko_release</code> pins <code>pko_entity</code> and <code>pko_relation</code> rows, layered base → industry → department → job. RDF/OWL/Turtle documents are ingest material converted into draft rows; the conveyor runs no RDF store and no reasoner.</li>
+<li><strong>Process documents</strong> — BPMN 2.0 XML, Visio and draw.io exports ingest on the same path: activities → steps, gateways → gates, plus PKO rows.</li>
+<li><strong>Knowledge pairing</strong> — the harvested domain knowledge is a pinned knowledge pack in <code>strata_rag</code>, paired with the procedural knowledge; the procedure release names both. Readiness blocks a run before the first step.</li>
+<li><strong>Gates</strong> — every SOP-derived artefact is a draft behind a review gate (default human). A batch never publishes itself, and no SOP can grant a tool or widen an effect ceiling.</li>
+</ul>
+<p><strong>Tenant asset authoring (D55).</strong> The same intake pipeline drafts every tenant asset from chat input and documents: organisation, jobs, capabilities, procedures, PKO, knowledge packs, project templates, policies and tool requests. Every output is a draft behind a review gate; the asset order is dependency-ordered (industry → department → job/capability → procedure/PKO → knowledge pack → policies/templates → tools); a draft whose referenced asset is unpublished is refused; a chat message or document can never grant a tool, widen an effect ceiling or change an approval policy. The authoring job family is ordinary jobs on the two executors; the pipeline is a procedure, not a hard-coded wizard.</p>
+<h2 id="tool-estate">Tool estate</h2>
+<p>A job is only as capable as what it may call. Every cluster service that offers a typed operation is a <strong>tool</strong>; tools are published in immutable <strong>toolkit</strong> versions; a job's access is a <strong>binding</strong> with an effect ceiling; every call is a <strong>ledgered row</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+<th>Not to be confused with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tool</strong></td>
+<td>one callable operation <code>&lt;service&gt;.&lt;operation&gt;</code>: closed input schema, output schema, effect class, idempotency, timeout, redaction, destination alias</td>
+<td>a conveyor action</td>
+</tr>
+<tr>
+<td><strong>Toolkit</strong></td>
+<td>an immutable, versioned bundle of one service's tools + auth adapter + licence app + destination</td>
+<td>a repo, a package</td>
+</tr>
+<tr>
+<td><strong>Tool binding</strong></td>
+<td>tenant-scoped grant of pinned toolkit versions to a job binding or run, narrowed by effect ceiling, rate and credential alias</td>
+<td>the release's tool grant</td>
+</tr>
+<tr>
+<td><strong>Tool grant</strong></td>
+<td>the release's operation allowlist and per-call tool gate</td>
+<td>the binding (existence + credential)</td>
+</tr>
+<tr>
+<td><strong>Tool call</strong></td>
+<td>one audited invocation: run/step, tool version, input hash, status, latency, bytes, cost</td>
+<td><code>action_invocation</code></td>
+</tr>
+</tbody>
+</table>
+<p>The measured estate includes the coding fleet, <code>strata_rag</code>, <code>strata_ingest</code>, <code>webscraper</code>, <code>media_discovery</code>, <code>scientific_processor</code>, <code>lean4_prover</code>, <code>evidence_review</code>, the w2v orchestrator and stage fleet, <code>video-compiler</code>, the ops read/write verbs, <code>billing_service</code>/<code>licenses</code>, the AHTAPol <code>discovery</code> draft and the planned AHTAPol services. Planned tools enter as <code>draft</code> and cannot be called until their slice deploys them and a probe passes. n8n, the <code>fr</code>/RM backends, Planka, Keycloak, the agent platform, <code>care-bus</code>, <code>inference-router</code>/laya/modality-gateway, <code>provisioning</code>, <code>artifact_service</code>/<code>storage-api</code> and the <code>mcp</code> deployments are deliberately not job tools.</p>
+<p><strong>The broker is the one call path</strong> (<code>tools.call</code>): resolve the binding and pinned version → check the effect ceiling and spend → validate the closed input schema → resolve the sealed credential by alias → call the registered destination alias (no caller-supplied URL) → normalise and redact into <code>{status, data, checks[], next[]}</code> → record one <code>tool_call</code> row and one <code>tool.called</code> event. A missing binding or version is <code>409 tool_not_ready</code>; an effect breach is <code>403 tool_effect_forbidden</code>; an invalid input is <code>422 tool_input_invalid</code>; an exhausted budget is <code>429 tool_budget_exceeded</code>. Writes return read-back <code>checks[]</code> and take an idempotency key; a write with no verification path cannot be published.</p>
+<p><strong>Effect classes</strong> are read / write / destructive / spend. A binding narrows only; a job may lower its effect class at run time, never raise it. Destructive calls need a dry-run and the tenant's configured approvals (default human dual control) in every environment. Spend calls need a budget.</p>
+<p><strong>BYO tools (D42)</strong> are OpenAPI 3.1 toolkits and remote MCP servers. Never uploaded code, arbitrary container images, caller-supplied URLs at call time, or a tenant credential in a prompt. The conveyor never executes tenant code; a tenant that needs executable logic runs its own service and registers it. Promotion to the platform catalogue is a development project with a platform review, never an admin toggle.</p>
+<p><strong>Tool authoring</strong> has three governed paths: spec → toolkit, service → toolkit, and a missing operation → tool-request card. Draft → validation (schema, effect, egress, credential scope) → security review → <code>tools.publish</code> (immutable version) → binding. The tool that publishes a tool is itself a tool and cannot widen its own effect ceiling.</p>
+<p><strong>Probes and retirement:</strong> every published tool has a read-only <code>tools.probe</code>; a probe failure unbinds new runs while in-flight runs finish. A tool with zero calls over one programme cycle is flagged and retired. A schema-drift signature opens a kata.</p>
+<p><strong>Storage (D57):</strong> the conveyor writes and reads its own bytes directly to the shared platform MinIO with a mandatory tenant prefix, server-side encryption, a content hash per object, a size cap and sealed credential profiles. <code>artifact_service</code> and <code>storage-api</code> are not conveyor dependencies; a job never sees an S3 key.</p>
+<p><strong>Relationship to <code>nonagenticai_mcp_server</code> (D44, D59):</strong> concepts borrowed, dependency refused. The conveyor implements its own registry, broker, credential injection and call ledger. The agent platform keeps its own gateway; there is no planned convergence and the conveyor broker is not exposed to the agent.</p>
+<h2 id="executable-rigour--togaf-safe-pmp">Executable rigour — TOGAF, SAFe, PMP</h2>
+<p>The rigour is rows and gates, not a document library.</p>
+<ul>
+<li><strong>TOGAF ADM as an architecture project type:</strong> phases A–H as WBS nodes, each with required artefacts and a contract gate; requirements management is continuous, linked by <code>trace_link</code>.</li>
+<li><strong>SAFe as the programme cadence:</strong> portfolio (computed), programme/ART with shared config and a dependency graph, PI planning, backlog refinement, system demo (no demo, no credit), inspect &amp; adapt, lean governance at value boundaries.</li>
+<li><strong>PMP artefacts as typed rows:</strong> charter (<code>governed_asset</code>), WBS (<code>wbs_node</code>), baseline (<code>project_baseline</code>), the one six-kind register, change control with impact analysis, closure.</li>
+<li><strong>The trace chain:</strong> requirement/principle/ADR → architecture contract → charter → WBS deliverable → work package → run → step → artefact/evidence → acceptance → closure. The governance screen answers one question end to end: which requirement does this run prove, and where is the evidence?</li>
+<li><strong>What is not claimed:</strong> no TOGAF certification, no SAFe compliance badge, no PMP certification, no full ADM conformance, no portfolio optimiser, no schedule solver. The claim is that the artefacts and gates the organisation uses are rows, the process runs, and the evidence is traceable.</li>
+</ul>
+<p>The earlier <strong>TOC study</strong> remains in the studio as an optional constraint-reasoning view. It is not part of SPEC_V2's method: V2's method is SAFe/PMP/TOGAF plus the coach's closed triage and remedy sets. The TOC bars, float and buffer figures are illustrative; no scheduling solver runs.</p>
+<h2 id="knowledge-and-memory-workbench">Knowledge and memory workbench</h2>
+<p>Knowledge management is not a document library and memory is not a transcript. The workbench lets a tenant <strong>inspect → explain → test → revise → review → release</strong>, and answers four questions for every job, work package and run:</p>
+<ul>
+<li>What does this job know, and where did that knowledge come from?</li>
+<li>What does it remember, and which parts are observations, claims or verified conclusions?</li>
+<li>Why did a particular run receive — or exclude — this information?</li>
+<li>Would a proposed change improve results, and what could it regress?</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Knowledge</strong></th>
+<th><strong>Memory</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Procedural</strong></td>
+<td><code>capability → procedure → step(PDDL) → action|gate</code> + the pinned PKO release (conveyor)</td>
+<td><code>run</code>/<code>run_step</code>/<code>approval</code>/<code>action_invocation</code>/<code>event</code> (conveyor)</td>
+</tr>
+<tr>
+<td><strong>Domain</strong></td>
+<td>layered kinds + one versioned <code>capability</code> pack in <code>strata_rag</code>, pinned per job</td>
+<td>work-package memory: hot rows in conveyor, one cold digest per card in <code>strata_rag</code></td>
+</tr>
+<tr>
+<td><strong>Organisational</strong></td>
+<td>curated lessons promoted to a source draft (D36)</td>
+<td>lesson memory: proposed → reviewed → promoted/rejected</td>
+</tr>
+</tbody>
+</table>
+<p>Rules carried from V1 and the KH hierarchy:</p>
+<ul>
+<li>A required kind with zero resolvable leaves <strong>blocks the run</strong> before the first step; an optional source degrades with a recorded warning, never silently.</li>
+<li>A pack is pinned <code>key@version</code>; publishing a new version does not change a live run's pin.</li>
+<li>Work-package memory is hot rows + one derived digest; hot wins on conflict; the digest is rebuildable, the rows are not.</li>
+<li><strong>Lesson promotion</strong> needs ≥ 2 independent evidence references (different cards/runs/incidents), a person's review and the normal source/pack release path. One bad run never becomes doctrine.</li>
+<li>The conveyor never hosts embeddings or a model; retrieval is <code>strata_rag</code>; generation is the executor.</li>
+</ul>
+<h3 id="effective-configuration--what-applies-and-what-can-change">Effective configuration — what applies and what can change</h3>
+<p>The designer keeps its capability → process → agent → resolved-call view and gains a first-class <strong>effective configuration</strong> view for a job release. It shows the V2 layering rather than hiding it:</p>
+<ul>
+<li><strong>base → industry → department archetype → each department in declared order (with its region sub-layer) → job.</strong> The table is <code>setting · originating layer · inherited value · override · effective value</code>; every row names its source pin (<code>capability@17</code>, <code>delivery-handbook@4</code>, …).</li>
+<li>A required kind can only be tightened downward. A sibling department that sets one key to a different value is a <strong><code>department_conflict</code> compile error</strong>, resolved only by a job-layer row; the resolution dialog compares both definitions and their sources and requires a value and a rationale.</li>
+<li>A required kind with zero resolvable leaves names the kind and department and refuses <code>409 release_not_ready</code>; the UI explains the resolution action instead of only showing "blocked".</li>
+<li><strong>Current release / Draft / Compare</strong> are distinct views. Editing shows the layer, the scope of the change and the affected consumers (dependent jobs, procedures and bindings) before saving. Saving creates a draft release behind a review gate; a published release is never mutated.</li>
+<li>The job-release scope is deliberately separate from the retained capability-scope fixtures: a capability contract and a job release are different configuration objects, and the UI says which one is in view.</li>
+</ul>
+<h3 id="sources-and-retrieval--the-transformation-into-usable-evidence">Sources and retrieval — the transformation into usable evidence</h3>
+<p>A source record connects the whole chain <strong>original → extracted content → passages/entities → reviewed knowledge → published pack → consuming jobs</strong>, and keeps seven achievements distinct:</p>
+<ol type="1">
+<li>imported (the source job succeeded);</li>
+<li>extracted (parsing preserved the content);</li>
+<li>reviewed (a person checked the extracted passages);</li>
+<li>published (a pack release names them);</li>
+<li>eligible for this job (the layer/kind/capability pins select them);</li>
+<li>retrieved for this query;</li>
+<li>included in this call (the context manifest).</li>
+</ol>
+<p>An imported source is not necessarily extracted correctly; a published source is not necessarily eligible for this job. The inspector shows the original beside the extracted passage and its locator (page/section), enables or disables a passage, and records its review state. Corrections are proposed as <strong>versioned drafts</strong>, never in-place edits. Quality signals are explicit: parsing errors, missing tables, duplicates, conflicting statements, freshness, provenance/licence and the jobs that consume the source. Each source also shows a named verifier, the next review date and the approval requirement.</p>
+<p><strong>Test retrieval sits beside the content.</strong> The tenant supplies a question and the evidence it expects, then inspects the returned passages with locator, score and layer. When the expected evidence is missed, "Save as evaluation case" records a <strong>candidate</strong> with its split and expected evidence; a person reviews it, and a model's assessment never becomes the acceptance criterion. The UI keeps <strong>finding evidence</strong> separate from <strong>generating a correct answer</strong>: retrieval can find the right passage and the answer can still be wrong.</p>
+<h3 id="memory--records-interpretations-and-reusable-lessons">Memory — records, interpretations and reusable lessons</h3>
+<p>Every memory detail exposes the record taxonomy — <strong>observation, claim, verdict, decision, blocker, summary, lesson candidate</strong> — and six questions:</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Required information</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What is this?</td>
+<td>type and status (claim ≠ verified conclusion)</td>
+</tr>
+<tr>
+<td>Where did it originate?</td>
+<td>card, run, step, actor and supporting evidence</td>
+</tr>
+<tr>
+<td>When was it applicable?</td>
+<td>recorded time, validity period and supersession</td>
+</tr>
+<tr>
+<td>Who can use it?</td>
+<td><strong>human inspection authority and agent recall eligibility, separately</strong></td>
+</tr>
+<tr>
+<td>What changed?</td>
+<td>corrections, superseding records and derived summaries</td>
+</tr>
+<tr>
+<td>Did it help?</td>
+<td>recall usage, evaluation evidence and linked findings</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Current / History / Derivation</strong> are distinct views. The cold digest opens beside its supporting hot records, with omitted and conflicting material visible; "Rebuild digest" is a dry-run diff and an explicit confirmation. The actions are correct by adding a successor (the original is retained), exclude from recall (a reason is required and history is kept), rebuild digest, propose lesson and compare memory policy. Actions that change a release, exclusion or promotion show their reviewer role and approval requirement in the review queue; each record shows its recall usage and evaluation evidence.</p>
+<p>The <strong>scope selector</strong> groups the levels by <strong>organisation, work, execution and lifecycle</strong>. One record can appear in several authorised views without creating several memory stores; a tenant administrator's ability to inspect records is separate from an agent's permission to recall them.</p>
+<h3 id="procedural-knowledge--the-pko-term-workspace">Procedural knowledge — the PKO term workspace</h3>
+<p>The PKO is edited as structured terms and relations, not as a diagram. Each term carries its definition, kind, permitted relationships (with cardinality), constraints, source evidence, owner and release. Terms link to the procedure steps that use them; a searchable, kind-filterable table handles routine editing, and a local two-hop graph helps exploration with the table as the accessible authority. An edit creates a draft release and a review gate; an unknown term or an invalid relation is refused (<code>422 pko_term_unknown</code> / <code>422 pko_relation_invalid</code>), and a term with no definition blocks publication (<code>409 pko_not_ready</code>). RDF/OWL/Turtle and BPMN/Visio/draw.io remain ingest material converted into draft rows behind the same gate.</p>
+<h3 id="explain-context--why-a-run-received-or-excluded-information">Explain context — why a run received or excluded information</h3>
+<p>From a run or call, the run inspector explains the context that was compiled:</p>
+<ul>
+<li>eligible source and memory versions, with their pins;</li>
+<li>what was retrieved, selected, excluded or truncated, <strong>with the reason</strong> for each and its budget impact;</li>
+<li>the inheritance rules and overrides that applied;</li>
+<li>a missing required item and the refusal code it produced;</li>
+<li>the budget consumed and the governing policy, refinement and laya-config versions.</li>
+</ul>
+<p>The compiled prompt text is <strong>never stored</strong>, so the inspector never renders it. It shows the recorded manifest, source identities and <code>prompt_sha256</code>, and states whether an exact reconstruction is possible from retained inputs. When it is not, it names what is missing rather than inventing a transcript.</p>
+<h3 id="evaluation-from-every-object">Evaluation from every object</h3>
+<p>The existing S17–S21 instruments gain contextual entry points from sources, passages, packs, PKO terms, memory records, policies and jobs. The subject table makes the measured thing explicit:</p>
+<table>
+<thead>
+<tr>
+<th>Subject</th>
+<th>What the tenant measures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Knowledge extraction</td>
+<td>missing content, incorrect extraction and evidence fidelity</td>
+</tr>
+<tr>
+<td>Retrieval</td>
+<td>expected-evidence recall, relevance and citation coverage</td>
+</tr>
+<tr>
+<td>Procedural knowledge (PKO)</td>
+<td>undefined terms, invalid relationships, contradictory constraints and scenario coverage</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>recall usefulness, stale/conflicting facts, unsupported synthesis and digest omissions</td>
+</tr>
+<tr>
+<td>Scope policies</td>
+<td>cross-card/project/tenant exclusion and authorised recall</td>
+</tr>
+<tr>
+<td>Job outcomes</td>
+<td>acceptance, failures, latency, context size and cost</td>
+</tr>
+</tbody>
+</table>
+<p>A memory change can compare <strong>memory disabled / current policy / candidate policy</strong>. Replay tests have a defined time cutoff and isolated memory state so later information cannot leak into earlier cases. Results show per-case improvements and regressions with sample size, uncertainty and cost; human review status, model assessment and measured outcome stay visibly separate.</p>
+<h3 id="review-and-release">Review and release</h3>
+<p>The review path is a queue, not a decorative stepper. Items from all three surfaces — source corrections, pack versions and binding revisions, PKO release drafts, memory lesson promotions and policy refinements — appear with the required reviewer role (source owner, capability owner, tenant admin), required decisions, evidence references and age. The change-set lifecycle is <strong>Draft → In review → Approved → Published (immutable) → Superseded / Rolled back</strong>. Approval records the person, rationale, timestamp and evidence; a model or the proposing agent cannot approve. Rollback creates a new version and keeps the supersession audit visible.</p>
+<h3 id="the-workflow-and-its-acceptance-criterion">The workflow and its acceptance criterion</h3>
+<p>A tenant can complete the whole loop through the UI:</p>
+<blockquote>
+<p>failed run → inspect its evidence and memory → identify the cause → draft a source or policy correction → compare against the baseline → review held-out results → approve a new release → monitor affected jobs.</p>
+</blockquote>
+<p>The acceptance criterion is that this path is completable with visible evidence and authority at every step. Backend capabilities that do not exist are labelled <strong>V2 · PROPOSED</strong>; the prototype never implies that a preview is a working write path.</p>
+<h3 id="platform-research--verified-2026-11-12">Platform research — verified 2026-11-12</h3>
+<p>Two independent documentation passes verified all 16 links in the review brief. This was a documentation review, not a hands-on audit of product accounts. The Letta ADE link is the V1 SDK reference and is marked legacy/deprecated; the concepts are borrowed, not the current product shape.</p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Surface reviewed</th>
+<th>Borrowed into the workbench</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dify</td>
+<td><a href="https://dify.ai/blog/introducing-knowledge-pipeline">Knowledge Pipeline</a>, <a href="https://docs.dify.ai/en/cloud/use-dify/knowledge/test-retrieval">Test retrieval</a></td>
+<td>visible processing stages with inspectable intermediate inputs; isolated retrieval tests</td>
+</tr>
+<tr>
+<td>RAGFlow</td>
+<td><a href="https://ragflow.io/docs/v1.0.0/chunk_parsing_results_and_knowledge_fragment_management">chunk management</a>, <a href="https://ragflow.io/docs/v1.0.0/retrieval_testing">retrieval testing</a></td>
+<td>original document beside extracted passages with a locator; corrections become versioned drafts</td>
+</tr>
+<tr>
+<td>Letta</td>
+<td><a href="https://docs.letta.com/v1-sdk/ade">ADE</a>, <a href="https://www.letta.com/blog/memory-blocks/">memory blocks</a></td>
+<td>named, bounded memory sections; visible budgets; explicit edit authority; context viewer and archival search</td>
+</tr>
+<tr>
+<td>Zep</td>
+<td><a href="https://help.getzep.com/v4/graph-visualizer-assistant">graph visualizer</a>, <a href="https://help.getzep.com/graph-overview">graph overview</a></td>
+<td>inspect entities/facts/source episodes; follow retrieval steps; validity timestamps and "why do we believe this?"</td>
+</tr>
+<tr>
+<td>Mem0</td>
+<td><a href="https://mem0.ai/blog/stale-ai-agent-memory-and-how-mem0-dream-fixes-it">memory lifecycle</a></td>
+<td>active/superseded/merged/synthesized records; source evidence; current memory versus retained history</td>
+</tr>
+<tr>
+<td>Guru</td>
+<td><a href="https://help.getguru.com/docs/verifying-and-unverifying-cards">verification</a>, <a href="https://help.getguru.com/docs/training-guru-ai-agent-center">AI Agent Center</a></td>
+<td>named verifiers, review dates, verification status and a quality log; review queues and explanations</td>
+</tr>
+<tr>
+<td>Glean</td>
+<td><a href="https://docs.glean.com/user-guide/knowledge/verification/how-verification-works">verification</a></td>
+<td>source-owner responsibility, verification tasks, deprecation and visible reviewer/date</td>
+</tr>
+<tr>
+<td>Palantir</td>
+<td><a href="https://www.palantir.com/docs/foundry/ontology-manager/overview">Ontology Manager</a>, <a href="https://www.palantir.com/docs/foundry/ontologies/review-ontology-proposals">ontology proposals</a></td>
+<td>types, properties, relationships, dependencies, usage and observability; proposals reviewed before integration</td>
+</tr>
+<tr>
+<td>WebProtégé</td>
+<td><a href="https://protegewiki.stanford.edu/wiki/WebProtegeUsersGuide">user guide</a></td>
+<td>progressive disclosure: terms and relationships first, formal representation on demand; revision snapshots</td>
+</tr>
+<tr>
+<td>LangSmith</td>
+<td><a href="https://docs.langchain.com/langsmith/evaluation-types">evaluation types</a></td>
+<td>curated datasets, baseline/candidate experiments, per-example regressions and production findings becoming test cases</td>
+</tr>
+</tbody>
+</table>
+<p><strong>What Conveyor does differently:</strong> every correction is a versioned draft behind a review gate (RAGFlow's in-place chunk edit is not allowed); inheritance conflicts are compile errors resolved only at the job layer; human inspection and agent recall are separate authorities; compiled prompt text is never stored; and evaluation is tenant-authored with held-out, paired comparisons rather than only daily checks derived from real answers.</p>
+<h3 id="honest-status">Honest status</h3>
+<table>
+<thead>
+<tr>
+<th>Workbench surface</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capability → procedure → step, pack pins, retrieval, hot/cold work-package memory, lessons, evals, benchmarks, hillclimb, prompt audit</td>
+<td><strong>V1 · implemented</strong> (S15–S21)</td>
+</tr>
+<tr>
+<td>Effective job-release configuration over industry/department/job, <code>department_conflict</code>, job-layer resolution, dependents</td>
+<td><strong>V2 · proposed</strong> (T0/T3); no V2 code</td>
+</tr>
+<tr>
+<td>Seven-state source transformation, passage inspector, correction drafts, per-object evaluation and candidate cases</td>
+<td><strong>V2 · proposed design extension</strong>; no committed table or action</td>
+</tr>
+<tr>
+<td>Memory taxonomy, Current/History/Derivation, successor/exclude/digest-rebuild/policy-compare actions</td>
+<td><strong>V1 hot rows and consolidation + proposed curation views</strong></td>
+</tr>
+<tr>
+<td>PKO term workspace, permitted relationships, graph and impact review</td>
+<td><strong>V2 · proposed</strong> (T16)</td>
+</tr>
+<tr>
+<td>Explain-context manifest</td>
+<td>V1 records <code>prompt_sha256</code>; the detailed manifest is proposed under SPEC_V2 §7.7</td>
+</tr>
+<tr>
+<td>Review queue and change-set lifecycle</td>
+<td><strong>proposed</strong>; the existing approval rows are the seed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Instruments carried from V1 (S17–S21):</strong></p>
+<ul>
+<li><strong>Benchmark / kata:</strong> pinned SWE-bench suite hashes, image lock, parity grader and gold/empty controls; comparison refuses a different suite, oracle or prompt; a service job records keep/revert/inconclusive; subject-version trends and baseline promotion.</li>
+<li><strong>Task eval / hillclimb:</strong> tenant outcome cases, versioned metrics and graders, immutable split, digest-bound sign-offs and held-out evidence access. The climb records goal, guardrails, allowed changes, prediction/falsifier, noise band, ceiling, cadence and stopping condition. Cost search uses caching health → prompt audit → model × effort → prompt climb → joint confirmation.</li>
+</ul>
+<p>The quality fixture uses 160 train / 80 held-out cases and 3 repetitions; its approximate noise floor is <code>1/sqrt(80*3) ≈ 6.5 pp</code> and the default decision band is 8 pp. Baseline is 70% held-out; v1 reaches 85%. For the displayed rep-1 paired comparison, both=53, neither=9, baseline-only=3, candidate-only=15; the exact two-sided McNemar value is computed from those fixture counts (<code>p≈0.0075</code>). Subsequent training-only improvements are reverted. Benchmark fixture counts use a separate 50-case instrument (both=18, neither=18, baseline-only=2, candidate-only=12; <code>p≈0.0129</code>). The two instruments are not pooled. These calculations explain the study's local decisions; they do not measure real application quality.</p>
+<p><strong>Metrics and metering (D37, D52).</strong> Flow, quality, cost, governance and knowledge metrics are computed read models over rows, never stored opinions. C0–C5 maturity thresholds are calibrated from real run/approval data and stored as configuration, not hard-coded. A gate that never refused is flagged. Metering rolls up at tenant, department/industry, programme, project and job, and drills down to run, step and call; attribution is call → run → card → project → programme → tenant; the job attribution is the run's binding; the department attribution is the binding's primary department, with a breakdown by the others; an unattributed call is reported separately, never dropped. <code>billing_service</code> remains the charging system; the conveyor's metering reconciles to it and a divergence opens an incident. The UI reads the same derivation the API serves.</p>
+<p><strong>The improvement loop is one loop:</strong> alert / failed run / eval delta / prompt finding / coach escalation → coach card (one interruption, closed remedy set) → kata (six Gets, evidence, candidate) → development project or procedure/prompt/knowledge change → held-out measurement → adoption gate (person; dual control) → production (new procedure/job/binding version) → monitoring and lesson. The kata's inputs are the prompt findings and eval deltas V1 already produces.</p>
+<h2 id="execution-and-real-actions">Execution and real actions</h2>
+<p>The execution room combines the selectable topology with activity, evidence, compiled context, the permitted tools, readiness and a human gate. A run records its job binding and the release hash it actually used, its executor kind and its budget. Operator notes append local card memory. Gate decisions require reasons and record <strong>George · person · Web</strong>. The detailed sample remains WP-2048; other work packages do not invent a transcript when no sample run exists.</p>
+<p>The <strong>compiled prompt</strong> is built at run time from instruction, procedure, role, knowledge and project/card sections in trust order, with character budgets, a measured refusal over budget and a recorded <code>prompt_sha256</code>; the compiled text is never stored. For an <code>internal_agent</code> step the four sources — knowledge, episodic memory, the PDDL request and the curated tool list — are compiled into the same envelope; there is no other prompt compiler.</p>
+<p>The <strong>coding catalogue</strong> remains available as a local source snapshot: 367 API operations from the coding gateway's OpenAPI (via the <code>n8n-nodes-coding</code> package), with original resource/operation names, routes, fields and producer/observer metadata. It is the V1 reference for the coding toolkit's operations; n8n is a retired system, not a tool, and the V2 tool estate imports the toolkit through the broker. Registration and agent grants stay separate; a producer response alone never establishes verification.</p>
+<h2 id="tenant-administration--byo-credentials-integrations-licences-and-tiers">Tenant administration — BYO credentials, integrations, licences and tiers</h2>
+<p>The studio's tenant-administration surfaces are implemented in the Rust app (<code>/settings/providers</code>, <code>/settings/integrations</code>, <code>/settings/licences</code>, <code>/measure/model-tiers</code>); the studio documents them and the Tools screen shows the V2 credential-profile and toolkit-licence vocabulary.</p>
+<ul>
+<li><strong>Providers &amp; credentials</strong> (<code>/settings/providers</code>): real <code>secrets.list/create/rotate/delete</code>; only metadata is read back and no action reveals a value. The wired names are <code>strata_ingest.token</code>, <code>strata_rag.token</code> and <code>laya.token</code>. inference-router, mlx-api, image-gen, tts, asr, webscraper_service, the w2v orchestrator, the agent-platform MCP relay and the Telegram bot are planned rows; the Telegram bot token is deployment configuration today. A missing token is a refusal, never a silent fallback. In V2 these become <strong>credential profiles</strong> resolved by the broker by alias; the prompt and the <code>tool_call</code> row never carry the value.</li>
+<li><strong>Integrations</strong> (<code>/settings/integrations</code>): MCP and Telegram bind/unbind are real (<code>channels.bind/unbind</code>; the Telegram config uses <code>chat_id</code> and <code>topic_id</code>); Keycloak is the app's real <code>/config.json</code>; schedules, deliveries and webhooks are real. <code>channels.list</code> is a declared gap and the screen names it. MCP and Telegram are <strong>channels</strong>, never executors.</li>
+<li><strong>Licences &amp; billing</strong> (<code>/settings/licences</code>): <code>licences.get</code> and the billing document are real; the service × user matrix is a preview. The toolkit's <code>licence app</code> links entitlement to the tool estate. The proposed contract is a tenant-scoped <code>service_licence</code> table plus <code>service_licences.list/assign/revoke</code>; the seeded seats are super-admin, execution, kata and the test users. The matrix uses the w2v slot vocabulary (<code>llm</code>, <code>vlm</code>, <code>image</code>, <code>tts</code>, <code>asr</code>, <code>ocr</code>, <code>video_gen</code>) plus strata_ingest, strata_rag, laya, inference-router, mlx-api and the w2v orchestrator. w2v's licence states are <code>active | expiring_soon | expired | revoked | none | not_onboarded</code>; the conveyor's own <code>app_licence</code> states are <code>active | expired | revoked | unknown</code>.</li>
+<li><strong>LLM tiers (future).</strong> The vocabulary and form mirror fr's real <code>/settings/llm-provider</code>: <code>__default__</code>, <code>small</code> (flash), <code>medium</code> (reasoning), <code>high</code> (frontier); each tier carries a provider, model, base URL, a write-only API key with a keep/clear tri-state, temperature and max tokens, plus Test / Save / Remove. A tier with no row falls back to the default. The licence posture is <code>local_allowed | byo_required | platform_only</code>. SPEC_V2 makes model providers and <code>model_ref</code> conveyor-owned; no model-tier registry exists today. The proposed contract is <code>model_tiers.list/upsert</code>; <code>/measure/model-tiers</code> is a labelled preview whose only live controls are links into evals, benchmarks and hillclimb.</li>
+<li><strong>GPU and media slots.</strong> The service vocabulary follows w2v_frontend's tenant slots: <code>llm</code>, <code>vlm</code>, <code>image</code>, <code>tts</code>, <code>asr</code>, <code>ocr</code> and <code>video_gen</code>; each slot's real form is provider type, base URL, model, a voice for <code>tts</code>, and a write-only key with a fingerprint and Replace / Clear / Keep, plus Load models / Test / Save / Remove. <code>webscraper_service</code> and <code>media_discovery</code> are platform-only in w2v; <code>w2v_orchestrator</code> is the backend and its tenant licence belongs in the licence matrix. The agent's provider form adds Name, Kind (<code>openai | laya | w2v</code>), comma-separated Models and a Remove-the-stored-token control; care-bus's route config adds region, timeout, fallback chain, PII redaction, vision EXIF and a monthly spend cap. The conveyor preview shows the union of those fields and wires none of them.</li>
+</ul>
+<p>These surfaces do not change the boundaries above: no action, table or event was added by the design pack, and every preview row is local design data.</p>
+<h2 id="system-architecture">System architecture</h2>
+<p>The <strong>System architecture</strong> destination (<code>architecture</code>, under GOVERN &amp; DESIGN) is the reverse map of this design pack: it draws SPEC_V2 and then shows which studio destination views which part of it. It is a design study, not a claim that V2 exists.</p>
+<h3 id="high-level--archimate-32">High level — ArchiMate 3.2</h3>
+<p>Three inline-SVG views use the ArchiMate 3.2 notation and layer bands:</p>
+<ul>
+<li><strong>Organisation and work</strong> (motivation + business): principles P1–P11, the tenant and human approver, the PM/coach/kata/delivery/operations/reviewer positions, the four processes, the four services and the objects (job release, job binding, card, approval, run, evidence, memory, pack, lesson). Solid = V1 implemented; dashed = V2 proposed; each element carries a V1/V2 chip.</li>
+<li><strong>Platform and integrations</strong> (application): Web/Telegram/MCP channels, the conveyor components (API/ActionSpec, domain, workflow, executors, decision ladder, knowledge/memory, tool broker, instruments, metering, auth, storage, events) and the backend services (laya, inference-router, strata, toolkits, MinIO, billing/licenses, Keycloak). The agent platform is a channel only.</li>
+<li><strong>Deployment</strong> (technology): ingress → <code>conveyor :8930</code> pods → Postgres 18/MinIO; Flux and the registry; the external services; and the explicit “no Redis, no new port, no external executor” constraint. The tool broker is in-process.</li>
+</ul>
+<p>A notation legend names the element shapes, the relationship line types and the V1/V2 status convention. Every view cites its SPEC_V2 sections.</p>
+<h3 id="low-level--mermaid">Low level — Mermaid</h3>
+<p>Thirteen <code>.mmd</code> sources are pre-rendered to light and dark SVG pairs at authoring time and committed under <code>architecture/diagrams/</code>; <code>scripts/build-architecture-diagrams.sh</code> regenerates them. The page never loads a Mermaid runtime and makes no external request. The diagrams cover:</p>
+<ul>
+<li>the component/context flow, the run-execution sequence (procedure vs internal_agent, binding check, prompt compile, gates), the seven-step tool-broker sequence with its 409/403/422/429 refusals, the run state machine and the L0–L3 decision ladder;</li>
+<li>three ER diagrams (organisation/work, execution/decisions, knowledge/tools), the knowledge pipeline (SOP/RDF/BPMN/chat → PKO + PDDL + pack → review → publish → pin → run) and the memory / lesson lifecycle;</li>
+<li>the one improvement loop and the T0–T17 slice DAG.</li>
+</ul>
+<p>The Mermaid source is shown in a collapsible block under each figure; <code>check-architecture.cjs</code> asserts it is byte-equal to the <code>.mmd</code> file, so the picture and the source cannot drift.</p>
+<h3 id="ui-map">UI map</h3>
+<p>A Mermaid overview plus a table for <strong>every sidebar destination</strong>: page id, architecture element(s), SPEC_V2 section(s) and status (<code>R</code> V1 implemented, <code>P</code> V2 proposed, <code>L</code> legacy study). A second table lists the tenant-administration app surfaces (providers, integrations, licences, model tiers) that are not mockup destinations. The map is the explicit answer to “where does this feature live in the design?”.</p>
+<h3 id="honest-status-1">Honest status</h3>
+<p>The ArchiMate views, the Mermaid sources and the UI map are <strong>design-study artefacts</strong>. No V1 element is changed by this page; every V2 element is a proposal. The page is one destination in the same offline pack and obeys the same no-backend, no-network, no-write-path rules.</p>
+<h2 id="destination-map">Destination map</h2>
+<p>Status: <strong>R</strong> = V1-implemented surface, <strong>P</strong> = V2 proposed preview (ribbon, no write path), <strong>L</strong> = legacy study retained with a banner. Existing page ids and routes are unchanged; new destinations are additive.</p>
+<table>
+<thead>
+<tr>
+<th>V2 destination</th>
+<th>Studio page id</th>
+<th>Screens</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Today / programme control</td>
+<td><code>overview</code></td>
+<td>Delivery map, integrated plan, gate readiness</td>
+<td>R</td>
+</tr>
+<tr>
+<td><strong>Portfolio</strong></td>
+<td><code>portfolio</code></td>
+<td>In flight, programmes, shared config &amp; dependencies, backlog &amp; WSJF, cadence &amp; capacity, metering</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td>Projects</td>
+<td><code>projects</code></td>
+<td>project list and workbench</td>
+<td>R</td>
+</tr>
+<tr>
+<td><strong>Plan</strong></td>
+<td><code>plan</code></td>
+<td>WBS, baseline vs forecast, registers, change control</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td>Execution room</td>
+<td><code>execution</code></td>
+<td>activity, evidence, context, tools, explain-context manifest</td>
+<td>R + P tools / explain context</td>
+</tr>
+<tr>
+<td>Decision inbox</td>
+<td><code>decisions</code></td>
+<td>approvals</td>
+<td>R</td>
+</tr>
+<tr>
+<td>Run history</td>
+<td><code>runs</code></td>
+<td>runs, two executors, binding pin</td>
+<td>R</td>
+</tr>
+<tr>
+<td><strong>Organisation</strong></td>
+<td><code>organisation</code></td>
+<td>authority matrix, approval policies, decision ladder, refinements &amp; laya config, job performance</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td><strong>Jobs</strong></td>
+<td><code>jobs</code></td>
+<td>catalogue, departments, releases, bindings, anatomy, legacy import</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td>Agents / executors</td>
+<td><code>agents</code></td>
+<td>internal agent configuration</td>
+<td>R + P note</td>
+</tr>
+<tr>
+<td><strong>Tools</strong></td>
+<td><code>toolkits</code></td>
+<td>toolkits, bindings &amp; grants, calls, probes, BYO, authoring, storage, credential profiles</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td>Project types</td>
+<td><code>types</code></td>
+<td>definition, used by, versions</td>
+<td>R + P V2 types</td>
+</tr>
+<tr>
+<td><strong>Procedures</strong></td>
+<td><code>procedures</code></td>
+<td>workspace, SOP intake, RDF/OWL &amp; process docs, PDDL, PKO term workspace, pairing, process map, publish</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td>Capabilities</td>
+<td><code>capabilities</code></td>
+<td>definition, used by, versions</td>
+<td>R</td>
+</tr>
+<tr>
+<td><strong>Authoring</strong></td>
+<td><code>authoring</code></td>
+<td>intake queue, drafts, review &amp; publish, dependency status</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td>Assurance &amp; baselines</td>
+<td><code>assurance</code></td>
+<td>traceability, architecture cycle, registers, baselines</td>
+<td>R</td>
+</tr>
+<tr>
+<td>Flow &amp; constraints</td>
+<td><code>constraints</code></td>
+<td>flow/coach; the TOC study is optional</td>
+<td>L</td>
+</tr>
+<tr>
+<td>Requirements / principles / models</td>
+<td><code>requirements</code>, <code>principles</code>, <code>models</code></td>
+<td>governance and ArchiMate/UML</td>
+<td>R</td>
+</tr>
+<tr>
+<td>Knowledge design / sources / memory</td>
+<td><code>knowledge-design</code>, <code>knowledge</code>, <code>memory</code></td>
+<td>effective configuration, source transformation, record lifecycle, review &amp; release, evaluation</td>
+<td>R + P workbench</td>
+</tr>
+<tr>
+<td><strong>System architecture</strong></td>
+<td><code>architecture</code></td>
+<td>ArchiMate high-level views, Mermaid low-level design, UI destination map</td>
+<td>design study</td>
+</tr>
+<tr>
+<td><strong>Improve</strong></td>
+<td><code>improve</code></td>
+<td>kata queue, six Gets, coach, lessons, adoption</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td><strong>Improve</strong></td>
+<td><code>improve</code></td>
+<td>kata queue, six Gets, coach, lessons, adoption</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td>Evaluation / benchmark / hillclimb / audit</td>
+<td><code>evals</code>, <code>benchmarks</code>, <code>hillclimb</code>, <code>usage</code></td>
+<td>S17–S21 instruments</td>
+<td>R</td>
+</tr>
+<tr>
+<td><strong>Metering</strong></td>
+<td><code>metering</code></td>
+<td>roll-ups, attribution, metrics &amp; maturity</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td><strong>Operations</strong></td>
+<td><code>operations</code></td>
+<td>incidents, on-call, runbooks, read/write, postmortems, andon</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td>Agent job types</td>
+<td><code>jobtypes</code></td>
+<td>historical 92-entry snapshot</td>
+<td>L</td>
+</tr>
+<tr>
+<td>Coding action catalogue</td>
+<td><code>tools</code></td>
+<td>367 coding operations</td>
+<td>L</td>
+</tr>
+</tbody>
+</table>
+<h2 id="existing-implementation-versus-proposed-ui">Existing implementation versus proposed UI</h2>
+<p><strong>Implemented in V1 (the Rust app, live at <code>conveyor.nonagentic.ai</code>):</strong> the one binary with projects, boards, lists, cards, runs, approvals, procedures, capabilities, capability agents, knowledge/memory bindings, the inference ledger, the native SWE-bench harness, evals, the eval hillclimb and the compiled-prompt pipeline; secrets, channels, webhooks, schedules, notifications, <code>licences.get</code>, billing, members, roles, audit and the admin surfaces. The last whole-tree checkpoint measured 83 tables and 243 actions; later S19–S21 lanes moved the served-spec past 290 ops, so those are floors, not live figures. The eval screen already exposes cases/runs/report/ sign-offs/climb and marks authoring, audit and interop as planned; the benchmark screen permits gold/empty controls and refuses unavailable subject arms.</p>
+<p><strong>Proposed in V2 (T0–T17, no V2 code written):</strong> the organisation spine (<code>industry</code>, <code>department</code>, <code>job_catalogue</code>, <code>job_release</code>, <code>job_binding</code>); the plan spine (<code>wbs_node</code>, <code>project_baseline</code>, <code>project_register_item</code>, <code>project_dependency</code>, programme shared config and cadence); the decision tables and laya client; PM/coach/kata/development/operations jobs; lessons; PKO and SOP/RDF/BPMN ingestion; tenant asset authoring; the tool estate (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>, the broker, BYO and authoring); metering roll-ups; the MinIO storage adapter; and the knowledge and memory workbench (effective job-release configuration, the seven-state source transformation, memory record lifecycle and derivation views, the review/release queue, the explain-context manifest and per-object evaluation). The studio renders these as labelled previews.</p>
+<p>The V1 retention is concrete: capability packs, <code>strata_ingest</code>/<code>strata_rag</code> retrieval, hot work-package rows and cold digests, lesson promotion, the compiled-prompt pipeline and the S17–S21 instruments exist in the Rust app. The workbench's organisation inheritance, source/passage inspector, record taxonomy and actions, PKO term workspace, explain-context manifest and object evaluation are design previews; no table or action was added by this pack.</p>
+<h2 id="files-and-boundaries">Files and boundaries</h2>
+<p><code>studio.html</code> is the entry point. <code>studio.js</code> / <code>studio.css</code> retain the S12 editors and workbenches; <code>enterprise.js</code> / <code>enterprise.css</code> supply the programme surfaces and the sources &amp; retrieval workbench; <code>learning.js</code> / <code>learning.css</code> add knowledge design, the effective configuration and review surfaces, scoped memory and measurement; <code>v2.js</code> / <code>v2.css</code> add the SPEC_V2 destinations (portfolio, plan, organisation, jobs, procedures, authoring, improve, operations, tools, metering), the PKO term workspace, the explain-context panel and the V2 sidebar and banners; <code>architecture.js</code> / <code>architecture.css</code> add the System architecture page, its ArchiMate model and the UI map; <code>architecture/diagrams/</code> holds the Mermaid <code>.mmd</code> sources and their pre-rendered light/dark SVG pairs; <code>job-catalogue.js</code> and <code>coding-catalogue.js</code> are local source snapshots. Local IBM Plex fonts and code-native SVG are used. The architecture page adds only the committed SVG diagram pairs beyond the existing stylesheets.</p>
+<p><code>data/</code> is the live-data boundary. <code>data/snapshot.js</code> is a placeholder by default (<code>window.CONVEYOR_SNAPSHOT = null</code>, DESIGN mode); <code>conveyor snapshot --out docs/design/data</code> overwrites it with a <code>design-snapshot/v1</code> payload plus the raw <code>manifest.json</code>, <code>programme.json</code>, <code>organisation.json</code>, <code>config.json</code>, <code>work.json</code>, <code>artefacts.json</code>, <code>measure.json</code>, <code>secrets.json</code>, <code>evidence.json</code> and <code>feedback.json</code> files. When the payload is present, the Portfolio, Organisation, Jobs and Metering pages replace the fixtures they cover with the platform's own rows and show a <strong>LIVE</strong> ribbon with the payload hash, timestamp and git sha; every destination with no live source keeps the DESIGN ribbon. <code>data/issues.json</code> is the committed GitHub issue registry (generated by <code>scripts/fetch-issues.sh</code>); the payload never calls GitHub or the app backend at page load.</p>
+<p>No production route, schema, service, credential, source repository or backend behaviour is changed by this design pack. Everything resets on reload except theme preference. No accounts or remote services are contacted. Native dialogs, text-labelled status, keyboard navigation, reduced motion and internal scrolling support the interaction study. Wider WBS tables, models, timelines and graphs keep internal scroll.</p>
+<p>Regenerate the historical snapshot with:</p>
+<pre class="sh"><code>python3 docs/design/scripts/build-job-catalogue.py</code></pre>
+<p>The script reads sibling repositories, writes only <code>job-catalogue.js</code> and records the RM source SHA-256. It is a display extractor, not an executable migration or a parser of live n8n prompts.</p>
+<h2 id="verification">Verification</h2>
+<p>Five headless Chrome passes run against <code>studio.html</code> using <code>playwright-core</code> and local Chrome; set <code>NODE_PATH</code> if Playwright is installed outside this repo, <code>CHROME_BIN</code> for a non-default browser, and <code>CONVEYOR_QA_OUTPUT</code> to change the screenshot directory (defaults to the system temporary directory). Run from any working directory:</p>
+<pre class="sh"><code>node docs/design/scripts/check-studio.cjs       # 234 checks
+node docs/design/scripts/check-learning.cjs     # 139 checks
+node docs/design/scripts/check-v2.cjs           # 158 checks
+node docs/design/scripts/check-workbench.cjs    # 119 checks
+node docs/design/scripts/check-architecture.cjs # 141 checks
+node docs/design/scripts/check-data.cjs         # snapshot gate (DESIGN: no-op)</code></pre>
+<p><code>check-data.cjs</code> is the generated-data gate: when <code>data/snapshot.js</code> carries a payload it verifies the manifest schema, every file's SHA-256 and byte length, the <code>window.CONVEYOR_SNAPSHOT</code> assignment, the secret-metadata-only rule, the absence of emails and credential-shaped strings, and that <code>studio.html</code> loads the snapshot before <code>v2.js</code>. With the placeholder it reports DESIGN mode and exits 0.</p>
+<ul>
+<li><code>check-studio.cjs</code> covers programme switching, project creation, WBS expansion, job authoring and publication, work-package creation, human decisions, immutable execution pins, baseline change, TOC inspection, source ingestion, provenance, cited retrieval, missing-pack refusal, pack publication, hot memory, consolidation, context manifests and original coding-option lookup.</li>
+<li><code>check-learning.cjs</code> covers independent capability/process/agent selection, memory-policy narrowing, all eight memory levels, card recall isolation, lesson curation, sign-off requirements and invalidation, analyzer/reviewer views, noise-band refusal, stall triage, one-round approval, training-only revert, paired exact comparisons, incompatible instrument/oracle refusal, independent instrument/campaign state, case authoring, cost guardrails, adoption drafts and prompt audit decisions.</li>
+<li><code>check-v2.cjs</code> covers the ten V2 destinations and the System architecture map at 1440/1024/390, deep links and breadcrumbs, programme switching and WSJF, dependency-cycle refusal, change control with and without a rationale, dual control and the decision ladder, release/binding/stale-binding refusal, SOP and PDDL refusals, PKO versioning, publish readiness, authoring dependency blocks, kata/lesson/ adoption gates, dry-run and destructive approvals, the andon cord, probe unbinding, effect ceilings, the tool-call ledger, BYO and tool authoring, metering drill-down and the run-inspector binding/tools panel — plus the V1 banners on the legacy surfaces.</li>
+<li><code>check-workbench.cjs</code> covers the knowledge and memory workbench: the effective-configuration inheritance table and conflict resolution, missing-required refusal, Current/Draft/Compare, dependents and the review/release queue (reviewer roles, change-set states, no agent approval, rollback and supersession); the seven source states, passage locator and correction draft, quality signals, retrieval test with expected evidence and the candidate eval case; the memory taxonomy, six questions, Current/History/Derivation, successor/exclude/digest actions and one-reference lesson refusal; the PKO term workspace, usage and invalid-relation refusal; the explain-context manifest with reasons, budget, hash and reconstruction status; and the object-evaluation subjects and memory three-arm comparison — at 1440/1024/390.</li>
+<li><code>check-architecture.cjs</code> covers the System architecture destination: title/breadcrumb/sidebar and deep link, the five tabs, the three ArchiMate views and their legend, all thirteen embedded Mermaid sources (asserted byte-equal to their <code>.mmd</code> files), the five runtime, five data/knowledge and two improvement diagrams, every sidebar destination in the UI map, the four tenant-administration rows, 1440/1024/390, the dark-theme SVG pair and no runtime errors, failed assets or external requests.</li>
+</ul>
+<p>All five passes record no runtime errors, failed assets or external page requests. Each V2 destination and each workbench surface was checked at <strong>1440, 1024 and 390 pixels</strong>; mobile navigation and Escape dismissal were checked in the studio pass. Screenshots cover the ten V2 destinations, the workbench surfaces, the architecture views, the mobile portfolio and the dark operations view. JavaScript syntax, local asset resolution and <code>git diff --check</code> are part of the final gate.</p>
+<p>These checks verify the offline interaction study, not backend integration, security enforcement, scheduling calculations, semantic model legality or standards conformance.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/design/STUDIO-SPEC.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

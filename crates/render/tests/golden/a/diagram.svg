@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1122.52" height="793.7" viewBox="0 0 1122.52 793.7" font-family="DejaVu Sans">
+<rect x="0" y="0" width="1122.52" height="793.7" fill="#ffffff"/>
+<g id="v-00000000-0000-0000-0000-0000000000be" transform="translate(231.26, 126.85) scale(1)">
+<path id="c-00000000-0000-0000-0000-0000000000bc" d="M 570 240 L 570 300" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="6 4"/>
+<path d="M 570 300 L 576.75 286.5 L 563.25 286.5 z" fill="#334155"/>
+<path id="c-00000000-0000-0000-0000-0000000000bd" d="M 180 195 L 240 195" fill="none" stroke="#334155" stroke-width="1.5"/>
+<path d="M 180 195 L 186.75 201.75 L 193.5 195 L 186.75 188.25 z" fill="#334155"/>
+<g id="e-00000000-0000-0000-0000-0000000000a3">
+<rect x="0" y="0" width="180" height="90" rx="6" fill="#e6dcf0" stroke="#8b6aa8" stroke-width="1.5"/>
+<text x="90" y="48.2" text-anchor="middle" font-size="12" fill="#0f172a">Platform Engineering</text>
+<text x="90" y="84" text-anchor="middle" font-size="9" fill="#64748b">stakeholder</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000a1">
+<rect x="240" y="0" width="180" height="90" rx="6" fill="#e6dcf0" stroke="#8b6aa8" stroke-width="1.5"/>
+<text x="330" y="41.2" text-anchor="middle" font-size="12" fill="#0f172a">Reduce onboarding to one</text>
+<text x="330" y="55.2" text-anchor="middle" font-size="12" fill="#0f172a">day</text>
+<text x="330" y="84" text-anchor="middle" font-size="9" fill="#64748b">goal</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000a2">
+<rect x="480" y="0" width="180" height="90" rx="6" fill="#e6dcf0" stroke="#8b6aa8" stroke-width="1.5"/>
+<text x="570" y="41.2" text-anchor="middle" font-size="12" fill="#0f172a">Self-service workspace</text>
+<text x="570" y="55.2" text-anchor="middle" font-size="12" fill="#0f172a">provisioning</text>
+<text x="570" y="84" text-anchor="middle" font-size="9" fill="#64748b">requirement</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000a4">
+<rect x="0" y="150" width="180" height="90" rx="6" fill="#fdf1dc" stroke="#b0822f" stroke-width="1.5"/>
+<text x="90" y="198.2" text-anchor="middle" font-size="12" fill="#0f172a">Workspace lifecycle</text>
+<text x="90" y="234" text-anchor="middle" font-size="9" fill="#64748b">capability</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000a5">
+<rect x="240" y="150" width="180" height="90" rx="6" fill="#fdf1dc" stroke="#b0822f" stroke-width="1.5"/>
+<text x="330" y="198.2" text-anchor="middle" font-size="12" fill="#0f172a">Automate provisioning</text>
+<text x="330" y="234" text-anchor="middle" font-size="9" fill="#64748b">course_of_action</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000a6">
+<rect x="480" y="150" width="180" height="90" rx="6" fill="#dae8fc" stroke="#5b8ac6" stroke-width="1.5"/>
+<text x="570" y="198.2" text-anchor="middle" font-size="12" fill="#0f172a">Conveyor</text>
+<text x="570" y="234" text-anchor="middle" font-size="9" fill="#64748b">application_component</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000a9">
+<rect x="0" y="300" width="180" height="90" rx="6" fill="#fff2cc" stroke="#c9a227" stroke-width="1.5"/>
+<text x="90" y="348.2" text-anchor="middle" font-size="12" fill="#0f172a">Onboarding</text>
+<text x="90" y="384" text-anchor="middle" font-size="9" fill="#64748b">business_process</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000a8">
+<rect x="240" y="300" width="180" height="90" rx="6" fill="#dae8fc" stroke="#5b8ac6" stroke-width="1.5"/>
+<text x="330" y="348.2" text-anchor="middle" font-size="12" fill="#0f172a">Workspace record</text>
+<text x="330" y="384" text-anchor="middle" font-size="9" fill="#64748b">data_object</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000a7">
+<rect x="480" y="300" width="180" height="90" rx="6" fill="#dae8fc" stroke="#5b8ac6" stroke-width="1.5"/>
+<text x="570" y="348.2" text-anchor="middle" font-size="12" fill="#0f172a">Workspace API</text>
+<text x="570" y="384" text-anchor="middle" font-size="9" fill="#64748b">application_service</text>
+</g>
+<g id="e-00000000-0000-0000-0000-0000000000aa">
+<rect x="240" y="450" width="180" height="90" rx="6" fill="#fff2cc" stroke="#c9a227" stroke-width="1.5"/>
+<text x="330" y="498.2" text-anchor="middle" font-size="12" fill="#0f172a">New engineer</text>
+<text x="330" y="534" text-anchor="middle" font-size="9" fill="#64748b">business_actor</text>
+</g>
+</g>
+</svg>

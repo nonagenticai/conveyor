@@ -1,0 +1,15 @@
+[package]
+name = "conveyor-workflow"
+description = "Phase-2 workflow engine (S13)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+conveyor-domain = { path = "../domain" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }

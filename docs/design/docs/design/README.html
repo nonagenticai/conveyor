@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Web UI design · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="web-ui-design">Web UI design</h1>
+<p>The latest design is <strong><a href="https://github.com/nonagenticai/conveyor/blob/main/docs/design/studio.html">studio.html</a></strong> — the <strong>SPEC_V2 organisational operating model</strong>. Open it directly in a browser; no build or server is required. When <code>data/snapshot.js</code> is present (written by <code>conveyor snapshot</code>), the pages it covers render the conveyor's own rows and carry a <code>LIVE</code> ribbon with the snapshot hash and timestamp; an unwired destination keeps the <code>V2 · PROPOSED</code> ribbon. V1 surfaces implemented in the Rust app are unlabelled.</p>
+<ul>
+<li><strong>Portfolio &amp; plan:</strong> the computed in-flight set, programme shared configuration, typed project-dependency edges, the WSJF backlog, PI cadence, capacity and per-project metering; then WBS, frozen baseline vs computed forecast, one six-kind register and controlled change.</li>
+<li><strong>Organisation &amp; jobs:</strong> industry → ordered departments → jobs, the full job anatomy, immutable releases, tenant-scoped bindings and the stale-binding refusal; the authority matrix, approval policies, the rule → laya → generation → human decision ladder, tenant refinements and laya config.</li>
+<li><strong>Procedures &amp; authoring:</strong> capability → procedure → step, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io conversion, the PDDL action space, the relational PKO, knowledge-pack pairing and publish; chat/document intake drafts every tenant asset behind a review gate.</li>
+<li><strong>Tools:</strong> toolkit versions, bindings and effect ceilings, the <code>tool_call</code> ledger, probes, BYO OpenAPI/MCP tools, governed tool authoring, the direct MinIO storage adapter and credential profiles. V1's coding catalogue (367 API operations) remains as a banner-labelled reference.</li>
+<li><strong>Improve &amp; operations:</strong> coach triage with the closed sets, kata six Gets, lessons with independent evidence and human adoption; incidents, on-call, runbooks, dry-run + dual-control writes, postmortems and the andon cord.</li>
+<li><strong>Measure:</strong> the retained S17–S21 evals, benchmarks, hillclimb and prompt audit, plus metering roll-ups and drill-down from tenant to tool call with billing reconciliation.</li>
+<li><strong>Knowledge &amp; memory workbench:</strong> effective job-release configuration over industry → ordered departments → job (with <code>department_conflict</code> resolution and dependents), the seven-state source transformation with source/passage inspection and retrieval tests, the memory record lifecycle (Current/History/Derivation, successor/exclude/digest actions), the review &amp; release queue, the explain-context manifest and per-object evaluation with memory-policy comparison.</li>
+<li><strong>System architecture:</strong> ArchiMate 3.2 high-level views (organisation and work, platform and integrations, deployment) and pre-rendered Mermaid low-level design (component context, run and broker sequences, run state, decision ladder, three ER diagrams, knowledge pipeline, memory lifecycle, improvement loop and slice DAG), plus a UI map for every sidebar destination. The Mermaid sources live in <code>architecture/diagrams/</code>; the light and dark SVGs are committed, local and pre-rendered — the page has no runtime Mermaid dependency.</li>
+<li><strong>Documents:</strong> every tracked design/spec/plan/evidence document is rendered from Markdown to a standalone HTML page under <code>docs/</code> and listed by the Documents destination.</li>
+<li><strong>Retained V1 surfaces:</strong> programme control, projects, boards, execution, decisions, requirements, principles, ArchiMate/UML, assurance, baselines, TOC (optional reasoning study), knowledge design, eight memory levels, and the tenant-administration screens documented in <code>STUDIO-SPEC.md</code>.</li>
+</ul>
+<p>Without a snapshot, every service result is an offline fixture. With <code>data/snapshot.js</code>, the platform's public rows replace those fixtures on the pages that have a live source; <code>docs/design/scripts/check-data.cjs</code> verifies the manifest hashes, the secret-metadata-only rule and the email/token redaction. See <a href="STUDIO-SPEC.html">STUDIO-SPEC.md</a> for sources, boundaries and verification.</p>
+<p>The pack is published at <strong><a href="https://nonagentic.ai/design/">https://nonagentic.ai/design/</a></strong> by the <code>nonagentic_homepage</code> repository, which copies this directory verbatim into <code>dist/design/</code> and serves <code>studio.html</code> as <code>index.html</code>. Opening <code>studio.html</code> directly is still the offline entry point.</p>
+<h2 id="documents">Documents</h2>
+<p><code>scripts/build-docs.py</code> renders every <code>docs/**/*.md</code> and the root <code>README.md</code> to <code>docs/&lt;repo path&gt;.html</code> (for example <code>docs/SPEC_V2.html</code>, <code>docs/plans/00-INDEX.html</code>) and writes the index to <code>docs/documents.json</code> + <code>docs/documents.js</code>. The pages are standalone — local fonts, local stylesheet, no fetch — so they work from <code>file://</code> and from the published site.</p>
+<ul>
+<li>Links between documents resolve to their generated <code>.html</code> page; links to any other tracked file resolve to the GitHub <code>main</code> URL, so a reader never lands on a 404.</li>
+<li>Regenerate with <code>python3 docs/design/scripts/build-docs.py</code> (requires pandoc) and commit the output. <code>node docs/design/scripts/check-docs.cjs</code> is the gate; it needs no pandoc.</li>
+<li>The Documents destination in <code>studio.html</code> reads <code>docs/documents.js</code>. Without that file (a clean checkout before generation) the destination says so instead of rendering a broken list.</li>
+</ul>
+<h2 id="feedback">Feedback</h2>
+<p>The public surface is GitHub, not a service. <code>studio.html</code> links the repository's <strong>Discussions</strong> and opens a prefilled issue with the <code>feedback</code> label from every page; the snapshot's <code>manifest.feedback_url</code> carries the target, and <code>data/feedback.json</code> publishes the feedback issues that exist. The issue template is <code>.github/ISSUE_TEMPLATE/feedback.yml</code>.</p>
+<h2 id="retired-studies">Retired studies</h2>
+<p>The earlier v1 studies are preserved under <a href="https://github.com/nonagenticai/conveyor/tree/main/docs/design/legacy"><code>legacy/</code></a> and are <strong>not</strong> published by this pack or linked from the site; the SPEC_V2 studio above replaces them.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/design/README.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

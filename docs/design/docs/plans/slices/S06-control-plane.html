@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S06 — Control plane · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06-control-plane.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><p>⚠️ <strong>Amended 2026-11-09 (process model).</strong> The computed system set is code, not workflows: <code>projects.create</code> creates the project + board + start card + root run in one transaction (the <code>conveyor.start</code> hook and <code>CONVEYOR_HOOK_SECRET</code> retire); the move step is the existing <code>cards.move</code>; <code>wip.pull</code> runs on board events; <code>err.card</code> runs on <code>run.failed</code>; approval routing is the gate resume. The <code>workflow.start</code> kind and the <code>schedules.upsert</code> payload retire. The run tree and the bus are S13's; <code>runs.create</code>/<code>runs.cancel</code> stay.</p>
+<h1 id="s06--control-plane">S06 — Control plane</h1>
+<p>Programme project: S06 · issues #14</p>
+<!-- 2026-11-08: `audience` and `audience_member` were built by 0005 and DROPPED by migration 0011 — S00 day 2
+measured zero usage (no `streams` node operation in any of the 348 flows, fr.streams 0 rows, no `/api/streams`
+route). `messages.send` therefore takes an explicit recipient list only; its `audience_id` field is gone. -->
+
+<p><strong>Gate (SPEC §8 S6):</strong> golden card-type×list path; dual-control approval; retry.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>Claims, runs, approvals, andon and notifications become one durable control plane: one conditional <code>UPDATE</code> per claim, one <code>job</code> row per period, one <code>message</code> plus N <code>delivery</code> rows per notification.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S03: <code>card</code> (claim columns, <code>claim_fence</code>), <code>run</code>, <code>approval</code>, <code>approval_decision</code>, <code>andon_state</code>.</li>
+<li>S04: registry + invocation route; S05: <code>comment</code>, <code>cards.move</code>, <code>board:{id}</code> SSE.</li>
+<li>S02: <code>job</code>, <code>schedule</code>, <code>event</code>, <code>audit_event</code>, SSE replay.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — the 6 tables of <code>02-DATA-ARCHITECTURE §2.6</code>; 17 actions; job kinds for 11 of fr's 14 timers (§5.3); SSE <code>run:{id}</code>, <code>approval:{id}</code>, <code>tenant</code>; Telegram in/out; andon and its gauge.</p>
+<p><strong>OUT</strong> — the signed mcp_server channel (<code>S06a</code>: HMAC, payloads, ±300 s); MCP tool surfacing (<code>S10</code>); <code>project_request.timeout</code> (<code>S07</code>); UI (<code>S12</code>: screens only, §5.6); <code>audience</code> screens (PENDING-S0).</p>
+<p><strong>UI surface declared for S12:</strong> <code>run queue</code> — <code>runs.list</code> (status, card, attempt, age, assignee) over <code>run</code>, on the queued partial index.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SPEC.md</code> §4.5; <code>02-source-map/20-fr.md</code> (fr <code>6f7c5097</code>) Workers, <code>approvals</code>/<code>conveyor</code>/<code>admin</code>/<code>schedules</code></td>
+<td>both signed directions; the 14 <code>runOnce</code> handlers; <code>andon_state</code>; <code>wip_slot</code>; <code>engagement_deliveries</code></td>
+<td>handlers as job kinds; seam shape</td>
+<td>the timers; the HMAC (S06a)</td>
+</tr>
+<tr>
+<td><code>02-source-map/10-agent-patterns.md</code> (<code>agent</code> <code>83b8de7e</code>) <code>lease.rs</code>, <code>provision/outbox.rs</code></td>
+<td>conditional <code>UPDATE … RETURNING 1</code>; <code>lease_until</code>+<code>lease_token</code>; enqueue in-tx, send outside</td>
+<td>the fence pair</td>
+<td>per-process <code>owner()</code></td>
+</tr>
+<tr>
+<td><code>02-source-map/30-rm-planka-mcp-n8n.md</code> §1 <code>pm_projects</code></td>
+<td><code>_is_fr_close</code></td>
+<td>—</td>
+<td>the fr-only close case</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>migrations/0005_control_plane.sql
+crates/domain/src/{claim,run,approval,andon,message}.rs
+crates/store/src/{claim,run,approval,andong,channel,delivery}.rs
+crates/actions/src/control/{cards,runs,approvals,andong,messages,channels}.rs
+crates/actions/src/channel/{mod,telegram,web,reply}.rs
+crates/api/src/{runs,approvals,events,telegram}.rs   apps/server/src/worker.rs
+crates/store/src/jobs/{runner,schedule,kind}.rs
+crates/api/tests/{golden_path,claim_race,run_retry,approval_dual,approval_expire,andon,delivery_retry,telegram_reply,notifications,sse_control}.rs</code></pre>
+<h3 id="51-tables--26-verbatim-six-only">5.1 Tables — §2.6 verbatim, six only</h3>
+<p><code>channel_binding</code> · <code>channel_preference</code> · <code>message</code> · <code>delivery</code> · <code>audience</code> · <code>audience_member</code> (PENDING-S0).</p>
+<h3 id="52-actions">5.2 Actions</h3>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>input → output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cards.claim</code> <code>.release</code> <code>.renew</code></td>
+<td>claim <code>{card_id,ttl_s?}</code> → <code>{claim_fence,version,lease_expires_at}</code>; renew <code>{card_id,claim_fence}</code> → the same; release <code>{card_id,claim_fence?}</code> → the same. The expected <code>version</code> is the request's <code>If-Match</code> (CONTRACT §3), bound as <code>$5</code> — never a body field</td>
+</tr>
+<tr>
+<td><code>runs.create</code> <code>.start</code> <code>.finish</code> <code>.cancel</code> <code>.list</code></td>
+<td><code>{card_id,correlation_id?}</code> → <code>RunOut</code> (added later: <code>procedure_id</code> by S11, <code>workflow_id</code> by S13); <code>IdIn</code>; <code>{id,outcome,error_class?}</code>; <code>{id,reason?}</code>; <code>{status?,card_id?} + PageIn</code> → <code>Page&lt;RunOut&gt;</code></td>
+</tr>
+<tr>
+<td><code>approvals.decide</code> <code>.list</code></td>
+<td><code>{approval_id,decision,note?,item_decisions?}</code> → <code>ApprovalOut</code>; <code>{status?} + PageIn</code> → <code>Page&lt;ApprovalOut&gt;</code></td>
+</tr>
+<tr>
+<td><code>andon.engage</code> <code>.release</code></td>
+<td><code>{reason}</code> → <code>AndonOut</code>; <code>{}</code> → <code>AndonOut</code> — per-tenant singleton, no id (<code>andon_state</code> keys on <code>tenant_id</code>)</td>
+</tr>
+<tr>
+<td><code>messages.send</code></td>
+<td><code>{recipients[],channel_kind,body,kind?,meta?,audience_id?}</code> → <code>{message_id,delivery_ids[]}</code></td>
+</tr>
+<tr>
+<td><code>notifications.list</code> <code>.update</code></td>
+<td><code>{unread?,cursor?}</code> → caller's deliveries; <code>{channel_kind,enabled?,quiet_hours?}</code> → pref</td>
+</tr>
+<tr>
+<td><code>channels.bind</code> <code>.unbind</code></td>
+<td><code>{tenant_id,channel_kind,route_key,config?}</code> → <code>ChannelBindingOut</code>; <code>{tenant_id,channel_kind,route_key}</code> → 204</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-job-kinds--every-timer-replaced">5.3 Job kinds — every timer replaced</h3>
+<table>
+<thead>
+<tr>
+<th>fr timer → job kind (cadence)</th>
+<th>dedupe key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scheduled-trigger-tick</code> → <code>schedule.materialise</code> 60 s</td>
+<td><code>schedule:&lt;cron-minute&gt;</code></td>
+</tr>
+<tr>
+<td><code>mcp-approval-closed</code> → <code>approval.closed.emit</code> 30 s</td>
+<td><code>&lt;approval_id&gt;:&lt;final_status&gt;</code></td>
+</tr>
+<tr>
+<td><code>approval-expiry</code> → <code>approval.expire</code> 60 s</td>
+<td><code>approval:&lt;id&gt;</code></td>
+</tr>
+<tr>
+<td><code>approval-redelivery</code> → <code>approval.redeliver</code> 900 s</td>
+<td><code>approval:&lt;id&gt;</code></td>
+</tr>
+<tr>
+<td><code>deblock-callback-redelivery</code> → <code>deblock.redeliver</code> 900 s</td>
+<td><code>run:&lt;id&gt;</code></td>
+</tr>
+<tr>
+<td><code>ac-coverage-redelivery</code> → <code>coverage.redeliver</code> 300 s</td>
+<td><code>card:&lt;id&gt;</code></td>
+</tr>
+<tr>
+<td><code>project-delivered-reconcile</code> → <code>project.reconcile</code> 300 s</td>
+<td><code>project:&lt;id&gt;</code></td>
+</tr>
+<tr>
+<td><code>project-request-analysis-timeout</code> → <code>project_request.timeout</code> <strong>S07</strong></td>
+<td><code>project_request:&lt;id&gt;</code></td>
+</tr>
+<tr>
+<td><code>scheduled-trigger-health</code> → <code>schedule.health</code> 60 s</td>
+<td><code>schedule</code></td>
+</tr>
+<tr>
+<td><code>idempotency-sweep</code> → <code>idempotency.sweep</code> 3600 s</td>
+<td><code>hour:&lt;yyyy-mm-ddThh&gt;</code></td>
+</tr>
+<tr>
+<td><code>scheduled-trigger-run-prune</code> → <code>job.prune</code> 86 400 s</td>
+<td><code>day:&lt;date&gt;</code></td>
+</tr>
+<tr>
+<td><code>analytics-rollup</code>, <code>signup-onboarding-tick</code>, <code>workflows-cache</code> → <strong>deleted</strong></td>
+<td>— (rollups derive from <code>event</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Also <code>card.claim</code>, <code>card.lease_sweep</code> (60 s), <code>delivery.send</code>, <code>run.execute</code>, <code>run.reap</code> (60 s). Handlers are idempotent on <code>(kind, dedupe_key)</code>; periods are <code>schedule</code> rows under <code>pg_advisory_xact_lock(hashtext('conveyor:schedule'))</code>.</p>
+<p><strong>The claim</strong> — one statement, no fallback arm (<code>02-DATA-ARCHITECTURE §4</code>, verbatim):</p>
+<pre class="sql"><code>UPDATE card
+   SET assignee_id = $3, lease_expires_at = now() + $4::interval,
+       lease_token = uuidv7(), claim_fence = claim_fence + 1,
+       version = version + 1, updated_at = now()
+ WHERE tenant_id = $1 AND id = $2 AND version = $5
+   AND (lease_expires_at IS NULL OR lease_expires_at &lt; now() OR assignee_id = $3)
+RETURNING claim_fence, version;</code></pre>
+<p><code>$5</code> is the caller's <code>If-Match: "&lt;version&gt;"</code> (CONTRACT §3) — the body carries no version, and a mismatch is the 412 path, never a grant. Zero rows = not granted; a DB error is a refusal, never <code>granted: true</code>. <strong>ABA:</strong> <code>claim_fence</code> is monotonic, so a holder past its TTL compares the fence before every write; a changed fence means the card moved — fr's <code>card_phase_lease</code> window, closed by a column. <strong>Waiter:</strong> a blocked claimant enqueues <code>job(kind='card.claim', dedupe_key=&lt;card_id&gt;)</code>; the partial unique index on <code>(tenant_id, kind, dedupe_key) WHERE status IN ('pending','running')</code> collapses N into one. <strong>Holder death:</strong> the lease expires; <code>card.lease_sweep</code> clears assignee and token, emits <code>card.lease_expired</code>, and the waiter's predicate already treats an expired lease as free.</p>
+<h3 id="54-approvals">5.4 Approvals</h3>
+<p>At most one pending per <code>(run, gate)</code>: the partial unique index, not a handler. Dual control is <code>required_decisions</code> (fr's <code>required_approvers</code> folds in); <code>uq (approval_id, approver_id)</code> stops one person twice. <code>approvals.decide</code> is <code>pending → approved</code> iff <code>count(approve) &gt;= required_decisions</code>, <code>pending → rejected</code> on any reject, one transaction. It records <code>decided_by_kind</code> (<code>human</code> from web/Telegram, <code>agent</code> from <code>/mcp</code> — D19) and <code>via</code> (<code>channel</code>, <code>agent_member_id</code>, <code>product</code>). <strong>First-response-counts</strong> closes the <em>delivery</em> set (other recipients <code>expired</code>), not the gate: with <code>required_decisions &gt; 1</code> it stays pending. <code>approval.expire</code> runs at 60 s. A close enqueues <code>delivery(channel_kind='mcp')</code>.</p>
+<h3 id="55-andon">5.5 Andon</h3>
+<p><code>andon.engage</code> writes <code>andon_state</code> and emits <code>andon.engaged</code>; <code>runs.create</code> refuses <code>409 andon-engaged</code>; the poller skips engaged tenants; <code>release</code> reverses both. <strong>Safety signal:</strong> S06 exposes <code>conveyor_andon_engaged{tenant_id}</code> and <code>conveyor_andon_engaged_at_seconds</code> from the <strong>worker's</strong> scrape path, read from <code>andon_state</code> with a 1 s timeout. S14 alarms on <code>conveyor_andon_engaged == 1</code> <strong>and</strong> <code>absent()</code>: a dead exporter is an alarm, not a silence; never a request-driven cache (fr's gauge had no sample after a restore).</p>
+<h3 id="56-comms">5.6 Comms</h3>
+<p><code>messages.send</code> writes one <code>message</code> and N <code>delivery</code> rows, each enqueuing <code>delivery.send</code> on <code>dedupe_key = delivery.id</code>. The drainer claims with <code>FOR UPDATE SKIP LOCKED</code> + <code>lease_token</code>, sends <strong>outside</strong> the transaction, writes <code>pending → sent → delivered | failed | expired</code>; <code>attempts &gt;= max_attempts</code> lands <code>failed</code>, backoff <code>min(2^attempts · 5 s, 900 s)</code>. <strong>Reply path:</strong> Telegram inbound (<code>POST /api/channels/telegram/{binding_id}</code>, secret-token header) resolves <code>(chat_id, topic_id) → channel_binding → tenant → sender</code> and calls the <em>same</em> <code>approvals.decide</code>/<code>cards.comment</code> the web does — no per-channel path. Web is <code>delivered</code> at SSE ack; <code>mcp</code> hands off to S06a.</p>
+<p><strong>SSE.</strong> <code>run:{id}</code> and <code>approval:{id}</code> are aggregate topics; <code>tenant</code> is the tenant-wide topic (inbox, andon banner). Every mutation writes its <code>event</code> in-tx and <code>pg_notify</code>s it.</p>
+<p><strong>17 events:</strong></p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>emitter</th>
+<th>payload keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>card.claimed</code></td>
+<td><code>cards.claim</code></td>
+<td>card_id, claim_fence</td>
+</tr>
+<tr>
+<td><code>card.released</code></td>
+<td><code>cards.release</code>, <code>card.lease_sweep</code></td>
+<td>card_id, claim_fence</td>
+</tr>
+<tr>
+<td><code>card.lease_expired</code></td>
+<td><code>card.lease_sweep</code></td>
+<td>card_id, claim_fence</td>
+</tr>
+<tr>
+<td><code>run.created</code></td>
+<td><code>runs.create</code></td>
+<td>run_id, card_id, attempt</td>
+</tr>
+<tr>
+<td><code>run.started</code></td>
+<td><code>runs.start</code></td>
+<td>run_id, attempt</td>
+</tr>
+<tr>
+<td><code>run.succeeded</code></td>
+<td><code>runs.finish</code></td>
+<td>run_id, outcome</td>
+</tr>
+<tr>
+<td><code>run.failed</code></td>
+<td><code>runs.finish</code>, <code>run.reap</code></td>
+<td>run_id, error_class, attempt</td>
+</tr>
+<tr>
+<td><code>run.cancelled</code></td>
+<td><code>runs.cancel</code></td>
+<td>run_id, reason</td>
+</tr>
+<tr>
+<td><code>approval.requested</code></td>
+<td>run → <code>waiting_approval</code></td>
+<td>approval_id, run_id, gate</td>
+</tr>
+<tr>
+<td><code>approval.approved</code>, <code>approval.rejected</code></td>
+<td><code>approvals.decide</code></td>
+<td>approval_id, run_id, actor</td>
+</tr>
+<tr>
+<td><code>approval.expired</code></td>
+<td><code>approval.expire</code></td>
+<td>approval_id, run_id</td>
+</tr>
+<tr>
+<td><code>approval.voided</code></td>
+<td><code>runs.cancel</code></td>
+<td>approval_id, run_id</td>
+</tr>
+<tr>
+<td><code>andon.engaged</code></td>
+<td><code>andon.engage</code></td>
+<td>reason, actor_id</td>
+</tr>
+<tr>
+<td><code>andon.released</code></td>
+<td><code>andon.release</code></td>
+<td>actor_id</td>
+</tr>
+<tr>
+<td><code>message.sent</code></td>
+<td><code>messages.send</code></td>
+<td>message_id, channel_kind</td>
+</tr>
+<tr>
+<td><code>delivery.changed</code></td>
+<td><code>delivery.send</code></td>
+<td>delivery_id, message_id, state</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Preflight: <code>cargo test --workspace</code>; port 8930 free; <code>docker compose up -d db</code>.</li>
+<li><code>0005_control_plane.sql</code>: 6 tables, FKs, §2.6 indexes, forced RLS. <code>cargo run -p conveyor-server -- migrate</code> twice</li>
+<li>Domain: <code>run::transition</code>, <code>approval::decide</code>, <code>andon::apply</code>, <code>claim::may_claim</code>. <code>cargo test -p conveyor-domain</code></li>
+<li><code>store/src/claim.rs</code>: <code>claim_card_tx</code> (above), <code>release</code> (fence optional), <code>renew</code> fenced by <code>claim_fence</code>. <code>cargo test -p conveyor-store claim</code></li>
+<li>Job runner — claim + fenced <code>finish</code>. <code>cargo test -p conveyor-store jobs::runner</code></li>
+<li>Schedule materialiser — one advisory lock. <code>cargo test -p conveyor-store jobs::schedule</code></li>
+<li><code>worker</code> subcommand draining any kind. <code>cargo run -p conveyor-server -- worker &amp; sleep 2; kill %1</code></li>
+<li><code>card.claim</code> waiter + <code>card.lease_sweep</code> + the lease events. <code>cargo test -p conveyor-api --test claim_race</code></li>
+<li>Runs: 5 actions, <code>run.execute</code>, <code>run.reap</code>; one-live-run invariant. <code>cargo test -p conveyor-api --test run_retry</code></li>
+<li>Approvals: 2 actions, dual control, <code>approval.expire</code>. <code>cargo test -p conveyor-api --test approval_dual</code></li>
+<li>Human vs agent: one approval decided twice, <code>decided_by_kind</code> <code>human</code> then <code>agent</code>. <code>cargo test -p conveyor-api --test approval_dual -- decided_by_kind</code></li>
+<li>Approval events + <code>approval.closed.emit</code> (payload only). <code>cargo test -p conveyor-api --test approval_expire</code></li>
+<li>Andon: 2 actions, poller pause, gauge + timeout. <code>cargo test -p conveyor-api --test andon</code></li>
+<li><code>messages.send</code>, fan-out, <code>delivery.send</code> + backoff. <code>cargo test -p conveyor-api --test delivery_retry</code></li>
+<li><code>channel</code>: preferences, web delivery, Telegram webhook + reply→action. <code>cargo test -p conveyor-api --test telegram_reply</code></li>
+<li><code>notifications.list|update</code>. <code>cargo test -p conveyor-api --test notifications</code></li>
+<li>SSE: 3 topics, replay bound, keepalive. <code>cargo test -p conveyor-api --test sse_control</code></li>
+<li><code>channels.bind</code>/<code>channels.unbind</code> (platform-admin, audited). <code>cargo run -p conveyor-server -- --print-openapi | jq -e '.paths["/api/actions/channels.bind/invocations"]'</code></li>
+<li>Gate (§7), clippy, served-spec lock. <code>rg -n 'setInterval' crates apps</code> empty</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-api --test golden_path --test claim_race --test run_retry \
+  --test approval_dual --test approval_expire --test andon --test delivery_retry \
+  --test telegram_reply --test notifications --test sse_control
+test -z &quot;$(rg -n &#39;setInterval&#39; crates apps || true)&quot;            # empty</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>golden path (<code>golden_path.rs</code>)</td>
+<td>card → claim → run → gate → decide → <code>cards.move(done)</code>: run <code>succeeded</code>, approval <code>approved</code>, one <code>audit_event</code>+<code>action_invocation</code>+<code>event</code> each</td>
+</tr>
+<tr>
+<td>b</td>
+<td>dual control</td>
+<td><code>required_decisions=2</code>: one <code>approve</code> leaves <code>pending</code>; the same approver again <code>409</code>; a second closes</td>
+</tr>
+<tr>
+<td>c</td>
+<td>retry</td>
+<td><code>kill -9</code> mid-run: <code>run.reap</code> → <code>failed</code>/<code>crashed</code>, next <code>runs.create</code> is <code>attempt=2</code>; two rows, never two live</td>
+</tr>
+<tr>
+<td>d</td>
+<td>andon</td>
+<td>engaged: <code>409</code>, a queued <code>run.execute</code> stays pending 60 s; released: runs within one poll</td>
+</tr>
+<tr>
+<td>e</td>
+<td>delivery retry</td>
+<td>stub returns 500 → <code>attempts=5</code>, <code>state='failed'</code>, one row</td>
+</tr>
+<tr>
+<td>f</td>
+<td>no timers</td>
+<td><code>rg</code> empty; every cadence is a <code>schedule</code> row</td>
+</tr>
+<tr>
+<td>g</td>
+<td>human vs agent</td>
+<td><code>required_decisions=2</code>: one decision from a human, one from a seeded <code>app_user(kind='agent')</code> — both persist with different <code>decided_by_kind</code>, driven through <code>approvals.decide</code> (S06a depends on S06, not the reverse)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>Approval expiry must not deliver after close.</strong> Decision and expiry race on <code>WHERE status='pending'</code>; the loser emits nothing — re-read status in-tx.</li>
+<li><strong>A delivery row per recipient, not per message</strong> — else "delivered once" is a convention.</li>
+<li><strong>Andon must not depend on the process holding the cord.</strong> State is a row; the gauge scrapes.</li>
+<li><strong>Handlers idempotent on <code>(kind, dedupe_key)</code>.</strong> The index covers <code>pending</code>/<code>running</code>, so a <code>dead</code> job never blocks re-enqueue.</li>
+<li><strong>Claim <code>version</code> vs a legitimate renew.</strong> The claim's version is the caller's <code>If-Match</code> (CONTRACT §3), bound to <code>$5</code>, never a body field. <code>cards.renew</code> takes <code>{card_id,claim_fence}</code> — the fence from the claim response — and re-checks it, never <code>version</code>: an unrelated <code>cards.update</code> bumps the version. <code>cards.release</code> takes <code>{card_id,claim_fence?}</code> and checks the fence when one is supplied.</li>
+<li><strong><code>delivery</code> retention never prunes <code>pending</code>/<code>sent</code></strong> — terminal only, 30 days.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li><strong>Claim stays on the card row</strong>; <code>claim_fence</code> is the ABA witness.</li>
+<li><strong>A waiter is a deduped <code>card.claim</code> job</strong>, not a table.</li>
+<li><strong>Run liveness is the driving job's <code>lease_until</code></strong> — no <code>run.heartbeat_at</code>; reaped, retried at <code>attempt+1</code>.</li>
+<li><strong><code>approval.expire</code> at 60 s</strong>, not 900 s.</li>
+<li><strong>First-response-counts closes deliveries, not the gate</strong> (§5.4).</li>
+<li><strong>Andon pauses the poller and refuses <code>runs.create</code></strong>; never scales replicas.</li>
+<li><strong>Telegram is the first channel</strong>; web and mcp share the rows.</li>
+<li><strong>The callback URL is on <code>approval</code>; the signed transport is S06a.</strong></li>
+<li><strong>Three timers deleted</strong> (<code>analytics-rollup</code>, <code>signup-onboarding-tick</code>, <code>workflows-cache</code>).</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Does andon pause <code>delivery.send</code> too?</td>
+<td>No — except <code>delivery.send</code> and <code>approval.closed.emit</code>.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>message.channel_kind</code> is single-valued while a message fans out.</td>
+<td>Originating channel; fan-out lives on <code>delivery</code>.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>audience</code>/<code>audience_member</code> are PENDING-S0.</td>
+<td>Ship tables; no UI until S0.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>runs.cancel</code> on a <code>waiting_approval</code> run.</td>
+<td>Voids it, same transaction.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>schedule.health</code> cadence.</td>
+<td><strong>60 s</strong> — fr's measured tick (<code>workers/scheduled-trigger-health.ts</code>, 2026-11-07), not 300 s.</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S06-control-plane.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

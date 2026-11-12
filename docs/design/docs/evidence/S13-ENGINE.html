@@ -1,0 +1,1113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S13 engine — session 1: the definition model and the pure engine · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S13-ENGINE.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s13-engine--session-1-the-definition-model-and-the-pure-engine">S13 engine — session 1: the definition model and the pure engine</h1>
+<blockquote>
+<p><strong>Public flip (2026-11-12):</strong> the recorded <code>fixtures/{a,b,c}.old.jsonl</code>, <code>fixtures/SHA256SUMS</code> and the trace-diff fixture tests were removed from the public tree. The n8n flows never ran successfully and that proof is retired; the projection code and the authored flow/expectation files remain.</p>
+</blockquote>
+<blockquote>
+<p>⛔ <strong>SUPERSEDED 2026-11-10 by the process model.</strong> This receipt records the DAG era. The <code>POST /api/hooks/{hook}</code> seam and <code>CONVEYOR_HOOK_SECRET</code> are deleted; <code>err.card</code> is a computed handler on <code>run.failed</code> (no <code>workflow.start</code> job); <code>conveyor.start</code> is <code>projects.create</code>. The workflow engine itself is RETAINED as the tool-sequence executor. Current receipt: <code>docs/evidence/S13-PROCESS.md</code>.</p>
+</blockquote>
+<p><strong>Date:</strong> 2026-11-09 12:55–13:10 CET · <strong>Session:</strong> <code>s13-engine</code> · <strong>Tree:</strong> <code>$HOME/Movies/conveyor</code> (no <code>.git</code>) <strong>Lease:</strong> <code>s13-engine</code> opened 12:55 in <code>00-INDEX</code> §Tree lease, released with this receipt. <strong>Split tree by message</strong> with <code>inference-ledger-prompt-audit</code> (S16) and <code>build-eval-instrument</code> (S19 Part A): this session edited only <code>crates/workflow/**</code> + this file + the index row/cell. No <code>spec.rs</code>, <code>lib.rs</code>, <code>migrate.rs</code>, <code>s07_schema.rs</code>, migration or <code>served-spec.lock.json</code> was touched — <strong>189 actions / 210 ops unchanged</strong>.</p>
+<h2 id="files">Files</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>lines</th>
+<th>what</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/workflow/src/definition.rs</code></td>
+<td>1142</td>
+<td>the one-document model (<code>schema/nodes/edges</code>, five node kinds, closed predicate set) and <code>validate_publish</code></td>
+</tr>
+<tr>
+<td><code>crates/workflow/src/engine.rs</code></td>
+<td>644</td>
+<td>the <strong>pure</strong> executor: <code>advance</code>, <code>succeeded</code>/<code>failed</code>/<code>gate_decided</code>, deterministic serial planning</td>
+</tr>
+<tr>
+<td><code>crates/workflow/src/lib.rs</code></td>
+<td>23</td>
+<td>the crate's public surface</td>
+</tr>
+<tr>
+<td><code>crates/workflow/tests/definition_validate.rs</code></td>
+<td>354</td>
+<td>14 publish-rule tests</td>
+</tr>
+<tr>
+<td><code>crates/workflow/tests/engine_advance.rs</code></td>
+<td>329</td>
+<td>11 executor tests</td>
+</tr>
+<tr>
+<td><code>crates/workflow/Cargo.toml</code></td>
+<td>14</td>
+<td>adds <code>serde</code>, <code>serde_json</code>, <code>thiserror</code>; still <code>workflow → domain</code> only (CONTRACT §1)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-was-run-real-output-rbuild-on-m1--local-cargo-is-disabled-by-design">What was run (real output, <code>rbuild</code> on m1 — local <code>cargo</code> is disabled by design)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>rbuild --doctor</code></td>
+<td>ok — m1, toolchain 1.99.0, <code>initdb</code> present, slot0 36 GiB / slot1 2 GiB</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>rbuild -- test -p conveyor-workflow</code></td>
+<td><strong>25 passed, 0 failed</strong> (14 <code>definition_validate</code> + 11 <code>engine_advance</code>)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>rbuild -- fmt -p conveyor-workflow -- --check</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>rbuild -- clippy -p conveyor-workflow --all-targets -- -D warnings</code></td>
+<td><strong>exit 0.</strong> The first run was blocked by <strong>S16's</strong> in-flight <code>crates/domain/src/prompt_audit.rs:487</code> (<code>unnecessary_map_or</code>); the peer fixed it on message, and the re-run then reached this crate and caught one real lint of mine — an unused binding in <code>require_branches</code> — fixed, re-run green.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs--each-is-the-proof-not-the-green-run">Reversal proofs — each is the proof, not the green run</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>guard removed / changed</th>
+<th>test</th>
+<th>observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>the join guard in <code>ready_nodes</code> (all inbound edges must be decided)</td>
+<td><code>fan_out_runs_in_document_order_and_the_join_waits_for_every_edge</code></td>
+<td><strong>FAILED</strong>: <code>left: ["start","b","join","c"]</code> vs <code>right: ["start","b","c","join"]</code></td>
+</tr>
+<tr>
+<td>B</td>
+<td>the "graph minus loops must be acyclic" guard</td>
+<td><code>a_cycle_without_a_loop_is_refused</code></td>
+<td><strong>FAILED</strong> at the <code>expect_err</code> (the two-node cycle validated)</td>
+</tr>
+<tr>
+<td>C</td>
+<td><code>MAX_LOOP_ITERATIONS</code> 1 000 → 1 001</td>
+<td><code>the_iteration_cap_is_enforced</code></td>
+<td><strong>FAILED</strong> (1 001 accepted)</td>
+</tr>
+<tr>
+<td>D</td>
+<td>the ready-node comparator reversed</td>
+<td><code>fan_out_…</code> (same test)</td>
+<td><strong>FAILED</strong>: <code>left: ["start","c","b","join"]</code> vs <code>right: ["start","b","c","join"]</code></td>
+</tr>
+</tbody>
+</table>
+<p>All four were reverted; the suite is green after the reverts (#2, #3 above).</p>
+<h2 id="corrections-this-session-made-to-its-own-plan-recorded-not-hidden">Corrections this session made to its own plan (recorded, not hidden)</h2>
+<ol type="1">
+<li><strong>"One loop per cycle" cannot mean "one loop node per SCC".</strong> Nested loops put <em>every</em> loop of the nest in one SCC, so the literal reading forbids exactly the nesting §5.2 permits (cap 3). The implemented rule: <strong>remove the loop nodes and the remaining graph must be acyclic</strong> — every cycle passes through a loop, and any number of nested loops is legal. A loop's body is its <strong><code>each</code>-reachable region</strong> (the engine resets that region each iteration), and <code>loop_nesting</code> counts loops by body containment. Proven by <code>nested_loops_publish_up_to_the_cap_and_no_deeper</code> (3 publishes, 4 is refused with <code>depth: 4</code>).</li>
+<li><strong>A loop's entry edge and its return edge must be told apart by the body, not by the SCC.</strong> <code>L1.each → L2</code> enters the inner loop; <code>L3.done → L2</code> returns to it. Both are "into a loop in the same SCC". Counting both as returns gave the nested document <strong>three start nodes</strong> (measured: <code>MultipleStarts { count: 3 }</code>). The rule now: an edge into a loop is a cycle-closing return <strong>iff its source is inside that loop's own body</strong>.</li>
+<li><strong>Template validation is roots-only</strong> (<code>validate_template(template, usize::MAX)</code>). A graph's execution order is not fixed at publish time — a loop repeats its body, a branch may skip one — so <code>steps.&lt;n&gt;</code> cannot be checked against a static position. S11's positional check stays where it belongs (<code>procedure_step</code>, fixed order). A genuinely forward reference fails <strong>typed at run time</strong>, not at publish. Recorded as a scoped deviation, not as a gap to "fix" by inventing a positional rule for graphs.</li>
+</ol>
+<h2 id="what-is-not-built--steps-1-317-stated-plainly">What is <strong>not</strong> built — steps 1, 3–17, stated plainly</h2>
+<ul>
+<li><strong>Step 1</strong> migration <code>0019_s13_workflow.sql</code> (the <code>workflow</code> table, <code>run.workflow_id</code> + FK, the four <code>run_step</code> trace columns, the partial index) + one line each in <code>store/src/migrate.rs</code> and <code>store/tests/s07_schema.rs</code>. Both ledger files are S16's right now; <code>0019</code> stays this lane's per its message.</li>
+<li><strong>Step 3</strong> <code>crates/store/src/workflow/{workflow,run_step}.rs</code> (+ the <code>lib.rs</code> line).</li>
+<li><strong>Step 4</strong> the 12 actions, <code>crates/api/src/workflows.rs</code>, registry 189 → 201, served-spec 210 → 222.</li>
+<li><strong>Steps 6–9</strong>: scheduler (<code>job(kind='workflow.node')</code>, <code>DEFAULT_SCHEDULES</code>, <code>prune.rs</code>), nodes, agent caps, trace + export + <code>admin trace-diff</code>.</li>
+<li><strong>Steps 10–15b</strong>: record the three old traces <strong>before S14</strong> (n8n history is 3 days), re-author A/B/C + the 4 named flows + <code>kata.open</code>, the 348-row <code>parity/n8n-dispositions.tsv</code>, and <strong>retire the legacy flows</strong> (<code>PATCH {"active":false}</code>, assert API <code>data: []</code> <strong>and</strong> DB <code>count(*) where active = 0</code>).</li>
+<li><strong>Steps 16a–16d</strong> the editor spike (<code>spikes/editor/</code>, never a workspace member) and the fallback decision.</li>
+<li><strong>Step 17</strong> the workspace gate.</li>
+</ul>
+<p>The engine currently <strong>plans</strong>; it does not yet invoke, persist or trace. Nothing in this slice can be read as an executable workflow: the store, the actions and the scheduler are the next slices of this lane.</p>
+<hr />
+<h1 id="s13-engine--session-2-migration-0019-the-workflow-store-six-actions">S13 engine — session 2: migration 0019, the workflow store, six actions</h1>
+<p><strong>Date:</strong> 2026-11-09 14:06– · <strong>Session:</strong> <code>s13-engine</code> · <strong>Tree:</strong> <code>$HOME/Movies/conveyor</code> (no <code>.git</code>) <strong>Lease:</strong> <code>s13-engine</code> (session 2) opened 14:06 in <code>00-INDEX</code> §Tree lease. ⚠️ <strong>No queue — owner ruling 2026-11-09: sessions run in parallel.</strong> Targeted edits only on shared files, re-read before each. S17 released its pass at ~14:14 and regenerated the lock; <strong>S19-B registered 7 eval actions mid-session</strong>, which moved the registry under this session — every count below is the measured final one, not the planned one.</p>
+<h2 id="files-1">Files</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>migrations/0019_s13_workflow.sql</code></td>
+<td><strong>new</strong> — <code>workflow</code> (one document, partial published-unique, 256 KiB CHECK, RLS enabled <strong>and</strong> forced), <code>run.workflow_id</code> + FK + partial index, <code>run_step</code>'s four trace columns</td>
+</tr>
+<tr>
+<td><code>crates/store/src/migrate.rs</code></td>
+<td>the <code>(19, "s13 workflow")</code> ledger line</td>
+</tr>
+<tr>
+<td><code>crates/store/tests/s07_schema.rs</code></td>
+<td>the applied-set pin gains 19</td>
+</tr>
+<tr>
+<td><code>crates/store/src/lib.rs</code></td>
+<td><code>pub mod workflow;</code></td>
+</tr>
+<tr>
+<td><code>crates/store/src/workflow/{mod,workflow}.rs</code></td>
+<td><strong>new</strong> — error-by-name mapping, the size guard, create/fork, get by id/key, keyset list, draft update (<code>If-Match</code>), publish (retire-then-freeze), retire</td>
+</tr>
+<tr>
+<td><code>crates/store/tests/workflow_publish.rs</code></td>
+<td><strong>new</strong> — 5 tests (fork, publish/retire, If-Match, the CHECK, RLS)</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/spec.rs</code></td>
+<td><code>WorkflowsRead</code>/<code>WorkflowsWrite</code> (59 → 61), <code>as_str</code>, <code>granted_to</code>, the vocabulary pin</td>
+</tr>
+<tr>
+<td><code>crates/actions-derive/src/lib.rs</code></td>
+<td>the macro's compile-time scope table gains the two spellings</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/lib.rs</code></td>
+<td><code>pub mod workflow;</code></td>
+</tr>
+<tr>
+<td><code>crates/actions/src/workflow/{mod,actions,views}.rs</code></td>
+<td><strong>new</strong> — the six actions, four events, error mapping, cursor</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/board/events.rs</code></td>
+<td>the four <code>workflow.*</code> events join <code>S05_EVENT_TYPES</code> (22 → 26)</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/registry.rs</code></td>
+<td><code>EXPECTED</code> 230 → 237 (S19-B's 7 landed mid-session), split <code>(224, 13)</code>, doc arithmetic</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/workflows.rs</code></td>
+<td><strong>new</strong> — 4 tests (create+event, If-Match, publish/retire, list/get)</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/parity_http_mcp.rs</code></td>
+<td>6 <code>workflows.*</code> samples + <code>seed_workflow</code> + prepare arms</td>
+</tr>
+<tr>
+<td><code>served-spec.lock.json</code></td>
+<td>regenerated at <strong>258 ops</strong> (S17 wrote it; this session verified <code>--check-lock</code> exit 0)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-was-run-real-output-rbuild-on-m1">What was run (real output, <code>rbuild</code> on m1)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>rbuild -- test -p conveyor-store --lib --test s07_schema --test workflow_publish</code></td>
+<td><strong>exit 0</strong> — 5 passed; the embedded set and the applied ledger both carry 19</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>rbuild -- test -p conveyor-actions --lib --test registry --test workflows</code></td>
+<td><strong>46 / 8 / 4 passed, 0 failed</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>rbuild -- clippy -p conveyor-actions -p conveyor-store -p conveyor-actions-derive --all-targets -- -D warnings</code></td>
+<td><strong>exit 0</strong> (4 lints fixed: <code>module_inception</code> allowed by name, three <code>collapsible_if</code> → let-chains)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>rbuild -- fmt -p conveyor-actions -p conveyor-store -p conveyor-actions-derive -- --check</code></td>
+<td><strong>this lane's files clean</strong>; S19-B's <code>eval/**</code> files still had diffs — theirs to format, not reformatted here</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>exit 0</strong> — <strong>258 ops</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>rbuild --gate</code> (fmt <code>--all --check</code> + clippy + <code>test --locked</code>)</td>
+<td><strong>stops at <code>fmt --all --check</code></strong> on two peers' files (<code>apps/web/src/state.rs</code>, <code>crates/domain/src/eval/grade.rs</code>) — not this lane's files, and not reformatted here</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>rbuild -- test --locked --no-fail-fast</code> (14:44 CET)</td>
+<td><strong>24 binaries green, 1 red target — <code>parity_http_mcp</code></strong>, exactly S19 Part B's 7 missing samples</td>
+</tr>
+<tr>
+<td>8</td>
+<td>count pins updated for the new actions</td>
+<td><code>crates/api/src/lib.rs</code> 224 → <strong>237</strong>; <code>portfolio_roundtrip</code> scopes 59 → <strong>61</strong> (this lane's two); <code>apps/server/tests/prune.rs</code> gains <code>eval.run.tick</code>/<code>eval.reap</code> (S19 Part B's two schedule rows). Re-run: api lib <strong>29</strong>, portfolio <strong>2</strong>, prune <strong>13</strong>, all green</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs--each-is-the-proof-not-the-green-run-1">Reversal proofs — each is the proof, not the green run</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>guard reversed</th>
+<th>test</th>
+<th>observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>publish's retire-previous step (<code>AND status='published'</code> → <code>AND false</code>)</td>
+<td><code>workflow_publish</code></td>
+<td><strong>FAILED 4/5</strong> — the second publish hit <code>uq_workflow_published</code> instead of retiring the first</td>
+</tr>
+<tr>
+<td>B</td>
+<td>create's Rust size guard (<code>ensure_definition_fits(&amp;definition)?</code> → ignored)</td>
+<td><code>workflow_publish</code></td>
+<td><strong>FAILED 4/5</strong> — the DB CHECK refused the document and the store mapped it to <code>Invalid</code>, not <code>DefinitionTooLarge</code></td>
+</tr>
+<tr>
+<td>C</td>
+<td>the <code>(19, "s13 workflow")</code> ledger line removed</td>
+<td>store <code>--lib</code> (embedded set)</td>
+<td><strong>FAILED 1/36</strong>, naming the embedded set</td>
+</tr>
+</tbody>
+</table>
+<p>All three were restored; runs #1–#2 are green after the restores.</p>
+<h2 id="scope-corrections-made-this-session-recorded-not-hidden">Scope corrections made this session (recorded, not hidden)</h2>
+<ol type="1">
+<li><strong>The plan said 12 actions; the slice's build order says 6 at step 4.</strong> <code>workflows.*</code> is step 4; <code>workflow_runs.*</code> (with the scheduler) is step 6, <code>workflow_traces.export</code> step 9, <code>agent.run</code>/<code>inference.chat</code> step 8. Six landed. Registry 224 → <strong>230</strong> from this lane (+7 from S19-B = <strong>237</strong>), scopes 59 → <strong>61</strong>, lock 245 → <strong>258</strong>.</li>
+<li><strong><code>crates/api/src/workflows.rs</code> is not written.</strong> No route is specified in SPEC, CONTRACT or S12; reads are already served by <code>workflows.get</code>/<code>workflows.list</code>, and inventing a REST facade would be a second implementation of the same rules. It belongs to whichever slice needs it (the editor, S13 step 16, or S12).</li>
+<li><strong><code>store/src/workflow/run_step.rs</code> is not written.</strong> It lands with the trace (steps 6/9); writing it now would be untested code with no caller.</li>
+<li><strong><code>--copy-back</code> cannot copy a single file back</strong> — <code>rbuild</code> passes a trailing slash to rsync, which fails with "Not a directory" for a file. The lock was verified on the local tree instead (S17 wrote it; <code>--check-lock</code> green). The <code>rbuild</code> doc line that advertises a file path is wrong.</li>
+</ol>
+<h2 id="the-workspace-gate--measured-with-the-one-external-red-named">The workspace gate — measured, with the one external red named</h2>
+<p><code>rbuild --gate</code> runs <code>fmt --all --check</code> first and stops there: two <strong>peers'</strong> files are unformatted (<code>apps/web/src/state.rs</code>, <code>crates/domain/src/eval/grade.rs</code>). They were left alone — this lane formats only its own packages (run #4). The suite was then run directly (<code>test --locked --no-fail-fast</code>, 13:44Z): <strong>24 binaries green, one red target, <code>parity_http_mcp</code></strong>, which requires one sample per registered action. S19 Part B's seven (<code>eval_runs.{start,get,list,cancel}</code>, <code>eval_results.{list,get,label}</code>) have none; their owner reported the two fixtures those need (an approved, digest-matching eval with a locked split; a filled <code>eval_result</code> slot with a <code>pending_label</code> row) cannot land this session. <strong>That red is theirs and is attributable, not hidden</strong>; this lane's six samples are present and compile.</p>
+<p>⚠️ The tree moved after that run: <code>s15-capability-aggregate</code> landed migrations <code>0020</code>/<code>0027</code> and both ledger lines at 14:53 CET, and at 14:59 its in-flight <code>CatalogueStoreError::CapabilityMoved</code> left <code>conveyor-actions</code> non-exhaustive at <code>crates/actions/src/governance/catalogues.rs:57</code> (reported to that session). The next lane re-runs the suite; <strong>this receipt does not claim a green workspace gate.</strong></p>
+<h2 id="what-is-not-built--steps-617">What is <strong>not</strong> built — steps 6–17</h2>
+<ul>
+<li><strong>Step 6</strong> scheduler on <code>job(kind='workflow.node')</code>, <code>workflow_runs.start|get|cancel</code>, <code>DEFAULT_SCHEDULES</code>, <code>prune.rs</code>.</li>
+<li><strong>Step 7</strong> action/procedure/gate nodes, retry, timeout, idempotency at the executor.</li>
+<li><strong>Step 8</strong> <code>agent.run</code> (internal, capped) + <code>inference.chat</code> (external, <code>captures_usage = true</code>).</li>
+<li><strong>Step 9</strong> trace columns' writers, <code>workflow_traces.export</code>, <code>admin trace-diff</code>, <code>run_step</code> store.</li>
+<li><strong>Steps 10–15b</strong> old-trace recording before S14, the A/B/C + named flows + <code>kata.open</code>, the 348-row <code>parity/n8n-dispositions.tsv</code>, and retiring the legacy flows (API <code>data: []</code> <strong>and</strong> DB <code>active</code> count 0).</li>
+<li><strong>Steps 16a–16d</strong> editor spike + decision; <strong>step 17</strong> the final workspace gate.</li>
+</ul>
+<h2 id="session-3--s13-steps-6-and-7-scheduler--node-execution">§Session 3 — S13 steps 6 and 7 (scheduler + node execution)</h2>
+<p><strong>Session:</strong> <code>s13-engine</code> (session 3), 2026-11-09 15:16 → the release below. <strong>Lease:</strong> released with the gate recorded here. The tree is shared and had three live peers (<code>s15-capability-aggregate</code>, <code>s15-capability-runtime</code>, <code>build-web-ui-wave2</code>); every shared-file edit was targeted and re-read first.</p>
+<h3 id="what-landed">What landed</h3>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/workflow/src/engine.rs</code></td>
+<td><code>RecordedStep</code>/<code>RecordedStatus</code>, <code>Engine::resume</code> (trace replay, <code>TraceDiverged</code>), <code>waiting_node</code>/<code>running_node</code></td>
+</tr>
+<tr>
+<td><code>crates/workflow/src/scheduler.rs</code></td>
+<td><strong>new</strong> — pure <code>plan</code> / <code>apply</code> / <code>apply_gate</code>, <code>Positions</code>, <code>NodeRequest</code>, <code>HostResult</code>, <code>GateState</code></td>
+</tr>
+<tr>
+<td><code>crates/workflow/src/nodes.rs</code></td>
+<td><strong>new</strong> — template input, closed predicate set, loop items, run-time timeout cap, <code>uuidv5(run_id:node_id:attempt)</code></td>
+</tr>
+<tr>
+<td><code>crates/workflow/tests/workflow_scheduler.rs</code></td>
+<td><strong>new</strong> — the step-6 gate (9 tests: replay, in-flight resume, retry appends, gate wait/resume, fan-out order)</td>
+</tr>
+<tr>
+<td><code>crates/workflow/tests/workflow_nodes.rs</code></td>
+<td><strong>new</strong> — the step-7 gate (6 tests: idempotency key, timeout cap, predicates, loop items, control-node rows)</td>
+</tr>
+<tr>
+<td><code>crates/store/src/workflow/run.rs</code></td>
+<td><strong>new</strong> — run context, <code>run_step</code> start/finish/list, next position, the tick job (<code>workflow.node</code>, dedupe <code>&lt;run_id&gt;:tick</code>)</td>
+</tr>
+<tr>
+<td><code>crates/store/src/approval.rs</code></td>
+<td>workflow-gate readers: <code>workflow_gate_tx</code>, <code>approved_workflow_gate_tx</code>, <code>workflow_gate_status_tx</code></td>
+</tr>
+<tr>
+<td><code>crates/actions/src/workflow/node.rs</code></td>
+<td><strong>new</strong> — the executor: rebuild from rows, plan, invoke actions as <code>Role::KataExecutor</code>, start/poll procedure children, gates</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/workflow/runs.rs</code></td>
+<td><strong>new</strong> — `workflow_runs.start</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/control/approvals.rs</code></td>
+<td>the <code>kind == "workflow"</code> decide arm (approved → resume + tick; rejected → refused row + cancel)</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/control/runs.rs</code></td>
+<td><code>void_run_approvals</code> extracted; both cancels void pending gates</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/procedure/step.rs</code></td>
+<td><code>gate_requirements</code>/<code>GateRequirements</code> → <code>pub(crate)</code> (a workflow gate uses S11's catalogue rules, not a copy)</td>
+</tr>
+<tr>
+<td><code>apps/server/src/worker.rs</code></td>
+<td>the <code>workflow.node</code> arm + handler; <code>approval.expire</code> records a workflow gate's row before the generic cancel</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/registry.rs</code></td>
+<td><code>EXPECTED</code> 237 → <strong>240</strong>; the split <code>(227 internal, 13 external)</code>; scopes unchanged by me (S15's 61→63)</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/workflow_runs.rs</code></td>
+<td><strong>new</strong> — 4 tests, incl. the end-to-end run</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/parity_http_mcp.rs</code></td>
+<td>3 samples + 2 harness fixes (below)</td>
+</tr>
+<tr>
+<td><code>served-spec.lock.json</code></td>
+<td><strong>261 operations</strong>, sha256 <code>f29b050d53a9c0c3…</code>, <code>--check-lock</code> OK</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-was-run">What was run</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>test -p conveyor-workflow</code></td>
+<td><strong>40 passed</strong> (<code>definition_validate</code> 14, <code>engine_advance</code> 11, <code>workflow_nodes</code> 6, <code>workflow_scheduler</code> 9)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>test -p conveyor-store --test s07_schema --test workflow_publish</code></td>
+<td><strong>3 + 5 passed</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>test -p conveyor-actions --test registry --test workflows --test workflow_runs</code></td>
+<td><strong>8 + 4 + 4 passed</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>test -p conveyor-actions --test parity_http_mcp</code></td>
+<td><strong>4 passed</strong> — every registered action, both transports (was the tree-wide red)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>test -p conveyor-api --test approval_dual --test mcp_agent</code></td>
+<td><strong>4 + 2 passed</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>test -p conveyor-server --test approval_expire --test procedure_gate --test procedure_step --test procedure_reap --test jobs_kill</code></td>
+<td><strong>1+1+1+3+2 passed</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>clippy -p conveyor-workflow -p conveyor-actions --all-targets -- -D warnings</code></td>
+<td><strong>clean</strong></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>fmt --check</code> on my files</td>
+<td>formatted through the pinned toolchain; peers' unformatted files left alone</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>--print-openapi --check-lock</code></td>
+<td><strong>lock OK — 261 operations</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="reversal-proofs-each-fired-then-was-restored">Reversal proofs (each fired, then was restored)</h3>
+<ol type="1">
+<li><code>Engine::resume</code>'s planned-step assertion disabled → <code>resume_refuses_a_trace_that_is_not_the_planned_prefix</code> and <code>a_retry_appends_a_row_at_the_same_position_with_a_new_attempt</code> both fail (<code>NotRunning { node: "b" }</code>).</li>
+<li><code>nodes::idempotency_key</code> ignoring <code>attempt</code> → <code>the_idempotency_key_is_per_attempt_and_stable_across_a_replay</code> fails.</li>
+<li>The run-status guard in <code>execute_node</code> removed → <code>cancel_stops_the_tick_without_advancing_the_run</code> fails.</li>
+</ol>
+<h3 id="corrections-and-findings-while-building">Corrections and findings while building</h3>
+<ul>
+<li><strong>The lock is written on the build host.</strong> <code>rbuild</code> syncs mini3 → m1 before every run, so a written lock is overwritten by the next <code>rbuild</code> call. Write, then copy back <strong>immediately</strong> (<code>scp m1:.../src/served-spec.lock.json</code>). <code>rbuild --copy-back &lt;file&gt;</code> treats the path as a directory and copies nothing.</li>
+<li><strong><code>parity_http_mcp</code>: <code>workflows.get</code> was marked <code>deterministic</code>.</strong> A deterministic sample builds its input twice (once per transport) from a one-row prepared queue → <code>workflows.get was not prepared before its input was built</code>. Dropped the flag. (This was the red S19-B attributed to S13.)</li>
+<li><strong><code>parity_http_mcp</code>: the andon pair netted to ENGAGED.</strong> The samples were declared release-then-engage and each prepare sets the opposite state, so after the pair the cord stayed pulled and every later run-starting sample (<code>workflow_runs.start</code>) got <code>409 andon-engaged</code>. Reordered engage → release; the pair nets to released.</li>
+<li>Peer reds seen and <strong>not</strong> fixed (recorded, attributable): <code>apps/server/src/eval_runner.rs:207</code> (<code>collapsible_if</code>, S19), <code>crates/store/tests/capability.rs:366</code> (<code>explicit_auto_deref</code>, S15), and the <code>fmt --check</code> reds in <code>apps/web/src/state.rs</code> + <code>crates/domain/src/eval/grade.rs</code> (S12/S19). <code>clippy --all-targets</code> over the whole workspace therefore cannot be green from this lane alone.</li>
+</ul>
+<h3 id="honest-limits-scoped-deviations-not-softened">Honest limits (scoped deviations, not softened)</h3>
+<ul>
+<li><strong>The first <code>run_step</code> row is written by the first tick, not by <code>start</code>.</strong> S13 §5.3 says <code>start</code> "creates the start <code>run_step</code>"; inserting it as <code>running</code> and later flipping it is an UPDATE, and the trace model appends one row per attempt. Start creates the run and its tick; the tick writes the row when it executes the node.</li>
+<li><strong>Gate rows:</strong> an approved gate is recorded on the next tick after <code>approvals.decide</code> settles the run; a rejected or expired gate is recorded by the decide/expire path before the run is cancelled.</li>
+<li><strong>Procedure nodes need a card-scoped parent run</strong> (<code>procedure_runs.start</code> requires <code>card_id</code>); a card-less workflow run fails that node typed (<code>workflow.nesting</code>/procedure refusal), never silently.</li>
+<li><strong>Step 8</strong> (<code>agent.run</code>, <code>inference.chat</code> + caps) was built in session 4 (below). <strong>Step 9</strong> (trace export, <code>admin trace-diff</code>) is not built. Steps 9–17 remain.</li>
+</ul>
+<hr />
+<h2 id="session-4--s13-step-8-agentrun--inferencechat--caps">Session 4 — S13 step 8: <code>agent.run</code> + <code>inference.chat</code> + caps</h2>
+<p><strong>Date:</strong> 2026-11-09 16:00– · <strong>Session:</strong> <code>s13-engine</code> session 4 (<code>scheduler-node-execution</code>) · <strong>Tree:</strong> same, no <code>.git</code> · <strong>Lease:</strong> opened 16:00, released with the gate below. Own files only: <code>crates/workflow/**</code>, <code>crates/actions/src/workflow/{agent,node,runs}.rs</code>, <code>crates/actions/src/integrations/inference.rs</code>, <code>crates/store/src/workflow/run.rs</code>, the two new test binaries, and the two parity samples (<code>s15-capability-crud-actions</code> handed the parity file over by message; the lock is their write).</p>
+<h3 id="what-was-built">What was built</h3>
+<table>
+<thead>
+<tr>
+<th>file</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/workflow/src/agent.rs</code></td>
+<td><strong>new</strong> — the pure capped loop: <code>Agent::start</code> / <code>Agent::apply</code> over <code>Plan::{CallModel, CallTool, Finished, Failed}</code>; 8/20 turns, 20/50 tool calls, 300 s, depth 0; typed <code>agent.turn_limit</code> / <code>agent.tool_limit</code> / <code>agent.timeout</code> / <code>agent.cap_invalid</code> / <code>agent.depth</code>; a cap is <strong>refused, never clamped</strong>, and the last allowed turn's tools are not executed</td>
+</tr>
+<tr>
+<td><code>crates/workflow/src/{lib,definition}.rs</code></td>
+<td>module export; the publish rule <code>DirectModelCall</code> — a workflow <code>action</code> node may not name <code>inference.chat</code>, the route is <code>agent.run</code> (S13 §8 trap "a second loop beside <code>agent.run</code>")</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/integrations/inference.rs</code></td>
+<td><code>inference.chat</code> declared beside <code>completions.create</code>: same router path, <code>captures_usage = true</code>, <code>model:write</code>, write effect, 60 s</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/workflow/agent.rs</code></td>
+<td><strong>new</strong> — <code>agent.run</code>'s declared action (its handler refuses a direct invocation: an internal action holds the invocation transaction and has no pool, so the loop cannot call <code>invoke</code> from a handler); the step-executor seam <code>resolve</code> (explicit input, or the run's <code>capability_agent</code> → <code>{model, allowed_actions→tools, max_turns, timeout_ms, prompt_ref}</code>) and <code>drive</code> (each model call and tool call through <code>invoke</code>, one <code>action_invocation</code> per call on <code>run:{run_id}</code>)</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/workflow/{node,runs}.rs</code></td>
+<td><code>workflow.node</code> special-cases <code>agent.run</code> and drives the loop; <code>workflow_runs.start</code> takes an optional <code>capability_agent_id</code> into <code>NewRun</code>; <code>WorkflowRunContext</code> carries the column</td>
+</tr>
+<tr>
+<td><code>crates/store/src/workflow/run.rs</code></td>
+<td><code>capability_agent_id</code> in the run context read</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/{agent_run,agent_run_resolved}.rs</code></td>
+<td><strong>new</strong> — the end-to-end proofs (two binaries because <code>CONVEYOR_EXTERNAL_INFERENCE_URL</code> is process-global)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-was-run-all-measured-this-session">What was run (all measured this session)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>test -p conveyor-workflow --test workflow_agent</code></td>
+<td><strong>10 passed</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>test -p conveyor-workflow --test definition_validate</code></td>
+<td><strong>15 passed</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>test -p conveyor-actions --test agent_run</code></td>
+<td><strong>1 passed</strong> — two model calls + one tool call, all three <code>action_invocation</code> rows on <code>run:{id}</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>test -p conveyor-actions --test agent_run_resolved</code></td>
+<td><strong>1 passed</strong> — the run records its executor; the model comes from the row (<code>resolved-model</code>), not the node input</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>test -p conveyor-actions --test workflow_runs</code></td>
+<td><strong>4 passed</strong> (no regression from the executor branch)</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>test -p conveyor-actions --test registry</code></td>
+<td><strong>8/8</strong>, <code>EXPECTED</code> 259 (a peer folded this lane's two actions in during the shared pass)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>test -p conveyor-actions --test parity_http_mcp</code></td>
+<td><strong>4/4</strong> — this lane's two samples plus the RBAC seven, once both landed</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>test -p conveyor-actions --lib</code></td>
+<td><strong>61 passed</strong> (incl. the four new seam tests)</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>test -p conveyor-store --test workflow_publish --test s07_schema</code></td>
+<td><strong>5 + 3 passed</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>clippy -p conveyor-workflow -p conveyor-actions --all-targets -- -D warnings</code></td>
+<td><strong>exit 0</strong>; <code>-p conveyor-store --lib</code> exit 0 (the <code>--all-targets</code> store red was a peer's <code>capability.rs:366</code>, reported and fixed by them)</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>cargo fmt -p conveyor-workflow -p conveyor-actions -p conveyor-store -- --check</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>run -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>RED, one op, not this lane</strong>: <code>changed: POST /api/actions/capabilities.bind_knowledge/invocations</code> (S15's action; handed over). Lock on disk is their write: 259 actions · 63 scopes · <strong>280 ops</strong>, sha <code>6c6906c4…</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="reversal-proofs-each-fired-then-was-restored-1">Reversal proofs (each fired, then was restored)</h3>
+<table>
+<thead>
+<tr>
+<th>fix</th>
+<th>reversal</th>
+<th>observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>turn cap</td>
+<td>the <code>turns &gt;= max_turns</code> branch disabled</td>
+<td><code>the_turn_cap_fails_typed_and_does_not_run_the_last_tools</code> failed: <code>expected Failed, got CallTool(call-2)</code></td>
+</tr>
+<tr>
+<td>cap ceiling</td>
+<td><code>MAX_TURNS</code> 20 → 21</td>
+<td><code>a_config_outside_the_ceiling_is_refused_never_clamped</code> failed: a 21-turn config started</td>
+</tr>
+<tr>
+<td>publish guard</td>
+<td><code>DirectModelCall</code> arm disabled</td>
+<td><code>a_step_cannot_reach_a_model_without_the_agent_loop</code> failed: the <code>inference.chat</code> node published</td>
+</tr>
+<tr>
+<td>run config</td>
+<td><code>capability_agent_id: None</code> restored in <code>workflow_runs.start</code></td>
+<td><code>the_run_declares_its_executor…</code> failed: <code>the run records its executor — left: None</code></td>
+</tr>
+<tr>
+<td>trace proof</td>
+<td>the tool invocation's <code>trace_id</code> dropped</td>
+<td><code>an_agent_node_runs_the_capped_loop…</code> failed: <code>["inference.chat","inference.chat"]</code> where three actions were expected</td>
+</tr>
+</tbody>
+</table>
+<h3 id="decisions-and-deviations-stated-plainly">Decisions and deviations, stated plainly</h3>
+<ul>
+<li><strong>The action's handler refuses; the executor drives the loop.</strong> [<code>HandlerCtx</code>] carries no pool and an internal action already holds the invocation transaction, so a handler cannot <code>invoke</code> the model or a tool. Every executor in this codebase (<code>procedure.step</code>, <code>workflow.node</code>, <code>/mcp</code>) is the layer that invokes outside a transaction, so <code>workflow.node</code> special-cases <code>agent.run</code>. Consequence recorded, not hidden: <strong>S11's <code>procedure.step</code> does not special-case it yet</strong>, so a procedure step that names <code>agent.run</code> reaches the refusing handler (typed 409) until S11 adopts the same seam. Workflow nodes — S13's surface — are complete.</li>
+<li><strong>The renderer is this lane's, per CONTRACT §17</strong> (the step executor resolves). S15 step 5 only reads <code>store::capability</code>; <code>s15-capability-crud-actions</code> confirmed no writer collision.</li>
+<li><strong>The built-in prompt catalogue does not exist.</strong> A resolved executor with <code>prompt_ref</code> set and no system message in the node input is refused <code>409 capability_not_ready</code> / <code>prompt_unresolved</code> — fail-closed, rather than calling the model without the configured prompt. The explicit-input path is the whole gate (S13 §5.3 "Sequencing"); a node can supply its system message today.</li>
+<li><strong>Idempotency:</strong> model and tool calls are keyed under the node attempt's key (<code>…:turnN</code> / <code>…:toolN</code>), so a node retry replays stored responses instead of buying a second round of effects.</li>
+<li><strong>Tool allowlist:</strong> the resolved <code>tools</code> array is the allowlist; a call the model names but the executor did not declare is refused before execution as <code>action-not-found</code> and fed back to the model — never audited after the fact.</li>
+<li>⚠️ <strong>Boundary slip, recorded:</strong> <code>cargo fmt -p conveyor-store</code> also rewrote the peer-owned <code>crates/store/src/seed.rs</code> (it was already fmt-red on the shared tree). Formatting only, no semantic change; <code>web-ui-wave-2-rbac</code> owns that file and was told.</li>
+<li><strong>Not fixed, handed over:</strong> <code>crates/api/tests/machine_login.rs</code> — two licence-tenant assertions return <code>Null</code> (<code>:189</code>, <code>:223</code>); identity lane, reported to <code>web-ui-wave-2-rbac</code>. And the one lock op above, to S15.</li>
+</ul>
+<h3 id="post-release-re-measurement-1645-both-hands-resolved">Post-release re-measurement (16:45, both hands resolved)</h3>
+<ul>
+<li><strong><code>--check-lock</code> is exit 0 at 280 ops, sha <code>6c6906c4…</code></strong> — the one-op drift was S15 running its own reversal proof (a temporary scope change on <code>capabilities.bind_knowledge</code>) inside my sync window, not a bad lock.</li>
+<li><strong><code>machine_login</code> is 6/6</strong> — the two failures were web-ui-wave-2-rbac's <code>/api/me</code> returning <code>active_tenant: null</code> unconditionally in its tenant-switcher bootstrap; its owner fixed it.</li>
+<li>Final snapshot of this lane's own binaries after both: <code>workflow_agent</code> <strong>10/10</strong>, <code>definition_validate</code> <strong>15/15</strong>, <code>agent_run</code> <strong>1/1</strong>, <code>agent_run_resolved</code> <strong>1/1</strong>, <code>registry</code> <strong>8/8</strong>, <code>parity_http_mcp</code> <strong>4/4</strong>.</li>
+</ul>
+<h2 id="session-5--s13-step-9-trace-export--admin-trace-diff">§Session 5 — S13 step 9 (trace export + <code>admin trace-diff</code>)</h2>
+<p><strong>Session:</strong> <code>trace-diff-export</code>, 2026-11-09 16:24 → the release below. <strong>Lease:</strong> released with the state recorded here. The tree was shared with three live lanes (<code>eval-hillclimb-loop</code>, <code>web-ui-wave-2-rbac</code>, <code>s15-capability-crud-actions</code>); step 8's peer had just released <code>node.rs</code>/<code>run.rs</code>, so its files were free.</p>
+<h3 id="what-landed-1">What landed</h3>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/workflow/src/trace.rs</code></td>
+<td><strong>new</strong> — <code>TraceRecord</code>/<code>TraceKind</code>/<code>TraceOutcome</code>, <code>mask_value</code> (UUIDs, RFC 3339, keyed ids, <code>usage</code>), <code>hash_value</code> (<code>sha256:</code> + <code>content_hash(masked)</code>), <code>project_effect</code> (<code>true</code>/<code>false</code>, <code>each</code>/<code>done</code>, action name, <code>procedure:&lt;key&gt;</code>), <code>effects</code> (last attempt per position), <code>parse_jsonl</code>/<code>to_jsonl</code>, <code>diff_records</code>, <code>DiffReport::exit_code</code></td>
+</tr>
+<tr>
+<td><code>crates/workflow/tests/{workflow_trace,trace_diff}.rs</code></td>
+<td><strong>new</strong> — 7 + 7 pure tests</td>
+</tr>
+<tr>
+<td><code>crates/store/src/workflow/run_step.rs</code></td>
+<td><strong>new</strong> — <code>RunTraceRow</code>, <code>RunTrace</code>, <code>run_trace_tx</code> (run→workflow join, <code>node_id IS NOT NULL</code>, ordered)</td>
+</tr>
+<tr>
+<td><code>crates/store/tests/workflow_trace.rs</code></td>
+<td><strong>new</strong> — 2 tests: ordering/filter and two-tenant RLS</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/workflow/trace.rs</code></td>
+<td><strong>new</strong> — <code>workflow_traces.export</code> (<code>{run_id}</code> → <code>{jsonl}</code>), kind/effect projection from the frozen definition, stored-hash fallback</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/workflow_trace_export.rs</code></td>
+<td><strong>new</strong> — 4 tests over the real registry (order/effects, masked-id invariance, live row, 404)</td>
+</tr>
+<tr>
+<td><code>apps/server/src/admin/{mod,trace_diff}.rs</code> + <code>lib.rs</code> + <code>main.rs</code></td>
+<td><strong>new</strong> — pure <code>admin trace-diff --old --new</code>, exit 0/1/2, before any DB config</td>
+</tr>
+<tr>
+<td><code>crates/store/src/workflow/run.rs</code></td>
+<td><code>NewWorkflowStep.input_hash</code>; <code>start_step_tx</code> writes it (and refreshes it on the conflict update)</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/workflow/node.rs</code></td>
+<td>all three start sites pass the masked <code>input_hash</code>; the two output-hash sites now use <code>hash_value</code> (masked)</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/{registry,parity_http_mcp}.rs</code>, <code>crates/api/src/lib.rs</code></td>
+<td>registration: <code>workflow_traces.export</code> in <code>EXPECTED</code> (260), api count 260, one parity sample with <code>seed_workflow_trace</code></td>
+</tr>
+<tr>
+<td><code>fixtures/trace-diff/{identical,mutated,bad}.jsonl</code></td>
+<td>the CLI proof files</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-was-run-1">What was run</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>rbuild -- test -p conveyor-workflow --test workflow_trace --test trace_diff</code></td>
+<td><strong>7 + 7 passed</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>rbuild -- test -p conveyor-store --test workflow_trace</code></td>
+<td><strong>2 passed</strong> (ordering + two-tenant RLS)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>rbuild -- test -p conveyor-actions --test workflow_trace_export</code></td>
+<td><strong>4 passed</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>rbuild -- clippy -p conveyor-workflow -p conveyor-store --all-targets -- -D warnings</code></td>
+<td><strong>clean</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>cargo fmt --check</code> on this lane's files</td>
+<td><strong>clean</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>rbuild -- run -p conveyor-server -- admin trace-diff --old … --new …</code></td>
+<td>identical <strong>0</strong>, one mutated hash <strong>1</strong>, n8n envelope <strong>2</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>rbuild -- test -p conveyor-actions --test registry</code></td>
+<td><strong>8/8 passed</strong> at <code>EXPECTED</code> <strong>266</strong> (S20's six registered; <code>workflow_traces.export</code> in the list)</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>rbuild -- test -p conveyor-actions --test parity_http_mcp</code></td>
+<td><strong>4/4 passed</strong> at <strong>266 actions</strong> — this lane's <code>workflow_traces.export</code> sample executes and matches over HTTP and MCP</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>rbuild -- run -p conveyor-server -- --print-openapi --write-lock</code></td>
+<td><strong>wrote 287 operations</strong> from a compiling tree; copied back to <code>served-spec.lock.json</code>, sha <code>47550345fe643d35…</code>; <strong><code>--check-lock</code> exit 0</strong> after <code>s13-agent-inference-nodes</code> fixed its in-flight <code>prompt.rs</code> (a field named <code>source</code> collided with thiserror's cause; renamed to <code>kind</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="reversal-proofs-each-fired-then-was-restored-2">Reversal proofs (each fired, then was restored)</h3>
+<ol type="1">
+<li><code>hash_value</code> bypassing <code>mask_value</code> → <code>hashes_ignore_masked_values_but_not_real_ones</code> failed on two different UUIDs hashing differently.</li>
+<li><code>effects</code> keeping the first attempt (<code>or_insert</code>) instead of the last → the retry test saw <code>Failed</code> instead of <code>Succeeded</code>.</li>
+<li><code>diff_records</code> dropping the <code>output_hash</code> comparison → <code>a_mutated_output_hash_is_a_mismatch</code> failed.</li>
+</ol>
+<h3 id="corrections-and-findings-while-building-1">Corrections and findings while building</h3>
+<ul>
+<li><strong>The plan named both binaries and both exist.</strong> §6 step 9 says <code>workflow_trace</code>, §7's gate says <code>trace_diff</code>; both were written, so either command is meaningful.</li>
+<li><strong>Masking is the hash, not a display concern.</strong> <code>usage</code> joins the mask list because an <code>agent.run</code> output's token counts vary between two runs of the same work (S13 step 8's owner, 2026-11-09); the execution trace and the diff would otherwise never agree on an agent node.</li>
+<li><strong><code>TraceOutcome::Running</code> is a scoped deviation from §5.4's <code>succeeded|failed|skipped</code>.</strong> A live run is exportable (the row is real) but <code>effects</code> refuses it as <code>Incomplete</code>, so a partial trace can never be diffed as if it were finished.</li>
+<li><strong>Input hashes are pinned at write time.</strong> <code>start_step_tx</code> now stores the masked hash; the export falls back to hashing stored values for rows written before this change, so old traces stay comparable.</li>
+<li><strong>The registration and the lock are in place.</strong> Live registry <strong>266</strong>, <code>EXPECTED</code> <strong>266</strong>, <code>registry</code> <strong>8/8</strong>, <code>parity</code> <strong>4/4</strong> (my export sample included), api lib <strong>29/29</strong> at 266, clippy clean across actions/api/workflow/store. S20 pushed the api count and its clippy fix, then handed the lock over; it was written from a compiling tree at <strong>287 ops</strong>, sha <code>47550345…</code>, and copied back immediately. The re-verification first hit <code>s13-agent-inference-nodes</code>' in-flight <code>prompt.rs:190</code> (<code>E0599</code>) and then passed — <strong><code>--check-lock</code> exit 0</strong> — once it renamed the field (<code>source</code> is thiserror's cause). Its prompt work adds no actions or scopes, so 287 ops stays correct and it will not regenerate the lock.</li>
+<li><strong>Clippy is clean across actions/api/workflow/store after S20's <code>eval_final.rs</code> fix</strong> (its <code>unused_mut</code> was the only remaining red).</li>
+<li><strong>Not run:</strong> the full gate rehearsal (<code>gate5</code> live run, export over HTTP, n8n stopped). It needs the tree's workspace gate to be green first; that is the lane's next gate after S20 settles.</li>
+</ul>
+<h3 id="lane-landing-at-release-recorded-because-it-is-not-obvious">Lane landing at release (recorded, because it is not obvious)</h3>
+<p>The shared checkout is on branch <code>lane/s20-eval-climb</code> (origin <code>2beb107</code>, local +6) with <strong>115 uncommitted files</strong> from several lanes; <code>main</code> is <code>e58e1ff</code>, origin <code>lane/bootstrap</code> and <code>lane/s20-eval-climb</code> share <code>2beb107</code>, and the only open PR is <strong>#1</strong> (bootstrap, red on the image build because the snapshot did not compile the server). <strong>There is no S13 branch, and this slice's files are untracked/uncommitted by design</strong> (the approved plan: the S13 lane's one branch/PR belongs to the last settling S13 session, and a branch cut from <code>main</code> would not compile). Step 8's files are in the same state. <code>s13-agent-inference-nodes</code> declined the PR; the landing step must base on a tree where the prerequisite lanes are committed, not on <code>main</code>.</p>
+<h2 id="session-6--step-8s-two-open-items-the-s11-seam-and-the-compiled-prompt-d27">§Session 6 — step 8's two open items: the S11 seam and the compiled prompt (D27)</h2>
+<p><strong>Owner decisions this session (George, 2026-11-09):</strong> the S11 issue gets a design <em>and</em> an implementation; the prompt catalogue is built now as the full three-source compiler, <strong>in Postgres</strong>, and <strong>all three prompt surfaces</strong> resolve through it; the 2026-2027 design goes on the spec as a preliminary plan (PDDL evaluated, not prototyped); the <code>cargo fmt -p conveyor-store</code> slip is codified and recorded.</p>
+<h3 id="what-was-built-1">What was built</h3>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/actions/src/workflow/agent.rs</code></td>
+<td><strong>+</strong> <code>run_step</code> — the one resolve+drive seam both step executors share; the resolved path now compiles the system message from the catalogue (<code>agent.prompt_conflict</code> if the input also carries one)</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/workflow/node.rs</code></td>
+<td><code>run_agent</code> becomes a call to that seam (same behaviour, no second loop driver)</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/procedure/step.rs</code></td>
+<td><strong>+</strong> the <code>AGENT_ACTION</code> branch: a procedure step naming <code>agent.run</code> resolves the run's <code>capability_agent</code> and drives the loop (5xx retryable, typed 4xx a failed step so <code>on_error</code> applies)</td>
+</tr>
+<tr>
+<td><code>migrations/0030_prompt_catalogue.sql</code></td>
+<td><strong>new</strong> <code>prompt</code> + <code>prompt_section</code> (RLS ENABLE+FORCE, one active version per key, <code>system</code> requires text)</td>
+</tr>
+<tr>
+<td><code>crates/domain/src/prompt.rs</code></td>
+<td><strong>new</strong> the pure compiler: five source kinds, required-missing refusal, SHA-256 of the compiled text</td>
+</tr>
+<tr>
+<td><code>crates/store/src/prompt.rs</code></td>
+<td><strong>new</strong> recipe reads by exact pin + the run/conversation fact readers</td>
+</tr>
+<tr>
+<td><code>crates/store/src/{seed.rs,prompts/**}</code></td>
+<td><strong>new</strong> <code>prompts_for_tenant</code> (<code>copilot_system@1</code>, <code>prompt_audit@1</code>, <code>agent@1</code>), idempotent and additive; the prompt texts move here so they have one home</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/prompt/mod.rs</code></td>
+<td><strong>new</strong> <code>compile_for_run{,_tx}</code>, <code>compile_for_copilot</code>, <code>compile_for_audit</code>; every refusal names the ref and the reason</td>
+</tr>
+<tr>
+<td><code>crates/api/src/copilot/turns.rs</code></td>
+<td>the system message is <code>compile_for_copilot(…, "copilot_system@1")</code>, not a constant</td>
+</tr>
+<tr>
+<td><code>apps/server/src/prompt_audit_run.rs</code></td>
+<td>the audit instruction is <code>compile_for_audit(…, "prompt_audit@1")</code>; a missing/retired row fails the audit, a DB error retries</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/{procedure_agent,procedure_agent_resolved,prompt_compile}.rs</code>, <code>crates/store/tests/prompt_catalogue.rs</code></td>
+<td><strong>new</strong> 7 tests across four binaries</td>
+</tr>
+<tr>
+<td><code>docs/{SPEC.md,plans/01-CONTRACT.md,plans/02-DATA-ARCHITECTURE.md,plans/00-INDEX.md}</code>, <code>docs/plans/slices/S21-message-construction.md</code></td>
+<td>D27 + the S21 design (PDDL evaluated against the step DSL, not adopted), §17 amended, §2.21 added, S13/S21 rows</td>
+</tr>
+</tbody>
+</table>
+<p>No new action, no new scope: the registry stays <strong>266</strong> and the lock <strong>287 ops</strong> (sha <code>47550345…</code>).</p>
+<h3 id="what-was-run-real-output-rbuild-on-m1-1">What was run (real output, <code>rbuild</code> on m1)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>test -p conveyor-domain --lib</code></td>
+<td><strong>209 passed</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>test -p conveyor-store --test prompt_catalogue</code></td>
+<td><strong>3 passed</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>test -p conveyor-store --test s07_schema</code></td>
+<td><strong>3 passed</strong> — ledger through <strong>30</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>test -p conveyor-actions --test procedure_agent --test procedure_agent_resolved</code></td>
+<td><strong>1 + 1 passed</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>test -p conveyor-actions --test prompt_compile</code></td>
+<td><strong>2 passed</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>test -p conveyor-actions --test registry --test parity_http_mcp --test agent_run --test agent_run_resolved --test procedure_step --lib</code></td>
+<td><strong>8 + 4 + 1 + 1 + 14 + 61 passed</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>test -p conveyor-api</code> (11 binaries: copilot_turn/rounds/crash_replay/approve/proposal/replay/reap/session/surface, agui_parity, mcp_agent)</td>
+<td><strong>13 passed</strong></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>test -p conveyor-server --test prompt_audit_run</code></td>
+<td><strong>2 passed</strong></td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>clippy -p conveyor-domain -p conveyor-store -p conveyor-actions -p conveyor-api --all-targets -- -D warnings</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>rustfmt --check</code> on this lane's 10 touched files</td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>run -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>RED, not this lane</strong> — <code>capabilities.get</code> drifted (S15 step 12, in flight); the lock file itself is 287 ops, sha <code>47550345…</code>, unchanged by this lane</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <code>clippy -p conveyor-server</code> is red on S19's <code>apps/server/tests/eval_support/mod.rs</code> (three dead-code errors under <code>-D warnings</code>) — pre-existing and untouched here.</p>
+<h3 id="reversal-proofs--each-is-the-proof-not-the-green-run-2">Reversal proofs — each is the proof, not the green run</h3>
+<ol type="1">
+<li><strong>The S11 seam.</strong> Flipping the branch to <code>false &amp;&amp; row.action == AGENT_ACTION</code> makes <code>procedure_agent</code> fail with the handler's own 409: <em>"agent.run executes inside a run's step, driven by its executor…"</em>. Restored; the test passes only with the seam.</li>
+<li><strong>The refusal is real.</strong> <code>prompt_audit_run</code> first failed with <code>prompt "prompt_audit@1" is not in this tenant's catalogue</code> before its fixture seeded the built-ins — the name is produced by the resolver, not by the test.</li>
+<li><strong>One active version is the database's rule.</strong> The store test asserts the <em>constraint name</em> (<code>uq_prompt_active</code>), not just "the second insert failed".</li>
+<li><strong>The RLS test was wrong the first time, and the reversal exposed it.</strong> It used <code>db.super_pool</code> and the forged write was accepted — the superuser is the positive control, and a test that runs as it proves nothing. Re-run as <code>db.runtime</code>, the forged <code>tenant_id</code> is refused.</li>
+<li><strong>The compile is live.</strong> Renaming the card changes the compiled text and its SHA-256, so the recorded <code>prompt_sha256</code> is a provenance key rather than a snapshot of a template.</li>
+</ol>
+<h3 id="the-slip-owner-decision-3">The slip (owner decision 3)</h3>
+<p><code>cargo fmt -p conveyor-store</code> in session 4 reformatted the peer-owned <code>store/src/seed.rs</code>. Recorded rather than reverted: the file also carries 241 uncommitted lines of its owner's content, so a revert would destroy their work, and the formatting is what the repo gate requires. <strong>Rule, now part of the lane protocol: a formatter runs on named files you own — never <code>--all</code> or <code>-p</code> on a shared tree. If a peer file was formatted, record it, tell the owner, and do not revert.</strong> This session formatted only its own files (<code>rustfmt &lt;paths&gt;</code>, checked over exactly that set).</p>
+<h3 id="one-correction-to-this-sessions-own-work">One correction to this session's own work</h3>
+<p>The first <code>PromptCompileError::MissingRequired</code> named its field <code>source</code>, which thiserror reads as the error's <strong>cause</strong> and requires to implement <code>std::error::Error</code> — <code>conveyor-domain</code> stopped compiling and blocked every peer for a few minutes. Renamed to <code>kind</code>, with a comment so it does not regress. Reported to <code>trace-diff-export</code> as soon as <code>cargo check -p conveyor-domain</code> was clean, because its <code>--check-lock</code> was waiting on it.</p>
+<h3 id="not-built">Not built</h3>
+<ul>
+<li><strong>S21</strong> is a design + preliminary plan only: selection/budgeting, the role section, the <code>plan</code> (PDDL-ish) projection and tenant-authored recipes are its steps.</li>
+<li>The S13 <strong>steps 10–17</strong> remain (live-trace recording, the 348-flow re-authoring, the editor, the final workspace gate).</li>
+<li><strong>The lane PR</strong>: still none. The tree is uncommitted across several lanes; the S13 branch is the last settling S13 session's, per the approved plan.</li>
+</ul>
+<h3 id="addendum-174x--the-two-not-this-lane-reds-re-measured">Addendum 17:4x — the two "not this lane" reds, re-measured</h3>
+<p><code>capability-readiness-guard</code> reported S15 step 12 <strong>closed and released</strong>, consuming <code>get_prompt_tx</code> unchanged (<code>None</code> and a retired row both → <code>prompt_unresolved</code>; a store error → 500). ⚠️ Its output-schema change moved the <strong>live</strong> document, not the file — and that is the drift: <code>served-spec.lock.json</code> is still <strong>287</strong> ops, sha <code>47550345fe643d35…</code>, with <code>capabilities.get</code>'s stored hash still <code>070d0c0a…</code>, so <code>--check-lock</code> is exit-1 (<code>changed: POST /api/actions/capabilities.get/invocations</code>) <strong>because the lock was not rewritten</strong>. It needs a <strong>write</strong>, and S20 owns it; an unchanged file does not mean the schema matched.</p>
+<p>⚠️ <code>--check-lock</code> itself could not be re-run: the tree currently fails to compile <code>conveyor-actions</code> — a duplicate <code>TraceRecord</code> import at <code>crates/actions/src/workflow/trace.rs:18</code>, which is the <code>record-n8n-trace-diffs</code>/<code>s13-trace-fixtures</code> lane's in-flight edit (it claimed <code>trace.rs</code> and <code>n8n.rs</code> at 16:31). The last green lock measurement for this lane was 17:19's red on <code>capabilities.get</code>; treat that as <strong>history</strong>, not current state, and re-measure when the trace lane releases.</p>
+<h2 id="session-7--steps-10-and-the-n8n-projection-s13-trace-fixtures-2026-11-09-1631z">Session 7 — steps 10 and the n8n projection (<code>s13-trace-fixtures</code>, 2026-11-09 16:31Z)</h2>
+<p>Owner ruling this session: finish the S13 lane; the deploy lane belongs to <code>deploy-conveyor-service</code> and S12 to the web lanes. Step 10 is time-critical — n8n keeps ~3 days of history (measured: 449 executions across 29 flows, newest <code>2026-11-08 16:50 +01</code>).</p>
+<h3 id="recorded-fixtures-step-10">Recorded fixtures (step 10)</h3>
+<p>Read-only, direct on the primary — <strong>no secret was extracted</strong> (the k8s-secret route is hook-denied; the database route needs only a superuser read):</p>
+<pre><code>ssh … admin@192.0.2.10 &quot;sudo -u postgres psql -d n8n -At&quot; &lt;&lt;&#39;SQL&#39;
+select data from execution_data where &quot;executionId&quot; = $id;
+SQL</code></pre>
+<p><code>fixtures/&lt;x&gt;.old.jsonl</code> is that value unmodified (n8n's <strong>flatted</strong> array — 622/957/575 entries); <code>fixtures/&lt;x&gt;.workflow.json</code> is <code>workflow_entity</code> (<code>id</code>, <code>name</code>, <code>versionId</code>, <code>nodes</code>) because an execution carries results and <strong>not node types</strong>. Provenance and both hash sets: <code>fixtures/executions.json</code> and <code>fixtures/SHA256SUMS</code>.</p>
+<table>
+<thead>
+<tr>
+<th>fixture</th>
+<th>shape</th>
+<th>flow</th>
+<th>execution</th>
+<th>captured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>linear (no <code>if</code>)</td>
+<td><code>cap.analysis.consult</code> <code>nJilzpQdRgF87YJ1</code></td>
+<td>1218441</td>
+<td><code>2026-11-08 16:41:20 +01</code></td>
+</tr>
+<tr>
+<td>b</td>
+<td>condition</td>
+<td><code>wip.pull</code> <code>rAwDtIctiVtjhvFI</code></td>
+<td>1218451</td>
+<td><code>2026-11-08 16:50:16 +01</code></td>
+</tr>
+<tr>
+<td>c</td>
+<td>agent</td>
+<td><code>cap.testing.consult</code> <code>u6qMvsAfx3p18MYx</code></td>
+<td>1218449</td>
+<td><code>2026-11-08 16:48:55 +01</code></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>C was chosen three times, and the reasons are the useful part.</strong> <code>bug_analysis.DOING</code> has only <code>status=error</code> executions. <code>project_start_request_analysis.DOING</code> executes a <code>planka</code> node with <code>resource=comment, operation=list</code> — and there is <strong>no <code>comments.list</code></strong> in the registry (<code>cards.comment</code>, <code>comments.update</code>, <code>comments.delete</code> only), so its old side can never map completely. <code>cap.testing.consult</code> has 40/40 successes and every executed node maps. <strong>A flow with an unmappable node is not a fixture.</strong></p>
+<h3 id="the-projection-cratesworkflowsrcn8nrs">The projection (<code>crates/workflow/src/n8n.rs</code>)</h3>
+<p><code>flatted_decode</code> resolves n8n's flat array (index references, cycle and depth bounded; a numeric string that addresses nothing stays a literal). <code>project_execution(snapshot, execution, run_id)</code> emits one <code>TraceRecord</code> per <strong>effect</strong>: order from <code>executionIndex</code>, attempt from the run array, kind from the node type (<code>if</code>/ <code>switch</code> → condition; <code>executeWorkflow</code> → procedure; else action), input hash from the <strong>producing node's item</strong> via <code>source</code>, output hash from the node's first item, <code>duration_ms</code> from <code>executionTime</code>, outcome from <code>error</code>/<code>executionStatus</code>. Not effects: <code>code</code>, <code>noOp</code>, <code>stickyNote</code>, <code>wait</code>, triggers, <code>lmChatOpenAi</code>, <code>toolWorkflow</code> and every <code>*Tool</code> sub-node. An operation the effect map does not cover is returned in <code>unmapped</code> and the CLI <strong>refuses</strong> — a diff over a shortened old side is a number with no meaning.</p>
+<p>Measured: A → <code>projects.get, requirements.get, catalogues.list, agent.run</code>; B → <code>true, projects.get, true, boards.get</code>; C → <code>projects.get, requirements.get, catalogues.list, agent.run</code>.</p>
+<h3 id="gate-this-slice">Gate (this slice)</h3>
+<p><code>rbuild -- test -p conveyor-workflow</code> <strong>78 green</strong>: lib 4, <code>definition_validate</code> 15, <code>engine_advance</code> 11, <code>trace_diff</code> 7, <code>workflow_agent</code> 10, <strong><code>workflow_n8n</code> 9</strong>, <code>workflow_nodes</code> 6, <code>workflow_scheduler</code> 9, <code>workflow_trace</code> 7. <code>clippy -p conveyor-workflow --all-targets -D warnings</code> and <code>clippy -p conveyor-actions --lib</code> clean; <code>clippy -p conveyor-server --lib --bins</code> clean; <code>rustfmt --check</code> clean over exactly the touched files. ⚠️ <code>clippy -p conveyor-server --all-targets</code> is red on S19's <code>apps/server/tests/eval_support/mod.rs:140</code> (<code>field version_id is never read</code>) — not this lane.</p>
+<p>CLI, both paths proved:</p>
+<pre><code>admin trace-diff --old fixtures/a.old.jsonl --old-workflow fixtures/a.workflow.json --new fixtures/trace-diff/identical.jsonl
+→ 4 named deltas, exit 1
+admin trace-diff --old fixtures/b.old.jsonl --old-workflow &lt;snapshot with comment/list&gt; --new …
+→ &quot;1 executed node(s) have no mapped conveyor effect: \&quot;Get board\&quot; …&quot;, exit 2</code></pre>
+<h3 id="no_entry-the-blocker-steps-1113-hit-hashes-are-not-comparable-across-the-two-systems">⛔ The blocker steps 11–13 hit: hashes are not comparable across the two systems</h3>
+<p>S13 §5.4 passes a flow only when <code>(position, node_id, effect, input_hash, output_hash, outcome)</code> are equal. The old node's payload is the <em>external system's</em> response: <code>cap.analysis.consult</code>'s <code>Project</code> node returns the RM project row — <strong>62 keys</strong>, planka ids, <code>created_at</code>/<code>updated_at</code>, <code>planka_list_ids</code>, <code>it_inputs</code> — and the conveyor's <code>projects.get</code> returns <code>ProjectView { project, boards }</code> (<code>crates/actions/src/board/views.rs:73</code>). Masking removes uuids/timestamps/ids; it cannot make two different schemas one value. The same holds for <code>planka</code> → <code>cards.*</code> (a Planka card object vs <code>CardOut</code>).</p>
+<p>⇒ <strong>A/B/C can be compared on effect, node id and outcome today; an exit-0 diff is unattainable under §5.4 as written</strong> unless the owner decides how hashes should be normalised (three options: compare effects only for migrated flows and keep hashes for same-system regressions; hash the <em>resolved parameters</em> under a per-package normalisation; or store a recorded old hash and compare a projection digest). This is a spec-level decision, not a lane edit — <code>diff_records</code> was <strong>not</strong> relaxed, and no hash was hand-edited.</p>
+<h3 id="not-built-steps-1117">Not built (steps 11–17)</h3>
+<p><code>fixtures/gate5.json</code> (the §7 harness body) does not exist and was not written; the three re-authored <code>.flow.json</code> definitions and their zero-delta proof are blocked on the decision above; the 348-row <code>parity/n8n-dispositions.tsv</code> close-out is step 15. The file now carries its first <strong>three</strong> rows (the three fixtures), columns <code>workflow_id, name, kind, disposition, target</code>, no header — so step 15's <code>wc -l</code> = 348 stays the gate.</p>
+<h3 id="one-duplicate-import-attribution-corrected">One duplicate import, attribution corrected</h3>
+<p>This session introduced a duplicate <code>TraceRecord</code> import in <code>crates/actions/src/workflow/trace.rs</code> — a plain <code>use</code> plus the new <code>pub use</code> (E0252). <strong><code>s13-agent-inference-nodes</code> did NOT fix it</strong>: it measured the error at 17:35 and deliberately left the file alone because it is this lane's, naming it precisely so it would not be mistaken for its own red. The file's mtime is 17:36:55, the plain <code>use</code> no longer carries <code>TraceRecord</code>, and <strong>which session removed it is not established</strong> — the earlier version of this paragraph credited that peer, and the peer corrected it. Removing a name from a plain <code>use</code> because a <code>pub use</code> added it is a correct fix; the rule to keep is: adding a name to a <code>pub use</code> in a module that already imports it is the error, and the next lane should check both lines before editing either.</p>
+<p>The peer also measured <code>--check-lock</code> red on <code>capabilities.get</code> (S15's write, not this lane) — this slice registers no action, scope or route, so it writes no lock.</p>
+<h2 id="session-8--steps-1113-the-tick-defect-and-the-348-row-ledger-2026-11-09-s13-trace-gate">Session 8 — steps 11–13, the tick defect, and the 348-row ledger (2026-11-09, <code>s13-trace-gate</code>)</h2>
+<p><strong>Owner rulings.</strong> (1) Finish this lane. (2) The §5.4 cross-system <strong>payload-hash</strong> comparison is <strong>thrown out</strong> ("stupid ruling, throw it out"): no normaliser, no projection digest. A migrated flow is compared on the ordered path — <code>(position, node_id, effect, outcome)</code> — with the hashes kept in the trace for forensics only. The second limb (a reviewed <code>Expected</code> artefact + <code>end_state</code>) was landed by <code>s13-trace-gate-behaviour</code> on top of this session's <code>DiffMode</code> and is recorded in <code>docs/evidence/S13-TRACE-EXPECT.md</code>; this session's <code>n8n_migration</code> now asserts <strong>both</strong>.</p>
+<p><strong>What landed and was proved</strong></p>
+<table>
+<thead>
+<tr>
+<th>what</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DiffMode::{SameSystem,Migration}</code> + <code>admin trace-diff</code> selecting Migration iff <code>--old-workflow</code></td>
+<td><code>trace_diff</code> <strong>11/11</strong> (4 new: hash ignored, normalised id matched, effect/outcome still fail, non-ASCII id)</td>
+</tr>
+<tr>
+<td><code>fixtures/gate5.json</code> — read → condition → update → gate → move (plus a never-run false branch)</td>
+<td>in-process <code>n8n_migration</code> <strong>3/3</strong>; §7 shell harness <strong>GATE5_OK</strong></td>
+</tr>
+<tr>
+<td><code>fixtures/{a,b,c}.flow.json</code> reproducing the recordings</td>
+<td><code>n8n_migration</code>: A/C agent flows, B conditional + a reorder negative — against <code>Expected::compare</code> <strong>and</strong> the direct old-projection diff</td>
+</tr>
+<tr>
+<td>§7 shell harness (fresh Postgres 5441, rbuild binary on 8938)</td>
+<td>5 effects, parks <code>waiting_approval</code>, resumes on <code>approvals.decide</code>, card lands in <code>done</code>, export = 5 records, same-system diff identical → <strong>0</strong>, one hash mutated → <strong>1</strong></td>
+</tr>
+<tr>
+<td><code>parity/n8n-dispositions.tsv</code></td>
+<td><strong>348 rows</strong> from the live n8n DB (2026-11-09): 280 matrix · 54 procedure · 2 platform-job · 12 retire</td>
+</tr>
+<tr>
+<td>editor decision (step 16d)</td>
+<td><code>docs/decisions/0002-editor.md</code> — fallback A (Leptos/SVG), no egui dependency</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⛔ The defect the harness found (fixed here): the driving tick never enqueued its successor.</strong> The tick job re-enqueued under the constant key <code>&lt;run_id&gt;:tick</code> while its <strong>own</strong> row was <code>running</code>, and the live-dedupe index (<code>(tenant, kind, dedupe_key) WHERE status IN ('pending','running')</code>) counts a running row as live — so the insert collided with the caller, became a no-op, and a deployed run executed exactly <strong>one</strong> node then stalled. Measured: the §7 run had one <code>run_step</code>, one succeeded <code>workflow.node</code> job, nothing pending, status <code>running</code> forever. The in-process tests missed it because they call <code>execute_node</code> directly. Fixed: the key is <code>&lt;run_id&gt;:tick:&lt;ordinal&gt;</code>, the ordinal being the <code>run_step</code> count read in the caller's transaction (<code>crates/store/src/workflow/run.rs</code>); <code>crates/store/tests/workflow_tick.rs</code> proves the successor is inserted while the current job is live (1/1); the shell harness re-proved the whole path end to end.</p>
+<p><strong>Two §7 gate corrections — recorded, not faked</strong></p>
+<ol type="1">
+<li>The <code>attempt &gt; 1</code> assertion is gone. A 5xx <strong>defers</strong> and spends no attempt (<code>node.rs</code> — <code>HostResult::deferred</code> → rearm); a 4xx retry cannot succeed without a fault-injection seam that does not exist. Retry-succeeds is <code>workflow_scheduler</code>'s test.</li>
+<li><code>cards.claim</code> and <code>cards.comment</code> are <strong>unrunnable from a workflow node</strong>: the node host executes as a service principal (<code>actor_id: Uuid::nil()</code>), and both resolve that actor as an <code>app_user</code> (<code>ensure_parent_tx(Parent::AppUser, …)</code>), so each fails a parent check. gate5 uses <code>cards.get</code> and <code>cards.update</code> instead; the write→gate→write path is unchanged.</li>
+</ol>
+<p><strong>⛔ Steps 14–15 are blocked on missing plumbing, measured.</strong> The four named flows and <code>kata.open</code> were pulled from the live n8n DB (node counts: <code>conveyor.start</code> 32, <code>wip.pull</code> 14, <code>ask_fr</code> 14, <code>err.card</code> 14, <code>kata.open</code> 15). Re-authoring them needs triggers the tree does not have: an inbound webhook → procedure intake, a schedule → procedure job kind, a <code>run.failed</code> consumer, and <code>fr.*</code>/coach actions. Writing procedures that silently drop those nodes would be a fake proof, so they are not written. <strong>15b</strong> (retire the 348 legacy flows) is a live n8n mutation and S14 P1's precondition; it is not run before cutover.</p>
+<p><strong>Gate.</strong> <code>rbuild -- test -p conveyor-workflow</code> <strong>exit 0</strong>: <strong>88 passed / 0 failed / 1 ignored</strong> across 10 binaries — trace_diff <strong>11</strong>, trace_expect <strong>6</strong>, workflow_n8n <strong>9</strong>, workflow_scheduler <strong>9</strong>, workflow_nodes <strong>6</strong>, workflow_agent <strong>10</strong>, engine_advance <strong>11</strong>, definition_validate <strong>15</strong>, workflow_trace <strong>7</strong>, lib <strong>4</strong>. <code>clippy -p conveyor-workflow -p conveyor-store -p conveyor-actions --all-targets -- -D warnings</code> <strong>exit 0</strong>. This session's files are clean under the pinned <code>rustfmt</code> 1.99.0. The <strong>workspace</strong> gate is red on peers, not this lane: <code>fmt --all --check</code> on <code>crates/actions/tests/{parity_http_mcp,registry}.rs</code>, and <code>crates/server</code> test <code>rls.rs</code> does not compile (<code>AppState</code> gained <code>services</code>). No action, scope, route or migration was added — no served-spec lock write.</p>
+<h2 id="session-9-2026-11-09-finish-s13-lane-steps--steps-1415-15b-16-17">Session 9 (2026-11-09, <code>finish-s13-lane-steps</code>) — steps 14–15, 15b, 16, 17</h2>
+<p>Steps 14–15 are <strong>built</strong>: the four named flows and <code>kata.open</code> are re-authored at the conveyor's model and driven end to end. The "blocked on missing plumbing" list from session 8 is closed:</p>
+<table>
+<thead>
+<tr>
+<th>missing piece</th>
+<th>built</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inbound webhook → procedure</td>
+<td><code>POST /api/hooks/{hook}</code> (<code>crates/api/src/routes/hooks.rs</code>): three closed hooks (<code>conveyor.start</code>, <code>wip.pull</code>, <code>katas.open</code>), a deployment shared secret (<code>CONVEYOR_HOOK_SECRET</code>, fail-closed 503/401), body <code>{tenant_id, project_id, card_id?, inputs}</code>, <code>202 {run_id}</code>. It starts through the SAME <code>start_published_tx</code> the action uses.</td>
+</tr>
+<tr>
+<td>schedule → procedure</td>
+<td>a <code>workflow.start</code> worker kind, and <code>schedules.upsert</code> gains a <code>payload</code> (the runner already copies it into the job). <code>wip.pull</code> is a platform job (<code>"wip.pull"</code>) over <code>board::pull::wip_pull</code>, which selects intake cards up to the active lane's <code>wip_limit</code> and performs each move through the <code>cards.move</code> <strong>action</strong> (matrix, position and event included).</td>
+</tr>
+<tr>
+<td><code>run.failed</code> consumer</td>
+<td><code>store::run::enqueue_run_failed_trigger_tx</code> at every <code>run.failed</code> emitter (worker reap both halves, <code>procedure.step</code>, <code>workflow.node</code>, <code>runs.finish</code>) → one <code>workflow.start</code> job for <code>err.card</code>, deduped by run. A project-scoped run (no card) enqueues nothing.</td>
+</tr>
+<tr>
+<td><code>fr.*</code>/coach actions</td>
+<td>not needed: <code>ask_fr</code> is a procedure over the conveyor's own <code>human_approval</code> gate; the coach is a recorded delta (below).</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>cards.comment</code>, <code>cards.create</code> and <code>cards.duplicate</code> now record no author/creator for a service principal (the workflow host runs as <code>actor_id: nil</code>); a user/agent keeps the parent check. The flows that comment (<code>ask_fr</code>, <code>err.card</code>, <code>katas.open</code>) and <code>conveyor.start</code>'s card creation work as a service without inventing an <code>app_user</code>.</li>
+<li>One new action, <code>cards.list</code> (<code>cards:read</code>): a workflow can only call actions, and <code>conveyor.start</code> reads a lane. Registry <strong>268 → 269</strong> (255 internal + 14 external).</li>
+<li>Definitions: <code>fixtures/named/{conveyor.start,err.card,katas.open}.json</code> (workflows), <code>fixtures/named/ask_fr.procedure.json</code> (procedure), the 89-node coverage table (<code>fixtures/named/mapping.tsv</code> + <code>fixtures/named/old/*.nodes.json</code>). <code>parity/n8n-dispositions.tsv</code> stays <strong>348</strong> rows; the five targets are refined to <code>workflow:conveyor.start</code>, <code>procedure:ask_fr</code>, <code>schedule:wip.pull</code>, <code>run.failed:workflow:err.card</code>, <code>workflow:katas.open</code>.</li>
+</ul>
+<p><strong>Two defects found by execution, one forced delta:</strong></p>
+<ol type="1">
+<li>The workflow <code>procedure</code> node sent <code>{"key": …}</code> to <code>procedure_runs.start</code>, which expects <code>procedure_key</code>; no test had exercised the node. Fixed in <code>crates/actions/src/workflow/node.rs</code>.</li>
+<li>⛔ <strong>A workflow cannot start a child procedure on its own card.</strong> <code>uq_run_live</code> permits one live run per card, and the parent is live, so the child start is a <code>409 LiveRunExists</code>. The coach nodes are therefore <strong>not ported</strong>; <code>mapping.tsv</code> records the delta, and the coach is started as its own run by the kata executor / its trigger (S14/S18 integration), not inside <code>err.card</code> or <code>katas.open</code>. Resolving it needs an inline execution of the child's steps or a <code>parent_run_id</code> exemption in the schema — an S13-open design decision, named here rather than silently dropped.</li>
+<li><code>projects.get</code> returns <code>{project, boards}</code>; the flow's identity check reads <code>steps.1.output.project.id</code> (recorded in the fixture, not assumed).</li>
+</ol>
+<p><strong>Step 15b.</strong> <code>scripts/retire-n8n-flows.sh</code> pages the n8n public API by cursor, asserts <strong>348</strong>, and only with <code>--apply</code> flips every flow inactive, then asserts the API's active list is empty. The dry run could not be executed in this environment: <code>N8N_API_KEY</code> is absent (the step-10 recording used a key supplied then; the n8n DB stores only its hash, so it cannot be recovered there). The flip is S14 P1 by design; the count of record is the 348-row dispositions ledger.</p>
+<p><strong>Step 16.</strong> <code>docs/decisions/0002-editor.md</code> records fallback <strong>A</strong>; the slice gate accepts the recorded decision in place of the spike (S13 §7).</p>
+<p><strong>Step 17 (gate).</strong> Measured on this tree (<code>rbuild</code>, m1; <code>TEST_DATABASE_URL</code> on 55432):</p>
+<ul>
+<li><code>crates/api/tests/named_flows.rs</code> <strong>6/6</strong> (conveyor.start create+move and its idempotent intake branch, wip.pull's cap and its second no-op run, ask_fr's ask→gate→answer, err.card's run.failed→waiting→comment, and the 89-node coverage assertion).</li>
+<li><code>crates/api/tests/kata_open.rs</code> <strong>1/1</strong> (hook → card/board/prior-run read → comment).</li>
+<li><code>conveyor-actions --test registry</code> <strong>4/4</strong> — <strong>269</strong> actions, <strong>(255, 14)</strong> internal/external.</li>
+<li><code>conveyor-actions --test parity_http_mcp</code> <strong>8/8</strong> over all 269 actions on both transports, including the new <code>cards.list</code> sample.</li>
+<li><code>conveyor-api --lib</code> <strong>30/30</strong> (the <code>every_action_has_a_documented_operation</code> 269 assertion).</li>
+<li><code>conveyor-actions --test n8n_migration</code> <strong>3/3</strong> and <code>conveyor-workflow --test trace_diff</code> <strong>11/11</strong> — the A/B/C replays and the diff machinery still pass after the node/service changes.</li>
+<li><code>--print-openapi --check-lock</code> <strong>exit 0</strong>.</li>
+<li><code>clippy --workspace --all-targets -D warnings</code> <strong>exit 0</strong>. Two reds were closed on the way: the S12 wave-2 lane added <code>AppState.services</code> to its <code>rls.rs</code>/<code>events.rs</code> constructors (owner <code>land-list-run-steps-detail-tx</code>, formerly <code>build-measure-screens</code>), and this lane added a type alias for its diagnostic tuple (<code>clippy::type_complexity</code>).</li>
+<li><code>fmt --all --check</code> <strong>exit 1</strong>, attributed: the remaining diffs are only <code>apps/server/src/eval_runner.rs</code> and <code>apps/server/tests/eval_*</code> (S19/S20 files). Every file this lane touched is rustfmt-clean under the pinned toolchain (<code>rustfmt --check</code> exit 0 on the set).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S13-ENGINE.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

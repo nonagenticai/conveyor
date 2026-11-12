@@ -1,0 +1,4532 @@
+{
+  "version": 1,
+  "generated_from": "requirements_api on master (read-only SQL, 2026-11-08)",
+  "source_note": "The RM catalogue tables hold 4 tenants' copies of one vocabulary; every row here is DISTINCT on name. Measured totals vs distinct: card_type 293->74, project_type 26->7, project_type_phase 46->14, type x card-type 282->100, capability 68->17, priority_level 16->4, deliverable_kind 8->2, milestone_kind 20->5, board_template 4->1, wip_limit 26->7. pm_gates and architecture_standards are EMPTY, so their two rows are hand-authored. The `standard` board_template is hand-authored: RM ships only `default`, but `projects.create` and `project_requests.promote` default to `standard` (S05's DEFAULT_TEMPLATE_CODE / DEFAULT_BOARD_TEMPLATE), so a tenant seeded without it cannot create a project.",
+  "matrix_note": "RM's type x card-type matrix is (card_type, phase, is_entry) -- which phase a card type is used in -- NOT board lane transitions. It is imported verbatim under project_type.meta.card_types. S05's may_move reads meta.matrix in a different shape ({card_type: {from_list_kind: [to_list_kind]}}), so every imported project type also carries the standard lane flow for each of its card types; a project type that needs a different flow overrides meta.matrix.",
+  "card_types": [
+    {
+      "code": "architecture_baseline_harvest",
+      "label": "Architecture baseline harvest",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "architecture_epic",
+      "label": "Architecture epic",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "architecture_refactoring",
+      "label": "Architecture refactoring",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: item_gone_at_location",
+          "QA: change_preserves_behaviour",
+          "QA: change_removes_item",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "architecture_spike",
+      "label": "Architecture spike",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "architecture_subtask",
+      "label": "Architecture subtask",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "architecture_task",
+      "label": "Architecture task",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false,
+        "definition_of_done": "asset_persisted"
+      }
+    },
+    {
+      "code": "bdd_test_development",
+      "label": "Bdd test development",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: test_files_in_test_dirs",
+          "DOING: every_case_written",
+          "DOING: suite_green_after",
+          "QA: tests_check_target",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "bdd_test_evaluation",
+      "label": "Bdd test evaluation",
+      "definition": {
+        "rules": [
+          "container_read_exec"
+        ],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "DOING: every_finding_cites_evidence",
+          "DOING: every_cited_scenario_exists",
+          "DOING: every_missing_scenario_cites_a_brief_item",
+          "QA: every_confirmed_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "bdd_test_improvement",
+      "label": "Bdd test improvement",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: test_files_in_test_dirs",
+          "DOING: every_case_written",
+          "DOING: suite_green_after",
+          "QA: tests_check_target",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "bug_analysis",
+      "label": "Bug analysis",
+      "definition": {
+        "rules": [
+          "container_read_exec",
+          "no_reclassify_target"
+        ],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "DOING: every_finding_cites_evidence",
+          "DOING: every_cited_location_exists",
+          "QA: every_confirmed_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false,
+        "definition_of_done": "none"
+      }
+    },
+    {
+      "code": "change_decision_development",
+      "label": "Change decision development",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "changes_artifact_id",
+          "reviewed_changes_artifact_id",
+          "published_artifact_id",
+          "written_ids"
+        ],
+        "acceptance": [
+          "READY: every_ask_cites_the_brief",
+          "DOING: every_change_cites_a_source",
+          "DOING: every_ask_has_a_change",
+          "QA: every_revise_addressed",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "change_impact_analysis",
+      "label": "Change impact analysis",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "change_principle_development",
+      "label": "Change principle development",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "changes_artifact_id",
+          "reviewed_changes_artifact_id",
+          "published_artifact_id",
+          "written_ids"
+        ],
+        "acceptance": [
+          "READY: every_ask_cites_the_brief",
+          "DOING: every_change_cites_a_source",
+          "DOING: every_ask_has_a_change",
+          "QA: every_revise_addressed",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "change_requirement_development",
+      "label": "Change requirement development",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "changes_artifact_id",
+          "reviewed_changes_artifact_id",
+          "published_artifact_id",
+          "written_ids"
+        ],
+        "acceptance": [
+          "READY: every_ask_cites_the_brief",
+          "DOING: every_change_cites_a_source",
+          "DOING: every_ask_has_a_change",
+          "QA: every_revise_addressed",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "change_risk_analysis",
+      "label": "Change risk analysis",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "choice_option_development",
+      "label": "Choice option development",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "changes_artifact_id",
+          "reviewed_changes_artifact_id",
+          "published_artifact_id",
+          "written_ids"
+        ],
+        "acceptance": [
+          "READY: every_ask_cites_the_brief",
+          "DOING: every_change_cites_a_source",
+          "DOING: every_ask_has_a_change",
+          "QA: every_revise_addressed",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "code_quality_analysis",
+      "label": "Code quality analysis",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "DOING: every_finding_cites_evidence",
+          "DOING: every_cited_location_exists",
+          "DOING: no_style_only_findings",
+          "QA: every_confirmed_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "code_smell_refactoring",
+      "label": "Code smell refactoring",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: item_gone_at_location",
+          "QA: change_preserves_behaviour",
+          "QA: change_removes_item",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "consistency_analysis",
+      "label": "Consistency analysis",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "DOING: every_finding_cites_evidence",
+          "DOING: every_cited_location_exists",
+          "DOING: convention_has_majority_examples",
+          "QA: every_confirmed_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "decision_development",
+      "label": "Decision development",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "changes_artifact_id",
+          "reviewed_changes_artifact_id",
+          "published_artifact_id",
+          "written_ids"
+        ],
+        "acceptance": [
+          "READY: every_ask_cites_the_brief",
+          "DOING: every_change_cites_a_source",
+          "DOING: every_ask_has_a_change",
+          "QA: every_revise_addressed",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "decoupling_refactoring",
+      "label": "Decoupling refactoring",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: item_gone_at_location",
+          "QA: change_preserves_behaviour",
+          "QA: change_removes_item",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "dependency_refactoring",
+      "label": "Dependency refactoring",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: item_gone_at_location",
+          "QA: change_preserves_behaviour",
+          "QA: change_removes_item",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "design_packaging",
+      "label": "Design packaging",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "development_bug_fix",
+      "label": "Development bug fix",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: finding_location_exists",
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: regression_test_added",
+          "DOING: failed_before_on_new_test_only",
+          "DOING: suite_green_after",
+          "QA: fix_addresses_root_cause",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "development_chore",
+      "label": "Development chore",
+      "definition": {
+        "rules": [
+          "repo_write",
+          "no_reclassify_target",
+          "dependency_upgrade"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: finding_location_exists",
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: issue_gone_at_location",
+          "QA: change_preserves_behaviour",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "development_feature_new",
+      "label": "Development feature new",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: planned_files_allowed",
+          "DOING: diff_only_planned_files",
+          "DOING: acceptance_test_added",
+          "DOING: failed_before_on_new_test_only",
+          "DOING: suite_green_after",
+          "QA: change_meets_acceptance",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "development_feature_update",
+      "label": "Development feature update",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: current_location_exists",
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: acceptance_test_added",
+          "DOING: failed_before_on_new_test_only",
+          "DOING: suite_green_after",
+          "QA: change_meets_acceptance",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "development_iac_security_patch",
+      "label": "Development iac security patch",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: finding_file_exists",
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: rule_not_reported_after",
+          "QA: change_fixes_misconfiguration",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "development_poc",
+      "label": "Development poc",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "findings_artifact_id"
+        ],
+        "acceptance": [
+          "READY: planned_files_allowed",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_after",
+          "QA: poc_answers_question",
+          "QA: capability_acceptance_met",
+          "DONE: report_cites_evidence",
+          "DONE: recommendation_follows_result"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "development_security_patch",
+      "label": "Development security patch",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: finding_location_exists",
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: regression_test_or_upgrade",
+          "DOING: failed_before_on_new_test_only",
+          "DOING: package_no_longer_vulnerable",
+          "DOING: suite_green_after",
+          "QA: fix_addresses_root_cause",
+          "QA: package_no_longer_vulnerable",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "development_source_security_patch",
+      "label": "Development source security patch",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: finding_location_exists",
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: regression_test_added",
+          "DOING: failed_before_on_new_test_only",
+          "DOING: suite_green_after",
+          "QA: fix_addresses_root_cause",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "diagram_design",
+      "label": "Diagram design",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "domain_analysis",
+      "label": "Domain analysis",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "feasibility_study",
+      "label": "Feasibility study",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "function_class_reallocation",
+      "label": "Function class reallocation",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: item_gone_at_location",
+          "QA: change_preserves_behaviour",
+          "QA: change_removes_item",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "future_state_analysis",
+      "label": "Future state analysis",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "gap_analysis",
+      "label": "Gap analysis",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "DOING: every_gap_cites_a_brief_item",
+          "DOING: every_update_location_exists",
+          "DOING: every_new_gap_absent_in_code",
+          "DOING: one_acceptance_sentence_each",
+          "QA: every_confirmed_gap_in_brief",
+          "QA: every_confirmed_update_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "library_refactoring",
+      "label": "Library refactoring",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: item_gone_at_location",
+          "QA: change_preserves_behaviour",
+          "QA: change_removes_item",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "narrative_design",
+      "label": "Narrative design",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "optimization_refactoring",
+      "label": "Optimization refactoring",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: item_gone_at_location",
+          "QA: change_preserves_behaviour",
+          "QA: change_removes_item",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "plateau_planning_analysis",
+      "label": "Plateau planning analysis",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "principle_development",
+      "label": "Principle development",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "changes_artifact_id",
+          "reviewed_changes_artifact_id",
+          "published_artifact_id",
+          "written_ids"
+        ],
+        "acceptance": [
+          "READY: every_ask_cites_the_brief",
+          "DOING: every_change_cites_a_source",
+          "DOING: every_ask_has_a_change",
+          "QA: every_revise_addressed",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "project_closure",
+      "label": "Project closure",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "final_report_artifact_id",
+          "final_brief_version",
+          "status_set",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "DOING: every_phase_report_linked",
+          "DONE: project_not_closed_yet"
+        ],
+        "human_task": false,
+        "definition_of_done": "none"
+      }
+    },
+    {
+      "code": "project_phase_closure",
+      "label": "Project phase closure",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "report_artifact_id"
+        ],
+        "acceptance": [
+          "DOING: every_link_exists",
+          "DONE: phase_unchanged_since_readying"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "project_phase_start",
+      "label": "Project phase start",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "plan_artifact_id"
+        ],
+        "acceptance": [
+          "READY: card_phase_is_rm_phase",
+          "READY: allowed_card_types_not_empty",
+          "DOING: every_goal_has_a_card",
+          "DOING: every_card_has_a_goal"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "project_setup",
+      "label": "Project setup",
+      "definition": {
+        "rules": [
+          "setup"
+        ],
+        "inputs": [],
+        "outputs": [
+          "brief_version_created"
+        ],
+        "acceptance": [
+          "READY: phase_is_setup",
+          "READY: project_type_set",
+          "DOING: board_matches_template",
+          "DOING: brief_base_is_latest",
+          "DOING: every_answer_in_clarifications",
+          "DONE: phase_still_setup"
+        ],
+        "human_task": false,
+        "definition_of_done": "none"
+      }
+    },
+    {
+      "code": "project_start_request_analysis",
+      "label": "Project start request analysis",
+      "definition": {
+        "rules": [],
+        "inputs": [
+          "problem_statement",
+          "desired_outcome",
+          "success_criteria",
+          "in_scope"
+        ],
+        "outputs": [],
+        "acceptance": [
+          "READY: brief_unchanged",
+          "QA: no_open_approval_on_card",
+          "QA: all_gaps_closed"
+        ],
+        "human_task": false,
+        "definition_of_done": "none"
+      }
+    },
+    {
+      "code": "prototype_experiment",
+      "label": "Prototype experiment",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "findings_artifact_id"
+        ],
+        "acceptance": [
+          "READY: planned_files_allowed",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_after",
+          "QA: prototype_answers_question",
+          "QA: capability_acceptance_met",
+          "DONE: report_cites_evidence",
+          "DONE: recommendation_follows_result"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "re_engineering",
+      "label": "Re engineering",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: component_paths_exist",
+          "READY: planned_files_exist",
+          "DOING: diff_only_planned_files",
+          "DOING: suite_green_before",
+          "DOING: suite_green_after",
+          "DOING: change_follows_plan",
+          "QA: change_preserves_behaviour",
+          "QA: change_achieves_target",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "release_planning",
+      "label": "Release planning",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "requirement_development",
+      "label": "Requirement development",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "changes_artifact_id",
+          "reviewed_changes_artifact_id",
+          "published_artifact_id",
+          "written_ids"
+        ],
+        "acceptance": [
+          "READY: every_ask_cites_the_brief",
+          "DOING: every_change_cites_a_source",
+          "DOING: every_ask_has_a_change",
+          "QA: every_revise_addressed",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "research_spike",
+      "label": "Research spike",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "rewrite_cutover_readiness",
+      "label": "Rewrite cutover readiness",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: parity_qa_released",
+          "DOING: parity_results_true_on_pinned_shas",
+          "DOING: data_copy_plan_present",
+          "QA: g4_evidence_complete",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false,
+        "definition_of_done": "asset_persisted"
+      }
+    },
+    {
+      "code": "rewrite_parity_qa",
+      "label": "Rewrite parity qa",
+      "definition": {
+        "rules": [
+          "container_read_exec"
+        ],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: source_shas_pinned",
+          "DOING: schema_diff_equal",
+          "DOING: openapi_diff_equal_to_source_union",
+          "DOING: behaviour_replay_equal",
+          "QA: parity_computed_without_judgement",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false,
+        "definition_of_done": "asset_persisted"
+      }
+    },
+    {
+      "code": "rewrite_plan",
+      "label": "Rewrite plan",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "DOING: every_finding_cites_evidence",
+          "DOING: every_cited_location_exists",
+          "QA: every_confirmed_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "rewrite_slice",
+      "label": "Rewrite slice",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: planned_files_allowed",
+          "DOING: diff_only_planned_files",
+          "DOING: workspace_test_run_green",
+          "DOING: openapi_diff_slice_routes_present_and_equal",
+          "QA: change_meets_acceptance"
+        ],
+        "human_task": false,
+        "definition_of_done": "pr_merged"
+      }
+    },
+    {
+      "code": "security_analysis",
+      "label": "Security analysis",
+      "definition": {
+        "rules": [
+          "container_read_exec",
+          "no_reclassify_target"
+        ],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "READY: manifest_files_exist",
+          "DOING: every_finding_cites_evidence",
+          "DOING: every_code_location_exists",
+          "DOING: every_dependency_listed_vulnerable",
+          "QA: every_confirmed_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "stakeholder_comms",
+      "label": "Stakeholder comms",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "structure_analysis",
+      "label": "Structure analysis",
+      "definition": {
+        "rules": [
+          "container_read_exec",
+          "no_reclassify_target"
+        ],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "DOING: every_finding_cites_evidence",
+          "DOING: every_cited_path_exists",
+          "DOING: every_finding_is_structural",
+          "QA: every_confirmed_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "tdd_test_development",
+      "label": "Tdd test development",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: test_files_in_test_dirs",
+          "READY: marker_is_strict",
+          "DOING: every_case_written",
+          "DOING: every_new_test_marked",
+          "DOING: suite_green_after",
+          "QA: tests_check_target",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "tdd_test_evaluation",
+      "label": "Tdd test evaluation",
+      "definition": {
+        "rules": [
+          "container_read_exec"
+        ],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "DOING: every_finding_cites_evidence",
+          "DOING: every_cited_test_exists",
+          "DOING: every_missing_test_subject_exists",
+          "QA: every_confirmed_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "tdd_test_improvement",
+      "label": "Tdd test improvement",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: test_files_in_test_dirs",
+          "DOING: every_case_written",
+          "DOING: suite_green_after",
+          "QA: tests_check_target",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "technology_landscape_survey",
+      "label": "Technology landscape survey",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "test_development",
+      "label": "Test development",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [],
+        "outputs": [
+          "commit_sha",
+          "pr_number",
+          "pr_url",
+          "head_sha",
+          "fix_report_artifact_id",
+          "merge_sha"
+        ],
+        "acceptance": [
+          "READY: test_files_in_test_dirs",
+          "DOING: every_case_written",
+          "DOING: suite_green_after",
+          "QA: tests_check_target",
+          "QA: capability_acceptance_met"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "test_process_evaluation",
+      "label": "Test process evaluation",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "testing_evaluation",
+      "label": "Testing evaluation",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "testing_execution",
+      "label": "Testing execution",
+      "definition": {
+        "rules": [
+          "container_read_exec"
+        ],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "report_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: scope_paths_exist",
+          "DOING: every_finding_cites_evidence",
+          "DOING: every_cited_location_exists",
+          "QA: every_confirmed_location_exists",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "testing_plan",
+      "label": "Testing plan",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "testing_strategy",
+      "label": "Testing strategy",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "wf_andon_scope",
+      "label": "Wf andon scope",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "andon_scope"
+        ],
+        "acceptance": [
+          "READY: computed_scope_known",
+          "DOING: scope_is_one_of_the_enum",
+          "DOING: scope_matches_the_computed_rule_or_says_why",
+          "QA: every_rule_rechecked",
+          "DONE: cord_state_matches_the_scope"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "wf_change",
+      "label": "Wf change",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "op_list",
+          "copy_workflow_id",
+          "copy_version_id",
+          "replay_report_artifact_id",
+          "live_version_id"
+        ],
+        "acceptance": [
+          "READY: cord_engaged_with_the_kata_as_holder",
+          "READY: evidence_artifact_present",
+          "READY: every_op_is_in_the_vocabulary",
+          "DOING: every_op_applied",
+          "DOING: copy_passes_lint",
+          "DOING: diff_touches_only_the_op_nodes",
+          "DOING: replay_ran",
+          "QA: three_replays_ran",
+          "QA: two_of_three_replays_pass_without_error",
+          "QA: original_failing_check_passes",
+          "DONE: live_flow_read_back_matches_the_copy",
+          "DONE: only_the_kata_nodes_changed",
+          "DONE: cord_released",
+          "DONE: blocked_cards_moved_back_and_commented",
+          "DONE: kata_closed_in_fr"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "wf_observe",
+      "label": "Wf observe",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "observation_artifact_id",
+          "published_artifact_id"
+        ],
+        "acceptance": [
+          "READY: evidence_artifact_present",
+          "DOING: five_lines_exactly",
+          "DOING: every_line_cites_the_evidence",
+          "QA: every_quote_found_in_the_evidence",
+          "DONE: artifact_is_the_qa_version"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "wf_probe",
+      "label": "Wf probe",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "probe_result"
+        ],
+        "acceptance": [
+          "READY: every_app_has_a_health_url",
+          "DOING: every_app_has_a_probe_result",
+          "QA: every_probe_recomputed",
+          "DONE: probe_result_matches_qa"
+        ],
+        "human_task": false
+      }
+    },
+    {
+      "code": "wf_root_cause",
+      "label": "Wf root cause",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "root_cause_class",
+          "evidence_quote"
+        ],
+        "acceptance": [
+          "READY: observation_reviewed",
+          "READY: probe_result_known",
+          "DOING: class_is_one_of_the_enum",
+          "DOING: evidence_quote_found_in_the_evidence",
+          "QA: confirmation_quotes_the_evidence",
+          "DONE: root_cause_class_is_one_of_the_enum"
+        ],
+        "human_task": false
+      }
+    }
+  ],
+  "entries": [
+    {
+      "kind": "project_type",
+      "code": "it",
+      "label": "It",
+      "meta": {
+        "description": "project that starts with receipt of a github repo url (and optional credentials) and ends with a pull request. Scope Levels: multi_repo, repo, app, module, component, file, class, function",
+        "phases": [
+          "setup",
+          "preliminary",
+          "analysis",
+          "design",
+          "execution",
+          "test"
+        ],
+        "card_types": [
+          {
+            "code": "architecture_baseline_harvest",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "architecture_epic",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "architecture_refactoring",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "architecture_spike",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "architecture_subtask",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "architecture_task",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "bdd_test_development",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "bdd_test_evaluation",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "bdd_test_improvement",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "bug_analysis",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "change_decision_development",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "change_impact_analysis",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "change_principle_development",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "change_requirement_development",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "change_risk_analysis",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "choice_option_development",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "code_quality_analysis",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "code_smell_refactoring",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "consistency_analysis",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "decision_development",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "decision_development",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "decoupling_refactoring",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "dependency_refactoring",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "design_packaging",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "development_bug_fix",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "development_bug_fix",
+            "phase": "test",
+            "is_entry": false
+          },
+          {
+            "code": "development_chore",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "development_feature_new",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "development_feature_update",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "development_iac_security_patch",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "development_poc",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "development_security_patch",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "development_source_security_patch",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "diagram_design",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "domain_analysis",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "feasibility_study",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "function_class_reallocation",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "future_state_analysis",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "gap_analysis",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "library_refactoring",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "narrative_design",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "optimization_refactoring",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "plateau_planning_analysis",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "principle_development",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "project_closure",
+            "phase": "test",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_closure",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_closure",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_closure",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_closure",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_closure",
+            "phase": "test",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_start",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_start",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_start",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_start",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_start",
+            "phase": "test",
+            "is_entry": false
+          },
+          {
+            "code": "project_setup",
+            "phase": "setup",
+            "is_entry": false
+          },
+          {
+            "code": "project_start_request_analysis",
+            "phase": "setup",
+            "is_entry": true
+          },
+          {
+            "code": "prototype_experiment",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "re_engineering",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "release_planning",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "requirement_development",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "research_spike",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "rewrite_cutover_readiness",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "rewrite_parity_qa",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "rewrite_plan",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "rewrite_slice",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "security_analysis",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "stakeholder_comms",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "structure_analysis",
+            "phase": "analysis",
+            "is_entry": false
+          },
+          {
+            "code": "tdd_test_development",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "tdd_test_evaluation",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "tdd_test_improvement",
+            "phase": "design",
+            "is_entry": false
+          },
+          {
+            "code": "technology_landscape_survey",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "test_development",
+            "phase": "test",
+            "is_entry": false
+          },
+          {
+            "code": "test_process_evaluation",
+            "phase": "test",
+            "is_entry": false
+          },
+          {
+            "code": "testing_evaluation",
+            "phase": "test",
+            "is_entry": false
+          },
+          {
+            "code": "testing_execution",
+            "phase": "test",
+            "is_entry": false
+          },
+          {
+            "code": "testing_plan",
+            "phase": "test",
+            "is_entry": false
+          },
+          {
+            "code": "testing_strategy",
+            "phase": "test",
+            "is_entry": false
+          }
+        ],
+        "matrix": {
+          "architecture_baseline_harvest": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "architecture_epic": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "architecture_refactoring": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "architecture_spike": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "architecture_subtask": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "architecture_task": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "bdd_test_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "bdd_test_evaluation": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "bdd_test_improvement": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "bug_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "change_decision_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "change_impact_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "change_principle_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "change_requirement_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "change_risk_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "choice_option_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "code_quality_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "code_smell_refactoring": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "consistency_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "decision_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "decoupling_refactoring": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "dependency_refactoring": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "design_packaging": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "development_bug_fix": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "development_chore": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "development_feature_new": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "development_feature_update": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "development_iac_security_patch": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "development_poc": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "development_security_patch": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "development_source_security_patch": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "diagram_design": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "domain_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "feasibility_study": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "function_class_reallocation": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "future_state_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "gap_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "library_refactoring": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "narrative_design": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "optimization_refactoring": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "plateau_planning_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "principle_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_closure": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_phase_closure": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_phase_start": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_setup": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_start_request_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "prototype_experiment": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "re_engineering": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "release_planning": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "requirement_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "research_spike": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "rewrite_cutover_readiness": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "rewrite_parity_qa": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "rewrite_plan": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "rewrite_slice": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "security_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "stakeholder_comms": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "structure_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "tdd_test_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "tdd_test_evaluation": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "tdd_test_improvement": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "technology_landscape_survey": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "test_development": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "test_process_evaluation": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "testing_evaluation": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "testing_execution": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "testing_plan": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "testing_strategy": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "kaizen",
+      "label": "Kaizen",
+      "meta": {
+        "description": "project about the continuous and incremental improvement of workflows used in the system",
+        "phases": [],
+        "card_types": [],
+        "matrix": {}
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "kata",
+      "label": "Kata",
+      "meta": {
+        "description": "A short project the kanban coach opens when a card is blocked by a conveyor defect: find the root cause, change the workflow, prove it by replaying the failing input, publish it, and let the stopped project resume (Kata K1-K21).",
+        "phases": [
+          "setup",
+          "preliminary",
+          "execution"
+        ],
+        "card_types": [
+          {
+            "code": "project_setup",
+            "phase": "setup",
+            "is_entry": false
+          },
+          {
+            "code": "project_start_request_analysis",
+            "phase": "setup",
+            "is_entry": true
+          },
+          {
+            "code": "wf_andon_scope",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "wf_change",
+            "phase": "execution",
+            "is_entry": false
+          },
+          {
+            "code": "wf_observe",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "wf_probe",
+            "phase": "preliminary",
+            "is_entry": false
+          },
+          {
+            "code": "wf_root_cause",
+            "phase": "preliminary",
+            "is_entry": false
+          }
+        ],
+        "matrix": {
+          "project_setup": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_start_request_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "wf_andon_scope": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "wf_change": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "wf_observe": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "wf_probe": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "wf_root_cause": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "meta_procedure",
+      "label": "Meta procedure",
+      "meta": {
+        "description": "project about the continuous and incremental improvement of procedures used in projects",
+        "phases": [],
+        "card_types": [],
+        "matrix": {}
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "meta_prompt",
+      "label": "Meta prompt",
+      "meta": {
+        "description": "project about the continuous and incremental improvement of prompts used in projects",
+        "phases": [],
+        "card_types": [],
+        "matrix": {}
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "program",
+      "label": "Program",
+      "meta": {
+        "description": "project of projects managing the dependencies between the projects and the overal direction",
+        "phases": [],
+        "card_types": [],
+        "matrix": {}
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "py2rust",
+      "label": "Python → Rust rewrite",
+      "meta": {
+        "description": "A rewrite of one or more Python source repositories, pinned to SHAs, into one Rust service: plan the slices, port them, prove parity with the sources, and collect the cutover evidence (py2rust RS-D1..RS-D6, George 2026-11-03).",
+        "phases": [
+          "setup",
+          "plan",
+          "port",
+          "parity",
+          "cutover"
+        ],
+        "card_types": [
+          {
+            "code": "project_phase_closure",
+            "phase": "cutover",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_closure",
+            "phase": "parity",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_closure",
+            "phase": "plan",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_closure",
+            "phase": "port",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_start",
+            "phase": "cutover",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_start",
+            "phase": "parity",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_start",
+            "phase": "plan",
+            "is_entry": false
+          },
+          {
+            "code": "project_phase_start",
+            "phase": "port",
+            "is_entry": false
+          },
+          {
+            "code": "project_setup",
+            "phase": "setup",
+            "is_entry": false
+          },
+          {
+            "code": "project_start_request_analysis",
+            "phase": "setup",
+            "is_entry": true
+          },
+          {
+            "code": "rewrite_cutover_readiness",
+            "phase": "cutover",
+            "is_entry": false
+          },
+          {
+            "code": "rewrite_parity_qa",
+            "phase": "parity",
+            "is_entry": false
+          },
+          {
+            "code": "rewrite_plan",
+            "phase": "plan",
+            "is_entry": false
+          },
+          {
+            "code": "rewrite_slice",
+            "phase": "port",
+            "is_entry": false
+          }
+        ],
+        "matrix": {
+          "project_phase_closure": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_phase_start": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_setup": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_start_request_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "rewrite_cutover_readiness": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "rewrite_parity_qa": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "rewrite_plan": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "rewrite_slice": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "analysis",
+      "label": "Analysis",
+      "meta": {},
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "cutover",
+      "label": "Cutover",
+      "meta": {},
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "design",
+      "label": "Design",
+      "meta": {},
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "execution",
+      "label": "Execution",
+      "meta": {},
+      "sort": 3,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "parity",
+      "label": "Parity",
+      "meta": {},
+      "sort": 4,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "plan",
+      "label": "Plan",
+      "meta": {},
+      "sort": 5,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "port",
+      "label": "Port",
+      "meta": {},
+      "sort": 6,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "preliminary",
+      "label": "Preliminary",
+      "meta": {},
+      "sort": 7,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "setup",
+      "label": "Setup",
+      "meta": {},
+      "sort": 8,
+      "is_active": true
+    },
+    {
+      "kind": "phase",
+      "code": "test",
+      "label": "Test",
+      "meta": {},
+      "sort": 9,
+      "is_active": true
+    },
+    {
+      "kind": "priority_level",
+      "code": "p0",
+      "label": "P0",
+      "meta": {
+        "rank": 0,
+        "is_default": false
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "priority_level",
+      "code": "p1",
+      "label": "P1",
+      "meta": {
+        "rank": 1,
+        "is_default": false
+      },
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "kind": "priority_level",
+      "code": "p2",
+      "label": "P2",
+      "meta": {
+        "rank": 2,
+        "is_default": true
+      },
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "kind": "priority_level",
+      "code": "p3",
+      "label": "P3",
+      "meta": {
+        "rank": 3,
+        "is_default": false
+      },
+      "sort": 3,
+      "is_active": true
+    },
+    {
+      "kind": "deliverable_kind",
+      "code": "deliverable",
+      "label": "Deliverable",
+      "meta": {
+        "description": "A result the project hands over."
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "deliverable_kind",
+      "code": "intermediate",
+      "label": "Intermediate",
+      "meta": {
+        "description": "A result a later card in the project consumes."
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "milestone_kind",
+      "code": "analysis_done",
+      "label": "Analysis done",
+      "meta": {
+        "description": "The analysis phase is done."
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "milestone_kind",
+      "code": "design_done",
+      "label": "Design done",
+      "meta": {
+        "description": "The design phase is done."
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "milestone_kind",
+      "code": "executed",
+      "label": "Executed",
+      "meta": {
+        "description": "The execution phase is done."
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "milestone_kind",
+      "code": "preliminary_done",
+      "label": "Preliminary done",
+      "meta": {
+        "description": "The preliminary phase is done."
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "milestone_kind",
+      "code": "tested",
+      "label": "Tested",
+      "meta": {
+        "description": "The test phase is done."
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "board_template",
+      "code": "default",
+      "label": "Default board",
+      "meta": {
+        "lists": [
+          "intake",
+          "active",
+          "waiting",
+          "done",
+          "archive"
+        ],
+        "source_lists": [
+          "TODO",
+          "READY",
+          "DOING",
+          "QA",
+          "BLOCKED",
+          "DONE",
+          "DROPPED"
+        ]
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "board_template",
+      "code": "standard",
+      "label": "Standard board",
+      "meta": {
+        "lists": [
+          "intake",
+          "active",
+          "waiting",
+          "done",
+          "archive"
+        ]
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "wip_limit",
+      "code": "it_wip",
+      "label": "it WIP limit",
+      "meta": {
+        "project_type": "it",
+        "limit": 1
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "wip_limit",
+      "code": "kaizen_wip",
+      "label": "kaizen WIP limit",
+      "meta": {
+        "project_type": "kaizen",
+        "limit": 1
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "wip_limit",
+      "code": "kata_wip",
+      "label": "kata WIP limit",
+      "meta": {
+        "project_type": "kata",
+        "limit": 1
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "wip_limit",
+      "code": "meta_procedure_wip",
+      "label": "meta_procedure WIP limit",
+      "meta": {
+        "project_type": "meta_procedure",
+        "limit": 1
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "wip_limit",
+      "code": "meta_prompt_wip",
+      "label": "meta_prompt WIP limit",
+      "meta": {
+        "project_type": "meta_prompt",
+        "limit": 1
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "wip_limit",
+      "code": "program_wip",
+      "label": "program WIP limit",
+      "meta": {
+        "project_type": "program",
+        "limit": 1
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "wip_limit",
+      "code": "py2rust_wip",
+      "label": "py2rust WIP limit",
+      "meta": {
+        "project_type": "py2rust",
+        "limit": 1
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "gate",
+      "code": "human_approval",
+      "label": "Human approval",
+      "meta": {
+        "dual_control": false
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "architecture_standard",
+      "code": "archimate_3_2",
+      "label": "ArchiMate 3.2",
+      "meta": {
+        "version": "3.2"
+      },
+      "sort": 0,
+      "is_active": true
+    }
+  ],
+  "capabilities_note": "The 17 kind='capability' rows moved to seed/capability.json (S15, 2026-11-09); this document carries no capability vocabulary."
+}

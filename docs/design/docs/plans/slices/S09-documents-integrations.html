@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S09 — Documents, repositories, secrets, workers UI, reports/metrics, billing display · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S09-documents-integrations.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s09--documents-repositories-secrets-workers-ui-reportsmetrics-billing-display">S09 — Documents, repositories, secrets, workers UI, reports/metrics, billing display</h1>
+<p>Programme project: S09 · issues none yet</p>
+<p><strong>Gate (SPEC §8 S9):</strong> feature-list items green.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>S09 ships four tables and a <strong>boundary</strong>: bytes in MinIO behind an authorized stream, write-only secrets, repositories as references, nine adjacent services reached only as declared actions with timeout and breaker — never a second worker manager, billing engine or KAG.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S03: <code>project</code>, <code>trace_link</code>, <code>revision</code>.</li>
+<li>S04: registry, <code>/api/actions</code>, <code>action_registry</code>, OpenAPI + MCP.</li>
+<li>S02 (<code>02-DATA-ARCHITECTURE §2.1</code>): <code>tenant</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>app_licence</code>, licence extractor.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> §2.10's four tables, the front-matter's actions, the <code>integrations</code> module, read-only workers/billing/observability displays, report queries over local tables, the strata handoff. <strong>OUT</strong> billing logic and metering writes (<strong><code>billing_service</code>, D12</strong>), worker scheduling (<strong><code>worker_management</code>, D14</strong>), artifact objects (<strong><code>artifacts</code></strong>), code analysis (<strong><code>coding-*</code></strong>), licence issuance (<strong><code>licenses</code></strong>), ingestion/embeddings (<strong><code>strata_ingest</code>/<code>strata_rag</code></strong>), screens (<strong>S12</strong>), <code>project_request.repository_url</code> (<strong>S07</strong>). <strong>UI surface declared for S12</strong>: <code>admin</code> — <code>actions.*</code>, <code>jobs.*</code>, <code>audit.list</code>, <code>licences.get</code>, <code>workers.list</code>, <code>billing.summary</code>; read models <code>/api/actions</code>, <code>audit_event</code>, <code>app_licence</code>; no own table.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SPEC §2, §3 D12/D14, §5.2, §5.5</td>
+<td>the nine-service list</td>
+<td><code>object_store</code>; strata ingestion</td>
+<td>absorbing any, KAG included</td>
+</tr>
+<tr>
+<td>01-CONTRACT §6, §9, §14</td>
+<td>external-action fields</td>
+<td>timeout + breaker; tenant from <code>membership</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>02-DATA-ARCHITECTURE §2.10, §5, §8</td>
+<td>the four tables' DDL</td>
+<td>verbatim; <code>meta</code> read-whole rule</td>
+<td>any fifth table or column</td>
+</tr>
+<tr>
+<td>02-source-map/20-fr <code>6f7c509792b3ca1fc1fb00c198aebcec83f0af29</code> <code>account</code>, <code>admin</code>, <code>operate</code>, <code>settings</code>, <code>integrations</code></td>
+<td>repo registry, secret store, reports/workers reads</td>
+<td>that shape</td>
+<td><code>kag.ts</code>, licensing/pricing, billing sync, <code>project-requests</code> (S07)</td>
+</tr>
+<tr>
+<td>02-source-map/30 §4</td>
+<td>artifacts/observability nodes</td>
+<td>they are external</td>
+<td>the node packages</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>migrations/0013_documents.sql · crates/store/src/{document,repository,secret}.rs
+crates/api/src/{documents,repositories,secrets,reports,workers,billing}.rs
+crates/api/tests/{documents_roundtrip,documents_limits,documents_attachment,documents_ingest,secrets_never_revealed,externals_declared,reports_match_sql,workers_readonly,repositories_crud,coding_jobs,billing_display}.rs
+crates/actions/src/integrations/{object_store,external,breaker,ingest}.rs   # module, not a crate (CONTRACT §1)</code></pre>
+<h3 id="51-the-line--nine-externals">5.1 The line — nine externals</h3>
+<table>
+<thead>
+<tr>
+<th>service</th>
+<th>external</th>
+<th>action gap it leaves</th>
+<th>how the conveyor calls it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>artifacts</code></td>
+<td>yes</td>
+<td>artifact objects</td>
+<td>external <code>artifacts.list</code> from its <code>openapi.json</code> (<code>artifact_service</code>; routes <code>/api/artifacts</code>, <code>/projects/{project_id}/artifacts</code>); display only</td>
+</tr>
+<tr>
+<td><code>worker_management</code></td>
+<td>yes</td>
+<td>workers/providers/graphs</td>
+<td>external <code>workers.list</code>/<code>providers.list</code>/<code>graphs.list</code> (bare <code>/workers</code>, <code>/providers</code>, <code>/graphs</code>); <strong>read-only</strong></td>
+</tr>
+<tr>
+<td><code>billing_service</code></td>
+<td>yes</td>
+<td>cost/budget summaries</td>
+<td>external <code>billing.summary</code> — <code>GET /api/billing/overview</code>; display only</td>
+</tr>
+<tr>
+<td><code>inference-router</code></td>
+<td>yes</td>
+<td>model routing, generation</td>
+<td>external invoke; no local model inventory</td>
+</tr>
+<tr>
+<td><code>licenses</code></td>
+<td>yes</td>
+<td>issuance, validation</td>
+<td><code>GET /licenses/active?tenant_id=&amp;app_key=conveyor</code> → <code>app_licence</code></td>
+</tr>
+<tr>
+<td><code>coding-*</code></td>
+<td>yes</td>
+<td>analysis, edit, dispatch</td>
+<td>external action per operation; ref in <code>run.external_ref</code></td>
+</tr>
+<tr>
+<td><code>strata_ingest</code></td>
+<td>yes <strong>as a service</strong></td>
+<td>chunking, embeddings</td>
+<td><strong>internal</strong> <code>documents.ingest</code>; <code>strata_ingest</code> out of band</td>
+</tr>
+<tr>
+<td><code>strata_rag</code></td>
+<td>yes</td>
+<td>retrieval</td>
+<td>external <code>retrieval.query</code></td>
+</tr>
+<tr>
+<td>observability</td>
+<td>yes</td>
+<td>panels, metrics</td>
+<td>read-only display links; no ingest</td>
+</tr>
+</tbody>
+</table>
+<p>⛔ <strong><code>documents.ingest</code> is <code>kind: internal</code></strong> — registered once; the registry refuses a name declared both.</p>
+<p>A call not in <code>action_registry</code> does not exist; <code>action_registry.service</code> names the backing service. 5 s read timeout, 30 s write; the breaker is process-local (opens after 5 failures/30 s).</p>
+<p>⚠️ <strong>Amended 2026-11-09 (D22).</strong> <code>retrieval.query</code> is the <strong>raw strata passthrough</strong>; S15 adds <code>knowledge.query</code> (capability-bound), which is the only retrieval path a capability run uses — keep the two distinct. ⚠️ The action's <code>path</code> is <code>/query</code> while <code>strata_rag</code> serves <strong><code>/api/query</code></strong> (measured at the pinned sha <code>b9426c38</code>, <code>src/api/mod.rs:71</code>), and the base URL is operator-set (<code>CONVEYOR_EXTERNAL_STRATA_RAG_URL</code>); a base without <code>/api</code> makes this a 404 the stub-backed tests cannot see. S15's client posts <code>/api/query</code>; align this action or state the base-URL contract where it is configured.</p>
+<h3 id="52-documents--bytes-backend">5.2 Documents — bytes backend</h3>
+<p><strong><code>object_store</code> → MinIO <code>minio.example.com:8389</code></strong> (§5.2), bucket <code>conveyor-documents</code>, key <code>t/&lt;tenant&gt;/&lt;document&gt;/&lt;version&gt;</code>. Rejected: <strong><code>artifacts</code></strong> (a second authorizer) and <strong>local disk</strong> (bytes die with the pod; worker3 carries all 24 PVs).</p>
+<p>Credentials are service-level: MinIO authorizes nothing; every byte streams through <code>/api/documents/{id}/content</code>, authenticated against <code>tenant_id</code> + membership. <strong>No presigned URLs</strong> (a time-bombed authorization decision).</p>
+<p>Upload: multipart, <strong>10 MiB</strong> (10,485,760 B) cap; allowlist <code>pdf, text/plain, text/markdown, text/csv, json, png, jpeg, svg</code>; magic bytes must match the type, <code>application/octet-stream</code> refused. Over cap → <code>413</code>, bad type → <code>415</code>, problem+json. <code>content_hash</code> is SHA-256 while streaming, re-verified on download. Delete sets <code>status='deleted'</code> and enqueues <code>document.purge</code> to remove the object; the row stays a tombstone. <code>content_type</code>/<code>size_bytes</code> in <code>meta</code> (read whole) — no new column.</p>
+<p><strong>Attachment:</strong> <code>ArtifactRef {document_id, role}</code> is a domain value, not a table (the §2 table cap); queryable as a <code>trace_link</code> row (<code>from_type='document'</code>, <code>kind='traces'</code>), <code>role</code> in <code>document.meta.role</code>. A role-indexed join table is a <code>CONTRACT-CHANGE REQUEST</code>.</p>
+<h3 id="53-repositories--references-not-clones">5.3 Repositories — references, not clones</h3>
+<p><code>repository</code> holds <code>provider</code>, <code>url</code>, <code>default_branch</code>, <code>installation_ref</code> (GitHub App installation id, text) and <code>credential_secret_id → secret</code>; <code>project_repository</code> is the join with <code>role</code>. The conveyor clones nothing — coding work is <code>coding_jobs.create {repository_url, ref, task}</code> returning a ref in <code>run.external_ref</code>; <code>coding_jobs.get</code> polls.</p>
+<h3 id="54-secrets--never-a-plaintext-response">5.4 Secrets — never a plaintext response</h3>
+<p><code>secret</code> is per tenant and never returns a value. <strong>Envelope:</strong> 32-byte KEK from <code>CONVEYOR_SECRET_KEK</code> (pod env from a Kubernetes Secret, never the database, <code>tenant.settings</code> or repo); per-tenant key = HKDF-SHA256(KEK, salt = <code>tenant_id</code>); values sealed XChaCha20-Poly1305, <code>ciphertext = nonce ‖ ct ‖ tag</code>, <code>key_id = 'kek:v1'</code>.</p>
+<p><code>create</code>/<code>rotate</code> take <code>value</code> marked <strong><code>x-secret</code></strong> (fr's <code>SECRET_MARKER_KEY</code>) — write-only in OpenAPI and MCP; <code>get</code>/<code>list</code> return <code>{id,name,scope,key_id,version,created_at}</code>; <strong>no reveal action</strong>. Rotation: <code>UPDATE … SET ciphertext=$new, key_id=$kek, version=version+1</code>; <code>uq(tenant,name)</code> forbids history — the old ciphertext does not survive. Values resolve server-side at the outbound call; an external action never receives one.</p>
+<h3 id="55-workers-ui-reports-billing-display">5.5 Workers UI, reports, billing display</h3>
+<p><strong>Workers:</strong> the page renders <code>worker_management</code>'s answer; no writes, no local table. Stopped service: last-known + banner.</p>
+<p><strong>Reports</strong> are <code>document(kind='report')</code> rows with <code>meta.params</code>/<code>meta.generated_at</code>; numbers are live queries, never rollups (<code>project_metrics</code> stays dropped).</p>
+<table>
+<thead>
+<tr>
+<th>number</th>
+<th>source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cards opened / reached done</td>
+<td><code>event</code> (<code>card.created</code>, <code>card.moved</code> where <code>to_kind='done'</code>)</td>
+</tr>
+<tr>
+<td>WIP</td>
+<td><code>card</code> join <code>list</code>, <code>list.kind='active'</code>, <code>archived_at is null</code></td>
+</tr>
+<tr>
+<td>run outcomes</td>
+<td><code>run</code> by <code>status</code>, <code>error_class</code></td>
+</tr>
+<tr>
+<td>approval latency / pending age</td>
+<td><code>approval.created_at</code> → <code>min(approval_decision.created_at)</code></td>
+</tr>
+<tr>
+<td>delivery success</td>
+<td><code>delivery</code> by <code>state</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Billing display</strong> reads <code>billing.summary</code> and <code>app_licence</code> (<code>status</code>, <code>expires_at</code>, <code>checked_at</code>), as of <code>checked_at</code>: no arithmetic, metering writes or budget mutation.</p>
+<h3 id="56-strata">5.6 strata</h3>
+<p><code>documents.ingest {id, store_id, source_id?, source_run?, options?}</code> (<strong>internal</strong>) hands it to <code>strata_ingest</code> and stores the returned job id in <code>document.external_ref</code>.</p>
+<p>⚠️ <strong>Built 2026-11-08 with one deviation from this plan, recorded rather than quietly taken:</strong> the failure path does <strong>not</strong> set <code>status='failed'</code>. <code>fetch_bytes</code> — the one path <code>documents.download</code> and the byte route share — requires <code>status='active'</code>, so a transient upstream outage would make a perfectly good document unreadable. A failed push writes nothing to the row; the engine's <code>record_failure</code> records it on the audit trail, and the caller gets the <code>502</code>/<code>422</code>/<code>503</code> that names the cause. The field is <code>id</code>, not <code>document_id</code>, matching every other <code>documents.*</code> action.</p>
+<p>⚠️ <strong>The contract below was re-read from the upstream's own source on 2026-11-08 (<code>~/Movies/strata_ingest</code>), not assumed. The earlier note in this section was wrong in two ways and cost the action a week of being "unbuildable".</strong></p>
+<ul>
+<li><code>POST /api/ingest/jobs</code>, <code>multipart/form-data</code> <strong>or</strong> <code>application/json</code>.</li>
+<li><strong><code>Authorization: Bearer &lt;token&gt;</code> and the token IS the tenant</strong> (<code>STRATA_INGEST_API_TOKENS</code> → tenant uuid; every route but <code>/health</code> is behind it — measured: an unauthenticated call is <code>401</code>). The conveyor therefore stores a per-tenant token as the sealed secret <code>strata_ingest.token</code> (S09's own envelope) and opens it per call; a tenant without one is <code>422 ingest_not_configured</code> <strong>before a byte is read</strong>. There is no plaintext token env and no shared token.</li>
+<li><strong>Multipart requires a <code>store_id</code> part before the first <code>file</code> part</strong>, and the upstream validates it as a <strong>leaf store of the caller's tenant</strong> (<code>src/api/upload.rs:274-284</code> → <code>src/api/handlers.rs:187</code>). The conveyor has no notion of a strata store, so <code>store_id</code> is a <strong>required action input</strong>, passed through and never invented.</li>
+<li><code>202 Accepted</code> body is <code>{"jobs":[{"job_id":&lt;uuid&gt;,"status":"queued"}]}</code>. A top-level <code>job_id</code> exists <strong>only</strong> for a single JSON <code>source</code> body (crawl/URL), which this action does not send — so the multipart answer has no top-level <code>job_id</code> and the client reads <code>jobs[0]</code>.</li>
+<li>Other answers the action must handle: <code>401</code> (bad token), <code>503 not_ready</code>/<code>busy</code> (retryable), <code>413</code>/<code>415</code> (the upstream's own limits), <code>400</code> (malformed part order).</li>
+</ul>
+<p><strong>KAG is archived (George 2026-11-04)</strong> — no client, no <code>asset_bindings</code>/<code>card_asset_binding</code>.</p>
+<h3 id="57-events">5.7 Events</h3>
+<p>Outbox rows, one per mutation, in its transaction (CONTRACT §7).</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>emitter</th>
+<th>payload keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>document.created</code></td>
+<td><code>documents.create</code>, <code>documents.report</code></td>
+<td>id, version</td>
+</tr>
+<tr>
+<td><code>document.updated</code></td>
+<td><code>documents.update</code> (title/tags), <code>documents.report</code>, <code>document.purge</code> job</td>
+<td>id, changed[]</td>
+</tr>
+<tr>
+<td><code>document.deleted</code></td>
+<td><code>documents.delete</code></td>
+<td>id</td>
+</tr>
+<tr>
+<td><code>document.ingested</code></td>
+<td><code>documents.ingest</code></td>
+<td>id, external_ref</td>
+</tr>
+<tr>
+<td><code>repository.created</code></td>
+<td><code>repositories.create</code></td>
+<td>id, url</td>
+</tr>
+<tr>
+<td><code>repository.linked</code></td>
+<td><code>repositories.link</code></td>
+<td>id, project_id</td>
+</tr>
+<tr>
+<td><code>secret.created</code></td>
+<td><code>secrets.create</code></td>
+<td>id, name</td>
+</tr>
+<tr>
+<td><code>secret.rotated</code></td>
+<td><code>secrets.rotate</code></td>
+<td>id, version</td>
+</tr>
+<tr>
+<td><code>secret.deleted</code></td>
+<td><code>secrets.delete</code></td>
+<td>id</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-build-order">6. Build order</h2>
+<p><strong>Part A — BUILT 2026-11-08</strong> (steps 2–8: the four tables, the object store, documents create/get/list/download/ update/delete, the byte route, the secret envelope and <code>secrets.*</code>; 11 actions, migration <code>0013</code>, 4 scopes). <strong>Part B — BUILT 2026-11-08</strong> (steps 9–15 except the strata push: <code>repositories.*</code> 6, <code>documents.report</code>, and the 8 external displays; 15 actions, 2 scopes). <strong>26 of the front-matter's 27 actions are registered.</strong> ⛔ <strong><code>documents.ingest</code> is the one that is not</strong>: it pushes multipart to <code>strata_ingest</code> (<code>POST /api/ingest/jobs</code> → 202 <code>{job_id}</code>), which no local environment can exercise, so writing it would be unproven code. It is a follow-up with a live target, not an omission.</p>
+<ol type="1">
+<li><p>MinIO: ephemeral container, random host port; no compose service. Teardown below.</p>
+<pre class="bash"><code>: &quot;${MINIO_ROOT_USER:?}&quot; &quot;${MINIO_ROOT_PASSWORD:?}&quot;
+docker run --rm -d --name conveyor-minio -p 127.0.0.1::9000 -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD minio/minio server /data
+export MINIO_ENDPOINT=&quot;http://127.0.0.1:$(docker port conveyor-minio 9000/tcp | sed &#39;s/.*://&#39;)&quot;   # tests reuse it; bucket from the test setup; teardown: docker rm -f conveyor-minio</code></pre></li>
+<li><p><code>0013_documents.sql</code>: four tables, FKs, <code>FORCE</code> RLS, indexes; <code>cargo run -p conveyor-server -- migrate</code> twice (the binary re-applies the runtime grants; <code>sqlx migrate run</code> would not — CONTRACT §16). ⚠️ Renumbered 2026-11-08: <code>0010</code> shipped as <code>s08_retention</code>, <code>0011</code> is the S00-verdict drop and <code>0012</code> the retention chain, so S09 takes <strong>0013</strong>.</p></li>
+<li><p><code>actions::integrations::object_store</code> put/get/delete/stat; <code>cargo test -p conveyor-actions integrations::object_store</code>.</p></li>
+<li><p><code>documents.create</code> streaming upload: cap, allowlist, magic bytes, hash — <code>cargo test -p conveyor-api --test documents_limits</code> (10,485,760 and 10,485,761 B).</p></li>
+<li><p><code>documents.{get,list,download,delete}</code>; Range; <code>Content-Disposition: attachment</code> + <code>nosniff</code>; purge job — <code>cargo test -p conveyor-api --test documents_roundtrip</code>.</p></li>
+<li><p><code>ArtifactRef</code> + <code>trace_link</code> attachment; cross-tenant test returns 0 rows — <code>cargo test -p conveyor-api --test documents_attachment</code>.</p></li>
+<li><p>Secret envelope: KEK load, HKDF, seal/open, <code>key_id</code>; <code>cargo test -p conveyor-store secret_envelope</code>.</p></li>
+<li><p><code>secrets.*</code>; <code>x-secret</code> through utoipa + MCP; served-spec — <code>cargo test -p conveyor-api --test secrets_never_revealed</code> then <code>cargo run -q -p conveyor-server -- --print-openapi --write-lock</code> (there is <strong>no</strong> <code>served_spec_lock</code> test target; the lock is the binary's own <code>--check-lock</code>).</p></li>
+<li><p><code>repositories.*</code>; link/unlink; assert no git crate — <code>cargo test -p conveyor-api --test repositories_crud &amp;&amp; ! cargo tree -p conveyor-api | grep -qi '^git '</code>.</p></li>
+<li><p>External ingest for <code>workers</code>/<code>providers</code>/<code>graphs</code>/<code>artifacts</code>/<code>billing</code>: registry rows, 5 s timeout, breaker; workers screen + write-action absence test — <code>cargo test -p conveyor-api --test externals_declared --test workers_readonly</code>.</p></li>
+<li><p><code>coding_jobs.create|get</code> from the fleet spec; <code>run.external_ref</code> written in the run transition — <code>cargo test -p conveyor-api --test coding_jobs</code>.</p></li>
+<li><p>Report queries + <code>documents.report</code>; SQL-vs-report test — <code>cargo test -p conveyor-api --test reports_match_sql</code>.</p></li>
+<li><p><code>billing.summary</code> + <code>app_licence</code> display; manifest has no billing write — <code>cargo test -p conveyor-api --test billing_display</code>.</p></li>
+<li><p><code>documents.ingest</code> → strata; <code>external_ref</code>, failure path — <code>cargo test -p conveyor-api --test documents_ingest</code>.</p></li>
+<li><p>Gate; <code>cargo clippy -- -D warnings</code>; <code>cargo fmt --check</code>.</p></li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo run -q -p conveyor-server -- --print-openapi --check-lock
+export DATABASE_MIGRATE_URL=&#39;postgres://postgres:postgres@127.0.0.1:5439/conveyor_dev&#39;
+cargo run -q -p conveyor-server -- migrate      # twice; the second must be a no-op
+cargo test -p conveyor-api --test documents_roundtrip --test documents_limits \
+        --test documents_ingest --test secrets_never_revealed \
+        --test externals_declared --test reports_match_sql \
+        --test repositories_crud --test s07_requests
+# ⚠️ Corrected 2026-11-09: this block named four test targets that do not exist — `documents_attachment`,
+# `workers_readonly`, `coding_jobs`, `billing_display`. `cargo test --test &lt;missing&gt;` is a hard error, so the
+# gate could never have passed as written. Their properties are covered, and are named by the tests that
+# actually prove them: the attachment/trace-link cross-tenant proof is
+# `s07_requests::a_trace_link_is_visible_from_both_ends_and_never_across_tenants`; the read-only worker,
+# coding-job and billing displays are `externals_declared` (declared external, `effect = read`, bounded) plus
+# `registry`/`parity_http_mcp` for their wire shape.
+# The object-store half of property (a) lives in `documents_roundtrip`, not here: integration tests run
+# against their own ephemeral database (CONTRACT §10), so a psql lookup in this gate would see no row and an
+# `mc stat` on an empty id passes vacuously. The test holds the key and asserts `object_store::head` → NotFound
+# after delete; `mc alias set` is only for manual inspection (build step 1), and needs `MINIO_ENDPOINT`,
+# `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` exported — the gate itself asserts nothing through it.</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property · proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>round-trip — upload 1 MiB, list, download: sha256 equals <code>content_hash</code>; delete → GET 404 <strong>and the object key is gone</strong> (<code>object_store::head</code> → NotFound, asserted in <code>documents_roundtrip</code>; <code>mc stat</code> is the manual cross-check)</td>
+</tr>
+<tr>
+<td>b</td>
+<td>cap — 10 MiB refused <code>413 application/problem+json</code> with stable <code>type</code>; 10 MiB−1 accepted</td>
+</tr>
+<tr>
+<td>c</td>
+<td>secret — rotate to v2; <code>GET</code> has no plaintext, <code>value</code> key or <code>ciphertext</code></td>
+</tr>
+<tr>
+<td>d</td>
+<td>workers — page renders live rows; service stopped → banner, breaker open after 5 failures</td>
+</tr>
+<tr>
+<td>e</td>
+<td>reports — each number equals its SQL count on the same snapshot</td>
+</tr>
+<tr>
+<td>f</td>
+<td>externals — <code>GET /api/actions</code> shows <code>timeout_ms</code> on every external; zero <code>reqwest::</code> outside the executor</td>
+</tr>
+<tr>
+<td>g</td>
+<td>billing — no write action, no metering event in the manifest</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-traps">8. Traps</h2>
+<ol start="0" type="1">
+<li>⚠️ <strong>The transport body limit is not the document cap.</strong> axum's default <code>DefaultBodyLimit</code> is 2 MiB, so a 10 MiB document (≈14 MB of base64 JSON) is refused by the router with its own 413 before the action's cap is ever consulted — measured while building Part A, fixed with a 16 MiB layer on the app. The rule stays the action's: the layer is an envelope, the cap is a check. 0b. ⚠️ <strong>The purge must check the tombstone before deleting bytes.</strong> <code>document.purge</code> deletes the object and then calls <code>clear_object_tx</code>, which refuses a non-deleted row — so without an explicit <code>status == 'deleted'</code> guard the object is gone and the pointer survives, leaving a live document with no bytes. <code>documents_purge::a_purge_of_a_live_document_removes_nothing</code> is that guard's test. 0c. ⚠️ <strong><code>documents/mod.rs</code> cannot contain <code>documents/documents.rs</code></strong> — clippy's <code>module_inception</code> is denied workspace-wide; the action module is <code>documents/actions.rs</code>.</li>
+<li><strong>Bytes in Postgres.</strong> <code>bytea</code> TOASTs the row, multiplies WAL and puts binaries in every dump; the cap settles it.</li>
+<li><strong>A "secret" returned once, "for convenience".</strong> One reveal endpoint is the whole leak; there is none.</li>
+<li><strong><code>x-secret</code> leaking into OpenAPI examples.</strong> A <code>default</code>/<code>example</code> on the value field publishes the credential shape into every client; strip examples for marked fields and assert.</li>
+<li><strong>Absorption by accretion.</strong> One direct read of <code>worker_management</code>'s database and you own its schema and outages.</li>
+<li><strong>Object-store credentials in the repo.</strong> Keys from env/Secret only; a committed <code>.env</code> survives.</li>
+<li><strong>Content-type trust.</strong> A <code>text/plain</code> carrying SVG/HTML served inline is stored XSS: sniff, reject mismatch, always <code>attachment</code> + <code>nosniff</code>.</li>
+<li><strong>Delete that drops the row and not the object</strong> — orphaned bytes are invisible.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li>Bytes: <code>object_store</code> → MinIO, one bucket, tenant prefix; the conveyor is sole authorizer, no presigned URLs.</li>
+<li>Cap, allowlist, magic-byte check, attachment disposition (§5.2).</li>
+<li><code>content_type</code>/<code>size_bytes</code> in <code>meta</code>; no column on <code>document</code>.</li>
+<li><code>ArtifactRef</code> is a domain value plus a <code>trace_link</code> row — no <code>artifact_ref</code> table.</li>
+<li>Secrets: HKDF per tenant from an env KEK, AEAD, <code>key_id</code> per generation, rotation bumps <code>version</code>.</li>
+<li>Repositories are references; the conveyor never clones.</li>
+<li>Every external call is a declared action with timeout and breaker.</li>
+<li>Reports are live queries plus a document row; <code>project_metrics</code> dropped.</li>
+<li>Workers, billing, observability are read-only displays.</li>
+<li><code>documents.ingest</code> is internal; <code>strata_ingest</code> is a service, never an action.</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><strong>PROVEN 2026-11-09 — the S3 wire round-trips.</strong> <code>scripts/prove-s3.sh</code> starts RustFS (<code>rustfs/rustfs</code>) on</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><code>127.0.0.1:9000</code>, and <code>s3_wire::the_s3_wire_round_trips_over_http_with_sigv4</code> passes against it, printing <code>S3_WIRE_PROVEN</code>: real endpoint, path-style addressing and SigV4, not the in-memory backend. ⚠️ This row said "UNVERIFIED locally" while <code>00-INDEX</code> claimed the opposite; the script settled it. What is still unproven is the <strong>deployed</strong> MinIO (<code>minio.example.com:8389</code>): credentials, bucket policy and the operator's base URL — not the wire. | Prove the deployed leg (credentials + bucket policy) before S14. | | 1 | MinIO has <strong>no off-site backup</strong> (gitops#4617): a disk loss keeps rows, loses bytes. | Accept; say so in the UI; <code>content_hash</code> checks | | 2 | Is <code>artifacts</code> needed for pre-existing objects? | Reference-only; no migration (D7) — <code>artifact_service</code> serves <code>/openapi.json</code> | | 3 | Do S08's PNG/PDF/XMI renders become <code>document(kind='export')</code> here? | Yes — same bucket, written by <code>render</code>, not <code>artifacts</code> | | 4 | strata_ingest contract: bytes pushed or URL pulled? | <strong>Resolved</strong> — multipart push, <code>POST /api/ingest/jobs</code> → 202 <code>{job_id}</code> | | 5 | Billing source: <code>billing_service</code> summary or licence data only? | <strong>Resolved</strong> — <code>GET /api/billing/overview</code> |</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S09-documents-integrations.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

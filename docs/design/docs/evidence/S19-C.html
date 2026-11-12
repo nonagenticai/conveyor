@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S19 Part C (steps 13–17) — report, audit, interop — built 2026-11-09 · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S19-C.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s19-part-c-steps-1317--report-audit-interop--built-2026-11-09">S19 Part C (steps 13–17) — report, audit, interop — built 2026-11-09</h1>
+<p>Lane <code>s19-eval-build-c</code>, branch <code>lane/s19-eval-build-c</code> off <code>b7c7e8b</code> (the S20 lane's HEAD; main's bootstrap snapshot predates S19 Part B's driver tests and S20's rustfmt repairs). <strong>S19 is now 33/33 actions built.</strong> No migration: <code>eval_audit</code> + <code>eval_audit_finding</code> were already in <code>0026</code>.</p>
+<h2 id="what-is-built">What is built</h2>
+<h3 id="step-13--eval_runsreport-cratesactionssrcevalreportrs">Step 13 — <code>eval_runs.report</code> (<code>crates/actions/src/eval/report.rs</code>)</h3>
+<p>Input <code>{run_id, group_by?}</code> (<code>tag</code> default, <code>split</code> the alternative; anything else a <code>422</code> naming <code>group_by</code>). Output <code>{run_id, eval_id, version_id, variant, status, reps, cases, graded, truncated, errors{total, failed_slots, by_class}, metrics[], perf[], per_tag[], noise_floor, headroom, cost{unit, subject, judge, failed, total, unpriced}}</code>. Reuses <code>run_core::all_results</code>, the store's read functions and S20's <code>climbs::{price_usage, tokens_of}</code> (now <code>pub(crate)</code>), so the report and the climb price the same rows with the same arithmetic.</p>
+<h3 id="step-14--the-health-audit">Step 14 — the health audit</h3>
+<ul>
+<li><code>crates/domain/src/eval/audit.rs</code> — the six-section checklist as pure functions (<code>Section</code>/<code>Severity</code>/<code>FindingDraft</code>, <code>InstrumentFacts</code>, <code>Controls</code>, <code>findings</code>, <code>resolution_line</code>, <code>resolution_shortfall</code>) and unit tests.</li>
+<li><code>crates/store/src/eval/audits.rs</code> — <code>eval_audit</code> + <code>eval_audit_finding</code> rows: insert, get, list (keyset), a guarded status transition (<code>queued → running → succeeded | failed</code>), findings insert and a decide-once transition. A new <code>EvalStoreError::NotOpen</code> maps to <code>409 not_open</code>.</li>
+<li><code>crates/actions/src/eval/audits.rs</code> — <code>eval_audits.start|get|list</code> and <code>eval_findings.list|decide</code>; start validates the eval, the version (same eval) and the optional target run (same eval <strong>and</strong> same version), writes the audit <strong>and one <code>eval.audit.run</code> job in the same transaction</strong>, and returns it <code>queued</code>. Decide records who/when and carries the note on the <code>eval_finding.decided</code> event (the finding table has no note column).</li>
+<li><code>apps/server/src/eval_audit.rs</code> — the job. It reads the version, its cases (and each answer key), its metrics, the target run and its results/attempts; runs the mechanical checks; runs the controls; writes the findings and the numbers; appends <code>eval_audit.completed</code> on <code>eval:{id}</code>. <strong>Controls:</strong> the oracle grades each case's answer key through every <code>programmatic</code> metric (presented both as the answer and wrapped as the subject's completion shape) and the null grades an empty answer the same way — the two numbers the <code>oracle ≈ 100 %</code> / <code>null ≈ 0 %</code> gate reads; the judge control feeds the first model-declaring <code>rubric</code>/<code>pairwise</code> metric an empty answer, an "I don't know" and a confident wrong answer through the real <code>invoke</code> → <code>grade_from_judge</code> path, and a score ≥ 0.5 on any of them is the <code>judge_accepts_negatives</code> finding. The resolution numbers come from the target run's held-out split (<code>1/sqrt(n·reps)</code> floor, binary headroom), and the <code>floor_above_headroom</code> finding fires when the floor cannot clear the headroom.</li>
+</ul>
+<h3 id="step-15--eval_runsexport-cratesactionssrcevalexportrs">Step 15 — <code>eval_runs.export</code> (<code>crates/actions/src/eval/export.rs</code>)</h3>
+<p>One gzip JSONL document: a run header, one <code>result</code> line per scored slot and one <code>trace</code> line per stored transcript, written through the S09 object store and a <code>document</code> row (<code>kind = export</code>, <code>content_type = application/gzip</code>, <code>content_hash</code>, <code>meta.eval_id/eval_run_id</code>). <strong>No case column is selected</strong>, so the answer key cannot appear in the bundle — <code>eval_roundtrip</code> asserts the literal string <code>"expected"</code> is absent. Caps at 64 MiB (<code>413</code>).</p>
+<h3 id="step-16--retention-and-registration">Step 16 — retention and registration</h3>
+<p><code>store::prune::eval_trace_prune</code> (90 days, batched, tenant-scoped) + the <code>eval.prune</code> worker arm + its <code>DEFAULT_SCHEDULES</code> row (18 → 19). SSE: the audit rides the existing <code>eval:{id}</code> topic, so no new topic. Registration: the seven actions above; <code>AGENT_TOOLS</code> <strong>34 → 37</strong> (<code>eval_runs.report</code>, <code>eval_audits.get</code>, <code>eval_findings.list</code>); <code>EXPECTED</code> <strong>247 → 254</strong> with the reachable set <strong>7 → 9</strong>; api count <strong>254</strong>; seven parity samples.</p>
+<h3 id="step-17--the-served-surface">Step 17 — the served surface</h3>
+<p><code>--print-openapi --write-lock</code> on this branch; <code>served-spec.lock.json</code> written and copied back from m1. <strong><code>--check-lock</code> exit 0.</strong></p>
+<h2 id="measured-gate-rbuild-on-m1-the-pinned-1990-toolchain">Measured gate (rbuild on m1, the pinned 1.99.0 toolchain)</h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test eval_report</code></td>
+<td><strong>5 / 0</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test registry</code></td>
+<td><strong>8 / 0</strong> at 254</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test parity_http_mcp</code></td>
+<td><strong>4 / 0</strong> (seven Part C samples over HTTP and MCP)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test eval_audits</code></td>
+<td><strong>2 / 0</strong> (start validates + one job; decide-once + foreign 404)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test eval_roundtrip</code></td>
+<td><strong>1 / 0</strong> (bundle out, cases back, no answer key, no measurement claimed)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-server --test eval_audit</code></td>
+<td><strong>4 / 0</strong> (checklist, controls, resolution numbers, judge reversal, no rerun)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-server --test eval_controls</code></td>
+<td><strong>3 / 0</strong> (oracle ≈ 100 %, null ≈ 0 %, an induced 5xx is a classified <code>serving</code> attempt)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-server --test prune</code></td>
+<td><strong>14 / 0</strong> (incl. <code>eval.prune</code>: old trace gone, fresh kept, other tenant untouched)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-domain --lib audit</code></td>
+<td><strong>4 / 0</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --no-fail-fast</code></td>
+<td><strong>44 test binaries ran, exactly 1 failed: <code>workflow_runs</code> 4/4</strong> — the pre-existing red above. Every other binary green.</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-server --no-fail-fast</code></td>
+<td><strong>25 binaries, 0 failed</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-store --no-fail-fast</code></td>
+<td><strong>38 binaries, 2 failed</strong> — both are the missing-<code>0028</code> ledger assertions below, not this lane</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-domain</code></td>
+<td>all green (209 lib + 3 + 22 + 5 + 1)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-api --lib</code></td>
+<td><strong>29 / 0</strong> at 254</td>
+</tr>
+<tr>
+<td><code>rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>exit 0</strong> (lock written)</td>
+</tr>
+<tr>
+<td><code>rbuild -- fmt --all -- --check</code></td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td><code>rbuild -- clippy … -- -D warnings</code></td>
+<td><strong>every one of this lane's files clean</strong>; the only errors are the two pre-existing peer files below</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-that-is-not-this-lane-measured-attributable">Red that is NOT this lane (measured, attributable)</h2>
+<ul>
+<li><strong><code>conveyor-actions --test workflow_runs</code> — 4/4 failed</strong>, the pre-existing red S20 named at <code>f083551</code>.</li>
+<li><strong>The two store ledger assertions</strong> (<code>store::migrate::tests::embedded_migrations_are_exactly_ the_s0_set</code> and <code>store/tests/s07_schema.rs::the_migration_ledger_is_gapless_apart_from_the_ reserved_six</code>) — both fail because <strong>migration <code>0028</code> is not on this branch</strong>: it is another lane's uncommitted <code>0028_rbac_provisioning.sql</code> in the shared checkout (<code>ls migrations</code> here ends <code>0027, 0029</code>). Nothing in this lane touches migration code.</li>
+<li><strong><code>crates/actions/src/workflow/node.rs</code> — 21 <code>clippy::explicit_auto_deref</code></strong> and <strong><code>crates/store/tests/capability.rs</code> — 1 clippy error</strong>: both S13's/S15's committed files; the shared checkout carries their fixes uncommitted. Every one of this lane's files is clippy-clean.</li>
+</ul>
+<h2 id="decisions-worth-carrying">Decisions worth carrying</h2>
+<ul>
+<li><strong>Cost is priced from the recorded usage, not from <code>inference_call</code>.</strong> D23's amendment (<code>inference_call.caller_kind='eval'</code>, <code>eval_run_id</code>) is specified and unbuilt; the ledger's only link today is <code>action_invocation_id</code>, which covers the subject call but not the judge. Report, audit and climb price <code>eval_case_result.usage</code>/<code>judge_usage</code> and <code>eval_attempt_error.usage</code> — one arithmetic across the three. <strong>Open item for the lane that lands the amendment:</strong> make the ledger the authority; a migration ≥ <code>0032</code> is needed because <code>0030</code>/<code>0031</code> are in flight.</li>
+<li><strong>The oracle presents the key in both shapes</strong> (the answer itself, and wrapped as the subject's completion body) because a programmatic grader reads either <code>label</code> or <code>choices.0.message.content</code>. It passes when either shape scores 1.0; the null passes only when neither does.</li>
+<li><strong>The judge control probes one metric, three calls.</strong> It is about the judge prompt, not every metric; three calls per metric would spend a run's budget on an audit. A call that errors is reported as <code>judge_error</code> and leaves the control unmeasured rather than counting an outage as leniency.</li>
+<li><strong><code>eval_runs.export</code> requires <code>evals:read</code></strong> (the slice's scope) but declares <code>effect: write</code>: it creates a document row and an object. The bundle's content type is <code>application/gzip</code>, which the <code>documents.create</code> allowlist does not carry — the export writes the document row directly and the download route serves the row's own type.</li>
+<li><strong>A finished audit is not re-run.</strong> A second delivery of the job returns before touching the findings; <code>eval_audits.start</code> is not idempotent and mints a new row per call.</li>
+</ul>
+<h2 id="not-built--known-limits">Not built / known limits</h2>
+<ul>
+<li>The method's tier-3 per-case LLM auditor (a model call per case) is <strong>not</strong> built; the audit's mechanical checks are exhaustive over the case set and the model is used only for the judge's three negatives.</li>
+<li>The report's <code>metrics[]</code> columns are whole-run; the held-out numbers are the per-split row (<code>group_by: "split"</code>) and the <code>noise_floor</code>/<code>headroom</code> pair.</li>
+</ul>
+<h2 id="the-train-merges-aa309b8-ae96d78">The train merges (<code>aa309b8</code>, <code>ae96d78</code>)</h2>
+<p>The lane merged <code>origin/lane/train-2026-11-09</code> twice: at <code>eb9bda2</code> — the integration train that commits the previously uncommitted S15/RBAC/S13 work and adds migrations <code>0028</code>, <code>0030</code>–<code>0032</code>, S21's plan projection and S13's <code>cards.list</code> — and again at <code>7d32d80</code>, where the train owner's own workspace run had caught the same two reds this lane repaired and fixed them better (an unreadable expiry is the only unopenable gate; the <code>/api/me</code> bootstrap). <strong>The train's versions won</strong> for <code>procedure_step.rs</code>, <code>active_tenant.rs</code> and <code>named_flows.rs</code>; this lane kept its own <code>externals_declared</code> repair (the train still lacks it), the counts and the lock. The conflicts were resolved by <strong>re-deriving</strong>, never by picking a side:</p>
+<ul>
+<li><code>EXPECTED</code> <strong>269 + 7 = 276</strong>; <code>(internal, external)</code> <strong><code>(262, 14)</code></strong>; <code>AGENT_TOOLS</code> <strong>40 + 3 = 43</strong>; api count <strong>276</strong>.</li>
+<li><code>served-spec.lock.json</code> regenerated on the merged tree: <strong>304 ops</strong>, <code>--check-lock</code> exit 0.</li>
+<li><code>00-INDEX.md</code>: the train's rows kept; this lane's lease row and S19 cell carry the completion.</li>
+<li><code>eval_audit.rs</code> gains <code>InvokeRequest.policy</code> (the train's field); <code>rls.rs</code> and <code>events.rs</code> gain <code>AppState.services</code>, which the train's tree left unset (a mechanical repair, named here).</li>
+<li><code>fmt --all</code> on the files the train left unformatted (S20's precedent), and one <code>#[allow(clippy::type_complexity)]</code> on the train's <code>named_flows</code> row read — the last workspace clippy error after the merge.</li>
+</ul>
+<p><strong>Measured on the merged tree:</strong> <code>registry</code> 8/8 at <strong>276</strong> · api lib <strong>30/30</strong> · <code>eval_report</code> 5/5 · <code>eval_audits</code> 2/2 · <code>eval_roundtrip</code> 1/1 · <code>parity_http_mcp</code> 4/4 · <code>eval_audit</code> 4/4 · <code>eval_controls</code> 3/3 · <code>conveyor-server</code> <strong>all binaries green</strong> · <strong><code>workflow_runs</code> 4/4 green</strong> (the train's S13 fix) · the two <code>0028</code> ledger assertions green (the train's migration) · workspace <code>clippy --all-targets -D warnings</code> <strong>exit 0</strong> · <code>fmt --all --check</code> <strong>exit 0</strong> · <code>--check-lock</code> <strong>exit 0</strong> (304 ops). The PR is #3, stacked on the train.</p>
+<h2 id="the-final-workspace-gate-m1-the-pinned-1990-toolchain-on-de3865d">The final workspace gate (m1, the pinned 1.99.0 toolchain, on <code>de3865d</code>)</h2>
+<p>After the train's <code>a2e6b7c</code> (docs + the role-script serialisation + its own strata allowlist) was merged (<code>4faded6</code>) and the train's allowlist was rustfmt'd (<code>de3865d</code>), the whole workspace was run again on the exact pushed tree:</p>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rbuild -- test --workspace --locked --no-fail-fast</code></td>
+<td><strong>201 test binaries, 0 failed</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- fmt --all -- --check</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- clippy --workspace --all-targets -- -D warnings</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>exit 0</strong> (304 ops)</td>
+</tr>
+</tbody>
+</table>
+<p>The same full-workspace run was also <strong>201 binaries, 0 failed</strong> on the immediately preceding tree (<code>c3cf84d</code>), so the result is not a single lucky pass.</p>
+<h2 id="environment-note-transient-corrected">Environment note (transient, corrected)</h2>
+<ul>
+<li><strong>The first full-workspace run on m1 hit a transient <code>ENOSPC</code></strong> (the first failure is <code>could not write to file "pg_wal/xlogtemp.NNNN": No space left on device</code>, and the DB-backed tests behind it fail with <code>PoolTimedOut</code> — the test Postgres died, not the code). <strong>The host was healthy again immediately afterwards (72 GiB free, 84 % used) and the suite was re-run on it</strong>; the re-run's result is the one recorded in "The final workspace gate" above.</li>
+<li><strong>CI's build job failed pulling its own smoke image</strong> from <code>registry.example.com:5000</code> after six attempts (connection refused on port 5000 for ~5 minutes) — the estate registry, not this change. The code gate is the <code>rust-checks</code> job (fmt, clippy, test).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S19-C.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

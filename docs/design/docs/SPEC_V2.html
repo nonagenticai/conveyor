@@ -1,0 +1,2680 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>SPEC V2 — conveyor: the organisational operating model · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="spec-v2--conveyor-the-organisational-operating-model">SPEC V2 — conveyor: the organisational operating model</h1>
+<p><strong>Repo:</strong> <code>nonagenticai/conveyor</code> · <strong>Host:</strong> <code>conveyor.nonagentic.ai</code> · <strong>Port:</strong> 8930 (existing; no new port) <strong>Date:</strong> 2026-11-11 · <strong>Status:</strong> draft for review · no V2 code written <strong>Relationship to <code>SPEC.md</code>:</strong> V1 (2026-11-07) remains the build record and stays binding for the slices it defines. V2 extends it — it adds <strong>the organisation that works the conveyor</strong> and <strong>the work hierarchy that organisation needs</strong>. V1 decisions D1–D27 stand unless a V2 decision explicitly extends or amends them (Appendix B). No V1 slice is re-opened by this document.</p>
+<blockquote>
+<p><strong>In one paragraph.</strong> V2 turns the conveyor from a work system into an organisation. Jobs are configured positions (industry → department → job) that receive cards, decide with rules and laya, generate with LLMs behind gates, and prove their work with runs and instruments. PM, kanban coach, kata, development and operations are jobs, not code. TOGAF/SAFe/PMP artefacts are rows, gates and evidence. Every cluster service a job may call is a versioned, bound, audited tool. The conveyor develops and operates itself under the same gates it imposes on any work. <strong>The conveyor owns its whole model and is as self-contained as possible</strong>: it reuses ideas — and where useful, code — from the agent, w2v, fr and care-bus applications, but holds no runtime dependency on any of them and treats the agent platform only as a user-interaction front end over MCP.</p>
+</blockquote>
+<hr />
+<h2 id="1-context">1. Context</h2>
+<h3 id="11-what-v1-built">1.1 What V1 built</h3>
+<p>V1 built <strong>one Rust application to replace fr, RM, Planka and procedure_management</strong> — the app is live; the old applications remain until the S14 cutover. It built the machine that can carry work: projects, boards, lists, cards, runs, approvals, procedures, capabilities, capability agents, knowledge and memory bindings, an inference ledger, a native SWE-bench harness, evals, evals' hillclimb and the compiled-prompt pipeline.</p>
+<p>The V1 build record's last whole-tree checkpoint (2026-11-09, <code>docs/plans/00-INDEX.md</code>) measured <strong>83 tables and 243 actions</strong>; S19–S21 lanes moved the registry past 290 served-spec ops that same day, so those numbers are a floor, not a live figure. The app is <strong>live</strong> at <code>conveyor.nonagentic.ai</code> on main <code>85487a04</code>, 3 pods, <code>/health</code> and <code>/health/ready</code> 200 on <code>:8930</code> (deploy record 2026-11-10).</p>
+<p>V1 answers <em>how work is carried</em>. It does not answer <em>who the organisation is</em>: there is no industry, no department, no job, no programme cadence, no PM/coach/kata role, no self-development project and no operations perspective. A project is created by a person; a card is typed by a person; the improvement loop exists but nothing staffs it.</p>
+<h3 id="12-the-three-convergences">1.2 The three convergences</h3>
+<p>V2 exists because three independently built things have arrived at the same shape:</p>
+<ol type="1">
+<li><strong><code>agent</code> is a user of the conveyor over MCP.</strong> D19/D21 made the conveyor's own <code>/mcp</code> the interface: the agent creates a project, starts one durable task (<code>projects.execute</code>), answers its approvals as task input requests and receives the terminal result (the agent-side plan of 2026-11-08). It is a front end — a conversation surface like Telegram — with its own autonomy configuration; it is not a catalogue, an executor or a system of record for conveyor work. The <strong>live end-to-end proof is the S06b/S14 gate</strong>, not a claim about today's deployment.</li>
+<li><strong>The organisational hierarchy is proven.</strong> The agent platform's KH (D106–D115; its §4 rollout record of 2026-10-23 reports agent#72 <code>e47c92e</code> deployed, migrations <code>0132</code>–<code>0139</code>, seed v3 applied) demonstrates the model the conveyor now implements itself: every job one industry, one or more ordered departments and an optional region; a job compiles base → industry → department archetype → job (with region after its parent) into an immutable release, with knowledge kinds, packs, instructions, settings, toolsets and System-1 gates. <strong>The conveyor reuses the ideas, not the implementation</strong> — it is self-contained (D33).</li>
+<li><strong>The conveyor has the work and the proof.</strong> Capability → procedure → step → action|gate is the procedural knowledge; <code>run</code>/<code>approval</code>/<code>action_invocation</code>/<code>event</code> is the procedural memory; <code>capability_agent</code> is the executor configuration; <code>inference_call</code> is the ledger; benchmark, evals and prompt audit are the instruments.</li>
+</ol>
+<p>The missing piece is the <strong>organisation</strong>: the conveyor already carries work and proof, and V2 gives it its own catalogue, immutable release, binding and inference configuration. The join is internal — no manifest is imported from another system.</p>
+<p><code>care-bus-agents</code> remains the standalone customer-interaction demo; it is <strong>not</strong> part of the organisational runtime. Customer care is not conveyor work (D48): the conveyor is built for project, continuous-line and line-management work, starting with a real IT department's development and operations, and later any capability in any industry.</p>
+<h3 id="13-what-the-field-does-and-what-it-does-not">1.3 What the field does, and what it does not</h3>
+<p>As of the sources fetched 2026-11-11:</p>
+<ul>
+<li><strong>CrewAI</strong> is a strong ergonomic layer for a <em>crew</em>: agents with roles/goals, tasks with expected outputs, and a <code>Process</code> that is either <code>sequential</code> or <code>hierarchical</code> (a manager agent delegates and validates). Memory is one unified <code>Memory</code> class over embeddings and a vector index. Typed control lives in <strong>Flows</strong>, not in the Crew abstraction; no runtime human-approval gate is documented on the Crews page. It is excellent at <em>starting</em> a small collaborative process and says nothing about portfolios, phase gates, evidence, budgets or an org chart.</li>
+<li><strong>ChatDev</strong> has moved to <strong>ChatDev 2.0 (DevAll, released 2026-01-07)</strong>, a zero-code multi-agent platform; its 1.x "virtual software company" (CEO/CTO/programmer/reviewer/designer, design→coding→testing→documenting) remains the mental model. It demonstrates role specialisation and visible handoffs; it does not attempt an operating model.</li>
+<li><strong>n8n</strong> is the best deterministic workflow engine we have used: a node graph with per-execution state and error branches. Its weakness is the one we measured in our own estate — <strong>348 workflows, 280 of them the generated card-type × list matrix</strong>, each carrying its own error exits. A flow engine gives you execution, not a process model.</li>
+</ul>
+<p>The gap is consistent: the field builds <strong>agent conversations</strong>; real organisations run on <strong>positions, work products, gates, baselines and evidence</strong>. That is the gap V2 fills, with the rigour the owner asked for — TOGAF for architecture, SAFe for project/programme management, PMP artefacts — implemented as <strong>executable rows and gates</strong>, not as documents.</p>
+<h3 id="14-what-the-previous-conveyor-taught-us">1.4 What the previous conveyor taught us</h3>
+<p>The v4 kanban design (the last serious attempt, in <code>n8n-designs/design/choices/v4</code>) had the right roles and the wrong substrate. We carry its concepts and delete its mechanism. Measured from those documents:</p>
+<table>
+<thead>
+<tr>
+<th>Finding</th>
+<th>Consequence for V2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PM = <code>project_management</code>, "the only RM writer after the request", owns phases, artifact sign-offs and TODO/READY prioritisation</td>
+<td>Keep the authority split; implement it as a <strong>job</strong> with a charter and gates, not a service account</td>
+</tr>
+<tr>
+<td>Coach = "protector of flow"; every interruption becomes a coach card; triage transient/defect/decision; remedies <code>rerun|move|repull|block|ask|note</code></td>
+<td>Keep one-card-per-interruption and the <strong>closed remedy set</strong>; add a recursion depth cap and an evidence requirement</td>
+</tr>
+<tr>
+<td>Kata = <code>workflow_engineering</code>, six Gets, <code>wf_change</code>, replay 2/3</td>
+<td>Keep the six Gets and the measured candidate; replace flow-patching with versioned procedure/prompt/code changes</td>
+</tr>
+<tr>
+<td>280 generated card-type × list flows; four <code>wf_*</code> types "serve nothing"; the generator was deleted ("live flow is the truth")</td>
+<td><strong>No generated flows.</strong> Procedures are data; one engine</td>
+</tr>
+<tr>
+<td>E32 duplicate card birth; 35 uncovered error exits; the kata record showed no kata closed (a moving count the source warns against quoting); an open-ended coach LLM rung fixed "0 of 22 blocks"</td>
+<td>Idempotency is structural; the coach has a closed decision set; a kata that cannot measure is not opened</td>
+</tr>
+</tbody>
+</table>
+<p>The Python substrate is why these fixes never compounded. V2 keeps the Rust substrate V1 built: typed actions, one schema, one binary, compiler-enforced crate boundaries, no flow generator.</p>
+<hr />
+<h2 id="2-the-thesis">2. The thesis</h2>
+<p><strong>An organisation is a set of positions making decisions and doing work under governance.</strong></p>
+<p>Four units, and only four:</p>
+<table>
+<thead>
+<tr>
+<th>Unit</th>
+<th>What it is</th>
+<th>Where it lives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Job</strong></td>
+<td>a position: a capability + a procedure + an inference configuration + an authority</td>
+<td><code>conveyor</code> (catalogue, release, binding)</td>
+</tr>
+<tr>
+<td><strong>Card</strong></td>
+<td>a work package: one unit of assigned work with an owner, a state and evidence</td>
+<td><code>conveyor</code></td>
+</tr>
+<tr>
+<td><strong>Approval</strong></td>
+<td>a decision: the one human-escalation primitive (a question is an approval)</td>
+<td><code>conveyor</code></td>
+</tr>
+<tr>
+<td><strong>Run</strong></td>
+<td>one attempt at a card through an executor, recorded</td>
+<td><code>conveyor</code></td>
+</tr>
+</tbody>
+</table>
+<p>Everything else is a view or an instrument. Departments, programmes and portfolios organise jobs and cards; knowledge, memory and tools configure a job; evals, benchmarks and the inference ledger measure it; TOGAF/SAFe/PMP supply the process grammar. <strong>The differentiator is not multi-agent conversation — it is that every handoff, decision and claim is a durable row with an owner, a state and a proof.</strong></p>
+<p>First principles the spec is built on:</p>
+<ol type="1">
+<li><strong>An organisation is a decision system, not a chat system.</strong> Agents do not need to talk to each other; they need to exchange typed work products through a governed process.</li>
+<li><strong>Most decisions are not language problems.</strong> They are choices among configured options. A small calibrated model (laya) is cheaper, faster and more auditable than an LLM for that.</li>
+<li><strong>Generation is the LLM's only job.</strong> Text, code, plans and reports are generated; they become drafts; applying a draft is an action behind a gate.</li>
+<li><strong>Trust comes from instruments, not from confidence.</strong> A change is adopted because a held-out eval or benchmark moved, not because an agent says it improved.</li>
+<li><strong>The system must be able to build and run itself</strong> under the same gates it imposes on any work — otherwise the process is theatre.</li>
+</ol>
+<hr />
+<h2 id="3-principles--hard-invariants">3. Principles — hard invariants</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Principle</th>
+<th>Enforcement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><strong>One record per fact.</strong> No concept is stored in two systems; systems join by pinned reference</td>
+<td>Ownership matrix (§10.1); a contract test per seam</td>
+</tr>
+<tr>
+<td>P2</td>
+<td><strong>Rule → laya → generation → human.</strong> An LLM never selects, routes, classifies or approves</td>
+<td>The decision ladder (§7); generation results have no path to a state transition</td>
+</tr>
+<tr>
+<td>P3</td>
+<td><strong>No work without a card; no transition without an action; no completion without evidence</strong></td>
+<td>Domain layer; <code>card_type.definition</code> acceptance; <code>run</code>/<code>approval</code> rows</td>
+</tr>
+<tr>
+<td>P4</td>
+<td><strong>The executor never approves its own work</strong></td>
+<td>Dual control on gates; <code>decided_by_kind</code>; approver ≠ assignee/executor</td>
+</tr>
+<tr>
+<td>P5</td>
+<td><strong>Measurement before adoption.</strong> A change to a procedure, prompt, job or code path needs an instrument</td>
+<td>Eval/benchmark version pin; sign-offs; noise band</td>
+</tr>
+<tr>
+<td>P6</td>
+<td><strong>The meta-jobs are ordinary jobs.</strong> PM, coach, kata, development and operations use the same catalogue, card, run and approval primitives</td>
+<td>No hard-coded role logic; every role is a <code>job_key</code></td>
+</tr>
+<tr>
+<td>P7</td>
+<td><strong>The system builds itself under its own gates.</strong> Development projects change conveyor and its dependency repos through the same process</td>
+<td>D34 guardrails; merge/deploy gates</td>
+</tr>
+<tr>
+<td>P8</td>
+<td><strong>Fail closed on missing configuration.</strong> An unresolved binding, pack, prompt source or tool refuses before the first model call or action</td>
+<td><code>409 *_not_ready</code> with <code>blocking[]</code></td>
+</tr>
+<tr>
+<td>P9</td>
+<td><strong>Every model call is ledgered and budgeted</strong></td>
+<td><code>inference_call</code>; per-run/per-tenant budgets</td>
+</tr>
+<tr>
+<td>P10</td>
+<td><strong>No speculative aggregates.</strong> A table exists because a named procedure uses it and a metric reads it</td>
+<td>Design review; <code>D40</code>; usage measured after one programme cycle</td>
+</tr>
+<tr>
+<td>P11</td>
+<td><strong>Tenant configuration over code.</strong> Every policy, threshold, limit, gate condition and approval kind is a versioned tenant-scoped row with a platform default; code implements mechanisms, never policy values</td>
+<td><code>*_policy</code>/<code>*_config</code> rows; a policy change is itself a gate; a hard-coded policy value is a review finding</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-the-organisational-model">4. The organisational model</h2>
+<h3 id="41-the-hierarchy">4.1 The hierarchy</h3>
+<p>V2 adopts the KH hierarchy — proven by the agent platform (D106–D115) — as the conveyor's <strong>own</strong> organisation spine. The concepts are reused; the implementation is the conveyor's (D33).</p>
+<pre><code>industry 1 ── * department (ordered, primary first)
+                    └── * job
+region?  ── optional sub-layer of any layer (folds immediately after its parent; no region content seeded yet)</code></pre>
+<ul>
+<li>A job sits in <strong>exactly one industry</strong> and <strong>one or more departments of that industry</strong>, ordered, primary first (D106/D115). A department from another industry is <code>422 department_industry_mismatch</code>.</li>
+<li>Knowledge is layered <strong>base → industry → department archetype → each department in declared order (with its region sub-layer) → job</strong>. Kinds are declared at every layer; a kind is required or optional; <code>required</code> can only be tightened downward. Sibling departments that set one key to different values are a <strong>compile error</strong> (<code>department_conflict</code>), resolved only by a job-layer row.</li>
+<li>The <strong>job release</strong> is immutable and pinned. A run records <code>job_key</code> + <code>release_hash</code>; a release change is a new binding and a gate, never a silent update. There is no live design → <code>409 job_not_live</code>; no resolvable required knowledge → <code>409 release_not_ready</code> naming the kind and department.</li>
+</ul>
+<p>The catalogue is the conveyor's own data (<code>industry</code>, <code>department</code>, <code>job_catalogue</code>, <code>job_release</code>); the release compiles from the same layers and is stored as an immutable artefact with a content hash. No manifest is imported from another system, and no other system is asked to validate a release.</p>
+<h3 id="42-job-anatomy--the-configured-position">4.2 Job anatomy — the configured position</h3>
+<p>A job is <strong>configuration, not a loop</strong>. Its release carries:</p>
+<p><strong>One author: the conveyor.</strong> A job is one record with one owner (D33). Every field below lives in the conveyor's catalogue or its immutable release; nothing is authored in another system for a conveyor job.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+<th>Author</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>job_key</code></td>
+<td>stable position key, e.g. <code>software.delivery.backend_engineer</code></td>
+<td>conveyor (<code>job_catalogue</code>)</td>
+</tr>
+<tr>
+<td>placement</td>
+<td>industry, ordered departments, optional region</td>
+<td>conveyor (<code>job_catalogue</code>)</td>
+</tr>
+<tr>
+<td><code>charter</code></td>
+<td>purpose, outcomes, non-goals, escalation path</td>
+<td>conveyor (release layer <code>instruction</code>)</td>
+</tr>
+<tr>
+<td>capability binding</td>
+<td>one or more capabilities</td>
+<td>conveyor (<code>job_binding</code>)</td>
+</tr>
+<tr>
+<td><code>procedure_ref</code></td>
+<td>published procedure version(s), each pinning its PKO release</td>
+<td>conveyor (<code>procedure</code>)</td>
+</tr>
+<tr>
+<td><code>executor</code></td>
+<td><code>procedure | internal_agent</code> (V1 D22, amended by D46)</td>
+<td>conveyor (<code>job_binding</code>)</td>
+</tr>
+<tr>
+<td><code>model_ref</code>, <code>params</code></td>
+<td>inference-router model and parameters</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td><code>prompt_recipe</code></td>
+<td>compiled-prompt recipe (<code>prompt_ref@version</code>)</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>knowledge pins</td>
+<td>layer kind pins + <code>capability</code> pack versions</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>memory policy</td>
+<td>recall scope, hot/cold, write rules</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>tool grants</td>
+<td>the release's operation allowlist (<code>op</code>, <code>variant</code>, <code>max_side_effect</code>, <code>enabled</code>) and per-call tool gate</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>tool binding</td>
+<td>pinned toolkit versions, effect ceiling and credential alias for the tools behind those grants (§11)</td>
+<td>conveyor (<code>tool_binding</code>)</td>
+</tr>
+<tr>
+<td>decision options</td>
+<td>laya option sets and policies for the work decisions the job makes</td>
+<td>conveyor (<code>decision_*</code>)</td>
+</tr>
+<tr>
+<td>limits</td>
+<td>max iterations, timeout, token and cost budget</td>
+<td>conveyor (release)</td>
+</tr>
+<tr>
+<td>gates</td>
+<td>required approvals, dual control, evidence requirements</td>
+<td>conveyor (binding + tenant policy)</td>
+</tr>
+<tr>
+<td>authority</td>
+<td>what the job may do without a gate</td>
+<td>conveyor binding</td>
+</tr>
+<tr>
+<td>metrics</td>
+<td>computed from execution, never stored as opinion</td>
+<td>conveyor</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rule:</strong> a job may lower a limit at run time, never raise it. The resolved <code>{job_key, release_hash, procedure_ref, model_ref, allowed_actions}</code> travels in the run's input hash, so the record pins what actually ran.</p>
+<h3 id="43-how-jobs-are-derived">4.3 How jobs are derived</h3>
+<p>Jobs are authored, not invented at runtime. The derivation method is the use-case chain the agent platform proved (D106–D115); the conveyor applies it to its own catalogue:</p>
+<pre><code>industry / department / job
+  → business model (axis selection)
+  → customer or internal journey (themes → stages)
+  → stage = capability column
+  → activity (customer | company)
+  → activity-information objects (objects × DO | REQUEST | OBSERVE)
+  → use case → context space + procedure
+  → job draft</code></pre>
+<p>A <strong>draft catalogue</strong> may be generated from the chain; a person curates it into published jobs. V2 explicitly does <strong>not</strong> auto-generate a thousand live jobs from an ontology — that is how the v4 generator produced four <code>wf_*</code> types that "serve nothing". The catalogue grows by evidence: a missing job is opened as a kata or a PM request, authored, bound, measured, then published.</p>
+<h3 id="44-the-job-binding--position-release-executor">4.4 The job binding — position, release, executor</h3>
+<pre><code>job_binding
+  id, tenant_id,
+  job_key, release_hash,
+  capability_id?, procedure_id?, executor_kind,
+  status ∈ draft|active|retired, version,
+  meta { department_scope[], authority, limits_override? }</code></pre>
+<ul>
+<li>A card names a binding (<code>card.job_binding_id</code>), not a free-text role.</li>
+<li>A run records the binding <strong>and</strong> the resolved release it actually used.</li>
+<li>A binding is tenant-scoped; the same <code>job_key</code> can be bound to different capabilities in two tenants.</li>
+<li>Retiring a binding does not rewrite history: existing runs keep their pinned reference.</li>
+<li><strong>A binding pins one immutable release.</strong> A new release is a new binding and a gate (D38); it never rewrites a live binding. A run request naming a retired binding, or naming a release that is not the binding's pin, is refused <code>409 job_binding_stale</code> before any model call; the refusal names the binding's release hash and the requested one. The check is internal — no catalogue call, no external caller-declared hash.</li>
+<li>The binding stores the release's content hash and its frozen configuration snapshot (<code>release_hash</code> + <code>release_snapshot</code> JSONB). It is a pinned artefact, like a lockfile, not a live mirror; a new release is a new binding and the old snapshot is never refreshed in place.</li>
+<li>Every binding also pins <code>executor_kind</code> and either a conveyor <code>procedure_id</code> (for a procedure executor) or the release's <code>capability_agent_id</code> (for an internal-agent executor). A binding with neither is refused at creation.</li>
+</ul>
+<h3 id="45-executor-kinds">4.5 Executor kinds</h3>
+<p>V1 D22 is <strong>amended by D46</strong> (and by D61, once accepted): a run has one executor, and there are <strong>two live kinds</strong> behind one internal <code>Executor</code> contract; the kind is to be an extensible enum.</p>
+<table>
+<thead>
+<tr>
+<th>Executor</th>
+<th>When</th>
+<th>Config source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>procedure</code></td>
+<td>a deterministic sequence of steps; no model of its own</td>
+<td>conveyor <code>procedure</code></td>
+</tr>
+<tr>
+<td><code>internal_agent</code></td>
+<td>a step needs generation over a compiled prompt</td>
+<td>conveyor <code>capability_agent</code> + the release</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A procedure is a sequence of prompt parts.</strong> Each step is an action — a PDDL action, a tool call, or a gate — and the sequence is the plan. Deterministic steps execute directly; a step whose action needs generation hands to the internal agent.</p>
+<p><strong>The internal agent receives a dynamically engineered prompt</strong> assembled at run time from four sources:</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>What it contributes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Knowledge</strong></td>
+<td>domain knowledge (pinned layer kinds and packs) and procedural knowledge (the capability/procedure/PKO)</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>episodic memory: the run's prior steps, the card's hot memory and the consolidated digest</td>
+</tr>
+<tr>
+<td><strong>Request</strong></td>
+<td>the action the agent must perform — the procedure step written in PDDL</td>
+</tr>
+<tr>
+<td><strong>Tools</strong></td>
+<td>the curated list of tools bound to this job, with their closed schemas</td>
+</tr>
+</tbody>
+</table>
+<p>The generation contract (§7.4) still applies: the output is a draft; applying it is a gated action.</p>
+<p><strong>The executor seam (D61).</strong> Both kinds are to implement one internal <code>Executor</code> contract (T0 builds it); <code>executor_kind</code> is to be an extensible enum, not a branch through the run path. Adding a kind is a new implementation plus one enum value, never an edit to the run loop. <strong>There is no external executor today</strong>, and an external runtime — the agent platform or any harness — is an explicit non-goal until all four hold: a generic work-packet ingress that returns per-step evidence the conveyor can verify (not outcome-level); governance at the boundary (a produce-only runtime, the conveyor ships); separate owners and roadmaps; and it beats the internal agent on the conveyor's own benchmark. The agent platform is a front end, not a runtime for conveyor jobs; if it is down, no conveyor run pauses.</p>
+<h3 id="46-scope-and-the-first-departments">4.6 Scope and the first departments</h3>
+<p><strong>The conveyor is for project work, continuous-line work and line-management work.</strong> It is a general engine for intelligent work execution with configurable human-in-the-loop: a tenant configures how much autonomy each job and gate has, and may offload human interaction to the agent platform over MCP. It does <strong>not</strong> do customer care (D48); customer care remains the agent platform's own product.</p>
+<p>The first tenant is <code>nonagentic</code>; the first industry is <code>software</code>; the first department set is a real IT department — <strong>development and operations</strong> — because the conveyor must develop and operate itself before it can be trusted with any other industry's work. Two further tenants are in scope from the same model: <strong>AHTAPol</strong> (industry <code>health-technology-assessment</code>) and <strong>w2v</strong> (industry <code>media</code>), each with its own departments and jobs (D60) — the proof that the model is not software-specific. Nothing below is hard-coded — each row is a job in the catalogue.</p>
+<table>
+<thead>
+<tr>
+<th>Department</th>
+<th>Jobs (initial)</th>
+<th>First work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>delivery</strong></td>
+<td>product owner, architect, tech lead, backend/frontend/data/platform engineer, reviewer, release manager, technical writer</td>
+<td>deliver conveyor features and dependency-repo changes</td>
+</tr>
+<tr>
+<td><strong>verification</strong></td>
+<td>QA engineer, security reviewer, performance engineer</td>
+<td>independent verification, red-team, eval authoring</td>
+</tr>
+<tr>
+<td><strong>operations</strong></td>
+<td>incident commander, SRE/on-call, platform operator</td>
+<td>k8s/git incidents, runbooks, postmortems</td>
+</tr>
+<tr>
+<td><strong>project office</strong></td>
+<td>PM, programme manager, portfolio analyst</td>
+<td>charters, WBS, baselines, cadence, change control</td>
+</tr>
+<tr>
+<td><strong>improvement</strong></td>
+<td>kanban coach, kata facilitator, measurement engineer</td>
+<td>interruptions, systemic fixes, instruments</td>
+</tr>
+</tbody>
+</table>
+<p>The first <strong>real</strong> job to instantiate is <em>conveyor maintenance</em> — the system's own upkeep — followed by <em>feature delivery</em> and then <em>operations</em>. Self-development is not a later phase; it is the first proof (§9).</p>
+<p><strong>Scale is a catalogue property, not a process property.</strong> A department's jobs are grouped into families (product, architecture, engineering, verification, release, operations, knowledge); a family can hold dozens of specific jobs (backend-rust, frontend-leptos, postgres, security-review, release-manager, …). The catalogue is searchable by code/capability/department and paginated; a tenant activates the subset it needs. Thousands of jobs are thousands of rows and bindings, not thousands of processes (D39).</p>
+<hr />
+<h2 id="5-the-work-model">5. The work model</h2>
+<h3 id="51-the-hierarchy">5.1 The hierarchy</h3>
+<p>V1 already ships <code>programme</code> and <code>project.programme_id</code>. V2 completes the hierarchy:</p>
+<pre><code>tenant
+  ├── portfolio   — computed: every project and programme in flight for the tenant (no row)
+  └── programme   — a set of projects with shared configuration and project-level dependencies
+        └── project — may also stand alone, outside any programme
+              └── WBS / deliverable → work package (card) → run → step / attempt</code></pre>
+<p><strong>Owner definition (2026-11-11, D49).</strong> A <strong>portfolio</strong> is <em>all projects and programmes in flight for a tenant</em>; a <strong>programme</strong> is <em>a set of projects with shared configuration and project-level dependencies</em>. The portfolio is a read model over <code>programme</code> and <code>project</code> (P10 — no row); the programme is a real aggregate carrying <code>shared_config</code> and the project dependency graph.</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Meaning</th>
+<th>State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Portfolio</strong></td>
+<td>every project and programme in flight for the tenant — a computed view, never a row</td>
+<td>none (read model)</td>
+</tr>
+<tr>
+<td><strong>Programme</strong></td>
+<td>a set of projects with shared config and project-level dependencies; carries the budget and cadence</td>
+<td><code>active | paused | closed</code></td>
+</tr>
+<tr>
+<td><strong>Project</strong></td>
+<td>a temporary endeavour with a charter and a baseline</td>
+<td><code>draft | active | paused | closed | archived</code></td>
+</tr>
+<tr>
+<td><strong>WBS node</strong></td>
+<td>phase, deliverable, work package or milestone; a tree under the project</td>
+<td>open → accepted / cancelled</td>
+</tr>
+<tr>
+<td><strong>Work package</strong></td>
+<td>the card: one assignment, one owner, one list</td>
+<td>list + <code>archived_at</code> (V1: the list is the state)</td>
+</tr>
+<tr>
+<td><strong>Run</strong></td>
+<td>one execution attempt</td>
+<td><code>queued → running → waiting_approval → running → succeeded | failed | cancelled</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Portfolio membership</strong> is derived: a project or programme is in flight when its status is in the tenant's configured in-flight set (default <code>active</code> and <code>paused</code>); closed and archived work is history and is not listed.</li>
+<li><strong>Programme shared config</strong> is inherited by its projects: knowledge pins and packs, default job families, approval-policy defaults, budget envelope and cadence. A project overrides a key only when the programme does not declare it locked; the lock set is tenant policy.</li>
+<li><strong>Project-level dependencies are edges</strong>, not prose: <code>project_dependency(from_project, to_project, kind ∈ blocks | needs | supersedes | informs, status)</code>, inside or across programmes. The PM reads them when sequencing the WBS; a cycle is refused at creation.</li>
+</ul>
+<h3 id="52-project-types">5.2 Project types</h3>
+<p><code>project.project_type_code</code> selects the phase template, the gate set and the default job family:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Template</th>
+<th>Gates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>delivery</strong></td>
+<td>charter → plan → build → verify → release → close (PMP)</td>
+<td>design (conditional), merge, deploy, close</td>
+</tr>
+<tr>
+<td><strong>architecture</strong></td>
+<td>TOGAF ADM phases A–H (§8.1)</td>
+<td>per-phase contract gate</td>
+</tr>
+<tr>
+<td><strong>improvement (kata)</strong></td>
+<td>six Gets (§6.3)</td>
+<td>hypothesis, adoption</td>
+</tr>
+<tr>
+<td><strong>development (self)</strong></td>
+<td>design → branch → implement → CI → review → merge → deploy → verify (§9.1)</td>
+<td>design (structural), merge, deploy</td>
+</tr>
+<tr>
+<td><strong>operations</strong></td>
+<td>detect → triage → mitigate → resolve → postmortem (§9.2)</td>
+<td>destructive-action gate only</td>
+</tr>
+<tr>
+<td><strong>setup (authoring)</strong></td>
+<td>intake → asset design → review → publish → validate (§5.7, T17)</td>
+<td>per-asset review; publish gate</td>
+</tr>
+</tbody>
+</table>
+<p>The project type is a <strong>template</strong>, not code: its phases are WBS node kinds, its gates are <code>approval</code> rows with the gate name and evidence refs, and its artefacts are <code>governed_asset</code> rows (V1's one lifecycle for requirements, principles and ADRs, extended to charter/contract/closure/postmortem).</p>
+<h3 id="53-plan-state-and-execution-are-different-things">5.3 Plan, state and execution are different things</h3>
+<p>Three separations are load-bearing and are the V1 fixes carried forward:</p>
+<ol type="1">
+<li><strong>Project lifecycle ≠ card state ≠ run state.</strong> A card can move without answering its approval; a completed run does not close a project.</li>
+<li><strong>Baseline ≠ forecast.</strong> A baseline is a frozen, approved snapshot; a forecast is computed from current rows. A change to scope/schedule/cost is a <strong>change request</strong> (<code>project_register_item.kind='change'</code>) with an impact analysis and a person's decision; existing runs keep their pins.</li>
+<li><strong>Plan ≠ evidence.</strong> A WBS node is accepted when its acceptance criteria are met by an artefact/run, not when its checkbox is ticked.</li>
+</ol>
+<h3 id="54-gates-evidence-and-dual-control">5.4 Gates, evidence and dual control</h3>
+<ul>
+<li>One primitive: <strong>approval</strong>. A gate is an <code>approval</code> row with <code>gate</code> (phase/DoD name), <code>kind</code>, <code>required_decisions</code>, <code>meta.evidence[]</code> (run ids, artefact ids, eval ids) and an optional <code>expires_at</code> (default: never expires).</li>
+<li><strong>Dual control</strong> is <code>required_decisions ≥ 2</code> and distinct approvers; the executor/assignee/requester cannot be an approver for the gate that judges their work.</li>
+<li><strong>A gate with no evidence is refused</strong> (<code>422 gate_evidence_missing</code>) unless the gate explicitly allows an override; the override is recorded on the approval and counted in the override metric.</li>
+<li><strong>Definition of Done</strong> lives on <code>card_type.definition</code> and is checked by the domain layer before a card can enter a <code>done</code> list; an approval can override with a reason, which the coach reads.</li>
+<li><strong>No gate that cannot fail.</strong> Every gate ships with a negative test (a run that must be refused). A gate that has never refused anything in a full programme cycle is flagged by the governance audit — that is a broken gate, not a healthy one.</li>
+<li><strong>Approvals are tenant-configurable and default to human.</strong> Each gate names an <code>approval_policy</code> row: required decisions (<code>1</code> by default; <code>≥2</code> for dual control), the approver kind (<code>human</code> by default; a tenant may authorise a job or agent only for a gate it explicitly declares non-governance), and an expiry. The policy is itself a gated change; a gate whose policy is automatic is flagged in the governance audit. Human-in-the-loop may be offloaded to the agent platform over MCP, which presents the approval with its own autonomy configuration; the conveyor still records the decision and <code>decided_by_kind</code>/<code>via</code>.</li>
+</ul>
+<h3 id="55-registers-and-change-control">5.5 Registers and change control</h3>
+<p>One generic register replaces five PM tables (the V1 lesson: RM's <code>pm_*</code> tables measured zero usage and were dropped):</p>
+<pre><code>project_register_item
+  id, tenant_id, project_id, kind ∈ risk|issue|assumption|dependency|benefit|change,
+  code, title, body, owner_job_id, status, severity, probability, impact,
+  links jsonb {cards[], requirements[], decisions[]}, meta, version</code></pre>
+<ul>
+<li>A <strong>change request</strong> references the baseline it changes and requires a scope/schedule/cost/risk impact block; the approval records the person's rationale.</li>
+<li>A <strong>risk</strong> can open a mitigation card; a <strong>dependency</strong> can link two projects or an external system; a <strong>benefit</strong> is measured at closure (planned vs realised).</li>
+</ul>
+<h3 id="56-procedure-authoring-and-sop-ingestion">5.6 Procedure authoring and SOP ingestion</h3>
+<p>A procedure is the executable form of a standard operating procedure: an ordered sequence of steps, each an action (PDDL), a tool call or a gate. Procedure design and management is a first-class conveyor feature (D47):</p>
+<ul>
+<li><strong>SOP intake.</strong> A tenant supplies SOPs — PDF, web URL or another document — singly or as a batch. A customer document is untrusted input: it enters as a <code>governed_asset(kind='sop_source')</code> with provenance, never as instructions to the system.</li>
+<li><strong>Conversion.</strong> The intake job harvests and curates the domain knowledge the SOP implies, then converts the SOP into <strong>procedural knowledge (the Procedural Knowledge Ontology, PKO)</strong> and a <strong>procedure draft whose steps are written in PDDL</strong>. The conversion job uses the web/research tools, and <code>lean4_prover</code> where a claim needs formal checking.</li>
+<li><strong>Two spaces, never mixed (D53).</strong> The <strong>action space</strong> is the procedure step written in PDDL — actions with preconditions and effects over typed facts. The <strong>procedural knowledge space</strong> is the PKO — the ontology of tasks, steps, roles, artefacts and constraints. A step references PKO terms; a PKO entity never contains an executable step.</li>
+<li><strong>PKO storage and ingestion.</strong> The PKO is relational, conveyor-owned and tenant-editable: an immutable <code>pko_release</code> pins <code>pko_entity</code> (name, label, kind, attributes, synonyms) and <code>pko_relation</code> (subject, predicate, object, cardinality) rows, layered base → industry → department → job. RDF/OWL/Turtle documents are ingest material — a converter turns them into draft rows behind the review gate; the conveyor runs no RDF store and no reasoner. The old <code>procedure_management</code> OWL/Turtle files import this way once (owner, 2026-11-11).</li>
+<li><strong>Process documents.</strong> BPMN 2.0 XML, Visio and draw.io exports ingest on the same path: the diagram becomes a procedure draft (activities → steps, gateways → gates) plus PKO rows. The diagram is a source document; the procedure is the executable artefact, and the same review gate applies.</li>
+<li><strong>Design reuse.</strong> The same pipeline designs capabilities, agents and jobs: an SOP yields a capability, a procedure, a job draft and its knowledge pins; a person reviews and publishes.</li>
+<li><strong>Knowledge pairing.</strong> The domain knowledge harvested for an SOP is stored as a pinned knowledge pack in <code>strata_rag</code> and paired with the procedural knowledge; the procedure's release names both. The conveyor uses <code>strata_ingest</code> and <code>strata_rag</code> at least to the extent the agent platform already does — document ingestion, pinned-leaf retrieval, pack storage and consolidation — and never hosts embeddings.</li>
+<li><strong>Gates.</strong> Every SOP-derived artefact is a draft behind a review gate (default: human, tenant-configurable). The ontology and the procedure are versioned and measured like any other procedure change (P5); a batch never publishes itself, and no SOP can grant a tool or widen an effect ceiling.</li>
+</ul>
+<h3 id="57-tenant-asset-authoring--from-chat-and-documents-draft">5.7 Tenant asset authoring — from chat and documents (draft)</h3>
+<p><strong>Owner concept, 2026-11-11 (D55); the first-wave asset matrix is an open question (T17).</strong> The same intake pipeline that converts an SOP is the general authoring path: a tenant supplies <strong>chat input and documents</strong>, and the conveyor drafts <strong>every tenant-scoped asset</strong> it needs.</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Produces (draft)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chat (web or the agent front end over MCP)</td>
+<td>organisation draft (industry, department, job catalogue), project templates, gate/approval policies, tool requests</td>
+</tr>
+<tr>
+<td>SOP (PDF, URL, document)</td>
+<td>capability, procedure (PDDL), PKO rows, knowledge pack, job draft</td>
+</tr>
+<tr>
+<td>BPMN / Visio / draw.io</td>
+<td>procedure (activities → steps, gateways → gates), PKO rows</td>
+</tr>
+<tr>
+<td>RDF / OWL / Turtle</td>
+<td>PKO entities and relations</td>
+</tr>
+<tr>
+<td>Existing policy/procedure exports</td>
+<td>procedure or policy drafts</td>
+</tr>
+</tbody>
+</table>
+<p>Rules:</p>
+<ul>
+<li><strong>Every output is a draft behind a review gate</strong> (tenant-configurable, default human); publication is a release and a gate. A chat message or a document can never grant a tool, widen an effect ceiling, approve its own artefact or change an approval policy.</li>
+<li><strong>Asset order is dependency-ordered:</strong> industry → department → job/capability → procedure/PKO → knowledge pack → policies/templates → tools. The authoring job refuses a draft whose referenced asset is unpublished.</li>
+<li><strong>The authoring job family is ordinary jobs</strong> on the two executors (§4.5); the pipeline is a procedure, not a hard-coded wizard.</li>
+<li><strong>Instruments:</strong> drafts accepted vs rejected, revisions per artefact, time from intake to first published job. An authored catalogue is measured by use — an asset no procedure uses is retired (P10).</li>
+<li><strong>The chat surface does not decide.</strong> Chat input is a request; rules/laya route it; the LLM drafts; a person approves. Tenant asset creation is subject to the same decision ladder as any work (§7).</li>
+</ul>
+<p>The detailed asset matrix, review depth per asset type and the first wave ship with T17; nothing above widens a tool grant or a gate policy without its own approval.</p>
+<hr />
+<h2 id="6-the-roles--meta-jobs-as-ordinary-jobs">6. The roles — meta-jobs as ordinary jobs</h2>
+<p>Each role is a <code>job_key</code> with a charter, a procedure, an authority matrix and metrics. They run on the <strong>same</strong> card, run, approval and event primitives as any other job, on the conveyor's two executor kinds — a procedure or the internal agent (§4.5).</p>
+<h3 id="61-pm--project-management">6.1 PM — project management</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Charter</strong></td>
+<td>turn a request into a governed project; define scope, WBS, plan, baseline, dependencies, risks and acceptance; sequence work; route gates; close with evidence</td>
+</tr>
+<tr>
+<td><strong>Inputs</strong></td>
+<td>request, portfolio priorities, architecture contracts, constraints, historical velocity</td>
+</tr>
+<tr>
+<td><strong>Outputs</strong></td>
+<td>project + charter, WBS, baseline, cards with job bindings, gate decisions, status report, closure record</td>
+</tr>
+<tr>
+<td><strong>Laya decides</strong></td>
+<td>request class, project type, priority band (WSJF), required capability set, gate set, escalation target</td>
+</tr>
+<tr>
+<td><strong>LLM generates</strong></td>
+<td>charter text, WBS draft, status narrative, closure narrative</td>
+</tr>
+<tr>
+<td><strong>Never</strong></td>
+<td>approve its own gates; change an approved baseline without a change request; do the work of a delivery job</td>
+</tr>
+<tr>
+<td><strong>Gates</strong></td>
+<td>charter approval, baseline approval, change requests, closure</td>
+</tr>
+</tbody>
+</table>
+<p>The PM is the only job that may create a project and the only job that may close one. It cannot be the sole approver of either.</p>
+<h3 id="62-kanban-coach--flow-protection">6.2 Kanban coach — flow protection</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Charter</strong></td>
+<td>protect flow; every interruption becomes exactly one coach card; triage and either apply a bounded remedy or escalate; open a kata when the evidence says systemic</td>
+</tr>
+<tr>
+<td><strong>Inputs</strong></td>
+<td>board events, failed runs, stale leases, WIP breaches, gate timeouts, repeated signatures</td>
+</tr>
+<tr>
+<td><strong>Outputs</strong></td>
+<td>one coach card per interruption; a triage row; a remedy action; an escalation; a kata candidate</td>
+</tr>
+<tr>
+<td><strong>Closed triage set</strong></td>
+<td><code>transient | conveyor_defect | job_defect | project_decision | external</code></td>
+</tr>
+<tr>
+<td><strong>Closed remedy set</strong></td>
+<td><code>retry | move | repull | block | ask | note</code></td>
+</tr>
+<tr>
+<td><strong>Laya decides</strong></td>
+<td>triage class and remedy, over the configured option set; confidence below policy → <code>ask</code> (human)</td>
+</tr>
+<tr>
+<td><strong>LLM generates</strong></td>
+<td>the diagnosis narrative attached to the card; never the remedy</td>
+</tr>
+<tr>
+<td><strong>Never</strong></td>
+<td>do the work it is unblocking ("the coach organises; a work capability does the work"); open a coach card about a coach card; retry the same signature beyond the policy cap</td>
+</tr>
+<tr>
+<td><strong>Recursion guard</strong></td>
+<td>one card per <code>(card_id, signature)</code> while open; a second same-signature block within the window escalates to a human, never to another coach card</td>
+</tr>
+</tbody>
+</table>
+<p>Measured lesson: the old open-ended coach LLM rung fixed "0 of 22 blocks", and duplicate coach cards made the board unreadable. The closed sets and the per-signature uniqueness are the fix.</p>
+<h3 id="63-kata--system-improvement">6.3 Kata — system improvement</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Charter</strong></td>
+<td>improve the system by changing a named part of it; prove the change with an instrument; hand adoption to a person</td>
+</tr>
+<tr>
+<td><strong>Procedure</strong></td>
+<td>six Gets: <strong>Go to See</strong> (observe the work and its evidence) → <strong>Grasp the Situation</strong> (problem statement with data) → <strong>Get to Solution</strong> (candidate change) → <strong>Get to Standardization</strong> (procedure/prompt/knowledge/job update) → <strong>Get to Sustainability</strong> (monitoring + regression guard) → <strong>Get to Stretch</strong> (yokoten: propagate to other jobs/departments)</td>
+</tr>
+<tr>
+<td><strong>Inputs</strong></td>
+<td>failed runs, eval deltas, benchmark regressions, prompt findings, coach escalations, ops postmortems</td>
+</tr>
+<tr>
+<td><strong>Outputs</strong></td>
+<td>observation, problem statement, hypothesis + pre-registered prediction, change candidate, measurement, adoption decision, propagation record</td>
+</tr>
+<tr>
+<td><strong>Laya decides</strong></td>
+<td>which class of change (procedure | prompt | knowledge | tool | job config | code) and which target surface</td>
+</tr>
+<tr>
+<td><strong>LLM generates</strong></td>
+<td>the analysis and the candidate change (procedure text, prompt diff, code patch)</td>
+</tr>
+<tr>
+<td><strong>Never</strong></td>
+<td>edit the instrument that judges it; approve its own adoption; measure on the training split only; open a second kata for the same open signature</td>
+</tr>
+<tr>
+<td><strong>Gates</strong></td>
+<td>hypothesis approval (optional, for spend), adoption (mandatory), propagation (per target)</td>
+</tr>
+</tbody>
+</table>
+<p>A kata that cannot name an instrument and a success threshold is not opened. A failed kata keeps the andon cord until a person releases it (V1/v4 ruling carried forward).</p>
+<p><strong>The kata is its own tenant.</strong> The improvement loop runs as tenant <code>kata</code>: its approvals, autonomy policy, budgets and tool bindings are configured for the kata tenant, so a kata's write scope never inherits the target tenant's autonomy (D45, owner 2026-11-11).</p>
+<h3 id="64-development-project--the-self-developing-path">6.4 Development project — the self-developing path</h3>
+<p>A <strong>project type</strong>, staffed by delivery/verification jobs, whose deliverable is a change to the conveyor or one of its dependency repositories.</p>
+<table>
+<tbody>
+<tr>
+<td><strong>Triggers</strong></td>
+<td>a user request (PM), a kata candidate, a security/eval finding, a dependency upgrade</td>
+</tr>
+<tr>
+<td><strong>Scope</strong></td>
+<td>one repo and one lane per PR; scope is written into the charter before any branch</td>
+</tr>
+<tr>
+<td><strong>Procedure</strong></td>
+<td>design note (structural changes only) → lane branch → implement via coding jobs → CI green (fmt, clippy <code>-D warnings</code>, tests, gitleaks) → independent review → merge gate → deploy → live verify → close</td>
+</tr>
+<tr>
+<td><strong>Tools</strong></td>
+<td>the coding fleet's actions (<code>coding_jobs.create/get</code>), git/PR/CI status, the conveyor's own eval/benchmark actions</td>
+</tr>
+<tr>
+<td><strong>Gates</strong></td>
+<td>design (if architecture/contract change), merge, deploy; rollback plan required</td>
+</tr>
+<tr>
+<td><strong>Never</strong></td>
+<td>modify its own gates, approval policy, or the eval/benchmark instrument that measures it; force-push; merge with red CI; deploy without a live check</td>
+</tr>
+<tr>
+<td><strong>Earned autonomy</strong></td>
+<td>auto-merge is an <code>approval_policy</code> row with <code>approver_kind='auto'</code> and typed <code>conditions</code> — consecutive green runs, revert count, path scope, independent-reviewer requirement, expiry; every value is tenant configuration, never code; the policy is itself a gated change and defaults to off</td>
+</tr>
+</tbody>
+</table>
+<h3 id="65-operations--the-platform-perspective">6.5 Operations — the platform perspective</h3>
+<p>The future the owner asked for: a job family that acts on <strong>kubernetes or git issues</strong>.</p>
+<table>
+<tbody>
+<tr>
+<td><strong>Charter</strong></td>
+<td>detect, triage, mitigate, resolve and learn from incidents in the conveyor and its dependencies</td>
+</tr>
+<tr>
+<td><strong>Inputs</strong></td>
+<td>alerts, webhooks, schedules, user reports, cluster events, CI failures</td>
+</tr>
+<tr>
+<td><strong>Outputs</strong></td>
+<td>incident card, severity, runbook run, mitigation record, resolution, postmortem, kata candidate</td>
+</tr>
+<tr>
+<td><strong>Read tools</strong></td>
+<td>pods, deployments, events, logs, metrics, Flux status, git/CI status</td>
+</tr>
+<tr>
+<td><strong>Write tools (gated)</strong></td>
+<td>restart, scale, rollback, feature-flag flip and their read-backs; each requires <code>ops:write</code>, a dry-run, the tenant's configured approvals (default: human dual control), and an audit event. <strong>The full write set ships in v1</strong> — autonomy is configuration, not a reduced feature</td>
+</tr>
+<tr>
+<td><strong>Autonomy</strong></td>
+<td>tenant-configured per operation class; the default is human approval; an incident commander may hold a tenant-configured break-glass path with post-hoc review</td>
+</tr>
+<tr>
+<td><strong>Laya decides</strong></td>
+<td>severity and runbook selection over the configured sets; below threshold → escalate to on-call</td>
+</tr>
+<tr>
+<td><strong>LLM generates</strong></td>
+<td>diagnosis narrative, incident summary, postmortem draft</td>
+</tr>
+<tr>
+<td><strong>Never</strong></td>
+<td>use cluster-admin; act without a card; perform a destructive action without the tenant's configured approvals; "fix" a symptom by deleting evidence</td>
+</tr>
+</tbody>
+</table>
+<h3 id="66-collaboration-protocol--handoffs-are-cards-not-messages">6.6 Collaboration protocol — handoffs are cards, not messages</h3>
+<ol type="1">
+<li><strong>A job that needs work from another job creates and assigns a card.</strong> It does not message an agent. The card names the job binding, the inputs (artefact ids), the acceptance criteria and the due date.</li>
+<li><strong>A handoff is an action</strong> (<code>cards.assign</code> / <code>cards.move</code> + <code>comment</code>/<code>artifact.attach</code>) producing an <code>event</code>. The receiving job's queue is its board/list; the PM's plan is the WBS.</li>
+<li><strong>A question is an approval</strong> (V1 D18/D19). If a job needs a human decision, it opens an <code>approval</code>; if it needs a decision from another job, it opens a card assigned to that job, optionally with a gate.</li>
+<li><strong>Memory is written at handoff.</strong> The sender records what the receiver must know (<code>memory.remember</code>), so a job does not depend on a conversation transcript that may be compacted.</li>
+<li><strong>Every card has one live run</strong> (<code>uq_run_live</code>); retries create attempts on the same run where the state machine permits, otherwise a new run with the previous as a link.</li>
+<li><strong>Escalation is bounded</strong>: a card may escalate to its parent WBS owner, then to the PM, then to the programme; the coach can escalate to a human at any point. No unbounded agent-to-agent loops.</li>
+</ol>
+<h3 id="67-authority-matrix-defaults-tenant-configurable">6.7 Authority matrix (defaults; tenant-configurable)</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>PM</th>
+<th>Coach</th>
+<th>Kata</th>
+<th>Delivery job</th>
+<th>Ops</th>
+<th>Human</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create/close project</td>
+<td>✅</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Create/move card in project</td>
+<td>✅</td>
+<td>✅ (remedy only)</td>
+<td>—</td>
+<td>own card</td>
+<td>own incident</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Assign a job binding</td>
+<td>✅</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Approve a phase gate</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>✅ (dual)</td>
+</tr>
+<tr>
+<td>Approve a merge</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Open a kata</td>
+<td>✅</td>
+<td>✅</td>
+<td>—</td>
+<td>—</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Adopt a kata change</td>
+<td>—</td>
+<td>—</td>
+<td>propose only</td>
+<td>—</td>
+<td>—</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Destructive ops action</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>propose + dry-run</td>
+<td>✅ (dual)</td>
+</tr>
+<tr>
+<td>Publish a procedure</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>✅ (or <code>procedures:write</code> + gate)</td>
+</tr>
+</tbody>
+</table>
+<p>The matrix is data (<code>tenant_role_scope</code> and the binding's <code>authority</code>), not branches in code. Every gate's required decisions and approver kinds are tenant-configured policy rows defaulting to human approval (§5.4).</p>
+<hr />
+<h2 id="7-the-decision-ladder--laya-first-llm-last">7. The decision ladder — laya first, LLM last</h2>
+<h3 id="71-the-four-rungs">7.1 The four rungs</h3>
+<table>
+<thead>
+<tr>
+<th>Rung</th>
+<th>Mechanism</th>
+<th>Used for</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L0 Rule</strong></td>
+<td>deterministic Rust over typed facts</td>
+<td>state transitions, WIP limits, WSJF arithmetic, thresholds, policy checks, acceptance</td>
+<td>the row + <code>action_invocation</code></td>
+</tr>
+<tr>
+<td><strong>L1 System-1 (laya)</strong></td>
+<td>calibrated choice/score/noul over a finite option set</td>
+<td>triage, routing, job/capability selection, remedy selection, severity, priority band, gate pre-check</td>
+<td><code>decision</code> row with the answer, probabilities where the question type provides them, and confidence</td>
+</tr>
+<tr>
+<td><strong>L2 Generation (LLM)</strong></td>
+<td>text/code/plan/report synthesis</td>
+<td>drafts, answers, patches, narratives, candidate procedures/prompts</td>
+<td><code>inference_call</code> + a draft artefact</td>
+</tr>
+<tr>
+<td><strong>L3 Human</strong></td>
+<td>approval</td>
+<td>every gate; every override; every irreversible action</td>
+<td><code>approval</code> + <code>approval_decision</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>The hard rule:</strong> L2 has no path to a state transition. A generated output is stored as a draft artefact (<code>governed_asset</code>, <code>document</code>, or a code patch); applying it is an <strong>action</strong>, and the action's gate is L1/L3. The Rust type system enforces this: the generation result type is not accepted by any transition function.</p>
+<h3 id="72-the-laya-contract">7.2 The laya contract</h3>
+<p><code>POST /v1/systemone {model, state, questions}</code> — <code>state</code> is the task text and <code>questions</code> is keyed by qid; each question is <code>{type: noul|choice|score, instructions, criteria}</code> and the response carries <code>answers.&lt;qid&gt;</code>. <code>noul</code> is a scalar answer, <code>choice</code> picks one of 2–255 labelled options, <code>score</code> is a 2–10 ordered scale; probabilities are carried for the types that provide them. The estate's laya is live on pgx behind a Jev-compatible bridge (<code>:9210</code>), ~17–21 ms per request (measured 2026-10-10).</p>
+<p>V2 rules:</p>
+<ul>
+<li><strong>Options are rows</strong> (<code>decision_option</code>), authored and versioned, never free text from a prompt.</li>
+<li><strong>Questions are rows</strong> (<code>decision_policy</code>), with <code>fire_when</code>, <code>min_confidence</code>, <code>fail_policy ∈ closed|open</code> and <code>action ∈ handover|block|annotate</code>. Safety gates fail closed; routing/quality gates fail open to a human or a note.</li>
+<li><strong>Configuration is per tenant, per case (D51).</strong> A platform <code>decision_policy</code> defines the case; a tenant's <code>decision_policy_refinement</code> overrides the threshold value (or the whole rule), the fail action and, optionally, the laya inference config. Refinements are versioned; changing one is a gated policy change. The shape mirrors the agent platform's proven <code>job_gates.threshold</code> + <code>job_gate_rule_refinement</code>, reimplemented by the conveyor (D33).</li>
+<li><strong>Laya inference is tenant-scoped.</strong> <code>laya_inference_config</code> pins <code>model_ref</code>, <code>params</code> and <code>timeout_ms</code> per tenant (provider kind <code>laya</code>, default <code>jev-latest</code>), optionally overridden per case. Every <code>decision</code> row records the policy version, the refinement version and the laya config version it used.</li>
+<li><strong>Every decision is recorded</strong> with the option set version, the answer, probabilities where the type provides them, confidence, policy, latency and input hash. A decision is reproducible from the row.</li>
+<li><strong>Below threshold is an outcome, not an error</strong>: escalate (<code>approval</code>) or refuse per policy. <code>Unavailable</code> is <code>gate_unavailable</code> and follows the fail policy; it is never silently treated as a pass.</li>
+<li><strong>The conveyor owns every question and option set its jobs evaluate</strong>, including the internal agent's per-step gates. The agent platform owns only the questions its own conversation runtime evaluates — its product, not conveyor work.</li>
+</ul>
+<h3 id="73-where-laya-is-mandatory">7.3 Where laya is mandatory</h3>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Options (examples)</th>
+<th>Fail policy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Request classification</td>
+<td><code>new_feature | bug | question | incident | improvement</code></td>
+<td>open → human</td>
+</tr>
+<tr>
+<td>Project type</td>
+<td><code>delivery | architecture | improvement | development | operations</code></td>
+<td>closed → PM</td>
+</tr>
+<tr>
+<td>Job/capability routing</td>
+<td>the tenant's active bindings for the department</td>
+<td>closed → coach</td>
+</tr>
+<tr>
+<td>Coach triage/remedy</td>
+<td>the closed sets in §6.2</td>
+<td>open → <code>ask</code></td>
+</tr>
+<tr>
+<td>Severity</td>
+<td><code>sev1..sev4</code></td>
+<td>closed → on-call</td>
+</tr>
+<tr>
+<td>Gate pre-check</td>
+<td><code>pass | review | refuse</code></td>
+<td>closed → human gate</td>
+</tr>
+<tr>
+<td>Candidate selection in a kata</td>
+<td>the registered candidate classes</td>
+<td>open → kata facilitator</td>
+</tr>
+</tbody>
+</table>
+<p>An LLM may <strong>describe</strong> the options and recommend one in prose, but the recommendation is not consumed by the engine.</p>
+<h3 id="74-the-generation-contract">7.4 The generation contract</h3>
+<p>A generation call is an <code>inference_call</code> (V1 D23) whose result is bound to a draft artefact. The artefact carries <code>prompt_ref</code>, <code>prompt_version</code>, <code>prompt_sha256</code>, <code>model_ref</code>, <code>usage</code>, <code>cost</code> (derived), and the trust order of its sources. It becomes applicable only through an action with a gate.</p>
+<p>Allowed generation: draft answer, draft charter/WBS, draft procedure, draft prompt/patch, code patch, status narrative, postmortem narrative, lesson draft. Forbidden generation: tool selection, routing, state transitions, gate decisions, scoring a submission, approving.</p>
+<h3 id="75-budgets-and-the-ledger">7.5 Budgets and the ledger</h3>
+<ul>
+<li>Every run declares a token/cost budget; every job binding declares a default; exceeding it is a refusal (<code>429 budget_exceeded</code>) before the next call, not a silent truncation.</li>
+<li><code>inference_call</code> keeps the prompt identity and usage, never the prompt/response bodies; the router keeps the text.</li>
+<li>The cache classes are defined (V1 D23): <code>cache_read &gt; 0</code> = hit, <code>cache_read = 0 ∧ cache_creation &gt; 0</code> = write, neither = miss, no usage = unknown.</li>
+<li>Cost is a read-time derivation over the ledger, never a stored column.</li>
+</ul>
+<p><strong>Metrics are computed from these rows, never stored as opinion</strong> (D37):</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Metrics</th>
+<th>Source rows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flow</td>
+<td>lead time, cycle time, queue time, block time, flow efficiency, WIP, throughput</td>
+<td><code>card</code>, <code>list</code>, <code>event</code>, <code>run</code></td>
+</tr>
+<tr>
+<td>Quality</td>
+<td>first-pass yield, rework rate, defect escapes, eval score, benchmark delta</td>
+<td><code>run</code>, <code>approval</code>, <code>eval*</code>, <code>benchmark*</code></td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>tokens, cost per work package, cost per accepted artefact</td>
+<td><code>inference_call</code></td>
+</tr>
+<tr>
+<td>Governance</td>
+<td>gate latency, approval rate, override rate, evidence completeness, never-refused gates</td>
+<td><code>approval</code>, <code>audit_event</code></td>
+</tr>
+<tr>
+<td>Knowledge</td>
+<td>pack hit rate, citation rate, readiness blocks, lesson promotion rate</td>
+<td><code>decision</code>, <code>inference_call</code>, <code>lesson</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Metering — roll-ups and drill-down (D52).</strong> Spend and usage are computed from the ledgers at call grain and presented at every level of the organisation:</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>What it shows</th>
+<th>Source rows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tenant</td>
+<td>total tokens, cost, tool spend and budget utilisation</td>
+<td><code>inference_call</code>, <code>tool_call</code>, <code>run</code></td>
+</tr>
+<tr>
+<td>Department / industry</td>
+<td>the same, attributed through the job binding's primary department</td>
+<td>+ <code>job_binding</code></td>
+</tr>
+<tr>
+<td>Programme / portfolio</td>
+<td>the same over the programme's projects; the portfolio is the in-flight set</td>
+<td>+ <code>project</code>, <code>project_dependency</code></td>
+</tr>
+<tr>
+<td>Project</td>
+<td>cost per job, per card and per accepted artefact</td>
+<td>+ <code>card</code>, <code>wbs_node</code></td>
+</tr>
+<tr>
+<td>Job</td>
+<td>cost per run, budget status, spend per tool</td>
+<td>+ <code>run</code>, <code>tool_call</code></td>
+</tr>
+<tr>
+<td>Run (drill-down)</td>
+<td>cost per step and per call</td>
+<td><code>run_step</code>, <code>inference_call</code>, <code>tool_call</code></td>
+</tr>
+<tr>
+<td>Step / call (drill-down)</td>
+<td>the ledger rows themselves</td>
+<td><code>inference_call</code>, <code>tool_call</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Attribution:</strong> a call belongs to its run → card → project (and its programme) → tenant; the job attribution is the run's <code>job_binding_id</code>; the department attribution is the binding's primary department, with a breakdown by the others. An unattributed call (<code>caller_kind='other'</code>) is reported separately, never silently dropped.</li>
+<li><strong>Cost is derived at read time</strong> from the ledger and a pinned price version — tokens are stored, money is derived (D37). Budgets are enforced before the next call (<code>429</code>), not reported after the fact.</li>
+<li><strong><code>billing_service</code> remains the charging system.</strong> It already rolls up tenant × day × project × actor × app × provider × model; the conveyor's metering reconciles to it and a divergence opens an incident, not a silent difference. <code>licenses</code> holds entitlement, not usage.</li>
+<li><strong>UI:</strong> first-class panels on Portfolio (per project and programme), Organisation (per job and department) and Measure (tenant roll-up); the run inspector drills to step and tool call. The UI reads the same derivation the API serves; it never recomputes cost from a stale cache.</li>
+</ul>
+<h3 id="76-knowledge-and-memory-configuration">7.6 Knowledge and memory configuration</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Knowledge</strong></th>
+<th><strong>Memory</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Procedural</strong></td>
+<td><code>capability → procedure → step(PDDL) → action|gate</code> + the pinned PKO release (conveyor)</td>
+<td><code>run</code>/<code>run_step</code>/<code>approval</code>/<code>action_invocation</code>/<code>event</code> (conveyor)</td>
+</tr>
+<tr>
+<td><strong>Domain</strong></td>
+<td>layered kinds + one versioned <code>capability</code> pack in <code>strata_rag</code>, pinned per job</td>
+<td><strong>work-package memory</strong>: hot rows in conveyor, one cold digest per card in <code>strata_rag</code></td>
+</tr>
+<tr>
+<td><strong>Organisational</strong></td>
+<td>curated lessons promoted to a source draft (D36)</td>
+<td><strong>lesson memory</strong>: proposed → reviewed → promoted/rejected</td>
+</tr>
+</tbody>
+</table>
+<p>Rules carried from V1 and KH:</p>
+<ul>
+<li>A required kind with zero resolvable leaves <strong>blocks the run</strong> before the first step (checked by the conveyor before the first step); an optional source degrades with a recorded warning, never silently.</li>
+<li>A pack is pinned <code>key@version</code>; publishing a new version does not change a live run's pin.</li>
+<li>Work-package memory is hot rows + one derived digest; hot wins on conflict; the digest is rebuildable, the rows are not.</li>
+<li><strong>Lesson promotion</strong> requires ≥2 independent evidence references (different cards/runs/incidents), a person's review and the normal source/pack release path. One bad run never becomes doctrine.</li>
+<li>The conveyor never hosts embeddings or a model; retrieval is <code>strata_rag</code>; generation is the executor.</li>
+</ul>
+<h3 id="77-compiled-prompts">7.7 Compiled prompts</h3>
+<p>V1 D27/S21 stands: a prompt is compiled at run time from the run's sources — instruction, procedure, capability/role, knowledge and project/card sections in trust order — with character budgets, a measured refusal over budget, and a recorded <code>prompt_sha256</code>. The compiled text is never stored. Missing required source → <code>409 capability_not_ready</code> naming the pin and section, <strong>before</strong> a model call. An identical recipe + facts compiles byte-identically. For an <code>internal_agent</code> step the four sources of §4.5 — knowledge, episodic memory, the PDDL request and the curated tool list — are compiled into the same envelope; there is no other prompt compiler in the system.</p>
+<hr />
+<h2 id="8-executable-rigour--togaf-safe-pmp">8. Executable rigour — TOGAF, SAFe, PMP</h2>
+<p>The point of this section is that the rigour is <strong>not a document library</strong>. Every artefact below is a row with a lifecycle; every gate is an approval; every claim links to evidence.</p>
+<h3 id="81-togaf-adm-as-an-architecture-project-type">8.1 TOGAF ADM as an architecture project type</h3>
+<p>An <code>architecture</code> project walks the ADM phases as WBS nodes, each with its required artefacts and a contract gate:</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Artefacts (governed assets)</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Preliminary</strong></td>
+<td>architecture principles, tailored ADM profile</td>
+<td>principles approved</td>
+</tr>
+<tr>
+<td><strong>A — Vision</strong></td>
+<td>scope, stakeholders, architecture vision, constraints</td>
+<td>vision contract</td>
+</tr>
+<tr>
+<td><strong>B — Business</strong></td>
+<td>business architecture, capabilities, value streams</td>
+<td>business contract</td>
+</tr>
+<tr>
+<td><strong>C — Information systems</strong></td>
+<td>data + application architecture</td>
+<td>IS contract</td>
+</tr>
+<tr>
+<td><strong>D — Technology</strong></td>
+<td>platform, infrastructure, deployment topology</td>
+<td>technology contract</td>
+</tr>
+<tr>
+<td><strong>E — Opportunities &amp; solutions</strong></td>
+<td>gap analysis, candidate solutions, work packages</td>
+<td>solution contract</td>
+</tr>
+<tr>
+<td><strong>F — Migration planning</strong></td>
+<td>roadmap, increments, dependencies, cost/benefit</td>
+<td>migration contract</td>
+</tr>
+<tr>
+<td><strong>G — Implementation governance</strong></td>
+<td>compliance reviews attached to delivery projects</td>
+<td>per-delivery compliance</td>
+</tr>
+<tr>
+<td><strong>H — Change management</strong></td>
+<td>monitoring, new requests, lessons</td>
+<td>change review → kata/PM</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Requirements management is continuous</strong>, not a phase: every requirement/principle/ADR is a <code>governed_asset</code> linked by <code>trace_link</code> to the cards, runs and evidence that realise it. A delivery project cannot pass its design gate without the architecture contract that governs it; a contract change is a new version and a new gate.</p>
+<p>Scope note: this is a <strong>lean ADM profile</strong> for software delivery, not a claim of TOGAF certification or full conformance. The phases, artefacts and gates are the ones the organisation will actually use and measure.</p>
+<h3 id="82-safe-as-the-programme-cadence">8.2 SAFe as the programme cadence</h3>
+<table>
+<thead>
+<tr>
+<th>SAFe concept</th>
+<th>V2 implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Portfolio</td>
+<td>the computed view of every project and programme in flight for the tenant; budget and strategy sit above it</td>
+</tr>
+<tr>
+<td>Programme / ART</td>
+<td>a <code>programme</code> with <code>shared_config</code>, a project dependency graph, a cadence and a standing backlog</td>
+</tr>
+<tr>
+<td>PI planning</td>
+<td>a <code>programme_cadence(kind='pi')</code> job that materialises the next cadence's draft cards from the backlog, ordered by WSJF, subject to WIP limits; a person approves the plan</td>
+</tr>
+<tr>
+<td>Backlog refinement</td>
+<td>a scheduled job that re-scores WSJF and flags stale items</td>
+</tr>
+<tr>
+<td>System demo</td>
+<td>a cadence event requiring each completed deliverable to exhibit its evidence; no demo, no credit</td>
+</tr>
+<tr>
+<td>Inspect &amp; adapt</td>
+<td>a retro card producing lessons and kata candidates; owned by the coach</td>
+</tr>
+<tr>
+<td>Lean governance</td>
+<td>gates at value boundaries (phase/increment), not per card</td>
+</tr>
+</tbody>
+</table>
+<p><strong>WSJF is arithmetic, not opinion:</strong> <code>(business_value + time_criticality + risk_reduction) / job_size</code>, all four typed integer fields on the backlog/WBS row. The computed score is never stored; the inputs are. An LLM may draft the narrative, never the numbers.</p>
+<h3 id="83-pmp-artefacts-as-typed-rows">8.3 PMP artefacts as typed rows</h3>
+<table>
+<thead>
+<tr>
+<th>PMP artefact</th>
+<th>V2 row</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Charter</td>
+<td><code>governed_asset(kind='charter')</code> + project</td>
+</tr>
+<tr>
+<td>WBS</td>
+<td><code>wbs_node</code> tree</td>
+</tr>
+<tr>
+<td>Scope/schedule/cost baseline</td>
+<td><code>project_baseline</code> (frozen snapshot, approved)</td>
+</tr>
+<tr>
+<td>Risk/issue/assumption/dependency/benefit registers</td>
+<td><code>project_register_item</code> (one table, six kinds)</td>
+</tr>
+<tr>
+<td>Change control</td>
+<td><code>project_register_item(kind='change')</code> + approval with impact analysis</td>
+</tr>
+<tr>
+<td>Acceptance/closure</td>
+<td><code>governed_asset(kind='closure')</code> + DoD evidence</td>
+</tr>
+</tbody>
+</table>
+<p>The registers are deliberately one table, not five: the v4 design had separate PM tables and V1 measured RM's <code>pm_*</code> at zero usage. One generic register with a <code>kind</code> CHECK is leaner and still queryable.</p>
+<h3 id="84-the-trace-chain">8.4 The trace chain</h3>
+<pre><code>requirement / principle / ADR (approved)
+   → architecture contract (approved)
+   → project charter (approved)
+   → WBS deliverable → work package (card) → run → step → artefact / evidence
+   → acceptance (approval) → closure</code></pre>
+<p><code>trace_link</code> is V1's existing edge; V2 requires the link at creation time for architecture-governed work. The governance screen answers one question end to end: <em>which requirement does this run prove, and where is the evidence?</em></p>
+<h3 id="85-what-is-not-claimed">8.5 What is not claimed</h3>
+<p>No TOGAF certification, no SAFe compliance badge, no PMP certification. No full ADM conformance, no portfolio optimiser, no schedule solver. The claim is narrower and testable: <strong>the artefacts and gates the organisation uses are rows, the process runs, and the evidence is traceable.</strong></p>
+<hr />
+<h2 id="9-self-development-and-operations">9. Self-development and operations</h2>
+<h3 id="91-development-projects--the-conveyor-builds-itself">9.1 Development projects — the conveyor builds itself</h3>
+<p>The organisation's first real job is to change its own substrate. A development project is an ordinary project with a <code>development</code> type and a stricter gate set:</p>
+<ol type="1">
+<li><strong>Charter</strong> names the repo, the lane, the scope and the acceptance evidence.</li>
+<li><strong>Design note</strong> for structural changes (architecture contract, migration plan, rollback).</li>
+<li><strong>Lane branch</strong> (<code>lane/&lt;slug&gt;</code>), one branch, at most one PR for the unit's life (house rule).</li>
+<li><strong>Implement</strong> through coding jobs; the executor cannot merge.</li>
+<li><strong>Verify</strong>: CI-equivalent locally first (fmt, clippy <code>-D warnings</code>, the full suite), then the pipeline; gitleaks; the relevant eval/benchmark if the change touches a measured surface.</li>
+<li><strong>Review</strong>: an independent reviewer job; the reviewer cannot be the implementer.</li>
+<li><strong>Merge gate</strong>: a human (or an earned auto-merge policy) approves; red CI is a refusal, never a retry-until-green.</li>
+<li><strong>Deploy and verify live</strong>: rollout by image digest, <code>/health</code>, the slice's own acceptance check; a rollback plan exists before the deploy.</li>
+<li><strong>Close</strong>: the closure record links the PR, the pipeline, the deploy evidence and the acceptance.</li>
+</ol>
+<p><strong>Dependency repos are in scope.</strong> A dependency change is a development project against that repo, with the same gates; the conveyor's own dependency bump is a linked project, not a side effect. A dependency is in scope only if its own change protocol permits an agent project; <strong>shared infrastructure</strong> (cluster control plane, ingress, DNS, registry) remains a human-run change, never a development project.</p>
+<h3 id="92-operations--the-platform-perspective">9.2 Operations — the platform perspective</h3>
+<p>The operations job family closes the loop on the substrate:</p>
+<ul>
+<li><strong>Incident</strong> is a card type with <code>service</code>, <code>severity</code>, <code>detected_at</code>, <code>mitigated_at</code>, <code>resolved_at</code> and a link to the run/evidence. Detection is an alert/webhook/schedule; a person can also open one.</li>
+<li><strong>Runbook</strong> is a published procedure whose steps are k8s/git actions with gates. The first runbooks: pod crash-loop, rollout stuck, dependency/DB down, certificate expiry, disk pressure, queue backlog, stale lease storm.</li>
+<li><strong>Read-first</strong>: diagnose with read actions (pods, deployments, events, logs, metrics, Flux status, git/CI). Write actions (restart, scale, rollback, flag flip) are <code>ops:write</code>, dry-run first, approved under the tenant's configured policy (default human dual control), and audited. The full write set ships in v1; autonomy is a tenant configuration, not a reduced feature.</li>
+<li><strong>Least privilege</strong>: the ops connector uses a namespace-scoped service account, never cluster-admin; the action registry declares every verb.</li>
+<li><strong>Postmortem</strong> is a <code>governed_asset</code>; a systemic finding becomes a kata candidate; a one-off becomes a runbook improvement. Blameless, evidence-linked, due within the policy window.</li>
+<li><strong>The andon cord</strong> (V1/fr) is an incident-class action: stop new runs for a tenant/programme, keep the record, alert the on-call; only a person releases it.</li>
+</ul>
+<h3 id="93-guardrails--the-system-cannot-grade-its-own-homework">9.3 Guardrails — the system cannot grade its own homework</h3>
+<ul>
+<li>A development project <strong>cannot modify the gate set, approval policy, eval instrument or benchmark suite</strong> that judges it. Those are changed by a separate architecture/governance project with a different approver set.</li>
+<li>A kata <strong>cannot approve</strong> its own adoption; a kata that changed the instrument is void for that measurement.</li>
+<li>The <strong>merge gate</strong> and the <strong>deploy gate</strong> are separate decisions; a green CI is evidence, not an approval.</li>
+<li><strong>Auto-merge is earned</strong>, policy-scoped and revocable: the conditions (track record, revert count, path scope, reviewer requirement, expiry) are tenant configuration rows, not constants in code; one revert revokes it and opens a kata. The default is off; the database model, the UI and the code all read the policy, never a hard-coded number.</li>
+<li><strong>Rollback is mandatory</strong> for deployable changes; a deploy without a tested rollback is refused.</li>
+<li>The <strong>benchmark harness and eval versions are frozen per measurement</strong> (V1 D24–D26); a change to an instrument creates a new version and voids its sign-offs.</li>
+</ul>
+<h3 id="94-the-improvement-loop-end-to-end">9.4 The improvement loop, end to end</h3>
+<pre><code>alert / failed run / eval delta / prompt finding / coach escalation
+  → coach card (one interruption, closed remedy set)
+  → if systemic: kata (six Gets, evidence, candidate)
+  → development project (code) or procedure/prompt/knowledge change (config)
+  → measurement (benchmark / eval / run outcome, held-out)
+  → adoption gate (person; dual control)
+  → production (new procedure/job/binding version)
+  → monitoring + lesson</code></pre>
+<p>This is one loop, not four. The kata-executor's inputs are the prompt findings and eval deltas V1 already produces; the coach's escalations are cards; the PM's closure record is evidence; the operations postmortem feeds it back.</p>
+<hr />
+<h2 id="10-architecture-and-ownership">10. Architecture and ownership</h2>
+<h3 id="101-ownership-matrix--one-record-per-fact">10.1 Ownership matrix — one record per fact</h3>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>System of record</th>
+<th>Consumer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Industry, department, job, job release, knowledge layers/kinds, packs, PKO/ontology releases, decision policies and their tenant refinements, laya inference config, model providers, tool grants, channels, conversations/turns</td>
+<td><strong><code>conveyor</code></strong></td>
+<td>jobs execute on it; humans and the agent front end</td>
+</tr>
+<tr>
+<td>Tool estate: tool/toolkit versions, tool bindings, credential profiles, the <code>tool_call</code> ledger (§11)</td>
+<td><strong><code>conveyor</code></strong></td>
+<td>conveyor jobs through the broker; humans</td>
+</tr>
+<tr>
+<td>Tool backends: the coding fleet, the kag-era services, the w2v fleet and <code>video-compiler</code>, AHTAPol services, k8s/git APIs</td>
+<td>each service / the cluster</td>
+<td>the conveyor broker only (§11.3)</td>
+</tr>
+<tr>
+<td>Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings</td>
+<td><strong><code>conveyor</code></strong></td>
+<td>humans; the agent front end over <code>/mcp</code></td>
+</tr>
+<tr>
+<td>Documents/bytes</td>
+<td>conveyor <code>document</code> + <strong>MinIO</strong>, written by the conveyor's own storage adapter under tenant-separated prefixes (§11.10)</td>
+<td>all</td>
+</tr>
+<tr>
+<td>Domain knowledge bytes/embeddings</td>
+<td><code>strata_rag</code> / <code>strata_ingest</code></td>
+<td>conveyor</td>
+</tr>
+<tr>
+<td>Models/inference</td>
+<td><code>inference-router</code> for text; <code>mlx-api</code>/<code>modality-gateway</code> for media; laya on pgx</td>
+<td>conveyor</td>
+</tr>
+<tr>
+<td>Charging and entitlement: cost rollups, plans, licences</td>
+<td><code>licenses</code>, <code>billing_service</code>; the conveyor's metering read models are computed from its own ledgers</td>
+<td>conveyor</td>
+</tr>
+<tr>
+<td>Git/CI execution</td>
+<td>the <code>coding-*</code> fleet, through the conveyor broker's coding toolkit (§11)</td>
+<td>development jobs</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>the cluster, through the ops toolkit (§11.2)</td>
+<td>operations jobs</td>
+</tr>
+<tr>
+<td>The agent platform's own conversations, cases, journeys and its autonomy configuration</td>
+<td><strong><code>agent</code></strong> (its product, outside the conveyor's model)</td>
+<td>its own users and channels</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The conveyor owns every decision it evaluates.</strong> Its <code>decision</code> rows cover work routing, gates and the internal agent's per-step choices; there is no second decision store for conveyor jobs. The agent platform's own runtime decisions are its product and never enter the conveyor's model.</p>
+<p><strong>The join is internal.</strong> <code>job_binding</code> references the conveyor's own <code>job_catalogue</code>, <code>job_release</code>, <code>capability</code> and <code>procedure</code> rows; <code>release_hash</code> pins the immutable release. There is no imported manifest and no live copy of another system's data.</p>
+<p><strong>Channels.</strong> The conveyor's web/Telegram/MCP channels are the <strong>work and approval</strong> surfaces (cards, runs, gates, task input requests). The agent platform is a conversation front end over MCP with its own autonomy configuration; a conversation that needs internal work opens a card across the MCP seam. Customer care is not conveyor work (D48).</p>
+<h3 id="102-seams-and-contracts">10.2 Seams and contracts</h3>
+<table>
+<thead>
+<tr>
+<th>Seam</th>
+<th>Contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>agent → conveyor</td>
+<td>MCP <code>/mcp</code>, licence bearer, MCP tasks (V1 D19/D21); the agent front end acts as a user; tool names carry <code>_meta.operation</code>; a task start names the <code>job_binding_id</code>; the tool surface is versioned like an external API (V1 R11)</td>
+</tr>
+<tr>
+<td>conveyor → agent</td>
+<td><strong>no call.</strong> The agent front end may present approvals and questions with its own autonomy configuration; the conveyor records the decision and <code>decided_by_kind</code>/<code>via</code>. An agent outage does not stop any conveyor run</td>
+</tr>
+<tr>
+<td>conveyor → laya</td>
+<td><code>POST /v1/systemone</code>, 1500 ms default / 3 s hard budget; fail policy per decision policy</td>
+</tr>
+<tr>
+<td>conveyor → inference-router</td>
+<td>V1 D23: <code>inference_call</code> ledger, prompt identity, cache classes</td>
+</tr>
+<tr>
+<td>conveyor → strata</td>
+<td><code>knowledge.query</code> over pinned <code>leaf_ids</code>; <code>ingest.*</code> for authoring and SOP/RDF/process-document intake; <code>memory.consolidate</code> writes one digest per card; <code>strata</code> is never the system of record</td>
+</tr>
+<tr>
+<td>conveyor → coding</td>
+<td>the coding toolkit through the broker (§11.3): operations imported from the coding gateway's <code>openapi.json</code>; timeout/breaker; normalised result</td>
+</tr>
+<tr>
+<td>conveyor → k8s</td>
+<td>the ops toolkit through the broker: namespace-scoped service account; read/write verbs declared as tools with effect classes (§11.4)</td>
+</tr>
+<tr>
+<td>conveyor → tool backends</td>
+<td>the broker (§11.3): registered destination alias, sealed credential profile, closed input schema, effect class, one <code>tool_call</code> row. No caller-supplied URL at call time; no runtime dependency on <code>nonagenticai_mcp_server</code> (§11.7)</td>
+</tr>
+<tr>
+<td>conveyor → MinIO</td>
+<td>the storage adapter: S3 API to tenant-prefixed keys, server-side encryption, content hash, size cap; bucket administration is never a job action (§11.10)</td>
+</tr>
+<tr>
+<td>any → human</td>
+<td>approval; web, Telegram, an MCP task input request, or the agent front end under its own autonomy configuration</td>
+</tr>
+</tbody>
+</table>
+<p><strong>How a meta-job actually runs.</strong> The job is a conveyor release; its internal agent executes a PDDL step from a prompt compiled from the four sources of §4.5, and its turn opens or advances a <strong>card</strong>. The unit of work is the card/run, not the turn: a turn can end, the worker can restart, and the card remains with its owner, state and evidence. The conveyor records the run, every decision and every model call; the agent front end, if it presented the conversation, records only its own turns.</p>
+<h3 id="103-data-model-additions-proposed-refined-in-slice-plans">10.3 Data model additions (proposed; refined in slice plans)</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>industry</code> / <code>department</code></td>
+<td>the organisation spine</td>
+<td>ordered departments; a job in one industry</td>
+</tr>
+<tr>
+<td><code>job_catalogue</code></td>
+<td>the position: key, placement, status</td>
+<td>the conveyor's own job table; not V1's durable <code>job</code> queue</td>
+</tr>
+<tr>
+<td><code>job_release</code></td>
+<td>the immutable compiled release</td>
+<td>content hash, snapshot, status; a change is a new release</td>
+</tr>
+<tr>
+<td><code>job_binding</code></td>
+<td>the join of a position to its release/capability/procedure/executor</td>
+<td>tenant-scoped, versioned; immutable <code>release_snapshot</code> + <code>release_hash</code>; <code>executor_kind</code> is to be extensible (D61, T0)</td>
+</tr>
+<tr>
+<td><code>approval_policy</code></td>
+<td>per-gate approvals</td>
+<td>required decisions, approver kinds, expiry, autonomy conditions; default human</td>
+</tr>
+<tr>
+<td><code>wbs_node</code></td>
+<td>phase/deliverable/work package/milestone tree</td>
+<td><code>card_id</code> nullable; WSJF inputs; acceptance</td>
+</tr>
+<tr>
+<td><code>project_baseline</code></td>
+<td>frozen, approved scope/schedule/cost</td>
+<td>immutable; change requests reference it</td>
+</tr>
+<tr>
+<td><code>programme_cadence</code></td>
+<td>PI/sprint/demo/retro/refinement</td>
+<td>state machine; materialises cards</td>
+</tr>
+<tr>
+<td><code>project_register_item</code></td>
+<td>risk/issue/assumption/dependency/benefit/change</td>
+<td>one generic register, six kinds</td>
+</tr>
+<tr>
+<td><code>decision</code></td>
+<td>one L1 decision</td>
+<td>probabilities, confidence, policy, latency, input hash</td>
+</tr>
+<tr>
+<td><code>decision_option</code></td>
+<td>options for a choice/score question</td>
+<td>authored, versioned</td>
+</tr>
+<tr>
+<td><code>decision_policy</code></td>
+<td>thresholds, fail policy, action</td>
+<td>per decision kind/gate</td>
+</tr>
+<tr>
+<td><code>lesson</code></td>
+<td>organisational memory proposal</td>
+<td>evidence refs, independent count, review state</td>
+</tr>
+<tr>
+<td><code>project_dependency</code></td>
+<td>project-level dependency edges</td>
+<td><code>blocks | needs | supersedes | informs</code>; a cycle is refused</td>
+</tr>
+<tr>
+<td><code>decision_policy_refinement</code></td>
+<td>tenant per-case decision config</td>
+<td>threshold/rule override, fail action, optional laya config; versioned</td>
+</tr>
+<tr>
+<td><code>laya_inference_config</code></td>
+<td>tenant-scoped laya inference</td>
+<td><code>model_ref</code>, <code>params</code>, <code>timeout_ms</code>; optional per-case override</td>
+</tr>
+<tr>
+<td><code>pko_release</code></td>
+<td>immutable PKO/ontology release</td>
+<td>content hash, layers, status; pinned by a procedure</td>
+</tr>
+<tr>
+<td><code>pko_entity</code> / <code>pko_relation</code></td>
+<td>PKO terms and edges</td>
+<td>kind, attributes, synonyms; subject/predicate/object/cardinality</td>
+</tr>
+</tbody>
+</table>
+<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | architecture_contract | closure | postmortem | sop_source</code>), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and a PKO pin. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
+<h3 id="104-action-families">10.4 Action families</h3>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>programme/plan</td>
+<td><code>programmes.*</code>, <code>programme_config.*</code>, <code>project_dependencies.*</code>, <code>cadences.*</code>, <code>wbs.*</code>, <code>baselines.*</code>, <code>registers.*</code></td>
+</tr>
+<tr>
+<td>organisation</td>
+<td><code>industries.*</code>, <code>departments.*</code>, <code>jobs.create|update|release|retire</code>, <code>job_releases.publish|retire</code>, <code>job_bindings.create|retire|list</code></td>
+</tr>
+<tr>
+<td>procedures</td>
+<td><code>procedures.ingest_sop|ingest_process|ingest_rdf|draft|validate|publish</code>, <code>capabilities.design|publish</code>, <code>pko.import_rdf|edit|publish|pin</code></td>
+</tr>
+<tr>
+<td>authoring</td>
+<td><code>authoring.intake|draft|review|publish</code>, <code>authoring.assets</code></td>
+</tr>
+<tr>
+<td>approvals</td>
+<td><code>approval_policies.list|get|set</code>, <code>approvals.request|decide|escalate</code></td>
+</tr>
+<tr>
+<td>decision</td>
+<td><code>decisions.open|evaluate|decide|escalate</code>, <code>decision_options.*</code>, <code>decision_policies.*|refine</code>, <code>laya_configs.*</code></td>
+</tr>
+<tr>
+<td>PM</td>
+<td><code>pm.charter</code>, <code>pm.plan</code>, <code>pm.baseline</code>, <code>pm.close</code></td>
+</tr>
+<tr>
+<td>coach</td>
+<td><code>coach.interrupt</code>, <code>coach.triage</code>, <code>coach.remedy</code>, <code>coach.escalate</code></td>
+</tr>
+<tr>
+<td>kata</td>
+<td><code>kata.open|observe|analyse|propose|measure|adopt|propagate|close</code></td>
+</tr>
+<tr>
+<td>development</td>
+<td><code>dev.open|implement|verify|merge|release|rollback</code> (composes coding/git/CI actions)</td>
+</tr>
+<tr>
+<td>operations</td>
+<td><code>ops.incident|triage|mitigate|resolve|postmortem</code>, <code>ops.k8s_*</code>, <code>ops.git_*</code></td>
+</tr>
+<tr>
+<td>tools</td>
+<td><code>tools.list|get|probe|call|publish|retire</code>, <code>toolkits.import_openapi|publish|list</code>, <code>tool_bindings.create|update|retire</code>, <code>tool_calls.list</code>, <code>tool_authoring.draft|validate|test|review</code> (§11.8)</td>
+</tr>
+<tr>
+<td>memory</td>
+<td><code>lessons.propose|review|promote</code></td>
+</tr>
+<tr>
+<td>metrics</td>
+<td><code>metrics.flow</code>, <code>metrics.job</code>, <code>metrics.programme</code>, <code>metrics.maturity</code></td>
+</tr>
+</tbody>
+</table>
+<p>Every action is an <code>ActionSpec</code> (V1 §5.5): one declaration → HTTP + MCP + OpenAPI + generated client.</p>
+<h3 id="105-ui-additions">10.5 UI additions</h3>
+<p>V1's nine destinations stand (Today, Board, Runs, Build, Design, Measure, Evals, Govern, Channels). V2 adds:</p>
+<table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Screens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Organisation</strong></td>
+<td>departments/jobs, job catalogue + release, authority matrix, approval policies, decision-policy refinements, laya config, job performance and metering</td>
+</tr>
+<tr>
+<td><strong>Procedures</strong></td>
+<td>capability/procedure workspace, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, PDDL step editor, PKO editor (tenant-editable), knowledge-pack pairing, publish</td>
+</tr>
+<tr>
+<td><strong>Authoring</strong></td>
+<td>intake queue (chat + documents), asset draft catalogue, review/publish, asset dependency status</td>
+</tr>
+<tr>
+<td><strong>Portfolio</strong></td>
+<td>portfolio view (in-flight projects + programmes), programme shared config + dependency graph, backlog + WSJF, cadence (PI planning, demo, retro), capacity, metering per project</td>
+</tr>
+<tr>
+<td><strong>Plan</strong></td>
+<td>WBS, baseline vs forecast, registers, change control</td>
+</tr>
+<tr>
+<td><strong>Improve</strong></td>
+<td>kata queue, six-Gets workspace, lesson review, adoption</td>
+</tr>
+<tr>
+<td><strong>Operations</strong></td>
+<td>incidents, on-call, runbooks, postmortems, andon</td>
+</tr>
+</tbody>
+</table>
+<p>A <strong>Tools</strong> screen under Organisation lists toolkit versions, bindings, effect ceilings, health probes and recent calls; the run inspector gains a tools panel (which tool version was called, with which credential alias, what it returned). The board remains the work surface; the execution canvas remains the run surface, keeping the provenance inspector pattern from <code>w2v_frontend</code> (<code>StageIOInspector</code>: every stage's input → output is inspectable). Metering panels appear on Portfolio (per project and programme), Organisation (per job and department) and Measure (tenant roll-up); the run inspector drills to step and tool call (D52). The org chart is not a new runtime.</p>
+<h3 id="106-deployment-and-scale">10.6 Deployment and scale</h3>
+<ul>
+<li>Same binary, same Postgres, same namespace, <strong>no new port</strong> (8930). New tables/actions only.</li>
+<li>Durable jobs scale by worker replicas; each run is bounded by its budget; the queue uses <code>FOR UPDATE SKIP LOCKED</code> (V1).</li>
+<li>A thousand jobs is a thousand catalogue rows and bindings, not a thousand processes. A thousand cards is one board with pagination and SSE topics. WIP limits and budgets are the pressure valves.</li>
+<li>The tool broker is in-process: no sidecar, no new port. Outbound calls use registered destination aliases, the storage adapter (MinIO) and the cluster's egress policy; the broker holds no model and stores no tool bodies.</li>
+<li>No Redis. No model hosted. The one internal agent loop (V1 S13 <code>agent.run</code>, configured by S15's <code>capability_agent</code>) is the only runtime; the <code>Executor</code> seam is a T0 deliverable (D61) that will make the kind extensible, and an external runtime remains an explicit non-goal until D61's four conditions hold.</li>
+</ul>
+<hr />
+<h2 id="11-the-tool-estate">11. The tool estate</h2>
+<p><strong>The claim.</strong> A job is only as capable as what it may call. V2 makes the tool estate a first-class, versioned, governed surface: every cluster service that offers a typed operation is a <strong>tool</strong>, tools are published in immutable <strong>toolkit</strong> versions, a job's access is a <strong>binding</strong> with an effect ceiling, and every call is a <strong>ledgered row</strong>. The conveyor owns the catalogue, the broker and the ledger. It does not route through <code>nonagenticai_mcp_server</code> (D44), and it does not reach a backend by an ad-hoc HTTP call from a procedure or an agent.</p>
+<h3 id="111-definitions--five-things-one-owner-each">11.1 Definitions — five things, one owner each</h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+<th>Not to be confused with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tool</strong></td>
+<td>one callable operation <code>&lt;service&gt;.&lt;operation&gt;</code>: closed input schema, output schema, effect class, idempotency, timeout, redaction, destination alias</td>
+<td>a conveyor action (the conveyor's own op)</td>
+</tr>
+<tr>
+<td><strong>Toolkit</strong></td>
+<td>an immutable, versioned bundle of one service's tools + auth adapter + licence app + destination</td>
+<td>a repo, a package</td>
+</tr>
+<tr>
+<td><strong>Tool binding</strong></td>
+<td>tenant-scoped grant of pinned toolkit versions to a job binding or a run, narrowed by effect ceiling, rate and credential alias</td>
+<td>the release's tool grant</td>
+</tr>
+<tr>
+<td><strong>Tool grant</strong></td>
+<td>the release's operation allowlist (<code>op</code>, <code>variant</code>, <code>max_side_effect</code>, <code>enabled</code>) and per-call tool gate</td>
+<td>the conveyor binding (tool existence + credential)</td>
+</tr>
+<tr>
+<td><strong>Tool call</strong></td>
+<td>one audited invocation: run/step, tool version, input hash, status, latency, bytes, cost</td>
+<td><code>action_invocation</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>P1 applied: one owner, two rows.</strong> The release's grant names the operations the job may use (inside the release hash); the binding pins the toolkit versions and the credential alias. Both are conveyor rows; the release never carries tool content, and the binding never widens the grant.</p>
+<h3 id="112-the-estate--what-exists-today-measured-2026-11-11">11.2 The estate — what exists today (measured 2026-11-11)</h3>
+<table>
+<thead>
+<tr>
+<th>Service (destination)</th>
+<th>What it gives a job</th>
+<th>Status</th>
+<th>First job family</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>coding fleet</strong> — <code>coding.example.com</code>: gateway, analysis, containers, github, jobs, realtime, repo-jobs, security, test-runs, testing, ai</td>
+<td>repository provisioning, dependency graph, verified writes, tests, security audit, PRs</td>
+<td>live</td>
+<td>delivery, verification, development projects</td>
+</tr>
+<tr>
+<td><code>strata_rag</code></td>
+<td>pinned-leaf retrieval (<code>knowledge.query</code>), routed RAG</td>
+<td>live</td>
+<td>every job</td>
+</tr>
+<tr>
+<td><code>strata_ingest</code></td>
+<td>files/URLs → markdown; ingestion</td>
+<td>live</td>
+<td>knowledge, AHTAPol acquisition</td>
+</tr>
+<tr>
+<td><code>webscraper</code> :9119</td>
+<td>four-backend scraping (Playwright, curl_cffi, Scrapy, httpx) → Markdown/JSON</td>
+<td>live</td>
+<td>research, SOP ingestion</td>
+</tr>
+<tr>
+<td><code>media_discovery</code> :8809</td>
+<td>federated media search, transcripts, quality scoring</td>
+<td>live</td>
+<td>media production</td>
+</tr>
+<tr>
+<td><code>scientific_processor</code> :8808</td>
+<td>meta-analysis, survival fitting, verification/trust scoring, sandboxed analysis</td>
+<td>deployed; scaled to 0 today (measured 2026-11-11) — a binding needs a scale-up and a green probe</td>
+<td>AHTAPol evidence</td>
+</tr>
+<tr>
+<td><code>lean4_prover</code> :8812 (mini1 host)</td>
+<td>Lean 4 typecheck/elaborate/prove over REST</td>
+<td>live</td>
+<td>verification, SOP formal checks</td>
+</tr>
+<tr>
+<td><code>evidence_review</code> :8810</td>
+<td>protocol-locked PRISMA screening, blinded review, adjudication, inclusion export</td>
+<td>built; not deployed</td>
+<td>AHTAPol screening</td>
+</tr>
+<tr>
+<td><code>w2v-orchestrator</code> :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on mini1)</td>
+<td>deliverable runs and stage capabilities; rendered artifacts</td>
+<td>live; <strong>migration target — the stage fleet moves into the conveyor and is rewritten in Rust (D54)</strong></td>
+<td>media production</td>
+</tr>
+<tr>
+<td><code>video-compiler</code> :8200</td>
+<td>ffmpeg render/compile jobs (slide/footage → video), durable <code>compile_jobs</code>, MinIO outputs</td>
+<td>live; migration candidate — joins the conveyor workspace when rewritten in Rust (D58)</td>
+<td>media production</td>
+</tr>
+<tr>
+<td>ops — Kubernetes API, GitHub API, Flux, Prometheus/Loki/Grafana</td>
+<td>read verbs (pods, deployments, events, logs, metrics, CI); write verbs gated</td>
+<td>live (read) / gated (write)</td>
+<td>operations</td>
+</tr>
+<tr>
+<td><code>billing_service</code>, <code>licenses</code> :8544</td>
+<td>usage and entitlement facts</td>
+<td>live</td>
+<td>project office, governance</td>
+</tr>
+<tr>
+<td>AHTAPol <code>discovery</code> :8807</td>
+<td>source discovery, harvest and surveillance over guideline, literature and HTA sources</td>
+<td>planned (spec); catalogue <code>draft</code> — binds when its slice deploys it (D56)</td>
+<td>AHTAPol evidence</td>
+</tr>
+<tr>
+<td>AHTAPol planned — 8811 research output, 8813 decision modelling, 8814 guideline registry, 8815 terminology broker</td>
+<td>governed reports, CEA/CUA/PSA/BIA, guidelines, terminology</td>
+<td>planned (specs)</td>
+<td>AHTAPol</td>
+</tr>
+<tr>
+<td>AHTAPol <code>8812</code> R stats sidecar</td>
+<td>R engine for survival, EVPPI/EVSI, PSM/DES (GPL isolated)</td>
+<td>planned (spec)</td>
+<td>AHTAPol health economics</td>
+</tr>
+<tr>
+<td><strong>BYO</strong> — tenant OpenAPI toolkits + remote MCP servers</td>
+<td>whatever the tenant is licensed for</td>
+<td>per tenant (§11.5)</td>
+<td>any tenant</td>
+</tr>
+</tbody>
+</table>
+<p>Notes that keep the table honest:</p>
+<ul>
+<li><strong>The kag-era tools are these four.</strong> <code>webscraper</code>, <code>media_discovery</code>, <code>scientific_processor</code> and <code>lean4_prover</code> are the surviving kag-era tools and enter the first wave; <code>scientific_processor</code> is deployed but scaled to 0 today. <code>scientific_discovery</code> is not a separate service — the capability enters as the AHTAPol <code>discovery</code> :8807 draft (D56). <code>evidence_review</code> :8810 has no deployment in the cluster — it enters as <code>draft</code> and binds when its deployment lands.</li>
+<li><strong>Legacy kag is archived and not a tool.</strong> Every kag repo — <code>kag</code>, <code>kag_orchestrator</code>, <code>kag_graph_service</code>, <code>kag_common</code>, <code>kag_clients</code>, <code>kag-frontend</code>, <code>hirag_service</code>, <code>karma_service</code>, <code>neo4j</code>, <code>n8n-nodes-kag</code> — is archived on GitHub (measured 2026-11-11), and no kag, hirag, karma or neo4j deployment exists in the cluster. The direction is a <strong>Rust rewrite</strong>, with the home decided per capability in <code>docs/SPEC_LEGACY_KAG.md</code>, the separate spec this V2 creates; neo4j, hirag and karma are explicitly undecided there. <code>strata_ingest</code> and <code>strata_rag</code> are the live, shared ingest/retrieval services both platforms use, and the conveyor binds them at least to the extent the agent platform already does (D54).</li>
+<li><strong>External sources stay behind services.</strong> PubMed, Europe PMC, ClinicalTrials.gov, NICE, GIN/INAHTA, EMA/FDA, ICD-11, SNOMED CT, ATC/DDD, RxNorm and the rest are called by the services that own their licences and rate limits, not by conveyor jobs directly (D42). Migration is expected, not exceptional: where a Python source must change to fit the conveyor's contracts it is re-architected rather than line-ported (owner, 2026-11-11).</li>
+<li><strong>Planned tools enter as <code>draft</code>.</strong> An AHTAPol service that is specified but not live gets a catalogue entry and no binding; it cannot be called until its slice deploys it and its probe passes (P8).</li>
+<li><strong><code>8812</code> is two distinct services.</strong> <code>lean4_prover</code> is a launchd process on the mini1 host reached by a ServiceEntry; the AHTAPol R stats sidecar is a separate planned container reached only by 8808 and 8813 over internal HTTP. Same port number, different hosts and networks — never the same toolkit, and a port is not an identity.</li>
+<li><strong>AHTAPol's own documents overstate deployment.</strong> They describe <code>evidence_review</code> :8810 and research output :8811 as "existing live"; the cluster has no deployment of either (measured 2026-11-11). The catalogue follows the cluster, not the document: both are <code>draft</code> until a slice deploys them and a probe passes.</li>
+<li><strong>AHTAPol's plan assumes archived kag components.</strong> Its service documents call the kag gateway, <code>karma_service</code> :8801, <code>hirag_service</code> and <code>kag_orchestrator</code> :8806; every one is archived and none is deployed. Their functions are re-homed per <code>docs/SPEC_LEGACY_KAG.md</code> before the AHTAPol slice that needs them, and none may be bound as a tool (R19).</li>
+</ul>
+<p><strong>Deliberately not tools.</strong> <code>n8n</code> and <code>kata-n8n</code> (V1 replaces the flow corpus with procedures; n8n is a retired system, not a tool), <code>fr</code> backend and <code>requirements_management</code> (replaced at cutover), Planka (<code>kanban</code>) and <code>kanban-mcp</code> (retired with Planka), <code>w2v_frontend</code> and <code>portal-bff</code> (UI surfaces), Keycloak (the broker authenticates; jobs do not call it), <code>agent</code> (a conversation front end and a client, not a tool backend — D33), <code>care-bus-agents</code> and the <code>care-bus</code> fleet (customer care is the agent platform's product — D48), <code>inference-router</code>, <code>modality-gateway</code> and laya (they are the L1 and L2 rungs, not job tools — a job never "calls a model" through a tool; its executor does; <code>modality-gateway</code> folds into <code>mlx-api</code>, which may itself be rewritten in Rust), <code>provisioning</code> :8546 (tenant/user/licence/inference-config control plane — onboarding stays with the website and provisioning automation), <code>artifact_service</code> :8556 and <code>storage-api</code> :8391 (file plumbing; the conveyor uses MinIO directly, §11.10), and the <code>mcp</code>/<code>mcp-executor</code>/<code>mcp-external-driver</code> deployments (the agent platform's gateway — outside the path, §11.7, and permanently so, D59). <strong>Product applications are clients, not backends:</strong> <code>commonpractice</code> (+ coaching), <code>book-fulfillment</code>, <code>frappe</code>, <code>tsymeon-*</code>, <code>merqi-*</code>, <code>chat-bridge*</code>, <code>raisemytickets-site</code>, <code>nonagentic-homepage</code>, <code>early-access-intake</code>. <strong>Platform infrastructure</strong> — <code>alloy-gateway</code>, <code>secrets</code>, PgBouncer, the registries (<code>verdaccio</code>, <code>pypiserver</code>), mail (<code>maddy</code>, <code>listmonk</code>), Prometheus/Loki/Grafana, Istio, cert-manager — is never a job tool; <code>worker-management</code> is legacy and the conveyor's own durable queue replaces it, so it is not bound.</p>
+<h3 id="113-the-broker--one-call-path">11.3 The broker — one call path</h3>
+<p><code>tools.call</code> is the only way a conveyor-internal run reaches a <strong>job backend</strong>. The executor's own knowledge and memory rungs are not tools: the compiled prompt's <code>knowledge.query</code> and the per-card <code>memory.consolidate</code> (§7.6) stay where they are. A job that explicitly searches — rather than the executor grounding its prompt — uses the retrieval toolkit like any other tool. (V1's twelve external actions — S09 Part B added eight, including <code>coding_jobs.create|get</code>, <code>retrieval.query</code>, <code>artifacts.list</code>, <code>billing.summary</code> — are the seed of this registry and migrate in T13: the backend operations onto toolkit operations, <code>artifacts.list</code> onto the storage adapter (§11.10). They do not run beside it as a second path.)</p>
+<ol type="1">
+<li><strong>Resolve</strong> the binding and the pinned tool version; missing binding or version fails closed (<code>409 tool_not_ready</code>) before any network call.</li>
+<li><strong>Check effect</strong> against the binding ceiling and the job authority (<code>403 tool_effect_forbidden</code>); check spend budget (<code>429 tool_budget_exceeded</code>).</li>
+<li><strong>Validate</strong> the input against the closed schema (<code>422 tool_input_invalid</code>) — <code>additionalProperties: false</code>, enums, patterns, bounds.</li>
+<li><strong>Resolve the credential</strong> from the sealed secret store by alias. The broker injects it; the prompt never carries it and the <code>tool_call</code> row never records it.</li>
+<li><strong>Call the destination alias.</strong> The base URL is registered and reviewed at publication; no caller-supplied URL at call time (SSRF rule). BYO destinations are tenant-allowlisted at registration.</li>
+<li><strong>Normalise and redact</strong>: the result envelope is <code>{status, data, checks[], next[]}</code> with <code>ok | precondition_failed | check_failed | pending | backend_error</code>; declared fields are redacted and the response size is capped.</li>
+<li><strong>Record and emit</strong>: one <code>tool_call</code> row (input hash, status, latency, bytes, cost) and one <code>tool.called</code> event. The call is never a card transition.</li>
+</ol>
+<p><strong>Long operations are bounded.</strong> Every poll has a fixed budget; on timeout the tool returns <code>pending</code> with a <code>resume_token</code>, and the matching status tool continues from it. A timeout never fails silently.</p>
+<p><strong>Writes verify themselves.</strong> A write tool returns read-back <code>checks[]</code> and a <code>verdict</code>; a write with no verification path cannot be published. Writes take an <code>idempotency_key</code>. These two rules are borrowed from the proven <code>nonagenticai_mcp_server</code> tool contract and are not negotiable in the conveyor's registry.</p>
+<h3 id="114-effect-classes-and-gates">11.4 Effect classes and gates</h3>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Examples</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>read</strong></td>
+<td>scrape, search, retrieve, pod status, CI status</td>
+<td>none; audit only</td>
+</tr>
+<tr>
+<td><strong>write</strong></td>
+<td>code write, test run, PR, artifact upload, report assembly</td>
+<td>job authority + audit; no human gate by default</td>
+</tr>
+<tr>
+<td><strong>destructive</strong></td>
+<td>k8s restart/scale/rollback, branch delete, data purge</td>
+<td>approval + dry-run + dual control (<code>ops:write</code>)</td>
+</tr>
+<tr>
+<td><strong>spend</strong></td>
+<td>LLM generation, w2v render, TTS, paid data source</td>
+<td>budget check + ledger</td>
+</tr>
+</tbody>
+</table>
+<p>A binding's ceiling narrows only: a job may lower its effect class at run time, never raise it. The mapping is data on the tool version; it is not inferred from the HTTP method.</p>
+<p><strong>Tool selection is not an LLM decision.</strong> In a procedure run the step names its tool; a step that must choose among tools uses L1 over the bound option set. In an <code>internal_agent</code> run the release's grant set bounds what the agent may choose, and every choice is recorded; the broker never widens the grant.</p>
+<h3 id="115-byo-tools-d42">11.5 BYO tools (D42)</h3>
+<p>A tenant may bring two kinds of tool and only two:</p>
+<ol type="1">
+<li><strong>OpenAPI toolkit</strong> — an OpenAPI 3.1 document imported as a draft toolkit: operations, closed schemas, mappings, effect class per operation (default <code>read</code>), a destination base URL and a credential alias. Publication needs tenant-admin approval and a contract test against a recorded replay.</li>
+<li><strong>Remote MCP server</strong> — a streamable-HTTP MCP endpoint; the conveyor discovers its tools, binds a credential and exposes only the bound subset to the tenant's jobs (binding-scoped discovery).</li>
+</ol>
+<p>Never: uploaded code, arbitrary container images, caller-supplied URLs at call time, or a tenant credential in a prompt. The conveyor never executes tenant code; a tenant that needs executable logic runs its own service and registers it. A tenant toolkit stays tenant-scoped; promoting it to the platform catalogue is a kata/development project with a platform review, never an admin toggle.</p>
+<h3 id="116-tools-that-generate-tools-d43">11.6 Tools that generate tools (D43)</h3>
+<p>Development projects already act through the coding toolkit. Three generation paths, all governed:</p>
+<ol type="1">
+<li><strong>Spec → toolkit.</strong> An OpenAPI document (a new service, or one being changed) is imported as draft operations, contract-tested, then published.</li>
+<li><strong>Service → toolkit.</strong> A new service is scaffolded from <code>template-rust-service</code>, deployed, and its OpenAPI is registered — the tool is the new service, not a wrapper around it.</li>
+<li><strong>Missing operation → tool request.</strong> A procedure step that needs an operation with no tool opens a tool-request card; a development job implements it, publishes the version, and the step is rebound to that pin.</li>
+</ol>
+<p>The pipeline is a governed-asset lifecycle: <code>governed_asset(kind='tool_draft')</code> → validation (schema, effect, egress, credential scope) → security review (a destructive tool needs a named approver) → <code>tools.publish</code> (immutable version) → binding. A tool cannot be published with wildcard egress, a free-form input schema, or a write effect without an idempotency declaration. The tool that publishes a tool is itself a tool bound to the authoring job — and cannot grant itself a wider effect ceiling.</p>
+<p><strong>Tool code lives in the conveyor monorepo (D58).</strong> A new tool is a crate or service inside the conveyor workspace, registered from its own OpenAPI; a migrated tool joins the workspace on the day it is rewritten in Rust. An external service stays bindable as a toolkit meanwhile. Nothing is imported from <code>nonagenticai_mcp_server</code>'s <code>toolkits/</code> (<code>coding</code>, <code>fr</code>) — those are read as reference only (D44).</p>
+<h3 id="117-relationship-to-nonagenticai_mcp_server-d44">11.7 Relationship to <code>nonagenticai_mcp_server</code> (D44)</h3>
+<p><strong>Concepts borrowed (measured 2026-11-11):</strong> the catalog shape — <code>mcp_services</code>/<code>mcp_sources</code> → <code>mcp_tool_versions</code>/<code>mcp_toolkit_versions</code> → <code>mcp_bindings</code> with <code>mcp_credential_profiles</code> → <code>mcp_tool_call_audit</code>; immutable version pinning; the closed Draft 2020-12 schema subset; binding-scoped MCP discovery; the credential broker; the result envelope; write-verify. The server ships two toolkits today — <code>coding</code> (11 operations) and <code>fr</code> (3) — and its <code>mcp_tool_call_audit</code> is the direct model for <code>tool_call</code>. <strong>Not adopted:</strong> ephemeral Kata execution — BYO is declarative only, so the conveyor never runs uploaded code.</p>
+<p><strong>Dependency refused.</strong> The mcp server is a second control plane: Python, its own Postgres queue, its own catalog and runner. The conveyor already owns actions, secrets, entitlements, audit and a durable job queue. One repo, one schema, one queue (owner direction, 2026-11-11). The mcp server remains the <strong>agent platform's</strong> gateway for its own backends; it is that platform's own roadmap, and the conveyor never routes through it. Its <code>coding</code> toolkit (repo provisioning, verified writes, PRs) is the reference for the conveyor's coding toolkit. The <code>fr</code> toolkit retires with fr at cutover (V1 D19).</p>
+<p><strong>Two paths, permanently (D59).</strong> There is no planned convergence: the agent platform keeps its own gateway, and the conveyor broker is not exposed to it. "One audit path" is explicitly not a V2 goal; the conveyor's ledger covers conveyor jobs only (§15.2 #11).</p>
+<h3 id="118-data-model-and-actions">11.8 Data model and actions</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tool</code></td>
+<td>one operation version</td>
+<td>input/output schema, effect, idempotency, timeout, redact, destination alias, status</td>
+</tr>
+<tr>
+<td><code>toolkit</code></td>
+<td>a service's published bundle</td>
+<td>immutable <code>key@version</code>, auth adapter, licence app, owner</td>
+</tr>
+<tr>
+<td><code>tool_binding</code></td>
+<td>job/run access</td>
+<td>tenant-scoped, pinned toolkit versions, effect ceiling, credential alias, enabled</td>
+</tr>
+<tr>
+<td><code>tool_call</code></td>
+<td>the call ledger</td>
+<td>run/step, tool version, input hash, status, latency, bytes, cost</td>
+</tr>
+</tbody>
+</table>
+<p>Reused, not created: V1 <code>secret</code> (credential storage), <code>governed_asset(kind='tool_draft')</code>, <code>event</code>, <code>audit_event</code>, <code>inference_call</code> (for a spend tool that causes model calls). A tool call is <strong>not</strong> an <code>action_invocation</code> and never transitions a card. The actions are the <code>tools.*</code> family in §10.4; each is an <code>ActionSpec</code> like every other action, so it is served over HTTP, MCP and OpenAPI from one declaration.</p>
+<h3 id="119-metrics-health-and-retirement">11.9 Metrics, health and retirement</h3>
+<p>Per tool: calls, success rate, p95 latency, error classes, cost. Per job: tool-budget usage. Every published tool has a <code>tools.probe</code> (read-only health); a probe failure unbinds the tool from new runs (<code>409 tool_not_ready</code>) while in-flight runs finish. A tool with zero calls over one programme cycle is flagged and retired (P10). A schema-drift signature — the backend changed under the contract — opens a kata, not a silent retry.</p>
+<h3 id="1110-object-storage--direct-minio-tenant-separated-d57">11.10 Object storage — direct MinIO, tenant-separated (D57)</h3>
+<p>The conveyor does not depend on <code>artifact_service</code> :8556 or <code>storage-api</code> :8391 for its own bytes. One storage adapter writes and reads the platform's shared MinIO instance directly — not a private store — with tenant separation enforced by key prefix and bucket policy: a mandatory tenant prefix (<code>tenant/&lt;tenant_id&gt;/</code>), project/run prefixes beneath it, server-side encryption, a content hash per object, a size cap, and no bucket administration from a job. Credentials are sealed broker credential profiles; a job never sees an S3 key. <code>artifact_service</code> and <code>storage-api</code> keep serving their existing consumers; the conveyor keeps no compatibility shim by default — whether V1's <code>artifacts.list</code> callers are migrated to the adapter or routed through a shim is settled in T13 (§15.2 #17).</p>
+<hr />
+<h2 id="12-delivery-plan--v2-slices">12. Delivery plan — V2 slices</h2>
+<p>Each slice is proved locally (compose + real Postgres + integration tests) before it is called done; CI runs when a slice integrates and when the repo merges. V2 slices build on V1's S-slices and do not re-open them.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Slice</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>T0</strong></td>
+<td><strong>Model and contracts</strong> — approve V2; the ownership matrix; <code>industry</code>/<code>department</code>/<code>job_catalogue</code>/<code>job_release</code>/<code>job_binding</code>; the decision-ladder types; the internal <code>Executor</code> contract (two live kinds, extensible <code>executor_kind</code>)</td>
+<td>a job is created in the conveyor, a release is published, a binding pins its hash, and a run on a retired binding refuses <code>409 job_binding_stale</code>; no concept has two stores; a test-only third executor kind registers without editing the run path</td>
+</tr>
+<tr>
+<td><strong>T1</strong></td>
+<td><strong>Plan spine</strong> — <code>wbs_node</code>, <code>project_baseline</code>, <code>project_register_item</code>, <code>project_dependency</code>, programme <code>shared_config</code> and cadence; project types; DoD</td>
+<td>one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused</td>
+</tr>
+<tr>
+<td><strong>T2</strong></td>
+<td><strong>Decision ladder</strong> — <code>decision</code>/<code>decision_option</code>/<code>decision_policy</code>/<code>decision_policy_refinement</code>, <code>laya_inference_config</code>; laya client; policy evaluation; the generation split</td>
+<td>a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card</td>
+</tr>
+<tr>
+<td><strong>T3</strong></td>
+<td><strong>PM job</strong> — charter, WBS, baseline, staffing, gate routing, closure</td>
+<td>PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request</td>
+</tr>
+<tr>
+<td><strong>T4</strong></td>
+<td><strong>Kanban coach</strong> — interruption taxonomy, closed remedy set, per-signature uniqueness, depth cap</td>
+<td>an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata</td>
+</tr>
+<tr>
+<td><strong>T5</strong></td>
+<td><strong>Kata</strong> — six Gets, evidence set, pre-registered prediction, candidate, measurement, adoption, propagation</td>
+<td>a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened</td>
+</tr>
+<tr>
+<td><strong>T6</strong></td>
+<td><strong>Development project</strong> — the self-development path on conveyor + one dependency repo</td>
+<td>a real feature lands: lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested</td>
+</tr>
+<tr>
+<td><strong>T7</strong></td>
+<td><strong>Operations</strong> — incidents, runbooks, k8s read actions, the full gated write set, postmortem</td>
+<td>an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable</td>
+</tr>
+<tr>
+<td><strong>T8</strong></td>
+<td><strong>Organisational memory</strong> — lessons, evidence refs, review, promotion to a knowledge source</td>
+<td>a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine</td>
+</tr>
+<tr>
+<td><strong>T9</strong></td>
+<td><strong>TOGAF profile</strong> — architecture project type, phases A–H, contracts, delivery-project compliance</td>
+<td>an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata</td>
+</tr>
+<tr>
+<td><strong>T10</strong></td>
+<td><strong>SAFe cadence</strong> — backlog, WSJF, PI planning, demo, inspect &amp; adapt</td>
+<td>PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons</td>
+</tr>
+<tr>
+<td><strong>T11</strong></td>
+<td><strong>Metrics, metering and maturity</strong> — flow, quality, cost, governance, C0–C5 (thresholds calibrated from real run/approval data and stored as configuration); metering roll-ups (tenant, department, programme, project, job) and drill-down (run, step, call); billing reconciliation</td>
+<td>every metric and every metering level recomputes from rows; the reconciliation with <code>billing_service</code> is exact or opens an incident; a C0–C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged</td>
+</tr>
+<tr>
+<td><strong>T12</strong></td>
+<td><strong>One organisation loop</strong> — the acceptance of V2</td>
+<td>one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget</td>
+</tr>
+<tr>
+<td><strong>T13</strong></td>
+<td><strong>Tool platform</strong> — <code>tool</code>/<code>toolkit</code>/<code>tool_binding</code>/<code>tool_call</code>; the broker; effect classes; credential profiles; the MinIO storage adapter; the coding toolkit and one kag-era toolkit; V1's external actions migrated</td>
+<td>a development job calls coding through the broker (not <code>nonagenticai_mcp_server</code>); a <code>tool_call</code> is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt</td>
+</tr>
+<tr>
+<td><strong>T14</strong></td>
+<td><strong>Estate toolkits</strong> — import wave over the live services: coding fleet, strata, billing and licence reads, webscraper, media_discovery, scientific_processor, lean4_prover, video-compiler, w2v orchestrator, ops read tools; <code>evidence_review</code>, <code>discovery</code> :8807 and the planned AHTAPol services enter as <code>draft</code></td>
+<td>each published toolkit has a probe and one live call; <code>scientific_processor</code> is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish</td>
+</tr>
+<tr>
+<td><strong>T15</strong></td>
+<td><strong>Tool authoring and BYO</strong> — OpenAPI draft import, service-scaffold registration, remote-MCP binding, tenant binding, promotion path</td>
+<td>a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling</td>
+</tr>
+<tr>
+<td><strong>T16</strong></td>
+<td><strong>SOP, RDF/OWL and process-document ingestion</strong> — SOP intake as a governed asset; RDF/OWL/Turtle and BPMN/Visio/draw.io conversion into PKO rows and PDDL procedure drafts; the PKO tables and tenant editing; capability/agent/job design from an SOP; the review gates</td>
+<td>a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a tenant edits a PKO entity and the change is versioned; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds</td>
+</tr>
+<tr>
+<td><strong>T17</strong></td>
+<td><strong>Tenant asset authoring</strong> — chat + document intake producing drafts of every tenant asset (organisation, jobs, procedures, PKO, packs, policies, templates, tool requests), the review queue, publication</td>
+<td>a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant</td>
+</tr>
+</tbody>
+</table>
+<p>Dependencies: T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 <strong>and T13</strong>; T7 after T2/T4 <strong>and T13</strong>; T9/T10 after T1/T3; T8 after T5; T11 continuous; T12 after all; T13 after T2; T14 after T13; T15 after T13 and T6; T16 after T2 and T13; T17 after T16 and T3. T9 and T10 may run in parallel once T1 and T3 exist.</p>
+<p><strong>The first three months of work are T0–T3 plus T13.</strong> They install the organisation spine and the tool spine; everything else is a job that uses them. T16 follows the tool spine and is the first authoring feature built on it; T17 generalises T16 to every tenant asset. The legacy kag and w2v Rust rewrites are governed by <code>docs/SPEC_LEGACY_KAG.md</code> — a separate spec, not a V2 slice; V2 fixes only their direction (D54). A tenant that does not use a V2 aggregate does not ship it (P10).</p>
+<hr />
+<h2 id="13-what-this-buys">13. What this buys</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>V1 today</th>
+<th>V2 target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Work</td>
+<td>projects/cards/runs/approvals</td>
+<td>the same, plus programme cadence, WBS, baselines, registers; a computed portfolio of everything in flight</td>
+</tr>
+<tr>
+<td>Who does the work</td>
+<td>a person creates a project; agents run runs</td>
+<td>a conveyor-owned catalogue of jobs; PM/coach/kata/development/operations staff the loop</td>
+</tr>
+<tr>
+<td>Organisation</td>
+<td>none</td>
+<td>industry → department(s) → job, immutable releases, tenant-scoped bindings</td>
+</tr>
+<tr>
+<td>Procedures</td>
+<td>capability → procedure → step</td>
+<td>+ SOP/RDF/OWL/BPMN ingestion → PKO + PDDL procedures, used to design capabilities, agents and jobs</td>
+</tr>
+<tr>
+<td>Self-contained</td>
+<td>concepts imported from other apps</td>
+<td><strong>the conveyor owns its whole model</strong>; the agent platform is a front end over MCP</td>
+</tr>
+<tr>
+<td>Decisions</td>
+<td>rules + agents + humans, ad hoc</td>
+<td><strong>rule → laya → generation → human</strong>, every decision recorded</td>
+</tr>
+<tr>
+<td>LLM use</td>
+<td>prompts and loops</td>
+<td><strong>generation only</strong>, behind a gate, measured</td>
+</tr>
+<tr>
+<td>Process rigour</td>
+<td>requirements, ADRs, capabilities</td>
+<td>TOGAF ADM, SAFe cadence, PMP artefacts — executable</td>
+</tr>
+<tr>
+<td>Improvement</td>
+<td>evals/benchmark exist</td>
+<td>coach → kata → dev → measure → adopt, one loop</td>
+</tr>
+<tr>
+<td>Self-development</td>
+<td>manual</td>
+<td>development projects on conveyor + dependencies, under gates</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>alerts only</td>
+<td>incident cards, runbooks, k8s/git actions, postmortems</td>
+</tr>
+<tr>
+<td>Tools</td>
+<td>12 ad-hoc external actions</td>
+<td>a governed estate: every cluster service a versioned toolkit, BYO tools, generated tools, every call ledgered</td>
+</tr>
+<tr>
+<td>Metering</td>
+<td>ledger + budgets</td>
+<td>roll-ups at tenant, department, programme, project and job; drill-down to run, step and call; reconciled with billing</td>
+</tr>
+<tr>
+<td>Authoring</td>
+<td>SOP ingestion only</td>
+<td>every tenant asset drafted from chat input and documents, behind review gates</td>
+</tr>
+<tr>
+<td>Proof</td>
+<td>run/approval/action records</td>
+<td>+ decision rows, lesson evidence, baseline/contract traceability</td>
+</tr>
+</tbody>
+</table>
+<p>The unglamorous win: <strong>the organisation's work becomes auditable at the level of a single decision</strong> — which option, which confidence, which policy, which person, which evidence.</p>
+<hr />
+<h2 id="14-risks">14. Risks</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td><strong>Over-abstraction</strong> — the v4 lesson: four <code>wf_*</code> types "serve nothing", the generator was deleted</td>
+<td>P10: no aggregate without a named procedure and a metric; T0–T3 only the spine; kill any table with zero use after one programme cycle</td>
+</tr>
+<tr>
+<td>R2</td>
+<td><strong>Meta-job recursion</strong> — coach cards about coach cards; 9/9 katas failed</td>
+<td>closed triage/remedy sets, per-signature uniqueness, depth cap, evidence-before-kata, failed kata keeps the cord</td>
+</tr>
+<tr>
+<td>R3</td>
+<td><strong>Reimplementation drift</strong> — the conveyor duplicates concepts from the agent platform and they diverge</td>
+<td>the conveyor owns its model (D33); the agent is a client with its own roadmap; concept parity is tested only where a channel contract depends on it; no runtime import</td>
+</tr>
+<tr>
+<td>R4</td>
+<td><strong>LLM decision creep</strong> — routing logic reappears in prompts</td>
+<td>the decision-ladder types; generation result has no transition path; a code-review rule and a negative test per surface</td>
+</tr>
+<tr>
+<td>R5</td>
+<td><strong>Governance theatre</strong> — gates that cannot fail</td>
+<td>every gate ships with a negative test; never-refused gates are flagged; evidence is required</td>
+</tr>
+<tr>
+<td>R6</td>
+<td><strong>Self-development runaway</strong> — agents change the system that judges them</td>
+<td>§9.3: no changing own gates/instruments; merge and deploy are separate human decisions; auto-merge earned and revocable; rollback mandatory</td>
+</tr>
+<tr>
+<td>R7</td>
+<td><strong>Cost/latency</strong> — laya + LLM + evals at thousand-card scale</td>
+<td>budgets per run/job/tenant; laya for choices; caching; the ledger makes spend visible; fail-closed on budget</td>
+</tr>
+<tr>
+<td>R8</td>
+<td><strong>Release drift inside the conveyor</strong> — a live binding points at a release that was superseded</td>
+<td>immutable release; a release change is a new binding and a gate; a retired binding refuses <code>409 job_binding_stale</code>; a run records the release hash it used</td>
+</tr>
+<tr>
+<td>R9</td>
+<td><strong>Scale of the catalogue</strong> — thousands of jobs become unmanageable</td>
+<td>derivation + curation; department/job search; publish in waves; metrics per job; retire by evidence</td>
+</tr>
+<tr>
+<td>R10</td>
+<td><strong>Standards cosplay</strong> — TOGAF/SAFe in name only</td>
+<td>a lean profile with named artefacts and gates; no certification claims; the first architecture project is the test</td>
+</tr>
+<tr>
+<td>R11</td>
+<td><strong>MCP contract break at cutover</strong></td>
+<td>V1 R11 stands: the tool surface is versioned; S06b's tool-contract test; a job release pins the expected tool keys</td>
+</tr>
+<tr>
+<td>R12</td>
+<td><strong>Operations blast radius</strong></td>
+<td>read-first; namespace-scoped service account; dry-run; dual control; andon; no cluster-admin</td>
+</tr>
+<tr>
+<td>R13</td>
+<td><strong>Tool sprawl</strong> — dozens of unowned backends; a tool nobody calls</td>
+<td>one toolkit owner per service; <code>tools.probe</code>; zero-use retirement after a programme cycle (P10); bindings reviewed with the job</td>
+</tr>
+<tr>
+<td>R14</td>
+<td><strong>SSRF / credential leak</strong> — a procedure or a tenant reaches an arbitrary URL or exfiltrates a secret</td>
+<td>destination aliases only; sealed credential injection; redaction fields; response caps; BYO destinations reviewed at registration</td>
+</tr>
+<tr>
+<td>R15</td>
+<td><strong>Tool contract drift</strong> — a backend changes under a published schema</td>
+<td>pinned toolkit version; scheduled probe; a drift signature unbinds and opens a kata; a changed contract is a new version, never a silent patch</td>
+</tr>
+<tr>
+<td>R16</td>
+<td><strong>BYO blast radius</strong> — a tenant tool writes or spends beyond its station</td>
+<td>declarative-only BYO; effect ceiling per binding; tenant rate/budget limits; promotion requires platform review</td>
+</tr>
+<tr>
+<td>R17</td>
+<td><strong>Authoring injection / knowledge poisoning</strong> — an SOP, document, diagram or chat message carries instructions or false doctrine into a procedure or any tenant asset</td>
+<td>every source is untrusted input; every derived artefact is a draft behind a human gate; provenance is recorded; no source can grant a tool, widen an effect ceiling or change a policy; the PKO is reviewed and versioned</td>
+</tr>
+<tr>
+<td>R18</td>
+<td><strong>Tenant-configuration sprawl</strong> — thousands of per-case refinements and autonomy policies diverge, and nobody can explain why a decision happened</td>
+<td>platform defaults; every refinement and policy is versioned and gated; every decision row pins the policy, refinement and laya config versions; a per-tenant configuration report; unused refinements are retired (P10)</td>
+</tr>
+<tr>
+<td>R19</td>
+<td><strong>The AHTAPol plan rests on archived kag components</strong> — its service documents assume the kag gateway, <code>karma_service</code>, <code>hirag_service</code> and <code>kag_orchestrator</code>, all archived and undeployed</td>
+<td>re-home each function per <code>SPEC_LEGACY_KAG.md</code> before the AHTAPol slice that needs it; no archived component may be bound as a tool; the slice gates on the re-homed service's probe, never on the old name</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="15-decisions-and-open-questions">15. Decisions and open questions</h2>
+<h3 id="151-v2-decisions-d28d61-d1d27-of-v1-stand-except-d14-and-d22-as-amended-below">15.1 V2 decisions (D28–D61; D1–D27 of V1 stand, except D14 and D22 as amended below)</h3>
+<p><strong>D28–D61 are this spec's decisions.</strong> They are written as answers because a spec that only lists questions is not reviewable; each can be accepted, amended or rejected as a unit, and the entries carrying an owner ruling are marked with its date. D33, D41, D43 and D45 carry the first review's owner rulings of 2026-11-11; D46–D48 record the procedure/SOP model, the SOP feature and the scope that review produced; <strong>D49–D55 carry the second review's owner rulings of 2026-11-11</strong> (portfolio and programme, tenant configuration, per-case laya config, metering, PKO, the legacy-kag direction and tenant asset authoring); <strong>D56–D60 carry the third review's rulings of 2026-11-11</strong> (discovery, live-estate classification and direct MinIO storage, the tool monorepo, the permanently separate agent tool path, and the AHTAPol/w2v tenant scope); <strong>D61 records the independent runtime review's recommendation</strong> — executor seam to be built in T0, external runtime deferred — and is proposed for acceptance with the rest.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Decision</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>D28</strong></td>
+<td>Organisation model</td>
+<td><strong>Industry → department(s), ordered → job</strong> is first-class; a job is a configured position with a charter, capability binding, procedure, inference config, knowledge/memory pins, tool grants, decision options, limits and gates. Adopted from the agent platform's KH concepts (D106–D115) and <strong>implemented by the conveyor</strong> (D33); there is no external contract</td>
+</tr>
+<tr>
+<td><strong>D29</strong></td>
+<td>Work hierarchy</td>
+<td><strong>Tenant → portfolio (computed) / programme (shared config + project dependency graph) → project → WBS/deliverable → work package (card) → run → step/attempt</strong> (D49 refines the portfolio/programme definition); project types select phase templates, gate sets and job families; programme cadence carries the SAFe rhythm</td>
+</tr>
+<tr>
+<td><strong>D30</strong></td>
+<td>Decision ladder</td>
+<td><strong>Rule → laya → generation → human.</strong> An LLM never selects, routes, classifies or approves; a generated output is a draft and applying it is a gated action. Options and policies are rows; every L1 decision is recorded with its answer, probabilities where the type provides them, and confidence</td>
+</tr>
+<tr>
+<td><strong>D31</strong></td>
+<td>Meta-jobs</td>
+<td><strong>PM, kanban coach, kata, development and operations are ordinary jobs</strong> in the same catalogue and use the same card/run/approval primitives; no hard-coded role logic; the authority matrix is data</td>
+</tr>
+<tr>
+<td><strong>D32</strong></td>
+<td>Executable rigour</td>
+<td><strong>TOGAF ADM, SAFe cadence and PMP artefacts are executable aggregates</strong>, not documents: phases are WBS nodes, artefacts are governed assets, gates are approvals, evidence is traceable. A lean profile, not a certification claim</td>
+</tr>
+<tr>
+<td><strong>D33</strong></td>
+<td><strong>Ownership — the conveyor owns everything</strong></td>
+<td><strong>The conveyor owns the whole model</strong>: industry, department, job, job release, knowledge layers/kinds, packs, providers, laya gate questions/options, tool grants, channels, and the work/governance/measurement it already owned. <strong>The agent platform is a user-interaction front end over MCP — a conversation surface like Telegram — with its own autonomy configuration and its own roadmap.</strong> It is not a catalogue, an executor or a system of record for conveyor work. The conveyor reuses the agent's ideas (and where useful its code) but is self-contained (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D34</strong></td>
+<td>Self-development</td>
+<td><strong>Development projects change conveyor and its dependency repos</strong> through lane/PR/CI/review/merge/deploy/verify; the system cannot change its own gates or instruments; merge and deploy are separate human decisions; auto-merge is earned and revocable, and its conditions are tenant configuration (D50)</td>
+</tr>
+<tr>
+<td><strong>D35</strong></td>
+<td>Operations</td>
+<td><strong>Operations is a job family</strong> acting on k8s and git: incidents as cards, runbooks as procedures, read-first actions, the full gated write set (restart, scale, rollback, flag flip) with dry-run and the tenant's configured approvals (default human dual control), postmortems feeding kata</td>
+</tr>
+<tr>
+<td><strong>D36</strong></td>
+<td>Organisational memory</td>
+<td><strong>Lessons are proposed, reviewed and promoted</strong>: ≥2 independent evidence references and a person's review before a lesson can become a knowledge source draft; execution → memory → lesson → knowledge</td>
+</tr>
+<tr>
+<td><strong>D37</strong></td>
+<td>Metrics and maturity</td>
+<td>Flow, quality, cost and governance metrics and C0–C5 maturity are <strong>computed read models over rows</strong>, never stored opinions; the C0–C5 level thresholds are calibrated from real run/approval data in T11 and stored as configuration (D50), not hard-coded; a gate that never refused is flagged</td>
+</tr>
+<tr>
+<td><strong>D38</strong></td>
+<td>Job binding</td>
+<td>A binding pins <code>job_key</code> + <code>release_hash</code> + an immutable <code>release_snapshot</code> + capability/procedure/executor; a release change is a new binding and a gate; a run against a retired binding or a release that is not its pin refuses <code>409 job_binding_stale</code> before any model call. The check is internal — no catalogue call, no caller-declared hash</td>
+</tr>
+<tr>
+<td><strong>D39</strong></td>
+<td>Scale</td>
+<td>Thousands of jobs are catalogue rows and bindings, not processes; runs are durable jobs bounded by per-run budgets; WIP limits, leases and <code>uq_run_live</code> are the concurrency controls</td>
+</tr>
+<tr>
+<td><strong>D40</strong></td>
+<td>Lean governance</td>
+<td>No speculative aggregate: a table exists because a named procedure uses it and a metric reads it; the T0–T3 spine ships first; an unused aggregate is removed, not defended</td>
+</tr>
+<tr>
+<td><strong>D41</strong></td>
+<td><strong>Tool estate ownership</strong></td>
+<td><strong>The conveyor owns tool access in full</strong> — <code>tool</code>/<code>toolkit</code> versions, the release's tool grants, <code>tool_binding</code>, credential profiles, the <code>tool_call</code> ledger, and the broker that executes every call. There is no agent-side grant and no second tool path (owner, 2026-11-11). The grant names ops; the binding pins versions and credentials; both are conveyor rows</td>
+</tr>
+<tr>
+<td><strong>D42</strong></td>
+<td><strong>BYO tools</strong></td>
+<td>A tenant may bring <strong>OpenAPI toolkits</strong> and <strong>remote MCP servers</strong>; the conveyor never executes tenant code and never accepts a caller-supplied URL at call time. Tenant tools are tenant-scoped, effect-classed and rate-limited; promotion to the platform catalogue is a development project with a platform review</td>
+</tr>
+<tr>
+<td><strong>D43</strong></td>
+<td><strong>Tool generation</strong></td>
+<td>Development projects <strong>generate tools</strong> through a governed authoring pipeline: OpenAPI import, service scaffold, or a tool-request card → validation → security review → publication → binding. <strong>Approvals are tenant-configurable and default to a human approval</strong>; a destructive tool needs a named approver. The publishing job cannot widen its own effect ceiling. The same default applies to every approval and question (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D44</strong></td>
+<td><strong><code>nonagenticai_mcp_server</code></strong></td>
+<td><strong>Concepts borrowed, dependency refused.</strong> The conveyor implements its own registry, broker, credential injection and call ledger; it never routes through <code>nonagenticai_mcp_server</code> at runtime. The mcp server remains the agent platform's gateway for its own backends; it is that platform's own roadmap, and the conveyor neither uses nor audits it</td>
+</tr>
+<tr>
+<td><strong>D45</strong></td>
+<td><strong>Tool effects and proof</strong></td>
+<td>Every tool declares one of <strong>read / write / destructive / spend</strong>; a binding's ceiling narrows only; writes verify themselves with read-back checks and an idempotency key; destructive calls need a dry-run and the tenant's configured approvals <strong>in every environment, defaulting to human dual control</strong>; spend calls need a budget; a tool with a failing probe cannot be bound to new runs. <strong>The kata runs as its own tenant</strong>, so its autonomy policy never inherits the work tenant's (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D46</strong></td>
+<td><strong>Procedure and prompt model</strong></td>
+<td>A procedure is a sequence of prompt parts: each step is an action (PDDL), a tool call or a gate. The <strong>internal agent</strong> executes a PDDL action with a prompt assembled at run time from four sources — knowledge (domain/procedural), episodic memory, the PDDL request, and the curated tool list. Two <strong>live</strong> executor kinds: <code>procedure</code> and <code>internal_agent</code>, behind one internal <code>Executor</code> contract with an extensible kind (D61, proposed); no external executor today (V1 D22 amended)</td>
+</tr>
+<tr>
+<td><strong>D47</strong></td>
+<td><strong>SOP ingestion</strong></td>
+<td>Procedure design and management is a first-class feature: a tenant supplies SOPs (PDF, web URL, other; single or batch); the conveyor harvests and curates the domain knowledge and converts the SOP into <strong>procedural knowledge (the Procedural Knowledge Ontology)</strong> and a <strong>procedure draft with PDDL steps</strong>. The same pipeline designs capabilities, agents and jobs. It uses the web/research tools (and <code>lean4_prover</code> where formal checking helps). Every SOP-derived artefact is a draft behind a human gate; an unreviewed SOP never binds a job</td>
+</tr>
+<tr>
+<td><strong>D48</strong></td>
+<td><strong>Scope</strong></td>
+<td>The conveyor is a <strong>general engine for intelligent work execution</strong> for <strong>project, continuous-line and line-management work</strong>. It starts with a real <strong>IT department — development and operations</strong> — because it must develop and operate itself, then extends to any capability/department in any industry. <strong>It does not do customer care</strong>: that remains the agent platform's own product. Human-in-the-loop is configurable per tenant and may be offloaded to the agent platform over MCP with the agent's own autonomy configuration</td>
+</tr>
+<tr>
+<td><strong>D49</strong></td>
+<td><strong>Portfolio and programme</strong></td>
+<td>A <strong>portfolio</strong> is <em>all projects and programmes in flight for a tenant</em> — a computed read model, never a row. A <strong>programme</strong> is <em>a set of projects with shared configuration and project-level dependencies</em>: its <code>shared_config</code> (knowledge pins, job families, approval-policy defaults, budget, cadence) is inherited by its projects, and <code>project_dependency</code> edges (<code>blocks | needs | supersedes | informs</code>) are the dependency graph. A project may stand alone (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D50</strong></td>
+<td><strong>Tenant configuration over code</strong></td>
+<td>Almost everything is tenant-configurable: policies, thresholds, gate conditions, approval kinds, limits and autonomy. Every such value is a versioned tenant-scoped row with a platform default; the database model, the UI and the code accommodate it, and code implements mechanisms, never policy values (P11). Auto-merge is one instance: its conditions are configuration, not a hard-coded track record (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D51</strong></td>
+<td><strong>Per-case decision configuration</strong></td>
+<td>Laya thresholds are configured by each tenant per decision case: a platform <code>decision_policy</code> defines the case; a tenant <code>decision_policy_refinement</code> overrides the threshold/rule, fail action and optionally the laya inference config, and <code>laya_inference_config</code> pins model, params and timeout per tenant. Every decision records the policy, refinement and config versions it used (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D52</strong></td>
+<td><strong>Metering</strong></td>
+<td>Metering is fine-grained and shown at every organisational level: roll-ups at tenant, department/industry, programme and project; job-level cost; drill-down to run, step and individual call. Cost is derived at read time from <code>inference_call</code>/<code>tool_call</code>; <code>billing_service</code> remains the charging system and the conveyor reconciles to it (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D53</strong></td>
+<td><strong>PKO and process documents</strong></td>
+<td>The <strong>action space</strong> (procedure steps in PDDL) and the <strong>procedural knowledge space</strong> (the PKO) are separate concepts. The PKO is relational, conveyor-owned and tenant-editable (<code>pko_release</code>/<code>pko_entity</code>/<code>pko_relation</code>); RDF/OWL/Turtle documents are ingested and converted into draft PKO rows, never read at runtime. BPMN 2.0, Visio and draw.io exports ingest on the same path into procedure drafts and PKO rows. Every derived artefact is a draft behind a review gate (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D54</strong></td>
+<td><strong>Legacy kag and w2v</strong></td>
+<td>Legacy kag is <strong>rewritten in Rust</strong>, not revived: every kag repo is archived and no kag/neo4j/hirag/karma deployment exists. The home of each capability — strata_ingest, strata_rag or the conveyor — is decided in <code>docs/SPEC_LEGACY_KAG.md</code>; neo4j, hirag and karma are explicitly undecided there. The w2v stage fleet <strong>migrates into the conveyor and is rewritten in Rust</strong>. Python sources may be re-architected rather than line-ported (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D55</strong></td>
+<td><strong>Tenant asset authoring</strong></td>
+<td>The platform can create <strong>all tenant assets from tenant chat input and documents</strong>: organisation, jobs, capabilities, procedures, PKO, knowledge packs, project templates, policies and tool requests. Every output is a draft behind a review gate; asset creation is dependency-ordered; a chat message or document can never grant a tool, widen an effect ceiling or change an approval policy. The asset matrix and first wave ship with T17 (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D56</strong></td>
+<td><strong>Discovery tool</strong></td>
+<td><code>scientific_discovery</code> is not a separate service: the capability enters the catalogue as the <strong>AHTAPol <code>discovery</code> :8807</strong> toolkit, status <code>draft</code> until its slice deploys it and a probe passes. One name for one capability; no second discovery service is created (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D57</strong></td>
+<td><strong>Live-estate classification and storage</strong></td>
+<td><code>video-compiler</code> :8200 <strong>is a job tool</strong>. <code>provisioning</code> :8546 stays control-plane automation used by the existing website and provisioning automation — not a conveyor tool. <code>modality-gateway</code> :8890 is generation infrastructure, folded into <code>mlx-api</code> (which may itself be rewritten in Rust) — not a job tool. <code>artifact_service</code> :8556 and <code>storage-api</code> :8391 are <strong>not conveyor dependencies</strong>: the conveyor writes and reads bytes directly to <strong>MinIO</strong> with tenant separation and shared platform use (§11.10) (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D58</strong></td>
+<td><strong>Tool code in the conveyor monorepo</strong></td>
+<td>The conveyor is <strong>one large repo</strong>: the platform plus every new or rewritten tool. A legacy Python service stays external and bindable as a toolkit until it is rewritten in Rust, at which point it joins the workspace. No tool is imported from <code>nonagenticai_mcp_server</code>; its two toolkits are reference only (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D59</strong></td>
+<td><strong>Two tool paths, permanently</strong></td>
+<td>The agent platform keeps its own gateway (<code>nonagenticai_mcp_server</code>) for its own backends; the conveyor broker serves conveyor jobs only. There is <strong>no planned convergence</strong> and the broker is not exposed to the agent. One ledger covers conveyor calls; the agent's calls are its product (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D60</strong></td>
+<td><strong>AHTAPol and w2v scope</strong></td>
+<td>The conveyor <strong>covers the AHTAPol implementation and the w2v product</strong> (owner, 2026-11-11 — "the conveyor will also cover the AHTAPol implementation"; every tool AHTAPol and w2v use is in the estate): their projects run as conveyor work and their services are estate toolkits. <strong>AHTAPol is its own tenant, industry <code>health-technology-assessment</code>; w2v is its own tenant, industry <code>media</code></strong> — neither sits under <code>nonagentic</code>. The first engineering tenant remains <code>nonagentic</code>/software (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>D61</strong></td>
+<td><strong>Executor seam; external runtime deferred</strong></td>
+<td>The conveyor keeps <strong>one runtime</strong>: <code>procedure</code> and <code>internal_agent</code> are two implementations of one internal <code>Executor</code> contract, and <code>executor_kind</code> is an extensible enum rather than a branch through the run path. <strong>An external runtime is an explicit non-goal</strong> until four conditions hold: a generic work-packet ingress returning per-step evidence the conveyor can verify (not outcome-level); governance at the boundary (a produce-only runtime, the conveyor ships); separate owners and roadmaps; and it beats the internal agent on the conveyor's own benchmark. D33/D44 stand — the agent platform is a front end, not a runtime — and D46's two live kinds stand. The product boundary is <code>/mcp</code>; only stateless infrastructure is shared (inference-router, strata, MinIO, tool backends). The seam preserves the option at near-zero cost (proposed 2026-11-11, from the independent runtime review)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="152-open-questions-at-review">15.2 Open questions at review</h3>
+<p><strong>Resolved 2026-11-11 (owner, second review):</strong> #1 portfolio and programme (D49); #3 laya thresholds (D51); #4 auto-merge and every gate condition (D50); #7 metering (D52); #8 legacy kag (D54); #9 external-source migration (D54); #12 n8n (closed); #13 PKO depth (direction fixed in D53). Resolved in the first review: #2 (D33), #5 (D45/D48), #10 and #11 (the agent platform's own product, D33/D44). <strong>Resolved 2026-11-11 (owner, third review):</strong> the discovery tool is the AHTAPol <code>discovery</code> :8807 draft (D56); the live-estate classification and direct MinIO storage (D57); tool code in the conveyor monorepo (D58); the two tool paths stay separate permanently, re-closing #11 under D59; AHTAPol and w2v are conveyor-covered, each its own tenant and industry (D60). <strong>Proposed 2026-11-11 (D61, from the independent runtime review; open until accepted):</strong> the runtime split with the agent platform is closed — one runtime, two live executor kinds behind an internal seam.</p>
+<ol type="1">
+<li><del>Programme vs portfolio.</del> <strong>Resolved (D49):</strong> a <strong>portfolio</strong> is every project and programme in flight for a tenant — a computed read model, no row; a <strong>programme</strong> is a set of projects with shared config and project-level dependencies.</li>
+<li><del>Catalogue home.</del> <strong>Resolved:</strong> the conveyor owns the catalogue, the release and the binding (D33); there is no manifest contract.</li>
+<li><del>Laya model and thresholds.</del> <strong>Resolved (D51):</strong> thresholds are tenant configuration per decision case, with a tenant-scoped laya inference config; platform defaults apply where a tenant sets nothing.</li>
+<li><del>Auto-merge policy.</del> <strong>Resolved (D50):</strong> every gate condition — track record, path scope, reviewer requirement, expiry — is a tenant configuration row; the database model, the UI and the code read the policy. The default is off; there is no hard-coded track record.</li>
+<li><del>Ops write scope in v1.</del> <strong>Resolved:</strong> the full write set (restart, scale, rollback, flag flip) ships; autonomy is tenant-configured, defaulting to human approval (D45/D48).</li>
+<li><strong>First job set.</strong> The departments in §4.6 are the proposal; the first jobs and their charters are authored in T0/T3, not generated. The first real job remains conveyor maintenance; the first department set is IT development and operations (D48). <em>Open.</em></li>
+<li><del>Metering.</del> <strong>Resolved (D52):</strong> fine-grained metering with roll-ups at tenant, department, programme, project and job, and drill-down to run, step and call; cost derived from the ledgers; reconciled with <code>billing_service</code>.</li>
+<li><del>Legacy kag.</del> <strong>Resolved direction (D54):</strong> a Rust rewrite; the home of each capability — including neo4j, hirag and karma — is decided in <code>docs/SPEC_LEGACY_KAG.md</code>; until that spec lands no legacy kag service is a conveyor tool.</li>
+<li><del>External source migration.</del> <strong>Resolved direction (D54):</strong> migrate or rewrite into the conveyor's estate; re-architecture is allowed where a line-port would not fit; external sources stay behind services until then.</li>
+<li><del>mcp_server migration.</del> <strong>Closed:</strong> the mcp server is the agent platform's own gateway; it is outside the conveyor's model (D44). There is no migration to plan.</li>
+<li><del>Agent-side tool calls.</del> <strong>Closed:</strong> the agent front end's own tool calls are its product; only calls through the conveyor broker enter the <code>tool_call</code> ledger (D41/D44).</li>
+<li><del>n8n legacy visibility.</del> <strong>Closed:</strong> n8n is reference only — a previous design that is superseded. No operations job reads its execution history; it is not a tool.</li>
+<li><del>Procedure ontology depth.</del> <strong>Resolved direction (D53):</strong> the action space (PDDL steps) and the procedural knowledge space (PKO) are separate; the PKO is relational, conveyor-owned and tenant-editable, fed by RDF/OWL ingestion. How deep the ontology goes and whether <code>lean4_prover</code> checks are mandatory for a procedure class are decided by the first T16 pilots.</li>
+<li><strong>Tenant asset authoring — first wave.</strong> D55 fixes the concept; which asset types ship first, the review depth per asset type, and whether a dedicated setup project type is needed are decided in T17. <em>Open.</em></li>
+<li><strong>w2v migration order.</strong> D54 fixes that the stage fleet moves into the conveyor and is rewritten in Rust; which stage migrates first and how the live fleet and the rewrite coexist are decided in <code>docs/SPEC_LEGACY_KAG.md</code>. <em>Open.</em></li>
+<li><strong>Programme shared-config keys.</strong> T1 authors the first key set; which keys a programme may lock and which a project may override is tenant policy. <em>Open.</em></li>
+<li><strong><code>artifact_service</code> compatibility.</strong> D57 removes the dependency; whether V1's <code>artifacts.list</code> callers move to the MinIO adapter inside T13, or a temporary shim is kept, is a T13 implementation decision. <em>Open.</em></li>
+<li><strong><code>mlx-api</code> consolidation.</strong> <code>modality-gateway</code> folds into <code>mlx-api</code>, which may be rewritten in Rust; the owning repo, the rewrite order and how the w2v stages call it are decided with the w2v migration (<code>SPEC_LEGACY_KAG.md</code>). <em>Open.</em></li>
+<li><del>AHTAPol and w2v tenant shape.</del> <strong>Resolved (D60):</strong> AHTAPol is its own tenant with industry <code>health-technology-assessment</code>; w2v is its own tenant with industry <code>media</code>. Neither sits under <code>nonagentic</code>. The <strong>first AHTAPol job set</strong> is still authored with its implementation spec. <em>Job set open.</em></li>
+<li><strong><code>discovery</code> :8807 build slice.</strong> The toolkit is <code>draft</code>; which slice builds the service (the AHTAPol implementation or a conveyor tool slice), and the first job bound to it, is settled when that slice opens. <em>Open.</em></li>
+<li><strong>Runtime split with the agent platform.</strong> <strong>Proposed direction (D61, from the independent runtime review):</strong> the conveyor keeps one runtime; two live executor kinds sit behind one internal contract, and an external runtime is deferred until D61's four conditions hold. The product boundary stays <code>/mcp</code>; only stateless infrastructure is shared (inference-router, strata, MinIO, tool backends). <em>Open until D61 is accepted; if rejected, decide the split here.</em></li>
+</ol>
+<hr />
+<h2 id="appendix-a--vocabulary">Appendix A — Vocabulary</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+<th>Not to be confused with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Industry / department / job</strong></td>
+<td>the organisational placement of a position</td>
+<td>a tenant, a project, a card</td>
+</tr>
+<tr>
+<td><strong>Job</strong></td>
+<td>a configured position with a charter, capability binding, procedure, inference config and authority</td>
+<td><code>capability</code> (an ability), <code>capability_agent</code> (a conveyor-local executor config)</td>
+</tr>
+<tr>
+<td><strong>Capability</strong></td>
+<td>what the organisation can do (design, build, test, govern, operate)</td>
+<td>a job (who does it)</td>
+</tr>
+<tr>
+<td><strong>Procedure</strong></td>
+<td>executable documentation: ordered steps, each an action + optional gate</td>
+<td>a job (the position), a run (one attempt)</td>
+</tr>
+<tr>
+<td><strong>Card</strong></td>
+<td>the work package; the unit of assignment</td>
+<td>a run (one execution), a conversation turn</td>
+</tr>
+<tr>
+<td><strong>Run</strong></td>
+<td>one attempt at a card through an executor</td>
+<td>a job (the position), a card (the assignment)</td>
+</tr>
+<tr>
+<td><strong>Executor</strong></td>
+<td>the mechanism that executes a run: <code>procedure</code> or <code>internal_agent</code> behind one contract</td>
+<td>a job (the position), a runtime backend</td>
+</tr>
+<tr>
+<td><strong>Approval</strong></td>
+<td>a decision/gate; a question is an approval</td>
+<td>a comment, a notification</td>
+</tr>
+<tr>
+<td><strong>Binding</strong></td>
+<td>the join of a job to its immutable release, capability, procedure and executor</td>
+<td>the release row itself</td>
+</tr>
+<tr>
+<td><strong>Portfolio</strong></td>
+<td>every project and programme in flight for a tenant — a computed view, never a row</td>
+<td>a programme (a set of projects with shared config)</td>
+</tr>
+<tr>
+<td><strong>Programme</strong></td>
+<td>a set of projects with shared configuration and project-level dependencies; carries budget and cadence</td>
+<td>a project (a temporary endeavour), the portfolio (a computed view)</td>
+</tr>
+<tr>
+<td><strong>Kata</strong></td>
+<td>a system-improvement job using the six Gets</td>
+<td>a bug fix, a retry</td>
+</tr>
+<tr>
+<td><strong>Coach</strong></td>
+<td>the flow-protection job; triage + bounded remedies</td>
+<td>a PM (plan and scope)</td>
+</tr>
+<tr>
+<td><strong>Laya</strong></td>
+<td>the System-1 calibrated choice/score/noul model</td>
+<td>an LLM (generation)</td>
+</tr>
+<tr>
+<td><strong>Tool</strong></td>
+<td>one typed callable operation on a backend (<code>&lt;service&gt;.&lt;operation&gt;</code>)</td>
+<td>a conveyor action, a capability</td>
+</tr>
+<tr>
+<td><strong>Toolkit</strong></td>
+<td>an immutable, versioned bundle of one service's tools</td>
+<td>a package, a repo</td>
+</tr>
+<tr>
+<td><strong>Tool binding</strong></td>
+<td>tenant-scoped access to pinned toolkit versions with an effect ceiling</td>
+<td>a tool grant (the release's op allowlist)</td>
+</tr>
+<tr>
+<td><strong>Tool call</strong></td>
+<td>one audited invocation through the broker</td>
+<td>an <code>action_invocation</code></td>
+</tr>
+<tr>
+<td><strong>Storage adapter</strong></td>
+<td>the conveyor's own MinIO client with tenant-separated prefixes and sealed credentials</td>
+<td><code>artifact_service</code>, <code>storage-api</code>, an S3 key in a prompt</td>
+</tr>
+<tr>
+<td><strong>Effect class</strong></td>
+<td>read / write / destructive / spend — the gate a call must pass</td>
+<td>a role scope</td>
+</tr>
+<tr>
+<td><strong>PDDL</strong></td>
+<td>Planning Domain Definition Language — the notation a procedure step is written in</td>
+<td>a prompt, a task description</td>
+</tr>
+<tr>
+<td><strong>Action space</strong></td>
+<td>the PDDL step: an action with preconditions and effects over typed facts, inside a procedure</td>
+<td>the PKO (the knowledge that names and constrains it)</td>
+</tr>
+<tr>
+<td><strong>PKO</strong></td>
+<td>the Procedural Knowledge Ontology — relational entities and relations describing tasks, steps, roles, artefacts and constraints, ingested from SOPs, RDF/OWL and process diagrams</td>
+<td>a procedure (the executable sequence), the PDDL action space</td>
+</tr>
+<tr>
+<td><strong>Decision policy refinement</strong></td>
+<td>a tenant's versioned override of a platform decision case (threshold/rule, fail action, laya config)</td>
+<td>the platform <code>decision_policy</code> itself</td>
+</tr>
+<tr>
+<td><strong>Authoring</strong></td>
+<td>the job family that drafts tenant assets from chat input and documents</td>
+<td>a chat assistant (it drafts; it never publishes)</td>
+</tr>
+<tr>
+<td><strong>SOP</strong></td>
+<td>a standard operating procedure a tenant supplies (PDF, URL, document) and the conveyor converts</td>
+<td>the procedure itself, a prompt</td>
+</tr>
+<tr>
+<td><strong>Continuous line</strong></td>
+<td>standing, repeatable work (operations) as opposed to a temporary project</td>
+<td>a project (a temporary endeavour)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="appendix-b--v1-decisions-retained-amended-superseded">Appendix B — V1 decisions: retained, amended, superseded</h2>
+<table>
+<thead>
+<tr>
+<th>V1 decision</th>
+<th>V2 status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1–D5, D7–D17 (build location, parity, scope, UI, data, cutover, procedures, API, identity, channels)</td>
+<td><strong>Retained</strong></td>
+</tr>
+<tr>
+<td>D6 (n8n later — in-app engine + <code>egui_xyflow</code> editor)</td>
+<td><strong>Retained in V1, clarified by V2</strong>: V1 S13 owns the in-app engine and the internal agent loop (<code>agent.run</code>) and re-authors the flows as procedures; V2 uses that engine as its procedure executor. The n8n product itself is reference only — a superseded design, not a tool (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td>D18 (agent interface via <code>mcp_server</code>)</td>
+<td><strong>Already superseded by V1's own D19</strong> (2026-11-08); the surviving rule — a question is an approval — is carried into §6.6</td>
+</tr>
+<tr>
+<td>D19 (agent calls the conveyor's <code>/mcp</code>)</td>
+<td><strong>Retained</strong>; the agent platform is a user-interaction front end over MCP (D33)</td>
+</tr>
+<tr>
+<td>D20 (capability/knowledge/memory)</td>
+<td><strong>Extended</strong> by D28 (organisation layer), D33 (ownership), D36 (lessons), D37 (metrics). One clarification: the conveyor owns the job release and its knowledge pins; there is no second copy in the agent platform</td>
+</tr>
+<tr>
+<td>D21 (MCP tasks) / D22 (executor model)</td>
+<td><strong>D21 retained. D22 amended by D46; D61 (proposed) adds the seam</strong>: two live executor kinds (<code>procedure</code>, <code>internal_agent</code>) behind one internal <code>Executor</code> contract, with an extensible kind once D61 is accepted; the external agent executor is retired; an external runtime is a non-goal until D61's conditions hold; the conveyor never depends on <code>agent</code></td>
+</tr>
+<tr>
+<td>D23 (inference ledger/prompt audit)</td>
+<td><strong>Retained</strong>; D30 adds the decision ledger beside it</td>
+</tr>
+<tr>
+<td>D24–D27 (benchmark, eval, hillclimb, compiled prompts)</td>
+<td><strong>Retained</strong>; they are the instruments D32/D37/P5 rely on. D27 governs every prompt the conveyor runs, including the internal agent's (§7.7)</td>
+</tr>
+<tr>
+<td>D19's statement that <code>nonagenticai_mcp_server</code> remains the agent platform's gateway for every other backend</td>
+<td><strong>Retained for the agent platform; amended for the conveyor</strong> by D44: the conveyor implements its own broker and never routes through it</td>
+</tr>
+<tr>
+<td>D14 (adjacent services — <code>artifacts</code> not absorbed)</td>
+<td><strong>Amended by D57</strong>: <code>artifact_service</code>/<code>storage-api</code> stay outside, but the conveyor does not call them for its own bytes — it uses MinIO directly under tenant prefixes</td>
+</tr>
+<tr>
+<td>No V1 decision is superseded <strong>by V2</strong></td>
+<td>D18 was superseded by V1's own D19; D6 is clarified (V1's in-app engine is the executor; the n8n product is reference only); D14 is amended by D57; V2 adds D28–D61 and does not re-open the V1 build</td>
+</tr>
+</tbody>
+</table>
+<h2 id="appendix-c--what-we-carry-from-the-old-design-and-what-we-delete">Appendix C — What we carry from the old design, and what we delete</h2>
+<p><strong>Carried (concepts):</strong> PM owns the project structure and is the only project writer after the request; per-phase and per-artefact sign-offs; WIP limits on ready/doing; one coach card per interruption; the closed remedy set; the six Gets; unique open kata signature; a failed kata keeps the andon cord until a person releases it; "no data, no improvement"; measure live callers before deleting anything. One deliberate change: the old kata could not touch <strong>procedures</strong> (measured 0 of 334 active flows); V2's procedures are first-class and kata may change them — the old exclusion was a measurement of zero use, not a principle.</p>
+<p><strong>Deleted (mechanism):</strong> Planka as the state owner; 280 generated card-type × list flows; the flow generator; four <code>wf_*</code> types; the open-ended coach LLM rung; kata pausing the whole conveyor for 30–45 minutes; duplicate card birth (non-idempotent plumbing); 35 uncovered error exits; the Python substrate.</p>
+<p><strong>Measured evidence:</strong> E32 duplicate card birth; 35 uncovered error exits E1–E35; the kata record showed no kata closed (the source records a moving count — 9, then 10, then 11 the same day — and warns against quoting it); the generator deleted because "the live flow is the truth" (<code>n8n-designs/design/choices/v4</code>, <code>kata_v1.html</code>).</p>
+<hr />
+<p><em>End of SPEC V2. The V1 build record remains <code>docs/SPEC.md</code>; the slice plans remain <code>docs/plans/</code>. On approval, this file is registered in <code>~/.claude/plans/program/INDEX.md</code>, the ownership matrix is signed, and T0 opens.</em></p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/SPEC_V2.md</code> at build time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

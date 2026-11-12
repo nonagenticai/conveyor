@@ -1,0 +1,163 @@
+# security_analysis — uses tools to find security flaws (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (the type's inputs/outputs/acceptance and rules
+# container_read_exec, no_reclassify_target) and
+# n8n-designs/design/choices/v4/capabilities/analysis.yaml (text, phase, item_kinds, inspect
+# criteria). Items are code, dependency and iac; the fixes are planned from the report in a later
+# phase, never created here.
+card_type: security_analysis
+capability: analysis
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: security_analysis
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: security_analysis.ready
+    title: Security analysis — definition of ready
+    definition_of_ready: {checks: [scope_paths_exist, manifest_files_exist]}
+    definition_of_done: {checks: [scan_coverage_stated]}
+    acceptance_criteria:
+      - {name: scope_paths_exist, text: "Every path in the card's scope exists in the imported workspace."}
+      - {name: manifest_files_exist, text: "Every manifest and IaC file the scan needs is present, or the analysis states the coverage it loses without it before it starts."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: security_analysis.doing
+    title: Security analysis — definition of doing
+    definition_of_ready: {checks: [scan_coverage_stated]}
+    definition_of_done: {checks: [every_finding_cites_evidence, every_code_location_exists, every_dependency_listed_vulnerable]}
+    acceptance_criteria:
+      - {name: every_finding_cites_evidence, text: "Every finding cites the scan row or the file:line evidence that shows the weakness."}
+      - {name: every_code_location_exists, text: "Every code or IaC finding names a file and a line span that exist in the scanned workspace."}
+      - {name: every_dependency_listed_vulnerable, text: "Every dependency finding names a package the advisory database lists as vulnerable at its installed version, and the version that fixes it."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: security_analysis.qa
+    title: Security analysis — definition of QA
+    definition_of_ready: {checks: [every_finding_cites_evidence]}
+    definition_of_done: {checks: [every_confirmed_location_exists, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: every_confirmed_location_exists, text: "Every finding the report confirms points at a location that exists in the revision scanned."}
+      - {name: capability_acceptance_met, text: "The report is true of every acceptance statement the security analysis card type declares."}
+      - {name: findings_located, text: "Every confirmed code or iac finding names a file and a line span; every confirmed dependency finding names the package, its installed version and its fixed version."}
+      - {name: severity_fits_weakness, text: "Every confirmed finding's severity fits the weakness its symptom and root cause describe."}
+      - {name: findings_in_card_scope, text: "Every finding lies inside the part of the repository the card's title and description name."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: security_analysis.done
+    title: Security analysis — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The report published to the card is the exact revision QA reviewed; no finding was added, dropped or re-rated after the review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: security_analysis.system
+    title: Security analysis — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: security_analysis.READY
+    list: ready
+    title: Security analysis — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: security_analysis
+        sop: security_analysis.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: security_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: security_analysis.DOING
+    list: doing
+    title: Security analysis — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: security_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: security_analysis.QA
+    list: qa
+    title: Security analysis — QA
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: security_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: security_analysis.DONE
+    list: done
+    title: Security analysis — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: security_analysis, sop: security_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: security_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

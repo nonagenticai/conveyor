@@ -1,0 +1,867 @@
+{
+  "version": 1,
+  "programme": {
+    "name": "conveyor buildout",
+    "status": "active"
+  },
+  "projects": [
+    {
+      "key": "S00",
+      "name": "Usage inventory → parity/parity.yaml",
+      "description": "Plan: docs/plans/slices/S00-usage-inventory.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S00-usage-inventory.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S01",
+      "name": "UI spike — Leptos CSR vs Leptos SSR",
+      "description": "Plan: docs/plans/slices/S01-ui-spike.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S01-ui-spike.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S02",
+      "name": "Skeleton — workspace, tenancy, auth, jobs, SSE",
+      "description": "Plan: docs/plans/slices/S02-skeleton.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S02-skeleton.md",
+        "track": "v1",
+        "issues": [
+          12
+        ],
+        "depends_on": [
+          "S00"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S03",
+      "name": "Domain and schema — aggregates, state machines, baseline domain migration",
+      "description": "Plan: docs/plans/slices/S03-domain-schema.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S03-domain-schema.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S02"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S04",
+      "name": "Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest",
+      "description": "Plan: docs/plans/slices/S04-action-registry.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S04-action-registry.md",
+        "track": "v1",
+        "issues": [
+          13
+        ],
+        "depends_on": [
+          "S02",
+          "S03"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S05",
+      "name": "Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
+      "description": "Plan: docs/plans/slices/S05-board.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S05-board.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S03",
+          "S04"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S06",
+      "name": "Control plane — claims, runs, approvals, andon, comms and notifications",
+      "description": "Plan: docs/plans/slices/S06-control-plane.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S06-control-plane.md",
+        "track": "v1",
+        "issues": [
+          14
+        ],
+        "depends_on": [
+          "S03",
+          "S04",
+          "S05"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S06a",
+      "name": "mcp_server signed channel — both directions",
+      "description": "Plan: docs/plans/slices/S06a-mcp-server-channel.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S06a-mcp-server-channel.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S04",
+          "S05",
+          "S06]   # S05 ships `projects.*`",
+          "which both properties (b) and the grammar call"
+        ],
+        "plan_status": "superseded",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S06b",
+      "name": "Agent direct interface — the conveyor's own MCP surface",
+      "description": "Plan: docs/plans/slices/S06b-agent-direct-interface.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S06b-agent-direct-interface.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S04",
+          "S05",
+          "S06"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S06c",
+      "name": "MCP tasks — a long-running project asks for input",
+      "description": "Plan: docs/plans/slices/S06c-mcp-tasks.md",
+      "status": "closed",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S06c-mcp-tasks.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S04",
+          "S05",
+          "S06",
+          "S06b"
+        ],
+        "plan_status": "built 2026-11-09",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S06d",
+      "name": "Interaction connector standard — web, Telegram, MCP first",
+      "description": "Plan: docs/plans/slices/S06d-connector-standard.md",
+      "status": "closed",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S06d-connector-standard.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S02",
+          "S04",
+          "S05",
+          "S06",
+          "S06b",
+          "S06c"
+        ],
+        "plan_status": "built",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S07",
+      "name": "Requirements, catalogues, revisions, quality scoring, search",
+      "description": "Plan: docs/plans/slices/S07-requirements-search.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S07-requirements-search.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S03",
+          "S04"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S08",
+      "name": "Governance, modelling, render and export",
+      "description": "Plan: docs/plans/slices/S08-governance-modelling.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S08-governance-modelling.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S03",
+          "S04",
+          "S07"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S09",
+      "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
+      "description": "Plan: docs/plans/slices/S09-documents-integrations.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S09-documents-integrations.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S03",
+          "S04"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S10",
+      "name": "Copilot / AG-UI — one action surface, proposals, conversations",
+      "description": "Plan: docs/plans/slices/S10-copilot-ag-ui.md",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S10-copilot-ag-ui.md",
+        "track": "v1",
+        "issues": [],
+        "depends_on": [
+          "S02",
+          "S03",
+          "S04",
+          "S06"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S11",
+      "name": "Processes, steps and SOPs — executable documentation",
+      "description": "Plan: docs/plans/slices/S11-procedures.md",
+      "status": "closed",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S11-procedures.md",
+        "track": "v1",
+        "issues": [
+          15
+        ],
+        "depends_on": [
+          "S03",
+          "S04",
+          "S06",
+          "S07]   # S07 owns `migrate --seed`: the card_type and gate codes this gate reads"
+        ],
+        "plan_status": "built 2026-11-09 (steps 1–12); amended 2026-11-09 (process/step/SOP split — migration 0033)",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S12",
+      "name": "UI build-out",
+      "description": "Plan: docs/plans/slices/S12-ui-buildout.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S12-ui-buildout.md",
+        "track": "v1",
+        "issues": [
+          16,
+          41,
+          42,
+          43
+        ],
+        "depends_on": [
+          "S01",
+          "S02",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S17",
+          "S18"
+        ],
+        "plan_status": "built",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S13",
+      "name": "Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored",
+      "description": "Plan: docs/plans/slices/S13-n8n-engine.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S13-n8n-engine.md",
+        "track": "v1",
+        "issues": [
+          17
+        ],
+        "depends_on": [
+          "S03",
+          "S04",
+          "S11",
+          "S15"
+        ],
+        "plan_status": "built (2026-11-10; session 2 closed W4/W5/D29, the catalogue E2E and the BYO token path; session 3 closed the step contract, gate/call seed content, the run lifecycle, the judge record, map authoring, the bus replay proof and the install path; the DAG plan is superseded; the engine is retained — owner ruling 2026-11-09)",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S14",
+      "name": "Cutover — deploy, seed, rehearse, decommission fr / RM / Planka",
+      "description": "Plan: docs/plans/slices/S14-cutover.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S14-cutover.md",
+        "track": "v1",
+        "issues": [
+          18,
+          44
+        ],
+        "depends_on": [
+          "S00",
+          "S06b",
+          "S12",
+          "S13"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S15",
+      "name": "Capability, knowledge and memory",
+      "description": "Plan: docs/plans/slices/S15-capability-knowledge-memory.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S15-capability-knowledge-memory.md",
+        "track": "v1",
+        "issues": [
+          19
+        ],
+        "depends_on": [
+          "S03",
+          "S04",
+          "S06",
+          "S11"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S16",
+      "name": "Inference ledger and prompt audit",
+      "description": "Plan: docs/plans/slices/S16-inference-audit.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S16-inference-audit.md",
+        "track": "v1",
+        "issues": [
+          20
+        ],
+        "depends_on": [
+          "S02",
+          "S03",
+          "S04",
+          "S10",
+          "S11"
+        ],
+        "plan_status": "built 2026-11-09",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S17",
+      "name": "Native benchmark harness",
+      "description": "Plan: docs/plans/slices/S17-benchmark-harness.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S17-benchmark-harness.md",
+        "track": "v1",
+        "issues": [
+          21
+        ],
+        "depends_on": [
+          "S02",
+          "S03",
+          "S04",
+          "S09"
+        ],
+        "plan_status": "built 2026-11-09",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S18",
+      "name": "Kata continuous improvement",
+      "description": "Plan: docs/plans/slices/S18-kata-improvement.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S18-kata-improvement.md",
+        "track": "v1",
+        "issues": [
+          22,
+          45
+        ],
+        "depends_on": [
+          "S13",
+          "S15",
+          "S17"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S19",
+      "name": "Eval builder",
+      "description": "Plan: docs/plans/slices/S19-eval-builder.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S19-eval-builder.md",
+        "track": "v1",
+        "issues": [
+          23,
+          46
+        ],
+        "depends_on": [
+          "S02",
+          "S03",
+          "S04",
+          "S06",
+          "S09",
+          "S10",
+          "S11",
+          "S16"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S20",
+      "name": "Eval hillclimb",
+      "description": "Plan: docs/plans/slices/S20-eval-hillclimb.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S20-eval-hillclimb.md",
+        "track": "v1",
+        "issues": [
+          24
+        ],
+        "depends_on": [
+          "S19"
+        ],
+        "plan_status": "planned",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "S21",
+      "name": "S21",
+      "description": "Plan: docs/plans/slices/S21-message-construction.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/slices/S21-message-construction.md",
+        "track": "v1",
+        "issues": [
+          25
+        ],
+        "depends_on": [],
+        "plan_status": "",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T0",
+      "name": "Model and contracts",
+      "description": "SPEC_V2 slice T0 (docs/SPEC_V2.md §12)",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [
+          52
+        ],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T1",
+      "name": "Plan spine",
+      "description": "SPEC_V2 slice T1 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T2",
+      "name": "Decision ladder",
+      "description": "SPEC_V2 slice T2 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T3",
+      "name": "PM job",
+      "description": "SPEC_V2 slice T3 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T4",
+      "name": "Kanban coach",
+      "description": "SPEC_V2 slice T4 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T5",
+      "name": "Kata",
+      "description": "SPEC_V2 slice T5 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T6",
+      "name": "Development project",
+      "description": "SPEC_V2 slice T6 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T7",
+      "name": "Operations",
+      "description": "SPEC_V2 slice T7 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T8",
+      "name": "Organisational memory",
+      "description": "SPEC_V2 slice T8 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T9",
+      "name": "TOGAF profile",
+      "description": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T10",
+      "name": "SAFe cadence",
+      "description": "SPEC_V2 slice T10 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T11",
+      "name": "Metrics, metering and maturity",
+      "description": "SPEC_V2 slice T11 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T12",
+      "name": "One organisation loop",
+      "description": "SPEC_V2 slice T12 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T13",
+      "name": "Tool platform",
+      "description": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T14",
+      "name": "Estate toolkits",
+      "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T15",
+      "name": "Tool authoring and BYO",
+      "description": "SPEC_V2 slice T15 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T16",
+      "name": "SOP, RDF/OWL and process-document ingestion",
+      "description": "SPEC_V2 slice T16 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "T17",
+      "name": "Tenant asset authoring",
+      "description": "SPEC_V2 slice T17 (docs/SPEC_V2.md §12)",
+      "status": "draft",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [],
+        "depends_on": [],
+        "plan_status": "draft",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "DESIGN-PUBLISH",
+      "name": "Publish the SPEC_V2 studio design pack, live",
+      "description": "Programme-level unit (plan: docs/design/STUDIO-SPEC.md)",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/design/STUDIO-SPEC.md",
+        "track": "programme",
+        "issues": [
+          49,
+          51
+        ],
+        "depends_on": [],
+        "plan_status": "active",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "PLATFORM",
+      "name": "CI, runners and platform",
+      "description": "Programme-level unit (plan: docs/plans/development-process-speed.md)",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/development-process-speed.md",
+        "track": "programme",
+        "issues": [
+          27,
+          32
+        ],
+        "depends_on": [],
+        "plan_status": "active",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    },
+    {
+      "key": "SPEC-V2",
+      "name": "SPEC V2 — the organisational operating model",
+      "description": "Programme-level unit (plan: docs/SPEC_V2.md)",
+      "status": "closed",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md",
+        "track": "programme",
+        "issues": [
+          38
+        ],
+        "depends_on": [],
+        "plan_status": "active",
+        "status_source": "open GitHub issues + plan frontmatter"
+      }
+    }
+  ]
+}

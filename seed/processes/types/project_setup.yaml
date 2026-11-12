@@ -1,0 +1,165 @@
+# project_setup — sets the project up and confirms the setup (project_management, S13 §5.2).
+#
+# Content sources: seed/catalogue.json (output `brief_version_created` and the READY / DOING / DONE
+# acceptance strings) and n8n-designs/design/choices/v4 — model.md §5 and §7 (the card checks the board
+# against the RM template and asks PM to define the preliminary phase, R46; the project type is part of
+# the brief and the user confirms it at the brief sign-off, R15; the brief is versioned in RM, R24) and
+# capability-flows.md §12 (setup consults every capability that declares itself selectable, the PM agent
+# turns the consults into decisions and risks, and the QA sign-off lists decisions, order and risks).
+# v4 carries NO inspect.criteria for this capability, so the QA stage's criteria are derived from that
+# flow description, marked `derived` below. Ladder: READY = readying + the move; DOING/QA/DONE = four
+# agents (readying → doing → inspecting → releasing) + the move.
+card_type: project_setup
+capability: project_management
+outputs:
+  - brief_version_created
+
+agent:
+  key: project_setup
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: project_setup.ready
+    title: Project setup — definition of ready
+    definition_of_ready: {checks: [phase_is_setup, project_type_set]}
+    definition_of_done: {checks: [every_capability_consulted]}
+    acceptance_criteria:
+      - {name: phase_is_setup, text: "The project is in RM phase `setup`, so setting the project up is the work this phase holds and not a later phase's."}
+      - {name: project_type_set, text: "The project carries a project type, because setup consults the capabilities that type catalogues and has no set to consult without it."}
+      # derived: capability-flows.md §12 / R302 — setup consults every selectable capability
+      - {name: every_capability_consulted, text: "Every selectable capability was consulted for the project phase, and each capability's involvement, purpose and order is recorded."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: project_setup.doing
+    title: Project setup — definition of doing
+    definition_of_ready: {checks: [every_capability_consulted]}
+    definition_of_done: {checks: [board_matches_template, brief_base_is_latest, every_answer_in_clarifications]}
+    acceptance_criteria:
+      - {name: board_matches_template, text: "The board's lanes and the lists inside them match the board template the project type names, with no lane missing and none added."}
+      - {name: brief_base_is_latest, text: "The brief setup works from is RM's latest brief version, so an earlier version is never what setup confirms or versions again."}
+      - {name: every_answer_in_clarifications, text: "Every question setup put to the user is answered in the card's clarifications, and no answer is left unread."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: project_setup.qa
+    title: Project setup — definition of QA
+    definition_of_ready: {checks: [every_answer_in_clarifications]}
+    definition_of_done: {checks: [signoff_lists_decisions, capability_acceptance_met]}
+    acceptance_criteria:
+      # derived: capability-flows.md §12 — the QA sign-off lists decisions, order and risks
+      - {name: signoff_lists_decisions, text: "The QA sign-off lists every setup decision, the order the capabilities were placed in and every risk, and each entry matches what setup recorded and what RM now holds."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the project_setup card type carries is true of the board and the brief, checked against RM rather than against the card's own summary."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: project_setup.done
+    title: Project setup — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [brief_version_created]}
+    acceptance_criteria:
+      - {name: phase_still_setup, text: "The project is still in RM phase `setup` when setup completes, because the next phase is chosen by the phase start card and setup itself moves nothing."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [brief_version_created]
+
+  - key: project_setup.system
+    title: Project setup — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: project_setup.READY
+    list: ready
+    title: Project setup — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: project_setup
+        sop: project_setup.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_setup.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: project_setup.DOING
+    list: doing
+    title: Project setup — doing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_setup.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: project_setup.QA
+    list: qa
+    title: Project setup — QA
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_setup.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: project_setup.DONE
+    list: done
+    title: Project setup — done
+    outputs: [brief_version_created]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: project_setup, sop: project_setup.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_setup.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S12 — UI build-out · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S12-ui-buildout.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><p>⚠️ <strong>Amended 2026-11-09 (process model).</strong> Screen 7 (<code>procedures</code>) becomes the <strong>process view</strong>: the ordered <strong>steps</strong> with their <code>kind</code>, <code>actor</code> (process agent / tool agent / system / human), the step's <strong>SOP</strong> (definition of ready/done, acceptance criteria, inspection), the <strong>judge verdict</strong> and the process's <strong>user-facing outputs</strong>; gate and child-call badges. A new screen <strong>22 <code>process map</code></strong> renders the per-project-type <strong>DAG</strong> (processes/capabilities/phases) with the project's live position — a Leptos/SVG map, read/author, not an execution graph. The run detail (<code>/runs/:id</code>) gains the <strong>run tree</strong> (parent/children, depth, step) and the dead-letter state. The execution engine has no graph editor.</p>
+<h1 id="s12--ui-build-out">S12 — UI build-out</h1>
+<p>Programme project: S12 · issues #16, #41, #42, #43</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>Build every declared screen on S01's stack, each proved by a Playwright click-through against a real API and a real database. S12 designs nothing and invents nothing: no component library (S01's), no action, table, event or screen. The output is the screens plus their specs.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S01 has recorded the stack (Leptos CSR is the prior) and deleted <code>spikes/web/</code>.</li>
+<li>S02 and S05–S11 each carry a <strong>"UI surface declared for S12"</strong> line: the screen, the actions it calls, the read model and its SSE topic.</li>
+<li><code>GET /api/actions</code> serves the whole registry; every action a screen calls already exists and is tested.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — the twenty-two screens of §5 on S01's stack, each with a Playwright spec that asserts empty state, error state and happy path. <strong>OUT</strong> — design, component-library choice, any new action/table/event/screen, the <strong>execution-graph</strong> editor (the engine has none; screen 22's process map is a declarative map), server-rendered pages (CONTRACT §11: no stack assumption beyond S01's decision).</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>slices/S01-ui-spike.md</code></td>
+<td>the chosen stack and its ADR</td>
+<td>the decision</td>
+<td>the spike code (deleted)</td>
+</tr>
+<tr>
+<td><code>slices/S02,S05–S11</code> §3 "UI surface declared for S12"</td>
+<td>each screen's actions, read models, SSE topics</td>
+<td>them verbatim — a screen may not call an action its declaring slice does not name</td>
+<td>their API shapes re-invented</td>
+</tr>
+<tr>
+<td><code>02-source-map/20-fr.md</code> §"Frontend (S12)" (<code>fr</code> <code>6f7c5097</code>)</td>
+<td>the 195 <code>+page.svelte</code> route groups</td>
+<td>coverage check only</td>
+<td>the pages themselves</td>
+</tr>
+<tr>
+<td><code>docs/SPEC.md</code> §5.7</td>
+<td>the screen order</td>
+<td>the order</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables--the-screen-list">5. Deliverables — the screen list</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>screen</th>
+<th>declared by</th>
+<th>actions</th>
+<th>read model / SSE</th>
+<th>spec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>shell/login</td>
+<td>S02</td>
+<td><code>me.get</code>, <code>tenants.get</code></td>
+<td><code>/api/me</code>; no table</td>
+<td><code>shell-login.spec.ts</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>board</td>
+<td>S05</td>
+<td><code>boards.get</code>, <code>cards.*</code>, <code>lists.move</code>, <code>labels.*</code>, <code>custom_fields.*</code></td>
+<td><code>BoardView</code>; SSE <code>board:{id}</code>, <code>card:{id}</code></td>
+<td><code>board.spec.ts</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>card cockpit</td>
+<td>S05, S06, S11</td>
+<td><code>cards.get/update/claim/release</code>, <code>runs.start/cancel</code>, <code>approvals.decide/list</code>, <code>procedure_runs.start</code></td>
+<td><code>CardView</code> + <code>ApprovalOut</code> (renders <code>decided_by_kind</code> on each approval decision — an <code>agent</code> badge distinct from a person's — plus <code>via.channel</code>, so an agent decision shows which channel carried it); SSE <code>run:{id}</code>, <code>approval:{id}</code></td>
+<td><code>card-cockpit.spec.ts</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>run queue</td>
+<td>S06</td>
+<td><code>runs.list</code></td>
+<td><code>run</code> (queued partial index)</td>
+<td><code>run-queue.spec.ts</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>requirements editor/revisions</td>
+<td>S07</td>
+<td><code>requirements.*</code>, <code>quality.score</code></td>
+<td><code>governed_asset</code> + <code>revision</code> (<code>RevisionDiff</code>)</td>
+<td><code>requirements.spec.ts</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>trace/architecture</td>
+<td>S08</td>
+<td><code>model_views.get</code>, <code>models.traceability</code></td>
+<td><code>model_view</code> + rendered object; <code>model_validation_run</code>; SSE <code>model:{id}</code></td>
+<td><code>trace-architecture.spec.ts</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>processes</td>
+<td>S11</td>
+<td><code>processes.*</code>, <code>procedures.*</code> (SOP), <code>process_runs.start/cancel</code></td>
+<td><code>process</code> + <code>process_step</code> + <code>procedure</code> (SOP) + <code>run_step</code>; SSE <code>run:{id}</code></td>
+<td><code>processes.spec.ts</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>search</td>
+<td>S07</td>
+<td><code>search.query</code></td>
+<td>ranked assets/cards/catalogue entries</td>
+<td><code>search.spec.ts</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>admin</td>
+<td>S09</td>
+<td><code>actions.*</code>, <code>jobs.*</code>, <code>audit.list</code>, <code>licences.get</code>, <code>workers.list</code>, <code>billing.summary</code></td>
+<td><code>/api/actions</code>, <code>audit_event</code>, <code>app_licence</code></td>
+<td><code>admin.spec.ts</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td>copilot conversation</td>
+<td>S10</td>
+<td>conversation routes; <code>approvals.decide</code></td>
+<td><code>conversation_turn</code>; SSE <code>conversation:{id}</code></td>
+<td><code>copilot.spec.ts</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td>inference usage</td>
+<td>S16</td>
+<td><code>inference_usage.report</code>, <code>inference_calls.list</code></td>
+<td><code>inference_call</code> — hit / write / miss / unknown over time, ratio per model and per caller, and the call table with its run/turn join</td>
+<td><code>inference-usage.spec.ts</code></td>
+</tr>
+<tr>
+<td>12</td>
+<td>prompt audit</td>
+<td>S16</td>
+<td><code>prompt_audits.start/list/get</code>, <code>prompt_findings.list/decide</code>, and the cadence via <code>tenants.update_settings</code></td>
+<td><code>prompt_audit</code> + <code>prompt_audit_finding</code> — findings grouped by pattern (<code>1a</code>…<code>4</code>) with confidence, evidence and the proposed diff; accept/reject per finding; the <em>after N executions</em> setting; the findings a refused publish returned</td>
+<td><code>prompt-audit.spec.ts</code></td>
+</tr>
+<tr>
+<td>13</td>
+<td>benchmarks</td>
+<td>S17</td>
+<td><code>benchmark_suites.list</code>, <code>benchmark_runs.start/get/list/cancel/compare/promote</code>, <code>benchmark_cases.list</code></td>
+<td><code>benchmark_run</code> + <code>benchmark_case</code> + <code>benchmark_suite</code> — arm/subject, controls, resolved/n, per-case verdict/patch/log, the paired matrix and exact McNemar with its refusal banner; SSE <code>benchmark_run:{id}</code></td>
+<td><code>benchmarks.spec.ts</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td>improvement</td>
+<td>S18</td>
+<td><code>benchmark_runs.trend</code>, plus <code>benchmark_runs.start/compare/promote</code> for the candidate control</td>
+<td><code>benchmark_run</code> grouped by <code>capability_agent_id</code>/<code>procedure_id</code> — rate per version against the promoted baseline, control badges, regression flags</td>
+<td><code>improvement.spec.ts</code></td>
+</tr>
+<tr>
+<td>15</td>
+<td>evals</td>
+<td>S19</td>
+<td><code>evals.create/get/list/update/retire</code>, <code>eval_versions.*</code>, <code>eval_cases.*</code>, <code>eval_metrics.*</code>, <code>evals.draw_split</code></td>
+<td><code>eval</code> + <code>eval_version</code> + <code>eval_case</code> + <code>eval_metric</code> — one flow per eval, the version digest, the case table with tags/expected-provenance/split, the metric list with its grader and the headline rule (first <code>binary</code>)</td>
+<td><code>evals.spec.ts</code></td>
+</tr>
+<tr>
+<td>16</td>
+<td>eval run</td>
+<td>S19</td>
+<td><code>eval_runs.start/get/list/cancel</code>, <code>eval_results.list/get</code>, <code>eval_results.label</code></td>
+<td><code>eval_run</code> + <code>eval_case_result</code> + <code>eval_attempt_error</code> — N×R progress, retries and the failure sidecar beside the results, truncation count, served-model mismatches, the cost derived from the ledger; SSE <code>eval_run:{id}</code>, <code>eval_result.recorded</code></td>
+<td><code>eval-run.spec.ts</code></td>
+</tr>
+<tr>
+<td>17</td>
+<td>eval report</td>
+<td>S19</td>
+<td><code>eval_runs.report/export</code>, <code>eval_results.list/get</code></td>
+<td>per-case table with <strong>every declared metric column</strong> and the perf columns, click-through transcripts with tool calls as their own cards, attachments, per-tag breakdown, mean + CI against the noise floor; the screen that replaces <code>report.html</code></td>
+<td><code>eval-report.spec.ts</code></td>
+</tr>
+<tr>
+<td>18</td>
+<td>eval audit</td>
+<td>S19</td>
+<td><code>eval_audits.start/get/list</code>, <code>eval_findings.list/decide</code></td>
+<td><code>eval_audit</code> + <code>eval_audit_finding</code> — findings by §1–§6 and severity, the oracle/null control scores, the noise-floor-vs-headroom line, evidence links; accept/fix/dismiss per finding</td>
+<td><code>eval-audit.spec.ts</code></td>
+</tr>
+<tr>
+<td>19</td>
+<td>eval sign-off</td>
+<td>S19</td>
+<td><code>eval_signoffs.request/decide</code></td>
+<td>the two literal pauses as full-screen reviews: <strong>every</strong> input with its text rendered as data (never HTML), the pilot's grades beside their transcripts, and an approve/reject with a note — the screen that makes the number trusted</td>
+<td><code>eval-signoff.spec.ts</code></td>
+</tr>
+<tr>
+<td>20</td>
+<td>eval interop</td>
+<td>S19</td>
+<td><code>eval_runs.export</code>, <code>eval_cases.import</code></td>
+<td>the method's <code>results.jsonl</code>/<code>traces/</code> bundle in and out through S09 documents; import names the eval and variant it lands as</td>
+<td><code>eval-interop.spec.ts</code></td>
+</tr>
+<tr>
+<td>21</td>
+<td>eval hillclimb</td>
+<td>S20</td>
+<td><code>eval_climbs.start/get/list/stop/round/compare</code>, <code>eval_runs.report/get</code></td>
+<td><code>eval_climb</code> + the round's <code>eval_run</code> — goal and guardrails, stopping condition, the round table with train and test side by side, <code>$/run</code> and derived spend, the diff drawer, the stall-triage buckets, and the final four-part summary; SSE <code>eval_climb.changed</code>, <code>eval_climb.round_completed</code></td>
+<td><code>eval-hillclimb.spec.ts</code></td>
+</tr>
+<tr>
+<td>22</td>
+<td>process map</td>
+<td>S13</td>
+<td><code>process_maps.get/list</code>, <code>processes.list/get</code></td>
+<td><code>process_map</code> + <code>process</code> — the per-project-type DAG of processes/capabilities/phases, the project's live position (running/done/blocked) derived from the runs; read/author on a Leptos/SVG map, never an execution graph</td>
+<td><code>process-map.spec.ts</code></td>
+</tr>
+</tbody>
+</table>
+<p>Screens 11–21 are declared by <strong>S16</strong>, <strong>S17</strong>, <strong>S18</strong>, <strong>S19</strong> and <strong>S20</strong>, and screen 22 by <strong>S13</strong>; they are the only rows here that name a slice after S11. They enter S12's build order only when their slice is built — S12 renders a report the slice produces and invents neither the read model nor its columns. Row 13 is not a cutover proof: S14 does not depend on it, so it may be deferred past the other rows without moving cutover, and the same is true of rows 15–21.</p>
+<p>⚠️ <strong>Two of these screens are the product, not a view of it.</strong> Rows 15 and 19 are where the <code>build-eval</code> method's two literal pauses live — the input review and the grading review. A sign-off is an <code>approval</code> row, so the same ask is answerable from Telegram and <code>/mcp</code>; the screen is the web channel of one primitive, not a fourth mechanism.</p>
+<p>Workflow editor: <strong>S13</strong>, not here. Specs live at <code>apps/web/e2e/&lt;name&gt;.spec.ts</code> with <code>apps/web/playwright.config.ts</code>.</p>
+<p><strong>Coverage rule:</strong> every <code>used</code> fr UI row of <code>parity/parity.yaml</code> maps to one screen above or is recorded <strong>API-only</strong> with its reason. A coverage table with no orphan proves it — the 195 fr pages are an input, never a target.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<p>One screen at a time, table order; no parallelism.</p>
+<ol start="0" type="1">
+<li>Harness: <code>npx playwright install chromium</code>; <code>apps/web/playwright.config.ts</code> with <code>webServer</code> running the real binary against a seeded ephemeral database, started with <code>CONVEYOR_DEV_AUTH=1</code>, the dev cookie <code>conveyor_dev=alice</code> in <code>storageState</code> <strong>only in dev mode</strong> (CONTRACT §10) — it is never attached on the OIDC path. <strong>When <code>BASE_URL</code> is exported the config starts no webServer and targets that base</strong>; the login helper picks its mode from <code>DEV_AUTH_TOKEN</code>: set ⇒ the dev cookie (local, and S14's local rehearsal), unset ⇒ real OIDC with <code>E2E_USER</code>/<code>E2E_PASS</code> (a dedicated Keycloak test user seeded at S14 step 7) — which is how the same suite runs against the deployed app, where dev-auth is refused. One helper, two modes. <code>npx playwright test --list</code> → 0 tests, exit 0.</li>
+<li>shell/login — slot, <code>me.get</code>/<code>tenants.get</code>, <code>/api/me</code>; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/shell-login.spec.ts</code>.</li>
+<li>board — <code>boards.get</code>/<code>cards.*</code>, <code>BoardView</code> + <code>board:{id}</code>; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/board.spec.ts</code>.</li>
+<li>card cockpit — card/run/approval actions, <code>CardView</code> + <code>ApprovalOut</code> with the <code>decided_by_kind</code> agent badge on each decision; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/card-cockpit.spec.ts</code>.</li>
+<li>run queue — <code>runs.list</code>, queued projection; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/run-queue.spec.ts</code>.</li>
+<li>requirements — <code>requirements.*</code>, <code>revision</code> + <code>RevisionDiff</code>; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/requirements.spec.ts</code>.</li>
+<li>trace/architecture — <code>model_views.get</code> + rendered object; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/trace-architecture.spec.ts</code>.</li>
+<li>processes — <code>processes.*</code>, <code>procedures.*</code>, <code>process_step</code>, <code>run_step</code>; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/processes.spec.ts</code>.</li>
+<li>search — <code>search.query</code>, ranked page; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/search.spec.ts</code>.</li>
+<li>admin — admin actions, <code>/api/actions</code> + <code>app_licence</code>; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/admin.spec.ts</code>.</li>
+<li>copilot — conversation routes, <code>conversation:{id}</code>; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/copilot.spec.ts</code>.</li>
+<li>inference usage — <code>inference_usage.report</code>, <code>inference_calls.list</code>; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/inference-usage.spec.ts</code>.</li>
+<li>prompt audit — <code>prompt_audits.*</code>, <code>prompt_findings.*</code>; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/prompt-audit.spec.ts</code>.</li>
+<li>benchmarks — <code>benchmark_runs.*</code>, <code>benchmark_cases.list</code>, <code>benchmark_run:{id}</code>; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/benchmarks.spec.ts</code>.</li>
+<li>improvement — <code>benchmark_runs.trend</code> + the candidate controls; <code>npx playwright test -c apps/web/playwright.config.ts apps/web/e2e/improvement.spec.ts</code>.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cd $HOME/Movies/conveyor
+docker compose up -d db &amp;&amp; cargo run -p conveyor-server -- migrate --dev-seed
+CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- serve &amp;
+trap &#39;kill %1 2&gt;/dev/null || true&#39; EXIT
+for i in $(seq 1 30); do curl -sf -H &#39;authorization: Bearer dev:alice&#39; localhost:8930/health/ready &gt;/dev/null &amp;&amp; break; sleep 1; done   # readiness, not a fixed sleep
+test &quot;$(yq &#39;[.[]|select(.status==&quot;used&quot; and .app==&quot;fr&quot; and .area!=&quot;workflows&quot;)]|length&#39; parity/parity.yaml)&quot; -gt 0   # YAML, not JSON — jq cannot read it
+curl -sf -H &#39;authorization: Bearer dev:alice&#39; localhost:8930/api/actions | jq -e &#39;.actions|length &gt; 0&#39;   # the app is up and authenticated
+cd apps/web &amp;&amp; npx playwright install chromium
+BASE_URL=http://127.0.0.1:8930 DEV_AUTH_TOKEN=dev:alice npx playwright test --reporter=list   # every spec, against the app started above (config skips its webServer)</code></pre>
+<ul>
+<li>Every spec asserts empty state, error state and happy path — a spec that only asserts the happy path fails review.</li>
+<li>Every action is resolved against <code>GET /api/actions</code> before the first click; a missing action fails at build time.</li>
+<li>The coverage table has no orphan; the count it explains equals the <code>yq</code> line above.</li>
+</ul>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>Rebuilding S05–S11's components inside S12</strong> (board column, approval card, run badge) — one component, owned by the screen that first needs it.</li>
+<li><strong>A screen calling the database.</strong> Writes go through <code>POST /api/actions/{name}/invocations</code>; reads use the declared projections.</li>
+<li><strong>Playwright passing on a mocked API.</strong> Seed real rows, run the real binary; runtime request mocking is a green light that means nothing.</li>
+<li><strong>Copying fr's 195-page UI.</strong> It is a coverage check, not a template — the rewrite drops far more than it keeps.</li>
+<li><strong>A screen no slice declared.</strong> If a row has no declaring slice, it is not built; it is an open question.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li><strong>S12 invents no screen.</strong> Every row cites a declaring slice; the table is the whole scope.</li>
+<li><strong>S12 owns no action, table or event</strong> — it consumes the registry as served.</li>
+<li><strong>The workflow editor is S13's</strong>, not a twelfth row.</li>
+<li><strong>The copilot screen ships because S10 declared it.</strong> SPEC §5.7's screen order predates the copilot surface, so this row is filed as a <code>CONTRACT-CHANGE REQUEST</code> (add one screen to §5.7's order, UI-only); it is <strong>recorded, not self-approved</strong> — the main session adjudicates it in <code>00-INDEX.md</code>'s decision register before S12 closes.</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Does the run queue need its own route, or is it a filter on the board?</td>
+<td>its own route; S06 declared a projection for it</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Are keyboard-only flows in scope?</td>
+<td>no — one accessibility pass after the last screen, not per screen</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Who owns shared components (card tile, approval card)?</td>
+<td>the first screen that needs one; later screens import it</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Do screens ship behind a flag?</td>
+<td>no — one app, one tenant population, cutover switches the host</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S12-ui-buildout.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

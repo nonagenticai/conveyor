@@ -1,0 +1,167 @@
+# tdd_test_improvement — rewrite the tests one evaluation finding names (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type tdd_test_improvement: outputs and acceptance) and
+# n8n-designs/design/choices/v4/capabilities/bddtdd.yaml (text "improvement of tests based on
+# evaluation", phase design, proof tests_only, inspect criteria). Archetype development: the card comes
+# from exactly one confirmed tdd_test_evaluation finding, the diff changes tests and fixtures only, and
+# the suite is green afterwards. It is not a tdd_test_development card — no new test is marked expected
+# to fail here, because the behaviour being tested already exists.
+card_type: tdd_test_improvement
+capability: bdd_tdd
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: tdd_test_improvement
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: tdd_test_improvement.ready
+    title: TDD test improvement — definition of ready
+    definition_of_ready: {checks: [test_files_in_test_dirs, evaluation_item_located]}
+    definition_of_done: {checks: [test_command_found]}
+    acceptance_criteria:
+      - {name: test_files_in_test_dirs, text: "Every test file the change touches stays in a test directory the repository already uses, beside the tests for its subject and never beside the production code it exercises."}
+      - {name: evaluation_item_located, text: "The card names exactly one confirmed tdd_test_evaluation finding, and that finding's test file, test and symptom are still found at the revision the card reads — an item that was never confirmed, or whose test has since moved, is reported before any edit."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: tdd_test_improvement.doing
+    title: TDD test improvement — definition of doing
+    definition_of_ready: {checks: [evaluation_item_located, test_command_found]}
+    definition_of_done: {checks: [every_case_written, suite_green_after]}
+    acceptance_criteria:
+      - {name: every_case_written, text: "Every case the evaluation item names — the missing test, the weak assertion, the brittle setup — is written or rewritten in the file that item names, so the symptom the item reported can no longer be reproduced."}
+      - {name: diff_confined_to_the_named_test, text: "The diff changes only the test the evaluation item names, plus the fixtures and helpers that test owns; a second test rewritten along the way is reported as out of scope rather than merged quietly."}
+      - {name: suite_green_after, text: "The suite, run with the command READY recorded, is green after the change: the changed tests pass and no test that passed before now fails."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: tdd_test_improvement.qa
+    title: TDD test improvement — definition of QA
+    definition_of_ready: {checks: [every_case_written]}
+    definition_of_done: {checks: [tests_check_target, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: tests_check_target, text: "Each changed test fails when the behaviour the evaluation item names is broken and passes when it is correct, so the improvement changes what the test checks rather than only renaming or reformatting it."}
+      - {name: capability_acceptance_met, text: "The diff is true of every acceptance statement the tdd_test_improvement card type declares — it addresses the evaluation item, its changed tests assert behaviour, and no production file changed."}
+      - {name: addresses_evaluation_item, text: "The diff answers the one confirmed tdd_test_evaluation finding the card names — its missing test, weak assertion or brittle setup is the thing that changed — and not an adjacent weakness the evaluation did not confirm."}
+      - {name: tests_assert_behaviour, text: "Every changed test asserts its subject's behaviour, not only that the code runs."}
+      - {name: no_production_change, text: "The diff changes no production file: the item is addressed by the test change alone, and a finding that cannot be is reported instead of patched around."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: tdd_test_improvement.done
+    title: TDD test improvement — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request that rewrites the test is merged, and the merged test is the one QA reviewed, with the symptom the evaluation item reported now covered."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: tdd_test_improvement.system
+    title: TDD test improvement — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: tdd_test_improvement.READY
+    list: ready
+    title: TDD test improvement — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: tdd_test_improvement
+        sop: tdd_test_improvement.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: tdd_test_improvement.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: tdd_test_improvement.DOING
+    list: doing
+    title: TDD test improvement — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: tdd_test_improvement.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: tdd_test_improvement.QA
+    list: qa
+    title: TDD test improvement — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: tdd_test_improvement.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: tdd_test_improvement.DONE
+    list: done
+    title: TDD test improvement — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_improvement, sop: tdd_test_improvement.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: tdd_test_improvement.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

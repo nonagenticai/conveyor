@@ -1,0 +1,21 @@
+# cargo-audit configuration (read by the `cargo audit` step in the CI archetype).
+#
+# Every ignore here is a decision with an expiry condition, not a mute button.
+[advisories]
+ignore = [
+  # RUSTSEC-2026-0459 — `libsqlite3-sys` 0.37.0 via `sqlx-sqlite` (C SQLite
+  # CVE-2026-119375; fixed in libsqlite3-sys >= 0.39.0).
+  #
+  # ⛔ NOT COMPILED INTO THIS SERVICE. sqlx is used with `default-features =
+  # false` and the postgres driver only; `cargo tree -i sqlx-sqlite` prints
+  # "warning: nothing to print" on this lockfile (verified 2026-11-10). The
+  # sqlite and mysql crates appear in Cargo.lock only because Cargo records a
+  # package's optional dependencies feature-agnostically — cargo-audit scans the
+  # lock, so it flags a crate the compiler never builds.
+  #
+  # There is no upstream fix to take: sqlx 0.9.0 is the latest release and
+  # sqlx-sqlite pins libsqlite3-sys ^0.37. Remove this entry the moment a sqlx
+  # release moves to libsqlite3-sys >= 0.39, or if this workspace ever enables
+  # the sqlite feature (at which point the advisory becomes real).
+  "RUSTSEC-2026-0459",
+]

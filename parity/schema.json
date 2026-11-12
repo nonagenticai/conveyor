@@ -1,0 +1,64 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "app",
+      "area",
+      "surface",
+      "source",
+      "evidence",
+      "evidence_class",
+      "acceptance",
+      "status"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^P-[0-9]{4}$"
+      },
+      "app": {
+        "enum": [
+          "fr",
+          "rm",
+          "planka",
+          "n8n"
+        ]
+      },
+      "area": {
+        "type": "string"
+      },
+      "surface": {
+        "type": "string"
+      },
+      "source": {
+        "type": "string"
+      },
+      "evidence": {
+        "type": "string"
+      },
+      "evidence_class": {
+        "enum": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ]
+      },
+      "acceptance": {
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "used",
+          "rare",
+          "unused",
+          "dropped"
+        ]
+      }
+    }
+  }
+}

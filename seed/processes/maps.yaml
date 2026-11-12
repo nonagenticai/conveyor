@@ -1,0 +1,59 @@
+version: 1
+# The `process_map` documents (SPEC D30, CONTRACT §21), one per project type.
+#
+# A node's `ref` is resolved against the facts the loader supplies: published process keys,
+# the tenant's capability codes, THIS project type's `meta.phases` (seed/catalogue.json) and the
+# `milestone_kind` codes. Phase nodes below therefore repeat the project type's phases exactly —
+# adding a phase to a project type in seed/catalogue.json means adding it here too.
+#
+# `kaizen`, `meta_procedure`, `meta_prompt` and `program` declare zero phases (and zero card
+# types) in seed/catalogue.json, so no map is derived for them.
+maps:
+  - key: it
+    title: It
+    project_type: it
+    definition:
+      schema: "1"
+      nodes:
+        - {id: setup, kind: phase, ref: setup, label: Setup}
+        - {id: preliminary, kind: phase, ref: preliminary, label: Preliminary}
+        - {id: analysis, kind: phase, ref: analysis, label: Analysis}
+        - {id: design, kind: phase, ref: design, label: Design}
+        - {id: execution, kind: phase, ref: execution, label: Execution}
+        - {id: test, kind: phase, ref: test, label: Test}
+      edges:
+        - {from: setup, to: preliminary}
+        - {from: preliminary, to: analysis}
+        - {from: analysis, to: design}
+        - {from: design, to: execution}
+        - {from: execution, to: test}
+
+  - key: kata
+    title: Kata
+    project_type: kata
+    definition:
+      schema: "1"
+      nodes:
+        - {id: setup, kind: phase, ref: setup, label: Setup}
+        - {id: preliminary, kind: phase, ref: preliminary, label: Preliminary}
+        - {id: execution, kind: phase, ref: execution, label: Execution}
+      edges:
+        - {from: setup, to: preliminary}
+        - {from: preliminary, to: execution}
+
+  - key: py2rust
+    title: Py2Rust
+    project_type: py2rust
+    definition:
+      schema: "1"
+      nodes:
+        - {id: setup, kind: phase, ref: setup, label: Setup}
+        - {id: plan, kind: phase, ref: plan, label: Plan}
+        - {id: port, kind: phase, ref: port, label: Port}
+        - {id: parity, kind: phase, ref: parity, label: Parity}
+        - {id: cutover, kind: phase, ref: cutover, label: Cutover}
+      edges:
+        - {from: setup, to: plan}
+        - {from: plan, to: port}
+        - {from: port, to: parity}
+        - {from: parity, to: cutover}

@@ -1,0 +1,40 @@
+flowchart LR
+  subgraph ARCH["SPEC_V2 architecture"]
+    ORG["Organisation spine"]:::v2
+    PLAN["Portfolio, programme and plan"]:::v2
+    RUN["Execution, run and gate"]:::v1
+    DEC["Decision ladder"]:::v2
+    KM["Knowledge and memory"]:::v1
+    TOOL["Tool estate and broker"]:::v2
+    IMP["Improve, coach and kata"]:::v2
+    OPS["Operations"]:::v2
+    MET["Metering and instruments"]:::v1
+    AUTH["Identity, licences and channels"]:::v1
+  end
+  subgraph UI["Studio destinations"]
+    U1["Programme control and Projects"]:::ui
+    U2["Portfolio and Plan and WBS"]:::ui
+    U3["Execution room, Runs and Decision inbox"]:::ui
+    U4["Organisation, Jobs and Agents"]:::ui
+    U5["Knowledge design, Sources and Memory"]:::ui
+    U6["Tools, Procedures and Authoring"]:::ui
+    U7["Improve, Evals, Benchmarks and Hillclimb"]:::ui
+    U8["Operations and Assurance"]:::ui
+    U9["Metering and Usage and audit"]:::ui
+    U10["Requirements, Principles, Models and Types"]:::ui
+  end
+  ORG --> U4
+  ORG --> U10
+  PLAN --> U1
+  PLAN --> U2
+  RUN --> U3
+  DEC --> U3
+  KM --> U5
+  TOOL --> U6
+  IMP --> U7
+  OPS --> U8
+  MET --> U9
+  AUTH --> U10
+  classDef v1 fill:#eef3ef,stroke:#8aa596,color:#1f2a24
+  classDef v2 fill:#ffffff,stroke:#8aa596,stroke-dasharray:5 3,color:#1f2a24
+  classDef ui fill:#f4f1f8,stroke:#b9acce,color:#1f2a24

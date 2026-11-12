@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>20 — fr source map · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-source-map/20-fr.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="20--fr-source-map">20 — fr source map</h1>
+<p><code>repo: $HOME/Movies/fr · sha: 6f7c509792b3ca1fc1fb00c198aebcec83f0af29</code></p>
+<p>Merge commit <code>#1731 lane/tenant-projects-page</code>, 2026-11-07 10:53 +0100. <strong>The local tree is 14 commits behind <code>origin/main</code> (<code>dc6c53bcd431</code>), measured 2026-11-07 21:59 with <code>git rev-list --count HEAD..origin/main</code>; the local HEAD is <code>6f7c509792b3</code> and clean.</strong> That gap is a reading, not a fact that survives: re-run the two commands before relying on it. Everything below is measured at the local sha; re-check any path that moved since. Nothing here was read from <code>origin/main</code>.</p>
+<p>Shape: <code>backend/</code> (Bun + TypeScript) · <code>frontend/</code> (SvelteKit 5) · <code>packages/</code> · <code>docs/</code> · <code>certs/</code> · <code>tooling/</code>. Backend boots from <code>backend/src/server.ts</code>; 23 top-level src dirs.</p>
+<h2 id="backend-source-directories">Backend source directories</h2>
+<table>
+<thead>
+<tr>
+<th>path / dir</th>
+<th>symbols</th>
+<th>what it is</th>
+<th>slices</th>
+<th>carry / do-not-carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backend/src/server.ts</code></td>
+<td><code>Bun.serve</code>, <code>deriveRouter</code> mount</td>
+<td>composition root, WS upgrade, route table</td>
+<td>S02</td>
+<td>composition shape only</td>
+</tr>
+<tr>
+<td><code>backend/src/config.ts</code>, <code>config/</code></td>
+<td><code>config</code>, <code>config.services.mcp</code></td>
+<td>env config; DB URL is a throwing getter</td>
+<td>S02</td>
+<td>typed config crate</td>
+</tr>
+<tr>
+<td><code>backend/src/db/</code></td>
+<td>pool client</td>
+<td>Postgres pool; drizzle-orm via <code>postgres.js</code></td>
+<td>S02/S03</td>
+<td>pg only; drop drizzle</td>
+</tr>
+<tr>
+<td><code>backend/src/domain/</code></td>
+<td><code>domain/engagement/*</code>, adapters</td>
+<td>engagement/notification domain + <code>McpAdapter</code></td>
+<td>S06, S06a</td>
+<td>adapter seam only</td>
+</tr>
+<tr>
+<td><code>backend/src/middleware/</code></td>
+<td><code>request-context</code>, <code>bridge-auth</code>, <code>usage-spans</code></td>
+<td>tenant/<code>X-Active-Tenant</code> resolution, SA bridge auth, metering</td>
+<td>S02, S06</td>
+<td>use <code>agent</code>'s <code>TenantCtx</code>, not this</td>
+</tr>
+<tr>
+<td><code>backend/src/lib/</code></td>
+<td><code>super-admin-gate</code>, <code>super-admin-switch*</code>, <code>licence-introspect</code>, <code>require-fr-license</code></td>
+<td>auth/tenancy/licence primitives</td>
+<td>S02</td>
+<td>licence shape yes; super-admin switch no</td>
+</tr>
+<tr>
+<td><code>backend/src/services/</code></td>
+<td><code>user-roles</code>, <code>projects/create.ts createProjectCore</code></td>
+<td>domain services; one project-creation engine</td>
+<td>S05/S06</td>
+<td>the single-engine lesson</td>
+</tr>
+<tr>
+<td><code>backend/src/connectors/</code></td>
+<td>dispatcher</td>
+<td>outbound connector dispatch</td>
+<td>S06</td>
+<td>assess in S0</td>
+</tr>
+<tr>
+<td><code>backend/src/integrations/</code></td>
+<td><code>kag.ts uploadDocument</code></td>
+<td>external clients</td>
+<td>S09</td>
+<td>shape, not kag</td>
+</tr>
+<tr>
+<td><code>backend/src/telemetry/</code></td>
+<td>spans/metrics</td>
+<td>OTel + <code>fr_*</code> counters</td>
+<td>S02</td>
+<td>metrics naming</td>
+</tr>
+<tr>
+<td><code>backend/src/utils/</code></td>
+<td><code>response</code>, <code>routed-dispatch</code></td>
+<td>problem responses, licence route door</td>
+<td>S02</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>backend/src/routes/</code></td>
+<td>215 <code>.ts</code> + 20 subdirs</td>
+<td>handlers; capability-derived ones are thin adapters</td>
+<td>all</td>
+<td>not 1:1</td>
+</tr>
+<tr>
+<td><code>backend/src/scripts/</code></td>
+<td>backfills, checks</td>
+<td>operational scripts</td>
+<td>—</td>
+<td>not as runtime</td>
+</tr>
+</tbody>
+</table>
+<p><code>routes/</code> subdirectories, largest first: <code>assets</code> 33, <code>admin</code> 24, <code>me</code> 15, <code>cards</code>/<code>tools</code> 10, <code>kanban</code> 8, then 1–5 each (<code>asset-scope</code>, <code>webhooks</code>, <code>tenant</code>, <code>coding</code>, <code>notifications</code>, <code>research</code>, <code>settings</code>, <code>workspace</code>, <code>_lib</code>, <code>engagements</code>, <code>findings</code>, <code>governance</code>, <code>reports</code>, <code>asset-authoring</code>). Notable flat files: <code>mcp-webhook.ts</code>, <code>telegram-webhook.ts</code>, <code>email-webhook.ts</code>, <code>teams-webhook.ts</code>, <code>agui*.ts</code>, <code>andon.ts</code>, <code>kanbanWebSocket.ts</code>, <code>katas.ts</code>, <code>internal-*.ts</code>.</p>
+<h2 id="backendsrccapabilities--21-dirs-106-files-25436-loc"><code>backend/src/capabilities/</code> — 21 dirs, 106 files, 25,436 LOC</h2>
+<p>88 <code>defineCapability(...)</code> calls; <strong>548 distinct <code>/api/...</code> paths</strong>. (SPEC §1 quotes 1,376 endpoints / 549 paths — the difference is frozen multi-method rows. Do not restate 1,376 without re-deriving it.)</p>
+<table>
+<thead>
+<tr>
+<th>dir</th>
+<th>files</th>
+<th>what it does</th>
+<th>slices</th>
+<th>carry / do-not-carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>account</code></td>
+<td>8</td>
+<td>billing, github-app, <code>me</code>, notifications, repositories, usage, workspace-members</td>
+<td>S09, S12</td>
+<td>user-scoped reads; not billing sync</td>
+</tr>
+<tr>
+<td><code>admin</code></td>
+<td>12</td>
+<td>andon, asset-scope, assets, departments, katas, licensing, platform, pricing, provisioning, signup-approvals, verification</td>
+<td>S06, S09</td>
+<td>andon yes; licensing/pricing no</td>
+</tr>
+<tr>
+<td><code>agent</code></td>
+<td>1</td>
+<td><code>invoke.ts</code> — <code>POST /api/capabilities/:id/invoke</code>; <code>agent-members/members.ts</code> alongside</td>
+<td>S04, S10</td>
+<td>the invocation prototype</td>
+</tr>
+<tr>
+<td><code>approvals</code></td>
+<td>2</td>
+<td>list/get, <code>decide</code></td>
+<td>S06</td>
+<td>state machine; one store</td>
+</tr>
+<tr>
+<td><code>cards</code></td>
+<td>1</td>
+<td>card CRUD/move (state lives in Planka)</td>
+<td>S05</td>
+<td>shape, not the split</td>
+</tr>
+<tr>
+<td><code>conveyor</code></td>
+<td>4</td>
+<td>catalogue, failures, flow-runs, list-project-types</td>
+<td>S06</td>
+<td>flow-run/failure concepts</td>
+</tr>
+<tr>
+<td><code>decompositions</code></td>
+<td>1</td>
+<td>split/commit</td>
+<td>S05</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>kag</code></td>
+<td>4</td>
+<td>assets, reviews passthrough, tools, <code>_body</code></td>
+<td>S09</td>
+<td><strong>no</strong> (strata replaces)</td>
+</tr>
+<tr>
+<td><code>kanban</code></td>
+<td>2</td>
+<td>board + assets — the Planka-facing surface</td>
+<td>S05</td>
+<td>the board contract</td>
+</tr>
+<tr>
+<td><code>library</code></td>
+<td>7</td>
+<td>architecture(+modeling), asset-authoring, asset-surfaces, governed-assets, toc</td>
+<td>S07, S08</td>
+<td>asset/revision model</td>
+</tr>
+<tr>
+<td><code>observe</code></td>
+<td>6</td>
+<td>asset-assignments, card-types, engagements, measure, traceability</td>
+<td>S06, S07</td>
+<td>traceability</td>
+</tr>
+<tr>
+<td><code>operate</code></td>
+<td>3</td>
+<td>reports, workers, workflows</td>
+<td>S09</td>
+<td>reports read</td>
+</tr>
+<tr>
+<td><code>platform</code></td>
+<td>8</td>
+<td>account-frozen, admin-frozen, agui, coding, inbound, service-frozen, system</td>
+<td>S02, S10</td>
+<td><code>agui.ts</code> only</td>
+</tr>
+<tr>
+<td><code>project-requests</code></td>
+<td>1</td>
+<td>CP→fr bridge intake + approve/reject</td>
+<td>S07</td>
+<td>new contract</td>
+</tr>
+<tr>
+<td><code>projects</code></td>
+<td>14</td>
+<td>artifacts, assets, collaboration, conveyor-history, create/get/list, documents, execution, outputs, project-frozen, project-routes, quality-people, registers</td>
+<td>S05, S06, S07</td>
+<td><strong>largest carry surface</strong></td>
+</tr>
+<tr>
+<td><code>research</code></td>
+<td>4</td>
+<td>discover, media, scientific</td>
+<td>S07</td>
+<td>S0 decides</td>
+</tr>
+<tr>
+<td><code>schedules</code></td>
+<td>3</td>
+<td>scheduled-triggers, suggested-schedules</td>
+<td>S06</td>
+<td>→ job/schedule table</td>
+</tr>
+<tr>
+<td><code>service</code></td>
+<td>1</td>
+<td><code>service-routes.ts</code></td>
+<td>S02</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>settings</code></td>
+<td>7</td>
+<td>channels, llm-provider, messaging, secrets, tenant, url-credentials</td>
+<td>S09</td>
+<td>secrets yes; llm-provider S0</td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td>2</td>
+<td>analytics, bridge</td>
+<td>S07</td>
+<td>S0 decides</td>
+</tr>
+</tbody>
+</table>
+<p>Two files sit at the top, not in a dir: <code>define.ts</code> and its derivations. <code>frozen-routes.ts</code>, <code>route-overlap-pairs.json</code>, <code>served-spec.lock.json</code>, <code>served-spec.ts</code>, <code>spec-document.ts</code>, <code>rbac-rules.ts</code>, <code>principal.ts</code>, <code>lazy.ts</code>, <code>redact.ts</code>, <code>json-schema.ts</code> are the machinery.</p>
+<h2 id="the-registry-mechanism--the-model-for-s04">The registry mechanism — the model for S04</h2>
+<table>
+<thead>
+<tr>
+<th>file</th>
+<th>exported symbols</th>
+<th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>capabilities/define.ts</code> (469)</td>
+<td><code>CapabilityArea</code>, <code>HttpMethod</code>, <code>ErrorSpec</code>, <code>LICENCE_ROUTE_DOOR_ERROR</code>, <code>isAgentExclusionReason</code>, <code>CapabilityHttp</code>, <code>RequestHeaderSpec</code>, <code>ResponseSpec</code>, <code>LegacyRouteHandler</code>, <code>Capability</code>, <code>InvalidCapabilityError</code>, <code>defaultConfirm</code>, <code>defineCapability</code></td>
+<td>declaration + load-time validation</td>
+</tr>
+<tr>
+<td><code>capabilities/derive-openapi.ts</code> (354)</td>
+<td><code>SERVED_SPEC_EXTENSIONS=false</code>, <code>openApiPath</code>, <code>pathParams</code>, <code>capabilityExtension</code>, <code>DeriveOptions</code>, <code>deriveOperation</code>, <code>inputIsPassthrough</code>, <code>inputIsStrict</code>, <code>SECRET_MARKER_KEY='x-secret'</code>, <code>markSecret</code>, <code>toOas30</code>, <code>OpenApiDerivationError</code>, <code>servedOperationKey</code>, <code>buildOpenApiSpec</code></td>
+<td>declaration → OAS 3.0 operation</td>
+</tr>
+<tr>
+<td><code>capabilities/derive-mcp.ts</code> (34)</td>
+<td><code>McpToolDescriptor</code>, <code>deriveMcpTool</code>, <code>deriveMcp</code></td>
+<td>declaration → MCP tool (<code>.</code>→<code>_</code>)</td>
+</tr>
+<tr>
+<td><code>capabilities/derive-agent.ts</code> (125)</td>
+<td>agent-callable projection</td>
+<td>declaration → AG-UI action</td>
+</tr>
+<tr>
+<td><code>capabilities/derive-router.ts</code> (237)</td>
+<td><code>PlaceableRow</code>, <code>OverlapPair</code>, <code>ROUTE_OVERLAP_PAIRS</code>, <code>routeRowKey</code>, <code>CapabilityRouteRow</code>, <code>capabilityRouteRows</code>, <code>placeCapabilityRoutes</code>, <code>capabilityRouteHandler</code>, <code>deriveRouter</code></td>
+<td>declaration → route</td>
+</tr>
+<tr>
+<td><code>capabilities/registry.ts</code> (300)</td>
+<td><code>RegisteredCapability</code>, <code>REGISTERED_CAPABILITIES</code>, <code>CAPABILITIES</code>, <code>DuplicateCapabilityError</code>, <code>registryErrors</code>, <code>assertRegistryConsistent</code></td>
+<td>the single boot-time table</td>
+</tr>
+<tr>
+<td><code>capabilities/lazy.ts</code> (59) · <code>principal.ts</code> (305)</td>
+<td><code>HandlerRef</code>, <code>lazyHandler</code>, <code>lazyActionHandler</code> · <code>ChannelTenant</code>, <code>ChannelTenantResolution</code>, <code>channelTenantRefusalText</code></td>
+<td>deferred handlers; principal/tenant resolution</td>
+</tr>
+</tbody>
+</table>
+<p><code>Capability</code> fields, exactly: <code>id</code> (<code>&lt;area&gt;.&lt;verb_noun&gt;</code>, one dot, lowercase), <code>area</code>, <code>summary</code>, <code>description?</code>, <code>http{method, path|null, operationId, idempotencyHeader?, successStatus?, stream?:'ndjson', requestBody?, queryFields?, responseContentType?, mountedWhen?, bodyFields?, headers?, unrouted?, specExempt?}</code>, <code>input: ZodTypeAny</code>, <code>output: ZodTypeAny</code>, <code>errors: ErrorSpec[]</code>, <code>auth{principal:'user'|'service'|'public'|'webhook', rbac}</code>, <code>tenancy:'self'|'tenant'|'project'|'platform'</code>, <code>effect:'read'|'write'|'destructive'</code>, <code>confirm:'none'|'card'|'card-typed'</code>, <code>secrets?</code>, <code>conveyorGated?</code>, <code>rmOwned?</code>, <code>agent</code> (<code>{expose:true, tier, idempotencyKey, cronSafe, card?, channelPendingText?, idempotencyTtlSeconds?, approvalTtlSeconds?}</code> | <code>{expose:false, reason}</code>), <code>licence{ops}</code>, <code>approval?</code>, <code>parking?</code>, <code>autoApproveForInitiator?</code>, <code>openapi{frozen?, tags?, responses?, security?, internal?}</code>, <code>handler?</code>, <code>legacyHandler?</code>.</p>
+<p>Carry to S04: one declaration → four artifacts; the closed <code>effect</code>/<code>confirm</code>/<code>tenancy</code>/<code>principal</code> vocabularies; load-time validation; the served-spec lock (per-operation sha256, CI-checked); <code>specExempt</code>/<code>unrouted</code> as honest escape hatches. Not: Zod (Rust uses serde/schemars), <code>legacyHandler</code>, <code>frozen</code>.</p>
+<h2 id="licence">Licence</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>symbols</th>
+<th>what it is</th>
+<th>slices</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backend/src/lib/licence-introspect.ts</code> (402)</td>
+<td><code>LicenceIdentity</code>, <code>looksLikeJwt</code>, <code>licencePathEnabled</code>, <code>introspectLicenceToken</code>, <code>introspectLicenceForRequest</code>, <code>isLicenceBearer</code>, <code>licenceUser</code>, <code>DELEGATION_TENANT_HEADERS</code>, <code>delegatingLicenceSubjects</code>, <code>resolveDelegatedTenant</code></td>
+<td>bearer classifier + licences-service introspection</td>
+<td>S02</td>
+</tr>
+<tr>
+<td><code>backend/src/lib/require-fr-license.ts</code> (133)</td>
+<td><code>FR_APP_KEY</code>, <code>tenantHasFrLicense</code>, <code>invalidateFrLicenseCache</code>, <code>requireFrLicense</code></td>
+<td>per-tenant app entitlement gate</td>
+<td>S02</td>
+</tr>
+</tbody>
+</table>
+<p>Shape rule: <code>looksLikeJwt</code> is <strong>exactly three non-empty dot-separated parts</strong>; <code>a..c</code>, <code>.b.c</code>, <code>a.b.</code>, two- and four-part strings are not JWT-shaped. A JWT-shaped token that fails verification is a hard 401 and is <strong>never retried</strong> as a licence token. Tokens are <code>secrets.token_urlsafe(32)</code> (base64url, no dots), so the shapes cannot collide. <code>isLicenceBearer</code> requires non-JWT shape <strong>and</strong> the path configured.</p>
+<p>Cache: <code>CACHE_TTL_MS = 60_000</code>, <code>CACHE_MAX_ENTRIES = 1_000</code>, keyed <code>sha256(token)</code>. <strong>Positive results only</strong>; a negative answer is never cached and <strong>evicts</strong> any cached entry so a revocation is seen on the next call. TTL is clipped to token/licence expiry; an already-past expiry means do not cache. <code>require-fr-license</code> is a <strong>second, Redis-backed</strong> cache (<code>fr-license:tenant:&lt;tenantId&gt;</code>, <code>config.frLicense.cacheTtlSeconds</code>), coalesced by <code>createSingleFlight</code> and guarded by a <code>cacheEpoch</code> so an invalidation cannot write back a stale answer; it <strong>fails closed</strong>. Carry both into S02 (§5.4 of the spec collapses them to one in-process cache — that is a deliberate change).</p>
+<h2 id="channels-and-the-s06a-seam">Channels and the S06a seam</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>symbols</th>
+<th>what it is</th>
+<th>slices</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backend/src/routes/mcp-webhook.ts</code> (30)</td>
+<td><code>handleMcpIncoming</code></td>
+<td><code>POST /api/webhooks/mcp/incoming</code>: verify signature → <code>parseMcpBody</code> → <code>channelDispatcher</code></td>
+<td>S06a</td>
+</tr>
+<tr>
+<td><code>backend/src/channels/mcp.ts</code> (88)</td>
+<td><code>parseMcpBody</code>, <code>mcpChannel</code> (<code>parseWebhook</code>, <code>postReply</code>)</td>
+<td>inbound body <code>{address, text, correlation_id, job?, on_behalf_of?}</code>; <code>MAX_TEXT=4000</code>; malformed optional field invalidates the whole body</td>
+<td>S06a</td>
+</tr>
+<tr>
+<td><code>backend/src/channels/mcp-signature.ts</code> (41)</td>
+<td><code>MCP_SIGNATURE_HEADER='X-Channel-Signature'</code>, <code>MCP_TIMESTAMP_HEADER='X-Channel-Timestamp'</code>, <code>MAX_SKEW_SECONDS=300</code>, <code>signMcpBody</code>, <code>verifyMcpSignature</code></td>
+<td><code>sha256=&lt;hex HMAC-SHA256 of "&lt;ts&gt;.&lt;raw body&gt;"&gt;</code>, timestamp inside the MAC, <code>timingSafeEquals</code></td>
+<td>S06a</td>
+</tr>
+<tr>
+<td><code>backend/src/domain/engagement/adapters/mcp.ts</code> (112)</td>
+<td><code>McpAdapter</code>, <code>mcpAdapter</code>, <code>approvalEvent</code></td>
+<td><strong>the outbound emitter</strong> — <code>fetch(config.services.mcp.eventsUrl)</code> signed with <code>signMcpBody</code>, 204 expected, idempotency key derived from the body</td>
+<td>S06a</td>
+</tr>
+<tr>
+<td><code>backend/src/channels/index.ts</code> (1509)</td>
+<td><code>InboundMessage</code>, <code>ChannelInbound</code>, <code>DuplicateChannelError</code>, <code>registerChannel</code>, <code>getChannel</code>, <code>listChannels</code>, <code>WEB_SESSION_CHANNELS</code>, <code>TENANT_FREE_CHANNEL_ACTIONS</code>, <code>PER_WORKSPACE_CHANNEL_READS</code>, <code>DispatchOptions</code>, <code>channelDispatcher</code></td>
+<td>ONE inbound pipeline: identity → intent → tenant → capability → reply</td>
+<td>S06, S06a</td>
+</tr>
+<tr>
+<td><code>backend/src/channels/</code></td>
+<td><code>email.ts</code>, <code>inapp.ts</code>, <code>teams.ts</code>, <code>telegram.ts</code>, <code>telegram-envelope.ts</code>, <code>voice.ts</code>, <code>web.ts</code></td>
+<td>per-channel adapters</td>
+<td>S06a</td>
+</tr>
+<tr>
+<td><code>backend/src/workers/mcp-approval-closed.ts</code></td>
+<td><code>runOnce</code> + <code>setInterval</code></td>
+<td>emits <code>approval.closed</code> (the 30 s close emitter §4.5 names)</td>
+<td>S06a</td>
+</tr>
+</tbody>
+</table>
+<p>Outbound event payloads (from <code>approvalEvent</code> / <code>sendMessage</code>): <code>approval.requested</code> carries <code>approval_id, project_id, tenant_id, kind, description, change_summary, impact_analysis, expires_at, correlation_id</code>; <code>approval.closed</code> carries the same base plus <code>final_status</code>; <code>message</code> carries <code>kind, text, correlation_id, meta</code>. <code>correlation_id</code> is <code>approval.metadata.mcp_run_id</code> when set by an n8n run. S06a must reproduce these names, fields, the ±300 s window, the <code>sha256=</code> prefix, and idempotent 204 close.</p>
+<h2 id="workers--14-files-the-setinterval-set-s02-replaces">Workers — 14 files, the setInterval set S02 replaces</h2>
+<p><code>ac-coverage-redelivery</code>, <code>analytics-rollup</code>, <code>approval-expiry</code>, <code>approval-redelivery</code>, <code>deblock-callback-redelivery</code>, <code>idempotency-sweep</code>, <code>mcp-approval-closed</code>, <code>project-delivered-reconcile</code>, <code>project-request-analysis-timeout</code>, <code>scheduled-trigger-health</code>, <code>scheduled-trigger-run-prune</code>, <code>scheduled-trigger-tick</code>, <code>signup-onboarding-tick</code>, <code>workflows-cache</code>.</p>
+<p><strong>13 of 14 use <code>setInterval</code></strong> (module-level <code>timer</code>, start/stop pair, <code>runOnce</code>). Only <code>scheduled-trigger-run-prune</code> uses a self-rescheduling timeout, and <code>deblock-callback-redelivery</code> documents the defect: <code>setInterval</code> never runs until one full interval elapses, so the first tick after deploy is late by the interval. Carry the <code>runOnce</code> handlers as job kinds; not the timers.</p>
+<h2 id="migrations--224-files-001235-gaps">Migrations — 224 files (<code>001</code>..<code>235</code>, gaps)</h2>
+<p>Representative: <code>001_remove_planka_board_id</code>, <code>002_n8n_integration</code>, <code>003_repositories_documents_projects</code> (<code>repositories</code>, <code>documents</code>, <code>projects</code>), <code>004_notification_hub</code> (<code>notification_log</code>, <code>approvals</code>), <code>023_user_roles</code>, <code>026_workspaces_and_departments</code>, <code>100_card_phase_lease</code>, <code>202_signup_approvals</code>, <code>213_conveyor_flow_runs</code>.</p>
+<h2 id="db-tables-that-matter-to-s03s05s06">DB tables that matter to S03/S05/S06</h2>
+<p><strong>There is no <code>cards</code> table.</strong> Card state is in Planka; fr stores only satellites: <code>card_drafts</code>, <code>card_bridge_links</code>, <code>card_seeker_links</code>, <code>card_contracts</code>, <code>card_version_stamps</code>, <code>card_computed_checks</code>, <code>card_done_overrides</code>, <code>card_asset_binding</code>, <code>card_plan_pins</code>, <code>card_plan_events</code>, <code>card_executed_activities</code>, <code>card_scenario_evidence</code>, <code>card_phase_lease</code>, <code>card_phase_lease_waiter</code>.</p>
+<p>Control-plane: <code>approvals</code> (created in <code>004</code>, extended by <code>011/021/042/047/101/105/110</code>), <code>approval_callback_urls</code>, <code>execution_signoff_blocks</code>, <code>wip_slot</code>, <code>project_conveyor_failures</code>, <code>project_conveyor_start_attempts</code>, <code>conveyor_flow_runs</code>, <code>andon_state</code>, <code>andon_state_history</code> (<code>workspaces_andon_history</code> was dropped by migration <code>065</code>), <code>engagement_deliveries</code>. Comms: <code>notifications</code>, <code>notification_log</code>, <code>notification_prefs</code>, <code>inapp_messages</code>, <code>channels</code>, <code>user_channel_prefs</code>, <code>telegram_forum_topics</code> (<code>telegram_pending_answers</code> was dropped by migration <code>223</code>). Identity/tenancy: <code>workspaces</code>, <code>departments</code>, <code>department_members</code>, <code>user_roles</code>, <code>agent_members</code>, <code>member_knowledge_areas</code>, <code>super_admin_tenant_actions</code>. Projects: <code>projects</code>, <code>project_requests</code>, <code>project_request_repositories</code>, <code>project_repositories</code>, <code>project_deliverables</code>, <code>project_milestones</code>, <code>project_outlines</code>, <code>project_reports</code>, <code>project_stakeholders</code>, <code>repositories</code>, <code>documents</code>, <code>streams</code>, <code>scheduled_triggers</code>, <code>scheduled_trigger_runs</code>, <code>action_idempotency</code>, <code>capability_audit</code>.</p>
+<p>S03 maps <code>card*</code> → one <code>card</code> + <code>comment</code> + <code>task</code>, folds the lease satellites into the card row (01-CONTRACT §4), and replaces <code>notifications</code>/<code>inapp_messages</code>/<code>engagement_deliveries</code> with one <code>delivery</code> table.</p>
+<h2 id="ag-ui--copilot-s10">AG-UI / copilot (S10)</h2>
+<p><code>backend/src/agui/</code> — <strong>46 files, 12,734 LOC</strong>. Entry points: <code>agui/registry.ts</code> (<code>ActionAlreadyRegisteredError</code>, <code>InvalidActionNameError</code>, <code>InvalidActionApprovalError</code>, <code>UnknownActionError</code>), <code>agui/register-all-actions.ts</code> (<code>ACTION_MODULE_LOADERS</code>, <code>registerAllActions</code>), <code>agui/agent-surface.ts</code> (<code>PROJECT_AGENT_ACTIONS</code>, <code>PROJECT_AGENT_CORE</code>, <code>PROJECT_AGENT_SEARCHABLE</code>, <code>PROJECT_BINDING</code>, <code>SurfaceRefusal</code>, <code>agentSurfaceRefusal</code>), <code>agui/protocol.types.ts</code>, <code>agui/rbac.ts</code>, <code>agui/coverage-check.ts</code>, <code>agui/context-provenance.ts</code>, <code>agui/tenant-member-provider.ts</code>, <code>agui/capability-invoke-card.ts</code>, <code>agui/proposal-shape.ts</code>. <strong>34 action modules</strong> in <code>agui/actions/</code> (<code>project-core</code>, <code>kanban-card</code>, <code>approvals-decide</code>, <code>architecture-*</code>, <code>n8n</code>, <code>workers</code>, <code>secrets</code>, <code>toc</code>, <code>ui-navigate</code>, …). Routes: <code>routes/agui.ts</code>, <code>agui-session.ts</code>, <code>agui-threads.ts</code>.</p>
+<p><code>backend/src/agent-core/</code> — <strong>7 files, 882 LOC</strong>: <code>index.ts</code> (<code>agentCore</code>, <code>setIntentResolver</code>, <code>HeuristicIntentResolver</code>, type re-exports), <code>identity.ts</code>, <code>llm-resolver.ts</code>, <code>resolver.ts</code>, <code>session-refresh.ts</code>, <code>session-store.ts</code>, <code>types.ts</code>. <code>backend/src/agent/</code> is a further 17 files / 2,943 LOC.</p>
+<p>S10 carries the action-surface/RBAC model and the AG-UI wire protocol if consumers depend on it; not the 34 modules as written.</p>
+<h2 id="frontend-s12">Frontend (S12)</h2>
+<p>Stack: <strong>SvelteKit 2.70 + Svelte 5.57 + Vite 8 + Tailwind 4</strong>, <code>adapter-node</code>, <code>keycloak-js</code> 26, <code>@xyflow/svelte</code>, <code>d3</code>, <code>svelte-dnd-action</code>, <code>@tanstack/svelte-virtual</code>. <strong>195 <code>+page.svelte</code></strong>.</p>
+<p>Route groups:</p>
+<ul>
+<li><code>(admin)/admin/(platform)/*</code> — andon, assets/<em>, kata, licenses/</em>, metering, onboarding, pricing, tenant-budgets, tenants/[nameOrId], users.</li>
+<li><code>(admin)/admin/(tenant)/*</code> — billing, budget, departments, members; <code>/admin/home</code> outside both groups.</li>
+<li><code>(project)/projects/[id]/*</code> — the cockpit: <code>board</code>, <code>cards/[cardId]</code>, <code>approve/[approvalId]</code>, <code>needs-you</code>, <code>plan</code>, <code>goal</code>, <code>flow-runs</code>, <code>cost</code>, <code>documents/[artifactId]</code>, <code>library/*</code> (architecture, channels, decisions, principles, requirements, triggers, workflows, pm, kag), <code>quality</code>, <code>reasoning</code>, <code>registers</code>, <code>repositories</code>, <code>settings</code>, <code>threads</code>, <code>traceability</code>, <code>governance</code>, <code>artifacts</code>.</li>
+<li>Flat: <code>/kanban</code>, <code>/cards/[id]</code>, <code>/approvals</code>, <code>/chat</code>, <code>/threads/*</code>, <code>/decisions/*</code>, <code>/requirements/*</code>, <code>/principles/*</code>, <code>/library/*</code>, <code>/reports/*</code>, <code>/secrets/*</code>, <code>/settings/*</code>, <code>/workers/*</code>, <code>/workflows/*</code>, <code>/projects/{intake,new,requests}</code>, <code>/repositories/*</code>, <code>/bridge/*</code>, <code>/engagements/*</code>, <code>/executions/*</code>, <code>/operate/*</code>, <code>/notifications</code>, <code>/measure</code>, <code>/login</code>.</li>
+</ul>
+<p>Layout: <code>frontend/src/lib/</code> holds <code>api/</code> (typed clients), <code>components/</code>, <code>layout/</code>, <code>nav/</code>, <code>guards/</code>, <code>manifests/</code>, <code>actions/</code>, plus a dir per feature (<code>projects</code>, <code>cards</code>, <code>approvals</code>, <code>assets</code>, <code>conveyor-catalogue</code>, <code>kag</code>, <code>coding</code>, <code>katas</code>, <code>modeling</code>, <code>quality</code>, <code>judge</code>). S12 reproduces <strong>screens and their data requirements</strong> (01-CONTRACT §11); <code>ProjectForm.svelte</code> and the board/cockpit pages are the highest-value re-reads.</p>
+<h2 id="notes-and-traps">Notes and traps</h2>
+<ul>
+<li><code>capabilities/</code> holds 88 modern declarations against 548 paths — most of the surface is <code>frozen</code>/legacy. Counting <code>defineCapability</code> understates fr ~6×.</li>
+<li>The outbound MCP emitter is <strong>not</strong> in <code>channels/</code>; it is <code>domain/engagement/adapters/mcp.ts</code>. S06a starts there, not at <code>channels/mcp.ts</code> (inbound only).</li>
+<li>The licence rule is two caches with different lifecycles (60 s in-process, Redis per tenant). The spec collapses them — a change, not a port.</li>
+<li><strong><code>MCP_EVENTS_URL</code>, measured live 2026-11-07:</strong> <code>http://mcp.mcp.svc.cluster.local:8033/api/channels/fr/events</code> — a literal on the <strong><code>fr</code></strong> deployment (<code>kubectl -n fr get deploy -o jsonpath</code> → <code>MCP_EVENTS_URL</code>). It is <strong>not</strong> set on <code>mcp-external-driver</code>, whose env carries only <code>MCP_FR_BASE_URL</code>, <code>MCP_FR_CHANNEL_SECRET</code> and <code>MCP_N8N_*</code>. <strong>One marker remains</strong> — what changed in the commits after <code>6f7c5097</code> and whether <code>routes/mcp-webhook.ts</code> is mounted at the same path. Resolve it in one command: <code>git -C $HOME/Movies/fr diff --stat 6f7c5097..origin/main -- backend/src/channels backend/src/routes/mcp-webhook.ts backend/src/domain/engagement</code>. <strong>Default if it is not run:</strong> nothing on the channel path moved — the contract S06a implements is byte-shaped (path, grammar, HMAC, response words), and the emitter/source-map anchors were read from the pinned tree, not from <code>origin/main</code>.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/02-source-map/20-fr.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

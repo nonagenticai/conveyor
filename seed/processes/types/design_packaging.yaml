@@ -1,0 +1,165 @@
+# design_packaging — the bundle of design, architecture and analysis artifacts presented for
+# approval (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type design_packaging: outputs
+# draft/reviewed/published, acceptance outline_within_card_scope, every_claim_cites_a_source,
+# every_cited_source_exists, no_unsupported_claims, capability_acceptance_met,
+# artifact_is_qa_version) and n8n-designs/design/choices/v4/capabilities/design.yaml (text,
+# phase design, sections included_artifacts/summary/approval_scope, signoff true, uses_repo false,
+# inspect.criteria). It is the last design card: its upstream set is diagram_design and
+# narrative_design alongside the architecture documents, so included_artifacts carries ids and
+# every claim is a claim about one of them.
+card_type: design_packaging
+capability: design
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: design_packaging
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: design_packaging.ready
+    title: Design packaging — definition of ready
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [package_outline_planned]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline lists only the upstream design, architecture and analysis artifacts the card presents, and each one is in the type's upstream set — a diagram, a narrative or an architecture document, never a source tree."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: design_packaging.doing
+    title: Design packaging — definition of doing
+    definition_of_ready: {checks: [package_outline_planned]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every statement the summary makes about a design decision names the included artifact it comes from."}
+      - {name: every_cited_source_exists, text: "Every id in included_artifacts, and every id the summary cites, resolves to an artifact in the card's upstream set at the revision it read."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: design_packaging.qa
+    title: Design packaging — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "The package says nothing the included artifacts do not say, both in the summary and in what approval_scope implies the approver accepts."}
+      - {name: capability_acceptance_met, text: "The package satisfies every acceptance statement the design_packaging card type declares."}
+      - {name: every_artifact_included, text: "included_artifacts lists every upstream artifact the package presents, each with its id."}
+      - {name: summary_faithful, text: "summary says nothing the included artifacts do not say."}
+      - {name: approval_scope_clear, text: "approval_scope states exactly what the approver signs off and what not."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id]
+
+  - key: design_packaging.done
+    title: Design packaging — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The package published to the card is the exact revision QA reviewed; no artifact entered or left included_artifacts and no summary sentence changed after the review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: design_packaging.system
+    title: Design packaging — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: design_packaging.READY
+    list: ready
+    title: Design packaging — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: design_packaging
+        sop: design_packaging.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: design_packaging.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: design_packaging.DOING
+    list: doing
+    title: Design packaging — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: design_packaging.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: design_packaging.QA
+    list: qa
+    title: Design packaging — QA
+    outputs: [reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: design_packaging.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: design_packaging.DONE
+    list: done
+    title: Design packaging — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: design_packaging, sop: design_packaging.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: design_packaging.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

@@ -1,0 +1,15 @@
+{
+  "input": {
+    "key": "cap.kanban_coach.handle_error",
+    "title": "kanban coach (flow_error) — the named flows' child procedure",
+    "steps": [
+      {
+        "action": "cards.comment",
+        "input_template": {
+          "id": "{{card.id}}",
+          "body": "coach: flow_error acknowledged"
+        }
+      }
+    ]
+  }
+}

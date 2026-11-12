@@ -1,0 +1,220 @@
+# conveyor's CI as a PUBLIC repository.
+#
+# Why this file exists and why it is self-contained: a public repository may only call PUBLIC
+# reusable workflows, so `uses: <gitops repo>/.github/workflows/rust-service.yml`
+# (the archetype every private Rust service here consumes) cannot resolve once this repo is public.
+# The gates below are copied from that archetype; the private plumbing it uses — the estate's
+# internal registry login, its object-store-backed sccache, and the Flux rollout receiver — is
+# deliberately absent. There is nothing here for a fork to steal: no repo secrets are referenced,
+# and the only token is the automatic one, used solely to push an image from main.
+#
+# ⛔ Every job is gated on `!github.event.repository.private` so this file can land while the repo
+# is still private (jobs report "skipped", never red) and activate with zero edits at the flip.
+#
+# Runner choice is load-bearing, not a preference: all ARC runner groups have
+# allows_public_repositories:false, and they must stay that way — a fork PR can edit `runs-on`, so
+# any self-hosted runner open to this repo is arbitrary untrusted code inside the estate network.
+# GitHub-hosted standard runners are free and unlimited on public repos (measured: 4 vCPU, 86 GB
+# free on /, zero queue wait on 2026-11-12).
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never cancel a run for main: its image job is what deploys.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # Secret scan. Dir-mode fingerprints are what `.gitleaksignore` holds (see its header), and a
+  # full-tree scan is the honest one for a repo whose whole point is being public.
+  gitleaks:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: install gitleaks 8.30.1 (pinned, sha256-verified)
+        run: |
+          set -euo pipefail
+          version=8.30.1
+          sha=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+          curl -fsSL -o "$RUNNER_TEMP/gitleaks.tgz" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${version}/gitleaks_${version}_linux_x64.tar.gz"
+          echo "${sha}  $RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+      - name: scan the tree
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/gitleaks" dir --redact --exit-code 1 --no-banner \
+            --gitleaks-ignore-path .gitleaksignore .
+
+  # Private infrastructure must not be published. gitleaks catches credentials; this catches the
+  # other half of the rule: internal hostnames, tailnet addresses and private repo paths.
+  # Run the same script locally before pushing: `bash scripts/ci/no-private-refs.sh`.
+  no-private-refs:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: scan tracked files
+        run: bash scripts/ci/no-private-refs.sh
+
+  # Code gates, copied step-for-step from the archetype's rust-library job and from the resolved
+  # settings in the legacy `ci.yml` at the time of the public flip: fmt, clippy -D warnings, nextest
+  # + doctests, cargo audit. `CARGO_PROFILE_DEV_DEBUG=0` is the archetype's `profile_dev_debug: "0"`
+  # — it drops the DWARF, which is what made `target/` 17 GiB and evicted the pod on ARC.
+  #
+  # One shared Postgres and one shared Redis, exactly as the archetype gives them (it exports
+  # TEST_DATABASE_URL and REDIS_URL when postgres_image/redis_image are set). The harness in
+  # crates/actions/tests/support/ and apps/server/tests/common/ short-circuits its own per-binary
+  # `docker run` on those variables. max_connections=300: nextest is process-per-test and the
+  # image default of 100 times out pools.
+  checks:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      REDIS_URL: redis://127.0.0.1:6379/
+      # Public images, named once. A literal `name:tag` in a `docker` line trips the estate's
+      # upstream-ref lint; a variable is the pattern the archetype itself uses.
+      PG_IMAGE: postgres:18
+      REDIS_IMAGE: library/redis:8.10.1-alpine
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: toolchain follows rust-toolchain.toml; assert the Dockerfile agrees
+        run: |
+          set -euo pipefail
+          rustup show
+          rustc --version
+          want=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)
+          got=$(sed -n 's/^ARG RUST_TOOLCHAIN=\(.*\)/\1/p' Dockerfile | head -1)
+          if [ "$want" != "$got" ]; then
+            echo "::error::Dockerfile ARG RUST_TOOLCHAIN=$got != rust-toolchain.toml channel=$want"
+            exit 1
+          fi
+
+      - uses: actions/cache@v4
+        with:
+          # Registry only: the target directory is multi-gigabyte and would thrash the 10 GB
+          # cache budget. Compiling is what a free public runner is for.
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+
+      - name: start Postgres 18 and Redis (the archetype's postgres_image / redis_image)
+        run: |
+          set -euo pipefail
+          docker run -d --name ci-pg \
+            -e POSTGRES_PASSWORD=postgres \
+            --tmpfs /var/lib/postgresql \
+            -p 127.0.0.1:5432:5432 \
+            "$PG_IMAGE" -c fsync=off -c max_connections=300
+          docker run -d --name ci-redis \
+            --tmpfs /data -p 127.0.0.1:6379:6379 \
+            "$REDIS_IMAGE"
+          for _ in $(seq 1 60); do
+            docker exec ci-pg pg_isready -h 127.0.0.1 -U postgres >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec ci-pg pg_isready -h 127.0.0.1 -U postgres
+          for _ in $(seq 1 60); do
+            docker exec ci-redis redis-cli ping >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec ci-redis redis-cli ping
+
+      - name: disk headroom
+        run: df -h /
+
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy
+        run: cargo clippy --all-targets --locked -- -D warnings
+
+      - name: cargo nextest (0.9.150 pinned, sha256-verified)
+        run: |
+          set -euo pipefail
+          curl -fsSL -o "$RUNNER_TEMP/nextest.tgz" \
+            "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.150/cargo-nextest-0.9.150-x86_64-unknown-linux-gnu.tar.gz"
+          echo "b0959bc64232974224cf9fb22c915845398c0e8668fa7831eb5b43fb1eef781f  $RUNNER_TEMP/nextest.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/nextest.tgz" -C "$RUNNER_TEMP" cargo-nextest
+          "$RUNNER_TEMP/cargo-nextest" nextest run --no-tests=fail --color never --locked
+          cargo test --doc --locked
+
+      - name: cargo audit 0.22.2 (pinned, sha256-verified)
+        run: |
+          set -euo pipefail
+          curl -fsSL -o "$RUNNER_TEMP/audit.tgz" \
+            "https://github.com/rustsec/rustsec/releases/download/cargo-audit%2Fv0.22.2/cargo-audit-x86_64-unknown-linux-musl-v0.22.2.tgz"
+          echo "7fb9497f8594b389e5fce5ef9b92db08432996895b2e0c5a0167a69ed445c428  $RUNNER_TEMP/audit.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/audit.tgz" -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/cargo-audit-x86_64-unknown-linux-musl-v0.22.2/cargo-audit" audit
+
+  # The image that deploys. On a PR this is a build+smoke check only (fork tokens are read-only).
+  # On main it also pushes to ghcr.io with the automatic token — no stored credential.
+  # The cluster consumes `latest` through Flux (gitops-production ImagePolicy `conveyor`), which is
+  # how the archetype's promote step behaved; `sha-*` tags are the immutable record for rollback.
+  image:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
+    env:
+      # A variable, not a literal: the estate lint scans every `docker` line for `name:tag` tokens
+      # and classifies a bare `conveyor:ci` as a Docker Hub ref. (The archetype's IMAGE_REF exists
+      # for the same reason.)
+      IMG: conveyor:ci
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: build
+        run: docker build --file Dockerfile --tag "$IMG" .
+
+      # The default smoke would start the server, which exits on the missing DATABASE_URL /
+      # BIND_ADDR / OIDC issuer before proving anything; instead check that the binary runs and
+      # emits its OpenAPI document.
+      #
+      # ⛔ NO PIPE AT ALL FOR THE OPENAPI CHECK. `grep -q` exits at its first match, so whoever is
+      # WRITING the document dies on SIGPIPE and the step goes red on a document it produced.
+      # Measured twice on ARC: run 42642725695 and run 42648606596, both "write /dev/stdout: broken
+      # pipe". A bash pattern match on the captured variable has no reader to exit early.
+      - name: smoke
+        run: |
+          set -euo pipefail
+          docker run --rm "$IMG" --version
+          out="$(docker run --rm "$IMG" --print-openapi)"
+          [[ "$out" == *'"openapi"'* ]]
+
+      # A dispatch on main is a maintainer action, so it may publish too — that is how the first
+      # image after the flip can be produced without an empty commit.
+      - name: push to ghcr.io (main only)
+        if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+        run: |
+          set -euo pipefail
+          ref="ghcr.io/${{ github.repository }}"
+          echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          sha="sha-${GITHUB_SHA::7}"
+          run="$(printf 'main-%06d' "${{ github.run_number }}")"
+          for tag in "$sha" "$run" latest; do
+            docker tag "$IMG" "$ref:$tag"
+            docker push "$ref:$tag"
+          done
+          echo "pushed $ref:$sha $ref:$run $ref:latest"

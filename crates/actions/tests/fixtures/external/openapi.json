@@ -1,0 +1,144 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "conveyor external fixtures",
+    "version": "1.0.0",
+    "description": "The four external operations S04 ingests and invokes."
+  },
+  "paths": {
+    "/echo": {
+      "post": {
+        "operationId": "fixtures.echo",
+        "summary": "Echo a message",
+        "tags": ["fixtures"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message"],
+                "additionalProperties": false,
+                "properties": {"message": {"type": "string"}}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The message and the service that answered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["message", "service"],
+                  "properties": {
+                    "message": {"type": "string"},
+                    "service": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow": {
+      "post": {
+        "operationId": "fixtures.slow",
+        "summary": "Sleep, then answer",
+        "tags": ["fixtures"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["delay_ms"],
+                "properties": {"delay_ms": {"type": "integer", "minimum": 0}}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "How long the stub waited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["waited_ms"],
+                  "properties": {"waited_ms": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fail": {
+      "post": {
+        "operationId": "fixtures.fail",
+        "summary": "Return the requested 4xx",
+        "tags": ["fixtures"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {"status": {"type": "integer"}}
+              }
+            }
+          }
+        },
+        "responses": {
+          "422": {"description": "A refused call"},
+          "200": {
+            "description": "Never returned by the stub",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {"status": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/timeout": {
+      "post": {
+        "operationId": "fixtures.timeout",
+        "summary": "Always answer 504",
+        "tags": ["fixtures"],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {"type": "object", "additionalProperties": false, "properties": {}}
+            }
+          }
+        },
+        "responses": {
+          "504": {"description": "Upstream timeout"},
+          "200": {
+            "description": "Never returned by the stub",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {"status": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

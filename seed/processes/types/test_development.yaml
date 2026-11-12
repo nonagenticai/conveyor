@@ -1,0 +1,173 @@
+# test_development — create or update the tests the card names, changing test files only
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type test_development: outputs commit_sha, pr_number,
+# pr_url, head_sha, fix_report_artifact_id, merge_sha; and the READY test_files_in_test_dirs, DOING
+# every_case_written / suite_green_after and QA tests_check_target / capability_acceptance_met
+# acceptance — the catalogue declares no DONE acceptance, so DONE is the repo_write convention the
+# bdd_test_development sibling uses, pr_merged from the merge_sha output) and
+# n8n-designs/design/choices/v4/capabilities/testing.yaml (text "creation of or updating tests",
+# archetype development, phase test, `source: card`, `proof: tests_only`, and the type's
+# inspect.criteria — tests_assert_behaviour, tests_cover_target, no_production_change).
+# `source: card` (P-W3-10): no analysis report leads here — the card is the scope and READY finds
+# the test command, so the flow runs no upstream report read. ⛔ Not the BDD or TDD variants:
+# bdd_test_development writes Gherkin scenarios and tdd_test_development writes the tests ahead of
+# the code; this type writes the tests the card names, in whatever framework the repository
+# already uses.
+card_type: test_development
+capability: testing
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: test_development
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: test_development.ready
+    title: Test development — definition of ready
+    definition_of_ready: {checks: [card_names_the_target]}
+    definition_of_done: {checks: [test_files_in_test_dirs, test_command_found]}
+    acceptance_criteria:
+      - {name: test_files_in_test_dirs, text: "The tests the card's change will add or extend belong in the directories the repository already keeps that kind of test in, beside the existing tests for the same module, and the change invents no new test layout, runner or fixture convention of its own."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: test_development.doing
+    title: Test development — definition of doing
+    definition_of_ready: {checks: [test_command_found]}
+    definition_of_done: {checks: [every_case_written, suite_green_after]}
+    acceptance_criteria:
+      - {name: every_case_written, text: "Every case the card names — each behaviour, edge case and acceptance statement it lists — exists as a test that sets up its own state, calls the target and asserts its result, so no case is left as prose, as a TODO or as a comment in the diff."}
+      - {name: suite_green_after, text: "The suite runs green after the new tests are in place, with the command READY recorded and no test excluded from that run, and each new test passes because the behaviour it checks is the one the card intends — not because its assertion was copied from whatever the code returns today."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: test_development.qa
+    title: Test development — definition of QA
+    definition_of_ready: {checks: [every_case_written, suite_green_after]}
+    definition_of_done: {checks: [tests_check_target, capability_acceptance_met, tests_assert_behaviour, tests_cover_target, no_production_change]}
+    acceptance_criteria:
+      - {name: tests_check_target, text: "Every new or changed test fails when the behaviour it checks breaks: it asserts a result the target produces, so a regression in that behaviour turns the suite red instead of leaving it green."}
+      - {name: capability_acceptance_met, text: "The diff is true of every acceptance statement the test_development card type declares — each case the card names is written, the suite is green, and the tests check the target — judged from the diff and the run rather than from the card's own wording."}
+      - {name: tests_assert_behaviour, text: "Every new or changed test asserts the behaviour of the target, not only that the code runs: no test that imports the module, calls it and asserts a value came back without checking which value."}
+      - {name: tests_cover_target, text: "The tests reach the module, class, endpoint or job the card scopes, and not only a helper beside it that the target happens to call."}
+      - {name: no_production_change, text: "The diff changes no production code: only test files, plus at most the fixtures and suite configuration the new tests need to run."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: test_development.done
+    title: Test development — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request carrying the new tests is merged and its merge sha recorded, and the tests it lands are the ones QA confirmed — no test file added, weakened or dropped between the QA pass and the merge."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: test_development.system
+    title: Test development — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: test_development.READY
+    list: ready
+    title: Test development — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: test_development
+        sop: test_development.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: test_development.DOING
+    list: doing
+    title: Test development — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: test_development.QA
+    list: qa
+    title: Test development — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: test_development.DONE
+    list: done
+    title: Test development — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: test_development, sop: test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

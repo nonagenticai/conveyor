@@ -1,0 +1,45 @@
+[package]
+name = "conveyor-api"
+description = "Axum routers, utoipa documents and RFC 9457 problem+json."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+axum = { workspace = true }
+# The proposal custody seal stores its ciphertext in `approval.meta` as base64.
+base64 = { workspace = true }
+chrono = { workspace = true }
+conveyor-actions = { path = "../actions" }
+conveyor-auth = { path = "../auth" }
+conveyor-domain = { path = "../domain" }
+# The byte routes and the actions render through the same pure crate (CONTRACT §1).
+conveyor-render = { path = "../render" }
+conveyor-store = { path = "../store" }
+metrics = { workspace = true }
+metrics-exporter-prometheus = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sqlx = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+utoipa = { workspace = true }
+utoipa-axum = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+# The API tests include `../../actions/tests/support/mod.rs` by path, whose `redis` module starts
+# an ephemeral bus for the S13 delivery tests — so this crate needs the bus crate too.
+conveyor-bus = { path = "../bus" }
+# `documents_roundtrip` hashes the bytes it uploads and compares them with the row's `content_hash`.
+sha2 = { workspace = true }
+tower = { workspace = true }
+# The S05 gate's API tests drive the REAL server over HTTP (the actions test harness is
+# included by path), so they need the same client the server is tested with.
+reqwest = { workspace = true }
+rust_decimal = { workspace = true }

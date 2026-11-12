@@ -1,0 +1,171 @@
+# domain_analysis — the domain a design must be built in: its terms, actors and what the system
+# already does (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type domain_analysis: outputs draft/reviewed/published
+# and acceptance outline_within_card_scope, every_claim_cites_a_source, every_cited_source_exists,
+# no_unsupported_claims, capability_acceptance_met, artifact_is_qa_version) and
+# n8n-designs/design/choices/v4/capabilities/research.yaml (text "study to prepare for
+# architecture, design and/or feature development", phase preliminary, upstream research_spike,
+# sections domain_terms / actors / current_capabilities / constraints / implications_for_design,
+# signoff false, uses_repo true, uses_knowledge false, and the three inspect.criteria the QA stage
+# judges by).
+#
+# `uses_repo: true` is the load-bearing field: current_capabilities is read from the repository at
+# the pinned head, which is why DOING's citation checks resolve repository paths rather than only
+# the upstream spike, and why the document may not describe a capability the code does not show.
+# architecture_spike names domain_analysis as its upstream, so implications_for_design is what the
+# architecture chain acts on; nothing here designs anything.
+card_type: domain_analysis
+capability: research
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: domain_analysis
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: domain_analysis.ready
+    title: Domain analysis — definition of ready
+    definition_of_ready: {checks: [upstream_research_spike_done]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline holds the type's five sections — domain_terms, actors, current_capabilities, constraints, implications_for_design — and each one is a question to answer about the domain the card names. It proposes no architecture, no design and no feature, and it does not carry a section the card's domain does not need."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: domain_analysis.doing
+    title: Domain analysis — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every term, actor, current capability, constraint and design implication names what it comes from: a repository file and symbol for anything the system does today, and the research spike for anything the spike established. A domain fact the analysis cannot source is named as an assumption under constraints, never written as a finding."}
+      - {name: every_cited_source_exists, text: "Every repository path the document cites resolves at the pinned head the card read, and every research-spike passage it cites is in the version of that card the analysis read. A citation that does not resolve is reported on the card and kept out of the document."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: domain_analysis.qa
+    title: Domain analysis — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [terms_defined, capabilities_from_repo, implications_actionable, no_unsupported_claims, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "The document asserts no term, actor, capability, constraint or implication that the sources it cites do not state, and an assumption stays labelled as an assumption wherever the design would act on it."}
+      - {name: terms_defined, text: "Every term in domain_terms has a one-line definition, and the definition is the one the domain uses rather than a synonym for a term the document also defines."}
+      - {name: capabilities_from_repo, text: "current_capabilities cites repository files for what the system does today, and every capability it lists is present at the pinned head the card read."}
+      - {name: implications_actionable, text: "implications_for_design states what the architecture or design must do because of the domain — each implication traceable to one term, actor, capability or constraint above it — rather than restating the domain in other words."}
+      - {name: capability_acceptance_met, text: "The document meets every acceptance statement the domain_analysis card type declares for READY, DOING and QA."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id]
+
+  - key: domain_analysis.done
+    title: Domain analysis — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The document published to the card is the exact revision QA reviewed; no term, actor, capability, constraint or implication was added, cut or reworded after the review, so architecture_spike reads the domain the analysis was judged on."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: domain_analysis.system
+    title: Domain analysis — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: domain_analysis.READY
+    list: ready
+    title: Domain analysis — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: domain_analysis
+        sop: domain_analysis.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: domain_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: domain_analysis.DOING
+    list: doing
+    title: Domain analysis — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: domain_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: domain_analysis.QA
+    list: qa
+    title: Domain analysis — QA
+    outputs: [reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: domain_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: domain_analysis.DONE
+    list: done
+    title: Domain analysis — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: domain_analysis, sop: domain_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: domain_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

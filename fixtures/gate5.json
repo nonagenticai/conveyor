@@ -1,0 +1,68 @@
+{
+  "input": {
+    "key": "s13.gate5",
+    "title": "S13 gate: claim, condition, comment, gate, move",
+    "definition": {
+      "schema": 1,
+      "nodes": [
+        {
+          "id": "read",
+          "kind": "action",
+          "action": "cards.get",
+          "input_template": {
+            "id": "{{card.id}}"
+          }
+        },
+        {
+          "id": "condition",
+          "kind": "condition",
+          "predicate": {
+            "op": "eq",
+            "left": "{{steps.1.output.card.id}}",
+            "right": "{{card.id}}"
+          }
+        },
+        {
+          "id": "update",
+          "kind": "action",
+          "action": "cards.update",
+          "input_template": {
+            "id": "{{card.id}}",
+            "name": "s13 gate card",
+            "_version": 1
+          }
+        },
+        {
+          "id": "gate",
+          "kind": "gate",
+          "gate_kind": "human_approval"
+        },
+        {
+          "id": "move",
+          "kind": "action",
+          "action": "cards.move",
+          "input_template": {
+            "id": "{{card.id}}",
+            "list_id": "{{run.inputs.target_list_id}}",
+            "_version": "{{steps.3.output.version}}"
+          }
+        },
+        {
+          "id": "unused",
+          "kind": "action",
+          "action": "cards.get",
+          "input_template": {
+            "id": "{{card.id}}"
+          }
+        }
+      ],
+      "edges": [
+        {"from": "read", "to": "condition"},
+        {"from": "condition", "to": "update", "when": "true"},
+        {"from": "condition", "to": "unused", "when": "false"},
+        {"from": "update", "to": "gate"},
+        {"from": "gate", "to": "move"}
+      ]
+    }
+  }
+}

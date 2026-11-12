@@ -1,0 +1,3150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>02 — DATA ARCHITECTURE (binding) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="02--data-architecture-binding">02 — DATA ARCHITECTURE (binding)</h1>
+<p><strong>Authority:</strong> this file fixes every schema decision for <code>conveyor</code>. S03 implements it. <strong>No slice may add a table that is not in §2, and no slice may change a column, key or index defined here</strong> without a <code>CONTRACT-CHANGE REQUEST</code> to <code>01-CONTRACT.md</code>. <strong>Written:</strong> 2026-11-07, before the slice plans. Sources: <code>docs/SPEC.md</code> §4/§5.3/§6/§7, <code>01-CONTRACT.md</code>, <code>02-source-map/50-schema-inventory.md</code> (the total source lists), <code>02-source-map/{10,20,30,40}</code>.</p>
+<hr />
+<h2 id="1-principles">1. Principles</h2>
+<ol type="1">
+<li>One database <code>conveyor</code>, one runtime user <code>conveyor_runtime</code> (<code>NOSUPERUSER NOBYPASSRLS</code>), one migration role that owns the schema. One baseline + forward-only migrations, never edited after their slice closes.</li>
+<li><code>tenant_id uuid NOT NULL</code> on every tenant-owned table, with <code>ENABLE ROW LEVEL SECURITY</code> and a <code>FOR ALL</code> policy <code>tenant_isolation</code> carrying <strong>both</strong> <code>USING</code> and <code>WITH CHECK</code> (<code>tenant_id = current_setting('app.current_tenant', true)::uuid</code>). Scope is set per transaction with <code>set_config(…, true)</code>; a session-level <code>SET</code> is forbidden (PgBouncer transaction pooling).</li>
+<li>PKs are uuid v7. <strong>No external id is ever a PK or an FK target</strong> — no <code>planka_card_id</code>, no <code>execution_id</code> as a key.</li>
+<li>Every mutable aggregate has <code>version bigint NOT NULL DEFAULT 1</code>. <strong>Edits</strong> require <code>If-Match</code> and a zero-row <code>UPDATE</code> is <code>412</code>, never a blind write; <strong>state transitions are status-guarded, not version-guarded</strong> — the transitions named in CONTRACT §3 take no <code>If-Match</code> and no <code>version</code> input, and a zero-row update is <code>409</code> with the current state.</li>
+<li><code>timestamptz</code> everywhere, UTC, <code>now()</code> defaults. Never <code>timestamp</code> without a zone.</li>
+<li><strong>The list is the state.</strong> A card's lifecycle is <code>list_id</code> + <code>archived_at</code>. There is no <code>card.state</code>.</li>
+<li>Flattening per SPEC §4: one <code>revision</code>, one <code>catalogue_entry</code>, one <code>outline_node</code>, one <code>comment</code>, one <code>delivery</code>, one identity. A derived value is a query, not a column — the two exceptions are <code>tsv</code> (a generated column that exists only to be indexed) and <code>card.board_id</code> (denormalised to carry the board index).</li>
+<li><strong>No Postgres enum types.</strong> Every vocabulary is <code>text</code> + <code>CHECK</code>. Measured reason: <code>ALTER TYPE … ADD VALUE</code> cannot be used in the same transaction as an index on the new label (<code>fr/backend/migrations/153_u3_approval_kinds.sql</code> documents the failure), and the migration runner wraps each file in one transaction.</li>
+<li>JSONB holds only values read whole with their parent. Anything in a <code>WHERE</code>, <code>ORDER BY</code>, <code>JOIN</code> or <code>UNIQUE</code> is a column. §5 is the exhaustive list.</li>
+<li><code>event</code> is written in the same transaction as the mutation and is the only fan-out source. <code>audit_event</code> is append-only by <code>GRANT</code> (<code>SELECT, INSERT</code> only). Neither is optional per slice.</li>
+<li>Names: lowercase singular tables, <code>app_user</code> (never <code>user</code>), <code>position</code> (never <code>order</code>).</li>
+</ol>
+<h2 id="2-entity-catalogue">2. Entity catalogue</h2>
+<p>Shorthand: <code>nn</code> = not null, <code>d=</code> default, <code>uq</code> = unique, <code>ix</code> = index, <code>rls</code> = row-level security, <code>ret</code> = retention. All uuid PKs <code>DEFAULT uuidv7()</code>. All tables carry <code>created_at timestamptz nn d=now()</code>; mutable aggregates also carry <code>updated_at</code> and <code>version</code>, and those columns are not repeated per table below.</p>
+<h3 id="21-identity-and-tenancy--s02-4">2.1 Identity and tenancy — S02 (4)</h3>
+<pre><code>tenant · S02 · the root aggregate; one row per customer, the only object with no tenant_id
+  id uuid pk · slug text nn · name text nn · status text nn d=&#39;active&#39; check(status in (&#39;active&#39;,&#39;suspended&#39;,&#39;closed&#39;))
+  settings jsonb nn d=&#39;{}&#39;
+  uq (slug) · ix (status) · rls NO · ret none
+
+app_user · S02 · one row per human or agent principal; identity is OIDC sub, never a realm claim
+  id uuid pk · oidc_subject text null (null for agents) · email text null · display_name text nn d=&#39;&#39;
+  kind text nn d=&#39;human&#39; check(kind in (&#39;human&#39;,&#39;agent&#39;,&#39;service&#39;)) · status text nn d=&#39;active&#39;
+  uq (oidc_subject) where oidc_subject is not null · ix (email) · rls NO (no tenant_id; reached via membership) · ret none
+
+membership · S02 · the ONE role store per tenant; absorbs fr user_roles + agent_members + department_members + member_knowledge_areas
+  id uuid pk · tenant_id uuid nn · user_id uuid nn · role text nn d=&#39;member&#39;
+  check(role in (&#39;owner&#39;,&#39;admin&#39;,&#39;member&#39;,&#39;viewer&#39;,&#39;kata_executor&#39;)) · department_id uuid null · knowledge_areas text[] nn d=&#39;{}&#39;
+  meta jsonb nn d=&#39;{}&#39;
+  fk tenant_id→tenant, user_id→app_user, department_id→department
+  uq (tenant_id, user_id) · ix (tenant_id, role) · ix (user_id) · rls YES · ret none
+
+department · S02 · tenant org unit; absorbs fr departments
+  id uuid pk · tenant_id uuid nn · name text nn · parent_id uuid null check(parent_id &lt;&gt; id)
+  fk parent_id→department
+  uq (tenant_id, name) · rls YES · ret none</code></pre>
+<p>No separate agent table: an agent is an <code>app_user</code> row with <code>kind='agent'</code> and a null <code>oidc_subject</code>, reached per tenant through a <code>membership</code> row whose <code>meta.product</code> names the product.</p>
+<h3 id="22-platform--s02-7">2.2 Platform — S02 (7)</h3>
+<p>The seven tables of SPEC §6. Nothing else may be called a platform table.</p>
+<pre><code>event · S02 · the transactional outbox and the ONLY fan-out source (contract §7 shape, verbatim)
+  seq bigserial pk · id uuid nn d=uuidv7() · tenant_id uuid nn · topic text nn · type text nn
+  aggregate_type text nn · aggregate_id uuid nn · payload jsonb nn d=&#39;{}&#39;
+  correlation_id uuid null · causation_id uuid null · created_at timestamptz nn d=now()
+  bus_stream_id text null · published_at timestamptz null   -- 0035: the Redis relay&#39;s cursor (the bus is a nudge)
+  uq (id) · ix (tenant_id, seq) · (topic, seq) · (aggregate_type, aggregate_id, seq) · (published_at) where published_at is null
+  rls YES · ret 90 days, pruned by job; partition in 09 not before ~50M rows
+
+job · S02 · durable work queue; replaces all fourteen fr setInterval workers
+  id uuid pk · tenant_id uuid nn · kind text nn · dedupe_key text nn · status text nn d=&#39;pending&#39;
+  check(status in (&#39;pending&#39;,&#39;running&#39;,&#39;succeeded&#39;,&#39;failed&#39;,&#39;dead&#39;))
+  payload jsonb nn d=&#39;{}&#39; · run_after timestamptz nn d=now() · attempts int nn d=0 · max_attempts int nn d=5
+  lease_until timestamptz null · lease_token uuid null · last_error text null
+  uq (tenant_id, kind, dedupe_key) where status in (&#39;pending&#39;,&#39;running&#39;)
+  ix (tenant_id, run_after, id) where status=&#39;pending&#39; · (lease_until) where status=&#39;running&#39;
+  rls YES · ret 30 days after terminal
+
+schedule · S02 · materialises jobs under one advisory lock; replaces scheduled_triggers
+  id uuid pk · tenant_id uuid nn · kind text nn · cron text nn · timezone text nn d=&#39;UTC&#39;
+  payload jsonb nn d=&#39;{}&#39; · enabled bool nn d=true · next_run_at timestamptz nn · last_run_at timestamptz null
+  uq (tenant_id, kind) · ix (next_run_at) where enabled · rls YES · ret none
+
+audit_event · S02 · append-only; GRANT SELECT, INSERT only, never UPDATE/DELETE
+  id uuid pk · tenant_id uuid nn · actor_id uuid null · actor_kind text nn d=&#39;user&#39;
+  action text nn check(action ~ &#39;^[a-z0-9_]+\.[a-z0-9_]+$&#39;) · status text nn check(status in (&#39;ok&#39;,&#39;refused&#39;,&#39;error&#39;))
+  resource_type text null · resource_id uuid null · request_id text null
+  details jsonb nn d=&#39;{}&#39; check(length(details::text) &lt;= 8192)
+  ix (tenant_id, created_at desc, id) · (tenant_id, resource_type, resource_id, created_at desc)
+  rls YES · ret UNBOUNDED (see §6)
+
+action_invocation · S02 · one row per registry invocation, written in the mutation transaction
+  id uuid pk · tenant_id uuid nn · actor_id uuid null · action text nn · action_version int nn d=1
+  input_hash text nn · idempotency_key text null · outcome text nn check(outcome in (&#39;ok&#39;,&#39;refused&#39;,&#39;error&#39;,&#39;timeout&#39;))
+  duration_ms int nn d=0 · trace_id text null
+  ix (tenant_id, action, created_at desc) · (tenant_id, trace_id) · rls YES · ret 30 days
+
+idempotency_key · S02 · POST replay store; absorbs action_idempotency + router_dedupe
+  tenant_id uuid nn · scope text nn · key text nn · request_hash text nn
+  status_code int null · response jsonb null · expires_at timestamptz nn
+  pk (tenant_id, scope, key) · ix (expires_at) · rls YES · ret 24 h TTL, swept by job
+
+app_licence · S02 · the synced app-level entitlement; one row per (tenant, app_key)
+  tenant_id uuid nn · app_key text nn d=&#39;conveyor&#39; · status text nn check(status in (&#39;active&#39;,&#39;expired&#39;,&#39;revoked&#39;,&#39;unknown&#39;))
+  expires_at timestamptz null · checked_at timestamptz nn · raw jsonb nn d=&#39;{}&#39;
+  pk (tenant_id, app_key) · rls YES · ret none</code></pre>
+<h3 id="23-board-spine--s03-9">2.3 Board spine — S03 (9)</h3>
+<p>The aggregates the domain crate models and proptests. Nothing here is a satellite.</p>
+<pre><code>programme · S03 · portfolio container; ships here because `project` (S03) is its first consumer
+  id uuid pk · tenant_id uuid nn · name text nn · status text nn d=&#39;active&#39; · owner_user_id uuid null
+  fk owner_user_id→app_user · uq (tenant_id, name) · rls YES · ret none
+
+project · S03 · the ONE project entity; absorbs fr projects + Planka project + RM pm_projects
+  id uuid pk · tenant_id uuid nn · key text nn · name text nn · description text nn d=&#39;&#39;
+  status text nn d=&#39;active&#39; check(status in (&#39;draft&#39;,&#39;active&#39;,&#39;paused&#39;,&#39;closed&#39;,&#39;archived&#39;))
+  programme_id uuid null · project_type_code text null · phase_code text null
+  owner_user_id uuid null · repo_url text null · meta jsonb nn d=&#39;{}&#39;
+  fk programme_id→programme, owner_user_id→app_user
+  uq (tenant_id, key) · ix (tenant_id, status, updated_at desc, id) · (tenant_id, programme_id)
+  rls YES · ret none (closed projects are history, not garbage)
+
+board · S03 · one board per project today, but the FK is the contract, not a 1:1 assumption
+  id uuid pk · tenant_id uuid nn · project_id uuid nn · name text nn · position numeric nn d=0
+  settings jsonb nn d=&#39;{}&#39;   -- default_card_type_code, default_view, display flags
+  fk project_id→project · uq (tenant_id, project_id, name) · ix (tenant_id, project_id, position)
+  rls YES · ret none
+
+list · S03 · the card STATE; `kind` is the only lifecycle vocabulary in the system
+  id uuid pk · tenant_id uuid nn · board_id uuid nn · name text nn · position numeric nn
+  kind text nn check(kind in (&#39;intake&#39;,&#39;active&#39;,&#39;waiting&#39;,&#39;done&#39;,&#39;archive&#39;))
+  color text null · wip_limit int null check(wip_limit is null or wip_limit &gt; 0)
+  fk board_id→board · uq (tenant_id, board_id, id) · ix (tenant_id, board_id, position, id)
+  rls YES · ret none
+
+card_type · S03 · a card&#39;s type; the join target of the conveyor matrix. Deliberate exception to &quot;one catalogue&quot; — see §10 Q1
+  id uuid pk · tenant_id uuid nn · code text nn · label text nn · definition jsonb nn d=&#39;{}&#39;
+  is_active bool nn d=true
+  uq (tenant_id, code) · ix (tenant_id, is_active, code) · rls YES · ret none
+
+card · S03 · the work item; claim columns replace fr card_phase_lease per contract §4
+  id uuid pk · tenant_id uuid nn · board_id uuid nn · list_id uuid nn · card_type_id uuid nn
+  parent_card_id uuid null · name text nn · description text nn d=&#39;&#39; · position numeric nn
+  due_at timestamptz null · due_done_at timestamptz null
+  stopwatch_started_at timestamptz null · stopwatch_seconds int nn d=0   -- read-only stopwatch
+  archived_at timestamptz null · assignee_id uuid null
+  lease_expires_at timestamptz null · lease_token uuid null · claim_fence bigint nn d=0
+  prev_list_id uuid null · list_changed_at timestamptz nn d=now() · meta jsonb nn d=&#39;{}&#39; · created_by uuid null
+  tsv tsvector generated always as (to_tsvector(&#39;english&#39;, name || &#39; &#39; || description)) stored
+  fk list_id→list, board_id→board, card_type_id→card_type, parent_card_id→card(id), assignee_id→app_user
+  uq (tenant_id, board_id, id) · uq (tenant_id, list_id, id)
+  ix (tenant_id, board_id, list_id, position, id) where archived_at is null
+  ix (tenant_id, board_id, position, id) where archived_at is null
+  ix (tenant_id, assignee_id, lease_expires_at) where assignee_id is not null
+  ix gin(tsv) · ix using gin (name gin_trgm_ops) · rls YES · ret archived cards kept; no partition
+
+run · S03 · one execution of a card through a process; a run is a TREE (2026-11-09)
+  id uuid pk · tenant_id uuid nn · card_id uuid null · project_id uuid nn
+  status text nn d=&#39;queued&#39; check(status in (&#39;queued&#39;,&#39;running&#39;,&#39;waiting_approval&#39;,&#39;succeeded&#39;,&#39;failed&#39;,&#39;cancelled&#39;))
+  attempt int nn d=1 · error_class text null · error_message text null
+  process_id uuid null    -- the process; S11&#39;s `procedure_id`, renamed by 0035 (FK in the same file)
+  inputs jsonb nn d=&#39;{}&#39;  -- column added by S11&#39;s migration: the run&#39;s input document
+  parent_run_id uuid null · step_id uuid null       -- the tree: a child run names its parent and its step
+  depth int nn d=0                                   -- 0 = root; CHECK (depth between 0 and 3)
+  correlation_id uuid null · external_ref text null · started_at timestamptz null · finished_at timestamptz null
+  fk card_id→card, project_id→project, parent_run_id→run, step_id→process_step
+  check(parent_run_id is null or step_id is not null)
+  uq (tenant_id, card_id) where parent_run_id is null and status in (&#39;queued&#39;,&#39;running&#39;,&#39;waiting_approval&#39;)  -- one live ROOT run per card
+  uq (tenant_id, project_id) where parent_run_id is null and card_id is null and status in (…)             -- one live root per project
+  uq (parent_run_id, step_id) where parent_run_id is not null and status in (…)                          -- one live child per (parent, step)
+  uq (tenant_id, parent_run_id, step_id, attempt) where parent_run_id is not null                        -- one row per attempt
+  ix (tenant_id, status, created_at, id) where status=&#39;queued&#39; · (tenant_id, created_at desc, id) · (tenant_id, card_id, created_at desc)
+  rls YES · ret terminal runs 180 days, then pruned
+
+⚠️ **Amended 2026-11-09, corrected as built 2026-11-10.** `run.procedure_id` is renamed `run.process_id` and
+`run_step.process_step_id` likewise, by migration `0035_process_tree.sql`. **`run.workflow_id` and the `workflow`
+table are RETAINED** (owner ruling 2026-11-09): the workflow engine is the tool-sequence executor a process `call`
+step can name, and there is no drop migration. The old card-wide `uq_run_live` is replaced by the two root-only
+indexes above — which is what makes a child run (the coach, a `cap.*` call) possible on a card that already has a
+live parent.
+
+approval · S03 · the gate. At most ONE pending per (run, gate); dual control is required_decisions, not a second gate
+  id uuid pk · tenant_id uuid nn · run_id uuid null · card_id uuid null · project_id uuid null
+  gate text nn · kind text nn · status text nn d=&#39;pending&#39; check(status in (&#39;pending&#39;,&#39;approved&#39;,&#39;rejected&#39;,&#39;expired&#39;,&#39;voided&#39;))
+  required_decisions int nn d=1 check(required_decisions &gt;= 1)
+  requested_by uuid null · expires_at timestamptz null · callback_url text null
+  correlation_id uuid null · meta jsonb nn d=&#39;{}&#39;
+  fk run_id→run, card_id→card, project_id→project, requested_by→app_user
+  uq (tenant_id, run_id, gate) where status=&#39;pending&#39;
+  ix (tenant_id, status, expires_at) where status=&#39;pending&#39; · (tenant_id, card_id, created_at desc)
+  rls YES · ret 1 year
+
+approval_decision · S03 · one row per approver per approval; absorbs fr approval_decisions
+  id uuid pk · tenant_id uuid nn · approval_id uuid nn · approver_id uuid nn
+  decision text nn check(decision in (&#39;approve&#39;,&#39;reject&#39;)) · note text nn d=&#39;&#39; · item_decisions jsonb null
+  decided_by_kind text nn d=&#39;human&#39; check(decided_by_kind in (&#39;human&#39;,&#39;triage_agent&#39;,&#39;rule&#39;,&#39;agent&#39;)) · via jsonb null   -- fr 211/219: an agent decision must be distinguishable from a human one (SPEC D18)
+  fk approval_id→approval, approver_id→app_user
+  uq (approval_id, approver_id) · ix (tenant_id, approver_id, created_at desc) · rls YES · ret 1 year</code></pre>
+<h3 id="24-governance-core--s03-5">2.4 Governance core — S03 (5)</h3>
+<p>S03 ships these because two later slices need them and a table is assigned to its earliest consumer.</p>
+<pre><code>governed_asset · S03 · ONE lifecycle for requirements, principles and ADRs; absorbs RM requirements,
+                 principles, decisions. Kind-specific fields live in `meta`
+  id uuid pk · tenant_id uuid nn · kind text nn check(kind in (&#39;requirement&#39;,&#39;principle&#39;,&#39;adr&#39;))
+  key text nn · title text nn · body text nn d=&#39;&#39;
+  status text nn d=&#39;draft&#39; check(status in (&#39;draft&#39;,&#39;in_review&#39;,&#39;approved&#39;,&#39;superseded&#39;,&#39;archived&#39;))
+  version bigint nn d=1 · supersedes_id uuid null
+  superseded_by_id uuid null check(superseded_by_id is null or superseded_by_id &lt;&gt; id)
+  project_id uuid null · owner_user_id uuid null · phase_code text null
+  effort numeric null · reach numeric null · impact numeric null · confidence numeric null
+  acceptance jsonb nn d=&#39;[]&#39; · links jsonb nn d=&#39;{}&#39; · lens jsonb nn d=&#39;{}&#39; · meta jsonb nn d=&#39;{}&#39;
+  tsv tsvector generated always as (to_tsvector(&#39;english&#39;, key || &#39; &#39; || title || &#39; &#39; || body)) stored
+  fk project_id→project, owner_user_id→app_user, supersedes_id→governed_asset(id),
+     superseded_by_id→governed_asset(id)
+  check(status &lt;&gt; &#39;superseded&#39; or superseded_by_id is not null)
+  uq (tenant_id, kind, key) · ix (tenant_id, kind, status, updated_at desc, id) · (tenant_id, project_id)
+  ix gin(tsv) · ix using gin (title gin_trgm_ops) · rls YES · ret none (superseded rows are the history)
+
+trace_link · S03 · the only many-to-many between governed assets, cards and model elements
+  id uuid pk · tenant_id uuid nn · from_type text nn · from_id uuid nn · to_type text nn · to_id uuid nn
+  kind text nn d=&#39;traces&#39; check(kind in (&#39;traces&#39;,&#39;realises&#39;,&#39;derives&#39;,&#39;satisfies&#39;,&#39;conflicts&#39;))
+  fk none (polymorphic; the domain function validates both ends in the same transaction)
+  uq (tenant_id, from_type, from_id, to_type, to_id, kind)
+  ix (tenant_id, to_type, to_id) · (tenant_id, from_type, from_id) · rls YES · ret none
+
+catalogue_entry · S03 · the ONE vocabulary table; absorbs RM&#39;s project/spec phases, capabilities, project
+                   types, recipes, wip limits, priority levels, deliverable/milestone kinds, gates, board
+                   templates, architecture standards
+  id uuid pk · tenant_id uuid nn · kind text nn · code text nn · label text nn
+  meta jsonb nn d=&#39;{}&#39; · sort int nn d=0 · is_active bool nn d=true
+  uq (tenant_id, kind, code) · ix (tenant_id, kind, sort, code) · ix using gin (label gin_trgm_ops)
+  rls YES · ret none
+
+revision · S03 · the ONE history table; absorbs entity_version_history, modeling_model_revisions,
+           modeling_publications, pm_project_brief_versions, card_version_stamps
+  id uuid pk · tenant_id uuid nn · entity_type text nn · entity_id uuid nn
+  seq int nn · label text nn d=&#39;&#39; · content jsonb nn d=&#39;{}&#39; · content_hash text nn
+  author_id uuid null · status text nn d=&#39;draft&#39; check(status in (&#39;draft&#39;,&#39;published&#39;,&#39;superseded&#39;))
+  fk author_id→app_user
+  uq (tenant_id, entity_type, entity_id, seq) · ix (tenant_id, entity_type, entity_id, seq desc)
+  rls YES · ret none for governed assets; model revisions pruned to the last 50 per model
+
+andon_state · S03 · one row per tenant; the estate-wide stop
+  tenant_id uuid pk · engaged bool nn d=false · engaged_by uuid null · engaged_at timestamptz null
+  released_at timestamptz null · reason text nn d=&#39;&#39;
+  fk engaged_by→app_user · ix (tenant_id) where engaged · rls YES · ret none</code></pre>
+<h3 id="25-board-satellites--s05-9">2.5 Board satellites — S05 (9)</h3>
+<pre><code>board_membership · S05 · replaces Planka board_membership + project_manager + board_subscription
+  id uuid pk · tenant_id uuid nn · board_id uuid nn · user_id uuid nn
+  role text nn d=&#39;member&#39; check(role in (&#39;owner&#39;,&#39;admin&#39;,&#39;member&#39;,&#39;viewer&#39;)) · can_comment bool nn d=true
+  watching bool nn d=true
+  fk board_id→board, user_id→app_user · uq (tenant_id, board_id, user_id)
+  ix (user_id) · rls YES · ret none
+
+label · S05 · per-board label
+  id uuid pk · tenant_id uuid nn · board_id uuid nn · name text nn · color text nn
+  position numeric nn d=0
+  fk board_id→board · uq (tenant_id, board_id, name) · ix (tenant_id, board_id, position) · rls YES · ret none
+
+card_label · S05 · join
+  tenant_id uuid nn · card_id uuid nn · label_id uuid nn
+  fk card_id→card, label_id→label · pk (card_id, label_id) · ix (label_id, card_id) · rls YES · ret none
+
+comment · S05 · the ONE comment store (replaces fr comments + Planka comment)
+  id uuid pk · tenant_id uuid nn · card_id uuid nn · author_id uuid null · body text nn
+  edited_at timestamptz null
+  fk card_id→card, author_id→app_user · ix (tenant_id, card_id, created_at, id) · rls YES · ret none
+
+task_list · S05 · checklist container; replaces Planka task_list
+  id uuid pk · tenant_id uuid nn · card_id uuid nn · name text nn · position numeric nn d=0
+  hide_completed bool nn d=false · show_on_front bool nn d=false
+  fk card_id→card · ix (tenant_id, card_id, position) · rls YES · ret none
+
+task · S05 · checklist item
+  id uuid pk · tenant_id uuid nn · task_list_id uuid nn · name text nn · done bool nn d=false
+  position numeric nn d=0
+  fk task_list_id→task_list · ix (tenant_id, task_list_id, position) · rls YES · ret none
+
+custom_field · S05 · group flattened into two columns; replaces Planka custom_field_group + base_custom_field_group
+  id uuid pk · tenant_id uuid nn · board_id uuid nn · group_name text nn d=&#39;&#39; · group_position numeric nn d=0
+  name text nn · kind text nn d=&#39;text&#39; check(kind in (&#39;text&#39;,&#39;number&#39;,&#39;date&#39;,&#39;select&#39;,&#39;checkbox&#39;))
+  options jsonb nn d=&#39;[]&#39; · position numeric nn d=0
+  fk board_id→board · uq (tenant_id, board_id, name) · ix (tenant_id, board_id, group_position, position)
+  rls YES · ret none
+
+custom_field_value · S05 · one value per (card, field)
+  tenant_id uuid nn · card_id uuid nn · custom_field_id uuid nn · content jsonb nn d=&#39;null&#39;
+  fk card_id→card, custom_field_id→custom_field · pk (card_id, custom_field_id)
+  ix (tenant_id, custom_field_id) · rls YES · ret dies with the card
+
+webhook_subscription · S05 · replaces Planka webhook; semantics kept, instance-admin scoping dropped
+  id uuid pk · tenant_id uuid nn · board_id uuid null · url text nn
+  secret_ciphertext bytea null · events text[] nn d=&#39;{}&#39; · excluded_events text[] nn d=&#39;{}&#39; · active bool nn d=true
+  fk board_id→board · ix (tenant_id, active) · rls YES · ret none</code></pre>
+<h3 id="26-channel-and-delivery--s06-6">2.6 Channel and delivery — S06 (6)</h3>
+<pre><code>channel_binding · S06 · per-tenant channel config; absorbs fr channels + telegram_forum_topics
+  id uuid pk · tenant_id uuid nn · channel_kind text nn check(channel_kind in (&#39;web&#39;,&#39;telegram&#39;,&#39;mcp&#39;))
+  route_key text nn d=&#39;&#39;   -- e.g. project key or &#39;default&#39;
+  config jsonb nn d=&#39;{}&#39;   -- chat id, topic id, bot ref; secrets by reference only
+  active bool nn d=true
+  uq (tenant_id, channel_kind, route_key) · rls YES · ret none
+
+channel_preference · S06 · absorbs fr notification_prefs + user_channel_prefs
+  id uuid pk · tenant_id uuid nn · user_id uuid nn · channel_kind text nn
+  enabled bool nn d=true · quiet_hours jsonb nn d=&#39;{}&#39;
+  fk user_id→app_user · uq (tenant_id, user_id, channel_kind) · rls YES · ret none
+
+message · S06 · the outbound content, once per send; delivery fans out from it
+  id uuid pk · tenant_id uuid nn · channel_kind text nn · sender_id uuid null
+  kind text nn d=&#39;text&#39; · body text nn · meta jsonb nn d=&#39;{}&#39; · correlation_id uuid null
+  fk sender_id→app_user · ix (tenant_id, correlation_id) · rls YES · ret 90 days, but only once no delivery references it (deliveries prune first — §6)
+
+delivery · S06 · one row per (message, channel, recipient); the state machine of contract §8
+  id uuid pk · tenant_id uuid nn · message_id uuid nn · channel_kind text nn · recipient_ref text nn
+  state text nn d=&#39;pending&#39; check(state in (&#39;pending&#39;,&#39;sent&#39;,&#39;delivered&#39;,&#39;failed&#39;,&#39;expired&#39;))
+  attempts int nn d=0 · last_error text null · sent_at/delivered_at/expires_at timestamptz null
+  fk message_id→message · uq (message_id, channel_kind, recipient_ref)
+  ix (tenant_id, state, expires_at) where state in (&#39;pending&#39;,&#39;sent&#39;) · rls YES · ret 30 days after terminal
+
+-- audience, audience_member · S06 · DROPPED 2026-11-08 by migration 0011.
+-- S00 day 2 measured zero usage: no `streams` node operation in any of the 348 flows, fr.streams 0 rows,
+-- asset_stream_membership 0, and fr has no /api/streams route at all. `messages.send` takes an explicit
+-- recipient list; there is no multicast audience.</code></pre>
+<h3 id="27-requirements-catalogues-revision--s07-3-after-the-s00-verdicts">2.7 Requirements, catalogues, revision — S07 (3 after the S00 verdicts)</h3>
+<pre><code>-- outline, outline_node · S07 · DROPPED 2026-11-08 by migration 0011.
+-- S00 day 2 measured zero usage: RM toc_trees/toc_nodes/toc_settings 0 rows, fr project_outlines 0 rows,
+-- no `toc` operation in any of the 348 flows, fr /toc/* = 15 unused + 1 rare. `project_request` never
+-- referenced them, so project intake is unaffected. Re-adding is a new migration, not an edit here.
+
+quality_evaluation · S07 · score history; absorbs RM quality_evaluations
+  id uuid pk · tenant_id uuid nn · entity_type text nn · entity_id uuid nn
+  score numeric null · criteria jsonb nn d=&#39;{}&#39; · evaluator_kind text nn d=&#39;heuristic&#39;
+  ix (tenant_id, entity_type, entity_id, created_at desc) · rls YES · ret none
+
+principle_conflict · S07 · persisted verdicts; absorbs RM principle_conflicts
+  id uuid pk · tenant_id uuid nn · principle_a_id uuid nn · principle_b_id uuid nn
+  verdict text nn · dismissed_by uuid null · dismissed_at timestamptz null
+  fk principle_a_id→governed_asset, principle_b_id→governed_asset, dismissed_by→app_user
+  uq (tenant_id, principle_a_id, principle_b_id) · rls YES · ret none
+
+project_request · S07 · the CP→conveyor bridge intake; absorbs fr project_requests
+  id uuid pk · tenant_id uuid nn · external_ref text nn · external_origin text nn
+  payload jsonb nn d=&#39;{}&#39; · status text nn d=&#39;draft&#39; check(status in (&#39;draft&#39;,&#39;approved&#39;,&#39;rejected&#39;,&#39;promoted&#39;))
+  project_id uuid null · repository_url text null   -- text, not an FK: repositories ship in S09
+  fk project_id→project · uq (tenant_id, external_ref) · ix (tenant_id, status, created_at, id) · rls YES · ret none</code></pre>
+<h3 id="28-model-architecture-uml--s08-7">2.8 Model, architecture, UML — S08 (7)</h3>
+<p>ArchiMate and UML share one shape; <code>model.language</code> is the discriminator. Absorbs RM's <code>architecture_*</code>, <code>modeling_*</code> and <code>uml_*</code> families.</p>
+<pre><code>model · S08 · one model header; language decides the ruleset, not the schema
+  id uuid pk · tenant_id uuid nn · project_id uuid null
+  language text nn check(language in (&#39;archimate&#39;,&#39;uml&#39;)) · language_version text nn
+  title text nn · description text nn d=&#39;&#39; · head_revision int nn d=0 · published_revision_id uuid null
+  meta jsonb nn d=&#39;{}&#39;
+  fk project_id→project, published_revision_id→revision · ix (tenant_id, project_id) · rls YES · ret none
+
+model_element · S08 · absorbs architecture_elements + uml_elements
+  id uuid pk · tenant_id uuid nn · model_id uuid nn · kind text nn · name text nn · documentation text nn d=&#39;&#39;
+  parent_element_id uuid null · meta jsonb nn d=&#39;{}&#39;
+  fk model_id→model, parent_element_id→model_element · ix (tenant_id, model_id, kind) · rls YES · ret none
+
+model_relationship · S08 · absorbs architecture_relationships + uml_relationships + uml_interactions
+  id uuid pk · tenant_id uuid nn · model_id uuid nn · kind text nn
+  source_id uuid nn · target_id uuid nn · meta jsonb nn d=&#39;{}&#39;
+  check(source_id &lt;&gt; target_id)
+  fk model_id→model · ix (tenant_id, model_id, kind) · (source_id) · (target_id) · rls YES · ret none
+
+model_view · S08 · absorbs architecture_views + uml_diagrams
+  id uuid pk · tenant_id uuid nn · model_id uuid nn
+  kind text nn d=&#39;diagram&#39; check(kind in (&#39;diagram&#39;,&#39;archimate_view&#39;,&#39;uml_diagram&#39;))
+  name text nn · meta jsonb nn d=&#39;{}&#39;
+  fk model_id→model · ix (tenant_id, model_id) · rls YES · ret none
+
+view_object · S08 · absorbs architecture_view_objects + uml_diagram_objects
+  id uuid pk · tenant_id uuid nn · view_id uuid nn · element_id uuid null · parent_object_id uuid null
+  kind text nn d=&#39;element&#39; · bounds jsonb nn d=&#39;{}&#39; · style jsonb nn d=&#39;{}&#39; · label text null
+  position numeric nn d=0
+  fk view_id→model_view, element_id→model_element, parent_object_id→view_object
+  ix (tenant_id, view_id, position, id) · rls YES · ret none
+
+view_connection · S08 · absorbs architecture_view_connections + uml_diagram_connections
+  id uuid pk · tenant_id uuid nn · view_id uuid nn · relationship_id uuid null
+  source_object_id uuid nn · target_object_id uuid nn · bendpoints jsonb nn d=&#39;[]&#39; · style jsonb nn d=&#39;{}&#39;
+  fk view_id→model_view, relationship_id→model_relationship
+  ix (tenant_id, view_id) · rls YES · ret none
+
+model_validation_run · S08 · absorbs modeling_validation_runs; findings folded into jsonb
+  id uuid pk · tenant_id uuid nn · model_id uuid nn · revision_id uuid null
+  ruleset text nn · ruleset_version text nn · status text nn d=&#39;ok&#39; check(status in (&#39;ok&#39;,&#39;findings&#39;,&#39;error&#39;))
+  findings jsonb nn d=&#39;[]&#39; · content_hash text nn
+  fk model_id→model, revision_id→revision · ix (tenant_id, model_id, created_at desc) · rls YES · ret 90 days</code></pre>
+<h3 id="29-portfolio--s08-1-after-the-s00-verdicts">2.9 Portfolio — S08 (1 after the S00 verdicts)</h3>
+<pre><code>project_stakeholder · S08 · absorbs fr project_stakeholders
+  id uuid pk · tenant_id uuid nn · project_id uuid nn · user_id uuid null · name text nn d=&#39;&#39;
+  email text null · role text nn d=&#39;&#39;
+  fk project_id→project, user_id→app_user · ix (tenant_id, project_id) · rls YES · ret none
+
+-- project_capability, deliverable, register_item · S08 · DROPPED 2026-11-08 by migration 0011.
+-- S00 day 2 measured zero usage: project_deliverables/project_milestones 0, pm_project_capabilities 0,
+-- pm_resources/pm_risks/pm_benefits 0, no deliverable/capability operation and no register route in any
+-- of the 348 flows. `project_stakeholder` STAYS on 21 live rows.</code></pre>
+<h3 id="210-documents-repositories-secrets--s09-4">2.10 Documents, repositories, secrets — S09 (4)</h3>
+<pre><code>document · S09 · metadata only; bytes go to the object store, never to the row (absorbs fr documents +
+           project_reports — a report is a document of kind &#39;report&#39;)
+  id uuid pk · tenant_id uuid nn · project_id uuid null
+  kind text nn d=&#39;document&#39; check(kind in (&#39;document&#39;,&#39;report&#39;,&#39;export&#39;)) · title text nn
+  status text nn d=&#39;active&#39; check(status in (&#39;active&#39;,&#39;rejected&#39;,&#39;failed&#39;,&#39;deleted&#39;))
+  object_key text null · content_hash text null · external_ref text null · meta jsonb nn d=&#39;{}&#39;
+  fk project_id→project · ix (tenant_id, project_id, kind, updated_at desc) · rls YES · ret none
+
+secret · S09 · encrypted at rest; absorbs fr user_secrets — declared FIRST so `repository`&#39;s FK resolves in 0013
+  id uuid pk · tenant_id uuid nn · name text nn · ciphertext bytea nn · key_id text nn
+  scope text nn d=&#39;tenant&#39; · version bigint nn d=1   -- rotation bumps version, never overwrites
+  uq (tenant_id, name) · rls YES · ret none
+
+repository · S09 · the repo registry; absorbs fr repositories + github_app_installations
+  id uuid pk · tenant_id uuid nn · provider text nn d=&#39;github&#39; · url text nn · default_branch text nn d=&#39;main&#39;
+  installation_ref text null · credential_secret_id uuid null
+  fk credential_secret_id→secret · uq (tenant_id, url) · rls YES · ret none
+
+project_repository · S09 · absorbs fr project_repositories
+  tenant_id uuid nn · project_id uuid nn · repository_id uuid nn · role text nn d=&#39;primary&#39;
+  fk project_id→project, repository_id→repository · pk (project_id, repository_id) · rls YES · ret none</code></pre>
+<h3 id="211-copilot-and-conversation--s10-2">2.11 Copilot and conversation — S10 (2)</h3>
+<pre><code>conversation · S10 · absorbs fr agent_sessions
+  id uuid pk · tenant_id uuid nn · user_id uuid null · project_id uuid null
+  title text nn d=&#39;&#39; · status text nn d=&#39;active&#39; check(status in (&#39;active&#39;,&#39;archived&#39;))
+  fk user_id→app_user, project_id→project · ix (tenant_id, user_id, updated_at desc) · rls YES · ret 90 days
+
+conversation_turn · S10 · one row per message; tool calls land in action_invocation, not here
+  id uuid pk · tenant_id uuid nn · conversation_id uuid nn · seq int nn
+  role text nn check(role in (&#39;user&#39;,&#39;assistant&#39;,&#39;system&#39;)) · body text nn
+  meta jsonb nn d=&#39;{}&#39; · trace_id text null
+  fk conversation_id→conversation · uq (conversation_id, seq) · rls YES · ret with the conversation</code></pre>
+<p><strong>Index added by S10's migration</strong> (not a table): <code>uq_approval_copilot_turn</code> — a partial unique index on S03's <code>approval</code> keyed by the copilot turn that proposed the action, so one turn cannot raise two pending approvals. It belongs to S10's migration because S10 is its only writer; S03 stays unaware of copilot.</p>
+<p><strong>Indexes added by S07's migration</strong> (not tables): <code>CREATE EXTENSION pg_trgm</code> plus the trigram indexes on <code>card (name)</code>, <code>governed_asset (title)</code> and <code>catalogue_entry (label)</code> (§4). They belong to S07 because the extension ships there (S02 §5 decision 5); S03's baseline creates only the <code>gin(tsv)</code> indexes.</p>
+<h3 id="212-process-step-and-procedure-sop--s11-5">2.12 Process, step and procedure (SOP) — S11 (5)</h3>
+<p>⚠️ <strong>Amended 2026-11-09 (the process model).</strong> S11's <code>procedure</code> is <strong>renamed <code>process</code></strong> and <code>procedure_step</code> → <code>process_step</code> by migration <code>0035_process_tree.sql</code>; a <strong>new <code>procedure</code> table is the SOP</strong> attached to a step (definition of ready, definition of done, acceptance criteria, inspection). <code>process_map</code> is the user-facing DAG. The word <em>procedure</em> now means the SOP, never the sequence.</p>
+<pre><code>process · S11 (renamed by 0035) · the ordered sequence; tenant-authored or the default catalogue
+  id uuid pk · tenant_id uuid nn · key text nn · title text nn · description text nn d=&#39;&#39;
+  status text nn d=&#39;draft&#39; check(status in (&#39;draft&#39;,&#39;published&#39;,&#39;retired&#39;)) · version bigint nn d=1
+  capability_id uuid null · card_type_id uuid null · list_kind text null · project_type_id uuid null
+  outputs jsonb nn d=&#39;[]&#39;          -- the USER-FACING deliverables a person sees when the process completes
+  fk capability_id→capability, card_type_id→card_type, project_type_id→project_type
+  uq (tenant_id, key, version) · uq (tenant_id, key) where status=&#39;published&#39;
+  ix (tenant_id, status, key) · rls YES · ret none
+
+process_step · S11 (renamed by 0035) · one ordered step; the four kinds are agent | computed | gate | call
+  id uuid pk · tenant_id uuid nn · process_id uuid nn · position int nn
+  kind text nn d=&#39;computed&#39; check(kind in (&#39;agent&#39;,&#39;computed&#39;,&#39;gate&#39;,&#39;call&#39;))
+  actor text nn d=&#39;tool_agent&#39; check(actor in (&#39;process_agent&#39;,&#39;tool_agent&#39;,&#39;system&#39;,&#39;human&#39;))
+  capability_id uuid null · process_agent_id uuid null · procedure_id uuid null
+  child_process_key text null · action text null · input_template jsonb nn d=&#39;{}&#39;
+  gate_kind text null · on_result text nn d=&#39;fail&#39; check(on_result in (&#39;fail&#39;,&#39;continue&#39;,&#39;retry&#39;))
+  max_attempts int nn d=1 check(max_attempts &gt;= 1)
+  fk process_id→process, capability_id→capability, process_agent_id→capability_agent, procedure_id→procedure
+  uq (process_id, position) · rls YES · ret none
+
+procedure · S11 (NEW: the SOP) · the per-step standard operating procedure, versioned and reusable
+  id uuid pk · tenant_id uuid nn · key text nn · title text nn · description text nn d=&#39;&#39;
+  status text nn d=&#39;draft&#39; check(status in (&#39;draft&#39;,&#39;published&#39;,&#39;retired&#39;)) · version bigint nn d=1
+  definition_of_ready jsonb nn d=&#39;{}&#39;     -- inputs and preconditions
+  definition_of_done jsonb nn d=&#39;{}&#39;      -- outputs and checks
+  acceptance_criteria jsonb nn d=&#39;[]&#39;     -- what the judge evaluates
+  inspection jsonb nn d=&#39;{}&#39;              -- {kind: laya|eval|checker, threshold?, max_rejects?}
+  outputs jsonb nn d=&#39;[]&#39;                 -- the step&#39;s deliverables
+  uq (tenant_id, key, version) · uq (tenant_id, key) where status=&#39;published&#39;
+  ix (tenant_id, status, key) · rls YES · ret none
+
+process_map · S11 · the USER-FACING DAG, per project type; declarative (it never executes)
+  id uuid pk · tenant_id uuid nn · key text nn · title text nn · status text nn d=&#39;draft&#39;
+  check(status in (&#39;draft&#39;,&#39;published&#39;,&#39;retired&#39;)) · version bigint nn d=1
+  project_type_id uuid nn · definition jsonb nn d=&#39;{&quot;nodes&quot;:[],&quot;edges&quot;:[]}&#39;
+  fk project_type_id→project_type · uq (tenant_id, key, version) · rls YES · ret none
+
+run_step · S11 · step-level execution; the trace S13&#39;s diff gate reads
+  id uuid pk · tenant_id uuid nn · run_id uuid nn · process_step_id uuid null · position int nn
+  attempt int nn d=1 check(attempt &gt;= 1)           -- one row per attempt; a retry appends
+  action text nn · status text nn d=&#39;queued&#39; check(status in (&#39;queued&#39;,&#39;running&#39;,&#39;succeeded&#39;,&#39;failed&#39;,&#39;skipped&#39;))
+  input jsonb nn d=&#39;{}&#39; · output jsonb nn d=&#39;{}&#39; · error text null
+  judge jsonb null                                  -- the laya/eval verdict (2026-11-09)
+  started_at/finished_at timestamptz null
+  fk run_id→run, process_step_id→process_step · uq (run_id, position, attempt)
+  ix (tenant_id, run_id, position) · rls YES · ret with the run</code></pre>
+<h3 id="213-workflow-engine--retained-s13-2026-11-09">2.13 Workflow engine — RETAINED (S13, 2026-11-09)</h3>
+<p>✅ <strong>The engine is retained (owner ruling 2026-11-09).</strong> <code>crates/workflow</code>, the <code>workflow</code> table, <code>workflows.*</code>/<code>workflow_runs.*</code> and the <code>workflow.node</code>/<code>workflow.start</code> job kinds stay: the workflow engine is the <strong>tool-sequence executor</strong>, and a process <code>call</code> step resolves <code>child_process_key</code> <strong>process-first, workflow-second</strong>. It is never a top-level executor — the process is (see §2.12). There is <strong>no drop migration</strong>: <code>run.workflow_id</code> and the <code>workflow</code> table are not removed. S13's migrations are <code>0035_process_tree.sql</code> (the renames, the SOP, <code>process_map</code>, the run tree and the bus cursor) and <code>0036_s19_output_grade.sql</code>; the earlier <code>0033</code>/<code>0034</code> numbers belong to the train (<code>0033_d23_eval_caller</code>, <code>0034_s18_kata_arm</code>) and keep them.</p>
+<pre><code>workflow · S13 · RETAINED — the tool-sequence executor (owner ruling 2026-11-09; no drop migration)
+  id uuid pk · tenant_id uuid nn · key text nn · title text nn · status text nn d=&#39;draft&#39;
+  check(status in (&#39;draft&#39;,&#39;published&#39;,&#39;retired&#39;)) · version bigint nn d=1
+  definition jsonb nn d=&#39;{&quot;nodes&quot;:[],&quot;edges&quot;:[]}&#39; · published_revision_id uuid null
+  fk published_revision_id→revision · uq (tenant_id, key, version) · rls YES · ret none</code></pre>
+<h3 id="214-action-registry--s04-1">2.14 Action registry — S04 (1)</h3>
+<pre><code>action_registry · S04 · rows exist ONLY for kind=&#39;external&#39; (internal actions are compile-time); a schema
+                    refresh that removes or retypes a field needs an approved row
+  id uuid pk · tenant_id uuid nn · name text nn · spec_version int nn d=1
+  kind text nn d=&#39;external&#39; check(kind = &#39;external&#39;) · service text nn   -- &#39;workflow&#39; retained with the engine (2026-11-09)
+  spec jsonb nn d=&#39;{}&#39; · schema_hash text nn · timeout_ms int nn d=30000 · idempotent bool nn d=false
+  approved_at timestamptz null · approved_by uuid null
+  fk approved_by→app_user · uq (tenant_id, name, spec_version)
+  ix (tenant_id, service, name) · rls YES · ret none</code></pre>
+<h3 id="215-capability-knowledge-and-memory--s15-5">2.15 Capability, knowledge and memory — S15 (5)</h3>
+<p>Design: <code>docs/KNOWLEDGE-MEMORY.md</code> (SPEC D20).</p>
+<pre><code>capability · S15 · the aggregate; replaces catalogue_entry(kind=&#39;capability&#39;), whose 17 rows migrate here
+  id uuid pk · tenant_id uuid nn · code text nn · label text nn · description text nn d=&#39;&#39;
+  kind text nn d=&#39;tenant&#39; check(kind in (&#39;system&#39;,&#39;tenant&#39;))   -- 0035: PM/coach/kata are system, always present
+  status text nn d=&#39;draft&#39; check(status in (&#39;draft&#39;,&#39;active&#39;,&#39;retired&#39;)) · meta jsonb nn d=&#39;{}&#39;
+  uq (tenant_id, code) · ix (tenant_id, status) · rls YES · ret none
+
+capability_agent · S15 · the configured executor of one capability; the ROLE splits process from tool (2026-11-09)
+  id uuid pk · tenant_id uuid nn · capability_id uuid nn · key text nn
+  status text nn d=&#39;draft&#39; check(status in (&#39;draft&#39;,&#39;active&#39;,&#39;retired&#39;))
+  role text nn d=&#39;process_agent&#39; check(role in (&#39;process_agent&#39;,&#39;tool_agent&#39;))   -- 0035
+  process_key text null   -- the process/card type a process agent owns (0035)
+  toolset text null       -- the toolset a tool agent executes (0035)
+  model_ref text nn · prompt_ref text null · params jsonb nn d=&#39;{}&#39;
+  allowed_actions text[] nn d=&#39;{}&#39; · max_iterations int nn d=1 check(max_iterations &gt;= 1)
+  timeout_secs int nn d=600 check(timeout_secs &gt; 0)
+  check((role=&#39;process_agent&#39; and process_key is not null and toolset is null)
+        or (role=&#39;tool_agent&#39; and toolset is not null and process_key is null))
+  fk capability_id→capability · uq (tenant_id, key) · ix (tenant_id, capability_id, status) · rls YES · ret none
+
+capability_knowledge · S15 · the domain-knowledge binding; pack_key/pack_version pin a strata pack
+  id uuid pk · tenant_id uuid nn · capability_id uuid nn · pack_key text nn · pack_version int nn
+  min_score numeric null · required boolean nn d=true
+  fk capability_id→capability · uq (tenant_id, capability_id, pack_key, pack_version) · rls YES · ret none
+
+capability_relation · S15 · the ontology edges between capabilities
+  tenant_id uuid nn · from_capability_id uuid nn · to_capability_id uuid nn
+  kind text nn check(kind in (&#39;requires&#39;,&#39;enables&#39;,&#39;concern&#39;))
+  fk from_capability_id→capability, to_capability_id→capability
+  pk (from_capability_id, to_capability_id, kind) · check(from_capability_id &lt;&gt; to_capability_id) · rls YES · ret none
+
+work_package_memory · S15 · hot memory; the record, consolidated into strata and never the reverse
+  id uuid pk · tenant_id uuid nn · project_id uuid nn · card_id uuid nn
+  run_id uuid null · capability_id uuid null
+  kind text nn check(kind in (&#39;fact&#39;,&#39;attempt&#39;,&#39;decision&#39;,&#39;blocker&#39;,&#39;digest&#39;))
+  source text nn check(source in (&#39;agent&#39;,&#39;human&#39;,&#39;system&#39;))
+  body text nn · supersedes_id uuid null · consolidated_at timestamptz null · meta jsonb nn d=&#39;{}&#39;
+  fk project_id→project, card_id→card, run_id→run, capability_id→capability, supersedes_id→work_package_memory
+  ix (tenant_id, card_id, created_at) · ix (tenant_id) where consolidated_at is null
+  rls YES · ret none</code></pre>
+<h3 id="216-count">2.16 Count</h3>
+<p><strong>88 tables</strong> across 18 slice groups (S02 11 · S03 14 · S04 1 · S05 9 · S06 <strong>4</strong> · S07 <strong>3</strong> · S08 <strong>8</strong> · S09 4 · S10 2 · S11 3 · <strong>S12 3</strong> · S13 1 · S15 5 · <strong>S16 3</strong> · <strong>S17 4</strong> · <strong>S19 10</strong> · <strong>S20 1</strong> · <strong>S21 2</strong>) — <strong>re-counted from <code>migrations/</code> on 2026-11-09: 95 <code>CREATE TABLE</code> − 7 <code>DROP TABLE</code> = 88</strong>. The earlier re-count (2026-11-08, after <code>0011</code>) said 83 and omitted <code>0028</code>'s three RBAC tables (<code>tenant_role_scope</code>, <code>invite</code>, <code>platform_admin</code>) and <code>0030</code>'s two prompt tables (<code>prompt</code>, <code>prompt_section</code>); corrected here, not carried forward. SPEC §10's target was "~60"; 67 was the parity baseline, and S15's five capability/memory tables are a <strong>contract change taken with D20</strong> (2026-11-08). <strong>S16's three tables are the second such change, taken with D23</strong> (2026-11-09): <code>inference_call</code>, <code>prompt_audit</code>, <code>prompt_audit_finding</code>, specified in §2.17. They are the first tables in this catalogue whose subject is the conveyor's <em>own</em> model use rather than a domain aggregate, and <code>inference_call</code> is the only one written by the action engine rather than by a handler. <strong>S17's four tables are the third such change, taken with D24</strong> (2026-11-09): <code>benchmark_suite</code>, <code>benchmark_instance</code>, <code>benchmark_run</code>, <code>benchmark_case</code>, specified in §2.18 — the absorbed <code>conveyor-bench</code> harness, whose rows are the measurement record rather than a domain aggregate. <strong>S19's ten tables are the fourth such change, taken with D25</strong> (2026-11-09, §2.19): <code>eval</code>, <code>eval_version</code>, <code>eval_case</code>, <code>eval_metric</code>, <code>eval_run</code>, <code>eval_case_result</code>, <code>eval_attempt_error</code>, <code>eval_trace</code>, <code>eval_audit</code>, <code>eval_audit_finding</code> — the <code>build-eval</code> method's own record, the second family whose subject is the conveyor's model use rather than a domain aggregate, and the first whose rows are <em>intentionally</em> comparable across time only within one version. <strong>S20's one table is the fifth, taken with D26</strong> (§2.20): <code>eval_climb</code>, the loop state the <code>eval-hillclimb</code> method keeps in <code>_state.json</code>. ⚠️ <strong>S19 and S17 are two instruments, not two copies of one:</strong> the benchmark measures a pinned SWE-bench subset with a parity-ported verdict ladder and a k8s sandbox; an eval measures any registered action with a per-metric grader. They share the <code>job</code> runner, the outbox, the <code>run</code>/<code>inference_call</code> ledger and the SSE stream, and <strong>no table</strong> — a consolidation is a later decision taken after both are built, with its own plan. The seven over the parity target were <code>audience</code>, <code>audience_member</code>, <code>conversation</code>, <code>conversation_turn</code>, <code>workflow</code>, <code>action_registry</code> and <code>register_item</code>; <strong>five of them are gone</strong> (<code>audience</code>, <code>audience_member</code> and <code>register_item</code> by <code>0011</code>; the two are the S00 verdicts), so the count now sits <strong>below</strong> the parity baseline. §9's other six PENDING-S0 tables were adjudicated KEEP by S00 day 2. No further table is permitted without a contract change.</p>
+<p>⚠️ <strong>Amended 2026-11-09, corrected as built 2026-11-10 (the process model).</strong> The count stays <strong>88 on disk</strong>; migration <code>0035_process_tree.sql</code> adds two tables (the <code>procedure</code> SOP and <code>process_map</code>) and renames <code>procedure</code>/<code>procedure_step</code> to <code>process</code>/<code>process_step</code>; <code>0036_s19_output_grade.sql</code> is S13's second migration. <strong><code>workflow</code> is retained</strong> (owner ruling 2026-11-09), so nothing is dropped and the earlier "89 once both land" prediction no longer applies. The row above counts the 88 measured on 2026-11-09 — re-count from <code>migrations/</code> after <code>0035</code> applies rather than quoting it.</p>
+<h3 id="217-inference-ledger-and-prompt-audit--s16-3">2.17 Inference ledger and prompt audit — S16 (3)</h3>
+<p>⚠️ Numbered after §2.16 on purpose: four documents cite "§2.16" as the table ceiling, and renumbering them to gain a tidy reading order would churn history for nothing. The count in §2.16 already includes these three.</p>
+<p>All three are <code>ENABLE</code>+<code>FORCE</code> ROW LEVEL SECURITY with one <code>tenant_isolation</code> policy each, exactly as §2.11's pair. <strong><code>inference_call</code> is written by the engine, not by a handler</strong> — inside <code>record_bookkeeping</code>'s transaction (CONTRACT §18) — so no action can write a usage row for a call that was not made.</p>
+<pre class="sql"><code>CREATE TABLE inference_call (
+    id                          uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id                   uuid NOT NULL DEFAULT app_current_tenant(),
+    action_invocation_id        uuid,
+    trace_id                    text,
+    correlation_id              text,
+    caller_kind                 text NOT NULL
+                                CHECK (caller_kind IN (&#39;copilot&#39;,&#39;process_step&#39;,&#39;workflow_step&#39;,&#39;agent_run&#39;,&#39;other&#39;)),
+    run_id                      uuid,
+    run_step_id                 uuid,
+    conversation_turn_id        uuid,
+    prompt_ref                  text,
+    prompt_version              text,
+    prompt_sha256               text,
+    model                       text NOT NULL,
+    served_model                text,
+    prompt_tokens               int  NOT NULL DEFAULT 0 CHECK (prompt_tokens &gt;= 0),
+    completion_tokens           int  NOT NULL DEFAULT 0 CHECK (completion_tokens &gt;= 0),
+    total_tokens                int  NOT NULL DEFAULT 0 CHECK (total_tokens &gt;= 0),
+    cache_creation_input_tokens int  NOT NULL DEFAULT 0 CHECK (cache_creation_input_tokens &gt;= 0),
+    cache_read_input_tokens     int  NOT NULL DEFAULT 0 CHECK (cache_read_input_tokens &gt;= 0),
+    cache_status                text NOT NULL DEFAULT &#39;unknown&#39;
+                                CHECK (cache_status IN (&#39;hit&#39;,&#39;write&#39;,&#39;miss&#39;,&#39;unknown&#39;)),
+    latency_ms                  int  NOT NULL DEFAULT 0 CHECK (latency_ms &gt;= 0),
+    outcome                     text NOT NULL DEFAULT &#39;ok&#39;
+                                CHECK (outcome IN (&#39;ok&#39;,&#39;refused&#39;,&#39;error&#39;,&#39;timeout&#39;)),
+    created_at                  timestamptz NOT NULL DEFAULT now(),
+    -- &quot;whose call was this&quot; must always be answerable (CONTRACT §18)
+    CONSTRAINT inference_call_join_key CHECK (
+        caller_kind = &#39;other&#39;
+        OR run_id IS NOT NULL OR run_step_id IS NOT NULL OR conversation_turn_id IS NOT NULL),
+    -- the cache definition lives in the database too, so a second writer cannot invent a fifth meaning.
+    -- §3&#39;s &quot;no CHECK duplicates the function&quot; is about TRANSITIONS; this is a derived-value invariant.
+    CONSTRAINT inference_call_cache_status CHECK (
+        cache_status = &#39;unknown&#39;
+        OR (cache_status = &#39;hit&#39;   AND cache_read_input_tokens &gt; 0)
+        OR (cache_status = &#39;write&#39; AND cache_read_input_tokens = 0 AND cache_creation_input_tokens &gt; 0)
+        OR (cache_status = &#39;miss&#39;  AND cache_read_input_tokens = 0 AND cache_creation_input_tokens = 0))
+);
+CREATE INDEX inference_call_tenant_created_idx ON inference_call (tenant_id, created_at DESC, id);
+CREATE INDEX inference_call_cache_idx          ON inference_call (tenant_id, cache_status, created_at DESC);
+CREATE INDEX inference_call_run_idx            ON inference_call (tenant_id, run_id) WHERE run_id IS NOT NULL;
+CREATE INDEX inference_call_prompt_idx         ON inference_call (tenant_id, prompt_sha256)
+    WHERE prompt_sha256 IS NOT NULL;
+
+CREATE TABLE prompt_audit (
+    id            uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id     uuid NOT NULL DEFAULT app_current_tenant(),
+    scope         jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb CHECK (length(scope::text) &lt;= 8192),
+    target_model  text NOT NULL,
+    prompt_ref    text NOT NULL,                  -- &#39;prompt_audit@1&#39;
+    status        text NOT NULL DEFAULT &#39;queued&#39;
+                  CHECK (status IN (&#39;queued&#39;,&#39;running&#39;,&#39;succeeded&#39;,&#39;failed&#39;)),
+    finding_count int  NOT NULL DEFAULT 0 CHECK (finding_count &gt;= 0),
+    error         text,
+    requested_by  uuid,
+    created_at    timestamptz NOT NULL DEFAULT now(),
+    updated_at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX prompt_audit_tenant_created_idx ON prompt_audit (tenant_id, created_at DESC, id);
+
+CREATE TABLE prompt_audit_finding (
+    id           uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id    uuid NOT NULL DEFAULT app_current_tenant(),
+    audit_id     uuid NOT NULL,
+    location     text NOT NULL,                   -- &#39;process_step:&lt;uuid&gt;&#39; | &#39;action:&lt;name&gt;&#39; | &#39;copilot:SYSTEM_PROMPT&#39;
+    evidence     text NOT NULL,
+    pattern      text NOT NULL CHECK (pattern IN (&#39;1a&#39;,&#39;1b&#39;,&#39;1c&#39;,&#39;1d&#39;,&#39;1e&#39;,&#39;1f&#39;,&#39;2&#39;,&#39;3&#39;,&#39;4&#39;)),
+    why_obsolete text NOT NULL,
+    confidence   text NOT NULL CHECK (confidence IN (&#39;high&#39;,&#39;medium&#39;,&#39;low&#39;)),
+    action       text NOT NULL CHECK (action IN (&#39;remove&#39;,&#39;rewrite&#39;,&#39;move&#39;,&#39;replace_with_api_feature&#39;,&#39;add&#39;,&#39;flag&#39;)),
+    replacement  text,
+    status       text NOT NULL DEFAULT &#39;open&#39; CHECK (status IN (&#39;open&#39;,&#39;accepted&#39;,&#39;rejected&#39;,&#39;applied&#39;)),
+    decided_by   uuid,
+    decided_at   timestamptz,
+    created_at   timestamptz NOT NULL DEFAULT now(),
+    updated_at   timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT prompt_audit_finding_audit_fk
+        FOREIGN KEY (audit_id) REFERENCES prompt_audit (id),
+    -- the skill&#39;s Step 6: &#39;rewrite&#39; and &#39;add&#39; always carry their replacement text
+    CONSTRAINT prompt_audit_finding_replacement
+        CHECK (action NOT IN (&#39;rewrite&#39;,&#39;add&#39;) OR (replacement IS NOT NULL AND replacement &lt;&gt; &#39;&#39;)),
+    -- a decided finding names its decider (CONTRACT §18: every transition is a person&#39;s)
+    CONSTRAINT prompt_audit_finding_decider
+        CHECK (status = &#39;open&#39; OR decided_by IS NOT NULL)
+);
+CREATE INDEX prompt_audit_finding_audit_idx ON prompt_audit_finding (tenant_id, audit_id, confidence, id);</code></pre>
+<p><strong>Retention:</strong> <code>inference_call</code> is an operational trace, pruned at 90 days by <code>inference_call.prune</code> (§6 — the longer window than <code>action_invocation</code>'s 30 is deliberate: a cache report over a quarter is the point of the table). <code>prompt_audit</code>/<code>prompt_audit_finding</code> follow the procedures they audit — a finding is retained while its <code>evidence</code> still resolves, and the audit's own <code>prompt_ref</code> version is what makes an old finding re-readable.</p>
+<p><strong>The audit cadence has no table.</strong> <em>After N executions</em> is <code>tenant.settings.prompt_audit</code> <code>{enabled, after_executions, surfaces, target_model}</code>, set through the existing <code>tenants.update_settings</code>. The trigger is an <strong>event at capture time</strong> (owner 2026-11-09): the engine counts the tenant's <code>inference_call</code> rows since its last <code>prompt_audit.created_at</code> and, at the threshold, inserts the queued audit and its job in the same transaction. The counter is therefore the ledger itself — there is no <code>last_counted</code> column that can drift, which is the failure mode a separate counter would have. The count excludes <code>prompt_ref = 'prompt_audit@1'</code>, so an audit cannot re-trigger the cadence it is servicing; <code>prompt_audit_auto_live_idx</code> makes two calls crossing the threshold together insert exactly one event-created audit. <code>target_model</code> is required for an event-created audit; an enabled policy without one is not armed.</p>
+<p><strong><code>run_id</code> / <code>run_step_id</code> / <code>conversation_turn_id</code> carry no FK, on purpose.</strong> A foreign key's RI check runs as the table owner and <strong>bypasses RLS</strong>, so it would accept another tenant's id — the same trap <code>departments.create</code> records. The engine resolves each id in the caller's tenant before it writes, and the <code>inference_call_join_key</code> CHECK is what keeps "whose call was this" answerable without one. <code>prompt_audit_finding.audit_id</code> <em>is</em> an FK (parent and child share the tenant by construction) and is still resolved in-tenant at insert.</p>
+<h3 id="218-benchmark-harness--s17-4">2.18 Benchmark harness — S17 (4)</h3>
+<p>⚠️ Numbered after §2.17 for the same reason §2.17 follows §2.16: the count in §2.16 already includes these four, and four documents cite the sections by number.</p>
+<p>All four are <code>ENABLE</code>+<code>FORCE</code> ROW LEVEL SECURITY with one <code>tenant_isolation</code> policy each. <strong><code>benchmark_run</code> and <code>benchmark_case</code> are written only by the engine and the run driver</strong>, never by an action handler, so they carry no <code>version</code> column — the S16 <code>prompt_audit</code> exception, stated here rather than left implicit. <code>resolved_rate</code> is not a column: it is <code>n_resolved / n_graded</code>, derived by the read models.</p>
+<pre class="sql"><code>CREATE TABLE benchmark_suite (
+    id                uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id         uuid NOT NULL DEFAULT app_current_tenant(),
+    slug              text NOT NULL,
+    dataset           text NOT NULL,              -- e.g. SWE-bench/SWE-bench_Verified
+    dataset_revision  text NOT NULL,              -- the HF revision the seed was cut from
+    seed_sha256       text NOT NULL,              -- hash of seed/benchmark/&lt;slug&gt;.json
+    image_lock_sha256 text NOT NULL,              -- hash of data/images-&lt;slug&gt;.lock.json
+    swebench_version  text NOT NULL,              -- the semantics the grader reproduces
+    parser_version    text NOT NULL,              -- the parser set&#39;s own version
+    baseline_run_id   uuid,                       -- set by benchmark_runs.promote; no FK (see below)
+    created_at        timestamptz NOT NULL DEFAULT now(),
+    updated_at        timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT benchmark_suite_slug UNIQUE (tenant_id, slug)
+);
+
+CREATE TABLE benchmark_instance (
+    id                uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id         uuid NOT NULL DEFAULT app_current_tenant(),
+    suite_id          uuid NOT NULL REFERENCES benchmark_suite (id),
+    instance_id       text NOT NULL,              -- e.g. django__django-16493
+    repo              text NOT NULL,
+    base_commit       text NOT NULL,
+    image             text NOT NULL,              -- registry path @ sha256 digest
+    problem_statement text NOT NULL,
+    oracle_files      text[] NOT NULL DEFAULT &#39;{}&#39;,  -- the paths the gold patch touches
+    gold_patch        text NOT NULL,
+    test_patch        text NOT NULL,
+    fail_to_pass      text[] NOT NULL,
+    pass_to_pass      text[] NOT NULL,
+    eval_script       text NOT NULL,              -- precomputed, deterministic for the pinned dataset
+    parser            text NOT NULL,              -- the repo&#39;s parser key
+    created_at        timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT benchmark_instance_key UNIQUE (suite_id, instance_id)
+);
+CREATE INDEX benchmark_instance_suite_idx ON benchmark_instance (tenant_id, suite_id);
+
+CREATE TABLE benchmark_run (
+    id                  uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id           uuid NOT NULL DEFAULT app_current_tenant(),
+    suite_id            uuid NOT NULL REFERENCES benchmark_suite (id),
+    arm                 text NOT NULL
+                        CHECK (arm IN (&#39;gold&#39;,&#39;empty&#39;,&#39;baseline&#39;,&#39;conveyor&#39;)),
+    subject_kind        text NOT NULL DEFAULT &#39;suite&#39;
+                        CHECK (subject_kind IN (&#39;suite&#39;,&#39;capability_agent&#39;,&#39;procedure&#39;)),
+    capability_agent_id uuid,                    -- forward reference, no FK until S15 lands
+    procedure_id        uuid,                    -- forward reference, no FK until S11&#39;s table is the target
+    label               text NOT NULL,           -- the predictions label, e.g. conveyor-oracle-files+failing-test
+    model               text,
+    status              text NOT NULL DEFAULT &#39;queued&#39;
+                        CHECK (status IN (&#39;queued&#39;,&#39;running&#39;,&#39;succeeded&#39;,&#39;failed&#39;,&#39;cancelled&#39;)),
+    n                   int NOT NULL DEFAULT 0 CHECK (n &gt;= 0),
+    n_graded            int NOT NULL DEFAULT 0 CHECK (n_graded &gt;= 0),
+    n_resolved          int NOT NULL DEFAULT 0 CHECK (n_resolved &gt;= 0),
+    n_no_attempt        int NOT NULL DEFAULT 0 CHECK (n_no_attempt &gt;= 0),
+    counts              jsonb NOT NULL DEFAULT &#39;{}&#39;,   -- the full status histogram, read whole
+    control_ok          boolean,                 -- NULL for non-control arms
+    cancel_requested_at timestamptz,
+    last_polled_at      timestamptz,             -- the driver&#39;s heartbeat
+    started_at          timestamptz,
+    finished_at         timestamptz,
+    error               text,
+    environment         jsonb NOT NULL DEFAULT &#39;{}&#39;,
+    options             jsonb NOT NULL DEFAULT &#39;{}&#39;,
+    created_at          timestamptz NOT NULL DEFAULT now(),
+    updated_at          timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT benchmark_run_subject CHECK (
+        (subject_kind = &#39;suite&#39; AND capability_agent_id IS NULL AND procedure_id IS NULL)
+        OR (subject_kind = &#39;capability_agent&#39; AND capability_agent_id IS NOT NULL)
+        OR (subject_kind = &#39;procedure&#39; AND procedure_id IS NOT NULL)),
+    CONSTRAINT benchmark_run_arm_subject CHECK (arm &lt;&gt; &#39;conveyor&#39; OR subject_kind &lt;&gt; &#39;suite&#39;)
+);
+CREATE INDEX benchmark_run_tenant_created_idx ON benchmark_run (tenant_id, created_at DESC, id);
+CREATE INDEX benchmark_run_suite_idx          ON benchmark_run (tenant_id, suite_id, created_at DESC);
+
+CREATE TABLE benchmark_case (
+    id                uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id         uuid NOT NULL DEFAULT app_current_tenant(),
+    benchmark_run_id  uuid NOT NULL REFERENCES benchmark_run (id),
+    instance_id       text NOT NULL,
+    produce_status    text NOT NULL DEFAULT &#39;pending&#39;
+                      CHECK (produce_status IN (&#39;pending&#39;,&#39;ok&#39;,&#39;fail&#39;,&#39;no_attempt&#39;)),
+    attempts          int NOT NULL DEFAULT 0 CHECK (attempts &gt;= 0),
+    patch             text,
+    patch_sha256      text,
+    verdict           text NOT NULL DEFAULT &#39;pending&#39;
+                      CHECK (verdict IN (&#39;pending&#39;,&#39;resolved&#39;,&#39;unresolved&#39;,&#39;apply_failed&#39;,&#39;eval_timeout&#39;,&#39;infra_error&#39;)),
+    seconds           numeric CHECK (seconds IS NULL OR seconds &gt;= 0),
+    sandbox_ref       text,                       -- the k8s Job name
+    log_document_id   uuid,                       -- S09 document; no FK (see below)
+    detail            jsonb NOT NULL DEFAULT &#39;{}&#39;,
+    created_at        timestamptz NOT NULL DEFAULT now(),
+    updated_at        timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT benchmark_case_key UNIQUE (benchmark_run_id, instance_id),
+    CONSTRAINT benchmark_case_patch_cap CHECK (patch IS NULL OR octet_length(patch) &lt;= 262144)
+);
+CREATE INDEX benchmark_case_run_idx     ON benchmark_case (tenant_id, benchmark_run_id, verdict, instance_id);</code></pre>
+<p><strong><code>baseline_run_id</code>, <code>capability_agent_id</code>, <code>procedure_id</code> and <code>log_document_id</code> carry no FK</strong>, for the reason §2.17 records: a foreign key's RI check runs as the table owner and bypasses RLS. Each is resolved inside the caller's tenant before it is written. The <code>benchmark_run_subject</code> CHECK is what keeps "which executor did this run measure" answerable without one. <strong><code>suite_id</code> and <code>benchmark_run_id</code> <em>are</em> FKs</strong> — parent and child share the tenant by construction — the same shape as <code>prompt_audit_finding.audit_id</code>.</p>
+<p><strong>The <code>patch</code> cap is 256 KiB</strong> — the <code>revision.content</code> precedent — enforced in the domain <em>and</em> by the CHECK; an over-cap patch is a typed 422 naming the instance, never a truncation. The assembled sandbox ConfigMap (<code>patch.diff</code> + <code>eval.sh</code> + <code>run.sh</code>) is capped at 1 MiB at run time, the k8s limit.</p>
+<h3 id="219-eval-builder--s19-10">2.19 Eval builder — S19 (10)</h3>
+<p>All ten are <code>ENABLE</code>+<code>FORCE</code> ROW LEVEL SECURITY with one <code>tenant_isolation</code> policy each, exactly as §2.17's set. The aggregate is <code>eval</code> (the flow) → <code>eval_version</code> (a frozen instrument) → <code>eval_case</code>/<code>eval_metric</code>, with <code>eval_run</code> → <code>eval_case_result</code>/<code>eval_attempt_error</code>/<code>eval_trace</code> on the measurement side and <code>eval_audit</code> → <code>eval_audit_finding</code> beside it. <strong><code>eval_version</code> is what makes two numbers comparable</strong>: a run names a version, and a comparison across versions, graders or splits is refused (CONTRACT §20).</p>
+<p><strong>One ALTER precedes the ten</strong> — the sign-offs are <code>approval</code> rows (§20), and <code>uq_appr_pending</code> cannot cover them because <code>run_id</code> is NULL there and Postgres treats NULLs as distinct. This is the CCR recorded in <code>00-INDEX.md</code>'s decision register; it is additive and nullable, so no existing row, query or index changes:</p>
+<pre class="sql"><code>ALTER TABLE approval ADD COLUMN eval_id uuid;
+CREATE UNIQUE INDEX uq_appr_eval_pending
+    ON approval (tenant_id, eval_id, gate) WHERE status = &#39;pending&#39; AND eval_id IS NOT NULL;</code></pre>
+<p>⚠️ <strong>The index alone is not the guarantee until the column exists.</strong> Measured 2026-11-09 on a throwaway Postgres 18: with the ALTER omitted, two pending <code>eval_inputs</code> gates on one eval are <strong>both accepted</strong>, and a probe that checks "the second insert failed" reports a pass for the wrong reason — the error is <code>column "eval_id" does not exist</code>, not a unique violation. A gate line must assert the constraint <em>name</em>.</p>
+<pre class="sql"><code>CREATE TABLE eval (
+    id            uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id     uuid NOT NULL DEFAULT app_current_tenant(),
+    name          text NOT NULL CHECK (name &lt;&gt; &#39;&#39;),
+    purpose       text NOT NULL DEFAULT &#39;&#39;,
+    subject_kind  text NOT NULL
+                  CHECK (subject_kind IN (&#39;completions&#39;,&#39;copilot&#39;,&#39;procedure&#39;,&#39;external&#39;,&#39;agent_run&#39;)),
+    entry_action  text NOT NULL,
+    model_ref     text,
+    prompt_ref    text,
+    inputs_schema jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb CHECK (length(inputs_schema::text) &lt;= 8192),
+    trace_source  text NOT NULL DEFAULT &#39;synthesized&#39;
+                  CHECK (trace_source IN (&#39;synthesized&#39;,&#39;conversation_turn&#39;,&#39;run_step&#39;)),
+    -- &#39;draft&#39; | &#39;running&#39; | &#39;climbing&#39; | &#39;retired&#39;. There is deliberately NO &#39;ready&#39;:
+    -- readiness is computed from the two approvals at start time, so no column can
+    -- disagree with the sign-off rows it summarises (the S16 counter lesson).
+    status        text NOT NULL DEFAULT &#39;draft&#39;
+                  CHECK (status IN (&#39;draft&#39;,&#39;running&#39;,&#39;climbing&#39;,&#39;retired&#39;)),
+    current_version_id uuid,
+    created_by    uuid,
+    created_at    timestamptz NOT NULL DEFAULT now(),
+    updated_at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX eval_tenant_idx ON eval (tenant_id, created_at DESC, id);
+
+CREATE TABLE eval_version (
+    id              uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id       uuid NOT NULL DEFAULT app_current_tenant(),
+    eval_id         uuid NOT NULL,
+    version         int  NOT NULL CHECK (version &gt;= 1),
+    digest          text NOT NULL,                 -- sha256 over the frozen instrument
+    -- NO case_count / train_count: a maintained counter drifts from the rows it counts
+    -- (the §2.17 lesson). Counts are read-time, and the split lock is the real fact.
+    split_sha256    text,
+    split_locked_at timestamptz,
+    prices          jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb,
+    harness_paths   text[] NOT NULL DEFAULT &#39;{}&#39;,
+    created_by      uuid,
+    created_at      timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT eval_version_eval_fk FOREIGN KEY (eval_id) REFERENCES eval (id),
+    CONSTRAINT eval_version_unique UNIQUE (tenant_id, eval_id, version),
+    -- a locked split names when it was drawn; readiness is the predicate, not this table
+    CONSTRAINT eval_version_split_pair CHECK ((split_sha256 IS NULL) = (split_locked_at IS NULL))
+);
+CREATE INDEX eval_version_eval_idx ON eval_version (tenant_id, eval_id, version DESC);
+
+CREATE TABLE eval_case (
+    id              uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id       uuid NOT NULL DEFAULT app_current_tenant(),
+    version_id      uuid NOT NULL,
+    ordinal         int  NOT NULL CHECK (ordinal &gt;= 0),
+    input           text NOT NULL CHECK (input &lt;&gt; &#39;&#39;),
+    tags            text[] NOT NULL DEFAULT &#39;{}&#39;,       -- tags[0] is the grouping key
+    expected        jsonb,                              -- WRITE-ONLY: no view returns it
+    attachments     jsonb NOT NULL DEFAULT &#39;[]&#39;::jsonb,
+    source          text NOT NULL DEFAULT &#39;handwritten&#39;
+                    CHECK (source IN (&#39;production&#39;,&#39;ticket&#39;,&#39;handwritten&#39;,&#39;synthesized&#39;)),
+    gold_provenance text NOT NULL DEFAULT &#39;human_written&#39;
+                    CHECK (gold_provenance IN (&#39;human_written&#39;,&#39;human_verified&#39;,&#39;model&#39;)),
+    gold_model      text,
+    split           text NOT NULL DEFAULT &#39;none&#39; CHECK (split IN (&#39;train&#39;,&#39;test&#39;,&#39;none&#39;)),
+    meta            jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb,
+    created_at      timestamptz NOT NULL DEFAULT now(),
+    updated_at      timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT eval_case_version_fk FOREIGN KEY (version_id) REFERENCES eval_version (id),
+    CONSTRAINT eval_case_ordinal_unique UNIQUE (tenant_id, version_id, ordinal),
+    -- model-derived gold names its model; a golden set that cannot name its source cannot be trusted
+    CONSTRAINT eval_case_gold_model CHECK (gold_provenance &lt;&gt; &#39;model&#39; OR gold_model IS NOT NULL),
+    CONSTRAINT eval_case_attachments_cap CHECK (length(attachments::text) &lt;= 16384)
+);
+CREATE INDEX eval_case_version_idx ON eval_case (tenant_id, version_id, ordinal);
+CREATE INDEX eval_case_split_idx   ON eval_case (tenant_id, version_id, split);
+
+CREATE TABLE eval_metric (
+    id          uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id   uuid NOT NULL DEFAULT app_current_tenant(),
+    version_id  uuid NOT NULL,
+    key         text NOT NULL CHECK (key ~ &#39;^[a-z][a-z0-9_]*$&#39;),   -- the grade dict key
+    role        text NOT NULL CHECK (role IN (&#39;quality&#39;,&#39;perf&#39;)),
+    kind        text NOT NULL CHECK (kind IN (&#39;binary&#39;,&#39;judge&#39;,&#39;float&#39;)),
+    better      text NOT NULL DEFAULT &#39;higher&#39; CHECK (better IN (&#39;higher&#39;,&#39;lower&#39;)),
+    -- the full viewer&#39;s legend truncates; qualifiers belong in the rubric, not the label
+    label       text NOT NULL CHECK (char_length(label) &lt;= 14),
+    unit        text,
+    grader_kind text NOT NULL CHECK (grader_kind IN (&#39;programmatic&#39;,&#39;pairwise&#39;,&#39;rubric&#39;,&#39;human&#39;,&#39;none&#39;)),
+    grader      jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb CHECK (length(grader::text) &lt;= 8192),
+    rubric      text,
+    ordinal     int  NOT NULL CHECK (ordinal &gt;= 0),
+    created_at  timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT eval_metric_version_fk FOREIGN KEY (version_id) REFERENCES eval_version (id),
+    CONSTRAINT eval_metric_key_unique UNIQUE (tenant_id, version_id, key),
+    -- a perf field is measured, never graded
+    CONSTRAINT eval_metric_perf_ungraded CHECK (role = &#39;quality&#39; OR grader_kind = &#39;none&#39;),
+    -- a rubric or pairwise grader always has its rubric text
+    CONSTRAINT eval_metric_rubric_required
+        CHECK (grader_kind NOT IN (&#39;rubric&#39;,&#39;pairwise&#39;) OR (rubric IS NOT NULL AND rubric &lt;&gt; &#39;&#39;))
+);
+CREATE INDEX eval_metric_version_idx ON eval_metric (tenant_id, version_id, ordinal);
+
+CREATE TABLE eval_run (
+    id            uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id     uuid NOT NULL DEFAULT app_current_tenant(),
+    eval_id       uuid NOT NULL,
+    version_id    uuid NOT NULL,
+    -- the report builder silently ignores anything else; here it is impossible
+    variant       text NOT NULL CHECK (variant = &#39;baseline&#39; OR variant ~ &#39;^v[0-9]+$&#39;),
+    round         int  NOT NULL DEFAULT 0 CHECK (round &gt;= 0),
+    mode          text NOT NULL DEFAULT &#39;full&#39; CHECK (mode IN (&#39;pilot&#39;,&#39;full&#39;)),
+    reps          int  NOT NULL DEFAULT 1 CHECK (reps &gt;= 1),
+    case_count    int  NOT NULL DEFAULT 0 CHECK (case_count &gt;= 0),
+    status        text NOT NULL DEFAULT &#39;queued&#39;
+                  CHECK (status IN (&#39;queued&#39;,&#39;running&#39;,&#39;partial&#39;,&#39;complete&#39;,&#39;void&#39;,&#39;cancelled&#39;)),
+    change_md     text,
+    change_patch  text,
+    summary       jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb,   -- {description,target,suspicious}
+    narrative_md  text,
+    environment   jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb,   -- repo sha, model ids, stubs, flags
+    noise_floor   numeric,
+    cost_ceiling_cents int CHECK (cost_ceiling_cents &gt;= 0),
+    last_polled_at timestamptz,
+    started_at    timestamptz,
+    finished_at   timestamptz,
+    created_at    timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT eval_run_eval_fk    FOREIGN KEY (eval_id)    REFERENCES eval (id),
+    CONSTRAINT eval_run_version_fk FOREIGN KEY (version_id) REFERENCES eval_version (id),
+    CONSTRAINT eval_run_variant_unique UNIQUE (tenant_id, eval_id, variant),
+    CONSTRAINT eval_run_patch_cap CHECK (change_patch IS NULL OR length(change_patch) &lt;= 262144)
+);
+CREATE INDEX eval_run_eval_idx   ON eval_run (tenant_id, eval_id, round DESC);
+CREATE INDEX eval_run_status_idx ON eval_run (tenant_id, status) WHERE status IN (&#39;queued&#39;,&#39;running&#39;,&#39;partial&#39;);
+
+CREATE TABLE eval_case_result (
+    id                   uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id            uuid NOT NULL DEFAULT app_current_tenant(),
+    eval_run_id          uuid NOT NULL,
+    case_id              uuid NOT NULL,
+    rep                  int  NOT NULL CHECK (rep &gt;= 0),
+    status               text NOT NULL CHECK (status IN (&#39;ok&#39;,&#39;truncated&#39;,&#39;pending_label&#39;)),
+    stop_reason          text,
+    grade                jsonb NOT NULL,                -- {metric_id: number}; never a bare scalar here
+    explanation          jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb,
+    model                text NOT NULL,                 -- from the RESPONSE, not from config
+    usage                jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb,
+    latency_ms           int  NOT NULL DEFAULT 0 CHECK (latency_ms &gt;= 0),
+    tool_calls           int  NOT NULL DEFAULT 0 CHECK (tool_calls &gt;= 0),
+    action_invocation_id uuid,
+    subject_run_id       uuid,                          -- the `run` this case produced, if any
+    judge_model          text,
+    judge_usage          jsonb,
+    human_score          numeric,                       -- the judge-calibration label
+    created_at           timestamptz NOT NULL DEFAULT now(),
+    -- ONE row per slot, and a failed attempt never writes here (see eval_attempt_error)
+    CONSTRAINT eval_case_result_slot UNIQUE (tenant_id, eval_run_id, case_id, rep),
+    -- the method&#39;s rule: with more than one quality metric the grade MUST be the dict form,
+    -- or every metric column renders as a dash
+    CONSTRAINT eval_case_result_grade_object CHECK (jsonb_typeof(grade) = &#39;object&#39;),
+    CONSTRAINT eval_case_result_label CHECK (status &lt;&gt; &#39;pending_label&#39; OR human_score IS NULL)
+);
+CREATE INDEX eval_case_result_run_idx  ON eval_case_result (tenant_id, eval_run_id, case_id, rep);
+CREATE INDEX eval_case_result_slow_idx ON eval_case_result (tenant_id, eval_run_id, latency_ms DESC);
+
+CREATE TABLE eval_attempt_error (
+    id            uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id     uuid NOT NULL DEFAULT app_current_tenant(),
+    eval_run_id   uuid NOT NULL,
+    case_id       uuid NOT NULL,
+    rep           int  NOT NULL CHECK (rep &gt;= 0),
+    attempt       int  NOT NULL CHECK (attempt &gt;= 1),
+    failure_class text NOT NULL
+                  CHECK (failure_class IN (&#39;refusal&#39;,&#39;harness&#39;,&#39;serving&#39;,&#39;timeout&#39;,
+                                           &#39;served_model_mismatch&#39;,&#39;grader&#39;)),
+    retry_count   int  NOT NULL DEFAULT 0 CHECK (retry_count &gt;= 0),
+    model         text,
+    usage         jsonb,                                -- billed-but-failed spend is still spend
+    message       text NOT NULL,
+    deadline_at   timestamptz,                          -- the per-case ceiling that fired, if any
+    created_at    timestamptz NOT NULL DEFAULT now(),
+    -- APPEND-ONLY across resumes: one row per failed attempt. A later success writes
+    -- eval_case_result and leaves these in place, superseded but never deleted.
+    CONSTRAINT eval_attempt_unique UNIQUE (tenant_id, eval_run_id, case_id, rep, attempt)
+);
+CREATE INDEX eval_attempt_error_run_idx ON eval_attempt_error (tenant_id, eval_run_id, failure_class);
+
+CREATE TABLE eval_trace (
+    id          uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id   uuid NOT NULL DEFAULT app_current_tenant(),
+    eval_run_id uuid NOT NULL,
+    case_id     uuid NOT NULL,
+    rep         int  NOT NULL CHECK (rep &gt;= 0),
+    turns       jsonb NOT NULL,                        -- [{role,content,thinking?,name?,attachments?}]
+    sha256      text NOT NULL,
+    bytes       int  NOT NULL CHECK (bytes &gt;= 0 AND bytes &lt;= 1048576),
+    created_at  timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT eval_trace_slot UNIQUE (tenant_id, eval_run_id, case_id, rep),
+    CONSTRAINT eval_trace_turns_array CHECK (jsonb_typeof(turns) = &#39;array&#39;),
+    -- a role outside the method&#39;s five is a writer bug, not data
+    CONSTRAINT eval_trace_roles CHECK (NOT jsonb_path_exists(turns, &#39;$[*] ? (@.role != &quot;system&quot; &amp;&amp;
+        @.role != &quot;user&quot; &amp;&amp; @.role != &quot;assistant&quot; &amp;&amp; @.role != &quot;tool_call&quot; &amp;&amp; @.role != &quot;tool_result&quot;)&#39;))
+);
+
+CREATE TABLE eval_audit (
+    id            uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id     uuid NOT NULL DEFAULT app_current_tenant(),
+    eval_id       uuid NOT NULL,
+    version_id    uuid NOT NULL,
+    target_run_id uuid,
+    status        text NOT NULL DEFAULT &#39;queued&#39;
+                  CHECK (status IN (&#39;queued&#39;,&#39;running&#39;,&#39;succeeded&#39;,&#39;failed&#39;)),
+    oracle_score  numeric,                              -- the must-pass control, expected ~1.0
+    null_score    numeric,                              -- the must-fail control, expected ~0.0
+    noise_floor   numeric,
+    headroom      numeric,
+    summary       jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb,
+    error         text,
+    requested_by  uuid,
+    created_at    timestamptz NOT NULL DEFAULT now(),
+    updated_at    timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT eval_audit_eval_fk FOREIGN KEY (eval_id) REFERENCES eval (id)
+);
+CREATE INDEX eval_audit_eval_idx ON eval_audit (tenant_id, eval_id, created_at DESC);
+
+CREATE TABLE eval_audit_finding (
+    id          uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id   uuid NOT NULL DEFAULT app_current_tenant(),
+    audit_id    uuid NOT NULL,
+    section     text NOT NULL CHECK (section IN (&#39;1&#39;,&#39;2&#39;,&#39;3&#39;,&#39;4&#39;,&#39;5&#39;,&#39;6&#39;)),
+    item        text NOT NULL,                          -- the checklist key, e.g. &#39;no_answer_is_not_negative&#39;
+    severity    text NOT NULL CHECK (severity IN (&#39;misleading&#39;,&#39;noise&#39;,&#39;generality&#39;)),
+    evidence    text NOT NULL CHECK (evidence &lt;&gt; &#39;&#39;),
+    suggestion  text NOT NULL CHECK (suggestion &lt;&gt; &#39;&#39;),
+    status      text NOT NULL DEFAULT &#39;open&#39;
+                CHECK (status IN (&#39;open&#39;,&#39;accepted&#39;,&#39;fixed&#39;,&#39;dismissed&#39;)),
+    decided_by  uuid,
+    decided_at  timestamptz,
+    created_at  timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT eval_audit_finding_audit_fk FOREIGN KEY (audit_id) REFERENCES eval_audit (id),
+    CONSTRAINT eval_audit_finding_decider CHECK (status = &#39;open&#39; OR decided_by IS NOT NULL)
+);
+CREATE INDEX eval_audit_finding_audit_idx ON eval_audit_finding (tenant_id, audit_id, severity, id);</code></pre>
+<p><strong><code>eval_run_id</code>, <code>case_id</code> and <code>subject_run_id</code> carry no FK</strong>, for the §2.17 reason: an RI check runs as the table owner and bypasses RLS, so it would accept another tenant's id. <code>eval_version.eval_id</code>, <code>eval_case.version_id</code>, <code>eval_metric.version_id</code>, <code>eval_run.eval_id</code>/<code>version_id</code> and <code>eval_audit_finding.audit_id</code> <em>are</em> FKs — parent and child share the tenant by construction, the same shape as <code>prompt_audit_finding.audit_id</code>. <strong><code>subject_run_id</code> never points at a <code>benchmark_run</code></strong>: S19 has its own run notion and overloading one column with two ids would make the cost join ambiguous.</p>
+<p><strong><code>expected</code> is write-only.</strong> It is read by the grader and by nothing else — no <code>CaseView</code>, no export of a case list, no agent-reachable action. The subject-input builder is constructed from <code>input</code> alone, so a handler cannot pass the answer key by accident.</p>
+<h3 id="220-eval-hillclimb--s20-1">2.20 Eval hillclimb — S20 (1)</h3>
+<p>One table, <code>ENABLE</code>+<code>FORCE</code> RLS with a <code>tenant_isolation</code> policy. It is the method's <code>_state.json</code>: the loop's goal, stopping condition, split reference and best-so-far. <strong>Rounds are <code>eval_run</code> rows</strong> (<code>variant='v&lt;N&gt;'</code>, <code>round</code>, <code>change_md</code>, <code>change_patch</code>, <code>summary.suspicious</code>, <code>narrative_md</code>) — S19 ships those columns and S20 ships only the loop.</p>
+<pre class="sql"><code>CREATE TABLE eval_climb (
+    id                 uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id          uuid NOT NULL DEFAULT app_current_tenant(),
+    eval_id            uuid NOT NULL,
+    version_id         uuid NOT NULL,
+    -- {target, direction, hold[]}; the search order for a cost goal is state here too,
+    -- so a resumed session does not restart the staircase at the top
+    goal               jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb CHECK (length(goal::text) &lt;= 8192),
+    direction          text NOT NULL DEFAULT &#39;higher&#39; CHECK (direction IN (&#39;higher&#39;,&#39;lower&#39;)),
+    reps               int  NOT NULL DEFAULT 1 CHECK (reps &gt;= 1),
+    stopping           text NOT NULL DEFAULT &#39;plateau&#39; CHECK (stopping IN (&#39;plateau&#39;,&#39;rounds&#39;,&#39;manual&#39;)),
+    plateau_k          int  NOT NULL DEFAULT 3 CHECK (plateau_k &gt;= 3),  -- two flat rounds is too few
+    max_rounds         int  CHECK (max_rounds &gt;= 1),
+    delta              numeric NOT NULL CHECK (delta &gt; 0),              -- set above the noise floor
+    off_limits         text[] NOT NULL DEFAULT &#39;{}&#39;,
+    approve_each_round boolean NOT NULL DEFAULT true,
+    cost_ceiling_cents int CHECK (cost_ceiling_cents &gt;= 0),
+    current_round      int  NOT NULL DEFAULT 0 CHECK (current_round &gt;= 0),
+    best_round         int,
+    best_test_score    numeric,
+    -- the final report, written by `eval_climbs.stop`. Added by migration 0029: the one column
+    -- the loop state cannot derive, and the reason this table&#39;s DDL and its migration differ.
+    narrative_md       text,
+    status             text NOT NULL DEFAULT &#39;planned&#39;
+                       CHECK (status IN (&#39;planned&#39;,&#39;running&#39;,&#39;plateaued&#39;,&#39;stopped&#39;)),
+    created_by         uuid,
+    created_at         timestamptz NOT NULL DEFAULT now(),
+    updated_at         timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT eval_climb_eval_fk    FOREIGN KEY (eval_id)    REFERENCES eval (id),
+    CONSTRAINT eval_climb_version_fk FOREIGN KEY (version_id) REFERENCES eval_version (id),
+    CONSTRAINT eval_climb_rounds CHECK (stopping &lt;&gt; &#39;rounds&#39; OR max_rounds IS NOT NULL)
+);
+CREATE INDEX eval_climb_eval_idx ON eval_climb (tenant_id, eval_id, created_at DESC);</code></pre>
+<p><strong>There is no <code>spend</code> column.</strong> Cumulative spend is <code>sum</code> over the climb's <code>eval_case_result.usage</code> at read time, plus the billed <code>usage</code> on <code>eval_attempt_error</code> rows — a maintained counter is the one thing that can drift from the rows it counts, and the method says so.</p>
+<p><strong>Rounds are runs, and a re-grade is a round's sibling.</strong> A round is an <code>eval_run</code> row (<code>variant='v&lt;N&gt;'</code>, <code>round</code>, <code>change_md</code>, <code>change_patch</code>, <code>summary.decision</code>), so the climb needs no state table of its own. <code>eval_runs.regrade</code> adds no table either: it writes another <code>eval_run</code> whose <code>summary.regraded_from</code> names the source, and its slots are ordinary <code>eval_case_result</code> rows. The one thing it adds to <code>eval_trace</code> is the captured <code>output</code> on the assistant turn — a field inside the existing <code>turns</code> JSONB, which is why no migration accompanies it.</p>
+<h3 id="221-prompt-catalogue--d27-2">2.21 Prompt catalogue — D27 (2)</h3>
+<p>Two tables, <code>ENABLE</code>+<code>FORCE</code> RLS with a <code>tenant_isolation</code> policy. A prompt is a <strong>recipe</strong>, not a stored text: <code>prompt</code> names a versioned key and <code>prompt_section</code> is its ordered layout. The compiled text is never stored — <code>inference_call.prompt_ref</code>/<code>prompt_version</code>/<code>prompt_sha256</code> name the recipe and hash every call, and a second copy would drift from the sources it was built from.</p>
+<pre class="sql"><code>CREATE TABLE prompt (
+    id          uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id   uuid NOT NULL DEFAULT app_current_tenant(),
+    key         text NOT NULL,
+    version     int  NOT NULL CHECK (version &gt;= 1),
+    status      text NOT NULL DEFAULT &#39;active&#39; CHECK (status IN (&#39;active&#39;,&#39;retired&#39;)),
+    title       text NOT NULL,
+    created_at  timestamptz NOT NULL DEFAULT now(),
+    updated_at  timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT prompt_key_not_blank   CHECK (btrim(key) &lt;&gt; &#39;&#39;),
+    CONSTRAINT prompt_title_not_blank CHECK (btrim(title) &lt;&gt; &#39;&#39;),
+    CONSTRAINT prompt_tenant_key_version_key UNIQUE (tenant_id, key, version)
+);
+-- At most one active version per key; retired rows stay addressable by exact pin.
+CREATE UNIQUE INDEX uq_prompt_active ON prompt (tenant_id, key) WHERE status = &#39;active&#39;;
+
+CREATE TABLE prompt_section (
+    id          uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id   uuid NOT NULL DEFAULT app_current_tenant(),
+    prompt_id   uuid NOT NULL,
+    position    int  NOT NULL CHECK (position &gt;= 1),
+    source_kind text NOT NULL
+                CHECK (source_kind IN (&#39;system&#39;,&#39;procedure&#39;,&#39;capability&#39;,&#39;project_card&#39;,&#39;knowledge&#39;)),
+    required    boolean NOT NULL DEFAULT false,
+    template    text NOT NULL DEFAULT &#39;&#39;,
+    created_at  timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT prompt_section_prompt_fk
+        FOREIGN KEY (prompt_id) REFERENCES prompt (id) ON DELETE CASCADE,
+    CONSTRAINT prompt_section_position_key UNIQUE (prompt_id, position),
+    CONSTRAINT prompt_section_system_has_text
+        CHECK (source_kind &lt;&gt; &#39;system&#39; OR btrim(template) &lt;&gt; &#39;&#39;)
+);</code></pre>
+<p><strong><code>system</code> is the only literal kind.</strong> The other four are rendered from the run's facts — the process (stored as a process) and its step, the capability/agent row, the project and card, and the capability's bound packs. A <code>required</code> section with no source is a readiness refusal, not an empty section. The built-in recipes (<code>copilot_system@1</code>, <code>prompt_audit@1</code>, <code>agent@1</code>) are seeded per tenant by <code>seed::prompts_for_tenant</code>; an existing <code>(key, version)</code> is never rewritten by a seed.</p>
+<h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
+<p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>
+<h3 id="31-card-lifecycle">3.1 Card lifecycle</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td>not a column. <code>list.kind ∈ {intake, active, waiting, done, archive}</code> plus <code>card.archived_at</code></td>
+</tr>
+<tr>
+<td>Transitions</td>
+<td>any move allowed by <code>domain::board::may_move(card_type_id, from_kind, to_kind)</code>; setting <code>archived_at</code> is the only other lifecycle act</td>
+</tr>
+<tr>
+<td>Enforced</td>
+<td><code>domain::board::may_move</code> — one function, called by the API, by actions, and by the procedure runner</td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>card.list_id</code>, <code>card.prev_list_id</code>, <code>card.list_changed_at</code>, <code>card.archived_at</code>, <code>card.version</code></td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td><code>UPDATE card SET list_id=$new, prev_list_id=list_id, list_changed_at=now(), version=version+1 WHERE id=$1 AND tenant_id=$2 AND version=$3</code> — 0 rows ⇒ 412; a move can never be applied to a card that changed since it was read</td>
+</tr>
+</tbody>
+</table>
+<p><code>may_move</code> reads the matrix from <code>catalogue_entry(kind='project_type').meta.matrix</code> for the project's <code>project_type_code</code>; the 280 generated card-type×list flows become this one lookup.</p>
+<h3 id="32-run">3.2 Run</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td><code>queued → running → waiting_approval → running → succeeded | failed | cancelled</code></td>
+</tr>
+<tr>
+<td>Transitions</td>
+<td><code>queued→running</code>, <code>queued→cancelled</code>, <code>running→waiting_approval</code>, <code>running→succeeded</code>, <code>running→failed</code>, <code>running→cancelled</code>, <code>waiting_approval→running</code>, <code>waiting_approval→cancelled</code>; <code>succeeded</code>/<code>failed</code>/<code>cancelled</code> are terminal</td>
+</tr>
+<tr>
+<td>Enforced</td>
+<td><code>domain::run::transition(from, to) -&gt; Result&lt;Run, RunError&gt;</code>; the store layer refuses a status the function rejects</td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>run.status</code>, <code>started_at</code>, <code>finished_at</code>, <code>attempt</code>, <code>error_class</code>, <code>error_message</code></td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td><strong>a run is a tree (2026-11-09).</strong> Partial unique <code>(tenant_id, card_id) WHERE parent_run_id IS NULL AND status IN ('queued','running','waiting_approval')</code> — <strong>one live ROOT run per card</strong>; the project form is <code>(tenant_id, project_id) WHERE parent_run_id IS NULL AND card_id IS NULL AND status IN (…)</code>; one live child per <code>(parent_run_id, step_id)</code> and one row per <code>(parent_run_id, step_id, attempt)</code>. <code>CHECK (parent_run_id IS NULL OR step_id IS NOT NULL)</code> and <code>CHECK (depth BETWEEN 0 AND 3)</code>. Cancel cascades from a parent to its children; a child's failure does not re-fire the parent's <code>err.card</code>. Enforced by the DB even if two API pods race</td>
+</tr>
+</tbody>
+</table>
+<h3 id="33-approval">3.3 Approval</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td><code>pending → approved | rejected | expired | voided</code> (<code>voided</code> is a withdrawn gate)</td>
+</tr>
+<tr>
+<td>Transitions</td>
+<td><code>pending→approved</code> when <code>count(approval_decision where decision='approve') &gt;= required_decisions</code>; <code>pending→rejected</code> on any reject; <code>pending→expired</code> by the expiry job at <code>expires_at</code>; <code>pending→voided</code> by <code>runs.cancel</code> — the gate is withdrawn and will never be answered</td>
+</tr>
+<tr>
+<td>Enforced</td>
+<td><code>domain::approval::decide</code>; expiry is a <code>job</code> kind (<code>approval.expire</code>), not a timer</td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>approval.status</code>, <code>required_decisions</code>, <code>expires_at</code>; <code>approval_decision(approver_id, decision, note, decided_by_kind, via)</code></td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td>partial unique <code>(tenant_id, run_id, gate) WHERE status='pending'</code> — <strong>at most one pending per (run, gate)</strong>; unique <code>(approval_id, approver_id)</code> — one person cannot satisfy dual control twice</td>
+</tr>
+</tbody>
+</table>
+<h3 id="34-requirement-and-every-governed_asset">3.4 Requirement (and every <code>governed_asset</code>)</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td><code>draft → in_review → approved → superseded</code>; <code>in_review → draft</code> when changes are requested; <code>archived</code> is an operator act from any non-superseded state</td>
+</tr>
+<tr>
+<td>Transitions</td>
+<td><code>domain::governance::transition(kind, from, to)</code>; <code>approved</code> is required before a <code>superseded_by</code> may be set</td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>governed_asset.status</code>, <code>version</code> (bigint), <code>supersedes_id</code>, <code>superseded_by_id</code>, <code>approved_by/at</code> in <code>meta</code></td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td>every transition writes a <code>revision</code> row with <code>seq = version</code> in the same transaction. The FK on <code>superseded_by_id</code> keeps the chain from dangling; <code>check (superseded_by_id is null or superseded_by_id &lt;&gt; id)</code> forbids a self-cycle; <code>check (status &lt;&gt; 'superseded' or superseded_by_id is not null)</code> makes <code>superseded ⇒ superseded_by_id</code> a DB guarantee — PostgreSQL CHECK constraints are immediate, so both pointers are set in the one <code>UPDATE</code>. The reciprocal edge (<code>supersedes_id</code>/<code>superseded_by_id</code> agree) is domain-enforced by <code>governed_asset.supersede</code>, <strong>not</strong> a DEFERRED constraint</td>
+</tr>
+</tbody>
+</table>
+<h3 id="35-procedure">3.5 Procedure</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td><code>draft → published → retired</code>. <code>published</code> is immutable: an edit forks <code>version+1</code> in <code>draft</code></td>
+</tr>
+<tr>
+<td>Enforced</td>
+<td><code>domain::process::publish</code>; publishing validates that every <code>process_step.action</code> exists in the registry and that referenced gates are in <code>catalogue_entry(kind='gate')</code></td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>procedure.status</code>, <code>procedure.version</code>, <code>process_step</code> rows (never mutated after publish, only copied forward)</td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td>a <code>run.procedure_id</code> must point at a <code>published</code> procedure (FK + CHECK via the domain; the partial unique index <code>uq (tenant_id, key) WHERE status='published'</code> guarantees at most one live version)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="36-delivery">3.6 Delivery</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td><code>pending → sent → delivered | failed | expired</code></td>
+</tr>
+<tr>
+<td>Enforced</td>
+<td><code>domain::channel::deliver</code>; the drainer is a <code>job</code> kind (<code>delivery.send</code>), at-least-once, idempotent on <code>delivery.id</code></td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>delivery.state</code>, <code>attempts</code>, <code>last_error</code>, <code>sent_at</code>, <code>delivered_at</code></td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td>unique <code>(message_id, channel_kind, recipient_ref)</code> — a retried send cannot create a second row, so "delivered once" is a key, not a convention</td>
+</tr>
+</tbody>
+</table>
+<h3 id="37-prompt-audit-s16">3.7 Prompt audit (S16)</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td><code>prompt_audit</code>: <code>queued → running → succeeded | failed</code>. <code>prompt_audit_finding</code>: <code>open → accepted | rejected → applied</code></td>
+</tr>
+<tr>
+<td>Enforced</td>
+<td><code>domain::prompt_audit</code>; the run is one <code>prompt_audit.run</code> job, whose inventory and signal scan are code and whose judgement is one bounded <code>completions.create</code>. Only <code>prompt_findings.decide</code> moves a finding out of <code>open</code>, and the CHECK in §2.17 requires a <code>decided_by</code> for every such move</td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>prompt_audit.status</code>, <code>finding_count</code>, <code>prompt_ref</code>; <code>prompt_audit_finding.status</code>, <code>decided_by</code>, <code>decided_at</code>, <code>replacement</code></td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td><strong><code>applied</code> is never reachable from the audit.</strong> No action in this slice holds <code>procedures:write</code>; an applied finding records that some later <code>procedures.update</code> changed the surface, and the finding keeps its <code>evidence</code> as the before-image. A finding cannot point at a surface the audit did not inventory — <code>location</code> is written by the scanner from the same list <code>scope</code> names</td>
+</tr>
+</tbody>
+</table>
+<h3 id="38-benchmark-runs-s17">3.8 Benchmark runs (S17)</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td><code>benchmark_run</code>: <code>queued → running → succeeded | failed | cancelled</code> (<code>cancel_requested_at</code> is a stamp, not a state). <code>benchmark_case</code>: <code>produce_status pending → ok | fail | no_attempt</code>; <code>verdict pending → resolved | unresolved | apply_failed | eval_timeout | infra_error</code></td>
+</tr>
+<tr>
+<td>Enforced</td>
+<td><code>domain::benchmark</code>: the arm/verdict vocabulary; the verdict ladder of CONTRACT §19 (apply marker → eval marker → timeout marker → parsed statuses → infra/end-marker guard); the 256 KiB patch cap; the McNemar pairing. The single driver <code>benchmark.run.poll</code> is the only writer of a run's progress; <code>benchmark.reap</code> fails a run whose <code>last_polled_at</code> is stale</td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>benchmark_run.status</code>, the four counters, <code>counts</code>, <code>control_ok</code>, <code>last_polled_at</code>, <code>finished_at</code>, <code>error</code>; <code>benchmark_case.produce_status</code>, <code>verdict</code>, <code>patch</code>, <code>sandbox_ref</code>, <code>log_document_id</code>, <code>detail</code></td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td><strong>A case is final only once.</strong> The verdict is written by the driver in the same transaction that records the log document id; a re-poll of a finished case is a no-op, and a sandbox Job name is deterministic so a retried create is a reattach. A run is <code>succeeded</code> only when every case is final; <code>control_ok=false</code> never becomes <code>failed</code> — the data exists and its interpretation is refused downstream</td>
+</tr>
+</tbody>
+</table>
+<h3 id="39-eval-s19">3.9 Eval (S19)</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td><code>eval</code>: <code>draft → running ⇄ climbing → retired</code>. <strong>No <code>ready</code> state</strong> — readiness is computed at <code>eval_runs.start</code> from the two approvals. <code>eval_run</code>: <code>queued → running → partial ⇄ running → complete | void</code>, plus <code>cancelled</code>; a pilot is <code>mode='pilot'</code> on the <code>baseline</code> variant and is superseded by the full pass, never deleted. <code>eval_audit</code>: <code>queued → running → succeeded | failed</code>; <code>eval_case_result</code>: <code>pending_label → ok</code> after a human label</td>
+</tr>
+<tr>
+<td>Enforced</td>
+<td><code>domain::eval</code>: the subject-kind vocabulary; the readiness predicate (<code>blocking[]</code> names each missing gate, refusal <code>409 eval_not_ready</code>); the variant grammar; the retry policy. <strong>One writer per slot</strong>: <code>eval.case.run</code> is the only writer of <code>eval_case_result</code>/<code>eval_trace</code>, and only the attempt that produced a scorable output writes it. <code>eval.run.tick</code> finalises; <code>eval.reap</code> fails a run whose <code>last_polled_at</code> is stale — never one whose cases are merely silent (the S17 lesson)</td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>eval.current_version_id</code>; <code>eval_version.digest</code>/<code>split_sha256</code>/<code>split_locked_at</code>; <code>eval_run.status</code>/<code>round</code>/<code>noise_floor</code>/<code>last_polled_at</code>; <code>eval_case_result.grade</code>/<code>model</code>/<code>usage</code>/<code>status</code>; <code>eval_attempt_error.failure_class</code>/<code>attempt</code></td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td><strong>A sign-off is bound to an artifact, not to a moment.</strong> The approval carries <code>meta.artifact_sha256</code>; an edit to the version's cases or metrics changes the digest and the gate reads <code>void</code> at the next start. A sign-off whose digest no longer matches is never "still valid because nobody re-asked".</td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td><strong>A failed attempt cannot occupy the slot.</strong> <code>eval_attempt_error</code> is append-only and never shares the <code>(eval_run, case, rep)</code> uniqueness of <code>eval_case_result</code>, so resume re-runs exactly what produced no output and never re-uses a row whose score and trace came from different calls.</td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td><strong><code>grade</code> is an object, always</strong> (CHECK <code>jsonb_typeof = 'object'</code>), because a scalar beside two declared metrics renders as a dash in every column and would be read as a zero.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="310-eval-climb-s20">3.10 Eval climb (S20)</h3>
+<table>
+<tbody>
+<tr>
+<td>States</td>
+<td><code>eval_climb</code>: <code>planned → running → plateaued | stopped</code>. A round is not a state of the climb: it is an <code>eval_run</code> whose <code>round</code> is <code>current_round + 1</code></td>
+</tr>
+<tr>
+<td>Enforced</td>
+<td><code>domain::eval::climb</code>: the keep/revert rule (train up + test flat ⇒ revert; both up ⇒ keep; train down + test up ⇒ keep only if it repeats; tie ⇒ the later round); the stopping predicate at a <code>delta</code> above the noise floor; the split is read-only (a climb cannot redraw it); a comparison across versions, graders or splits is refused; after two rounds that do not clear the band the next round <strong>must</strong> carry categorisation buckets and a content diff is refused</td>
+</tr>
+<tr>
+<td>Stored</td>
+<td><code>eval_climb.goal</code>/<code>stopping</code>/<code>plateau_k</code>/<code>delta</code>/<code>current_round</code>/<code>best_round</code>/<code>best_test_score</code>; per round, <code>eval_run.change_md</code>/<code>change_patch</code>/<code>summary.suspicious</code>/<code>narrative_md</code></td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td><strong>The held-out wall is access, not convention.</strong> <code>eval_climbs.round</code> records the trace ids it handed to the analyzer; a round citing a <code>test</code>-split id is void, and reading a test trace requires <code>evals:approve</code> — which an <code>agent</code> principal does not hold.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-concurrency-and-access-paths">4. Concurrency and access paths</h2>
+<p><strong>Version / If-Match.</strong> Every mutating statement is <code>UPDATE &lt;t&gt; SET …, version = version + 1, updated_at = now() WHERE id = $1 AND tenant_id = $2 AND version = $3</code> with <code>RETURNING *</code>. Zero rows is unambiguously either 404 or 412 — the handler re-reads once to distinguish, and returns the current representation in the problem body. Creation returns <code>201</code> + <code>ETag: "&lt;version&gt;"</code>.</p>
+<p><strong>The card claim is one conditional UPDATE — no lease table.</strong></p>
+<pre class="sql"><code>UPDATE card
+   SET assignee_id = $3, lease_expires_at = now() + $4::interval,
+       lease_token = uuidv7(), claim_fence = claim_fence + 1,
+       version = version + 1, updated_at = now()
+ WHERE tenant_id = $1 AND id = $2 AND version = $5
+   AND (lease_expires_at IS NULL OR lease_expires_at &lt; now() OR assignee_id = $3)
+RETURNING claim_fence, version;</code></pre>
+<p>Zero rows = not granted. There is <strong>no fallback arm and no <code>granted: true</code> on a DB error</strong> — the closed-degradation argument in <code>fr/backend/migrations/100_card_phase_lease.sql</code> §3.4 is carried verbatim as a principle: <em>a lease that grants itself when the arbiter is down is not a lease</em>. <code>claim_fence</code> is monotonic and never reset (the card row survives release), which is what lets a holder that slept past its TTL discover the card moved beneath it — the ABA window fr's <code>card_phase_lease</code> existed to close. Waiters are not a table: a blocked claimant enqueues <code>job(kind='card.claim')</code>, deduped on <code>(tenant_id, 'card.claim', card_id)</code>.</p>
+<p><strong>Job claim</strong> — <code>FOR UPDATE SKIP LOCKED</code>, fenced:</p>
+<pre class="sql"><code>UPDATE job SET status=&#39;running&#39;, lease_token=uuidv7(), lease_until=now()+interval &#39;60 s&#39;,
+               attempts=attempts+1
+ WHERE id = (SELECT id FROM job
+              WHERE tenant_id=$1 AND status=&#39;pending&#39; AND run_after &lt;= now()
+              ORDER BY run_after, id
+              FOR UPDATE SKIP LOCKED LIMIT 1)
+RETURNING *;</code></pre>
+<p>A handler must present <code>lease_token</code> on completion; a stale token writes nothing. <code>schedule</code> materialisation runs under <code>pg_advisory_xact_lock(hashtext('conveyor:schedule'))</code> so two pods cannot double-materialise.</p>
+<p><strong>SSE replay.</strong> <code>pg_notify('conveyor_event', seq::text)</code> fires in the mutation transaction. A subscriber reads <code>SELECT … FROM event WHERE topic = ANY($topics) AND seq &gt; $last ORDER BY seq LIMIT 500</code>, using the <code>Last-Event-ID</code> header. Replay is bounded by that <code>LIMIT 500</code>; a client whose cursor is older than the retained window (or ahead of it) gets <code>resync</code>, never a silent skip; a client further behind than the retention window is told to refetch, not silently skipped. The <code>event</code> seq is the only ordering authority — never a timestamp.</p>
+<p><strong>Cursor pagination.</strong> Cursors are base64 of <code>(sort_key, id)</code>; they are opaque and never documented as stable.</p>
+<table>
+<thead>
+<tr>
+<th>endpoint</th>
+<th>sort key</th>
+<th>cursor</th>
+<th>index it must hit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /api/boards/{id}/cards</code></td>
+<td>list, position, id</td>
+<td><code>(list_id, position, id)</code></td>
+<td><code>card (tenant_id, board_id, list_id, position, id) WHERE archived_at IS NULL</code></td>
+</tr>
+<tr>
+<td><code>GET /api/cards/{id}/comments</code></td>
+<td>created_at, id</td>
+<td><code>(created_at, id)</code></td>
+<td><code>comment (tenant_id, card_id, created_at, id)</code></td>
+</tr>
+<tr>
+<td><code>GET /api/runs</code></td>
+<td>created_at desc, id</td>
+<td><code>(created_at, id)</code></td>
+<td><code>run (tenant_id, created_at desc, id)</code> / <code>(tenant_id, card_id, created_at desc)</code></td>
+</tr>
+<tr>
+<td><code>GET /api/requirements</code></td>
+<td>updated_at desc, id</td>
+<td><code>(updated_at, id)</code></td>
+<td><code>governed_asset (tenant_id, kind, status, updated_at desc, id)</code></td>
+</tr>
+<tr>
+<td><code>GET /api/audit</code></td>
+<td>created_at desc, id</td>
+<td><code>(created_at, id)</code></td>
+<td><code>audit_event (tenant_id, created_at desc, id)</code></td>
+</tr>
+<tr>
+<td><code>GET /api/events</code></td>
+<td>seq</td>
+<td><code>seq</code></td>
+<td><code>event (topic, seq)</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>The three access paths that must stay fast.</strong></p>
+<ul>
+<li><em>Board, 1,000 cards.</em> One partial index on <code>(tenant_id, board_id, list_id, position, id)</code> serves the whole board as an index scan grouped by list; the API never sorts in Rust. Archived cards are excluded by the predicate, so board load cost is independent of history depth.</li>
+<li><em>Run queue.</em> <code>run (tenant_id, status, created_at, id) WHERE status='queued'</code> — a queue that is empty in steady state, so the index stays tiny and the claim is an index-only scan.</li>
+<li><em>Search.</em> <code>gin(tsv)</code> on <code>card</code> and <code>governed_asset</code>, plus <code>pg_trgm</code> trigram indexes on <code>card.name</code>, <code>governed_asset.title</code> and <code>catalogue_entry.label</code> for fuzzy prefix. S07's <code>0007</code> migration creates <code>CREATE EXTENSION pg_trgm</code> and the three trigram indexes (S02 §5 decision 5); S03 ships only the FTS indexes. FTS first, pgvector only after the S07 eval set proves an FTS baseline (R2). ⛔ <strong>These indexes do nothing unless two operators are LEAKPROOF</strong> — measured 2026-11-08: under FORCE RLS the planner will not use a non-leakproof qual, and <code>ts_match_vq</code> (<code>@@</code>) and <code>word_similarity_op</code> (<code>&lt;%</code>) both ship <code>proleakproof = false</code>. The <code>ALTER FUNCTION</code>s are a superuser step and live in <code>scripts/db-roles.sql</code>; see <code>01-CONTRACT.md</code> §2. Without it the search runs at O(rows per tenant) and reports no error.</li>
+</ul>
+<p><strong>Board position.</strong> Planka's float <code>position</code> is replaced by <code>numeric</code> (exact, unconstrained scale) with a <strong>midpoint insert</strong>: a card between neighbours <code>a</code> and <code>b</code> gets <code>(a+b)/2</code>; a card appended to a list gets <code>max+1024</code>. There is no renumber job and no precision loss, because <code>numeric</code> is exact — a float implementation degrades after ~50 halvings and then needs the compaction job that nobody writes. Moves that touch more than one card (multi-select drag) take <code>pg_advisory_xact_lock(hashtext('board:'||board_id))</code> and renumber the affected lists inside one transaction.</p>
+<h2 id="5-jsonb-policy">5. JSONB policy</h2>
+<p><strong>Allowed in jsonb</strong> — read whole with the parent, never filtered, sorted, joined or uniquely constrained:</p>
+<table>
+<thead>
+<tr>
+<th>column</th>
+<th>why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tenant.settings</code></td>
+<td>per-tenant display/feature settings <strong>and the prompt-audit cadence</strong> (<code>prompt_audit.{enabled, after_executions, surfaces}</code>, §2.17); read whole with the tenant</td>
+</tr>
+<tr>
+<td><code>membership.meta</code></td>
+<td>agent <code>product</code> and role metadata; read with the membership row</td>
+</tr>
+<tr>
+<td><code>event.payload</code></td>
+<td>carries the event's own shape; consumers parse by <code>type</code>, never query into it</td>
+</tr>
+<tr>
+<td><code>job.payload</code></td>
+<td>handler-specific work input</td>
+</tr>
+<tr>
+<td><code>schedule.payload</code></td>
+<td>handler-specific config for the jobs it materialises</td>
+</tr>
+<tr>
+<td><code>audit_event.details</code></td>
+<td>scrubbed at write, capped at 8 KiB, never queried</td>
+</tr>
+<tr>
+<td><code>idempotency_key.response</code></td>
+<td>the replayed status and body of one POST, returned verbatim</td>
+</tr>
+<tr>
+<td><code>app_licence.raw</code></td>
+<td>the upstream licence payload; <code>status</code>/<code>expires_at</code> are the columns</td>
+</tr>
+<tr>
+<td><code>project.meta</code></td>
+<td>per-project blobs with no query path; filters use the columns</td>
+</tr>
+<tr>
+<td><code>board.settings</code></td>
+<td>default card type, default view, display flags; loaded with the board</td>
+</tr>
+<tr>
+<td><code>card_type.definition</code></td>
+<td>inputs/outputs/acceptance/rules read as one object at run time</td>
+</tr>
+<tr>
+<td><code>card.meta</code></td>
+<td>fr fold targets (<code>card_contracts</code>, <code>card_plan_pins</code>); never filtered</td>
+</tr>
+<tr>
+<td><code>run.inputs</code></td>
+<td>the run's input document, read whole at start</td>
+</tr>
+<tr>
+<td><code>approval.meta</code></td>
+<td>gate context; only <code>turn_id</code> is indexed, and that is the exception below</td>
+</tr>
+<tr>
+<td><code>approval_decision.item_decisions</code></td>
+<td>per-item decisions on a multi-item gate; read with the decision</td>
+</tr>
+<tr>
+<td><code>approval_decision.via</code></td>
+<td>channel/agent provenance blob (D18)</td>
+</tr>
+<tr>
+<td><code>governed_asset.acceptance / links / lens / meta</code></td>
+<td>authored blobs; search uses <code>tsv</code>, never these</td>
+</tr>
+<tr>
+<td><code>catalogue_entry.meta</code></td>
+<td>matrix, phase order, recipes and WIP limits; loaded once per project type and cached</td>
+</tr>
+<tr>
+<td><code>revision.content</code></td>
+<td>an immutable snapshot; the only query is "give me content by id"</td>
+</tr>
+<tr>
+<td><code>custom_field.options</code></td>
+<td>select-field option list, read with the field</td>
+</tr>
+<tr>
+<td><code>custom_field_value.content</code></td>
+<td>the value for one (card, field); no query path</td>
+</tr>
+<tr>
+<td><code>channel_binding.config</code></td>
+<td>chat/topic/bot references; secrets by reference only</td>
+</tr>
+<tr>
+<td><code>channel_preference.quiet_hours</code></td>
+<td>per-user quiet window, read when a send is considered</td>
+</tr>
+<tr>
+<td><code>prompt_audit.scope</code></td>
+<td>which surfaces the audit covered (tenant/procedure ids, <code>action_registry</code>, <code>copilot_prompt</code>); read with the audit row, never filtered — §2.17</td>
+</tr>
+<tr>
+<td><code>message.meta</code></td>
+<td>per-send content metadata</td>
+</tr>
+<tr>
+<td><code>quality_evaluation.criteria</code></td>
+<td>per-evaluation criterion scores, read with the row</td>
+</tr>
+<tr>
+<td><code>project_request.payload</code></td>
+<td>the CP intake document; <code>status</code> and <code>external_ref</code> are columns</td>
+</tr>
+<tr>
+<td><code>model.meta</code></td>
+<td>model-level vendor extensions; <code>language</code> and <code>title</code> are columns</td>
+</tr>
+<tr>
+<td><code>model_element.meta</code></td>
+<td>element vendor extensions</td>
+</tr>
+<tr>
+<td><code>model_relationship.meta</code></td>
+<td>relationship vendor extensions</td>
+</tr>
+<tr>
+<td><code>model_view.meta</code></td>
+<td>view-level layout/vendor extensions</td>
+</tr>
+<tr>
+<td><code>view_object.bounds / style</code></td>
+<td>diagram geometry</td>
+</tr>
+<tr>
+<td><code>view_connection.bendpoints / style</code></td>
+<td>connection geometry and styling</td>
+</tr>
+<tr>
+<td><code>model_validation_run.findings</code></td>
+<td>a report, read whole</td>
+</tr>
+<tr>
+<td><code>project_capability.meta</code></td>
+<td>capability-ledger extras; the key is <code>capability_code</code></td>
+</tr>
+<tr>
+<td><code>deliverable.meta</code></td>
+<td>deliverable details; <code>kind_code</code> and <code>due_at</code> are columns</td>
+</tr>
+<tr>
+<td><code>register_item.meta</code></td>
+<td>register-specific fields; <code>kind</code> and <code>status</code> are columns</td>
+</tr>
+<tr>
+<td><code>document.meta</code></td>
+<td>document metadata; bytes and object keys are columns</td>
+</tr>
+<tr>
+<td><code>conversation_turn.meta</code></td>
+<td>per-turn tool/citation payloads; the turn key is <code>seq</code></td>
+</tr>
+<tr>
+<td><code>benchmark_run.counts</code></td>
+<td>the grader's full status histogram, read whole with the run; the four counters are columns because they are compared and ordered — §2.18</td>
+</tr>
+<tr>
+<td><code>benchmark_run.environment</code></td>
+<td>the captured environment (versions, hashes, subject tenant, provider), read with the run</td>
+</tr>
+<tr>
+<td><code>benchmark_run.options</code></td>
+<td>the start options (<code>concurrency</code>, <code>only</code>, <code>with_failing_test</code>), read with the run</td>
+</tr>
+<tr>
+<td><code>benchmark_case.detail</code></td>
+<td>the verdict's reason and produce provenance, read with the case</td>
+</tr>
+<tr>
+<td><code>process_step.input_template</code></td>
+<td>the step's input template, expanded at run time</td>
+</tr>
+<tr>
+<td><code>run_step.input / output</code></td>
+<td>per-attempt invocation blobs</td>
+</tr>
+<tr>
+<td><code>workflow.definition</code></td>
+<td><strong>RETAINED (owner ruling 2026-11-09)</strong> — the workflow engine is the tool-sequence executor; a process is still the ordered <code>process_step</code> rows</td>
+</tr>
+<tr>
+<td><code>action_registry.spec</code></td>
+<td>the external action's schema document, read whole at invoke</td>
+</tr>
+<tr>
+<td><code>eval_version.prices</code> (§2.19)</td>
+<td>the token price table the report derives cost from; read whole with the version, so a price change is a new version and never re-prices history</td>
+</tr>
+<tr>
+<td><code>eval_metric.grader</code> (§2.19)</td>
+<td>the grader's config document (pattern, schema, judge model, normalisation); read whole with the metric</td>
+</tr>
+<tr>
+<td><code>eval_case.expected</code> (§2.19)</td>
+<td>the answer key or the per-case rubric, read only by the grader; <strong>write-only by design</strong> — no query filters it and no view returns it</td>
+</tr>
+<tr>
+<td><code>eval_case.attachments</code> / <code>meta</code> (§2.19)</td>
+<td>artifact refs and provenance sidecar, rendered with the case, never filtered; <code>tags</code>/<code>source</code>/<code>split</code>/<code>gold_provenance</code> are the columns</td>
+</tr>
+<tr>
+<td><code>eval_case_result.grade</code> / <code>explanation</code> / <code>usage</code> (§2.19)</td>
+<td>the per-metric scores keyed by metric id, the judge's reasoning, and the response's token block — read whole with the row</td>
+</tr>
+<tr>
+<td><code>eval_trace.turns</code> (§2.19)</td>
+<td>the transcript; the viewer and the analyzer read the whole list, and <code>tool_calls</code>/<code>latency_ms</code>/<code>status</code> are the columns anything queries</td>
+</tr>
+<tr>
+<td><code>eval_run.summary</code> / <code>environment</code> (§2.19)</td>
+<td><code>{description,target,suspicious}</code> and the captured fingerprint; read with the run</td>
+</tr>
+<tr>
+<td><code>eval_audit.summary</code> (§2.19)</td>
+<td>the audit's per-section detail, read whole with the audit</td>
+</tr>
+<tr>
+<td><code>eval_climb.goal</code> (§2.20)</td>
+<td>the target/hold pair and the cost-search position; read whole with the climb</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>The report's arithmetic is Rust, not SQL.</strong> Per-metric means, the confidence interval, the noise floor (<code>1/sqrt(n·reps)</code>), the per-tag breakdown and the derived cost are all computed over the fetched rows, so <code>eval_case_result.grade</code> is never a <code>GROUP BY</code> target and <code>eval_case.tags</code> never a join key. That is what admits them under this policy; if a future read wants a SQL aggregate over a grade, it becomes a column first.</p>
+<p><strong>Never in jsonb</strong> — these must be columns: <code>tenant_id</code>, any id, any status/kind vocabulary, <code>list_id</code>, <code>position</code>, any timestamp used for ordering or retention, <code>version</code>, anything with a FK, anything in a <code>UNIQUE</code>, and anything the UI sorts or filters on (name, title, key, email, due_at, score). The test is mechanical: <em>if it appears in a <code>WHERE</code>, <code>ORDER BY</code>, <code>JOIN</code>, <code>GROUP BY</code> or <code>UNIQUE</code>, it is a column.</em></p>
+<p><strong>One documented exception:</strong> <code>uq_approval_copilot_turn</code> (§2.11) is a <em>partial unique index over an expression</em> — <code>approval.meta-&gt;&gt;'turn_id'</code> — not a table constraint. It is allowed because it enforces a concurrency invariant (one copilot turn cannot raise two pending approvals) and the key is written only by S10. Any second such index needs the same justification recorded here; "it is only an index" is not one.</p>
+<p>Size caps, enforced by CHECK where the value is written by us and by a domain guard where it is not: <code>event.payload</code> ≤ 64 KiB, <code>revision.content</code> ≤ 256 KiB (larger artifacts go to the object store and the row keeps the key), <code>audit_event.details</code> ≤ 8 KiB. A payload that exceeds the cap is a modelling error, not a reason to raise the cap.</p>
+<h2 id="6-retention-growth-and-size">6. Retention, growth and size</h2>
+<p>Volumes are per tenant per day at the planning target (one active project, ~200 card transitions/day).</p>
+<table>
+<thead>
+<tr>
+<th>table</th>
+<th>rows/day/tenant</th>
+<th>rule</th>
+<th>index cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>event</code></td>
+<td>~1,500 (≈7 per card transition, plus run/approval events)</td>
+<td><strong>prune at 90 days</strong> by job, batched; monthly RANGE partition on <code>created_at</code> only if the table passes ~50M rows</td>
+<td>3 secondary indexes; each ~60 B/row — the cheapest of the high-volume tables</td>
+</tr>
+<tr>
+<td><code>audit_event</code></td>
+<td>~150</td>
+<td><strong>UNBOUNDED. Never pruned.</strong> Append-only by GRANT; this is the one table whose growth is deliberate</td>
+<td>2 indexes, append-only inserts, no bloat from updates</td>
+</tr>
+<tr>
+<td><code>action_invocation</code></td>
+<td>~600</td>
+<td>prune at 30 days; it is an operational trace, not a record</td>
+<td>3 indexes (one added by <code>0012</code> for the age scan)</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td>~200</td>
+<td>keep terminal runs 180 days, then prune with their <code>run_step</code> rows; a run with a <strong>pending</strong> approval is skipped, not pruned</td>
+<td>3 indexes + 1 partial unique (<code>0012</code> adds the terminal-age index)</td>
+</tr>
+<tr>
+<td><code>delivery</code></td>
+<td>~400</td>
+<td>delete 30 days after terminal state; pending/sent rows are never pruned — so a <code>message</code> is deletable only after its last delivery is gone (deliveries prune first)</td>
+<td>2 indexes, 2 partial (<code>0012</code> adds the terminal-age index)</td>
+</tr>
+<tr>
+<td><code>revision</code></td>
+<td>~250</td>
+<td>model revisions keep the last 50 per model; governed-asset revisions are unbounded (they are the governance record)</td>
+<td>1 composite</td>
+</tr>
+<tr>
+<td><code>job</code></td>
+<td>~2,000 (transient)</td>
+<td>30 days after terminal; the queue table should be near-empty, and steady-state growth is a defect</td>
+<td>2 partial</td>
+</tr>
+<tr>
+<td><code>inference_call</code></td>
+<td>~400 (one per model call: a copilot turn is 1, an <code>agent.run</code> up to its 20-turn cap)</td>
+<td><strong>prune at 90 days</strong> — deliberately longer than <code>action_invocation</code>'s 30, because a cache report over a quarter is the point of the table</td>
+<td>4 indexes, two partial</td>
+</tr>
+<tr>
+<td><code>prompt_audit</code> + <code>prompt_audit_finding</code></td>
+<td>one audit per surface change; tens of findings</td>
+<td><strong>180 days after the audit's last finding is decided</strong>; the audit's <code>prompt_ref</code> version is what keeps an old finding re-readable</td>
+<td>3 indexes</td>
+</tr>
+<tr>
+<td><code>benchmark_suite</code> + <code>benchmark_instance</code></td>
+<td>seed-time only: one suite is ~50 instances, written once</td>
+<td><strong>UNBOUNDED. Never pruned.</strong> Immutable seed data; a suite's identity <em>is</em> its hashes</td>
+<td>2 indexes</td>
+</tr>
+<tr>
+<td><code>benchmark_run</code> + <code>benchmark_case</code></td>
+<td>a run is ~50 cases, started by a person or a kata iteration</td>
+<td><strong>UNBOUNDED. Never pruned.</strong> A run is the number's provenance — deleting it deletes the evidence behind a published score; the case log is an S09 document and follows that table's retention</td>
+<td>4 indexes</td>
+</tr>
+<tr>
+<td><code>eval_trace</code></td>
+<td>N cases × R reps × one row each; an eval pass is tens to hundreds of rows, and a round adds another</td>
+<td><strong>prune at 90 days</strong> — it is the bulk of an eval and the only table here that grows per round; a trace older than a quarter is not re-read</td>
+<td>2 indexes</td>
+</tr>
+<tr>
+<td><code>eval_case_result</code> + <code>eval_attempt_error</code></td>
+<td>the same rows as <code>eval_trace</code>, plus the failures</td>
+<td><strong>UNBOUNDED. Never pruned.</strong> This is the evidence behind a number a person may act on; a trace can be discarded, a score cannot</td>
+<td>4 indexes</td>
+</tr>
+<tr>
+<td><code>eval</code> + <code>eval_version</code> + <code>eval_case</code> + <code>eval_metric</code></td>
+<td>written when an instrument is authored, not per run</td>
+<td><strong>UNBOUNDED. Never pruned.</strong> A version is the instrument; pruning a case set makes every past run unreproducible</td>
+<td>5 indexes</td>
+</tr>
+<tr>
+<td><code>eval_run</code> + <code>eval_audit</code> + <code>eval_audit_finding</code></td>
+<td>one run or audit per pass</td>
+<td><strong>UNBOUNDED. Never pruned.</strong> The round history is the climb's record and the audit is why a number was believed</td>
+<td>4 indexes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A stated rule is not a producer.</strong> This paragraph used to claim "everything else is bounded by a stated rule", which was false: a rule in this table does nothing until a job enforces it, and five of them had no job. Corrected 2026-11-08 (S08 Part B2) — the table above states the <em>intent</em>; this list states the <em>producer</em>:</p>
+<table>
+<thead>
+<tr>
+<th>rule</th>
+<th>producer</th>
+<th>state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>event</code> 90 days</td>
+<td><code>event.prune</code> (S02)</td>
+<td>shipped</td>
+</tr>
+<tr>
+<td><code>job</code> 30 days after terminal</td>
+<td><code>job.prune</code> (S02)</td>
+<td>shipped</td>
+</tr>
+<tr>
+<td><code>idempotency_key</code> by <code>expires_at</code></td>
+<td><code>idempotency.sweep</code> (S02)</td>
+<td>shipped</td>
+</tr>
+<tr>
+<td><code>revision</code>: model revisions keep the last 50 per model</td>
+<td><strong><code>model.prune</code></strong> (S08 B2)</td>
+<td>shipped 2026-11-08</td>
+</tr>
+<tr>
+<td><code>model_validation_run</code> 90 days</td>
+<td><strong><code>validation.prune</code></strong> (S08 B2)</td>
+<td>shipped 2026-11-08</td>
+</tr>
+<tr>
+<td><code>action_invocation</code> 30 days</td>
+<td><strong><code>action_invocation.prune</code></strong> (<code>0012</code>)</td>
+<td>shipped 2026-11-08</td>
+</tr>
+<tr>
+<td><code>run</code> 180 days (with its <code>run_step</code> rows)</td>
+<td><strong><code>run.prune</code></strong> (<code>0012</code>)</td>
+<td>shipped 2026-11-08</td>
+</tr>
+<tr>
+<td><code>delivery</code> 30 days after terminal (deliveries before messages)</td>
+<td><strong><code>delivery.prune</code></strong> (<code>0012</code>)</td>
+<td>shipped 2026-11-08</td>
+</tr>
+<tr>
+<td><code>inference_call</code> 90 days</td>
+<td><strong><code>inference_call.prune</code></strong> (S16)</td>
+<td>planned — the slice is not built</td>
+</tr>
+<tr>
+<td><code>prompt_audit</code> + findings 180 days</td>
+<td><strong><code>prompt_audit.prune</code></strong> (S16)</td>
+<td>planned — the slice is not built</td>
+</tr>
+<tr>
+<td>benchmark suites, instances, runs and cases</td>
+<td><strong>none — UNBOUNDED by design</strong> (the <code>audit_event</code> shape: seed data and the evidence behind a score)</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td><code>eval_trace</code> 90 days</td>
+<td><strong><code>eval.prune</code></strong> (S19)</td>
+<td>planned — the slice is not built</td>
+</tr>
+<tr>
+<td>eval instruments, results, runs and audits</td>
+<td><strong>none — UNBOUNDED by design</strong> (the evidence behind a number a person may act on)</td>
+<td>n/a</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Every rule above now has a producer</strong> — with three exceptions, named honestly rather than implied: S16's two pruners are written into its slice plan (§6 there) but the slice is not built, so those two rows read <code>planned</code>; the benchmark tables are <strong>UNBOUNDED by design</strong> (the <code>audit_event</code> shape — a run is the evidence behind a score), so they have no producer and need none. A rule whose producer is <code>planned</code> enforces nothing today, and the table says so.</p>
+<p>Two consequences are part of the design, not accidents:</p>
+<ul>
+<li><strong><code>approval</code> is never pruned.</strong> <code>0012</code> re-created <code>approval.run_id</code> as <code>ON DELETE SET NULL</code>, so a pruned run detaches and the human decision — with <code>approval_decision.note</code>, which exists nowhere else — survives. A <code>run_step</code> row goes the other way: <strong>S11 must declare <code>run_step.run_id ON DELETE CASCADE</code></strong>, and <code>run.prune</code> then carries the steps for free.</li>
+<li>A run whose gate is still <code>pending</code> is <strong>skipped</strong>: <code>uq_appr_pending</code> is partial on <code>(tenant_id, run_id, gate) WHERE status = 'pending'</code>, and a detached NULL <code>run_id</code> would defeat it.</li>
+</ul>
+<p><strong>Explicitly unbounded:</strong> <code>audit_event</code>, <code>approval</code>, <code>revision</code> for governed assets. <code>model.prune</code> never deletes the revision named by <code>model.published_revision_id</code> — a published snapshot is the governance record of a model in the same way a governed asset's revision is, and a retention rule that could delete it would make <code>models.compare</code> fail on the newest thing it compares.</p>
+<h2 id="7-source-mapping--total">7. Source mapping — TOTAL</h2>
+<p>Every table enumerated in <code>02-source-map/50-schema-inventory.md</code> appears exactly once. Dispositions: <strong>port</strong> (same concept, new shape) · <strong>fold</strong> (columns move onto another table) · <strong>drop</strong> · <strong>replaced-by-platform</strong>.</p>
+<blockquote>
+<p>Count note, measured 2026-11-07 so nobody re-derives it: <strong>fr 86 domain tables</strong> (88 base tables in <code>public</code>, 90 relations including two <code>pg_stat_statements*</code> views), <strong>RM 57 domain tables</strong> (58 base tables including <code>alembic_version</code>), <strong>Planka 33 domain tables</strong> (35 base tables including <code>migration</code> and <code>migration_lock</code>). Reproduce: <code>psql -Atc "select count(*) from pg_tables where schemaname='public'"</code> → 88 / 58 / 35; relations: <code>psql -Atc "select relkind, count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind in ('r','p','v','m') group by relkind"</code> → <code>r|88, v|2</code> for fr. <strong><code>pm_projects</code> is mapped</strong> — §2.3's <code>project</code> folds it — and was missing only from the inventory list; it is now a row in §7.2 and in <code>50-schema-inventory.md</code>.</p>
+</blockquote>
+<h3 id="71-fr--86-enumerated--bookkeeping">7.1 fr — 86 enumerated + bookkeeping</h3>
+<table>
+<thead>
+<tr>
+<th>source table</th>
+<th>target table(s)</th>
+<th>disposition</th>
+<th>reason (≤12 words)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>action_idempotency</td>
+<td>idempotency_key</td>
+<td>replaced-by-platform</td>
+<td>one POST replay store, contract §5</td>
+</tr>
+<tr>
+<td>agent_members</td>
+<td>membership</td>
+<td>fold</td>
+<td>agent is <code>app_user.kind='agent'</code> (null <code>oidc_subject</code>); <code>product</code> in <code>membership.meta</code>; <code>agent:&lt;tenant_id&gt;</code> → <code>channel_binding(mcp)</code></td>
+</tr>
+<tr>
+<td>agent_runtime_sessions</td>
+<td>—</td>
+<td>drop</td>
+<td>runtime state belongs to the <code>agent</code> service</td>
+</tr>
+<tr>
+<td>agent_sessions</td>
+<td>conversation</td>
+<td>port</td>
+<td>copilot thread survives, S10</td>
+</tr>
+<tr>
+<td>analytics_rollup_meta</td>
+<td>—</td>
+<td>drop</td>
+<td>rollups derive from <code>event</code></td>
+</tr>
+<tr>
+<td>analytics_rollups</td>
+<td>—</td>
+<td>drop</td>
+<td>derived; no second aggregate store</td>
+</tr>
+<tr>
+<td>andon_state</td>
+<td>andon_state</td>
+<td>port</td>
+<td>one row per tenant, audited</td>
+</tr>
+<tr>
+<td>andon_state_history</td>
+<td>audit_event</td>
+<td>fold</td>
+<td>a history row is an audit fact</td>
+</tr>
+<tr>
+<td>approval_callback_urls</td>
+<td>approval.callback_url</td>
+<td>fold</td>
+<td>one URL per approval</td>
+</tr>
+<tr>
+<td>approval_decisions</td>
+<td>approval_decision</td>
+<td>port</td>
+<td>dual control needs per-approver rows; decided_by_kind/via carried, not dropped</td>
+</tr>
+<tr>
+<td>approvals</td>
+<td>approval</td>
+<td>port</td>
+<td>one pending per (run, gate)</td>
+</tr>
+<tr>
+<td>asset_assignments</td>
+<td>—</td>
+<td>drop</td>
+<td>KAG out; strata_ingest/strata_rag replaces</td>
+</tr>
+<tr>
+<td>asset_bindings</td>
+<td>—</td>
+<td>drop</td>
+<td>KAG out; strata replaces</td>
+</tr>
+<tr>
+<td>asset_stream_membership</td>
+<td>—</td>
+<td>drop</td>
+<td>KAG out; strata replaces</td>
+</tr>
+<tr>
+<td>budget_alert_receipts</td>
+<td>—</td>
+<td>drop</td>
+<td>billing stays external (D12)</td>
+</tr>
+<tr>
+<td>budget_topups</td>
+<td>—</td>
+<td>drop</td>
+<td>billing stays external (D12)</td>
+</tr>
+<tr>
+<td>capability_audit</td>
+<td>action_invocation</td>
+<td>replaced-by-platform</td>
+<td>every invocation is already recorded</td>
+</tr>
+<tr>
+<td>card_asset_binding</td>
+<td>—</td>
+<td>drop</td>
+<td>KAG out; strata replaces</td>
+</tr>
+<tr>
+<td>card_bridge_links</td>
+<td>—</td>
+<td>drop</td>
+<td>bridge retired; PENDING-S0</td>
+</tr>
+<tr>
+<td>card_computed_checks</td>
+<td>run</td>
+<td>fold</td>
+<td>a check outcome is run data</td>
+</tr>
+<tr>
+<td>card_contracts</td>
+<td>card.meta</td>
+<td>fold</td>
+<td>no query path; PENDING-S0</td>
+</tr>
+<tr>
+<td>card_done_overrides</td>
+<td>audit_event</td>
+<td>fold</td>
+<td>an override is an audit fact</td>
+</tr>
+<tr>
+<td>card_drafts</td>
+<td>—</td>
+<td>drop</td>
+<td>0 rows; PENDING-S0</td>
+</tr>
+<tr>
+<td>card_executed_activities</td>
+<td>action_invocation</td>
+<td>fold</td>
+<td>an activity IS an invocation</td>
+</tr>
+<tr>
+<td>card_phase_lease</td>
+<td>card</td>
+<td>fold</td>
+<td>the claim is card columns (contract §4)</td>
+</tr>
+<tr>
+<td>card_phase_lease_waiter</td>
+<td>job</td>
+<td>fold</td>
+<td>a waiter is a queued claim job</td>
+</tr>
+<tr>
+<td>card_plan_events</td>
+<td>event</td>
+<td>fold</td>
+<td>already an event stream</td>
+</tr>
+<tr>
+<td>card_plan_pins</td>
+<td>card.meta</td>
+<td>fold</td>
+<td>one flag, never queried</td>
+</tr>
+<tr>
+<td>card_scenario_evidence</td>
+<td>—</td>
+<td>drop</td>
+<td>PENDING-S0</td>
+</tr>
+<tr>
+<td>card_seeker_links</td>
+<td>—</td>
+<td>drop</td>
+<td>PENDING-S0</td>
+</tr>
+<tr>
+<td>card_version_stamps</td>
+<td>revision</td>
+<td>fold</td>
+<td>a version stamp is a revision reference</td>
+</tr>
+<tr>
+<td>channels</td>
+<td>channel_binding</td>
+<td>port</td>
+<td>per-tenant channel configuration</td>
+</tr>
+<tr>
+<td>coding_analysis_runs</td>
+<td>—</td>
+<td>drop</td>
+<td>coding fleet not absorbed (D14)</td>
+</tr>
+<tr>
+<td>comments</td>
+<td>comment</td>
+<td>port</td>
+<td>one comment store</td>
+</tr>
+<tr>
+<td>contract_dependencies</td>
+<td>card.meta</td>
+<td>fold</td>
+<td>PENDING-S0, no query path</td>
+</tr>
+<tr>
+<td>conveyor_flow_runs</td>
+<td>run</td>
+<td>port</td>
+<td>status vocabulary remapped, §7.4</td>
+</tr>
+<tr>
+<td>decompositions</td>
+<td>card</td>
+<td>fold</td>
+<td><code>parent_card_id</code> plus an event</td>
+</tr>
+<tr>
+<td>department_members</td>
+<td>membership</td>
+<td>fold</td>
+<td><code>department_id</code> column</td>
+</tr>
+<tr>
+<td>departments</td>
+<td>department</td>
+<td>port</td>
+<td>tenant org unit</td>
+</tr>
+<tr>
+<td>documents</td>
+<td>document</td>
+<td>port</td>
+<td>metadata row; bytes in object store</td>
+</tr>
+<tr>
+<td>engagement_deliveries</td>
+<td>delivery</td>
+<td>fold</td>
+<td>one delivery state machine</td>
+</tr>
+<tr>
+<td>execution_signoff_blocks</td>
+<td>approval</td>
+<td>fold</td>
+<td>a block is a pending gate</td>
+</tr>
+<tr>
+<td>family_bundles</td>
+<td>—</td>
+<td>drop</td>
+<td>PENDING-S0</td>
+</tr>
+<tr>
+<td>family_decisions</td>
+<td>—</td>
+<td>drop</td>
+<td>PENDING-S0</td>
+</tr>
+<tr>
+<td>finding_suppression_events</td>
+<td>—</td>
+<td>drop</td>
+<td>findings live in coding-security</td>
+</tr>
+<tr>
+<td>finding_suppressions</td>
+<td>—</td>
+<td>drop</td>
+<td>findings live in coding-security</td>
+</tr>
+<tr>
+<td>github_app_installations</td>
+<td>repository</td>
+<td>fold</td>
+<td><code>installation_ref</code> column</td>
+</tr>
+<tr>
+<td>inapp_messages</td>
+<td>message</td>
+<td>fold</td>
+<td>channel <code>web</code> message</td>
+</tr>
+<tr>
+<td>interface_validations</td>
+<td>—</td>
+<td>drop</td>
+<td>PENDING-S0</td>
+</tr>
+<tr>
+<td>katas</td>
+<td>—</td>
+<td>drop</td>
+<td>kata domain outside this spec</td>
+</tr>
+<tr>
+<td>member_knowledge_areas</td>
+<td>membership</td>
+<td>fold</td>
+<td><code>knowledge_areas text[]</code></td>
+</tr>
+<tr>
+<td>n8n_execution_mapping</td>
+<td>run</td>
+<td>fold</td>
+<td><code>correlation_id</code>/<code>external_ref</code> on run</td>
+</tr>
+<tr>
+<td>notification_log</td>
+<td>delivery</td>
+<td>fold</td>
+<td>delivery IS the log</td>
+</tr>
+<tr>
+<td>notification_prefs</td>
+<td>channel_preference</td>
+<td>fold</td>
+<td>one preference row per channel</td>
+</tr>
+<tr>
+<td>notifications</td>
+<td>message</td>
+<td>fold</td>
+<td>content and delivery split</td>
+</tr>
+<tr>
+<td>priority_change_events</td>
+<td>event</td>
+<td>fold</td>
+<td>already an event stream</td>
+</tr>
+<tr>
+<td>project_asset_copy_intents</td>
+<td>—</td>
+<td>drop</td>
+<td>KAG out; strata replaces</td>
+</tr>
+<tr>
+<td>project_conveyor_failures</td>
+<td>run</td>
+<td>fold</td>
+<td><code>error_class</code>/<code>error_message</code> on run</td>
+</tr>
+<tr>
+<td>project_conveyor_start_attempts</td>
+<td>run</td>
+<td>fold</td>
+<td><code>attempt</code> counter on run</td>
+</tr>
+<tr>
+<td>project_deliverables</td>
+<td>—</td>
+<td><strong>drop</strong></td>
+<td>S00 day 2: 0 rows, no deliverable operation in 348 flows</td>
+</tr>
+<tr>
+<td>project_metrics</td>
+<td>—</td>
+<td>drop</td>
+<td>derived from run/event</td>
+</tr>
+<tr>
+<td>project_milestones</td>
+<td>—</td>
+<td><strong>drop</strong></td>
+<td>S00 day 2: 0 rows</td>
+</tr>
+<tr>
+<td>project_outlines</td>
+<td>—</td>
+<td><strong>drop</strong></td>
+<td>S00 day 2: 0 rows; no <code>toc</code> operation in 348 flows</td>
+</tr>
+<tr>
+<td>project_reports</td>
+<td>document</td>
+<td>fold</td>
+<td>a report is a document</td>
+</tr>
+<tr>
+<td>project_repositories</td>
+<td>project_repository</td>
+<td>port</td>
+<td>project↔︎repository join</td>
+</tr>
+<tr>
+<td>project_request_repositories</td>
+<td>project_request</td>
+<td>fold</td>
+<td><code>repository_url</code> column on the request row</td>
+</tr>
+<tr>
+<td>project_requests</td>
+<td>project_request</td>
+<td>port</td>
+<td>intake state machine</td>
+</tr>
+<tr>
+<td>project_stakeholders</td>
+<td>project_stakeholder</td>
+<td>port</td>
+<td>small, listed, per project</td>
+</tr>
+<tr>
+<td>projects</td>
+<td>project</td>
+<td>port</td>
+<td>one project entity</td>
+</tr>
+<tr>
+<td>provisioning_audit</td>
+<td>audit_event</td>
+<td>replaced-by-platform</td>
+<td>audit is structural, not a feature</td>
+</tr>
+<tr>
+<td>repositories</td>
+<td>repository</td>
+<td>port</td>
+<td>the repo registry</td>
+</tr>
+<tr>
+<td>required_approvers</td>
+<td>approval</td>
+<td>fold</td>
+<td><code>required_decisions</code> + gate meta</td>
+</tr>
+<tr>
+<td>router_dedupe</td>
+<td>idempotency_key</td>
+<td>replaced-by-platform</td>
+<td>one dedupe store</td>
+</tr>
+<tr>
+<td>scheduled_trigger_runs</td>
+<td>job</td>
+<td>fold</td>
+<td>a trigger run is a job row</td>
+</tr>
+<tr>
+<td>scheduled_triggers</td>
+<td>schedule</td>
+<td>replaced-by-platform</td>
+<td>durable schedule table</td>
+</tr>
+<tr>
+<td>signup_approvals</td>
+<td>—</td>
+<td>drop</td>
+<td>signup flow not carried</td>
+</tr>
+<tr>
+<td>streams</td>
+<td>—</td>
+<td><strong>drop</strong></td>
+<td>S00 day 2: 0 rows, no <code>/api/streams</code> route, no <code>streams</code> node operation</td>
+</tr>
+<tr>
+<td>suggested_schedules</td>
+<td>—</td>
+<td>drop</td>
+<td>PENDING-S0</td>
+</tr>
+<tr>
+<td>super_admin_tenant_actions</td>
+<td>audit_event</td>
+<td>replaced-by-platform</td>
+<td>impersonation is audited</td>
+</tr>
+<tr>
+<td>telegram_forum_topics</td>
+<td>channel_binding</td>
+<td>fold</td>
+<td><code>route_key</code> + <code>config</code></td>
+</tr>
+<tr>
+<td>tenant_improvement_projects</td>
+<td>—</td>
+<td>drop</td>
+<td>PENDING-S0</td>
+</tr>
+<tr>
+<td>user_channel_prefs</td>
+<td>channel_preference</td>
+<td>fold</td>
+<td>one preference row per channel</td>
+</tr>
+<tr>
+<td>user_roles</td>
+<td>membership</td>
+<td>replaced-by-platform</td>
+<td>one role store per tenant</td>
+</tr>
+<tr>
+<td>user_secrets</td>
+<td>secret</td>
+<td>port</td>
+<td>encrypted secret store</td>
+</tr>
+<tr>
+<td>wip_slot</td>
+<td>run</td>
+<td>fold</td>
+<td>WIP occupancy is active runs</td>
+</tr>
+<tr>
+<td>workspaces</td>
+<td>tenant</td>
+<td>replaced-by-platform</td>
+<td>tenant is the only root</td>
+</tr>
+<tr>
+<td><em>(bookkeeping: <code>_migrations</code>, <code>_migration_effects</code>)</em></td>
+<td>—</td>
+<td>drop</td>
+<td>replaces the 224-migration history with one baseline</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-requirements_management--57">7.2 requirements_management — 57</h3>
+<table>
+<thead>
+<tr>
+<th>source table</th>
+<th>target table(s)</th>
+<th>disposition</th>
+<th>reason (≤12 words)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>architecture_element_realisation_bindings</td>
+<td>trace_link</td>
+<td>fold</td>
+<td>it is a typed trace</td>
+</tr>
+<tr>
+<td>architecture_elements</td>
+<td>model_element</td>
+<td>fold</td>
+<td>one element table</td>
+</tr>
+<tr>
+<td>architecture_relationships</td>
+<td>model_relationship</td>
+<td>fold</td>
+<td>one relationship table</td>
+</tr>
+<tr>
+<td>architecture_standards</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>kind='architecture_standard'</td>
+</tr>
+<tr>
+<td>architecture_view_connections</td>
+<td>view_connection</td>
+<td>fold</td>
+<td>one view-connection table</td>
+</tr>
+<tr>
+<td>architecture_view_objects</td>
+<td>view_object</td>
+<td>fold</td>
+<td>one view-object table</td>
+</tr>
+<tr>
+<td>architecture_views</td>
+<td>model_view</td>
+<td>fold</td>
+<td>one view table</td>
+</tr>
+<tr>
+<td>decisions</td>
+<td>governed_asset</td>
+<td>fold</td>
+<td>kind='adr'; identical lifecycle</td>
+</tr>
+<tr>
+<td>entity_version_history</td>
+<td>revision</td>
+<td>replaced-by-platform</td>
+<td>one revision table</td>
+</tr>
+<tr>
+<td>idempotency_keys</td>
+<td>idempotency_key</td>
+<td>replaced-by-platform</td>
+<td>one key store</td>
+</tr>
+<tr>
+<td>modeling_change_sets</td>
+<td>—</td>
+<td>drop</td>
+<td>drafts are transactional; no set objects</td>
+</tr>
+<tr>
+<td>modeling_model_revisions</td>
+<td>revision</td>
+<td>fold</td>
+<td>one revision table</td>
+</tr>
+<tr>
+<td>modeling_models</td>
+<td>model</td>
+<td>port</td>
+<td>model header row</td>
+</tr>
+<tr>
+<td>modeling_publications</td>
+<td>model</td>
+<td>fold</td>
+<td><code>published_revision_id</code></td>
+</tr>
+<tr>
+<td>modeling_reviews</td>
+<td>approval</td>
+<td>fold</td>
+<td>a review is a decision</td>
+</tr>
+<tr>
+<td>modeling_trace_links</td>
+<td>trace_link</td>
+<td>fold</td>
+<td>one trace table</td>
+</tr>
+<tr>
+<td>modeling_validation_findings</td>
+<td>model_validation_run</td>
+<td>fold</td>
+<td>findings jsonb on the run</td>
+</tr>
+<tr>
+<td>modeling_validation_runs</td>
+<td>model_validation_run</td>
+<td>port</td>
+<td>one validation-run row</td>
+</tr>
+<tr>
+<td>pm_benefits</td>
+<td>—</td>
+<td><strong>drop</strong></td>
+<td>S00 day 2: 0 rows, no register route</td>
+</tr>
+<tr>
+<td>pm_board_templates</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>kind='board_template'</td>
+</tr>
+<tr>
+<td>pm_capabilities</td>
+<td>capability</td>
+<td>port</td>
+<td>S15: the aggregate, not a catalogue kind (D20)</td>
+</tr>
+<tr>
+<td>pm_card_ledger</td>
+<td>—</td>
+<td>drop</td>
+<td>keyed by Planka card id (SPEC §4)</td>
+</tr>
+<tr>
+<td>pm_card_types</td>
+<td>card_type</td>
+<td>port</td>
+<td>the card-type definition</td>
+</tr>
+<tr>
+<td>pm_coach_actions</td>
+<td>—</td>
+<td>drop</td>
+<td>coach retired; PENDING-S0</td>
+</tr>
+<tr>
+<td>pm_deliverable_kinds</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>kind='deliverable_kind'</td>
+</tr>
+<tr>
+<td>pm_gates</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>kind='gate'</td>
+</tr>
+<tr>
+<td>pm_milestone_kinds</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>kind='milestone_kind'</td>
+</tr>
+<tr>
+<td>pm_priority_levels</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>kind='priority_level'</td>
+</tr>
+<tr>
+<td>pm_programmes</td>
+<td>programme</td>
+<td>port</td>
+<td>portfolio container</td>
+</tr>
+<tr>
+<td>pm_project_brief_versions</td>
+<td>revision</td>
+<td>fold</td>
+<td>brief revisions are revisions</td>
+</tr>
+<tr>
+<td>pm_project_capabilities</td>
+<td>—</td>
+<td><strong>drop</strong></td>
+<td>S00 day 2: 0 rows, no capability operation</td>
+</tr>
+<tr>
+<td>pm_project_capability_events</td>
+<td>event</td>
+<td>fold</td>
+<td>already an event stream</td>
+</tr>
+<tr>
+<td>pm_project_phase_events</td>
+<td>event</td>
+<td>fold</td>
+<td>already an event stream</td>
+</tr>
+<tr>
+<td>pm_project_phases</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>kind='phase'</td>
+</tr>
+<tr>
+<td>pm_project_type_card_types</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>the matrix inside project_type.meta</td>
+</tr>
+<tr>
+<td>pm_project_type_phases</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>phase order inside project_type.meta</td>
+</tr>
+<tr>
+<td>pm_project_types</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>kind='project_type' + meta.matrix</td>
+</tr>
+<tr>
+<td>pm_projects</td>
+<td>project</td>
+<td>fold</td>
+<td>columns land on the one project entity</td>
+</tr>
+<tr>
+<td>pm_recipe_items</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>inside project_type.meta.recipes</td>
+</tr>
+<tr>
+<td>pm_recipes</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>inside project_type.meta</td>
+</tr>
+<tr>
+<td>pm_resources</td>
+<td>—</td>
+<td><strong>drop</strong></td>
+<td>S00 day 2: 0 rows, no register route</td>
+</tr>
+<tr>
+<td>pm_risks</td>
+<td>—</td>
+<td><strong>drop</strong></td>
+<td>S00 day 2: 0 rows, no register route</td>
+</tr>
+<tr>
+<td>pm_wip_limits</td>
+<td>catalogue_entry</td>
+<td>fold</td>
+<td>kind='wip_limit'</td>
+</tr>
+<tr>
+<td>principle_conflicts</td>
+<td>principle_conflict</td>
+<td>port</td>
+<td>persisted verdicts, read + dismiss</td>
+</tr>
+<tr>
+<td>principles</td>
+<td>governed_asset</td>
+<td>fold</td>
+<td>kind='principle'; identical lifecycle</td>
+</tr>
+<tr>
+<td>quality_evaluations</td>
+<td>quality_evaluation</td>
+<td>port</td>
+<td>score history</td>
+</tr>
+<tr>
+<td>requirements</td>
+<td>governed_asset</td>
+<td>fold</td>
+<td>kind='requirement'; one lifecycle</td>
+</tr>
+<tr>
+<td>tenant_id_crosswalk</td>
+<td>—</td>
+<td>drop</td>
+<td>historical remap ledger</td>
+</tr>
+<tr>
+<td>toc_nodes</td>
+<td>outline_node</td>
+<td>fold</td>
+<td>one outline-node table</td>
+</tr>
+<tr>
+<td>toc_settings</td>
+<td>outline</td>
+<td>fold</td>
+<td>settings on the outline</td>
+</tr>
+<tr>
+<td>toc_trees</td>
+<td>outline</td>
+<td>fold</td>
+<td>one outline</td>
+</tr>
+<tr>
+<td>uml_diagram_connections</td>
+<td>view_connection</td>
+<td>fold</td>
+<td>one view-connection table</td>
+</tr>
+<tr>
+<td>uml_diagram_objects</td>
+<td>view_object</td>
+<td>fold</td>
+<td>one view-object table</td>
+</tr>
+<tr>
+<td>uml_diagrams</td>
+<td>model_view</td>
+<td>fold</td>
+<td>kind='uml_diagram'</td>
+</tr>
+<tr>
+<td>uml_elements</td>
+<td>model_element</td>
+<td>fold</td>
+<td>one element table</td>
+</tr>
+<tr>
+<td>uml_interactions</td>
+<td>model_relationship</td>
+<td>fold</td>
+<td>kind='message', seq in meta</td>
+</tr>
+<tr>
+<td>uml_relationships</td>
+<td>model_relationship</td>
+<td>fold</td>
+<td>one relationship table</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73-planka-kanban--33-enumerated">7.3 Planka (<code>kanban</code>) — 33 enumerated</h3>
+<table>
+<thead>
+<tr>
+<th>source table</th>
+<th>target table(s)</th>
+<th>disposition</th>
+<th>reason (≤12 words)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_conveyor_reset_20260922</td>
+<td>—</td>
+<td>drop</td>
+<td>a reset marker, not a feature</td>
+</tr>
+<tr>
+<td>action</td>
+<td>event</td>
+<td>replaced-by-platform</td>
+<td>activity is the event stream</td>
+</tr>
+<tr>
+<td>attachment</td>
+<td>—</td>
+<td>drop</td>
+<td>SPEC §2: attachments out</td>
+</tr>
+<tr>
+<td>background_image</td>
+<td>—</td>
+<td>drop</td>
+<td>not in the used-feature list</td>
+</tr>
+<tr>
+<td>base_custom_field_group</td>
+<td>custom_field</td>
+<td>fold</td>
+<td><code>group_name</code> column</td>
+</tr>
+<tr>
+<td>board</td>
+<td>board</td>
+<td>port</td>
+<td>board entity</td>
+</tr>
+<tr>
+<td>board_membership</td>
+<td>board_membership</td>
+<td>port</td>
+<td>role + <code>can_comment</code></td>
+</tr>
+<tr>
+<td>board_subscription</td>
+<td>board_membership</td>
+<td>fold</td>
+<td><code>watching</code> flag on membership</td>
+</tr>
+<tr>
+<td>card</td>
+<td>card</td>
+<td>port</td>
+<td>the card entity</td>
+</tr>
+<tr>
+<td>card_label</td>
+<td>card_label</td>
+<td>port</td>
+<td>join table</td>
+</tr>
+<tr>
+<td>card_membership</td>
+<td>—</td>
+<td>drop</td>
+<td>SPEC §2: card-level memberships out</td>
+</tr>
+<tr>
+<td>card_subscription</td>
+<td>—</td>
+<td>drop</td>
+<td>no watcher store; fan-out is <code>delivery</code></td>
+</tr>
+<tr>
+<td>comment</td>
+<td>comment</td>
+<td>port</td>
+<td>one comment store</td>
+</tr>
+<tr>
+<td>config</td>
+<td>—</td>
+<td>drop</td>
+<td>instance config, no consumer</td>
+</tr>
+<tr>
+<td>custom_field</td>
+<td>custom_field</td>
+<td>port</td>
+<td>fields; groups flattened</td>
+</tr>
+<tr>
+<td>custom_field_group</td>
+<td>custom_field</td>
+<td>fold</td>
+<td><code>group_name</code>, <code>group_position</code></td>
+</tr>
+<tr>
+<td>custom_field_value</td>
+<td>custom_field_value</td>
+<td>port</td>
+<td>one value per card per field</td>
+</tr>
+<tr>
+<td>identity_provider_user</td>
+<td>app_user</td>
+<td>replaced-by-platform</td>
+<td>OIDC identity is the only identity</td>
+</tr>
+<tr>
+<td>internal_config</td>
+<td>—</td>
+<td>drop</td>
+<td>instance config, no consumer</td>
+</tr>
+<tr>
+<td>label</td>
+<td>label</td>
+<td>port</td>
+<td>board label</td>
+</tr>
+<tr>
+<td>list</td>
+<td>list</td>
+<td>port</td>
+<td><code>kind</code> + <code>position</code></td>
+</tr>
+<tr>
+<td>notification</td>
+<td>message</td>
+<td>fold</td>
+<td>channel <code>web</code> message</td>
+</tr>
+<tr>
+<td>notification_service</td>
+<td>channel_binding</td>
+<td>fold</td>
+<td>a channel config row</td>
+</tr>
+<tr>
+<td>project</td>
+<td>project</td>
+<td>port</td>
+<td>the project entity</td>
+</tr>
+<tr>
+<td>project_favorite</td>
+<td>—</td>
+<td>drop</td>
+<td>PENDING-S0; not in used-feature list</td>
+</tr>
+<tr>
+<td>project_manager</td>
+<td>board_membership</td>
+<td>fold</td>
+<td>owner is a membership role</td>
+</tr>
+<tr>
+<td>session</td>
+<td>—</td>
+<td>drop</td>
+<td>auth sessions are Keycloak/OIDC</td>
+</tr>
+<tr>
+<td>storage_usage</td>
+<td>—</td>
+<td>drop</td>
+<td>attachment storage is gone</td>
+</tr>
+<tr>
+<td>task</td>
+<td>task</td>
+<td>port</td>
+<td>checklist item</td>
+</tr>
+<tr>
+<td>task_list</td>
+<td>task_list</td>
+<td>port</td>
+<td>checklist container</td>
+</tr>
+<tr>
+<td>uploaded_file</td>
+<td>—</td>
+<td>drop</td>
+<td>SPEC §2: attachments out</td>
+</tr>
+<tr>
+<td>user_account</td>
+<td>app_user</td>
+<td>replaced-by-platform</td>
+<td>one identity table</td>
+</tr>
+<tr>
+<td>webhook</td>
+<td>webhook_subscription</td>
+<td>port</td>
+<td>payload and semantics kept</td>
+</tr>
+</tbody>
+</table>
+<h3 id="74-vocabulary-remap-conveyor_flow_runs--run">7.4 Vocabulary remap (<code>conveyor_flow_runs</code> → <code>run</code>)</h3>
+<p><code>running → running</code> · <code>waiting → waiting_approval</code> · <code>success → succeeded</code> · <code>error → failed</code> · <code>canceled → cancelled</code> · <code>crashed → failed</code> (with <code>error_class='crashed'</code>). The old table's terminal-wins upsert rule is carried as: a <code>run</code> in a terminal state rejects any further transition.</p>
+<h2 id="8-data-dependency-graph">8. Data dependency graph</h2>
+<p>Slice order is <code>00-INDEX.md</code>'s execution order: S02 → S03 → S04 → S05 → S06 → S06b → S07 → S08 → S09 → S10 → S11 → S12 → S13 → S14 → S15 → S16 → S17 → S18. S16 sits last in the <strong>table</strong>, not in readiness: its only dependencies are S02, S03, S10 and S11, all built, so it may start as soon as its own plan is accepted. S17's only unmet dependency is a decision about the grading node; S18 waits for S13 and S15 by construction.</p>
+<table>
+<thead>
+<tr>
+<th>slice</th>
+<th>ships</th>
+<th>depends on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S02</td>
+<td>tenant, app_user, membership, department, event, job, schedule, audit_event, action_invocation, idempotency_key, app_licence</td>
+<td>—</td>
+</tr>
+<tr>
+<td>S03</td>
+<td>programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state</td>
+<td>S02 (tenant, app_user, event)</td>
+</tr>
+<tr>
+<td>S04</td>
+<td>action_registry</td>
+<td>S03 (tenant only)</td>
+</tr>
+<tr>
+<td>S05</td>
+<td>board_membership, label, card_label, comment, task_list, task, custom_field, custom_field_value, webhook_subscription</td>
+<td>S03 (board, list, card), S02 (app_user)</td>
+</tr>
+<tr>
+<td>S06</td>
+<td>channel_binding, channel_preference, message, delivery</td>
+<td>S02 (app_user), S03 (run, approval)</td>
+</tr>
+<tr>
+<td>S06b</td>
+<td>— (no tables; <code>approvals.request</code> writes S03's <code>approval</code>)</td>
+<td>S04, S05, S06</td>
+</tr>
+<tr>
+<td>S07</td>
+<td>quality_evaluation, principle_conflict, project_request</td>
+<td>S03 (governed_asset, catalogue_entry, project)</td>
+</tr>
+<tr>
+<td>S08</td>
+<td>project_stakeholder, model, model_element, model_relationship, model_view, view_object, view_connection, model_validation_run</td>
+<td>S03 (project, revision)</td>
+</tr>
+<tr>
+<td>S09</td>
+<td>document, repository, project_repository, secret</td>
+<td>S03 (project)</td>
+</tr>
+<tr>
+<td>S10</td>
+<td>conversation, conversation_turn</td>
+<td>S03 (approval), S02 (app_user)</td>
+</tr>
+<tr>
+<td>S11</td>
+<td>process, process_step, procedure (SOP), process_map, run_step</td>
+<td>S03 (run, card_type), S04 (action names)</td>
+</tr>
+<tr>
+<td>S13</td>
+<td><strong>— no new tables</strong> (the process step columns and the run tree land on S11's <code>process_step</code>/<code>run</code>/<code>run_step</code> in <code>0035</code>; the <code>workflow</code> table it used to ship is <strong>RETAINED</strong>, owner ruling 2026-11-09)</td>
+<td>S03 (run), S11 (procedure, process_step, run_step), S04 (action names)</td>
+</tr>
+<tr>
+<td>S15</td>
+<td>capability, capability_agent, capability_knowledge, capability_relation, work_package_memory</td>
+<td>S03 (card_type, run, card), S04 (action names), S06 (run outcomes), S11 (procedure)</td>
+</tr>
+<tr>
+<td>S16</td>
+<td>inference_call, prompt_audit, prompt_audit_finding</td>
+<td>S02 (tenant), S03 (run), S04 (action descriptions it audits), S10 (conversation_turn, <code>completions.create</code>), S11 (run_step, procedure)</td>
+</tr>
+<tr>
+<td>S17</td>
+<td>benchmark_suite, benchmark_instance, benchmark_run, benchmark_case</td>
+<td>S02 (tenant), S03 (tenant only), S04 (action names), S09 (the case log document)</td>
+</tr>
+<tr>
+<td>S18</td>
+<td>— (no tables)</td>
+<td>S13 (<code>agent.run</code>), S15 (<code>capability_agent</code>), S17 (runs, compare)</td>
+</tr>
+</tbody>
+</table>
+<p>The graph is a DAG in slice order; <strong>every FK points from a higher slice to a lower one, with five deliberate forward references, all into S03's <code>run</code></strong>, each added by the slice that owns the target and never pre-created by S03:</p>
+<table>
+<thead>
+<tr>
+<th>column</th>
+<th>added by</th>
+<th>shape</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run.procedure_id</code></td>
+<td>S11 (<code>0015</code>)</td>
+<td><code>uuid NULL</code> → <code>procedure</code></td>
+</tr>
+<tr>
+<td><code>run.inputs</code></td>
+<td>S11 (<code>0015</code>)</td>
+<td><code>jsonb NOT NULL DEFAULT '{}'</code> — the run's input document, not a reference</td>
+</tr>
+<tr>
+<td><code>run.workflow_id</code></td>
+<td>S13 (<code>0019</code>)</td>
+<td><code>uuid NULL</code> → <code>workflow</code> — <strong>RETAINED (owner ruling 2026-11-09): the column and the <code>workflow</code> table stay</strong>; there is no drop migration</td>
+</tr>
+<tr>
+<td><code>run.capability_id</code></td>
+<td>S15 (<code>0020</code>)</td>
+<td><code>uuid NULL</code> → <code>capability</code></td>
+</tr>
+<tr>
+<td><code>run.capability_agent_id</code></td>
+<td>S15 (<code>0020</code>)</td>
+<td><code>uuid NULL</code> → <code>capability_agent</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cross-slice column additions that are not FK targets into <code>run</code>:</strong> S13 adds <code>run_step.node_id</code>, <code>input_hash</code>, <code>output_hash</code> and <code>duration_ms</code> to S11's <code>run_step</code> (the table is S11's <code>0015</code>; the four columns arrive in S13's <code>0019</code>). S15 adds <code>card_type.capability_id</code> (into S03) and <code>procedure.capability_id</code> (into S11's <code>procedure</code>, <code>0020</code>). S11's <code>attempt</code> column and its <code>uq (run_id, position, attempt)</code> are unchanged by S13. Neither slice pre-creates the other's table.</p>
+<p><strong>S17's cross-slice columns are deliberately not FKs.</strong> <code>benchmark_run.capability_agent_id</code> (S15) and <code>procedure_id</code> (S11) name another slice's aggregate, but each is resolved in-tenant at write and carries no FK — the §2.17 RLS reason. <code>benchmark_case.log_document_id</code> (S09) is the same shape. The <code>benchmark_run_subject</code> CHECK is what makes them answerable without the FK.</p>
+<p><strong>Tables needed by two slices are assigned to the earlier one:</strong> <code>catalogue_entry</code> (S06, S07, S08 → S03), <code>revision</code> (S07, S08, S09 → S03), <code>trace_link</code> (S07, S08 → S03), <code>approval</code> (S06, S10 → S03), <code>message</code>/<code>delivery</code> (S06, S10 → S06), <code>membership</code> (every slice → S02). No table is defined twice.</p>
+<h2 id="9-pending-s0--adjudicated-2026-11-08">9. PENDING-S0 — ADJUDICATED 2026-11-08</h2>
+<p>S00 day 2 measured every table below against the 348-flow node census, the 24 h Loki sample and the source row counts (<code>parity/evidence/02-day2-method.txt</code> §9 "PENDING-S0 — the 13 tables 02-DATA-ARCHITECTURE §9 assigns to S0"). The section is kept, with its outcome, because the rule it states is the one that governed the build.</p>
+<table>
+<thead>
+<tr>
+<th>table</th>
+<th>verdict</th>
+<th>evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>audience, audience_member</td>
+<td><strong>DROP</strong> — migration <code>0011</code></td>
+<td>no <code>streams</code> node operation in 348 flows; fr.streams 0 rows; asset_stream_membership 0; no <code>/api/streams</code> route</td>
+</tr>
+<tr>
+<td>outline, outline_node</td>
+<td><strong>DROP</strong> — migration <code>0011</code></td>
+<td>RM toc_trees/toc_nodes/toc_settings 0; fr project_outlines 0; no <code>toc</code> operation; fr /toc/* 15 unused + 1 rare</td>
+</tr>
+<tr>
+<td>deliverable</td>
+<td><strong>DROP</strong> — migration <code>0011</code></td>
+<td>project_deliverables 0, project_milestones 0, no deliverable operation</td>
+</tr>
+<tr>
+<td>project_capability</td>
+<td><strong>DROP</strong> — migration <code>0011</code></td>
+<td>pm_project_capabilities 0, no capability operation</td>
+</tr>
+<tr>
+<td>register_item</td>
+<td><strong>DROP</strong> — migration <code>0011</code></td>
+<td>pm_resources / pm_risks / pm_benefits all 0, no register route</td>
+</tr>
+<tr>
+<td>project_stakeholder</td>
+<td><strong>KEEP</strong></td>
+<td>fr project_stakeholders 21 rows</td>
+</tr>
+<tr>
+<td>custom_field, custom_field_value</td>
+<td><strong>KEEP</strong></td>
+<td>Planka custom_field 1815 rows, custom_field_value 70 (§9's old premise "measured 0" was stale)</td>
+</tr>
+<tr>
+<td>webhook_subscription</td>
+<td><strong>KEEP</strong></td>
+<td>Planka webhook 3 live rows — these are what trigger the conveyor</td>
+</tr>
+<tr>
+<td>conversation, conversation_turn</td>
+<td><strong>KEEP</strong></td>
+<td>S10 (copilot) is planned, not dropped</td>
+</tr>
+</tbody>
+</table>
+<p>Dropping a PENDING-S0 table is a <strong>migration</strong>, not a silent omission — five were dropped by <code>0011</code>, and the evidence class is recorded next to each verdict in <code>parity/evidence/02-day2-method.txt</code>. Reversing one is a new migration from the old database, which stays read-only until S14.</p>
+<h2 id="10-open-data-questions">10. Open data questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>Default if unanswered</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong><code>card_type</code> is a table while 14 RM catalogue tables become <code>catalogue_entry</code>.</strong> Is that exception right?</td>
+<td><strong>Yes.</strong> <code>Card *—1 CardType</code> is an entity in SPEC §6, it is the FK target of the conveyor matrix, and it carries executable definition (<code>inputs</code>, <code>outputs</code>, <code>rules</code>). The <em>vocabularies</em> collapse; the aggregate does not.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>governed_asset</code> folds requirements, principles and ADRs into one table with a <code>kind</code> discriminator.</strong></td>
+<td><strong>Yes.</strong> Identical lifecycle, identical revision/quality/trace machinery. If a kind later needs a column that is filtered on, add the column and leave the others NULL — do not fork the table.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>position numeric</code> with midpoint insert, no renumber job.</strong></td>
+<td><strong>Yes.</strong> Planka used a float; numeric is exact and never degrades. Revisit only if a board with &gt;10k cards in one list measures a problem.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>event</code> prune at 90 days ships with <code>event</code> in S02.</strong></td>
+<td><strong>Yes.</strong> An outbox with no reaper is unbounded growth; the retention job is part of the platform slice, not a later chore.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>model revisions keep the last 50; governed-asset revisions are unbounded.</strong></td>
+<td><strong>Yes.</strong> A model revision is recoverable working state; a governed-asset revision is the governance record and is never pruned.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Seed data for <code>catalogue_entry</code></strong> (project types, phases, card types, gates) is data, not schema.</td>
+<td>Seed it from the live RM counts (<code>pm_card_types=293</code>, <code>pm_project_types=26</code>, <code>pm_project_type_card_types=282</code>) in a <code>migrate --seed</code> step; the numbers are <code>pg_stat_user_tables</code> estimates and must be re-counted before seeding.</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/02-DATA-ARCHITECTURE.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

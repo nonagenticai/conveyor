@@ -1,0 +1,174 @@
+# phase_coverage_check — checks a phase plan's coverage (project_management, S13 §5.2).
+#
+# ⚠️ This card type has NO entry in seed/catalogue.json (measured 2026-11-10: absent from all 74
+# card_types) and NO entry in the v4 capability file, so there is no catalogue acceptance and no
+# `inspect.criteria` to take. It is authored here because the four process keys are NOT optional:
+# `parity/n8n-dispositions.tsv` carries four live flows targeting `phase_coverage_check.READY/.DOING/
+# .QA/.DONE`, and the catalogue test requires every disposition target to resolve to a seeded key
+# (seed/processes/README.md §`manifest.yaml`, S13 §5.9). It is also one of the 70 types the type × list
+# matrix names, while the five `wf_*` catalogue types are not.
+#
+# Content sources, therefore, are the three rulings that define the card rather than a catalogue row:
+#   R341 (4) — coverage is an EXPLICIT PM process, carried by a single agent (R339 shape) with a laya
+#              choice where needed; the goals come from the capabilities themselves.
+#   R342 (1) — the card is created by `project_phase_start` BEFORE the phase's real cards; it is
+#              visible on the board, re-runnable and auditable, and one card plus one board round-trip
+#              is the accepted cost.
+#   R347 (4) — the card type was RETIRED as a board type; coverage is judged inside
+#              `project_phase_start`. The four processes survive only for the parity contract above, so
+#              this file must not be read as a live re-introduction of the type.
+# Every criterion below is derived from those rulings, not quoted; no source names an output, so
+# `outputs` is empty (as for `project_start_request_analysis`). Ladder: READY = readying + the move;
+# DOING/QA/DONE = four agents (readying → doing → inspecting → releasing) + the move.
+card_type: phase_coverage_check
+capability: project_management
+outputs: []
+
+agent:
+  key: phase_coverage_check
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: phase_coverage_check.ready
+    title: Phase coverage check — definition of ready
+    definition_of_ready: {checks: [phase_plan_present]}
+    definition_of_done: {checks: [goals_from_capabilities]}
+    acceptance_criteria:
+      - {name: phase_plan_present, text: "The card names the phase and the plan version it judges, and that plan is the phase's current plan rather than one already superseded."}
+      # derived: R341 (4) — the goals come from the capabilities, not from the checker
+      - {name: goals_from_capabilities, text: "Every goal the check judges was taken from a capability's own declaration for this phase, and the check adds no goal of its own."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: phase_coverage_check.doing
+    title: Phase coverage check — definition of doing
+    definition_of_ready: {checks: [goals_from_capabilities]}
+    definition_of_done: {checks: [every_declared_goal_carried, every_card_traces_to_a_goal]}
+    acceptance_criteria:
+      - {name: every_declared_goal_carried, text: "Every goal the phase's capabilities declared has a card on the board for this phase, or a named reason why it deliberately does not."}
+      - {name: every_card_traces_to_a_goal, text: "Every card in the phase traces to a goal a capability declared; a card with no such goal is a gap, not coverage."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: phase_coverage_check.qa
+    title: Phase coverage check — definition of QA
+    definition_of_ready: {checks: [every_card_traces_to_a_goal]}
+    definition_of_done: {checks: [recheck_is_reproducible, every_gap_has_an_owner]}
+    acceptance_criteria:
+      # derived: R342 (1) — the verdict must be auditable, which means the same read twice says the same
+      - {name: recheck_is_reproducible, text: "Re-reading the phase's plan and board produces the same coverage verdict as the first run, so the result can be audited later."}
+      - {name: every_gap_has_an_owner, text: "Every coverage gap names the capability that owns the missing card and the goal it belongs to, so the gap can be acted on."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: phase_coverage_check.done
+    title: Phase coverage check — definition of done
+    definition_of_ready: {checks: [every_gap_has_an_owner]}
+    definition_of_done: {checks: [verdict_recorded_on_card]}
+    acceptance_criteria:
+      # derived: R342 (1) — visible on the board, not buried in a run log
+      - {name: verdict_recorded_on_card, text: "The coverage verdict and every gap it found are written on the card, so the phase's coverage is visible and can be re-run after this run."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: phase_coverage_check.system
+    title: Phase coverage check — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: phase_coverage_check.READY
+    list: ready
+    title: Phase coverage check — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: phase_coverage_check
+        sop: phase_coverage_check.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: phase_coverage_check.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: phase_coverage_check.DOING
+    list: doing
+    title: Phase coverage check — doing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: phase_coverage_check.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: phase_coverage_check.QA
+    list: qa
+    title: Phase coverage check — QA
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: phase_coverage_check.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: phase_coverage_check.DONE
+    list: done
+    title: Phase coverage check — done
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: phase_coverage_check, sop: phase_coverage_check.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: phase_coverage_check.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

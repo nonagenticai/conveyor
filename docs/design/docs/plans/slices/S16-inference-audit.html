@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S16 — Inference ledger and prompt audit · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S16-inference-audit.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s16--inference-ledger-and-prompt-audit">S16 — Inference ledger and prompt audit</h1>
+<p>Programme project: S16 · issues #20</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>Every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and the provider's prompt-cache classes, so "what did this cost and was it cached" is a query rather than a guess. On top of that record, a <strong>prompt audit</strong> inventories the three prompt surfaces the conveyor owns — procedure step templates, every action's description, and the copilot's system prompt — classifies them against the <code>claude-api</code> <code>prompt-audit</code> method's four anti-pattern groups, and reports findings with confidence and a proposed diff. Both are ordinary actions, so both are user-invokable over HTTP and machine-invokable over <code>/mcp</code>.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>The action engine already owns the external call and writes <code>action_invocation</code> + <code>audit_event</code> in one transaction (<code>crates/actions/src/invoke.rs</code>); the two model-call actions are <code>completions.create</code> (<strong>built</strong>, S10) and <code>inference.chat</code> (<strong>declared by S13, not built</strong> — it declares <code>captures_usage</code> when it lands).</li>
+<li><code>inference-router</code> already returns <code>usage</code> with both cache classes and already accepts <code>X-Correlation-Id</code>; the conveyor drops both on the floor.</li>
+<li>S11's <code>procedure</code>/<code>procedure_step</code>/<code>run_step</code> and S10's <code>conversation_turn</code> exist and are the join targets.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN.</strong> The three tables (§2.17); the engine capture seam; the <strong>eight</strong> actions; the two scopes and four events; the <code>prompt_audit.run</code> and <code>prompt_audit.sweep</code> jobs with the built-in prompt; the <strong>two triggers</strong> — a manual <code>prompt_audits.start</code>, and a configurable <em>after N executions</em> policy the sweep enforces against <code>inference_call</code> itself; the <strong>draft check that becomes part of publishing</strong> (<code>prompt_audits.check</code>, called by S11's publish); the two screens <strong>declared</strong> for S12.</p>
+<p><strong>OUT.</strong> Building any UI — the screens belong to S12 and are listed here so S12 may not invent them. Absorbing <code>inference-router</code> or <code>billing_service</code>: the conveyor reads neither database, adds no cache endpoint and emits no cost event (SPEC §4 still says <em>never absorbed</em>). A tenant-authored prompt store — <code>prompt_ref</code> stays the built-in versioned reference of CONTRACT §17. Any AI-driven <em>fixing</em> of prompts: the audit proposes, a person decides, and <code>procedures.update</code> applies. Kata-specific tables: kata's prompts are procedures and the kata domain stays outside this spec — kata <strong>consumes</strong> findings through <code>prompt_findings.list</code>, which is already on its allowlist. A configuration table or action for the cadence: the policy rides <code>tenant.settings.prompt_audit</code> through the existing <code>tenants.update_settings</code>, so the trigger is configurable without widening this slice.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>…/claude-api/shared/prompt-audit.md</code> (the installed skill)</td>
+<td>Steps 0–7, the four groups, the keep list, the Step 5 report columns</td>
+<td>the <strong>method and the column set verbatim</strong></td>
+<td>its file-editing affordances — the conveyor's surfaces are rows, not files</td>
+</tr>
+<tr>
+<td><code>…/claude-api/shared/prompt-caching.md</code></td>
+<td>§Silent invalidators, §Automatic vs explicit breakpoints</td>
+<td>the invalidation signals Group 4 measures</td>
+<td>the API-level advice; this slice calls the router, not a provider</td>
+</tr>
+<tr>
+<td><code>inference-router/src/models/schemas.py</code></td>
+<td>the <code>Usage</code> model (its two <code>cache_*_input_tokens</code> fields) and <code>ChatCompletionResponse.usage</code></td>
+<td>the exact field names</td>
+<td>any assumption of a response cache — there is none</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/invoke.rs</code></td>
+<td><code>invoke_external</code>, <code>record_bookkeeping</code></td>
+<td>the transaction shape the capture joins</td>
+<td>its breaker/idempotency logic, unchanged</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/spec.rs</code></td>
+<td><code>ActionSpec</code>, <code>AGENT_TOOLS</code>, <code>Scope</code></td>
+<td>the declaration pattern</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>crates/api/src/copilot/turns.rs</code></td>
+<td><code>SYSTEM_PROMPT</code> (<code>:51</code>)</td>
+<td>the text as an audit surface</td>
+<td>the turn runner</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<p><code>migrations/00NN_s16_inference_audit.sql</code> (next free number at start; <code>0024</code> at time of writing), DDL exactly as <code>02-DATA-ARCHITECTURE §2.17</code>. Modules: <code>crates/domain/src/{inference,prompt_audit}.rs</code>, <code>crates/store/src/{inference,prompt_audit}.rs</code>, <code>crates/actions/src/inference/{calls,usage}.rs</code>, <code>crates/actions/src/prompt_audit/{audits,findings,scan}.rs</code>, <code>crates/actions/src/prompts/prompt_audit_v1.md</code> (<code>include_str!</code>, the built-in <code>prompt_audit@1</code>). Plus <code>crates/actions/src/spec.rs</code> (<code>captures_usage</code> field, two new scopes — <strong><code>inference:read</code> and <code>inference:write</code></strong>, <code>Scope::ALL</code> 52 → 54 — and six <code>AGENT_TOOLS</code> entries — all but <code>prompt_findings.decide</code>, a human's, and <code>prompt_audits.check</code>, publish's), <code>crates/actions-derive/src/lib.rs</code> (the attribute + scope table), <code>crates/actions/src/invoke.rs</code> (the capture), <code>apps/server/src/worker.rs</code> (the <code>prompt_audit.run</code> arm).</p>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>input</th>
+<th>output</th>
+<th>scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inference_calls.list</code></td>
+<td><code>{caller_kind?, run_id?, model?, cache_status?, since?, page}</code></td>
+<td><code>Page&lt;InferenceCallView&gt;</code></td>
+<td><code>inference:read</code></td>
+</tr>
+<tr>
+<td><code>inference_usage.report</code></td>
+<td><code>{since, until, group_by: day|model|caller_kind|cache_status|prompt_sha}</code></td>
+<td><code>{rows:[{bucket, calls, prompt_tokens, completion_tokens, hits, writes, misses, unknown, hit_ratio}]}</code></td>
+<td><code>inference:read</code></td>
+</tr>
+<tr>
+<td><code>prompt_audits.start</code></td>
+<td><code>{scope:{surfaces:[procedures|actions|copilot], procedure_ids?:[uuid]}, target_model}</code></td>
+<td><code>PromptAuditView</code></td>
+<td><code>inference:write</code></td>
+</tr>
+<tr>
+<td><code>prompt_audits.check</code></td>
+<td><code>{procedure_version_id}</code></td>
+<td><code>{findings:[FindingView], blocking:bool}</code></td>
+<td><code>inference:write</code></td>
+</tr>
+<tr>
+<td><code>prompt_audits.get</code></td>
+<td><code>{id}</code></td>
+<td><code>{audit, findings:[FindingView]}</code></td>
+<td><code>inference:read</code></td>
+</tr>
+<tr>
+<td><code>prompt_audits.list</code></td>
+<td><code>{page}</code></td>
+<td><code>Page&lt;PromptAuditView&gt;</code></td>
+<td><code>inference:read</code></td>
+</tr>
+<tr>
+<td><code>prompt_findings.list</code></td>
+<td><code>{audit_id?, status?, confidence?, page}</code></td>
+<td><code>Page&lt;FindingView&gt;</code></td>
+<td><code>inference:read</code></td>
+</tr>
+<tr>
+<td><code>prompt_findings.decide</code></td>
+<td><code>{finding_id, decision: accept|reject, note?}</code></td>
+<td><code>FindingView</code></td>
+<td><code>inference:write</code></td>
+</tr>
+</tbody>
+</table>
+<p>Screens declared for S12: <strong>#11 Inference usage</strong> (<code>inference_usage.report</code>, <code>inference_calls.list</code>; <code>inference-usage.spec.ts</code>) and <strong>#12 Prompt audit</strong> (<code>prompt_audits.*</code>, <code>prompt_findings.*</code>, and the cadence in <code>tenants.update_settings</code>; <code>prompt-audit.spec.ts</code>) — the screen that shows a kata what to fix, and the one place a person sees a finding. Jobs: <code>prompt_audit.run</code>, <code>inference_call.prune</code>, <code>prompt_audit.prune</code>. <strong>There is no <code>prompt_audit.sweep</code> job:</strong> the <em>after N executions</em> trigger is an event at capture time (owner 2026-11-09, answering §10 Q2), so the audit is started by the call that crosses the threshold.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Migration + <code>crates/store/src/migrate.rs</code> touch (the macro embeds at compile time). apply migration 0024 to the dev database (a m1-built binary against the compose DB; CONTRACT §16).</li>
+<li><code>domain::inference</code>: <code>Usage</code> parsing, <code>cache_status()</code> with its four-way rule, and the bucket arithmetic. <code>rbuild -- test -p conveyor-domain inference</code>.</li>
+<li><code>store::inference</code>: the insert (called from the engine), the keyset list, the aggregate. <code>rbuild -- test -p conveyor-store inference_</code>.</li>
+<li><code>spec.rs</code> + derive: <code>captures_usage</code>; declare it on <code>completions.create</code>. <code>rbuild -- test -p conveyor-actions registry</code>.</li>
+<li><code>invoke.rs</code>: parse <code>usage</code> from a successful response and write the row in <code>record_bookkeeping</code>'s transaction, sending <code>X-Correlation-Id</code>. <code>rbuild -- test -p conveyor-actions inference_capture</code>.</li>
+<li><code>inference_calls.list</code> + <code>inference_usage.report</code> over <code>store::inference</code>. <code>rbuild -- test -p conveyor-actions inference</code>.</li>
+<li>Scopes + <code>AGENT_TOOLS</code> (six: the read/start actions, not <code>prompt_findings.decide</code> and not <code>prompt_audits.check</code>) + the count assertion + <code>served-spec.lock.json</code>. <code>--print-openapi --write-lock</code>.</li>
+<li><code>prompt_audit</code> tables' store + the state machine in <code>domain::prompt_audit</code>. <code>rbuild -- test -p conveyor-store prompt_audit</code>.</li>
+<li><code>scan.rs</code>: inventory (procedure steps, <code>actions.list</code> descriptions, <code>SYSTEM_PROMPT</code>) + the group signals + the cache-order probe (a prompt whose stable prefix reports <code>creation &gt; 0</code> with <code>read = 0</code> over N calls).</li>
+<li>The built-in prompt <code>prompt_audit@1</code> and the <code>prompt_audit.run</code> worker arm: one bounded <code>completions.create</code>, findings persisted, <code>prompt_audit.completed</code>. <code>rbuild -- test -p conveyor-server prompt_audit_run</code>.</li>
+<li><code>prompt_audits.*</code> + <code>prompt_findings.*</code>. <code>rbuild -- test -p conveyor-actions prompt_audits</code>.</li>
+<li><strong>The two triggers.</strong> The <em>after N executions</em> policy is an <strong>event at capture time</strong> (owner 2026-11-09): after the engine inserts an <code>inference_call</code>, it counts the tenant's rows since the last <code>prompt_audit.created_at</code> (excluding <code>prompt_ref = 'prompt_audit@1'</code>) and, at the threshold, inserts the queued audit (<code>requested_by IS NULL</code>, <code>ON CONFLICT DO NOTHING</code> against <code>prompt_audit_auto_live_idx</code>) and its <code>prompt_audit.run</code> job in the same transaction. <code>tenant.settings.prompt_audit</code> carries <code>{enabled, after_executions, surfaces, target_model}</code>; an enabled policy without a <code>target_model</code> is not armed. Then <code>prompt_audits.check</code>: deterministic signal scan of ONE draft version, no LLM, synchronous. <code>rbuild -- test -p conveyor-server prompt_audit_triggers</code>.</li>
+<li><strong>The publish seam.</strong> S11's <code>procedures.publish</code> calls <code>prompt_audits.check</code> on the draft it is publishing and refuses with <code>422 procedure_audit_findings</code> when a <code>high</code>-confidence finding remains; the publisher re-sends with <code>acknowledge_findings: true</code> to override, and the override is recorded on the publish's <code>audit_event</code>. <code>rbuild -- test -p conveyor-actions procedure_publish_audit_gate</code>.</li>
+<li>The two pruners on <code>schedule</code> rows. <code>rbuild -- test -p conveyor-server pruners</code>.</li>
+<li>Whole gate below — <code>rbuild --gate</code> (fmt + clippy + <code>test --locked</code>) on m1 (CONTRACT §16).</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+# CONTRACT §16: Rust runs on m1 through rbuild; mini3&#39;s cargo refuses inside a Cargo project.
+# 1. the three tables exist with RLS forced (a policy without FORCE reads zero rows and proves nothing)
+test &quot;$(psql &quot;$DATABASE_URL&quot; -tAc &quot;SELECT count(*) FROM pg_class WHERE relname IN
+  (&#39;inference_call&#39;,&#39;prompt_audit&#39;,&#39;prompt_audit_finding&#39;) AND relrowsecurity AND relforcerowsecurity&quot;)&quot; -eq 3
+# 2. a REAL call end to end: one `completions.create` through the router, then the stored row compared field-for-field
+#    with the router&#39;s own `usage` (SPEC §9 — a fixture cannot prove the capture seam; this is the only line that can)
+rbuild -- test -p conveyor-actions --test inference_capture -- --exact a_real_call_records_the_router_usage
+# 3. the derivation is exhaustive — read&gt;0 hit, creation-only write, both-zero miss, no usage unknown (unit, no router)
+rbuild -- test -p conveyor-domain --test inference_usage
+# 4. the deterministic scan reproduces: two runs over the same draft differ in no finding&#39;s
+#    (pattern, location, confidence). The LLM run is proved with the scripted model (CCR 6).
+rbuild -- test -p conveyor-actions --test prompt_audits -- --exact the_same_draft_scans_identically
+# 5. the audit cannot edit what it audits: no action in this slice carries `procedures:write`.
+#    A compile-time registry assertion — `action_registry.scopes` does not exist (CCR 3).
+rbuild -- test -p conveyor-actions --test registry -- --exact no_prompt_action_holds_procedures_write
+# 6. the cache definition is a DB invariant, not a convention: the constraint exists, and a Rust test against
+#    the runtime role proves a &#39;hit&#39; with zero read tokens is refused (psql would otherwise fail for the wrong
+#    reason — a missing app.current_tenant — and the line would pass vacuously)
+test &quot;$(psql &quot;$DATABASE_URL&quot; -tAc &quot;SELECT count(*) FROM pg_constraint
+  WHERE conname = &#39;inference_call_cache_status&#39; AND contype = &#39;c&#39;&quot;)&quot; -eq 1
+rbuild -- test -p conveyor-store --test inference_constraints -- --exact cache_status_check_refuses_a_hit_with_no_read
+# 7. the served surface and the lock agree — the repo&#39;s own checker, not a hand-rolled count
+rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock
+rbuild --gate</code></pre>
+<h2 id="8-traps">8. Traps</h2>
+<ul>
+<li><strong><code>sqlx::migrate!</code> embeds the set at compile time</strong> — a new <code>.sql</code> is invisible until the crate rebuilds and the command exits 0 either way. Touch <code>migrate.rs</code> and verify by the ledger, never by the migrate log line.</li>
+<li><strong>Usage capture must never fail the call.</strong> The row is written after a 2xx; a response with no <code>usage</code> stores <code>unknown</code>, and a parse failure logs and continues. A model call that succeeded must not become an error because bookkeeping did — but it <em>is</em> in the same transaction, so a genuine DB failure rolls the call's audit row back with it. That is the honest trade: one transaction, no divergence, and the failure is visible as a missing row.</li>
+<li><strong>Derive <code>cache_status</code> from the response, never the request.</strong> The request says nothing about caching; a caller that asked for a cache breakpoint still misses on a cold prefix.</li>
+<li><strong>Do not emit cost.</strong> The router meters this same call into billing, whose <code>billing_cost_events</code> already carries both cache classes; a second emission double-counts a tenant's bill.</li>
+<li><strong><code>AGENT_TOOLS</code> is a fixed-size array</strong> (<code>[&amp;str; 22]</code>): adding six entries changes the type, the MCP allowlist test and <code>/mcp</code>'s <code>tools/list</code> snapshot together.</li>
+<li><strong>The audit reads the live registry, not a copy.</strong> <code>actions.list</code> is the writer of record for a description; an audit against a checked-in copy would report findings about text that no longer ships, and would itself become the staleness problem it exists to find.</li>
+<li><strong>The join keys are not foreign keys, and that is deliberate.</strong> An FK's RI check runs as the table owner and bypasses RLS, so it would accept another tenant's <code>run_id</code>; the engine resolves each id in the caller's tenant first and the <code>inference_call_join_key</code> CHECK keeps the row answerable without one. Copying the FK idiom from <code>conversation_turn_conversation_fk</code> without this step is the defect.</li>
+<li><strong><code>prompt_audit@1</code> is versioned, not edited.</strong> Changing the audit prompt means <code>prompt_audit@2</code>; an audit row names the version that produced its findings, and rewriting v1 would make every past finding unreproducible.</li>
+</ul>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ul>
+<li><strong><code>inference_call</code> is written by the engine, not by a handler</strong> — the call site already owns the response and the transaction; a handler-side writer would be a second path for the same fact. Contract-level: CONTRACT §18.</li>
+<li><strong>Cache is three states plus unknown, never two.</strong> A write is a deliberate warm priced above a miss's saving, so folding it into "miss" would make every optimisation look like a regression. SPEC D23.</li>
+<li><strong>The audit is a procedure with one bounded model call</strong>, not <code>agent.run</code>: it needs no tool loop, and D22's executor slot must not grow a further kind for a reporting feature.</li>
+<li><strong>Findings are decided by a person; the audit holds no write scope over its own surfaces.</strong> CONTRACT §18.</li>
+<li><strong>Screens are declared here and built in S12</strong> — S12 may not invent a screen, action or table.</li>
+<li><strong>Contract change taken:</strong> three tables beyond §2.16's ceiling, with D23 (2026-11-09).</li>
+<li><strong>Two triggers, and the second one is configurable</strong> (George 2026-11-09): a manual <code>prompt_audits.start</code>, and an <em>after N executions</em> policy in <code>tenant.settings.prompt_audit</code> that fires <strong>as an event on the Nth captured call</strong> (owner decision 2026-11-09, §10 Q2 — the slice's original sweep default is superseded). <strong><code>inference_call</code> is the counter</strong> — the rows since the tenant's last audit, excluding the audit's own call — so the trigger adds no counter column and cannot drift from the ledger it is counting. The policy names the <code>target_model</code> the event-created audit will call; without one it is not armed.</li>
+<li><strong>The cache report groups by <code>prompt_sha</code> from day one</strong> (George). The whole point is to see <em>which prompt</em> is cache-hostile; model and caller alone cannot answer the Group 4 finding it exists to evidence.</li>
+<li><strong>A draft is audited at publish, not on a cadence</strong> (George: <em>"audit of a draft procedure should become part of the publishing of a procedure version"</em>). <code>procedures.publish</code> runs <code>prompt_audits.check</code>; a <code>high</code>-confidence finding refuses with <code>422 procedure_audit_findings</code>, and <code>acknowledge_findings: true</code> overrides it and is recorded on the publish's <code>audit_event</code> — a scoped, logged override, never a silent one.</li>
+<li><strong>The findings feed the kata-executor</strong> (George 2026-11-09): kata reads <code>prompt_findings.list</code> and starts audits with <code>prompt_audits.start</code>, both already on its allowlist. S16 adds no kata surface and no kata table.</li>
+<li><strong>Retention: 90 days</strong> (George) — a cache ratio over a month is noise, over a quarter it is a signal.</li>
+</ul>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>answer (owner, 2026-11-09)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Is <code>served_model</code> ever different from <code>model</code> for our provider set?</td>
+<td><strong>Store both, report on <code>served_model</code>, fall back to <code>model</code>.</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Is the <em>after N executions</em> check a periodic sweep or an event on the Nth call?</td>
+<td><strong>An event on the Nth call.</strong> The counter is still the ledger (rows since the last audit, excluding <code>prompt_audit@1</code>), so there is no separate counter to drift; <code>prompt_audit.sweep</code> is not built.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Does a <code>high</code>-confidence finding from <code>prompt_audits.check</code> block publishing of a <em>first</em> draft, or only of a version that replaces a published one?</td>
+<td><strong>Both.</strong> A first publish is exactly where a dated prompt enters the system.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-build-amendments-ccrs-2026-11-09">11. Build amendments (CCRs, 2026-11-09)</h2>
+<ol type="1">
+<li><strong><code>prompt_audits.check</code> takes <code>procedure_id</code></strong>, not <code>procedure_version_id</code> — no such identity exists; publish already uses <code>procedure_id</code>.</li>
+<li><strong><code>check</code> is pure.</strong> A finding cannot be persisted without an audit (<code>audit_id</code> FK NOT NULL, <code>target_model</code> NOT NULL), so <code>check</code> returns <code>CheckFindingView</code>s and persists nothing. Only <code>prompt_audit.run</code> persists findings, under a real audit.</li>
+<li><strong>Gate item 5's SQL is invalid</strong> (<code>action_registry.scopes</code> does not exist; internal actions are never rows there). Replaced by a compile-time registry assertion that no <code>prompt_*</code> action holds <code>procedures:write</code>.</li>
+<li><strong><code>prompt_findings.list</code> was not on <code>AGENT_TOOLS</code></strong> despite §9's claim; S16 adds it plus the other five read/start tools (22 → 28 on S16's baseline).</li>
+<li><strong>The event trigger needs a model:</strong> <code>tenant.settings.prompt_audit</code> gains <code>target_model</code>; without it the policy is not armed and the capture seam logs and skips.</li>
+<li><strong>Reproducibility is asserted on the deterministic scan</strong>, not on the model call: an LLM cannot be bit-reproducible. <code>prompt_audit.run</code> is proved with the scripted model harness plus one live rehearsal.</li>
+<li><strong>The <code>actions</code> surface is declared but empty:</strong> <code>ActionSpec</code> carries no authored description (the OpenAPI description is generated boilerplate). Procedure templates and the copilot <code>SYSTEM_PROMPT</code> are the audited surfaces until specs carry descriptions.</li>
+<li><strong><code>note</code> is not accepted on <code>prompt_findings.decide</code>:</strong> no column persists it, so it is refused rather than silently discarded.</li>
+</ol>
+<h2 id="12-build-record-2026-11-09">12. Build record (2026-11-09)</h2>
+<p><strong>Built.</strong> Migration <code>0024_s16_inference_audit.sql</code> (three tables, FORCE RLS, the cache CHECK, the cadence index and the auto-audit race guard); <code>domain::{inference,prompt_audit}</code>; <code>store::{inference,prompt_audit}</code> with the capture seam (<code>capture_and_maybe_audit_tx</code>, two savepoints) and the event-on-Nth-call trigger; the eight actions; the deterministic scanner and the versioned <code>prompt_audit@1</code> prompt with its <code>prompt_audit.run</code> worker arm; the publish gate; the two pruners' worker arms. Owner decisions and the eight build amendments are in §9–§11.</p>
+<p><strong>Evidence.</strong> Domain 165 tests; store 18 (<code>s16_schema</code>, <code>inference_</code>, <code>prompt_audit</code>, <code>s16_capture</code> 4, <code>s16_prune</code>, <code>jobs</code>); actions S16 targets 16 (registry 8, inference 1, inference_capture 2, prompt_audits 3, publish gate 2); server <code>prompt_audit_run</code> 2; <code>parity_http_mcp</code> green at 216 with all eight S16 samples; <code>clippy --workspace --all-targets -D warnings</code> clean. S16 measured <strong>216 actions · 57 scopes · 28 AGENT_TOOLS · 237 ops</strong>; the combined tree after S17 measures <strong>224 · 59 · 245</strong>, lock sha256 <code>35fb4c05…</code>. The one workspace-suite run at the handover saw four failures, all from S17's eight actions landing mid-run (count assertions + its parity samples), none in S16 code.</p>
+<p><strong>Pending, deliberately:</strong> the live-router capture rehearsal (needs <code>CONVEYOR_EXTERNAL_INFERENCE_URL</code> and a real <code>completions.create</code>; a fixture cannot prove the live seam) and the two prune schedule rows (<code>store/src/schedule.rs</code> was S17's).</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S16-inference-audit.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

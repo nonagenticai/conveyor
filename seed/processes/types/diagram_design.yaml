@@ -1,0 +1,164 @@
+# diagram_design — the diagram document a design is approved from before development starts
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type diagram_design: outputs draft/reviewed/published,
+# acceptance outline_within_card_scope, every_claim_cites_a_source, every_cited_source_exists,
+# no_unsupported_claims, capability_acceptance_met, artifact_is_qa_version) and
+# n8n-designs/design/choices/v4/capabilities/design.yaml (text, phase design, sections
+# purpose/diagrams/notes, signoff true, uses_repo true, inspect.criteria). Diagrams are text
+# (Mermaid) in the document and the reader renders them; there is no image tool, so QA read
+# `diagrams_readable` is a criterion on the text, not on a rendering.
+card_type: diagram_design
+capability: design
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: diagram_design
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: diagram_design.ready
+    title: Diagram design — definition of ready
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [diagram_outline_planned]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline names only the diagrams the card's design question needs, and each one maps to a section the type declares — purpose, diagrams, notes — rather than inventing a new one."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: diagram_design.doing
+    title: Diagram design — definition of doing
+    definition_of_ready: {checks: [diagram_outline_planned]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every element, relation and boundary a diagram draws names the upstream architecture or domain document it comes from."}
+      - {name: every_cited_source_exists, text: "Every document and RM view_id a diagram cites exists at the revision the card read; a citation that does not resolve is reported in notes, not drawn."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: diagram_design.qa
+    title: Diagram design — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "No diagram shows a component, relation or boundary that the upstream documents it cites do not state."}
+      - {name: capability_acceptance_met, text: "The diagram document is true of every acceptance statement the diagram_design card type declares."}
+      - {name: diagrams_cover_purpose, text: "The diagrams show everything purpose says the design must show."}
+      - {name: diagrams_follow_upstream, text: "Every diagram agrees with the upstream architecture and domain documents it cites."}
+      - {name: diagrams_readable, text: "Every diagram is text (for example Mermaid) with labelled elements and a one-line caption."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id]
+
+  - key: diagram_design.done
+    title: Diagram design — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The diagram document published to the card is the exact revision QA reviewed; no diagram, label or caption was added, dropped or redrawn after the review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: diagram_design.system
+    title: Diagram design — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: diagram_design.READY
+    list: ready
+    title: Diagram design — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: diagram_design
+        sop: diagram_design.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: diagram_design.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: diagram_design.DOING
+    list: doing
+    title: Diagram design — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: diagram_design.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: diagram_design.QA
+    list: qa
+    title: Diagram design — QA
+    outputs: [reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: diagram_design.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: diagram_design.DONE
+    list: done
+    title: Diagram design — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: diagram_design, sop: diagram_design.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: diagram_design.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

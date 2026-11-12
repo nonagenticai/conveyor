@@ -1,0 +1,166 @@
+# project_phase_closure — closes a phase and opens the next one (project_management, S13 §5.2).
+#
+# Content sources: seed/catalogue.json (outputs, DOING `every_link_exists`, DONE
+# `phase_unchanged_since_readying`) and n8n-designs/design/choices/v4 — model.md §6 (every project phase
+# has its own sign-off, R15; closing a phase triggers the next phase or asks the user to approve it) and
+# R352 (the DONE agent receives the closing phase and the type's remaining phases and returns
+# `next_phase` + `next_phase_reason`; "Phase order" validates the choice and falls back to the type's
+# next entry). v4 carries NO inspect.criteria for this capability, so each silent stage gets one
+# criterion derived from that prose, marked `derived` below. Ladder: READY = readying + the move;
+# DOING/QA/DONE = four agents (readying → doing → inspecting → releasing) + the move.
+card_type: project_phase_closure
+capability: project_management
+outputs:
+  - report_artifact_id
+
+agent:
+  key: project_phase_closure
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: project_phase_closure.ready
+    title: Project phase closure — definition of ready
+    definition_of_ready: {checks: [phase_work_finished]}
+    definition_of_done: {checks: [signoff_requested]}
+    acceptance_criteria:
+      # derived: model.md §6 — a phase is closed over its cards, so their lanes are what makes it ready
+      - {name: phase_work_finished, text: "Every card the phase plan created for this phase is in a terminal lane, and each card left unfinished is named in the closure with what remains."}
+      # derived: R15 — a separate sign-off per project phase
+      - {name: signoff_requested, text: "The card asks the user to approve the phase, or states why this phase needs no approval."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: project_phase_closure.doing
+    title: Project phase closure — definition of doing
+    definition_of_ready: {checks: [signoff_requested]}
+    definition_of_done: {checks: [every_link_exists, report_accounts_for_every_card]}
+    acceptance_criteria:
+      - {name: every_link_exists, text: "Every link the phase report makes to a card, an artifact or an RM asset resolves to something that exists."}
+      # derived: R342 (1) — the phase holds its own coverage card, so the report cannot be card-blind
+      - {name: report_accounts_for_every_card, text: "The phase report accounts for every card in the phase, including the phase's coverage card and any card abandoned during the phase, and names the lane each one closed in."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: project_phase_closure.qa
+    title: Project phase closure — definition of QA
+    definition_of_ready: {checks: [report_accounts_for_every_card]}
+    definition_of_done: {checks: [report_matches_phase, capability_acceptance_met]}
+    acceptance_criteria:
+      # derived: model.md §6 — the report describes this phase, not the project
+      - {name: report_matches_phase, text: "The report's cards, outcomes and carried-over items are the phase's own, read again from the board at QA time rather than taken from the report."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the project_phase_closure card type carries is true of the phase report and the phase's board state."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: project_phase_closure.done
+    title: Project phase closure — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [next_phase_valid]}
+    acceptance_criteria:
+      - {name: phase_unchanged_since_readying, text: "The project's RM phase is still the phase this card opened against; no other card moved it while the closure ran."}
+      # derived: R352 — the closure names the next phase; "Phase order" then validates it
+      - {name: next_phase_valid, text: "The next phase is a later phase of the project's type or `project_closure`, its reason is recorded, and an invalid or missing choice falls back to the type's next entry instead of moving the project anywhere else."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: project_phase_closure.system
+    title: Project phase closure — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: project_phase_closure.READY
+    list: ready
+    title: Project phase closure — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: project_phase_closure
+        sop: project_phase_closure.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_phase_closure.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: project_phase_closure.DOING
+    list: doing
+    title: Project phase closure — doing
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_phase_closure.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: project_phase_closure.QA
+    list: qa
+    title: Project phase closure — QA
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_phase_closure.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: project_phase_closure.DONE
+    list: done
+    title: Project phase closure — done
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_closure, sop: project_phase_closure.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_phase_closure.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

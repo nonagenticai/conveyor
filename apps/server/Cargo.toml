@@ -1,0 +1,51 @@
+[package]
+name = "conveyor-server"
+description = "The conveyor composition root: serve | migrate | worker | admin."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "conveyor_server"
+path = "src/lib.rs"
+
+[[bin]]
+name = "conveyor"
+path = "src/main.rs"
+
+[dependencies]
+axum = { workspace = true }
+# The S17 driver hands the eval log to the object store as `Bytes`.
+bytes = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+conveyor-actions = { path = "../../crates/actions" }
+conveyor-api = { path = "../../crates/api" }
+conveyor-auth = { path = "../../crates/auth" }
+# S13: the relay publishes to the care-bus and the worker consumes it (CONTRACT §7).
+conveyor-bus = { path = "../../crates/bus" }
+conveyor-domain = { path = "../../crates/domain" }
+conveyor-store = { path = "../../crates/store" }
+# The S17 sandbox talks to the Kubernetes API directly (no `kube`: five REST calls), and the
+# SSE gate reads a stream chunk by chunk from a real socket.
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+regex = { workspace = true }
+# The eval audit writes its control scores as `NUMERIC`; the conversion stays in Rust.
+rust_decimal = { workspace = true }
+# The sandbox Job name's truncation hash.
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+sqlx = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+tower = { workspace = true }
+# `documents_purge` hashes the seeded bytes so the row and the object agree — `sha2` is a
+# normal dependency now (the sandbox Job name's truncation hash), so the test reuses it.

@@ -1,0 +1,169 @@
+# project_phase_start — plans a phase and creates its cards (project_management, S13 §5.2).
+#
+# Content sources: seed/catalogue.json (outputs, READY `card_phase_is_rm_phase` and
+# `allowed_card_types_not_empty`, DOING `every_goal_has_a_card` and `every_card_has_a_goal`) and
+# n8n-designs/design/choices/v4 — model.md §6 (the card decides per phase which capabilities and card
+# types are needed and creates that phase's initial set of cards; the type × phase matrix is a catalogue
+# of what MAY exist, not the plan, R340/R341), capability-flows.md §12 (READY consults every candidate
+# capability, DOING takes each capability's plan with involvement/purpose/rigor/complexity/order and the
+# seam links, DONE creates the cards with their `requires`), R342 (1) (the phase's coverage card is
+# created before the real cards) and R348 (4) (an empty phase plan is skipped inline, with no closure
+# card). v4 carries NO inspect.criteria for this capability, so silent stages get derived criteria,
+# marked `derived` below. Ladder: READY = readying + the move; DOING/QA/DONE = four agents
+# (readying → doing → inspecting → releasing) + the move.
+card_type: project_phase_start
+capability: project_management
+outputs:
+  - plan_artifact_id
+
+agent:
+  key: project_phase_start
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: project_phase_start.ready
+    title: Project phase start — definition of ready
+    definition_of_ready: {checks: [card_phase_is_rm_phase, allowed_card_types_not_empty]}
+    definition_of_done: {checks: [every_capability_consulted]}
+    acceptance_criteria:
+      - {name: card_phase_is_rm_phase, text: "The phase the card names is one of the project type's RM phases, so the plan is built for a phase the project actually runs."}
+      - {name: allowed_card_types_not_empty, text: "The project type's catalogue admits at least one card type in this phase, so a card plan can be written for it."}
+      # derived: capability-flows.md §12 / R302 — at each phase start the PM consults every capability
+      - {name: every_capability_consulted, text: "Every capability the project type catalogues for this phase was consulted for this phase, and a capability that declined is recorded as declining rather than left out."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: project_phase_start.doing
+    title: Project phase start — definition of doing
+    definition_of_ready: {checks: [every_capability_consulted]}
+    definition_of_done: {checks: [every_goal_has_a_card, every_card_has_a_goal]}
+    acceptance_criteria:
+      - {name: every_goal_has_a_card, text: "Every goal the phase plan declares has at least one card in the phase, either planned by this card or already on the board."}
+      - {name: every_card_has_a_goal, text: "Every card the phase plan creates belongs to a goal the plan declared, and no card is created outside the plan."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [plan_artifact_id]
+
+  - key: project_phase_start.qa
+    title: Project phase start — definition of QA
+    definition_of_ready: {checks: [every_card_has_a_goal]}
+    definition_of_done: {checks: [plan_dependencies_valid, capability_acceptance_met]}
+    acceptance_criteria:
+      # derived: capability-flows.md §12 / R306 — the plan's seam links and its cycle check are the gate
+      - {name: plan_dependencies_valid, text: "Every seam link runs from a capability's entry card to an exit card of a capability the plan places before it, and the plan's reduced `requires` graph has no cycle."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the project_phase_start card type carries is true of the plan and of the cards the phase now holds."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: project_phase_start.done
+    title: Project phase start — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [coverage_card_created_first, plan_cards_created]}
+    acceptance_criteria:
+      # derived: R342 (1) — coverage is visible, re-runnable and judged before the real cards exist
+      - {name: coverage_card_created_first, text: "The phase's coverage card exists and was created before the phase's real cards, so the plan it judges is the plan that ran."}
+      # derived: R348 (4) — an empty phase plan is skipped inline, never closed by a card
+      - {name: empty_phase_skipped_inline, text: "A phase whose plan names no card is skipped without a closure card and without creating any card."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: project_phase_start.system
+    title: Project phase start — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: project_phase_start.READY
+    list: ready
+    title: Project phase start — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: project_phase_start
+        sop: project_phase_start.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_phase_start.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: project_phase_start.DOING
+    list: doing
+    title: Project phase start — doing
+    outputs: [plan_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_phase_start.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: project_phase_start.QA
+    list: qa
+    title: Project phase start — QA
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_phase_start.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: project_phase_start.DONE
+    list: done
+    title: Project phase start — done
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: project_phase_start, sop: project_phase_start.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: project_phase_start.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

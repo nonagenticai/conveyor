@@ -1,0 +1,169 @@
+# function_class_reallocation — move functions and classes where the layout item says
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type function_class_reallocation: outputs and
+# acceptance) and n8n-designs/design/choices/v4/capabilities/refactoring.yaml (text "refactoring
+# scoped to reconfiguring function class layout of the repo structure", phase execution, proof
+# suite_only, test_files none, inspect criteria). The card carries one item of a structure_analysis
+# report of kind layout, so READY proves the planned paths exist and DOING proves the suite was
+# green before and after, with every caller following the moved symbols.
+card_type: function_class_reallocation
+capability: refactoring
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: function_class_reallocation
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: function_class_reallocation.ready
+    title: Function class reallocation — definition of ready
+    definition_of_ready: {checks: [planned_files_exist]}
+    definition_of_done: {checks: [workspace_imported]}
+    acceptance_criteria:
+      - {name: planned_files_exist, text: "Every file the plan names for the reallocation — the files that lose the functions or classes and the files that gain them — exists at the imported revision, or the plan explains why a destination file is new."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: function_class_reallocation.doing
+    title: Function class reallocation — definition of doing
+    definition_of_ready: {checks: [workspace_imported]}
+    definition_of_done: {checks: [suite_green_after, item_gone_at_location]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff touches only the source files, destination files and call sites the plan named, and no test file."}
+      - {name: suite_green_before, text: "The suite is green on the base revision before any function or class moves."}
+      - {name: suite_green_after, text: "The suite is green after the reallocation, unchanged, so no call site was left pointing at the old location."}
+      - {name: item_gone_at_location, text: "At the new revision the functions or classes no longer live at the path the item names, and every caller reads them from their new home."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: function_class_reallocation.qa
+    title: Function class reallocation — definition of QA
+    definition_of_ready: {checks: [item_gone_at_location]}
+    definition_of_done: {checks: [change_preserves_behaviour, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: change_preserves_behaviour, text: "Every moved function and class behaves as it did at its old location; only the module or file it lives in changed."}
+      - {name: change_removes_item, text: "The layout problem the card's structure_analysis item names (kind layout) is gone: its functions or classes now sit where the item says."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the function class reallocation card type declares is true of the final diff."}
+      - {name: removes_the_item, text: "The diff removes the misplacement the card's item names: the functions or classes move where it says and every caller follows."}
+      - {name: preserves_behaviour, text: "The diff changes no observable behaviour: each moved function and class returns the same results for the same inputs."}
+      - {name: change_is_minimal, text: "The diff changes only the moves and import rewrites the item needs, with no tidying of the moved code itself."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: function_class_reallocation.done
+    title: Function class reallocation — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request is squash-merged and the reallocation's merge sha is recorded on the card."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: function_class_reallocation.system
+    title: Function class reallocation — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: function_class_reallocation.READY
+    list: ready
+    title: Function class reallocation — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: function_class_reallocation
+        sop: function_class_reallocation.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: function_class_reallocation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: function_class_reallocation.DOING
+    list: doing
+    title: Function class reallocation — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: function_class_reallocation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: function_class_reallocation.QA
+    list: qa
+    title: Function class reallocation — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: function_class_reallocation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: function_class_reallocation.DONE
+    list: done
+    title: Function class reallocation — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: function_class_reallocation, sop: function_class_reallocation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: function_class_reallocation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

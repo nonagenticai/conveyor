@@ -1,0 +1,163 @@
+# change_impact_analysis — the magnitude and complexity of reaching the future state from the
+# current state (document archetype).
+#
+# Content sources: seed/catalogue.json (outputs + acceptance) and
+# n8n-designs/design/choices/v4/capabilities/analysis.yaml (text, phase `analysis`, upstream
+# gap_analysis, sections current_state/future_state/affected_areas/magnitude/complexity,
+# uses_repo true, signoff false, change_impact_analysis inspect.criteria). The document is
+# written into the draft READY creates, so DOING declares no new artifact; QA is the first stage
+# that leaves a new version (reviewed_artifact_id) and DONE publishes it.
+card_type: change_impact_analysis
+capability: analysis
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: change_impact_analysis
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: change_impact_analysis.ready
+    title: Change impact analysis — definition of ready
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [draft_artifact_id]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline's five sections and the questions it opens cover only the change the card describes, and name nothing the card did not ask for."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: change_impact_analysis.doing
+    title: Change impact analysis — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every claim in every section names the gap analysis, the brief version or the repository path it comes from."}
+      - {name: every_cited_source_exists, text: "Every gap analysis, artifact version and repository path a claim cites exists when the claim is written."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: change_impact_analysis.qa
+    title: Change impact analysis — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "No sentence of the document says more than the sources it cites support."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the change_impact_analysis card type carries is true of the document."}
+      - {name: affected_areas_located, text: "Every affected area names the repository paths or components it covers."}
+      - {name: magnitude_and_complexity_justified, text: "magnitude and complexity each give a rating and the reasons, taken from the affected areas."}
+      - {name: states_match_sources, text: "current_state and future_state say what the gap analysis and the brief they cite say."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id]
+
+  - key: change_impact_analysis.done
+    title: Change impact analysis — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The published document is the version QA confirmed; no section was edited after QA."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: change_impact_analysis.system
+    title: Change impact analysis — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: change_impact_analysis.READY
+    list: ready
+    title: Change impact analysis — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: change_impact_analysis
+        sop: change_impact_analysis.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: change_impact_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: change_impact_analysis.DOING
+    list: doing
+    title: Change impact analysis — doing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: change_impact_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: change_impact_analysis.QA
+    list: qa
+    title: Change impact analysis — QA
+    outputs: [reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: change_impact_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: change_impact_analysis.DONE
+    list: done
+    title: Change impact analysis — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: change_impact_analysis, sop: change_impact_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: change_impact_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

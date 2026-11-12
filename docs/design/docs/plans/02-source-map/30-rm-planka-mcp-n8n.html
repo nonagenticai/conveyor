@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>30 — Source map: RM · Planka · mcpserver · n8n · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-source-map/30-rm-planka-mcp-n8n.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="30--source-map-rm--planka--mcp_server--n8n">30 — Source map: RM · Planka · mcp_server · n8n</h1>
+<p>Reference for S00, S05, S06a, S07, S08, S13. Symbols and paths only — no line numbers. <code>UNVERIFIED</code> = not checked here; <code>PENDING-S0</code> = needs the live inventory.</p>
+<p>Pinned 2026-11-07: requirements_management local HEAD <code>9ee72ab4e178</code> (5 behind <code>origin/main</code> <code>191086942ce5</code>), kanban <code>aafb771cea4c</code> (= <code>origin/main</code>). All symbols and paths below were read from these local trees.</p>
+<hr />
+<h2 id="1-requirements_management">1. requirements_management</h2>
+<p>repo: <code>$HOME/Movies/requirements_management</code> · sha: <code>9ee72ab4e1785c5bba636df025d8e06d73eef2a5</code> · slices: [S07, S08]</p>
+<p>Measured: 28 router modules / 33 router objects, <strong>314 route decorators</strong>, <strong>56</strong> <code>__tablename__</code> literals. Mounts are unprefixed and unversioned (no <code>/api</code> anywhere in RM).</p>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>symbols</th>
+<th>what it is</th>
+<th>slice</th>
+<th>carry / do-not-carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/routers/__init__.py</code></td>
+<td><code>register_routers()</code></td>
+<td>the mount map; static/tool first, wildcard CRUD last</td>
+<td>S07/S08</td>
+<td>carry as the domain inventory</td>
+</tr>
+<tr>
+<td><code>src/routers/requirements.py</code></td>
+<td><code>router</code>, <code>/requirements</code></td>
+<td>requirement CRUD + <code>/{rid}/version</code>, <code>/versions</code>, <code>/versions/{v1}/compare/{v2}</code>, <code>/promote</code>, <code>/project-copy</code>, <code>/quality</code>, <code>/priority</code></td>
+<td>S07</td>
+<td>carry entity + revision/compare; drop promote/project-copy machinery</td>
+</tr>
+<tr>
+<td><code>src/routers/principles.py</code></td>
+<td><code>router</code>, <code>/principles</code></td>
+<td>principles with the same lifecycle</td>
+<td>S08</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>src/routers/decisions.py</code></td>
+<td><code>router</code>, <code>/decisions</code></td>
+<td>ADRs, same lifecycle</td>
+<td>S08</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>src/routers/principle_conflicts.py</code></td>
+<td><code>router</code>, <code>/principle-conflicts</code></td>
+<td>persisted conflict verdicts, read + manual dismiss</td>
+<td>S08</td>
+<td>carry table; the reconciler is already gone</td>
+</tr>
+<tr>
+<td><code>src/routers/toc.py</code></td>
+<td><code>router</code>, <code>/toc</code></td>
+<td>Dettmer LTP trees, nodes, necessity/sufficiency edges, graph, quality, <code>/config</code></td>
+<td>S08</td>
+<td>carry trees as <code>outline_node</code>; drop <code>toc_trees/nodes</code> split</td>
+</tr>
+<tr>
+<td><code>src/routers/search.py</code></td>
+<td><code>router</code>, <code>/search</code>, <code>/semantic_search</code></td>
+<td>FTS + semantic across entities</td>
+<td>S07</td>
+<td>carry as <code>search</code> module; eval set first (R2)</td>
+</tr>
+<tr>
+<td><code>src/routers/bulk.py</code></td>
+<td><code>router</code>, <code>/bulk</code>, `/requirements</td>
+<td>principles</td>
+<td>decisions/bulk`</td>
+<td>multi-entity batch ops</td>
+</tr>
+<tr>
+<td><code>src/routers/pm_programmes.py</code></td>
+<td><code>router</code>, <code>/pm/programmes</code></td>
+<td>programme portfolio</td>
+<td>S08</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>src/routers/pm_projects.py</code></td>
+<td><code>router</code>, <code>/pm/projects</code></td>
+<td>project CRUD + brief versions, capabilities/events, coach-actions, criteria, close (<code>_is_fr_close</code>)</td>
+<td>S06/S08</td>
+<td>carry project; drop the fr-only close special case</td>
+</tr>
+<tr>
+<td><code>src/routers/pm_card_ledger.py</code></td>
+<td><code>router</code>, <code>/pm/cards/{planka_card_id}/ledger</code></td>
+<td>append-only facts/claims keyed by <strong>Planka card id</strong></td>
+<td>S06</td>
+<td>do-not-carry as an external-id table (SPEC §4)</td>
+</tr>
+<tr>
+<td><code>src/routers/pm_resources.py</code> · <code>pm_risks.py</code> · <code>pm_benefits.py</code></td>
+<td><code>router</code></td>
+<td>resource, risk and benefit registers</td>
+<td>S08</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>src/routers/pm_catalogue.py</code></td>
+<td>12 routers: <code>project_phases</code>, <code>capabilities</code>, <code>card_types</code>, <code>project_types</code>, <code>catalogue</code>, <code>recipes</code>, <code>wip_limits</code>, <code>priority_levels</code>, <code>deliverable_kinds</code>, <code>milestone_kinds</code>, <code>gates</code>, <code>board_templates</code></td>
+<td>the vocabulary projects are composed from; <code>catalogue</code> imports defaults</td>
+<td>S06/S08</td>
+<td>collapse to <code>catalogue_entry(kind, code, label, meta)</code> — this is the ~20-table sprawl of SPEC §4</td>
+</tr>
+<tr>
+<td><code>src/routers/architecture_elements.py</code> · <code>_relationships</code> · <code>_views</code> · <code>_standards</code> · <code>_containers</code></td>
+<td><code>router</code> per module</td>
+<td>ArchiMate element/relationship/view/standard store; containers feed fr's queue selector</td>
+<td>S08</td>
+<td>carry model; views become flattened</td>
+</tr>
+<tr>
+<td><code>src/routers/architecture_tools.py</code></td>
+<td><code>router</code>, <code>/architecture/tools</code></td>
+<td>traceability matrix, gap/impact analysis, ADM completeness, capability heatmap, compliance, conformance, derive-relationships, generate-view</td>
+<td>S08</td>
+<td>carry as read-only computations</td>
+</tr>
+<tr>
+<td><code>src/routers/architecture_metamodel.py</code></td>
+<td><code>metamodel_router</code>, <code>viewpoints_router</code>, <code>rulesets_router</code></td>
+<td>ArchiMate 3.2 reference data generated from Archi 5.10.0 + rule catalogue</td>
+<td>S08</td>
+<td>carry <code>src/data/archimate/3.2/registry.json</code> as data</td>
+</tr>
+<tr>
+<td><code>src/routers/modeling_models.py</code></td>
+<td><code>router</code>, <code>validation_runs_router</code>, <code>change_sets_router</code>, <code>trace_links_router</code></td>
+<td>language-neutral model store: revisions, publications, reviews, validation runs/findings, change sets, trace links</td>
+<td>S08</td>
+<td>do-not-carry the five-table sprawl → one <code>revision</code></td>
+</tr>
+<tr>
+<td><code>src/routers/modeling_exchange.py</code></td>
+<td><code>exchange_router</code>, <code>view_render_router</code></td>
+<td>ArchiMate exchange import/export + view render</td>
+<td>S08</td>
+<td>carry as <code>render</code></td>
+</tr>
+<tr>
+<td><code>src/routers/modeling_document_export.py</code></td>
+<td><code>router</code></td>
+<td>one PDF page / zipped SVG per view or diagram</td>
+<td>S08</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>src/routers/uml_models.py</code></td>
+<td><code>router</code>, <code>revision_render_router</code></td>
+<td>UML 2.5.1 subset: elements, relationships, interactions, diagrams, objects, connections, render</td>
+<td>S08</td>
+<td>carry (flattened)</td>
+</tr>
+<tr>
+<td><code>src/routers/uml_tools.py</code></td>
+<td><code>router</code></td>
+<td>stateless UML validation</td>
+<td>S08</td>
+<td>carry as a pure domain check</td>
+</tr>
+<tr>
+<td><code>src/routers/integration_tools.py</code></td>
+<td><code>router</code>, <code>/integration/tools</code></td>
+<td><code>gap-to-workpackages</code>, <code>requirement-trace</code></td>
+<td>S07</td>
+<td>carry requirement→card trace</td>
+</tr>
+<tr>
+<td><code>src/routers/health.py</code></td>
+<td><code>router</code></td>
+<td><code>/health</code>, <code>/health/live</code>, <code>/health/ready</code>; public</td>
+<td>S02</td>
+<td>carry</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Models (<code>src/models/</code>).</strong> Tables: <code>requirements</code>, <code>principles</code>, <code>decisions</code>, <code>principle_conflicts</code>, <code>quality_evaluations</code>, <code>idempotency_keys</code>; <code>toc_trees</code>, <code>toc_nodes</code>, <code>toc_settings</code>; <code>architecture_elements</code>, <code>architecture_relationships</code>, <code>architecture_views</code> (+ <code>_view_objects</code>, <code>_view_connections</code>), <code>architecture_standards</code>, <code>architecture_element_realisation_bindings</code>; <code>modeling_models</code>, <code>modeling_model_revisions</code>, <code>modeling_publications</code>, <code>modeling_reviews</code>, <code>modeling_validation_runs</code>, <code>modeling_validation_findings</code>, <code>modeling_change_sets</code>, <code>modeling_trace_links</code>; <code>uml_elements</code>, <code>uml_relationships</code>, <code>uml_interactions</code>, <code>uml_diagrams</code> (+ objects, connections); and the <code>pm_*</code> family — projects, programmes, resources, risks, benefits, the catalogue set in §1, card ledger, brief versions, coach actions and the capability/phase event tables.</p>
+<p><strong><code>entity_version_history</code></strong> (<code>src/models/version_history.py</code>) is the one table with <strong>no <code>tenant_id</code></strong>, excluded from RLS and reached only via scoped parents. Do not carry the table or its policy exception; one <code>revision</code> row per mutation covers it (SPEC §4).</p>
+<hr />
+<h2 id="2-kanban-planka">2. kanban (Planka)</h2>
+<p>repo: <code>$HOME/Movies/kanban</code> · sha: <code>aafb771cea4c3e9f7a51363fd4a3920b2f719936</code> · slices: [S05, S06]</p>
+<p><strong>Identity correction — load-bearing.</strong> This checkout is <code>nonagenticai/kanban-mcp</code> (<code>mcp-kanban</code> 0.1.0), an MCP wrapper over Planka 2.0 — <strong>not</strong> the <code>planka-private</code> fork. <code>planka/</code> holds only <code>.env</code>/<code>.vscode</code> and is EMPTY otherwise; there is no <code>server/db</code> or model source on this machine. The deployed image is <code>registry.example.com:5000/planka-private:latest</code> (gitops <code>gitops-production/clusters/strato/services/kanban/deployment.yaml</code>), built elsewhere. ⇒ <strong>The fork's source is not local, so S05 must port from two measured sources, not from code:</strong> (1) <code>docs/openapi.json</code>, <strong>PLANKA API <code>2.0.0-rc.4</code>, 67 paths</strong>, base <code>/api</code> — the wire contract; and (2) the <strong>live <code>kanban</code> Postgres schema</strong>, introspected at S05 — it is the <strong>column/FK/index authority</strong>; <code>50-schema-inventory.md</code> carries the 33 table names, not their columns. Anything the fork does that neither reveals is <code>UNVERIFIED</code> and must be measured at S05 against the running instance, not guessed.</p>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>symbols</th>
+<th>what it is</th>
+<th>slice</th>
+<th>carry / do-not-carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docs/openapi.json</code></td>
+<td><code>Card</code>, <code>List</code>, <code>Board</code>, <code>TaskList</code>, <code>CustomFieldValue</code>, <code>Label</code>, <code>Comment</code>, <code>BoardMembership</code></td>
+<td>the authoritative field shapes</td>
+<td>S05</td>
+<td>carry as port source</td>
+</tr>
+<tr>
+<td><code>/projects</code>, <code>/projects/{id}</code>, <code>/projects/{projectId}/boards</code>, <code>/boards/{id}</code></td>
+<td><code>Board</code></td>
+<td>project → board</td>
+<td>S05</td>
+<td>carry; kills the board↔︎project round-trip</td>
+</tr>
+<tr>
+<td><code>/boards/{boardId}/lists</code>, <code>/lists/{id}</code>, <code>/lists/{id}/sort</code>, <code>/clear</code>, <code>/move-cards</code></td>
+<td><code>List</code> = <code>{boardId, type, position, name, color}</code></td>
+<td>the lists</td>
+<td>S05</td>
+<td>carry; <code>List.type</code> is what SPEC §6's <code>kind</code> maps onto</td>
+</tr>
+<tr>
+<td><code>/cards/{id}</code>, <code>/lists/{listId}/cards</code>, <code>/cards/{id}/duplicate</code></td>
+<td><code>Card</code> = <code>{listId, prevListId, isClosed, listChangedAt, dueDate, isDueCompleted, stopwatch, position, name, description, type}</code></td>
+<td>the cards</td>
+<td>S05</td>
+<td>carry; <strong>no <code>state</code> column</strong> — state is <code>listId</code> + <code>isClosed</code></td>
+</tr>
+<tr>
+<td><code>/boards/{id}/labels</code>, <code>/cards/{cardId}/card-labels</code></td>
+<td><code>Label</code></td>
+<td>labels</td>
+<td>S05</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>/board-memberships/{id}</code>, <code>/boards/{boardId}/board-memberships</code></td>
+<td><code>BoardMembership</code> = <code>{role, canComment}</code></td>
+<td>board memberships</td>
+<td>S05/S06</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>/cards/{cardId}/comments</code>, <code>/comments/{id}</code></td>
+<td><code>Comment</code> = <code>{cardId, userId, text}</code></td>
+<td>comments</td>
+<td>S05</td>
+<td>carry (single store)</td>
+</tr>
+<tr>
+<td><code>/cards/{cardId}/custom-field-values/…</code>, <code>/custom-field-groups/…</code>, <code>/custom-fields/{id}</code></td>
+<td><code>CustomFieldValue</code> = <code>{cardId, customFieldGroupId, customFieldId, content}</code></td>
+<td>custom field values</td>
+<td>S05</td>
+<td>carry values; flatten groups/fields</td>
+</tr>
+<tr>
+<td><code>/webhooks</code>, <code>/webhooks/{id}</code></td>
+<td><code>events</code>, <code>excludedEvents</code>, <code>url</code>, <code>accessToken</code></td>
+<td>instance-wide, admin-only webhooks</td>
+<td>S05</td>
+<td>carry payload+semantics; drop admin-only instance scoping</td>
+</tr>
+<tr>
+<td><code>/cards/{cardId}/task-lists</code>, <code>/task-lists/{taskListId}/tasks</code>, <code>/tasks/{id}</code></td>
+<td><code>TaskList</code></td>
+<td>task lists</td>
+<td>S05</td>
+<td>carry</td>
+</tr>
+<tr>
+<td>card move</td>
+<td><code>PATCH /cards/{id}</code>, <code>/lists/{id}/move-cards</code></td>
+<td>list change</td>
+<td>S05</td>
+<td>carry as <code>cards.move</code></td>
+</tr>
+<tr>
+<td>due dates</td>
+<td><code>Card.dueDate</code>, <code>isDueCompleted</code></td>
+<td>due dates</td>
+<td>S05</td>
+<td>carry</td>
+</tr>
+<tr>
+<td>stopwatch</td>
+<td><code>Card.stopwatch</code> (<code>startedAt</code>, <code>total</code>)</td>
+<td>per-card time</td>
+<td>S05</td>
+<td>carry <strong>read-only</strong></td>
+</tr>
+<tr>
+<td><code>/cards/{cardId}/attachments</code>, <code>/attachments/{id}</code>; <code>/cards/{cardId}/card-memberships</code></td>
+<td>—</td>
+<td>attachments; card-level memberships</td>
+<td>—</td>
+<td><strong>OUT</strong> (SPEC §2)</td>
+</tr>
+<tr>
+<td><code>/notifications</code>, <code>/notification-services</code>, <code>/terms/{type}</code>, <code>/users</code>, <code>/access-tokens</code>, <code>/config/test-smtp</code>, <code>/background-images</code>, <code>/project-managers</code></td>
+<td>—</td>
+<td>not in the used-feature list</td>
+<td>—</td>
+<td>S0 decides; default drop</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Webhook payload (S05 ports this).</strong> Planka POSTs <code>{event, data, prevData, user}</code> to the webhook URL, with <code>Authorization: Bearer &lt;accessToken&gt;</code> when the webhook has one. Event names are strings such as <code>cardCreate</code>, <code>cardUpdate</code>, <code>cardDelete</code>; on the wire <code>events</code> / <code>excludedEvents</code> are <strong>comma-separated</strong> (the REST API takes/returns arrays). Sources: <code>operations/webhooks.ts</code>, <code>mcpServer.ts</code> (<code>mcp_kanban_webhook_manager</code>). <code>UNVERIFIED</code>: the per-event <code>data</code> envelope — it lives in the fork, which is not checked out here.</p>
+<hr />
+<h2 id="3-nonagenticai_mcp_server-the-s06a-conformance-gate">3. nonagenticai_mcp_server (the S06a conformance gate)</h2>
+<p>repo: <code>$HOME/Movies/nonagenticai_mcp_server</code> · sha: <code>dd2cabf6c2de6b2f9ac16917970c52eab1c7ad57</code> · slices: [S06a, S04, S14]</p>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>symbols</th>
+<th>what it is</th>
+<th>slice</th>
+<th>carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/external/signing.py</code></td>
+<td><code>sign</code>, <code>verify</code>, <code>_digest</code>, <code>SKEW_SECONDS</code>, <code>SIGNATURE_HEADER</code>, <code>TIMESTAMP_HEADER</code>, <code>IDEMPOTENCY_HEADER</code></td>
+<td>the HMAC scheme, both directions</td>
+<td>S06a</td>
+<td>reimplement byte-identically</td>
+</tr>
+<tr>
+<td><code>src/external/fr.py</code></td>
+<td><code>FrAdapter</code>, <code>FrCommandAdapter</code>, <code>INBOUND_PATH</code>, <code>TEXT_LIMIT</code>, <code>FR_COMMANDS</code>, <code>decision_text</code>, <code>FrRefusedError</code></td>
+<td>outbound client: envelope, grammar, status mapping</td>
+<td>S06a</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>src/routers/fr_channel.py</code></td>
+<td><code>events</code>, <code>verify</code>, <code>EVENT_TYPES</code>, <code>START_ACTION</code>, <code>START_ENDINGS</code>, <code>_approval</code>, <code>_message</code></td>
+<td>inbound events receiver, 204 semantics</td>
+<td>S06a</td>
+<td>carry</td>
+</tr>
+<tr>
+<td><code>tests/test_fr_adapter.py</code>, <code>tests/test_fr_channel_events.py</code></td>
+<td>sign/verify roundtrip; 401/413/503/204, replay, tombstone, first-report-wins</td>
+<td>pin both directions</td>
+<td>S06a</td>
+<td>port as the conformance suite</td>
+</tr>
+<tr>
+<td><code>src/config.py</code></td>
+<td><code>fr_base_url</code>, <code>fr_channel_secret</code>, <code>env_prefix="MCP_"</code></td>
+<td>env names</td>
+<td>S06a</td>
+<td><code>MCP_FR_BASE_URL</code>, <code>MCP_FR_CHANNEL_SECRET</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>HMAC (exact).</strong> Canonical string is <code>&lt;unix-seconds-timestamp&gt;.&lt;raw-body-bytes&gt;</code>, HMAC-SHA256 keyed by the shared secret, hex, prefixed <code>sha256=</code>. Headers: <code>X-Channel-Timestamp</code> (ASCII digits) and <code>X-Channel-Signature: sha256=&lt;hex&gt;</code>; the sender also sets <code>Idempotency-Key</code> (a uuid4) but this receiver does <strong>not</strong> validate it. Tolerance is <strong>±300 s</strong> (<code>SKEW_SECONDS = 300</code>). The body is verified as <strong>raw bytes as transmitted</strong> — re-serializing breaks it; header lookup is case-insensitive. Secrets: fr side <code>FR_MCP_CHANNEL_SECRET</code>, mcp side <code>MCP_FR_CHANNEL_SECRET</code>; base URL <code>MCP_FR_BASE_URL</code>.</p>
+<p><strong>Inbound (mcp → fr).</strong> <code>POST {MCP_FR_BASE_URL}/api/webhooks/mcp/incoming</code>. JSON envelope <code>{address, text, correlation_id}</code> plus optional <code>job</code>, <code>on_behalf_of</code>, serialized compact and <code>sort_keys=True</code>. Grammar (text, max <strong>4000</strong> chars, fr <code>MAX_TEXT</code>): <code>projects.create {json}</code> (<code>title</code> and <code>project_type</code> required; passthrough <code>description</code>, <code>problem_statement</code>, <code>desired_outcome</code>, <code>repository_url</code>), <code>projects.get {"id"}</code>, <code>projects.close {"id"}</code>, <code>approve &lt;approvalId&gt; [comment]</code>, <code>reject &lt;approvalId&gt; [reason]</code>. Identity is the envelope <code>address</code>: an <code>agent:&lt;tenant_id&gt;</code> address must equal the run's tenant (else <code>actor_tenant_mismatch</code>).</p>
+<p><strong>Response vocabulary</strong> — HTTP 200 body <code>status</code> ∈ <code>result</code> | <code>pending-approval</code> | <code>no-action</code> | <code>error</code> | <code>unknown-sender</code>; plus <code>result.project_id</code>, <code>approvalId</code>, <code>code</code>. Client mapping: <code>unknown-sender</code> → <code>actor_unresolved</code>; <code>no-action</code>/<code>error</code> → sanitized <code>code</code> (<code>^[a-z_]{1,64}$</code>); non-JSON or non-object → <code>external_result_invalid</code>; 5xx → <code>fr_unavailable</code>; other HTTP → <code>fr_rejected</code>.</p>
+<p><strong>Outbound (fr → mcp).</strong> <code>POST {MCP_EVENTS_URL}/api/channels/fr/events</code>, same signing. ⚠️ The outbound URL is <strong><code>MCP_EVENTS_URL</code></strong>, not <code>MCP_FR_BASE_URL</code> — the latter points at fr itself, so a sender built on it has no destination. Measured 2026-11-07: fr's backend deployment carries <code>MCP_EVENTS_URL=http://mcp.mcp.svc.cluster.local:8033/api/channels/fr/events</code>. Body <code>type</code> ∈ <code>approval.requested</code> | <code>approval.closed</code> | <code>message</code>; <strong>all three also carry <code>type</code> and <code>address</code></strong>. Measured from the emitter (<code>fr/backend/src/domain/engagement/adapters/mcp.ts:34-67</code>, pinned <code>6f7c5097</code>): <code>approval.requested</code> carries <code>approval_id, project_id, tenant_id, correlation_id, kind, description, change_summary, impact_analysis, proposed_answer, proposed_answer_note, allowed_decisions, deblock_actions, expires_at, text</code> (<code>change_summary</code>/<code>impact_analysis</code>/<code>proposed_answer</code>/<code>proposed_answer_note</code>/<code>deblock_actions</code> optional; <code>allowed_decisions</code> is <code>['approved','rejected']</code>; <code>text</code> is the numbered menu every channel sends); <code>approval.closed</code> carries <code>approval_id, project_id, tenant_id, correlation_id, final_status</code>; <code>message</code> carries <code>correlation_id</code>, <code>kind</code> (<code>approval-request</code> | <code>action-result</code> | <code>action-error</code> | <code>text</code> | <code>report</code>), <code>text</code> and <code>meta</code> (<code>approvalId</code>, <code>actionName</code>, <code>result.project_id</code>, <code>outcome</code>). The mcp receiver reads only <code>approval_id</code>, <code>expires_at</code> and <code>project_id</code>/<code>correlation_id</code> (the last two via <code>_runs</code>/<code>_record</code>); the remaining fields are carried for parity, not consumed.</p>
+<p><strong>204 + idempotent close.</strong> Every accepted event answers <strong>204 with an empty body</strong> — including malformed JSON and unknown <code>type</code>. Errors are 413 (<code>payload_too_large</code>, &gt;64 KiB), 503 (<code>channel_unconfigured</code>), 401 (<code>invalid_signature</code>). Close is idempotent in both directions: <code>inputs.close_everywhere(approval)</code> fans out and a per-run tombstone means a late <code>approval.requested</code> for a closed approval is ignored; <code>_record</code> is a conditional <code>UPDATE</code> that only writes when <code>external_ref</code> has neither <code>project_id</code> nor <code>start_outcome</code> — <strong>first report wins</strong>. A start approval closed as <code>rejected</code>/<code>expired</code>/<code>voided</code> records <code>start_outcome</code>; an approved start records <code>project_id</code>.</p>
+<p><strong>Cutover changes</strong> are exactly two values: <code>MCP_FR_BASE_URL</code> and the secret. Nothing else in mcp_server changes.</p>
+<hr />
+<h2 id="4-n8n-node-packages">4. n8n node packages</h2>
+<p>repo: <code>$HOME/Movies/n8n_separated_modules</code> (plain bundle dir, <strong>no <code>.git</code></strong>) · sha: <code>n/a</code> — per-clone: <code>n8n-nodes-fr a6ac51d</code>, <code>n8n-nodes-kanban eca73b4</code>, <code>n8n-nodes-requirements 13d94c6</code>, <code>n8n-nodes-coding 0abcea3</code>, <code>n8n-nodes-artifacts f90f1da</code>, <code>n8n-nodes-mcp da2890f</code>, <code>n8n-nodes-workflows a6dfd9b</code>, <code>n8n-nodes-observability 09a515f</code>, <code>license-validator 0d27fc3</code>; scripts repo <code>$HOME/Movies/n8n_module_scripts b7dad4f</code> · slices: [S13, S04, S00]</p>
+<p>SPEC §2 claims 24 <code>n8n-nodes-*</code> repos; <strong>8 are cloned here</strong> (<code>ls -d n8n_separated_modules/n8n-nodes-* | wc -l</code> = 8: artifacts, coding, fr, kanban, mcp, observability, requirements, workflows), <strong>the other 16 are <code>PENDING-S0</code></strong> (org repo listing / npm). <code>license-validator</code> is also local but is <strong>not</strong> an <code>n8n-nodes-*</code> package — 9 local packages in total, 8 of them <code>n8n-nodes-*</code>. ⛔ S13/S04 must not infer that an operation exists or does not exist from this table: a package that is not cloned is <strong>unmeasured</strong>, not absent.</p>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>symbols</th>
+<th>what it is</th>
+<th>slice</th>
+<th>carry / do-not-carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n8n-nodes-fr/nodes/Fr/resources</code></td>
+<td><code>andon</code>, <code>approvals</code>, <code>auth</code>, <code>cards</code>, <code>comments</code>, <code>decompositions</code>, <code>documents</code>, <code>katas</code>, <code>metrics</code>, <code>projects</code>, <code>webhooks</code>, <code>_legacy</code></td>
+<td>the fr write surface as n8n sees it</td>
+<td>S04</td>
+<td>use as the action-name source; drop <code>_legacy</code></td>
+</tr>
+<tr>
+<td><code>n8n-nodes-kanban/nodes/Planka/operations</code></td>
+<td><code>action</code>, <code>attachment</code>, <code>baseCustomFieldGroup</code>, <code>board</code>, <code>card</code>, <code>comment</code>, <code>config</code>, <code>customField</code>, <code>customFieldGroup</code>, <code>customFieldValue</code>, <code>label</code>, <code>list</code>, <code>membership</code>, <code>notification</code>, <code>notificationService</code>, <code>project</code>, <code>projectManager</code>, <code>task</code>, <code>taskList</code>, <code>terms</code>, <code>user</code>, <code>webhook</code></td>
+<td>every Planka call the flows make</td>
+<td>S05</td>
+<td>keep the in-scope subset only</td>
+</tr>
+<tr>
+<td><code>n8n-nodes-requirements/nodes/Requirements/resources</code></td>
+<td>40 resources mirroring the RM routers (<code>requirements</code>, <code>principles</code>, <code>decisions</code>, <code>toc</code>, <code>architecture-*</code>, <code>modeling</code>, <code>pm-*</code>, <code>uml</code>, <code>search</code>, <code>quality</code>)</td>
+<td>RM as n8n sees it — a cross-check on the §1 mount map</td>
+<td>S07/S08</td>
+<td>confirms no RM domain is missed</td>
+</tr>
+<tr>
+<td><code>n8n-nodes-coding/nodes/Coding/resources</code></td>
+<td>~60 resources (analysis, workspaces, parity, security, jobs)</td>
+<td>coding fleet, <strong>not absorbed</strong> (D14)</td>
+<td>—</td>
+<td>external actions via OpenAPI ingest</td>
+</tr>
+<tr>
+<td><code>n8n-nodes-artifacts/…/Artifacts</code></td>
+<td><code>artifacts</code></td>
+<td>not absorbed</td>
+<td>—</td>
+<td>external action</td>
+</tr>
+<tr>
+<td><code>n8n-nodes-mcp/…/Mcp</code></td>
+<td><code>audit</code>, <code>tools</code>, <code>tool-versions</code>, <code>default</code></td>
+<td>MCP gateway client</td>
+<td>S04</td>
+<td>reference only</td>
+</tr>
+<tr>
+<td><code>n8n-nodes-workflows/…/Workflows</code></td>
+<td><code>execution</code>, <code>webhook</code>, <code>workflow</code></td>
+<td>n8n managing itself</td>
+<td>S13</td>
+<td>dies with n8n</td>
+</tr>
+<tr>
+<td><code>n8n-nodes-observability/…/Observability</code></td>
+<td><code>grafana</code>, <code>loki</code>, <code>metering</code>, <code>prometheus</code>, <code>pushgateway</code></td>
+<td>read-only display</td>
+<td>S09</td>
+<td>external</td>
+</tr>
+<tr>
+<td><code>license-validator</code></td>
+<td>credential helper</td>
+<td>node licence auth</td>
+<td>S04</td>
+<td>replaced by <code>RequireLicence</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Counts CONFIRMED against the live DB (2026-11-07, <code>sudo -u postgres psql -d n8n</code>):</strong> <code>workflow_entity</code> = <strong>348 rows, 332 active</strong> (<code>activeVersionId</code> set on 332). Measured split: <strong>280</strong> card-type × list matrix flows (<strong>276 active</strong>; 70 each of <code>.READY</code>/<code>.DOING</code>/<code>.QA</code>/<code>.DONE</code>), <strong>51</strong> <code>cap.*</code> (51 active), <strong>10</strong> <code>zz.*</code> (<strong>0 active</strong>), and <strong>7 other</strong> — 5 active (<code>conveyor.start</code>, <code>ask_fr</code>, <code>wip.pull</code>, <code>kata.open</code>, <code>err.card</code>) and 2 inactive (<code>dispatcher</code>, a <code>PROBE</code> workflow). The remaining S0 task is the <strong>per-flow operation census</strong>: record, per flow, the fr/RM/Planka operations it calls by parsing <code>workflow_entity.nodes</code> (json). ⚠️ Use the DB, not the public API — the API paginates at 250. Node-type census across all 348 (2026-11-07): <code>code</code> 3113, <code>kanban.planka</code> 2904, <code>if</code> 1244, <code>langchain.agent</code> 941, <code>executeWorkflow</code> 915, <code>coding.codingTool</code> 756, <code>requirements.requirements</code> 746, <code>coding.coding</code> 586, <code>requirements.requirementsTool</code> 430, <code>artifacts.artifactsTool</code> 372, <code>webhook</code> 287.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/02-source-map/30-rm-planka-mcp-n8n.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

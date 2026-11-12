@@ -1,0 +1,162 @@
+# architecture_task — the task, how it is evaluated, and its directive for the subtasks (v4 R343, design phase).
+#
+# Content sources: seed/catalogue.json (card_type architecture_task: outputs, acceptance and its
+# definition_of_done `asset_persisted`) and
+# n8n-designs/design/choices/v4/capabilities/architecture.yaml (text, sections, upstream
+# architecture_epic, inspect.criteria). The card changes no code: it is persisted as the asset its
+# subtasks read, which is why DONE also checks that the record exists.
+card_type: architecture_task
+capability: architecture
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: architecture_task
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: architecture_task.ready
+    title: Architecture task — definition of ready
+    definition_of_ready: {checks: [epic_directive_present]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline holds only the task's three sections — task, evaluation_method and directive_for_subtasks — and adds nothing the epic did not ask for."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: architecture_task.doing
+    title: Architecture task — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every statement about the task and how it is evaluated cites the epic directive, repository path or document it rests on."}
+      - {name: every_cited_source_exists, text: "Every cited source exists at the commit the card fixed and supports the task's reading of it."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id, reviewed_artifact_id]
+
+  - key: architecture_task.qa
+    title: Architecture task — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, task_follows_epic, evaluation_is_checkable, directive_actionable, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "The task states no requirement, evaluation rule or instruction that no cited source supports."}
+      - {name: task_follows_epic, text: "task follows the upstream epic's directive_for_tasks."}
+      - {name: evaluation_is_checkable, text: "evaluation_method says how to check that the task is done."}
+      - {name: directive_actionable, text: "directive_for_subtasks tells the subtasks what to do, in steps they can act on."}
+      - {name: capability_acceptance_met, text: "The task meets every acceptance statement the architecture_task card type declares."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id, published_artifact_id]
+
+  - key: architecture_task.done
+    title: Architecture task — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version, asset_persisted]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The task published to its subtasks is the version QA approved; no evaluation rule or directive changed after review."}
+      - {name: asset_persisted, text: "The task document is persisted as the asset its subtasks read; the card closes only once that record exists."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: architecture_task.system
+    title: Architecture task — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: architecture_task.READY
+    list: ready
+    title: Architecture task — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: architecture_task
+        sop: architecture_task.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_task.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_task.DOING
+    list: doing
+    title: Architecture task — doing
+    outputs: [draft_artifact_id, reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_task.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_task.QA
+    list: qa
+    title: Architecture task — QA
+    outputs: [reviewed_artifact_id, published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_task.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_task.DONE
+    list: done
+    title: Architecture task — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_task, sop: architecture_task.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_task.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

@@ -1,0 +1,176 @@
+# prototype_experiment — the smallest unmerged prototype that explores what a research spike found,
+# and a findings report (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type prototype_experiment: outputs commit_sha,
+# pr_number, pr_url, head_sha, fix_report_artifact_id, findings_artifact_id and acceptance
+# planned_files_allowed, diff_only_planned_files, suite_green_after, prototype_answers_question,
+# capability_acceptance_met, report_cites_evidence, recommendation_follows_result) and
+# n8n-designs/design/choices/v4/capabilities/research.yaml (archetype development, text "minimal
+# prototype development to explore research_spike results", phase preliminary, upstream
+# research_spike, merge false, source card, proof suite_only, and the two inspect.criteria
+# answers_the_question and smallest_prototype).
+#
+# Three of those v4 fields decide the shape below. `source: card` — no analysis report leads here,
+# so READY reads the scope and the test command off the card itself. `proof: suite_only` — the
+# proof is the suite run, not an acceptance test against a gap, which is why DOING judges a green
+# suite rather than a test that failed before. `merge: false` — the card opens a draft PR and DONE
+# closes on its findings report, never on a merge; the catalogue's own DONE acceptance is
+# report_cites_evidence and recommendation_follows_result, which agrees. The branch is left open
+# because the feasibility study reads the run it holds.
+card_type: prototype_experiment
+capability: research
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - findings_artifact_id
+
+agent:
+  key: prototype_experiment
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: prototype_experiment.ready
+    title: Prototype experiment — definition of ready
+    definition_of_ready: {checks: [question_named]}
+    definition_of_done: {checks: [planned_files_allowed]}
+    acceptance_criteria:
+      - {name: planned_files_allowed, text: "Every path the plan will write lies inside the repository and folder the card scopes the experiment to, on a branch of its own and never on a main line. The card is the scope here — no analysis report sits behind it — so a plan that reaches into a repository the card only reads, or a folder the card does not name, is refused before any file is written."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: prototype_experiment.doing
+    title: Prototype experiment — definition of doing
+    definition_of_ready: {checks: [planned_files_allowed]}
+    definition_of_done: {checks: [diff_only_planned_files, suite_green_after]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff holds only the prototype and the check that exercises it, at the paths READY named, so the whole experiment can be read in one short diff on a draft branch and nothing outside it moves."}
+      - {name: suite_green_after, text: "Run with the command READY recorded, the suite is green with the prototype in place: the prototype's own check passes and no test that passed before now fails. A prototype that reddens the suite has measured the damage it did, not the question it was built for."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [commit_sha, pr_number, pr_url, head_sha]
+
+  - key: prototype_experiment.qa
+    title: Prototype experiment — definition of QA
+    definition_of_ready: {checks: [diff_only_planned_files, suite_green_after]}
+    definition_of_done: {checks: [prototype_answers_question, answers_the_question, smallest_prototype, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: prototype_answers_question, text: "The question the research spike left open has a stated answer, and that answer is the one the run's output supports. A result that neither confirms nor refutes the question — inconclusive, or true only under conditions the card did not name — is not an answer, and the card stays in DOING until one exists."}
+      - {name: answers_the_question, text: "The diff and the review doing recorded answer the question taken from the research spike, not a narrower or neighbouring question the prototype happened to answer. A prototype that shows a library is fast answers a performance question only if the spike asked one."}
+      - {name: smallest_prototype, text: "The diff holds only what answering the question needs — no extra feature, no cleanup outside the question, no second experiment bundled in. Anything a later card could build is left to that card."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the prototype_experiment card type declares for READY, DOING and QA is true of the prototype and of the review doing recorded: the files stayed in the plan, the diff stayed inside them, the draft PR holds the run, and the suite is green with the prototype in place."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: prototype_experiment.done
+    title: Prototype experiment — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [report_cites_evidence, recommendation_follows_result]}
+    acceptance_criteria:
+      - {name: report_cites_evidence, text: "Every claim the findings report makes points at the commit, command or run that produced it, closely enough that a reader can repeat it and get the same result, and the report names the draft PR and head sha it leaves open so the feasibility study can return to the exact code the run used. A number with no run behind it is not evidence."}
+      - {name: recommendation_follows_result, text: "The recommendation — implement, abandon, or take to a feasibility study under stated conditions — is the one the results support, and the report names the result that decided it. A recommendation that would read the same whatever the run had produced fails this check, and none of them merges the draft PR."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [findings_artifact_id]
+
+  - key: prototype_experiment.system
+    title: Prototype experiment — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: prototype_experiment.READY
+    list: ready
+    title: Prototype experiment — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: prototype_experiment
+        sop: prototype_experiment.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: prototype_experiment.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: prototype_experiment.DOING
+    list: doing
+    title: Prototype experiment — doing
+    outputs: [commit_sha, pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: prototype_experiment.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: prototype_experiment.QA
+    list: qa
+    title: Prototype experiment — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: prototype_experiment.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: prototype_experiment.DONE
+    list: done
+    title: Prototype experiment — done
+    outputs: [findings_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: prototype_experiment, sop: prototype_experiment.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: prototype_experiment.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

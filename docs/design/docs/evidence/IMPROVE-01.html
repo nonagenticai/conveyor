@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>IMPROVE-01 — built-tree hardening, receipt · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/IMPROVE-01.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="improve-01--built-tree-hardening-receipt">IMPROVE-01 — built-tree hardening, receipt</h1>
+<p><strong>Date:</strong> 2026-11-09T06:21Z– · <strong>Session:</strong> <code>improve-01</code> · <strong>Tree:</strong> <code>$HOME/Movies/conveyor</code> (no <code>.git</code>) <strong>Lease:</strong> <code>improve-01</code>, opened 06:21Z, released with the gate below. Split tree by message with <code>s11-gates-cancel-seam</code> (S11): no <code>procedure/**</code>, <code>store/src/{run,procedure*}.rs</code>, <code>worker.rs</code>, <code>migrations/0015-0017, 0021</code> or S11 index row was touched.</p>
+<h2 id="files">Files</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/actions/tests/copilot_coverage.rs</code></td>
+<td><strong>+</strong> <code>no_proposal_triggering_action_carries_a_secret</code> and its recursive <code>x-secret</code> walker</td>
+</tr>
+<tr>
+<td><code>crates/api/tests/copilot_rounds.rs</code></td>
+<td><strong>new binary</strong> — the <code>MAX_ROUNDS</code> refusal</td>
+</tr>
+<tr>
+<td><code>crates/api/tests/copilot_crash_replay.rs</code></td>
+<td><strong>new binary</strong> — the crash-window replay</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/spec.rs</code></td>
+<td><code>AGENT_TOOLS</code> 9 → 12 (<code>boards.get</code>, <code>cards.create</code>, <code>runs.create</code>) + rationale</td>
+</tr>
+<tr>
+<td><code>crates/api/tests/mcp_agent.rs</code></td>
+<td>the run chain over <code>/mcp</code>; the inverted <code>boards.get</code> assertion; receipt carries a real <code>run_id</code></td>
+</tr>
+<tr>
+<td><code>crates/actions/src/integrations/external.rs</code></td>
+<td><code>retrieval.query</code> path <code>/query</code> → <code>/api/query</code></td>
+</tr>
+<tr>
+<td><code>crates/api/tests/externals_declared.rs</code></td>
+<td><strong>+</strong> <code>every_external_action_declares_its_services_path_prefix</code></td>
+</tr>
+<tr>
+<td><code>docs/plans/slices/S{06b,07,08,09,10}-*.md</code></td>
+<td>gate lines corrected to targets that exist (§B)</td>
+</tr>
+<tr>
+<td><code>docs/plans/00-INDEX.md</code></td>
+<td>the <code>improve-01</code> lease row</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-was-run">What was run</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>cargo test -p conveyor-actions --test copilot_coverage</code></td>
+<td><strong>3 passed</strong> (<code>no_proposal_triggering_action_carries_a_secret</code> green)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>reversal: <code>secrets.create</code> <code>confirm = "none"</code> → <code>"card"</code></td>
+<td><strong>failed by name</strong> — <code>["secrets.create (value)"]</code>; reverted</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>cargo test -p conveyor-api --test copilot_rounds</code></td>
+<td><strong>1 passed</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>cargo test -p conveyor-api --test copilot_crash_replay</code></td>
+<td><strong>1 passed</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>cargo test -p conveyor-api --test mcp_agent</code></td>
+<td><strong>2 passed</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>cargo test -p conveyor-api --test externals_declared</code></td>
+<td><strong>3 passed</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>reversal: <code>path: "/api/query"</code> → <code>"/query"</code></td>
+<td><strong>failed by name</strong> — <code>retrieval.query declares /query, but strata_rag serves under "/api"</code>; restored</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>cargo test -p conveyor-api --test copilot_{approve,proposal,replay,reap,session,surface} --test agui_parity</code></td>
+<td><strong>8 passed</strong> (S10 regression)</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>cargo test -p conveyor-actions --test registry</code> / <code>--test parity_http_mcp</code> / <code>--lib</code></td>
+<td><strong>6 / 4 / 34 passed</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>cargo test -p conveyor-store --test s07_schema</code></td>
+<td><strong>3 passed</strong> — ledger <code>[1,2,3,4,5,7..18,21]</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>cargo clippy -p conveyor-api -p conveyor-actions -p conveyor-store -p conveyor-domain --all-targets -- -D warnings</code></td>
+<td><strong>green</strong></td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>cargo run -q -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>exit 0</strong> — 209 ops unchanged</td>
+</tr>
+<tr>
+<td>13</td>
+<td>corrected <strong>S09</strong> gate (8 binaries)</td>
+<td><strong>30 passed</strong>, 0 failed</td>
+</tr>
+<tr>
+<td>14</td>
+<td>corrected <strong>S07</strong> gate (6 binaries)</td>
+<td><strong>36 passed</strong>, 0 failed</td>
+</tr>
+<tr>
+<td>15</td>
+<td>corrected <strong>S08</strong> gate (5 binaries)</td>
+<td><strong>28 passed</strong>, 0 failed</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>scripts/prove-s3.sh</code> (RustFS on <code>127.0.0.1:9000</code>)</td>
+<td><strong><code>S3_WIRE_PROVEN</code></strong> — real endpoint, path-style, SigV4</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>cargo test -p conveyor-api --test search_eval -- --ignored</code></td>
+<td><strong>1 passed</strong> — <code>full_text_beats_the_ilike_floor</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="receipt--the-s06b-run-verbatim---nocapture">Receipt — the S06b run (verbatim, <code>--nocapture</code>)</h2>
+<pre><code>S06B-RECEIPT {&quot;agent_tools&quot;:12,&quot;approval_id&quot;:&quot;01a1befc-d75a-7ee9-8867-6e76146863dd&quot;,&quot;approval_meta&quot;:{&quot;allowed_decisions&quot;:[&quot;approve&quot;,&quot;reject&quot;],&quot;description&quot;:&quot;Which of the two designs should this follow?&quot;,&quot;proposed_answer&quot;:&quot;the first&quot;},&quot;base_url&quot;:&quot;http://127.0.0.1:55851&quot;,&quot;decided_by_kind&quot;:&quot;agent&quot;,&quot;decision&quot;:&quot;approve&quot;,&quot;project_id&quot;:&quot;01a1befc-d723-7d28-9b98-e3d14230019e&quot;,&quot;run_id&quot;:&quot;01a1befc-d749-7e50-bafe-acc9a861d423&quot;,&quot;via&quot;:{&quot;channel&quot;:&quot;mcp&quot;}}</code></pre>
+<p><code>run_id</code> is non-null: the agent ran <code>projects.get</code> → <code>boards.get</code> → <code>cards.create</code> → <code>runs.create</code> over <code>/mcp</code> under its licence principal. The run is <strong>card-scoped</strong>, not S06c's project-execution task.</p>
+<h2 id="clause-table">Clause table</h2>
+<table>
+<thead>
+<tr>
+<th>clause</th>
+<th>verdict</th>
+<th>evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S10 §5.3 — a secret-bearing action cannot become proposal-triggering without redaction</td>
+<td><strong>PROVEN (fail-closed)</strong></td>
+<td>#1 + #2. The guard is over the <em>next</em> action; <code>secrets.create</code>/<code>secrets.rotate</code> are <code>confirm = "none"</code> today, so nothing is proposal-triggering and no redactor is written (an unused redactor is untested code)</td>
+</tr>
+<tr>
+<td>§17 "hard cap, never silent truncation"</td>
+<td><strong>PROVEN</strong></td>
+<td>#3: 8 recorded tool calls, 8 <code>completions.create</code> invocations, 8 stub hits, the 9th never requested, terminal <code>refused</code></td>
+</tr>
+<tr>
+<td>S10-D3 — <code>proposal:&lt;id&gt;</code> makes a retry a replay</td>
+<td><strong>PROVEN</strong></td>
+<td>#4: after the crash window the second <code>execute()</code> returns <code>Executed(same invocation)</code> and the invocation count stays 1</td>
+</tr>
+<tr>
+<td>S09 §5.5 — every external path is the service's real path</td>
+<td><strong>PROVEN</strong></td>
+<td>#6 + #7; the table covers all 7 services and panics by name on an unknown one</td>
+</tr>
+<tr>
+<td>S14 P2 — the evidence contains a <code>run_id</code></td>
+<td><strong>PROVEN (card-scoped)</strong></td>
+<td>#5 + the receipt above</td>
+</tr>
+<tr>
+<td>S07/S08/S09 gates are executable</td>
+<td><strong>PROVEN</strong></td>
+<td>#13–#15. Each block previously named 3–4 targets that do not exist</td>
+</tr>
+</tbody>
+</table>
+<h2 id="corrections-this-lane-made-to-its-own-plan--recorded-not-hidden">Corrections this lane made to its own plan — recorded, not hidden</h2>
+<ol type="1">
+<li><strong>"No new binary" was wrong.</strong> <code>crates/api/tests/copilot/mod.rs</code> states that each copilot test binary runs <strong>one</strong> test because <code>CONVEYOR_EXTERNAL_INFERENCE_URL</code> is process-global; a second test in <code>copilot_turn.rs</code> inherited the empty URL the first test sets and got a 503. Both new proofs are their own binaries (<code>copilot_rounds</code>, <code>copilot_crash_replay</code>).</li>
+<li><strong>A refused turn is HTTP 201, not 422.</strong> <code>turns.rs:209</code> returns <code>CREATED</code> for every recorded turn; the problem status is returned only for <code>failed</code>. S10 specifies <code>refused</code> as a <strong>turn status</strong>, not a status code, so the test asserts the record (<code>meta.status</code>, <code>meta.error.type</code> = <code>/problems/copilot-refused</code>, <code>error.status</code> 422). ⚠️ The asymmetry — <code>failed</code> returns its status, <code>refused</code> does not — is recorded here as an <strong>observation</strong>, not changed: altering a client-visible status without a spec is a bigger decision than this lane.</li>
+<li><strong><code>cargo test -p conveyor-store --test migrate</code> does not exist.</strong> The plan's own gate line had the defect this lane exists to remove; the migration ledger is <code>--test s07_schema</code>.</li>
+</ol>
+<h2 id="docs-corrected-the-updated-spec-and-plans-the-next-sessions-build-from">Docs corrected (the "updated spec and plans" the next sessions build from)</h2>
+<table>
+<thead>
+<tr>
+<th>where</th>
+<th>was</th>
+<th>now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>01-CONTRACT.md</code> §17</td>
+<td>refusal code <code>action-not-permitted</code></td>
+<td><code>action-not-found</code> (owner ruling; the code never had the other name)</td>
+</tr>
+<tr>
+<td><code>SPEC.md:315</code></td>
+<td>"S8 and S13 … can run in parallel once S2–S4 exist"</td>
+<td>S8 only; S13 depends on S11</td>
+</tr>
+<tr>
+<td><code>SPEC.md:315</code></td>
+<td>"S14 is blocked by two things"</td>
+<td>three — S12 was omitted</td>
+</tr>
+<tr>
+<td><code>S06b:115,132</code></td>
+<td><code>cargo test -p conveyor-actions approvals</code> (0 tests)</td>
+<td><code>--test approval_dual --test mcp_agent</code>; the vacuous line removed</td>
+</tr>
+<tr>
+<td><code>S07:173</code></td>
+<td>5 non-existent targets</td>
+<td>real targets; block run (36 tests)</td>
+</tr>
+<tr>
+<td><code>S08:315</code></td>
+<td>3 non-existent targets</td>
+<td>real targets; block run (28 tests)</td>
+</tr>
+<tr>
+<td><code>S09:192</code></td>
+<td>4 non-existent targets</td>
+<td>real targets; block run (30 tests)</td>
+</tr>
+<tr>
+<td><code>S09:251</code></td>
+<td>"the S3 wire is UNVERIFIED"</td>
+<td><strong>PROVEN</strong> by <code>scripts/prove-s3.sh</code></td>
+</tr>
+<tr>
+<td><code>S10:126</code></td>
+<td><code>cargo test -p conveyor-actions external_inference</code> (0 tests)</td>
+<td><code>--lib inference</code> (2 tests)</td>
+</tr>
+<tr>
+<td><code>00-INDEX</code> S06b / S06c / S10 / S15</td>
+<td><code>run_id</code> outstanding; S06c "plan written"; S10 redaction open; S15 no ledger</td>
+<td>all four record their ruling and this receipt</td>
+</tr>
+</tbody>
+</table>
+<h2 id="adversarial-review--disposition-wave-1-cratesactions-wave-2-cratesstoreauth">Adversarial review — disposition (wave 1: <code>crates/actions</code>, wave 2: <code>crates/store</code>+<code>auth</code>)</h2>
+<p>⛔ <strong>This lane is NOT done.</strong> The review returned findings after the gate above was green; they are recorded here with what was verified, what was fixed, and what is still owed. A finding is listed as <em>unverified</em> until someone read the code — an agent's report is a hypothesis, not a defect.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>severity</th>
+<th>finding</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>critical</td>
+<td><code>approvals.decide</code> is agent-reachable and nothing checks requester ≠ approver, so an agent can decide (or self-approve) the gate that exists to check it</td>
+<td><strong>ACCEPTED by owner ruling 2026-11-09 — no change.</strong> "The agent platform will have full execution ability through the MCP task construct and will decide on its own rules when to ask a human; the conveyor might not know whether an approval is human or agent, and that is fine." S06b's proof stands</td>
+</tr>
+<tr>
+<td>2</td>
+<td>high</td>
+<td><code>projects.close</code> is agent-reachable, <code>effect = destructive</code>, <code>confirm = none</code></td>
+<td><strong>ACCEPTED by owner ruling 2026-11-09 — no change.</strong> Same reasoning: the agent holds full execution ability; the human gate is the agent platform's own decision. ⚠️ Recorded, not silently dropped</td>
+</tr>
+<tr>
+<td>3</td>
+<td>high</td>
+<td><code>documents.update</code> merges caller <code>meta</code> over the row's, so <code>content_type</code>/<code>size_bytes</code>/<code>sha256</code> can be rewritten — an accepted PDF re-labelled <code>text/html</code> is stored XSS at the app origin</td>
+<td><strong>FIXED in code</strong> (<code>documents/actions.rs</code> now refuses those three keys in the merge). ⚠️ <strong>Regression test OUTSTANDING</strong> — needs the upload harness in <code>documents_roundtrip</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>high</td>
+<td><code>project_requests.promote</code> needs only <code>requests:write</code> (member) yet creates a project/board, bypassing admin-only <code>projects:write</code></td>
+<td><strong>UNVERIFIED</strong> — next session reads <code>governance/requests.rs</code> before acting</td>
+</tr>
+<tr>
+<td>5</td>
+<td>medium</td>
+<td><code>documents/secrets.delete</code> + <code>repositories.delete</code> take <code>If-Match</code>, then discard it (<code>let _ = expected;</code>) — the delete is unversioned, so a stale ETag destroys a concurrent change instead of 412</td>
+<td><strong>VERIFIED, NOT FIXED</strong> — needs a store <code>delete … WHERE version</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>medium</td>
+<td><code>webhooks.test</code> is <code>effect = "read"</code> but POSTs outbound, and <code>validate_url</code> accepts loopback/link-local/RFC1918 — blind SSRF from inside the mesh</td>
+<td><strong>VERIFIED, NOT FIXED</strong> — needs the effect changed <em>and</em> a resolved-address policy</td>
+</tr>
+<tr>
+<td>7–12</td>
+<td>medium/low</td>
+<td>unbounded <code>required_decisions</code>; process-global circuit breaker not keyed by tenant; upstream error text echoed in <code>detail</code>; <code>completions.create</code> declared <code>read</code> though it is a paid POST; <code>secrets.rotate</code> <code>write</code> vs <code>destructive</code>; <code>Mutex::lock().expect</code> panic-on-poison</td>
+<td><strong>UNVERIFIED</strong> — carried into the next session of this lane</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Wave 2 — <code>crates/store</code> + <code>crates/auth</code>.</strong> Its strong result first: <strong>cross-tenant leaks: clean</strong> (every <code>&amp;PgPool</code> function opens <code>begin_scoped</code>; every table except <code>tenant</code>/<code>app_user</code> is ENABLE+FORCE RLS; no query runs on <code>&amp;self.pool</code>), and <strong>panics: clean</strong> outside <code>#[cfg(test)]</code>. Five findings, none fixed:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>severity</th>
+<th>finding</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>13</td>
+<td>medium</td>
+<td><code>idempotency::begin</code> inserts <code>ON CONFLICT DO NOTHING</code>, but <code>lookup</code> treats an <strong>expired</strong> row as <code>Miss</code> → retrying a key after its 24 h expiry but before the sweep returns a permanent 409 and can never execute</td>
+<td><strong>UNVERIFIED</strong> — the fix is an <code>ON CONFLICT … DO UPDATE … WHERE expires_at &lt;= now()</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td>medium</td>
+<td>the decision UPDATE is guarded only by <code>status='pending'</code>; <strong><code>expires_at</code> is never checked</strong>, so a gate past its deadline can still be decided before <code>approval.expire</code> sweeps it</td>
+<td><strong>UNVERIFIED</strong> — add <code>AND (expires_at IS NULL OR expires_at &gt; now())</code> to the guarded update. This one is governance-significant: it decides whether an expired gate is dead</td>
+</tr>
+<tr>
+<td>15</td>
+<td>low</td>
+<td><code>DeliveryTarget</code>/<code>NewWebhook</code> derive <code>Debug</code> while holding the plaintext signing secret; <code>WebhookRecord</code> deliberately omits it, so the invariant is known</td>
+<td><strong>UNVERIFIED</strong> — latent log leak, no call site logs it today</td>
+</tr>
+<tr>
+<td>16</td>
+<td>low</td>
+<td><code>JwksCache</code> keys by <code>kid</code> only and ignores <code>url</code>, contradicting its own "one instance per issuer" doc; two realms sharing a <code>kid</code> would cross-reject</td>
+<td><strong>UNVERIFIED</strong> — latent while <code>from_config</code> wires one issuer</td>
+</tr>
+<tr>
+<td>17</td>
+<td>cosmetic</td>
+<td><code>grants-runtime.sql</code> revokes UPDATE/DELETE from the append-only tables except <code>approval_decision</code> and <code>revision</code> (UPDATE only — <code>revision</code> needs DELETE for the pruner)</td>
+<td><strong>UNVERIFIED</strong> — no reachable failure today; the grant is the boundary, not the doc</td>
+</tr>
+</tbody>
+</table>
+<h2 id="open--the-lanes-remaining-work-in-order">Open — the lane's remaining work, in order</h2>
+<ol type="1">
+<li><strong>#3's regression test</strong> (the one code fix in this batch that has no proof). Create a document, call <code>documents.update</code> with <code>meta: {"content_type": "text/html"}</code>, assert the downloaded <code>content-type</code> is unchanged and the update returns either 200-without-change or 422. Prove by reversal.</li>
+<li><strong>#4–#17: verify, then fix or write the reason.</strong> Fifteen findings, of which two are already fixed/accepted. Verify at the source before acting — an agent's report is a hypothesis (three of wave 1's were verified as stated, one suggested fix (<code>proposal_required</code>) was measured not to work).</li>
+<li><strong>The two rulings are recorded here but NOT in the <code>00-INDEX</code> decision register.</strong> They belong there too: "an agent principal may decide its own approval gate" and "the agent holds full execution ability; the human gate is the agent platform's decision" (owner, 2026-11-09). Until that row exists, this file is the only copy.</li>
+<li><strong>The lease was released at 06:38Z with the review still open.</strong> A session continuing this lane re-takes it by message; it must not edit <code>procedure/**</code>, <code>store/src/{run,procedure*}.rs</code>, <code>worker.rs</code> or <code>migrations/0021</code>.</li>
+</ol>
+<h2 id="what-this-lane-actually-proved-stated-plainly">What this lane actually proved, stated plainly</h2>
+<p>The built tree's <em>tests and gates</em> now say what they mean: S10's three unproven rules have fail-closed proofs, the S09 path defect is fixed with a guard over every service, and five slices' gates can be run for the first time. The tree's <em>code</em> is <strong>not</strong> hardened: 17 review findings exist, one is fixed, two are accepted by ruling, and fourteen are unverified. Do not read the green gate as a hardened tree.</p>
+<hr />
+<h1 id="session-2--2026-11-09-improve-01--close-review-findings">Session 2 — 2026-11-09, <code>improve-01</code> / <code>close-review-findings</code></h1>
+<p><strong>Tree:</strong> <code>$HOME/Movies/conveyor</code> (no <code>.git</code>) · <strong>lease:</strong> <code>00-INDEX.md</code> §Tree lease, opened 08:46, released with the gate at the end of this section · <strong>peer:</strong> <code>s17-benchmark-core</code> writes new <code>crates/domain/src/benchmark/**</code> files under a disjoint split; no file below is theirs, and the workspace gate was timed around their steps.</p>
+<h2 id="disposition--all-17-findings-measured">Disposition — all 17 findings, measured</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>disposition</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>NO-CHANGE</strong> — owner ruling: an agent may decide its own gate</td>
+<td>decision register, <code>00-INDEX.md</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>NO-CHANGE</strong> — owner ruling: the agent holds full execution ability; <code>projects.close</code> stays reachable</td>
+<td>decision register</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>FIXED + TEST</strong></td>
+<td><code>crates/api/tests/documents_roundtrip.rs::a_caller_cannot_rewrite_the_stored_objects_facts</code>; reversal (skip list disabled) failed naming <code>text/html</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>NO-CHANGE</strong> — owner ruling: roles are granted per tenant by the tenant-admin; <code>requests:write</code> is defined as "create, decide and promote" (<code>actions/src/spec.rs:49</code>)</td>
+<td>decision register; production provisioning of the first member is S14's</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>FIXED + TEST</strong></td>
+<td><code>delete_secret_tx</code> / <code>delete_repository_tx</code> now take the version (SELECT … FOR UPDATE, then delete); stale ETag → 412 and the row survives. Reversal (guards disabled) returned 204 for both</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>EFFECT FIXED; ADDRESS POLICY DEFERRED</strong> (owner ruling)</td>
+<td><code>webhooks.test</code> <code>effect = write</code>; unit test <code>a_test_delivery_is_declared_a_write_not_a_read</code>; reversal (read) failed. The SSRF exposure is named in the action's doc comment and below</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>FIXED + TEST</strong></td>
+<td><code>approvals.request</code> clamps <code>required_decisions</code> to <code>1..=255</code>; test <code>a_gate_cannot_require_more_decisions_than_the_bound</code> (256 → 422, 255 → 200); reversal (bound removed) created a 256-decision gate</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>FIXED + TEST</strong></td>
+<td>breaker keyed by <code>(tenant, action)</code>; test <code>one_tenants_open_breaker_does_not_refuse_another_tenant</code>; reversal (fixed key) failed</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>FIXED + TEST</strong></td>
+<td>upstream 4xx body goes to <code>tracing</code> only; test in <code>external_actions.rs</code> asserts the body is absent from <code>detail</code>; reversal (re-echoed) failed with <code>{"error":"refused"}</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>FIXED</strong></td>
+<td><code>completions.create</code> <code>effect = write</code>; unit pin updated. Lock regenerated (see corrections)</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>NO-CHANGE</strong> — owner ruling: <code>secrets.rotate</code> stays <code>write</code>; redaction would break execute because the proposal stores AND replays its input (<code>api/src/copilot/proposal.rs:188-190</code>). Proposal-input custody is the real design item</td>
+<td>decision register</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>FIXED (no test possible)</strong></td>
+<td><code>PoisonError::into_inner</code> at the breaker (3) and matrix cache (6) sites; poisoning has no honest test — recorded, not faked</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>FIXED + TEST</strong></td>
+<td><code>idempotency::begin</code> reclaims an expired row (<code>DO UPDATE … WHERE expires_at &lt;= now()</code>); test extended in <code>store/tests/audit_idempotency.rs</code>; reversal (<code>DO NOTHING</code>) failed</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>NO-CHANGE + TTL REMOVED</strong> (owner ruling: approvals never expire)</td>
+<td>copilot proposals now carry <code>expires_at = None</code>; <code>PROPOSAL_TTL_HOURS</code> deleted; <code>copilot_proposal.rs</code> asserts <code>expires_at IS NULL</code>. The opt-in sweep (S11 procedure gates, caller-supplied expiry) is untouched</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>FIXED + TEST</strong></td>
+<td>manual redacted <code>Debug</code> for <code>NewWebhook</code>/<code>DeliveryTarget</code>; unit test; reversal (secret printed) failed</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>FIXED + TEST</strong></td>
+<td><code>JwksCache</code> keyed by <code>(url, kid)</code> and refresh retains other realms; two tests; reversals failed (cross-realm key, and a wiped map after refresh)</td>
+</tr>
+<tr>
+<td>17</td>
+<td><strong>FIXED (no runtime test exists)</strong></td>
+<td><code>scripts/grants-runtime.sql</code> revokes UPDATE+DELETE on <code>approval_decision</code> and UPDATE on <code>trace_link</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="corrections-this-session-made-to-its-own-plan--recorded-not-hidden">Corrections this session made to its own plan — recorded, not hidden</h2>
+<ol type="1">
+<li><strong>#17's plan named <code>revision</code> for a revoke; that was wrong.</strong> <code>store/src/model.rs:1248</code> executes <code>UPDATE revision SET status = 'superseded'</code> when a model publishes, and <code>prune.rs:160</code> / <code>model.rs:385</code> DELETE it. Both grants are load-bearing, so <code>revision</code> is deliberately NOT revoked and the file says why.</li>
+<li><strong>#7's refusal is 422, not 400.</strong> The handler's <code>invalid()</code> maps to <code>action-invalid-input</code> (422); the test's first assertion said 400 and was corrected against the measured response.</li>
+<li><strong>#16's first test could not fail by reversal.</strong> A zero TTL forced a refetch on every call, which hides the cross-realm bug (the dangerous window is <em>known kid, still fresh</em>). Rewritten as two tests — a long-TTL cross-realm test and a short-TTL refresh-retention test — and both reversals were re-run.</li>
+<li><strong><code>effect</code> is part of the served OpenAPI.</strong> The two effect corrections drifted exactly <code>POST /api/actions/{completions.create,webhooks.test}/invocations</code>; the lock was regenerated with <code>--write-lock</code>, and <code>--check-lock</code> exits 0 at <strong>210 operations</strong>.</li>
+</ol>
+<h2 id="what-was-run-all-measured-this-session">What was run (all measured this session)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>cargo test -p conveyor-api --test documents_roundtrip</code></td>
+<td>2 passed</td>
+</tr>
+<tr>
+<td>2</td>
+<td>reversal: skip list disabled</td>
+<td>failed — <code>text/html</code> returned</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>cargo test -p conveyor-store --test audit_idempotency</code></td>
+<td>5 passed</td>
+</tr>
+<tr>
+<td>4</td>
+<td>reversal: <code>DO NOTHING</code> restored</td>
+<td>failed at the reclaim assertion</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>cargo test -p conveyor-api --test secrets_never_revealed --test repositories_crud</code></td>
+<td>2 + 1 passed</td>
+</tr>
+<tr>
+<td>6</td>
+<td>reversal: version comparison disabled</td>
+<td>both returned 204 instead of 412</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>cargo test -p conveyor-actions --lib</code></td>
+<td>37 passed (incl. breaker ×3, webhooks effect, inference effect)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>reversals: effect→read, breaker→fixed key, body re-echoed</td>
+<td>all three failed by name</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>cargo test -p conveyor-api --test approval_dual</code></td>
+<td>4 passed</td>
+</tr>
+<tr>
+<td>10</td>
+<td>reversal: bound removed</td>
+<td>256 accepted (200)</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>cargo test -p conveyor-store --lib</code></td>
+<td>36 passed (incl. the redacted-<code>Debug</code> test)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>reversal: <code>Debug</code> printed the secret</td>
+<td>failed</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>cargo test -p conveyor-auth</code></td>
+<td>29 + 7 + 0 passed (incl. both realm tests)</td>
+</tr>
+<tr>
+<td>14</td>
+<td>reversals: kid-only key, whole-map replace</td>
+<td>both tests failed</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>cargo test -p conveyor-actions --test copilot_coverage --test registry --test parity_http_mcp --test idempotency --test external_actions</code></td>
+<td>3 / 1 / 4 / 6 / 1 passed</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>cargo test -p conveyor-api --test {documents_roundtrip,mcp_agent,machine_login,approval_dual,copilot_rounds,copilot_crash_replay,externals_declared,repositories_crud,kata_role,secrets_never_revealed,copilot_proposal}</code></td>
+<td>all passed (4/1/1/1/2/3/1/6/2/1/2)</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>cargo test -p conveyor-store --test s07_schema --test webhook_seal --test audit_idempotency</code></td>
+<td>5 + 3 + 3 passed</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>cargo run -q -p conveyor-server -- --print-openapi --write-lock</code> then <code>--check-lock</code></td>
+<td>exit 0, <strong>210 ops</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="still-open--do-not-read-the-green-gate-as-a-closed-lane">Still open — do not read the green gate as a closed lane</h2>
+<ol type="1">
+<li><strong>Tenancy requirement (owner, 2026-11-09):</strong> one Keycloak identity must hold different roles in different tenants. ⛔ <strong>Blocked by the code and the contract:</strong> <code>auth/src/authn.rs:96-101</code> refuses any principal with more than one membership (401), and CONTRACT §9 (<code>01-CONTRACT.md:197</code>) mandates exactly one. The decision register carries an OPEN row; the tenant-selection mechanism is undecided and nothing was built.</li>
+<li><strong>Webhook SSRF is deferred, not fixed.</strong> <code>validate_url</code> still checks only the scheme, so an admin (<code>boards:write</code>) can point <code>webhooks.test</code> at <code>169.254.169.254</code> or a private host. Owner ruling: permissive for now, tighten later.</li>
+<li><strong><code>secrets.rotate</code> is still declared <code>write</code></strong> although it destroys the old credential — blocked on proposal-input custody (#11).</li>
+<li><strong>#12 and #17 have no failing-test proof</strong> (no honest poisoning test exists; the grants file has no runtime test). They are fixes with a stated measurement, not proofs.</li>
+<li><strong>The workspace gate result is recorded separately below when it runs</strong> — it measures a tree that also contains <code>s17-benchmark-core</code>'s new module, which this lane does not own.</li>
+</ol>
+<h2 id="workspace-gate--measured-09150922-tree-shared-with-s17-benchmark-core">Workspace gate — measured 09:15–09:22, tree shared with <code>s17-benchmark-core</code></h2>
+<table>
+<thead>
+<tr>
+<th>step</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cargo test --workspace --no-fail-fast</code> (first run)</td>
+<td><strong>RED on one target that is not this lane's</strong>: <code>crates/actions/tests/benchmark_parity.rs::every_banked_log_reproduces_its_banked_verdict</code> — the peer's fixture reader hit a macOS <code>._*.log</code> entry; they fixed it and reported 555/555. <strong>My own</strong> <code>jwks::tests::a_shared_kid_never_crosses_realms</code> also failed in that run: it had a load-dependent <code>min_refresh</code>, passed alone and failed under a parallel suite. Rewritten (<code>min_refresh = 0</code> for the cross-realm test; a 2 s margin for the retention test) and re-run green</td>
+</tr>
+<tr>
+<td><code>cargo test --workspace --no-fail-fast</code> (final run)</td>
+<td><strong>exit 0</strong> — every target <code>ok</code>, 0 failed</td>
+</tr>
+<tr>
+<td><code>cargo clippy -p conveyor-api -p conveyor-actions -p conveyor-store -p conveyor-domain -p conveyor-auth --all-targets -- -D warnings</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>cargo fmt -p api -p actions -p store -p auth -- --check</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>cargo run -q -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>exit 0</strong>, <strong>210 operations</strong></td>
+</tr>
+<tr>
+<td>migrations ledger (<code>cargo test -p conveyor-store --test s07_schema</code>)</td>
+<td><strong>ok</strong> — includes the peer's <code>0025_s17_benchmark</code></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ The workspace number is not comparable to the peer's earlier 569/0: the tree gained S17's benchmark module and this lane's eight new tests. <strong>The gate is green, but the tree is not "hardened"</strong> — see "Still open" above.</p>
+<h2 id="session-3--the-tenancy-change-and-the-two-deferrals">Session 3 — the tenancy change and the two deferrals</h2>
+<p><strong>Date:</strong> 2026-11-09 11:58– · <strong>Session:</strong> <code>improve-01</code> session 3 (<code>tenancy-change-deferred-findings</code>) · <strong>Tree:</strong> same, no <code>.git</code> <strong>Lease:</strong> opened 11:58, released with the gate below. S17 held the tree until it reported GATE_GREEN and released row 199; this session touched no S17 file and neither migration ledger.</p>
+<h3 id="owner-decisions-taken-in-this-session">Owner decisions taken in this session</h3>
+<ol type="1">
+<li><strong>Scope</strong> = the tenancy change + the two findings deferred by the earlier rulings (#6 webhook address policy, #11 <code>secrets.rotate</code> custody). The four prose-cap overruns stay untouched.</li>
+<li><strong>No silent tenant choice:</strong> a person with more than one membership and no <code>X-Active-Tenant</code> is <code>400 active_tenant_required</code>.</li>
+<li><strong>S19 CCR 5 stays open</strong> — deferred to the S19 build session, which must return for a decision before the <code>approval.eval_id</code> ALTER ships. Relayed to that session by message.</li>
+</ol>
+<h3 id="a--tenancy-one-identity-many-memberships-one-active-tenant">A — tenancy (one identity, many memberships, one active tenant)</h3>
+<table>
+<thead>
+<tr>
+<th>file</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/auth/src/authn.rs</code></td>
+<td><code>X-Active-Tenant</code> parsed once (a single non-empty value), matched <strong>only</strong> against the caller's own rows (tenant id, then slug); a licence bearer's tenant stays authoritative and a contradicting header is refused; the session lists every active membership</td>
+</tr>
+<tr>
+<td><code>crates/auth/src/error.rs</code>, <code>crates/api/src/error.rs</code></td>
+<td><code>active_tenant_required</code> / <code>active_tenant_not_permitted</code> / <code>active_tenant_invalid</code> (400/403/400)</td>
+</tr>
+<tr>
+<td><code>crates/auth/src/principal.rs</code></td>
+<td><code>Session::active()</code> finds the selected row instead of <code>[0]</code></td>
+</tr>
+<tr>
+<td><code>crates/api/tests/active_tenant.rs</code></td>
+<td><strong>new</strong> — owner-in-A / member-in-B / refused-in-C, by id and by slug, empty header, single-membership control, and an admin-scope action allowed in A and refused in B</td>
+</tr>
+<tr>
+<td><code>docs/plans/01-CONTRACT.md</code> §9/§10, <code>docs/SPEC.md</code> §5.4/§4.4</td>
+<td>the rule, and <strong>D27</strong> in the decision register</td>
+</tr>
+</tbody>
+</table>
+<p>No migration: <code>membership</code> was already unique per <code>(tenant_id, user_id)</code>, and <code>resolve_identity</code> already read every row.</p>
+<h3 id="b--webhook-address-policy-6-previously-deferred">B — webhook address policy (#6, previously deferred)</h3>
+<ul>
+<li><code>validate_url</code> refuses a literal loopback / link-local (metadata) / multicast / unspecified / broadcast address at registration; <code>deliver_once</code> additionally resolves <strong>at connect time</strong> through <code>GuardedResolver</code> and refuses any resolved address in those classes (DNS rebinding), with redirects disabled.</li>
+<li>Private targets (RFC1918, <code>100.64/10</code>, ULA) stay allowed: every legitimate webhook target on this estate is private. Loopback is allowed only when <code>CONVEYOR_WEBHOOK_ALLOW_LOOPBACK=1</code>, which the test harness sets for its loopback recorders; a deployed process never sets it.</li>
+<li>Tests: the address-class table, an integration <code>webhooks.create</code> refusal naming <code>url</code>/<code>link-local</code>, and a delivery to a <code>localhost</code> name proved refused <strong>before the socket opens</strong> (a listener on that port records nothing).</li>
+</ul>
+<h3 id="c--secretsrotate-custody-11-previously-deferred">C — <code>secrets.rotate</code> custody (#11, previously deferred)</h3>
+<ul>
+<li><code>secrets.rotate</code> is now <code>effect = "destructive"</code>, so an agent's call becomes a proposal.</li>
+<li><code>proposal::create_tx</code> seals the exact input with the tenant's KEK (<code>store::secret::sealer</code>, the <code>secrets.*</code> key) into <code>meta.sealed_input</code>; <code>meta.input</code>/<code>meta.diff</code> carry a redacted projection where every <code>x-secret</code> property is <code>&lt;redacted&gt;</code>. <code>proposal::execute</code> replays <strong>only</strong> the sealed input; a secret-bearing proposal without a seal is <code>Refused</code>, never run from the projection. No migration: the sealed blob is another <code>meta</code> key and no API returns it.</li>
+<li><code>crates/actions/tests/copilot_coverage.rs</code>'s blanket ban became a positive proof over every proposal-triggering action carrying a secret (non-vacuous by assertion).</li>
+<li><code>crates/api/tests/proposal_custody.rs</code> (<strong>new</strong>): a real turn proposes <code>secrets.rotate</code> with a canary, the SQL row contains the canary nowhere, then approval + <code>execute</code> rotates the secret (version 1 → 2) through the sealed input.</li>
+</ul>
+<h3 id="reversal-proofs-each-was-made-to-fail-then-restored">Reversal proofs (each was made to fail, then restored)</h3>
+<table>
+<thead>
+<tr>
+<th>fix</th>
+<th>reversal</th>
+<th>observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>header ignored, first membership used</td>
+<td>both tenancy tests failed — <code>/api/me</code> served tenant A for a <code>dev-b</code> request, and the "member in B" call created a duplicate in A (409) instead of 403</td>
+</tr>
+<tr>
+<td>B</td>
+<td>link-local refusal removed</td>
+<td>the unit table failed on <code>http://169.254.169.254/… must be refused</code>, and <code>webhooks.create</code> returned <strong>201</strong> where the test requires 422</td>
+</tr>
+<tr>
+<td>C</td>
+<td>redaction removed (<code>input</code> stored verbatim)</td>
+<td>the custody test failed, naming the canary in both <code>meta.input</code> and the diff</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gate-the-exact-final-tree">Gate (the exact final tree)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>rbuild --gate</code> (<code>fmt --all -- --check</code> &amp;&amp; <code>clippy</code> &amp;&amp; <code>test --locked</code>)</td>
+<td><strong>exit 0</strong> — <strong>119 test binaries, 647 passed / 0 failed</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>rbuild -- clippy --workspace --all-targets -- -D warnings</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock</code></td>
+<td><strong>exit 0</strong>, <strong>210 operations</strong>; <code>secrets.rotate</code> hash <code>b4bd39ac…</code> → <code>ed90894591f4bab437c093ddf8fbb05aea37f1837af4d985d9e22e59e1483e44</code> (effect <code>write</code> → <code>destructive</code>)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>the new and affected binaries inside run 1</td>
+<td><code>active_tenant</code> <strong>2/2</strong>, <code>proposal_custody</code> <strong>1/1</strong>, <code>copilot_coverage</code> <strong>3/3</strong>, <code>webhook_shape</code> <strong>2/2</strong>, <code>conveyor-actions</code> lib <strong>39/39</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ The gate ran 12:24:35–12:31 local on the tree containing this lane's final code. No <code>.rs</code>, <code>.sql</code> or <code>.toml</code> file under <code>crates/</code>, <code>apps/</code> or <code>migrations/</code> changed between the gate's start and the clippy/lock checks (<code>find -newermt</code>). The S19 lane resumed after the window closed; its later files are <strong>not</strong> part of these numbers. The workspace target was the single-lock rbuild tree; by the time the clippy/lock checks ran, <code>rbuild</code> had gained independent build slots, so those two ran in slot 1 while slot 0 was in use.</p>
+<h3 id="what-this-session-did-not-do">What this session did NOT do</h3>
+<ul>
+<li><strong>S19 CCR 5</strong> — open by the owner's answer; the S19 session was told not to ship the ALTER without a decision.</li>
+<li><strong><code>00-INDEX:856</code></strong> still calls <code>0025</code> "not yet applied"; that row is S17's and was handed over, not edited.</li>
+<li><strong>The <code>me</code> ACTION</strong> (<code>crates/actions/src/handlers.rs</code>) still returns the active membership only; <code>/api/me</code> (the session path) lists every membership. An agent acts in one tenant per call, so this is a recorded deviation.</li>
+<li><strong>Prose caps</strong> (S07/S09/S11/S08) — outside the chosen scope.</li>
+</ul>
+<h3 id="re-verification-at-172x-a-later-session--two-findings-were-nearly-re-fixed">Re-verification at 17:2x (a later session) — two findings were nearly re-fixed</h3>
+<p>A session that had not re-read this file's disposition table re-measured #4 and #14 as <strong>code-present</strong> and implemented both. They were reverted before anything landed, when this table was read:</p>
+<ul>
+<li><strong>#4</strong> is an owner ruling (<code>00-INDEX</code> decision register, approved): <code>requests:write</code> is defined as "create, decide and promote", so member-scoped <code>project_requests.promote</code> is the decision, not a bug.</li>
+<li><strong>#14</strong> is a no-change ruling: approvals never expire, and the copilot's TTL was removed (<code>api/src/copilot/turns.rs:158</code> is <code>expires_at: None</code>). The sweep stays the only expiry actor, which is what <code>apps/server/tests/approval_expire.rs</code> asserts.</li>
+</ul>
+<p>Both patches worked (F4: member 403 / admin 200, reversal created a project; S14: expired decide 409, reversal approved it). ⛔ <strong>A finding that is still in the code is not an open finding — this table is the disposition record.</strong> The only durable cost of the detour is the lesson; no code, migration or count changed.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/IMPROVE-01.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

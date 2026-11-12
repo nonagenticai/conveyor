@@ -1,0 +1,38 @@
+{
+  "a/diagram.pdf": {
+    "sha256": "8bfedbafa128bff10447df593f8271585cd0b20a4a4e271b20aeb6f495f2624d",
+    "byte_len": 17056
+  },
+  "a/diagram.png": {
+    "sha256": "8d876894d2fc237ad712543f23519dd95ad345ee3eef1388f380cd630710a5e2",
+    "byte_len": 252288
+  },
+  "a/diagram.svg": {
+    "sha256": "40a968f0797501e0dd446ed79a375dd96e0d50ae9acc0962fbea7b9fc1d6d2d7",
+    "byte_len": 4434
+  },
+  "b/diagram.pdf": {
+    "sha256": "a0699df5b626e4938ae2eb3a6cf8645c607b8bb0f2dfe36420a5f457c013ab23",
+    "byte_len": 14508
+  },
+  "b/diagram.png": {
+    "sha256": "09716646a3808fff1720e9bd5364b202f85521422a71fae881f3db081b8ee238",
+    "byte_len": 188815
+  },
+  "b/diagram.svg": {
+    "sha256": "39aad1ebb84bea3e419d8fe8b38751a141e059ef6ea62acb3a313ec128a3059f",
+    "byte_len": 3443
+  },
+  "c/diagram.pdf": {
+    "sha256": "e0f0fe21095669401fc5f2950d3c9f3ae19cd6ccafc52b18e18be8745d300839",
+    "byte_len": 12275
+  },
+  "c/diagram.png": {
+    "sha256": "c6497c2e0b64e982143f22336bf2786a88b9412fee2490664d45a6ada088da33",
+    "byte_len": 145901
+  },
+  "c/diagram.svg": {
+    "sha256": "314d3b02c14f931c8f32ec1b197800d74185571d0047b14c9e8898d52117788b",
+    "byte_len": 2790
+  }
+}

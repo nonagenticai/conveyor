@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S07 — Requirements, catalogues, revisions, quality scoring, search · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S07-requirements-search.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s07--requirements-catalogues-revisions-quality-scoring-search">S07 — Requirements, catalogues, revisions, quality scoring, search</h1>
+<p>Programme project: S07 · issues none yet</p>
+<!-- 2026-11-08: `outline` and `outline_node` were built by 0007 and DROPPED by migration 0011 — S00 day 2
+measured zero usage (RM toc_trees/toc_nodes/toc_settings 0 rows, fr project_outlines 0 rows, no `toc` operation
+in any of the 348 flows, fr `/toc/*` 15 unused + 1 rare). `project_request` is untouched: it has no outline FK. -->
+
+<p><strong>Gate (SPEC §8 S7):</strong> relevance eval set beats the agreed baseline.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>RM's requirement surface lands on S03's <code>governed_asset</code>/<code>revision</code>/<code>catalogue_entry</code>/<code>trace_link</code>, not RM's 57 domain tables: one lifecycle for requirements, principles and ADRs, one <code>revision</code> per mutation with a working <code>compare</code>, read-only quality scoring, and FTS + trigram search.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S03: <code>governed_asset</code> (+ generated <code>tsv</code>, <code>gin(tsv)</code>), <code>revision</code>, <code>catalogue_entry</code>, <code>trace_link</code>, <code>card_type</code>, <code>project</code>, <code>card.tsv</code>.</li>
+<li>S04: registry, <code>/api/actions</code>, OpenAPI + MCP projection.</li>
+<li>S02: <code>migrate</code>, <code>event</code>, <code>job</code>.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> §2.7's five tables, 32 actions, the <code>search</code> module, the eval harness, §7.2's coverage table. <strong>OUT</strong> TOC API and screens (<strong>S08</strong>; <code>outline</code>/<code>outline_node</code> ship here), ArchiMate/UML/renders (<strong>S08</strong>), project CRUD (<strong>S05</strong>), <code>bulk</code> and RM's <code>promote</code>/<code>project-copy</code> (<strong>dropped</strong>), UI (<strong>S12</strong>). <strong>UI surface declared for S12</strong>: <code>requirements editor/revisions</code> — <code>requirements.*</code> + <code>quality.score</code>, read models <code>governed_asset</code> + <code>revision</code> (<code>RevisionDiff</code>), and <code>search</code> — <code>search.query</code> ranked results over assets/cards/catalogue entries.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<ul>
+<li><strong>SPEC §4, §6, §8 S7, §11 R2</strong> — one lifecycle, one revision table; not <code>entity_version_history</code>, the ~20 catalogue tables or the model/revision sprawl.</li>
+<li><strong>02-DATA-ARCHITECTURE §2.4, §2.7, §3.4, §4, §5</strong> — columns and indexes verbatim, the state machine, the JSONB policy.</li>
+<li><strong>02-source-map/30-rm §1</strong> (RM <code>9ee72ab</code>) — 28 routers → §7.2; <code>entity_version_history</code> has <strong>no <code>tenant_id</code></strong>; not <code>bulk</code>, <code>pm_card_ledger</code>, promote/project-copy.</li>
+<li><strong>02-source-map/20-fr <code>6f7c509792b3ca1fc1fb00c198aebcec83f0af29</code></strong> (<code>library</code>, <code>observe</code>, <code>project-requests</code>) — asset shape, traceability, intake; not <code>research</code>/<code>tools</code> (S0).</li>
+</ul>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>migrations/0007_requirements.sql · crates/domain/src/{governance,quality,compare}.rs
+crates/store/src/{governed_asset,revision,catalogue,quality,search,project_request}.rs
+crates/actions/src/{governance,library}/*.rs · crates/api/src/search/{rank,query}.rs   # module, not a crate (CONTRACT §1)
+apps/server/src/seed.rs                                   # the `migrate --seed` importer this slice owns
+crates/api/src/{requirements,principles,decisions,catalogues,search,project_requests}.rs
+crates/api/tests/{revision_model,catalogue_seed,quality_rubric,search_index,traceability,project_request,search_eval}.rs
+seed/catalogue.json · tests/eval/search_queries.json   # eval DATA, not a test target</code></pre>
+<h3 id="51-tables--27-verbatim-five-only">5.1 Tables — §2.7 verbatim, five only</h3>
+<pre><code>outline            project_id, kind∈(wbs,ltp,toc), title, settings · uq(tenant,project,kind,title)
+outline_node       outline_id, parent_id, position, kind, title, body, meta, edge_kind
+                   · ix(tenant,outline,parent,position,id)
+quality_evaluation entity_type, entity_id, score, criteria, evaluator_kind
+                   · ix(tenant,entity_type,entity_id,created_at desc)
+principle_conflict principle_a_id, principle_b_id, verdict, dismissed_by/at · uq(tenant,a,b)
+project_request    external_ref, external_origin, payload, status∈(draft,approved,rejected,promoted),
+                   project_id, repository_url · uq(tenant,external_ref)</code></pre>
+<p>All five: <code>tenant_id NOT NULL</code>, <code>FORCE</code> RLS, <code>tenant_isolation</code> (<code>USING</code>+<code>WITH CHECK</code>); <code>quality_evaluation</code> is append-only. The migration also adds <code>pg_trgm</code> and <code>gin(title gin_trgm_ops)</code> on <code>governed_asset</code>, <code>card</code>, <code>catalogue_entry(label)</code> — no column, key or constraint.</p>
+<h3 id="52-actions">5.2 Actions</h3>
+<p>One handler serves <code>requirements.*</code>, <code>principles.*</code>, <code>decisions.*</code>: <code>create {key?,title,body?,acceptance?,project_id?}</code> → <code>{id,key,version,status,etag}</code>, <code>get</code>, <code>update</code>, <code>transition {id,to,superseded_by?}</code>, <code>list</code>, and <code>requirements.compare {id,from,to}</code> → <code>RevisionDiff</code>. Separate: <code>catalogues.list|import {dry_run?}</code>, <code>quality.score {revision_id}</code>, <code>search.query {q,types?,limit?}</code>, <code>trace_links.*</code>, <code>project_requests.*</code> (idempotent on <code>(tenant,external_ref)</code>).</p>
+<p>Two more over <code>principle_conflict</code>: <code>principles.list_conflicts {verdict?,cursor?,limit?}</code> → page of <code>{id,principle_a_id,principle_b_id,verdict,dismissed_at}</code>; <code>principles.dismiss_conflict {id,reason?}</code> → <code>{id,verdict,dismissed_by,dismissed_at}</code>, <code>dismissed_by</code> from the principal.</p>
+<p><strong>Kind is never an input</strong> — <code>requirements.*</code> is bound to <code>kind='requirement'</code> at declaration, so it cannot reach a principle. <code>domain::governance::transition(kind,from,to)</code> is the only legality check (proptested); <code>superseded</code> requires <code>superseded_by_id</code> in the same statement (§3.4's immediate CHECK: <code>status &lt;&gt; 'superseded' or superseded_by_id is not null</code>).</p>
+<h3 id="53-revision-model">5.3 Revision model</h3>
+<p>Every mutation writes one <code>revision</code> row in the same transaction: <code>entity_type='governed_asset'</code>, <code>seq = governed_asset.version</code>, <code>label ∈ created|updated|status:&lt;to&gt;</code>, <code>content</code> = the post-mutation snapshot, <code>content_hash</code> = SHA-256 of JCS-canonical JSON, <code>author_id</code>, <code>status</code> mapped <code>draft|in_review→draft</code>, <code>approved→published</code>, <code>superseded→superseded</code>. <code>uq(tenant,entity_type,entity_id,seq)</code> makes a double write fail loudly. <code>compare</code> diffs two <code>content</code> documents <strong>in Rust</strong> — field-level <code>added/removed/changed</code>, <code>acceptance</code> matched by criterion id, not index.</p>
+<h3 id="54-catalogue-import">5.4 Catalogue import</h3>
+<p><code>seed/catalogue.json</code> is a checked-in export of live RM, never called at runtime; re-count first (293/282/26 are <code>pg_stat</code> estimates). <code>migrate --seed [--tenant &lt;slug&gt;]</code> writes — <code>--tenant</code> optional, default <strong>all tenants</strong> (the local gates call plain <code>migrate --seed</code>); the same importer runs at tenant create. One row per kind (codes <code>UNVERIFIED</code> until S14 §6 step 8's re-count and export):</p>
+<pre><code>card_type → table card_type   bug_fix &quot;Bug fix&quot;  {&quot;inputs&quot;:[&quot;repo&quot;],&quot;gates&quot;:[&quot;human_approval&quot;]}   # its own table, NOT a catalogue kind
+project_type         bug_fix &quot;Bug fix&quot;        {&quot;phase_order&quot;:[…],&quot;matrix&quot;:{&quot;bug_fix&quot;:[…]}}
+phase                do &quot;Doing&quot;               {&quot;order&quot;:2}
+capability           recovery &quot;Recovery&quot;      {}
+wip_limit            active &quot;Active WIP&quot;      {&quot;limit&quot;:3}
+priority_level       p2 &quot;High&quot;                {&quot;rank&quot;:2}
+deliverable_kind     report &quot;Report&quot;          {}
+milestone_kind       gate_review &quot;Gate review&quot; {}
+gate                 human_approval &quot;Human approval&quot; {&quot;dual_control&quot;:false}
+board_template       standard &quot;Standard board&quot; {&quot;lists&quot;:[&quot;intake&quot;,&quot;active&quot;,&quot;waiting&quot;,&quot;done&quot;,&quot;archive&quot;]}
+architecture_standard archimate_3_2 &quot;ArchiMate 3.2&quot; {&quot;version&quot;:&quot;3.2&quot;}</code></pre>
+<p>Only the first row is a direct table write: <code>card_type</code> rows land in <code>card_type</code>, because <code>catalogue_entry.kind</code> is S03's fixed eleven-value vocabulary and does <strong>not</strong> include <code>card_type</code>. Every other line's left-hand name is a <code>catalogue_entry.kind</code>. The 282 type×card-type pairs sit in <code>project_type.meta.matrix</code> (what <code>may_move</code> reads), not 282 rows. Import is <code>ON CONFLICT (tenant,kind,code) DO UPDATE … WHERE (label,meta,sort,is_active) IS DISTINCT FROM (…)</code>.</p>
+<h3 id="55-quality-scoring">5.5 Quality scoring</h3>
+<p>Scored: <strong>one immutable revision</strong> (<code>entity_type='revision'</code>, <code>entity_id=&lt;revision.id&gt;</code>); re-scoring yields the same number, history per row. Rubric v1, weights summing to 1, <code>score = 100·Σ(w·raw/5)</code>:</p>
+<ul>
+<li><strong>clarity (.20)</strong> — title 15–80 chars, no vague-list term.</li>
+<li><strong>testability (.30)</strong> — ≥1 <code>acceptance</code> entry with <code>given/when/then</code> or a numeric threshold.</li>
+<li><strong>atomicity (.20)</strong> — ≤1 conjunction per sentence, mean ≤25 words.</li>
+<li><strong>traceability (.15)</strong> — 0 links → 0; 1 → 3; ≥2 including a card → 5.</li>
+<li><strong>uniqueness (.15)</strong> — same-kind trigram similarity: ≥0.9 → 0, ≤0.5 → 5.</li>
+</ul>
+<p><code>criteria</code> stores the rubric version and each raw/weighted value. <strong>Read-only:</strong> scoring writes only <code>quality_evaluation</code> — never <code>governed_asset</code>, never a status change or blocked transition — as <code>job(kind='quality.score', dedupe_key='revision:&lt;id&gt;')</code> enqueued <strong>after commit</strong>.</p>
+<h3 id="56-search-and-the-eval-set">5.6 Search and the eval set</h3>
+<p>Three ranked arms (<code>governed_asset</code>, <code>card</code>, <code>catalogue_entry</code>) <code>UNION ALL</code>, each <code>LIMIT n</code>, outer <code>ORDER BY score, id</code>. Every predicate — <code>tenant_id = current_setting('app.current_tenant',true)::uuid</code>, <code>kind</code>, <code>status</code>, <code>project_id</code> — is SQL, so Rust sees at most <code>limit+1</code> rows. Score is <code>ts_rank_cd(tsv, websearch_to_tsquery('english',$1))·w₁ + similarity(title,$1)·w₂ + key-exact-bonus</code>, restricted by <code>tsv @@ tsquery OR title % $1</code>; the three weights are one committed constant tuned by grid search, not a learned model.</p>
+<p><strong>Eval set:</strong> <code>tests/eval/search_queries.json</code> — 40 queries <code>{id,text,intent,expected_top5,source}</code>, intents <code>exact_key|title|body_phrase|paraphrase|typo</code>, ≥6 each: ~20 from the Loki 24 h <code>/requirements/search*</code> sample, ~10 live probes, ~10 handwritten (Istio may log no query string; RM's router tests substitute). <strong>Corpus:</strong> a read-only RM export in a throwaway DB — an eval fixture, not a migration (D7) — keys preserved so both share one key space. <strong>Expected ids are human-labelled, never from whichever system produced them</strong>, or the baseline is a ceiling.</p>
+<p>Arms: A <code>ILIKE</code> floor, B FTS + trigram (shipped), C live RM <code>/search</code> (baseline), D pgvector (contingency). <code>recall@5 = mean(|expected ∩ top5| / |expected|)</code>, MRR = mean 1/rank. <strong>Targets:</strong> B ≥ 0.75 recall@5, ≥ 0.60 MRR, <strong>B ≥ C</strong> on both; a loss above 0.05 recall@5 ships D, ≤ 0.05 is recorded; if C is unreachable, B ≥ A + 0.20.</p>
+<h3 id="57-traceability">5.7 Traceability</h3>
+<p><code>trace_links.*</code> is the only writer of <code>trace_link</code>; S08 references it. S07 demonstrates the path: requirement <code>R</code> → <code>trace_links.create{requirement,R,'card',C,'traces'}</code> → <code>GET /api/requirements/{R}?include=trace</code> returns <code>C</code> <strong>and</strong> <code>GET /api/cards/{C}/traces</code> returns <code>R</code>, same tenant, cross-tenant 0 rows; <code>requirement→model_element</code> uses the same actions in S08. <code>project_requests.promote</code> creates its <code>project</code> in the same transaction via the store, never by re-calling <code>projects.create</code>.</p>
+<h3 id="58-events">5.8 Events</h3>
+<p>Outbox rows, one per mutation, in its transaction (CONTRACT §7).</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>emitter</th>
+<th>payload keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>governed_asset.created</code></td>
+<td><code>{requirements,principles,decisions}.create</code></td>
+<td><code>id,key,kind,version</code></td>
+</tr>
+<tr>
+<td><code>governed_asset.updated</code></td>
+<td><code>.update</code></td>
+<td><code>id,version,changed[]</code></td>
+</tr>
+<tr>
+<td><code>governed_asset.transitioned</code></td>
+<td><code>.transition</code></td>
+<td><code>id,from,to,version</code></td>
+</tr>
+<tr>
+<td><code>governed_asset.superseded</code></td>
+<td><code>.transition</code> to <code>superseded</code></td>
+<td><code>id,superseded_by,version</code></td>
+</tr>
+<tr>
+<td><code>quality.evaluated</code></td>
+<td><code>quality.score</code> job</td>
+<td><code>revision_id,score,rubric</code></td>
+</tr>
+<tr>
+<td><code>catalogue.imported</code></td>
+<td><code>catalogues.import</code></td>
+<td><code>kind,created,updated,skipped</code></td>
+</tr>
+<tr>
+<td><code>project_request.created</code></td>
+<td><code>project_requests.create</code></td>
+<td><code>id,external_ref,status</code></td>
+</tr>
+<tr>
+<td><code>project_request.updated</code></td>
+<td><code>.update</code></td>
+<td><code>id,status</code></td>
+</tr>
+<tr>
+<td><code>project_request.approved</code></td>
+<td><code>.approve</code></td>
+<td><code>id,project_id</code></td>
+</tr>
+<tr>
+<td><code>project_request.rejected</code></td>
+<td><code>.reject</code></td>
+<td><code>id,reason</code></td>
+</tr>
+<tr>
+<td><code>project_request.promoted</code></td>
+<td><code>.promote</code></td>
+<td><code>id,project_id</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li><code>cargo test --workspace</code>; <code>docker compose up -d db</code>; re-count RM in one read-only statement — <code>export RM_RECOUNT="BEGIN READ ONLY; SELECT 'pm_card_types',count(*) FROM pm_card_types UNION ALL SELECT 'pm_catalogue',count(*) FROM pm_catalogue UNION ALL SELECT 'pm_project_type_card_types',count(*) FROM pm_project_type_card_types; COMMIT;"; psql "$RM_READONLY_URL" -c "$RM_RECOUNT"</code>.</li>
+<li><code>0007_requirements.sql</code>: five tables, FKs, indexes, <code>FORCE</code> RLS, <code>pg_trgm</code>, trigram indexes; <code>cargo run -p conveyor-server -- migrate</code> twice (the binary re-applies the runtime grants; <code>sqlx migrate run</code> would not — CONTRACT §16).</li>
+<li>Domain <code>governance::transition</code>, <code>compare::diff</code>, <code>quality::rubric</code>; <code>cargo test -p conveyor-domain</code>.</li>
+<li>Store: asset write + revision insert in one transaction; <code>cargo test -p conveyor-store requirements</code>.</li>
+<li><code>requirements.*</code>, <code>trace_links.*</code>, <code>principles.*</code>, <code>decisions.*</code> in the registry; test that no input can set <code>kind</code>; <code>curl /api/actions | jq</code>.</li>
+<li><code>requirements.compare</code> diffs two <code>content</code> documents in Rust; snapshot test on a 3-revision asset — <code>cargo test -p conveyor-api --test revision_model</code>.</li>
+<li>Export <code>seed/catalogue.json</code>; <code>migrate --seed --tenant dev-a</code> twice → <code>0/0/N</code> (<code>dev-a</code> is S02's dev tenant; a tenant row must exist first); <code>catalogues.list|import</code> with <code>dry_run</code>.</li>
+<li>Rubric + <code>quality.score</code> + the post-commit job — <code>cargo test -p conveyor-api --test quality_rubric</code>; assert no <code>quality_evaluation</code> row in the asset transaction.</li>
+<li><code>search.query</code>: three arms, weights, <code>ts_headline</code> capped at 50 — <code>cargo test -p conveyor-api --test search_index</code>.</li>
+<li>Eval harness: corpus loader, 40-query JSON, <code>--ignored</code> test that <strong>asserts</strong> recall@5 and MRR meet the agreed targets and beat baseline C, printing the numbers and exiting non-zero on a miss. <code>cargo test -p conveyor-api --test search_eval -- --ignored --nocapture</code>.</li>
+<li>Baselines A and B (ILIKE floor; FTS + trigram) — <code>BASELINE=ab cargo test -p conveyor-api --test search_eval -- --ignored --nocapture</code>.</li>
+<li>Baseline C, live RM <code>/search</code> replayed over the same corpus — <code>BASELINE=c RM_READONLY_URL="$RM_READONLY_URL" cargo test -p conveyor-api --test search_eval -- --ignored --nocapture</code>.</li>
+<li>Weight grid search, one bounded run — <code>GRID=1 cargo test -p conveyor-api --test search_eval -- --ignored --nocapture</code>.</li>
+<li>Decide D by §5.6 and write the completion record — <code>cargo test -p conveyor-api --test search_eval -- --ignored --nocapture</code>.</li>
+<li><code>project_requests.*</code> + <code>project_request.timeout</code> (S06 §5.3) — <code>cargo test -p conveyor-api --test project_request</code>; clippy.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-api --test search_index --test s07_assets --test s07_requests
+cargo test -p conveyor-store --test s07_store --test s07_seed --test s07_governance
+cargo test -p conveyor-api --test search_eval -- --ignored --nocapture
+# ⚠️ Corrected 2026-11-09: this block named five targets that do not exist — `revision_model`, `catalogue_seed`,
+# `quality_rubric`, `traceability`, `project_request`. `cargo test --test &lt;missing&gt;` is a hard error, so the gate
+# could never have passed as written. The properties are proved by the targets above: the asset/revision model
+# and its seed by `s07_store`/`s07_seed` (store crate), the rubric and quality scoring by `s07_assets`, the
+# project-request surface by `s07_requests`, and traceability by `s07_governance` + `s07_requests`.
+SEARCH_SQL=&quot;SELECT id FROM governed_asset WHERE tenant_id = current_setting(&#39;app.current_tenant&#39;,true)::uuid AND (tsv @@ websearch_to_tsquery(&#39;english&#39;,&#39;auth&#39;) OR title % &#39;auth&#39;) ORDER BY ts_rank_cd(tsv, websearch_to_tsquery(&#39;english&#39;,&#39;auth&#39;)) DESC, id LIMIT 20&quot;
+TENANT=$(psql &quot;$DATABASE_URL&quot; -tAc &quot;select id from tenant where slug=&#39;dev-a&#39;&quot;)   # `tenant` has no RLS
+psql &quot;$DATABASE_URL&quot; -qAtc &quot;BEGIN; SET LOCAL enable_seqscan=off; SET LOCAL app.current_tenant=&#39;$TENANT&#39;; EXPLAIN (ANALYZE, BUFFERS) $SEARCH_SQL; COMMIT;&quot; \
+  | grep -qE &#39;governed_asset_tsv_idx|governed_asset_title_trgm_idx&#39;</code></pre>
+<p>⚠️ <strong>The grep above must name the GIN, not "any index".</strong> The first version of this line matched <code>Bitmap|Index Scan</code>, which is satisfied by the <em>degraded</em> plan — measured 2026-11-08, under FORCE RLS without the LEAKPROOF provisioning, the planner answers <code>Bitmap Index Scan on governed_asset_project_idx</code> (a tenant btree) plus a per-row filter, i.e. exactly the shape the check was supposed to reject. Both GINs are dead until <code>scripts/db-roles.sql</code> marks <code>ts_match_vq</code> and <code>word_similarity_op</code> LEAKPROOF (CONTRACT §2). The real proof is <code>crates/api/tests/search_index.rs</code>, which asserts the index <strong>by name</strong> as <code>conveyor_runtime</code>.</p>
+<p><strong>Properties.</strong> (a) 3 revisions — create+update+transition → <code>count(*)=3, max(seq)=3</code>, <code>compare 1..3</code> shows the status change. (b) seed idempotent — second run <code>{0,0,N}</code>. (c) indexes used — both GINs present, <code>EXPLAIN</code> under <code>enable_seqscan=off</code>, <code>idx_scan</code> rises on a 50k-row load (4k seq-scans: vacuous). (d) relevance — B meets §5.6's targets. (e) traceability — both directions, cross-tenant 0 rows. (f) quality read-only — <code>version</code>/<code>status</code> untouched, no row in the asset transaction. (g) no orphan — the list below covers all 28.</p>
+<p><strong>Completion record</strong> (CONTRACT §14): <code>A/B/C/D × recall@5 · MRR · 40 queries · corpus · date</code>, filled at close.</p>
+<p><strong>RM coverage — 28 modules: 7 here, 2 dropped, 19 elsewhere.</strong> No orphan.</p>
+<ul>
+<li><strong>S07 (7):</strong> <code>requirements</code>, <code>principles</code>, <code>decisions</code> (one lifecycle; <code>promote</code>/<code>project-copy</code> dropped), <code>principle_conflicts</code>, <code>search</code>, <code>pm_catalogue</code> (one <code>catalogue_entry</code> + seed), <code>integration_tools</code> (<code>gap-to-workpackages</code> → S08).</li>
+<li><strong>Dropped (2):</strong> <code>bulk</code> (registry invocations replace batch), <code>pm_card_ledger</code> (Planka-id key, SPEC §4).</li>
+<li><strong>Elsewhere (19):</strong> <code>pm_projects</code> (S05); <code>toc</code>, <code>pm_programmes</code> (<strong>S08</strong>); <code>pm_resources</code>, <code>pm_risks</code>, <code>pm_benefits</code>, <code>architecture_{elements,relationships,views,standards,containers,tools,metamodel}</code>, <code>modeling_{models,exchange,document_export}</code>, <code>uml_{models,tools}</code> (S08; <code>_is_fr_close</code> dropped); <code>health</code> (S02).</li>
+</ul>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong><code>entity_version_history</code> had no <code>tenant_id</code>.</strong> Do not carry its RLS carve-out: <code>revision.tenant_id</code> is <code>NOT NULL</code>, so a bad join reaches no other tenant's history.</li>
+<li><strong>No Rust-side filtering.</strong> 10k rows narrowed in memory is fatal in production; predicates are SQL, each arm carries <code>LIMIT</code>.</li>
+<li><strong><code>tsvector</code> config.</strong> The generated column needs a literal <code>'english'</code> (<code>current_setting(...)</code> is not immutable and is rejected) and <code>ts_rank_cd</code> must name the index's config or it scores 0.</li>
+<li><strong>Trigram ≠ full-text.</strong> <code>gin(title gin_trgm_ops)</code> serves <code>%</code>, <code>ILIKE</code> and <code>similarity()</code>; <code>tsv @@ tsquery</code> needs <code>gin(tsv)</code>; <code>similarity()</code> ordering without a <code>%</code> predicate scans the table.</li>
+<li><strong>Quality inside the mutation transaction is a lock hazard.</strong> Several trigram queries per criterion hold the asset's row lock.</li>
+<li><strong>RM's mounts are unprefixed and unversioned</strong> (<code>/requirements</code>, <code>/search</code>); the contract's are <code>/api/&lt;resource&gt;</code> — no alias, no rewrite; the durable name is the action.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li>One <code>revision</code> per mutation, <code>seq = version</code>, full snapshot, hash of canonical JSON; <code>compare</code> diffs two revisions in Rust.</li>
+<li>Three resource groups, one handler; kind fixed by action name, never by input.</li>
+<li>Card types stay in <code>card_type</code> (data-arch §10 Q1); everything else is <code>catalogue_entry</code>.</li>
+<li>Catalogue seed is per-tenant data from a checked-in export, imported at tenant create.</li>
+<li>Search ships FTS + trigram; pgvector only on the stated trigger.</li>
+<li>Ranking is explicit committed weights, grid-tuned — no sklearn port.</li>
+<li>Quality scores a revision: append-only, post-commit, advisory.</li>
+<li><code>trace_links.*</code> is the single writer of <code>trace_link</code>.</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<ol type="1">
+<li><strong>Does Loki's 24 h sample record query strings?</strong> <code>UNVERIFIED</code>; default: assume not — RM router tests plus a probe.</li>
+<li><strong>Is RM's <code>semantic_search</code> reproducible?</strong> Default: replay <code>/search</code>; semantic is an upper bound.</li>
+<li><strong>Does S08 re-create <code>outline</code>/<code>outline_node</code>?</strong> Default: no — it references them; both stay empty until S08.</li>
+<li><strong><code>project_request.timeout</code> window</strong> (fr's timer was 300 s)? Default: 24 h, measured before S14.</li>
+<li><strong>Does <code>search.query</code> return cards?</strong> Default: yes, but the eval scores governed assets until card text is real.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S07-requirements-search.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

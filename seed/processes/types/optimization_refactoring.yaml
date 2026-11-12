@@ -1,0 +1,169 @@
+# optimization_refactoring — remove one performance problem without changing behaviour
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type optimization_refactoring: outputs and acceptance)
+# and n8n-designs/design/choices/v4/capabilities/refactoring.yaml (text "refactoring scoped to
+# performance optimization", phase execution, proof suite_only, test_files none, inspect criteria).
+# The card carries one item of a code_quality_analysis report of kind performance, so READY proves
+# the planned files exist and DOING records the before-measurement the item used, then proves the
+# suite green before and after with the item gone from the path it named.
+card_type: optimization_refactoring
+capability: refactoring
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: optimization_refactoring
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: optimization_refactoring.ready
+    title: Optimization refactoring — definition of ready
+    definition_of_ready: {checks: [planned_files_exist]}
+    definition_of_done: {checks: [workspace_imported]}
+    acceptance_criteria:
+      - {name: planned_files_exist, text: "Every file the plan names for the optimization exists at the imported revision, and the plan names how the item's performance is measured so a before and an after can be compared."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: optimization_refactoring.doing
+    title: Optimization refactoring — definition of doing
+    definition_of_ready: {checks: [workspace_imported]}
+    definition_of_done: {checks: [suite_green_after, item_gone_at_location]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff touches only the hot path files the plan named, and no test file."}
+      - {name: suite_green_before, text: "The suite is green on the base revision, and the item's measurement is taken there so the optimization has a before."}
+      - {name: suite_green_after, text: "The suite is green after the optimization, and the item's measurement at the new revision is better than the before it recorded."}
+      - {name: item_gone_at_location, text: "The performance problem the item names is gone from the location it names: the repeated work, blocking call or allocation it described no longer sits on that path."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: optimization_refactoring.qa
+    title: Optimization refactoring — definition of QA
+    definition_of_ready: {checks: [item_gone_at_location]}
+    definition_of_done: {checks: [change_preserves_behaviour, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: change_preserves_behaviour, text: "The tests covering the optimised path pass unchanged: same outputs and same side effects, only cheaper on the measurement the item used."}
+      - {name: change_removes_item, text: "The performance problem the card's code_quality_analysis item names (kind performance) is gone at the location it names."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the optimization refactoring card type declares is true of the final diff."}
+      - {name: removes_the_item, text: "The diff removes the performance problem the card's item names, shown by the same measurement it used coming out better."}
+      - {name: preserves_behaviour, text: "The diff changes no observable behaviour: the optimised path returns the same results and makes the same side effects for the same inputs."}
+      - {name: change_is_minimal, text: "The diff changes only the hot path the item names; no unrelated code is reworked in the same change."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: optimization_refactoring.done
+    title: Optimization refactoring — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request is squash-merged and the optimization's merge sha is recorded on the card."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: optimization_refactoring.system
+    title: Optimization refactoring — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: optimization_refactoring.READY
+    list: ready
+    title: Optimization refactoring — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: optimization_refactoring
+        sop: optimization_refactoring.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: optimization_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: optimization_refactoring.DOING
+    list: doing
+    title: Optimization refactoring — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: optimization_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: optimization_refactoring.QA
+    list: qa
+    title: Optimization refactoring — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: optimization_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: optimization_refactoring.DONE
+    list: done
+    title: Optimization refactoring — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: optimization_refactoring, sop: optimization_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: optimization_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

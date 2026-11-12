@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S17 — Native benchmark harness · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S17-benchmark-harness.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s17--native-benchmark-harness">S17 — Native benchmark harness</h1>
+<p>Programme project: S17 · issues #21</p>
+<p>⚠️ <strong>Process model 2026-11-09:</strong> the subject is the <strong>process</strong> (<code>process_id</code>); the old <code>procedure_id</code> pin migrates in <code>0033</code> (a SOP is not a measured subject). The <code>conveyor</code> arm resolves the run's <strong>process agent</strong>.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p><code>conveyor-bench</code> is absorbed: the conveyor becomes the whole measurement loop — seed the SWE-bench subset, produce a patch per instance for an arm, run the graded test in a sandbox, parse the log with a ported swebench parser, resolve it, store the verdict, and compare runs. At the end, a 50-instance run is an ordinary tenant-scoped record with two controls that make its number publishable, and <strong>no Python exists in the build or the image</strong>. The old repo is then frozen; its committed logs are this slice's oracle, not a dependency.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S04's registry, invocation/audit/idempotency, and the <code>job</code> runner exist; S09's <code>document</code> + object store are the log sink (<code>log_document_id</code>, §2.18).</li>
+<li>The banked artefacts are committed in <code>conveyor-bench/results/2026-09-17-full/artefacts/</code>: drive and grade run dirs, including per-instance eval logs and <code>results.jsonl</code> for the conveyor, baseline and control arms. The 17 runs that carry both a <code>results.jsonl</code> and an <code>eval-logs.tgz</code> are frozen into <code>crates/actions/tests/fixtures/benchmark/2026-09-17/</code> (557 rows; 555 graded + 2 harness-level k8s timeouts).</li>
+<li>No Kubernetes client exists anywhere in the workspace. The conveyor pod has no sandbox RBAC.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN.</strong> Four tables (§2.18); the hashed seed artifact and its seeder; the pure grader (verdict ladder + the 12 repo parsers) and the exact McNemar; the k8s Job sandbox adapter; the <code>gold</code>, <code>empty</code> and <code>baseline</code> arms; the single run driver and its reaper; the eight actions, two scopes and two events; screens <strong>13</strong> (benchmarks) and <strong>14</strong> (improvement, data contract only) <strong>declared</strong> for S12.</p>
+<p><strong>OUT.</strong> The <code>conveyor</code> arm — it measures a capability-agent/procedure version and belongs to <strong>S18</strong>, which waits for S13 and S15; this slice ships its columns and refuses it (<code>409 arm_not_ready</code>). Also out: hosting a model (the baseline calls the router), any Hugging Face call at run time, importing the old harness's CLI, a second service, and any Python in the image or the build.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conveyor-bench/src/conveyor_bench/grader.py</code> (<code>47-241</code>)</td>
+<td><code>runner_script</code>, <code>job_name</code>, <code>build_manifests</code>, <code>grade_log</code>'s ladder</td>
+<td>the ladder <strong>verbatim</strong>, the runner script verbatim, the 1 MiB ConfigMap cap</td>
+<td><code>make_test_spec</code> at run time — the eval script is generated at seed time by the Rust port</td>
+</tr>
+<tr>
+<td><code>conveyor-bench/src/conveyor_bench/baseline.py</code></td>
+<td><code>SYS_DEFAULT</code>, the edit contract, <code>parse_reply</code>, <code>apply_reply</code>, the difflib writer</td>
+<td>the prompt byte-for-byte and the refusal rules (zero/multiple anchors)</td>
+<td>any Python implementation, <code>urllib</code></td>
+</tr>
+<tr>
+<td><code>conveyor-bench/src/conveyor_bench/tasks.py</code>, <code>data/</code></td>
+<td>dataset pin, image lock, subset ids</td>
+<td>the identities and the lock digests</td>
+<td>the HF download at run time</td>
+</tr>
+<tr>
+<td><code>conveyor-bench/scripts/report-arms.py</code> (<code>46-190</code>)</td>
+<td>arm derivation, <code>mcnemar</code>, the refusal rule</td>
+<td>the rule and the two test vectors</td>
+<td>the script itself</td>
+</tr>
+<tr>
+<td><code>conveyor-bench/results/2026-09-17-full/artefacts/*</code></td>
+<td><code>results.jsonl</code>, <code>eval-logs.tgz</code>, <code>summary.json</code></td>
+<td>the parity fixtures</td>
+<td>the published prose</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/integrations/ingest.rs</code></td>
+<td>a transport with a typed failure ladder</td>
+<td>fail-closed config, 502/422 mapping</td>
+<td>its URL/token shape</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<p><code>migrations/0025_s17_benchmark.sql</code> (DDL exactly as <code>02-DATA-ARCHITECTURE §2.18</code>; update BOTH migration-ledger lists — <code>crates/store/src/migrate.rs</code> and <code>crates/store/tests/s07_schema.rs</code>), <code>seed/benchmark/verified50-v1.json</code></p>
+<ul>
+<li><code>seed/benchmark/images-verified50-v1.lock.json</code>, <code>tools/seed-benchmark/</code> (standalone crate: parquet reader + artifact writer), <code>crates/domain/src/benchmark/{mod,arm,grade,parsers,mcnemar,specgen}.rs</code>, <code>crates/domain/tests/{benchmark_specgen.rs,fixtures/benchmark/golden-eval-scripts.json}</code>, <code>crates/store/src/seed_benchmark.rs</code>, <code>crates/store/src/benchmark.rs</code>, <code>crates/actions/src/benchmark/{mod,runs,cases}.rs</code>, <code>apps/server/src/sandbox.rs</code>, <code>apps/server/src/worker.rs</code> (the driver + reaper). Tests: <code>crates/actions/tests/benchmark_parity.rs</code> (+ its frozen fixtures), <code>crates/api/tests/benchmark_rls.rs</code>, <code>apps/server/tests/benchmark_jobs.rs</code>, <code>apps/server/tests/sandbox_live.rs</code> (<code>#[ignore]</code>, needs the cluster). Plus <code>spec.rs</code> (two scopes), <code>crates/actions-derive/src/lib.rs</code> (the wire table), <code>served-spec.lock.json</code>, and the S12 screen declaration.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>input</th>
+<th>output</th>
+<th>scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>benchmark_suites.list</code></td>
+<td><code>{page}</code></td>
+<td><code>Page&lt;SuiteView&gt;</code> (hashes, versions, baseline)</td>
+<td><code>benchmarks:read</code></td>
+</tr>
+<tr>
+<td><code>benchmark_runs.start</code></td>
+<td><code>{suite_id, arm, subject_kind?, capability_agent_id?, procedure_id?, label, concurrency?, only?, with_failing_test?}</code></td>
+<td><code>RunView</code> (<code>queued</code>)</td>
+<td><code>benchmarks:write</code></td>
+</tr>
+<tr>
+<td><code>benchmark_runs.get</code></td>
+<td><code>{id}</code></td>
+<td><code>RunView</code></td>
+<td><code>benchmarks:read</code></td>
+</tr>
+<tr>
+<td><code>benchmark_runs.list</code></td>
+<td><code>{suite_id?, arm?, status?, page}</code></td>
+<td><code>Page&lt;RunView&gt;</code></td>
+<td><code>benchmarks:read</code></td>
+</tr>
+<tr>
+<td><code>benchmark_runs.cancel</code></td>
+<td><code>{id}</code></td>
+<td><code>RunView</code></td>
+<td><code>benchmarks:write</code></td>
+</tr>
+<tr>
+<td><code>benchmark_runs.compare</code></td>
+<td><code>{a_run_id, b_run_id}</code></td>
+<td><code>{comparable, reason?, both, neither, a_only, b_only, discordant, p_value, missing_in_one?, by_repo?}</code></td>
+<td><code>benchmarks:read</code></td>
+</tr>
+<tr>
+<td><code>benchmark_runs.promote</code></td>
+<td><code>{id}</code></td>
+<td><code>SuiteView</code> (baseline set)</td>
+<td><code>benchmarks:write</code></td>
+</tr>
+<tr>
+<td><code>benchmark_cases.list</code></td>
+<td><code>{run_id, verdict?, page}</code></td>
+<td><code>Page&lt;CaseView&gt;</code></td>
+<td><code>benchmarks:read</code></td>
+</tr>
+</tbody>
+</table>
+<p>Screens declared for S12: <strong>#13 Benchmarks</strong> (<code>benchmark_runs.*</code>, <code>benchmark_cases.list</code>, SSE <code>benchmark_run:{id}</code>, <code>benchmarks.spec.ts</code>) and <strong>#14 Improvement</strong> (<code>benchmark_runs.trend</code> arrives with S18; <code>improvement.spec.ts</code>). Jobs: <code>benchmark.run.poll</code>, <code>benchmark.reap</code>. Scopes: <code>benchmarks:read</code>, <code>benchmarks:write</code>. Events: <code>benchmark_run.changed</code>, <code>benchmark_case.recorded</code>.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li><strong>Seed artifact</strong> — <code>tools/seed-benchmark</code> (a standalone crate, not a workspace member) reads the pinned parquet and generates <code>seed/benchmark/verified50-v1.json</code> through the Rust port of swebench 5.0.2's <code>make_test_spec</code> (<code>crates/domain/src/benchmark/specgen.rs</code>), with <code>seed_sha256</code>; commit it. Assert its 50 instance ids equal <code>data/verified50-v1.json</code>. The harness runs once in development as the <strong>golden oracle</strong> (50 scripts, <code>crates/domain/tests/fixtures/benchmark/golden-eval-scripts.json</code>); no Python is in the build or the image.</li>
+<li>Migration + <code>crates/store/src/migrate.rs</code> touch (the macro embeds at compile time). <code>cargo run -p conveyor-server -- migrate</code>; verify the ledger, not the log line.</li>
+<li><code>domain::benchmark::arm</code> — the <code>report-arms.py</code> derivation (<code>conveyor-*</code>, <code>control-*</code>, direct; <code>+failing-test</code> ⇒ <code>files+test</code>/<code>bug_fix</code>), and the <code>MixedArmLabels</code> refusal. Tests with the five banked labels.</li>
+<li><code>domain::benchmark::mcnemar</code> — exact two-sided, both vectors (9/p=0.180 counts-only, 8/p=0.289); the refusal.</li>
+<li><code>domain::benchmark::parsers</code> — extract the test-output section, then one parser per repo (12), producing a <code>test → status</code> map; resolve <code>FAIL_TO_PASS</code>/<code>PASS_TO_PASS</code>.</li>
+<li><code>domain::benchmark::grade</code> — <code>grade_log</code>'s ladder, including the infra classifier and the end-marker guard.</li>
+<li><strong>Parity test</strong> <code>crates/actions/tests/benchmark_parity.rs</code>, over fixtures copied to <code>crates/actions/tests/fixtures/benchmark/2026-09-17/</code> (the grade dirs' <code>results.jsonl</code> + <code>eval-logs.tgz</code>, the drive dirs' <code>predictions.jsonl</code>/<code>provenance.jsonl</code>/<code>summary.json</code>, and the seed) — every banked grade run's logs reproduce its <code>results.jsonl</code> row for row. This is the slice's central proof; do it before any sandbox code.</li>
+<li><code>store::benchmark</code> — suite/instance seed (idempotent by <code>seed_sha256</code>; conflict ⇒ 409), run create/get/list/ cancel, case finalise, compare query (paired on the graded intersection), baseline promote, reap. RLS tests.</li>
+<li><code>actions::benchmark</code> — the eight handlers; scopes at the five code sites; registry <code>EXPECTED</code> and the api-lib count; a <code>parity_http_mcp</code> sample for each action.</li>
+<li><code>apps/server/src/sandbox.rs</code> — <code>kube</code> client, ConfigMap + Job, pod log, delete; deterministic names; fail-closed config. Unit-test the manifest builder; one <code>#[ignore]</code> live proof against the cluster.</li>
+<li>Worker: <code>benchmark.run.poll</code> (start ≤ concurrency, poll, grade, finalise, re-enqueue per tick with <code>max_attempts=1</code>) and <code>benchmark.reap</code> in <code>DEFAULT_SCHEDULES</code> + <code>prune.rs</code>'s exact list.</li>
+<li><code>--write-lock</code>; schema/action/op counts in the index; <code>cargo test --workspace</code>; clippy; <code>/tmp/s17-gate.sh</code>.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+cd $HOME/Movies/conveyor
+step() { printf &#39;\n=== %s ===\n&#39; &quot;$1&quot;; }
+
+# Rust runs on m1 (CONTRACT §16): `~/.local/bin/cargo` refuses inside a Cargo project on mini3.
+step &quot;fmt + clippy&quot;
+rbuild -- fmt --all -- --check
+rbuild -- clippy --workspace --all-targets -- -D warnings
+
+step &quot;the served spec matches the lock&quot;
+rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock &gt;/dev/null
+
+step &quot;the banked logs reproduce the banked verdicts (the oracle)&quot;
+rbuild -- test -p conveyor-actions --test benchmark_parity -- --nocapture
+# 555/555 graded rows reproduce their banked verdicts; the gold controls are 50/50, the empty 0/50
+
+step &quot;golden eval scripts (the harness oracle, 50/50)&quot;
+rbuild -- test -p conveyor-domain --test benchmark_specgen
+
+step &quot;arm derivation and McNemar&quot;
+rbuild -- test -p conveyor-domain benchmark
+
+step &quot;the workspace suite&quot;
+rbuild -- test --workspace --locked
+
+step &quot;the seed tool (standalone workspace; run from the repo root)&quot;
+rbuild -- clippy --manifest-path tools/seed-benchmark/Cargo.toml --all-targets -- -D warnings
+rbuild -- fmt --manifest-path tools/seed-benchmark/Cargo.toml --check
+rbuild -- run -q --manifest-path tools/seed-benchmark/Cargo.toml -- \
+  --parquet &lt;the pinned parquet&gt; --images seed/benchmark/images-verified50-v1.lock.json \
+  --ids &lt;verified50-v1.json&gt; --out .seed-gate/verified50-v1.json
+cmp seed/benchmark/verified50-v1.json .seed-gate/verified50-v1.json
+
+# ⚠️ This probe observes mini3&#39;s compose `conveyor_dev`, where the operator applies `migrate`.
+# The `test` commands above run against m1&#39;s throwaway cluster, a DIFFERENT database — so the
+# probe names its database rather than leaving the reader to assume it.
+step &quot;RLS on every new table (compose conveyor_dev)&quot;
+export DATABASE_URL=&#39;postgres://postgres:postgres@127.0.0.1:5439/conveyor_dev&#39;
+for t in benchmark_suite benchmark_instance benchmark_run benchmark_case; do
+  test &quot;$(psql &quot;$DATABASE_URL&quot; -tAc &quot;SELECT relrowsecurity AND relforcerowsecurity FROM pg_class WHERE relname=&#39;$t&#39;&quot;)&quot; = &quot;t&quot;
+done
+
+step &quot;two tenants cannot see each other&#39;s run&quot;
+rbuild -- test -p conveyor-api --test benchmark_rls
+
+step &quot;the sandbox is fail-closed&quot;
+rbuild -- test -p conveyor-server --test benchmark_jobs
+
+printf &#39;\nGATE_GREEN\n&#39;</code></pre>
+<p>A live sandbox proof is <strong>not</strong> in this block: it needs the grading node (§10). It is one <code>#[ignore]</code> test, <code>rbuild -- test -p conveyor-server --test sandbox_live -- --ignored</code>, run once when the node exists.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>The parser is the score.</strong> A regex that silently matches nothing turns a testbed fault into a model failure. The parity test must compare every instance, and an unparseable case is <code>infra_error</code>, never <code>unresolved</code>.</li>
+<li><strong>A Job name is not free.</strong> <code>swb-&lt;run8&gt;-&lt;slug&gt;</code> can exceed 63 chars and can collide on a re-run; the harness's <code>job_name</code> truncation is part of the port, and a 409 on create is a <strong>reattach</strong>.</li>
+<li><strong>The ConfigMap is capped at 1 MiB by k8s</strong>, and the three files share the cap. Refuse before create.</li>
+<li><strong>The patch cap is 256 KiB in the domain and in the CHECK</strong>; truncating a patch fabricates an <code>apply_failed</code>.</li>
+<li><strong>Answers are not producer input.</strong> <code>gold_patch</code>/<code>test_patch</code>/<code>FAIL_TO_PASS</code> are read only by the grader; a producer sees the problem statement and <code>oracle_files</code>. An action that returns them is the bug.</li>
+<li><strong>A control miss is data, not a failure to hide.</strong> Gold 50/50 and empty 0/50 are gates on the <em>grader</em>; a run that misses is recorded <code>control_ok=false</code> and its number is never shown as a score.</li>
+<li><strong>The poll chain must survive a flaky runner.</strong> A same-key re-enqueue is refused while the current job is running; use a per-tick dedupe key and <code>max_attempts=1</code>. The reaper keys on <code>last_polled_at</code>, not on case silence.</li>
+<li><strong>No FK across tenant tables.</strong> The <code>inference_call</code> rule (§2.17): a foreign key's RI check bypasses RLS. The two forward references are resolved in-tenant at write.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li><strong>The eval script is generated at seed time, in Rust.</strong> swebench 5.0.2's <code>make_test_spec</code> takes the dataset's <code>eval_script</code> and only inserts the test-exit-code lines around the end marker (<code>utils.py:223-245</code>); that transform is ported byte for byte (<code>domain::benchmark::specgen</code>) and pinned by a golden test generated once by the harness. A new suite is a new hashed artifact. Python never runs in the build, the image or the product.</li>
+<li><strong>The image lock and dataset revision are suite identity.</strong> A re-seed with different hashes is a 409, not an update; a suite name cannot silently change what it measures.</li>
+<li><strong>One writer per run.</strong> <code>benchmark.run.poll</code> is the only writer of progress; there is no ingest action and no second driver.</li>
+<li><strong>The baseline is the model control, not an arm of the product.</strong> It is measured and displayed, never compared against a <code>conveyor</code> run whose oracle/prompt differ (§7's refusal).</li>
+<li><strong>No benchmark action is in <code>AGENT_TOOLS</code>.</strong> A model-driven principal cannot start a run or read an answer.</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Which node runs the eval Jobs?</td>
+<td>a designated node with a taint; the selector is deployment config, never a repointed <code>worker1</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>May the baseline reach <code>raw.githubusercontent.com</code> from the pod?</td>
+<td>yes if the namespace allows egress; otherwise fetch through a sandbox Job</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Is the seed's one-time extraction acceptable as Python, though the product has none?</td>
+<td><strong>RESOLVED 2026-11-09 (owner): no Python anywhere in the seed path.</strong> The eval script is generated by the Rust port; the harness is a development-only golden oracle, and its output is a committed fixture.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Does a run pin a provider/model?</td>
+<td><code>model</code> is recorded from the router's response; a differing model is disclosed by <code>compare</code>, never refused</td>
+</tr>
+<tr>
+<td>5</td>
+<td>How long is a run's deadline?</td>
+<td>the sum of per-case deadlines at the configured concurrency; the reaper fails a dead driver, not a slow run</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S17-benchmark-harness.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

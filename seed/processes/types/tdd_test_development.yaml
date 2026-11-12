@@ -1,0 +1,168 @@
+# tdd_test_development — write the tests a feature card will make pass (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type tdd_test_development: outputs and acceptance) and
+# n8n-designs/design/choices/v4/capabilities/bddtdd.yaml (text "test creation (prior to development)",
+# phase execution, source card, proof expected_failure: suite green before, then diff only test files,
+# expected failures present and suite green). The new tests carry the strict expected-failure marker;
+# the later feature card makes them pass and removes the marker. `source: card` — no analysis report
+# leads here, READY finds the test command and the card itself is the scope (P-W3-10).
+card_type: tdd_test_development
+capability: bdd_tdd
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: tdd_test_development
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: tdd_test_development.ready
+    title: TDD test development — definition of ready
+    definition_of_ready: {checks: [test_files_in_test_dirs, marker_is_strict]}
+    definition_of_done: {checks: [test_command_found, suite_green_before]}
+    acceptance_criteria:
+      - {name: test_files_in_test_dirs, text: "Every test file the change adds sits in a test directory the repository already uses, beside the tests for the subject it exercises and never beside the production code."}
+      - {name: marker_is_strict, text: "Every new test carries the strict expected-failure facility its framework provides — one that turns an unexpected pass into a failure of the suite — not a skipped or disabled test, a commented-out assertion, or a test that merely fails today."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: tdd_test_development.doing
+    title: TDD test development — definition of doing
+    definition_of_ready: {checks: [test_command_found, suite_green_before]}
+    definition_of_done: {checks: [every_case_written, every_new_test_marked, suite_green_after]}
+    acceptance_criteria:
+      - {name: every_case_written, text: "Every case the card names exists as a test, written out with the setup, the call and the assertion it makes, so each case is one test a reader can point at rather than a description in the card."}
+      - {name: every_new_test_marked, text: "Every test the diff adds carries the strict expected-failure marker READY recorded, and no test the suite already had is marked."}
+      - {name: new_tests_fail_without_the_marker, text: "With the marker removed, every new test fails for the behaviour the card names — not for a missing import, a typo or a compile error — so each is a real red test the feature card will turn green."}
+      - {name: suite_green_after, text: "Run with the command READY recorded, the suite reports no failure after the marked tests are added: the new tests fail as expected and every test that passed before still passes."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: tdd_test_development.qa
+    title: TDD test development — definition of QA
+    definition_of_ready: {checks: [every_new_test_marked]}
+    definition_of_done: {checks: [tests_check_target, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: tests_check_target, text: "Each new test fails when the behaviour the card names is broken and passes when that behaviour is correct, so the test checks the behaviour rather than only that the module imports or the call returns."}
+      - {name: capability_acceptance_met, text: "The diff is true of every acceptance statement the tdd_test_development card type declares — each named case is written as a test in a test directory, each new test is strictly marked expected to fail, and the suite is green with those expectations in place."}
+      - {name: tests_assert_behaviour, text: "Every new test asserts the target's behaviour, not only that the code runs."}
+      - {name: tests_cover_target, text: "The tests cover the target the card names."}
+      - {name: no_production_change, text: "The diff changes no production file: the production change that turns these tests green belongs to the feature card this one precedes, not to this diff."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: tdd_test_development.done
+    title: TDD test development — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request carrying the new tests is merged, and the tests it lands are the ones QA reviewed — still marked expected to fail, so the feature card that makes them pass has the exact cases it must turn green."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: tdd_test_development.system
+    title: TDD test development — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: tdd_test_development.READY
+    list: ready
+    title: TDD test development — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: tdd_test_development
+        sop: tdd_test_development.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: tdd_test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: tdd_test_development.DOING
+    list: doing
+    title: TDD test development — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: tdd_test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: tdd_test_development.QA
+    list: qa
+    title: TDD test development — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: tdd_test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: tdd_test_development.DONE
+    list: done
+    title: TDD test development — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: tdd_test_development, sop: tdd_test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: tdd_test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

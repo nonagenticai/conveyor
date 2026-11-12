@@ -1,0 +1,902 @@
+{
+  "version": 1,
+  "note": "Synthetic requirement documents written solely as labelled ground truth for the search relevance eval; nothing here describes a real system.",
+  "assets": [
+    {
+      "key": "REQ-AUTH-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Users can reset their own password by email",
+      "body": "A registered user who has forgotten their credentials may request a reset link from the sign-in page. The link expires after thirty minutes and may be used only once. Support staff should not be able to read the new password at any point."
+    },
+    {
+      "key": "REQ-AUTH-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Administrators can trigger a password reset for another user",
+      "body": "Helpdesk agents need to unblock locked accounts without seeing the credential itself. The reset link expires after thirty minutes and can be used once. Every manual reset is written to the audit trail with the agent identity."
+    },
+    {
+      "key": "REQ-AUTH-003",
+      "kind": "requirement",
+      "status": "superseded",
+      "title": "Password reset links expire and are single use",
+      "body": "Each issued token is bound to a single account and a single purpose. Reuse of a consumed token returns a generic failure that reveals nothing about the account. Expired tokens are removed nightly by a scheduled job."
+    },
+    {
+      "key": "REQ-AUTH-004",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Multi-factor authentication is required for administrative accounts",
+      "body": "Anyone holding an elevated role must present a second factor at every new session. Time-based one-time codes and hardware keys are supported, while text messages are not. Recovery codes are issued once and stored only as hashes."
+    },
+    {
+      "key": "REQ-AUTH-005",
+      "kind": "requirement",
+      "status": "draft",
+      "title": "Sessions end automatically after thirty minutes of inactivity",
+      "body": "An idle browser session is invalidated on the server rather than merely hidden in the client. The countdown resets on genuine interaction, not on background polling. Users receive a warning two minutes before expiry so they can continue working."
+    },
+    {
+      "key": "REQ-AUTH-006",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Users sign in with their email address and a password",
+      "body": "The login form accepts a case-insensitive email and a secret that is never written to logs. Failed attempts are rate limited per account and per source address. A generic message is shown so the response does not disclose whether an account exists."
+    },
+    {
+      "key": "REQ-AUTH-007",
+      "kind": "requirement",
+      "status": "in_review",
+      "title": "Single sign-on through the corporate identity provider",
+      "body": "Staff accounts are federated using OpenID Connect against the company directory. Local passwords are disabled for federated users once the link is established. Group membership is mapped to application roles at each sign-in."
+    },
+    {
+      "key": "REQ-AUTH-008",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Account recovery codes allow access when a phone is lost",
+      "body": "Ten recovery codes are generated when a second factor is enrolled. Each code is single use and is invalidated after a successful sign-in. Users may regenerate the whole set, which immediately revokes every previous code."
+    },
+    {
+      "key": "REQ-AUTHZ-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Roles determine which screens and actions a user can access",
+      "body": "Permissions are attached to roles rather than to individuals so access can be reviewed in one place. A user may hold several roles and receives the union of their grants. Changes take effect on the next request without a re-login."
+    },
+    {
+      "key": "REQ-AUTHZ-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Workspace owners can invite colleagues with a chosen role",
+      "body": "An owner selects an email address and one of the predefined roles when inviting someone. The invitation expires after seven days and can be revoked before acceptance. Invitees who already have an account are added directly."
+    },
+    {
+      "key": "REQ-AUTHZ-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Deny by default for every newly introduced endpoint",
+      "body": "A route without an explicit permission declaration must reject all callers, including administrators. The policy is enforced centrally in middleware so individual handlers cannot opt out. Reviews check the route inventory rather than trusting each handler."
+    },
+    {
+      "key": "REQ-AUTHZ-004",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Approvals require a second person for high value payments",
+      "body": "Any payout above the configured threshold must be confirmed by a different operator than the one who created it. The approver cannot approve their own submission. The threshold is configurable per workspace and shown on the approval screen."
+    },
+    {
+      "key": "REQ-AUTHZ-005",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Users can only see records from their own workspace",
+      "body": "Tenant identity is derived from the authenticated session, never from a request parameter. Queries are filtered at the data layer so that a forgotten condition in a handler cannot leak rows. Cross-tenant access returns not found rather than forbidden."
+    },
+    {
+      "key": "REQ-AUTHZ-006",
+      "kind": "requirement",
+      "status": "in_review",
+      "title": "Temporary elevation is granted for a fixed period",
+      "body": "An engineer requests elevated access with a stated reason and a duration of at most four hours. A manager approves the request and the grant expires automatically. All actions taken during elevation are recorded in a separate report."
+    },
+    {
+      "key": "REQ-AUTHZ-007",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Permission changes appear in the audit log within a minute",
+      "body": "Every grant and revocation records who made the change, the previous state and the new state. The entries are append-only and cannot be edited by application administrators. Reports can filter by subject, actor and time range."
+    },
+    {
+      "key": "REQ-AUTHZ-008",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Service accounts use scoped tokens instead of shared passwords",
+      "body": "Each integration receives its own credential limited to the operations it needs. Tokens rotate on a schedule and can be revoked individually without affecting other callers. Shared logins for automation are prohibited and detected by a scanning job."
+    },
+    {
+      "key": "REQ-PAY-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Customers can pay an invoice with a saved card",
+      "body": "The checkout page lists cards the customer has previously stored and lets them pick one without re-entering details. The charge is authorised immediately and captured the same day. A receipt is emailed after the capture succeeds."
+    },
+    {
+      "key": "REQ-PAY-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Refunds are issued against the original payment method",
+      "body": "A refund is limited to the captured amount still available on that transaction. Partial refunds may be repeated until the full amount is returned. The customer sees a credit note referencing the original invoice."
+    },
+    {
+      "key": "REQ-PAY-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Failed card payments are retried three times over a week",
+      "body": "A declined charge is retried on days one, three and seven before the subscription is suspended. The customer is told which attempt failed and why, in plain language. A successful retry cancels the remaining schedule."
+    },
+    {
+      "key": "REQ-PAY-004",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Payment provider webhooks update the order state",
+      "body": "The gateway notifies us asynchronously when a charge settles, fails or is disputed. Duplicate notifications are ignored through an idempotency identifier. Orders never move to paid on the strength of a browser redirect alone."
+    },
+    {
+      "key": "REQ-PAY-005",
+      "kind": "requirement",
+      "status": "superseded",
+      "title": "Customers can pay in euros, pounds and dollars",
+      "body": "Prices are stored in a single base currency and converted at checkout using a daily rate. The charged currency and the applied rate are recorded with the transaction. Settlement reports reconcile to the base amount."
+    },
+    {
+      "key": "REQ-PAY-006",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Saved card details must never be stored on our servers",
+      "body": "Card numbers are tokenised by the provider and only the resulting tokens are kept. The card verification value is never transmitted to our backend. Payment forms are rendered by the provider's hosted fields."
+    },
+    {
+      "key": "REQ-PAY-007",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Subscriptions renew automatically until cancelled",
+      "body": "A renewal is attempted on the billing anniversary using the stored mandate. Customers receive notice three days before the charge is made. Cancellation stops future renewals and leaves the current period paid for."
+    },
+    {
+      "key": "REQ-PAY-008",
+      "kind": "requirement",
+      "status": "draft",
+      "title": "Disputed charges are frozen pending investigation",
+      "body": "When a customer raises a chargeback the related payout is held back until the case is decided. Evidence is collected in one place and submitted before the provider deadline. A lost dispute is recorded against the merchant account."
+    },
+    {
+      "key": "REQ-NOTIF-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Customers receive an email when their order ships",
+      "body": "The message includes the carrier, the tracking reference and an estimated delivery window. It is sent once per shipment and never for orders still awaiting payment. Bounced messages raise a task for the support queue."
+    },
+    {
+      "key": "REQ-NOTIF-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Users can choose which notifications they receive",
+      "body": "A preferences screen lists every category with separate switches for email, push and in-app. Marketing messages are opt-in while service messages cannot be disabled. Changes apply to subsequent sends rather than to queued ones."
+    },
+    {
+      "key": "REQ-NOTIF-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Urgent alerts are delivered to the on-call engineer by pager",
+      "body": "Alerts that indicate customer impact page the current on-call rota within one minute. Acknowledging the page silences further repeats for that incident. If nobody acknowledges within ten minutes the next engineer is paged."
+    },
+    {
+      "key": "REQ-NOTIF-004",
+      "kind": "requirement",
+      "status": "archived",
+      "title": "Digest emails summarise activity once per day",
+      "body": "Members who opt in receive one consolidated message each morning instead of per-event mail. The digest groups items by workspace and links directly to each. An empty digest is not sent."
+    },
+    {
+      "key": "REQ-NOTIF-005",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Push notifications respect quiet hours",
+      "body": "Between ten in the evening and seven in the morning local time, non-critical pushes are queued until the window ends. Critical security notices are exempt. The device timezone is used rather than the server clock."
+    },
+    {
+      "key": "REQ-NOTIF-006",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Message templates support localisation without code changes",
+      "body": "Translators edit copy in the admin console and publish without a deployment. Each template declares a locale and falls back to the default language when a translation is missing. Placeholders are validated against the template's allowed variables."
+    },
+    {
+      "key": "REQ-NOTIF-007",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Undeliverable email addresses are suppressed after repeated bounces",
+      "body": "Three hard bounces within thirty days mark the address as undeliverable. Suppressed addresses are skipped rather than retried and are shown to the account owner. A later successful delivery clears the suppression."
+    },
+    {
+      "key": "REQ-NOTIF-008",
+      "kind": "requirement",
+      "status": "draft",
+      "title": "Notification delivery is tracked per channel and recipient",
+      "body": "Each send records the channel, the provider response and the eventual delivery state. Operators can search by recipient over the last ninety days. Aggregate failure rates feed a monitoring dashboard."
+    },
+    {
+      "key": "REQ-SEARCH-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Search finds documents by words in the title and body",
+      "body": "Indexed fields include the title, description and any attached text a user can see. Results rank documents containing more of the query terms higher. Stop words are dropped so that common words do not dominate scoring."
+    },
+    {
+      "key": "REQ-SEARCH-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Typing mistakes are tolerated in the search box",
+      "body": "A query with a single transposed or dropped letter should still match the intended word. Similarity matching runs against a trigram index over the indexed text. The correction is never shown as a suggestion, only used to broaden the match."
+    },
+    {
+      "key": "REQ-SEARCH-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Filters narrow results by status, owner and date",
+      "body": "The results page offers facets that can be combined freely with the text query. Filtering happens in the database alongside ranking so counts stay accurate. Selected filters survive pagination and are reflected in the URL."
+    },
+    {
+      "key": "REQ-SEARCH-004",
+      "kind": "requirement",
+      "status": "archived",
+      "title": "Results show the matching snippet with the words highlighted",
+      "body": "Each result displays a short excerpt around the strongest match rather than the opening paragraph. Query words are wrapped in a safe highlight marker on the server. Long documents are truncated with an ellipsis."
+    },
+    {
+      "key": "REQ-SEARCH-005",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Users can search by document key using an exact match",
+      "body": "A query that consists solely of an identifier such as a requirement key resolves directly to that document. Exact matches are ranked above fuzzy ones. The behaviour is case insensitive and ignores surrounding whitespace."
+    },
+    {
+      "key": "REQ-SEARCH-006",
+      "kind": "requirement",
+      "status": "draft",
+      "title": "Search terms can be combined with boolean operators",
+      "body": "The parser accepts quoted phrases, a leading minus for exclusion and the word OR in capital letters. Unbalanced quotes are treated as a phrase running to the end of the input. Operators cannot cause an unbounded wildcard scan."
+    },
+    {
+      "key": "REQ-SEARCH-007",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Recently viewed documents rank higher in suggestions",
+      "body": "The suggestion list blends textual similarity with how recently the user opened each document. Personal history never leaks into another user's ranking. History older than sixty days is ignored."
+    },
+    {
+      "key": "REQ-SEARCH-008",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Search covers archived documents only when requested",
+      "body": "Archived items are excluded from the default result set to keep the list relevant. A toggle on the results page re-includes them with a visible badge. Permissions still apply to archived content."
+    },
+    {
+      "key": "REQ-REPORT-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Managers can export the monthly usage report as a spreadsheet",
+      "body": "The export contains one row per workspace and one column per billing period. Number formatting is applied in the file so it opens cleanly in common tools. Large exports are generated in the background and emailed when ready."
+    },
+    {
+      "key": "REQ-REPORT-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Dashboards refresh every five minutes without a reload",
+      "body": "Open dashboards poll for new aggregates on a fixed interval and update in place. The indicator shows the timestamp of the most recent data. A failed refresh leaves the previous figures visible with a warning."
+    },
+    {
+      "key": "REQ-REPORT-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Every report can be filtered by date range",
+      "body": "The selector offers common windows such as today, last seven days and this quarter. Custom ranges accept inclusive start and end dates. Totals and charts both reflect the chosen window."
+    },
+    {
+      "key": "REQ-REPORT-004",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Report figures must reconcile with the transaction ledger",
+      "body": "A nightly job compares each workspace's reported totals against the sums in the ledger. Any difference above one cent opens an investigation task. Reports display the reconciliation state for the previous day."
+    },
+    {
+      "key": "REQ-REPORT-005",
+      "kind": "requirement",
+      "status": "in_review",
+      "title": "Users can schedule recurring email summaries",
+      "body": "A saved report can be delivered daily, weekly or monthly to a list of recipients. The schedule uses the workspace timezone rather than the operator's. Recipients who lack permission receive nothing rather than a redacted copy."
+    },
+    {
+      "key": "REQ-REPORT-006",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Revenue is broken down by product and region",
+      "body": "The overview tab groups settled revenue by catalogue item and by the country of the billing address. Amounts are shown in the base currency with the exchange rate applied. Rows below one percent are folded into an other bucket."
+    },
+    {
+      "key": "REQ-REPORT-007",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Reports never expose data from other tenants",
+      "body": "Every query behind a dashboard is scoped to the caller's workspace at the database layer. Aggregate caches are keyed by tenant so results cannot bleed between customers. A shared link shows only the viewer's own data."
+    },
+    {
+      "key": "REQ-REPORT-008",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Managers can compare two periods side by side",
+      "body": "The comparison view shows the selected range next to the preceding range of equal length. Percentage change is shown for every metric with the direction indicated. Missing data is rendered as a dash rather than zero."
+    },
+    {
+      "key": "REQ-BILL-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Invoices are generated on the first day of each month",
+      "body": "A scheduled job assembles usage from the previous period and produces one invoice per workspace. The document is numbered sequentially and stored as a PDF. Customers are notified once the invoice is available."
+    },
+    {
+      "key": "REQ-BILL-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Plan upgrades are prorated for the remainder of the period",
+      "body": "When a workspace moves to a higher plan mid-cycle the difference is charged immediately. Downgrades take effect at the next renewal instead. Both cases show the calculation before the change is confirmed."
+    },
+    {
+      "key": "REQ-BILL-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Usage above the plan allowance is billed per unit",
+      "body": "Metered usage is collected hourly and summarised into the invoice. The first thousand units are included in the subscription. Rate cards differ per plan and are shown on the pricing page."
+    },
+    {
+      "key": "REQ-BILL-004",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Tax is calculated from the customer's billing address",
+      "body": "The applicable rate and jurisdiction are resolved when the invoice is issued. Customers with a valid tax number are reverse charged where the law allows. The tax lines are broken out per rate."
+    },
+    {
+      "key": "REQ-BILL-005",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Customers can update their billing details at any time",
+      "body": "Billing name, address and tax identifiers are editable from the account settings. Changes apply to future invoices and never rewrite issued documents. A new tax number is validated before it is accepted."
+    },
+    {
+      "key": "REQ-BILL-006",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Cancelling a subscription keeps access until period end",
+      "body": "Cancellation stops the next renewal but the workspace remains usable for the days already paid. The account is moved to a read-only state afterwards. Data is retained according to the published retention schedule."
+    },
+    {
+      "key": "REQ-BILL-007",
+      "kind": "requirement",
+      "status": "superseded",
+      "title": "Credit notes are issued when an invoice is corrected",
+      "body": "A corrected invoice never overwrites the original document. Instead a credit note negates the wrong lines and a new invoice is raised. Both documents reference each other by number."
+    },
+    {
+      "key": "REQ-BILL-008",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Overdue invoices suspend non-essential features after grace",
+      "body": "Payment reminders go out on the due date and again seven days later. After a further seven days the workspace becomes read-only. Suspension never deletes data and is lifted automatically on payment."
+    },
+    {
+      "key": "REQ-INTEG-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Incoming webhooks are authenticated with a shared secret",
+      "body": "Each configured endpoint carries a signing secret used to compute a request digest. Requests whose signature does not match are rejected before parsing. Secrets can be rotated with an overlap window."
+    },
+    {
+      "key": "REQ-INTEG-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Outbound webhooks retry with exponential backoff",
+      "body": "A failed delivery is retried after one, five and thirty minutes before being dropped. Each attempt carries the same event identifier so receivers can deduplicate. Repeated failures disable the endpoint and notify its owner."
+    },
+    {
+      "key": "REQ-INTEG-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "The public API uses versioned REST endpoints",
+      "body": "Breaking changes are introduced under a new version prefix while the previous one is supported for at least six months. Deprecations are announced in the changelog and with response headers. Clients choose a version explicitly."
+    },
+    {
+      "key": "REQ-INTEG-004",
+      "kind": "requirement",
+      "status": "archived",
+      "title": "CSV import maps columns to fields before committing",
+      "body": "The upload screen previews the first rows and lets the operator align each column with a target field. Validation errors list the offending line numbers. Nothing is written until the mapping is confirmed."
+    },
+    {
+      "key": "REQ-INTEG-005",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Third-party connections can be revoked from settings",
+      "body": "The connected applications page lists every provider with the granted scopes and the last use. Revoking a connection removes the stored tokens immediately. The provider is informed so the grant can be withdrawn on their side."
+    },
+    {
+      "key": "REQ-INTEG-006",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "API rate limits are reported in response headers",
+      "body": "Every response includes the remaining quota and the time until the window resets. Exceeding the limit returns a specific status code with a retry hint. Limits differ between read and write operations."
+    },
+    {
+      "key": "REQ-INTEG-007",
+      "kind": "requirement",
+      "status": "in_review",
+      "title": "Nightly synchronisation keeps the CRM copy up to date",
+      "body": "Contacts and organisations are pulled overnight and merged by external identifier. Deletions on either side are marked rather than purged. A summary of created and updated records is emailed to the administrator."
+    },
+    {
+      "key": "REQ-INTEG-008",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Integration failures appear on a status page for operators",
+      "body": "Each connector reports its last successful run and any pending errors. The page distinguishes a provider outage from a configuration mistake. Operators can trigger a manual retry from the same screen."
+    },
+    {
+      "key": "REQ-SEC-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "All traffic between services is encrypted in transit",
+      "body": "Internal calls use mutual TLS with certificates issued by the platform's own authority. Plain text listeners are disabled and monitored. Certificate rotation happens without restarting the service."
+    },
+    {
+      "key": "REQ-SEC-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Secrets are stored in a managed vault, not in code",
+      "body": "Application secrets are fetched at start-up and held in memory only. Committed credentials are blocked by a scanning check on every change. Rotation requires no rebuild of the application image."
+    },
+    {
+      "key": "REQ-SEC-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Dependencies are scanned for known vulnerabilities nightly",
+      "body": "The scanner compares the lock file against public advisory feeds each night. Findings above the agreed severity open a ticket automatically. A break-glass exception must name an owner and an expiry date."
+    },
+    {
+      "key": "REQ-SEC-004",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Administrative actions are logged with the actor identity",
+      "body": "Privileged operations record the authenticated subject, the source address and the affected resource. Logs are shipped to a separate account the application cannot delete. Retention follows the audit schedule."
+    },
+    {
+      "key": "REQ-SEC-005",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Repeated failed sign-ins lock the account temporarily",
+      "body": "Five consecutive failures within fifteen minutes trigger a lock that lifts after thirty minutes. The lock is per account and independent of the source address. Support can release it after verifying the owner."
+    },
+    {
+      "key": "REQ-SEC-006",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Uploaded files are scanned before they become downloadable",
+      "body": "Files are quarantined until the malware scan returns a verdict. A positive result deletes the object and alerts the uploader's administrator. The scan result is recorded with the file metadata."
+    },
+    {
+      "key": "REQ-SEC-007",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Personal data is encrypted at rest with managed keys",
+      "body": "Sensitive columns are encrypted before they reach the storage layer. Keys are rotated on a yearly schedule and never exported. Backups inherit the same protection without extra configuration."
+    },
+    {
+      "key": "REQ-SEC-008",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Security headers are applied to every public response",
+      "body": "Responses carry a strict content security policy, frame restrictions and a referrer policy. The policy is defined once at the edge rather than per handler. Violations are reported to a collection endpoint."
+    },
+    {
+      "key": "REQ-PERF-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "The dashboard loads within two seconds on a typical connection",
+      "body": "The target is measured on a mid-range laptop over a throttled link. Server rendering covers the first screen so the customer sees content before scripts finish. Slow queries are logged with their execution plan."
+    },
+    {
+      "key": "REQ-PERF-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Database queries must not scan full tables",
+      "body": "Every query used by a request path is checked against its plan in review. Sequential scans on tables above a size threshold fail the check. Indexes are added alongside the query that needs them."
+    },
+    {
+      "key": "REQ-PERF-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Bulk imports process ten thousand rows per minute",
+      "body": "The importer batches writes and commits in chunks to bound memory use. Progress is reported to the operator as rows are accepted. A failure rolls back only the current chunk."
+    },
+    {
+      "key": "REQ-PERF-004",
+      "kind": "requirement",
+      "status": "draft",
+      "title": "Heavy reports run in the background and notify when ready",
+      "body": "Reports that would exceed ten seconds move to a worker queue automatically. The requester receives an in-app message with a download link. Queued work survives a restart of the web tier."
+    },
+    {
+      "key": "REQ-PERF-005",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "The system serves five hundred requests per second at peak",
+      "body": "Load testing reproduces the busiest hour before each major release. The target assumes the standard production instance size. Headroom of thirty percent is kept above the published figure."
+    },
+    {
+      "key": "REQ-PERF-006",
+      "kind": "requirement",
+      "status": "superseded",
+      "title": "Static assets are cached at the edge for a day",
+      "body": "Versioned bundles are immutable and may be cached for a year, while unversioned responses use a shorter window. Cache keys ignore tracking parameters. Invalidation is by publishing a new file name, not by purging."
+    },
+    {
+      "key": "REQ-PERF-007",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Long running jobs can be cancelled without side effects",
+      "body": "Cancellation is checked between batches rather than in the middle of a write. A cancelled job records the last completed unit so it can resume later. Partial output remains visible but is marked incomplete."
+    },
+    {
+      "key": "REQ-PERF-008",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Memory use stays below the container limit under load",
+      "body": "Streaming is preferred over buffering whole payloads in memory. The limit is enforced so that a runaway process is restarted rather than degrading its neighbours. Alerts fire at eighty percent of the ceiling."
+    },
+    {
+      "key": "REQ-A11Y-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Every interactive element is reachable with the keyboard",
+      "body": "Tab order follows the visual reading order and focus is always visible. Custom widgets implement the expected key handling. Skip links let keyboard users bypass repeated navigation."
+    },
+    {
+      "key": "REQ-A11Y-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Forms label every input and describe validation errors",
+      "body": "Labels are associated programmatically rather than by proximity. An invalid field is announced and its message explains how to correct it. Errors are summarised at the top of the form with links to each field."
+    },
+    {
+      "key": "REQ-A11Y-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Text meets the contrast ratio required for readability",
+      "body": "Body copy and essential icons maintain at least a four and a half to one ratio. Non-text indicators rely on more than colour alone. The palette is checked in both light and dark themes."
+    },
+    {
+      "key": "REQ-A11Y-004",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Images carry alternative text describing their purpose",
+      "body": "Decorative images are marked so assistive technology skips them. Meaningful charts have a textual summary in addition to the description. The upload form prompts the author for the text."
+    },
+    {
+      "key": "REQ-A11Y-005",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "The interface works with screen readers on every platform",
+      "body": "Dynamic updates are announced through a live region rather than by moving focus. Modal dialogs trap focus and restore it on close. Testing covers the two most common readers on each supported platform."
+    },
+    {
+      "key": "REQ-A11Y-006",
+      "kind": "requirement",
+      "status": "in_review",
+      "title": "Users can enlarge text to two hundred percent without loss",
+      "body": "Layouts reflow rather than overflow when zoomed, with no horizontal scrolling for paragraphs. Fixed heights that clip content are forbidden. Icons scale with the surrounding text."
+    },
+    {
+      "key": "REQ-A11Y-007",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Video content includes captions and a transcript",
+      "body": "Captions are provided for all recorded material that contains speech. The transcript is available below the player and is searchable. Captions are checked for accuracy before publication."
+    },
+    {
+      "key": "REQ-A11Y-008",
+      "kind": "requirement",
+      "status": "archived",
+      "title": "Animation can be reduced by preference",
+      "body": "The system setting for reduced motion is honoured without a separate toggle. Motion that conveys meaning is replaced by an equivalent static cue. Decorative animation stops when the preference is set."
+    },
+    {
+      "key": "REQ-DATA-001",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Deleted records are purged thirty days after removal",
+      "body": "Items moved to the recycle bin remain restorable for a month. After that a scheduled job removes them permanently, including derived copies. The purge is recorded in the audit trail."
+    },
+    {
+      "key": "REQ-DATA-002",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Customers can request a copy of all their data",
+      "body": "A self-service action assembles a machine-readable export of the workspace. The archive is produced asynchronously and offered through a short-lived link. The request and its completion are logged."
+    },
+    {
+      "key": "REQ-DATA-003",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Closing an account erases personal data within ninety days",
+      "body": "The closure marks the tenant inactive immediately and stops processing. Personal fields are removed after the statutory period, while aggregate records remain. A certificate of deletion is available on request."
+    },
+    {
+      "key": "REQ-DATA-004",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Backups are retained for thirty five days and no longer",
+      "body": "Nightly backups roll off automatically once they pass the retention window. Restores are tested quarterly against a scratch environment. Backup media are encrypted with the same key policy as production."
+    },
+    {
+      "key": "REQ-DATA-005",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Audit records are kept for seven years",
+      "body": "Access and change records fall outside the general purge schedule. They are stored in write-once storage and indexed for investigation. Only the compliance role may read them."
+    },
+    {
+      "key": "REQ-DATA-006",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Data residency is limited to the agreed region",
+      "body": "Primary storage and backups stay within the contracted territory. Any new subprocessor must be approved before it can receive production data. The region is stated on the trust page."
+    },
+    {
+      "key": "REQ-DATA-007",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Personal data is minimised in logs and traces",
+      "body": "Identifiers are redacted or hashed before a log line leaves the process. Free text fields are excluded unless explicitly enabled for debugging. Retention for operational logs is capped at fourteen days."
+    },
+    {
+      "key": "REQ-DATA-008",
+      "kind": "requirement",
+      "status": "approved",
+      "title": "Restore from backup completes within four hours",
+      "body": "The recovery objective covers the full database at production size. A rehearsed restore is timed every quarter and the figure published internally. The procedure is documented and owned by the platform team."
+    },
+    {
+      "key": "PRIN-001",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Prefer boring, well-understood technology",
+      "body": "New tools carry an ongoing cost that is easy to underestimate at selection time. We choose a widely adopted option unless a measured problem proves it inadequate. Novelty alone is never a reason to adopt something."
+    },
+    {
+      "key": "PRIN-002",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Security decisions belong in one place",
+      "body": "Access rules scattered across handlers drift apart and become impossible to review. We centralise authorisation so that a missing check fails in a predictable way. Local exceptions need a named owner and an expiry date."
+    },
+    {
+      "key": "PRIN-003",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Every change is reviewed by someone else",
+      "body": "A second pair of eyes catches the mistakes the author is blind to. Reviews focus on behaviour, tests and the risk of the change rather than style. Authors merge their own work once the review has passed."
+    },
+    {
+      "key": "PRIN-004",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Fail closed rather than open",
+      "body": "When a dependency or check cannot answer, the safe answer is no. We accept the occasional false rejection in exchange for never admitting an unverified caller. Recovery runbooks exist for the cases where this blocks an operator."
+    },
+    {
+      "key": "PRIN-005",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Measure before optimising",
+      "body": "A performance change without a baseline is a guess. We profile the real workload and record the numbers before and after. Work that cannot show a measured improvement is reverted rather than kept."
+    },
+    {
+      "key": "PRIN-006",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Accessibility is part of done",
+      "body": "A feature that excludes some users is unfinished, not merely imperfect. Keyboard use, labelling and contrast are checked in the same review as the logic. Fixing accessibility later costs more and usually never happens."
+    },
+    {
+      "key": "PRIN-007",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Data belongs to the customer",
+      "body": "Customers must be able to take their records elsewhere without asking us for permission. Exports use open formats and include everything they can see in the product. Deleting an account removes the data rather than hiding it."
+    },
+    {
+      "key": "PRIN-008",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Small reversible changes over large launches",
+      "body": "Frequent small releases limit the blast radius of a mistake and make rollback trivial. We ship behind tested defaults and remove the old path once the new one is proven. A long-lived branch is treated as a risk."
+    },
+    {
+      "key": "PRIN-009",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Automate repetitive checks",
+      "body": "Anything a reviewer checks by hand will eventually be missed. Formatting, tests and dependency audits run in continuous integration on every change. Humans spend their attention on design and behaviour instead."
+    },
+    {
+      "key": "PRIN-010",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Observability is designed in, not bolted on",
+      "body": "Operators need to answer what is happening without reading the source. Services emit metrics, structured logs and traces from the first release. A dashboard added after an incident is the usual sign that we were late."
+    },
+    {
+      "key": "PRIN-011",
+      "kind": "principle",
+      "status": "approved",
+      "title": "One service owns one dataset",
+      "body": "Sharing a database between services couples their releases and hides ownership. Each service reads and writes only its own schema with its own credentials. Data needed elsewhere is published through an interface."
+    },
+    {
+      "key": "PRIN-012",
+      "kind": "principle",
+      "status": "approved",
+      "title": "Errors speak to humans and logs speak to machines",
+      "body": "A customer needs a clear next step, not a stack trace. Logs need stable fields that can be aggregated and searched. The same event is rendered twice, once for each audience."
+    },
+    {
+      "key": "PRIN-013",
+      "kind": "principle",
+      "status": "in_review",
+      "title": "Defaults should be the safest option",
+      "body": "Most people never change a setting, so the default carries the real policy. New features start private and permissive sharing is opt-in. The interface should not make the risky choice look normal."
+    },
+    {
+      "key": "PRIN-014",
+      "kind": "principle",
+      "status": "draft",
+      "title": "Documentation lives beside the code it describes",
+      "body": "Documents in a separate tool rot as soon as the code moves. We keep short notes next to the module and link them from the repository. Anything that must be remembered belongs there, not in a chat thread."
+    },
+    {
+      "key": "PRIN-015",
+      "kind": "principle",
+      "status": "draft",
+      "title": "Performance is a feature with a budget",
+      "body": "Each screen and endpoint has a stated limit that is tested like any other requirement. Budgets are reviewed when the underlying infrastructure changes. Regressions are treated as defects rather than as eventual tuning work."
+    },
+    {
+      "key": "PRIN-016",
+      "kind": "principle",
+      "status": "superseded",
+      "title": "Delete what you no longer use",
+      "body": "Unused code and stale flags are read by every future maintainer and slow them down. We remove dead paths as part of the change that makes them dead. A repository should contain only what is still running."
+    },
+    {
+      "key": "ADR-001",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Use PostgreSQL for transactional and search data",
+      "body": "Requirement text is indexed with built-in full-text search plus a trigram index for fuzzy matching. Keeping one datastore avoids a second system to operate and back up. The decision is revisited if relevance tests show a measured shortfall."
+    },
+    {
+      "key": "ADR-002",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Federate staff authentication with OpenID Connect",
+      "body": "Employees authenticate against the corporate directory rather than a separate password we store. The application maps directory groups to roles at sign-in. Local accounts remain only for break-glass access."
+    },
+    {
+      "key": "ADR-003",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Store uploads in S3-compatible object storage",
+      "body": "File content is written to object storage and referenced by an opaque identifier. The database keeps metadata and ownership, never the bytes. Downloads use short-lived signed links."
+    },
+    {
+      "key": "ADR-004",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Publish domain events through a durable queue",
+      "body": "Cross-service notifications travel as events rather than synchronous calls. The broker persists messages until a consumer acknowledges them. Consumers must tolerate duplicate delivery."
+    },
+    {
+      "key": "ADR-005",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Run asynchronous work in dedicated worker processes",
+      "body": "Background jobs execute outside the web tier so that request latency stays predictable. Workers scale independently of the API. A failing job is retried and then parked for inspection."
+    },
+    {
+      "key": "ADR-006",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Version the public API in the URL path",
+      "body": "Clients select a major version with a path prefix such as v1. The previous version is supported for six months after a new one ships. Breaking changes never appear inside a published version."
+    },
+    {
+      "key": "ADR-007",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Keep runtime secrets in a managed vault",
+      "body": "Applications request short-lived credentials from the vault at start-up. No secret is written into an image or a repository. Rotation is a vault operation that requires no redeployment."
+    },
+    {
+      "key": "ADR-008",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Record timestamps in UTC with an explicit zone",
+      "body": "Storage and transport always use UTC. Rendering into a local zone happens only at the edge where the user is known. Any timestamp without a zone is treated as a defect."
+    },
+    {
+      "key": "ADR-009",
+      "kind": "adr",
+      "status": "superseded",
+      "title": "Ship features behind long-lived feature flags",
+      "body": "Flags let us release code without enabling it for every customer. This record was superseded because flags were left switched on for years and became a source of confusion. Current guidance limits flags to two release cycles."
+    },
+    {
+      "key": "ADR-010",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Adopt trunk-based development with short-lived branches",
+      "body": "Work merges into the main line at least daily and incomplete features stay hidden behind defaults. Long-running branches are rejected because they hide integration problems. The practice replaced the previous flag-heavy release model."
+    },
+    {
+      "key": "ADR-011",
+      "kind": "adr",
+      "status": "approved",
+      "title": "Enforce tenant isolation with row level security",
+      "body": "The database applies the tenant predicate even if a handler forgets to add one. Session variables carry the tenant identity from the authenticated context. Integration tests attempt cross-tenant reads and expect no rows."
+    },
+    {
+      "key": "ADR-012",
+      "kind": "adr",
+      "status": "in_review",
+      "title": "Emit structured logs with stable field names",
+      "body": "Log lines are JSON objects with agreed keys such as event, subject and trace identifier. Free-form messages are reserved for the human-readable summary. The schema is documented and versioned."
+    },
+    {
+      "key": "ADR-013",
+      "kind": "adr",
+      "status": "in_review",
+      "title": "Share one component library across the web frontends",
+      "body": "Common controls are published as a versioned package so behaviour and accessibility are fixed once. Product teams may compose but not fork the primitives. Adoption is measured per application before the old copy is removed."
+    },
+    {
+      "key": "ADR-014",
+      "kind": "adr",
+      "status": "draft",
+      "title": "Retire the dedicated reporting replica",
+      "body": "Reports will read through the primary with bounded queries instead of a replica that drifts behind. The change removes a host and the cost of keeping it patched. It waits on query budgets being met in staging."
+    },
+    {
+      "key": "ADR-015",
+      "kind": "adr",
+      "status": "archived",
+      "title": "Introduce a read-only analytics warehouse",
+      "body": "A separate column store would receive a nightly copy for long-range reporting. This proposal was archived because the data volume did not justify another system. The question reopens if query cost grows again."
+    },
+    {
+      "key": "ADR-016",
+      "kind": "adr",
+      "status": "archived",
+      "title": "Split the platform into independent microservices",
+      "body": "The original plan divided the product into a dozen services with separate releases. It was archived once operations showed the coordination cost outweighed the benefit. The current approach keeps a modular monolith with clear boundaries."
+    }
+  ]
+}

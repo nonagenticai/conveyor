@@ -1,0 +1,47 @@
+flowchart LR
+  T0["T0 - Model and contracts"]:::slice
+  T1["T1 - Plan spine"]:::slice
+  T2["T2 - Decision ladder"]:::slice
+  T3["T3 - PM job"]:::slice
+  T4["T4 - Coach"]:::slice
+  T5["T5 - Kata"]:::slice
+  T6["T6 - Development"]:::slice
+  T7["T7 - Operations"]:::slice
+  T8["T8 - Organisational memory"]:::slice
+  T9["T9 - TOGAF profile"]:::slice
+  T10["T10 - SAFe cadence"]:::slice
+  T11["T11 - Metrics and metering"]:::slice
+  T12["T12 - One organisation loop"]:::final
+  T13["T13 - Tool platform"]:::slice
+  T14["T14 - Estate toolkits"]:::slice
+  T15["T15 - Tool authoring and BYO"]:::slice
+  T16["T16 - SOP, RDF and process ingestion"]:::slice
+  T17["T17 - Tenant asset authoring"]:::slice
+  T0 --> T1
+  T1 --> T2
+  T2 --> T3
+  T3 --> T4
+  T2 --> T5
+  T5 --> T6
+  T2 --> T13
+  T13 --> T14
+  T13 --> T15
+  T6 --> T15
+  T2 --> T16
+  T13 --> T16
+  T16 --> T17
+  T3 --> T17
+  T1 --> T9
+  T1 --> T10
+  T3 --> T9
+  T3 --> T10
+  T5 --> T8
+  T13 --> T6
+  T13 --> T7
+  T4 --> T7
+  T11 --> T12
+  T3 --> T12
+  T7 --> T12
+  T17 --> T12
+  classDef slice fill:#eef3ef,stroke:#8aa596,color:#1f2a24
+  classDef final fill:#f7f4ea,stroke:#b9a77a,color:#1f2a24

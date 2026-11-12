@@ -1,0 +1,16 @@
+conveyor
+Copyright 2026 Non-Agentic AI
+
+This distribution includes third-party material:
+
+1. IBM Plex Sans, IBM Plex Mono and Fraunces fonts, under the SIL Open Font
+   License 1.1. The license texts are in docs/design/assets/:
+   IBM-Plex-Sans-OFL.txt, IBM-Plex-Mono-OFL.txt, Fraunces-OFL.txt.
+
+2. Benchmark fixtures and golden evaluation scripts derived from SWE-bench
+   5.0.2, Copyright (c) 2023 Carlos E Jimenez, John Yang, Alexander Wettig,
+   Shunyu Yao, Kexin Pei, Ofir Press, Karthik R Narasimhan, under the MIT
+   License. The full text is in third_party/SWE-bench-LICENSE.
+
+3. Rust crate dependencies. Each crate carries its own license; the resolved
+   set is recorded in Cargo.lock and the crates' manifests.

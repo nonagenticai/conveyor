@@ -1,0 +1,11 @@
+{
+  "run_id": "091615504508",
+  "subset": "verified50-v1",
+  "label": "control-gold",
+  "n": 50,
+  "counts": {
+    "resolved": 50
+  },
+  "resolved": 50,
+  "resolved_rate": 1.0
+}

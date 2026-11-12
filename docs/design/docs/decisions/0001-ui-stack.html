@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0001 — UI stack · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0001-ui-stack.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0001--ui-stack">0001 — UI stack</h1>
+<p>Status: Accepted · Date: 2026-11-08 · Slice: S01 (<code>spikes/web</code>, deleted after this ADR)</p>
+<h2 id="context">Context</h2>
+<p><code>conveyor</code> needs a Rust web UI. SPEC §5.7 sets <strong>Leptos CSR as the prior</strong>: the app is authenticated and has no SEO requirement, so SSR's win is weak, while SSR hydration and double-fetch bugs are the known trap. SSR is chosen only if measured TTI exceeds 2 s or the auth flow forces cookie-based SSR; a tie, or a loss on both, is CSR. Dioxus is out of scope (admitted only if the phase-2 flow editor forces it).</p>
+<p>Both stacks were built from <strong>one component tree</strong> (<code>spikes/web/shared/ui.rs</code>, included by both crates) against one deterministic fixture (axum, <code>:8791</code>: 500 cards in 10 lists, <code>card.moved</code> SSE every 2 s, 50-message chat history, 80-token stream at 25 ms, fixture OP with auth-code + PKCE S256). Two hard screens: the board (pointer + keyboard drag between lists, live SSE moves) and the chat (streaming tokens, tool-call card with collapsed result). Leptos <code>0.9.0-rc1</code> (leptos / leptos_axum / leptos_router pinned to that one minor), cargo-leptos 0.3.11, release + wasm-opt, served from the built output (<code>/tmp/s1-csr/site</code>, and the built SSR binary on <code>:8802</code>).</p>
+<p>Measurement conditions: 5 runs per stack for metrics 1–4 and 8; metrics 5–7 carry their own n in the row (n=1, not measured, n=2), because the coordinator time-box closed before their full sets. Median with min–max, fresh fixture per run. Every browser run was throttled with the same values the Lighthouse flags name — 4× CPU slowdown and Slow 4G (150 ms latency, 1638.4 kbps down, 675 kbps up) — via CDP <code>Emulation.setCPUThrottlingRate</code> and <code>Network.emulateNetworkConditions</code>; no number below is an unthrottled localhost load. Browser: Google Chrome 156 driven by Playwright 1.49.1 (<code>channel: 'chrome'</code>; the Playwright-pinned Chromium download was incomplete on this box — noted, same engine family). Lighthouse 12 with the §7 flags supplies the supplementary <code>interactive</code> number.</p>
+<h2 id="options">Options</h2>
+<table>
+<thead>
+<tr>
+<th>option</th>
+<th>shape</th>
+<th>auth</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CSR</td>
+<td>Leptos <code>csr</code> build: static <code>index.html</code> + WASM, mount on load, no server render</td>
+<td>auth-code + PKCE S256, access token held in memory, login gate on the deep link; an authenticated SSE needs a fetch + <code>ReadableStream</code> shim because <code>EventSource</code> cannot send <code>Authorization</code></td>
+</tr>
+<tr>
+<td>SSR</td>
+<td><code>leptos_axum</code>: server render of the same tree, then WASM hydration</td>
+<td>server-side code exchange, HttpOnly session cookie + CSRF double-submit; <code>EventSource</code> sends the cookie same-origin, no shim</td>
+</tr>
+</tbody>
+</table>
+<h2 id="measured">Measured</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>metric</th>
+<th>stack</th>
+<th>value (median; min–max, n=5 unless stated)</th>
+<th>command that produced it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>interaction TTI (ms), throttled</td>
+<td>CSR</td>
+<td>5426 (5408–5628); Lighthouse <code>interactive</code> 5703 (5553–5747), FCP 751</td>
+<td><code>node /tmp/s1-tools/measure.js http://127.0.0.1:8801 tti &lt;i&gt;</code>; <code>npx -y lighthouse@12 http://127.0.0.1:8801/ --only-categories=performance --throttling-method=simulate --throttling.cpuSlowdownMultiplier=4 --throttling.requestLatencyMs=150 --throttling.downloadThroughputKbps=1638.4 --throttling.uploadThroughputKbps=675 --output=json --chrome-flags='--headless=new'</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>interaction TTI (ms), throttled</td>
+<td>SSR</td>
+<td>5736 (5705–5758); Lighthouse <code>interactive</code> 5855 (5853–5865), FCP 1655</td>
+<td>same two commands with <code>http://127.0.0.1:8802</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>bundle, gzip-9 wasm+js (bytes)</td>
+<td>CSR</td>
+<td>290723 (raw 809797)</td>
+<td><code>find /tmp/s1-csr/site -type f \( -name '*.wasm' -o -name '*.js' \) -exec sh -c 'gzip -9 -c "$1" | wc -c' _ {} \; | awk '{s+=$1} END {print s}'</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>bundle, gzip-9 wasm+js (bytes)</td>
+<td>SSR</td>
+<td>301017 (raw 844826); server binary 9315696, not shipped to the browser</td>
+<td>same <code>find</code> over <code>/tmp/s1-ssr/site</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>500-card first render (ms), all-at-once / virtualised</td>
+<td>CSR</td>
+<td>4726 (4724–4736) / 4726 (4714–4728), 240 cards in virtual mode</td>
+<td><code>node /tmp/s1-tools/measure.js http://127.0.0.1:8801 firstrender &lt;i&gt;</code> and <code>... virtual &lt;i&gt;</code> (reads <code>window.__s1.card500</code> / <code>virtualReady</code> set by a MutationObserver)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>500-card first render (ms), all-at-once / virtualised</td>
+<td>SSR</td>
+<td>1444 (1441–1452) / 945 (901–948), 240 cards in virtual mode</td>
+<td>same commands with <code>http://127.0.0.1:8802</code> (virtual via <code>/virt</code>)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>drag frames, 2 s pointer drag</td>
+<td>CSR</td>
+<td>p95 16.7 ms, max 16.8, 80.0 % ≤16.7 (75.5–82.7), 0 long tasks &gt;50 ms, 245–254 frames</td>
+<td><code>node /tmp/s1-tools/measure.js http://127.0.0.1:8801 drag &lt;i&gt;</code> (rAF deltas + <code>longtask</code> PerformanceObserver)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>drag frames, 2 s pointer drag</td>
+<td>SSR</td>
+<td>p95 16.8 ms, max 16.8, 76.5 % ≤16.7 (71.8–80.4), 0 long tasks &gt;50 ms, 240–243 frames</td>
+<td>same command with <code>http://127.0.0.1:8802</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>SSE → DOM (ms), 30 events</td>
+<td>CSR</td>
+<td>1 run only, not the 5-run median: p50 1.0, p95 1.8 (n=30 events). The 5-run set did not complete inside the coordinator time-box — the first batch read <code>__s1.sse[id]</code> while the app marks the send time at <code>__s1["sse.&lt;id&gt;"]</code>, so it returned n=0 pairs; the harness was fixed and one run captured before closure</td>
+<td><code>node /tmp/s1-tools/measure.js http://127.0.0.1:8801 sse &lt;i&gt;</code> (fixture <code>ts</code> → <code>sse.&lt;id&gt;</code> → MutationObserver <code>sseDom.&lt;id&gt;</code>)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>SSE → DOM (ms), 30 events</td>
+<td>SSR</td>
+<td>not measured: same harness key-path bug; no SSR runs completed inside the time-box</td>
+<td>same command with <code>http://127.0.0.1:8802</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>memory, 5 min soak</td>
+<td>CSR</td>
+<td>not measured: 5-minute profile skipped by coordinator time-box after the decision measurements closed</td>
+<td><code>node /tmp/s1-tools/measure.js http://127.0.0.1:8801 memory 1</code> (CDP <code>Performance.getMetrics</code> + <code>Memory.getDOMCounters</code> after 300 s)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>memory, 5 min soak</td>
+<td>SSR</td>
+<td>not measured: 5-minute profile skipped by coordinator time-box after the decision measurements closed</td>
+<td>same command with <code>http://127.0.0.1:8802</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>cold build, release (s)</td>
+<td>CSR</td>
+<td>44.41 (35.58–54.71)</td>
+<td><code>rm -rf /tmp/s1-cold-csr &amp;&amp; /usr/bin/time -p env CARGO_TARGET_DIR=/tmp/s1-cold-csr cargo leptos build --release -p spike-csr --frontend-only</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>cold build, release (s)</td>
+<td>SSR</td>
+<td>two runs: 56.54 and 79.95 (n=2; no median — the values are stated, not averaged). CSR used <code>--frontend-only</code>, SSR builds both server and wasm, so the comparison is context, not a decision input</td>
+<td><code>rm -rf /tmp/s1-cold-ssr &amp;&amp; /usr/bin/time -p env CARGO_TARGET_DIR=/tmp/s1-cold-ssr cargo leptos build --release -p spike-ssr</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>auth</td>
+<td>CSR</td>
+<td>pass, no forcing condition: auth-code + PKCE S256, 3/3 login→board→logout cycles, deep link gated while logged out (<code>/projects/demo/board</code> → sign-in), token in memory, no cookies; an authenticated SSE needs a fetch + <code>ReadableStream</code> shim (<code>EventSource</code> cannot send <code>Authorization</code>) — work, not a failure</td>
+<td><code>node /tmp/s1-tools/auth.js http://127.0.0.1:8801 3</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>auth</td>
+<td>SSR</td>
+<td>pass, not forcing: HttpOnly <code>s1_session</code> + CSRF double-submit, server-side code exchange, 3/3 login→board→logout cycles, deep link gated (303 → <code>/login</code>), <code>EventSource</code> sends the cookie same-origin, no shim</td>
+<td><code>node /tmp/s1-tools/auth.js http://127.0.0.1:8802 3</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="decision">Decision</h2>
+<p><strong>CSR — Leptos <code>csr</code>/WASM SPA.</strong> The prior holds: SSR did not beat CSR on interaction TTI, and the auth flow did not force cookie-based SSR.</p>
+<ul>
+<li>Interaction TTI (navigationStart → the first drag that mutates list membership, <code>performance.now()</code> in the drag handler), 4× CPU / Slow 4G, n=5: <strong>CSR 5426 ms (5408–5628)</strong> vs <strong>SSR 5736 ms (5705–5758)</strong>. The ranges do not overlap; SSR is 310 ms (~5.7 %) slower to first interaction.</li>
+<li>Both stacks exceed the 2 s threshold on this harsh protocol, so SSR's <em>precondition</em> is met — but the rule also requires SSR to beat CSR on TTI or on auth. It loses on both.</li>
+<li>SSR does what SSR is for: 500 cards are in the DOM at <strong>1444 ms</strong> (virtualised: 945 ms) vs <strong>4726 ms</strong> (virtualised: 4726 ms) for CSR. That win is real, but the prior's premise is an authenticated app with no SEO need, and the win does not survive to interactivity: the same WASM must download and hydrate 500 server-rendered nodes, which is why SSR is slower to interact.</li>
+<li>The known SSR trap (hydration double-fetch) <strong>did not reproduce</strong> on Leptos 0.9.0-rc1: exactly one board fetch per page load, server-side, in 5/5 runs, including with the client fallback disabled (<code>?raw=1</code>). SSR lost on hydration CPU, not on a refetch.</li>
+<li>Auth: CSR auth-code + PKCE S256 works end to end — 3/3 login → board → logout cycles, deep link gated while logged out, token in memory, no cookies. It does not force cookies. The one CSR cost is that an <em>authenticated</em> SSE needs a fetch + <code>ReadableStream</code> shim (<code>EventSource</code> cannot set <code>Authorization</code>); that is work, not a forcing condition, and it is the same work any SPA does.</li>
+<li>Metric 4's §7 threshold — <strong>≥95 % of frames ≤16.7 ms</strong> — was <strong>not met by either stack</strong>: CSR 80.0 % (75.5–82.7), SSR 76.5 % (71.8–80.4), with 0 long tasks &gt;50 ms on both. The miss is symmetric, so it does not change the stack choice; it is a drag-smoothness target for S12, not evidence for SSR.</li>
+<li>Lighthouse 12 (simulated 4×/Slow 4G): <code>interactive</code> CSR 5703 ms (5553–5747) vs SSR 5855 ms (5853–5865); FCP CSR 751 ms vs SSR 1655 ms; TBT ≤ 24 ms on both. The supplementary number agrees with the in-page interaction measurement: CSR is the faster stack to interact with.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>S12 builds <code>apps/web</code> as a Leptos CSR/WASM SPA. No server-side rendering, hence no hydration path and no double-render surface in the app; the UI can ship as static assets behind the same origin as the API.</li>
+<li>Auth is auth-code + PKCE with the access token held in memory. Reloads need a re-login (or silent re-auth) and the app owns the deep-link gate; the server needs no UI session/CSRF surface.</li>
+<li>The authenticated event streams (board, chat) need a fetch + <code>ReadableStream</code> SSE client because <code>EventSource</code> cannot carry the bearer token. Budget it in S12.</li>
+<li>First interaction waits on the WASM bundle: 790 KiB raw / 284 KiB (291 kB) gzip-9 for this spike. A release size budget belongs in S12 CI. Virtualisation stays available as a fallback but did not help CSR's boot-bound first render (4726 vs 4726 ms); it does help SSR (1444 → 945 ms).</li>
+<li>What SSR would have cost: HttpOnly session + CSRF + a server-side token exchange, a server binary to deploy and scale, per-screen hydration behaviour to re-verify, +10 KiB gzip-9 — for a 3.3× faster first paint and no interaction win.</li>
+<li>A public/unauthenticated screen that needs first paint without WASM is a scoped exception, not a stack change: SSR was measured slower to interact.</li>
+</ul>
+<h2 id="revisit-triggers">Revisit triggers</h2>
+<ul>
+<li>CSR interaction TTI on a real device/network that puts a hard first-paint requirement on an authenticated screen and where only server rendering meets it.</li>
+<li>A requirement that makes the token unavailable to the SPA (no CORS/refresh path) so only an HttpOnly cookie can authenticate the app.</li>
+<li>Leptos 0.9 final, or a later version, reversing the measured order by more than the 5.7 % here (this measured <code>0.9.0-rc1</code>).</li>
+<li>A screen needing SEO or public unauthenticated first paint at scale.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0001-ui-stack.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

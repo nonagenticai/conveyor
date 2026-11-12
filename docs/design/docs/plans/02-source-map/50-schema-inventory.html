@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>50 — Source schema inventory (live, 2026-11-07) · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-source-map/50-schema-inventory.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="50--source-schema-inventory-live-2026-11-07">50 — Source schema inventory (live, 2026-11-07)</h1>
+<p>Measured on <strong>2026-11-07</strong> from master Postgres (<code>sudo -u postgres psql -d &lt;db&gt;</code>, <code>\dt</code>), not from migrations. This file is the <strong>raw inventory</strong> only: the complete <code>public</code> table lists, verbatim. The <strong>total disposition</strong> — where each table lands (a target entity, or the dropped list with a reason) — lives in <code>02-DATA-ARCHITECTURE.md</code> §7 (Source mapping — TOTAL), and every table listed here appears there. Nothing in this file is a mapping decision.</p>
+<p>Counts measured 2026-11-07 (<code>pg_tables</code> / <code>pg_class</code> in <code>fr</code>, <code>requirements_api</code>, <code>kanban</code>): <strong>fr 86 domain tables</strong> (88 base tables in <code>public</code>, 90 relations including two <code>pg_stat_statements*</code> views), <strong>RM 57 domain tables</strong> (58 base tables including <code>alembic_version</code>), <strong>Planka 33 domain tables</strong> (35 base tables including <code>migration</code> and <code>migration_lock</code>). Queries: <code>select count(*) from pg_tables where schemaname='public'</code>; <code>select relkind, count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind in ('r','p','v','m') group by relkind</code>.</p>
+<p>Bookkeeping tables are listed for completeness and are <strong>not</strong> domain surfaces: <code>_migration_effects</code>, <code>_migrations</code>, <code>pg_stat_statements</code>, <code>pg_stat_statements_info</code>, <code>alembic_version</code>, <code>migration</code>, <code>migration_lock</code>.</p>
+<h2 id="fr--database-fr-86-domain-tables">fr — database <code>fr</code> (86 domain tables)</h2>
+<p>action_idempotency, agent_members, agent_runtime_sessions, agent_sessions, analytics_rollup_meta, analytics_rollups, andon_state, andon_state_history, approval_callback_urls, approval_decisions, approvals, asset_assignments, asset_bindings, asset_stream_membership, budget_alert_receipts, budget_topups, capability_audit, card_asset_binding, card_bridge_links, card_computed_checks, card_contracts, card_done_overrides, card_drafts, card_executed_activities, card_phase_lease, card_phase_lease_waiter, card_plan_events, card_plan_pins, card_scenario_evidence, card_seeker_links, card_version_stamps, channels, coding_analysis_runs, comments, contract_dependencies, conveyor_flow_runs, decompositions, department_members, departments, documents, engagement_deliveries, execution_signoff_blocks, family_bundles, family_decisions, finding_suppression_events, finding_suppressions, github_app_installations, inapp_messages, interface_validations, katas, member_knowledge_areas, n8n_execution_mapping, notification_log, notification_prefs, notifications, priority_change_events, project_asset_copy_intents, project_conveyor_failures, project_conveyor_start_attempts, project_deliverables, project_metrics, project_milestones, project_outlines, project_reports, project_repositories, project_request_repositories, project_requests, project_stakeholders, projects, provisioning_audit, repositories, required_approvers, router_dedupe, scheduled_trigger_runs, scheduled_triggers, signup_approvals, streams, suggested_schedules, super_admin_tenant_actions, telegram_forum_topics, tenant_improvement_projects, user_channel_prefs, user_roles, user_secrets, wip_slot, workspaces</p>
+<h2 id="requirements_management--database-requirements_api-57-domain-tables">requirements_management — database <code>requirements_api</code> (57 domain tables)</h2>
+<p>architecture_element_realisation_bindings, architecture_elements, architecture_relationships, architecture_standards, architecture_view_connections, architecture_view_objects, architecture_views, decisions, entity_version_history, idempotency_keys, modeling_change_sets, modeling_model_revisions, modeling_models, modeling_publications, modeling_reviews, modeling_trace_links, modeling_validation_findings, modeling_validation_runs, pm_benefits, pm_board_templates, pm_capabilities, pm_card_ledger, pm_card_types, pm_coach_actions, pm_deliverable_kinds, pm_gates, pm_milestone_kinds, pm_priority_levels, pm_programmes, pm_project_brief_versions, pm_project_capabilities, pm_project_capability_events, pm_project_phase_events, pm_project_phases, pm_project_type_card_types, pm_project_type_phases, pm_project_types, pm_projects, pm_recipe_items, pm_recipes, pm_resources, pm_risks, pm_wip_limits, principle_conflicts, principles, quality_evaluations, requirements, tenant_id_crosswalk, toc_nodes, toc_settings, toc_trees, uml_diagram_connections, uml_diagram_objects, uml_diagrams, uml_elements, uml_interactions, uml_relationships</p>
+<h2 id="planka--database-kanban-33-domain-tables">Planka — database <code>kanban</code> (33 domain tables)</h2>
+<p>_conveyor_reset_20260922 (a 2026-09-22 reset marker, not a feature), action, attachment, background_image, base_custom_field_group, board, board_membership, board_subscription, card, card_label, card_membership, card_subscription, comment, config, custom_field, custom_field_group, custom_field_value, identity_provider_user, internal_config, label, list, notification, notification_service, project, project_favorite, project_manager, session, storage_usage, task, task_list, uploaded_file, user_account, webhook</p>
+<h2 id="live-row-counts-that-matter-2026-11-07">Live row counts that matter (2026-11-07)</h2>
+<ul>
+<li><code>kanban.card = 5</code>, <code>kanban.board = 4</code>, <code>kanban.custom_field_value = 0</code>, <code>kanban.label = 0</code>, <code>kanban.task = 0</code> — <strong>test data only</strong>; usage cannot be inferred from it.</li>
+<li><code>fr.approvals = 0</code>, <code>fr.approval_decisions = 0</code>, <code>fr.card_drafts = 0</code>, <code>fr.card_phase_lease = 0</code>, <code>fr.conveyor_flow_runs = 693</code> — the app is idle; only the run history is non-empty.</li>
+<li><code>requirements_api.pm_card_types = 293</code>, <code>pm_project_type_card_types = 282</code>, <code>pm_capabilities = 68</code>, <code>pm_project_types = 26</code> — real catalogue data.</li>
+<li><code>n8n.workflow_entity = 348</code> (332 active) with 2,904 Planka nodes, 746 requirements nodes, 1,342 coding nodes.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/02-source-map/50-schema-inventory.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,1930 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Conveyor Web UI</title>
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   Design tokens — light first, then the two dark blocks.
+   Palette: cool graphite neutrals, one deep teal-slate accent, four
+   semantic hues that never double as the accent.
+   Type: system sans for reading, system mono for identifiers and labels.
+   Layout: sticky contents rail + one measured column of prose, with
+   rendered app wireframes breaking out to full width.
+   ───────────────────────────────────────────────────────────────────────── */
+:root{
+  color-scheme: light;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+
+  --bg:#eef1f1;
+  --surface:#ffffff;
+  --surface-2:#f5f7f7;
+  --surface-3:#e9eded;
+  --ink:#12181b;
+  --ink-2:#49565c;
+  --ink-3:#78868c;
+  --rule:#d7dfdf;
+  --rule-2:#c2cdce;
+
+  --accent:#145c69;
+  --accent-soft:#e0eef0;
+  --on-accent:#ffffff;
+
+  --ok:#1c6e46;      --ok-soft:#e2f1e9;
+  --wait:#8a5a06;    --wait-soft:#f9eed8;
+  --bad:#a52626;     --bad-soft:#f9e5e5;
+  --run:#2a568f;     --run-soft:#e4ecf8;
+
+  --shadow:0 1px 2px rgba(14,24,28,.05),0 18px 40px -28px rgba(14,24,28,.35);
+  --shadow-soft:0 1px 2px rgba(14,24,28,.04);
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0b0f11;
+    --surface:#111619;
+    --surface-2:#161d21;
+    --surface-3:#1b2429;
+    --ink:#e7edef;
+    --ink-2:#a2b0b6;
+    --ink-3:#728087;
+    --rule:#232d33;
+    --rule-2:#2f3b42;
+    --accent:#74bcc8;
+    --accent-soft:#14333a;
+    --on-accent:#08181c;
+    --ok:#63c58f;      --ok-soft:#12301f;
+    --wait:#e0ad4f;    --wait-soft:#2e2410;
+    --bad:#e8807f;     --bad-soft:#331717;
+    --run:#8ab4ef;     --run-soft:#152640;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 18px 40px -28px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0b0f11;
+  --surface:#111619;
+  --surface-2:#161d21;
+  --surface-3:#1b2429;
+  --ink:#e7edef;
+  --ink-2:#a2b0b6;
+  --ink-3:#728087;
+  --rule:#232d33;
+  --rule-2:#2f3b42;
+  --accent:#74bcc8;
+  --accent-soft:#14333a;
+  --on-accent:#08181c;
+  --ok:#63c58f;      --ok-soft:#12301f;
+  --wait:#e0ad4f;    --wait-soft:#2e2410;
+  --bad:#e8807f;     --bad-soft:#331717;
+  --run:#8ab4ef;     --run-soft:#152640;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 18px 40px -28px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font:16px/1.6 var(--sans);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 80px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.2;letter-spacing:-.018em}
+p{margin:0}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+code,kbd,samp{font-family:var(--mono);font-size:.88em}
+kbd{border:1px solid var(--rule-2);border-bottom-width:2px;border-radius:4px;padding:1px 5px;background:var(--surface-2);font-size:.78em}
+
+/* ── shell ─────────────────────────────────────────────────────────────── */
+.topbar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+  margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));
+  padding-inline:max(16px,env(safe-area-inset-left,0px));
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule);
+}
+.topbar-in{
+  max-width:1320px;margin:0 auto;display:flex;align-items:center;gap:16px;
+  min-height:56px;padding-block:8px;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:650;font-size:14px;letter-spacing:-.01em}
+.brand .mark{
+  width:22px;height:22px;border-radius:6px;background:var(--accent);color:var(--on-accent);
+  display:grid;place-items:center;font:700 11px/1 var(--mono);flex:none;
+}
+.brand small{display:block;font:500 11px/1.3 var(--mono);color:var(--ink-3);letter-spacing:.02em}
+.topbar .spacer{flex:1 1 auto}
+.toggle{
+  display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule-2);
+  background:var(--surface);border-radius:999px;padding:5px 10px 5px 6px;
+  font:600 12px/1 var(--sans);color:var(--ink-2);cursor:pointer;
+}
+.toggle:hover{border-color:var(--accent);color:var(--ink)}
+.switch{width:30px;height:18px;border-radius:999px;background:var(--surface-3);position:relative;transition:background .16s ease}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow-soft);transition:transform .16s ease}
+[data-adv="on"] .switch{background:var(--accent)}
+[data-adv="on"] .switch::after{transform:translateX(12px)}
+[data-adv="on"] .toggle{color:var(--ink);border-color:var(--accent)}
+
+.wrap{max-width:1320px;margin:0 auto}
+.doc{display:grid;grid-template-columns:220px minmax(0,1fr);gap:56px;align-items:start}
+.toc{position:sticky;top:76px;max-height:calc(100vh - 96px);overflow:auto;padding-block:40px 40px}
+.toc h2{font:600 10px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:12px}
+.toc ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.toc a{
+  display:block;padding:5px 8px;border-radius:6px;color:var(--ink-2);text-decoration:none;
+  font-size:13px;line-height:1.35;border-left:2px solid transparent;
+}
+.toc a:hover{color:var(--ink);background:var(--surface-2)}
+.toc a.on{color:var(--ink);font-weight:600;border-left-color:var(--accent);background:var(--surface-2)}
+.toc .sub{padding-left:18px;font-size:12px;color:var(--ink-3)}
+main{padding-block:40px;min-width:0}
+
+/* ── typography blocks ─────────────────────────────────────────────────── */
+section{padding-block:8px 56px;scroll-margin-top:80px}
+.eyebrow{font:600 10.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:12px}
+h1{font-size:clamp(32px,5vw,46px);font-weight:680;letter-spacing:-.03em}
+h2{font-size:clamp(22px,3vw,28px);font-weight:660;margin-bottom:8px}
+h3{font-size:17px;font-weight:660;margin-bottom:6px}
+h4{font-size:13px;font-weight:660;letter-spacing:0}
+.lede{font-size:19px;line-height:1.55;color:var(--ink-2);max-width:62ch;margin-top:16px}
+.prose{max-width:66ch;display:flex;flex-direction:column;gap:14px;color:var(--ink-2)}
+.prose strong{color:var(--ink);font-weight:620}
+.sect-head{margin-bottom:24px;max-width:70ch}
+.sect-head p{color:var(--ink-2);margin-top:8px}
+.rule{height:1px;background:var(--rule);border:0;margin:0}
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.hero{padding-block:56px 24px;max-width:820px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.tag{
+  display:inline-flex;align-items:center;gap:6px;font:600 10.5px/1 var(--mono);
+  padding:5px 8px;border-radius:5px;background:var(--surface);border:1px solid var(--rule);
+  color:var(--ink-2);letter-spacing:.02em;
+}
+.tag.acc{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.tag.pl{background:var(--wait-soft);border-color:transparent;color:var(--wait)}
+
+/* ── principle cards ───────────────────────────────────────────────────── */
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{
+  background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);
+  padding:18px 18px 16px;box-shadow:var(--shadow-soft);
+}
+.card .n{font:700 10px/1 var(--mono);color:var(--accent);letter-spacing:.08em;margin-bottom:10px}
+.card h3{font-size:15px;margin-bottom:6px}
+.card p{font-size:13.5px;line-height:1.5;color:var(--ink-2)}
+.card .then{
+  margin-top:12px;padding-top:10px;border-top:1px dashed var(--rule);font-size:12.5px;color:var(--ink-2);
+}
+.card .then b{color:var(--ink);font-weight:640}
+
+/* ── generic table ─────────────────────────────────────────────────────── */
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:var(--radius);background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{
+  text-align:left;font:600 10px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink-3);padding:10px 12px;border-bottom:1px solid var(--rule);white-space:nowrap;
+  background:var(--surface-2);
+}
+td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+td b,td strong{color:var(--ink);font-weight:620}
+td .mono{font-family:var(--mono);font-size:.86em;color:var(--ink-3)}
+.num{font-variant-numeric:tabular-nums;text-align:right}
+
+/* ── depth ladder ──────────────────────────────────────────────────────── */
+.depths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.depth{background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);padding:16px}
+.depth .k{font:700 10px/1 var(--mono);letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
+.depth h4{margin:8px 0 6px;font-size:14px}
+.depth p{font-size:13px;color:var(--ink-2);line-height:1.5}
+.depth.d3{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+
+/* ── wireframe shell ───────────────────────────────────────────────────── */
+.screen{margin-top:20px}
+.screen-note{font-size:13.5px;color:var(--ink-2);max-width:66ch;margin-top:4px}
+.shot{
+  margin-top:14px;background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+  overflow:hidden;box-shadow:var(--shadow);
+}
+.chrome{
+  display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--surface-2);
+  border-bottom:1px solid var(--rule);font:500 11px/1 var(--mono);color:var(--ink-3);
+}
+.chrome .dots{display:flex;gap:5px;flex:none}
+.chrome .dots i{width:9px;height:9px;border-radius:50%;background:var(--rule-2)}
+.chrome .url{
+  flex:1 1 auto;min-width:0;background:var(--surface);border:1px solid var(--rule);border-radius:5px;
+  padding:4px 8px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.app{display:grid;grid-template-columns:168px minmax(0,1fr);font-size:12px;line-height:1.45;min-height:360px}
+.rail{background:var(--surface-2);border-right:1px solid var(--rule);padding:10px 8px;display:flex;flex-direction:column;gap:1px}
+.rail .who{padding:6px 8px 10px;font:600 10px/1.3 var(--mono);color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--rule);margin-bottom:6px}
+.rail a{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 8px;border-radius:5px;
+  color:var(--ink-2);text-decoration:none;font-size:12px;border-left:2px solid transparent;
+}
+.rail a:hover{background:var(--surface-3);color:var(--ink)}
+.rail a.on{background:var(--surface);color:var(--ink);font-weight:640;border-left-color:var(--accent);box-shadow:inset 0 0 0 1px var(--rule)}
+.rail .grp{font:600 9.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);padding:12px 8px 4px}
+.rail .cnt{font:600 9.5px/1 var(--mono);background:var(--surface-3);padding:2px 4px;border-radius:3px;color:var(--ink-2)}
+.rail a.on .cnt{background:var(--accent-soft);color:var(--accent)}
+.main{padding:14px 16px 18px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.mtop{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.mtop h4{font-size:15px;letter-spacing:-.01em}
+.mtop .sub{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.mtop .spacer{flex:1 1 auto}
+
+/* buttons, pills, chips inside wireframes */
+.btn{
+  display:inline-flex;align-items:center;gap:5px;border:1px solid var(--rule-2);background:var(--surface);
+  color:var(--ink);border-radius:5px;padding:4px 9px;font:600 11px/1.4 var(--sans);white-space:nowrap;
+}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.pill{
+  display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 7px;
+  font:600 9.5px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;
+  background:var(--surface-3);color:var(--ink-2);
+}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.wait{background:var(--wait-soft);color:var(--wait)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.run{background:var(--run-soft);color:var(--run)}
+.pill.acc{background:var(--accent-soft);color:var(--accent)}
+.dotp{width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block}
+.mono{font-family:var(--mono);font-size:.9em}
+.muted{color:var(--ink-3)}
+.hint{font-size:10.5px;color:var(--ink-3);font-family:var(--mono)}
+
+/* tables inside the wireframe */
+.wtbl{width:100%;border-collapse:collapse;font-size:11px}
+.wtbl th{
+  font:600 9px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);
+  padding:5px 7px;border-bottom:1px solid var(--rule);background:transparent;white-space:nowrap;
+}
+.wtbl td{padding:6px 7px;border-bottom:1px solid var(--rule);color:var(--ink-2);vertical-align:middle}
+.wtbl tr:last-child td{border-bottom:0}
+.wtbl tbody tr:hover{background:var(--surface-2)}
+.wtbl td.n{text-align:right;font-variant-numeric:tabular-nums}
+
+/* board */
+.lanes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.lane{background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;padding:7px;min-width:0}
+.lane .lh{display:flex;align-items:center;justify-content:space-between;font:600 9.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);padding:2px 2px 7px}
+.ticket{
+  background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:7px;margin-bottom:6px;
+  box-shadow:var(--shadow-soft);
+}
+.ticket:last-child{margin-bottom:0}
+.ticket .tt{font-size:11px;font-weight:600;color:var(--ink);line-height:1.35;margin-bottom:5px}
+.ticket .tm{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:9.5px;color:var(--ink-3)}
+.avatar{
+  width:16px;height:16px;border-radius:50%;background:var(--surface-3);color:var(--ink-2);
+  display:inline-grid;place-items:center;font:700 8px/1 var(--mono);flex:none;
+}
+.lbl{font:600 8.5px/1 var(--mono);padding:2px 4px;border-radius:3px;background:var(--surface-3);color:var(--ink-2);letter-spacing:.03em}
+
+/* split panels */
+.split{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:12px}
+.panel{background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;padding:10px;min-width:0}
+.panel .ph{display:flex;align-items:center;justify-content:space-between;gap:8px;font:600 9.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);margin-bottom:8px}
+.kv{display:grid;grid-template-columns:84px minmax(0,1fr);gap:3px 8px;font-size:10.5px}
+.kv dt{color:var(--ink-3)}
+.kv dd{margin:0;color:var(--ink-2);min-width:0;overflow-wrap:anywhere}
+
+/* stat tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;padding:9px 10px;min-width:0}
+.tile .tk{font:600 8.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3)}
+.tile .tv{font:640 19px/1.15 var(--sans);letter-spacing:-.02em;margin-top:5px;font-variant-numeric:tabular-nums}
+.tile .td{font-size:9.5px;color:var(--ink-3);margin-top:2px}
+.tile .tv small{font-size:11px;font-weight:600;color:var(--ink-3);letter-spacing:0}
+
+/* bar chart */
+.chart{background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;padding:10px 12px 8px}
+.chart .ch{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font:600 9.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:10px}
+.plot{display:flex;align-items:stretch;gap:6px;height:88px;border-bottom:1px solid var(--rule-2);padding-bottom:0}
+.col{flex:1 1 0;display:flex;flex-direction:column;justify-content:flex-end;gap:1px;min-width:0}
+.seg{width:100%;border-radius:2px 2px 0 0}
+.seg.hit{background:var(--ok)}
+.seg.wr{background:var(--run)}
+.seg.miss{background:var(--bad);opacity:.75}
+.axis{display:flex;gap:6px;margin-top:4px}
+.axis span{flex:1 1 0;text-align:center;font:500 8.5px/1.4 var(--mono);color:var(--ink-3);min-width:0}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:9.5px;color:var(--ink-3)}
+.legend i{width:7px;height:7px;border-radius:2px;display:inline-block;margin-right:4px}
+
+/* matrix */
+.mx{border-collapse:collapse;width:100%;font-size:11px}
+.mx th{background:transparent;padding:6px 8px;font:600 9px/1.2 var(--mono);letter-spacing:.06em;text-align:center;color:var(--ink-3);border-bottom:1px solid var(--rule)}
+.mx th:first-child{text-align:left}
+.mx td{padding:5px 8px;border-bottom:1px solid var(--rule);color:var(--ink-2)}
+.mx td.c{text-align:center;width:64px}
+.mx .grp td{
+  background:var(--surface-2);font:600 9px/1 var(--mono);text-transform:uppercase;letter-spacing:.07em;
+  color:var(--ink-3);padding:7px 8px;
+}
+.mk{
+  width:17px;height:17px;border-radius:4px;display:inline-grid;place-items:center;
+  font:700 10px/1 var(--mono);vertical-align:middle;
+}
+.mk.y{background:var(--ok-soft);color:var(--ok)}
+.mk.n{background:transparent;border:1px dashed var(--rule-2);color:var(--ink-3)}
+.mk.lock{background:var(--surface-3);color:var(--ink-3)}
+.changed{position:relative}
+.changed::after{content:"";position:absolute;top:1px;right:-3px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
+
+/* tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+.tabs span{padding:5px 9px;font-size:11px;color:var(--ink-3);border-bottom:2px solid transparent;white-space:nowrap}
+.tabs span.on{color:var(--ink);font-weight:640;border-bottom-color:var(--accent)}
+
+/* finding list */
+.finding{background:var(--surface-2);border:1px solid var(--rule);border-left:3px solid var(--rule-2);border-radius:0 6px 6px 0;padding:8px 10px;margin-bottom:7px}
+.finding.high{border-left-color:var(--bad)}
+.finding.med{border-left-color:var(--wait)}
+.finding .fh{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.finding .ft{font-size:11px;font-weight:640;color:var(--ink)}
+.finding p{font-size:10.5px;color:var(--ink-2);line-height:1.45}
+.diff{font-family:var(--mono);font-size:10px;line-height:1.5;background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:6px 8px;margin-top:6px;overflow-x:auto;white-space:pre}
+.diff .del{color:var(--bad)}
+.diff .add{color:var(--ok)}
+
+/* palette overlay */
+.palwrap{position:relative}
+.palwrap .behind{filter:blur(1.2px) saturate(.6);opacity:.5}
+.palette{
+  position:absolute;left:50%;top:34px;transform:translateX(-50%);width:min(460px,calc(100% - 24px));
+  background:var(--surface);border:1px solid var(--rule-2);border-radius:9px;box-shadow:0 24px 60px -20px rgba(0,0,0,.45);
+  overflow:hidden;
+}
+.palette .pinput{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--rule)}
+.palette .pinput .q{flex:1 1 auto;font-size:12.5px;color:var(--ink)}
+.palette .pinput .caret{width:1px;height:14px;background:var(--accent);display:inline-block;margin-left:-7px}
+.pgroup{font:600 8.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);padding:8px 12px 4px}
+.pitem{display:flex;align-items:center;gap:9px;padding:6px 12px;font-size:11.5px;color:var(--ink-2)}
+.pitem.sel{background:var(--accent-soft);color:var(--ink)}
+.pitem .res{margin-left:auto;font:500 9px/1 var(--mono);color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.pitem .glyph{width:16px;height:16px;border-radius:4px;background:var(--surface-3);display:grid;place-items:center;font:700 8px/1 var(--mono);color:var(--ink-3);flex:none}
+
+/* login */
+.login{display:grid;place-items:center;min-height:330px;background:var(--surface-2);padding:24px}
+.logincard{width:min(320px,100%);background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:20px;box-shadow:var(--shadow)}
+.logincard h4{font-size:15px;margin-bottom:4px}
+.logincard p{font-size:11.5px;color:var(--ink-2);line-height:1.5;margin-bottom:14px}
+.field{margin-bottom:9px}
+.field label{display:block;font:600 9px/1 var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);margin-bottom:4px}
+.field .inp{border:1px solid var(--rule-2);border-radius:5px;padding:6px 8px;font-size:11.5px;color:var(--ink-2);background:var(--surface)}
+
+/* advanced-only reveal */
+.adv{display:none;font-family:var(--mono);font-size:.85em;color:var(--ink-3);letter-spacing:.01em}
+.adv:not(.blk){margin-left:.45em}
+[data-adv="on"] .adv{display:inline}
+[data-adv="on"] .adv.blk{display:block}
+[data-adv="on"] .adv.flex{display:flex}
+.adv.badge{background:var(--accent-soft);color:var(--accent);border-radius:3px;padding:1px 4px;font-size:.8em;font-weight:600}
+
+/* callouts */
+.callout{border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;background:var(--surface);padding:14px 16px;font-size:13.5px;color:var(--ink-2)}
+.callout.warn{border-left-color:var(--wait)}
+.callout.bad{border-left-color:var(--bad)}
+.callout b{color:var(--ink)}
+.callout .hd{font:600 10px/1 var(--mono);text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);margin-bottom:6px}
+
+ul.tight{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
+ul.tight li::marker{color:var(--rule-2)}
+ol.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14px;color:var(--ink-2)}
+ol.steps li::marker{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+
+/* waves */
+.wave{background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);padding:16px}
+.wave .wk{font:700 10px/1 var(--mono);letter-spacing:.09em;color:var(--accent);text-transform:uppercase}
+.wave h3{font-size:15px;margin:8px 0 4px}
+.wave .when{font-size:11.5px;color:var(--ink-3);font-family:var(--mono);margin-bottom:10px}
+.wave ul{margin:0;padding-left:16px;font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:5px}
+
+footer{border-top:1px solid var(--rule);margin-top:8px;padding-top:18px;font-size:12px;color:var(--ink-3);display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between}
+
+/* ── responsive ────────────────────────────────────────────────────────── */
+@media (max-width:1180px){
+  .doc{grid-template-columns:1fr;gap:0}
+  .toc{position:static;max-height:none;padding-block:24px 0;border-bottom:1px solid var(--rule)}
+  .toc ol{flex-direction:row;flex-wrap:wrap;gap:4px}
+  .toc a{border-left:0;border-bottom:2px solid transparent;padding:4px 7px}
+  .toc a.on{border-left:0;border-bottom-color:var(--accent)}
+  .toc .sub{display:none}
+  main{padding-block:28px}
+}
+@media (max-width:900px){
+  .g3,.depths{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
+  .split{grid-template-columns:1fr}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lanes{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .app{grid-template-columns:1fr}
+  .panel{overflow-x:auto}
+  .mx{min-width:460px}
+  .rail{
+    flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--rule);
+    padding:6px;gap:2px;align-items:center;
+  }
+  .rail .who,.rail .grp{display:none}
+  .rail a{white-space:nowrap;border-left:0;border-bottom:2px solid transparent;padding:5px 8px}
+  .rail a.on{border-left:0;border-bottom-color:var(--accent);box-shadow:none}
+  .main{padding:12px}
+  .hero{padding-block:36px 12px}
+  .lede{font-size:17px}
+  .mk{width:22px;height:22px}
+  .palette{position:static;transform:none;width:100%;margin-top:10px}
+  .palwrap .behind{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <span class="mark">C</span>
+      <span>Conveyor Web UI<small>design proposal · 2026-11-09</small></span>
+    </div>
+    <span class="spacer"></span>
+    <button class="toggle" id="advToggle" type="button" aria-pressed="false">
+      <span class="switch" aria-hidden="true"></span>
+      Advanced
+    </button>
+  </div>
+</header>
+
+<div class="wrap doc">
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#thesis">The thesis</a></li>
+      <li><a href="#principles">Six principles</a></li>
+      <li><a href="#ia">Information architecture</a></li>
+      <li><a href="#depths">Three depths</a></li>
+      <li><a href="#catalogue">Screen catalogue</a></li>
+      <li><a href="#screens">The screens</a></li>
+      <li><a href="#today" class="sub">Today</a></li>
+      <li><a href="#board" class="sub">Board</a></li>
+      <li><a href="#cockpit" class="sub">Card cockpit</a></li>
+      <li><a href="#run" class="sub">Run detail</a></li>
+      <li><a href="#members" class="sub">Members</a></li>
+      <li><a href="#roles" class="sub">Roles &amp; permissions</a></li>
+      <li><a href="#cache" class="sub">Usage &amp; cache</a></li>
+      <li><a href="#audit" class="sub">Prompt &amp; procedure audit</a></li>
+      <li><a href="#bench" class="sub">Benchmarks</a></li>
+      <li><a href="#evals" class="sub">Evals</a></li>
+      <li><a href="#palette" class="sub">⌘K</a></li>
+      <li><a href="#signin" class="sub">Sign in</a></li>
+      <li><a href="#rbac">RBAC backend delta</a></li>
+      <li><a href="#measure">Measure definitions</a></li>
+      <li><a href="#waves">Build waves</a></li>
+      <li><a href="#amend">Plan-set amendments</a></li>
+      <li><a href="#open">Open questions</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section class="hero" id="top">
+      <div class="eyebrow">Design for review</div>
+      <h1>Conveyor Web UI</h1>
+      <p class="lede">
+        A working surface for a system that runs work, stops at gates, and has to prove it is getting
+        better. Simple on arrival. Deep on request.
+      </p>
+      <div class="meta">
+        <span class="tag acc">Not implemented</span>
+        <span class="tag">Leptos CSR · ADR 0001</span>
+        <span class="tag">23 screens · 9 destinations</span>
+        <span class="tag pl">Wave 3 panels are planned</span>
+      </div>
+    </section>
+
+    <section id="thesis">
+      <div class="sect-head">
+        <h2>The thesis</h2>
+      </div>
+      <div class="prose">
+        <p>
+          Conveyor's server is not a set of resources with endpoints. It is <strong>189 actions</strong>
+          behind one dispatcher, one tenancy model, and three channels — web, Telegram, MCP. The same
+          authorization decides all three. That fact should shape the UI, not hide inside it.
+        </p>
+        <p>
+          So the app is not a CRUD console with a sidebar of entities. It is three loops:
+          <strong>what needs a human</strong>, <strong>what the work is</strong>, and
+          <strong>whether the machine is improving</strong>. Everything else — procedures, members,
+          permissions, the action registry — is configuration of the machinery that serves those loops.
+        </p>
+        <p>
+          The design's central move is that configuration never crowds the working view.
+          One global <em>Advanced</em> switch deepens every screen at once, and <kbd>⌘K</kbd> reaches
+          every action the caller's role permits. A screen that lacks a knob is not a dead end; the
+          registry is one keystroke away.
+        </p>
+      </div>
+    </section>
+
+    <section id="principles">
+      <div class="sect-head">
+        <h2>Six principles</h2>
+        <p>Each one has a mechanical consequence, not just an intention.</p>
+      </div>
+      <div class="grid g3">
+        <div class="card">
+          <div class="n">01</div>
+          <h3>The registry is the contract</h3>
+          <p>Every control names the action it invokes. The app bootstraps from <span class="mono">GET /api/actions</span> and renders only what the caller's role can reach.</p>
+          <div class="then"><b>Consequence:</b> no hidden mutations, and an action shipped today is reachable today.</div>
+        </div>
+        <div class="card">
+          <div class="n">02</div>
+          <h3>One switch, not twenty panels</h3>
+          <p><em>Advanced</em> is global. It reveals object IDs, versions, the action behind each button, and a raw-JSON inspector — everywhere at once, consistently.</p>
+          <div class="then"><b>Consequence:</b> no per-screen "advanced settings" sections to build or to learn.</div>
+        </div>
+        <div class="card">
+          <div class="n">03</div>
+          <h3>⌘K is the escape hatch</h3>
+          <p>Fuzzy over screens, objects and every permitted action. Picking an action renders its input schema as a form, with a JSON mode beside it.</p>
+          <div class="then"><b>Consequence:</b> fine-grained configuration has a guaranteed home, so screens can stay simple.</div>
+        </div>
+        <div class="card">
+          <div class="n">04</div>
+          <h3>One route per object</h3>
+          <p>A card is always <span class="mono">/board/:id/card/:id</span>; a run is always <span class="mono">/runs/:id</span>; an eval report is always <span class="mono">/evals/:id/report</span>.</p>
+          <div class="then"><b>Consequence:</b> links are shareable and every deep view is a destination, never a modal.</div>
+        </div>
+        <div class="card">
+          <div class="n">05</div>
+          <h3>Decisions are the product</h3>
+          <p>An approval is the one human primitive, answerable from web, Telegram or MCP. It gets an inbox with age and staleness, and it does not expire on its own.</p>
+          <div class="then"><b>Consequence:</b> "waiting 6 days" is visible, so a stalled project is a choice, not an accident.</div>
+        </div>
+        <div class="card">
+          <div class="n">06</div>
+          <h3>State is shown, never implied</h3>
+          <p>Every async surface renders its position in the state machine and its last update time. No spinner stands in for a state.</p>
+          <div class="then"><b>Consequence:</b> a queued run and a dead run never look the same.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ia">
+      <div class="sect-head">
+        <h2>Information architecture</h2>
+        <p>Nine destinations. Each answers one question; related screens are tabs inside it, not new nav items.</p>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Destination</th><th>The question it answers</th><th>Inside</th><th>Ready</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><b>Today</b></td><td>What needs me right now?</td><td>Waiting approvals · failed runs · assigned cards · andon state</td><td><span class="pill ok">yes</span></td></tr>
+            <tr><td><b>Board</b></td><td>What is the work?</td><td>Projects → boards → lanes → card cockpit</td><td><span class="pill ok">yes</span></td></tr>
+            <tr><td><b>Runs</b></td><td>What is executing?</td><td>Queue · run detail · steps · jobs · artifacts</td><td><span class="pill ok">yes</span></td></tr>
+            <tr><td><b>Build</b></td><td>How is work defined?</td><td>Procedures: author → publish → run</td><td><span class="pill ok">yes</span></td></tr>
+            <tr><td><b>Design</b></td><td>What is it supposed to be?</td><td>Requirements + revisions · trace/architecture models</td><td><span class="pill ok">yes</span></td></tr>
+            <tr><td><b>Measure</b></td><td>What does it cost and where does it leak?</td><td>Usage &amp; cache · prompt &amp; procedure audit · improvement</td><td><span class="pill wait">partial</span></td></tr>
+            <tr><td><b>Evals</b></td><td>Is it getting better?</td><td>Benchmarks · evals: cases, runs, report, audit, sign-off, interop, climb</td><td><span class="pill wait">planned</span></td></tr>
+            <tr><td><b>Govern</b></td><td>Who may do what?</td><td>Members · roles &amp; permissions · action registry · audit log · integrations</td><td><span class="pill ok">yes</span><span class="adv badge">roles: new</span></td></tr>
+            <tr><td><b>Channels</b></td><td>How do people and agents talk to it?</td><td>Copilot · approvals history · Telegram bindings</td><td><span class="pill ok">yes</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="screen-note" style="margin-top:14px">
+        <b>Today</b> is the only destination without an S12 row of its own. It composes the declared
+        run-queue projection with <span class="mono">approvals.list</span> and the card projections, and
+        invents no action, table or event — filed as a contract-change request, the same mechanism S12
+        used for its copilot row.
+      </p>
+    </section>
+
+    <section id="depths">
+      <div class="sect-head">
+        <h2>Three depths</h2>
+        <p>The same screen at three levels of detail. Depth is a user choice, not a separate route tree.</p>
+      </div>
+      <div class="depths">
+        <div class="depth">
+          <div class="k">Depth 1 · default</div>
+          <h4>Do</h4>
+          <p>One screen answers one question. A row shows what it is, who owns it, and what state it is in. No IDs, no versions, no JSON.</p>
+        </div>
+        <div class="depth">
+          <div class="k">Depth 2 · on selection</div>
+          <h4>Inspect</h4>
+          <p>Selecting any object opens the right-hand inspector: its detail, its history, and the actions you can take on it. The list stays where it was.</p>
+        </div>
+        <div class="depth d3">
+          <div class="k">Depth 3 · the switch</div>
+          <h4>Configure</h4>
+          <p><em>Advanced</em> deepens every screen: IDs, versions, the action name on every control, and a raw payload tab. <kbd>⌘K</kbd> opens any action as a generated form.</p>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:16px">
+        <div class="hd">Try it on this page</div>
+        The <b>Advanced</b> switch in the header is wired to every wireframe below. Turn it on and the
+        same screens gain their identifiers, versions and action names — the extra layer is the depth-3
+        state, demonstrated rather than described.
+      </div>
+    </section>
+
+    <section id="catalogue">
+      <div class="sect-head">
+        <h2>Screen catalogue</h2>
+        <p>All 21 screens declared by S12, plus the two RBAC screens and the super-admin Platform surface the owner ruled in. Readiness is measured against the action registry and the routes, not inferred.</p>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Screen</th><th>Destination</th><th>Declared by</th><th>Actions today</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="mono">01</td><td>Shell / sign in</td><td>shell</td><td class="mono">S02</td><td><span class="pill ok">present</span></td></tr>
+            <tr><td class="mono">02</td><td>Board</td><td>Board</td><td class="mono">S05</td><td><span class="pill ok">present</span></td></tr>
+            <tr><td class="mono">03</td><td>Card cockpit</td><td>Board → card</td><td class="mono">S05 S06 S11</td><td><span class="pill ok">present</span></td></tr>
+            <tr><td class="mono">04</td><td>Run queue</td><td>Runs</td><td class="mono">S06</td><td><span class="pill ok">present</span></td></tr>
+            <tr><td class="mono">05</td><td>Requirements &amp; revisions</td><td>Design</td><td class="mono">S07</td><td><span class="pill ok">present</span></td></tr>
+            <tr><td class="mono">06</td><td>Trace / architecture</td><td>Design</td><td class="mono">S08</td><td><span class="pill ok">present</span></td></tr>
+            <tr><td class="mono">07</td><td>Procedures</td><td>Build</td><td class="mono">S11</td><td><span class="pill ok">present</span> <span class="adv">cancel = runs.cancel</span></td></tr>
+            <tr><td class="mono">08</td><td>Search</td><td>⌘K</td><td class="mono">S07</td><td><span class="pill ok">present</span></td></tr>
+            <tr><td class="mono">09</td><td>Admin / registry</td><td>Govern</td><td class="mono">S09</td><td><span class="pill ok">present</span></td></tr>
+            <tr><td class="mono">10</td><td>Copilot</td><td>Channels</td><td class="mono">S10</td><td><span class="pill ok">present</span></td></tr>
+            <tr><td class="mono">11</td><td>Inference usage <span class="muted">+ Cost &amp; usage</span></td><td>Measure</td><td class="mono">S16</td><td><span class="pill ok">built</span> <span class="adv">billing route</span></td></tr>
+            <tr><td class="mono">12</td><td>Prompt &amp; procedure audit</td><td>Measure</td><td class="mono">S16</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">13</td><td>Benchmarks</td><td>Evals</td><td class="mono">S17</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">14</td><td>Improvement</td><td>Measure</td><td class="mono">S18</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">15</td><td>Evals</td><td>Evals → Cases</td><td class="mono">S19</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">16</td><td>Eval run</td><td>Evals → Runs</td><td class="mono">S19</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">17</td><td>Eval report</td><td>Evals → Report</td><td class="mono">S19</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">18</td><td>Eval audit</td><td>Evals → Audit</td><td class="mono">S19</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">19</td><td>Eval sign-off</td><td>Evals → Sign-off</td><td class="mono">S19</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">20</td><td>Eval interop</td><td>Evals → Interop</td><td class="mono">S19</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">21</td><td>Eval hillclimb</td><td>Evals → Climb</td><td class="mono">S20</td><td><span class="pill wait">blocked</span></td></tr>
+            <tr><td class="mono">22</td><td><b>Roles &amp; permissions</b></td><td>Govern</td><td class="mono">owner ruling</td><td><span class="pill ok">built</span></td></tr>
+            <tr><td class="mono">23</td><td><b>Members</b></td><td>Govern</td><td class="mono">owner ruling</td><td><span class="pill ok">built</span></td></tr>
+            <tr><td class="mono">24</td><td><b>Platform</b> <span class="muted">(super-admin)</span></td><td>outside the nine</td><td class="mono">owner ruling</td><td><span class="pill ok">built</span> <span class="adv">platform routes</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="screen-note" style="margin-top:14px">
+        "Blocked" means the screen's actions are not in the registry — the slice that declares them is
+        not built. It is not a UI problem, and no screen below pretends otherwise.
+      </p>
+    </section>
+
+    <section id="screens">
+      <div class="sect-head">
+        <h2>The screens</h2>
+        <p>Thirteen wireframes with realistic data, including the super-admin Platform surface. Flip <b>Advanced</b> in the header to see the depth-3 layer on each.</p>
+      </div>
+
+      <!-- ─── TODAY ─────────────────────────────────────────────────────── -->
+      <div class="screen" id="today">
+        <h3>Today</h3>
+        <p class="screen-note">
+          The landing route. It answers one question — what needs a person — and nothing else. Age is
+          first-class, because an approval never expires on its own.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">conveyor.nonagentic.ai/today</span><span>Acme</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a class="on" href="#today">Today <span class="cnt">4</span></a>
+              <a href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a href="#cache">Measure</a>
+              <a href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>Good morning, Ada</h4>
+                  <div class="sub">4 things need you · 3 runs active · last sync 11 s ago</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="btn">Search <kbd>⌘K</kbd></span>
+                <span class="btn pri">New card</span>
+              </div>
+
+              <div class="panel">
+                <div class="ph"><span>Waiting on you · 3</span><span class="hint">oldest first</span></div>
+                <table class="wtbl">
+                  <thead><tr><th>Gate</th><th>What it is</th><th>Age</th><th></th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="pill wait"><span class="dotp"></span>6d 2h</span></td>
+                      <td><b>Approve the checkout rewrite plan</b><br><span class="muted">Card LOY-142 · requested by the triage agent</span></td>
+                      <td class="n">6d 2h</td>
+                      <td><span class="btn">Open</span> <span class="adv badge">approval 9c1e4f</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="pill wait"><span class="dotp"></span>2d 4h</span></td>
+                      <td><b>Publish procedure bug-fix v7</b><br><span class="muted">3 high-confidence prompt findings block this publish</span></td>
+                      <td class="n">2d 4h</td>
+                      <td><span class="btn">Review</span> <span class="adv badge">approval 4a77b0</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="pill wait"><span class="dotp"></span>4h</span></td>
+                      <td><b>Eval grading sign-off — bug-fix judge v3</b><br><span class="muted">120 pilot cases graded · review before the full run</span></td>
+                      <td class="n">4h</td>
+                      <td><span class="btn">Review</span> <span class="adv badge">approval e2d118</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="split">
+                <div class="panel">
+                  <div class="ph"><span>Runs that stopped</span><span class="muted">2 failed · 1 needs input</span></div>
+                  <table class="wtbl">
+                    <thead><tr><th>Run</th><th>Card</th><th>State</th><th>When</th></tr></thead>
+                    <tbody>
+                      <tr><td class="mono">r-8f2c</td><td>LOY-138 · idempotency keys</td><td><span class="pill bad">failed</span></td><td class="n">12 min</td></tr>
+                      <tr><td class="mono">r-8f19</td><td>LOY-129 · retry policy</td><td><span class="pill bad">failed</span></td><td class="n">1 h</td></tr>
+                      <tr><td class="mono">r-8ef0</td><td>LOY-144 · audit export</td><td><span class="pill run">running</span></td><td class="n">18 min</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="hint adv blk" style="margin-top:8px">runs.list status=failed,running · action names shown in Advanced</div>
+                </div>
+                <div class="panel">
+                  <div class="ph"><span>Machine state</span></div>
+                  <div class="kv">
+                    <dt>Andon</dt><dd><span class="pill ok">released</span></dd>
+                    <dt>Workers</dt><dd>1 of 1 ready</dd>
+                    <dt>Queue</dt><dd>3 jobs · oldest 41 s</dd>
+                    <dt>Licence</dt><dd><span class="pill ok">active</span> until 2027-03-01</dd>
+                    <dt class="adv">tenant</dt><dd class="adv">t-acme · 7 members · 2 admins</dd>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Calls:</b> <span class="mono">approvals.list</span>, <span class="mono">runs.list</span>, <span class="mono">cards.*</span> projections, <span class="mono">andon</span> state.</li>
+          <li><b>Live:</b> subscribes to tenant-wide <span class="mono">run:</span> and <span class="mono">approval:</span> topics; a completed run disappears from "stopped" without a reload.</li>
+          <li><b>Never:</b> auto-expires an approval. Age is the only pressure the UI applies.</li>
+        </ul>
+      </div>
+
+      <!-- ─── BOARD ─────────────────────────────────────────────────────── -->
+      <div class="screen" id="board">
+        <h3>Board</h3>
+        <p class="screen-note">
+          The list is the state. There is no second status column to disagree with it. Drag between lanes
+          is one conditional update carrying the card's version.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/board/b-loyalty/delivery</span><span>Acme</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a href="#today">Today <span class="cnt">4</span></a>
+              <a class="on" href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a href="#cache">Measure</a>
+              <a href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>Loyalty platform <span class="muted" style="font-weight:400">/ Delivery</span></h4>
+                  <div class="sub">14 live cards · 2 archived · 4 lanes</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="btn ghost">Filter</span>
+                <span class="btn">List view</span>
+                <span class="btn pri">New card</span>
+              </div>
+              <div class="lanes">
+                <div class="lane">
+                  <div class="lh"><span>Intake</span><span>3</span></div>
+                  <div class="ticket">
+                    <div class="tt">Split the refund webhook from the capture path</div>
+                    <div class="tm"><span class="avatar">C</span><span>Chen</span><span class="lbl">infra</span></div>
+                  </div>
+                  <div class="ticket">
+                    <div class="tt">Audit export must include the actor kind</div>
+                    <div class="tm"><span class="avatar">B</span><span>Bob</span><span class="lbl">security</span></div>
+                  </div>
+                  <div class="ticket">
+                    <div class="tt">Backfill the metric store for Q3</div>
+                    <div class="tm"><span class="avatar">A</span><span>Ada</span></div>
+                  </div>
+                </div>
+                <div class="lane">
+                  <div class="lh"><span>Doing</span><span>2</span></div>
+                  <div class="ticket">
+                    <div class="tt">Idempotency keys on payment webhooks</div>
+                    <div class="tm"><span class="pill run"><span class="dotp"></span>run 18 min</span></div>
+                    <div class="tm" style="margin-top:4px"><span class="avatar">C</span><span>Chen</span><span class="adv">card 4f21a</span></div>
+                  </div>
+                  <div class="ticket">
+                    <div class="tt">Retry policy for the notification fan-out</div>
+                    <div class="tm"><span class="pill bad">run failed</span><span class="adv">run 8f19</span></div>
+                  </div>
+                </div>
+                <div class="lane">
+                  <div class="lh"><span>Waiting</span><span>1</span></div>
+                  <div class="ticket">
+                    <div class="tt">Checkout rewrite plan</div>
+                    <div class="tm"><span class="pill wait"><span class="dotp"></span>gate 6d</span></div>
+                    <div class="tm" style="margin-top:4px"><span class="muted">blocked on you</span></div>
+                  </div>
+                </div>
+                <div class="lane">
+                  <div class="lh"><span>Done</span><span>8</span></div>
+                  <div class="ticket">
+                    <div class="tt">Trace links on the billing model</div>
+                    <div class="tm"><span class="pill ok">done</span><span>yesterday</span></div>
+                  </div>
+                  <div class="ticket">
+                    <div class="tt">Kill the legacy webhook retry</div>
+                    <div class="tm"><span class="pill ok">done</span><span>2 days ago</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="hint adv blk">boards.get b-loyalty · lists.move · cards.move (If-Match: version) · SSE board:b-loyalty · card:4f21a</div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Depth 2:</b> clicking a card opens the cockpit as a route; the board stays mounted behind it, so Esc returns with the scroll position intact.</li>
+          <li><b>Live:</b> one SSE topic per board. Remote moves animate in place; a drag in progress is never interrupted.</li>
+          <li><b>Advanced:</b> every card shows its id and version; the lane header shows the list id and kind.</li>
+        </ul>
+      </div>
+
+      <!-- ─── CARD COCKPIT ──────────────────────────────────────────────── -->
+      <div class="screen" id="cockpit">
+        <h3>Card cockpit</h3>
+        <p class="screen-note">
+          One unit of work in full. The left column is what the work is; the right column is what has
+          happened to it and what is waiting. Approvals carry the kind of decider — a person and an agent
+          never look the same.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/board/b-loyalty/card/4f21a</span><span>Acme</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a href="#today">Today <span class="cnt">4</span></a>
+              <a class="on" href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a href="#cache">Measure</a>
+              <a href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>Idempotency keys on payment webhooks</h4>
+                  <div class="sub">LOY-142 · Doing · claimed by Chen, lease 42 min left</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="btn">Release</span>
+                <span class="btn pri">Run procedure</span>
+              </div>
+              <div class="split">
+                <div class="panel">
+                  <div class="ph"><span>Brief</span><span class="muted">updated 2 h ago</span></div>
+                  <p style="font-size:11px;line-height:1.5;color:var(--ink-2)">
+                    Every inbound payment callback must carry a stable idempotency key derived from the
+                    provider event id. Duplicate deliveries must be a no-op, and the key must be visible
+                    in the audit trail.
+                  </p>
+                  <div class="ph" style="margin-top:12px"><span>Acceptance</span><span class="muted">3 of 4</span></div>
+                  <table class="wtbl">
+                    <tbody>
+                      <tr><td><span class="pill ok">✓</span></td><td>Key derived and stored</td><td class="n muted">done</td></tr>
+                      <tr><td><span class="pill ok">✓</span></td><td>Duplicate delivery is a no-op</td><td class="n muted">done</td></tr>
+                      <tr><td><span class="pill ok">✓</span></td><td>Key appears in the audit event</td><td class="n muted">done</td></tr>
+                      <tr><td><span class="pill wait">○</span></td><td>Load test at 2× peak</td><td class="n muted">open</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="ph" style="margin-top:12px"><span>Fields</span></div>
+                  <div class="kv">
+                    <dt>Type</dt><dd>feature</dd>
+                    <dt>Priority</dt><dd>high</dd>
+                    <dt>Owner</dt><dd>Chen Wu</dd>
+                    <dt>Labels</dt><dd>payments · infra</dd>
+                    <dt class="adv">card id</dt><dd class="adv">4f21a6d2-… · v7</dd>
+                    <dt class="adv">list id</dt><dd class="adv">l-doing · kind=active</dd>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+                  <div class="panel">
+                    <div class="ph"><span>Runs</span><span class="muted">3</span></div>
+                    <table class="wtbl">
+                      <tbody>
+                        <tr><td class="mono">r-8f2c</td><td><span class="pill run">running</span><br><span class="muted">bug-fix v6 · step 3 of 5</span></td></tr>
+                        <tr><td class="mono">r-8e11</td><td><span class="pill ok">succeeded</span><br><span class="muted">bug-fix v6 · 4 m 12 s</span></td></tr>
+                        <tr><td class="mono">r-8d02</td><td><span class="pill bad">failed</span><br><span class="muted">tests did not compile</span></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="panel">
+                    <div class="ph"><span>Gates</span><span class="pill wait">1 waiting</span></div>
+                    <div style="font-size:10.5px;color:var(--ink-2);line-height:1.5">
+                      <b>Merge to main</b><br>
+                      requested by <span class="mono">triage_agent</span> · via mcp · 2 d
+                    </div>
+                    <div style="display:flex;gap:6px;margin-top:8px">
+                      <span class="btn pri">Approve</span><span class="btn">Reject</span>
+                    </div>
+                    <div class="adv blk" style="margin-top:8px">approval 9c1e4f · required_decisions 1 · expires_at NULL · decided_by_kind records human</div>
+                  </div>
+                  <div class="panel">
+                    <div class="ph"><span>Activity</span></div>
+                    <div style="font-size:10.5px;color:var(--ink-2);line-height:1.6">
+                      <span class="mono muted">10:42</span> agent added acceptance item 4<br>
+                      <span class="mono muted">10:18</span> Chen claimed the card<br>
+                      <span class="mono muted">09:55</span> procedure v6 started
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Agent vs person:</b> every approval decision renders <span class="mono">decided_by_kind</span> and the channel that carried it. An agent's approval is auditable as an agent's.</li>
+          <li><b>Advanced:</b> adds the raw card payload tab, the run inputs JSON, and the version used for <span class="mono">If-Match</span>.</li>
+        </ul>
+      </div>
+
+      <!-- ─── RUN DETAIL ────────────────────────────────────────────────── -->
+      <div class="screen" id="run">
+        <h3>Run detail</h3>
+        <p class="screen-note">
+          A run is a state machine, so it is drawn as one: steps left to right, jobs underneath, artifacts
+          at the end. A failed step says which step failed — never "something went wrong".
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/runs/8f2c</span><span>Acme</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a href="#today">Today <span class="cnt">4</span></a>
+              <a href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a class="on" href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a href="#cache">Measure</a>
+              <a href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>Run 8f2c · bug-fix v6</h4>
+                  <div class="sub">Card LOY-142 · started 10:18 · 24 min elapsed</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="pill run"><span class="dotp"></span>step 3 of 5</span>
+                <span class="btn">Cancel</span>
+              </div>
+              <div class="panel">
+                <div class="ph"><span>Steps</span><span class="muted">procedure bug-fix@6</span></div>
+                <div style="display:flex;gap:4px;align-items:stretch;font-size:9.5px">
+                  <div style="flex:1;min-width:0;border-radius:4px;padding:6px;background:var(--ok-soft);color:var(--ok);font-weight:700">1 · gather</div>
+                  <div style="flex:1;min-width:0;border-radius:4px;padding:6px;background:var(--ok-soft);color:var(--ok);font-weight:700">2 · reproduce</div>
+                  <div style="flex:1;min-width:0;border-radius:4px;padding:6px;background:var(--run-soft);color:var(--run);font-weight:700">3 · patch</div>
+                  <div style="flex:1;min-width:0;border-radius:4px;padding:6px;background:var(--surface-3);color:var(--ink-3);font-weight:700">4 · gate</div>
+                  <div style="flex:1;min-width:0;border-radius:4px;padding:6px;background:var(--surface-3);color:var(--ink-3);font-weight:700">5 · land</div>
+                </div>
+              </div>
+              <div class="split">
+                <div class="panel">
+                  <div class="ph"><span>Jobs</span><span class="muted">1 per step</span></div>
+                  <table class="wtbl">
+                    <thead><tr><th>Step</th><th>Job</th><th>Attempt</th><th>State</th><th>Duration</th></tr></thead>
+                    <tbody>
+                      <tr><td>gather</td><td class="mono">j-1a2</td><td class="n">1</td><td><span class="pill ok">ok</span></td><td class="n">3.2 s</td></tr>
+                      <tr><td>reproduce</td><td class="mono">j-1a3</td><td class="n">1</td><td><span class="pill ok">ok</span></td><td class="n">1 m 04 s</td></tr>
+                      <tr><td>patch</td><td class="mono">j-1a4</td><td class="n">1</td><td><span class="pill run">running</span></td><td class="n">18 m</td></tr>
+                      <tr><td>gate</td><td class="mono">j-1a5</td><td class="n">—</td><td><span class="pill">queued</span></td><td class="n">—</td></tr>
+                      <tr><td>land</td><td class="mono">j-1a6</td><td class="n">—</td><td><span class="pill">queued</span></td><td class="n">—</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="adv blk" style="margin-top:8px">job dedupe keys visible · lease holder per job · run_step.input JSON per row</div>
+                </div>
+                <div class="panel">
+                  <div class="ph"><span>Artifacts</span></div>
+                  <table class="wtbl">
+                    <tbody>
+                      <tr><td>repro.md</td><td class="n muted">4 KB</td></tr>
+                      <tr><td>patch.diff</td><td class="n muted">12 KB</td></tr>
+                      <tr><td>test.log</td><td class="n muted">88 KB</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="ph" style="margin-top:10px"><span>Inputs</span></div>
+                  <div class="kv">
+                    <dt>card</dt><dd>LOY-142</dd>
+                    <dt>procedure</dt><dd>bug-fix@6</dd>
+                    <dt>model</dt><dd>claude-sonnet-5-5</dd>
+                    <dt class="adv">run id</dt><dd class="adv">8f2c19 · v3</dd>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── MEMBERS ───────────────────────────────────────────────────── -->
+      <div class="screen" id="members">
+        <h3>Members</h3>
+        <p class="screen-note">
+          Who is in this tenant and what role they hold. The single-user rule is stated, not implied: a
+          tenant with one member shows that member as its admin.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/settings/members</span><span>Acme</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a href="#today">Today <span class="cnt">4</span></a>
+              <a href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a href="#cache">Measure</a>
+              <a href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a class="on" href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>Members</h4>
+                  <div class="sub">7 people · 2 admins · 4 members · 1 viewer</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="btn ghost">Roles &amp; permissions →</span>
+                <span class="btn pri">Add member</span>
+              </div>
+              <div class="panel" style="border-left:3px solid var(--accent);border-radius:0 7px 7px 0">
+                <div style="font-size:10.5px;color:var(--ink-2);line-height:1.5">
+                  <b>This tenant has one member, so that member is its tenant admin.</b>
+                  <span class="muted">As soon as a second member joins, roles are explicit and can be changed here.</span>
+                </div>
+              </div>
+              <div class="panel">
+                <table class="wtbl">
+                  <thead><tr><th>Person</th><th>Role</th><th>Department</th><th>Last active</th><th></th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="avatar">A</span> <b>Ada Okafor</b><br><span class="muted">ada@acme.dev</span></td>
+                      <td><span class="pill acc">tenant admin</span></td>
+                      <td>Platform</td><td class="n">now</td>
+                      <td><span class="btn ghost">Change role</span> <span class="adv">last admin: cannot be demoted</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="avatar">B</span> <b>Bob de Vries</b><br><span class="muted">bob@acme.dev</span></td>
+                      <td><span class="pill acc">admin</span></td>
+                      <td>Platform</td><td class="n">11 min</td>
+                      <td><span class="btn ghost">Change role</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="avatar">C</span> <b>Chen Wu</b><br><span class="muted">chen@acme.dev</span></td>
+                      <td><span class="pill">member</span></td>
+                      <td>Payments</td><td class="n">2 h</td>
+                      <td><span class="btn ghost">Change role</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="avatar">D</span> <b>Dara Singh</b><br><span class="muted">dara@acme.dev</span></td>
+                      <td><span class="pill">viewer</span></td>
+                      <td>Finance</td><td class="n">yesterday</td>
+                      <td><span class="btn ghost">Change role</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="adv blk" style="margin-top:8px">members.list · members.set_role (If-Match: membership.version) · user uuid · membership uuid · created_at</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Actions:</b> <span class="mono">members.list</span> and <span class="mono">members.set_role</span> — both already in the registry.</li>
+          <li><b>Guards:</b> the last admin cannot be demoted; <span class="mono">kata_executor</span> is a machine role and never appears in this table.</li>
+          <li><b>Invite and remove are real writes now.</b> <span class="mono">invites.create|list|revoke</span> and <span class="mono">members.remove</span>; an invite binds at the invited address's first verified sign-in, and removing the last admin is refused.</li>
+        </ul>
+      </div>
+
+      <!-- ─── ROLES & PERMISSIONS ───────────────────────────────────────── -->
+      <div class="screen" id="roles">
+        <h3>Roles &amp; permissions</h3>
+        <p class="screen-note">
+          The second RBAC screen. A tenant admin decides what each role may do; the compiled table is the
+          default, and only deviations are stored. Every scope has a value — there is no "unset".
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/settings/roles</span><span>Acme</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a href="#today">Today <span class="cnt">4</span></a>
+              <a href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a href="#cache">Measure</a>
+              <a href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a class="on" href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>Roles &amp; permissions</h4>
+                  <div class="sub">Applies to every member of Acme holding that role</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="btn ghost">Reset to defaults</span>
+                <span class="btn pri">Save 3 changes</span>
+              </div>
+              <div class="tabs">
+                <span class="on">Roles</span><span>Machine principals</span><span>History</span>
+              </div>
+              <div class="panel" style="padding:0;overflow-x:auto">
+                <table class="mx">
+                  <thead>
+                    <tr><th>Permission</th><th>Admin</th><th>Member</th><th>Viewer</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr class="grp"><td colspan="4">Work · cards, boards, lists</td></tr>
+                    <tr><td>Read cards and boards <span class="adv">cards:read</span></td><td class="c"><span class="mk lock">●</span></td><td class="c"><span class="mk y">✓</span></td><td class="c"><span class="mk y">✓</span></td></tr>
+                    <tr><td>Create and move cards <span class="adv">cards:write</span></td><td class="c"><span class="mk lock">●</span></td><td class="c changed"><span class="mk y">✓</span></td><td class="c"><span class="mk n">—</span></td></tr>
+                    <tr><td>Create projects <span class="adv">projects:write</span></td><td class="c"><span class="mk lock">●</span></td><td class="c changed"><span class="mk y">✓</span></td><td class="c"><span class="mk n">—</span></td></tr>
+                    <tr class="grp"><td colspan="4">Runs &amp; decisions</td></tr>
+                    <tr><td>Start and cancel runs <span class="adv">runs:write</span></td><td class="c"><span class="mk lock">●</span></td><td class="c"><span class="mk y">✓</span></td><td class="c"><span class="mk n">—</span></td></tr>
+                    <tr><td>Decide approvals <span class="adv">approvals:write</span></td><td class="c"><span class="mk lock">●</span></td><td class="c"><span class="mk y">✓</span></td><td class="c"><span class="mk n">—</span></td></tr>
+                    <tr class="grp"><td colspan="4">Measure</td></tr>
+                    <tr><td>Read usage and cache <span class="adv">inference:read</span></td><td class="c"><span class="mk lock">●</span></td><td class="c"><span class="mk y">✓</span></td><td class="c changed"><span class="mk y">✓</span></td></tr>
+                    <tr><td>Run evals and sign off <span class="adv">evals:approve</span></td><td class="c"><span class="mk lock">●</span></td><td class="c"><span class="mk n">—</span></td><td class="c"><span class="mk n">—</span></td></tr>
+                    <tr class="grp"><td colspan="4">Governance</td></tr>
+                    <tr><td>Manage members <span class="adv">members:write</span></td><td class="c"><span class="mk lock">●</span></td><td class="c"><span class="mk n">—</span></td><td class="c"><span class="mk n">—</span></td></tr>
+                    <tr><td>Edit this policy <span class="adv">roles.policy_set</span></td><td class="c"><span class="mk lock">●</span></td><td class="c"><span class="mk n">—</span></td><td class="c"><span class="mk n">—</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--ink-3)">
+                <span><span class="mk y" style="width:12px;height:12px">✓</span> allowed</span>
+                <span><span class="mk n" style="width:12px;height:12px">—</span> denied</span>
+                <span><span class="mk lock" style="width:12px;height:12px">●</span> not editable</span>
+                <span><span class="changed"><span class="mk y" style="width:12px;height:12px">✓</span></span> differs from default</span>
+                <span class="spacer" style="flex:1"></span>
+                <span>3 changes · affects <b>4 members</b> · next request</span>
+              </div>
+              <div class="adv blk">roles.policy_get / policy_set / policy_reset · tenant_role_scope rows: 3 · kernel scopes locked: me, tenants, actions, events, members · SSE topics gated by scope</div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Defaults are the compiled table.</b> A fresh tenant stores nothing; the dots mark only what this tenant changed.</li>
+          <li><b>Tenant admin is a lock, not a role you edit.</b> Admin cannot be demoted or stripped of member management, so a tenant cannot lock itself out of this screen. There is no owner role: the tenant owns itself.</li>
+          <li><b>Effects are immediate</b> — the policy is read on the next request, so a revoked scope stops working before the page is reloaded.</li>
+        </ul>
+      </div>
+
+      <!-- ─── USAGE & CACHE ─────────────────────────────────────────────── -->
+      <div class="screen" id="cache">
+        <h3>Usage &amp; cache</h3>
+        <p class="screen-note">
+          The cache is measured from the provider's two token classes, not from a response cache — the
+          router has none. A cache <em>write</em> that is never read is the failure this screen exists to
+          show, which is why the ratio is broken down by prompt hash.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/measure/usage</span><span>Acme</span><span class="pill wait">planned · S16</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a href="#today">Today <span class="cnt">4</span></a>
+              <a href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a class="on" href="#cache">Measure</a>
+              <a href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>Usage &amp; cache</h4>
+                  <div class="sub">Last 7 days · 1,284 calls · 3 models</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="btn ghost">Group: day</span>
+                <span class="btn">Export</span>
+              </div>
+              <div class="tiles">
+                <div class="tile"><div class="tk">Cache hit ratio</div><div class="tv">78<small>%</small></div><div class="td">target ≥ 80%</div></div>
+                <div class="tile"><div class="tk">Calls</div><div class="tv">1,284</div><div class="td">+12% vs last week</div></div>
+                <div class="tile"><div class="tk">Tokens</div><div class="tv">4.2<small>M</small></div><div class="td">3.1 M prompt · 1.1 M out</div></div>
+                <div class="tile"><div class="tk">Writes never read</div><div class="tv" style="color:var(--bad)">412<small>k</small></div><div class="td">6 prompt hashes</div></div>
+              </div>
+              <div class="chart">
+                <div class="ch"><span>Cache classes by day</span><span class="muted">tokens · max 640 k</span></div>
+                <div class="plot" role="img" aria-label="Stacked bars of cache hits, writes and misses over seven days">
+                  <div class="col"><div class="seg miss" style="height:6%"></div><div class="seg wr" style="height:9%"></div><div class="seg hit" style="height:38%"></div></div>
+                  <div class="col"><div class="seg miss" style="height:5%"></div><div class="seg wr" style="height:7%"></div><div class="seg hit" style="height:46%"></div></div>
+                  <div class="col"><div class="seg miss" style="height:9%"></div><div class="seg wr" style="height:12%"></div><div class="seg hit" style="height:44%"></div></div>
+                  <div class="col"><div class="seg miss" style="height:4%"></div><div class="seg wr" style="height:5%"></div><div class="seg hit" style="height:52%"></div></div>
+                  <div class="col"><div class="seg miss" style="height:11%"></div><div class="seg wr" style="height:16%"></div><div class="seg hit" style="height:40%"></div></div>
+                  <div class="col"><div class="seg miss" style="height:3%"></div><div class="seg wr" style="height:4%"></div><div class="seg hit" style="height:58%"></div></div>
+                  <div class="col"><div class="seg miss" style="height:6%"></div><div class="seg wr" style="height:8%"></div><div class="seg hit" style="height:49%"></div></div>
+                </div>
+                <div class="axis"><span>Nov 3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+                <div class="legend">
+                  <span><i style="background:var(--ok)"></i>hit</span>
+                  <span><i style="background:var(--run)"></i>write</span>
+                  <span><i style="background:var(--bad);opacity:.75"></i>miss</span>
+                  <span class="muted">unknown is shown as a striped segment in the full view</span>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="ph"><span>By prompt hash — cache-hostile first</span><span class="muted">6 of 41</span></div>
+                <table class="wtbl">
+                  <thead><tr><th>Prompt</th><th>Model</th><th class="n">Writes</th><th class="n">Reads</th><th class="n">Hit %</th><th></th></tr></thead>
+                  <tbody>
+                    <tr><td class="mono">sha 7c2a…</td><td>sonnet-5.5</td><td class="n">128 k</td><td class="n">0</td><td class="n" style="color:var(--bad)">0%</td><td><span class="pill bad">never read</span></td></tr>
+                    <tr><td class="mono">sha 91be…</td><td>sonnet-5.5</td><td class="n">96 k</td><td class="n">1.2 k</td><td class="n" style="color:var(--bad)">1%</td><td><span class="pill bad">prefix unstable</span></td></tr>
+                    <tr><td class="mono">sha 3fd0…</td><td>haiku-5.5</td><td class="n">64 k</td><td class="n">310 k</td><td class="n" style="color:var(--ok)">83%</td><td></td></tr>
+                    <tr><td class="mono">sha b104…</td><td>opus-5.5</td><td class="n">22 k</td><td class="n">140 k</td><td class="n" style="color:var(--ok)">86%</td><td></td></tr>
+                  </tbody>
+                </table>
+                <div class="adv blk" style="margin-top:8px">inference_usage.report group_by=prompt_sha · inference_calls.list · cost derived from the ledger at read time, never stored</div>
+              </div>
+              <div class="panel">
+                <div class="ph"><span>Cost &amp; usage</span><span class="muted">billing_service · November</span></div>
+                <div class="tiles">
+                  <div class="tile"><div class="tk">Billed</div><div class="tv">$18.40</div><div class="td">conveyor licence</div></div>
+                  <div class="tile"><div class="tk">Requests</div><div class="tv">1,284</div><div class="td">this month</div></div>
+                  <div class="tile"><div class="tk">Quota used</div><div class="tv">0.13<small>%</small></div><div class="td">of 1,000,000</div></div>
+                  <div class="tile"><div class="tk">Markup</div><div class="tv">20<small>%</small></div><div class="td">applied by billing</div></div>
+                </div>
+                <table class="wtbl">
+                  <thead><tr><th>By project <span class="pill wait">tenant-wide</span></th><th class="n">Requests</th><th class="n">Cost</th></tr></thead>
+                  <tbody>
+                    <tr><td class="mono">7c2a…</td><td class="n">812</td><td class="n">$11.60</td></tr>
+                    <tr><td class="mono">91be…</td><td class="n">472</td><td class="n">$6.80</td></tr>
+                  </tbody>
+                </table>
+                <div class="adv blk" style="margin-top:8px">GET /api/tenants/{id}/billing · billing (app-scoped) · costs (tenant-wide, no app axis) · actors (billing-internal) · a failed source renders its reason, never $0.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Four classes, no fudging:</b> hit, write, miss, unknown. A write is never counted as a miss, and unknown is its own bucket rather than a silent zero.</li>
+          <li><b>Why by prompt hash:</b> "cache-hostile ordering" is invisible in a per-model average and obvious as a stable prefix with writes and no reads.</li>
+          <li><b>Cost:</b> derived from the ledger each time it is read — never a stored column that can drift.</li>
+        </ul>
+      </div>
+
+      <!-- ─── PROMPT & PROCEDURE AUDIT ──────────────────────────────────── -->
+      <div class="screen" id="audit">
+        <h3>Prompt &amp; procedure audit</h3>
+        <p class="screen-note">
+          Route <span class="mono">/measure/prompt-audit</span>. The audit reads three surfaces — procedure step
+          templates, action descriptions, and the copilot system prompt — and reports. It never edits. Applying a rewrite is an ordinary procedure edit
+          that a person decides.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/measure/prompt-audit</span><span>Acme</span><span class="pill ok">live</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a href="#today">Today <span class="cnt">4</span></a>
+              <a href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a class="on" href="#cache">Measure</a>
+              <a href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>Prompt &amp; procedure audit</h4>
+                  <div class="sub">Audit 31 · 2026-11-09 · 3 surfaces · 7 findings</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="btn ghost">After every 250 executions</span>
+                <span class="btn pri">Run audit</span>
+              </div>
+              <div class="finding high">
+                <div class="fh"><span class="pill bad">high</span><span class="pill">pattern 1a</span><span class="ft">The step repeats the action description verbatim</span><span class="muted" style="margin-left:auto">procedure bug-fix · step 2</span></div>
+                <p>The template restates what <span class="mono">completions.create</span> already says, so the model receives the same instruction twice in different words and the second copy is the one it trusts.</p>
+                <div class="diff"><span class="del">- Apply the patch to the repository using the tools available.</span>
+<span class="add">+ Apply the patch. Return the diff and the test log.</span></div>
+                <div style="display:flex;gap:6px;margin-top:7px"><span class="btn pri">Accept rewrite</span><span class="btn">Reject</span><span class="btn ghost">Open in editor</span></div>
+              </div>
+              <div class="finding med">
+                <div class="fh"><span class="pill wait">medium</span><span class="pill">pattern 3</span><span class="ft">A default the model cannot use</span><span class="muted" style="margin-left:auto">action cards.create</span></div>
+                <p>The description names a field that was removed from the schema two migrations ago; the model still tries to send it in about 4% of calls.</p>
+                <div style="display:flex;gap:6px;margin-top:7px"><span class="btn">Accept rewrite</span><span class="btn ghost">Reject</span></div>
+              </div>
+              <div class="finding">
+                <div class="fh"><span class="pill">low</span><span class="pill">pattern 2</span><span class="ft">Verbose preamble before the instruction</span><span class="muted" style="margin-left:auto">copilot system prompt</span></div>
+                <p>Twenty-two tokens of framing precede the first instruction, which sits after the point where the model has usually already chosen a tool.</p>
+                <div style="display:flex;gap:6px;margin-top:7px"><span class="btn">Accept rewrite</span><span class="btn ghost">Reject</span></div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--ink-3)">
+                <span>4 more findings</span><span>·</span><span>3 accepted this audit</span><span>·</span><span>blocking publish: <b style="color:var(--wait)">yes — 3 high</b></span>
+                <span class="adv" style="margin-left:auto">prompt_audits.get · prompt_findings.list · prompt_findings.decide · publish refused 422 procedure_audit_findings</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Three triggers, one screen:</b> manual, the tenant's <em>after N executions</em> cadence, and a synchronous check when a procedure is published.</li>
+          <li><b>Findings are an input, not a report:</b> a high-confidence finding refuses the publish unless the publisher acknowledges it, and the acknowledgement lands in the audit event.</li>
+        </ul>
+      </div>
+
+      <!-- ─── BENCHMARKS ────────────────────────────────────────────────── -->
+      <div class="screen" id="bench">
+        <h3>Benchmarks</h3>
+        <p class="screen-note">
+          Routes <span class="mono">/evals/benchmarks</span> (suites and runs) and
+          <span class="mono">/evals/benchmarks/run/:id</span> (this wireframe). A comparison screen. Two arms, a
+          paired matrix, and an exact test that refuses to answer when the pairing is not valid. The refusal is part of the design, not an error state.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/evals/benchmarks/run/77b1</span><span>Acme</span><span class="pill ok">live · controls only until S18</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a href="#today">Today <span class="cnt">4</span></a>
+              <a href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a href="#cache">Measure</a>
+              <a class="on" href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>swe-lite-50 · baseline vs conveyor</h4>
+                  <div class="sub">Suite 2e9c · dataset 5.0.2 · seed verified · 50 instances</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="pill ok">control ok</span>
+                <span class="btn">Compare</span>
+              </div>
+              <div class="tiles">
+                <div class="tile"><div class="tk">Baseline</div><div class="tv">31<small>/50</small></div><div class="td">62% resolved</div></div>
+                <div class="tile"><div class="tk">Conveyor</div><div class="tv">34<small>/50</small></div><div class="td">68% resolved</div></div>
+                <div class="tile"><div class="tk">Delta</div><div class="tv">+3</div><div class="td">6% · not significant</div></div>
+                <div class="tile"><div class="tk">McNemar exact</div><div class="tv">p=0.42</div><div class="td">8 discordant pairs</div></div>
+              </div>
+              <div class="split">
+                <div class="panel">
+                  <div class="ph"><span>Paired outcomes</span><span class="muted">n=50, no unpaired case</span></div>
+                  <table class="wtbl">
+                    <thead><tr><th></th><th class="n">baseline ✓</th><th class="n">baseline ✗</th></tr></thead>
+                    <tbody>
+                      <tr><td><b>conveyor ✓</b></td><td class="n">29</td><td class="n">5</td></tr>
+                      <tr><td><b>conveyor ✗</b></td><td class="n">2</td><td class="n">14</td></tr>
+                    </tbody>
+                  </table>
+                  <div style="margin-top:10px;padding:8px;border-radius:5px;background:var(--wait-soft);color:var(--wait);font-size:10px;line-height:1.45">
+                    <b>Not a promotion.</b> 7 discordant pairs against a 50-case suite cannot separate these arms. The screen says so before it shows a number.
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="ph"><span>Controls</span></div>
+                  <div class="kv">
+                    <dt>gold</dt><dd>50 / 50 <span class="pill ok">pass</span></dd>
+                    <dt>empty</dt><dd>0 / 50 <span class="pill ok">pass</span></dd>
+                    <dt>subject</dt><dd>capability_agent · kata-v4</dd>
+                    <dt>model</dt><dd>sonnet-5-5</dd>
+                    <dt>repeat</dt><dd>1 of 1</dd>
+                    <dt class="adv">run id</dt><dd class="adv">77b1e0 · suite 2e9c</dd>
+                  </div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="ph"><span>Cases</span><span class="muted">5 conveyor-only · 2 baseline-only</span></div>
+                <table class="wtbl">
+                  <thead><tr><th>Instance</th><th>Repo</th><th>Baseline</th><th>Conveyor</th><th class="n">Time</th></tr></thead>
+                  <tbody>
+                    <tr><td class="mono">astropy__astropy-12907</td><td>astropy</td><td><span class="pill ok">✓</span></td><td><span class="pill bad">✗</span></td><td class="n">182 s</td></tr>
+                    <tr><td class="mono">django__django-11099</td><td>django</td><td><span class="pill bad">✗</span></td><td><span class="pill ok">✓</span></td><td class="n">241 s</td></tr>
+                    <tr><td class="mono">sympy__sympy-20590</td><td>sympy</td><td><span class="pill ok">✓</span></td><td><span class="pill ok">✓</span></td><td class="n">96 s</td></tr>
+                    <tr><td class="mono">matplotlib__matplotlib-23563</td><td>matplotlib</td><td><span class="pill bad">✗</span></td><td><span class="pill ok">✓</span></td><td class="n">304 s</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Refusal banner first:</b> when the arms are not paired, or n is too small to separate them, the comparison refuses before rendering a delta.</li>
+          <li><b>Controls are proofs:</b> the gold arm must resolve all, the empty arm none. If either fails, the suite is broken, not the subject.</li>
+          <li><b>Arms today:</b> <span class="mono">benchmark_runs.start</span> accepts <span class="mono">gold</span> and <span class="mono">empty</span>; <span class="mono">baseline</span> and <span class="mono">conveyor</span> return <span class="mono">409 arm_not_ready</span> until S18. The screen lists them disabled with that reason, and a control-vs-control comparison is labelled a suite check.</li>
+        </ul>
+      </div>
+
+      <!-- ─── EVALS ─────────────────────────────────────────────────────── -->
+      <div class="screen" id="evals">
+        <h3>Evals — the report</h3>
+        <p class="screen-note">
+          Routes <span class="mono">/evals</span> (the list) and <span class="mono">/evals/:id/:tab</span>
+          (this wireframe, <span class="mono">report</span> tab). Seven tabs, one destination. The report is the trust screen: every metric column, every
+          transcript, and the noise floor drawn beside the score so a difference has to earn its place.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/evals/9e14/report?v=3</span><span>Acme</span><span class="pill ok">live</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Acme · tenant admin</div>
+              <a href="#today">Today <span class="cnt">4</span></a>
+              <a href="#board">Board</a>
+              <div class="grp">Operate</div>
+              <a href="#run">Runs <span class="cnt">3</span></a>
+              <a href="#cockpit">Build</a>
+              <a href="#board">Design</a>
+              <div class="grp">Improve</div>
+              <a href="#cache">Measure</a>
+              <a class="on" href="#bench">Evals</a>
+              <div class="grp">Administer</div>
+              <a href="#members">Govern</a>
+              <a href="#palette">Channels</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>bug-fix judge · v3</h4>
+                  <div class="sub">Digest 4c81… · 120 cases · 2 reps · test split locked</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="pill ok">signed off</span>
+                <span class="btn">Export bundle</span>
+              </div>
+              <div class="tabs">
+                <span>Cases</span><span>Runs</span><span class="on">Report</span><span>Audit</span><span>Sign-off</span><span>Interop</span><span>Climb</span>
+              </div>
+              <div class="tiles">
+                <div class="tile"><div class="tk">Mean score</div><div class="tv">0.68</div><div class="td">95% CI 0.61–0.75</div></div>
+                <div class="tile"><div class="tk">Noise floor</div><div class="tv">0.04</div><div class="td">from repeated pilot</div></div>
+                <div class="tile"><div class="tk">Headroom</div><div class="tv">0.32</div><div class="td">to the ceiling</div></div>
+                <div class="tile"><div class="tk">Cost</div><div class="tv">$18.40</div><div class="td">derived · $0.15 / run</div></div>
+              </div>
+              <div class="panel" style="padding:0;overflow-x:auto">
+                <table class="wtbl">
+                  <thead><tr><th>Case</th><th>Tags</th><th class="n">correct</th><th class="n">grounded</th><th class="n">latency</th><th class="n">cost</th><th></th></tr></thead>
+                  <tbody>
+                    <tr><td>case 001 · refund duplicate</td><td><span class="lbl">payments</span></td><td class="n">1.0</td><td class="n">0.9</td><td class="n">2.4 s</td><td class="n">$0.01</td><td><span class="pill ok">go</span></td></tr>
+                    <tr><td>case 002 · webhook ordering</td><td><span class="lbl">payments</span></td><td class="n">0.0</td><td class="n">0.4</td><td class="n">3.1 s</td><td class="n">$0.02</td><td><span class="pill bad">miss</span></td></tr>
+                    <tr><td>case 003 · retry storm</td><td><span class="lbl">infra</span></td><td class="n">1.0</td><td class="n">1.0</td><td class="n">1.9 s</td><td class="n">$0.01</td><td><span class="pill ok">go</span></td></tr>
+                    <tr><td>case 004 · audit actor kind</td><td><span class="lbl">security</span></td><td class="n">0.5</td><td class="n">0.7</td><td class="n">2.8 s</td><td class="n">$0.02</td><td><span class="pill wait">partial</span></td></tr>
+                    <tr><td>case 005 · idempotent replay</td><td><span class="lbl">payments</span></td><td class="n">1.0</td><td class="n">0.8</td><td class="n">2.2 s</td><td class="n">$0.01</td><td><span class="pill ok">go</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="adv blk">eval_runs.report · every declared metric column + perf columns · transcripts with tool calls as cards · per-tag breakdown · noise floor drawn against the CI · cost from inference_call, never stored</div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Sign-off is a tab, not a dialog:</b> the input review and the grading review are full-screen, because they are the two places the method requires a person.</li>
+          <li><b>One flow per eval:</b> a version freezes cases, metrics, graders, prices and harness paths under one digest; a cross-version comparison is refused.</li>
+          <li><b>Live, with honest gaps:</b> the report, runs, sign-off and climb tabs read the registered S19/S20 actions. Audit and Interop have no actions (<span class="mono">eval_audits.*</span> / <span class="mono">eval_findings.*</span> do not exist), so those tabs are labelled Planned — never mocked into looking live. Authoring an instrument is the next pass.</li>
+        </ul>
+      </div>
+
+      <!-- ─── ⌘K ────────────────────────────────────────────────────────── -->
+      <div class="screen" id="palette">
+        <h3>The palette</h3>
+        <p class="screen-note">
+          Depth 3's front door. It finds screens, objects and actions in one list, and an action opens as a
+          form generated from its own input schema. This is why no screen needs to expose every field.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">anything · ⌘K</span><span>Acme</span></div>
+          <div class="app palwrap" style="grid-template-columns:1fr">
+            <div class="behind" aria-hidden="true" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;gap:8px"><span class="btn">Filter</span><span class="btn">List view</span><span class="btn pri">New card</span></div>
+              <div class="lanes">
+                <div class="lane"><div class="lh"><span>Intake</span><span>3</span></div><div class="ticket"><div class="tt">Split the refund webhook</div></div></div>
+                <div class="lane"><div class="lh"><span>Doing</span><span>2</span></div><div class="ticket"><div class="tt">Idempotency keys</div></div></div>
+                <div class="lane"><div class="lh"><span>Waiting</span><span>1</span></div><div class="ticket"><div class="tt">Checkout rewrite</div></div></div>
+                <div class="lane"><div class="lh"><span>Done</span><span>8</span></div><div class="ticket"><div class="tt">Trace links</div></div></div>
+              </div>
+            </div>
+            <div class="palette">
+              <div class="pinput">
+                <span class="mono muted">⌘K</span>
+                <span class="q">card<span class="caret"></span></span>
+                <span class="hint">esc</span>
+              </div>
+              <div class="pgroup">Screens</div>
+              <div class="pitem"><span class="glyph">B</span>Board<span class="res">route</span></div>
+              <div class="pgroup">Objects</div>
+              <div class="pitem"><span class="glyph">4</span>Idempotency keys on payment webhooks<span class="res">card</span></div>
+              <div class="pitem"><span class="glyph">1</span>Checkout rewrite plan<span class="res">card</span></div>
+              <div class="pgroup">Actions · cards</div>
+              <div class="pitem sel"><span class="glyph">→</span>cards.create<span class="res">members +</span></div>
+              <div class="pitem"><span class="glyph">→</span>cards.move<span class="res">admin</span></div>
+              <div class="pitem"><span class="glyph">→</span>cards.claim<span class="res">member +</span></div>
+              <div class="pitem"><span class="glyph">→</span>cards.archive<span class="res">admin</span></div>
+              <div style="border-top:1px solid var(--rule);padding:7px 12px;font-size:9.5px;color:var(--ink-3);display:flex;justify-content:space-between">
+                <span>↵ open · ⇥ form · ⌘↵ invoke</span><span>39 of 189 actions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Role-filtered:</b> the action list is the same manifest the server serves, so an action you cannot invoke is never offered.</li>
+          <li><b>Form and JSON:</b> the generated form and the raw payload are two views of one request, so using the form teaches the API.</li>
+          <li><b>Why it matters:</b> it is the guarantee that "simple" never means "you cannot do the thing".</li>
+        </ul>
+      </div>
+
+      <!-- ─── SIGN IN ───────────────────────────────────────────────────── -->
+      <div class="screen" id="signin">
+        <h3>Sign in and tenant switch</h3>
+        <p class="screen-note">
+          The only unauthenticated screen. One identity, many memberships: the switcher sends the active
+          tenant on every request, and a tenant the caller has no membership in is refused — the absent
+          row is the proof.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/sign-in</span><span class="muted">unauthenticated</span></div>
+          <div class="login">
+            <div class="logincard">
+              <div class="brand" style="margin-bottom:14px"><span class="mark">C</span><span>Conveyor</span></div>
+              <h4>Sign in</h4>
+              <p>You will be taken to the identity provider, then returned here. The token stays in memory for this tab.</p>
+              <div class="field"><label>Tenant</label><div class="inp">Acme <span class="muted">· 1 of 2 memberships</span></div></div>
+              <div class="field"><label>Identity</label><div class="inp">ada@acme.dev</div></div>
+              <span class="btn pri" style="width:100%;justify-content:center;margin-top:4px">Continue to sign in</span>
+              <div style="margin-top:12px;font-size:9.5px;color:var(--ink-3)">Signing in to a tenant you do not belong to is refused, not hidden.</div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>Auth:</b> auth-code + PKCE, access token in memory, no cookies on the OIDC path. The dev cookie is the only local exception and is refused in production.</li>
+          <li><b>Live streams:</b> an authenticated SSE needs <span class="mono">fetch</span> + <span class="mono">ReadableStream</span>, because EventSource cannot carry a bearer token. Budgeted, not discovered later.</li>
+        </ul>
+      </div>
+
+      <!-- ─── PLATFORM (super-admin) ────────────────────────────────────── -->
+      <div class="screen" id="platform">
+        <h3>Platform — tenants and provisioning</h3>
+        <p class="screen-note">
+          Not a tenant screen: it lives outside the nine destinations and only a super-admin sees the
+          link. Provisioning is four steps — Keycloak user, <span class="mono">POST /api/provision</span>,
+          local rows, one set-password email — and the screen shows each one. Billing is a separate
+          source with its own availability: an outage says so instead of drawing zeros.
+        </p>
+        <div class="shot">
+          <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">/platform</span><span class="pill ok">super-admin</span></div>
+          <div class="app">
+            <nav class="rail">
+              <div class="who">Platform</div>
+              <a href="#platform" class="on">Tenants <span class="cnt">3</span></a>
+              <a href="#platform">New tenant</a>
+              <div class="grp">Tenant surfaces</div>
+              <a href="#members">Members</a>
+              <a href="#roles">Roles &amp; permissions</a>
+              <a href="#cache">Usage &amp; cache</a>
+            </nav>
+            <div class="main">
+              <div class="mtop">
+                <div>
+                  <h4>Tenants</h4>
+                  <div class="sub">Every tenant, its admins and its conveyor entitlement</div>
+                </div>
+                <span class="spacer"></span>
+                <span class="btn">New tenant</span>
+              </div>
+              <div class="panel">
+                <table class="wtbl">
+                  <thead><tr><th>Tenant</th><th>Status</th><th class="n">Members</th><th class="n">Admins</th><th>Licence</th><th>Created</th></tr></thead>
+                  <tbody>
+                    <tr><td><b>Acme</b><div class="muted mono">acme</div></td><td><span class="pill ok">active</span></td><td class="n">4</td><td class="n">2</td><td><span class="pill ok">active</span></td><td class="muted">9 Nov</td></tr>
+                    <tr><td><b>Kata</b><div class="muted mono">kata</div></td><td><span class="pill ok">active</span></td><td class="n">1</td><td class="n">1</td><td><span class="pill ok">active</span></td><td class="muted">9 Nov</td></tr>
+                    <tr><td><b>Execution</b><div class="muted mono">execution</div></td><td><span class="pill ok">active</span></td><td class="n">1</td><td class="n">1</td><td><span class="pill wait">pending</span></td><td class="muted">9 Nov</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="panel">
+                <div class="ph"><span>Kata — tenant detail</span><span class="muted">licence checked 2 m ago</span></div>
+                <div class="kv"><span>Licence</span><b>active · plan standard · quota 1,000,000</b></div>
+                <div class="kv"><span>Admins</span><b>fr-test@example.invalid</b></div>
+                <div class="tiles" style="margin-top:8px">
+                  <div class="tile"><div class="tk">Billed</div><div class="tv">$1.20</div><div class="td">conveyor licence, this month</div></div>
+                  <div class="tile"><div class="tk">Requests</div><div class="tv">100</div><div class="td">this month</div></div>
+                  <div class="tile"><div class="tk">Quota used</div><div class="tv">0.01<small>%</small></div><div class="td">of the plan</div></div>
+                  <div class="tile"><div class="tk">Markup</div><div class="tv">20<small>%</small></div><div class="td">applied by billing</div></div>
+                </div>
+                <div class="panel" style="margin-top:8px">
+                  <div class="ph"><span>By project</span><span class="pill wait">tenant-wide</span></div>
+                  <table class="wtbl"><thead><tr><th>Project</th><th class="n">Requests</th><th class="n">Cost</th></tr></thead>
+                    <tbody><tr><td class="mono">7c2a…</td><td class="n">64</td><td class="n">$0.80</td></tr><tr><td class="mono">91be…</td><td class="n">36</td><td class="n">$0.40</td></tr></tbody></table>
+                </div>
+                <div class="adv blk" style="margin-top:8px">GET /api/platform/tenants/{id} · GET /api/tenants/{id}/billing?month= · licence raw JSON · request ids</div>
+              </div>
+              <div class="panel">
+                <div class="ph"><span>New tenant</span><span class="muted">step 3 of 4</span></div>
+                <div class="kv"><span>Name</span><b>Acme</b></div>
+                <div class="kv"><span>Slug</span><b class="mono">acme</b></div>
+                <div class="kv"><span>First admin</span><b>owner@acme.dev</b></div>
+                <div class="kv"><span>Plan</span><b>standard · quota 1,000,000</b></div>
+                <div class="steps" style="margin-top:8px">
+                  <div class="step done"><span>1</span>Keycloak user ensured</div>
+                  <div class="step done"><span>2</span>Provisioning: 201 success</div>
+                  <div class="step run"><span>3</span>Tenant, admin membership and entitlement written</div>
+                  <div class="step"><span>4</span>Set-password email</div>
+                </div>
+                <div class="adv blk" style="margin-top:8px">POST /api/platform/tenants · idempotency key = f(email, slug) · POST /api/provision · keycloak execute-actions-email</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top:12px">
+          <li><b>The wizard cannot duplicate a tenant.</b> The provisioning key is derived from the email and slug, so Retry after a failed step is the same operation — there is no attempt ledger to go stale.</li>
+          <li><b>A recovered tenant still has its history.</b> Invite tenant admin writes an <span class="mono">admin</span> invite keyed by a verified email; the first sign-in redeems it, even when the tenant has no admins left.</li>
+          <li><b>Money is never invented.</b> Each billing source (licence billing, tenant-wide project split, per-person) carries its own availability; a failure names the upstream reason and renders no number.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ─── RBAC ───────────────────────────────────────────────────────── -->
+    <section id="rbac">
+      <div class="sect-head">
+        <h2>RBAC: what the two screens require</h2>
+        <p>Today the permission table is compiled into the binary. The screens make it tenant data, with the compiled table as the default.</p>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <div class="n">Today</div>
+          <h3>Five fixed roles</h3>
+          <p><span class="mono">admin</span> (the tenant-admin), <span class="mono">member</span>, <span class="mono">viewer</span> and the machine role <span class="mono">kata_executor</span>. There is no <span class="mono">owner</span> role: the tenant owns itself, and a single-user tenant's user is tenant-admin by default. 63 scopes are compiled: reads open to all, work writes for member and up, administration writes for admin and up.</p>
+          <div class="then">A tenant admin cannot change any of it today.</div>
+        </div>
+        <div class="card">
+          <div class="n">Proposed</div>
+          <h3>Defaults plus a tenant policy</h3>
+          <p>A new <span class="mono">tenant_role_scope</span> row overrides one (role, scope) pair. No row means the compiled default, so a fresh tenant stores nothing and the screen starts truthful.</p>
+          <div class="then"><b>Admin and <span class="mono">kata_executor</span> are compiled</b> — Admin so a tenant cannot lock itself out, <span class="mono">kata_executor</span> because a machine role is not a person's to edit.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:28px">The backend delta in full</h3>
+      <div class="tablewrap" style="margin-top:10px">
+        <table>
+          <thead><tr><th>Piece</th><th>Change</th><th>Why it is not optional</th></tr></thead>
+          <tbody>
+            <tr><td><b>Migration 0028</b></td><td><span class="mono">tenant_role_scope(tenant_id, role, scope, allowed, updated_at)</span>, primary key on the triple, row-level security forced</td><td>Absent row = default. That is what keeps the screen honest and the migration empty for existing tenants.</td></tr>
+            <tr><td><b>Policy on the session</b></td><td>Load the tenant's rows once in <span class="mono">authenticate</span>, carry them on the session; check a stored value first, else the compiled table</td><td>A change applies on the next request, with no cache to invalidate and no per-action query.</td></tr>
+            <tr><td><b>Kernel scopes</b></td><td><span class="mono">me</span>, <span class="mono">tenants</span>, <span class="mono">actions</span>, <span class="mono">events</span>, <span class="mono">members</span> cannot be revoked</td><td>Otherwise a tenant can revoke its way out of the screen that restores it.</td></tr>
+            <tr><td><b>Three actions</b></td><td><span class="mono">roles.policy_get</span>, <span class="mono">roles.policy_set</span>, <span class="mono">roles.policy_reset</span> — all <span class="mono">members:write</span></td><td>No 53rd scope, and reset is separately auditable from an edit.</td></tr>
+            <tr><td><b>Last-admin guard</b></td><td><span class="mono">members.set_role</span> refuses demoting the final admin or owner</td><td>There is no guard today; a tenant can empty its own administration.</td></tr>
+            <tr><td><b>Stream gating</b></td><td><span class="mono">/api/events</span> checks the scope each topic needs, not just authentication</td><td>Without it, a viewer denied <span class="mono">runs:read</span> still receives run frames — the screen's promise would be false.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn" style="margin-top:18px">
+        <div class="hd">The consequence to decide deliberately</div>
+        The compiled defaults stay the defaults, so <span class="mono">projects:write</span> remains
+        admin-only until someone flips that cell. That is the ruling made operable: a member who must run a
+        project is one click away from being allowed to, and the click is the tenant admin's, recorded in
+        the audit log — not a code change.
+      </div>
+    </section>
+
+    <!-- ─── MEASURE DEFINITIONS ───────────────────────────────────────── -->
+    <section id="measure">
+      <div class="sect-head">
+        <h2>Measure: the headline numbers</h2>
+        <p>Each panel opens with one number. These are their exact definitions, so a number cannot mean two things.</p>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Panel</th><th>Headline</th><th>Definition</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td><b>Usage &amp; cache</b></td><td>Hit ratio</td><td>hits ÷ (hits + misses). Writes are counted separately and never folded into misses; unknown is its own bucket.</td><td class="mono">inference_call</td></tr>
+            <tr><td><b>Usage &amp; cache</b></td><td>Writes never read</td><td>Prompt hashes with cache writes above zero and cache reads at or near zero — the signature of an unstable prefix.</td><td class="mono">group_by=prompt_sha</td></tr>
+            <tr><td><b>Prompt audit</b></td><td>Open findings</td><td>Findings by severity, with the blocking count shown next to the publish action it blocks.</td><td class="mono">prompt_audit_finding</td></tr>
+            <tr><td><b>Benchmarks</b></td><td>Resolved rate</td><td>resolved ÷ graded. A case that produced no attempt is excluded and counted separately, never treated as a failure.</td><td class="mono">benchmark_case</td></tr>
+            <tr><td><b>Benchmarks</b></td><td>p-value</td><td>Exact McNemar over discordant pairs, with the pairs shown. Refused when the arms are not paired.</td><td class="mono">compare</td></tr>
+            <tr><td><b>Evals</b></td><td>Mean score</td><td>Mean of the headline metric over the test split, with its confidence interval drawn against the measured noise floor.</td><td class="mono">eval_case_result</td></tr>
+            <tr><td><b>Evals</b></td><td>Cost</td><td>Derived from the inference ledger at read time; never a stored column.</td><td class="mono">inference_call</td></tr>
+            <tr><td><b>Improvement</b></td><td>Pass rate per version</td><td>Rate for a capability agent or procedure version, against the promoted baseline, with regressions flagged.</td><td class="mono">benchmark_run</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout" style="margin-top:18px">
+        <div class="hd">What is built</div>
+        Benchmarks and evals have their tables (migrations 0025 and 0026) but no store and no actions;
+        usage and prompt audit have neither — migration 0024 is unapplied. These panels are designed
+        against declared actions and labelled <b>planned</b> everywhere they appear.
+      </div>
+    </section>
+
+    <!-- ─── WAVES ─────────────────────────────────────────────────────── -->
+    <section id="waves">
+      <div class="sect-head">
+        <h2>Build waves</h2>
+        <p>Readiness is measured against the registry: 11 of the 23 screens have their actions today.</p>
+      </div>
+      <div class="grid g3">
+        <div class="wave">
+          <div class="wk">Wave 1 · now</div>
+          <h3>Shell and the core loop</h3>
+          <div class="when">every action exists</div>
+          <ul>
+            <li>Playwright harness, dev cookie, one helper for both auth modes</li>
+            <li>Leptos shell, action client, fetch + ReadableStream SSE</li>
+            <li>Sign in · Today · Board · Card cockpit · Run queue</li>
+            <li>Parallel backend: migration 0028, policy actions, last-admin guard, stream gating</li>
+          </ul>
+        </div>
+        <div class="wave">
+          <div class="wk">Wave 2 · breadth</div>
+          <h3>Design, build, govern</h3>
+          <div class="when">after wave 1's client is stable</div>
+          <ul>
+            <li>Requirements, models, procedures, search, admin, copilot</li>
+            <li>Members, then Roles &amp; permissions once the policy actions land</li>
+            <li>Extract shared components from wave 1 — one owner per component</li>
+          </ul>
+        </div>
+        <div class="wave">
+          <div class="wk">Wave 3 · slice-gated</div>
+          <h3>Measure and evals</h3>
+          <div class="when">each waits on its slice</div>
+          <ul>
+            <li>Usage &amp; cache and prompt audit — S16 (migration 0024)</li>
+            <li>Benchmarks and improvement — S17 steps 8–12, then S18</li>
+            <li>Evals and climb — S19, then S20</li>
+            <li>No UI work starts before the action is in the served spec</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid g2" style="margin-top:14px">
+        <div class="callout bad">
+          <div class="hd">Risk · the manifest has no precondition flag</div>
+          Writes require <span class="mono">If-Match</span>, and the manifest does not say which ones. A
+          screen cannot derive it, and a missed one is a permanent 412. Add the flag to the manifest
+          before the cockpit, admin and member screens.
+        </div>
+        <div class="callout warn">
+          <div class="hd">Risk · the web crate joins the host build</div>
+          <span class="mono">apps/web</span> is a workspace member and the repo's gate is
+          <span class="mono">cargo test --workspace</span>. Measure the wasm dependency on the build host
+          before it lands; if it refuses a non-wasm target, gate the crate out of the host build first.
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── AMENDMENTS ────────────────────────────────────────────────── -->
+    <section id="amend">
+      <div class="sect-head">
+        <h2>What this changes in the plan set</h2>
+        <p>The design is a proposal. Adopting it is a small, explicit set of edits — not a rewrite.</p>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>File</th><th>Edit</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">docs/plans/slices/S12-ui-buildout.md</td><td>Screen table gains rows 22 (roles &amp; permissions) and 23 (members); the 21 rows are re-parented to the nine destinations. §9 gains the contract-change request for <b>Today</b> as a composed destination.</td></tr>
+            <tr><td class="mono">docs/plans/01-CONTRACT.md §9</td><td>Records the tenant role policy: defaults compiled, overrides per tenant, kernel scopes non-revocable.</td></tr>
+            <tr><td class="mono">docs/plans/00-INDEX.md</td><td>Decision register: the RBAC screen pair and the policy default; a note that S20's plan text still claims migration 0027 for a table 0026 already creates.</td></tr>
+            <tr><td class="mono">docs/SPEC.md §5.7</td><td>Screen order gains the two RBAC screens inside Governance. No new action, table or event is proposed by the UI.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─── OPEN ──────────────────────────────────────────────────────── -->
+    <section id="open">
+      <div class="sect-head">
+        <h2>Open questions</h2>
+        <p>Three, each with a default so work is not blocked on an answer.</p>
+      </div>
+      <ol class="steps">
+        <li><b>Invite and remove.</b> No action exists and there is no just-in-time provisioning — an unknown identity is refused rather than created. Default: ship Members with role changes only, and add invite/remove as a follow-up bounded to existing users.</li>
+        <li><b>Owner versus admin — settled (2026-11-09).</b> There is no owner: the tenant owns itself and <span class="mono">admin</span> is the tenant-admin. A sole member is tenant-admin by default, and a tenant must always keep at least one admin.</li>
+        <li><b>Today as a destination.</b> It has no S12 row of its own. Default: record it as a UI-only contract-change request rather than adding a screen the plan does not declare.</li>
+      </ol>
+    </section>
+
+    <footer>
+      <span>Conveyor Web UI · design proposal, 2026-11-09</span>
+      <span>Not implemented · no action, table or migration proposed by this page</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('advToggle');
+  btn.addEventListener('click', function () {
+    var on = root.getAttribute('data-adv') === 'on';
+    if (on) { root.removeAttribute('data-adv'); }
+    else { root.setAttribute('data-adv', 'on'); }
+    btn.setAttribute('aria-pressed', String(!on));
+  });
+
+  // Contents highlighting — read only, no layout side effects.
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var targets = links.map(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    return document.getElementById(id);
+  });
+  if ('IntersectionObserver' in window) {
+    var seen = new Map();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { seen.set(e.target.id, e.isIntersecting ? e.intersectionRatio : 0); });
+      var best = null, bestV = 0;
+      seen.forEach(function (v, k) { if (v > bestV) { bestV = v; best = k; } });
+      links.forEach(function (a) {
+        a.classList.toggle('on', a.getAttribute('href') === '#' + best);
+      });
+    }, { rootMargin: '-72px 0px -65% 0px', threshold: [0, 0.25, 0.6] });
+    targets.forEach(function (t) { if (t) io.observe(t); });
+  }
+})();
+</script>
+</body>
+</html>

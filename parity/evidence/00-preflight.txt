@@ -1,0 +1,200 @@
+00-preflight — S00 usage inventory (day 1)
+Executed from mini3 (darwin) 2026-11-07, preflight window 22:09:33Z .. 22:27:19Z.
+Working tree: $HOME/Movies/conveyor (docs-only, not a git repo; parity/ created by this run).
+Read-only: every SQL statement ran on master directly as postgres; no PgBouncer, no session SET,
+no prune/delete/write. No docker containers touched.
+
+1. DISK (gate: <10% free => STOP)
+   df -h $HOME/Movies
+   -> /dev/disk3s5 228Gi size, 115Gi used, 60Gi avail, 66% capacity (26% free). PASS.
+
+2. TOOLS (local)
+   ssh /usr/bin/ssh · jq /usr/bin/jq · yq v4.54.1 (/opt/homebrew/bin/yq) · curl /usr/bin/curl
+   uv $HOME/.local/bin/uv · python3 /opt/homebrew/bin/python3 · git /usr/bin/git
+   shasum /usr/bin/shasum
+   check-jsonschema: was ABSENT. Installed once:
+     uv tool install check-jsonschema   -> check-jsonschema 0.39.0 at ~/.local/bin/check-jsonschema
+
+3. MASTER (192.0.2.10) ACCESS
+   ssh -i ~/.ssh/deploy-key admin@192.0.2.10   -> OK
+   show server_version -> 18.6 (Ubuntu 18.6-1.pgdg24.04+2)
+   Databases present: fr, requirements_api, kanban, n8n, keycloak  (5/5)
+
+4. TABLE COUNTS (pg_stat_user_tables, schemaname='public')
+   fr              88 base tables  (86 domain + _migrations/_migration_effects)
+   requirements_api 58 base tables  (57 domain + alembic_version)
+   kanban           35 base tables  (33 domain + migration/migration_lock)
+   Command: select count(*) from pg_stat_user_tables where schemaname='public';
+
+5. LOKI (from master; service loki.loki.svc.cluster.local:3100, ClusterIP 192.0.2.11)
+   Labels: container, filename, job, namespace, pod, service_name, stream. Only job=kubernetes-pods.
+   Selector used: {namespace="istio-system",container="istio-proxy"}   (ingress access log, text format)
+   Retention: 24h  => every sample is a 24-hour sample, never a history.
+   Query form: instant /api/v1/query with a [24h] lookback (a query_range of 24h + 24h lookback is
+   rejected: "query time range exceeds the limit ... limit: 1d1h").
+   POSITIVE CONTROL (same selector, no host filter, same 24h instant):
+     sum(count_over_time({namespace="istio-system",container="istio-proxy"}[24h]))
+     -> 1,210,461 lines at epoch 1794089866 (2026-11-07T22:17:46Z). PASS (>0).
+   api.example.com returned 0 series; the positive control above proves the source was alive.
+   fr.example.com / fr-backend.example.com / requirements.example.com / kanban.example.com / n8n.example.com /
+   n8n.nonagentic.ai / kanban.nonagentic.ai / api.nonagentic.ai were also sampled (raw JSON in this dir).
+
+6. SOURCE PINS USED
+   fr                   4a579e91d355  (object present locally; git cat-file -t -> commit)
+   fr live OpenAPI      https://fr-backend.example.com/openapi.json -> 200, 4,443,140 bytes
+                        (616 paths / 785 operations, identical to served-spec.lock.json)
+                        https://fr.nonagentic.ai/openapi.json -> 404 (matches plan)
+   RM                   191086942ce5  (object present locally)
+   Planka openapi       kanban@aafb771cea4c docs/openapi.json (PLANKA API 2.0.0-rc.4, base /api)
+   n8n                  live DB on master (no pin)
+   Keycloak             live DB on master (no pin)
+
+7. COMMAND IDS (referenced by parity.yaml evidence strings)
+   S1  fr surface set:
+       git -C $HOME/Movies/fr show 4a579e91d355:backend/src/capabilities/served-spec.lock.json \
+         | jq -r '.operations[].op'
+       -> 785 operations / 616 paths. Plus 5 http.specExempt rows from
+       backend/src/capabilities/kag/reviews-passthrough.ts (GET/POST/PATCH/PUT/DELETE on
+       /api/assets/kag/reviews(.*)) and 8 direct handlers in backend/src/server.ts not in the lock:
+       GET /health/live, GET /api/metrics/prom, GET /openapi.json, GET /api/license/status,
+       GET /api/approvals/ws, GET /api/kanban/ws, GET /api/coding/broadcast/ws/:container, GET /.
+       (GET /health is already in the lock, declared http.unrouted.)
+       Completeness check: scripts/check-route-spec-coverage.ts GRANDFATHERED_UNDECLARED_DATA() is
+       EMPTY at this pin (measured; the "674" in its comment is stale). CI therefore asserts that no
+       routed row is undeclared except the 5 EXEMPT_ROUTES. fr manifest = 785+5+8 = 798.
+   S2  RM surface set:
+       git -C $HOME/Movies/requirements_management archive 191086942ce5 src/routers | tar -x -C /tmp/rm-pinned
+       parse '@<router>.(get|post|put|patch|delete)("<path>")' (314 decorators) and resolve each
+       router object to its mount prefix from src/routers/__init__.py include_router(..., prefix="...").
+       -> 314 method+path rows, 0 unresolved.
+   S3  Planka surface set:
+       jq -r '.paths | to_entries[] | .key as $p | (.value|keys[]|select(...)) as $m |
+              "planka\t\($m|ascii_upcase) /api\($p)"' $HOME/Movies/kanban/docs/openapi.json
+       -> 67 paths / 96 operations (servers[0].url = /api).
+   A1  n8n operations (durable, class A):
+       sudo -u postgres psql -d n8n -Atc "select n->>'type', n->'parameters'->>'resource',
+         coalesce(n->'parameters'->>'operation', case when n->>'type' in
+           ('@nonagentic/n8n-nodes-kanban.planka','@nonagentic/n8n-nodes-kanban.plankaTool')
+           and n->'parameters'->>'resource' in ('card','comment') then 'create' end),
+         count(distinct w.id)
+         from workflow_entity w, jsonb_array_elements(w.nodes::jsonb) n
+         where w.\"activeVersionId\" is not null and n->'parameters'->>'resource' is not null
+         group by 1,2,3 order by 1,2,3"
+       -> 87 distinct in-scope (package,resource,operation) tuples. Packages kept: fr/frTool,
+       kanban.planka/plankaTool, requirements/requirementsTool, workflows.n8nWorkflowsApi.
+       Excluded by D14: coding*, artifacts. The two operation-less kanban nodes were resolved to
+       'create' from the node package defaults (comment.description.ts default:'create';
+       card.description.ts line 63 default:'create').
+       Census: workflow_entity 348 rows, 332 active (activeVersionId not null);
+       280 matrix (276 active), 51 cap.* (51 active), 10 zz.* (0 active), 7 other (5 active:
+       conveyor.start, ask_fr, wip.pull, kata.open, err.card; inactive: dispatcher, PROBE).
+       The slice names FOUR flows; kata.open is the fifth active "other" flow and is NOT in the
+       four-flow surface set (recorded as an open item in SUMMARY.md).
+   A2  call sites:
+       - nonagenticai_mcp_server@dd2cabf src/external/fr.py:26 INBOUND_PATH =
+         "/api/webhooks/mcp/incoming"; live deploy mcp-external-driver 1/1 with MCP_FR_BASE_URL set.
+       - deploy/fr env (names/booleans only): CHANNEL_DISPATCH_ENABLED=true, TELEGRAM_ENABLED=true
+         -> POST /api/webhooks/telegram/incoming is a live channel endpoint.
+         TEAMS_ENABLED absent and FR_EMAIL_API_URL/KEY absent -> email/teams disabled.
+   B1  Loki per-host 24h:
+       Q='sum by (method, path) (count_over_time({namespace="istio-system",container="istio-proxy"}
+          |= "<host>" | pattern `[<_>] "<method> <path> HTTP/<_>"` [24h]))'
+       curl -sG http://192.0.2.11:3100/loki/api/v1/query --data-urlencode "query=$Q" \
+            --data-urlencode "time=1794089866"
+       Hosts sampled (raw JSON): fr.nonagentic.ai (380 series), fr.example.com (1), fr-backend.example.com (1),
+       requirements.example.com (2), kanban.nonagentic.ai (4), kanban.example.com (30), n8n.nonagentic.ai (4),
+       n8n.example.com (85), api.nonagentic.ai (444), api.example.com (0).
+       Shared-host attribution: api.nonagentic.ai paths are rewritten before matching:
+       /requirements/* -> RM path /*, /kanban/* -> Planka path /* (VirtualService rewrites).
+       Query strings are stripped. Paths are matched to surface templates segment-wise.
+   C1  executions (class C):
+       select e."workflowId", coalesce(w.name,'<no workflow row>'), count(*),
+              min(e."startedAt"), max(e."startedAt")
+         from execution_entity e left join workflow_entity w on w.id=e."workflowId"
+         group by 1,2 order by 3 desc
+       -> 558 total rows; 470 in the last 72h; window 2026-11-04T23:23:01+01 .. 2026-11-07T23:21:45+01.
+       C per operation tuple: same nodes query restricted to workflows with >=1 execution in 72h
+       -> 34 tuples exercised.
+   D1  fr counts: select relname, (xpath('/row/c/text()', query_to_xml(
+         format('select count(*) as c from %I.%I', schemaname, relname), false, true, '')))[1]::text::int
+         from pg_stat_user_tables where schemaname='public' order by relname   -> 88 exact count(*) rows.
+       Six conveyor tables: approvals=4, approval_decisions=2, card_drafts=0, card_phase_lease=0,
+       conveyor_flow_runs=844, project_conveyor_start_attempts=13.
+   D2  RM counts: same query on requirements_api -> 58 exact count(*) rows.
+       pm_card_types=293, pm_project_type_card_types=282, pm_capabilities=68, pm_project_types=26,
+       pm_projects=21.
+   D3  Planka counts: same query on kanban -> 35 exact count(*) rows.
+       project=19, board=19, list=147, card=26, comment=65, task=0, label=15, webhook=3,
+       custom_field_value=70. Row counts are NOT usage evidence (D3).
+   E1  Keycloak: select r.name,c.client_id,c.enabled from client c join realm r on r.id::text=c.realm_id
+         where r.name='portal' order by c.client_id   -> 34 portal clients (of 202 clients in 10 realms).
+       Realm census: agent, care-bus, commonpractice, fr, master, n8n-demo, portal, raisemyticket,
+       secure-apps, w2v. Default realm for S0 = portal (slice §12 open question 3).
+
+8. METHOD NOTES / DEVIATIONS (deliberate, recorded)
+   a) Normalisation: the slice's literal awk uses gsub(/[0-9]+/,":id"). Applied to the real surface
+      set that rewrites literal names ('/api/tools/n8n/...' -> '/api/tools/n:idn/...') and path
+      parameters ('{v1}' -> '{v:id}'). The prose requirement is "UUID/number SEGMENTS -> :id", so
+      normalisation was applied segment-wise (a whole segment that is a UUID or all-digits becomes
+      :id). No route surface in this inventory contained such a segment; the rule is applied for
+      determinism and n8n tuple names are untouched.
+   b) Matching: a concrete request path is matched to a surface template by splitting both on '/',
+      treating {param}/:param segments as one-segment wildcards and (.*) as a suffix wildcard.
+      Trailing-slash variants are accepted because FastAPI/Nest issue 307s between /x and /x/.
+   c) Code-node opacity: the A1 census reads typed node parameters. n8n `code` nodes (3,125) could
+      in principle make arbitrary HTTP calls; no n8n-nodes-base.httpRequest node exists in any flow
+      (George 2026-11-04: no plain HTTP nodes), so this is not expected, but it is UNMEASURED.
+   d) In-cluster opacity: Loki here is the INGRESS gateway access log only. Pod-to-pod calls
+      (n8n -> RM/fr/Planka service DNS, fr -> Planka) are invisible to it. fr /api/internal/* and
+      /api/webhooks/n8n/* are therefore marked rare (D) with an explicit caveat, not unused.
+
+9. MEASUREMENT ARTIFACTS (exclude from usage reasoning)
+   - fr-backend.example.com GET /openapi.json 3 hits, fr.example.com 1 hit: produced by THIS session's
+     read-only OpenAPI probe (22:12Z), inside the sample window.
+   - GET /api/projects on fr.nonagentic.ai: 63,802 in the 24h sample, but hourly buckets are
+     40,902@09:00Z, 19,761@08:00Z, 2,673@10:00Z, 303@11:00Z, <=115 every other hour, 13 in the last
+     hour (UA curl/8.5.0). This is a BURST (08:00-11:00Z), not steady user traffic. It remains used
+     on A evidence (n8n fr.projects.listProjects) regardless.
+   - Planka traffic on kanban.nonagentic.ai (288 GET/24h) is the external probe's 5-minute /
+     health check, not user usage. Same for n8n.nonagentic.ai (288).
+   - api.nonagentic.ai "other" traffic is /laya/health polling (4,319) and bot scans of /.env* -
+     outside the four apps.
+
+10. UNMATCHED-BUT-OBSERVED (for day 2 / S05)
+   - Planka: POST /api/boards/{id}/memberships (2), POST /api/webhooks/{id}/boards (4) are in live
+     traffic but NOT in docs/openapi.json (2.0.0-rc.4). The running instance is a superset of the
+     openapi file; S05 must verify against the live instance (source map already warns).
+   - fr: GET /api/openapi.json (1), GET /api/spec.json (1) are bot/probe paths with no fr route.
+   - fr frontend paths (/_app/*, /projects/new, /chat, /projects/{id}/settings, /admin/assets/...) are
+     SvelteKit UI screens (S12), deliberately outside the API inventory.
+
+11. GATE SELF-CHECK (provisional; the real gate runs day 2 after sample 2)
+   G1 unique ids: 0 duplicates.  G2 id shape: 0 bad.  G3 used acceptance: 0 bad.
+   G4 surfaces<->parity exact: 0 diff lines.  G5 counts: 1299 = 1299.
+   G7 dropped reason: 0 bad.  check-jsonschema --schemafile parity/schema.json parity/parity.yaml: ok.
+   G6 NOT satisfied honestly: 11 sample-1 files exist, so the file-count form would pass vacuously;
+   a second 24h sample has NOT been taken. No B-class status was promoted to used.
+
+12. END-OF-RUN NOTE (2026-11-07T22:28:24Z)
+   Disk re-measured: 228Gi / 121Gi used / 53Gi avail / 70% capacity (23% free). PASS (>10% free).
+   The drop from 60Gi to 53Gi avail during this run is NOT from parity/ (904K total): another
+   session concurrently added the Rust workspace (Cargo.toml, crates/, apps/, migrations/, scripts/,
+   spikes/, target/) at ~23:15 local. This session created/edited ONLY parity/. The tree is still
+   not a git repository (git rev-parse --is-inside-work-tree -> fatal: not a git repository).
+
+13. A2 CALL SITES MEASURED AFTER THE FIRST CLASSIFICATION PASS (2026-11-07T22:35Z)
+   Added to parity.yaml as class A (live caller, not inference):
+   - kubelet probes: deploy/fr -> liveness /health/live, readiness /health, startup /health/live;
+     deploy/requirements -> liveness /health/live, readiness /health/ready, startup /health.
+     Command: kubectl -n {fr,requirements} get deploy -o json | jq '...probes...'
+   - Prometheus: /api/v1/targets?state=active -> job=kubernetes-service-endpoints,
+     scrapeUrl http://192.0.2.12:8888/api/metrics/prom, health=up. Command from master:
+     curl -s 'http://192.0.2.13:9090/api/v1/targets?state=active' | jq ...
+   - billing-service deploy env (non-secret URL read):
+     PLATFORM_BUDGET_WEBHOOK_URL=https://fr.nonagentic.ai/api/webhooks/billing/budget-threshold;
+     FR_BASE_URL=http://fr-backend.fr.svc.cluster.local:8888 (its other fr calls are not mapped).
+   These 8 rows moved unused/rare -> used(A); totals in SUMMARY.md are post-update.
+
+14. FINAL ARTIFACT HASH
+   parity/parity.yaml sha256 = 8cb7a295bd6748802f553c72242c880ba105105cc0e827f9835d6be786e7ce00
+   (PROVISIONAL — this is not the sign-off hash; day 2 re-generates and signs.)

@@ -1,0 +1,55 @@
+[package]
+name = "conveyor-actions"
+description = "ActionSpec, registry, invocation, MCP projection and external OpenAPI ingest (S04)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+conveyor-actions-derive = { path = "../actions-derive" }
+conveyor-auth = { path = "../auth" }
+conveyor-domain = { path = "../domain" }
+conveyor-workflow = { path = "../workflow" }
+# The three exchange actions (S08 B2) call the pure renderer; CONTRACT §1 records the edge.
+conveyor-render = { path = "../render" }
+conveyor-store = { path = "../store" }
+base64 = { workspace = true }
+chrono = { workspace = true }
+http = { workspace = true }
+inventory = { workspace = true }
+openapiv3 = { workspace = true }
+# S09: the object-store client and the external-action breaker.
+object_store = { workspace = true }
+bytes = { workspace = true }
+reqwest = { workspace = true }
+# `position` is `numeric`; the actions layer formats it for the wire and seeds a board
+# position. All midpoint arithmetic still happens in `store::position` on `Decimal`.
+rust_decimal = { workspace = true }
+rmcp = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+sqlx = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+utoipa = { workspace = true }
+uuid = { workspace = true }
+# The eval export writes a gzip JSONL bundle (S19 Part C step 15); the same crate the parity
+# gate's banked-log reader uses.
+flate2 = "1.1.11"
+
+[dev-dependencies]
+tar = "0.4.46"
+# The bus tests (`tests/bus_delivery.rs`) publish and consume through the real port against a real
+# Redis, so the transport is exercised rather than a mock of it.
+conveyor-bus = { path = "../bus" }
+# The integration tests start a real HTTP server, so they need the composition root's
+# router. A dev-dependency cycle (api → actions) is legal: the cycle is broken in the test
+# target, and it is the only way `cargo test -p conveyor-actions` can exercise HTTP and MCP.
+conveyor-api = { path = "../api" }
+axum = { workspace = true }
+tower = { workspace = true }

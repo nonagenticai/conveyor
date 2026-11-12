@@ -1,0 +1,57 @@
+name: Design feedback
+description: Report what a screen of nonagentic.ai/design showed, and what you expected.
+title: "Design feedback: <page>"
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the public development surface of the conveyor. The site is a design study:
+        pages marked `LIVE` render the platform's own rows from a published snapshot; pages
+        marked `V2 · PROPOSED` are still fixtures. Say which one you were looking at.
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The studio destination or URL you were on.
+      placeholder: portfolio · jobs · architecture · docs/SPEC_V2.html
+    validations:
+      required: true
+  - type: input
+    id: snapshot
+    attributes:
+      label: Snapshot
+      description: The hash shown in the page ribbon (`LIVE · snapshot …`), if there is one.
+      placeholder: 2a76b92bb3a5
+  - type: input
+    id: generated_at
+    attributes:
+      label: Generated at
+      description: The timestamp in the same ribbon.
+      placeholder: 2026-11-12T14:46:44Z
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      placeholder: https://nonagentic.ai/design/#portfolio
+  - type: textarea
+    id: saw
+    attributes:
+      label: What I saw
+      description: The behaviour, the screen, or the wording that prompted this report.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What I expected
+      description: What the platform should have shown or done instead.
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: This report contains no credential, personal data or private infrastructure detail.
+          required: true

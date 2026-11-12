@@ -1,0 +1,168 @@
+# decision_development — the choices closed into decisions (v4 R343 + RM#262: EXECUTION phase,
+# `rm_asset`).
+#
+# Content sources: seed/catalogue.json (card_type decision_development: outputs and the
+# READY/DOING/QA/DONE acceptance names) and
+# n8n-designs/design/choices/v4/capabilities/architecture.yaml (text "capturing, review, and
+# revision", phase execution, upstream choice_option_development, asset_kind decision — RM
+# decisions {title, context, decision, alternatives?, relatedPrinciples?}, updating the
+# choice_option record when there is one, and the inspect.criteria the QA stage judges by). It
+# stays in execution because its upstream choice option is there: this card records the choice
+# that was made, not the options that were weighed. The agent proposes and the flow writes RM
+# (R207).
+card_type: decision_development
+capability: architecture
+outputs:
+  - changes_artifact_id
+  - reviewed_changes_artifact_id
+  - published_artifact_id
+  - written_ids
+
+agent:
+  key: decision_development
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  # One SOP per stage for the agent steps, plus one mechanical SOP for every computed move.
+  - key: decision_development.ready
+    title: Decision development — definition of ready
+    definition_of_ready: {checks: [brief_present, upstream_choice_option_development_done]}
+    definition_of_done: {checks: [changes_artifact_id]}
+    acceptance_criteria:
+      - {name: every_ask_cites_the_brief, text: "Every ask the draft changes answers names the brief passage or choice under evaluation it came from, and that source leaves the question open."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [changes_artifact_id]
+
+  - key: decision_development.doing
+    title: Decision development — definition of doing
+    definition_of_ready: {checks: [changes_artifact_id]}
+    definition_of_done: {checks: [every_change_cites_a_source, every_ask_has_a_change]}
+    acceptance_criteria:
+      - {name: every_change_cites_a_source, text: "Every proposed decision change names the brief passage, choice card or option it comes from, and that source is the question the decision settles."}
+      - {name: every_ask_has_a_change, text: "Every ask the brief makes about a decision has one change answering it, and every change names the choice card whose question it closes."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [changes_artifact_id, reviewed_changes_artifact_id]
+
+  - key: decision_development.qa
+    title: Decision development — definition of QA
+    definition_of_ready: {checks: [reviewed_changes_artifact_id]}
+    definition_of_done: {checks: [every_revise_addressed, changes_cite_sources, decision_has_context, alternatives_considered, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: every_revise_addressed, text: "Every revise left on the reviewed decisions is applied in the artifact, or the thread records why the decision stands as recorded."}
+      - {name: changes_cite_sources, text: "Every change names the brief passage or upstream artifact it comes from, and that source asks for it."}
+      - {name: decision_has_context, text: "Every decision states its context and the decision taken."}
+      - {name: alternatives_considered, text: "Every decision names the alternatives it rejected, or says there were none."}
+      - {name: capability_acceptance_met, text: "The reviewed decisions meet every acceptance statement the decision_development card type declares."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_changes_artifact_id, published_artifact_id]
+
+  - key: decision_development.done
+    title: Decision development — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version, choice_option_record_updated]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The decisions the flow writes to RM are the version QA approved; no context, decision text or rejected alternative changed after review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id, written_ids]
+
+  - key: decision_development.system
+    title: Decision development — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: decision_development.READY
+    list: ready
+    title: Decision development — ready
+    outputs: [changes_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: decision_development
+        sop: decision_development.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: decision_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: decision_development.DOING
+    list: doing
+    title: Decision development — doing
+    outputs: [changes_artifact_id, reviewed_changes_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: decision_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: decision_development.QA
+    list: qa
+    title: Decision development — QA
+    outputs: [reviewed_changes_artifact_id, published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: decision_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: decision_development.DONE
+    list: done
+    title: Decision development — done
+    outputs: [published_artifact_id, written_ids]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: decision_development, sop: decision_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: decision_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

@@ -1,0 +1,175 @@
+# development_security_patch — move a vulnerable dependency to at least its fixed version and open a PR
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type development_security_patch: outputs, acceptance and
+# definition_of_done pr_merged) and n8n-designs/design/choices/v4/capabilities/development.yaml
+# (text "security patch implementation", phase execution, proof package_upgrade, inspect criteria
+# weakness_closed / change_is_minimal / no_new_weakness). The v4 note under P-W3-2 narrows this type
+# to dependency items only — an upgrade to the fixed version; a code finding is
+# development_source_security_patch, and an IaC misconfiguration is development_iac_security_patch.
+# vendor/trigger_registry.md:232 carries only the one-line text.
+#
+# ⚠ package_no_longer_vulnerable appears at both DOING and QA, as the catalogue's acceptance list says
+# it should: DOING shows the lockfile moved, QA installs from that lockfile afresh and rescans.
+card_type: development_security_patch
+capability: development
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: development_security_patch
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: development_security_patch.ready
+    title: Security patch — definition of ready
+    definition_of_ready: {checks: [finding_location_exists]}
+    definition_of_done: {checks: [workspace_imported]}
+    acceptance_criteria:
+      - {name: finding_location_exists, text: "The finding names the vulnerable package, the advisory that reports it and the fixed version, and the manifest that pins the package in the workspace carries the version the finding says is installed. A finding whose package no manifest here pins is a different card."}
+      - {name: planned_files_exist, text: "Every manifest, lockfile and test file the plan names exists in the workspace, or the plan says which one the upgrade has to create — a workspace locked by a lockfile the plan did not name produces a diff nobody reviewed."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: development_security_patch.doing
+    title: Security patch — definition of doing
+    definition_of_ready: {checks: [workspace_imported]}
+    definition_of_done: {checks: [regression_test_or_upgrade, package_no_longer_vulnerable, suite_green_after]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff touches only the manifest, lockfile and test files the plan named. A dependency upgrade that also bumps packages the advisory does not name fails this check even when every test still passes."}
+      - {name: regression_test_or_upgrade, text: "The diff proves the change one of two ways, and says which: it moves the package to at least its fixed version in the manifest and the lockfile that ships with it, or, where the vulnerability can be reached from a test, it adds that test. An upgrade of a package the advisory names at a version below the fixed one proves nothing."}
+      - {name: failed_before_on_new_test_only, text: "Where the diff adds a test of the vulnerability, that test fails on the vulnerable version the workspace had and no other test fails, so the red is the weakness and not a broken test. An upgrade proved by the lockfile alone records that no test was added and why."}
+      - {name: package_no_longer_vulnerable, text: "The version the diff leaves in the lockfile is at or above the fixed version the finding names, and the scanner that raised the finding reports the advisory gone against that lockfile."}
+      - {name: suite_green_after, text: "The suite is green after the upgrade — the whole suite, not only the tests near the upgraded package — because a version move reaches code the finding never mentions."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: development_security_patch.qa
+    title: Security patch — definition of QA
+    definition_of_ready: {checks: [package_no_longer_vulnerable]}
+    definition_of_done: {checks: [fix_addresses_root_cause, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: fix_addresses_root_cause, text: "The advisory is cleared by the version the diff installs — the vulnerable code path the advisory names is gone from the resolved tree — and not by suppressing the finding, pinning the scanner to an older database, narrowing the lockfile entry or excluding the package from the scan."}
+      - {name: package_no_longer_vulnerable, text: "A fresh install from the diff's manifest and lockfile resolves a version at or above the fixed version, and the scanner reports the advisory gone on that fresh install. A workspace that still holds the old package in a cache or a vendored copy has not been upgraded."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the development_security_patch card type declares is true of the diff and of the report QA reviews."}
+      - {name: weakness_closed, text: "The diff removes the weakness the finding names: for a dependency, the package moves to at least its fixed version, including the transitive copy when the advisory concerns one."}
+      - {name: change_is_minimal, text: "The diff changes only what closing the weakness needs — no package bump, lockfile regeneration or refactor the advisory does not require, so a reviewer can attribute every changed line to the finding."}
+      - {name: no_new_weakness, text: "The diff adds no insecure pattern and no vulnerable version, direct or transitive, and disables no check, scanner rule or test. An upgrade that drags in a second advisory fails here."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: development_security_patch.done
+    title: Security patch — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request carrying the upgrade is merged, and the lockfile at the merge sha pins the fixed version QA installed from."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: development_security_patch.system
+    title: Security patch — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: development_security_patch.READY
+    list: ready
+    title: Security patch — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: development_security_patch
+        sop: development_security_patch.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_security_patch.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: development_security_patch.DOING
+    list: doing
+    title: Security patch — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_security_patch.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: development_security_patch.QA
+    list: qa
+    title: Security patch — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_security_patch.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: development_security_patch.DONE
+    list: done
+    title: Security patch — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: development_security_patch, sop: development_security_patch.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_security_patch.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

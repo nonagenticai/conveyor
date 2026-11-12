@@ -1,0 +1,28 @@
+[package]
+name = "conveyor-domain"
+description = "Pure aggregates, identifiers and invariants. No IO, no sqlx, no axum."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# `timestamptz` and `numeric` in the aggregates' value types. This is a type dependency
+# only: the crate still performs no IO, and `sqlx` is not a dependency (CONTRACT §1).
+chrono = { workspace = true }
+rust_decimal = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+# S07: `content_hash` is SHA-256 of the JCS-canonical revision snapshot. Pure computation —
+# the crate still performs no IO and sqlx is still not a dependency (CONTRACT §1).
+sha2 = { workspace = true }
+# S17: the per-repo log parsers and the grader's marker/exit-code patterns are ports of
+# swebench 5.0.2's regular expressions; the suite's verdict is only as faithful as they are.
+regex = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+proptest = { workspace = true }

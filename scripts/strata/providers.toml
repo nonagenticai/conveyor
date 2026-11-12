@@ -1,0 +1,36 @@
+# strata_rag provider config for the conveyor's local `strata` compose profile.
+#
+# Dev mode only, exactly like the deployed strato config: no tenant registrations, the
+# estate's mlx-api text host supplies embeddings and reranking. `knowledge.query` never
+# calls /api/ask, so there is deliberately no [default.chat].
+#
+# The key is an env reference, never a literal: strata refuses to start on a literal key.
+# Supply MLX_API_KEY from the SOPS secret when bringing the profile up.
+
+region = "eu"
+mode = "dev"
+
+[policy]
+allowed_dialects = ["openai", "cohere"]
+
+[default.embed]
+base_url = "http://mlx-api-text.example.com:9131/v1"
+dialect = "openai"
+model = "BAAI/bge-m3"
+model_id = "BAAI/bge-m3@1024"
+dims = 1024
+api_key = "env:MLX_API_KEY"
+regions = ["eu"]
+zdr = true
+timeout_ms = 30000
+concurrency = 8
+
+[default.rerank]
+base_url = "http://mlx-api-text.example.com:9131/v2"
+dialect = "cohere"
+model = "BAAI/bge-reranker-v2-m3"
+api_key = "env:MLX_API_KEY"
+regions = ["eu"]
+zdr = true
+timeout_ms = 10000
+concurrency = 4

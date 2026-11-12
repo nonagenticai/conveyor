@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Capability, knowledge and memory — design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/KNOWLEDGE-MEMORY.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="capability-knowledge-and-memory--design">Capability, knowledge and memory — design</h1>
+<p><strong>Date:</strong> 2026-11-08 · <strong>Status:</strong> design for review · implements SPEC <strong>D20</strong> <strong>Related:</strong> <code>SPEC.md</code> §6, §8 S15; <code>plans/slices/S15-capability-knowledge-memory.md</code>; <code>plans/02-DATA-ARCHITECTURE.md</code>; <code>plans/slices/S09-documents-integrations.md</code> §5.6 (strata).</p>
+<hr />
+<h2 id="1-why-this-document-exists">1. Why this document exists</h2>
+<p>The conveyor has a capability vocabulary (<code>catalogue_entry(kind='capability')</code>, 17 seeded rows) and a project capability ledger planned in S08, but no design for what a capability <em>is</em>, what executes it, or what it knows and remembers. "Capability agent" appears nowhere in the codebase; "memory" and "ontology" appear nowhere. The previous program's capability design (C0–C5 maturity, 13 TIM capabilities) predates the rewrite and is not carried.</p>
+<p>This document defines the four things the rewrite needs, in the owner's own split:</p>
+<ul>
+<li><strong>knowledge</strong>: <em>procedural</em> (what to do, in what order, under which gates) and <em>domain</em> (what is true about the work);</li>
+<li><strong>memory</strong>: <em>procedural</em> (what actually happened) and <em>agent work-package</em> (what the agent learned while working one card).</li>
+</ul>
+<h2 id="2-vocabulary">2. Vocabulary</h2>
+<table>
+<thead>
+<tr>
+<th>term</th>
+<th>meaning</th>
+<th>where it lives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Capability</strong></td>
+<td>a named unit of ability: what the organisation can do (design, build, test, govern, operate). It is an aggregate, not a label.</td>
+<td><code>capability</code></td>
+</tr>
+<tr>
+<td><strong>Capability agent</strong></td>
+<td>the configured executor of a capability: model, prompt, parameters, permitted actions, limits, and the knowledge/memory bindings it may use.</td>
+<td><code>capability_agent</code></td>
+</tr>
+<tr>
+<td><strong>Work package</strong></td>
+<td>the unit an agent works on: <strong>the card</strong> in its list, plus the runs it spawns. The card id is the work-package id — no second identity.</td>
+<td><code>card</code></td>
+</tr>
+<tr>
+<td><strong>Procedure</strong></td>
+<td>executable documentation for one path through a capability: ordered steps, each an action plus an optional gate.</td>
+<td><code>procedure</code>, <code>procedure_step</code> (S11)</td>
+</tr>
+<tr>
+<td><strong>Capability maturity</strong></td>
+<td>a computed grade (C0–C5) from evidence, never a stored opinion.</td>
+<td>computed from execution history</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-the-model">3. The model</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>knowledge</strong></th>
+<th><strong>memory</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>procedural</strong></td>
+<td><strong>the ontology</strong>: <code>capability → procedure → step → action | gate</code>. It says what can be done, in what order, under which gate.</td>
+<td><strong>execution history</strong>: <code>run</code>, <code>approval</code>, <code>action_invocation</code>, <code>event</code>. It says what was actually done, by whom, with what outcome.</td>
+</tr>
+<tr>
+<td><strong>domain</strong></td>
+<td><strong>capability packs</strong> in <code>strata_rag</code>: versioned, published, provenance-bearing documents about the domain a capability works in.</td>
+<td><strong>work-package memory</strong>: hot, transactional rows in the conveyor; cold, consolidated digests in <code>strata_rag</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>The diagonal is the point: procedural knowledge is written by people and published; procedural memory is written by the system and never edited; domain knowledge is curated and versioned; work-package memory is ephemeral and per-card.</p>
+<h2 id="4-capability-as-a-first-class-aggregate">4. Capability as a first-class aggregate</h2>
+<p><code>catalogue_entry(kind='capability')</code> is deleted and replaced by <code>capability</code> — the same reason <code>card_type</code> is a table while 14 RM catalogues folded into <code>catalogue_entry</code>: it carries executable definition and is an FK target.</p>
+<pre><code>capability            id, tenant_id, code (natural key), label, description,
+                      status ∈ draft|active|retired, maturity_note, meta
+capability_relation   from_capability_id, to_capability_id, kind ∈ requires|enables|concern</code></pre>
+<p><code>code</code> is the stable key. S08's planned <code>project_capability.capability_code</code> remains a text reference to it (S08 is not built; when it is, it may promote to an FK).</p>
+<p><strong>The ontology</strong> is the directed graph <code>capability → procedure → step → action|gate</code>, plus <code>capability_relation</code> between capabilities. A procedure may belong to a capability directly (<code>procedure.capability_id</code>) or through its card type (<code>card_type.capability_id</code>). The step's <code>action</code> must exist in the action registry and its <code>gate_kind</code> in <code>catalogue_entry(kind='gate')</code> — the same validation S11 already applies.</p>
+<h2 id="5-capability-agent">5. Capability agent</h2>
+<pre><code>capability_agent   id, tenant_id, capability_id, key, status ∈ draft|active|retired,
+                   model_ref (inference-router model), prompt_ref (&lt;name&gt;@&lt;version&gt;, built-in in v1),
+                   params jsonb, allowed_actions text[], max_iterations ≤20, timeout_secs ≤300</code></pre>
+<p>It is <strong>configuration</strong>, not a loop (SPEC D22, CONTRACT §17). A <code>run</code> records <code>capability_id</code> and <code>capability_agent_id</code>; the agent's <code>allowed_actions</code> become the run's scope (an action outside the list is refused before execution, not after); the knowledge and memory bindings resolve through the capability. The loop that reads this config is S13's <code>agent.run</code>: the run wiring stores <code>run.capability_agent_id</code>, the step executor resolves the row into the step input, and the action is a pure loop; S10's copilot is an interactive surface and does not use it. The model itself is never local: the conveyor calls <code>inference-router</code> (SPEC §5.2), it does not host weights. The resolved <code>{capability_agent_id, prompt_ref, model_ref}</code> travels in the <code>agent.run</code> step input, so the invocation hash pins what ran.</p>
+<h2 id="6-domain-knowledge--strata_rag-platform-packs">6. Domain knowledge — <code>strata_rag</code> platform packs</h2>
+<p><strong>What it is.</strong> A <em>pack</em> is an immutable, numbered version (<code>key@version</code>) of one platform-owner root store. Draft → published → retired; published is frozen; a new version is a new root. Tenant documents shadow platform ones through <code>supersedes</code>; provenance and a licence allow-list are enforced at ingest. This is a ready-made domain knowledge layer; the conveyor binds to it rather than rebuilding it.</p>
+<p><strong>Shape.</strong> One pack, key <code>capability</code>, versioned as a whole. Each document carries <code>metadata.capability = &lt;code&gt;</code> and its <code>provenance</code>. One pack, not one per capability: a pack is one root store and versions are immutable, so per-capability packs multiply roots and version churn. Retrieval filters by <code>metadata</code> in SQL before rerank.</p>
+<pre><code>capability_knowledge   capability_id, pack_key, pack_version, min_score, required boolean</code></pre>
+<p><strong>Retrieval.</strong> <code>knowledge.query {capability_id, query, top_k?}</code> resolves <code>capability_knowledge → pack key/version → leaf ids</code> (cached; <code>GET /api/platform/packs/{key}/{version}/stores</code>), then calls <code>POST /api/query</code> with <code>leaf_ids</code>, <code>metadata: {capability: code}</code>, <code>top_k</code>, <code>min_score</code>. Results carry <code>layer</code>, <code>pack</code>, <code>text</code>, <code>title</code>, <code>source</code>, pages — the conveyor returns them unchanged and does not re-rank.</p>
+<p><strong>Degradation.</strong> If a <code>required</code> pack is unreachable or its pinned version is missing, the run fails <code>knowledge_degraded</code>; an optional pack degrades to no hits with a recorded warning. Never silently answer from nothing.</p>
+<h2 id="7-procedural-memory--execution-history">7. Procedural memory — execution history</h2>
+<p>No new table. <code>run</code>, <code>approval</code>, <code>approval_decision</code>, <code>action_invocation</code> and <code>event</code> already record who did what, with which input hash and outcome. Capability maturity is a <strong>computed projection</strong> over that evidence (success rate, retries, approval latency, refusal rate), not a stored opinion; it is computed on read and cached only if a measurement shows it is needed.</p>
+<p>This is also the input to the improvement loop: a capability whose runs fail at one step is evidenced by <code>action_invocation</code> rows for that action, not by a narrative.</p>
+<h2 id="8-work-package-memory">8. Work-package memory</h2>
+<p><strong>Hot (system of record).</strong> Rows written in the run's own transaction:</p>
+<pre><code>work_package_memory   id, tenant_id, project_id, card_id, run_id?, capability_id?,
+                      kind ∈ fact|attempt|decision|blocker|digest,
+                      source ∈ agent|human|system,
+                      body text, supersedes_id?, consolidated_at?, meta jsonb</code></pre>
+<p><code>memory.remember</code> writes one row and emits <code>memory.recorded</code>. Hot rows are never deleted while the card exists; they are the record, and a digest is derived from them.</p>
+<p><strong>Cold (semantic recall).</strong> The <code>memory.consolidate</code> job builds one digest per work package from its un-consolidated rows and writes it to <code>strata_rag</code> as one document:</p>
+<table>
+<thead>
+<tr>
+<th>field</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>store</td>
+<td>the tenant's root store (one per tenant)</td>
+</tr>
+<tr>
+<td><code>source_id</code></td>
+<td><code>conveyor:work:&lt;card_id&gt;</code></td>
+</tr>
+<tr>
+<td><code>source_run</code></td>
+<td>the consolidation id</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td><code>{project_id, card_id, run_ids[], capability, last_consolidated_at}</code></td>
+</tr>
+<tr>
+<td>body</td>
+<td>a fixed header line <code>work-package: &lt;card_id&gt;</code> followed by the digest</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>The header line is load-bearing.</strong> <code>strata_rag</code> deduplicates identical normalized text across sources: the second source gets the <em>first</em> source's document, and pruning the first source deletes it. Short, templated card notes make that collision likely; a card-id header makes every digest unique.</p>
+<p>Re-consolidation follows strata's immutable-document model: ingest the new digest under a new <code>source_run</code>, then <code>DELETE /api/sources/conveyor:work:&lt;card_id&gt;/documents?except_run=&lt;new&gt;</code>. The empty-run guard is left on.</p>
+<p><strong>Recall.</strong> <code>memory.recall {card_id, query?, limit?}</code> returns hot rows (structured, newest first) and, when a query is given, semantic hits from <code>strata_rag</code> filtered by <code>source_ids: ["conveyor:work:&lt;card_id&gt;"]</code>. Hot always wins on conflict: the digest is derived.</p>
+<p><strong>When it is read.</strong> At run start (the card's memory and the capability's domain knowledge are loaded into the run's context) and at each step that declares <code>memory: read</code> in its procedure.</p>
+<p><strong>Who writes it.</strong> <code>memory.remember</code> is the only <strong>action</strong> that writes; the <code>memory.consolidate</code> job appends one <code>kind='digest'</code> row and stamps <code>consolidated_at</code>. A copilot turn or an <code>agent.run</code> step records what it learned through <code>memory.remember</code>, never by SQL; hot rows are the record and the digest is derived.</p>
+<h2 id="9-the-binding-chain">9. The binding chain</h2>
+<pre><code>card → card_type → capability → { capability_knowledge → strata pack }
+                              → { capability_agent → allowed_actions, model, limits }
+run  → capability_id + capability_agent_id  (what actually ran, not what was default)
+work_package_memory → card_id (the work package)</code></pre>
+<p><code>card_type.capability_id</code> is the default; <code>run.capability_id</code> records the actual. A run may name a capability different from its card type's default (a split, a repair), and the record shows it.</p>
+<h2 id="10-actions-events-jobs">10. Actions, events, jobs</h2>
+<table>
+<thead>
+<tr>
+<th>kind</th>
+<th>name</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>action</td>
+<td><code>capabilities.list</code>, <code>capabilities.get</code></td>
+<td>read</td>
+</tr>
+<tr>
+<td>action</td>
+<td><code>capabilities.bind_knowledge</code></td>
+<td>emits <code>knowledge.bound</code>; admin scope</td>
+</tr>
+<tr>
+<td>action</td>
+<td>`capability_agents.create</td>
+<td>update</td>
+</tr>
+<tr>
+<td>action</td>
+<td><code>knowledge.query</code></td>
+<td>retrieval only — <strong>no</strong> <code>knowledge.answer</code></td>
+</tr>
+<tr>
+<td>action</td>
+<td><code>memory.remember</code>, <code>memory.recall</code></td>
+<td>hot write, hot+cold read</td>
+</tr>
+<tr>
+<td>job</td>
+<td><code>memory.consolidate</code></td>
+<td><code>dedupe_key = (card_id, last_row_id)</code>; idempotent</td>
+</tr>
+<tr>
+<td>event</td>
+<td><code>memory.recorded</code></td>
+<td>produced by <code>memory.remember</code></td>
+</tr>
+<tr>
+<td>event</td>
+<td><code>knowledge.bound</code></td>
+<td>produced by <code>capabilities.bind_knowledge</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>knowledge.ingest</code> is <strong>not</strong> added: S09's <code>documents.ingest</code> already delegates to <code>strata_ingest</code>, and that is the only conversion path.</p>
+<h2 id="11-what-this-design-does-not-do">11. What this design does not do</h2>
+<ul>
+<li>It does not host embeddings, a vector store, or a model. Retrieval is <code>strata_rag</code>; generation is the executor (the agent's <code>knowledge.answer</code>, or the conveyor copilot in S10).</li>
+<li>It does not copy the agent's knowledge plane. <code>agent</code> already queries strata with pinned packs; the conveyor owns the <strong>binding</strong> and exposes it, so the binding has one home.</li>
+<li>It does not make <code>strata</code> the system of record for anything. Memory rows and execution history are the record.</li>
+<li>It does not revive KAG (archived 2026-11-04).</li>
+<li>It does not build a model loop. <code>capability_agent</code> is configuration; the loop is S13's <code>agent.run</code> (D22), and S10's copilot is an interactive surface, not a work executor.</li>
+</ul>
+<h2 id="12-open-questions">12. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Who curates the <code>capability</code> pack?</td>
+<td>The platform-owner tenant; the conveyor's platform admin acts as curator</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Is one pack per capability ever right?</td>
+<td>No by default; revisit only if a pack becomes large enough that versioning the whole set is a burden</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Retention for hot memory?</td>
+<td>Keep while the card exists; the digest is rebuildable, the rows are not</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Does a human edit a digest?</td>
+<td>No — digests are derived; edit the hot row and re-consolidate</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Maturity C0–C5 mapping?</td>
+<td>Computed from execution evidence in S15; the thresholds are a measurement, not a guess</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/KNOWLEDGE-MEMORY.md</code> at build time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

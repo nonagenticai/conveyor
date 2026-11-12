@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S03 — Domain and schema · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S03-domain-schema.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><p>⚠️ <strong>Amended 2026-11-09 (process model).</strong> <code>run</code> becomes a <strong>tree</strong>: <code>parent_run_id uuid → run</code>, <code>step_id uuid → process_step</code>, <code>depth int NOT NULL DEFAULT 0 CHECK (depth BETWEEN 0 AND 3)</code>, <code>CHECK (parent_run_id IS NULL OR step_id IS NOT NULL)</code>. The card-wide <code>uq_run_live</code> is replaced by root-only indexes — <code>(tenant_id, card_id) WHERE parent_run_id IS NULL AND status IN ('queued','running','waiting_approval')</code> and the project form <code>(tenant_id, project_id) WHERE parent_run_id IS NULL AND card_id IS NULL AND status IN (…)</code> — plus <code>uq (parent_run_id, step_id) WHERE parent_run_id IS NOT NULL AND status IN (…)</code> and <code>uq (tenant_id, parent_run_id, step_id, attempt)</code> for history. The columns land in migration <code>0033</code>, not <code>0002</code>; the old index is dropped there. The DAG's <code>workflow</code> table and <code>run.workflow_id</code> are dropped by <code>0034</code>.</p>
+<h1 id="s03--domain-and-schema">S03 — Domain and schema</h1>
+<p>Programme project: S03 · issues none yet</p>
+<p><strong>Gate (SPEC §8 S3):</strong> proptest on transitions; schema review.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>Fourteen aggregates as total Rust functions, plus the one migration that stores them, so no later slice invents a table: <code>crates/domain</code> holds the machines, <code>crates/store</code> the SQL, Postgres the same refusal.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S02 shipped <code>0001_platform.sql</code> (11 tables), <code>begin_scoped</code>, <code>conveyor_runtime</code>, <code>domain::{TenantId, Id, Version}</code>.</li>
+<li><code>crates/store</code> has pool, outbox, jobs, audit, idempotency; no domain query module. Routes: health, <code>/api/me</code>, <code>/api/events</code>.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — the 14 aggregates of §2.3+§2.4; <code>may_move</code>, run/approval/asset transitions; store modules taking <code>TenantId</code> under <code>_tx</code>; <code>0002_domain.sql</code> with columns, FKs, partial uniques, indexes, <code>ENABLE</code>+<code>FORCE</code> RLS and 14 policies; the <code>catalogue_entry.kind</code> vocabulary.</p>
+<p><strong>OUT</strong> — every route and action (S04–S06); board satellites <code>label</code>/<code>comment</code>/<code>task*</code>/<code>custom_field*</code>/<code>board_membership</code>/<code>webhook_subscription</code> (S05); channels and delivery (S06); outlines, quality, project_request (S07); models, views, portfolio registers (S08); documents, repositories, secrets (S09); conversations (S10); procedures (S11); workflow (S13). <code>run.procedure_id</code> / <code>run.workflow_id</code> arrive with S11/S13's FKs, and <code>run.capability_id</code> / <code>run.capability_agent_id</code> with S15's <code>0020</code>, never here.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>02-DATA-ARCHITECTURE §2.3/§2.4</code></td>
+<td>14 table bodies</td>
+<td>verbatim</td>
+<td>anything — a deviation is a contract change</td>
+</tr>
+<tr>
+<td><code>agent@83b8de7</code> — <code>crates/agent-api/src/{lease,tenancy}.rs</code>, <code>crates/agent-api/migrations/0190_b8_worker_lease.sql</code></td>
+<td>conditional <code>UPDATE … RETURNING</code>, paired-null CHECK, <code>begin_scoped</code></td>
+<td>claim shape, tx-local <code>set_config</code></td>
+<td>resume targets, <code>ACTIVE_TENANT_HEADER</code></td>
+</tr>
+<tr>
+<td><code>strata_rag@b9426c3</code> <code>store_providers.rs</code></td>
+<td><code>put_store_providers_tx</code></td>
+<td>the <code>_tx</code> convention</td>
+<td>its schema</td>
+</tr>
+<tr>
+<td><code>fr@6f7c509</code> <code>100_card_phase_lease.sql</code> §3.4; <code>card_*</code> satellites; <code>30-rm-planka</code> §1 <code>pm_*</code></td>
+<td>the closed-degradation argument; the sprawl</td>
+<td><em>a lease that grants itself when the arbiter is down is not a lease</em>; the concept list</td>
+<td>the lease table, the satellites</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>crates/domain/src/{id,version,catalogue,board,run,approval,governance,lib}.rs
+crates/store/src/{project,board,list,card,run,approval,governance,catalogue,revision,andon}.rs
+crates/store/tests/{rls_domain,claim_race,approval_race,transitions}.rs
+migrations/0002_domain.sql</code></pre>
+<p><code>crates/domain</code> deps: serde, uuid, time, thiserror — no sqlx/tokio/axum.</p>
+<pre class="rust"><code>pub enum ListKind { Intake, Active, Waiting, Done, Archive }
+pub enum RunStatus { Queued, Running, WaitingApproval, Succeeded, Failed, Cancelled }
+pub enum ApprovalStatus { Pending, Approved, Rejected, Expired, Voided }
+// AssetKind: Requirement | Principle | Adr
+// AssetStatus: Draft | InReview | Approved | Superseded | Archived
+
+pub struct Card {                 // no `state` field, no accessor naming one
+    pub list_id: Uuid, pub card_type_id: Uuid, pub board_id: Uuid,
+    pub archived_at: Option&lt;Timestamp&gt;, pub assignee_id: Option&lt;Uuid&gt;,
+    pub lease_expires_at: Option&lt;Timestamp&gt;, pub lease_token: Option&lt;Uuid&gt;,
+    pub claim_fence: i64, pub version: Version,
+}
+pub fn may_move(card: &amp;Card, from: ListKind, to: ListKind, rules: &amp;CardTypeRules)
+    -&gt; Result&lt;Move, MoveError&gt;;
+impl Run           { pub fn transition(self, to: RunStatus) -&gt; Result&lt;Run, RunError&gt;; }
+impl Approval      { pub fn decide(self, d: Decision, required: u16) -&gt; Result&lt;Self, ApprovalError&gt;;
+                     pub fn expire(self, at: Timestamp) -&gt; Result&lt;Self, ApprovalError&gt;; }
+impl GovernedAsset { pub fn transition(self, to: AssetStatus) -&gt; Result&lt;Self, GovernanceError&gt;; }</code></pre>
+<p><code>adds_tables</code> is <strong>14</strong>: §2.3 lists nine, §2.4 five; §8's dependency graph enumerates the same 14 names (§2.16 gives the per-slice count), and <code>00-INDEX.md</code>'s contract-delta register carries the list. The 67 total is unaffected.</p>
+<p><code>0002_domain.sql</code> — bodies are §2.3/§2.4 column-for-column; <code>approval_decision</code> therefore ports <code>decided_by_kind</code> and <code>via</code> from §2.3 as well, and <code>domain::approval::decide</code> carries the decider kind; the envelope and the clauses that carry this slice's invariants:</p>
+<pre class="sql"><code>-- text + CHECK, never CREATE TYPE: ALTER TYPE … ADD VALUE cannot share a transaction
+-- with an index on the new label, and each migration file is one transaction (data-arch §1.8)
+list.kind  text NOT NULL CHECK (kind IN (&#39;intake&#39;,&#39;active&#39;,&#39;waiting&#39;,&#39;done&#39;,&#39;archive&#39;))
+run.status text NOT NULL DEFAULT &#39;queued&#39;
+             CHECK (status IN (&#39;queued&#39;,&#39;running&#39;,&#39;waiting_approval&#39;,&#39;succeeded&#39;,&#39;failed&#39;,&#39;cancelled&#39;))
+CONSTRAINT card_lease_pair CHECK ((lease_expires_at IS NULL) = (lease_token IS NULL));
+
+-- one live ROOT run per card (amended 2026-11-09)
+CREATE UNIQUE INDEX uq_run_live     ON run (tenant_id, card_id)
+  WHERE parent_run_id IS NULL AND status IN (&#39;queued&#39;,&#39;running&#39;,&#39;waiting_approval&#39;);
+CREATE UNIQUE INDEX uq_appr_pending ON approval (tenant_id, run_id, gate) WHERE status = &#39;pending&#39;;
+
+-- all 14, no exception
+ALTER TABLE card ENABLE ROW LEVEL SECURITY;
+ALTER TABLE card FORCE  ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON card FOR ALL
+  USING (tenant_id = app_current_tenant()) WITH CHECK (tenant_id = app_current_tenant());</code></pre>
+<p><strong>The card-state proof.</strong> Three executable checks: <code>information_schema.columns</code> for <code>card</code> + <code>column_name IN ('state','status')</code> returns zero rows; an <code>insta</code> snapshot of <code>serde_json::to_value(&amp;Card)</code> pins the field set; <code>grep -niE '\bstate\b' migrations/0002_domain.sql</code> returns <strong>0</strong> — <code>andon_state</code> does not match on a word boundary, so the substantive proof is the <code>information_schema</code> query above, not this grep.</p>
+<p><code>archived_at</code> and <code>list.kind='archive'</code> are two depths. The <strong>kind</strong> is a place: a positionable lane the card can be dragged out of — the UI's archive drop target writes <code>list_id</code>, a <code>may_move</code> transition. The <strong>stamp</strong> is exclusion: every hot index is <code>WHERE archived_at IS NULL</code>, so a stamped card leaves the board scan and is reachable only from the restore screen. Invariant, proptested: <code>archived_at IS NOT NULL ⇒ list.kind='archive'</code>. The UI archives by list kind; only the sweep stamps.</p>
+<p><strong>The 280 flows as one row.</strong> <code>catalogue_entry.kind</code> has no CHECK by design; S03 fixes the vocabulary: <code>project_type | phase | recipe | wip_limit | gate | capability | deliverable_kind | milestone_kind | priority_level | board_template | architecture_standard</code>. A project type carries its own matrix — <code>project_type.meta.matrix</code> — so there is <strong>no separate matrix kind</strong> and no second row (data-arch §2.3, §7.2).</p>
+<table>
+<thead>
+<tr>
+<th>column</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kind</code></td>
+<td><code>project_type</code></td>
+</tr>
+<tr>
+<td><code>code</code></td>
+<td><code>delivery</code> (= <code>project.project_type_code</code>)</td>
+</tr>
+<tr>
+<td><code>meta</code></td>
+<td><code>{"matrix":{"feature":{"intake":["active","archive"],"active":["waiting","done","archive"],"waiting":["active","archive"],"done":["archive"],"archive":["intake"]},"bug":{"intake":["active"],"active":["done","archive"],"done":["archive"]}}}</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>may_move(feature_card, Active, Waiting, rules)</code> reads <code>matrix["feature"]["active"]</code>, finds <code>"waiting"</code> ⇒ <code>Ok</code>. <code>may_move(feature_card, Intake, Done, _)</code> ⇒ <code>Err(MoveNotAllowed)</code> ⇒ 409 <code>card-move-not-allowed</code>. Absent entry, card type or row ⇒ <strong>deny</strong>; <code>wip_limit</code> rows are templates, the instance is <code>list.wip_limit</code>.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>Preflight: <code>cargo test -p conveyor-domain</code>; <code>select max(version) from _sqlx_migrations</code> = 1; <code>docker compose up -d db</code>; <code>lsof -nP -iTCP:5439 -sTCP:LISTEN</code>. Never 5432, never 8000.</li>
+<li><code>domain/src/{id,version,catalogue}.rs</code>: <code>Code</code>, <code>Version</code>, <code>CatalogueKind</code>, <code>CardTypeRules::from_entry</code>. <code>cargo clippy -p conveyor-domain --all-targets -- -D warnings</code>.</li>
+<li><code>domain/src/board.rs</code>: <code>Programme</code>, <code>Project</code>, <code>Board</code>, <code>List</code>, <code>CardType</code>, <code>Card</code>, <code>Move</code>, <code>MoveError</code>, <code>may_move</code>; then <code>Card::archive(&amp;List, Timestamp)</code> / <code>restore</code> and proptest (a). <code>cargo test -p conveyor-domain board</code>.</li>
+<li><code>domain/src/{run,approval}.rs</code>: both machines, terminal-wins refusal, <code>decide</code> reaching <code>required_decisions</code>. <code>cargo test -p conveyor-domain run approval</code>.</li>
+<li><code>domain/src/governance.rs</code>: <code>transition</code>, <code>supersede</code>, <code>Revision</code>, <code>RevisionPolicy::is_prunable</code>. <code>cargo test -p conveyor-domain</code>.</li>
+<li><code>0002_domain.sql</code>: <code>programme, project, board, list, card_type</code> (§2.3 verbatim), then <code>card</code> — claim columns, paired-null CHECK, <code>prev_list_id</code>, <code>list_changed_at</code>, <code>tsv</code> generated, three partial indexes, <code>gin(tsv)</code>, then <code>run, approval, approval_decision</code> with both partial uniques. <code>grep -c 'CREATE TABLE' migrations/0002_domain.sql</code> → 9.</li>
+<li>Same file: <code>governed_asset, trace_link, catalogue_entry, revision, andon_state</code>; then RLS for 14, grants to <code>conveyor_runtime</code>, <code>REVOKE ALL ON _sqlx_migrations</code>. <code>grep -c 'FORCE ROW LEVEL SECURITY' migrations/0002_domain.sql</code> → 14.</li>
+<li><code>store/src/migrate.rs</code> assertion → <code>[(1,"platform"),(2,"domain")]</code>; <code>cargo run -p conveyor-server -- migrate</code>, twice.</li>
+<li><code>store/src/{project,board,list,card}.rs</code> under <code>_tx</code>; <code>claim_card_tx</code> is the data-arch §4 <code>UPDATE</code> verbatim, returning <code>Option&lt;ClaimGranted{claim_fence, version}&gt;</code>. <code>cargo clippy -p conveyor-store --all-targets -- -D warnings</code>.</li>
+<li><code>store/src/{run,approval}.rs</code>: <code>transition_run_tx</code>, <code>insert_approval_tx</code> (23505 → <code>ApprovalConflict</code>), <code>record_decision_tx</code>, <code>expire_due_tx</code>. <code>cargo clippy -p conveyor-store --all-targets -- -D warnings</code>.</li>
+<li><code>store/src/{governance,catalogue,revision,andon}.rs</code>; <code>transition_asset_tx</code> writes the <code>revision</code> row with <code>seq = version</code> in the same transaction. <code>cargo clippy -p conveyor-store --all-targets -- -D warnings</code>.</li>
+<li>Store tests: RLS as <code>conveyor_runtime</code> for 14; claim race (b); approval race (c).</li>
+<li>Schema review by a second reader against §2.3/§2.4 line by line — 14 tables, zero deviations or a reviewed list; <code>cargo clippy --workspace --all-targets -- -D warnings</code>.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-domain      # proptests (a) and (d), ≥256 cases
+cargo test -p conveyor-store       # (b) and (c) need a database
+cargo run -p conveyor-server -- migrate &amp;&amp; cargo run -p conveyor-server -- migrate
+test &quot;$(psql &quot;$DATABASE_MIGRATE_URL&quot; -tAc &#39;select count(*) from _sqlx_migrations&#39;)&quot; -ge 2
+test -z &quot;$(psql &quot;$DATABASE_MIGRATE_URL&quot; -tAc &quot;select column_name from information_schema.columns
+     where table_name=&#39;card&#39; and column_name in (&#39;state&#39;,&#39;status&#39;)&quot;)&quot;     # 0 rows
+test -z &quot;$(grep -niE &#39;create type&#39; migrations/0002_domain.sql || true)&quot;      # 0
+test &quot;$(grep -c &#39;FORCE ROW LEVEL SECURITY&#39; migrations/0002_domain.sql)&quot; = 14   # 14</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>no transition leaves <code>list.kind</code> and <code>archived_at</code> contradictory</td>
+<td>proptest over random card/list/kind sequences: <code>archived_at.is_some() ⇒ from_kind == Archive</code>; <code>restore</code> off a non-archive list is <code>Err</code></td>
+</tr>
+<tr>
+<td>b</td>
+<td>a claim never succeeds twice without release or expiry</td>
+<td>32 concurrent tasks on one card: exactly one <code>Some</code>; sequential claims strictly increase <code>claim_fence</code>; a stale-fence completion writes nothing</td>
+</tr>
+<tr>
+<td>c</td>
+<td>one pending approval per (run, gate)</td>
+<td>16 concurrent inserts: one <code>Ok</code>, fifteen <code>ApprovalConflict</code>, pending count 1</td>
+</tr>
+<tr>
+<td>d</td>
+<td>truncate/archive invariants</td>
+<td>a terminal <code>run</code> rejects every transition; <code>revision</code> seq dense from 1; <code>is_prunable("model")</code> true past 50, false for <code>"requirement"</code> at any depth</td>
+</tr>
+</tbody>
+</table>
+<p>RLS: as <code>conveyor_runtime</code> scoped to A, B's rows are absent from all 14 tables and a forged <code>tenant_id=B</code> insert fails <code>WITH CHECK</code>; the <strong>owner</strong> sees 0 (<code>FORCE</code>), a superuser both. Migrations: fresh DB → 2 applied; second run → exit 0, <code>_sqlx_migrations</code> unchanged; no <code>IF NOT EXISTS</code> — it masks failure as a no-op.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>List-as-state has no second source.</strong> A <code>CardState</code> derived from <code>list.kind</code> is a read; cached it is fr's disagreement class reborn. No <code>UPDATE card SET status</code>.</li>
+<li><strong><code>position numeric</code> midpoint insert.</strong> <code>(a+b)/2</code> between neighbours, <code>max+1024</code> on append. Planka's <code>double precision</code> was the old behaviour: ~50 halvings, then the compaction job nobody wrote. A move writes <code>list_id, prev_list_id, list_changed_at, position</code> in one statement.</li>
+<li><strong><code>governed_asset</code> vs a fork.</strong> <code>kind</code> is a column; a kind needing a filtered field gets a nullable column (data-arch Q2). <code>superseded ⇒ superseded_by_id IS NOT NULL</code> is an <strong>immediate CHECK</strong> in <code>0002</code> — PostgreSQL CHECK constraints cannot be deferred, so the one <code>UPDATE</code> writes both pointers and the reciprocal edge is domain-enforced (§3.4).</li>
+<li><strong><code>revision</code> unbounded for assets, 50 for models.</strong> A job-applied policy on <code>entity_type</code>, never a trigger; unknown ⇒ keep. A wrong cap deletes history.</li>
+<li><strong>The partial index is the guarantee, not the code.</strong> <code>check-then-insert</code> races; 23505 → 409. <code>run_id IS NULL</code> escapes <code>uq_appr_pending</code> (NULLs distinct): gate approvals carry a run, card-level ones use <code>INSERT … WHERE NOT EXISTS</code>.</li>
+<li><strong><code>timestamptz</code> UTC.</strong> Every lease test is <code>lease_expires_at &lt; now()</code> in SQL, never a Rust clock.</li>
+<li><strong><code>FORCE</code> RLS.</strong> <code>ENABLE</code> alone lets the owner read everything; prove owner 0, superuser n.</li>
+<li><strong><code>card.board_id</code> is denormalised</strong> and must equal <code>list.board_id</code>; <code>move_card_tx</code>/<code>claim_card_tx</code> join <code>list</code> in the same statement.</li>
+<li><strong><code>sqlx::migrate!</code> path.</strong> S02 fixed it; S03 extends the embedded-set assertion. A file outside the set is a silent no-op.</li>
+<li><strong>R10 — porting fr's accreted model is the biggest failure mode.</strong> The baseline is built from SPEC §6's domain model, never by transcribing fr's 224 migrations; a column that exists only because a past migration needed it does not enter this schema.</li>
+<li><strong>R8 — tenancy is typed, not remembered.</strong> Every store function takes <code>TenantId</code>; RLS is <code>FORCE</code>d; the isolation proof is in S02's gate and re-run here for every new table.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S3-D1</td>
+<td>Matrix is one row: <code>kind='project_type'</code>, <code>code = project_type_code</code>, <code>meta.matrix</code></td>
+<td><code>kind</code> has no CHECK; S03 owns the vocabulary, and data-arch §2.3/§7.2 plus the S07 seed already put the matrix on the project_type row</td>
+</tr>
+<tr>
+<td>S3-D2</td>
+<td><code>archived_at ⇒ list.kind='archive'</code>; UI archives by list kind, sweep stamps</td>
+<td>one proptestable invariant, not two archive notions</td>
+</tr>
+<tr>
+<td>S3-D3</td>
+<td>Absent entry / card type / row ⇒ deny</td>
+<td>the rewrite cannot silently allow</td>
+</tr>
+<tr>
+<td>S3-D4</td>
+<td><code>revision.seq = governed_asset.version</code>, both from 1</td>
+<td>"revision 7" means one thing everywhere</td>
+</tr>
+<tr>
+<td>S3-D5</td>
+<td><code>approval_decision</code> has no <code>version</code>, immutable after insert; <code>andon_state</code> is one lazily created row per tenant, pk <code>tenant_id</code>; claim TTL is a store parameter (<code>DEFAULT_CLAIM_TTL</code> 900 s)</td>
+<td>a decision is a fact; no null tenant; fr's per-phase TTLs had no basis</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Claim TTL 900 s vs <code>agent</code>'s 600 s</td>
+<td>900 s; revisit at S06</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>NULLS NOT DISTINCT</code> on <code>uq_appr_pending</code> would close the <code>run_id IS NULL</code> hole</td>
+<td>not here — a data-arch change S06 decides with the card-level path</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>catalogue_entry</code> seed size (data-arch §10 Q6)</td>
+<td>the worked row; full seed via <code>migrate --seed</code> from S00 counts</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S03-domain-schema.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

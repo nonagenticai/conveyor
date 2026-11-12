@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S18 — Kata continuous improvement · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S18-kata-improvement.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s18--kata-continuous-improvement">S18 — Kata continuous improvement</h1>
+<p>Programme project: S18 · issues #22, #45</p>
+<p>⚠️ <strong>Process model 2026-11-09:</strong> the arm pins the <strong>process</strong> (<code>process_id</code>) and the run's <strong>process agent</strong>; the old <code>procedure_id</code> pin migrates in <code>0033</code>. Nothing else in this slice changes.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>The benchmark becomes the kata loop's measuring instrument. A <code>conveyor</code>-arm run measures one pinned <code>capability_agent</code> or <code>procedure</code> version against the suite; two such runs are compared with S17's exact McNemar; one of them is promoted as the suite's <strong>baseline</strong>; and the improvement iteration — start a candidate, wait, compare, keep or revert — is a durable job that invokes exactly the actions a person would. The improvement screen shows the version-to-version trend and flags a significant regression; it invents no new runtime.</p>
+<p>The loop only means something because the comparison is <strong>paired and controlled</strong>. Every candidate is measured on the same 50 instances, with the same suite hashes, the same grader and the same prompt/oracle pair; the run's <code>subject_kind</code> and id say which executor version produced it; and the promoted baseline is the fixed point every later run is read against. The old harness measured that two byte-identical baseline runs can differ by four instances, so a candidate that "wins" by one or two instances has not won anything — the exact test must say whether the discordant pairs are more than noise, and a run that is not comparable is refused rather than averaged into a trend. That is the whole reason the benchmark is being pulled into the conveyor: the improvement loop and the instrument that judges it must not be allowed to drift apart.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S17: <code>benchmark_run</code>/<code>benchmark_case</code>, the driver, <code>compare</code>, <code>promote</code>, the gold/empty/baseline arms, and the columns <code>subject_kind</code>, <code>capability_agent_id</code>, <code>procedure_id</code> (forward references, no FK).</li>
+<li>S13: <code>agent.run</code> — the bounded internal loop, taking its resolved <code>capability_agent</code> in the step input (D22/§17).</li>
+<li>S15: <code>capability</code>, <code>capability_agent</code>, and the readiness check that refuses an unusable binding before a run.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — the <code>conveyor</code> arm's producer (start one conveyor run per instance through the ordinary action surface, poll for the patch), the version pinning on the run, <code>benchmark_runs.trend</code>, the improvement job, the baseline / regression semantics, and screen 14's data contract.</p>
+<p><strong>OUT</strong> — a new agent runtime or a second model loop (the arm calls S13's <code>agent.run</code> exactly as a card run does); automatic code changes (the loop proposes and measures; a person or the kata's own procedures apply); any new table or event; a second benchmark driver.</p>
+<p>The producer is a <strong>consumer of the public surface</strong>, and that is a constraint, not a style note. It may start a run, read a run and compare runs; it may not read <code>benchmark_instance</code> (the answers), it may not write a case verdict, and it may not run the instance in a different tenant from the one that owns the run. If the producer needed a private path, the arm would be measuring a second implementation of the conveyor rather than the one the product ships — which is exactly the failure this integration exists to prevent.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/actions/src/procedure/step.rs</code></td>
+<td>how a step invokes an action internally with a resolved template</td>
+<td>the invocation path</td>
+<td>a second executor</td>
+</tr>
+<tr>
+<td><code>docs/plans/01-CONTRACT.md</code> §17</td>
+<td>the executor slot, the caps, the readiness rules</td>
+<td>the rules</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>slices/S15-capability-knowledge-memory.md</code></td>
+<td><code>capability_agent</code>, <code>prompt_ref</code>, readiness</td>
+<td>the shape</td>
+<td>S15's build</td>
+</tr>
+<tr>
+<td><code>slices/S17-benchmark-harness.md</code></td>
+<td>the arms, the compare/refusal, <code>promote</code></td>
+<td>the API</td>
+<td>the harness build</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<ul>
+<li><strong>The <code>conveyor</code> arm producer</strong>: per instance, start a conveyor run through the same public action a person uses (a <code>swebench-fix</code> procedure or an <code>agent.run</code> step carrying the resolved <code>capability_agent</code>), wait for its terminal state, and take the patch from the run's output. The run row pins <code>subject_kind</code> and the id; a missing or unready binding is <code>409 arm_not_ready</code> before the first case, and scope/prompt/cap failures are recorded as <code>no_attempt</code>, never as a model failure.</li>
+<li><strong><code>benchmark_runs.trend</code></strong> (<code>benchmarks:read</code>): <code>{suite_id, arm?, limit?}</code> → <code>{baseline_run_id?, points: [{run_id, subject_kind, subject_id, subject_version, started_at, n_graded, n_resolved, rate, control_ok, vs_baseline: {discordant, a_only, b_only, p_value, direction}}]}</code> — computed from the stored runs/cases, no new table.</li>
+<li><strong>The improvement job</strong> <code>benchmark.improvement.run</code>: <code>{suite_id, candidate_subject, baseline_run_id}</code> → starts a run, waits on <code>benchmark_run.changed</code>/<code>get</code>, compares with the baseline, and records <code>keep | revert | inconclusive</code> with the McNemar delta. It invokes <code>benchmark_runs.start</code>, <code>benchmark_runs.get</code>, <code>benchmark_runs.compare</code> — never SQL and never a private path.</li>
+<li><strong>Screen 14</strong> declared for S12: version → rate, baseline line, control badges, regression flags, and the Start-candidate control (<code>improvement.spec.ts</code>).</li>
+</ul>
+<p>Tests: <code>apps/server/tests/benchmark_arm.rs</code>, <code>crates/api/tests/benchmark_trend.rs</code>, <code>apps/server/tests/benchmark_improvement.rs</code> — the gate's three named targets.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<ol type="1">
+<li>The producer seam: a function that, given an instance and a subject, starts the run through the action layer and returns the patch; unit tests for the three failure classes (<code>no_attempt</code>, <code>fail</code>, typed refusal).</li>
+<li><code>benchmark_runs.trend</code> — the query and its read model; the regression rule (McNemar p &lt; 0.05 with a negative delta); no new table.</li>
+<li>The improvement job: enqueue, wait, compare, record; a dead job is reaped by S17's <code>benchmark.reap</code>, never a second state machine.</li>
+<li>The <code>conveyor</code> arm wiring in the S17 driver (the arm value already exists; the producer is the only addition).</li>
+<li>S12's screen-14 rows and spec; the <code>--write-lock</code> delta (one action, one operation).</li>
+<li>Gate below.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env
+cd $HOME/Movies/conveyor
+
+# the arm refuses before S13/S15 data exists, and runs when it does
+cargo test -p conveyor-server --test benchmark_arm
+# two versions of one subject compare with an exact McNemar delta
+cargo test -p conveyor-api --test benchmark_trend
+# the improvement job performs the same calls a person does
+cargo test -p conveyor-server --test benchmark_improvement
+# the workspace is still green and the lock still matches
+cargo run -q -p conveyor-server -- --print-openapi --check-lock &gt;/dev/null
+cargo test --workspace 2&gt;&amp;1 | tee /tmp/s18-tests.log | grep -E &#39;^test result|FAILED&#39; | tail -5
+! grep -q &#39;FAILED&#39; /tmp/s18-tests.log
+cargo clippy --workspace --all-targets -- -D warnings
+printf &#39;\nGATE_GREEN\n&#39;</code></pre>
+<p>The end-to-end proof is one real katas-tenant iteration: a candidate <code>capability_agent</code> version, one run, a comparison against the promoted baseline, and a recorded keep/revert — with the screen showing the same numbers.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>A benchmark run is not a card run.</strong> The arm starts a conveyor run through the public action surface; do not wire a private executor or pass the gold patch into the model's context.</li>
+<li><strong>Version pinning is the measurement.</strong> A run without <code>capability_agent_id</code>/<code>procedure_id</code> measures nothing comparable; <code>subject_kind='suite'</code> with <code>arm='conveyor'</code> is refused by S17's CHECK.</li>
+<li><strong>Do not compare across oracle/prompt.</strong> S17's <code>compare</code> refuses; the trend must surface the refusal, not average over it.</li>
+<li><strong>A regression flag is not an automatic revert.</strong> The job records the verdict; the kata's own procedure decides, and a person can always read the same comparison.</li>
+<li><strong>A dead improvement job must not hold a run.</strong> The run keeps its own lifecycle; the job is replaceable and S17's reaper owns the stale case.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li><strong>The improvement loop is a consumer of the action registry.</strong> It has no private store, no second state machine and no privileged path; the UI and the loop call the same actions.</li>
+<li><strong>The baseline is per suite and promoted explicitly.</strong> <code>promote</code> is a person's (or a procedure's) act, recorded on the run; a newer run does not silently become the baseline.</li>
+<li><strong>The trend is a query, not a table.</strong> Rates and deltas are derived from <code>benchmark_run</code>/<code>benchmark_case</code>; nothing is rolled up and left to drift.</li>
+<li><strong>A trend point is only a run of the same suite and arm.</strong> A <code>conveyor</code> run of a different suite, or a <code>baseline</code> run, is displayed but never plotted against the capability baseline; mixing them is the visual form of the comparison S17 refuses.</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>May a kata <strong>agent</strong> invoke <code>benchmark_runs.start</code> directly?</td>
+<td>no — the loop runs as a procedure/job as a service principal; <code>AGENT_TOOLS</code> stays unchanged</td>
+</tr>
+<tr>
+<td>2</td>
+<td>How many candidate versions may be in flight per suite?</td>
+<td>one; a second start while a candidate is <code>queued/running</code> is a 409</td>
+</tr>
+<tr>
+<td>3</td>
+<td>What counts as a regression worth flagging?</td>
+<td>McNemar p &lt; 0.05 with a negative delta, and both runs <code>control_ok=true</code>; otherwise "inconclusive"</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Does the improvement job auto-start the next candidate?</td>
+<td>no — it records the verdict; the kata procedure chooses the next candidate</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S18-kata-improvement.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+erDiagram
+  RUN ||--o{ RUN_STEP : has
+  RUN ||--o{ INFERENCE_CALL : ledgers
+  RUN ||--o{ TOOL_CALL : ledgers
+  RUN ||--o{ DECISION : records
+  DECISION }o--|| DECISION_POLICY : follows
+  DECISION }o--|| DECISION_OPTION : selects
+  DECISION_POLICY ||--o{ DECISION_POLICY_REFINEMENT : refined_by
+  DECISION_POLICY_REFINEMENT }o--|| LAYA_INFERENCE_CONFIG : pins
+  CARD ||--o{ APPROVAL : gates
+  APPROVAL ||--o{ APPROVAL_DECISION : records
+  RUN ||--o{ GOVERNED_ASSET : produces
+  GOVERNED_ASSET ||--o{ TRACE_LINK : traced_by

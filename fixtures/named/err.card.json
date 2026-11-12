@@ -1,0 +1,47 @@
+{
+  "input": {
+    "key": "err.card",
+    "title": "err.card — a failed run's card, re-authored",
+    "definition": {
+      "schema": 1,
+      "nodes": [
+        {
+          "id": "card",
+          "kind": "action",
+          "action": "cards.get",
+          "input_template": { "id": "{{card.id}}" }
+        },
+        {
+          "id": "board",
+          "kind": "action",
+          "action": "boards.get",
+          "input_template": { "id": "{{steps.1.output.card.board_id}}" }
+        },
+        {
+          "id": "move_blocked",
+          "kind": "action",
+          "action": "cards.move",
+          "input_template": {
+            "id": "{{card.id}}",
+            "list_id": "{{steps.2.output.lists.2.list.id}}",
+            "_version": "{{steps.1.output.card.version}}"
+          }
+        },
+        {
+          "id": "comment",
+          "kind": "action",
+          "action": "cards.comment",
+          "input_template": {
+            "id": "{{card.id}}",
+            "body": "[BLOCKED/flow_error] run {{run.inputs.run_id}} failed"
+          }
+        }
+      ],
+      "edges": [
+        { "from": "card", "to": "board" },
+        { "from": "board", "to": "move_blocked" },
+        { "from": "move_blocked", "to": "comment" }
+      ]
+    }
+  }
+}

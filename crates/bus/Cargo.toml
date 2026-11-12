@@ -1,0 +1,18 @@
+[package]
+name = "conveyor-bus"
+description = "The care-bus port: envelope, Redis Streams, consumer groups, dead letter (S13)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# No workspace crate is a dependency: the bus carries an envelope, it does not know what a run or
+# a card is (CONTRACT §1's dependency direction stops here). `tokio` is absent on purpose — redis's
+# `tokio-comp` feature supplies the runtime, and this crate never names a tokio type.
+[dependencies]
+redis = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }

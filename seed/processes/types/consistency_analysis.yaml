@@ -1,0 +1,163 @@
+# consistency_analysis — evaluate how consistently the codebase follows its own conventions.
+#
+# Content sources: seed/catalogue.json (outputs + acceptance) and
+# n8n-designs/design/choices/v4/capabilities/analysis.yaml (text "uses tools to evaluate
+# consistency of the codebase", phase `analysis`, consistency_analysis inspect.criteria). A
+# deviation is only worth a finding when most of the scope already agrees on the convention, so
+# that majority is evidence the doing stage must produce. The card reports; it creates no cards.
+# Ladder: READY = readying + move; DOING/QA/DONE = four agents + move.
+card_type: consistency_analysis
+capability: analysis
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: consistency_analysis
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: consistency_analysis.ready
+    title: Consistency analysis — definition of ready
+    definition_of_ready: {checks: [scope_paths_exist]}
+    definition_of_done: {checks: [draft_artifact_id]}
+    acceptance_criteria:
+      - {name: scope_paths_exist, text: "Every module or directory the card's title and description name exists in the workspace."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: consistency_analysis.doing
+    title: Consistency analysis — definition of doing
+    definition_of_ready: {checks: [scope_paths_exist]}
+    definition_of_done: {checks: [every_finding_cites_evidence, every_cited_location_exists, convention_has_majority_examples]}
+    acceptance_criteria:
+      - {name: every_finding_cites_evidence, text: "Every deviation names the examples on both sides: the places that follow the convention and the place that departs from it."}
+      - {name: every_cited_location_exists, text: "Every file, function and line span a deviation cites exists in the workspace at the commit the card pins."}
+      - {name: convention_has_majority_examples, text: "Every convention a deviation is measured against is followed by most of the scope's code, and the examples proving that are cited."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: consistency_analysis.qa
+    title: Consistency analysis — definition of QA
+    definition_of_ready: {checks: [convention_has_majority_examples]}
+    definition_of_done: {checks: [every_confirmed_location_exists, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: every_confirmed_location_exists, text: "Every location of every confirmed deviation still exists in the workspace when QA runs."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the consistency_analysis card type carries is true of the report."}
+      - {name: convention_is_real, text: "Every confirmed deviation names a convention that most of the scope's code follows."}
+      - {name: findings_located, text: "Every confirmed deviation names a file, a function (null at module level) and a line span."}
+      - {name: proposed_change_follows_convention, text: "Every confirmed deviation's proposed change makes that place follow the convention."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: consistency_analysis.done
+    title: Consistency analysis — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The published report is the version QA confirmed; no deviation was edited after QA."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: consistency_analysis.system
+    title: Consistency analysis — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: consistency_analysis.READY
+    list: ready
+    title: Consistency analysis — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: consistency_analysis
+        sop: consistency_analysis.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: consistency_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: consistency_analysis.DOING
+    list: doing
+    title: Consistency analysis — doing
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: consistency_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: consistency_analysis.QA
+    list: qa
+    title: Consistency analysis — QA
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: consistency_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: consistency_analysis.DONE
+    list: done
+    title: Consistency analysis — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: consistency_analysis, sop: consistency_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: consistency_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

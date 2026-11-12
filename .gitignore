@@ -1,0 +1,30 @@
+# Rust build output — workspace root (278 MB measured 2026-11-09) and any nested crate.
+target/
+
+# Node / Playwright artefacts of the Leptos web harness (apps/web). Measured: 19 MB.
+node_modules/
+test-results/
+playwright-report/
+
+# Estate housekeeping.
+.DS_Store
+.seed-gate/
+.worktrees/
+# Claude Code's own per-session worktree metadata (created 2026-11-09); local state, not source.
+# Project skills are source: they travel with the clone and load in every worktree.
+.claude/*
+!.claude/skills/
+!.claude/skills/**
+# The two repo-level guards and their registration are source too (2026-11-11).
+!.claude/settings.json
+!.claude/hooks/
+!.claude/hooks/**
+
+# Local environment and secrets — never committed.
+.env
+*.env
+
+# Python bytecode from the repo-local hook tests. Last, because a negation above
+# (!.claude/hooks/**) would otherwise re-include it — gitignore's last match wins.
+__pycache__/
+*.pyc

@@ -1,0 +1,192 @@
+# Local development stack. Same port inside and outside every container (CONTRACT §10):
+#   db       5439  — `command: postgres -p 5439`, because the image defaults to 5432
+#   pgbouncer 6439 — LISTEN_PORT, not a 6439:5432 mapping
+#   redis    6380  — `command: redis-server --port 6380`, no persistence (the bus is a nudge)
+#   app      8930
+#
+# First run:  docker compose up -d db pgbouncer
+#             psql "$DATABASE_MIGRATE_URL" -f scripts/db-roles.sql   # superuser; creates the roles
+#             docker compose run --rm app migrate --dev-seed
+#             docker compose up -d app
+# `serve` never migrates implicitly (CONTRACT §10).
+name: conveyor
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg18
+    command: ["postgres", "-p", "5439"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: conveyor_dev
+    ports:
+      - "127.0.0.1:5439:5439"
+    volumes:
+      - conveyor-db:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5439 -U postgres -d conveyor_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  pgbouncer:
+    # The estate's pooler image and tag (gitops pgbouncer/deployment.yaml). `LISTEN_PORT`
+    # is what the edoburu entrypoint writes into pgbouncer.ini; the image's default is 5432.
+    image: edoburu/pgbouncer:v1.26.1-p0
+    environment:
+      DB_HOST: db
+      DB_PORT: "5439"
+      DB_NAME: conveyor_dev
+      DB_USER: conveyor_runtime
+      DB_PASSWORD: conveyor_runtime_dev
+      LISTEN_ADDR: 0.0.0.0
+      LISTEN_PORT: "6439"
+      AUTH_TYPE: scram-sha-256
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: "100"
+      DEFAULT_POOL_SIZE: "10"
+      # Carried from the estate pooler: a session-level SET sticks to the SERVER connection
+      # under transaction pooling and would be inherited by the next client. The reset
+      # runs on every release because this pool is transaction-mode.
+      SERVER_RESET_QUERY: "RESET row_security; RESET default_transaction_read_only; RESET app.current_tenant; RESET app.current_user"
+      SERVER_RESET_QUERY_ALWAYS: "1"
+    ports:
+      - "127.0.0.1:6439:6439"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 6439 -U conveyor_runtime -d conveyor_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # ── S13's care-bus (CONTRACT §7) ────────────────────────────────────────────
+  # The bus is a nudge, never the record: no AOF and no RDB, because `event` in Postgres is
+  # what a Redis loss is recovered from. The port is the same inside and out (CONTRACT §10),
+  # and the app reaches it as `redis:6380` on the compose network.
+  redis:
+    image: library/redis:8.10.1-alpine
+    command: ["redis-server", "--port", "6380", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:6380:6380"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6380 ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["serve"]
+    environment:
+      APP_ENV: development
+      BIND_ADDR: 0.0.0.0:8930
+      DATABASE_URL: postgres://conveyor_runtime:conveyor_runtime_dev@pgbouncer:6439/conveyor_dev
+      DATABASE_MIGRATE_URL: postgres://conveyor_migrate:conveyor_migrate_dev@db:5439/conveyor_dev
+      DATABASE_LISTEN_URL: postgres://conveyor_runtime:conveyor_runtime_dev@db:5439/conveyor_dev
+      # The relay publishes the outbox here; unset means Postgres-only (the job arm drives).
+      REDIS_URL: redis://redis:6380
+      CONVEYOR_DEV_AUTH: "1"
+      APP_KEY: conveyor
+      JOB_LEASE_SECS: "60"
+    ports:
+      - "127.0.0.1:8930:8930"
+    healthcheck:
+      # `/health/ready` is the probe that checks Postgres through the pooled runtime path,
+      # so "healthy" here means "can serve", not "the process started".
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:8930/health/ready"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      db:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+      # Not a correctness dependency: the relay retries a missing Redis. Ordering it here keeps
+      # the dev stack's first pass from logging a reconnect for a container that is still booting.
+      redis:
+        condition: service_healthy
+
+  # The worker: the other half of the engine. `serve` creates jobs (a `process.step` per step
+  # transition) and spawns the bus relay, but it never executes them — only `conveyor worker`
+  # polls and consumes. Without this service `docker compose up` enqueues work nothing runs.
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["worker"]
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgres://conveyor_runtime:conveyor_runtime_dev@pgbouncer:6439/conveyor_dev
+      DATABASE_MIGRATE_URL: postgres://conveyor_migrate:conveyor_migrate_dev@db:5439/conveyor_dev
+      DATABASE_LISTEN_URL: postgres://conveyor_runtime:conveyor_runtime_dev@db:5439/conveyor_dev
+      REDIS_URL: redis://redis:6380
+      CONVEYOR_DEV_AUTH: "1"
+      APP_KEY: conveyor
+      JOB_LEASE_SECS: "60"
+    depends_on:
+      db:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ── S15's real strata_rag, profile `strata` ─────────────────────────────────
+  # The knowledge binding is proved against the real service, never a stub:
+  #   docker compose --profile strata up -d --wait strata-db strata-rag
+  # 5440/8092 are free on mini3; the API binds on all interfaces so m1 (the build
+  # host) can run the ignored live tests over the LAN. It is token-protected.
+  strata-db:
+    profiles: ["strata"]
+    image: pgvector/pgvector:0.8.7-pg18
+    command: ["postgres", "-p", "5440"]
+    environment:
+      POSTGRES_USER: strata_rag
+      POSTGRES_PASSWORD: strata_rag
+      POSTGRES_DB: strata_rag
+    ports:
+      - "127.0.0.1:5440:5440"
+    volumes:
+      - strata-db:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5440 -U strata_rag -d strata_rag"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  strata-rag:
+    profiles: ["strata"]
+    build:
+      context: ../strata_rag
+    environment:
+      STRATA_DATABASE_URL: postgres://strata_rag:strata_rag@strata-db:5440/strata_rag
+      # `*:` = multi-tenant service caller; each request names its tenant in X-Tenant-Id.
+      STRATA_API_TOKENS: "*:conveyor-strata-dev"
+      STRATA_PROVIDERS_FILE: /etc/strata/providers.toml
+      # Dev-only sealing key for tenant provider registrations (base64 of 32 bytes).
+      STRATA_PROVIDER_KEY: "Y29udmV5b3ItZGV2LXByb3ZpZGVyLWtleS0zMmJ5dGU="
+      # The estate's text host; export MLX_API_KEY before starting the profile.
+      MLX_API_KEY: ${MLX_API_KEY:-}
+    ports:
+      - "0.0.0.0:8092:8092"
+    volumes:
+      - ./scripts/strata/providers.toml:/etc/strata/providers.toml:ro
+    depends_on:
+      strata-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:8092/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+volumes:
+  conveyor-db:
+  strata-db:

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 2 — the plan projection over declared step outputs (receipt) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-2--the-plan-projection-over-declared-step-outputs-receipt">S21 step 2 — the plan projection over declared step outputs (receipt)</h1>
+<p><strong>Date:</strong> 2026-11-09. <strong>Lane:</strong> <code>lane/train-2026-11-09</code> (integration base <code>e92de62</code>; the slice commits on top). <strong>Owner ruling:</strong> add the declared <code>outputs</code>, accept the migration and the served-spec change, then write the lock and land the train.</p>
+<h2 id="what-was-built">What was built</h2>
+<ul>
+<li><code>migrations/0032_s21_plan_outputs.sql</code> — <code>procedure_step.outputs jsonb NOT NULL DEFAULT '[]'</code>, CHECK <code>jsonb_typeof(outputs) = 'array'</code>.</li>
+<li><code>crates/domain/src/plan.rs</code> (new) — <code>project()</code> (the read-only plan) and <code>findings()</code> with <code>BadOutput</code>, <code>UndeclaredOutput</code>, <code>UnproducibleInput</code>, <code>MaybeAbsentInput</code>, <code>FutureInput</code>, <code>GateNeverOpens</code>, <code>UnreachableStep</code>; the JSON-Schema path walker (<code>properties</code>, <code>items</code>, <code>anyOf</code>/<code>oneOf</code>/<code>allOf</code>, <code>additionalProperties</code>, <code>$ref</code>→<code>$defs</code>). A reference must be BOTH declared by its producer and resolvable in the producer's action output schema: the declaration is the contract, the schema is what the run actually returns. The walker answers "does the schema DECLARE this path" (allOf unions; a missing additionalProperties declares nothing beyond <code>properties</code>), which is stated at <code>schema_has_path</code>.</li>
+<li><code>crates/domain/src/procedure.rs</code> — <code>StepInput.outputs: Vec&lt;String&gt;</code>.</li>
+<li><code>crates/store/src/procedure.rs</code> — <code>ProcedureStepRecord.outputs</code>, <code>STEP_COLUMNS</code>, <code>StepRow</code>, <code>insert_steps_tx</code> binding.</li>
+<li><code>crates/actions/src/procedure/views.rs</code> — <code>StepIn.outputs</code>, <code>StepOut.outputs</code>.</li>
+<li><code>crates/actions/src/procedure/{mod,procedures}.rs</code> — the wire mapping, gate facts from <code>meta.expires_at</code>, the projection call after <code>validate_publish</code>, and <code>422 procedure.plan_invalid</code> with one field error per finding.</li>
+<li>Ledgers — <code>crates/store/src/migrate.rs</code> and <code>crates/store/tests/s07_schema.rs</code> both carry 32.</li>
+</ul>
+<h2 id="measured-gate-rbuild-on-m1-2026-11-09">Measured gate (rbuild on m1, 2026-11-09)</h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rbuild -- test -p conveyor-domain --lib plan</code></td>
+<td><strong>14 passed, 0 failed</strong></td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-store --test s11_procedure</code></td>
+<td><strong>11 passed, 0 failed</strong> (incl. <code>declared_step_outputs_round_trip</code>)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-store --test s07_schema</code></td>
+<td><strong>3 passed, 0 failed</strong> (ledger through 32)</td>
+</tr>
+<tr>
+<td><code>rbuild -- test -p conveyor-actions --test procedure</code></td>
+<td><strong>12 passed, 0 failed</strong> (incl. <code>procedure.plan_invalid</code>, the declared-output read-back and the non-string gate-expiry refusal)</td>
+</tr>
+<tr>
+<td><code>rbuild -- clippy -p conveyor-domain -p conveyor-store -p conveyor-actions --all-targets -- -D warnings</code></td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td><code>rustfmt --edition 2024 --check</code> on the eleven touched files</td>
+<td>exit 0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs-each-fired-then-reverted">Reversal proofs (each fired, then reverted)</h2>
+<table>
+<thead>
+<tr>
+<th>deleted check</th>
+<th>test that turned red</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the prefix-coverage rule in <code>covers()</code></td>
+<td><code>a_declared_reference_publishes_clean</code>, <code>the_prefix_rule_is_segment_aware</code></td>
+</tr>
+<tr>
+<td>the <code>on_error=continue</code> maybe-absent rule</td>
+<td><code>a_continue_producer_may_be_absent</code></td>
+</tr>
+<tr>
+<td>the unreadable-expiry gate arm</td>
+<td><code>an_unreadable_gate_expiry_is_refused</code></td>
+</tr>
+<tr>
+<td>the <code>$ref</code> arm in the schema walker</td>
+<td><code>the_schema_walker_handles_arrays_and_anyof</code></td>
+</tr>
+<tr>
+<td>the reference's producer-action schema check</td>
+<td><code>a_reference_deeper_than_the_action_schema_is_unproducible</code></td>
+</tr>
+<tr>
+<td>the <code>FutureInput</code> arm (self/forward reference)</td>
+<td><code>a_forward_or_self_reference_is_a_future_input</code></td>
+</tr>
+<tr>
+<td>the <code>BadInputReference</code> emission</td>
+<td><code>a_malformed_step_index_is_a_bad_input_reference</code></td>
+</tr>
+<tr>
+<td>the cyclic-<code>$ref</code> depth guard</td>
+<td><code>a_cyclic_ref_is_refused_without_overflowing_the_stack</code> (the binary aborts on the stack overflow)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deep-audit-fresh-agent-read-only--dispositions">Deep audit (fresh agent, read-only) — dispositions</h2>
+<p>Verdict on the first pass: <strong>NO</strong>, five findings. Dispositions:</p>
+<ol type="1">
+<li><strong>Fixed</strong> — a present-but-non-string <code>meta.expires_at</code> was silently treated as absent. The publish mapping now records it for <code>GateNeverOpens</code>, and an actions test inserts a numeric-expiry gate row and proves the 422. ⚠️ The FIRST version of this check also refused a valid PAST timestamp; the workspace suite caught that as a false positive — <code>procedure_step</code>'s <code>an_expired_gate_applies_the_steps_on_error</code> publishes such a procedure deliberately and proves the runtime applies the step's <code>on_error</code>. The check now refuses only an expiry the runtime cannot read, and the suite test passes.</li>
+<li><strong>Answered, documented</strong> — <code>allOf</code> is unioned, not intersected. The walker is a declared-path reader, not a JSON-Schema validator; a flattened schemars object adds members in a second branch. The semantics are stated at <code>schema_has_path</code>.</li>
+<li><strong>Fixed</strong> — the projection did not reject a self/forward reference on its own. It now emits <code>FutureInput</code>, with a test covering both (the template error still wins at publish).</li>
+<li><strong>Fixed</strong> — an external <code>$ref</code> was false-refused; it now does not refuse a declaration it cannot read.</li>
+<li><strong>Answered</strong> — the <code>steps.N.output</code> fixtures are WORKFLOW definitions validated by <code>conveyor_workflow::definition::validate_publish</code>, not procedures, so they are unaffected. The real consequence (an existing procedure DRAFT must declare its outputs before republishing) is deliberate and stated in the migration comment.</li>
+</ol>
+<p><strong>Second fresh audit: PASS.</strong> It verified the five dispositions and returned PASS with three non-blocking findings; two were taken as hardening: a cyclic <code>$ref</code> (root <code>#</code> or a self-referential <code>$defs</code> entry) recursed without consuming a segment — now capped at 64 hops and refused; and a <code>steps.</code> reference whose index is not a positive integer was silently dropped — now <code>BadInputReference</code>. The third (a <code>FutureInput</code> also raises <code>UnreachableStep</code>) is the intended summary shape.</p>
+<h2 id="workspace-gate">Workspace gate</h2>
+<ul>
+<li><code>clippy --workspace --all-targets -- -D warnings</code>: <strong>exit 0</strong>. One pre-existing red was fixed: <code>apps/server/tests/eval_support/mod.rs</code> is a fixture module compiled into three test binaries, so each binary sees the others' fields as dead; it now carries <code>#![allow(dead_code)]</code>. Peers fixed their own files during the run (<code>crates/api/tests/named_flows.rs</code> read its <code>waiting</code> field).</li>
+<li><code>test --workspace --locked --no-fail-fast</code>: <strong>exit 0, zero failing binaries</strong> (196 targets; a peer's reproduction of the previous tip measured 195/196, the one red being item 3 below). Reaching green cleared five blockers, each measured rather than guessed:
+<ol type="1">
+<li>this slice's gate-expiry false positive — <code>procedure_step::an_expired_gate_applies_the_steps_on_error</code> publishes a deliberately past gate and proves the runtime applies <code>on_error</code>; the check now covers only an expiry the runtime cannot read;</li>
+<li>a stale tenancy test — <code>/api/me</code> with no header is the switcher bootstrap (200 + the membership list), not a 400; the test now proves the bootstrap and keeps the 400 on a tenant-scoped action, and CONTRACT §9 states the exception;</li>
+<li><code>crates/api/tests/externals_declared.rs</code> — S15's <code>integrations/strata.rs</code> was missing from the exactly-compared ALLOWED list; added with the same transport rationale as <code>ingest.rs</code>;</li>
+<li><code>scripts/db-roles.sql</code> — its two cluster-wide ALTER ROLE statements raced across parallel test databases (<code>XX000 tuple concurrently updated</code>; measured 27 targets failed in one run); now serialised by a transaction-scoped advisory lock, released at COMMIT;</li>
+<li>the environment — m1 had <strong>7 GiB free</strong> and the first run died <code>StorageFull</code> (the mass panics at <code>common/mod.rs:213</code> were that, not code); three cold conveyor slot caches were pruned, freeing 77 GiB (84 GiB free), slot 0's warm target kept.</li>
+</ol></li>
+<li><code>fmt --all -- --check</code>: red on four S19/S20 eval files only (<code>apps/server/src/eval_runner.rs</code>, <code>apps/server/tests/eval_runner.rs</code>, <code>eval_runner_properties.rs</code>, <code>eval_support/mod.rs</code>); none of this slice's files. They are the eval lane's to format.</li>
+</ul>
+<h2 id="served-spec-lock">Served-spec lock</h2>
+<p>The declared member changes the <code>procedures.*</code> operation schemas (<code>StepIn</code> on create/update, <code>StepOut</code> on get/list/create/retire), so <code>served-spec.lock.json</code> was regenerated over the <strong>whole tree</strong> — not just this slice — with <code>conveyor-server --print-openapi --write-lock</code> on m1, copied back with <code>rbuild --copy-back</code>. Measured 2026-11-09 19:15 CET:</p>
+<ul>
+<li><strong>287 → 297 operations.</strong> Added 10: <code>GET/POST /api/platform/tenants</code>, <code>GET/POST /api/platform/tenants/{id}</code>, <code>POST /api/platform/tenants/{id}/invite-admin</code>, <code>POST /api/platform/tenants/{id}/retry</code>, <code>GET /api/tenants/{id}/billing</code>, <code>POST /api/hooks/{hook}</code>, and the invocation routes for <code>cards.list</code>, <code>runs.get</code> and <code>eval_runs.regrade</code>.</li>
+<li>14 operations changed hash, including all six <code>procedures.*</code> surfaces (this slice), <code>GET /api/actions</code> (the manifest), <code>capabilities.get</code> (S15), <code>eval_climbs.compare</code> (S20), <code>eval_signoffs.*</code> (S19), <code>approvals.*</code> and <code>schedules.upsert</code>.</li>
+<li>Proof: <code>conveyor --print-openapi --check-lock</code> → <strong><code>lock OK: served-spec.lock.json</code>, exit 0</strong>.</li>
+</ul>
+<p>Earlier counts (287 on disk at session start, and the 293/294 quoted by other lanes) were snapshots of trees that have since moved; this is the first count measured against the integrated tree.</p>
+<h2 id="not-in-this-slice">Not in this slice</h2>
+<ul>
+<li>Memory selection (open Q3): deferred with the owner's shape — selection → processing → <code>prompt.memory</code>.</li>
+<li>Tenant-authored recipes (open Q4): deferred; needs the CRUD surface.</li>
+<li>No new action, scope or route; the registry count does not move.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-PLAN.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

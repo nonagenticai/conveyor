@@ -1,0 +1,12 @@
+{
+  "name": "conveyor-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:list": "playwright test --list"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0"
+  }
+}

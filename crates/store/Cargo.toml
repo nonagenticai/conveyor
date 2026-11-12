@@ -1,0 +1,29 @@
+[package]
+name = "conveyor-store"
+description = "Queries, migrations, RLS scope and the outbox. The only crate that speaks SQL."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Opaque pagination cursors (CONTRACT §5).
+base64 = { workspace = true }
+chrono = { workspace = true }
+conveyor-domain = { path = "../domain" }
+# S09: the secret envelope (XChaCha20-Poly1305 + HKDF) lives beside the SQL that stores it.
+chacha20poly1305 = { workspace = true }
+hkdf = { workspace = true }
+# S13: `seed/processes/**` is embedded at compile time and parsed by `process_seed`.
+include_dir = { workspace = true }
+sha2 = { workspace = true }
+rust_decimal = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+sqlx = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }

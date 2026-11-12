@@ -1,0 +1,27 @@
+{
+  "input": {
+    "key": "ask_fr",
+    "title": "ask_fr — one human question on a card, re-authored",
+    "steps": [
+      {
+        "action": "cards.comment",
+        "input_template": {
+          "id": "{{card.id}}",
+          "body": "ask_fr: {{run.inputs.question}}"
+        }
+      },
+      {
+        "action": "cards.get",
+        "input_template": { "id": "{{card.id}}" },
+        "gate_kind": "human_approval"
+      },
+      {
+        "action": "cards.comment",
+        "input_template": {
+          "id": "{{card.id}}",
+          "body": "ask_fr: answered"
+        }
+      }
+    ]
+  }
+}

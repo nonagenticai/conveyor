@@ -1,0 +1,42 @@
+{
+  "fixture": "b",
+  "workflow_key": "wip.pull",
+  "provenance": {
+    "execution_id": 1218451,
+    "projection_sha256": "sha256:676431d59e93de3ea066f1ac54094e02d3073a0a7a8d5a78760b2ebb4bc0e174",
+    "flow": "fixtures/b.flow.json"
+  },
+  "steps": [
+    {
+      "position": 1,
+      "node_id": "act",
+      "old_node_id": "Act?",
+      "effect": "true",
+      "outcome": "succeeded"
+    },
+    {
+      "position": 2,
+      "node_id": "resolve_project",
+      "old_node_id": "Resolve project",
+      "effect": "projects.get",
+      "outcome": "succeeded"
+    },
+    {
+      "position": 3,
+      "node_id": "conveyor_board",
+      "old_node_id": "Conveyor board?",
+      "effect": "true",
+      "outcome": "succeeded"
+    },
+    {
+      "position": 4,
+      "node_id": "get_board",
+      "old_node_id": "Get board",
+      "effect": "boards.get",
+      "outcome": "succeeded"
+    }
+  ],
+  "end_state": {
+    "terminal_effect": "boards.get"
+  }
+}

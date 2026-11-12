@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>40 — LIVE STATE measured 2026-11-07 (read-only) · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-source-map/40-live-state.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="40--live-state-measured-2026-11-07-read-only">40 — LIVE STATE measured 2026-11-07 (read-only)</h1>
+<p><code>slices: [S00, S05, S14]</code> · <strong>No repository SHA applies to this file.</strong> Every number below is a live reading of 2026-11-07 with the command that produced it; re-measure before relying on any of it.</p>
+<p>Measured while writing the plan set, from <code>mini3</code>. Every number below is a reading with its command — re-measure before relying on it; none of it is a standing fact.</p>
+<h2 id="loki-the-s0-access-log-source">Loki (the S0 access-log source)</h2>
+<ul>
+<li>Service: <code>loki.loki.svc.cluster.local:3100</code>, ClusterIP <code>192.0.2.11</code>.</li>
+<li>Labels: <code>container</code>, <code>filename</code>, <code>job</code>, <code>namespace</code>, <code>pod</code>, <code>service_name</code>, <code>stream</code>. Only job value: <code>kubernetes-pods</code>.</li>
+<li>Ingress access logs live at <code>{namespace="istio-system", container="istio-proxy"}</code>. Line shape (measured): <code>[ts] "GET / HTTP/1.1" 200 - via_upstream - "-" 0 4540 86 58 "&lt;x-forwarded-for&gt;" "&lt;ua&gt;" "&lt;request-id&gt;" "fr.nonagentic.ai" ...</code> The host and path are plain quoted fields; per-path counts are a LogQL metric query over that selector.</li>
+<li>⛔ <strong>Retention is <code>24h</code></strong> (<code>gitops-production/clusters/strato/services/loki/loki/configmap-loki-config.yaml</code>, <code>retention_period: 24h</code>, config revision <code>2026-10-14-retention-24h-2gb-cap</code>). <strong>The access log is a 24-hour sample, not a history.</strong> S0 must label its evidence accordingly; it cannot answer "used at all this quarter" from Loki.</li>
+<li>Working query template (run from master): <code>curl -sG http://192.0.2.11:3100/loki/api/v1/query_range --data-urlencode 'query={namespace="istio-system",container="istio-proxy"} |= "fr.nonagentic.ai"' --data-urlencode "limit=2" --data-urlencode "start=$(( $(date +%s) - 3600 ))"</code></li>
+</ul>
+<h2 id="n8n">n8n</h2>
+<ul>
+<li>Database <code>n8n</code> on master Postgres (direct <code>sudo -u postgres psql -d n8n</code>; never through pgbouncer).</li>
+<li><code>workflow_entity</code>: <strong>348 rows, 332 active</strong> (confirmed 2026-11-07). <code>nodes</code> is <code>json</code>, <code>activeVersionId</code> set on 332.</li>
+<li><code>execution_entity</code>: only <strong>470 rows, 2026-11-04 15:27 → 2026-11-07 09:56</strong> — execution history is pruned. It is <strong>not</strong> a usage history either.</li>
+<li>Node-type census (all 348 workflows, <code>jsonb_array_elements(nodes)</code>): <code>code</code> 3113, <code>@nonagentic/n8n-nodes-kanban.planka</code> 2904, <code>if</code> 1244, <code>stickyNote</code> 1021, <code>langchain.agent</code> 941, <code>langchain.lmChatOpenAi</code> 941, <code>executeWorkflow</code> 915, <code>coding.codingTool</code> 756, <code>requirements.requirements</code> 746, <code>coding.coding</code> 586, <code>requirements.requirementsTool</code> 430, <code>artifacts.artifactsTool</code> 372, <code>webhook</code> 287. <strong>The flow JSON is the durable record of which operations exist</strong> — this, not execution history, is S0's primary n8n evidence.</li>
+</ul>
+<h2 id="planka-kanban-database">Planka (<code>kanban</code> database)</h2>
+<ul>
+<li>Only one deployment exists (<code>kanban</code> namespace, 181 d old). No second instance anywhere in the cluster.</li>
+<li>Live data (2026-11-07): <code>project=4 board=4 list=12 card=5 comment=5 task=0 label=0 webhook=3 custom_field_value=0</code>. Every card is an <code>[agent-contract-test]</code> card. A <code>_conveyor_reset_20260922</code> table exists (a 2026-09-22 reset marker).</li>
+<li>⛔ <strong>Do not derive feature usage from Planka row counts</strong> — the instance holds test data only. Derive from the fork's schema/feature set and from the call sites in fr and the n8n flows.</li>
+</ul>
+<h2 id="fr">fr</h2>
+<ul>
+<li>Database <code>fr</code> on master Postgres: <strong>86 domain tables</strong> (88 base tables in <code>public</code>, 90 relations including two <code>pg_stat_statements*</code> views). Query: <code>select count(*) from pg_tables where schemaname='public'</code> (88) and <code>select relkind, count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind in ('r','p','v','m') group by relkind</code> (<code>r</code> 88, <code>v</code> 2); domain = 88 − 2 bookkeeping (<code>_migrations</code>, <code>_migration_effects</code>).</li>
+<li>Conveyor-shaped tables exist (<code>card_drafts</code>, <code>card_phase_lease</code>, <code>approvals</code>, <code>approval_decisions</code>, <code>approval_callback_urls</code>, <code>conveyor_flow_runs</code>, <code>project_conveyor_start_attempts</code>, <code>card_contracts</code>, …), but live rows are sparse because the conveyor is idle: <code>approvals=0</code>, <code>approval_decisions=0</code>, <code>card_drafts=0</code>, <code>card_phase_lease=0</code>, <code>project_conveyor_start_attempts=0</code>; <code>conveyor_flow_runs=693</code>.</li>
+<li>Consequence: fr's <strong>schema</strong> is the evidence for which concepts exist; its <strong>row counts</strong> only prove which ran.</li>
+</ul>
+<h2 id="rm">RM</h2>
+<ul>
+<li>Database <code>requirements_api</code>. Catalogue data is real and large: <code>pm_card_types=293</code>, <code>pm_project_type_card_types=282</code>, <code>pm_capabilities=68</code>, <code>pm_project_type_phases=46</code>, <code>pm_project_phases=32</code>, <code>pm_wip_limits=26</code>, <code>pm_project_types=26</code>. These counts are <code>pg_stat_user_tables</code> estimates — re-count with <code>count(*)</code> before quoting in <code>parity.yaml</code>.</li>
+</ul>
+<h2 id="mcp-channel-wiring-fr--nonagenticai_mcp_server">MCP channel wiring (fr ↔︎ nonagenticai_mcp_server)</h2>
+<ul>
+<li><strong>fr backend deployment</strong> carries <code>MCP_EVENTS_URL = http://mcp.mcp.svc.cluster.local:8033/api/channels/fr/events</code> — fr POSTs its signed approval/message events there (<code>gitops-production/clusters/strato/services/fr/deployment.yaml</code>).</li>
+<li><strong>mcp external driver</strong> listens on <strong>8036</strong> (<code>containerPort</code>) and carries <code>MCP_FR_BASE_URL = http://fr-backend.fr.svc.cluster.local:8888</code> (<code>gitops-production/clusters/strato/services/mcp/external-driver-deployment.yaml</code>).</li>
+<li>Measured 2026-11-07; both are deployment values, so re-read the manifests before relying on them.</li>
+</ul>
+<h2 id="what-this-changes-in-the-spec">What this changes in the SPEC</h2>
+<p>§9 assumed (1) ingress logs answer per-path usage, (2) n8n execution data answers which operations ran, (3) the Planka feature table is a usage source. Measured: (1) is a 24-hour sample, (2) is a 3-day sample, (3) is test data. S0 must therefore rank evidence: <strong>flow JSON + code call sites (durable) &gt; 24 h Loki sample &gt; execution sample &gt; row counts</strong>, and mark every <code>used</code> verdict with the evidence class that produced it.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/02-source-map/40-live-state.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

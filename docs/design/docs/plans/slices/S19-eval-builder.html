@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S19 — Eval builder · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S19-eval-builder.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s19--eval-builder">S19 — Eval builder</h1>
+<p>Programme project: S19 · issues #23, #46</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>The <code>claude-api</code> <code>build-eval</code> and <code>eval-audit</code> methods become an ordinary product surface: a person defines <strong>one</strong> flow, builds an input set, signs off the inputs, chooses metrics and a grader, signs off the grading, runs a pilot and then a baseline, and reads a report — all against rows, not a <code>.claude/hillclimb/&lt;flow&gt;/</code> directory of <code>results.jsonl</code>, <code>traces/</code> and <code>report.html</code>. At the end, "did this prompt, model or procedure change help?" has a number with a confidence interval, a per-case transcript behind every score, and a health audit that says whether the number can be believed at all.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S04's registry and invocation engine are the only way anything is invoked; <code>completions.create</code> (S10) is the one model call and runs against <code>inference-router</code>. There is no model SDK.</li>
+<li>S06's <code>approval</code> is the single human-escalation primitive and <code>job</code> is the only durable runner (<code>FOR UPDATE SKIP LOCKED</code>, <code>dedupe_key</code>, leases, <code>max_attempts</code>).</li>
+<li>S16's <code>inference_call</code> is planned and <strong>not built</strong> (<code>0024</code> reserved, unapplied). S11's <code>procedure</code>/<code>run_step</code> and S10's <code>conversation_turn</code> exist and are the trace sources; S09's <code>document</code> + object store are the export sink and the attachment store.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN.</strong> The ten tables (§2.19); the <code>approval.eval_id</code> column and <code>uq_appr_eval_pending</code> index; the thirty-three actions, three scopes and seven events; the four jobs; the three built-in versioned prompts; screens <strong>15–20</strong> declared for S12. Parts A (define, inputs, sign-off), B (run, grade, capture) and C (report, audit, interop).</p>
+<p><strong>OUT.</strong> Any UI — screens are declared here so S12 may not invent them. Building a model call of its own: the runner invokes a registered action and never reconstructs a request, which is <code>build-eval.md</code>'s <em>"reimplementing the app"</em> failure. Hosting a model, embeddings or a second runtime (D22). The hillclimb loop and the cost search — <strong>S20</strong>. Amending the benchmark instrument (S17/S18): they are untouched, and no <code>benchmark_*</code> name is reused. Absorbing <code>inference-router</code> or <code>billing_service</code>; the conveyor derives cost from its own ledger and emits none (D23). Grading <em>paths</em> rather than outcomes for agentic subjects — the end state is the answer.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>…/claude-api/shared/evals/build-eval.md</code> (the installed skill)</td>
+<td>Steps 0–4, the two sign-offs, the four runner properties, the row/trace/<code>_state</code> field set</td>
+<td>the <strong>method and the field set verbatim</strong></td>
+<td>its file layout as a requirement — the rows are the record, the files are the export</td>
+</tr>
+<tr>
+<td><code>…/claude-api/shared/evals/eval-audit.md</code></td>
+<td>§1–§6 and the Tier-3 auditor prompt</td>
+<td>the checks as <strong>construction requirements</strong>, and §6's "observations and suggestions, severity first" as the report's voice</td>
+<td>the assumption that an agent runs the audit by reading code</td>
+</tr>
+<tr>
+<td><code>…/claude-api/shared/evals/report/SCHEMA.md</code></td>
+<td><code>Metric</code>, <code>PerfField</code>, <code>Variant</code>, <code>RepResult</code>, <code>Turn</code>, <code>SplitScore</code></td>
+<td>the column and turn shapes, and the <code>label ≤ 14 chars</code> rule</td>
+<td><code>report.html</code> as the deliverable — a screen replaces it</td>
+</tr>
+<tr>
+<td><code>…/claude-api/shared/evals/report/build-report-lite.mjs</code></td>
+<td>how <code>trajectory/scores.tsv</code> is derived</td>
+<td>that it is <strong>derived, never written by the runner</strong></td>
+<td>Node, or any second renderer</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/invoke.rs</code></td>
+<td><code>invoke</code>, <code>record_bookkeeping</code></td>
+<td>the one invocation path a case must use</td>
+<td>a second invoker</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/spec.rs</code></td>
+<td><code>ActionSpec</code>, <code>Scope</code>, <code>AGENT_TOOLS</code></td>
+<td>the declaration pattern</td>
+<td>its counts — they change here</td>
+</tr>
+<tr>
+<td><code>migrations/0002_domain.sql</code> (<code>approval</code>, <code>:221</code>)</td>
+<td><code>uq_appr_pending</code> and its comment <em>"This index, not check-then-insert, is the guarantee"</em></td>
+<td>the guarantee, extended to <code>eval_id</code></td>
+<td>a <code>meta</code>-only gate</td>
+</tr>
+<tr>
+<td><code>migrations/0001_platform.sql</code> (<code>job</code>, <code>:120</code>)</td>
+<td>dedupe/lease/attempt columns</td>
+<td>the runner's four properties for free</td>
+<td>a second queue</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<p><code>migrations/0026_s19_eval.sql</code> (next free number at start; <code>0026</code> at time of writing — <code>0019</code>, <code>0020</code> and <code>0024</code> stay reserved), DDL exactly as <code>02-DATA-ARCHITECTURE §2.19</code>, plus:</p>
+<pre class="sql"><code>ALTER TABLE approval ADD COLUMN eval_id uuid;
+CREATE UNIQUE INDEX uq_appr_eval_pending
+    ON approval (tenant_id, eval_id, gate) WHERE status = &#39;pending&#39; AND eval_id IS NOT NULL;</code></pre>
+<p>Modules: <code>crates/domain/src/eval/{mod,state,grade,split,cost,audit}.rs</code>, <code>crates/store/src/eval/{mod,evals,cases,metrics,runs,results,audits}.rs</code>, <code>crates/actions/src/eval/{mod,evals,versions,cases,metrics,signoffs,runs,results,report,audits}.rs</code>, <code>crates/actions/src/prompts/{eval_judge_rubric_v1,eval_judge_pairwise_v1,eval_audit_v1}.md</code> (<code>include_str!</code>). Plus <code>spec.rs</code> (three scopes, <code>AGENT_TOOLS</code>, the registry <code>EXPECTED</code> array), <code>crates/actions-derive/src/lib.rs</code> (the wire table), <code>apps/server/src/worker.rs</code> (four arms), <code>crates/api/src/eval.rs</code> (read routes), <code>served-spec.lock.json</code>.</p>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>input</th>
+<th>output</th>
+<th>scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>evals.create</code></td>
+<td><code>{name, purpose, subject_kind, entry_action, model_ref, prompt_ref, inputs_schema, trace_source}</code></td>
+<td><code>EvalView</code> (<code>draft</code>)</td>
+<td><code>evals:write</code></td>
+</tr>
+<tr>
+<td><code>evals.get</code> / <code>list</code> / <code>update</code> / <code>retire</code></td>
+<td><code>{id}</code> / <code>{status?, page}</code> / <code>{id, patch}</code> / <code>{id}</code></td>
+<td><code>EvalView</code> / <code>Page&lt;EvalView&gt;</code></td>
+<td><code>evals:read</code> / <code>evals:write</code></td>
+</tr>
+<tr>
+<td><code>evals.draw_split</code></td>
+<td><code>{eval_id, train_ratio, seed?}</code></td>
+<td><code>VersionView</code> (<code>split_sha256</code>, per-tag counts)</td>
+<td><code>evals:write</code></td>
+</tr>
+<tr>
+<td><code>eval_versions.create</code></td>
+<td><code>{eval_id}</code></td>
+<td><code>VersionView</code> (frozen copy + <code>digest</code>)</td>
+<td><code>evals:write</code></td>
+</tr>
+<tr>
+<td><code>eval_cases.create</code> / <code>update</code> / <code>delete</code> / <code>list</code> / <code>import</code></td>
+<td><code>{version_id, input, tags[], expected?, attachments?, source, gold_provenance, gold_model?}</code> …</td>
+<td><code>CaseView</code> / <code>Page&lt;CaseView&gt;</code></td>
+<td><code>evals:write</code></td>
+</tr>
+<tr>
+<td><code>eval_metrics.create</code> / <code>update</code> / <code>delete</code></td>
+<td><code>{version_id, id, role, kind, better, label, unit?, grader_kind, grader, rubric?, ordinal}</code></td>
+<td><code>MetricView</code></td>
+<td><code>evals:write</code></td>
+</tr>
+<tr>
+<td><code>eval_signoffs.request</code></td>
+<td><code>{eval_id, gate: eval_inputs|eval_grading|eval_cost|eval_harness, subject_sha256?, ask}</code></td>
+<td><code>ApprovalOut</code></td>
+<td><code>evals:write</code></td>
+</tr>
+<tr>
+<td><code>eval_signoffs.decide</code></td>
+<td><code>{approval_id, decision, note?}</code></td>
+<td><code>ApprovalOut</code></td>
+<td><code>evals:approve</code></td>
+</tr>
+<tr>
+<td><code>eval_runs.start</code></td>
+<td><code>{eval_id, version_id, variant, reps, mode: pilot|full, case_ids?, cost_ceiling_cents?}</code></td>
+<td><code>RunView</code> (<code>queued</code>)</td>
+<td><code>evals:approve</code></td>
+</tr>
+<tr>
+<td><code>eval_runs.get</code> / <code>list</code> / <code>cancel</code></td>
+<td><code>{id}</code> / <code>{eval_id?, status?, page}</code> / <code>{id}</code></td>
+<td><code>RunView</code> / <code>Page&lt;RunView&gt;</code></td>
+<td><code>evals:read</code> / <code>evals:approve</code></td>
+</tr>
+<tr>
+<td><code>eval_results.list</code></td>
+<td><code>{run_id, split?, tag?, status?, page}</code></td>
+<td><code>Page&lt;ResultView&gt;</code> (no <code>expected</code>)</td>
+<td><code>evals:read</code></td>
+</tr>
+<tr>
+<td><code>eval_results.get</code></td>
+<td><code>{run_id, case_id, rep}</code></td>
+<td><code>{result, turns}</code> — <code>split='test'</code> needs <code>evals:approve</code></td>
+<td><code>evals:read</code></td>
+</tr>
+<tr>
+<td><code>eval_results.label</code></td>
+<td><code>{result_id, human_score, note?}</code></td>
+<td><code>ResultView</code> (judge calibration)</td>
+<td><code>evals:approve</code></td>
+</tr>
+<tr>
+<td><code>eval_runs.report</code></td>
+<td><code>{run_id, group_by?}</code></td>
+<td><code>{metrics[], perf[], per_tag[], errors, truncated, noise_floor, headroom, cost}</code></td>
+<td><code>evals:read</code></td>
+</tr>
+<tr>
+<td><code>eval_runs.export</code></td>
+<td><code>{run_id}</code></td>
+<td><code>{document_id}</code> (S09 document, gzip JSONL + traces)</td>
+<td><code>evals:read</code></td>
+</tr>
+<tr>
+<td><code>eval_audits.start</code> / <code>get</code> / <code>list</code></td>
+<td><code>{eval_id, version_id, target_run_id?}</code> / <code>{id}</code> / <code>{eval_id?, page}</code></td>
+<td><code>AuditView</code> / <code>{audit, findings[]}</code></td>
+<td><code>evals:write</code> / <code>evals:read</code></td>
+</tr>
+<tr>
+<td><code>eval_findings.list</code> / <code>decide</code></td>
+<td><code>{audit_id?, severity?, status?, page}</code> / <code>{finding_id, decision, note?}</code></td>
+<td><code>Page&lt;FindingView&gt;</code> / <code>FindingView</code></td>
+<td><code>evals:read</code> / <code>evals:write</code></td>
+</tr>
+</tbody>
+</table>
+<p>Screens declared for S12: <strong>#15 Evals</strong> (<code>evals.*</code>, <code>eval_cases.*</code>, <code>eval_metrics.*</code>, <code>eval_signoffs.*</code>; SSE <code>eval:{id}</code>), <strong>#16 Eval run</strong> (<code>eval_runs.*</code>, <code>eval_results.*</code>; SSE <code>eval_run:{id}</code>, <code>eval_result.recorded</code>), <strong>#17 Eval report</strong> (<code>eval_runs.report/export</code>, <code>eval_results.*</code>), <strong>#18 Eval audit</strong> (<code>eval_audits.*</code>, <code>eval_findings.*</code>), <strong>#19 Eval sign-off</strong> (the two literal pauses as full-screen reviews), <strong>#20 Eval interop</strong> (import/export). Each with its <code>apps/web/e2e/&lt;name&gt;.spec.ts</code>.</p>
+<p>Jobs: <code>eval.case.run</code> (one <code>(case, rep)</code>), <strong><code>eval.run.tick</code></strong> (finaliser + heartbeat), <code>eval.reap</code>, <code>eval.prune</code>. Scopes: <code>evals:read</code> (member), <code>evals:write</code> (member), <strong><code>evals:approve</code> (<code>owner</code>/<code>admin</code> only)</strong> — building is not signing, and the held-out trace and the run cost both hang off the sign-off scope. ⛔ <strong><code>kata_executor</code> is deliberately NOT granted it</strong>: that role is held only by a machine principal, and a scope a machine holds cannot be a sign-off. <code>AGENT_TOOLS</code> gains <code>evals.get/list</code>, <code>eval_cases.list/create</code>, <code>eval_results.list</code>, <code>eval_runs.get/report</code>, <code>eval_audits.get</code>, <code>eval_findings.list</code> (22 → 30) and <strong>never</strong> <code>eval_signoffs.*</code>, <code>eval_results.get</code> for a test split, or <code>eval_runs.start</code>.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<p><strong>Part A — define, inputs, sign-off.</strong> Steps 1–7. Proves: an eval reaches <code>inputs_approved</code> and a run is refused until it does. <strong>Part B — run, grade, capture.</strong> Steps 8–12. Proves: a 5-case pilot yields 5 complete result rows, each with a transcript and a grade dict. <strong>Part C — report, audit, interop.</strong> Steps 13–17. Proves: a report recomputes from raw rows and an audit reproduces.</p>
+<ol type="1">
+<li><code>0026_s19_eval.sql</code> + the <code>approval</code> column/index; touch <code>crates/store/src/migrate.rs</code> (the macro embeds at compile time). <code>rbuild -- run -p conveyor-server -- migrate</code>, then verify <strong>the ledger</strong>: <code>SELECT count(*) FROM _sqlx_migrations WHERE version=26 AND success</code> = 1.</li>
+<li><code>domain::eval</code> — subject kinds, <code>EVAL_TRANSITIONS</code>, the readiness predicate (which gates are missing), variant grammar <code>baseline|v&lt;N&gt;</code>, the retry policy. <code>rbuild -- test -p conveyor-domain eval_</code>.</li>
+<li><code>store::eval</code> — CRUD, the <code>(run, case, rep)</code> slot, the frozen version copy, RLS tests. <code>rbuild -- test -p conveyor-store eval_</code>.</li>
+<li><code>evals.*</code> + <code>eval_versions.*</code>. <code>rbuild -- test -p conveyor-actions evals</code>.</li>
+<li><code>eval_cases.*</code> + <code>eval_cases.import</code>; <strong><code>expected</code> is write-only</strong> — no view carries it. <code>rbuild -- test -p conveyor-actions eval_cases</code>.</li>
+<li><code>evals.draw_split</code> — stratified by <code>tags[0]</code>, seeded from the version digest, fixed once (<code>409 split_locked</code> on re-draw), and train/test means checked within noise. <code>rbuild -- test -p conveyor-actions eval_split</code>.</li>
+<li><code>eval_signoffs.*</code> — open and decide an <code>approval</code> with <code>eval_id</code> and <code>meta.artifact_sha256</code>; a decided sign-off whose artifact digest no longer matches is <strong>void</strong>. <code>rbuild -- test -p conveyor-actions eval_signoff</code>.</li>
+<li><strong>The case driver</strong> — <code>eval.case.run</code>: build subject input from <code>input</code> alone (a type with no <code>expected</code> field), invoke through the engine, write <code>eval_case_result</code> + <code>eval_trace</code>; on a pre-output failure write <code>eval_attempt_error</code> and leave the slot empty. <code>rbuild -- test -p conveyor-server eval_runner</code>.</li>
+<li><strong>The four runner properties</strong> — <code>deadline_at</code> per attempt (not inactivity), jittered backoff with <code>attempt</code> visible, strict-per-attempt scoring, a failure class on every failed attempt. <code>rbuild -- test -p conveyor-server eval_runner_properties</code>.</li>
+<li><code>eval_runs.start</code> emits one <code>job</code> per <code>(case, rep)</code>; <code>eval.run.tick</code> finalises and heartbeats; <code>eval.reap</code> keys on <code>last_polled_at</code>. <code>rbuild -- test -p conveyor-server eval_jobs</code>.</li>
+<li><strong>Graders</strong> — <code>programmatic</code> (normalised exact/contains/schema/label), <code>rubric</code> and <code>pairwise</code> over <code>completions.create</code> with structured output, <code>human</code> (a queue); the judge model may not be the subject model (<code>422 judge_is_subject</code>). <code>rbuild -- test -p conveyor-actions eval_graders</code>.</li>
+<li>The served-model assertion and <code>eval_results.label</code> (judge-vs-human agreement). <code>rbuild -- test -p conveyor-actions eval_served_model</code>.</li>
+<li><code>eval_runs.report</code> — mean + CI, noise floor <code>1/sqrt(n·reps)</code>, headroom, per-tag breakdown, error/truncation counts, cost derived from <code>inference_call</code>. <code>rbuild -- test -p conveyor-actions eval_report</code>.</li>
+<li><code>eval_audits.start</code> — §1–§6 mechanical checks, the <strong>oracle ≈100% / null ≈0%</strong> probe, the judge's three known negatives, and the noise-floor-vs-headroom-vs-smallest-shippable-delta line. <code>rbuild -- test -p conveyor-server eval_audit</code>.</li>
+<li><code>eval_runs.export</code> / <code>eval_cases.import</code> — the method's bundle in and out; no attempts on import. <code>rbuild -- test -p conveyor-actions eval_roundtrip</code>.</li>
+<li>Scopes at the five sites, <code>AGENT_TOOLS</code>, <code>EXPECTED</code>, the api count, <code>parity_http_mcp</code> samples, SSE topics, <code>eval.prune</code> on a <code>schedule</code> row. <code>rbuild -- test -p conveyor-actions registry</code>.</li>
+<li><code>--print-openapi --write-lock</code>, counts into <code>00-INDEX.md</code>, the gate below.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<p>⚠️ <strong>Rust tests, not <code>psql</code> probes, and <code>rbuild</code>, not <code>cargo</code>.</strong> Since 2026-11-09 the tests run on the build host against a throwaway Postgres it creates and migrates itself (CONTRACT §16), so a local <code>psql</code> against compose <code>:5439</code> observes a different database and proves nothing; "ten tables RLS-forced" and "0026 in the ledger" are therefore ordinary <code>#[test]</code>s. <code>cargo</code> refuses on this machine — every line is <code>rbuild -- &lt;args&gt;</code>, and the last is <code>rbuild --gate</code> (<code>fmt --check &amp;&amp; clippy &amp;&amp; test --locked</code>).</p>
+<pre class="bash"><code>set -euo pipefail
+cd $HOME/Movies/conveyor
+
+# 1. ten tables RLS-forced, migration 0026 in the LEDGER (not the migrate log line, which says nothing)
+rbuild -- test -p conveyor-store --test eval_schema -- --exact ten_tables_rls_forced_and_0026_applied
+
+# 2. the sign-off index exists AND is the guarantee (not a check-then-insert)
+rbuild -- test -p conveyor-store --test eval_signoff_idx -- --exact a_second_pending_signoff_is_refused
+
+# 3. no run without both sign-offs; the refusal names the missing gate; an edit voids the sign-off
+rbuild -- test -p conveyor-actions --test eval_signoff_gate
+
+# 4. the answer key never reaches the subject
+rbuild -- test -p conveyor-domain --test eval_isolation -- --exact subject_input_carries_no_expected_bytes
+
+# 5. the held-out wall is access, not a prompt
+rbuild -- test -p conveyor-api --test eval_heldout -- --exact an_agent_principal_cannot_read_a_test_trace
+
+# 6. a failed attempt cannot occupy the (case,rep) slot
+rbuild -- test -p conveyor-store --test eval_slot
+
+# 7. cost is derived, never stored — a NEGATIVE column count, asserted in Rust so it can go red
+rbuild -- test -p conveyor-store --test eval_constraints -- --exact no_eval_table_has_a_cost_column
+
+# 8. oracle ≈100%, null ≈0%, an induced error is a classified attempt, the judge fails its three negatives
+rbuild -- test -p conveyor-server --test eval_controls
+
+# 9. the variant grammar, the grade-object shape, and the label length are database invariants
+rbuild -- test -p conveyor-store --test eval_constraints
+
+# 10. no answer-key or sign-off action is agent-reachable
+rbuild -- test -p conveyor-actions --test registry -- --exact no_eval_signoff_or_answer_key_action_is_agent_reachable
+
+# 11. the served surface and the lock agree (the repo&#39;s own checker, not a hand-rolled count)
+rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock
+
+# 12. fmt --check + clippy -D warnings + the whole suite, once, on the host
+rbuild --gate
+
+printf &#39;\nGATE_GREEN\n&#39;</code></pre>
+<p>⛔ <code>rbuild --gate</code> signals by exit code, not by <code>GATE_GREEN</code>; the <code>printf</code> is last only so a truncated log is distinguishable from a finished gate. It takes the host's repo lock — a second run exits <strong>75</strong> and names the owner, so a red gate and a busy host are not confused.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong><code>sqlx::migrate!</code> embeds the set at compile time.</strong> A new <code>.sql</code> is invisible until the crate rebuilds and <code>migrate</code> exits 0 either way. Touch <code>migrate.rs</code>; verify by <code>_sqlx_migrations</code>.</li>
+<li><strong>The sign-off is not a status field.</strong> <code>uq_appr_pending</code> is over <code>(tenant_id, run_id, gate)</code> and <code>run_id</code> is NULL for an eval gate — Postgres treats NULLs as distinct, so a <code>meta</code>-only gate allows two pending sign-offs. The <code>eval_id</code> column and its own partial index are the guarantee; a <code>check-then-insert</code> is exactly what S03's comment forbids.</li>
+<li><strong>A grade dict, not a scalar, whenever there is more than one metric.</strong> A bare bool alongside declared metrics renders as a dash in every column — the method calls it out, so make it a CHECK.</li>
+<li><strong>A failed attempt must never write the slot.</strong> A row at <code>(case, rep)</code> makes resume skip it forever and scores plumbing as a model failure. <code>eval_attempt_error</code> is append-only across resumes; a later success supersedes its error rows and <em>does not delete</em> them.</li>
+<li><strong><code>expected</code> is grader-only.</strong> It must not appear on any view, any export of a case list, or in <code>AGENT_TOOLS</code>. A "don't look at the answers" prompt is not a defence.</li>
+<li><strong>The runner marks truncated, never zero.</strong> A response cut at <code>max_tokens</code> is <code>status=truncated</code>, counted and excluded from the mean; scoring it wrong inflates every regression.</li>
+<li><strong><code>model</code> comes from the response, not the config.</strong> A silently substituted served model invalidates the comparison; assert it and fail the attempt loudly.</li>
+<li><strong>A per-case deadline is not an inactivity timer.</strong> A hung stream can emit keepalives forever; only a total ceiling reclaims the slot — and a <code>timeout</code> is a classified attempt, not a zero.</li>
+<li><strong>N×R jobs finalise nothing.</strong> Without <code>eval.run.tick</code> a run stays <code>running</code> forever after its last case; the reaper keys on <code>last_polled_at</code>, never on case silence (the S17 lesson).</li>
+<li><strong>Case text is untrusted.</strong> It comes from transcripts and tickets. No <code>inner_html</code>, <code>html</code>/<code>svg</code> attachments in a sandboxed frame, binaries as S09 <code>document</code> refs, and a size cap on <code>turns</code>.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ul>
+<li><strong>The instrument is versioned</strong> (design cross-check 2026-11-09). <code>eval_version</code> freezes the case set, metrics, graders, prices and harness paths under one digest; a run names a version and a compare across versions is refused. <code>eval-audit.md</code> §2: scores before and after a grader change are not comparable. Copy-on-write is cheap (≤100 cases) and exact.</li>
+<li><strong>Sign-offs are <code>approval</code> rows</strong>, with a nullable <code>eval_id</code> and its own partial unique index. One escalation primitive, so a sign-off is answerable in the web, Telegram and MCP channels for free. <strong>Contract change taken:</strong> an ALTER on S03's <code>approval</code> (additive, nullable) — CCR recorded.</li>
+<li><strong><code>evals:approve</code> is its own scope.</strong> Building is not signing, and the held-out trace and the run cost hang off it. <code>eval_signoffs.*</code> and <code>eval_runs.start</code> are absent from <code>AGENT_TOOLS</code>.</li>
+<li><strong>The answer key is structurally unreachable.</strong> The subject-input type has no <code>expected</code> field, no action returns it, and no answer-key action is agent-reachable.</li>
+<li><strong>Cost is derived from <code>inference_call</code>, never stored</strong> (D23). <strong>Amendment taken by S19:</strong> <code>inference_call.caller_kind</code> gains <code>eval</code> and <code>inference_call</code> gains a nullable <code>eval_run_id</code> referencing S19's <code>eval_run.id</code> only — never a <code>benchmark_run.id</code>, which is a different uuid and a different instrument. S17 records no inference calls of its own, so the ledger is the only cost record for both.</li>
+<li><strong>Two of the four grader kinds call a model, and both use structured output.</strong> Free-text JSON fails on an unescaped quote in the explanation often enough to matter.</li>
+<li><strong>The report is a screen; export is interop.</strong> No hand-rolled HTML anywhere — the one HTML surface the skill allows is its own escaping report builder, and here the escaping view is Leptos.</li>
+<li><strong>Retention:</strong> <code>eval_trace</code> 90 days (it is the bulk); results, cases and audits live with the eval.</li>
+</ul>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Does S19 block on S16, or record <code>usage</code> itself?</td>
+<td>block on S16; if it slips, record <code>usage</code> on <code>eval_case_result</code> from the action response and derive cost with the same arithmetic — identical columns, different source</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Which subjects are runnable at first?</td>
+<td><code>completions</code>, <code>copilot</code>, <code>procedure</code>, <code>external</code>; <code>agent_run</code> is declared and refused <code>409 subject_not_ready</code> until S13/S15, the shape S17 uses for its <code>conveyor</code> arm</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Is the pilot a separate run row or a mode of the same one?</td>
+<td>a mode (<code>mode: pilot</code>) writing to a <code>variant='baseline'</code> run marked <code>partial</code>; the full pass supersedes it, and the pilot's rows are kept</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Does a human-graded metric block a run?</td>
+<td>no — it parks the result <code>pending_label</code> and the report excludes it, naming the count; a queue that blocks would stop every automated pass</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Can two evals share a case set?</td>
+<td>no — a version is owned by one eval; <code>eval_cases.import</code> copies, it never links</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S19-eval-builder.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

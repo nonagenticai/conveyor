@@ -1,0 +1,170 @@
+# test_process_evaluation — evaluate how testing is organised and carried out: what the process
+# is observed to be, the gaps in it and the improvements that close them
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type test_process_evaluation: outputs
+# draft_artifact_id, report_artifact_id, published_artifact_id; and the READY
+# outline_within_card_scope, DOING every_claim_cites_a_source / every_cited_source_exists, QA
+# no_unsupported_claims / capability_acceptance_met and DONE artifact_is_qa_version acceptance) and
+# n8n-designs/design/choices/v4/capabilities/testing.yaml (text "evaluating of the test procedures
+# and organization", archetype document, phase test, upstream [testing_strategy, testing_plan,
+# testing_evaluation], sections [process_observed, gaps, improvements], uses_repo true — it reads
+# the test tree and the pipeline as well as the upstream cards — and the type's inspect.criteria
+# process_from_evidence / gaps_located / improvements_address_gaps).
+# ⛔ Not testing_evaluation: that one judges one run's results (pass rate, failures by area,
+# verdict); this one judges the process the runs come out of, against the project's own strategy
+# and plan, and changes no test and runs no suite.
+card_type: test_process_evaluation
+capability: testing
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: test_process_evaluation
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: test_process_evaluation.ready
+    title: Test process evaluation — definition of ready
+    definition_of_ready: {checks: [strategy_plan_and_evaluation_released]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline stays inside the card's scope: its sections are process_observed, gaps and improvements for the test process the card names, it names the released testing_strategy, testing_plan and testing_evaluation it will measure that process against, and it plans no test run and no change to a test."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: test_process_evaluation.doing
+    title: Test process evaluation — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every observation in process_observed names what it observed and where — the strategy or plan line that sets the practice, the evaluation that shows it happening, or the test tree and pipeline file it was seen in — so no practice is described from how testing usually goes."}
+      - {name: every_cited_source_exists, text: "Every source the report cites exists at the revision it read: each upstream card is the released strategy, plan or evaluation of this project, and every test-tree path and pipeline file it names resolves in the repository."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: test_process_evaluation.qa
+    title: Test process evaluation — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, capability_acceptance_met, process_from_evidence, gaps_located, improvements_address_gaps]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "No gap is asserted where the cited evidence shows the practice in place, and no improvement promises an outcome — a faster run, fewer escaped defects — that the strategy, plan, evaluation or repository does not already support."}
+      - {name: capability_acceptance_met, text: "The report is true of every acceptance statement the test_process_evaluation card type declares — the outline stays in scope, every claim has a source that exists, and nothing is claimed beyond those sources — judged from the report and its sources, not from the card's wording."}
+      - {name: process_from_evidence, text: "process_observed cites the strategy, plan or evaluation it describes, so a reader can reach the card each practice is judged against, instead of describing a test process from assumption."}
+      - {name: gaps_located, text: "Every gap names the part of the test process it sits in — the level, the procedure, the ownership or the reporting — together with the evidence that shows it, so a reader knows what to change and where."}
+      - {name: improvements_address_gaps, text: "Every improvement names the gap it closes and what changes in the test process to close it, and an improvement the report cannot tie to a named gap is dropped rather than left in."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: test_process_evaluation.done
+    title: Test process evaluation — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The evaluation published to the card is the revision QA confirmed: no observation, gap or improvement was added, dropped or reworded after the review, and every source it cites still resolves at the revision the report names."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: test_process_evaluation.system
+    title: Test process evaluation — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: test_process_evaluation.READY
+    list: ready
+    title: Test process evaluation — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: test_process_evaluation
+        sop: test_process_evaluation.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: test_process_evaluation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: test_process_evaluation.DOING
+    list: doing
+    title: Test process evaluation — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: test_process_evaluation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: test_process_evaluation.QA
+    list: qa
+    title: Test process evaluation — QA
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: test_process_evaluation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: test_process_evaluation.DONE
+    list: done
+    title: Test process evaluation — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: test_process_evaluation, sop: test_process_evaluation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: test_process_evaluation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

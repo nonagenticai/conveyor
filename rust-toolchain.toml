@@ -1,0 +1,6 @@
+# Must equal ARG RUST_TOOLCHAIN in the Dockerfile. rustup's default on the estate builders is
+# 1.98.0, so the pin is what makes a bare `cargo` compile with 1.99.0 (CONTRACT §16).
+[toolchain]
+channel = "1.99.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

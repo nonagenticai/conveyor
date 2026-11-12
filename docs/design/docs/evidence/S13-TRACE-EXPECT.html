@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S13 — the trace gate's second limb: a reviewed expectation (2026-11-09) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S13-TRACE-EXPECT.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s13--the-trace-gates-second-limb-a-reviewed-expectation-2026-11-09">S13 — the trace gate's second limb: a reviewed expectation (2026-11-09)</h1>
+<p><strong>Session:</strong> <code>s13-trace-gate-behaviour</code> · <strong>Tree:</strong> <code>$HOME/Movies/conveyor</code> (shared checkout; no lane branch of its own) · <strong>Lease:</strong> <code>00-INDEX.md</code> §Tree lease, opened 18:15, released with the gate below.</p>
+<p>Builds <strong>on</strong> the <code>DiffMode::{SameSystem,Migration}</code> shape landed by <code>s13-trace-gate</code> (then <code>record-n8n-trace-diffs</code>); nothing of that work was reverted. The four <code>trace_diff.rs</code> tests that pin it stay green and stay theirs.</p>
+<h2 id="owner-ruling-this-unit-encodes">Owner ruling this unit encodes</h2>
+<p>The §5.4 cross-system <strong>payload-hash</strong> rule is thrown out (George, 2026-11-09: <em>"stupid idea about this hash stuff — think again"</em>). The old node returns the external system's row; the conveyor returns its own view, so an equal hash for the same effect is impossible, and a mask list only grows until the gate cannot fail.</p>
+<h2 id="what-landed">What landed</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/workflow/src/expect.rs</code></td>
+<td><strong>new</strong> — <code>Expected</code> (fixture, workflow_key, provenance, steps, end_state), <code>derive</code>, <code>parse</code>, <code>to_json_pretty</code>, <code>validate</code>, <code>compare</code> (through the one diff path), <code>end_state_matches</code></td>
+</tr>
+<tr>
+<td><code>crates/workflow/src/trace.rs</code></td>
+<td><code>TraceDiffError::ExpectedInvalid</code> (fixture + detail); the peer's <code>DiffMode</code> untouched</td>
+</tr>
+<tr>
+<td><code>crates/workflow/src/lib.rs</code></td>
+<td><code>pub mod expect;</code></td>
+</tr>
+<tr>
+<td><code>crates/actions/src/workflow/trace.rs</code></td>
+<td>re-export <code>Expected</code>, <code>ExpectedStep</code>, <code>Provenance</code> for the CLI</td>
+</tr>
+<tr>
+<td><code>apps/server/src/admin/trace_diff.rs</code></td>
+<td><code>--expect &lt;file&gt;</code> alternative to <code>--old</code>; module doc states that <code>end_state</code> is asserted by the fixture test, not the file CLI</td>
+</tr>
+<tr>
+<td><code>apps/server/src/main.rs</code></td>
+<td><code>TraceDiff</code> gains <code>--expect</code> (<code>--old</code> is now <code>required_unless_present</code>), <code>--old-workflow</code> requires <code>--old</code></td>
+</tr>
+<tr>
+<td><code>crates/workflow/tests/trace_expect.rs</code></td>
+<td><strong>new</strong> — 6 tests + 1 ignored maintenance helper</td>
+</tr>
+<tr>
+<td><code>fixtures/{a,b,c}.expected.json</code></td>
+<td><strong>new</strong> — derived steps + <code>old_node_id</code> provenance + authored <code>end_state</code></td>
+</tr>
+<tr>
+<td><code>docs/plans/slices/S13-n8n-engine.md</code></td>
+<td>§5.4 rewritten to the two-limb gate (path + business result), scope 13 graph workflows, no hash in pass/fail</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-was-run">What was run</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>rbuild -- test -p conveyor-workflow</code></td>
+<td>every binary green — <strong>trace_expect 6/6</strong> (1 ignored helper), <strong>trace_diff 11/11</strong> (peer's), <strong>workflow_n8n 9/9</strong>, workflow_trace 7/7, workflow_scheduler 9/9, realtime 10/10</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>rbuild -- clippy -p conveyor-workflow --all-targets -- -D warnings</code></td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>rbuild -- clippy -p conveyor-actions --lib -- -D warnings</code></td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>rbuild -- clippy -p conveyor-server --bins -- -D warnings</code></td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>rustfmt --edition 2024 --check</code> on the five touched <code>.rs</code> files</td>
+<td>clean</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>rbuild -- run -q -p conveyor-server -- admin trace-diff --expect fixtures/a.expected.json --new &lt;4-step synthetic&gt;</code></td>
+<td><code>diff: zero deltas</code>, <strong>exit 0</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>same, one effect mutated (<code>requirements.get</code> → <code>inference.chat</code> at position 2)</td>
+<td><code>delta: position 2 node "brief" effect: "requirements.get" -&gt; "inference.chat"</code>, <strong>exit 1</strong> (measured, not inferred from the 2nd line)</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>the_committed_expectations_match_the_recordings</code></td>
+<td>each of a/b/c re-derives to the committed steps and provenance</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ One <code>conveyor-store</code> E0425 appeared during step 4's first run (a peer's in-flight write on the shared tree) and was gone on re-run; it is <strong>not</strong> this unit's and nothing was changed for it.</p>
+<h2 id="reversal-proofs-each-was-made-to-fail-then-restored">Reversal proofs (each was made to fail, then restored)</h2>
+<table>
+<thead>
+<tr>
+<th>claim</th>
+<th>reversal</th>
+<th>observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a payload difference must not be a delta</td>
+<td><em>none needed</em> — the test asserts it, and the <strong>same</strong> records under <code>DiffMode::SameSystem</code> DO differ</td>
+<td>migration: identical; same-system: delta. The zero is the rule, not a blind diff</td>
+</tr>
+<tr>
+<td>a changed effect is a delta</td>
+<td>change <code>agent.run</code> → <code>inference.chat</code></td>
+<td>one <code>Mismatch{field:"effect"}</code> naming both values</td>
+</tr>
+<tr>
+<td>an extra / missing step fails by name</td>
+<td>drop one step; add one</td>
+<td><code>Missing{node_id:"agent_consult"}</code> / <code>Added{node_id:"surprise"}</code></td>
+</tr>
+<tr>
+<td>a recorded node with no flow node is refused</td>
+<td>derive against a flow lacking it</td>
+<td>error names <code>"Agent consult"</code>, <code>agent_consult</code> and <code>fixtures/a.flow.json</code></td>
+</tr>
+<tr>
+<td>an expectation without an end state is invalid</td>
+<td>derive (which leaves <code>end_state</code> empty) then validate</td>
+<td><code>ExpectedInvalid</code> naming the fixture and <code>end_state</code></td>
+</tr>
+<tr>
+<td>the committed expectation cannot drift</td>
+<td>re-derive every fixture and compare steps + provenance</td>
+<td>equality for a/b/c</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-the-gate-proves--and-what-it-does-not">What the gate proves — and what it does not</h2>
+<ul>
+<li><strong>Proves:</strong> the re-authored flow executes the same ordered <code>(node, effect, outcome)</code> path as the recording, and (once the fixture test calls <code>end_state_matches</code>) reaches the declared business result.</li>
+<li><strong>Does not prove:</strong> payload-level equality across systems — by design; <code>input_hash</code>/<code>output_hash</code> remain in the trace for forensics and are compared only between two conveyor traces.</li>
+<li>The three synthetic fixtures' <code>end_state</code> is <code>{"terminal_effect": …}</code> today. Real re-authored flows (steps 14–15) carry business keys (card list/status, decision, message refs); an empty end state is invalid.</li>
+</ul>
+<h2 id="provenance-note-caught-by-s13-trace-gate">Provenance note (caught by <code>s13-trace-gate</code>)</h2>
+<p><code>provenance.projection_sha256</code> is the canonical-JSON hash of the <strong>projected records</strong>, not of the recorded <code>.old.jsonl</code> bytes (those are pinned by <code>fixtures/SHA256SUMS</code>). The field was renamed from <code>old_sha256</code> for exactly this reason: one name must not read as the other artefact.</p>
+<h2 id="open--the-next-session-of-this-unit">Open — the next session of this unit</h2>
+<ol type="1">
+<li><code>crates/actions/tests/n8n_migration.rs</code> (peer's) switches from the direct old-projection diff to <code>Expected::compare</code> + <code>end_state_matches</code> with the facts the run reads.</li>
+<li>Steps 11–13's re-authoring proof runs against <code>--expect</code>; the disposition ledger records business deltas, not hash pairs.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S13-TRACE-EXPECT.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

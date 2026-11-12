@@ -1,0 +1,160 @@
+# architecture_epic — the epic's objective and its directive for the architecture tasks (v4 R343, design phase).
+#
+# Content sources: seed/catalogue.json (card_type architecture_epic: outputs and acceptance) and
+# n8n-designs/design/choices/v4/capabilities/architecture.yaml (text, sections, upstream
+# architecture_spike, inspect.criteria). No code is changed: the epic is a document whose
+# directive_for_tasks is what the tasks below it act on.
+card_type: architecture_epic
+capability: architecture
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: architecture_epic
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: architecture_epic.ready
+    title: Architecture epic — definition of ready
+    definition_of_ready: {checks: [spike_directive_present]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline holds only the epic's three sections — objective, scope and directive_for_tasks — and adds no scope the card does not ask for."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: architecture_epic.doing
+    title: Architecture epic — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every goal and every boundary the epic states cites the spike passage, repository path or document it rests on."}
+      - {name: every_cited_source_exists, text: "Every cited source exists at the commit the card fixed and supports the epic's reading of it."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id, reviewed_artifact_id]
+
+  - key: architecture_epic.qa
+    title: Architecture epic — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, objective_follows_spike, scope_bounded, directive_actionable, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "The epic states no objective, boundary or instruction that no cited source supports."}
+      - {name: objective_follows_spike, text: "objective follows the upstream spike's directive_for_epics."}
+      - {name: scope_bounded, text: "scope says what the epic covers and what it leaves out."}
+      - {name: directive_actionable, text: "directive_for_tasks tells the tasks what to do, in steps they can act on."}
+      - {name: capability_acceptance_met, text: "The epic meets every acceptance statement the architecture_epic card type declares."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id, published_artifact_id]
+
+  - key: architecture_epic.done
+    title: Architecture epic — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The epic published to the tasks it directs is the version QA approved; no objective or directive changed after review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: architecture_epic.system
+    title: Architecture epic — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: architecture_epic.READY
+    list: ready
+    title: Architecture epic — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: architecture_epic
+        sop: architecture_epic.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_epic.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_epic.DOING
+    list: doing
+    title: Architecture epic — doing
+    outputs: [draft_artifact_id, reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_epic.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_epic.QA
+    list: qa
+    title: Architecture epic — QA
+    outputs: [reviewed_artifact_id, published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_epic.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_epic.DONE
+    list: done
+    title: Architecture epic — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_epic, sop: architecture_epic.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_epic.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

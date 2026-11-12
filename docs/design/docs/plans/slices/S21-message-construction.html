@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 — Message construction (the compiled prompt) · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21--message-construction-the-compiled-prompt">S21 — Message construction (the compiled prompt)</h1>
+<p>Programme project: S21 · issues #25</p>
+<p><strong>Status:</strong> <code>plan written 2026-11-09</code>; the v1 seam is built (D27), the 2026-2027 design is this document. <strong>Depends on:</strong> S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps), S09 (<code>retrieval.query</code> / <code>strata</code> packs). <strong>Owner ruling:</strong> George, 2026-11-09 — <em>a prompt is a run-time compilation from the procedure and the other system/tenant/project sources, stored in Postgres; prompt-engineering is 2024, context-engineering 2025.</em></p>
+<h2 id="1-what-is-already-true-the-seam-this-slice-extends">1. What is already true (the seam this slice extends)</h2>
+<ul>
+<li><code>prompt</code> + <code>prompt_section</code> (<code>migrations/0030_prompt_catalogue.sql</code>): a <strong>recipe</strong>, one active version per <code>(tenant, key)</code>, exact-pin resolution by <code>&lt;key&gt;@&lt;version&gt;</code>.</li>
+<li><code>conveyor_domain::prompt::compile</code>: pure renderer over <code>PromptFacts</code>; sections are <code>system</code>, <code>procedure</code>, <code>capability</code>, <code>project_card</code>, <code>knowledge</code>; a required section with no source refuses by name; the compiled text's SHA-256 is the provenance key.</li>
+<li><code>conveyor_actions::prompt</code>: three surfaces resolve through it — <code>agent.run</code> (resolved path), the copilot, and the prompt audit.</li>
+<li><code>inference_call.prompt_ref</code> / <code>prompt_version</code> / <code>prompt_sha256</code> record which recipe produced which call. The compiled text itself is never stored.</li>
+</ul>
+<p>This slice is the step <strong>after</strong> that: the compile becomes genuinely dynamic — a selection and budget step over many candidate sources, not a fixed five-section template.</p>
+<h2 id="2-the-problem-with-a-fixed-template">2. The problem with a fixed template</h2>
+<p>A fixed section list still decides <em>before</em> the run what the agent will read. The 2026-2027 target is the opposite: at the moment of the call, the executor selects the smallest set of sources that makes <em>this</em> step decidable, renders them in a fixed trust order, and records what it chose. The failure mode today is not a missing section; it is a section that is present, long, and irrelevant — which costs tokens and hides the one fact that mattered.</p>
+<h2 id="3-the-three-components">3. The three components</h2>
+<h3 id="31-procedural--what-the-agent-is-doing">3.1 Procedural — what the agent is doing</h3>
+<p>Source: the run's <code>procedure</code>/<code>workflow</code> and its <code>run_step</code> (position, action, gate, <code>on_error</code>), plus the step's declared intent. Rendered today from the frozen published version, so the procedure the agent reads is the procedure the run was started under.</p>
+<p>This is also where a formal representation is worth evaluating (see §6): a step is an action instance with preconditions (gates), effects (its output), and failure branches (<code>on_error</code>). The renderer needs the <em>intent</em> — "move the card to Done and comment why" — not a serialized state machine, so the representation question is about validation and planning, not about what the model reads.</p>
+<h3 id="32-domain--capability--role-knowledge">3.2 Domain / capability / role knowledge</h3>
+<p>Sources: <code>capability</code>, <code>capability_agent</code> (model, <code>allowed_actions</code>, caps), <code>capability_knowledge</code> (pinned packs) and — at call time — <code>knowledge.query</code> against the bound <code>strata</code> packs. The rule that survives from D20: a pack is <em>pinned</em> to a version; an unpinned or degraded pack is a readiness blocker, never a silent fallback.</p>
+<p>Role knowledge is the third element George named. In v1 the executor runs as <code>kata_executor</code> and the allowlist is the tool surface; the <em>prompt</em> does not yet say which role's perspective the agent works from. S21 adds a <code>role</code> section sourced from the run's capability binding (not from the caller's scopes, which are an authorisation fact, not context).</p>
+<h3 id="33-project--card-knowledge">3.3 Project / card knowledge</h3>
+<p>Sources: <code>project</code>, <code>board</code>, <code>list</code>, <code>card</code> (title, description, labels, links), and the work-package memory digest (<code>memory.recall</code>). Two hard rules:</p>
+<ul>
+<li><strong>Trust:</strong> card text is tenant-supplied <strong>data</strong>, never instruction. It renders inside a labelled block after the instruction block; a conflict between the two is resolved in favour of §3.1/§3.2, and the system section says so.</li>
+<li><strong>Freshness:</strong> facts are read at compile time, every time. There is no cached prompt.</li>
+</ul>
+<h2 id="4-the-compile-pipeline-the-s21-shape">4. The compile pipeline (the S21 shape)</h2>
+<ol type="1">
+<li><strong>Select</strong> — the recipe names section <em>kinds</em> and a budget; the selector picks concrete sources for the run (which packs, which card fields, how many memory items), with a deterministic order.</li>
+<li><strong>Fetch</strong> — one store read per source class, inside the executor's transaction where one exists.</li>
+<li><strong>Render</strong> — the pure renderer, sections in trust order: instructions → procedure → capability/role → knowledge → project/card. Untrusted text never precedes the instruction block.</li>
+<li><strong>Budget</strong> — a token ceiling per section and per prompt; over-budget is a <em>refusal with the measurement</em>, never silent truncation (the same rule as the loop caps).</li>
+<li><strong>Hash and record</strong> — SHA-256 of the compiled text into <code>prompt_sha256</code>, with the source versions in the hash's pre-image so a past call is reproducible.</li>
+<li><strong>Audit hook</strong> — the compiled text is what S16 audits; a finding names the recipe version and the compiled hash it was found against.</li>
+</ol>
+<h2 id="5-provenance-and-change">5. Provenance and change</h2>
+<ul>
+<li>A recipe is immutable per <code>(key, version)</code>; an edit is a new version, and <code>capability_agent.prompt_ref</code> pins one.</li>
+<li><code>inference_call</code> names the pin and the hash. A finding, a call and the text are then one chain.</li>
+<li>Retiring a version stops new runs; past calls remain explicable because their pin still resolves.</li>
+</ul>
+<h2 id="6-pddl--evaluation-not-prototype">6. PDDL — evaluation, not prototype</h2>
+<p><strong>What PDDL would buy.</strong> A formal action model: preconditions and effects, a planner that can order steps or detect unreachable goals, and a validation story that is not prose. If procedures are to be composed (S13 re-authoring 348 flows, S18 improving them), a planner-friendly representation is attractive.</p>
+<p><strong>What the conveyor already has.</strong> A typed step DSL — <code>position</code>, <code>action</code>, <code>input_template</code>, <code>gate_kind</code>, <code>on_error</code>, <code>max_attempts</code> — frozen at publish and executed by a deterministic engine with per-step idempotency, gates as real <code>approval</code> rows, and retries. It is already a small planning domain, expressed in Postgres and enforced by the runtime.</p>
+<p><strong>Why PDDL is not the storage format.</strong> (a) PDDL assumes a closed-world state and full observability; the conveyor's steps call APIs with side effects whose outcome is only known after the call. (b) A PDDL action's effects are declarative; a step's effect is an arbitrary JSON output consumed by later templates. (c) A planner's output would still have to be executed through the engine, so a plan is an <em>optimisation</em>, not a second executor. (d) Authoring cost: every change to a procedure would need a maintained PDDL model in addition to the step DSL, and two representations drift.</p>
+<p><strong>Recommendation.</strong> Keep the step DSL as the storage and execution truth. Add, in a later S21 step, a <strong><code>plan</code> projection</strong>: derive a read-only PDDL-ish model from a published procedure (actions = steps, preconditions = gates, effects = declared outputs) for validation and reachability checks; use it to <em>check</em> a procedure (an unreachable step, a gate that can never open, a step whose input references an output no earlier step produces), never to execute it. Prototype only if a real procedure fails the check in a way the renderer cannot explain.</p>
+<h2 id="7-failure-modes-and-readiness">7. Failure modes and readiness</h2>
+<ul>
+<li>A required source missing → <code>409 capability_not_ready</code> with <code>blocking[]</code>, before the first step.</li>
+<li>A retired or unknown pin → the same refusal, naming the pin (already implemented).</li>
+<li>Over budget → a typed refusal naming the section and the measured size.</li>
+<li>A pack degraded mid-run → <code>knowledge_degraded</code>, the mid-run equivalent.</li>
+</ul>
+<h2 id="8-open-questions">8. Open questions</h2>
+<ol type="1">
+<li><strong>Budget units</strong> — tokens (provider-tokenizer dependent) or characters? v1 should measure the provider's count only when it is cheap; otherwise a conservative character estimate with the measured actuals recorded in <code>inference_call</code>.</li>
+<li><strong>Role section</strong> — whose role: the capability binding's intended role, the run's principal, or both with a stated precedence?</li>
+<li><strong>Memory</strong> — how many recalled work-package items belong in a prompt before they crowd the card?</li>
+<li><strong>Tenant-authored recipes</strong> — when does a tenant get to edit a recipe, and what audit gate applies before an edit takes effect? (v1 seeds system recipes only.)</li>
+<li><strong>Planner projection</strong> — is the <code>plan</code> projection per-procedure, or computed once per published version and stored as a validation artifact?</li>
+</ol>
+<h2 id="9-acceptance-for-the-build-steps-not-this-document">9. Acceptance (for the build steps, not this document)</h2>
+<ul>
+<li>A step whose recipe requires <code>procedure</code> and whose run has none fails by name, before a model call.</li>
+<li>The same recipe and the same facts compile byte-identically (hash equality is the test).</li>
+<li>Changing the card changes the hash; changing an unrelated tenant's card does not.</li>
+<li>An over-budget section refuses with the measured size, never truncates.</li>
+<li>The prompt audit can name the compiled text it audited by <code>(prompt_ref, prompt_sha256)</code>.</li>
+</ul>
+<h2 id="10-build-record--step-1-budgets--the-role-component-2026-11-09-lane-s21-message-construction">10. Build record — step 1: budgets + the role component (2026-11-09, lane <code>s21-message-construction</code>)</h2>
+<p><strong>Built.</strong> Migration <code>0031_s21_prompt_budget.sql</code> gives the recipe its budget — <code>prompt.budget_chars</code> and <code>prompt_section.budget_chars</code>, both nullable (= unbounded), both <code>&gt; 0</code> by CHECK — and adds <code>'role'</code> to <code>prompt_section.source_kind</code>. <code>conveyor_domain::prompt::compile</code> now:</p>
+<ol type="1">
+<li>stable-sorts the sections by <strong>trust rank</strong> (instructions → procedure → capability/role → knowledge → project/card; recipe position is the tie-break), so an untrusted section can never precede the instruction block even if the recipe lists it first;</li>
+<li>renders each section, measures the <strong>block as it will be written</strong> (heading included, characters) and refuses <code>SectionOverBudget { kind, measured, limit }</code> when it exceeds its own ceiling;</li>
+<li>measures the joined prompt and refuses <code>PromptOverBudget { measured, limit }</code> against the recipe's total ceiling;</li>
+<li>hashes and returns — there is no truncation path anywhere. Both errors carry the measured size, and the boundary is exact: <code>budget = measured</code> compiles, <code>measured - 1</code> refuses (proved in the domain tests by re-reading the same measurement).</li>
+</ol>
+<p>A new <code>role</code> source renders the capability binding's declared perspective as its own section (<code>## Role\nrole: &lt;value&gt;</code>). <code>capability_agent.params-&gt;&gt;'role'</code> is the v1 source: <code>params</code> is existing editable config on <code>capability_agents.create|update</code>, so the role is usable immediately and no action input/output schema (and therefore no served-spec hash) moves. A first-class column is the graduation path when roles gain structure. An absent role leaves the section empty — an optional <code>role</code> renders nothing (existing agents compile unchanged), a <code>required</code> one refuses by name like every other missing source.</p>
+<p>The seeded <code>agent@1</code> gains the optional role section and is re-ordered into trust order (<code>system, procedure, capability, role, knowledge, project_card</code>); the seed stays additive, so an existing tenant keeps the recipe it already has.</p>
+<p><strong>Decisions recorded for the slice's open questions.</strong> (1) Budgets are <strong>characters</strong> — the deterministic fallback this document names; token counts are the provider's and already land in <code>inference_call.prompt_tokens</code>. (2) The role is the <strong>binding's</strong> intended role, never the run principal's scopes (an authorisation fact, not context). (3) Memory selection is <strong>not</strong> in this step. (4) Tenant-authored recipes are <strong>not</strong> in this step — they need a CRUD surface (new actions). (5) The <code>plan</code> projection stays a <strong>later step</strong>, as §6 says.</p>
+<p><strong>Measured (rbuild on m1, 2026-11-09).</strong> <code>conveyor-domain</code> prompt <strong>6/6</strong>; <code>conveyor-store</code> lib <strong>37/37</strong> (including <code>embedded_migrations_are_exactly_the_s0_set</code>, now through 31) and <code>prompt_catalogue</code> <strong>4/4</strong>; <code>conveyor-actions</code> <code>prompt_compile</code> <strong>4/4</strong> and <code>procedure_agent_resolved</code> <strong>1/1</strong>; <code>clippy -p conveyor-domain -p conveyor-store -p conveyor-actions --all-targets -- -D warnings</code> exit 0. Four reversal proofs fired and were reverted: deleting the section budget check, the total budget check, the <code>Role</code> render arm, and the trust sort each turned its own test red. A fresh independent deep audit returned <strong>YES</strong>; its two non-blocking findings (heading-inclusive measurement not mutation-pinned; the <code>Some(section)</code> mapping arm unasserted) were closed and re-measured before handoff.</p>
+<p><strong>Found on the way (not this lane's, fixed here because it was red in the tree).</strong> <code>crates/store/src/migrate.rs</code>'s embedded-set assertion ended at migration 29 while <code>0030</code> was already embedded; the prompt-catalogue session had updated <code>s07_schema.rs</code> only. Both ledger lists now carry 30 and 31.</p>
+<p><strong>Remaining for S21.</strong> The <code>plan</code> projection (§6), tenant-authored recipes (open question 4: an edit is a new version, and the CRUD surface + its audit gate are the gate), and memory selection (open question 3) — none of them built here.</p>
+<h2 id="11-build-record--step-2-the-plan-projection-and-declared-step-outputs-2026-11-09-lane-train-2026-11-09">11. Build record — step 2: the plan projection and declared step outputs (2026-11-09, lane <code>train-2026-11-09</code>)</h2>
+<p><strong>Owner ruling (2026-11-09): add the declaration.</strong> §6 names three checks, but template forward references (<code>template.rs:370</code>) and unknown gates (<code>procedure.rs:256</code>) are already refused at publish, and the step DSL declared no outputs — so "input references an output no earlier step produces" had nothing to check against. George's ruling: add <code>outputs</code> to the step, accept the migration and the served-spec change, then write the lock and land the train. Memory selection (open Q3) stays deferred with a recorded shape: memory selection → memory processing → a <code>prompt.memory</code> component.</p>
+<p><strong>Built.</strong> Migration <code>0032_s21_plan_outputs.sql</code> adds <code>procedure_step.outputs jsonb NOT NULL DEFAULT '[]'</code> — an array of dot-paths, CHECKed to be an array. <code>StepInput</code> / <code>StepIn</code> / <code>StepOut</code> carry it, the store binds and reads it, and publish does not copy step rows (it flips the status), so one column covers a draft and its published version; the frozen revision snapshot carries the declaration with the rest of <code>StepInput</code>.</p>
+<p><code>conveyor_domain::plan</code> is the projection and the validation:</p>
+<ul>
+<li><code>project(steps) -&gt; Plan</code> — each step as its action, gate, <code>on_error</code>, declared outputs and the earlier-step requirements its input template holds.</li>
+<li><code>findings(steps, action_outputs, gate_facts, now) -&gt; Vec&lt;Finding&gt;</code>:
+<ul>
+<li><code>BadOutput</code> — a declared path is empty, padded, or has an empty segment;</li>
+<li><code>UndeclaredOutput</code> — the path does not resolve in the action's output schema (the walker handles <code>properties</code>, <code>items</code>, <code>anyOf</code>/<code>oneOf</code>/<code>allOf</code>, <code>additionalProperties</code> and <code>$ref</code> into <code>$defs</code>);</li>
+<li><code>UnproducibleInput</code> — a <code>steps.N.output.&lt;path&gt;</code> the producer never declares, or one that does not resolve in the producer's action output schema. A declaration covers itself and its descendants (<code>card</code> covers <code>card.id</code>); a whole-output reference must name a path;</li>
+<li><code>MaybeAbsentInput</code> — the producer has <code>on_error=continue</code>, so a failure persists <code>Null</code> and the consumer runs with it instead of the run stopping (measured at <code>step.rs:677-711</code>);</li>
+<li><code>FutureInput</code> — a reference to the current or a later step, which cannot have run yet. Publish refuses it earlier (<code>validate_publish</code>), but the projection is public and must not pass a plan whose edges point forward;</li>
+<li><code>GateNeverOpens</code> — the catalogue row's <code>meta.expires_at</code> is present but not an RFC3339 string. A VALID timestamp, even one already past, is not refused: the runtime opens the gate and the expiry applies the step's <code>on_error</code> (<code>procedure_step::an_expired_gate_applies_the_steps_on_error</code>);</li>
+<li><code>UnreachableStep</code> — the summary finding for a step carrying an input finding.</li>
+</ul></li>
+<li>Publish runs the projection after <code>validate_publish</code> and refuses <code>422 procedure.plan_invalid</code> with one field error per finding. Nothing is stored and nothing executes: the plan is derived on demand.</li>
+</ul>
+<p><strong>Open questions.</strong> (5) <strong>closed</strong> — the projection is on demand and enforced at publish, never stored. (3) memory selection deferred; its shape is selection → processing → <code>prompt.memory</code>. (4) tenant-authored recipes remain deferred.</p>
+<p><strong>Measured (rbuild on m1, 2026-11-09).</strong> <code>conveyor-domain</code> plan <strong>14/14</strong>; <code>conveyor-store</code> <code>s11_procedure</code> <strong>11/11</strong> (including the declared-outputs round-trip) and <code>s07_schema</code> <strong>3/3</strong> (the ledger through 32); <code>conveyor-actions</code> <code>procedure</code> <strong>12/12</strong> and <code>procedure_step</code> <strong>14/14</strong> (including <code>procedure.plan_invalid</code>, the declared-output read-back and the expired-gate on_error path); clippy <code>-D warnings</code> on the three crates <code>--all-targets</code> exit 0; rustfmt clean on the touched files. <strong>Eight</strong> reversal proofs fired and were reverted: deleting the coverage rule, the maybe-absent rule, the unreadable-expiry gate rule, the <code>$ref</code> arm, the reference's action-schema check, the <code>FutureInput</code> arm and the <code>BadInputReference</code> emission each turned its own test red, and removing the cyclic-<code>$ref</code> depth guard aborted the test binary on a stack overflow.</p>
+<p><strong>Fresh independent deep audit: NO on first pass; its findings are fixed or answered.</strong> (1) A present-but-non-string <code>meta.expires_at</code> was silently treated as absent by the publish mapping — now <code>GateNeverOpens</code>, with an actions test that inserts such a gate row. The workspace suite then caught the first version refusing a VALID past timestamp, which <code>procedure_step::an_expired_gate_applies_the_steps_on_error</code> proves is a supported <code>on_error</code> path; the check now refuses only an expiry the runtime cannot read. (2) <code>allOf</code> is unioned, not intersected — deliberate: the walker answers "does the schema DECLARE this path", and a flattened schemars object adds members in a second branch; documented at <code>schema_has_path</code>. (3) The projection did not reject a self/forward reference on its own — now <code>FutureInput</code>, with a test for both. (4) A non-<code>#</code> <code>$ref</code> was false-refused — now an external ref does not refuse the declaration. (5) The fixtures that reference <code>steps.N.output</code> are WORKFLOW definitions validated by <code>conveyor_workflow::definition::validate_publish</code>, not procedures, so they are unaffected; the real consequence — an existing procedure DRAFT must declare its outputs before it can be republished — is deliberate and recorded in the migration comment.</p>
+<p><strong>Second fresh audit: PASS.</strong> A new agent verified the five dispositions and returned PASS with three non-blocking findings; two were worth taking. (a) A cyclic <code>$ref</code> (root <code>#</code>, or a <code>$defs</code> entry that points at itself) recursed without consuming a segment — now capped at 64 hops and refused; schemars never emits a cycle, so this is hardening, not a reachable bug. (b) A <code>steps.</code> reference whose index is not a positive integer was silently dropped — now <code>BadInputReference</code>. (c) A <code>FutureInput</code> also raises the <code>UnreachableStep</code> summary; that is the intended shape — every input finding carries the step-level summary.</p>
+<p><strong>Measured after the second audit (rbuild on m1, 2026-11-09).</strong> Domain plan <strong>14/14</strong>, actions <code>procedure</code> <strong>12/12</strong>.</p>
+<p><strong>Served-spec lock.</strong> Regenerated over the whole tree: <strong>287 → 297 operations</strong>, <code>--check-lock</code> exit 0. The full list of added/changed operations is in <code>docs/evidence/S21-PLAN.md</code>.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S21-message-construction.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

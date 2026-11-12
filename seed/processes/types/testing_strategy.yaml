@@ -1,0 +1,169 @@
+# testing_strategy — the objectives, principles, levels, scope and exit criteria the testing of a
+# system is measured against (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type testing_strategy: outputs draft/reviewed/published
+# and acceptance outline_within_card_scope, every_claim_cites_a_source, every_cited_source_exists,
+# no_unsupported_claims, capability_acceptance_met, artifact_is_qa_version) and
+# n8n-designs/design/choices/v4/capabilities/testing.yaml (archetype document, text "sets the
+# objectives, principles, goals and structure for testing", phase test, no upstream, sections
+# objectives / principles / levels / scope / exit_criteria, uses_repo true, uses_knowledge false,
+# signoff false, and the inspect.criteria the QA stage judges by). It is the head of the testing
+# chain — testing_plan, testing_execution and testing_evaluation each read it — so every objective,
+# level and exit criterion is tied to the brief or to the test setup the repository already has,
+# never asserted. Nothing is written to RM, so DONE closes on the published document alone.
+card_type: testing_strategy
+capability: testing
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: testing_strategy
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  # One SOP per stage for the agent steps, plus one mechanical SOP for every computed move.
+  - key: testing_strategy.ready
+    title: Testing strategy — definition of ready
+    definition_of_ready: {checks: [brief_present, repository_test_setup_read]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline holds only the strategy's five sections — objectives, principles, levels, scope and exit_criteria — and every objective in it is one the brief states, not one the outline adds."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: testing_strategy.doing
+    title: Testing strategy — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every objective, principle, test level, scope statement and exit criterion names the brief passage or the repository file and symbol it comes from."}
+      - {name: every_cited_source_exists, text: "Every brief passage and repository path the strategy cites resolves at the pinned head the card read; a citation that does not resolve is reported, not written into the strategy."}
+      - {name: levels_name_their_runner, text: "Every test level in levels names the runner or suite already in the repository that carries it, or says the level is not yet provided and which level stands in for it."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: testing_strategy.qa
+    title: Testing strategy — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [objectives_checkable, levels_have_scope, exit_criteria_checkable, no_unsupported_claims, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: objectives_checkable, text: "Every objective can be checked as met or not met."}
+      - {name: levels_have_scope, text: "Every test level in levels says what it covers."}
+      - {name: exit_criteria_checkable, text: "Every exit criterion can be checked from a test run."}
+      - {name: no_unsupported_claims, text: "The strategy asserts no objective, principle, level, scope statement or exit criterion that the brief or the repository does not support."}
+      - {name: capability_acceptance_met, text: "The strategy is true of every acceptance statement the testing_strategy card type declares."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id]
+
+  - key: testing_strategy.done
+    title: Testing strategy — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The strategy published to the card is the exact revision QA reviewed; no objective, principle, test level, scope statement or exit criterion was added, cut or reworded after the review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: testing_strategy.system
+    title: Testing strategy — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: testing_strategy.READY
+    list: ready
+    title: Testing strategy — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: testing_strategy
+        sop: testing_strategy.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_strategy.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: testing_strategy.DOING
+    list: doing
+    title: Testing strategy — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_strategy.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: testing_strategy.QA
+    list: qa
+    title: Testing strategy — QA
+    outputs: [reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_strategy.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: testing_strategy.DONE
+    list: done
+    title: Testing strategy — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_strategy, sop: testing_strategy.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_strategy.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

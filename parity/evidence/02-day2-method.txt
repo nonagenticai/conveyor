@@ -1,0 +1,263 @@
+02-day2-method — S00 usage inventory (day 2)
+Executed from mini3 (darwin) 2026-11-08, window starts 16:34:06Z.
+Every command below is recorded verbatim; all SQL is read-only on master as postgres
+(never through PgBouncer, no session SET, no prune, no write).
+
+0. STATE AT START
+   Working tree: $HOME/Movies/conveyor (still not a git repository).
+   parity.yaml sha256 = 8cb7a295bd6748802f553c72242c880ba105105cc0e827f9835d6be786e7ce00
+     — byte-identical to day 1's provisional hash (00-preflight.txt:199). Nothing touched it since.
+
+   date -u -> 2026-11-08T16:34:06Z (epoch 1794155646)
+   df -h $HOME/Movies -> 228Gi size, 133Gi used, 42Gi avail, 77% capacity (23% free). PASS (>10%).
+   tools: jq /usr/bin/jq · yq v4 (/opt/homebrew/bin/yq) · check-jsonschema ~/.local/bin/check-jsonschema
+          curl /usr/bin/curl · ssh /usr/bin/ssh · shasum /usr/bin/shasum     (all present)
+
+1. LOKI — the recorded deferral ("the Grafana/Loki stack is stood down", 00-INDEX.md:21,491) is FALSE
+   sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl -n loki get pod,deploy,svc
+   -> pod/loki-c999b76d5-n52th 1/1 Running, restartCount 0, startTime 2026-11-01T18:05:40Z
+      deployment.apps/loki 1/1; service/loki ClusterIP 192.0.2.11:3100 (182d)
+   Image grafana/loki:3.7.7. Grafana ns 1/1; Alloy DaemonSet 5/5.
+   PV loki-storage-worker3 50Gi Bound (local-path). gitops: clusters/strato/services/loki/.
+   Retention: loki/loki/configmap-loki-config.yaml:67 retention_period: 24h, :32 max_query_length: 25h.
+
+   Positive control (1h) at 16:34Z:
+     Q='sum(count_over_time({namespace="istio-system",container="istio-proxy"}[1h]))'
+     curl -sG http://192.0.2.11:3100/loki/api/v1/query --data-urlencode "query=$Q"
+   -> 43,338 lines. Loki is ingesting. Nothing needs to be spun up.
+
+2. THE REAL CONSTRAINT IS A CLOCK, NOT AVAILABILITY
+   Sample 1 instant = epoch 1794089866 (2026-11-07T22:17:46Z), a 24h lookback.
+   PromQL range selectors are left-open, so a sample exactly 86400s later has a window that is
+   adjacent to, and disjoint from, sample 1's window.
+   EPOCH2_MIN = 1794089866 + 86400 = 1794176266 = 2026-11-08T22:17:46Z.
+   Taking sample 2 earlier would overlap sample 1 and make the "B>=5 in each sample" rule meaningless.
+
+3. THE FIVE A-HIT CONTRADICTIONS (slice §9 STOP) — measured, then resolved
+   Call sites, read-only from n8n.workflow_entity (active = "activeVersionId" is not null):
+     select coalesce(n->'parameters'->>'resource','<none>'), coalesce(n->'parameters'->>'operation','<none>'),
+            count(distinct w.id), count(*)
+     from workflow_entity w, jsonb_array_elements(w.nodes::jsonb) n
+     where n->>'type' like '@nonagentic%' group by 1,2 order by 3 desc;
+   -> pmCardLedger.appendCardLedger  29 workflows / 145 call sites
+      pmCardLedger.listCardLedger    20 / 65
+      decisions.projectCopyDecision   3 / 3
+      principles.projectCopyPrinciple 2 / 2
+      requirements.projectCopyRequirement 2 / 2
+   Node parameters (measured):
+     appendCardLedger  {entriesJson, plankaCardId: $('Flow object').json.card_id, tenantIdOverride}
+        entry kind = claim|fact, value, source{list,node,execution_id}, laya_score, accepted, reason
+     projectCopy{Decision,Principle,Requirement}  {did|pid|rid, changes: $json.body, projectId}
+
+   RESOLUTION — the decision drops a KEY, not a capability, for the ledger:
+     P-1101 / P-1224 -> used. SPEC §4 forbids `planka_card_id` as card identity, and that is what is
+       dropped; a card-scoped append/read claim+verdict store is called by 49 workflow sites and must
+       exist at cutover re-keyed to the conveyor's card id. The new schema has no home for it yet
+       (no ledger/fact/claim action in crates/actions; 02-DATA-ARCHITECTURE §7.2 drops pm_card_ledger
+       for the key). Candidates named in SUMMARY: S15 work_package_memory (card_id, run_id, kind,
+       source, body) or event. NOT silently assigned — flagged for the owning slice.
+     P-1203 / P-1242 / P-1247 -> dropped + replacement:<kind>.update. RM project-copy is the fork step of
+       an inherit -> copy-into-project -> promote lifecycle (requirements_management/src/routers/
+       _governed.py:33: 409 inherited_asset_requires_copy). Measured: the word "inherit" appears NOWHERE
+       in docs/SPEC.md, 02-DATA-ARCHITECTURE.md or slices/S07, and governed_asset carries project_id
+       with ONE lifecycle. There is no inheritance, so there is nothing to fork; a project-scoped update
+       replaces the copy step. G7-legal (`replacement:` prefix).
+
+4. PENDING DEFAULT-DROPS (SUMMARY.md:90-94) — decided on measurement
+   Evidence used: the node census above (ALL 348 flows, not just active), and the day-1 row counts
+   (parity/evidence/{fr,rm,planka}-counts.tsv).
+     fr /api/research/**  58 rows -> dropped. No A/B/C hit in any of 348 flows or the 24h sample; KAG
+       substrate, and KAG is reference-only (George 2026-10-29).
+     fr /api/tools/{coding,bridge,analytics}/**  20 rows -> dropped. coding fleet not absorbed (D14);
+       bridge retired with KAG; analytics derived from run/event.
+     fr /api/admin/{licenses,pricing}**  53 rows -> dropped. SPEC §2 "Never absorbed: licenses,
+       billing_service"; 02-source-map/20-fr.md:36 says licensing/pricing "no".
+     planka aux (users, access-tokens, config/test-smtp, background-images, project-managers,
+       notifications, notification-services, terms)  25 rows -> dropped. SPEC §4 duplicate
+       notification/membership stores; Keycloak replaces Planka identity; S06 owns notifications.
+     fr /api/tools/{kanban,n8n}/**  4 rows -> UNCHANGED (live monitoring surfaces).
+     kata.open -> INCLUDED as P-1300, used, class A. 5th active "other" flow; an active flow S13 must
+       re-author, so excluding it would silently drop it. Added to parity/surfaces/n8n.txt as well.
+
+   Applied as one jq program (/tmp/day2-decisions.jq, not added to the repo — no helper scripts):
+     jq --indent 2 -f /tmp/day2-decisions.jq parity/parity.yaml > <new>
+   Formatting proof, run BEFORE the write:
+     jq --indent 2 . parity/parity.yaml | diff -q - parity/parity.yaml   -> IDENTICAL
+   so the rewrite touches only the rows whose fields changed. Day-1 file kept at
+   parity/parity.yaml.day1.bak.
+   Result: 1299 -> 1300 rows; used 167 -> 170, rare 334 -> 332, unused 708 -> 554, dropped 90 -> 244.
+   Post-apply gate: G1 dups 0 · G2 bad 0 · G3 bad 0 · G4 diff empty · G5 1300 = 1300 ·
+                   G7 dropped-without-reason 0 · check-jsonschema ok.
+
+5. IN-CLUSTER CALL OPACITY (SUMMARY item 7) — 24 rows rare(D) -> used(A2)
+   Loki here is the INGRESS access log only; n8n -> fr is pod-to-pod and invisible to it, so a
+   24 h zero there is NOT evidence of disuse (day 1 recorded that at 00-preflight §8d and left
+   these rows at rare). Resolved from source instead:
+
+   n8n -> fr webhooks/n8n/** (11 rows)
+     rg -o "webhooks/n8n/[a-z0-9-]+" n8n_separated_modules
+     -> 11 of the 11 inventory paths are posted by n8n-nodes-fr node source (the package pinned in
+        the live n8n-custom image). Reference counts: card-phase-lease 31, report 11, plan-event 11,
+        card-approval 10, executed-activity 9, project-start-failed 5, project-coach-failed 5,
+        approval-request 3, router-dedupe 2, project-request-outline 2, execution-event 2.
+     A 12th path exists in the node source, /api/webhooks/n8n/wip-slot, and has NO inventory row
+     CORRECTLY: fr retired it (fr/backend/src/server.ts:840, "RETIRED (v4 ruling, 2026-10-13)").
+     Not an inventory gap — dead node code; S05/S13 must not re-create it.
+
+   fr /api/internal/** (13 rows)
+     n8n-nodes-fr/src/generated/api-client.ts carries internal/{andon, andon/read-failure,
+       assets/{channel,decision,principle,requirement,trigger}, cards/{id}/computed-checks,
+       cards/{id}/platform-owner, github-app/binding, projects/tenant-map, suggested-schedules}
+     plus nodes/Fr/operations/index.ts (internal/cards/).
+     GET /api/internal/projects/tenant-map is ALSO called by billing_service:
+       billing_service/src/services/project_owner_map.py:43 TENANT_MAP_PATH, 5-min TTL cache.
+     POST /api/internal/conveyor/flow-runs is called by an n8n EXTERNAL EXECUTION HOOK:
+       n8n-custom/hooks/flow-run.js (gitops EXTERNAL_HOOK_FILES on n8n-worker) reports every
+       execution end/wait/resume. Cross-checked at fr/backend/src/services/conveyor-flow-runs.ts:3
+       ("the n8n execution-hook record of every conveyor flow run").
+
+   Inventory completeness re-checked while there: internal/system, internal/workflow-rollback,
+   aa-trace/ac-coverage, internal/github/clone-token all appear in source but are NOT routes and
+   NOT in served-spec.lock.json — "internal/system" is a tenant name. No missing surface.
+
+   Applied: jq --indent 2 -f /tmp/day2-callers.jq parity/parity.yaml   (program kept OUT of the
+   repo — no helper scripts). rare 332 -> 308, used 170 -> 194. G3/G7 re-checked 0/0.
+
+6. ACCEPTANCE STRINGS (SUMMARY item 4) — DOWNGRADED, not done as written
+   Slice §9 (S00-usage-inventory.md:145) defines acceptance as `test:<crate>::<name>`,
+   `e2e:<spec>::<name>` or `probe:<METHOD> <path>`, and the gate G3 only requires that prefix. The
+   167->194 `used` rows already carry `probe:<METHOD> <path>`, so item 4 is a quality wish, not a
+   gate requirement. Replacing them with real `test:` names is only honest for rows whose slice is
+   ALREADY built (S01-S08); every S09-S13 row would be an invented name. Decision: keep `probe:` and
+   say so in SUMMARY, rather than manufacture 100+ fake test identifiers.
+
+7. THE MATCHER, AND THE PROOF THAT IT REPRODUCES DAY 1
+   Day 1 matched paths to surfaces by hand and kept no program (00-preflight.txt §8b is prose), so
+   two samples cannot be compared unless one mapping is applied to both. The mapping is now a
+   program: parity/evidence/02-match-evidence.py (evidence, next to the JSON it reads — not a repo
+   helper script). Method, identical for both samples:
+     * surface = `METHOD /template`; segments are literal, {param}/:param (one segment), or (.*)/(*)
+       (suffix). Trailing-slash variants accepted (FastAPI/Nest 307). Query strings stripped.
+     * each observed (method, path) contributes to EXACTLY ONE surface: most literal segments wins
+       (tie: longer template, then non-wildcard). No double counting.
+     * api.nonagentic.ai / api.example.com rewrite before matching: /requirements/* -> rm, /kanban/* ->
+       planka, else fr.
+
+   REPRODUCTION AGAINST SAMPLE 1 (the guard — it found a real bug in the matcher):
+     python3 parity/evidence/02-match-evidence.py --reproduce parity/parity.yaml.day1.bak parity/evidence
+     FIRST RUN -> mismatches 2, but P-0069 was wrong by 17x (got 5987). CAUSE, found by the guard:
+       a path ending in "/" produced an empty segment that the compiler turned into a suffix
+       wildcard, so `GET /` compiled to ^/.*/?$ and swallowed every request on the host — 5,139
+       bot-scan paths (/.aws/credentials, /.env, ...) were credited to the site root. Fixed:
+       an empty segment is a separator, not a wildcard. Surfaced because parity.yaml already
+       contains day 1's number; nothing else would have caught it.
+     AFTER THE FIX -> B rows checked: 66   mismatches: 2
+        MISMATCH P-0069  GET /             want=342  got=632
+        MISMATCH P-0460  GET /openapi.json want=4    got=8
+   64 of 66 reproduce EXACTLY, and both exceptions are day-1 hand subtractions recorded in the
+   artifacts themselves:
+     * P-0069 `GET /` — 632 = 342 + 288 + 2. 288 is the external probe's 5-minute health check,
+       which 00-preflight §9 names as measurement artifact traffic ("288 GET/24h on
+       kanban.nonagentic.ai and n8n.nonagentic.ai are the external probe's 5-minute health check").
+       Day 1 subtracted it by hand; the matcher does not. Both counts are far above 5.
+     * P-0460 `GET /openapi.json` — 8 vs 4, day 1 having subtracted its own read-only openapi probe
+       (§9 of 00-preflight). The two counts STRADDLE the B>=5 threshold, so this row is decided
+       CONSERVATIVELY: stays `rare`, both numbers recorded.
+   Because the same matcher is applied to both samples, a row's day-2 comparison is like-for-like
+   even where day 1's hand number differs. Baseline: parity/evidence/surface-counts-sample1.tsv
+   (73 surfaces with a non-zero count; top: GET /api/projects 63802, then the polling endpoints).
+
+8. THE RECLASSIFIER AND ITS SMOKE TEST (built and proved BEFORE sample 2 exists)
+   Rule applied, per row, from slice §9 with first match wins:
+     used  when B >= 5 in EACH sample   (the C branch needs a per-row C hit, which day 1 only
+                                        measured for n8n operation tuples — not fabricated here)
+     rare  otherwise, with both counts recorded
+   Two guards, both found by testing rather than reasoning:
+     * a row whose status is `dropped` is SKIPPED. Without this the smoke test resurrected
+       P-0926 GET /api/users and P-0950 POST /api/access-tokens, which a carry decision dropped.
+       §9 precedence is decision-drop -> A -> B -> C -> D, so usage never outranks a decision.
+     * STRADDLE = {P-0460} stays `rare` (see §7).
+   A THIRD BRANCH, found while de-risking the sample query and covered by neither of the above:
+     day 1 classified 708 rows `unused` from SAMPLE 1 ALONE. A surface with zero in sample 1 can
+     still be hit in sample 2 (a weekly job, a shifted pattern), and such a row can no longer
+     honestly be called `unused`. Rule: `unused` + sample-2 count >= 1 -> `rare`
+     ("day-2 sample only; a B hit in one sample cannot stand alone"). It cannot promote to `used`
+     on one sample; it must simply stop claiming zero usage. Without this branch the run would
+     silently discard all day-2-only traffic.
+   Smoke test, sample 1 compared against itself (a mechanics test, NOT a prediction):
+     python3 /tmp/day2-reclass.py parity/parity.yaml surface-counts-sample1.tsv \
+              surface-counts-sample1.tsv s1 s1   -> 64 rows, 35 would promote
+     applied in dry run with jq -> 1300 rows, G1/G3/G7 clean, check-jsonschema ok.
+   The real run repeats this with surface-counts-sample2.tsv. The transform is a jq program
+   (/tmp/day2-apply-reclass.jq) that touches ONLY the rows named in the TSV, which is why the
+   final diff is exactly the movement list.
+
+9. PENDING-S0 — the 13 tables 02-DATA-ARCHITECTURE §9 assigns to S0
+   §9 lists nine rows covering 13 tables, each with an explicit "what would drop it / what would
+   keep it" test, and says "S0 records the verdict in parity.yaml". The parity schema cannot carry a
+   table verdict (app is enum fr|rm|planka|n8n, additionalProperties false), so the verdicts are
+   recorded HERE and in SUMMARY; parity.yaml already reflects them through the statuses of the
+   surfaces that touch each table. That deviation is stated, not hidden.
+
+   Evidence used: the 348-flow node census (§3 above, ALL flows not just active), the day-1 row
+   counts (parity/evidence/*-counts.tsv), and a migrations grep for what the build already created.
+
+   | table | verdict | evidence |
+   |---|---|---|
+   | audience | DROP | no `streams` node operation in any of the 348 flows; fr.streams 0 rows; asset_stream_membership 0; fr has NO /api/streams route at all |
+   | audience_member | DROP | same |
+   | custom_field | KEEP | Planka custom_field 1815 rows, custom_field_group 135 |
+   | custom_field_value | KEEP | Planka custom_field_value 70 rows (§9's premise "measured 0" is stale) |
+   | webhook_subscription | KEEP | Planka webhook 3 live rows — these are what trigger the conveyor |
+   | project_stakeholder | KEEP | fr project_stakeholders 21 rows |
+   | deliverable | DROP | project_deliverables 0, project_milestones 0, no deliverable operation in 348 flows |
+   | project_capability | DROP | pm_project_capabilities 0, no projectCapability operation |
+   | register_item | DROP | pm_resources 0, pm_risks 0, pm_benefits 0; no register route at all |
+   | conversation | KEEP | S10 (copilot) is planned, not dropped or deferred |
+   | conversation_turn | KEEP | same |
+   | outline | DROP | toc_trees 0, toc_nodes 0, toc_settings 0; no `toc` operation in 348 flows; fr /toc/* = 15 unused + 1 rare |
+   | outline_node | DROP | same |
+   ⛔ THE FINDING, stated plainly: six of those DROP verdicts (audience, audience_member, deliverable,
+   project_capability, register_item, outline/outline_node) are tables the build ALREADY CREATED —
+   `audience`+`audience_member` in migrations/0005 (S06), `deliverable`+`project_stakeholder`+
+   `register_item`+`project_capability` in 0008 (S08 Part A), `outline`+`outline_node` in 0007 (S07).
+   The spec's own order is S0 FIRST (00-INDEX.md:171 "S00 is the next executable step"), so these
+   features were built before the inventory that was supposed to gate them and the inventory now says
+   they should not have been. Dropping a built table is a MIGRATION (data-arch §9), not a doc edit, so
+   S00 records the verdict and does NOT migrate: that is a decision for the owning slices, flagged in
+   SUMMARY and the handoff. project_stakeholder stays KEEP on its 21 rows.
+
+10. SAMPLE 2 AND THE RECLASSIFICATION (the day-2 result)
+   Preconditions, asserted before the first query:
+     date +%s = 1794176470 >= 1794176266 (sample-1 instant + 86400)          PASS
+     Loki pod restartCount 0, startTime 2026-11-01T18:05:40Z (unchanged)    PASS
+     df -h -> 30 GiB avail, 83% capacity                                    PASS
+   Sample 2 instant = epoch 1794176484 = 2026-11-08T22:21:24Z, same 24h instant query, same 10
+   hosts + positive control (scripts kept out of the repo; the query is 00-preflight.txt:99-106):
+     parity/evidence/loki-sample2-20261108T222124Z-<host>.json   — 11 files, all status=success
+   POSITIVE CONTROL 1,241,610 lines vs sample 1's 1,210,461 (+2.6 %). The source was alive and at
+   comparable volume, so a low per-row count in this window is traffic, not a dead collector.
+   Series counts (sample1 -> sample2): fr.nonagentic.ai 380->125, kanban.example.com 30->0,
+   api.nonagentic.ai 444->217, n8n.example.com 85->105. Day 2 was materially quieter.
+
+   Counts re-derived with the SAME matcher for both samples, and the sample-1 baseline was
+   regenerated against the current 1300-row inventory first: byte-identical to the stored file
+   (SAMPLE1 BASELINE UNCHANGED), so the two samples are compared like-for-like.
+     surface-counts-sample1.tsv  73 surfaces with a hit
+     surface-counts-sample2.tsv  55 surfaces with a hit
+     03-reclassification.tsv     75 decisions
+
+   RESULT: 24 rare -> used (B>=5 in EACH sample); 40 stay rare; 11 unused -> rare (day-2-only hits,
+   the third branch added in §8). STRADDLE P-0460 stays rare as designed.
+   Both samples' counts are written into every changed row's evidence, so each decision is
+   re-checkable from the artifact.
+   Inventory: 1299 -> 1300 rows. used 167 -> 218, rare 334 -> 295, unused 708 -> 543, dropped 90 -> 244.
+
+   FINAL GATE (slice §7, run from $HOME/Movies/conveyor under bash):
+     G1 unique 0 dup · G2 id shape 0 bad · G3 acceptance 0 bad · G4 surfaces<->parity empty diff ·
+     G5 1300 = 1300 · G6 file count >= 2 · G7 dropped-without-reason 0 ·
+     check-jsonschema --schemafile parity/schema.json parity/parity.yaml -> ok
+   REAL G6 (the slice's G6 passes vacuously on file count): 24 B-class rows are now `used`, and 0 of
+   them lack the "B>=5 in each sample" justification. Asserted, not assumed.
+
+   parity/parity.yaml sha256 = 866acfc96fa2a608c98f13551243f7a75b47060bc3fa6b55751086f774d6ef25

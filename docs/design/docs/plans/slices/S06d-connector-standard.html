@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S06d — Interaction connector standard · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06d-connector-standard.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s06d--interaction-connector-standard">S06d — Interaction connector standard</h1>
+<p>Programme project: S06d · issues none yet</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>Web, Telegram and MCP are <strong>three instances of one class of user-interaction app</strong>. This slice builds the standard that makes the next connector cheap: one registry entry per kind (typed config + <code>schemars</code> schema, named secrets, default grant set, <code>authenticate</code>/<code>parse</code>/<code>send</code>), one inbound route and one command grammar, one multicast dispatcher with a first-response close, and a tenant-admin grant matrix. Config and credentials live in Postgres and are entered through the web UI; there are no per-connector environment variables.</p>
+<h2 id="2-what-the-standard-is">2. What the standard is</h2>
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Where</th>
+<th>Contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connector kind</td>
+<td><code>crates/actions/src/channel/connectors/</code></td>
+<td>A <code>ConnectorSpec</code> per kind: <code>config_schema</code> (the web form), <code>secret_fields</code> (<strong>names</strong> of sealed secrets), <code>default_actions</code>, <code>capabilities</code>, and three functions — <code>authenticate</code>, <code>parse</code>, <code>send</code>. The <code>webhook</code> kind is the zero-Rust on-ramp for a JSON gateway.</td>
+</tr>
+<tr>
+<td>Binding</td>
+<td><code>channel_binding</code></td>
+<td><code>(tenant, kind, route_key)</code>; <code>config</code> holds non-secret values and secret names. <code>channels.bind</code> validates the config with the kind's own schema and refuses a name the tenant does not hold.</td>
+</tr>
+<tr>
+<td>Identity</td>
+<td><code>app_user(kind='service', oidc_subject='service:&lt;kind&gt;:&lt;tenant&gt;')</code></td>
+<td>One per <code>(tenant, kind)</code> for provisioned connectors; <code>mcp</code> is the licence principal; <code>web</code> is the human session. Membership role <code>kata_executor</code>; the grant set is the real bound.</td>
+</tr>
+<tr>
+<td>Inbound</td>
+<td><code>POST /api/channels/{binding_id}/inbound</code></td>
+<td>Resolve binding → adapter authenticates (per-binding sealed secret) → adapter parses → <strong>shared</strong> command grammar → <code>invoke</code> with <code>Authority::Channel</code>. The adapter never authorizes.</td>
+</tr>
+<tr>
+<td>Command grammar</td>
+<td><code>channel::command</code></td>
+<td><code>approve/reject/answer</code>, <code>run/rerun/start/finish/cancel</code>, <code>close/create</code>, <code>do &lt;action&gt; &lt;json&gt;</code>, <code>help</code>. One implementation, every text connector.</td>
+</tr>
+<tr>
+<td>Multicast</td>
+<td><code>interaction.dispatch</code></td>
+<td>A pending approval is offered to every eligible machine binding (grant allows <code>approvals.decide</code>) and human web inbox (role/policy holds the response scope). <code>interaction_dispatch</code>'s PK is the fan-out idempotency.</td>
+</tr>
+<tr>
+<td>First response</td>
+<td><code>interaction.close</code></td>
+<td>A terminal approval expires every live sibling delivery to <code>expired</code> with <code>last_error='superseded: resolved via &lt;channel&gt;'</code> and sends one closure notice per dispatch. The action's status guard is the arbiter; this sweep is the notification half.</td>
+</tr>
+<tr>
+<td>Configuration</td>
+<td><code>channels.kinds/bind/get/list/unbind/test</code></td>
+<td>The schema, the binding, the inbound URL, secret presence, and a queued real test message.</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td><code>channels.policy_get/set/reset</code></td>
+<td>The tenant-admin matrix: compiled default, stored override, and the floor (a machine can never sign off evals, read held-out traces, administer the tenant (roles, invites, members, departments, channels, webhooks, secrets), control board membership, or author workflows).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-decisions">3. Decisions</h2>
+<ol type="1">
+<li><strong>One grammar, thin adapters.</strong> Platform payload parsing is the only per-kind code; the command vocabulary, identity, grants, retries and delivery state are core.</li>
+<li><strong>Config is data.</strong> A binding's config and secret names are rows; <code>channels.bind</code> validates against the kind's schema. <code>CONVEYOR_SECRET_KEK</code> remains the deployment root key.</li>
+<li><strong>The machine floor cannot be granted.</strong> <code>ActionSpec::machine_forbidden</code> is computed from declared scopes/resource, and both <code>channels.policy_set</code> and <code>invoke</code> enforce it.</li>
+<li><strong>Eval gates are human-only.</strong> The shared decision writer refuses a non-human or non-<code>evals:approve</code> decision on any approval with <code>eval_id IS NOT NULL</code>; the dispatcher never offers such a gate to a machine channel.</li>
+<li><strong>The first-response loser is <code>expired</code>.</strong> No second state machine: <code>pending|sent → expired</code> is the edge the data model already documents.</li>
+<li><strong>A publisher is checked by its authority.</strong> <code>procedures.publish</code> uses the channel grant set, so a channel cannot freeze a step it could not invoke.</li>
+<li><strong>The web channel has no machine grants.</strong> Its authorization is the human role policy.</li>
+</ol>
+<h2 id="4-code-map">4. Code map</h2>
+<pre><code>migrations/0038_s06d_connector_standard.sql
+crates/actions/src/channel/{mod,command}.rs
+crates/actions/src/channel/connectors/{mod,telegram,webhook}.rs
+crates/actions/src/control/channels.rs            kinds/bind/get/list/unbind/test/policy_*
+crates/actions/src/{invoke,spec}.rs               Authority, permits_channel, machine_forbidden
+crates/auth/src/{principal,authn}.rs              ChannelAuthority, Session.channel
+crates/store/src/{interaction,rbac,channel,delivery}.rs
+crates/api/src/routes/channels.rs                 the one inbound route
+apps/server/src/worker.rs                         interaction.dispatch / interaction.close</code></pre>
+<h2 id="5-gate">5. Gate</h2>
+<pre class="bash"><code>rbuild -- test --workspace --no-fail-fast --locked
+rbuild -- clippy --workspace --all-targets -- -D warnings
+rbuild -- fmt --check
+rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock</code></pre>
+<p>Result at <code>99ed39f</code> + the five-failure fix: clippy/fmt clean, lock OK, and every affected binary re-run green (<code>conveyor-api --lib</code>, <code>externals_declared</code>, <code>kata_role</code>, <code>channel_inbound</code>, <code>channel_policy</code>, <code>conveyor-server --test prune</code>, <code>interaction_dispatch</code>, <code>conveyor-store --lib</code>). The first full workspace run found exactly those five failures; the rest of the suite passed. The full suite was not repeated end-to-end after the fixes (each affected binary was).</p>
+<h2 id="6-traps">6. Traps</h2>
+<ol type="1">
+<li><strong>A channel kind is code, not a CHECK.</strong> The database owns the spelling; an unknown kind must be refused by <code>channels.bind</code> and inert at the route, never guessed.</li>
+<li><strong>A secret field holds a name.</strong> Never echo a value; <code>channels.get</code> reports presence only.</li>
+<li><strong>RLS in the migration.</strong> <code>membership</code> is FORCE RLS; the service-identity backfill lifts FORCE inside the migration and restores it (the 0028 pattern).</li>
+<li><strong><code>expired</code> is terminal.</strong> A delivered sibling stays delivered; the close sweep expires only live rows and still sends the closure notice.</li>
+<li><strong>The dispatcher is idempotent by PK, not by a scan.</strong> The advisory lock + the dispatch PK are the two guards; do not add a "has this run" column.</li>
+<li><strong>The eval floor is a scope test.</strong> <code>kata_executor</code> deliberately lacks <code>evals:approve</code>; a tenant grant cannot change that.</li>
+<li><strong>Webhook senders retry non-2xx.</strong> Business refusals are <code>200</code> acks; only a server-side failure asks for a retry.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S06d-connector-standard.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

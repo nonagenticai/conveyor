@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0002 — The workflow editor: a Leptos/SVG canvas, not eguixyflow · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0002-editor.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0002--the-workflow-editor-a-leptossvg-canvas-not-egui_xyflow">0002 — The workflow editor: a Leptos/SVG canvas, not <code>egui_xyflow</code></h1>
+<p>Status: Accepted · Date: 2026-11-09 · Slice: S13 §5.6 (step 16)</p>
+<h2 id="decision">Decision</h2>
+<p>The admin graph editor is <strong>fallback A</strong>: a small Leptos/SVG canvas in the existing web app. The <code>egui_xyflow</code> spike (<code>spikes/editor/</code>) is <strong>not</strong> adopted and is not built.</p>
+<p>The rule the slice set stands: <strong>the engine never depends on the editor.</strong> All validation is server-side (<code>workflows.publish</code> refuses an invalid graph); a failed or absent editor leaves every workflow publishable and runnable.</p>
+<h2 id="context--what-was-measured">Context — what was measured</h2>
+<p><code>docs/plans/slices/S13-n8n-engine.md</code> §5.6, measured 2026-11-07 against crates.io and GitHub, not locally:</p>
+<table>
+<thead>
+<tr>
+<th>fact</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>latest published</td>
+<td><code>egui_xyflow</code> <strong>0.4.3</strong>, 2026-05-06</td>
+</tr>
+<tr>
+<td>repository</td>
+<td><code>avinkrisv/egui-xyflow</code>, 21 stars, one maintainer</td>
+</tr>
+<tr>
+<td>repo head (unpublished)</td>
+<td>0.5.0 on egui 0.37, last commit 2026-10-26</td>
+</tr>
+<tr>
+<td>MSRV</td>
+<td>1.95</td>
+</tr>
+<tr>
+<td>0.4.3's egui pin</td>
+<td><strong>egui 0.31 — UNVERIFIED</strong> (the 0.5.0 commit message says 0.1–0.4 stayed on 0.31)</td>
+</tr>
+</tbody>
+</table>
+<p>The slice's adoption gate was four-fold: builds against the app's egui/eframe pin without patching; 60 fps drag at 20 nodes / 40 edges; a lossless layout round-trip; and a published version or a vendored commit with a recorded SHA. <strong>None of the four was measured</strong>, because the first already decides it: there is no eframe/egui in this app — ADR 0001 chose <strong>Leptos CSR</strong> — so "builds against the app's egui pin" would mean adding a second UI toolkit and a second rendering stack to an admin screen.</p>
+<h2 id="why-fallback-a">Why fallback A</h2>
+<ol type="1">
+<li><strong>No second UI stack.</strong> The app is Leptos CSR (ADR 0001). <code>egui_xyflow</code> would pull egui/eframe in as a parallel renderer for one admin screen, including its own event loop and wasm bundle.</li>
+<li><strong>The pin is a bet, not a dependency.</strong> A published 0.4.3 whose egui pin is unverified, against an 0.5.0 that is not on crates.io, maintained by one person. Vendoring a commit is possible but inherits the same unverified pin.</li>
+<li><strong>The graph surface is small.</strong> The measured estate is 13 graph workflows after the three-way split, of which one is live (<code>kata.open</code>); the gate fixtures are 5–7 nodes. 60 fps at 20 nodes/40 edges is not a requirement this screen has ever had to meet.</li>
+<li><strong>Nothing in the engine can depend on it.</strong> Publish-time validation is server-side and already proved (<code>definition_validate</code>, <code>workflows.publish</code>). The editor is an admin convenience.</li>
+</ol>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li><code>spikes/editor/</code> is not created; no <code>egui</code>/<code>eframe</code> dependency enters the workspace.</li>
+<li>The editor work is a Leptos/SVG screen: load a definition via <code>workflows.get</code>, lay out nodes, drag, save via <code>workflows.update</code> (draft only) — with the same publish validation as any client.</li>
+<li>If the canvas proves inadequate (measured, not assumed), fallback B is a read-only SVG importer plus form/JSON edits; the engine requires neither.</li>
+<li>This record closes S13 step 16d. The spike (16a–16c) is deliberately not run.</li>
+</ul>
+<h2 id="superseded-2026-11-09">Superseded 2026-11-09</h2>
+<p>The graph editor this decision selected <strong>is not built</strong>: the process model replaces the DAG (SPEC D6, amended 2026-11-09), so the editor edits an ordered list of stages, not a graph. Fallback A's principle stands — no second UI stack; the stage editor is a form/list in the existing Leptos app. The <code>egui_xyflow</code> spike remains unrun and unnecessary.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0002-editor.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

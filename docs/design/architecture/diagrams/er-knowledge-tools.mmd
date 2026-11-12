@@ -1,0 +1,15 @@
+erDiagram
+  CAPABILITY ||--o{ PROCEDURE : realises
+  PROCEDURE ||--o{ PROCEDURE_STEP : orders
+  PROCEDURE }o--|| PKO_RELEASE : pins
+  PKO_RELEASE ||--o{ PKO_ENTITY : contains
+  PKO_ENTITY ||--o{ PKO_RELATION : subject
+  PROCEDURE_STEP }o--o{ PKO_ENTITY : references
+  CAPABILITY }o--o{ KNOWLEDGE_PACK : pinned
+  CARD ||--o{ MEMORY_HOT : writes
+  CARD ||--o{ MEMORY_DIGEST : consolidates
+  LESSON }o--o{ EVIDENCE : needs
+  JOB_BINDING }o--o{ TOOL_BINDING : grants
+  TOOLKIT ||--o{ TOOL : versions
+  TOOL_BINDING }o--|| TOOLKIT : pins
+  TOOL_CALL }o--|| TOOL : invokes

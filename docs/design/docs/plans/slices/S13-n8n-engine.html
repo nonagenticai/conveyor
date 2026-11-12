@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S13 — Process engine, judge, map and care-bus · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S13-n8n-engine.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s13--process-engine-judge-map-and-care-bus">S13 — Process engine, judge, map and care-bus</h1>
+<p>Programme project: S13 · issues #17</p>
+<p><strong>Gate (SPEC §8 S13):</strong> the execution-trace diff against the old flows, plus the run tree (a child under a live parent), the judge (a reject loops, a laya outage waits) and the bus (a Redis loss re-delivers without a double outcome). <strong>R4 binds this plan:</strong> the process model replaces the DAG as the executor, flows are re-authored as processes/handlers (never converted), and the engine never depends on an editor.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>Make the conveyor execute <strong>processes</strong>, not n8n graphs. A process is an ordered list of <strong>steps</strong> — an <strong>agent</strong> task, a <strong>computed</strong> task, a <strong>gate</strong>, or a child <strong>call</strong> — stored as <code>process</code>/<code>process_step</code> (S11's tables, renamed by migration <code>0035</code>). Every step has a <strong>procedure (SOP)</strong>: definition of ready, definition of done, acceptance criteria and an <strong>inspection</strong>; the process declares its <strong>user-facing outputs</strong>. The step's output is <strong>judged</strong> by the SOP's judge (the laya decision model, an eval, or a checker): accept → done; reject → rerun with the judge's reason (max 2) → BLOCKED → coach; a laya outage <strong>waits</strong>.</p>
+<p>A run is a <strong>tree</strong>: one live root per card, and a live parent may start a child (the coach, a <code>cap.*</code> call). Step work is carried by the <strong>care-bus</strong> (Redis Streams, ported from <code>agent-api/src/runtime/bus.rs</code>, itself from <code>care-bus-agents@96c608c</code>) with consumer groups and a dead-letter stream, while Postgres <code>run</code>/<code>run_step</code>/<code>event</code> remain the system of record.</p>
+<p>The <strong>DAG returns only as the process map</strong>: a versioned, declarative <code>process_map</code> per project type whose nodes are processes, capabilities, phases or milestones — the user's view of what is happening, never the executor. The <strong>workflow engine is RETAINED</strong> (owner ruling 2026-11-09): <code>crates/workflow</code>, the <code>workflow</code> table, <code>workflows.*</code>/<code>workflow_runs.*</code> and the <code>workflow.node</code>/<code>workflow.start</code> job kinds stay as the <strong>tool-sequence executor</strong> — a process <code>call</code> step resolves <code>child_process_key</code> <strong>process-first, workflow-second</strong> — and there is <strong>no drop migration</strong>. What does retire is the hook seam: <code>POST /api/hooks/{hook}</code> and <code>CONVEYOR_HOOK_SECRET</code> are deleted. The five named legacy flows are <strong>absorbed</strong>: <code>conveyor.start</code> → <code>projects.create</code>; <code>wip.pull</code> → a <code>card.moved</code> handler; <code>err.card</code> → the <code>run.failed</code> handler; <code>ask_fr</code> and <code>kata.open</code> → processes.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S03/S04/S11 built: <code>run</code>, <code>run_step</code>, <code>procedure</code>, <code>procedure_step</code> (to be renamed), <code>run_step</code>, the six <code>procedures.*</code> actions, <code>procedure_runs.start</code>, the <code>procedure.step</code> executor, gates and cancel. S15 built: <code>capability_agent</code> with its readiness seam.</li>
+<li>The DAG exists and is proven (S13 sessions 1–9): <code>crates/workflow</code>, migration <code>0019</code>, the trace/diff gate, the 348-row dispositions ledger. <strong>It is RETAINED as the tool-sequence executor</strong> (owner ruling 2026-11-09); its graph planner never drives a process step. Evidence: <code>docs/evidence/S13-ENGINE.md</code>.</li>
+<li>Measured 2026-11-07: 348 flows / 332 active — 280 card-type × list (70 types × 4 lists), 51 <code>cap.*</code>, 4 named, 12 <code>zz.*</code>/dead, 1 <code>kata.open</code>. n8n history is 3 days; the three fixture traces are committed.</li>
+<li><code>uq_run_live</code> is card-wide today — the reason the coach child cannot start (<code>crates/store/src/run.rs:199</code>).</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN:</strong> migration <code>0035_process_tree.sql</code> (the <code>procedure</code>→<code>process</code> and <code>procedure_step</code>→<code>process_step</code> renames, the new <code>procedure</code> SOP table and <code>process_map</code>, the run tree, <code>capability.kind</code>, the agent roles, <code>run_step.judge</code>, the event bus cursor, and <code>inference_call.caller_kind</code> <code>procedure_step</code>→<code>process_step</code>); migration <code>0036_s19_output_grade.sql</code> (S19's per-output grade path); the process/SOP publish validation; the step executor with gate/retry/call; the judge (checker/laya/eval); the run tree (root-only live index, depth ≤3, cascade cancel); <code>crates/bus</code> + the relay + groups + DLQ; <code>projects.create</code> absorbing the start; <code>wip.pull</code>/<code>err.card</code> computed handlers; the 70 type files / 280 default processes / 350 SOPs with their agents; the dispositions rewrite; the trace export/diff over <code>run_step</code>. <strong>The DAG is NOT deleted</strong> — the workflow engine is retained (owner ruling 2026-11-09) as the tool-sequence executor.</p>
+<p><strong>OUT:</strong> data migration (D7); the map/stage editor beyond a read/author form (S12); the <code>cap.*</code> prompts (S15/S21); the benchmark/eval slices; <strong>w2v/media production</strong> (a later capability — the tenant-defined model is what will carry it, D30); parallel fan-out (v1 is serial); any Python.</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry / do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v4 <code>model.md</code> §3/§4, <code>workflows.md</code> §2, <code>capability-flows.md</code> §2</td>
+<td>macro/micro mantra; card-type → 4 list flows → 4 agents → atomics</td>
+<td>the vocabulary; not n8n's execution model</td>
+</tr>
+<tr>
+<td>v4 <code>README.md</code> R348(2), R359(1–4), R347(3)</td>
+<td>the laya judge: <code>{score, accepted, reason}</code>, margin, reject → rerun with the reason (2), outage waits</td>
+<td>the client is TypeSafe AI over <code>https://api.nonagentic.ai/laya</code> with the conveyor licence</td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/runtime/bus.rs</code> (from <code>care-bus-agents@96c608c</code>)</td>
+<td>envelope, topics, consumer groups, XACK/XAUTOCLAIM, DLQ, scope</td>
+<td>port with attribution; no <code>env</code></td>
+</tr>
+<tr>
+<td><code>agent/crates/agent-api/src/runtime/{case,orchestrator}.rs</code></td>
+<td>the case/phase machine and deadlines</td>
+<td>the shape of a run that waits</td>
+</tr>
+<tr>
+<td>S11 §5, S15 §5</td>
+<td>process/step, capability_agent, readiness</td>
+<td>the storage and the executor seam</td>
+</tr>
+<tr>
+<td><code>docs/evidence/S13-ENGINE.md</code></td>
+<td>the DAG's measured history and the 348 ledger</td>
+<td>evidence only; do not rebuild the DAG</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<h3 id="51-migration-0035_process_treesql">5.1 Migration <code>0035_process_tree.sql</code></h3>
+<ul>
+<li>Rename <code>procedure</code> → <code>process</code>, <code>procedure_step</code> → <code>process_step</code>; rename the FK columns accordingly (<code>run.procedure_id</code> → <code>run.process_id</code>, <code>run_step.process_step_id</code>).</li>
+<li><strong>New <code>procedure</code> (SOP)</strong>: <code>{key, title, description, status, version, definition_of_ready jsonb, definition_of_done jsonb, acceptance_criteria jsonb, inspection jsonb, outputs jsonb}</code>; one published per key.</li>
+<li><strong>New <code>process_map</code></strong>: <code>{key, title, status, version, project_type_id, definition jsonb}</code> (nodes/edges); one published per <code>(key, project_type_id)</code>.</li>
+<li><code>run</code>: <code>parent_run_id uuid → run(id)</code>, <code>step_id uuid → process_step(id)</code>, <code>depth int NOT NULL DEFAULT 0 CHECK (depth BETWEEN 0 AND 3)</code>, <code>CHECK (parent_run_id IS NULL OR step_id IS NOT NULL)</code>.</li>
+<li>Drop <code>uq_run_live</code> and <code>uq_run_project_live</code>; recreate both root-only; add <code>uq_run_child_live (parent_run_id, step_id)</code> and <code>uq_run_child_attempt (tenant_id, parent_run_id, step_id, attempt)</code>.</li>
+<li><strong><code>0037_run_tree_workflow_step.sql</code> (2026-11-10, W5)</strong>: <code>run.workflow_step_id uuid → run_step(id)</code> and the workflow pair of child indexes; <code>run_parent_step_check</code> replaced so a child names EXACTLY one step kind (a process parent's <code>process_step</code> or a workflow parent's <code>run_step</code>). Before this, a workflow's procedure node could not start a child at all: <code>step_id</code> is FK-bound to <code>process_step</code>, and a root start 409s on <code>uq_run_live</code> against the parent. <code>process_runs.start</code> takes <code>workflow_step_id</code>; the workflow node passes its <code>run_step</code> id.</li>
+<li><code>process_step</code>: <code>kind ∈ agent|computed|gate|call</code>, <code>actor ∈ process_agent|tool_agent|system|human</code>, <code>capability_id</code>, <code>process_agent_id</code>, <code>procedure_id</code>, <code>child_process_key</code>, <code>on_result</code>.</li>
+<li><code>process</code>: <code>capability_id</code>, <code>card_type_id</code>, <code>list_kind</code>, <code>project_type_id</code>, <code>outputs jsonb</code>.</li>
+<li><code>capability.kind ∈ system|tenant</code>; <code>capability_agent.role ∈ process_agent|tool_agent</code> + <code>process_key</code>/<code>toolset</code>.</li>
+<li><code>run_step.judge jsonb</code>; <code>event.bus_stream_id</code>/<code>published_at</code>.</li>
+</ul>
+<h3 id="52-the-processsop-definitions-and-publish-validation">5.2 The process/SOP definitions and publish validation</h3>
+<ul>
+<li>One process per <code>(card_type, list)</code> — 70 × 4 = <strong>280</strong> — is the <strong>default catalogue</strong>, not a fixed system set; a tenant may instantiate, override or design its own (D29). <strong>As built (2026-11-10):</strong> 70 type files / 280 processes / 350 SOPs, loaded by <code>crates/store/src/process_seed.rs</code> (<code>serde_yaml</code> + <code>include_dir</code>; <code>apply_all</code> after <code>migrate --seed</code>, <code>apply_type</code> for the dev fixture's start process); <code>seed/processes/manifest.yaml</code> is the generated 280-entry index. The loader test applies the whole catalogue <strong>twice on a fresh database</strong>, proving publish validation and idempotency. The <code>cap.*</code> processes, <code>ask_fr</code> and <code>kata.open</code> are the same shape. <code>project_management</code>, <code>kanban_coach</code> and <code>kata</code> are the fixed system capabilities.</li>
+<li>A <strong>step</strong> names its capability, worker (<code>process_agent_id</code>), tools, <code>procedure_id</code> (SOP), <code>on_result</code> and <code>max_attempts</code> (≤10). <strong>No predicates, no loop nodes, no expression language</strong>; a step's typed outcome is <code>continue | fail | retry</code>.</li>
+<li><strong>The step's action field (2026-11-10).</strong> An <code>agent</code> step stores the primitive it runs (<code>agent.run</code>, domain <code>AGENT_STEP_ACTION</code>) so <code>run_step.action</code> is truthful and publish/seed/executor read one value; a <code>computed</code> step stores its registered action; <code>gate</code> and <code>call</code> steps store none. Publish requires exactly that, the seed loader applies the same shape rule, and the executor dispatches on the step's KIND. Before this the validator forbade the action the seed wrote, which made every catalogue process un-republishable through the API.</li>
+<li>An <strong>SOP</strong> has <code>definition_of_ready</code>, <code>definition_of_done</code>, <code>acceptance_criteria</code>, <code>inspection</code> (<code>{kind: laya|eval|checker, threshold?, max_rejects?}</code>) and <code>outputs</code>.</li>
+<li>A <strong>process</strong> declares its <strong>user-facing outputs</strong> and is versioned; a run pins the process/SOP versions it used.</li>
+<li>Publish validation refuses: no steps; duplicate/non-contiguous positions; a computed/tool step whose action is not registered; an agent step with no <code>capability_agent(role='process_agent')</code>; a step with no published SOP; a call to an unpublished process or depth &gt;3; a map node that does not resolve; a reordering of a system capability's process.</li>
+</ul>
+<h3 id="53-the-run-tree">5.3 The run tree</h3>
+<p><code>process_runs.start</code> accepts <code>parent_run_id</code> plus <strong>the parent's own step kind</strong> — <code>step_id</code> (a <code>process_step</code>, for a process <code>call</code>) or <code>workflow_step_id</code> (a <code>run_step</code>, for a workflow's procedure node, 0037); naming both or neither is a <code>422</code>. A child may start under a live parent <strong>on the same card</strong>, depth ≤3; one live child per <code>(parent, step)</code> and one row per attempt; cancel cascades; a child failure does not re-fire the parent's <code>err.card</code>. The root-only indexes are the enforcement; the store's <code>live_run_for_card_tx</code> filters roots, and <code>next_attempt_for_card_tx</code> counts per <code>(parent, step)</code>. <strong>As built (2026-11-10):</strong> the root filter is <code>uq_run_live ... WHERE parent_run_id IS NULL</code>; a workflow parent's child is proven by <code>call_step::a_workflow_procedure_node_starts_a_child_under_the_parent</code>.</p>
+<h3 id="54-the-step-executor">5.4 The step executor</h3>
+<p><code>process.step</code> drives an attempt: load the run and step, write <code>run_step</code>, execute by <code>kind</code> (<code>agent</code> → <code>agent.run</code> with the resolved process agent; <code>computed</code>/tool → the action via the tool agent; <code>gate</code> → open the approval and park; <code>call</code> → start the child and poll), then <strong>judge the output</strong>, append the outcome and enqueue the next step. Retry appends an attempt; timeout is <code>error_class=timeout</code>; every write is idempotent on <code>(run_id, position, attempt)</code>.</p>
+<h3 id="55-the-judge">5.5 The judge</h3>
+<ul>
+<li><code>laya.judge</code> is an <strong>external action</strong> against <code>https://api.nonagentic.ai/laya</code>, authenticated with the conveyor's laya licence by a typed client — never a plain unauthenticated HTTP call. Request: the step output, the SOP's <code>acceptance_criteria</code> and the card's measured facts. Response: <code>{score, accepted, reason}</code> — the confidence margin is the signal, not the label.</li>
+<li><strong>Reject → rerun the same step with <code>reason</code> added</strong> (at most 2 rejects), then the card goes <strong>BLOCKED → coach</strong>. <strong>Outage → wait</strong>; never fail open, never count as a reject.</li>
+<li>The verdict is written to <code>run_step.judge</code> (decision, score/margin, reason, criteria, output hash) so acceptance is auditable and replayable. An <code>eval</code> inspection uses S19's <code>eval_runs</code> and records the same shape.</li>
+<li><strong>As built (2026-11-10):</strong> the judge is a step-executor seam over the registered <code>laya.judge</code> action and the <code>checker</code>/<code>eval</code> inspection kinds. A reject reruns the same position with the reason, bounded by the SOP's <code>max_rejects</code> (default <strong>2</strong>); an exhausted budget fails the run (→ <code>err.card</code> → the coach); an outage <strong>parks</strong> the step and re-enqueues it.</li>
+</ul>
+<h3 id="56-the-process-map">5.6 The process map</h3>
+<p><code>process_map</code> is a versioned document bound to a project type; nodes <code>process|capability|phase|milestone</code>, edges flow. It is <strong>declarative</strong> (no execution, no reordering). The API serves it (<code>process_maps.get/list</code>), the PM plans from it, and the UI overlays the project's live position (running/done/blocked) from the runs. A prescribed sequence of external API calls is a process whose steps are tool calls, not a second execution model. <strong>UI surface declared for S12:</strong> screen 7 (<code>processes</code> — steps, SOP, judge verdicts, user-facing outputs) and screen 22 (<code>process map</code> — the DAG with the live position).</p>
+<h3 id="57-the-bus">5.7 The bus</h3>
+<p>Port the envelope <code>{id, topic, from, correlation_id, procedure, tenant_id, job, payload}</code>; topics <code>work.requested|succeeded|failed</code>, <code>tool.call|response</code>, <code>dead.letter</code>; groups <code>process|tool</code>; <code>XADD</code>/<code>XREADGROUP</code>/ <code>XACK</code>/<code>XAUTOCLAIM</code>; <code>max_deliveries=5</code> → <code>bus:dead</code>. The relay publishes unpublished <code>event</code> rows by <code>seq</code> (woken by <code>pg_notify</code>), records <code>bus_stream_id</code>/<code>published_at</code>, and <strong>re-delivers after a Redis loss</strong> because the step's outcome in Postgres is the truth. <code>FLUSHALL</code> + replay must reproduce the same run state. <strong>As built (2026-11-10):</strong> <code>crates/bus</code> (envelope, groups <code>process|tool</code>, the relay and the DLQ) is in the workspace, and the <code>process.step</code> job is the <strong>Redis-absent fallback</strong> — a run still executes from Postgres with Redis down. CI starts a dind Redis from the archetype's <code>redis_image</code>.</p>
+<h3 id="58-the-computed-set-code-not-processes">5.8 The computed set (code, not processes)</h3>
+<p><code>projects.create</code> creates project + board + start card in one transaction and emits <code>card.created</code>; the start card is <code>project_start_request_analysis</code> (intake). It starts a root run <strong>only when the tenant has published a start process</strong> — there is no universal seed, because a tenant may run accounting, marketing or human project management (owner ruling 2026-11-10). The move step is <code>cards.move</code>. <code>wip.pull</code> reacts to <code>card.moved</code> and keeps <code>may_move</code> as the guard. <code>err.card</code> runs on <code>run.failed</code>, moves the card to BLOCKED, comments and starts the coach root run. Approval routing is the gate resume. The hook route and <code>CONVEYOR_HOOK_SECRET</code> are deleted.</p>
+<h3 id="59-the-dispositions-ledger">5.9 The dispositions ledger</h3>
+<p><code>parity/n8n-dispositions.tsv</code> is rewritten: the 280 rows target <code>process:&lt;card_type&gt;:&lt;list&gt;</code>, the 51 <code>cap.*</code> rows target <code>process:cap.&lt;c&gt;.&lt;function&gt;</code>, <code>ask_fr</code>/<code>kata.open</code> target processes, and the four computed flows (<code>conveyor.start</code>, <code>wip.pull</code>, <code>err.card</code>, the move step) are <code>absorbed:...</code>. <strong>No <code>delta:</code> rows.</strong> Every old node has a mapping row; the count is 348. <strong>As built (2026-11-10):</strong> the rewrite landed. Measured on disk: 348 rows, 333 distinct <code>process:</code> targets (280 type + 53 named), 3 <code>absorbed:</code> rows, 12 <code>n8n-retire</code>, no <code>delta:</code> row, and every target resolves against the seed catalogue. Column 3 still carries the DAG-era grouping (<code>matrix</code>/<code>cap</code>/<code>named</code>/<code>dead</code>/<code>kata</code>); it is a label, and the test asserts the target column, which is the claim.</p>
+<h2 id="6-build-order">6. Build order</h2>
+<p><strong>Done (2026-11-10):</strong></p>
+<ol type="1">
+<li>✅ Migration <code>0035_process_tree.sql</code> (renames, SOP, map, run tree, kinds, roles, judge, bus cursor, the <code>caller_kind</code> move) + migration <code>0036_s19_output_grade.sql</code> + the domain/store types + publish validation; <code>cargo test -p conveyor-store process_tree</code>.</li>
+<li>✅ The step executor and the run tree (Postgres only); the coach child end to end; <code>crates/actions/tests/process_step.rs</code> + <code>call_step.rs</code>, <code>crates/api/tests/project_start.rs</code> + <code>computed_set.rs</code> (the plan's <code>crates/api/tests/process_run.rs</code> was never created — corrected 2026-11-10).</li>
+<li>✅ The judge (<code>checker</code>/<code>laya</code>/<code>eval</code>) + the reject/rerun/block ladder and the outage wait; <code>crates/actions/tests/judge.rs</code> with a stub laya (a real call is the live gate).</li>
+<li>✅ <code>projects.create</code> + the start card + the root run; <code>crates/api/tests/project_start.rs</code>.</li>
+<li>✅ <code>wip.pull</code> and <code>err.card</code> as computed handlers; <code>crates/api/tests/computed_set.rs</code>.</li>
+<li>✅ <code>crates/bus</code> + the relay + consumer groups + DLQ; compose Redis; <code>crates/actions/tests/bus_delivery.rs</code>.</li>
+<li>✅ The default catalogue: 70 type files / 280 processes / 350 SOPs, with each file's agents; <code>seed/processes/**</code>; <code>seed/processes/manifest.yaml</code> (the generated 280-entry index); the loader test applies the whole catalogue twice on a fresh DB.</li>
+</ol>
+<p><strong>Session 3 (2026-11-10) — the contracts between the parts, and install completeness:</strong></p>
+<ol start="16" type="1">
+<li>✅ <strong>One step contract.</strong> <code>validate_publish</code> requires <code>action = agent.run</code> on an <code>agent</code> step (forbids it elsewhere), the seed loader applies the same shape rule, the executor dispatches on the KIND, and a per-step <code>process_agent_id</code> wins over the run-level fallback (readiness checks every bound agent; the prompt facts fall back to the step's agent). A fork of a catalogue process now publishes (D29), and an API-authored agent step now runs.</li>
+<li>✅ <strong>Gate and call steps are expressible in the seed</strong> (<code>StepSpec.gate_kind</code>, <code>.child_process_key</code>) and used: <code>ask_fr</code> parks at <code>human_approval</code>; the kanban coach calls <code>kata.open</code>. The loader refuses a call to a target not yet published.</li>
+<li>✅ <strong>The run lifecycle has one writer.</strong> <code>runs.finish</code> refuses a process run (<code>409 run.process_owned</code>); cancel/fail/reap cascade to descendants' steps; the reaper matches the job's dedupe key by prefix, so a dead park/gate/call job terminates its step.</li>
+<li>✅ <strong>Lease renewal (audit V1).</strong> A claimed job renews while its handler runs; a stale token can neither renew nor finish.</li>
+<li>✅ <strong>The judge record is complete and projected</strong>: criteria names + output hash on <code>run_step.judge</code>; <code>RunStepOut.judge</code>; <code>RunOut.process_step_id|workflow_step_id</code>; a timed-out action fails the run with <code>error_class = timeout</code>; an <code>eval</code> pin that names a missing eval is a publish refusal.</li>
+<li>✅ <strong>Maps are authorable</strong> (<code>process_maps.create|update|publish|retire</code>), so the domain map validator is reachable through the API.</li>
+<li>✅ <strong>The bus replay property is proved</strong> (<code>FLUSHALL</code> + replay on a real run) and the gate resume announces <code>run_step.requested</code>; parks and call polls deliberately do not (they carry a backoff). <code>compose.yaml</code> gains the <code>worker</code> service.</li>
+<li>✅ <strong>Install is complete</strong>: <code>migrate --process-catalogue</code> installs the catalogue vocabulary (card types, project types, gate codes) first, proved from a fresh database.</li>
+</ol>
+<p><strong>Session 2 (2026-11-10) — executor defects, catalogue E2E, BYO tokens:</strong></p>
+<ol start="8" type="1">
+<li>✅ <strong>W4</strong> — <code>agent.run</code> resolves a bound run from its <code>capability_agent</code> row <strong>first</strong>; a conflicting model, node-supplied tools, a substituted prompt/executor, or a <strong>raised</strong> cap is a typed <code>422</code> (<code>agent.config_conflict</code> / <code>agent.cap_exceeds_bound</code>); a lowered cap is accepted. <code>crates/actions/tests/agent_run_resolved.rs</code>.</li>
+<li>✅ <strong>W5</strong> — migration <code>0037_run_tree_workflow_step.sql</code>: a workflow's procedure node starts its child with <code>workflow_step_id</code> (its <code>run_step</code>), not a second root on the card. <code>crates/actions/tests/call_step.rs</code>.</li>
+<li>✅ <strong>D29 readiness</strong> — a process step's <code>process_agent_id</code> is checked directly; the "exactly one active executor" rule applies only to unbound capability runs. <code>crates/api/tests/capability_readiness.rs</code>.</li>
+<li>✅ <strong>The catalogue end to end</strong> — <code>process_seed::apply_all</code> creates <strong>333</strong> processes (280 card-type + 53 named), 403 SOPs and 3 maps; <code>bug_analysis.READY</code> executes agent → judge → move on a real card. <code>crates/actions/tests/process_catalogue.rs</code>.</li>
+<li>✅ <strong>Per-tenant upstream tokens</strong> — <code>inference.token</code> is an <em>optional</em> bearer (absent ⇒ no bearer, never a platform token); a sealed secret is either a raw BYO value or the licences-minted envelope; <code>conveyor admin upstream-token --tenant … --service … --mint|--token-stdin</code> fills/rotates the row. <code>apps/server/tests/upstream_tokens.rs</code>.</li>
+</ol>
+<p><strong>Outstanding:</strong></p>
+<ol start="13" type="1">
+<li><code>seed/processes/workflows/</code> — the reusable tool sequences. <strong>Not blocked, not shipped.</strong> The earlier note here claimed no <code>coding_jobs</code>/<code>workspaces</code> action existed; measured 2026-11-10 that is false (<code>coding_jobs.create|get</code> and the board/requirements/documents/artifacts families are registered). What is missing is the authoring, and the owner audit of 2026-11-10 excludes re-authoring the old flows. The <code>call</code> step's workflow limb is proved by <code>call_step.rs</code>.</li>
+<li>The historical n8n trace fixtures. <strong>They are in this repo</strong> (<code>fixtures/{a,b,c}.old.jsonl</code>, <code>*.workflow.json</code>, <code>executions.json</code>, <code>SHA256SUMS</code>, exercised by <code>crates/workflow/tests/</code>). The earlier "not in this repo" note was wrong; the gate over <code>run_step</code> (<code>process_trace.rs</code>) is the process-side trace, and the old recordings drive the workflow-side diff.</li>
+</ol>
+<p>⚠️ The <strong>bus test is CI-only in this environment</strong>: it needs a Redis reachable from the build host, which has neither docker nor a Redis and cannot reach mini3. It fails closed; it never skips.</p>
+<p>⛔ <strong>No longer an item:</strong> migration <code>0034</code>'s drop of <code>workflow</code>, and the deletion of <code>crates/workflow</code>, <code>workflows.*</code>/<code>workflow_runs.*</code> and <code>fixtures/named/**</code>. <strong>The workflow engine is retained as the tool-sequence executor</strong> (owner ruling 2026-11-09); only the hook route and <code>CONVEYOR_HOOK_SECRET</code> are deleted.</p>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16
+docker compose up -d db redis &amp;&amp; cargo run -p conveyor-server -- migrate --seed
+CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- worker &amp;
+trap &#39;kill $(jobs -p) 2&gt;/dev/null || true&#39; EXIT
+# Postgres-only limb: a 4-step process with a gate, a retry, a judged step and a coach child on the parent&#39;s card.
+cargo test -p conveyor-actions --test process_step
+cargo test -p conveyor-api --test project_start
+cargo test -p conveyor-api --test computed_set
+# The judge: accept, reject → rerun with the reason, two rejects → BLOCKED, outage waits (stub laya).
+cargo test -p conveyor-actions --test judge
+# The run tree: root live twice refused; a child allowed; depth 4 refused; cancel cascades.
+cargo test -p conveyor-store process_tree
+# The bus: duplicate delivery one outcome; a kill re-delivers; a poison message dead-letters.
+cargo test -p conveyor-actions --test bus_delivery
+# The default catalogue and the ledger: the manifest is 280 type processes; the import is 333
+# (280 card-type + 53 named); every old node mapped; no delta rows.
+test &quot;$(yq -r &#39;.processes | length&#39; seed/processes/manifest.yaml)&quot; -eq 280
+! grep -q &#39;delta:&#39; parity/n8n-dispositions.tsv
+test &quot;$(wc -l &lt; parity/n8n-dispositions.tsv)&quot; -eq 348
+# The trace gate over run_step.
+cargo test -p conveyor-actions --test n8n_migration
+# Session 2: the executor defects, the catalogue end to end, the BYO token path.
+cargo test -p conveyor-actions --test agent_run_resolved
+cargo test -p conveyor-actions --test call_step
+cargo test -p conveyor-actions --test process_catalogue
+cargo test -p conveyor-api --test capability_readiness   # one test is ignored: it needs the real strata
+cargo test -p conveyor-server --test upstream_tokens</code></pre>
+<p>Green when the process limb passes with the gate parked and resumed and the coach child proving the run tree; the judge proves accept, reject-rerun, the two-reject BLOCK and the outage wait; the bus proves duplicate idempotency, re-delivery after <code>FLUSHALL</code> and the DLQ; the default catalogue is exactly 280; the dispositions have no <code>delta:</code> row; and with Redis stopped the Postgres-only limb still passes.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ul>
+<li><strong>The bus is not the record.</strong> If a handler writes to Redis-only state, a Redis restart loses it. Every outcome is a Postgres row in the handler's transaction; the envelope is a nudge.</li>
+<li><strong>A child must not take the root slot.</strong> <code>live_run_for_card_tx</code> must filter <code>parent_run_id IS NULL</code>; otherwise <code>runs.create</code> 409s while a coach child runs.</li>
+<li><strong>A retry must not duplicate a side effect.</strong> Idempotency is the envelope id <strong>and</strong> <code>(run_id, position, attempt)</code>; the action's own <code>Idempotency-Key</code> is <code>uuidv5(run_id:step:attempt)</code>.</li>
+<li><strong>A judge reject is not a retry storm.</strong> The rerun budget is the SOP's <code>max_rejects</code> (default 2); an exhausted budget is a block, never an infinite loop. A laya outage is not a reject.</li>
+<li><strong>The map must not become the executor.</strong> It is a document; an edit to it changes no run. A process's order is its step positions.</li>
+<li><strong>The DAG must not become the process executor.</strong> <code>crates/workflow</code> is retained as the tool-sequence executor, and <code>process.step</code> never calls its graph planner: a <code>call</code> step resolves <code>child_process_key</code> process-first, workflow-second. Do not add a process step kind that runs a graph.</li>
+<li><strong>RLS FORCE.</strong> Seed/backfill as owner sees zero rows; every new table/column path stays tenant-scoped.</li>
+<li><strong>The 280 are a catalogue.</strong> The seed has 74 card-type codes and must filter to the 70 active pairs; a tenant's process is a row, not a code constant.</li>
+</ul>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li>Storage: <code>process</code>/<code>process_step</code> (renamed) + <code>procedure</code> (SOP) + <code>process_map</code>; migrations <code>0035_process_tree.sql</code> and <code>0036_s19_output_grade.sql</code>. <strong>The workflow engine is retained</strong> as the tool-sequence executor (owner ruling 2026-11-09); there is no drop migration.</li>
+<li>Step kinds <code>agent | computed | gate | call</code>; actor <code>process_agent | tool_agent | system | human</code>; no graph, no predicates, no loop nodes; <code>continue | fail | retry</code> bounded.</li>
+<li>The run tree: root-only live index, one live child per <code>(parent, step)</code>, depth ≤3, cascade cancel.</li>
+<li>The judge is the SOP's inspection: laya (external action), an eval or a checker; <code>{score, accepted, reason}</code>; reject → rerun with the reason, max 2, then BLOCKED → coach; outage waits.</li>
+<li>The process map is a declarative DAG per project type; the UI renders it; nothing executes from it.</li>
+<li>System capabilities (PM, coach, kata) are fixed; the rest is tenant-defined; the 280 are the default catalogue.</li>
+<li>The bus is the care-bus port (Redis Streams); Postgres is the record; the outbox re-delivers.</li>
+<li>No <code>delta:</code> rows: the four named flows are absorbed, and the two remaining are processes.</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<ol type="1">
+<li>Does a map node carry the process's live status from the runs, or does the UI derive it per card? <strong>Default:</strong> derive per card; one <code>process_maps.get</code> plus the existing run reads.</li>
+<li>Laya's request shape for the SOP criteria is not in a local wire schema (the TypeSafe AI node is installed, the schema is not in this repo). The first live call pins it; until then the stub fixes the conveyor side.</li>
+<li>Does a tenant-authored process need its own map node, or can it be reached from a capability node? <strong>Default:</strong> both; a map node refs a process or a capability.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S13-n8n-engine.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

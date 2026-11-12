@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S20 — eval hillclimb · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S20.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s20--eval-hillclimb">S20 — eval hillclimb</h1>
+<p>Lane <code>s20-eval-climb</code>, 2026-11-09. <strong>Part A and Part B are built and proved by execution.</strong> The one thing this lane could not honestly close is <code>served-spec.lock.json</code>, because the shared tree carries two other lanes' uncommitted registrations (below).</p>
+<h2 id="measured-at-close">Measured at close</h2>
+<table>
+<thead>
+<tr>
+<th>what</th>
+<th>value</th>
+<th>how</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>actions</td>
+<td><strong>247 on this branch</strong> (246 + <code>eval_runs.regrade</code>)</td>
+<td><code>registry</code> 8/8, <code>EXPECTED: [&amp;str; 247]</code></td>
+</tr>
+<tr>
+<td>eval actions</td>
+<td><strong>33</strong> (S19's 26 + six <code>eval_climbs.*</code> + <code>eval_runs.regrade</code>)</td>
+<td>the restated eval gate</td>
+</tr>
+<tr>
+<td>actions in the shared WORKTREE</td>
+<td><strong>267</strong></td>
+<td>20 of them are other lanes' <strong>uncommitted</strong> registrations (S15's knowledge/memory + capability actions, the RBAC pass's seven, S13's <code>agent.run</code>/<code>inference.chat</code>/<code>workflow_traces.export</code>)</td>
+</tr>
+<tr>
+<td>events</td>
+<td><strong>30</strong> (28 + <code>eval_climb.changed</code> + <code>eval_climb.round_completed</code>)</td>
+<td><code>S05_EVENT_TYPES</code></td>
+</tr>
+<tr>
+<td>job kinds</td>
+<td><strong>+1</strong> — <code>eval.regrade</code></td>
+<td><code>worker.rs</code> dispatch + the unknown-kind prose</td>
+</tr>
+<tr>
+<td>migrations</td>
+<td><strong>0029</strong> — <code>eval_climb.narrative_md</code> only; regrade needs <strong>no</strong> DDL</td>
+<td><code>ls migrations/</code></td>
+</tr>
+<tr>
+<td>served-spec lock</td>
+<td><strong>RED, deliberately not written</strong> — see below</td>
+<td><code>--check-lock</code></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>The count above is the branch's, not the worktree's.</strong> A lane's PR runs CI against its own tree, so <code>EXPECTED</code> must declare what that tree compiles: 247 here against 267 in the shared worktree, where twenty actions from other lanes exist but are uncommitted; <code>AGENT_TOOLS</code> is <strong>34</strong> here and 40 there for the same reason, and the internal/external split is <strong>(234, 13)</strong> — S13 step 8's <code>inference.chat</code> is one of the missing externals. The number was re-derived from the branch in an isolated worktree (<code>git worktree add /tmp/s20-verify HEAD</code>, <code>check --workspace --all-targets</code> clean, <code>eval_regrade</code> 5/5, <code>eval_compare</code> 2/2), not copied from the shared tree. Whoever merges last re-derives it again.</p>
+<h2 id="why-the-lock-is-not-written-measured-not-assumed">Why the lock is not written (measured, not assumed)</h2>
+<p><code>--check-lock</code> reports four attributable causes:</p>
+<ol type="1">
+<li><code>POST /api/actions/eval_runs.regrade/invocations</code> — <strong>added, this lane</strong>;</li>
+<li><code>GET /api/actions</code> — <strong>changed</strong>: every registration changes the manifest hash;</li>
+<li><code>POST /api/actions/capabilities.get/invocations</code> — <strong>changed</strong>, S15 step 12 (<code>ready</code>, <code>blocking[]</code>, timeout 15s → 30s), released but <strong>uncommitted</strong>;</li>
+<li>six <code>GET</code>/<code>POST /api/platform|tenants…</code> routes — <strong>added</strong>, the tenancy lane, <strong>uncommitted</strong> (<code>crates/api/src/routes/platform.rs</code> is untracked).</li>
+</ol>
+<p>Writing the lock would embed (3) and (4) — other lanes' in-flight registrations — into this branch, while the code that produces them is not on this branch. The lock is the <strong>last</strong> lane to settle's to write, and <strong>no remembered number is the answer</strong>: S21 step 2 later added a declared <code>outputs</code> to the procedure step DSL, which changes the <code>procedures.*</code> operations too. Whoever writes it regenerates over the whole tree and reports the measured count — 287, 293 and 294 were each a snapshot of a tree that no longer exists.</p>
+<h2 id="test-binaries--every-line-run-through-rbuild">Test binaries — every line run through <code>rbuild</code></h2>
+<table>
+<thead>
+<tr>
+<th>binary</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conveyor-store --test eval_climb_schema</code></td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-domain --test eval_climb_rules</code></td>
+<td><strong>22</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test eval_climb_gate</code></td>
+<td><strong>7</strong> (incl. <code>a_climb_cannot_redraw_the_split</code>)</td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test eval_compare</code></td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test eval_stall</code></td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test eval_cost_walk</code></td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test eval_regrade</code></td>
+<td><strong>5</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test eval_final</code></td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test eval_runs</code> (S19, unbroken by the extraction)</td>
+<td><strong>4</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test registry</code></td>
+<td><strong>8</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test parity_http_mcp</code></td>
+<td><strong>4</strong> — every registered action, <code>eval_runs.regrade 201</code>, and an</td>
+</tr>
+</tbody>
+</table>
+<p>exact 20-name <code>UNREGISTERED_SAMPLES</code> list for the other lanes' samples, so a sample that loses its action for any OTHER reason still fails | | <code>conveyor-server --test eval_runner</code> | <strong>5</strong> (2 new: the driver + the tick) | | <code>conveyor-server --test eval_jobs</code> | <strong>3</strong> | | <code>conveyor-api --lib every_action_has_a_documented_operation</code> | <strong>1</strong> at 247 |</p>
+<h2 id="the-local-gate-rbuild---gate-at-this-tree">The local gate (<code>rbuild --gate</code>, at this tree)</h2>
+<p><code>fmt --all -- --check</code> clean, <code>clippy -D warnings</code> clean, <strong>38 of 39 test binaries green</strong>. The one red is <strong><code>conveyor-actions --test workflow_runs</code> (4/4)</strong>, and it is <strong>not this lane's</strong>: the same four tests fail identically on the lane's own base commit <code>f083551</code>, where the fixture's first action answers an error envelope with no <code>output</code> and the helper panics on it. S13's workflow lane has uncommitted work in the shared tree that is the likely fix; a lane cannot carry another lane's repair. The formatting commits in this lane also repaired 21 files the base inherited unformatted at toolchain 1.99 — without them <code>fmt --check</code>, and therefore any PR's CI, could not be green for anyone.</p>
+<h2 id="the-reversal-proofs">The reversal proofs</h2>
+<ol type="1">
+<li><strong>The split is immovable.</strong> <code>a_climb_cannot_redraw_the_split</code> records the version's <code>split_sha256</code> and every <code>eval_case.split</code>, runs a round, re-reads both — identical — and then <code>evals.draw_split</code> answers <code>409 split_locked</code>.</li>
+<li><strong>The revert's reason is recorded.</strong> <code>a_two_round_climb_keeps_one_round_and_reverts_the_other…</code> — round 1 <code>keep</code>, round 2 <code>revert / held_out_flat</code>, on <code>eval_run.summary</code>, in the report, and reproduced by a fresh <code>eval_climbs.get</code>.</li>
+<li><strong>No round before the plan.</strong> <code>409 plan_pending</code>, then <code>409 baseline_missing</code>, then the round.</li>
+<li><strong>The analyzer never reads test.</strong> A round citing a <code>test</code>-split trace is <code>422 test_transcript_in_round</code>.</li>
+<li><strong>The noise floor is said out loud.</strong> <code>422 delta_below_noise</code> carrying the measured floor.</li>
+<li><strong>A gated round records itself and runs nothing.</strong> <code>awaiting_approval</code>, <code>queued_jobs: 0</code>.</li>
+<li><strong>The paired delta reproduces by hand.</strong> <code>a_paired_delta_recomputes_by_hand</code>: scores <code>a=[1,1,0,0]</code>, <code>b=[1,0,1,1]</code> ⇒ <code>both 1 · a_only 1 · b_only 2 · discordant 3</code>, exact McNemar <code>2·(C(3,0)+C(3,1))/2³ = 1.0</code>, <code>delta 0.25</code>, CI <code>[-0.688278, 1.188278]</code> (sample SD <code>√(2.75/3)</code>). <code>compare_refuses_two_versions_or_graders_or_splits</code> is the other half: a second version is <code>409 not_comparable</code>.</li>
+<li><strong>A fourth content round is refused.</strong> <code>a_fourth_content_round_is_refused</code>: three flat rounds, <code>422 buckets_required</code> on the second, a <code>buckets</code> round accepted, <code>409 content_round_refused</code> on the fourth. <code>no_round_without_registered_gates</code> is the cost twin: no <code>hold</code> ⇒ <code>422</code> at <code>start</code>, the floor on the plan, <code>409 plan_pending</code> before it is signed, <code>422 lever_order</code> when a round skips the staircase.</li>
+<li><strong>A regrade is a new run and never re-invokes the subject.</strong> <code>a_regrade_grades_the_stored_output…</code> — the same stored output scores 1.0 under v1's key and <strong>0.0</strong> under v2's, with the source's <code>model</code>/<code>latency</code>/<code>action_invocation_id</code> and an <strong>empty</strong> <code>usage</code> (the subject was billed once).</li>
+</ol>
+<h2 id="defects-the-execution-found-each-would-have-shipped-silently">Defects the execution found (each would have shipped silently)</h2>
+<p>Part A's six are in the git history of this lane; the five from Part B:</p>
+<ul>
+<li><strong>The stall gate could not fire.</strong> A categorisation round <strong>reset</strong> the flat streak, and the mandatory <code>buckets</code> round fires at streak 2 — so no streak could ever reach 3 and <code>content_round_refused</code> was unreachable. The slice counts the categorisation as one of the three rounds that did not clear the band; it now <strong>increments</strong> instead of resetting.</li>
+<li><strong>A cost climb measured no cost.</strong> Spend and hold readings were collected only from rows carrying the <strong>target's</strong> grade — and a <code>cost_usd</code> climb has no <code>cost_usd</code> grade key. Every cost round saw cost 0 (reverting <code>cost_not_cleared</code>) and the guardrail passed <strong>vacuously</strong>, which is the one thing it exists to stop.</li>
+<li><strong>The cost staircase never moved.</strong> <code>Goal::advance_lever</code> was implemented and domain-tested but never called, so a cost walk asked for <code>caching_health</code> on every round. It is now derived from the kept rounds — incrementing in place would advance twice on a re-settle.</li>
+<li><strong>The cost walk's winner was chosen by quality.</strong> All held-out means are 0 for a cost goal, so "highest test score" silently named the first kept round; a cost goal now names its <strong>cheapest</strong> kept round.</li>
+<li><strong><code>eval_climb.round_completed</code> fired only at <code>stop</code>.</strong> <code>persist_decisions</code> was called only from <code>stop</code>, so a live consumer saw nothing between round 1 and the report. <code>round</code> now persists and announces the rounds it settles (idempotent on the stored decision, so it emits once each).</li>
+</ul>
+<p>Plus one the regrade forced: <strong>the tick counted only <code>eval.case.run</code></strong> (<code>outstanding_jobs_tx</code>), so a regrade run would have been finalised <code>void</code>/<code>partial</code> before its first job ran. And one the regrade needed: <strong>the transcript stored only the answer text</strong>, while graders read paths into the whole output — a regrade from that would have scored a different value. The assistant turn now carries the raw <code>output</code> (≤256 KiB; a larger output is graded but not regradable).</p>
+<h2 id="owner-rulings-encoded-2026-11-09">Owner rulings encoded (2026-11-09)</h2>
+<ul>
+<li><strong>mcp is a role on the RBAC matrix</strong> — "mcp is same as users … same for telegram". No climb action is carved into <code>AGENT_TOOLS</code>. ⚠️ <strong>The allowlist itself is not retired</strong> here: deleting it and routing <code>invoke.rs</code>/<code>/mcp</code> through <code>Scope::granted_to</code> + <code>tenant_role_scope</code> is its own lane. Until then an agent principal still consults the allowlist, so <code>eval_climbs.round</code> is reachable <strong>by scope</strong> but not yet <strong>over /mcp</strong>.</li>
+<li>One <strong>active</strong> climb per eval; a later climb <strong>continues</strong> the variant numbering.</li>
+<li>The report is <code>eval_climb.narrative_md</code> (migration 0029).</li>
+<li><strong><code>eval_runs.regrade</code> is <code>evals:approve</code></strong>: it creates a run and can spend a judge call — the same budget decision <code>eval_runs.start</code> makes. The compiled <code>kata_executor</code> default keeps it.</li>
+<li><strong>A regrade onto the source's own version is refused</strong> <code>409 version_unchanged</code>: a regrade carries stored outputs onto a <strong>new</strong> instrument. Consequence, and the reason the refusal is sharp: compare refuses two versions, so a grader fix is <strong>regrade every arm, then compare new-vs-new</strong> — never a new grade against the run it replaced.</li>
+</ul>
+<h2 id="not-done">Not done</h2>
+<ul>
+<li><strong><code>AGENT_TOOLS</code> retirement</strong> (above) — its own lane.</li>
+<li><strong>The lock</strong> — see above; the last lane to settle writes it.</li>
+<li><strong>Screen 21</strong> — declared for S12, as the slice says. The read model is <code>eval_climbs.get/list</code> (round summaries carry train/test/Δ/decision/reason), <code>eval_climbs.compare</code> for the paired number, <code>eval_runs.regrade</code> for a re-grade, and the two events for live updates.</li>
+<li><strong>A cost walk's report columns.</strong> The winner is now correct, but <code>narrative_md</code>'s status table still renders train/test means, which are 0 for a cost goal; a cost column is not built.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S20.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

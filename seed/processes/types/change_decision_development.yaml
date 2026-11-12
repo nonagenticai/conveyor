@@ -1,0 +1,172 @@
+# change_decision_development — the program-level strategic decisions as RM records (v4
+# change_management, phase preliminary, `rm_asset`, asset_kind decision).
+#
+# Content sources: seed/catalogue.json (card_type change_decision_development: outputs and the
+# READY/DOING/QA/DONE acceptance names) and
+# n8n-designs/design/choices/v4/capabilities/change_management.yaml (text "Documenting key
+# program-level strategic decisions.", phase preliminary (RULED R328), upstream
+# future_state_analysis, asset_kind decision — RM decisions {title, context, decision,
+# alternatives?, relatedPrinciples?}, and the inspect.criteria the QA stage judges by). Its
+# upstream is the future state analysis: a decision settles a question that document leaves open,
+# so READY waits for that card when one exists and says so when none does (the v4 minimal upstream
+# gate). It is the program-level sibling of decision_development, which records the design-phase
+# choice under `architecture`. Under the `rm_asset` archetype the agent proposes and the flow
+# writes RM after the user signs the change list off (R207, P-W3-6), so DONE closes on the version
+# QA approved plus the ids that write returned.
+card_type: change_decision_development
+capability: change_management
+outputs:
+  - changes_artifact_id
+  - reviewed_changes_artifact_id
+  - published_artifact_id
+  - written_ids
+
+agent:
+  key: change_decision_development
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  # One SOP per stage for the agent steps, plus one mechanical SOP for every computed move.
+  - key: change_decision_development.ready
+    title: Change decision development — definition of ready
+    definition_of_ready: {checks: [brief_present, upstream_future_state_analysis_done_or_absent]}
+    definition_of_done: {checks: [changes_artifact_id]}
+    acceptance_criteria:
+      - {name: every_ask_cites_the_brief, text: "Every ask the draft changes answers names the future state analysis section or brief passage it came from, and that source leaves the decision open."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [changes_artifact_id]
+
+  - key: change_decision_development.doing
+    title: Change decision development — definition of doing
+    definition_of_ready: {checks: [changes_artifact_id]}
+    definition_of_done: {checks: [every_change_cites_a_source, every_ask_has_a_change]}
+    acceptance_criteria:
+      - {name: every_change_cites_a_source, text: "Every proposed decision change names the future state analysis section, discrepancy or brief passage it comes from, and that source is the question the decision settles."}
+      - {name: every_ask_has_a_change, text: "Every ask the brief makes about a strategic decision has one change answering it, and no change answers an ask the brief does not make."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [changes_artifact_id, reviewed_changes_artifact_id]
+
+  - key: change_decision_development.qa
+    title: Change decision development — definition of QA
+    definition_of_ready: {checks: [reviewed_changes_artifact_id]}
+    definition_of_done: {checks: [every_revise_addressed, changes_cite_sources, decision_has_context, alternatives_considered, no_duplicate_records, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: every_revise_addressed, text: "Every revise left on the reviewed decisions is applied in the artifact, or the thread records why the decision stands as recorded."}
+      - {name: changes_cite_sources, text: "Every change names the future state analysis section or brief passage it comes from."}
+      - {name: decision_has_context, text: "Every decision states its context and the decision taken."}
+      - {name: alternatives_considered, text: "Every decision names the alternatives it rejected, or says there were none."}
+      - {name: no_duplicate_records, text: "No change creates a record that repeats an existing one; it updates that record instead."}
+      - {name: capability_acceptance_met, text: "The reviewed decisions meet every acceptance statement the change_decision_development card type declares."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_changes_artifact_id, published_artifact_id]
+
+  - key: change_decision_development.done
+    title: Change decision development — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met, signed_off_changes_artifact_id]}
+    definition_of_done: {checks: [artifact_is_qa_version, decisions_written_to_rm]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The decisions the flow writes to RM are the version QA approved and the user signed the change list off; no context, decision text or rejected alternative changed after review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id, written_ids]
+
+  - key: change_decision_development.system
+    title: Change decision development — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: change_decision_development.READY
+    list: ready
+    title: Change decision development — ready
+    outputs: [changes_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: change_decision_development
+        sop: change_decision_development.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: change_decision_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: change_decision_development.DOING
+    list: doing
+    title: Change decision development — doing
+    outputs: [changes_artifact_id, reviewed_changes_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: change_decision_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: change_decision_development.QA
+    list: qa
+    title: Change decision development — QA
+    outputs: [reviewed_changes_artifact_id, published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: change_decision_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: change_decision_development.DONE
+    list: done
+    title: Change decision development — done
+    outputs: [published_artifact_id, written_ids]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: change_decision_development, sop: change_decision_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: change_decision_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

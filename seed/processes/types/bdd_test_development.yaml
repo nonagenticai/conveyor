@@ -1,0 +1,164 @@
+# bdd_test_development — write the missing BDD scenarios the brief asks for (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type bdd_test_development: outputs and acceptance) and
+# n8n-designs/design/choices/v4/capabilities/bddtdd.yaml (text, phase design, proof tests_only,
+# inspect criteria). The v4 source is `card`: no analysis report leads here, READY finds the BDD
+# command and the card itself is the scope. The diff changes test files only and the suite is green
+# afterwards — an expected-failure card is bdd/tdd_test_development, not this one.
+card_type: bdd_test_development
+capability: bdd_tdd
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: bdd_test_development
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: bdd_test_development.ready
+    title: BDD test development — definition of ready
+    definition_of_ready: {checks: [test_files_in_test_dirs]}
+    definition_of_done: {checks: [test_command_found]}
+    acceptance_criteria:
+      - {name: test_files_in_test_dirs, text: "Every feature file the change adds or extends sits in a BDD test directory the repository already uses, beside the scenarios it belongs with and never beside the production code."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: bdd_test_development.doing
+    title: BDD test development — definition of doing
+    definition_of_ready: {checks: [test_command_found]}
+    definition_of_done: {checks: [every_case_written, suite_green_after]}
+    acceptance_criteria:
+      - {name: every_case_written, text: "Every test use case and acceptance criterion the card names exists as a Gherkin scenario or scenario outline, with its steps written out rather than described in prose."}
+      - {name: suite_green_after, text: "The BDD suite, run with the command READY recorded, reports no failing scenario after the new feature files are in place."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: bdd_test_development.qa
+    title: BDD test development — definition of QA
+    definition_of_ready: {checks: [every_case_written]}
+    definition_of_done: {checks: [tests_check_target, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: tests_check_target, text: "The new scenarios exercise the behaviour the card names, so a later change that breaks that behaviour makes a scenario fail rather than leaving the suite green."}
+      - {name: capability_acceptance_met, text: "The diff is true of every acceptance statement the bdd_test_development card type declares — each scenario states one behaviour as Given, When, Then, and no production file changed."}
+      - {name: scenarios_given_when_then, text: "Every new scenario is written as Given / When / Then and states one behaviour."}
+      - {name: scenarios_check_target, text: "The scenarios check the target behaviour the card names, not only that the code runs."}
+      - {name: no_production_change, text: "The diff changes no production code."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: bdd_test_development.done
+    title: BDD test development — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request carrying the new scenarios is merged, and the feature files it lands are the ones QA reviewed."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: bdd_test_development.system
+    title: BDD test development — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: bdd_test_development.READY
+    list: ready
+    title: BDD test development — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: bdd_test_development
+        sop: bdd_test_development.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: bdd_test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: bdd_test_development.DOING
+    list: doing
+    title: BDD test development — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: bdd_test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: bdd_test_development.QA
+    list: qa
+    title: BDD test development — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: bdd_test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: bdd_test_development.DONE
+    list: done
+    title: BDD test development — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: bdd_test_development, sop: bdd_test_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: bdd_test_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

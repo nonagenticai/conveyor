@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S00 — Usage inventory → parity/parity.yaml · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S00-usage-inventory.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s00--usage-inventory--parityparityyaml">S00 — Usage inventory → <code>parity/parity.yaml</code></h1>
+<p>Programme project: S00 · issues none yet</p>
+<p><strong>Slice:</strong> S0 · <strong>Executor:</strong> a fresh session, verbatim · <strong>Gate (SPEC §8):</strong> the feature list is signed; zero-usage features are dropped, not ported.</p>
+<p><strong>Read first:</strong> <code>docs/SPEC.md</code> §4/§8/§9; <code>plans/01-CONTRACT.md</code> §12; <code>plans/02-source-map/{20,30,40,50}-*.md</code>.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>Measure from durable and sampled evidence which fr, RM, Planka and n8n operations are actually used, then publish one signed <code>parity/parity.yaml</code> that every slice consumes as <code>parity_ids</code> and S14 gates on (100 % of <code>used</code>). D2/R5: zero-usage surface is dropped, not ported.</p>
+<p><strong>Artifact:</strong> <code>$HOME/Movies/conveyor/parity/parity.yaml</code>; supporting files in §5.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>Measured 2026-11-07: the tree exists and holds only <code>docs/</code> — 25 files, no <code>Cargo.toml</code>, no <code>parity/</code>, no <code>.git</code> (CONTRACT §13).</li>
+<li>fr <strong>785 served operations / 616 paths</strong> (<code>backend/src/capabilities/served-spec.lock.json</code>, measured 2026-11-07); RM <strong>314</strong> decorators; Planka <strong>67</strong> openapi paths; n8n <strong>348 workflows / 332 active</strong>.</li>
+<li>Loki 24 h; <code>execution_entity</code> 3 d / 470 rows; Planka 5 test cards; fr <code>approvals=0</code> but <code>conveyor_flow_runs=693</code>; RM 293 card types (estimate). Re-measure.</li>
+<li>Read-only; SQL directly on master as <code>postgres</code>, <strong>never through PgBouncer</strong>, never a session <code>SET</code>; no prune, no state deletion; disk &lt;10 % ⇒ STOP and report.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN:</strong> every fr served operation plus handlers absent from the served spec; all RM routes; all Planka openapi paths; distinct <code>(package, resource, operation)</code> tuples in active n8n workflows; named flows <code>conveyor.start</code>, <code>wip.pull</code>, <code>ask_fr</code>, <code>err.card</code>; row counts and Keycloak clients as evidence.</p>
+<p><strong>OUT:</strong> coding-*, artifacts, worker_management, inference-router, licenses, billing_service (D12/D14); n8n flows as features (S13 re-authors them; 280 card-type×list flows are one feature); procedure_management's 54 endpoints (D10 — one SUMMARY line); UI screens (S12); performance; data migration (D7).</p>
+<h2 id="4-source-material--evidence-sources-and-classes">4. Source material — evidence sources and classes</h2>
+<p>Rank <strong>A &gt; B &gt; C &gt; D &gt; E</strong>; the highest class wins and is stored in <code>evidence_class</code>.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>source and query (exact in §6)</th>
+<th>pin (origin/main, 2026-11-07)</th>
+<th>window</th>
+<th>proves / cannot prove</th>
+<th>class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1</td>
+<td>fr <code>served-spec.lock.json</code> / live OpenAPI</td>
+<td><code>fr@4a579e91d355</code></td>
+<td>current</td>
+<td>the surface set (785) / usage</td>
+<td>D</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>RM <code>src/routers</code> + mount map / OpenAPI</td>
+<td><code>rm@191086942ce5</code></td>
+<td>current</td>
+<td>the surface set (314) / usage</td>
+<td>D</td>
+</tr>
+<tr>
+<td>A1</td>
+<td>n8n <code>workflow_entity.nodes</code>, <code>jsonb_array_elements</code>, active only</td>
+<td>live 2026-11-07, no pin</td>
+<td>durable</td>
+<td>an active flow calls it / that it ran</td>
+<td>A</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>call sites: mcp_server channel, telegram/email/teams webhooks, fr workers, cron</td>
+<td>live 2026-11-07, no pin</td>
+<td>durable</td>
+<td>a reachable path needs it / frequency</td>
+<td>A</td>
+</tr>
+<tr>
+<td>B1</td>
+<td>Loki <code>{namespace="istio-system",container="istio-proxy"}</code>, <code>count_over_time</code> by <code>path</code></td>
+<td>live 2026-11-07, no pin</td>
+<td>24 h × 2 samples</td>
+<td>traffic that day / older use</td>
+<td>B</td>
+</tr>
+<tr>
+<td>C1</td>
+<td>n8n <code>execution_entity</code>, <code>group by "workflowId"</code></td>
+<td>live 2026-11-07, no pin</td>
+<td>≤72 h / 470 rows</td>
+<td>recent execution / older use</td>
+<td>C</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>fr <code>pg_stat_user_tables</code>, then <code>count(*)</code></td>
+<td>live 2026-11-07, no pin</td>
+<td>current</td>
+<td>what ran (<code>conveyor_flow_runs=693</code>)</td>
+<td>D</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>RM <code>count(*)</code> on <code>pm_*</code>, requirements, modelling</td>
+<td>live 2026-11-07, no pin</td>
+<td>current</td>
+<td>catalogue is real / route use</td>
+<td>D</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>Planka DB + <code>docs/openapi.json</code></td>
+<td><code>kanban@aafb771cea4c</code> (file); DB live</td>
+<td>current</td>
+<td>nothing about usage — test data</td>
+<td>D</td>
+</tr>
+<tr>
+<td>E1</td>
+<td>Keycloak <code>client</code> + sessions</td>
+<td>live 2026-11-07, no pin</td>
+<td>current</td>
+<td>clients, logins / per-route use</td>
+<td>D/E</td>
+</tr>
+</tbody>
+</table>
+<p>A alone makes <code>used</code>; B needs repetition; C/D/E never do.</p>
+<h2 id="5-deliverables-and-sign-off">5. Deliverables and sign-off</h2>
+<p>Deliver <code>parity/parity.yaml</code> (one row per surface; contract artifact), <code>parity/schema.json</code> (<code>additionalProperties: false</code>, 9 required keys), <code>parity/surfaces/{fr,rm,planka,n8n}.txt</code>, <code>parity/evidence/*</code> (two Loki samples, execution census, row counts, <code>matched.tsv</code>), <code>parity/SUMMARY.md</code> (counts per area × status, <code>used</code> ids, evidence classes, gate output, sign block).</p>
+<p><strong>Signed:</strong> §7 passes; <code>SUMMARY.md</code> carries <code>signed_off: &lt;reviewer&gt; &lt;date&gt; &lt;sha256 parity.yaml&gt;</code>; the ledger row (<code>~/.claude/plans/program/LEDGER.md</code>) is updated. The reviewer (programme owner) signs that every <code>used</code> id will be built and every <code>dropped</code> id will not.</p>
+<h2 id="6-build-order--method">6. Build order — method</h2>
+<p>Steps 0–14, each ≤1 day, read-only. Run every SQL command on master: <code>ssh -i ~/.ssh/deploy-key admin@192.0.2.10 "sudo -u postgres psql -d &lt;db&gt; -Atc '&lt;sql&gt;'"</code>. <strong>Every Loki zero needs a positive control</strong> (same query minus the host filter &gt; 0), else record <code>query_failed</code>, never "unused".</p>
+<ol start="0" type="1">
+<li><strong>Preflight and dirs.</strong> Disk and tools; master databases; Loki template; create the output dirs; save <code>parity/evidence/00-preflight.txt</code>; any miss ⇒ STOP.</li>
+<li><strong>fr manifest.</strong> <code>served-spec.lock.json</code> (785 ops), union <code>routes/*.ts</code> handlers absent from the lock; live-OpenAPI fallback verified 2026-11-07: 200, 4,443,102 B; the public host 404s.</li>
+<li><strong>RM manifest.</strong> 314 decorators; pair each method with its path plus the mount prefix from <code>src/routers/__init__.py</code>; emit <code>rm&lt;TAB&gt;METHOD /path</code>.</li>
+<li><strong>Planka manifest.</strong> 67 openapi paths.</li>
+<li><strong>n8n operations.</strong> Distinct <code>(package, resource, operation)</code> in active workflows, plus the 348/332 census and four named flows. Parameter keys measured 2026-11-07 on an active Planka node: <code>resource</code>, <code>operation</code> and resource-specific fields (<code>boardId</code>, <code>listId</code>, <code>cardId</code>, <code>updateFields</code>, …) — no <code>url</code>/<code>method</code> key.</li>
+<li><strong>Keycloak.</strong> Database <code>keycloak</code>, table <code>client</code> (<code>realm_id</code>, <code>client_id</code>, <code>enabled</code>) verified 2026-11-07; clients only, never tokens.</li>
+<li><strong>Normalise.</strong> UUID/number segments → <code>:id</code>; strip query strings; uppercase methods; dedupe; sort <code>(app, surface)</code>; assign <code>P-0001…</code>; write <code>parity/inventory.tsv</code> and four <code>app&lt;TAB&gt;surface</code> manifests.</li>
+<li><strong>Loki sample 1.</strong> 24 h per host; the query below was validated on a 5 min window (positive control 3,743 lines; <code>path</code> series returned). Repeat per host; save raw JSON.</li>
+<li><strong>Loki sample 2</strong>, ≥24 h later, same command, new file. No sample 2 ⇒ no B-class <code>used</code>.</li>
+<li><strong>Executions.</strong> Columns are camelCase (<code>workflowId</code>, <code>startedAt</code>, <code>stoppedAt</code>, <code>createdAt</code>) — measured 2026-11-07, so double quotes are required; join to workflow names.</li>
+<li><strong>Counts.</strong> All <strong>88 fr base tables</strong> (86 domain + <code>_migrations</code>/<code>_migration_effects</code>) via <code>pg_stat_user_tables</code> — it lists tables, not the two <code>pg_stat_statements*</code> views, so the live <code>fr</code> database reads 88 here and 90 relations in <code>\dt+</code>; plus <code>count(*)</code> on the six conveyor tables; RM <code>count(*)</code> on the <code>pm_*</code> catalogue/model tables (57 domain tables, 58 incl. <code>alembic_version</code>); Planka per-table census (33 domain, 35 incl. <code>migration</code>/<code>migration_lock</code>; D3). Never quote estimates.</li>
+<li><strong>Cross-match.</strong> Layout measured 2026-11-07: <code>nodes/&lt;Node&gt;/operations/index.ts</code> calls <code>ctx.helpers.request({ method: "GET", uri: `${baseUrl}/api/…` })</code>; parameters are declared in <code>nodes/&lt;Node&gt;/resources/*.resource.ts</code> or <code>descriptions/</code> — not <code>url:</code>/<code>method:</code> node fields. Maps operation → endpoint; join step 4 to fr/RM/Planka; write <code>parity/evidence/matched.tsv</code>.</li>
+<li><strong>Classify and write.</strong> Apply §9; write <code>parity/schema.json</code> and <code>parity/parity.yaml</code>, one row per source surface.</li>
+<li><strong>Acceptance and conflicts.</strong> Every <code>used</code> gets an acceptance string; re-sample every B-only <code>used</code>, demote if it does not repeat; A-vs-decision contradictions ⇒ STOP.</li>
+<li><strong>Gate, SUMMARY, sign.</strong> Run §7; write <code>parity/SUMMARY.md</code>; sign per §5.</li>
+</ol>
+<p>Commands for steps 6, 10, 12–14 (from <code>$HOME/Movies/conveyor</code>):</p>
+<pre class="bash"><code># 6 — normalise, dedupe, assign ids
+awk -F&#39;\t&#39; &#39;BEGIN{OFS=&quot;\t&quot;} {s=$2; sub(/\?.*/,&quot;&quot;,s); gsub(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,&quot;:id&quot;,s); gsub(/[0-9]+/,&quot;:id&quot;,s); print $1, s}&#39; parity/surfaces/*.txt | sort -u | awk -F&#39;\t&#39; &#39;BEGIN{OFS=&quot;\t&quot;}{print &quot;P-&quot; sprintf(&quot;%04d&quot;,NR), $1, $2}&#39; &gt; parity/inventory.tsv
+# 10 — six conveyor-table counts, on master (pipe into parity/evidence/fr-counts.tsv)
+ssh -i ~/.ssh/deploy-key admin@192.0.2.10 &quot;sudo -u postgres psql -d fr -Atc \&quot;select &#39;approvals&#39;,count(*) from approvals union all select &#39;approval_decisions&#39;,count(*) from approval_decisions union all select &#39;card_drafts&#39;,count(*) from card_drafts union all select &#39;card_phase_lease&#39;,count(*) from card_phase_lease union all select &#39;conveyor_flow_runs&#39;,count(*) from conveyor_flow_runs union all select &#39;project_conveyor_start_attempts&#39;,count(*) from project_conveyor_start_attempts\&quot;&quot;
+# 12 — schema.json (9 required keys, no extras)
+jq -n &#39;{type:&quot;array&quot;,items:{type:&quot;object&quot;,additionalProperties:false,required:[&quot;id&quot;,&quot;app&quot;,&quot;area&quot;,&quot;surface&quot;,&quot;source&quot;,&quot;evidence&quot;,&quot;evidence_class&quot;,&quot;acceptance&quot;,&quot;status&quot;],properties:{id:{type:&quot;string&quot;,pattern:&quot;^P-[0-9]{4}$&quot;},app:{enum:[&quot;fr&quot;,&quot;rm&quot;,&quot;planka&quot;,&quot;n8n&quot;]},area:{type:&quot;string&quot;},surface:{type:&quot;string&quot;},source:{type:&quot;string&quot;},evidence:{type:&quot;string&quot;},evidence_class:{enum:[&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;,&quot;E&quot;]},acceptance:{type:&quot;string&quot;},status:{enum:[&quot;used&quot;,&quot;rare&quot;,&quot;unused&quot;,&quot;dropped&quot;]}}}}&#39; &gt; parity/schema.json
+# 13 — B/C rows to re-sample
+yq -r &#39;.[]|select(.status==&quot;used&quot; and (.evidence_class==&quot;B&quot; or .evidence_class==&quot;C&quot;))|&quot;\(.id)\t\(.surface)&quot;&#39; parity/parity.yaml &gt; parity/evidence/resample.txt
+# 14 — SUMMARY counts and the signed hash
+yq -r &#39;.[]|.area+&quot;\t&quot;+.status&#39; parity/parity.yaml | sort | uniq -c &gt; parity/evidence/counts.tsv &amp;&amp; shasum -a 256 parity/parity.yaml</code></pre>
+<h2 id="7-gate-executable">7. Gate (executable)</h2>
+<p>From <code>$HOME/Movies/conveyor</code>, under <code>bash</code>; every line is an assertion and exits 0 only when the property holds. <code>check-jsonschema</code> is <strong>not</strong> installed on mini3 (verified 2026-11-07) — install it first.</p>
+<pre class="bash"><code>set -euo pipefail
+uv tool install check-jsonschema            # once; absent 2026-11-07
+test -z &quot;$(yq -r &#39;.[].id&#39; parity/parity.yaml | sort | uniq -d)&quot;                                   # G1 ids unique
+test -z &quot;$(yq -r &#39;.[].id&#39; parity/parity.yaml | grep -Ev &#39;^P-[0-9]{4}$&#39; || true)&quot;                  # G2 id shape
+test -z &quot;$(yq -r &#39;.[] | select(.status == &quot;used&quot;) | select((.acceptance // &quot;&quot;) | test(&quot;^(test|e2e|probe):&quot;) | not) | .id&#39; parity/parity.yaml)&quot;  # G3 acceptance
+diff &lt;(cat parity/surfaces/*.txt | sort -u) &lt;(yq -r &#39;.[]|&quot;\(.app)\t\(.surface)&quot;&#39; parity/parity.yaml | sort)                     # G4 exactly once
+test &quot;$(cat parity/surfaces/*.txt | sort -u | wc -l | tr -d &#39; &#39;)&quot; = &quot;$(yq &#39;length&#39; parity/parity.yaml)&quot;                          # G5 reconciles
+test &quot;$(yq -r &#39;[.[]|select(.status==&quot;used&quot; and .evidence_class==&quot;B&quot;)]|length&#39; parity/parity.yaml)&quot; -eq 0 \
+  || test &quot;$(ls parity/evidence/loki-*sample*.json 2&gt;/dev/null | wc -l | tr -d &#39; &#39;)&quot; -ge 2                                       # G6 two B samples
+test -z &quot;$(yq -r &#39;.[] | select(.status == &quot;dropped&quot;) | select((.evidence // &quot;&quot;) | test(&quot;^(decision:|replacement:)&quot;) | not) | .id&#39; parity/parity.yaml)&quot;  # G7 dropped reason
+check-jsonschema --schemafile parity/schema.json parity/parity.yaml</code></pre>
+<p>G4 = "every surface appears exactly once"; G5 reconciles; <code>dropped</code> rows start <code>evidence</code> with <code>decision:</code> or <code>replacement:</code>.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>Loki is 24 h</strong> — zero ≠ unused; two samples + positive control; <code>query_failed</code> is a third state.</li>
+<li><strong>Executions are 3 d / 470 rows</strong> — never answer quarterly use.</li>
+<li><strong>Planka is empty</strong> — 4 boards / 5 test cards; use call sites.</li>
+<li><strong>Frozen/legacy is most of fr</strong> — 88 <code>defineCapability</code> vs 548 paths / 1,376 declarations; the lock holds 785 ops / 616 paths. Counting declarations understates fr ~6×.</li>
+<li><strong>n8n public API paginates at 250</strong> — use <code>workflow_entity</code>.</li>
+<li><strong><code>planka_card_id</code> joins are evidence only, never identity</strong> (CONTRACT §3).</li>
+<li><strong>One session <code>SET</code> through PgBouncer poisons the next client</strong>; query master directly.</li>
+<li><strong><code>nodes</code> is <code>json</code></strong> — cast <code>::jsonb</code>; <strong>Loki host is a quoted field, not a label</strong> — filter by string.</li>
+<li><strong>Idle ≠ unused</strong> — <code>approvals=0</code>, <code>conveyor_flow_runs=693</code>; a LogQL pattern that parses nothing returns 0, not zero traffic.</li>
+</ol>
+<h2 id="9-classification-rules">9. Classification rules</h2>
+<p>Precedence <strong>decision-drop → A → B → C → D</strong>; first match wins.</p>
+<table>
+<thead>
+<tr>
+<th>status</th>
+<th>rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dropped</code></td>
+<td>A taken carry decision (SPEC §2/§4; 20/30-source-map carry lists): Planka attachments/memberships, RM bulk/promote/ledger, procedures (D10). Or <code>unused</code> with a named replacement.</td>
+</tr>
+<tr>
+<td><code>used</code></td>
+<td>A hit from an active caller; OR B ≥5 in each sample; OR B ≥1 in both + C ≥1 in 72 h.</td>
+</tr>
+<tr>
+<td><code>rare</code></td>
+<td>B 1–4 in either sample and no A; OR C alone; OR A only from an inactive flow; OR D-only; OR an RM surface in a D3 domain.</td>
+</tr>
+<tr>
+<td><code>unused</code></td>
+<td>No A/B/C hit, no D corroboration, not decision-dropped.</td>
+</tr>
+<tr>
+<td><code>dropped</code> (usage)</td>
+<td>A <code>rare</code> row that at sign-off neither folds into a <code>used</code> action/enum nor reuses a <code>used</code> read model.</td>
+</tr>
+</tbody>
+</table>
+<p>Loki zero never downgrades an A <code>used</code>; a missing B sample caps at <code>rare</code>; C corroborates only; an A hit on a decision-dropped surface is a <strong>contradiction</strong> — STOP.</p>
+<p><code>acceptance</code>: <code>test:&lt;crate&gt;::&lt;name&gt;</code>, <code>e2e:&lt;spec&gt;::&lt;name&gt;</code>, <code>probe:&lt;METHOD&gt; &lt;path&gt;</code>; only <code>used</code> carries it.</p>
+<h2 id="10-feature-ids-and-areas">10. Feature IDs and areas</h2>
+<p><code>id: P-NNNN</code>, four digits, global, allocated once in <code>(app, surface)</code> order; never reused; dropped rows keep their id.</p>
+<p>Areas: <strong>board</strong> (Planka board/list/card/label/comment/task/webhook + fr kanban/cards) · <strong>control-plane</strong> (approvals, claims, runs, andon, schedules, workers, katas) · <strong>requirements</strong> (RM requirements/catalogues/quality/search) · <strong>modelling</strong> (RM architecture_<em>, modeling_</em>, uml_<em>, toc_</em>) · <strong>documents</strong> (fr documents, repositories, assets) · <strong>channels</strong> (fr notifications/telegram/email/teams/inapp + MCP) · <strong>copilot</strong> (agui*, agent-core, sessions) · <strong>admin</strong> (admin/*, workspaces, departments, user_roles, tenants, secrets, licences) · <strong>procedures</strong> (S11 only; empty, D10) · <strong>workflows</strong> (named flows, engine + editor, card-type×list matrix).</p>
+<p><code>app</code> ∈ <code>fr | rm | planka | n8n</code> (CONTRACT §12); <code>surface</code> = <code>METHOD /path</code>, <code>&lt;package&gt;.&lt;resource&gt;.&lt;operation&gt;</code>, or a flow name. Two added detail keys; no contract field removed or retyped:</p>
+<pre class="yaml"><code>- {id: P-0001, app: fr|rm|planka|n8n, area: &lt;area&gt;, surface: &lt;route|action|flow&gt;,
+   source: &lt;path|query&gt;, evidence: &lt;count|query|row&gt;, evidence_class: A|B|C|D|E,
+   acceptance: &lt;test|e2e|probe&gt;, status: used|rare|unused|dropped}</code></pre>
+<h2 id="11-decisions-closed-here">11. Decisions closed here</h2>
+<p><strong>Closed (binding):</strong></p>
+<ol type="1">
+<li>Unit = <code>(app, method, normalised path)</code>; n8n unit = <code>(package, resource, operation)</code>; flows are not features.</li>
+<li><code>rare</code> is carried only if it folds into a <code>used</code> action/enum; else dropped at sign-off.</li>
+<li>Decision-drops outrank usage; an A hit on one is a STOP.</li>
+<li>B-only <code>used</code> needs both samples; C never stands alone.</li>
+<li><code>parity/parity.yaml</code> is the only list; slices reference <code>parity_ids</code>.</li>
+<li>No data migration (D7); RM is whole (D3), so zero-usage RM is <code>rare</code>; <code>procedure_management</code> is one SUMMARY line (D10).</li>
+</ol>
+<h2 id="12-open-questions">12. Open questions</h2>
+<p><strong>Open (≤5, each with a default):</strong></p>
+<ol type="1">
+<li>Four named flows: procedures or platform features? <strong>Default:</strong> procedures; <code>err.card</code> → notification job.</li>
+<li>Do <code>email</code>/<code>teams</code> fan-out survive (SPEC §5.8)? <strong>Default:</strong> drop unless A.</li>
+<li>Which Keycloak realms count? <strong>Default:</strong> <code>portal</code> only.</li>
+<li>Frozen route with live Loki traffic — ported? <strong>Default:</strong> port; record <code>frozen</code>.</li>
+<li>All RM modelling tables empty? <strong>Default:</strong> <code>rare</code> under D3.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S00-usage-inventory.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

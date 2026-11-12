@@ -1,0 +1,90 @@
+{
+  "input": {
+    "key": "conveyor.start",
+    "title": "conveyor.start — a project's start request, re-authored",
+    "definition": {
+      "schema": 1,
+      "nodes": [
+        {
+          "id": "project",
+          "kind": "action",
+          "action": "projects.get",
+          "input_template": { "id": "{{run.project_id}}" }
+        },
+        {
+          "id": "project_ok",
+          "kind": "condition",
+          "predicate": {
+            "op": "eq",
+            "left": "{{steps.1.output.project.id}}",
+            "right": "{{run.project_id}}"
+          }
+        },
+        {
+          "id": "board",
+          "kind": "action",
+          "action": "boards.get",
+          "input_template": { "id": "{{run.inputs.board_id}}" }
+        },
+        {
+          "id": "cards_in_intake",
+          "kind": "action",
+          "action": "cards.list",
+          "input_template": {
+            "board_id": "{{run.inputs.board_id}}",
+            "list_id": "{{steps.3.output.lists.0.list.id}}",
+            "limit": 1
+          }
+        },
+        {
+          "id": "intake_empty",
+          "kind": "condition",
+          "predicate": { "op": "empty", "left": "{{steps.4.output.items}}" }
+        },
+        {
+          "id": "create",
+          "kind": "action",
+          "action": "cards.create",
+          "input_template": {
+            "board_id": "{{run.inputs.board_id}}",
+            "list_id": "{{steps.3.output.lists.0.list.id}}",
+            "name": "{{run.inputs.name}}",
+            "card_type_code": "{{run.inputs.card_type_code}}"
+          }
+        },
+        {
+          "id": "move",
+          "kind": "action",
+          "action": "cards.move",
+          "input_template": {
+            "id": "{{steps.6.output.id}}",
+            "list_id": "{{steps.3.output.lists.1.list.id}}",
+            "_version": "{{steps.6.output.version}}"
+          }
+        },
+        {
+          "id": "project_mismatch",
+          "kind": "action",
+          "action": "projects.get",
+          "input_template": { "id": "{{run.project_id}}" }
+        },
+        {
+          "id": "skip",
+          "kind": "action",
+          "action": "boards.get",
+          "input_template": { "id": "{{run.inputs.board_id}}" }
+        }
+      ],
+      "edges": [
+        { "from": "project", "to": "project_ok" },
+        { "from": "project_ok", "to": "board", "when": "true" },
+        { "from": "project_ok", "to": "project_mismatch", "when": "false" },
+        { "from": "board", "to": "cards_in_intake" },
+        { "from": "cards_in_intake", "to": "intake_empty" },
+        { "from": "intake_empty", "to": "create", "when": "true" },
+        { "from": "intake_empty", "to": "skip", "when": "false" },
+        { "from": "create", "to": "move" }
+      ]
+    }
+  }
+}

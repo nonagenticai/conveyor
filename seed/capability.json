@@ -1,0 +1,134 @@
+{
+ "version": 1,
+ "generated_from": "seed/catalogue.json (the 17 kind='capability' rows, moved by S15 on 2026-11-09)",
+ "source_note": "The 17 capability codes are the RM catalogue's distinct kind='capability' vocabulary. Relations have no RM source; the array is empty rather than invented \u2014 a requires edge is a readiness fact, not decoration.",
+ "capabilities": [
+  {
+   "code": "analysis",
+   "label": "Analysis",
+   "description": "Card types for analysis.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "architecture",
+   "label": "Architecture",
+   "description": "Card types for architecture.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "asset_library_statistics",
+   "label": "Asset library statistics",
+   "description": "Card types for principle, requirement and decision library statistics.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "bdd_tdd",
+   "label": "BDD / TDD",
+   "description": "Card types for behaviour- and test-driven development.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "change_management",
+   "label": "Change management",
+   "description": "Card types that deal with change management.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "design",
+   "label": "Design",
+   "description": "Card types for design.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "development",
+   "label": "Development",
+   "description": "Card types for development.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "kaizen",
+   "label": "Kaizen",
+   "description": "Card types for flow improvements.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "kanban_coach",
+   "label": "Kanban coach",
+   "description": "Protector of flow. Any card interruption invokes a card for the kanban coach. Owns all flow-related decisions and fr/human interaction during a phase: blocked cards, comments, human input and answers, in-flow approvals, and rework limit reached (R34).",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "kata",
+   "label": "Kata",
+   "description": "The continuous-improvement loop: open a kata from a benchmark or eval finding, run the improvement iteration, and report the verdict (SPEC D20/D29, S18).",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "meta_procedure",
+   "label": "Procedure improvement",
+   "description": "Card types for procedure improvements for agents.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "meta_prompt",
+   "label": "Prompt improvement",
+   "description": "Card types for prompt improvement in flows.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "program_management",
+   "label": "Program management",
+   "description": "Card types that deal with program management.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "project_management",
+   "label": "Project management",
+   "description": "Card types that deal with project management.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "refactoring",
+   "label": "Refactoring",
+   "description": "Card types for refactoring.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "research",
+   "label": "Research",
+   "description": "Card types for research.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "testing",
+   "label": "Testing",
+   "description": "Card types for testing.",
+   "status": "active",
+   "meta": {}
+  },
+  {
+   "code": "workflow_engineering",
+   "label": "Workflow engineering",
+   "description": "Card types for changing the workflow itself: observe, probe, root cause and andon scope.",
+   "status": "active",
+   "meta": {}
+  }
+ ],
+ "relations": []
+}

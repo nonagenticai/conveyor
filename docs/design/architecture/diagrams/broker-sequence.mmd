@@ -1,0 +1,30 @@
+sequenceDiagram
+  autonumber
+  participant EX as Executor
+  participant BR as tools.call broker
+  participant REG as Binding and pinned version
+  participant SEC as Sealed credential store
+  participant BE as Destination alias
+  participant LED as tool_call ledger
+  EX->>BR: service.operation and input
+  BR->>REG: resolve the binding and version
+  alt missing binding or version
+    REG-->>BR: 409 tool_not_ready
+    BR-->>EX: refused before the network call
+  end
+  BR->>BR: check the effect ceiling and spend budget
+  alt effect or budget breach
+    BR-->>EX: 403 tool_effect_forbidden or 429 tool_budget_exceeded
+  end
+  BR->>BR: validate the closed input schema
+  alt invalid input
+    BR-->>EX: 422 tool_input_invalid
+  end
+  BR->>SEC: resolve the credential by alias
+  SEC-->>BR: credential never reaches the prompt or ledger
+  BR->>BE: call the registered destination alias
+  BE-->>BR: raw result
+  BR->>BR: normalise and redact into status, data, checks, next
+  BR->>LED: one tool_call row and one tool.called event
+  LED-->>BR: recorded
+  BR-->>EX: normalised envelope

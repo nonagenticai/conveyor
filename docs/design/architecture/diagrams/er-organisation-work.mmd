@@ -1,0 +1,15 @@
+erDiagram
+  TENANT ||--o{ INDUSTRY : has
+  INDUSTRY ||--o{ DEPARTMENT : orders
+  DEPARTMENT ||--o{ JOB_CATALOGUE : places
+  JOB_CATALOGUE ||--o{ JOB_RELEASE : publishes
+  JOB_RELEASE ||--o{ JOB_BINDING : pinned_by
+  TENANT ||--o{ PROGRAMME : owns
+  PROGRAMME ||--o{ PROJECT : groups
+  PROJECT ||--o{ WBS_NODE : plans
+  WBS_NODE ||--o{ CARD : contains
+  CARD ||--o{ RUN : executes
+  RUN ||--o{ RUN_STEP : has
+  CARD ||--o{ APPROVAL : gates
+  JOB_BINDING ||--o{ CARD : assigned_to
+  JOB_BINDING ||--o{ RUN : used_by

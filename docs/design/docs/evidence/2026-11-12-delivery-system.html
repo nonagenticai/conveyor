@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Delivery system — queue truth, adoption and the four-plan split · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-12-delivery-system.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="delivery-system--queue-truth-adoption-and-the-four-plan-split">Delivery system — queue truth, adoption and the four-plan split</h1>
+<p><strong>Date:</strong> 2026-11-12. <strong>Unit:</strong> conveyor#26 (resumed). <strong>Protocol:</strong> <code>docs/plans/03-DELIVERY.md</code> (PR #11, hardened by #39/PR #40).</p>
+<p>Every number below is a reading with its time and the command that produced it. Do not quote one without its row.</p>
+<h2 id="what-changed">What changed</h2>
+<ol type="1">
+<li><strong>In-flight adoption.</strong> PR #36 (<code>lane/spec-v2</code>) had no issue and no closing reference. Issue <strong>#38</strong> now records the branch, baseline and delivery contract; PR #36's body carries the closing reference (restored after the PR owner's rewrite dropped it).</li>
+<li><strong>Merged branches deleted.</strong> Nine <code>lane/*</code> / <code>slice/*</code> heads whose tips are ancestors of <code>origin/main</code> were deleted by API. Local worktrees keep working; the map is below.</li>
+<li><strong>The four multi-session plans split</strong> into file-disjoint siblings, each with the full contract (DoR, BDD + <code>Verify:</code>, DoD, typed dependencies). The parent keeps the dependency-bearing part.</li>
+<li><strong>Inbound edges re-pointed</strong> where the split moved the target: #28 → #44, #24 → #43, #21 → #41, #20 → #43.</li>
+</ol>
+<p>The protocol hardening that this unit consumes was <strong>#39/PR #40</strong>, merged at <code>80dcf49</code> (2026-11-12T07:04:19Z): skills conform to <code>03-DELIVERY.md</code>, the <code>/issue-sweep</code> report-only routine, and the two repo guards (shared-root commit, unissued PR). Its PR run <code>43170039391</code> is <strong>success</strong>; <code>rust-checks</code> ran 20 minutes because <code>.claude/hooks/*.py</code> is code, not documentation. Its merge run <code>43172563380</code> was <strong>in progress</strong> at the final reading below.</p>
+<h2 id="before--after">Before / after</h2>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Before</th>
+<th>After</th>
+<th>Query</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Open <code>unit</code> issues</td>
+<td>19 at 2026-11-11T11:56:08Z</td>
+<td>24 at 2026-11-12T07:09:24Z</td>
+<td><code>gh issue list --state open --label unit --limit 100 --json number | jq length</code></td>
+</tr>
+<tr>
+<td>Ready / claimed / blocked / in review</td>
+<td>12 / 3 / 2 / 1 (+1 claimed this unit)</td>
+<td>17 / 3 / 3 / 1</td>
+<td><code>gh issue list --state open --label unit --json labels</code></td>
+</tr>
+<tr>
+<td>Non-<code>main</code> heads</td>
+<td>13 at 2026-11-11T11:56:08Z</td>
+<td>4 at 2026-11-12T07:09:24Z</td>
+<td><code>git ls-remote --heads origin</code></td>
+</tr>
+<tr>
+<td>Heads that are merged ancestors</td>
+<td>9</td>
+<td>0</td>
+<td>per-head <code>git merge-base --is-ancestor</code></td>
+</tr>
+<tr>
+<td>Open PRs without a closing reference</td>
+<td>1 (PR #36)</td>
+<td>0</td>
+<td><code>gh pr list --state open --json body</code> + the <code>Closes</code> regex</td>
+</tr>
+<tr>
+<td>Branches outside the model</td>
+<td>10 <code>lane/*</code> / <code>slice/*</code> work heads</td>
+<td>2 live claims (<code>lane/spec-v2</code>, <code>slice/s12-wave3/studio-ui</code>)</td>
+<td><code>git ls-remote --heads origin</code></td>
+</tr>
+</tbody>
+</table>
+<p>The before reading is the sweep snapshot taken during #39's build; the after reading is the final one taken for this doc. The issue count moves 19 → 24 by: −1 (#39 closed by its merge), +6 split siblings.</p>
+<h2 id="branch-cleanup-9-deleted-all-ancestors-of-originmain">Branch cleanup (9 deleted, all ancestors of <code>origin/main</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Branch</th>
+<th>Tip</th>
+<th>Deleting it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lane/bootstrap</code></td>
+<td><code>f18cb03</code></td>
+<td>worktree <code>.worktrees/bootstrap</code> keeps working locally</td>
+</tr>
+<tr>
+<td><code>lane/docs-process-model</code></td>
+<td><code>8bb6099</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>lane/integration-nov10</code></td>
+<td><code>917f18b</code></td>
+<td>worktree <code>.worktrees/integration-nov10</code></td>
+</tr>
+<tr>
+<td><code>lane/s12-wave3</code></td>
+<td><code>c88a2da</code></td>
+<td>worktree <code>.worktrees/render-determinism</code></td>
+</tr>
+<tr>
+<td><code>lane/s13-process-engine</code></td>
+<td><code>b72d775</code></td>
+<td>worktree <code>.worktrees/s13-finish/conveyor</code></td>
+</tr>
+<tr>
+<td><code>lane/s18-kata-improvement</code></td>
+<td><code>d61f739</code></td>
+<td>worktree <code>.worktrees/s18-kata</code></td>
+</tr>
+<tr>
+<td><code>lane/s19-eval-build-c</code></td>
+<td><code>7d74c8c</code></td>
+<td>worktree <code>.worktrees/s19-eval-c</code></td>
+</tr>
+<tr>
+<td><code>lane/s20-eval-climb</code></td>
+<td><code>deba81d</code></td>
+<td>no local worktree at deletion time</td>
+</tr>
+<tr>
+<td><code>slice/train-2026-11-09/s06d</code></td>
+<td><code>8a1817d</code></td>
+<td>worktree <code>.worktrees/s06d</code></td>
+</tr>
+</tbody>
+</table>
+<p>Deletion command, per branch: <code>gh api -X DELETE repos/nonagenticai/conveyor/git/refs/heads/&lt;b&gt;</code> → HTTP 204.</p>
+<p><strong>Left in place:</strong> <code>lane/spec-v2</code> (live claim of #38/PR #36) and <code>slice/s12-wave3/studio-ui</code> (live claim of #16). <code>lane/train-2026-11-09</code> duplicates PR #36's one-file change; it is deleted after PR #36 merges (worktree <code>.worktrees</code> root is parked on it — do not commit there).</p>
+<h2 id="split-map">Split map</h2>
+<table>
+<thead>
+<tr>
+<th>Parent</th>
+<th>Keeps</th>
+<th>Sibling</th>
+<th>Takes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#16 S12</td>
+<td>P1 OIDC, P2 board/cockpit</td>
+<td><strong>#41</strong></td>
+<td>P3 measurement UI</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><strong>#42</strong></td>
+<td>P4.1–P4.2 eval-report + eval-signoff</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><strong>#43</strong></td>
+<td>P4.3–P4.4 hillclimb + inference-usage</td>
+</tr>
+<tr>
+<td>#18 S14</td>
+<td>P2–P6 deployment, acceptance, receipt</td>
+<td><strong>#44</strong></td>
+<td>P1 the S14 rewrite (docs-only)</td>
+</tr>
+<tr>
+<td>#22 S18</td>
+<td>P1–P5 producers + improvement job</td>
+<td><strong>#45</strong></td>
+<td>P6 the live loop proof (<code>blocked-by #18</code>)</td>
+</tr>
+<tr>
+<td>#23 S19</td>
+<td>P1–P5 accounting model</td>
+<td><strong>#46</strong></td>
+<td>P6 the Tier-3 auditor</td>
+</tr>
+</tbody>
+</table>
+<p>Why the parent keeps that part: every inbound <code>acceptance-blocked-by #18</code> edge names the deployment gate, and every consumer of the accounting points at the model — moving those would silently re-point live-proof dependencies.</p>
+<h2 id="adoption-record-pr-36--issue-38">Adoption record (PR #36 / issue #38)</h2>
+<ul>
+<li>Issue #38 created 2026-11-11 with the 13-section contract, baseline <code>main@66ff7de</code>, and the branch <code>lane/spec-v2@76d26eb</code>.</li>
+<li>PR #36's body first received the closing reference, then the PR owner rewrote the body and dropped it; it was restored at the top and the owner was asked to keep it (PR comment).</li>
+<li>At 2026-11-12T07:09:24Z: #38 <code>OPEN</code>, PR #36 <code>OPEN</code>, and the body's <code>Closes</code> regex is true.</li>
+</ul>
+<h2 id="final-queue-reading-2026-11-12t070924z">Final queue reading (2026-11-12T07:09:24Z)</h2>
+<ul>
+<li>24 open <code>unit</code> issues: 17 <code>status:ready</code>, 3 <code>status:claimed</code> (#16, #26, #27), 3 <code>status:blocked</code> (#23, #32, #45), 1 in review (#38, no status label).</li>
+<li>5 remote heads: <code>issue/26-queue-truth</code>, <code>lane/spec-v2</code>, <code>lane/train-2026-11-09</code>, <code>main</code>, <code>slice/s12-wave3/studio-ui</code>.</li>
+<li>1 open PR: #36 (<code>lane/spec-v2</code>), with a closing reference.</li>
+</ul>
+<p>Commands: <code>gh issue list --state open --label unit --json number,labels</code>, <code>git ls-remote --heads origin</code>, <code>gh pr list --state open --json number,headRefName,body</code>.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-12-delivery-system.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

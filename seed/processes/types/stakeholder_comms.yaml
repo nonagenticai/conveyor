@@ -1,0 +1,165 @@
+# stakeholder_comms — who is told what, on which channel, when, and how they answer
+# (document archetype; schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (outputs + the READY/DOING/QA/DONE acceptance names) and
+# n8n-designs/design/choices/v4/capabilities/change_management.yaml (text "Planning and executing
+# communication strategies with various stakeholders.", phase `preliminary`, upstream
+# release_planning, sections stakeholders/messages/channels/schedule/feedback, signoff true,
+# uses_repo false, and the three stakeholder_comms inspect.criteria the QA stage judges by).
+# messages holds one ready-to-send text per stakeholder group; the conveyor has no send tool, so
+# QA confirms the wording and the user sends it — DONE publishes the confirmed version, it does
+# not deliver anything.
+card_type: stakeholder_comms
+capability: change_management
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: stakeholder_comms
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: stakeholder_comms.ready
+    title: Stakeholder comms — definition of ready
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [draft_artifact_id]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline's five sections and the questions it opens serve the stakeholders and the change the card names, and plan no announcement the card did not ask for."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: stakeholder_comms.doing
+    title: Stakeholder comms — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every stakeholder group, message, channel and time names the release plan section, upstream artifact or brief field it comes from."}
+      - {name: every_cited_source_exists, text: "Every release plan section, artifact version and brief field a message cites exists when the message is drafted."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: stakeholder_comms.qa
+    title: Stakeholder comms — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "No message promises a date, a change or an outcome that the release plan it cites does not state."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the stakeholder_comms card type declares is true of the plan."}
+      - {name: stakeholders_have_messages, text: "Every stakeholder has at least one message and a channel."}
+      - {name: schedule_complete, text: "schedule gives every message a time or a release step."}
+      - {name: feedback_route, text: "feedback says how each stakeholder answers and who reads it."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id]
+
+  - key: stakeholder_comms.done
+    title: Stakeholder comms — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The messages published to the card are the ones QA confirmed — no recipient group, channel, time or wording changed after review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: stakeholder_comms.system
+    title: Stakeholder comms — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: stakeholder_comms.READY
+    list: ready
+    title: Stakeholder comms — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: stakeholder_comms
+        sop: stakeholder_comms.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: stakeholder_comms.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: stakeholder_comms.DOING
+    list: doing
+    title: Stakeholder comms — doing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: stakeholder_comms.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: stakeholder_comms.QA
+    list: qa
+    title: Stakeholder comms — QA
+    outputs: [reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: stakeholder_comms.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: stakeholder_comms.DONE
+    list: done
+    title: Stakeholder comms — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: stakeholder_comms, sop: stakeholder_comms.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: stakeholder_comms.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

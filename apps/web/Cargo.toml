@@ -1,0 +1,96 @@
+[package]
+name = "conveyor-web"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# cargo-leptos builds the CSR bundle from this lib's `#[wasm_bindgen(start)]`. `rlib` is what
+# keeps the HOST-target build (`cargo check -p conveyor-web`, and therefore
+# `cargo test --workspace`) compiling the crate: measured green on m1, 2026-11-09.
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+# cargo-leptos 0.3.11 resolves a bin target for the project before it will build the lib,
+# even with `--frontend-only`. This bin is deliberately empty: CSR has no server half, and
+# the browser entry point is the lib's `#[wasm_bindgen(start)]`.
+[[bin]]
+name = "conveyor-web"
+path = "src/main.rs"
+
+[features]
+# cargo-leptos passes `--features=csr` to the lib target. It is deliberately empty: the
+# `csr` behaviour lives on the `leptos` dependency below, which is always enabled here.
+default = []
+csr = []
+
+[dependencies]
+leptos = { workspace = true }
+leptos_router = { workspace = true }
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
+js-sys = { workspace = true }
+web-sys = { workspace = true, features = [
+    "AbortController",
+    "AbortSignal",
+    "Clipboard",
+    "console",
+    "Crypto",
+    "CustomEvent",
+    "DataTransfer",
+    "Document",
+    "DomRect",
+    "DragEvent",
+    "Element",
+    "Event",
+    "EventTarget",
+    "Headers",
+    "History",
+    "HtmlAnchorElement",
+    "HtmlButtonElement",
+    "HtmlCollection",
+    "HtmlDialogElement",
+    "HtmlElement",
+    "HtmlInputElement",
+    "HtmlOptionElement",
+    "HtmlSelectElement",
+    "HtmlTextAreaElement",
+    "KeyboardEvent",
+    "Location",
+    "MessageEvent",
+    "MouseEvent",
+    "Navigator",
+    "Node",
+    "NodeList",
+    "PointerEvent",
+    "ReadableStream",
+    "ReadableStreamDefaultReader",
+    "Request",
+    "RequestCredentials",
+    "RequestInit",
+    "RequestMode",
+    "Response",
+    "Storage",
+    "TextDecoder",
+    "Url",
+    "UrlSearchParams",
+    "Window",
+] }
+console_error_panic_hook = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true, features = ["wasmbind"] }
+base64 = { workspace = true }
+sha2 = { workspace = true }
+
+[package.metadata.leptos]
+# The site is CONTRACT §11's: static files behind the API origin. The dev server
+# (`dev-server.mjs`) is the same-origin proxy; production serving is S14's ingress step.
+output-name = "conveyor-web"
+site-root = "target/site"
+site-pkg-dir = "pkg"
+assets-dir = "public"
+lib-features = ["csr"]
+# The crate has no server half and no SSR features, so default features stay on.
+lib-default-features = true

@@ -1,0 +1,208 @@
+{
+  "images": {
+    "astropy__astropy-13033": {
+      "digest": "sha256:c4ef76b3dbb0b9fc589ffff03dd4ca62e3d0406430f3a72be3dabfd5a3fc9990",
+      "repository": "swebench/sweb.eval.x86_64.astropy_1776_astropy-13033"
+    },
+    "astropy__astropy-14539": {
+      "digest": "sha256:84363223c36a289d101970473e56ad12199e9b5dcbd1deef5568f4fab743ff05",
+      "repository": "swebench/sweb.eval.x86_64.astropy_1776_astropy-14539"
+    },
+    "django__django-10880": {
+      "digest": "sha256:d093c7b3ac897213dc6e607df217be05cbf0bbfca79a58ca37463ea75ba3e980",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-10880"
+    },
+    "django__django-11149": {
+      "digest": "sha256:17b5ab946ab47c4711edb41debeee25837e4d3226dd7f720ae1dcf55576c84a6",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-11149"
+    },
+    "django__django-11163": {
+      "digest": "sha256:ae0b96085340fc1c0cc2962ba5ac39f9cc935cbd50fbc98229b635fd80df31a3",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-11163"
+    },
+    "django__django-11451": {
+      "digest": "sha256:e2c2c0e62a1c20b86f394eb12bda5efb503f1cc336069583d932dc7dfa81efb0",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-11451"
+    },
+    "django__django-11490": {
+      "digest": "sha256:d4fb2ca01ba943c7bac346b65e0e51b7a28a9170a29eaeb9091adcf6a2eab4b2",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-11490"
+    },
+    "django__django-11848": {
+      "digest": "sha256:3fb3b90074424b3deaed41b2e2e66483e54e922d22fa034952f5a7f8553be607",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-11848"
+    },
+    "django__django-11880": {
+      "digest": "sha256:4488d53c0526d3a4e679753beb3501d70253a1f687274ef9c2ed07e7225dde6c",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-11880"
+    },
+    "django__django-13112": {
+      "digest": "sha256:bcb7b5774dc303f2bd664c3c614a5fb99e5fbbe803a776d127621a7841dcae64",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-13112"
+    },
+    "django__django-13158": {
+      "digest": "sha256:ed8dd115b1b27e4eec5b2a5e940f7a4e5d7abfcff4ff4332b2c1d34566fa58c5",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-13158"
+    },
+    "django__django-13401": {
+      "digest": "sha256:64a74a21a4c80468a65e56823461e9ec05625df646d92b989bc59c20f4989a01",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-13401"
+    },
+    "django__django-13512": {
+      "digest": "sha256:d9ed685983c9725847d150a52114aaae03d8c922e266d37a61c4dadf4d89633e",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-13512"
+    },
+    "django__django-14500": {
+      "digest": "sha256:226410c4379e6c35a04b231cac4aae8bdc740818b13d126584ef2367d315f8e6",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-14500"
+    },
+    "django__django-14672": {
+      "digest": "sha256:9a59520a1e6af73e6e440228774e44d00471efe1f65e1edaf7987a144510843d",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-14672"
+    },
+    "django__django-15104": {
+      "digest": "sha256:935b41f18bb3b5f83eb1075d75b4f4b57af84d2610168c7ab9f929eb1fbdb6db",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-15104"
+    },
+    "django__django-15278": {
+      "digest": "sha256:26494a45d6639a4d8abe230a5eaf665ceef8e34b8e01d788f9e4eaa1a51c0144",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-15278"
+    },
+    "django__django-16082": {
+      "digest": "sha256:983c9f9fb852ccc0377c3a348f122f2f6cb4d90e107ec6ab978c55d11940ffd1",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-16082"
+    },
+    "django__django-16256": {
+      "digest": "sha256:dff239fbb615e9ef3f22f5eb4e7e9e3b19f0712ce78ad048e00361c2c9247f20",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-16256"
+    },
+    "django__django-16333": {
+      "digest": "sha256:a6fd5a545edb1bd60024060f68fb9ba28c96b7b2ecdea3fb1a38998841c942e1",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-16333"
+    },
+    "django__django-16493": {
+      "digest": "sha256:43fbf022eb3ddbbd32edf3cbc325c8dc532b48551f78fef14c2afd1d26dde858",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-16493"
+    },
+    "django__django-16527": {
+      "digest": "sha256:b5e7ef7a165a387b1ef6822dc7c4aed38f8548b36deda48ae2e8639146a8113b",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-16527"
+    },
+    "django__django-16950": {
+      "digest": "sha256:a16f90d5007ee651137562dc4f6161cd7907a38f7d89c4120aed3c45bfbcf0ca",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-16950"
+    },
+    "django__django-17029": {
+      "digest": "sha256:9c5ff672b8c4cc1491353c7d83aa38c4c1cc4085bbd8f87e6579d775c2cf9e80",
+      "repository": "swebench/sweb.eval.x86_64.django_1776_django-17029"
+    },
+    "matplotlib__matplotlib-23412": {
+      "digest": "sha256:914aa40628489b61dc06c60724d8c9bfefafcd6e012f0f92fa0896b747702f5f",
+      "repository": "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-23412"
+    },
+    "matplotlib__matplotlib-23476": {
+      "digest": "sha256:64bb043b17a25dbeeba766c82d1d5f66ca446ca32da12c88418ded9e0d79cfdc",
+      "repository": "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-23476"
+    },
+    "matplotlib__matplotlib-24627": {
+      "digest": "sha256:526b4c5c1b786ecf4dbfecb7c3ef847a0749d2de721932871abb46d8ca3dd6d8",
+      "repository": "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-24627"
+    },
+    "mwaskom__seaborn-3069": {
+      "digest": "sha256:7c6493e599d30fac87d2e45fd90ad1bbe755d878afdd3f366c41acbb80780aec",
+      "repository": "swebench/sweb.eval.x86_64.mwaskom_1776_seaborn-3069"
+    },
+    "pallets__flask-5014": {
+      "digest": "sha256:eaf597005c159361cb8ee26018fb3741b320f331065f0c95726d83ccf2f1fba4",
+      "repository": "swebench/sweb.eval.x86_64.pallets_1776_flask-5014"
+    },
+    "psf__requests-6028": {
+      "digest": "sha256:515bfc8e8e0ab4ab176c69960958abde78797ee9de59192d305f6de92bed9e30",
+      "repository": "swebench/sweb.eval.x86_64.psf_1776_requests-6028"
+    },
+    "pydata__xarray-3095": {
+      "digest": "sha256:fb721923cba0d05faafdafb2fb76e6caa3adc22fd4fdcbf2de45741312f91c74",
+      "repository": "swebench/sweb.eval.x86_64.pydata_1776_xarray-3095"
+    },
+    "pydata__xarray-6461": {
+      "digest": "sha256:5f0507f4349e057da586ceafba199570b94370808dcefbe55bc8cc39dfeacb0b",
+      "repository": "swebench/sweb.eval.x86_64.pydata_1776_xarray-6461"
+    },
+    "pylint-dev__pylint-7277": {
+      "digest": "sha256:d694c23350a84bee08191fb17ff4abd1a4686ffdbc4fcac377be11ba87713aae",
+      "repository": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7277"
+    },
+    "pytest-dev__pytest-5787": {
+      "digest": "sha256:d1abda88ac4d8effc52e3fde7711a19be44e4e6c7c9c262facdbca784c815c7a",
+      "repository": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-5787"
+    },
+    "pytest-dev__pytest-7982": {
+      "digest": "sha256:6e0be26902eb9766ddf66e9da973d8a3efa324eee1c8555f0d96fafbc80e32cb",
+      "repository": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-7982"
+    },
+    "scikit-learn__scikit-learn-10844": {
+      "digest": "sha256:0721acd36a3d3f0504af91510930b5915b131a1f60583654f3bd5f6a1a65bf5f",
+      "repository": "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-10844"
+    },
+    "scikit-learn__scikit-learn-25232": {
+      "digest": "sha256:900e73a469c0e96d9e33620187202814262c8409f6a51669d1c61d22ac48219d",
+      "repository": "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-25232"
+    },
+    "scikit-learn__scikit-learn-25747": {
+      "digest": "sha256:83c8ceadfea2c09ee31bb621af694c38a77b839d8a7e5587d69ff121cc81ce69",
+      "repository": "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-25747"
+    },
+    "sphinx-doc__sphinx-10449": {
+      "digest": "sha256:f6c9a3a3ecb31d4e4fcd7e4cc384d003dc63594a32a9ba91161626d110fcbbb6",
+      "repository": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-10449"
+    },
+    "sphinx-doc__sphinx-7985": {
+      "digest": "sha256:2579905496e0d250cb9e930c01d4b7c6949797df936758047b52a6693ea97dfe",
+      "repository": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-7985"
+    },
+    "sphinx-doc__sphinx-8475": {
+      "digest": "sha256:fcb5d82fdcbc4b03d1552e9f3f1ed500647541e8cb25386f8d553d8f22bc8831",
+      "repository": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8475"
+    },
+    "sphinx-doc__sphinx-9258": {
+      "digest": "sha256:64d5385bcf03c155a2718594a1d58d12dae15abb7e8759a988ca433241f9ab7f",
+      "repository": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-9258"
+    },
+    "sympy__sympy-12096": {
+      "digest": "sha256:0f9ad5cbf26325624de0de46f56adf96471b0d717c1cdd85d445a48d5158279b",
+      "repository": "swebench/sweb.eval.x86_64.sympy_1776_sympy-12096"
+    },
+    "sympy__sympy-13480": {
+      "digest": "sha256:e6f975f907a4785cd6ece52754b3192fe69bba309cf4bc24598725dc0a1807d4",
+      "repository": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13480"
+    },
+    "sympy__sympy-21847": {
+      "digest": "sha256:dc63eae1d6089ed44748eca7a136b877beaf316ca0ed31d0c563909ff1e094c8",
+      "repository": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21847"
+    },
+    "sympy__sympy-22456": {
+      "digest": "sha256:6c9b0a8431c7e8f1aaeee850822a66bc95ab7bbb50e53b177f895cc030f3aa85",
+      "repository": "swebench/sweb.eval.x86_64.sympy_1776_sympy-22456"
+    },
+    "sympy__sympy-23413": {
+      "digest": "sha256:20ff27f6a06e781c201194bc8c30f321703461c63e1a7e14014dae6b2fffbb0e",
+      "repository": "swebench/sweb.eval.x86_64.sympy_1776_sympy-23413"
+    },
+    "sympy__sympy-23950": {
+      "digest": "sha256:a55e5fd585231ba6bbcb53bb8b6a9f61fcc2e8012bfbb511430e6f192c2baa35",
+      "repository": "swebench/sweb.eval.x86_64.sympy_1776_sympy-23950"
+    },
+    "sympy__sympy-24213": {
+      "digest": "sha256:520c3b73e9160c42fdcd8ea7fa1e126156c639a326743074a622a2261672157e",
+      "repository": "swebench/sweb.eval.x86_64.sympy_1776_sympy-24213"
+    },
+    "sympy__sympy-24443": {
+      "digest": "sha256:2c038f0f89170065a375ccb9210f6cfc91d9c9a22683ebfe46f713078c30d2e1",
+      "repository": "swebench/sweb.eval.x86_64.sympy_1776_sympy-24443"
+    }
+  },
+  "note": "dst digests of the amd64-only copies made by scripts/mirror-swebench.sh; pin by digest, never :latest",
+  "platform": "linux/amd64",
+  "registry": "registry.example.com:5000",
+  "source": "docker.io"
+}

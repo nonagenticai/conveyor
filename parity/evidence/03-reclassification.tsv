@@ -1,0 +1,75 @@
+P-0003	DELETE /api/admin/assets/projects/{id}	3	0	rare	rare	hit in one sample only
+P-0058	DELETE /api/projects/{id}	25	0	rare	rare	hit in one sample only
+P-0069	GET /	632	598	rare	used	B>=5 in each sample
+P-0072	GET /api/admin/assets/decisions	2	0	rare	rare	hit in one sample only
+P-0074	GET /api/admin/assets/principles	2	0	rare	rare	hit in one sample only
+P-0076	GET /api/admin/assets/projects	8	0	rare	rare	hit in one sample only
+P-0078	GET /api/admin/assets/requirements	2	0	rare	rare	hit in one sample only
+P-0080	GET /api/admin/assets/workflows	2	0	rare	rare	hit in one sample only
+P-0082	GET /api/admin/control-tower	1	0	rare	rare	hit in one sample only
+P-0121	GET /api/agui/threads	6	7	rare	used	B>=5 in each sample
+P-0123	GET /api/andon	675	49	rare	used	B>=5 in each sample
+P-0126	GET /api/approvals	194	23	rare	used	B>=5 in each sample
+P-0131	GET /api/approvals/all	538	30	rare	used	B>=5 in each sample
+P-0207	GET /api/assets/decisions	195	23	rare	used	B>=5 in each sample
+P-0235	GET /api/assets/principles	194	23	rare	used	B>=5 in each sample
+P-0239	GET /api/assets/requirements	195	23	rare	used	B>=5 in each sample
+P-0244	GET /api/assets/toc	1	0	rare	rare	hit in one sample only
+P-0253	GET /api/assets/workers/providers	2	0	rare	rare	hit in one sample only
+P-0254	GET /api/assets/workers/providers/{provider}/models	1	0	rare	rare	hit in one sample only
+P-0256	GET /api/auth/me	68	8	rare	used	B>=5 in each sample
+P-0260	GET /api/cards/{cardId}	1	3	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0278	GET /api/conveyor/priority-levels	3	1	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0279	GET /api/conveyor/project-types	106	7	rare	used	B>=5 in each sample
+P-0283	GET /api/documents	193	23	rare	used	B>=5 in each sample
+P-0297	GET /api/kanban/boards	0	2	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0298	GET /api/kanban/boards/{boardId}	2	2	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0299	GET /api/kanban/cards/{cardId}	1	2	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0301	GET /api/kanban/ws	3	2	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0304	GET /api/license/status	368	11	rare	used	B>=5 in each sample
+P-0307	GET /api/me/budget/status	194	23	rare	used	B>=5 in each sample
+P-0312	GET /api/me/dept-roles	68	7	rare	used	B>=5 in each sample
+P-0316	GET /api/me/notifications	1	0	rare	rare	hit in one sample only
+P-0317	GET /api/me/notifications/unread-count	538	30	rare	used	B>=5 in each sample
+P-0319	GET /api/me/project-workspaces	5	1	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0322	GET /api/me/super-admin	69	7	rare	used	B>=5 in each sample
+P-0328	GET /api/me/usage/summary	193	23	rare	used	B>=5 in each sample
+P-0329	GET /api/me/workspace	69	9	rare	used	B>=5 in each sample
+P-0330	GET /api/me/workspaces	202	21	rare	used	B>=5 in each sample
+P-0334	GET /api/project-requests	3	0	rare	rare	hit in one sample only
+P-0338	GET /api/projects/{id}	19	4	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0339	GET /api/projects/{id}/agent-actions	0	2	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0340	GET /api/projects/{id}/andon	14	10	rare	used	B>=5 in each sample
+P-0347	GET /api/projects/{id}/cockpit	187	51	rare	used	B>=5 in each sample
+P-0350	GET /api/projects/{id}/conveyor-notices	10	7	rare	used	B>=5 in each sample
+P-0353	GET /api/projects/{id}/documents/{artifactId}/render	0	2	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0354	GET /api/projects/{id}/executions	0	2	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0355	GET /api/projects/{id}/flow-runs	0	2	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0358	GET /api/projects/{id}/outputs	0	3	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0366	GET /api/projects/{id}/registers	4	7	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0369	GET /api/projects/{id}/wip	3	3	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0376	GET /api/reports	0	1	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0382	GET /api/repositories	38	0	rare	rare	hit in one sample only
+P-0422	GET /api/tenant/members	38	0	rare	rare	hit in one sample only
+P-0446	GET /api/tools/kanban/liveness	675	48	rare	used	B>=5 in each sample
+P-0447	GET /api/tools/n8n/executions	662	85	rare	used	B>=5 in each sample
+P-0460	GET /openapi.json	8	1	rare	rare	day-1 hand count not reproducible and counts straddle the threshold
+P-0519	POST /api/agent/chat	0	1	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0521	POST /api/agui/session/{id}/revoke	2	2	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0522	POST /api/agui/session/issue	2	3	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0523	POST /api/agui/session/refresh	2	3	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0524	POST /api/agui/threads	0	1	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0525	POST /api/andon/disengage	1	1	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0526	POST /api/andon/engage	1	1	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0608	POST /api/assets/workers/chat/completions	1	0	rare	rare	hit in one sample only
+P-0616	POST /api/client-errors	63	3	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0646	POST /api/kanban/cards/{cardId}/move	0	1	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0650	POST /api/katas/{id}/release	8	1	rare	rare	hit in both samples but below 5 in at least one; no per-row C
+P-0652	POST /api/katas/{id}/stop	2	0	rare	rare	hit in one sample only
+P-0656	POST /api/me/notifications/{id}/read	2	0	rare	rare	hit in one sample only
+P-0666	POST /api/project-requests/verify-repo-access	12	0	rare	rare	hit in one sample only
+P-0667	POST /api/projects	6	0	rare	rare	hit in one sample only
+P-0765	PUT /api/approvals/{approvalId}	0	5	unused	rare	day-2 sample only; a B hit in one sample cannot stand alone
+P-0922	GET /api/projects	1	0	rare	rare	hit in one sample only
+P-0928	GET /api/webhooks	1	0	rare	rare	hit in one sample only
+P-0955	POST /api/boards/{boardId}/board-memberships	7	0	rare	rare	hit in one sample only

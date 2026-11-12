@@ -1,0 +1,168 @@
+# testing_evaluation — evaluate a test run's results: where they came from, the pass rate, the
+# failures by area and the verdict (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type testing_evaluation: outputs draft_artifact_id,
+# report_artifact_id, published_artifact_id; and the READY outline_within_card_scope, DOING
+# every_claim_cites_a_source / every_cited_source_exists, QA no_unsupported_claims /
+# capability_acceptance_met and DONE artifact_is_qa_version acceptance) and
+# n8n-designs/design/choices/v4/capabilities/testing.yaml (text "evaluating test results",
+# archetype document, phase test, upstream [testing_execution], sections [results_source,
+# pass_rate, failures_by_area, verdict] where results_source is the id of the testing_execution
+# report, signoff false, uses_repo false — and the type's inspect.criteria results_source_named /
+# pass_rate_matches_run / verdict_follows_failures).
+# The card judges a run it is given; it neither runs the suite itself nor creates the fix cards —
+# testing_execution's confirmed findings become development_bug_fix cards (P-W3-2).
+card_type: testing_evaluation
+capability: testing
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: testing_evaluation
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: testing_evaluation.ready
+    title: Testing evaluation — definition of ready
+    definition_of_ready: {checks: [testing_execution_report_attached]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline stays inside the card's scope: its sections are results_source, pass_rate, failures_by_area and verdict for the run the card names, and it plans no re-run, no test change and no judgement of the testing process."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: testing_evaluation.doing
+    title: Testing evaluation — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every statement in the report names where it comes from — the testing_execution report and run id for a count or a failure, the suite path and test name for a failing case — so no pass rate, failure area or verdict stands on its own."}
+      - {name: every_cited_source_exists, text: "Every source the report cites exists at the revision it read: the run id is the one testing_execution recorded, each failing test it names exists in the suite there, and each path it cites resolves."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: testing_evaluation.qa
+    title: Testing evaluation — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, capability_acceptance_met, results_source_named, pass_rate_matches_run, verdict_follows_failures]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "Every claim is one its cited sources support: no failure attributed to an area where no failing test sits, no cause asserted from a test name alone, and no 'most tests pass' where the run's own counts say otherwise."}
+      - {name: capability_acceptance_met, text: "The report is true of every acceptance statement the testing_evaluation card type declares — the outline stays in scope, every claim has a source that exists, and nothing is claimed beyond those sources — judged from the report and the run, not from the card's wording."}
+      - {name: results_source_named, text: "results_source names the test run the report evaluates — the testing_execution report and the run it records — so a reader can reach the results every number comes from."}
+      - {name: pass_rate_matches_run, text: "pass_rate is the count of passed and failed tests the named run actually reports: the same totals and the same failures, and any skipped, errored or timed-out test excluded from the denominator is excluded in the text and not silently."}
+      - {name: verdict_follows_failures, text: "verdict follows from the pass rate and failures_by_area: a pass verdict with failing tests, or a fail verdict with none, is refused, and a verdict that carries known failures names them."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: testing_evaluation.done
+    title: Testing evaluation — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The evaluation published to the card is the revision QA confirmed: no pass-rate number, failure area or verdict changed after the review, and results_source still names the same run."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: testing_evaluation.system
+    title: Testing evaluation — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: testing_evaluation.READY
+    list: ready
+    title: Testing evaluation — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: testing_evaluation
+        sop: testing_evaluation.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_evaluation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: testing_evaluation.DOING
+    list: doing
+    title: Testing evaluation — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_evaluation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: testing_evaluation.QA
+    list: qa
+    title: Testing evaluation — QA
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_evaluation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: testing_evaluation.DONE
+    list: done
+    title: Testing evaluation — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_evaluation, sop: testing_evaluation.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_evaluation.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

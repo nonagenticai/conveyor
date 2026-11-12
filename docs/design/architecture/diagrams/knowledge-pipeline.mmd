@@ -1,0 +1,32 @@
+flowchart LR
+  S1["SOP - PDF, URL, document"]:::src
+  S2["RDF / OWL / Turtle"]:::src
+  S3["BPMN / Visio / draw.io"]:::src
+  S4["Chat or document brief"]:::src
+  ING["Intake - governed_asset"]:::v1
+  CONV["Conversion job"]:::v2
+  PKO["PKO draft - entities and relations"]:::v2
+  PROC["Procedure draft - PDDL steps"]:::v2
+  PACK["Knowledge pack draft - strata_rag"]:::v1
+  REV["Review gate - a person"]:::v2
+  PUB["Published release - pinned"]:::v2
+  RUN["Run - readiness check"]:::v1
+  BLOCK["409 release_not_ready"]:::bad
+  S1 --> ING
+  S2 --> ING
+  S3 --> ING
+  S4 --> ING
+  ING --> CONV
+  CONV --> PKO
+  CONV --> PROC
+  CONV --> PACK
+  PKO --> REV
+  PROC --> REV
+  PACK --> REV
+  REV --> PUB
+  PUB --> RUN
+  RUN --> BLOCK
+  classDef src fill:#f4f1f8,stroke:#b9acce,color:#1f2a24
+  classDef v1 fill:#eef3ef,stroke:#8aa596,color:#1f2a24
+  classDef v2 fill:#ffffff,stroke:#8aa596,stroke-dasharray:5 3,color:#1f2a24
+  classDef bad fill:#fdf1ee,stroke:#c98b7b,color:#1f2a24

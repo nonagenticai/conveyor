@@ -1,0 +1,22 @@
+flowchart LR
+  A["Alert, failed run, eval delta or prompt finding"]:::src
+  C["Coach card - one interruption, closed remedy set"]:::v2
+  K["Kata - six Gets, instrument and threshold"]:::v2
+  D["Development project or procedure, prompt, knowledge or job change"]:::v2
+  M["Measurement - held-out eval, benchmark or run outcome"]:::v1
+  AD["Adoption gate - person, dual control"]:::v2
+  P["Production - new procedure, job or binding version"]:::v2
+  L["Monitoring and lesson"]:::v1
+  X["Unmeasurable kata is not opened"]:::bad
+  A --> C
+  C --> K
+  K --> D
+  D --> M
+  M --> AD
+  AD --> P
+  P --> L
+  K -. refused .-> X
+  classDef src fill:#f4f1f8,stroke:#b9acce,color:#1f2a24
+  classDef v1 fill:#eef3ef,stroke:#8aa596,color:#1f2a24
+  classDef v2 fill:#ffffff,stroke:#8aa596,stroke-dasharray:5 3,color:#1f2a24
+  classDef bad fill:#fdf1ee,stroke:#c98b7b,color:#1f2a24

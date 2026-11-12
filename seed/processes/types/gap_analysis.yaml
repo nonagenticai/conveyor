@@ -1,0 +1,163 @@
+# gap_analysis — delta analysis between the current and the future state (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (the type's inputs/outputs/acceptance) and
+# n8n-designs/design/choices/v4/capabilities/analysis.yaml (text, phase, inspect criteria).
+# The card produces a findings report of gaps; the feature cards that close them are planned in
+# a later phase (R150), never created here.
+card_type: gap_analysis
+capability: analysis
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: gap_analysis
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: gap_analysis.ready
+    title: Gap analysis — definition of ready
+    definition_of_ready: {checks: [scope_paths_exist]}
+    definition_of_done: {checks: [scope_paths_read]}
+    acceptance_criteria:
+      - {name: scope_paths_exist, text: "Every path in the card's scope exists in the repository, or the analysis names it as missing before it reads anything else."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: gap_analysis.doing
+    title: Gap analysis — definition of doing
+    definition_of_ready: {checks: [scope_paths_read]}
+    definition_of_done: {checks: [every_gap_cites_a_brief_item, one_acceptance_sentence_each]}
+    acceptance_criteria:
+      - {name: every_gap_cites_a_brief_item, text: "Every gap names the brief item it comes from, and that item asks for the capability the gap describes."}
+      - {name: every_update_location_exists, text: "Every update gap names the code location that falls short of the brief, and that location exists."}
+      - {name: every_new_gap_absent_in_code, text: "Every new gap names a capability the code does not provide today; a gap the code already provides is dropped or reclassified as an update."}
+      - {name: one_acceptance_sentence_each, text: "Every gap carries exactly one acceptance sentence that a test can check."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: gap_analysis.qa
+    title: Gap analysis — definition of QA
+    definition_of_ready: {checks: [one_acceptance_sentence_each]}
+    definition_of_done: {checks: [every_confirmed_gap_in_brief, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: every_confirmed_gap_in_brief, text: "Every gap the report confirms is one a brief item asks for; no confirmed gap was invented between the brief and the report."}
+      - {name: every_confirmed_update_location_exists, text: "Every confirmed update gap names a code location that exists at the revision the analysis read."}
+      - {name: capability_acceptance_met, text: "The report is true of every acceptance statement the gap analysis card type declares."}
+      - {name: gaps_cite_the_brief, text: "Every confirmed gap names the brief item it comes from, and that item asks for it."}
+      - {name: acceptance_is_testable, text: "Every confirmed gap has one acceptance sentence a test can check."}
+      - {name: update_gaps_located, text: "Every confirmed update gap names the code location that falls short; a new gap names none."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: gap_analysis.done
+    title: Gap analysis — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The report published to the card is the exact revision QA reviewed; no gap was added, dropped or reworded after the review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: gap_analysis.system
+    title: Gap analysis — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: gap_analysis.READY
+    list: ready
+    title: Gap analysis — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: gap_analysis
+        sop: gap_analysis.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: gap_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: gap_analysis.DOING
+    list: doing
+    title: Gap analysis — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: gap_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: gap_analysis.QA
+    list: qa
+    title: Gap analysis — QA
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: gap_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: gap_analysis.DONE
+    list: done
+    title: Gap analysis — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: gap_analysis, sop: gap_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: gap_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

@@ -1,0 +1,24 @@
+# Build outputs and other checkouts. Without target/ the context is multi-GB.
+target/
+.worktrees/
+.git/
+.github/
+# The web e2e harness is installed locally; it is not part of the Rust image.
+node_modules/
+apps/web/test-results/
+apps/web/playwright-report/
+# Secrets and local env files never enter the build context.
+.env
+.env.*
+*.env
+# `docs/design` is published at /design, so `docs/` stays in the build context (3 MB); the
+# other plans are read locally and parity/ is replayed by tooling.
+# ⚠️ `scripts/` is NOT excluded: crates/store `include_str!`s scripts/grants-runtime.sql into
+# the binary, so excluding it fails the build. `migrations/` is likewise embedded by
+# sqlx::migrate! and must stay in the context.
+parity/
+spikes/
+README.md
+Dockerfile
+.dockerignore
+compose.yaml

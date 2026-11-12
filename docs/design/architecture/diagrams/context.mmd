@@ -1,0 +1,44 @@
+flowchart LR
+  subgraph CH["Channels"]
+    W["Web studio"]:::v1
+    T["Telegram"]:::v1
+    M["MCP / agent front end"]:::v1
+  end
+  subgraph CV["Conveyor - one binary - :8930"]
+    API["API - ActionSpec registry"]:::v1
+    DOM["Domain - work + governance"]:::v1
+    WF["Workflow - durable queue"]:::v1
+    EXE["Executors - procedure / internal_agent"]:::v1
+    LAD["Decision ladder L0-L3"]:::v2
+    KM["Knowledge and memory"]:::v1
+    BRK["Tool broker"]:::v2
+    INS["Instruments - evals, benchmarks, hillclimb"]:::v1
+    MET["Metering read models"]:::v1
+  end
+  subgraph BK["Backends"]
+    LAYA["laya - System-1"]:::ext
+    ROUTER["inference-router - L2"]:::ext
+    STRATA["strata_ingest / strata_rag"]:::ext
+    TOOLS["coding, ops, w2v and AHTAPol toolkits"]:::ext
+    MINIO["MinIO"]:::ext
+    BILL["billing_service / licenses"]:::ext
+    KC["Keycloak"]:::ext
+  end
+  W --> API
+  T --> API
+  M --> API
+  API --> DOM
+  DOM --> WF
+  WF --> EXE
+  EXE --> LAD
+  EXE --> KM
+  EXE --> ROUTER
+  EXE --> BRK
+  BRK --> TOOLS
+  KM --> STRATA
+  MET --> BILL
+  API --> KC
+  DOM --> MINIO
+  classDef v1 fill:#eef3ef,stroke:#8aa596,color:#1f2a24
+  classDef v2 fill:#ffffff,stroke:#8aa596,stroke-dasharray:5 3,color:#1f2a24
+  classDef ext fill:#f4f1f8,stroke:#b9acce,color:#1f2a24

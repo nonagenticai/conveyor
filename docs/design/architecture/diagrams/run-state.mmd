@@ -1,0 +1,13 @@
+stateDiagram-v2
+  [*] --> queued
+  queued --> running: lease
+  running --> waiting_approval: gate
+  waiting_approval --> running: approved
+  waiting_approval --> failed: refused
+  running --> succeeded: evidence
+  running --> failed: error or refusal
+  running --> cancelled: cancel
+  succeeded --> [*]
+  failed --> [*]
+  cancelled --> [*]
+  note right of running: one live run per card (uq_run_live); a retry is an attempt

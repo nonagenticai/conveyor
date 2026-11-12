@@ -1,0 +1,5 @@
+{
+  "issuer": "https://auth.nonagentic.ai/realms/conveyor",
+  "client_id": "conveyor-web",
+  "dev_auth": true
+}

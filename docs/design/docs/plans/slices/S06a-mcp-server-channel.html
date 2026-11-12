@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S06a — mcpserver signed channel · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06a-mcp-server-channel.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><blockquote>
+<p><strong>SUPERSEDED 2026-11-08 by <code>S06b-agent-direct-interface.md</code> (SPEC D19).</strong> The agent now calls the conveyor's own <code>/mcp</code>; there is no HMAC channel, no five-command grammar and no shared secret. This file is kept as the measured record of the <em>old</em> seam — its field sets, signing algorithm and traps describe <code>fr</code>/<code>mcp_server</code>, not the conveyor. Nothing here is built or to be built.</p>
+</blockquote>
+<h1 id="s06a--mcp_server-signed-channel">S06a — <code>mcp_server</code> signed channel</h1>
+<p>Programme project: S06a · issues none yet</p>
+<p>Sources: <code>nonagenticai_mcp_server</code> @ <code>dd2cabf6</code>, <code>fr</code> @ <code>6f7c5097</code>. Authority: <code>02-source-map/30-rm-planka-mcp-n8n.md</code> §3; emitter field set: <code>02-source-map/20-fr.md</code>.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p><code>agent</code> reaches its backend only through <code>mcp_server</code>, and that binding is two HMAC-signed HTTP endpoints. This slice makes the conveyor speak both byte-compatibly: same path, grammar and five response words inbound; same three events, fields and 204 contract outbound. <strong>D18 makes it permanent</strong> — the conveyor is one more backend behind <code>mcp_server</code>, so conformance is maintained, never proved once and retired — and the agent handles approvals <strong>and questions</strong> through the same primitive: a question is an approval. <code>mcp_server</code> changes only <code>MCP_FR_BASE_URL</code> and the secret; the conveyor's outbound destination is <code>MCP_EVENTS_URL</code>.</p>
+<h2 id="2-starting-state">2. Starting state</h2>
+<ul>
+<li>S04: registry, <code>POST /api/actions/{name}/invocations</code>, RFC 9457 errors.</li>
+<li>S05: <code>projects.*</code>; S06: <code>approvals.decide</code>, the channel dispatcher, <code>approval</code>, <code>delivery</code>, the <code>approval.closed.emit</code> job kind — every task input is an fr approval, questions included (<code>src/external/adapter.py:55</code>).</li>
+<li>S02: outbox <code>event</code>, <code>job</code>, HTTP client.</li>
+</ul>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — both directions verbatim: <code>POST /api/webhooks/mcp/incoming</code> (receiver) and <code>POST {MCP_EVENTS_URL}/api/channels/fr/events</code> (sender); HMAC; the five-command grammar (questions ride as approvals — no second concept); the five response words; the three event types; inbound 200/400/401/413/503, outbound 204/401/413/503; the emitter job; a stub receiver and a suite replaying Python-captured fixtures.</p>
+<p><strong>OUT</strong> — <code>agent</code> (untouched, SPEC §4.5); <code>mcp_server</code>'s 48 tools, catalog, runs and 36 tables (it stays); the conveyor's own MCP surface (S10); every other fr caller (S13).</p>
+<h2 id="4-source-material">4. Source material</h2>
+<table>
+<thead>
+<tr>
+<th>path</th>
+<th>read this</th>
+<th>carry</th>
+<th>do not carry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nonagenticai_mcp_server/src/external/signing.py</code></td>
+<td><code>sign</code>, <code>verify</code>, <code>_digest</code>, <code>SKEW_SECONDS</code></td>
+<td>the algorithm exactly</td>
+<td>nothing</td>
+</tr>
+<tr>
+<td><code>nonagenticai_mcp_server/src/external/fr.py</code></td>
+<td><code>INBOUND_PATH</code>, <code>TEXT_LIMIT=4000</code>, <code>START_PASSTHROUGH</code>, <code>_send</code></td>
+<td>envelope, grammar, client codes</td>
+<td>httpx, the tool layer</td>
+</tr>
+<tr>
+<td><code>nonagenticai_mcp_server/src/routers/fr_channel.py</code></td>
+<td><code>EVENT_TYPES</code>, <code>MAX_BODY_BYTES=65536</code>, <code>_approval</code>, <code>_message</code>, <code>_record</code>, <code>events</code></td>
+<td>204 semantics, tombstone, first-report-wins</td>
+<td><code>mcp_runs</code>, activity rows</td>
+</tr>
+<tr>
+<td><code>nonagenticai_mcp_server/tests/test_fr_adapter.py</code>, <code>test_fr_channel_events.py</code></td>
+<td>sign/verify roundtrip; 401/413/503/204; replay; tombstone</td>
+<td>fixture shapes</td>
+<td>pytest as our runner</td>
+</tr>
+<tr>
+<td><code>fr/backend/src/domain/engagement/adapters/mcp.ts</code>, <code>channels/mcp-signature.ts</code>, <code>channels/mcp.ts</code></td>
+<td><code>approvalEvent</code>, <code>signMcpBody</code>, <code>MAX_TEXT</code></td>
+<td>sender's field set</td>
+<td>the Node runtime</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<pre><code>crates/api/src/channel/mcp.rs                 sign + verify, both directions, grammar, emit shaping
+crates/store/src/channel/mcp.rs              emitter outbox query; delivery state writes
+crates/api/tests/mcp_channel.rs              verify/grammar/vocabulary/tenancy + outbound/delivery
+crates/api/tests/mcp_channel_stub.rs         the stub mcp receiver (axum, ephemeral port)
+crates/api/tests/mcp_channel_conformance.rs  both directions end to end
+crates/api/tests/fixtures/mcp/               captured Python requests/responses + *.sig + README</code></pre>
+<p>No tables, actions, events. Uses <code>approval.callback_url</code>/<code>correlation_id</code> (S03), <code>message</code>/<code>delivery</code> (S06), and <strong>two job kinds whose ownership is split</strong>: S06 ships <code>approval.closed.emit</code> (its 30 s closer, S06 §5.3), <strong>S06a ships <code>mcp.event.emit</code></strong> (<code>dedupe_key = event.id</code>) — the slice that owns the sender owns its drainer, so there is no conditional dependency between the two plans and no migration is needed for either.</p>
+<h3 id="51-inbound--mcp_server--conveyor">5.1 Inbound — <code>mcp_server</code> → conveyor</h3>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>exact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>route</td>
+<td><code>POST /api/webhooks/mcp/incoming</code> — no other path</td>
+</tr>
+<tr>
+<td>auth</td>
+<td><code>X-Channel-Timestamp</code> + <code>X-Channel-Signature: sha256=&lt;hex&gt;</code>, shared secret <code>FR_MCP_CHANNEL_SECRET</code></td>
+</tr>
+<tr>
+<td>envelope</td>
+<td><code>{address, text, correlation_id}</code> + optional <code>job</code>, <code>on_behalf_of</code>; compact JSON, <code>sort_keys=True</code> at the sender</td>
+</tr>
+<tr>
+<td>grammar</td>
+<td><code>projects.create {json}</code>, <code>projects.get {"id"}</code>, <code>projects.close {"id"}</code>, <code>approve &lt;approvalId&gt; [comment]</code>, <code>reject &lt;approvalId&gt; [reason]</code></td>
+</tr>
+<tr>
+<td>answers</td>
+<td>a decision only: <code>approve</code>/<code>reject &lt;id&gt;</code> + optional <code>comment</code>/<code>reason</code> — no other material crosses inward; a declined/cancelled task sends nothing, so the approval stays open (<code>src/external/fr.py:141-150,328</code>)</td>
+</tr>
+<tr>
+<td>maps to</td>
+<td><code>projects.create</code> → S05 <code>ProjectCreateIn</code>: <code>title→title</code>, <code>project_type→project_type_code</code>, <code>repository_url→repo_url</code>, <code>description</code>/<code>problem_statement</code>/<code>desired_outcome</code> verbatim, <code>key</code> derived server-side (slug of <code>title</code>); the action's <code>ProjectOut.id</code> is returned as <code>result.project_id</code>. <code>approve &lt;id&gt; [comment]</code> → <code>approvals.decide {approval_id, decision:'approve', note:&lt;comment?&gt;}</code>; <code>reject &lt;id&gt; [reason]</code> → <code>{decision:'reject', note:&lt;reason?&gt;}</code> — the wire says <code>approved</code>/<code>rejected</code>, the action and <code>approval_decision.decision</code>'s CHECK say <code>approve</code>/<code>reject</code>. Both write <code>decided_by_kind='agent'</code> <strong>and</strong> <code>via = {channel:'mcp', agent_member_id, product}</code> (the identities resolved above), so D18's provenance is on the row, not only in the SPEC</td>
+</tr>
+<tr>
+<td><code>projects.create</code></td>
+<td><code>title</code> + <code>project_type</code> required; passthrough <code>description</code>, <code>problem_statement</code>, <code>desired_outcome</code>, <code>repository_url</code>; <code>project_type</code> must match <code>^[a-z0-9_-]{1,128}$</code></td>
+</tr>
+<tr>
+<td>text cap</td>
+<td><code>MAX_TEXT = 4000</code> <strong>characters</strong> (<code>text.length</code>, UTF-16 units, not bytes)</td>
+</tr>
+<tr>
+<td>identity</td>
+<td><code>agent:&lt;tenant_id&gt;</code> must equal the run's tenant, else <code>error</code>/<code>actor_tenant_mismatch</code>; it resolves through <code>membership(meta.product)</code> to that tenant's <code>app_user(kind='agent')</code>, which is the <code>approver_id</code>; the tenant's <code>channel_binding(channel_kind='mcp')</code> must exist and be active — the binding is <strong>tenant-level</strong> (<code>uq (tenant_id, channel_kind, route_key)</code>), not per agent; the decision is written with <code>decided_by_kind='agent'</code>. <strong><code>agent:</code> is the only address scheme</strong>, in two forms — <code>agent:&lt;tenant&gt;</code> / <code>agent:&lt;tenant&gt;:&lt;product&gt;</code> (<code>agent_members.address LIKE 'agent:%'</code>, measured); anything else, or unresolvable, is <code>unknown-sender</code></td>
+</tr>
+<tr>
+<td>response</td>
+<td>HTTP <strong>200</strong> <code>{status, result.project_id?, approvalId?, code?}</code>, <code>status ∈ result | pending-approval | no-action | error | unknown-sender</code>, <code>code</code> matching <code>^[a-z_]{1,64}$</code></td>
+</tr>
+<tr>
+<td>transport errors</td>
+<td>401 <code>invalid_signature</code>; 413 <code>payload_too_large</code> (&gt; 65536 bytes); 400 <code>bad_request</code> (body not <code>{address,text,correlation_id}</code>, or <code>text.length &gt; 4000</code> — measured on fr); nothing else is a 4xx</td>
+</tr>
+</tbody>
+</table>
+<p>The client must be able to map every answer: <code>unknown-sender</code> → <code>actor_unresolved</code>; <code>no-action</code>/<code>error</code> → sanitized <code>code</code>; <code>pending-approval</code> + string <code>approvalId</code> parks an input; <code>result</code> + string <code>result.project_id</code> starts. Non-JSON or non-object → <code>external_result_invalid</code>; 5xx → <code>fr_unavailable</code>.</p>
+<h3 id="52-outbound--conveyor--mcp_server">5.2 Outbound — conveyor → <code>mcp_server</code></h3>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>exact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>route</td>
+<td><code>POST {MCP_EVENTS_URL}/api/channels/fr/events</code></td>
+</tr>
+<tr>
+<td>signing</td>
+<td>identical to §5.3; the other side's name is <code>MCP_FR_CHANNEL_SECRET</code></td>
+</tr>
+<tr>
+<td><code>approval.requested</code></td>
+<td>the full measured set (<code>fr/backend/src/domain/engagement/adapters/mcp.ts:34-67</code>): <code>type, address, approval_id, project_id, tenant_id, correlation_id, kind, description, change_summary, impact_analysis, proposed_answer, proposed_answer_note, allowed_decisions, deblock_actions, expires_at, text</code> — the mcp receiver reads only <code>approval_id</code>, <code>expires_at</code> and, via <code>_runs</code>, <code>project_id</code>/<code>correlation_id</code>; the rest is carried for parity and removing a field fr sends is a contract change</td>
+</tr>
+<tr>
+<td><code>approval.closed</code></td>
+<td><code>type, address, approval_id, project_id, tenant_id, correlation_id, final_status</code> (same base, no requested-only fields)</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td><code>type</code>, <code>address</code>, <code>correlation_id</code>, <code>kind ∈ approval-request | action-result | action-error | text | report</code>, <code>text</code>, <code>meta{approvalId, actionName, result.project_id, outcome}</code> (<code>sendMessage</code> in the same adapter)</td>
+</tr>
+<tr>
+<td><code>correlation_id</code></td>
+<td><code>approval.metadata.mcp_run_id</code> when set, else the approval's own — never synthetic</td>
+</tr>
+<tr>
+<td>accepted</td>
+<td><strong>204 with an empty body</strong> for every accepted event, including malformed JSON and unknown <code>type</code></td>
+</tr>
+<tr>
+<td>errors</td>
+<td>413 <code>payload_too_large</code> (&gt; 65536 bytes), 401 <code>invalid_signature</code>, 503 <code>channel_unconfigured</code></td>
+</tr>
+<tr>
+<td>close semantics</td>
+<td>idempotent: a replayed close writes nothing; <code>_record</code>'s conditional <code>UPDATE</code> on <code>external_ref</code> means <strong>first report wins</strong>; the per-<strong>run</strong> tombstone drops a late <code>approval.requested</code> once that run's approval closed — never per approval id</td>
+</tr>
+</tbody>
+</table>
+<p>Sender duties: one <code>approval.requested</code> per approval at creation, one <code>approval.closed</code> per closure (including <code>rejected</code>/<code>expired</code>/<code>voided</code>), one <code>message</code> per outcome a run waits on.</p>
+<h3 id="53-signing-byte-exact">5.3 Signing, byte-exact</h3>
+<pre><code>canonical = ascii_decimal(unix_seconds) || &quot;.&quot; || raw_request_body_bytes
+signature = &quot;sha256=&quot; || lowercase_hex(HMAC-SHA256(key = secret_utf8, message = canonical))</code></pre>
+<ul>
+<li>Send <code>X-Channel-Timestamp: &lt;ascii digits&gt;</code>, <code>X-Channel-Signature: sha256=&lt;hex&gt;</code>, <code>Idempotency-Key: &lt;uuid4&gt;</code>; neither receiver validates the last.</li>
+<li>Verify the <strong>raw bytes as received</strong>; parse JSON only after verification succeeds.</li>
+<li>Header lookup is case-insensitive; values are not trimmed; the timestamp is ASCII digits only (no <code>+</code>, <code>-</code>, spaces, fraction).</li>
+<li>Refuse when <code>abs(now_seconds - timestamp) &gt; 300</code>; exactly 300 is accepted (Python uses <code>&gt;</code>).</li>
+<li>Compare in constant time; on failure answer the single word <code>invalid_signature</code> and log the discriminator (<code>skew</code> / <code>mismatch</code> / <code>bad_shape</code>) server-side only. An overflowing timestamp is a refusal, never a panic.</li>
+</ul>
+<h3 id="54-config--the-cutover-values">5.4 Config — the cutover values</h3>
+<table>
+<thead>
+<tr>
+<th>value</th>
+<th><code>mcp_server</code> side</th>
+<th>conveyor side</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inbound base URL</td>
+<td><code>MCP_FR_BASE_URL</code> (on <code>mcp-external-driver</code>; today <code>http://fr-backend.fr.svc.cluster.local:8888</code>)</td>
+<td>— (the conveyor is the inbound host)</td>
+</tr>
+<tr>
+<td>outbound events URL</td>
+<td>— (the receiver)</td>
+<td><code>MCP_EVENTS_URL</code> — today <code>http://mcp.mcp.svc.cluster.local:8033/api/channels/fr/events</code>, set on fr's backend; moves to the conveyor unchanged</td>
+</tr>
+<tr>
+<td>shared secret</td>
+<td><code>MCP_FR_CHANNEL_SECRET</code></td>
+<td><code>FR_MCP_CHANNEL_SECRET</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-build-order">6. Build order</h2>
+<ol start="0" type="1">
+<li>Re-capture the live contract first — another session is finishing <code>mcp_server</code>/<code>agent</code> elsewhere, so <code>dd2cabf6</code>/<code>6f7c5097</code> may be stale. Re-read <code>src/external/signing.py</code>, <code>src/external/fr.py</code>, <code>src/routers/fr_channel.py</code> and <code>agent/crates/agent-api/src/mcp_client/tasks.rs</code>; record the new SHAs in the Sources line via <code>git -C $HOME/Movies/nonagenticai_mcp_server rev-parse HEAD</code> and <code>git -C $HOME/Movies/agent rev-parse HEAD</code>. Measurement, not build.</li>
+<li>Copy the two Python test modules into <code>crates/api/tests/fixtures/mcp/</code> as read-only reference. <code>cd $HOME/Movies/nonagenticai_mcp_server &amp;&amp; python3 -m pytest tests/test_fr_adapter.py tests/test_fr_channel_events.py -q</code></li>
+<li><code>sign</code>/<code>verify</code> + unit tests (roundtrip, 300/301, non-digit ts, missing header, overflow). <code>cargo test -p conveyor-api channel::mcp::sign</code></li>
+<li>Cross-language vectors: a Rust test writes <code>crates/api/tests/fixtures/mcp/vectors.json</code> (<code>id</code>, <code>body_hex</code>, <code>timestamp</code>, <code>secret</code>, <code>expected</code>); Python <code>_digest</code> must reproduce every hex. <code>cd $HOME/Movies/nonagenticai_mcp_server &amp;&amp; python3 -c 'import json,sys;from src.external.signing import _digest;v=json.load(open("$HOME/Movies/conveyor/crates/api/tests/fixtures/mcp/vectors.json"));bad=[x["id"] for x in v if _digest(bytes.fromhex(x["body_hex"]),x["secret"],x["timestamp"])!=x["expected"]];print(bad);sys.exit(1 if bad else 0)'</code></li>
+<li>Golden fixtures: capture real Python-signed requests/responses into <code>crates/api/tests/fixtures/mcp/</code>. <code>cargo test -p conveyor-api --test mcp_channel -- golden_python_verifies</code></li>
+<li>Inbound route: capped body read (stream, never trust <code>Content-Length</code>), verify, parse, dispatch. <code>cargo test -p conveyor-api --test mcp_channel inbound_path</code></li>
+<li>Grammar parser for five commands → S05/S06 actions; unknown text ⇒ <code>no-action</code>; <code>cargo test -p conveyor-api --test mcp_channel grammar</code></li>
+<li>Response shaper: five words, <code>result.project_id</code>, <code>approvalId</code>, sanitized <code>code</code>; tenant check. <code>cargo test -p conveyor-api --test mcp_channel vocabulary</code></li>
+<li>Identity: <code>agent:&lt;uuid&gt;</code> → the tenant's <code>channel_binding(channel_kind='mcp')</code>; every other scheme ⇒ <code>unknown-sender</code> (§10). <code>cargo test -p conveyor-api --test mcp_channel tenancy</code></li>
+<li>Outbound sender: sign, POST, require 204 with an empty body; 401/413/503 permanent, 5xx retryable. <code>cargo test -p conveyor-api --test mcp_channel outbound_204</code></li>
+<li><code>approval.requested</code> at creation (creating transaction's outbox); <code>approval.closed.emit</code> (S06, 30 s) writes the closed event; <code>mcp.event.emit</code> drains it, <code>dedupe_key = event.id</code>. <code>cargo test -p conveyor-store channel::mcp</code></li>
+<li><code>message</code> for <code>action-result</code> / <code>action-error</code> / <code>text</code> / <code>report</code> from the reply path. <code>cargo test -p conveyor-api --test mcp_channel message_kinds</code></li>
+<li>Delivery: <code>delivery(channel_kind='mcp', recipient_ref=address)</code> → <code>delivered</code> on 204, <code>failed</code> + <code>last_error</code> on 401/413/503. <code>cargo test -p conveyor-api --test mcp_channel delivery_state</code></li>
+<li>Stub receiver <code>crates/api/tests/mcp_channel_stub.rs</code>: 204 empty, 401/413/503, tombstone, first-report-wins, queryable write log. <code>cargo test -p conveyor-api --test mcp_channel_stub</code></li>
+<li>Conformance suite: both directions, five words, three event types, four status codes. <code>cargo test -p conveyor-api --test mcp_channel_conformance</code></li>
+<li>Gate (§7) + <code>cargo clippy --workspace --all-targets -- -D warnings</code>.</li>
+</ol>
+<h2 id="7-gate">7. Gate</h2>
+<pre class="bash"><code>set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-api --test mcp_channel --test mcp_channel_stub --test mcp_channel_conformance
+cargo clippy --workspace --all-targets -- -D warnings
+# property c — a Rust-signed vector verifies with the REAL Python verifier, not a re-implementation
+(cd $HOME/Movies/nonagenticai_mcp_server &amp;&amp; python3 -c &#39;import json,sys;from src.external.signing import _digest;v=json.load(open(&quot;$HOME/Movies/conveyor/crates/api/tests/fixtures/mcp/vectors.json&quot;));bad=[x[&quot;id&quot;] for x in v if _digest(bytes.fromhex(x[&quot;body_hex&quot;]),x[&quot;secret&quot;],x[&quot;timestamp&quot;])!=x[&quot;expected&quot;]];print(bad);sys.exit(1 if bad else 0)&#39;)
+# property b — the agent task&#39;s evidence must exist (S14 repeats it against the live deployment)
+test -s docs/evidence/S6a-agent-task.md</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>property</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>Python → Rust</td>
+<td>a captured Python-signed request verifies in Rust byte-for-byte, not after a JSON round-trip</td>
+</tr>
+<tr>
+<td>b</td>
+<td><code>agent</code> end-to-end (SPEC §8 S6-α)</td>
+<td>one real <code>agent</code> task via <code>agent</code>'s <code>mcp_client</code> against a locally run <code>mcp_server</code> (<code>MCP_FR_BASE_URL=http://127.0.0.1:8930</code>, <code>MCP_EVENTS_URL=http://127.0.0.1:8931/api/channels/fr/events</code>): task starts, <code>projects.create</code> parks <code>pending-approval</code>, approval answered through <code>mcp_server</code>, <code>approval.closed</code> received, project id on the run's <code>external_ref</code>, task <code>succeeded</code>. Evidence in <code>docs/evidence/S6a-agent-task.md</code> (§7.1): <code>run_id</code>, <code>project_id</code>, one approval round-trip, one 204</td>
+</tr>
+<tr>
+<td>c</td>
+<td>Rust → Python</td>
+<td>a Rust-signed body verifies with the real <code>src.external.signing.verify</code></td>
+</tr>
+<tr>
+<td>d</td>
+<td>vocabulary</td>
+<td>all five <code>status</code> words and <code>result.project_id</code> / <code>approvalId</code> / <code>code</code> match the fixtures</td>
+</tr>
+<tr>
+<td>e</td>
+<td>events</td>
+<td>all three types' field sets match; <code>approval.closed</code> carries <code>final_status</code></td>
+</tr>
+<tr>
+<td>f</td>
+<td>204</td>
+<td>accepted, malformed JSON and unknown <code>type</code> all answer 204 with a zero-length body</td>
+</tr>
+<tr>
+<td>g</td>
+<td>replay</td>
+<td>a replayed close writes nothing and the tombstone suppresses a late <code>approval.requested</code></td>
+</tr>
+<tr>
+<td>h</td>
+<td>skew</td>
+<td>a timestamp 1 s outside the window → 401 <code>invalid_signature</code></td>
+</tr>
+<tr>
+<td>i</td>
+<td>re-serialisation</td>
+<td>the same JSON re-encoded with a different key order → 401; the trap, tested deliberately</td>
+</tr>
+<tr>
+<td>j</td>
+<td>caps</td>
+<td>65536 bytes accepted, 65537 → 413; 4000 characters accepted, 4001 → 400 <code>bad_request</code></td>
+</tr>
+<tr>
+<td>k</td>
+<td>tenancy</td>
+<td><code>agent:&lt;other-tenant&gt;</code> ⇒ <code>error</code>/<code>actor_tenant_mismatch</code>, zero mutations, zero <code>action_invocation</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="71-s14-re-run--the-live-deployment">7.1 S14 re-run — the live deployment</h3>
+<p>S6-α proves the task locally (property b) and records it at <code>docs/evidence/S6a-agent-task.md</code> — <code>run_id</code>, <code>project_id</code>, the approval round-trip and the one 204; the gate asserts that file exists, so the property is evidence-backed rather than prose. S14 repeats it against the deployed conveyor and the live <code>mcp_server</code> once <code>MCP_FR_BASE_URL</code> points at the conveyor: the same evidence, plus one activity row. SPEC §8 makes that re-run the cutover gate, so the requirement is carried, not dropped.</p>
+<h2 id="8-traps">8. Traps</h2>
+<ol type="1">
+<li><strong>Re-serialisation.</strong> A <code>serde_json::Value</code> round-trip reorders keys and changes spacing, so the MAC fails on a valid request; take <code>Bytes</code>, never <code>Json&lt;T&gt;</code>.</li>
+<li><strong>Header casing.</strong> <code>X-Channel-Signature</code> arrives lowercased from some clients; Python lowercases the whole map. A hand-rolled map keyed by the literal name 401s every real request.</li>
+<li><strong>Seconds vs milliseconds.</strong> <code>as_millis()</code> puts every timestamp ~56 years ahead and refuses everything, looking like a secret mismatch.</li>
+<li><strong>The timestamp is inside the MAC.</strong> Sign <code>ts "." body</code>; on receive recompute with the <em>received</em> <code>ts</code>. Body-only verification lets a captured body replay forever.</li>
+<li><strong><code>MAX_TEXT</code> counts characters, not bytes.</strong> Match fr's <code>text.length</code> (UTF-16 units), not <code>.len()</code>; <code>.len()</code> rejects valid multi-byte text at a fraction of the real limit.</li>
+<li><strong>A syntactically valid body of the wrong shape still gets 204.</strong> <code>{"type":"approval.requested"}</code> with no <code>approval_id</code> is accepted, logged and ignored. This endpoint has four status codes; a 400 on shape breaks the client's <code>raise_for_status</code>.</li>
+<li><strong>The tombstone is per run, not per approval id.</strong> <code>close(tenant, run, approval)</code> closes one run's input; another live run of the same approval must still receive it.</li>
+<li><strong>The secret has two names and one value.</strong> <code>MCP_FR_CHANNEL_SECRET</code> and <code>FR_MCP_CHANNEL_SECRET</code>; rotate both or both directions 401 with no other symptom. Keep it a secret reference, never in <code>channel_binding.config</code>.</li>
+<li><strong>A 401 must not say which half failed.</strong> One body, one code, one timing path; the expected digest is never logged.</li>
+<li><strong>204 means no body</strong> — <code>{}</code> is a protocol violation the stub must reject.</li>
+</ol>
+<h2 id="9-decisions-closed-here">9. Decisions closed here</h2>
+<ol type="1">
+<li><strong>Verify-then-parse on raw bytes, both directions</strong> — no re-serialisation anywhere.</li>
+<li><strong><code>approval.requested</code> at creation, <code>approval.closed</code> from the 30 s job</strong> — one event per transition, keyed on the outbox <code>event.id</code>, so a re-drive cannot duplicate.</li>
+<li><strong>Emit fr's full measured field set</strong>, including <code>tenant_id</code>, <code>kind</code>, <code>impact_analysis</code> — dropping a field fr sends is exactly what R11 forbids.</li>
+<li><strong>The conveyor enforces <code>agent:&lt;tenant_id&gt;</code> server-side</strong> even though <code>mcp_server</code> pre-checks: a client-side check binds only that client.</li>
+<li><strong>Channel failures are delivery failures, not command failures</strong> — a 401/503 lands <code>delivery.state='failed'</code> with <code>last_error</code>; the originating action is never retried because a notification failed.</li>
+<li><strong>One deployment-wide secret</strong>, matching fr; not per tenant.</li>
+<li><strong>The stub implements the receiver contract, not a mock</strong> — 204/401/413/503, tombstone and first-report-wins, so a wrong assumption fails here, not at S14.</li>
+<li><strong><code>MCP_EVENTS_URL</code> is the conveyor's own outbound var.</strong> It lives today on fr's backend as <code>http://mcp.mcp.svc.cluster.local:8033/api/channels/fr/events</code> (measured 2026-11-07); it moves to the conveyor unchanged. S14 repoints <code>MCP_FR_BASE_URL</code> (on <code>mcp-external-driver</code>) at the conveyor and rotates one secret.</li>
+<li><strong>The agent decides as <code>decided_by_kind='agent'</code>, and the channel's answer vocabulary is frozen at decision + comment/reason</strong> — it is an external contract (R11), so adding a word is a contract change.</li>
+</ol>
+<h2 id="10-open-questions">10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Is <code>voided</code> sent as <code>approval.closed</code> with <code>final_status='voided'</code>?</td>
+<td>Yes — <code>START_ENDINGS</code> has it.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>One event per approval or per recipient address?</td>
+<td>Per approval: <code>mcp_server</code> fans out by <code>correlation_id</code> → <code>project_id</code> → approval id.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Emitter retry budget — fr does not retry.</td>
+<td>5 attempts, <code>min(2^n·5 s, 900 s)</code>, then <code>failed</code>; idempotent on the outbox id.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>"Augment human escalations": does the agent <strong>respond</strong> (decision + comment — supported today) or <strong>attach analysis to a pending gate without deciding</strong> (needs <code>mcp_server</code> + <code>agent</code> changes, out of scope for this project)?</td>
+<td><strong>Responder</strong> — the supported path; nothing new to build. The other reading is a proposal to change two external services, not a conveyor slice.</td>
+</tr>
+</tbody>
+</table>
+<p>The two questions that used to sit here are <strong>closed measurements, not open ones</strong>, and now live where they are used: the <code>agent:</code>-only address scheme is in §5.1's identity row (two forms, <code>agent:&lt;tenant&gt;</code> and <code>agent:&lt;tenant&gt;:&lt;product&gt;</code>), and fr's <strong>400</strong> on <code>text.length &gt; 4000</code> is in §5.1's transport-errors row.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/slices/S06a-mcp-server-channel.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

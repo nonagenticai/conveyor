@@ -1,0 +1,170 @@
+# future_state_analysis — the distance between where the project is and where its strategic goals
+# ask it to go (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type future_state_analysis: outputs
+# draft/reviewed/published, acceptance outline_within_card_scope, every_claim_cites_a_source,
+# every_cited_source_exists, no_unsupported_claims, capability_acceptance_met and
+# artifact_is_qa_version) and
+# n8n-designs/design/choices/v4/capabilities/change_management.yaml (text "Identifying
+# discrepancies between current state and strategic goals.", phase preliminary, no upstream,
+# sections strategic_goals / current_state / discrepancies / implications, uses_repo true, signoff
+# false, and the inspect.criteria the QA stage judges by). current_state is read from the
+# repository at the pinned head and the other three sections are tied back to it and to the brief,
+# which is why the ladder judges citations rather than a diff: the card writes no code. It is the
+# entry card of the change_management chain — change requirement, principle and decision
+# development each read it — so it claims nothing the brief or the repository does not state, and
+# nothing is written to RM, so DONE closes on the published document alone.
+card_type: future_state_analysis
+capability: change_management
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: future_state_analysis
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: future_state_analysis.ready
+    title: Future state analysis — definition of ready
+    definition_of_ready: {checks: [brief_present]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline holds only the document's four sections — strategic_goals, current_state, discrepancies and implications — and every goal in it is one the brief states, not one the outline adds."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: future_state_analysis.doing
+    title: Future state analysis — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every statement of a strategic goal, a fact about the current state, a discrepancy or an implication names the brief passage or the repository file and symbol it comes from."}
+      - {name: every_cited_source_exists, text: "Every brief passage and repository path the document cites resolves at the pinned head the card read; a citation that does not resolve is reported, not written into the document."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: future_state_analysis.qa
+    title: Future state analysis — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [goals_cite_brief, discrepancies_tied, implications_follow, no_unsupported_claims, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "The document asserts no goal, current-state fact, discrepancy or implication that the sources it cites do not state."}
+      - {name: goals_cite_brief, text: "strategic_goals cites the brief for every goal."}
+      - {name: discrepancies_tied, text: "Every discrepancy names the goal and the current-state fact it lies between."}
+      - {name: implications_follow, text: "implications follow from the discrepancies."}
+      - {name: capability_acceptance_met, text: "The document meets every acceptance statement the future_state_analysis card type declares."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id]
+
+  - key: future_state_analysis.done
+    title: Future state analysis — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The document published to the card is the exact revision QA reviewed; no goal, current-state fact, discrepancy or implication was added, cut or reworded after the review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: future_state_analysis.system
+    title: Future state analysis — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: future_state_analysis.READY
+    list: ready
+    title: Future state analysis — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: future_state_analysis
+        sop: future_state_analysis.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: future_state_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: future_state_analysis.DOING
+    list: doing
+    title: Future state analysis — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: future_state_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: future_state_analysis.QA
+    list: qa
+    title: Future state analysis — QA
+    outputs: [reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: future_state_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: future_state_analysis.DONE
+    list: done
+    title: Future state analysis — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: future_state_analysis, sop: future_state_analysis.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: future_state_analysis.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

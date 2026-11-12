@@ -1,0 +1,24 @@
+# gitleaks allowlist — this file IS the public CI's baseline.
+#
+# ⛔ SCOPE: CI (`.github/workflows/ci-public.yml`) runs `gitleaks dir` over the whole tree, and
+# dir-mode fingerprints are `file:rule:line` — exactly the form below. So an entry here directly
+# suppresses a CI finding, and adding one is a security decision: state what the value is and why
+# it is safe to publish. Do not add an entry to silence a real credential — rotate it instead.
+#
+# (History: the retired private archetype scanned a git-mode *range* with no baseline, whose
+# `commit:file:rule:line` fingerprints could never match this file. That scan left with the
+# legacy `ci.yml`.)
+#
+# compose.yaml:173 — STRATA_PROVIDER_KEY for the local `strata` compose profile.
+# Base64 decodes to the literal 32-byte phrase "conveyor-dev-provider-key-32byte":
+# a hardcoded local default that spells out what it is, not key material.
+# Production sealing keys never live in the repo (they come from the SOPS secret).
+# Flagged by the generic-api-key rule on entropy alone. (Was :126 until compose.yaml grew;
+# re-fingerprint when the line moves — gitleaks dir mode keys on the line number.)
+compose.yaml:generic-api-key:173
+#
+# fixtures/{a,b,c}.flow.json:2 — the fixture id string ("s13.fixture.a" and siblings) in the
+# legacy flow definitions read by crates/workflow/tests/trace_expect.rs. Entropy false positive.
+fixtures/a.flow.json:generic-api-key:2
+fixtures/b.flow.json:generic-api-key:2
+fixtures/c.flow.json:generic-api-key:2

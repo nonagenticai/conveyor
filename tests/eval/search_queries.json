@@ -1,0 +1,286 @@
+{
+  "version": 1,
+  "note": "Forty handwritten queries whose expected results were chosen by meaning against corpus.json, used to compare full-text search with a plain ILIKE baseline.",
+  "queries": [
+    {
+      "id": "q01",
+      "text": "REQ-AUTH-001",
+      "intent": "exact_key",
+      "expected": ["REQ-AUTH-001"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q02",
+      "text": "REQ-PAY-003",
+      "intent": "exact_key",
+      "expected": ["REQ-PAY-003"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q03",
+      "text": "REQ-SEARCH-002",
+      "intent": "exact_key",
+      "expected": ["REQ-SEARCH-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q04",
+      "text": "REQ-A11Y-005",
+      "intent": "exact_key",
+      "expected": ["REQ-A11Y-005"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q05",
+      "text": "REQ-DATA-003",
+      "intent": "exact_key",
+      "expected": ["REQ-DATA-003"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q06",
+      "text": "PRIN-007",
+      "intent": "exact_key",
+      "expected": ["PRIN-007"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q07",
+      "text": "ADR-011",
+      "intent": "exact_key",
+      "expected": ["ADR-011"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q08",
+      "text": "REQ-NOTIF-006",
+      "intent": "exact_key",
+      "expected": ["REQ-NOTIF-006"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q09",
+      "text": "REQ-SEC-002",
+      "intent": "exact_key",
+      "expected": ["REQ-SEC-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q10",
+      "text": "REQ-INTEG-002",
+      "intent": "exact_key",
+      "expected": ["REQ-INTEG-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q11",
+      "text": "users own password reset by email",
+      "intent": "title",
+      "expected": ["REQ-AUTH-001"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q12",
+      "text": "frozen disputed charges pending investigation",
+      "intent": "title",
+      "expected": ["REQ-PAY-008"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q13",
+      "text": "suppressed email addresses after repeated bounces",
+      "intent": "title",
+      "expected": ["REQ-NOTIF-007"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q14",
+      "text": "suggestions rank recently viewed documents higher",
+      "intent": "title",
+      "expected": ["REQ-SEARCH-007"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q15",
+      "text": "prorated plan upgrades remainder of period",
+      "intent": "title",
+      "expected": ["REQ-BILL-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q16",
+      "text": "contrast ratio required text readability",
+      "intent": "title",
+      "expected": ["REQ-A11Y-003"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q17",
+      "text": "failed sign-ins lock account temporarily",
+      "intent": "title",
+      "expected": ["REQ-SEC-005"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q18",
+      "text": "versioned REST endpoints public API",
+      "intent": "title",
+      "expected": ["REQ-INTEG-003"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q19",
+      "text": "cancelled long running jobs without side effects",
+      "intent": "title",
+      "expected": ["REQ-PERF-007"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q20",
+      "text": "customers request copy of all their data",
+      "intent": "title",
+      "expected": ["REQ-DATA-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q21",
+      "text": "link expires after thirty minutes",
+      "intent": "body_phrase",
+      "expected": ["REQ-AUTH-001", "REQ-AUTH-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q22",
+      "text": "ignored through an idempotency identifier",
+      "intent": "body_phrase",
+      "expected": ["REQ-PAY-004"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q23",
+      "text": "ten in the evening and seven",
+      "intent": "body_phrase",
+      "expected": ["REQ-NOTIF-005"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q24",
+      "text": "reported totals against the sums",
+      "intent": "body_phrase",
+      "expected": ["REQ-REPORT-004"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q25",
+      "text": "collected hourly and summarised",
+      "intent": "body_phrase",
+      "expected": ["REQ-BILL-003"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q26",
+      "text": "at the top of the form",
+      "intent": "body_phrase",
+      "expected": ["REQ-A11Y-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q27",
+      "text": "above the agreed severity",
+      "intent": "body_phrase",
+      "expected": ["REQ-SEC-003"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q28",
+      "text": "hashed before a log line",
+      "intent": "body_phrase",
+      "expected": ["REQ-DATA-007"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q29",
+      "text": "resetting passwords by email",
+      "intent": "paraphrase",
+      "expected": ["REQ-AUTH-001", "REQ-AUTH-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q30",
+      "text": "retrying failed card payments",
+      "intent": "paraphrase",
+      "expected": ["REQ-PAY-003"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q31",
+      "text": "tolerating typing mistakes in searches",
+      "intent": "paraphrase",
+      "expected": ["REQ-SEARCH-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q32",
+      "text": "cancelled subscriptions retaining access",
+      "intent": "paraphrase",
+      "expected": ["REQ-BILL-006"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q33",
+      "text": "purging deleted records after thirty days",
+      "intent": "paraphrase",
+      "expected": ["REQ-DATA-001"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q34",
+      "text": "alternative texts describe image purposes",
+      "intent": "paraphrase",
+      "expected": ["REQ-A11Y-004"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q35",
+      "text": "authentcation",
+      "intent": "typo",
+      "expected": ["REQ-AUTH-004", "ADR-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q36",
+      "text": "proated",
+      "intent": "typo",
+      "expected": ["REQ-BILL-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q37",
+      "text": "backof",
+      "intent": "typo",
+      "expected": ["REQ-INTEG-002"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q38",
+      "text": "vulnerabilites",
+      "intent": "typo",
+      "expected": ["REQ-SEC-003"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q39",
+      "text": "conrast",
+      "intent": "typo",
+      "expected": ["REQ-A11Y-003"],
+      "source": "handwritten"
+    },
+    {
+      "id": "q40",
+      "text": "notifcations",
+      "intent": "typo",
+      "expected": ["REQ-NOTIF-002", "REQ-NOTIF-005"],
+      "source": "handwritten"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+# testing_execution — run the plan's tests and report the failures as findings (schema:
+# seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type testing_execution: rule container_read_exec,
+# outputs draft/report/published and acceptance scope_paths_exist, every_finding_cites_evidence,
+# every_cited_location_exists, every_confirmed_location_exists, capability_acceptance_met,
+# artifact_is_qa_version) and n8n-designs/design/choices/v4/capabilities/testing.yaml (archetype
+# analysis, text "running tests", phase test, upstream testing_plan, and the inspect.criteria the
+# QA stage judges by). The v4 entry carries no sections, uses_repo, uses_knowledge, signoff or
+# proof key, so the catalogue acceptance plus the plan this card runs are the whole source of the
+# file. Its upstream is the testing plan: the run executes the plan's execution_order, and READY
+# reports a command the container cannot run before any failure is recorded. Each confirmed item
+# becomes one development_bug_fix card (v4 P-W3-2), planned later — never created here.
+card_type: testing_execution
+capability: testing
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: testing_execution
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  # One SOP per stage for the agent steps, plus one mechanical SOP for every computed move.
+  - key: testing_execution.ready
+    title: Testing execution — definition of ready
+    definition_of_ready: {checks: [upstream_testing_plan_done_or_absent, test_commands_resolve]}
+    definition_of_done: {checks: [scope_paths_exist]}
+    acceptance_criteria:
+      - {name: scope_paths_exist, text: "Every path in the run's scope and every test file the plan names exists in the imported workspace at the pinned head, and one that does not is reported as missing before the run starts."}
+      - {name: test_commands_resolve, text: "Every command in the plan's execution_order resolves in the container the card runs in; a command or service the container cannot provide is reported before the run rather than recorded as a failure."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: testing_execution.doing
+    title: Testing execution — definition of doing
+    definition_of_ready: {checks: [scope_paths_exist]}
+    definition_of_done: {checks: [every_finding_cites_evidence, every_cited_location_exists]}
+    acceptance_criteria:
+      - {name: every_finding_cites_evidence, text: "Every finding names the failing test, the command that ran it and the output line that failed, so the failure reads from the report without being rerun."}
+      - {name: every_cited_location_exists, text: "Every cited test file, function and line span exists in the workspace at the revision the run recorded; a failure that points at a missing path is reported, not turned into a finding."}
+      - {name: run_is_reproducible, text: "Every recorded result names the command, the revision and the environment it ran in, so the same command at the same revision yields the same failures and the same passes."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: testing_execution.qa
+    title: Testing execution — definition of QA
+    definition_of_ready: {checks: [every_cited_location_exists]}
+    definition_of_done: {checks: [every_confirmed_location_exists, findings_from_failing_tests, findings_located, root_cause_explains_failure, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: every_confirmed_location_exists, text: "Every finding the report confirms points at a file, a function and a line span that exist in the revision the run recorded."}
+      - {name: findings_from_failing_tests, text: "Every confirmed finding names the failing test it comes from."}
+      - {name: findings_located, text: "Every confirmed finding names a file, a function (null at module level) and a line span."}
+      - {name: root_cause_explains_failure, text: "Every confirmed finding's root cause explains why the test fails, not just restates the failure."}
+      - {name: capability_acceptance_met, text: "The report is true of every acceptance statement the testing_execution card type declares, and each confirmed finding is reported as one development_bug_fix card's worth of work, not several."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: testing_execution.done
+    title: Testing execution — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The run report published to the card is the exact revision QA reviewed, with the same counts, the same pass rate and the same confirmed findings — nothing was rerun, added or dropped after the review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: testing_execution.system
+    title: Testing execution — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: testing_execution.READY
+    list: ready
+    title: Testing execution — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: testing_execution
+        sop: testing_execution.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_execution.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: testing_execution.DOING
+    list: doing
+    title: Testing execution — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_execution.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: testing_execution.QA
+    list: qa
+    title: Testing execution — QA
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_execution.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: testing_execution.DONE
+    list: done
+    title: Testing execution — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: testing_execution, sop: testing_execution.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: testing_execution.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

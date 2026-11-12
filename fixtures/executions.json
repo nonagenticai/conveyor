@@ -1,0 +1,48 @@
+{
+  "captured_at": "2026-11-09T16:31:00Z",
+  "source": "live n8n, database `n8n` on the master host (direct psql as postgres; read-only)",
+  "n8n_version": "2.46.1",
+  "query": "select data from execution_data where \"executionId\" = $id",
+  "fixtures": [
+    {
+      "fixture": "a",
+      "shape": "linear (no if/switch)",
+      "workflow_id": "nJilzpQdRgF87YJ1",
+      "workflow_name": "cap.analysis.consult",
+      "execution_id": 1218441,
+      "started_at": "2026-11-08T16:41:20.943+01:00",
+      "stopped_at": "2026-11-08T16:42:54.567+01:00",
+      "status": "success",
+      "bytes": 54333
+    },
+    {
+      "fixture": "b",
+      "shape": "condition (has if)",
+      "workflow_id": "rAwDtIctiVtjhvFI",
+      "workflow_name": "wip.pull",
+      "execution_id": 1218451,
+      "started_at": "2026-11-08T16:50:16.975+01:00",
+      "stopped_at": null,
+      "status": "success",
+      "bytes": 73518
+    },
+    {
+      "fixture": "c",
+      "shape": "agent (single agent step, no sub-workflow)",
+      "workflow_id": "u6qMvsAfx3p18MYx",
+      "workflow_name": "cap.testing.consult",
+      "execution_id": 1218449,
+      "started_at": "2026-11-08T16:48:55.295+01:00",
+      "stopped_at": null,
+      "status": "success",
+      "bytes": 50697
+    }
+  ],
+  "workflow_snapshots": "fixtures/<x>.workflow.json is workflow_entity (id, name, versionId, nodes) for that flow, captured at the same time. An n8n execution does not carry node types, so the projection needs both files.",
+  "snapshot_sha256": {
+    "a.workflow.json": "de51cd21281e4d02eaf056d1cbb9f36e9708cf0dba13b0531aa4defd57530188",
+    "b.workflow.json": "65b91f5edfb62563601d5d80907fa3b418b9fcc84fa9484afffec9fb291d71ea",
+    "c.workflow.json": "b196213cab9ec46473da8cfd3f2a90cace8d9c33c9da881373b8dfc0d51e642b"
+  },
+  "note": "Fixture C was re-picked twice. First pick bug_analysis.DOING (UHyWYx0ptuYUtWQo) had only error executions. Second pick project_start_request_analysis.DOING (99hBpLocY27gOzz8) executes a `planka` node with resource=comment, operation=list, which has no conveyor action (there is no comments.list; only cards.comment, comments.update and comments.delete) — an unmappable effect makes the old side incomplete, so it cannot be a fixture. cap.testing.consult has 40/40 successes and every executed node maps: executeWorkflowTrigger/code/lmChatOpenAi are not effects; requirements reads map to projects.get / requirements.get / catalogues.list; the agent maps to agent.run."
+}

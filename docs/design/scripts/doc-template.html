@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>$title$ · conveyor documents</title>
+    <link rel="icon" href="$root$assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="$root$assets/plex-sans.css" />
+    <link rel="stylesheet" href="$root$assets/plex-mono.css" />
+    <link rel="stylesheet" href="$root$docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="$root$studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="$root$studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="$source_url$" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body">$body$</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>$source$</code> at build time.</span>
+      <a href="$root$studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

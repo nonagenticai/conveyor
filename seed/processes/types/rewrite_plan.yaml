@@ -1,0 +1,162 @@
+# rewrite_plan — the target architecture and an ordered slice list for a language rewrite
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (the type's inputs/outputs/acceptance) and
+# n8n-designs/design/choices/v4/capabilities/analysis.yaml (text, phase, inspect criteria).
+# The plan is drafted from the source repositories at pinned SHAs and the user confirms the draft
+# (R212); nothing is rewritten here.
+card_type: rewrite_plan
+capability: analysis
+outputs:
+  - draft_artifact_id
+  - report_artifact_id
+  - published_artifact_id
+
+agent:
+  key: rewrite_plan
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: rewrite_plan.ready
+    title: Rewrite plan — definition of ready
+    definition_of_ready: {checks: [scope_paths_exist]}
+    definition_of_done: {checks: [brief_items_enumerated]}
+    acceptance_criteria:
+      - {name: scope_paths_exist, text: "Every source repository and path the card names exists at the sha the card pins, or the analysis names it as missing before it plans anything."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: rewrite_plan.doing
+    title: Rewrite plan — definition of doing
+    definition_of_ready: {checks: [brief_items_enumerated]}
+    definition_of_done: {checks: [every_finding_cites_evidence, every_cited_location_exists]}
+    acceptance_criteria:
+      - {name: every_finding_cites_evidence, text: "Every plan item — a component, a slice or a note — cites the source evidence it is derived from: a path, a route or a brief item."}
+      - {name: every_cited_location_exists, text: "Every path and route the plan cites exists in the source repositories at their pinned shas."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: rewrite_plan.qa
+    title: Rewrite plan — definition of QA
+    definition_of_ready: {checks: [every_cited_location_exists]}
+    definition_of_done: {checks: [every_confirmed_location_exists, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: every_confirmed_location_exists, text: "Every location the confirmed plan cites still exists at the pinned sha, so the plan can be executed as written."}
+      - {name: capability_acceptance_met, text: "The plan is true of every acceptance statement the rewrite plan card type declares."}
+      - {name: plan_answers_every_brief_item, text: "Every brief item readying returned (the desired outcome, each success criterion, each in-scope item) is answered by a component or a slice, or is named in architecture.notes as left out on purpose."}
+      - {name: components_name_what_they_replace, text: "Every component names the source files or folders it replaces, and every source folder of the rewrite is named by at least one component."}
+      - {name: slices_are_reviewable_changes, text: "Every slice is one reviewed change: one goal, an acceptance sentence a test can check, and no slice spanning two unrelated parts of the brief."}
+      - {name: plan_keeps_the_public_api, text: "No component, note or slice drops or renames a public route; internal boundaries may change, the published API may not."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [report_artifact_id]
+
+  - key: rewrite_plan.done
+    title: Rewrite plan — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The plan published to the card is the exact revision QA reviewed; no component, slice or note was changed after the review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: rewrite_plan.system
+    title: Rewrite plan — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: rewrite_plan.READY
+    list: ready
+    title: Rewrite plan — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: rewrite_plan
+        sop: rewrite_plan.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_plan.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_plan.DOING
+    list: doing
+    title: Rewrite plan — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_plan.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_plan.QA
+    list: qa
+    title: Rewrite plan — QA
+    outputs: [report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_plan.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: rewrite_plan.DONE
+    list: done
+    title: Rewrite plan — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: rewrite_plan, sop: rewrite_plan.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: rewrite_plan.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

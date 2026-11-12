@@ -1,0 +1,174 @@
+# technology_landscape_survey — which technologies, libraries and patterns exist for a planned
+# change, compared against a need stated in advance (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type technology_landscape_survey: outputs
+# draft/reviewed/published and acceptance outline_within_card_scope, every_claim_cites_a_source,
+# every_cited_source_exists, no_unsupported_claims, capability_acceptance_met,
+# artifact_is_qa_version) and n8n-designs/design/choices/v4/capabilities/research.yaml (text "study
+# to state-of-the-art technologies, tools, libraries, frameworks, design patterns relevant to a
+# planned project or change — for decision support, comparison, and selection.", phase preliminary,
+# upstream research_spike, sections need / candidates / comparison / shortlist with each candidate
+# carrying name, fit, licence and maturity, signoff false, uses_repo false, uses_knowledge false,
+# and the three inspect.criteria the QA stage judges by).
+#
+# The order of the four sections is the survey's guard: `need` states the criteria the comparison
+# will use before a candidate is named, so the criteria cannot be chosen to suit the candidates
+# this run happened to like. `uses_repo: false` and `uses_knowledge: false` together mean the card
+# has no web tool (HTTP is banned in flows, O-W3-WEB) and no knowledge base (O-W3-KAG): a licence or
+# a maturity claim is today's recall, it dates quickly, and the survey says so rather than
+# presenting it as something it looked up. A field that cannot be sourced stays marked unverified
+# through the comparison instead of being quietly dropped and inferred.
+card_type: technology_landscape_survey
+capability: research
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: technology_landscape_survey
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: technology_landscape_survey.ready
+    title: Technology landscape survey — definition of ready
+    definition_of_ready: {checks: [upstream_research_spike_done]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline holds the survey's four sections — need, candidates, comparison, shortlist — and its need section states the criteria the comparison will use, in a form that can decide between two candidates, before any candidate is named. A survey that names its candidates first has already chosen its criteria to fit them."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+  - key: technology_landscape_survey.doing
+    title: Technology landscape survey — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every candidate's name, fit, licence and maturity names where it came from: a repository path where the estate already uses it, a passage in the research spike, or the model's own knowledge, which the document must date and mark as unverified. A licence or maturity claim that would move a candidate on the shortlist and carries no source is not written into the comparison."}
+      - {name: every_cited_source_exists, text: "Every repository path the survey cites resolves at the pinned head, and every upstream passage it cites is in the version the spike read. The survey runs no candidate and has no web tool, so nothing it writes may read as a measurement it took: a licence or a benchmark that reads as tested is a citation the reader cannot check."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: technology_landscape_survey.qa
+    title: Technology landscape survey — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [candidates_described, comparison_against_need, shortlist_follows_comparison, no_unsupported_claims, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "The survey claims no capability, licence, maturity or cost its sources do not support, and every candidate fact taken from the model's own knowledge stays marked as unverified in the comparison rather than hardening into the reason a candidate was chosen."}
+      - {name: candidates_described, text: "Every candidate has a name, a fit, a licence and a maturity, and a licence or maturity that could not be established says so in its field — an empty field reads as a fact the survey left out, not as one it could not verify."}
+      - {name: comparison_against_need, text: "comparison takes every candidate against every criterion the need section stated, in that order and those words, and no candidate is excused a criterion it fails because it does well on another."}
+      - {name: shortlist_follows_comparison, text: "The shortlist holds the candidates the comparison favours and names the comparison rows that put them there. A shortlisted candidate the comparison does not favour is a selection the survey has made without saying so."}
+      - {name: capability_acceptance_met, text: "The survey meets every acceptance statement the technology_landscape_survey card type declares for READY, DOING and QA."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id]
+
+  - key: technology_landscape_survey.done
+    title: Technology landscape survey — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The survey published to the card is the exact revision QA reviewed; a candidate, a comparison cell or the shortlist that moved after review — a licence changed, a release shipped, a version was withdrawn — was re-reviewed before it was published, because a survey that edits itself after review is a decision made on a revision nobody checked."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: technology_landscape_survey.system
+    title: Technology landscape survey — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: technology_landscape_survey.READY
+    list: ready
+    title: Technology landscape survey — ready
+    outputs: []
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: technology_landscape_survey
+        sop: technology_landscape_survey.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: technology_landscape_survey.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: technology_landscape_survey.DOING
+    list: doing
+    title: Technology landscape survey — doing
+    outputs: [draft_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: technology_landscape_survey.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: technology_landscape_survey.QA
+    list: qa
+    title: Technology landscape survey — QA
+    outputs: [reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: technology_landscape_survey.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: technology_landscape_survey.DONE
+    list: done
+    title: Technology landscape survey — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: technology_landscape_survey, sop: technology_landscape_survey.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: technology_landscape_survey.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

@@ -1,0 +1,161 @@
+# architecture_spike — settles one architecture question and directs the epics (v4 R343, design phase).
+#
+# Content sources: seed/catalogue.json (card_type architecture_spike: outputs and acceptance) and
+# n8n-designs/design/choices/v4/capabilities/architecture.yaml (text, sections, upstream
+# domain_analysis, signoff and inspect.criteria). A spike carries a sign-off because its
+# directive_for_epics binds every epic that follows it, so the DONE stage also waits for that
+# approval to be recorded.
+card_type: architecture_spike
+capability: architecture
+outputs:
+  - draft_artifact_id
+  - reviewed_artifact_id
+  - published_artifact_id
+
+agent:
+  key: architecture_spike
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: architecture_spike.ready
+    title: Architecture spike — definition of ready
+    definition_of_ready: {checks: [upstream_domain_analysis_done]}
+    definition_of_done: {checks: [outline_within_card_scope]}
+    acceptance_criteria:
+      - {name: outline_within_card_scope, text: "The outline covers only the spike's four sections — objective, constraints, options and directive_for_epics — and settles no question outside the card."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: architecture_spike.doing
+    title: Architecture spike — definition of doing
+    definition_of_ready: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [every_claim_cites_a_source, every_cited_source_exists]}
+    acceptance_criteria:
+      - {name: every_claim_cites_a_source, text: "Every option and every constraint cites the document, repository path or measurement it rests on."}
+      - {name: every_cited_source_exists, text: "Every cited source exists at the commit the card fixed and says what the spike says it says."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id, reviewed_artifact_id]
+
+  - key: architecture_spike.qa
+    title: Architecture spike — definition of QA
+    definition_of_ready: {checks: [every_cited_source_exists]}
+    definition_of_done: {checks: [no_unsupported_claims, objective_clear, options_respect_constraints, directive_actionable, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: no_unsupported_claims, text: "The spike claims no option, constraint or consequence that no cited source shows."}
+      - {name: objective_clear, text: "objective states in one or two sentences what the spike must settle."}
+      - {name: options_respect_constraints, text: "Every option is checked against the constraints section."}
+      - {name: directive_actionable, text: "directive_for_epics tells the epics what to do, in steps they can act on."}
+      - {name: capability_acceptance_met, text: "The spike meets every acceptance statement the architecture_spike card type declares."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_artifact_id, published_artifact_id]
+
+  - key: architecture_spike.done
+    title: Architecture spike — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version, signoff_recorded]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The spike signed off to the epics is the version QA approved; no option or directive changed after review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id]
+
+  - key: architecture_spike.system
+    title: Architecture spike — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: architecture_spike.READY
+    list: ready
+    title: Architecture spike — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: architecture_spike
+        sop: architecture_spike.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_spike.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_spike.DOING
+    list: doing
+    title: Architecture spike — doing
+    outputs: [draft_artifact_id, reviewed_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_spike.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_spike.QA
+    list: qa
+    title: Architecture spike — QA
+    outputs: [reviewed_artifact_id, published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_spike.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: architecture_spike.DONE
+    list: done
+    title: Architecture spike — done
+    outputs: [published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: architecture_spike, sop: architecture_spike.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: architecture_spike.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

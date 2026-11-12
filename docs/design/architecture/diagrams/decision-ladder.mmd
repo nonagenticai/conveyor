@@ -1,0 +1,22 @@
+flowchart TD
+  L0["L0 - Rule: deterministic Rust"]:::rule
+  L1["L1 - Laya: calibrated choice, score or noul"]:::laya
+  L2["L2 - Generation: LLM text, code, plans"]:::gen
+  L3["L3 - Human: approval, override, irreversible action"]:::human
+  R0[("row and action_invocation")]:::row
+  R1[("decision row: answer and confidence")]:::row
+  R2[("inference_call and draft artefact")]:::row
+  R3[("approval and approval_decision")]:::row
+  L0 --> R0
+  L1 --> R1
+  L2 --> R2
+  L3 --> R3
+  R2 -. no path to a state transition .-> X["Refused by the type system"]:::refused
+  L1 --> L3
+  R1 --> L3
+  classDef rule fill:#eef3ef,stroke:#8aa596,color:#1f2a24
+  classDef laya fill:#f4f1f8,stroke:#b9acce,color:#1f2a24
+  classDef gen fill:#ffffff,stroke:#8aa596,stroke-dasharray:5 3,color:#1f2a24
+  classDef human fill:#f7f4ea,stroke:#b9a77a,color:#1f2a24
+  classDef row fill:#ffffff,stroke:#a9b8b0,color:#1f2a24
+  classDef refused fill:#fdf1ee,stroke:#c98b7b,color:#1f2a24

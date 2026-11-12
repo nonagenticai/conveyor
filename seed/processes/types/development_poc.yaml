@@ -1,0 +1,170 @@
+# development_poc — build the smallest prototype that answers one question, and report what it showed
+# (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type development_poc: outputs and acceptance) and
+# n8n-designs/design/choices/v4/capabilities/development.yaml (text "proof of concept development",
+# phase preliminary, proof suite_only, inspect criteria answers_the_question and smallest_prototype,
+# with the P-W3 draft facts: `merge: false` — a draft PR and a findings report, never merged (P-W3-7) —
+# and `source: card` — no analysis report leads here, so READY finds the test command and the card is
+# the scope (P-W3-10)). vendor/trigger_registry.md:228 carries only the one-line text.
+#
+# ⚠ the catalogue's `definition_of_done` says `pr_merged`, which contradicts that `merge: false`, and
+# the catalogue's own DONE acceptance names (report_cites_evidence, recommendation_follows_result) are
+# a findings report, not a merge. The report checks are what DONE closes on; the draft PR stays open.
+card_type: development_poc
+capability: development
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - findings_artifact_id
+
+agent:
+  key: development_poc
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: development_poc.ready
+    title: Proof of concept — definition of ready
+    definition_of_ready: {checks: [planned_files_allowed]}
+    definition_of_done: {checks: [test_command_found]}
+    acceptance_criteria:
+      - {name: planned_files_allowed, text: "Every path the plan will write lies inside the repository and folder the card scopes the prototype to. The card is the scope here and there is no analysis report behind it, so a plan that reaches into a repository this card only reads, or into a folder the card does not name, is refused before any file is written."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: development_poc.doing
+    title: Proof of concept — definition of doing
+    definition_of_ready: {checks: [test_command_found]}
+    definition_of_done: {checks: [diff_only_planned_files, suite_green_after]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff touches only the files the READY plan named — the prototype and the check that exercises it — and leaves every other file as it was, so a reader can see the whole experiment in one short diff."}
+      - {name: suite_green_after, text: "Run with the command READY recorded, the suite is green after the prototype is in place: the prototype's own check passes and no test that passed before now fails, because a proof of concept that breaks the repository has not answered anything."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: development_poc.qa
+    title: Proof of concept — definition of QA
+    definition_of_ready: {checks: [diff_only_planned_files, suite_green_after]}
+    definition_of_done: {checks: [poc_answers_question, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: poc_answers_question, text: "The card's question has a stated answer, and that answer is the one the assembled evidence supports. A run whose result neither confirms nor refutes the question — inconclusive, or true only under conditions the card did not name — is not an answer, and the card stays in DOING until one exists."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the development_poc card type declares for READY, DOING and QA is true of the prototype and of the review doing recorded: the files stayed in the plan, the diff stayed inside them, and the suite is green with the prototype in place."}
+      - {name: answers_the_question, text: "The diff and the review doing recorded answer the question the card names, rather than a narrower or neighbouring question the prototype happened to answer. A prototype that shows a library is fast answers a performance question only if the card asked one."}
+      - {name: smallest_prototype, text: "The diff holds only what answering the question needs — no extra feature, no cleanup outside the question, no second experiment bundled in. Anything a later card could build is left to that card."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: development_poc.done
+    title: Proof of concept — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [report_cites_evidence, recommendation_follows_result]}
+    acceptance_criteria:
+      - {name: report_cites_evidence, text: "Every claim the findings report makes points at the run, command or file that produced it, closely enough that a reader can repeat it and get the same result; a number with no run behind it is not evidence."}
+      - {name: recommendation_follows_result, text: "The report's recommendation — adopt, drop, or investigate further — is the one its results support, and the report names the result that decided it. A recommendation that would read the same whatever the run had produced fails this check."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [findings_artifact_id]
+
+  - key: development_poc.system
+    title: Proof of concept — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: development_poc.READY
+    list: ready
+    title: Proof of concept — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: development_poc
+        sop: development_poc.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_poc.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: development_poc.DOING
+    list: doing
+    title: Proof of concept — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_poc.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: development_poc.QA
+    list: qa
+    title: Proof of concept — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_poc.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: development_poc.DONE
+    list: done
+    title: Proof of concept — done
+    outputs: [findings_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: development_poc, sop: development_poc.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: development_poc.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

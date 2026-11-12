@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Remaining development work — corrected assessment, 2026-11-10 · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-10-plan-audit.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="remaining-development-work--corrected-assessment-2026-11-10">Remaining development work — corrected assessment, 2026-11-10</h1>
+<p>Checkout: <code>lane/train-2026-11-09</code>, <code>0ace3ee</code>. This assessment replaces the earlier version of this file.</p>
+<p>Three agents reread all 34 plan documents: the index, contract, data architecture, five source maps, all 25 slice plans and the development-process proposal. The primary agent read <code>docs/SPEC.md</code> and <code>docs/KNOWLEDGE-MEMORY.md</code>, checked findings against source, and consolidated the order below. No application code was changed.</p>
+<p>This is a source/evidence assessment. No fresh application tests, live agent session, deployment inspection or benchmark was run. Historical receipts are not a passing release receipt at this checkout. Deployment items identify what must be verified; they do not assert that external infrastructure is absent.</p>
+<h2 id="scope-correction">Scope correction</h2>
+<p>The owner's clarification is authoritative: <strong>the old fr/kanban/n8n conveyor is separate. Both systems may run concurrently. Developing or launching the new conveyor does not require changing, retiring or proving equivalence to the old one.</strong></p>
+<p>The earlier audit incorrectly promoted replacement assumptions from the spec/plans into launch dependencies. Remove these as automatic new-conveyor requirements:</p>
+<ul>
+<li>Freezing, dumping, shutting down or deleting old applications, databases, namespaces or workflows.</li>
+<li>Deactivating n8n flows, reaching an active-flow count of zero, or running <code>scripts/retire-n8n-flows.sh</code>.</li>
+<li>Reauthoring all 348 old flows, importing the old card ledger, or comparing old/new execution traces before launch.</li>
+<li>Switching the agent's existing old-conveyor registration or retiring its toolkit. A separate new-conveyor connection can coexist.</li>
+<li>Treating all 218 historically used features and legacy probes as an automatically binding launch checklist.</li>
+<li>Rolling back to the old conveyor. Release rollback concerns the new service's own image, configuration and database recovery.</li>
+</ul>
+<p>Historical source maps/fixtures can inform product design and regression tests. Separation does <strong>not</strong> remove the new product's boards, procedures, native runtime, capabilities, channels or measurement features. Accept those against intended new behavior. An old behavior becomes backlog only when it is also a requirement of the new product.</p>
+<h2 id="assessment-and-execution-order">Assessment and execution order</h2>
+<p>The backend is substantially built. Remaining work is concentrated in <strong>incorrect connections between implemented components, incomplete everyday UI, incomplete measurement execution/accounting, and missing integrated proof</strong>.</p>
+<p>Repair shared invocation/executor boundaries first. An action can currently be registered but unusable; a producer can exist but never execute; and a version can be recorded without being the configuration actually measured.</p>
+<p>Distinguish independent operation of the core conveyor from completion of the entire declared product. Core operation requires correct authorization, real external calls, executable native processes, usable required core screens and tested deployment/recovery. Full product completion also includes benchmark producers, trustworthy eval/climb accounting, later authoring/improvement UI, recipe authoring and memory selection. Explicitly deferred work remains product work; it is not legacy cutover work.</p>
+<p>An authorization defect in an enabled feature must be fixed before releasing that feature, even if its slice was outside historical S14 dependencies.</p>
+<table>
+<thead>
+<tr>
+<th>Order</th>
+<th>Work package</th>
+<th>Concrete output / completion condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Correct release contract and native acceptance</td>
+<td>Rewrite S14 for independent deployment; remove old shutdown/parity preconditions from active SPEC/index/S13 dependencies. List required new-product workflows and explicit later scope, each with setup, expected effects and executable checks.</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Repair authorization and external invocation</td>
+<td>Close generic eval-signoff bypass; identify Telegram senders and actual channel; make imported actions callable/restart-safe; supply upstream tenant credentials and a complete deadline. W1–W3.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Make native execution coherent</td>
+<td>Enforce bound capability-agent configuration, fix workflow/procedure composition, and provide repeatable setup for selected new processes. Verify long-job recovery. W4–W6, V1.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Make model execution observable and reproducible</td>
+<td>Complete ledger coverage, compiled prompt identity, actual-recipe audits and retention schedules. Reliable measurement/cost depends on this. W7–W8.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Complete core user workflows</td>
+<td>Board/card authoring and paging, approval history, requirements, architecture/trace, procedures, search, copilot, declared administration and real OIDC test fixtures. W9–W10. Can proceed alongside orders 2–3 once contracts stabilize.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Finish measurement and improvement</td>
+<td>Real benchmark/eval executor adapters, immutable subject pins, shared ledger-derived accounting/spend policy, and measurement UI wired to authoritative backends. W11–W14. Sandbox controls can be proved earlier.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Finish explicitly deferred authoring features</td>
+<td>Tenant recipe CRUD/versioning/audit, memory selection, accepted workflow editor, remaining per-case eval auditor or an explicit scope amendment. W15–W16.</td>
+</tr>
+<tr>
+<td>Release</td>
+<td>One integrated proof at the release revision</td>
+<td>Fresh-tenant setup, production OIDC, required real upstreams, native lifecycle/approval, real agent MCP integration, restart/retry/cancel, required browser flows and new-service rollback. V2–V4. No old-system gate.</td>
+</tr>
+</tbody>
+</table>
+<p>Define acceptance at the start; run focused checks as each task lands, then collect the integrated receipt. Core operation need not wait for explicitly deferred product features. Broken enabled actions still need implementation or explicit exclusion/disablement in that release's contract.</p>
+<h2 id="confirmed-implementation-and-rework">Confirmed implementation and rework</h2>
+<h3 id="w1-enforce-eval-signoff-policy-on-every-approval-path">W1. Enforce eval-signoff policy on every approval path</h3>
+<p><strong>Confirmed defect; release blocker while eval gates are enabled.</strong> <code>eval_signoffs.decide</code> requires <code>evals:approve</code> and a human (<code>crates/actions/src/eval/signoffs.rs:143</code>, <code>:159</code>). The same row can be decided through <code>approvals.decide</code>, requiring only <code>approvals:write</code>, with no eval policy check (<code>crates/actions/src/control/approvals.rs:47</code>, <code>:82</code>). The common writer checks state/quorum, not human-only authorization (<code>crates/store/src/approval.rs:691</code>). Generic approval decisions are agent-reachable.</p>
+<p>Enforce the policy at a shared decision boundary, including human scope checks. Prove generic HTTP/MCP, task updates and Telegram cannot circumvent it; refusal must leave gate/decision rows unchanged. Preserve ordinary agent-answerable approvals.</p>
+<h3 id="w2-resolve-telegram-senders-and-preserve-transport-attribution">W2. Resolve Telegram senders and preserve transport attribution</h3>
+<p><strong>Confirmed defect.</strong> The webhook checks chat/topic, then executes as <code>binding.config.user_id</code>, without resolving the message's <code>from</code> identity (<code>crates/api/src/routes/telegram.rs:165</code>, <code>:178</code>, <code>:219</code>). Different group responders can be attributed to one app member. Approval decisions separately infer channel from actor kind and deliberately label Telegram <code>web</code> (<code>crates/actions/src/control/approvals.rs:69</code>).</p>
+<p>Map sender to an authorized app principal, or implement explicitly constrained delegation. Carry authenticated transport context through invocation. Test unbound/distinct responders and revoked permissions. Add decision-history readback (W9).</p>
+<h3 id="w3-complete-the-external-action-execution-contract">W3. Complete the external-action execution contract</h3>
+<p><strong>Confirmed broken integration, independent of the old system.</strong> OpenAPI ingest rejects compiled-name collisions, approves novel actions and persists them (<code>crates/actions/src/ingest.rs:395</code>, <code>:429</code>). Invocation sees only the compiled registry (<code>crates/actions/src/invoke.rs:526</code>). Next <code>serve</code> startup refuses approved names missing from that registry (<code>apps/server/src/main.rs:347</code>). A successful import therefore creates an uncallable action and can prevent the server restarting. The previous audit overstated this as worker-startup failure too; the shown assertion is in <code>serve</code>.</p>
+<p>Build one tenant-aware resolution model for compiled/approved imported actions, consistently used by discovery, invocation, readiness, HTTP and MCP. Define refresh/revocation/restart behavior. Prove import → discover → invoke → restart → invoke, with breaking refresh held for approval.</p>
+<p>Generic transport adds only optional correlation, without upstream credentials or tenant identity (<code>crates/actions/src/invoke.rs:842</code>). Timeout covers <code>send()</code> but not response-body reads (<code>:859</code>, <code>:902</code>, <code>:922</code>). Supply target/tenant credentials, correct path/query/body binding, supported upstream idempotency and a deadline spanning the response. Prove authenticated upstream calls and a stalled body. Verify actual coding/worker/billing contracts rather than treating declarations as execution proof.</p>
+<p>Dedicated document-ingest and knowledge clients already resolve tokens. Preserve them. <code>retrieval.query</code> already uses <code>/api/query</code> in <code>crates/actions/src/integrations/external.rs</code>; the older <code>/query</code> plan discrepancy is documentation cleanup, not a current path defect.</p>
+<h3 id="w4-enforce-bound-capability-agent-configuration">W4. Enforce bound capability-agent configuration</h3>
+<p><strong>Confirmed invariant breach.</strong> The resolver accepts explicit <code>model</code> and <code>messages</code> and returns before consulting <code>capability_agent_id</code> (<code>crates/actions/src/workflow/agent.rs:262</code>). A bound run can substitute configuration despite D22's single persisted source and lower-only limits rule.</p>
+<p>Resolve a bound run from its bound agent first; reject conflicting model/prompt/tools and higher limits. If explicit unbound execution remains supported, distinguish it and record truthful provenance. Test attempted replacements and valid lowered caps. Remove comments claiming S15/the prompt catalogue do not exist.</p>
+<h3 id="w5-repair-native-workflow--procedure-composition">W5. Repair native workflow → procedure composition</h3>
+<p><strong>Confirmed structural conflict, not legacy-coach parity.</strong> A workflow procedure node requires the parent's card and starts a child procedure on that same card (<code>crates/actions/src/workflow/node.rs:683</code>, <code>:698</code>). The parent already occupies the single live-run slot (<code>migrations/0002_domain.sql:188</code>, <code>uq_run_live</code>).</p>
+<p>Implement composition within a run or explicit parent/child semantics while preserving root work-item concurrency protection. Prove parent → procedure → result, cancellation, retry/restart and depth limits. Simply removing the unique constraint is not a sufficient design.</p>
+<h3 id="w6-provide-repeatable-setup-for-the-new-conveyors-processes">W6. Provide repeatable setup for the new conveyor's processes</h3>
+<p><strong>Operational setup remains incomplete.</strong> Catalogue/prompt seeding exists, but the general seed path does not install published procedures/workflows. The index explicitly records deferred procedure seeding (<code>docs/plans/00-INDEX.md:86</code>). Tests publishing fixtures are not production installation.</p>
+<p>Define/install the processes intended for the new conveyor: published definitions, routing/matrix bindings, capability-agent configuration, required knowledge bindings/credentials and schedules. Make setup tenant-scoped, versioned and repeatable; prove a fresh tenant runs without test-only SQL. This does not require porting all old flows or installing every <code>fixtures/named</code> definition.</p>
+<h3 id="w7-complete-inference-coverage-and-compiled-prompt-identity">W7. Complete inference coverage and compiled prompt identity</h3>
+<p><strong>Confirmed gaps.</strong> Ordinary HTTP/MCP calls supply <code>usage: None</code> (<code>crates/api/src/actions.rs:194</code>, <code>crates/actions/src/mcp.rs:232</code>); capture requires that context (<code>crates/actions/src/invoke.rs:933</code>). Internal judge-negative audit probes also omit it (<code>apps/server/src/eval_audit.rs:545</code>). These model calls can escape D23's ledger.</p>
+<p>Supply minimum context for every usage-capturing action, preserving run/step/turn/eval joins. Keep absent usage unknown; account for billed failures where observable. Implement durable capture recovery or explicitly amend the completeness guarantee: current behavior logs capture failure and continues (<code>crates/actions/src/invoke.rs:1091</code>). Do not retry a successful paid call solely to repair its accounting.</p>
+<p>The compiler hashes compiled system text (<code>crates/domain/src/prompt.rs:248</code>), while invocation hashes the complete messages array (<code>crates/actions/src/invoke.rs:950</code>). Copilot discards compiled identity, records <code>copilot@1</code>, and converts readiness failure to generic 500 (<code>crates/api/src/copilot/turns.rs:388</code>, <code>:396</code>, <code>:611</code>). Carry recipe key/version/compiled hash intact; name any full-request hash separately. Preserve the readiness refusal before a model call. Prove identity across agent/copilot/audit.</p>
+<p>The eval ledger join already exists in <code>migrations/0033_d23_eval_caller.sql</code>, and subject/judge callers supply it. Rework consumers; do not rebuild this schema because older comments claim it is absent.</p>
+<h3 id="w8-audit-actual-prompt-sources-and-schedule-retention">W8. Audit actual prompt sources and schedule retention</h3>
+<p><strong>Confirmed rework.</strong> Copilot executes a tenant recipe but audit inventory scans <code>COPILOT_SYSTEM_PROMPT</code> (<code>apps/server/src/prompt_audit_run.rs:219</code>). Audit actual recipes/resolved source identities. The action-description audit surface is also declared but empty; S16 explicitly records that authored descriptions are absent (<code>docs/plans/slices/S16-inference-audit.md:237</code>). Implement that coverage or explicitly narrow its contract.</p>
+<p><code>inference_call.prune</code> and <code>prompt_audit.prune</code> handlers exist but are absent from <code>DEFAULT_SCHEDULES</code> (<code>crates/store/src/schedule.rs:35</code>). Install their schedule rows and prove scheduler dispatch. Retain existing audit/publish-gate machinery.</p>
+<h3 id="w9-complete-core-ui-and-repair-existing-screens">W9. Complete core UI and repair existing screens</h3>
+<p><strong>Missing clients over existing backends.</strong> Build/Design/Copilot remain planned shell entries (<code>apps/web/src/app.rs:246</code>, <code>:247</code>, <code>:267</code>). Requirements/revision, architecture/trace, procedure author/publish/execute, search and copilot-conversation workflows lack corresponding screens/routes.</p>
+<p>Board UI reads only the first 50 projects and first 200 cards, consuming only <code>items</code> (<code>apps/web/src/screens/boards.rs:33</code>, <code>:99</code>). Its sole board write is move (<code>:4</code>). Complete paging and declared project/card/lane/label/custom-field authoring. Prove users can find/act on cards beyond page one.</p>
+<p>Expose decision history/principal/channel through approval projection/cockpit; counts cannot render promised attribution (<code>crates/actions/src/control/views.rs:298</code>). Complete declared action/job/audit/licence/worker/billing administration workflows. The earlier assessment overreached by separately requiring standalone document/integration administration screens without tying them to a declared workflow.</p>
+<h3 id="w10-implement-production-oidc-browser-test-mode">W10. Implement production OIDC browser-test mode</h3>
+<p><strong>Missing test capability, not proof that production login is broken.</strong> Playwright comments promise OIDC, but shared API setup always sends <code>Bearer dev:alice</code> (<code>apps/web/e2e/helpers.ts:3</code>). <code>BASE_URL</code> changes origin; it does not implement production authentication (<code>apps/web/playwright.config.ts:3</code>).</p>
+<p>Add a real OIDC session/fixture and corresponding authorized API setup. Run required workflows against the deployed app with dev auth disabled, including role/tenant refusals. Build this alongside screens rather than at the end.</p>
+<h3 id="w11-connect-measurement-subjects-to-the-existing-executor">W11. Connect measurement subjects to the existing executor</h3>
+<p><strong>Confirmed broken/missing adapters.</strong> Conveyor benchmark production invokes ordinary <code>agent.run</code> (<code>apps/server/src/benchmark_producer.rs:132</code>), whose handler always refuses because the loop is executor-driven (<code>crates/actions/src/workflow/agent.rs:219</code>). The producer records <code>no_attempt</code>. It also rereads mutable agent configuration per case (<code>benchmark_producer.rs:85</code>); recording <code>subject_version</code> at start does not freeze execution.</p>
+<p>Create a real run/step through the shared executor, executing an immutable agent/procedure/configuration snapshot including prompt/actions/limits and relevant pins. Prove a case reaches patch grading and a current-agent edit cannot change an already-started benchmark. Do not relax the executor-only handler merely to make its caller succeed.</p>
+<p>Three additional adapters explicitly refuse execution:</p>
+<ul>
+<li>Benchmark baseline: <code>409 arm_not_ready</code> (<code>crates/actions/src/benchmark/runs.rs:113</code>). Implement bounded one-shot production, source/edit contract and patch generation.</li>
+<li>Benchmark procedure subject: <code>409 arm_not_ready</code> (<code>:184</code>). Map a case into existing card-scoped execution and collect its patch/result.</li>
+<li>Eval agent subject: <code>409 subject_not_ready</code> (<code>crates/actions/src/eval/runs.rs:185</code>). Connect the existing loop through an executor-backed adapter.</li>
+</ul>
+<p>Share dispatch/provenance/result collection. These are missing adapters, not missing agent runtimes or a missing benchmark grader. Reconcile the later RBAC ruling with the still-active agent tool allowlist before claiming the external agent can drive the improvement actions; preserve explicit human-only and held-out restrictions.</p>
+<h3 id="w12-unify-report-climb-and-spend-accounting-over-the-ledger">W12. Unify report, climb and spend accounting over the ledger</h3>
+<p><strong>Confirmed inconsistency.</strong> Backend report sums copied subject/judge/failure usage (<code>crates/actions/src/eval/report.rs:368</code>). Climb spend sums subject result usage (<code>crates/actions/src/eval/climbs.rs:486</code>), omitting other billed calls. Pricing handles input/output but not cache classes (<code>:354</code>); token fallback can be compared with a ceiling named cents. Run start explicitly records but does not enforce its ceiling (<code>crates/actions/src/eval/runs.rs:71</code>); climb admission checks already-accounted spend (<code>climbs.rs:1505</code>).</p>
+<p>After W7, use one accounting read model for reports, decisions and spend checks: subject/judge calls, billed failed attempts, cache pricing and explicit unknown/unpriced amounts. Define hard execution ceiling versus round-admission threshold, then enforce/label consistently. Prove all consumers agree; regrade must not charge subject calls twice.</p>
+<p>SPEC conflicts too: D25/§6 eval says ledger-derived cost; §6 hillclimb describes result-row sums. Resolve to one source of truth. Cost-climb narrative still prints train/test score columns (<code>crates/actions/src/eval/climbs.rs:2051</code>); provide the declared cost/quality narrative using the same model.</p>
+<h3 id="w13-repair-and-finish-measurement-ui">W13. Repair and finish measurement UI</h3>
+<p>Eval list/detail, run start/cancel/regrade, signoff request/decide, report/transcript display and climb start/list/get/stop already exist. The previous blanket treatment as missing was too broad.</p>
+<p>Concrete remaining work:</p>
+<ul>
+<li>Report fetches only 200 results and recomputes means/cost in-browser (<code>apps/web/src/screens/evals.rs:280</code>, <code>:745</code>). Use authoritative report/accounting APIs and paginate detail rows; a page must not become a whole-run score.</li>
+<li>Add instrument/case/metric authoring, audit/findings and export/interop controls, plus climb-round and cost-goal/guardrail workflows. Audit/interop tabs and hints still claim existing actions do not exist (<code>evals.rs:430</code>, <code>:437</code>, <code>:964</code>).</li>
+<li>Benchmark UI disables conveyor and describes subject arms as unbuilt (<code>apps/web/src/screens/benchmarks.rs:375</code>). Wire completed producers/subject selection, trend/candidate/comparison/promotion and improvement controls.</li>
+</ul>
+<h3 id="w14-prove-the-real-measurementimprovement-loop">W14. Prove the real measurement/improvement loop</h3>
+<p><strong>Outstanding evidence, not missing pure logic.</strong> Existing receipts cover banked parser/verdict parity and stub sandbox lifecycle, not the actual configured Job, cleanup/resource policy, live gold/empty controls or repaired producer → grader → compare → keep/revert path (<code>docs/evidence/S17-CORE.md:169</code>, <code>docs/evidence/S18-B.md:57</code>).</p>
+<p>Use the recorded grading-node decision (<code>hp1</code>, index); verify config rather than reopening it. Prove one live sandbox lifecycle, then controls and producer/improvement. Compare an authenticated real router response with its ledger row and retain repeatable audit evidence. Keep benchmark gold/empty and eval oracle/null/judge-negative controls distinct.</p>
+<h3 id="w15-finish-deferred-recipememory-authoring">W15. Finish deferred recipe/memory authoring</h3>
+<p>Tenant recipe CRUD/version activation/retirement with audit, and automatic memory selection → processing → <code>prompt.memory</code>, remain explicitly deferred (<code>docs/plans/slices/S21-message-construction.md:237</code>). Knowledge prompt sections currently render pack identities, not automatically selected retrieved content (<code>crates/domain/src/prompt.rs:414</code>). Design/implement selection without duplicating working <code>knowledge.query</code>.</p>
+<p>Native memory accepts structured metadata on write but omits it from reads (<code>crates/store/src/memory.rs:47</code>, <code>crates/actions/src/memory/mod.rs:22</code>). Restore readback if native consumers require structured provenance. This is a native API concern, <strong>not</strong> an old-ledger migration/readback gate.</p>
+<p>Prompt budgets, role sources, declared outputs and publish-time plan validation exist. Do not re-add them or reopen PDDL as storage.</p>
+<h3 id="w16-finish-bounded-later-product-features">W16. Finish bounded later product features</h3>
+<ul>
+<li>Accepted ADR 0002 chooses a Leptos/SVG workflow editor; it is not an implementation (<code>docs/decisions/0002-editor.md:7</code>, <code>:50</code>). Build load/layout/drag/save/reload over existing APIs. Runtime does not depend on it; no egui spike is needed.</li>
+<li>Tier-3 per-case eval LLM auditor is explicitly absent (<code>docs/evidence/S19-C.md:119</code>). Implement through bounded shared invocation/ledger, or record an explicit scope reduction. Mechanical audit/control/export machinery exists.</li>
+</ul>
+<h2 id="verification-and-unresolved-questions">Verification and unresolved questions</h2>
+<h3 id="v1-establish-long-job-leaserecovery-behavior">V1. Establish long-job lease/recovery behavior</h3>
+<p>New concern, <strong>not a demonstrated duplicate-effects bug</strong>: default job lease is 60 seconds (<code>crates/api/src/config.rs:278</code>); worker awaits the handler without an evident heartbeat (<code>apps/server/src/worker.rs:268</code>); another worker can reclaim expired running work (<code>crates/store/src/jobs.rs:149</code>). Agent execution can take 300 seconds.</p>
+<p>Run a legitimate handler beyond its lease with two workers, then kill/restart one worker. Check step/handler ownership, idempotency and completion without duplicate paid calls, overlapping effects or stranded runs. Depending on results, add renewal/fencing or adjust bounded execution/lease policy. Source inspection alone does not establish the final effect.</p>
+<h3 id="v2-build-native-behavioral-acceptance">V2. Build native behavioral acceptance</h3>
+<p>The historical inventory's 218 used entries reference legacy probes. S14 reachability rejects only connection failures/5xx, allowing unexpected 401/404/422 (<code>docs/plans/slices/S14-cutover.md:168</code>). It is unsuitable as the new release gate.</p>
+<p>For each required new-product workflow, record native actions/UI, setup, expected status/body/effects, tenant/role refusals and executable checks. Historical IDs may provide provenance; there is no requirement to pass every old endpoint or add compatibility routes. Fail missing required checks, zero selected tests and unexpected statuses. Explicitly run search relevance, which is ignored by default (<code>crates/api/tests/search_eval.rs:355</code>).</p>
+<h3 id="v3-verify-independent-deployment-and-real-integrations">V3. Verify independent deployment and real integrations</h3>
+<p>Repo/CI bootstrap exists; <code>.github/workflows/ci.yml</code> requests deployment. Inspect actual GitOps/live state before declaring infrastructure unbuilt. Verify own DB roles/RLS/PgBouncer, migration job, worker/scheduler, static UI, OIDC, licence, secret sealing, required upstream credentials and network routes.</p>
+<p>Prove fresh-tenant setup, native process → approval → resume → terminal result, cancellation and restart. Separately connect the real external agent to the new <code>/mcp</code>: import, real licence attribution, question/approval/completion and cross-tenant refusal without mutations. Task/polling implementations exist; the receipt still lacks a real agent run (<code>docs/evidence/S06b-agent-task.md:48</code>). Update proof rather than rebuilding the lifecycle.</p>
+<p>The internal executor does not depend on external <code>agent</code>. Real integration remains declared acceptance when that channel is released. Test coexistence using distinct new identities, routes, registrations and data ownership; no old-service deletion/inactivity gate. Exercise new-service rollback/recovery only.</p>
+<h3 id="v4-produce-one-release-sha-receipt">V4. Produce one release-SHA receipt</h3>
+<p>Historical lane receipts at different revisions do not compose into one tested release. Record SHA/toolchain; run required workspace checks, served-spec lock check, production UI build/browser workflows; attach native acceptance and real-dependency results at that revision. Record executed test counts; repair stale filters/targets before using them as gates.</p>
+<p>The development-process-speed document is an optimization proposal. Address measured iteration/CI bottlenecks; cache/cancellation-policy experiments are not product prerequisites. Local commit/push hook receipts are not Rust test receipts.</p>
+<h2 id="contradictions-to-reconcile">Contradictions to reconcile</h2>
+<table>
+<thead>
+<tr>
+<th>Stale claim / contradiction</th>
+<th>Required correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SPEC D8/§8/§9 and S14 require replacement, old-engine rehearsals and decommission.</td>
+<td>Apply independent-system/coexistence ruling. Rewrite objective, dependencies, commands and evidence; do not merely reorder shutdown steps.</td>
+</tr>
+<tr>
+<td>S13 couples native runtime completion to reauthoring/retiring old flows.</td>
+<td>Retain native execution/editor requirements and useful regression fixtures; remove retirement gates.</td>
+</tr>
+<tr>
+<td>Signed old inventory/S15 ownership become a mandatory ledger migration.</td>
+<td>Express retained native memory/provenance requirements directly; no automatic old-ledger import gate.</td>
+</tr>
+<tr>
+<td>S14 HMAC/gateway settings and <code>mcp_server</code> approval wording contradict D19.</td>
+<td>Direct new-app <code>/mcp</code> plus licence principal. Keep old connections untouched.</td>
+</tr>
+<tr>
+<td>D27 means both compiled prompts and multi-tenant identity.</td>
+<td>Assign distinct stable decision identifiers.</td>
+</tr>
+<tr>
+<td>SPEC startup migrations contradict explicit code/compose <code>migrate</code>.</td>
+<td>Document actual pre-rollout migration model; do not add implicit migration to <code>serve</code>.</td>
+</tr>
+<tr>
+<td>Blanket version checks contradict guarded status/quorum transition exemptions.</td>
+<td>Align SPEC/data architecture with CONTRACT's edit-versus-transition rule.</td>
+</tr>
+<tr>
+<td>Old one-membership prose contradicts active-tenant selection.</td>
+<td>Update plans; current multi-membership implementation exists.</td>
+</tr>
+<tr>
+<td>D23 completeness contradicts optional/best-effort capture; prompt identities differ.</td>
+<td>W7 coverage/recovery and compiled identity, or explicit contract amendment.</td>
+</tr>
+<tr>
+<td>D25 ledger-derived cost contradicts hillclimb prose/code.</td>
+<td>One ledger/accounting model (W12).</td>
+</tr>
+<tr>
+<td>S20 evidence says retire special <code>AGENT_TOOLS</code>; invocation still uses it (<code>invoke.rs:532</code>).</td>
+<td>Reconcile one authorization contract before expanding access, preserving human signoff/held-out restrictions. Necessary for claimed agent-driven improvement; not a wholesale auth rebuild.</td>
+</tr>
+<tr>
+<td>R12 says no grading node chosen; index records hp1.</td>
+<td>Carry recorded decision into current config/proof.</td>
+</tr>
+<tr>
+<td>Frontmatter/counts/early remaining paragraphs/UI hints lag later build records.</td>
+<td>Replace append-only status with current disposition/evidence. Counts are inventory, not backlog. Preserve applied migrations.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="coverage-and-completed-work-to-preserve">Coverage and completed work to preserve</h2>
+<p>“Present” means inspected implementation/existing evidence, not fresh full certification.</p>
+<table>
+<thead>
+<tr>
+<th>Plans</th>
+<th>Current disposition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S00; five source maps</td>
+<td>Historical scope evidence exists. Native acceptance needs rework; no legacy launch census.</td>
+</tr>
+<tr>
+<td>S01</td>
+<td>Leptos CSR decision made. Measure finished UI; no stack-choice redo.</td>
+</tr>
+<tr>
+<td>S02–S03; contract/data architecture</td>
+<td>Auth/tenancy/schema/jobs/SSE/audit exist. Integrated proof, V1 and contract reconciliation remain.</td>
+</tr>
+<tr>
+<td>S04</td>
+<td>Compiled registry/invocation exist. W3 is substantive execution rework.</td>
+</tr>
+<tr>
+<td>S05</td>
+<td>Board backend exists. Paging/authoring/browser behavior remain.</td>
+</tr>
+<tr>
+<td>S06</td>
+<td>Control plane exists. W1–W2 and decision-history readback remain.</td>
+</tr>
+<tr>
+<td>S06a</td>
+<td>Superseded HMAC channel; remove active assumptions, do not implement it.</td>
+</tr>
+<tr>
+<td>S06b–S06c</td>
+<td>Direct MCP/lifecycle/durable tasks exist. Real-client proof remains.</td>
+</tr>
+<tr>
+<td>S07–S08</td>
+<td>Requirements/search/governance/model/validation/render backends exist. Missing clients and relevant behavioral/relevance/consumer proof remain.</td>
+</tr>
+<tr>
+<td>S09</td>
+<td>Documents including ingest, repositories, secrets/reports exist. Generic external execution and declared admin remain.</td>
+</tr>
+<tr>
+<td>S10</td>
+<td>Copilot/AG-UI backend exists. Conversation UI, identity and real inference proof remain.</td>
+</tr>
+<tr>
+<td>S11</td>
+<td>Procedure author/publish/steps/gates/retry/cancel exist. Native installation/UI/composition remain.</td>
+</tr>
+<tr>
+<td>S12</td>
+<td>Real board/cockpit/runs/admin/measurement subsets exist. W9–W10 and W13 are targeted remainder.</td>
+</tr>
+<tr>
+<td>S13</td>
+<td>Native engine/triggers/trace exist. W4–W5 and editor remain; old retirement excluded.</td>
+</tr>
+<tr>
+<td>S14</td>
+<td>Replace with independent deployment/release plan. Repo/CI bootstrap exists.</td>
+</tr>
+<tr>
+<td>S15</td>
+<td>Readiness, knowledge queries, hot/cold memory/consolidation exist. Native setup/selected extensions remain; no legacy import gate.</td>
+</tr>
+<tr>
+<td>S16</td>
+<td>Ledger/audit/publish gate exist. W7–W8 and live proof remain.</td>
+</tr>
+<tr>
+<td>S17</td>
+<td>Seed/specgen/parser/verdict/grader/comparison logic exists. Baseline and live sandbox/controls remain.</td>
+</tr>
+<tr>
+<td>S18</td>
+<td>Trend/comparison/improvement bookkeeping exists. Executor-backed pinned producers and real loop/UI remain.</td>
+</tr>
+<tr>
+<td>S19</td>
+<td>Instrument/runner/graders/signoffs/report/audit/export exist. Bypass, agent adapter, accounting, authoring/audit UI and Tier-3 auditor remain.</td>
+</tr>
+<tr>
+<td>S20</td>
+<td>Split/climb/stall/regrade rules and some UI exist. Accounting/spend, round UI, cost narrative and authorization reconciliation remain.</td>
+</tr>
+<tr>
+<td>S21</td>
+<td>Catalogue compiler/budgets/roles/plan-output validation exist. Recipe authoring, memory selection and executed identity remain.</td>
+</tr>
+<tr>
+<td>development-process-speed</td>
+<td>Separate optimization proposal; measure bottlenecks before adopting changes.</td>
+</tr>
+</tbody>
+</table>
+<p>Immediate implementation priorities are W1–W5. Largest visible product gap is W9. Measurement is incomplete until W7 and W11–W14 work together. None requires operating or retiring the old conveyor.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-10-plan-audit.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

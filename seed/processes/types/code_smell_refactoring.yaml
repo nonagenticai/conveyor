@@ -1,0 +1,173 @@
+# code_smell_refactoring — remove one confirmed code smell and open a PR (schema: seed/processes/README.md).
+#
+# Content sources: seed/catalogue.json (card_type code_smell_refactoring: outputs, acceptance and
+# definition_of_done pr_merged) and n8n-designs/design/choices/v4/capabilities/refactoring.yaml
+# (text "refactoring scoped to finding and resolving code smells", phase execution, proof suite_only,
+# test_files none, inspect criteria removes_the_item / preserves_behaviour / change_is_minimal). The
+# card carries one confirmed item of kind smell from code_quality_analysis (v4 P-W3-2), and that
+# report's own findings_located rule gives the item a file, a function (null at module level) and a
+# line span — the same triple this file's item_gone checks read back.
+#
+# ⚠ proof is suite_only and R233 fixes test_files: none — no test file is planned or changed
+# (computed gates no_test_file_planned, no_test_changed). A smell is removed from code that already
+# passes its tests; an edited test would remove the only evidence that it still does.
+card_type: code_smell_refactoring
+capability: refactoring
+outputs:
+  - commit_sha
+  - pr_number
+  - pr_url
+  - head_sha
+  - fix_report_artifact_id
+  - merge_sha
+
+agent:
+  key: code_smell_refactoring
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  - key: code_smell_refactoring.ready
+    title: Code smell refactoring — definition of ready
+    definition_of_ready: {checks: [source_item_located, planned_files_exist]}
+    definition_of_done: {checks: [workspace_imported]}
+    acceptance_criteria:
+      - {name: planned_files_exist, text: "Every file the smell plan names exists in the imported workspace, and the file, function and line span the code_quality_analysis item gives for the smell is one of them. A plan that refactors around that location, or that names a file the workspace only has under another path, has not planned for the item it was handed."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [draft_artifact_id]
+
+  - key: code_smell_refactoring.doing
+    title: Code smell refactoring — definition of doing
+    definition_of_ready: {checks: [workspace_imported]}
+    definition_of_done: {checks: [suite_green_after, item_gone_at_location]}
+    acceptance_criteria:
+      - {name: diff_only_planned_files, text: "The diff touches only the source files the plan named and changes no test file. The smell is in source the suite already passes against; a test adjusted to accommodate the extraction is a behaviour change the item did not ask for, and R233 makes that adjustment the failure, not a detail."}
+      - {name: suite_green_before, text: "The whole suite is green on the base revision, so the smell is being removed from code that worked. A refactor begun on a red baseline cannot afterwards show which red, if any, it caused."}
+      - {name: suite_green_after, text: "The whole suite is green after the refactor on the revision the diff produces, run whole: a smell is removed by changing code other tests already exercise, and a run narrowed to the smell's own module would miss the callers the decomposition reached."}
+      - {name: item_gone_at_location, text: "The smell the item names is gone at the file, function and line span it gave — the duplicated block exists once, the long function is decomposed, the parameter list is the clump the item described — and the measure that raised it (the duplicate detector, the complexity figure, the length) reads below its threshold at that same location on the new revision."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [pr_number, pr_url, head_sha]
+
+  - key: code_smell_refactoring.qa
+    title: Code smell refactoring — definition of QA
+    definition_of_ready: {checks: [item_gone_at_location]}
+    definition_of_done: {checks: [change_preserves_behaviour, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: change_preserves_behaviour, text: "Every test that covers the touched function passes unchanged, and that function returns the same result for the same input as at the base revision, so the smell was removed from the outside in rather than compensated for inside."}
+      - {name: change_removes_item, text: "Re-running the code_quality_analysis measure that raised the smell on the final revision reports it gone at that location, not merely below a threshold the diff moved, and not suppressed by a lint annotation, an exclusion or a detector configuration change."}
+      - {name: capability_acceptance_met, text: "Every acceptance statement the code_smell_refactoring card type declares is true of the final diff and of the fix report QA reviews."}
+      - {name: removes_the_item, text: "The diff removes the code smell the card's item names, at the location the item gave, rather than removing an instance of the same smell somewhere else in the file."}
+      - {name: preserves_behaviour, text: "The refactored function behaves as it did: same return value for the same input, same errors on the same inputs, and no caller edited to keep working."}
+      - {name: change_is_minimal, text: "The diff changes only what removing the smell needs — one smell, not the file it lives in: no reformatting, no rename and no second refactor the item did not name, so a reviewer can attribute every changed line to the smell."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [fix_report_artifact_id]
+
+  - key: code_smell_refactoring.done
+    title: Code smell refactoring — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [pr_merged]}
+    acceptance_criteria:
+      - {name: pr_merged, text: "The pull request carrying the smell refactor is squash-merged, and the merge sha is recorded on the card against the revision the smell was measured on, so the location the item named is the location the merge changed."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [merge_sha]
+
+  - key: code_smell_refactoring.system
+    title: Code smell refactoring — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: code_smell_refactoring.READY
+    list: ready
+    title: Code smell refactoring — ready
+    outputs: [draft_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: code_smell_refactoring
+        sop: code_smell_refactoring.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: code_smell_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: code_smell_refactoring.DOING
+    list: doing
+    title: Code smell refactoring — doing
+    outputs: [pr_number, pr_url, head_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: code_smell_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: code_smell_refactoring.QA
+    list: qa
+    title: Code smell refactoring — QA
+    outputs: [fix_report_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: code_smell_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: code_smell_refactoring.DONE
+    list: done
+    title: Code smell refactoring — done
+    outputs: [merge_sha]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: code_smell_refactoring, sop: code_smell_refactoring.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: code_smell_refactoring.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

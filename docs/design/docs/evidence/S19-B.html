@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S19 Part B — run, grade, capture (steps 8–12) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S19-B.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s19-part-b--run-grade-capture-steps-812">S19 Part B — run, grade, capture (steps 8–12)</h1>
+<p>Lane <code>s19-eval-build-b</code>, session 2 (2026-11-09). Session 1 built the driver, the tick, the reaper and the seven actions; <strong>none of it had ever executed</strong>, the workspace gate was red on seven missing parity samples, and <code>AGENT_TOOLS</code> still stood at 28. This session closed all three.</p>
+<h2 id="measured-at-close">Measured at close</h2>
+<table>
+<thead>
+<tr>
+<th>what</th>
+<th>value</th>
+<th>how</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>actions</td>
+<td><strong>243</strong> (237 at this lane's close)</td>
+<td><code>registry</code> 8/8 with <code>EXPECTED: [&amp;str; 243]</code> — S13's <code>workflow_runs.*</code> and S15's <code>knowledge.*</code>/<code>memory.*</code> landed after</td>
+</tr>
+<tr>
+<td>eval actions</td>
+<td><strong>26</strong></td>
+<td>the narrowed gate asserts the count and the split</td>
+</tr>
+<tr>
+<td><code>AGENT_TOOLS</code></td>
+<td><strong>34</strong> (28 + 6)</td>
+<td><code>spec.rs:62</code>, asserted by <code>registry</code></td>
+</tr>
+<tr>
+<td>served-spec lock</td>
+<td><strong>258 ops</strong>, <code>lock OK</code> <strong>at this lane's close</strong></td>
+<td><code>--print-openapi --check-lock</code>, <strong>real exit 0</strong></td>
+</tr>
+<tr>
+<td>lock NOW</td>
+<td><strong>RED, not this lane's</strong></td>
+<td><code>--check-lock</code> exit <strong>1</strong>: <em>added <code>knowledge.query</code>, <code>memory.recall</code>, <code>memory.remember</code>; changed <code>GET /api/actions</code></em></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ The lock is red because S15's three actions landed without a <code>--write-lock</code>, and <strong>S15 owns that write</strong> (S13 measured 240 actions / 261 ops at their release; expect 243 / 264). This lane adds no route, so it writes no lock — and it must not overwrite S13's regeneration with an older tree, which is why the number here is a measurement and not an edit.</p>
+<p><code>parity_http_mcp</code> is <strong>4/4 green</strong> as re-measured after S13 fixed their two harness bugs (a <code>deterministic</code> sample rebuilding its input from a one-row queue; the andon pair netting to ENGAGED because each prepare set the opposite of its sample). | formatting | clean | <code>cargo fmt -p {actions,server,api} -- --check</code> |</p>
+<h2 id="test-binaries--every-line-run-on-m1-through-rbuild">Test binaries — every line run on m1 through <code>rbuild</code></h2>
+<table>
+<thead>
+<tr>
+<th>binary</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conveyor-actions --test eval_runs</code></td>
+<td><strong>4 passed</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test eval_graders</code></td>
+<td><strong>2 passed</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test eval_served_model</code></td>
+<td><strong>2 passed</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-actions --test registry</code></td>
+<td><strong>8 passed</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-server --test eval_runner</code></td>
+<td><strong>3 passed</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-server --test eval_runner_properties</code></td>
+<td><strong>5 passed</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-server --test eval_jobs</code></td>
+<td><strong>3 passed</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-api --test eval_heldout</code></td>
+<td><strong>1 passed</strong></td>
+</tr>
+<tr>
+<td><code>conveyor-store --test schedule</code></td>
+<td>compiles; the harness fix below is why</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-four-reversal-proofs">The four reversal proofs</h2>
+<ol type="1">
+<li><strong>A failed attempt never writes the slot.</strong> <code>eval_runner::a_failed_attempt_leaves_the_slot_empty_and_the_retry_fills_it</code> — a 5xx leaves <code>eval_case_result</code> empty and one <code>eval_attempt_error</code> at attempt 1, <code>failure_class='serving'</code>; the retry fills the slot and <strong>the error row survives</strong>.</li>
+<li><strong>The refusal names every gate.</strong> <code>eval_runs::start_names_every_missing_gate_in_one_answer</code> — <code>409 eval_not_ready</code> naming <code>eval_inputs, eval_grading, metrics, split_missing</code> in one reply, and no run row written.</li>
+<li><strong>The machine is walled twice.</strong> <code>eval_heldout::an_agent_reads_the_instrument_but_never_the_held_out_half</code> — the agent's six tools answer 2xx; <code>eval_results.get</code> is refused by the <strong>allowlist</strong> (<code>action-forbidden</code>) before any row is read; a human <code>member</code> reaches the handler and is refused by <strong>scope</strong> (<code>held_out_split</code>, naming <code>evals:approve</code>) on <code>test</code> and allowed on <code>train</code>; the owner reads the <code>test</code> transcript and still never sees <code>expected</code>.</li>
+<li><strong>A second start is a resume.</strong> <code>eval_runs::start_enqueues_one_job_per_case_and_rep_and_a_second_start_resumes</code> — the same run id, <code>queued_jobs = 0</code>, and the job count stays at <code>cases × reps</code>.</li>
+</ol>
+<h2 id="defect-found-by-executing-and-fixed">Defect found by executing (and fixed)</h2>
+<p><code>apps/server/src/eval_worker.rs::tick</code> set <code>complete</code>/<code>partial</code> directly from <code>queued</code>. The domain's table admits only <code>queued → running</code>, so the tick raised <code>an eval run cannot transition from queued to complete</code> and the run could <strong>never</strong> finalise — reachable whenever every case lands before the first tick sees the run. The tick now makes the <code>queued → running</code> step first. Proved by <code>eval_jobs::the_tick_heartbeats_while_work_outstanding_and_finalises_when_it_is_not</code>, which failed with that exact message before the fix.</p>
+<p>A smaller one, also fixed: the driver's <code>judge_is_subject</code> refusal reached the evidence row as prose only. It now carries the machine code, because that is what an operator greps.</p>
+<h2 id="parity--the-lanes-debt">Parity — the lane's debt</h2>
+<p><code>expect_status: Option&lt;u16&gt;</code> and <code>assert_outcome</code> were added to <code>parity_http_mcp</code>: the harness compares <strong>bodies</strong> and never statuses, so two identical refusals satisfied it. The seven eval samples carry an expected status (six 200/201, <code>eval_results.label</code> <strong>201</strong> — my first guess of 200 was wrong and the new assertion caught it).</p>
+<p>Measured state at close: the run <strong>reaches <code>workflows.get</code></strong> and fails there (<code>was not prepared before its input was built</code>) — S13's half-landed block, not this lane's. Every <code>eval_*</code> sample declared before it passed, status assertions included. Parity is therefore <strong>red, attributably, on another lane's in-flight work</strong>.</p>
+<h2 id="not-done-here-observations-not-debts-of-this-lane">Not done here (observations, not debts of this lane)</h2>
+<ul>
+<li><code>served_model_matches</code> strips a <strong>build suffix</strong> (<code>-</code>, <code>@</code>) and nothing else. A router that answers <code>vendor/model</code> for a configured <code>model</code> fails the attempt. That is the documented contract and trap 7's literal reading; recorded in <code>eval_served_model.rs</code> so it is not "fixed" by accident.</li>
+<li><code>parity_http_mcp</code> still asserts no status for the other 201 samples — same class of false green, pre-existing, not widened.</li>
+<li>Part C (steps 13–17: <code>eval_runs.report</code>, <code>eval_audits.*</code>, export/import, screens 15–20) is unclaimed.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S19-B.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

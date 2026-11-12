@@ -1,0 +1,166 @@
+# requirement_development — the brief's requirements as RM records (v4 R343, design phase,
+# `rm_asset`).
+#
+# Content sources: seed/catalogue.json (card_type requirement_development: outputs and the
+# READY/DOING/QA/DONE acceptance names) and
+# n8n-designs/design/choices/v4/capabilities/architecture.yaml (text "creation, review, and
+# updating", phase design, upstream principle_development, asset_kind requirement — RM
+# requirements {title, description, effort} with effort required, and the inspect.criteria the QA
+# stage judges by). A requirement has to rest on the principles the estate already holds, so READY
+# waits for that upstream card; the agent proposes and the flow writes RM (R207).
+card_type: requirement_development
+capability: architecture
+outputs:
+  - changes_artifact_id
+  - reviewed_changes_artifact_id
+  - published_artifact_id
+  - written_ids
+
+agent:
+  key: requirement_development
+  role: process_agent
+  prompt: agent
+  model: claude-sonnet-5-5
+  max_iterations: 12
+  timeout_secs: 120
+
+sops:
+  # One SOP per stage for the agent steps, plus one mechanical SOP for every computed move.
+  - key: requirement_development.ready
+    title: Requirement development — definition of ready
+    definition_of_ready: {checks: [brief_present, upstream_principle_development_done]}
+    definition_of_done: {checks: [changes_artifact_id]}
+    acceptance_criteria:
+      - {name: every_ask_cites_the_brief, text: "Every ask the draft changes answers names the brief passage or principle it came from, and that source asks for a requirement."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [changes_artifact_id]
+
+  - key: requirement_development.doing
+    title: Requirement development — definition of doing
+    definition_of_ready: {checks: [changes_artifact_id]}
+    definition_of_done: {checks: [every_change_cites_a_source, every_ask_has_a_change, every_requirement_has_effort]}
+    acceptance_criteria:
+      - {name: every_change_cites_a_source, text: "Every proposed requirement change names the brief passage or upstream principle it comes from, and that source asks for the requirement it writes."}
+      - {name: every_ask_has_a_change, text: "Every ask the brief makes about a requirement has one change answering it, and no change answers an ask the brief does not make."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [changes_artifact_id, reviewed_changes_artifact_id]
+
+  - key: requirement_development.qa
+    title: Requirement development — definition of QA
+    definition_of_ready: {checks: [reviewed_changes_artifact_id]}
+    definition_of_done: {checks: [every_revise_addressed, changes_cite_sources, requirement_is_checkable, no_duplicate_records, capability_acceptance_met]}
+    acceptance_criteria:
+      - {name: every_revise_addressed, text: "Every revise left on the reviewed requirements is applied in the artifact, or the thread records why the requirement stands as written."}
+      - {name: changes_cite_sources, text: "Every change names the brief passage or upstream artifact it comes from, and that source asks for it."}
+      - {name: requirement_is_checkable, text: "Every requirement's description can be checked as met or not met."}
+      - {name: no_duplicate_records, text: "No change creates a record that repeats an existing one; it updates that record instead."}
+      - {name: capability_acceptance_met, text: "The reviewed requirements meet every acceptance statement the requirement_development card type declares."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [reviewed_changes_artifact_id, published_artifact_id]
+
+  - key: requirement_development.done
+    title: Requirement development — definition of done
+    definition_of_ready: {checks: [capability_acceptance_met]}
+    definition_of_done: {checks: [artifact_is_qa_version, requirements_written_to_rm]}
+    acceptance_criteria:
+      - {name: artifact_is_qa_version, text: "The requirements the flow writes to RM are the version QA approved; no title, description or effort changed after review."}
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: [published_artifact_id, written_ids]
+
+  - key: requirement_development.system
+    title: Requirement development — a computed move has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+
+processes:
+  - key: requirement_development.READY
+    list: ready
+    title: Requirement development — ready
+    outputs: [changes_artifact_id]
+    steps:
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: requirement_development
+        sop: requirement_development.ready
+        on_result: fail
+        max_attempts: 1
+        input_template: {stage: ready, phase: readying}
+      - position: 2
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: requirement_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.active}}"
+          _version: "{{card.version}}"
+
+  - key: requirement_development.DOING
+    list: doing
+    title: Requirement development — doing
+    outputs: [changes_artifact_id, reviewed_changes_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.doing, on_result: fail, max_attempts: 1, input_template: {stage: doing, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: requirement_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.waiting}}"
+          _version: "{{card.version}}"
+
+  - key: requirement_development.QA
+    list: qa
+    title: Requirement development — QA
+    outputs: [reviewed_changes_artifact_id, published_artifact_id]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.qa, on_result: fail, max_attempts: 1, input_template: {stage: qa, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: requirement_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.done}}"
+          _version: "{{card.version}}"
+
+  - key: requirement_development.DONE
+    list: done
+    title: Requirement development — done
+    outputs: [published_artifact_id, written_ids]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: readying}}
+      - {position: 2, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: doing}}
+      - {position: 3, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: inspecting}}
+      - {position: 4, kind: agent, actor: process_agent, action: agent.run, process_agent: requirement_development, sop: requirement_development.done, on_result: fail, max_attempts: 1, input_template: {stage: done, phase: releasing}}
+      - position: 5
+        kind: computed
+        actor: system
+        action: cards.move
+        sop: requirement_development.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          id: "{{card.id}}"
+          list_id: "{{board.lists.archive}}"
+          _version: "{{card.version}}"

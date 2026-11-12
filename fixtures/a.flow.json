@@ -1,0 +1,45 @@
+{
+  "key": "s13.fixture.a",
+  "title": "S13 fixture A: cap.analysis.consult, re-authored",
+  "definition": {
+    "schema": 1,
+    "nodes": [
+      {
+        "id": "project",
+        "kind": "action",
+        "action": "projects.get",
+        "input_template": {"id": "{{run.project_id}}"}
+      },
+      {
+        "id": "brief",
+        "kind": "action",
+        "action": "requirements.get",
+        "input_template": {"id": "{{run.inputs.requirement_id}}"}
+      },
+      {
+        "id": "project_type_card_types",
+        "kind": "action",
+        "action": "catalogues.list",
+        "input_template": {"kind": "project_type"}
+      },
+      {
+        "id": "agent_consult",
+        "kind": "action",
+        "action": "agent.run",
+        "input_template": {
+          "model": "test-model",
+          "messages": [
+            {"role": "system", "content": "you are the recorded consult agent"},
+            {"role": "user", "content": "summarise the project"}
+          ],
+          "max_turns": 4
+        }
+      }
+    ],
+    "edges": [
+      {"from": "project", "to": "brief"},
+      {"from": "brief", "to": "project_type_card_types"},
+      {"from": "project_type_card_types", "to": "agent_consult"}
+    ]
+  }
+}

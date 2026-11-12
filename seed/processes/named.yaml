@@ -1,0 +1,1771 @@
+# named.yaml — the catalogue's NAMED processes (schema + rules: seed/processes/README.md).
+#
+# The 53 processes that are not a card type's four list stages: the 51 `cap.<family>.<fn>` capability
+# processes measured in `parity/n8n-dispositions.tsv` (`procedure:` rows), `ask_fr`, and `kata.open`
+# (SPEC D20, S13). A named process has no card type and no list stage (`list` is absent — `ProcessSpec`
+# reads a missing `list` as null), so nothing here moves a card: each process runs one agent step
+# against one SOP and returns its answer to the caller, which writes.
+#
+# ⛔ One agent and one SOP per process, and the agent key EQUALS the process key (the convention the 280
+# type files follow). Each agent carries its own `capability:` because the process's capability override
+# does not reach the agent row — the agent hangs off the capability its process runs under.
+#
+# Capability per process = its family code. The two processes v4 does not spell as `cap.<family>.<fn>`
+# take the capability their v4 flow names:
+#   - `ask_fr`    → `kanban_coach`.  R311 (George 2026-10-19, G4): the coach decides to engage the user
+#                   "(ask_fr)"; `ask_fr` is reached only through the coach's ask path (§4.6, R303, U0),
+#                   and it asks one question on the card the coach is working.
+#   - `kata.open` → `kata`.  SPEC D20 (amended 2026-11-09) names `kata` one of the three system
+#                   capabilities (`project_management`, `kanban_coach`, `kata`); `kata.open` is that
+#                   capability's own flow — the coach escalates to it (R344 (3)) but does not own it.
+#
+# Content sources: n8n-designs `design/choices/v4/capability-flows.md` (§2 flow kinds, §4 `plan`, §5
+# `create`, §8.1 `inspect`, §8.2 `unblock`, §12 `consult`), each family's `capabilities/<family>.yaml`
+# (`capability_flows.purpose` + `inspect.criteria` — the criteria `inspect` judges by),
+# `kanban-coach-errors.md` (R311) and the re-authored named procedures in `fixtures/named/` (`ask_fr`,
+# `cap.kanban_coach.handle_error`, and `katas.open` — the fixture's own key for `kata.open`). The live
+# n8n flow remains the truth for prompts, tools and slot outputs (R352); these SOPs are the contract a
+# step is judged against, not a copy of a prompt.
+#
+# ⚠ Catalogue notes (re-measured 2026-11-10 — two of these used to be recorded as open defects
+# and are now closed, so they are stated as facts, not as warnings):
+#   - the family GROUPING in this file is `bddtdd` (the key prefix and the section heading),
+#     while every agent and process names the capability CODE `bdd_tdd` — the code
+#     `seed/capability.json` actually carries. `capability_id()` resolves the code it is given,
+#     so the two spellings never meet; `bddtdd` is a name, not a code.
+#   - `kata` IS a row in `seed/capability.json` (18 codes today, `kata` among them), so
+#     `kata.open` resolves its capability once `migrate --seed` has run for the tenant.
+#   - `cap.project_management.update_type_card_types` exists in the measured n8n flow set, while R351 (3)
+#     records "no update_type_card_types flow"; its SOP keeps the cell change behind the consult and the
+#     phase-plan sign-off, which is the behaviour R351 (3) describes.
+#
+file: named.yaml
+capability: analysis
+
+agents:
+  # ── analysis ────────────────────────────────────────────────────────────────────────
+  - {key: cap.analysis.consult, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.analysis.create, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.analysis.inspect, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.analysis.plan, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.analysis.unblock, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── architecture ────────────────────────────────────────────────────────────────────
+  - {key: cap.architecture.consult, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.architecture.create, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.architecture.inspect, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.architecture.plan, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.architecture.unblock, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── bddtdd ──────────────────────────────────────────────────────────────────────────
+  - {key: cap.bddtdd.consult, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.bddtdd.create, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.bddtdd.inspect, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.bddtdd.plan, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.bddtdd.unblock, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── change_management ───────────────────────────────────────────────────────────────
+  - {key: cap.change_management.consult, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.change_management.create, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.change_management.inspect, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.change_management.plan, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.change_management.unblock, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── design ──────────────────────────────────────────────────────────────────────────
+  - {key: cap.design.consult, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.design.create, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.design.inspect, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.design.plan, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.design.unblock, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── development ─────────────────────────────────────────────────────────────────────
+  - {key: cap.development.consult, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.development.create, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.development.inspect, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.development.plan, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.development.unblock, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── refactoring ─────────────────────────────────────────────────────────────────────
+  - {key: cap.refactoring.consult, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.refactoring.create, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.refactoring.inspect, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.refactoring.plan, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.refactoring.unblock, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── research ────────────────────────────────────────────────────────────────────────
+  - {key: cap.research.consult, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.research.create, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.research.inspect, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.research.plan, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.research.unblock, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── testing ─────────────────────────────────────────────────────────────────────────
+  - {key: cap.testing.consult, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.testing.create, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.testing.inspect, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.testing.plan, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.testing.unblock, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── project_management ──────────────────────────────────────────────────────────────
+  - {key: cap.project_management.create_type, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.project_management.select_type, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.project_management.unblock, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.project_management.update_type_card_types, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.project_management.update_type_phases, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── kanban_coach ────────────────────────────────────────────────────────────────────
+  - {key: cap.kanban_coach.handle_error, capability: kanban_coach, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: ask_fr, capability: kanban_coach, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  # ── kata ────────────────────────────────────────────────────────────────────────────
+  - {key: kata.open, capability: kata, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+
+sops:
+  # ── analysis ────────────────────────────────────────────────────────────────────────
+  - key: cap.analysis.consult.sop
+    title: Analysis consult — the advisory's contract
+    definition_of_ready: {checks: [phase_and_capability_loaded]}
+    definition_of_done: {checks: [answer_is_grounded_in_the_sources, card_types_are_own_and_placed]}
+    acceptance_criteria:
+      - name: answer_is_grounded_in_the_sources
+        text: >-
+          Every proposed card type names the brief passage, the phase goal or the prior-phase
+          report it serves, and that source asks for it; a need the sources do not show goes into
+          questions for PM, never into cards. Analysis proposes reading work only: a proposal to
+          change code is refused, because its cards report what is true and the change that
+          follows is planned by another capability from that report (R150).
+      - name: card_types_are_own_and_placed
+        text: >-
+          Every name is a card type of this capability that the project type places in this phase,
+          or allows for it where the phase is read as a name or an id; a type placed only in
+          another phase states why this phase needs it, and a phase with none of this capability's
+          types answers involvement none with a declined sentence, never an invented type.
+      - name: involvement_and_the_card_set_agree
+        text: >-
+          involvement none holds exactly when the answer carries no card types plus a declined
+          reason; light is one or two cards; standard and heavy are sized by rigor and complexity
+          under the plan maximum; every count, purpose, when and needs/feeds names only consulted
+          capabilities, never this one, and the answer writes nothing.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.analysis.create.sop
+    title: Analysis create — the card-spec contract
+    definition_of_ready: {checks: [signed_off_plan_entry_present]}
+    definition_of_done: {checks: [spec_is_the_signed_off_card, inputs_and_sources_are_the_plan]}
+    acceptance_criteria:
+      - name: spec_is_the_signed_off_card
+        text: >-
+          The draft is one card spec for the plan entry at this position — card_type, title,
+          description, goal, inputs and source ids — and its recomputed spec_hash equals the one
+          the sign-off approved; a hash that does not match is refused, because creation is
+          idempotent on that hash and a drifted spec would be born as a different card.
+      - name: title_and_description_carry_the_work
+        text: >-
+          The title is at most 80 characters and names the project and the card's purpose; the
+          description states the goal and a scope READY can act on in two to four sentences, in
+          English (R209).
+      - name: inputs_and_sources_are_the_plan
+        text: >-
+          The inputs keys are exactly the card type's declared inputs and none is empty; the
+          source ids are the plan's; an input the plan leaves empty is refused rather than filled
+          from the model's own knowledge.
+      - name: card_stays_inside_the_capability
+        text: >-
+          The card's deliverable is a findings report or a document, never a code change; the fix
+          a finding implies is another capability's card in a later phase (R150).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.analysis.inspect.sop
+    title: Analysis inspect — the judging contract
+    definition_of_ready: {checks: [deliverable_and_card_type_present]}
+    definition_of_done: {checks: [one_check_per_criterion, checks_judge_the_deliverable]}
+    acceptance_criteria:
+      - name: one_check_per_criterion
+        text: >-
+          Exactly one check per criterion of this capability's criteria for the card's type,
+          carrying that criterion's own name; a card type with no criteria answers no_criteria at
+          once and no judgement runs.
+      - name: checks_judge_the_deliverable
+        text: >-
+          Every check judges what the card produced — the report, the document, the diff or the
+          evaluation, with the artifact ids it read — and cites the card, comment or artifact its
+          verdict rests on; a claim the deliverable does not show fails its check.
+      - name: inspection_is_read_only
+        text: >-
+          The inspection proposes no fix, moves no card and writes nothing: the caller folds
+          capability_acceptance_met into its own inspecting slot and applies whatever the outcome
+          means (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.analysis.plan.sop
+    title: Analysis plan — the plan's contract
+    definition_of_ready: {checks: [capability_card_types_loaded]}
+    definition_of_done: {checks: [card_type_of_capability_in_phase, required_inputs_and_sources_come_from_the_inputs]}
+    acceptance_criteria:
+      - name: card_type_of_capability_in_phase
+        text: >-
+          Every card is a card type of this capability that the project type allows in this phase,
+          and the set is sized to the consult — none for involvement none, at most two for light —
+          under the plan maximum; items it does not plan appear in not_planned with a reason, and
+          open points go into questions for PM, because a capability never talks to the user.
+      - name: required_inputs_and_sources_come_from_the_inputs
+        text: >-
+          Every key in the card type's declared inputs is present and non-empty, and every source
+          id is one of the input source ids; an id the flow did not supply is never invented.
+      - name: no_duplicate_source_item_and_count_within_max
+        text: >-
+          No card type and source-item pair repeats when the item id is not null, and the card
+          count stays within the flow's max_cards.
+      - name: same_capability_upstream_planned_or_done
+        text: >-
+          Every upstream card type of a planned card that belongs to this same capability is
+          either in this answer or already DONE on the board; another capability's upstream types
+          are left to PM's own gate.
+      - name: at_least_one_actionable_card
+        text: >-
+          The plan returns at least one card whose title and description give READY a scope it can
+          act on; a phase with nothing to examine returns no card and says why in not_planned
+          (R219 proof).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.analysis.unblock.sop
+    title: Analysis unblock — the proposal's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [proposal_states_the_remedy, card_specs_stay_in_this_capability]}
+    acceptance_criteria:
+      - name: proposal_states_the_remedy
+        text: >-
+          The proposal is two to six sentences: why the card is blocked, taken from the block
+          comment and the card's own state, and the remedy a human or the coach can apply; its
+          reason is the R139 reason of the block's first line.
+      - name: card_specs_stay_in_this_capability
+        text: >-
+          Every card spec the proposal adds is a card type of this capability (a split follows
+          R44) and an empty list is normal; a spec naming another capability's card type is
+          refused.
+      - name: nothing_makes_the_block_worse
+        text: >-
+          The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
+          posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
+          make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── architecture ────────────────────────────────────────────────────────────────────
+  - key: cap.architecture.consult.sop
+    title: Architecture consult — the advisory's contract
+    definition_of_ready: {checks: [phase_and_capability_loaded]}
+    definition_of_done: {checks: [answer_is_grounded_in_the_sources, card_types_are_own_and_placed]}
+    acceptance_criteria:
+      - name: answer_is_grounded_in_the_sources
+        text: >-
+          Every proposed card type names the brief passage, the phase goal or the prior-phase
+          report it serves, and that source asks for it; a need the sources do not show goes into
+          questions for PM, never into cards. Architecture proposes structure and decision work
+          only: its cards produce documents, or RM records after a sign-off, so a proposal that
+          changes code is refused.
+      - name: card_types_are_own_and_placed
+        text: >-
+          Every name is a card type of this capability that the project type places in this phase,
+          or allows for it where the phase is read as a name or an id; a type placed only in
+          another phase states why this phase needs it, and a phase with none of this capability's
+          types answers involvement none with a declined sentence, never an invented type.
+      - name: involvement_and_the_card_set_agree
+        text: >-
+          involvement none holds exactly when the answer carries no card types plus a declined
+          reason; light is one or two cards; standard and heavy are sized by rigor and complexity
+          under the plan maximum; every count, purpose, when and needs/feeds names only consulted
+          capabilities, never this one, and the answer writes nothing.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.architecture.create.sop
+    title: Architecture create — the card-spec contract
+    definition_of_ready: {checks: [signed_off_plan_entry_present]}
+    definition_of_done: {checks: [spec_is_the_signed_off_card, inputs_and_sources_are_the_plan]}
+    acceptance_criteria:
+      - name: spec_is_the_signed_off_card
+        text: >-
+          The draft is one card spec for the plan entry at this position — card_type, title,
+          description, goal, inputs and source ids — and its recomputed spec_hash equals the one
+          the sign-off approved; a hash that does not match is refused, because creation is
+          idempotent on that hash and a drifted spec would be born as a different card.
+      - name: title_and_description_carry_the_work
+        text: >-
+          The title is at most 80 characters and names the project and the card's purpose; the
+          description states the goal and a scope READY can act on in two to four sentences, in
+          English (R209).
+      - name: inputs_and_sources_are_the_plan
+        text: >-
+          The inputs keys are exactly the card type's declared inputs and none is empty; the
+          source ids are the plan's; an input the plan leaves empty is refused rather than filled
+          from the model's own knowledge.
+      - name: card_stays_inside_the_capability
+        text: >-
+          The card's deliverable is a document, or an RM record written only after the sign-off —
+          the agent proposes, the flow writes (R207) — and no code changes.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.architecture.inspect.sop
+    title: Architecture inspect — the judging contract
+    definition_of_ready: {checks: [deliverable_and_card_type_present]}
+    definition_of_done: {checks: [one_check_per_criterion, checks_judge_the_deliverable]}
+    acceptance_criteria:
+      - name: one_check_per_criterion
+        text: >-
+          Exactly one check per criterion of this capability's criteria for the card's type,
+          carrying that criterion's own name; a card type with no criteria answers no_criteria at
+          once and no judgement runs.
+      - name: checks_judge_the_deliverable
+        text: >-
+          Every check judges what the card produced — the report, the document, the diff or the
+          evaluation, with the artifact ids it read — and cites the card, comment or artifact its
+          verdict rests on; a claim the deliverable does not show fails its check.
+      - name: inspection_is_read_only
+        text: >-
+          The inspection proposes no fix, moves no card and writes nothing: the caller folds
+          capability_acceptance_met into its own inspecting slot and applies whatever the outcome
+          means (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.architecture.plan.sop
+    title: Architecture plan — the plan's contract
+    definition_of_ready: {checks: [capability_card_types_loaded]}
+    definition_of_done: {checks: [card_type_of_capability_in_phase, required_inputs_and_sources_come_from_the_inputs]}
+    acceptance_criteria:
+      - name: card_type_of_capability_in_phase
+        text: >-
+          Every card is a card type of this capability that the project type allows in this phase,
+          and the set is sized to the consult — none for involvement none, at most two for light —
+          under the plan maximum; items it does not plan appear in not_planned with a reason, and
+          open points go into questions for PM, because a capability never talks to the user.
+      - name: required_inputs_and_sources_come_from_the_inputs
+        text: >-
+          Every key in the card type's declared inputs is present and non-empty, and every source
+          id is one of the input source ids; an id the flow did not supply is never invented.
+      - name: no_duplicate_source_item_and_count_within_max
+        text: >-
+          No card type and source-item pair repeats when the item id is not null, and the card
+          count stays within the flow's max_cards.
+      - name: same_capability_upstream_planned_or_done
+        text: >-
+          Every upstream card type of a planned card that belongs to this same capability is
+          either in this answer or already DONE on the board; another capability's upstream types
+          are left to PM's own gate.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.architecture.unblock.sop
+    title: Architecture unblock — the proposal's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [proposal_states_the_remedy, card_specs_stay_in_this_capability]}
+    acceptance_criteria:
+      - name: proposal_states_the_remedy
+        text: >-
+          The proposal is two to six sentences: why the card is blocked, taken from the block
+          comment and the card's own state, and the remedy a human or the coach can apply; its
+          reason is the R139 reason of the block's first line.
+      - name: card_specs_stay_in_this_capability
+        text: >-
+          Every card spec the proposal adds is a card type of this capability (a split follows
+          R44) and an empty list is normal; a spec naming another capability's card type is
+          refused.
+      - name: nothing_makes_the_block_worse
+        text: >-
+          The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
+          posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
+          make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── bddtdd ──────────────────────────────────────────────────────────────────────────
+  - key: cap.bddtdd.consult.sop
+    title: BDD/TDD consult — the advisory's contract
+    definition_of_ready: {checks: [phase_and_capability_loaded]}
+    definition_of_done: {checks: [answer_is_grounded_in_the_sources, card_types_are_own_and_placed]}
+    acceptance_criteria:
+      - name: answer_is_grounded_in_the_sources
+        text: >-
+          Every proposed card type names the brief passage, the phase goal or the prior-phase
+          report it serves, and that source asks for it; a need the sources do not show goes into
+          questions for PM, never into cards. BDD/TDD proposes test work only: its cards change
+          test files, so a proposal that changes production code is refused.
+      - name: card_types_are_own_and_placed
+        text: >-
+          Every name is a card type of this capability that the project type places in this phase,
+          or allows for it where the phase is read as a name or an id; a type placed only in
+          another phase states why this phase needs it, and a phase with none of this capability's
+          types answers involvement none with a declined sentence, never an invented type.
+      - name: involvement_and_the_card_set_agree
+        text: >-
+          involvement none holds exactly when the answer carries no card types plus a declined
+          reason; light is one or two cards; standard and heavy are sized by rigor and complexity
+          under the plan maximum; every count, purpose, when and needs/feeds names only consulted
+          capabilities, never this one, and the answer writes nothing.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.bddtdd.create.sop
+    title: BDD/TDD create — the card-spec contract
+    definition_of_ready: {checks: [signed_off_plan_entry_present]}
+    definition_of_done: {checks: [spec_is_the_signed_off_card, inputs_and_sources_are_the_plan]}
+    acceptance_criteria:
+      - name: spec_is_the_signed_off_card
+        text: >-
+          The draft is one card spec for the plan entry at this position — card_type, title,
+          description, goal, inputs and source ids — and its recomputed spec_hash equals the one
+          the sign-off approved; a hash that does not match is refused, because creation is
+          idempotent on that hash and a drifted spec would be born as a different card.
+      - name: title_and_description_carry_the_work
+        text: >-
+          The title is at most 80 characters and names the project and the card's purpose; the
+          description states the goal and a scope READY can act on in two to four sentences, in
+          English (R209).
+      - name: inputs_and_sources_are_the_plan
+        text: >-
+          The inputs keys are exactly the card type's declared inputs and none is empty; the
+          source ids are the plan's; an input the plan leaves empty is refused rather than filled
+          from the model's own knowledge.
+      - name: card_stays_inside_the_capability
+        text: >-
+          The card changes test files only; a tdd test is written first and marked expected to
+          fail, and the feature card that follows removes the markers (P-W3-2).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.bddtdd.inspect.sop
+    title: BDD/TDD inspect — the judging contract
+    definition_of_ready: {checks: [deliverable_and_card_type_present]}
+    definition_of_done: {checks: [one_check_per_criterion, checks_judge_the_deliverable]}
+    acceptance_criteria:
+      - name: one_check_per_criterion
+        text: >-
+          Exactly one check per criterion of this capability's criteria for the card's type,
+          carrying that criterion's own name; a card type with no criteria answers no_criteria at
+          once and no judgement runs.
+      - name: checks_judge_the_deliverable
+        text: >-
+          Every check judges what the card produced — the report, the document, the diff or the
+          evaluation, with the artifact ids it read — and cites the card, comment or artifact its
+          verdict rests on; a claim the deliverable does not show fails its check.
+      - name: inspection_is_read_only
+        text: >-
+          The inspection proposes no fix, moves no card and writes nothing: the caller folds
+          capability_acceptance_met into its own inspecting slot and applies whatever the outcome
+          means (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.bddtdd.plan.sop
+    title: BDD/TDD plan — the plan's contract
+    definition_of_ready: {checks: [capability_card_types_loaded]}
+    definition_of_done: {checks: [card_type_of_capability_in_phase, required_inputs_and_sources_come_from_the_inputs]}
+    acceptance_criteria:
+      - name: card_type_of_capability_in_phase
+        text: >-
+          Every card is a card type of this capability that the project type allows in this phase,
+          and the set is sized to the consult — none for involvement none, at most two for light —
+          under the plan maximum; items it does not plan appear in not_planned with a reason, and
+          open points go into questions for PM, because a capability never talks to the user.
+      - name: required_inputs_and_sources_come_from_the_inputs
+        text: >-
+          Every key in the card type's declared inputs is present and non-empty, and every source
+          id is one of the input source ids; an id the flow did not supply is never invented.
+      - name: no_duplicate_source_item_and_count_within_max
+        text: >-
+          No card type and source-item pair repeats when the item id is not null, and the card
+          count stays within the flow's max_cards.
+      - name: same_capability_upstream_planned_or_done
+        text: >-
+          Every upstream card type of a planned card that belongs to this same capability is
+          either in this answer or already DONE on the board; another capability's upstream types
+          are left to PM's own gate.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.bddtdd.unblock.sop
+    title: BDD/TDD unblock — the proposal's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [proposal_states_the_remedy, card_specs_stay_in_this_capability]}
+    acceptance_criteria:
+      - name: proposal_states_the_remedy
+        text: >-
+          The proposal is two to six sentences: why the card is blocked, taken from the block
+          comment and the card's own state, and the remedy a human or the coach can apply; its
+          reason is the R139 reason of the block's first line.
+      - name: card_specs_stay_in_this_capability
+        text: >-
+          Every card spec the proposal adds is a card type of this capability (a split follows
+          R44) and an empty list is normal; a spec naming another capability's card type is
+          refused.
+      - name: nothing_makes_the_block_worse
+        text: >-
+          The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
+          posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
+          make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── change_management ───────────────────────────────────────────────────────────────
+  - key: cap.change_management.consult.sop
+    title: Change management consult — the advisory's contract
+    definition_of_ready: {checks: [phase_and_capability_loaded]}
+    definition_of_done: {checks: [answer_is_grounded_in_the_sources, card_types_are_own_and_placed]}
+    acceptance_criteria:
+      - name: answer_is_grounded_in_the_sources
+        text: >-
+          Every proposed card type names the brief passage, the phase goal or the prior-phase
+          report it serves, and that source asks for it; a need the sources do not show goes into
+          questions for PM, never into cards. Change management proposes project-level work only —
+          program-level types are out of the initial v4 scope — and its messages to stakeholders
+          are drafted for the user to send, never sent.
+      - name: card_types_are_own_and_placed
+        text: >-
+          Every name is a card type of this capability that the project type places in this phase,
+          or allows for it where the phase is read as a name or an id; a type placed only in
+          another phase states why this phase needs it, and a phase with none of this capability's
+          types answers involvement none with a declined sentence, never an invented type.
+      - name: involvement_and_the_card_set_agree
+        text: >-
+          involvement none holds exactly when the answer carries no card types plus a declined
+          reason; light is one or two cards; standard and heavy are sized by rigor and complexity
+          under the plan maximum; every count, purpose, when and needs/feeds names only consulted
+          capabilities, never this one, and the answer writes nothing.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.change_management.create.sop
+    title: Change management create — the card-spec contract
+    definition_of_ready: {checks: [signed_off_plan_entry_present]}
+    definition_of_done: {checks: [spec_is_the_signed_off_card, inputs_and_sources_are_the_plan]}
+    acceptance_criteria:
+      - name: spec_is_the_signed_off_card
+        text: >-
+          The draft is one card spec for the plan entry at this position — card_type, title,
+          description, goal, inputs and source ids — and its recomputed spec_hash equals the one
+          the sign-off approved; a hash that does not match is refused, because creation is
+          idempotent on that hash and a drifted spec would be born as a different card.
+      - name: title_and_description_carry_the_work
+        text: >-
+          The title is at most 80 characters and names the project and the card's purpose; the
+          description states the goal and a scope READY can act on in two to four sentences, in
+          English (R209).
+      - name: inputs_and_sources_are_the_plan
+        text: >-
+          The inputs keys are exactly the card type's declared inputs and none is empty; the
+          source ids are the plan's; an input the plan leaves empty is refused rather than filled
+          from the model's own knowledge.
+      - name: card_stays_inside_the_capability
+        text: >-
+          The card's deliverable is a document, or an RM record written only after the sign-off;
+          stakeholder messages are drafted, because the conveyor has no send tool.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.change_management.inspect.sop
+    title: Change management inspect — the judging contract
+    definition_of_ready: {checks: [deliverable_and_card_type_present]}
+    definition_of_done: {checks: [one_check_per_criterion, checks_judge_the_deliverable]}
+    acceptance_criteria:
+      - name: one_check_per_criterion
+        text: >-
+          Exactly one check per criterion of this capability's criteria for the card's type,
+          carrying that criterion's own name; a card type with no criteria answers no_criteria at
+          once and no judgement runs.
+      - name: checks_judge_the_deliverable
+        text: >-
+          Every check judges what the card produced — the report, the document, the diff or the
+          evaluation, with the artifact ids it read — and cites the card, comment or artifact its
+          verdict rests on; a claim the deliverable does not show fails its check.
+      - name: inspection_is_read_only
+        text: >-
+          The inspection proposes no fix, moves no card and writes nothing: the caller folds
+          capability_acceptance_met into its own inspecting slot and applies whatever the outcome
+          means (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.change_management.plan.sop
+    title: Change management plan — the plan's contract
+    definition_of_ready: {checks: [capability_card_types_loaded]}
+    definition_of_done: {checks: [card_type_of_capability_in_phase, required_inputs_and_sources_come_from_the_inputs]}
+    acceptance_criteria:
+      - name: card_type_of_capability_in_phase
+        text: >-
+          Every card is a card type of this capability that the project type allows in this phase,
+          and the set is sized to the consult — none for involvement none, at most two for light —
+          under the plan maximum; items it does not plan appear in not_planned with a reason, and
+          open points go into questions for PM, because a capability never talks to the user.
+      - name: required_inputs_and_sources_come_from_the_inputs
+        text: >-
+          Every key in the card type's declared inputs is present and non-empty, and every source
+          id is one of the input source ids; an id the flow did not supply is never invented.
+      - name: no_duplicate_source_item_and_count_within_max
+        text: >-
+          No card type and source-item pair repeats when the item id is not null, and the card
+          count stays within the flow's max_cards.
+      - name: same_capability_upstream_planned_or_done
+        text: >-
+          Every upstream card type of a planned card that belongs to this same capability is
+          either in this answer or already DONE on the board; another capability's upstream types
+          are left to PM's own gate.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.change_management.unblock.sop
+    title: Change management unblock — the proposal's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [proposal_states_the_remedy, card_specs_stay_in_this_capability]}
+    acceptance_criteria:
+      - name: proposal_states_the_remedy
+        text: >-
+          The proposal is two to six sentences: why the card is blocked, taken from the block
+          comment and the card's own state, and the remedy a human or the coach can apply; its
+          reason is the R139 reason of the block's first line.
+      - name: card_specs_stay_in_this_capability
+        text: >-
+          Every card spec the proposal adds is a card type of this capability (a split follows
+          R44) and an empty list is normal; a spec naming another capability's card type is
+          refused.
+      - name: nothing_makes_the_block_worse
+        text: >-
+          The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
+          posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
+          make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── design ──────────────────────────────────────────────────────────────────────────
+  - key: cap.design.consult.sop
+    title: Design consult — the advisory's contract
+    definition_of_ready: {checks: [phase_and_capability_loaded]}
+    definition_of_done: {checks: [answer_is_grounded_in_the_sources, card_types_are_own_and_placed]}
+    acceptance_criteria:
+      - name: answer_is_grounded_in_the_sources
+        text: >-
+          Every proposed card type names the brief passage, the phase goal or the prior-phase
+          report it serves, and that source asks for it; a need the sources do not show goes into
+          questions for PM, never into cards. Design proposes document work only: its cards
+          produce material people read, and a diagram is mermaid text in the document because
+          there is no image tool.
+      - name: card_types_are_own_and_placed
+        text: >-
+          Every name is a card type of this capability that the project type places in this phase,
+          or allows for it where the phase is read as a name or an id; a type placed only in
+          another phase states why this phase needs it, and a phase with none of this capability's
+          types answers involvement none with a declined sentence, never an invented type.
+      - name: involvement_and_the_card_set_agree
+        text: >-
+          involvement none holds exactly when the answer carries no card types plus a declined
+          reason; light is one or two cards; standard and heavy are sized by rigor and complexity
+          under the plan maximum; every count, purpose, when and needs/feeds names only consulted
+          capabilities, never this one, and the answer writes nothing.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.design.create.sop
+    title: Design create — the card-spec contract
+    definition_of_ready: {checks: [signed_off_plan_entry_present]}
+    definition_of_done: {checks: [spec_is_the_signed_off_card, inputs_and_sources_are_the_plan]}
+    acceptance_criteria:
+      - name: spec_is_the_signed_off_card
+        text: >-
+          The draft is one card spec for the plan entry at this position — card_type, title,
+          description, goal, inputs and source ids — and its recomputed spec_hash equals the one
+          the sign-off approved; a hash that does not match is refused, because creation is
+          idempotent on that hash and a drifted spec would be born as a different card.
+      - name: title_and_description_carry_the_work
+        text: >-
+          The title is at most 80 characters and names the project and the card's purpose; the
+          description states the goal and a scope READY can act on in two to four sentences, in
+          English (R209).
+      - name: inputs_and_sources_are_the_plan
+        text: >-
+          The inputs keys are exactly the card type's declared inputs and none is empty; the
+          source ids are the plan's; an input the plan leaves empty is refused rather than filled
+          from the model's own knowledge.
+      - name: card_stays_inside_the_capability
+        text: >-
+          The card's deliverable is a document people read, diagrams included as mermaid text; no
+          code changes.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.design.inspect.sop
+    title: Design inspect — the judging contract
+    definition_of_ready: {checks: [deliverable_and_card_type_present]}
+    definition_of_done: {checks: [one_check_per_criterion, checks_judge_the_deliverable]}
+    acceptance_criteria:
+      - name: one_check_per_criterion
+        text: >-
+          Exactly one check per criterion of this capability's criteria for the card's type,
+          carrying that criterion's own name; a card type with no criteria answers no_criteria at
+          once and no judgement runs.
+      - name: checks_judge_the_deliverable
+        text: >-
+          Every check judges what the card produced — the report, the document, the diff or the
+          evaluation, with the artifact ids it read — and cites the card, comment or artifact its
+          verdict rests on; a claim the deliverable does not show fails its check.
+      - name: inspection_is_read_only
+        text: >-
+          The inspection proposes no fix, moves no card and writes nothing: the caller folds
+          capability_acceptance_met into its own inspecting slot and applies whatever the outcome
+          means (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.design.plan.sop
+    title: Design plan — the plan's contract
+    definition_of_ready: {checks: [capability_card_types_loaded]}
+    definition_of_done: {checks: [card_type_of_capability_in_phase, required_inputs_and_sources_come_from_the_inputs]}
+    acceptance_criteria:
+      - name: card_type_of_capability_in_phase
+        text: >-
+          Every card is a card type of this capability that the project type allows in this phase,
+          and the set is sized to the consult — none for involvement none, at most two for light —
+          under the plan maximum; items it does not plan appear in not_planned with a reason, and
+          open points go into questions for PM, because a capability never talks to the user.
+      - name: required_inputs_and_sources_come_from_the_inputs
+        text: >-
+          Every key in the card type's declared inputs is present and non-empty, and every source
+          id is one of the input source ids; an id the flow did not supply is never invented.
+      - name: no_duplicate_source_item_and_count_within_max
+        text: >-
+          No card type and source-item pair repeats when the item id is not null, and the card
+          count stays within the flow's max_cards.
+      - name: same_capability_upstream_planned_or_done
+        text: >-
+          Every upstream card type of a planned card that belongs to this same capability is
+          either in this answer or already DONE on the board; another capability's upstream types
+          are left to PM's own gate.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.design.unblock.sop
+    title: Design unblock — the proposal's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [proposal_states_the_remedy, card_specs_stay_in_this_capability]}
+    acceptance_criteria:
+      - name: proposal_states_the_remedy
+        text: >-
+          The proposal is two to six sentences: why the card is blocked, taken from the block
+          comment and the card's own state, and the remedy a human or the coach can apply; its
+          reason is the R139 reason of the block's first line.
+      - name: card_specs_stay_in_this_capability
+        text: >-
+          Every card spec the proposal adds is a card type of this capability (a split follows
+          R44) and an empty list is normal; a spec naming another capability's card type is
+          refused.
+      - name: nothing_makes_the_block_worse
+        text: >-
+          The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
+          posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
+          make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── development ─────────────────────────────────────────────────────────────────────
+  - key: cap.development.consult.sop
+    title: Development consult — the advisory's contract
+    definition_of_ready: {checks: [phase_and_capability_loaded]}
+    definition_of_done: {checks: [answer_is_grounded_in_the_sources, card_types_are_own_and_placed]}
+    acceptance_criteria:
+      - name: answer_is_grounded_in_the_sources
+        text: >-
+          Every proposed card type names the brief passage, the phase goal or the prior-phase
+          report it serves, and that source asks for it; a need the sources do not show goes into
+          questions for PM, never into cards. Development works from evidence another capability
+          produced — a confirmed finding, a signed-off requirement — and never decides on its own
+          what is broken; a need with no such evidence is a question for PM, not a card.
+      - name: card_types_are_own_and_placed
+        text: >-
+          Every name is a card type of this capability that the project type places in this phase,
+          or allows for it where the phase is read as a name or an id; a type placed only in
+          another phase states why this phase needs it, and a phase with none of this capability's
+          types answers involvement none with a declined sentence, never an invented type.
+      - name: involvement_and_the_card_set_agree
+        text: >-
+          involvement none holds exactly when the answer carries no card types plus a declined
+          reason; light is one or two cards; standard and heavy are sized by rigor and complexity
+          under the plan maximum; every count, purpose, when and needs/feeds names only consulted
+          capabilities, never this one, and the answer writes nothing.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.development.create.sop
+    title: Development create — the card-spec contract
+    definition_of_ready: {checks: [signed_off_plan_entry_present]}
+    definition_of_done: {checks: [spec_is_the_signed_off_card, inputs_and_sources_are_the_plan]}
+    acceptance_criteria:
+      - name: spec_is_the_signed_off_card
+        text: >-
+          The draft is one card spec for the plan entry at this position — card_type, title,
+          description, goal, inputs and source ids — and its recomputed spec_hash equals the one
+          the sign-off approved; a hash that does not match is refused, because creation is
+          idempotent on that hash and a drifted spec would be born as a different card.
+      - name: title_and_description_carry_the_work
+        text: >-
+          The title is at most 80 characters and names the project and the card's purpose; the
+          description states the goal and a scope READY can act on in two to four sentences, in
+          English (R209).
+      - name: inputs_and_sources_are_the_plan
+        text: >-
+          The inputs keys are exactly the card type's declared inputs and none is empty; the
+          source ids are the plan's; an input the plan leaves empty is refused rather than filled
+          from the model's own knowledge.
+      - name: card_stays_inside_the_capability
+        text: >-
+          The card is one small, reviewed change that lands as one squash-merged PR (a proof of
+          concept stays an unmerged draft), proven by tests in a fresh workspace (R200, R201).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.development.inspect.sop
+    title: Development inspect — the judging contract
+    definition_of_ready: {checks: [deliverable_and_card_type_present]}
+    definition_of_done: {checks: [one_check_per_criterion, checks_judge_the_deliverable]}
+    acceptance_criteria:
+      - name: one_check_per_criterion
+        text: >-
+          Exactly one check per criterion of this capability's criteria for the card's type,
+          carrying that criterion's own name; a card type with no criteria answers no_criteria at
+          once and no judgement runs.
+      - name: checks_judge_the_deliverable
+        text: >-
+          Every check judges what the card produced — the report, the document, the diff or the
+          evaluation, with the artifact ids it read — and cites the card, comment or artifact its
+          verdict rests on; a claim the deliverable does not show fails its check.
+      - name: inspection_is_read_only
+        text: >-
+          The inspection proposes no fix, moves no card and writes nothing: the caller folds
+          capability_acceptance_met into its own inspecting slot and applies whatever the outcome
+          means (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.development.plan.sop
+    title: Development plan — the plan's contract
+    definition_of_ready: {checks: [capability_card_types_loaded]}
+    definition_of_done: {checks: [card_type_of_capability_in_phase, required_inputs_and_sources_come_from_the_inputs]}
+    acceptance_criteria:
+      - name: card_type_of_capability_in_phase
+        text: >-
+          Every card is a card type of this capability that the project type allows in this phase,
+          and the set is sized to the consult — none for involvement none, at most two for light —
+          under the plan maximum; items it does not plan appear in not_planned with a reason, and
+          open points go into questions for PM, because a capability never talks to the user.
+      - name: required_inputs_and_sources_come_from_the_inputs
+        text: >-
+          Every key in the card type's declared inputs is present and non-empty, and every source
+          id is one of the input source ids; an id the flow did not supply is never invented.
+      - name: no_duplicate_source_item_and_count_within_max
+        text: >-
+          No card type and source-item pair repeats when the item id is not null, and the card
+          count stays within the flow's max_cards.
+      - name: same_capability_upstream_planned_or_done
+        text: >-
+          Every upstream card type of a planned card that belongs to this same capability is
+          either in this answer or already DONE on the board; another capability's upstream types
+          are left to PM's own gate.
+      - name: exactly_one_card_per_confirmed_finding
+        text: >-
+          The plan returns exactly one development card per confirmed finding of the source
+          report, each carrying the R188 source ids; an unconfirmed finding appears in not_planned
+          and never as a card (R219 proof).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.development.unblock.sop
+    title: Development unblock — the proposal's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [proposal_states_the_remedy, card_specs_stay_in_this_capability]}
+    acceptance_criteria:
+      - name: proposal_states_the_remedy
+        text: >-
+          The proposal is two to six sentences: why the card is blocked, taken from the block
+          comment and the card's own state, and the remedy a human or the coach can apply; its
+          reason is the R139 reason of the block's first line.
+      - name: card_specs_stay_in_this_capability
+        text: >-
+          Every card spec the proposal adds is a card type of this capability (a split follows
+          R44) and an empty list is normal; a spec naming another capability's card type is
+          refused.
+      - name: nothing_makes_the_block_worse
+        text: >-
+          The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
+          posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
+          make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── refactoring ─────────────────────────────────────────────────────────────────────
+  - key: cap.refactoring.consult.sop
+    title: Refactoring consult — the advisory's contract
+    definition_of_ready: {checks: [phase_and_capability_loaded]}
+    definition_of_done: {checks: [answer_is_grounded_in_the_sources, card_types_are_own_and_placed]}
+    acceptance_criteria:
+      - name: answer_is_grounded_in_the_sources
+        text: >-
+          Every proposed card type names the brief passage, the phase goal or the prior-phase
+          report it serves, and that source asks for it; a need the sources do not show goes into
+          questions for PM, never into cards. Refactoring works from a confirmed item of an
+          analysis report, or from a component the brief names, and never decides on its own that
+          code needs restructuring.
+      - name: card_types_are_own_and_placed
+        text: >-
+          Every name is a card type of this capability that the project type places in this phase,
+          or allows for it where the phase is read as a name or an id; a type placed only in
+          another phase states why this phase needs it, and a phase with none of this capability's
+          types answers involvement none with a declined sentence, never an invented type.
+      - name: involvement_and_the_card_set_agree
+        text: >-
+          involvement none holds exactly when the answer carries no card types plus a declined
+          reason; light is one or two cards; standard and heavy are sized by rigor and complexity
+          under the plan maximum; every count, purpose, when and needs/feeds names only consulted
+          capabilities, never this one, and the answer writes nothing.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.refactoring.create.sop
+    title: Refactoring create — the card-spec contract
+    definition_of_ready: {checks: [signed_off_plan_entry_present]}
+    definition_of_done: {checks: [spec_is_the_signed_off_card, inputs_and_sources_are_the_plan]}
+    acceptance_criteria:
+      - name: spec_is_the_signed_off_card
+        text: >-
+          The draft is one card spec for the plan entry at this position — card_type, title,
+          description, goal, inputs and source ids — and its recomputed spec_hash equals the one
+          the sign-off approved; a hash that does not match is refused, because creation is
+          idempotent on that hash and a drifted spec would be born as a different card.
+      - name: title_and_description_carry_the_work
+        text: >-
+          The title is at most 80 characters and names the project and the card's purpose; the
+          description states the goal and a scope READY can act on in two to four sentences, in
+          English (R209).
+      - name: inputs_and_sources_are_the_plan
+        text: >-
+          The inputs keys are exactly the card type's declared inputs and none is empty; the
+          source ids are the plan's; an input the plan leaves empty is refused rather than filled
+          from the model's own knowledge.
+      - name: card_stays_inside_the_capability
+        text: >-
+          The card is one behaviour-preserving change that lands as one squash-merged PR, with the
+          suite green before and after.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.refactoring.inspect.sop
+    title: Refactoring inspect — the judging contract
+    definition_of_ready: {checks: [deliverable_and_card_type_present]}
+    definition_of_done: {checks: [one_check_per_criterion, checks_judge_the_deliverable]}
+    acceptance_criteria:
+      - name: one_check_per_criterion
+        text: >-
+          Exactly one check per criterion of this capability's criteria for the card's type,
+          carrying that criterion's own name; a card type with no criteria answers no_criteria at
+          once and no judgement runs.
+      - name: checks_judge_the_deliverable
+        text: >-
+          Every check judges what the card produced — the report, the document, the diff or the
+          evaluation, with the artifact ids it read — and cites the card, comment or artifact its
+          verdict rests on; a claim the deliverable does not show fails its check.
+      - name: inspection_is_read_only
+        text: >-
+          The inspection proposes no fix, moves no card and writes nothing: the caller folds
+          capability_acceptance_met into its own inspecting slot and applies whatever the outcome
+          means (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.refactoring.plan.sop
+    title: Refactoring plan — the plan's contract
+    definition_of_ready: {checks: [capability_card_types_loaded]}
+    definition_of_done: {checks: [card_type_of_capability_in_phase, required_inputs_and_sources_come_from_the_inputs]}
+    acceptance_criteria:
+      - name: card_type_of_capability_in_phase
+        text: >-
+          Every card is a card type of this capability that the project type allows in this phase,
+          and the set is sized to the consult — none for involvement none, at most two for light —
+          under the plan maximum; items it does not plan appear in not_planned with a reason, and
+          open points go into questions for PM, because a capability never talks to the user.
+      - name: required_inputs_and_sources_come_from_the_inputs
+        text: >-
+          Every key in the card type's declared inputs is present and non-empty, and every source
+          id is one of the input source ids; an id the flow did not supply is never invented.
+      - name: no_duplicate_source_item_and_count_within_max
+        text: >-
+          No card type and source-item pair repeats when the item id is not null, and the card
+          count stays within the flow's max_cards.
+      - name: same_capability_upstream_planned_or_done
+        text: >-
+          Every upstream card type of a planned card that belongs to this same capability is
+          either in this answer or already DONE on the board; another capability's upstream types
+          are left to PM's own gate.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.refactoring.unblock.sop
+    title: Refactoring unblock — the proposal's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [proposal_states_the_remedy, card_specs_stay_in_this_capability]}
+    acceptance_criteria:
+      - name: proposal_states_the_remedy
+        text: >-
+          The proposal is two to six sentences: why the card is blocked, taken from the block
+          comment and the card's own state, and the remedy a human or the coach can apply; its
+          reason is the R139 reason of the block's first line.
+      - name: card_specs_stay_in_this_capability
+        text: >-
+          Every card spec the proposal adds is a card type of this capability (a split follows
+          R44) and an empty list is normal; a spec naming another capability's card type is
+          refused.
+      - name: nothing_makes_the_block_worse
+        text: >-
+          The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
+          posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
+          make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── research ────────────────────────────────────────────────────────────────────────
+  - key: cap.research.consult.sop
+    title: Research consult — the advisory's contract
+    definition_of_ready: {checks: [phase_and_capability_loaded]}
+    definition_of_done: {checks: [answer_is_grounded_in_the_sources, card_types_are_own_and_placed]}
+    acceptance_criteria:
+      - name: answer_is_grounded_in_the_sources
+        text: >-
+          Every proposed card type names the brief passage, the phase goal or the prior-phase
+          report it serves, and that source asks for it; a need the sources do not show goes into
+          questions for PM, never into cards. Research settles nothing a later card must act on
+          and changes no main branch: a question is answered in a document, so a proposal that
+          asks for a change is refused.
+      - name: card_types_are_own_and_placed
+        text: >-
+          Every name is a card type of this capability that the project type places in this phase,
+          or allows for it where the phase is read as a name or an id; a type placed only in
+          another phase states why this phase needs it, and a phase with none of this capability's
+          types answers involvement none with a declined sentence, never an invented type.
+      - name: involvement_and_the_card_set_agree
+        text: >-
+          involvement none holds exactly when the answer carries no card types plus a declined
+          reason; light is one or two cards; standard and heavy are sized by rigor and complexity
+          under the plan maximum; every count, purpose, when and needs/feeds names only consulted
+          capabilities, never this one, and the answer writes nothing.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.research.create.sop
+    title: Research create — the card-spec contract
+    definition_of_ready: {checks: [signed_off_plan_entry_present]}
+    definition_of_done: {checks: [spec_is_the_signed_off_card, inputs_and_sources_are_the_plan]}
+    acceptance_criteria:
+      - name: spec_is_the_signed_off_card
+        text: >-
+          The draft is one card spec for the plan entry at this position — card_type, title,
+          description, goal, inputs and source ids — and its recomputed spec_hash equals the one
+          the sign-off approved; a hash that does not match is refused, because creation is
+          idempotent on that hash and a drifted spec would be born as a different card.
+      - name: title_and_description_carry_the_work
+        text: >-
+          The title is at most 80 characters and names the project and the card's purpose; the
+          description states the goal and a scope READY can act on in two to four sentences, in
+          English (R209).
+      - name: inputs_and_sources_are_the_plan
+        text: >-
+          The inputs keys are exactly the card type's declared inputs and none is empty; the
+          source ids are the plan's; an input the plan leaves empty is refused rather than filled
+          from the model's own knowledge.
+      - name: card_stays_inside_the_capability
+        text: >-
+          The card's deliverable is a document, or a prototype kept as an unmerged draft; the main
+          branch is unchanged.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.research.inspect.sop
+    title: Research inspect — the judging contract
+    definition_of_ready: {checks: [deliverable_and_card_type_present]}
+    definition_of_done: {checks: [one_check_per_criterion, checks_judge_the_deliverable]}
+    acceptance_criteria:
+      - name: one_check_per_criterion
+        text: >-
+          Exactly one check per criterion of this capability's criteria for the card's type,
+          carrying that criterion's own name; a card type with no criteria answers no_criteria at
+          once and no judgement runs.
+      - name: checks_judge_the_deliverable
+        text: >-
+          Every check judges what the card produced — the report, the document, the diff or the
+          evaluation, with the artifact ids it read — and cites the card, comment or artifact its
+          verdict rests on; a claim the deliverable does not show fails its check.
+      - name: inspection_is_read_only
+        text: >-
+          The inspection proposes no fix, moves no card and writes nothing: the caller folds
+          capability_acceptance_met into its own inspecting slot and applies whatever the outcome
+          means (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.research.plan.sop
+    title: Research plan — the plan's contract
+    definition_of_ready: {checks: [capability_card_types_loaded]}
+    definition_of_done: {checks: [card_type_of_capability_in_phase, required_inputs_and_sources_come_from_the_inputs]}
+    acceptance_criteria:
+      - name: card_type_of_capability_in_phase
+        text: >-
+          Every card is a card type of this capability that the project type allows in this phase,
+          and the set is sized to the consult — none for involvement none, at most two for light —
+          under the plan maximum; items it does not plan appear in not_planned with a reason, and
+          open points go into questions for PM, because a capability never talks to the user.
+      - name: required_inputs_and_sources_come_from_the_inputs
+        text: >-
+          Every key in the card type's declared inputs is present and non-empty, and every source
+          id is one of the input source ids; an id the flow did not supply is never invented.
+      - name: no_duplicate_source_item_and_count_within_max
+        text: >-
+          No card type and source-item pair repeats when the item id is not null, and the card
+          count stays within the flow's max_cards.
+      - name: same_capability_upstream_planned_or_done
+        text: >-
+          Every upstream card type of a planned card that belongs to this same capability is
+          either in this answer or already DONE on the board; another capability's upstream types
+          are left to PM's own gate.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.research.unblock.sop
+    title: Research unblock — the proposal's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [proposal_states_the_remedy, card_specs_stay_in_this_capability]}
+    acceptance_criteria:
+      - name: proposal_states_the_remedy
+        text: >-
+          The proposal is two to six sentences: why the card is blocked, taken from the block
+          comment and the card's own state, and the remedy a human or the coach can apply; its
+          reason is the R139 reason of the block's first line.
+      - name: card_specs_stay_in_this_capability
+        text: >-
+          Every card spec the proposal adds is a card type of this capability (a split follows
+          R44) and an empty list is normal; a spec naming another capability's card type is
+          refused.
+      - name: nothing_makes_the_block_worse
+        text: >-
+          The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
+          posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
+          make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── testing ─────────────────────────────────────────────────────────────────────────
+  - key: cap.testing.consult.sop
+    title: Testing consult — the advisory's contract
+    definition_of_ready: {checks: [phase_and_capability_loaded]}
+    definition_of_done: {checks: [answer_is_grounded_in_the_sources, card_types_are_own_and_placed]}
+    acceptance_criteria:
+      - name: answer_is_grounded_in_the_sources
+        text: >-
+          Every proposed card type names the brief passage, the phase goal or the prior-phase
+          report it serves, and that source asks for it; a need the sources do not show goes into
+          questions for PM, never into cards. Testing proposes planning, running or evaluating
+          work only: missing tests are written only where a test-development card asks for them,
+          so a proposal that changes production code is refused.
+      - name: card_types_are_own_and_placed
+        text: >-
+          Every name is a card type of this capability that the project type places in this phase,
+          or allows for it where the phase is read as a name or an id; a type placed only in
+          another phase states why this phase needs it, and a phase with none of this capability's
+          types answers involvement none with a declined sentence, never an invented type.
+      - name: involvement_and_the_card_set_agree
+        text: >-
+          involvement none holds exactly when the answer carries no card types plus a declined
+          reason; light is one or two cards; standard and heavy are sized by rigor and complexity
+          under the plan maximum; every count, purpose, when and needs/feeds names only consulted
+          capabilities, never this one, and the answer writes nothing.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.testing.create.sop
+    title: Testing create — the card-spec contract
+    definition_of_ready: {checks: [signed_off_plan_entry_present]}
+    definition_of_done: {checks: [spec_is_the_signed_off_card, inputs_and_sources_are_the_plan]}
+    acceptance_criteria:
+      - name: spec_is_the_signed_off_card
+        text: >-
+          The draft is one card spec for the plan entry at this position — card_type, title,
+          description, goal, inputs and source ids — and its recomputed spec_hash equals the one
+          the sign-off approved; a hash that does not match is refused, because creation is
+          idempotent on that hash and a drifted spec would be born as a different card.
+      - name: title_and_description_carry_the_work
+        text: >-
+          The title is at most 80 characters and names the project and the card's purpose; the
+          description states the goal and a scope READY can act on in two to four sentences, in
+          English (R209).
+      - name: inputs_and_sources_are_the_plan
+        text: >-
+          The inputs keys are exactly the card type's declared inputs and none is empty; the
+          source ids are the plan's; an input the plan leaves empty is refused rather than filled
+          from the model's own knowledge.
+      - name: card_stays_inside_the_capability
+        text: >-
+          The card's deliverable is a test strategy, a plan, a run whose failures are reported as
+          findings, or an evaluation; tests are written only for a test-development card.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.testing.inspect.sop
+    title: Testing inspect — the judging contract
+    definition_of_ready: {checks: [deliverable_and_card_type_present]}
+    definition_of_done: {checks: [one_check_per_criterion, checks_judge_the_deliverable]}
+    acceptance_criteria:
+      - name: one_check_per_criterion
+        text: >-
+          Exactly one check per criterion of this capability's criteria for the card's type,
+          carrying that criterion's own name; a card type with no criteria answers no_criteria at
+          once and no judgement runs.
+      - name: checks_judge_the_deliverable
+        text: >-
+          Every check judges what the card produced — the report, the document, the diff or the
+          evaluation, with the artifact ids it read — and cites the card, comment or artifact its
+          verdict rests on; a claim the deliverable does not show fails its check.
+      - name: inspection_is_read_only
+        text: >-
+          The inspection proposes no fix, moves no card and writes nothing: the caller folds
+          capability_acceptance_met into its own inspecting slot and applies whatever the outcome
+          means (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.testing.plan.sop
+    title: Testing plan — the plan's contract
+    definition_of_ready: {checks: [capability_card_types_loaded]}
+    definition_of_done: {checks: [card_type_of_capability_in_phase, required_inputs_and_sources_come_from_the_inputs]}
+    acceptance_criteria:
+      - name: card_type_of_capability_in_phase
+        text: >-
+          Every card is a card type of this capability that the project type allows in this phase,
+          and the set is sized to the consult — none for involvement none, at most two for light —
+          under the plan maximum; items it does not plan appear in not_planned with a reason, and
+          open points go into questions for PM, because a capability never talks to the user.
+      - name: required_inputs_and_sources_come_from_the_inputs
+        text: >-
+          Every key in the card type's declared inputs is present and non-empty, and every source
+          id is one of the input source ids; an id the flow did not supply is never invented.
+      - name: no_duplicate_source_item_and_count_within_max
+        text: >-
+          No card type and source-item pair repeats when the item id is not null, and the card
+          count stays within the flow's max_cards.
+      - name: same_capability_upstream_planned_or_done
+        text: >-
+          Every upstream card type of a planned card that belongs to this same capability is
+          either in this answer or already DONE on the board; another capability's upstream types
+          are left to PM's own gate.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.testing.unblock.sop
+    title: Testing unblock — the proposal's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [proposal_states_the_remedy, card_specs_stay_in_this_capability]}
+    acceptance_criteria:
+      - name: proposal_states_the_remedy
+        text: >-
+          The proposal is two to six sentences: why the card is blocked, taken from the block
+          comment and the card's own state, and the remedy a human or the coach can apply; its
+          reason is the R139 reason of the block's first line.
+      - name: card_specs_stay_in_this_capability
+        text: >-
+          Every card spec the proposal adds is a card type of this capability (a split follows
+          R44) and an empty list is normal; a spec naming another capability's card type is
+          refused.
+      - name: nothing_makes_the_block_worse
+        text: >-
+          The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
+          posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
+          make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── project_management ──────────────────────────────────────────────────────────────
+  - key: cap.project_management.create_type.sop
+    title: Project type create — the type's contract
+    definition_of_ready: {checks: [no_existing_type_fits]}
+    definition_of_done: {checks: [phases_are_ordered_and_real, every_card_type_is_a_real_catalogue_type]}
+    acceptance_criteria:
+      - name: phases_are_ordered_and_real
+        text: >-
+          The type names RM phases in an order, setup first and the closure phase last, and every
+          phase is a row RM holds; a type that reuses another type's order says which one and why.
+      - name: every_card_type_is_a_real_catalogue_type
+        text: >-
+          Every capability-to-card-type cell names a real capability and one of its card types,
+          and every entry card type's declared inputs are fields the brief can carry (R193, R194).
+      - name: written_only_after_the_sign_off
+        text: >-
+          The type reaches RM only after the sign-off: the draft is a proposal a person reads, and
+          creating it changes no existing project's type.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.project_management.select_type.sop
+    title: Project type select — the proposal's contract
+    definition_of_ready: {checks: [brief_loaded]}
+    definition_of_done: {checks: [type_exists_in_rm_and_fits_the_brief]}
+    acceptance_criteria:
+      - name: type_exists_in_rm_and_fits_the_brief
+        text: >-
+          The proposed type is one RM holds, and its required entry inputs are the ones the brief
+          provides; a type whose entry inputs the brief does not carry is refused rather than
+          proposed.
+      - name: proposal_cites_the_brief
+        text: >-
+          The proposal names the brief passage it rests on and says in one sentence why the other
+          candidate types do not fit.
+      - name: nothing_is_written_before_the_sign_off
+        text: >-
+          The flow proposes and writes nothing: the user confirms the type at the brief or
+          contract sign-off, and the confirming step writes it (R343, R15).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.project_management.unblock.sop
+    title: Project management unblock — the remedy's contract
+    definition_of_ready: {checks: [block_comment_present]}
+    definition_of_done: {checks: [one_remedy_from_the_closed_set]}
+    acceptance_criteria:
+      - name: one_remedy_from_the_closed_set
+        text: >-
+          Exactly one remedy out of rerun, ask_fr, repull and escalate_kata, with one or two
+          sentences on why it fits the block's class and the card's state (R344 (3)).
+      - name: rerun_only_when_no_live_execution
+        text: >-
+          A rerun is refused while a new, waiting or running execution exists for the card, and a
+          release-op or phase-mover DONE flow is never rerun (R311 rerun guard).
+      - name: kata_only_for_a_replayable_flow
+        text: >-
+          escalate_kata is proposed only for a flow the kata sandbox can replay — an
+          executeWorkflow trigger and no main-path executeWorkflow carrying a computed workflowId
+          (R362).
+      - name: the_coach_or_a_human_applies_it
+        text: >-
+          The flow proposes and writes nothing: the coach's block path or a human applies the
+          remedy, and the card stays BLOCKED until it is applied.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.project_management.update_type_card_types.sop
+    title: Project type cards — the cells' contract
+    definition_of_ready: {checks: [cell_and_consult_loaded]}
+    definition_of_done: {checks: [every_cell_names_a_real_capability_and_card_type]}
+    acceptance_criteria:
+      - name: every_cell_names_a_real_capability_and_card_type
+        text: >-
+          Every cell names a real capability and one of its card types that RM holds; a card type
+          of another capability, or one RM does not hold, is refused.
+      - name: the_change_comes_from_a_consult_and_a_sign_off
+        text: >-
+          A cell changes only from a capability consult's proposal confirmed at the phase-plan
+          sign-off (R351 (3)); the flow never widens the matrix on its own.
+      - name: a_removed_cell_leaves_planned_cards_alone
+        text: >-
+          Removing a cell changes what a later phase may plan and never touches a card already
+          planned or born: the change is recorded, not back-applied.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: cap.project_management.update_type_phases.sop
+    title: Project type phases — the order's contract
+    definition_of_ready: {checks: [type_and_phase_order_loaded]}
+    definition_of_done: {checks: [order_is_a_real_rm_phase_sequence]}
+    acceptance_criteria:
+      - name: order_is_a_real_rm_phase_sequence
+        text: >-
+          Every phase in the new order is one RM holds — an added phase is named as an addition —
+          setup stays first and the closure phase last, and the order contains no cycle.
+      - name: replan_only_at_a_closure_and_laya_judged
+        text: >-
+          A phase order is re-planned only at a phase closure and the re-plan is laya-judged
+          before it is written (R351 (1)); a re-plan proposed mid-phase is refused.
+      - name: a_skipped_phase_records_its_reason
+        text: >-
+          A phase whose plan comes out empty is skipped with its reason recorded and the next
+          phase started in the same run, with no closure card for the skipped phase (R348 (4)).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # ── kanban_coach ────────────────────────────────────────────────────────────────────
+  - key: cap.kanban_coach.handle_error.sop
+    title: Kanban coach — the handle_error contract
+    definition_of_ready: {checks: [failure_and_caller_chain_present]}
+    definition_of_done: {checks: [remedy_comes_from_the_class_and_the_board, only_the_admitted_coach_acts]}
+    acceptance_criteria:
+      - name: remedy_comes_from_the_class_and_the_board
+        text: >-
+          The remedy is one of rerun, move, repull, block, ask or note, computed from the error
+          class and the board state (R311 (3)); the diagnose agent runs only for an unknown class
+          and proposes, never acts.
+      - name: one_ask_per_entry
+        text: >-
+          An ask goes through ask_fr, and there is no second ask on the same entry across R303,
+          R286, U0 and the coach; an ask that cannot run because ask_fr is unreachable is a block
+          (E25).
+      - name: only_the_admitted_coach_acts
+        text: >-
+          The list entry and the wait=True caller chain travel in the contract and are never
+          derived; only the coach RM admits posts its marker, after a board re-read made after
+          Admit; a coach that cannot reach RM never moves a card and posts only its Not acted by
+          the kanban coach: comment, and one that can neither act nor comment notifies fr
+          project.coach_failed.
+      - name: caps_and_escalation_hold
+        text: >-
+          One remedy per entry, three per card and ten incidents per project per phase visit,
+          counted in RM; a rerun is refused while a new, waiting or running execution exists for
+          the card; escalation opens a kata only for a flow the sandbox can replay (R362).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  - key: ask_fr.sop
+    title: ask_fr — the question's contract
+    definition_of_ready: {checks: [question_present]}
+    definition_of_done: {checks: [one_question_per_run]}
+    acceptance_criteria:
+      - name: one_question_per_run
+        text: >-
+          One question, in one plain sentence, with the context a human needs to answer it, posted
+          on the card as the ask; a second question is a second run by the caller, never a
+          follow-up inside this one.
+      - name: the_question_waits_for_a_human
+        text: >-
+          The run posts the ask and parks at the human_approval gate; it resumes only on a
+          recorded decision, nothing answers for the human on a timeout, and an ask that cannot
+          run is a block, so no card is moved on a failed ask (E25).
+      - name: the_answer_is_recorded_and_the_caller_applies
+        text: >-
+          The decision is recorded as the approval and one closing comment marks the answer; the
+          flow applies nothing else — the caller (sub.block_ask, the coach, or PM's unblock)
+          decides what the answer means for the card.
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # A gate and a call carry no quality question of their own: the human decision IS the
+  # inspection, and a child run is judged by its own steps. Both still need a published SOP,
+  # because every step is judged against one.
+  - key: ask_fr.system
+    title: ask_fr — the human gate has no quality question
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+  - key: cap.kanban_coach.handle_error.system
+    title: Kanban coach — a child kata run is judged by its own steps
+    definition_of_ready: {checks: []}
+    definition_of_done: {checks: []}
+    acceptance_criteria: []
+    inspection: {kind: checker, rule: always}
+    outputs: []
+  # ── kata ────────────────────────────────────────────────────────────────────────────
+  - key: kata.open.sop
+    title: kata.open — the kata's contract
+    definition_of_ready: {checks: [blocked_card_present]}
+    definition_of_done: {checks: [only_a_replayable_flow_opens_a_kata]}
+    acceptance_criteria:
+      - name: the_card_and_its_flow_are_read
+        text: >-
+          The card, its board and its previous runs are read before anything opens; the trace is
+          exported only when a previous run exists, and the symptom is the block text, else flow,
+          node and check, else conveyor block when the block text is empty (R362 (6)).
+      - name: only_a_replayable_flow_opens_a_kata
+        text: >-
+          A kata opens only on a flow the sandbox can replay — an executeWorkflow trigger and no
+          main-path executeWorkflow carrying a computed workflowId; otherwise nothing opens, one
+          comment says why, and the card stays BLOCKED for a human (R362 (2), (4)).
+      - name: a_failed_kata_keeps_the_cord
+        text: >-
+          The open accepts the conveyor token alone, with no HMAC (R351 (9)); the kata records its
+          base and the failing run; a kata that fails is archived and keeps the whole-conveyor
+          cord, and nothing releases or resumes it on a timer (R354 (1)).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+
+processes:
+  # ── analysis ────────────────────────────────────────────────────────────────────────
+  - key: cap.analysis.consult
+    title: Analysis consult — the card set one phase needs
+    capability: analysis
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.analysis.consult, sop: cap.analysis.consult.sop, on_result: fail, max_attempts: 1, input_template: {function: consult}}
+  - key: cap.analysis.create
+    title: Analysis create — draft the card a signed-off plan names
+    capability: analysis
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.analysis.create, sop: cap.analysis.create.sop, on_result: fail, max_attempts: 1, input_template: {function: create}}
+  - key: cap.analysis.inspect
+    title: Analysis inspect — judge a deliverable against the capability's criteria
+    capability: analysis
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.analysis.inspect, sop: cap.analysis.inspect.sop, on_result: fail, max_attempts: 1, input_template: {function: inspect}}
+  - key: cap.analysis.plan
+    title: Analysis plan — the cards this mandate needs
+    capability: analysis
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.analysis.plan, sop: cap.analysis.plan.sop, on_result: fail, max_attempts: 1, input_template: {function: plan}}
+  - key: cap.analysis.unblock
+    title: Analysis unblock — propose the remedy for a blocked card
+    capability: analysis
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.analysis.unblock, sop: cap.analysis.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # ── architecture ────────────────────────────────────────────────────────────────────
+  - key: cap.architecture.consult
+    title: Architecture consult — the card set one phase needs
+    capability: architecture
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.architecture.consult, sop: cap.architecture.consult.sop, on_result: fail, max_attempts: 1, input_template: {function: consult}}
+  - key: cap.architecture.create
+    title: Architecture create — draft the card a signed-off plan names
+    capability: architecture
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.architecture.create, sop: cap.architecture.create.sop, on_result: fail, max_attempts: 1, input_template: {function: create}}
+  - key: cap.architecture.inspect
+    title: Architecture inspect — judge a deliverable against the capability's criteria
+    capability: architecture
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.architecture.inspect, sop: cap.architecture.inspect.sop, on_result: fail, max_attempts: 1, input_template: {function: inspect}}
+  - key: cap.architecture.plan
+    title: Architecture plan — the cards this mandate needs
+    capability: architecture
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.architecture.plan, sop: cap.architecture.plan.sop, on_result: fail, max_attempts: 1, input_template: {function: plan}}
+  - key: cap.architecture.unblock
+    title: Architecture unblock — propose the remedy for a blocked card
+    capability: architecture
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.architecture.unblock, sop: cap.architecture.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # ── bddtdd ──────────────────────────────────────────────────────────────────────────
+  - key: cap.bddtdd.consult
+    title: BDD/TDD consult — the card set one phase needs
+    capability: bdd_tdd
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.bddtdd.consult, sop: cap.bddtdd.consult.sop, on_result: fail, max_attempts: 1, input_template: {function: consult}}
+  - key: cap.bddtdd.create
+    title: BDD/TDD create — draft the card a signed-off plan names
+    capability: bdd_tdd
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.bddtdd.create, sop: cap.bddtdd.create.sop, on_result: fail, max_attempts: 1, input_template: {function: create}}
+  - key: cap.bddtdd.inspect
+    title: BDD/TDD inspect — judge a deliverable against the capability's criteria
+    capability: bdd_tdd
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.bddtdd.inspect, sop: cap.bddtdd.inspect.sop, on_result: fail, max_attempts: 1, input_template: {function: inspect}}
+  - key: cap.bddtdd.plan
+    title: BDD/TDD plan — the cards this mandate needs
+    capability: bdd_tdd
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.bddtdd.plan, sop: cap.bddtdd.plan.sop, on_result: fail, max_attempts: 1, input_template: {function: plan}}
+  - key: cap.bddtdd.unblock
+    title: BDD/TDD unblock — propose the remedy for a blocked card
+    capability: bdd_tdd
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.bddtdd.unblock, sop: cap.bddtdd.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # ── change_management ───────────────────────────────────────────────────────────────
+  - key: cap.change_management.consult
+    title: Change management consult — the card set one phase needs
+    capability: change_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.change_management.consult, sop: cap.change_management.consult.sop, on_result: fail, max_attempts: 1, input_template: {function: consult}}
+  - key: cap.change_management.create
+    title: Change management create — draft the card a signed-off plan names
+    capability: change_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.change_management.create, sop: cap.change_management.create.sop, on_result: fail, max_attempts: 1, input_template: {function: create}}
+  - key: cap.change_management.inspect
+    title: Change management inspect — judge a deliverable against the capability's criteria
+    capability: change_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.change_management.inspect, sop: cap.change_management.inspect.sop, on_result: fail, max_attempts: 1, input_template: {function: inspect}}
+  - key: cap.change_management.plan
+    title: Change management plan — the cards this mandate needs
+    capability: change_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.change_management.plan, sop: cap.change_management.plan.sop, on_result: fail, max_attempts: 1, input_template: {function: plan}}
+  - key: cap.change_management.unblock
+    title: Change management unblock — propose the remedy for a blocked card
+    capability: change_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.change_management.unblock, sop: cap.change_management.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # ── design ──────────────────────────────────────────────────────────────────────────
+  - key: cap.design.consult
+    title: Design consult — the card set one phase needs
+    capability: design
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.design.consult, sop: cap.design.consult.sop, on_result: fail, max_attempts: 1, input_template: {function: consult}}
+  - key: cap.design.create
+    title: Design create — draft the card a signed-off plan names
+    capability: design
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.design.create, sop: cap.design.create.sop, on_result: fail, max_attempts: 1, input_template: {function: create}}
+  - key: cap.design.inspect
+    title: Design inspect — judge a deliverable against the capability's criteria
+    capability: design
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.design.inspect, sop: cap.design.inspect.sop, on_result: fail, max_attempts: 1, input_template: {function: inspect}}
+  - key: cap.design.plan
+    title: Design plan — the cards this mandate needs
+    capability: design
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.design.plan, sop: cap.design.plan.sop, on_result: fail, max_attempts: 1, input_template: {function: plan}}
+  - key: cap.design.unblock
+    title: Design unblock — propose the remedy for a blocked card
+    capability: design
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.design.unblock, sop: cap.design.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # ── development ─────────────────────────────────────────────────────────────────────
+  - key: cap.development.consult
+    title: Development consult — the card set one phase needs
+    capability: development
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.development.consult, sop: cap.development.consult.sop, on_result: fail, max_attempts: 1, input_template: {function: consult}}
+  - key: cap.development.create
+    title: Development create — draft the card a signed-off plan names
+    capability: development
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.development.create, sop: cap.development.create.sop, on_result: fail, max_attempts: 1, input_template: {function: create}}
+  - key: cap.development.inspect
+    title: Development inspect — judge a deliverable against the capability's criteria
+    capability: development
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.development.inspect, sop: cap.development.inspect.sop, on_result: fail, max_attempts: 1, input_template: {function: inspect}}
+  - key: cap.development.plan
+    title: Development plan — the cards this mandate needs
+    capability: development
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.development.plan, sop: cap.development.plan.sop, on_result: fail, max_attempts: 1, input_template: {function: plan}}
+  - key: cap.development.unblock
+    title: Development unblock — propose the remedy for a blocked card
+    capability: development
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.development.unblock, sop: cap.development.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # ── refactoring ─────────────────────────────────────────────────────────────────────
+  - key: cap.refactoring.consult
+    title: Refactoring consult — the card set one phase needs
+    capability: refactoring
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.refactoring.consult, sop: cap.refactoring.consult.sop, on_result: fail, max_attempts: 1, input_template: {function: consult}}
+  - key: cap.refactoring.create
+    title: Refactoring create — draft the card a signed-off plan names
+    capability: refactoring
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.refactoring.create, sop: cap.refactoring.create.sop, on_result: fail, max_attempts: 1, input_template: {function: create}}
+  - key: cap.refactoring.inspect
+    title: Refactoring inspect — judge a deliverable against the capability's criteria
+    capability: refactoring
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.refactoring.inspect, sop: cap.refactoring.inspect.sop, on_result: fail, max_attempts: 1, input_template: {function: inspect}}
+  - key: cap.refactoring.plan
+    title: Refactoring plan — the cards this mandate needs
+    capability: refactoring
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.refactoring.plan, sop: cap.refactoring.plan.sop, on_result: fail, max_attempts: 1, input_template: {function: plan}}
+  - key: cap.refactoring.unblock
+    title: Refactoring unblock — propose the remedy for a blocked card
+    capability: refactoring
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.refactoring.unblock, sop: cap.refactoring.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # ── research ────────────────────────────────────────────────────────────────────────
+  - key: cap.research.consult
+    title: Research consult — the card set one phase needs
+    capability: research
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.research.consult, sop: cap.research.consult.sop, on_result: fail, max_attempts: 1, input_template: {function: consult}}
+  - key: cap.research.create
+    title: Research create — draft the card a signed-off plan names
+    capability: research
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.research.create, sop: cap.research.create.sop, on_result: fail, max_attempts: 1, input_template: {function: create}}
+  - key: cap.research.inspect
+    title: Research inspect — judge a deliverable against the capability's criteria
+    capability: research
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.research.inspect, sop: cap.research.inspect.sop, on_result: fail, max_attempts: 1, input_template: {function: inspect}}
+  - key: cap.research.plan
+    title: Research plan — the cards this mandate needs
+    capability: research
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.research.plan, sop: cap.research.plan.sop, on_result: fail, max_attempts: 1, input_template: {function: plan}}
+  - key: cap.research.unblock
+    title: Research unblock — propose the remedy for a blocked card
+    capability: research
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.research.unblock, sop: cap.research.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # ── testing ─────────────────────────────────────────────────────────────────────────
+  - key: cap.testing.consult
+    title: Testing consult — the card set one phase needs
+    capability: testing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.testing.consult, sop: cap.testing.consult.sop, on_result: fail, max_attempts: 1, input_template: {function: consult}}
+  - key: cap.testing.create
+    title: Testing create — draft the card a signed-off plan names
+    capability: testing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.testing.create, sop: cap.testing.create.sop, on_result: fail, max_attempts: 1, input_template: {function: create}}
+  - key: cap.testing.inspect
+    title: Testing inspect — judge a deliverable against the capability's criteria
+    capability: testing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.testing.inspect, sop: cap.testing.inspect.sop, on_result: fail, max_attempts: 1, input_template: {function: inspect}}
+  - key: cap.testing.plan
+    title: Testing plan — the cards this mandate needs
+    capability: testing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.testing.plan, sop: cap.testing.plan.sop, on_result: fail, max_attempts: 1, input_template: {function: plan}}
+  - key: cap.testing.unblock
+    title: Testing unblock — propose the remedy for a blocked card
+    capability: testing
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.testing.unblock, sop: cap.testing.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # ── project_management ──────────────────────────────────────────────────────────────
+  - key: cap.project_management.create_type
+    title: Project type create — draft a type, its phases and its cells
+    capability: project_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.project_management.create_type, sop: cap.project_management.create_type.sop, on_result: fail, max_attempts: 1, input_template: {function: create_type}}
+  - key: cap.project_management.select_type
+    title: Project type select — propose the type the brief needs
+    capability: project_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.project_management.select_type, sop: cap.project_management.select_type.sop, on_result: fail, max_attempts: 1, input_template: {function: select_type}}
+  - key: cap.project_management.unblock
+    title: Project management unblock — propose one remedy for a blocked PM card
+    capability: project_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.project_management.unblock, sop: cap.project_management.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  - key: cap.project_management.update_type_card_types
+    title: Project type cards — change one phase's capability-to-card-type cells
+    capability: project_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.project_management.update_type_card_types, sop: cap.project_management.update_type_card_types.sop, on_result: fail, max_attempts: 1, input_template: {function: update_type_card_types}}
+  - key: cap.project_management.update_type_phases
+    title: Project type phases — change the order a type walks
+    capability: project_management
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.project_management.update_type_phases, sop: cap.project_management.update_type_phases.sop, on_result: fail, max_attempts: 1, input_template: {function: update_type_phases}}
+  # ── kanban_coach ────────────────────────────────────────────────────────────────────
+  # ⛔ `kata.open` is published BEFORE the coach that calls it: the loader refuses a `call` step
+  # whose target is not yet published in this tenant (a call target must exist at apply time).
+  # ── kata ────────────────────────────────────────────────────────────────────────────
+  - key: kata.open
+    title: kata.open — open a kata on a blocked card
+    capability: kata
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: kata.open, sop: kata.open.sop, on_result: fail, max_attempts: 1, input_template: {function: open}}
+  - key: cap.kanban_coach.handle_error
+    title: Kanban coach — handle one uncovered execution error
+    capability: kanban_coach
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.kanban_coach.handle_error, sop: cap.kanban_coach.handle_error.sop, on_result: fail, max_attempts: 1, input_template: {function: handle_error}}
+      # R344 (3): the coach escalates a replayable flow to the kata capability, which opens the
+      # kata; the coach does not open it itself. The child run is a real child of this run.
+      - {position: 2, kind: call, actor: system, child_process_key: kata.open, sop: cap.kanban_coach.handle_error.system, on_result: fail, max_attempts: 1, input_template: {card_id: "{{card.id}}"}}
+  - key: ask_fr
+    title: ask_fr — one human question on a card
+    capability: kanban_coach
+    outputs: []
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: ask_fr, sop: ask_fr.sop, on_result: fail, max_attempts: 1, input_template: {function: ask}}
+      # The SOP's own contract: "the run posts the ask and parks at the human_approval gate".
+      # Fidelity fix 2026-11-10 — the flow this replaces had the gate, the seed did not.
+      - {position: 2, kind: gate, actor: system, gate_kind: human_approval, sop: ask_fr.system, on_result: fail, max_attempts: 1, input_template: {}}
