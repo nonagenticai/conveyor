@@ -119,8 +119,14 @@ jobs:
       - name: start Postgres 18 and Redis (the archetype's postgres_image / redis_image)
         run: |
           set -euo pipefail
+          # ⛔ --shm-size is load-bearing. Docker's default /dev/shm is 64 MB, and Postgres
+          # parallel query workers allocate dynamic shared memory there: with several test
+          # databases migrating at once the first public run failed three prompt_catalogue
+          # tests with `53100 could not resize shared memory segment … No space left on device`
+          # (run 43313232334, dsm_impl.c). 1 GB is far above what this suite touches.
           docker run -d --name ci-pg \
             -e POSTGRES_PASSWORD=postgres \
+            --shm-size=1g \
             --tmpfs /var/lib/postgresql \
             -p 127.0.0.1:5432:5432 \
             "$PG_IMAGE" -c fsync=off -c max_connections=300
