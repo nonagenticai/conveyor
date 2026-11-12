@@ -30,8 +30,14 @@ COPY . .
 # `-p conveyor-server` (not a bare workspace build): a broken sibling crate must not block
 # the service image, and the binary needs no other member's artifacts beyond its deps.
 # sqlx::migrate! embeds migrations/ into the binary, so the runtime image needs no SQL files.
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,target=/src/target \
+# ⛔ Every cache mount below carries an EXPLICIT `id=`, and the two stages' ids are disjoint.
+# BuildKit builds independent stages IN PARALLEL, and a cache mount's default id is its target
+# path — so without distinct ids the `build` and `web` stages compiled into one registry/src and
+# one /src/target at the same time. A warm ARC builder hid this; the first cold GitHub-hosted
+# build failed deterministically: `failed to open …/tracing-subscriber-0.3.23/.cargo-ok:
+# File exists (os error 17)` in the web stage while the build stage unpacked the same crate.
+RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-build \
+    --mount=type=cache,target=/src/target,id=cargo-target-build \
     cargo build --release --locked -p conveyor-server \
     && install -D -m 0755 target/release/conveyor /out/conveyor
 
@@ -59,9 +65,9 @@ COPY . .
 # its own step left `cargo leptos` unavailable in the next one ("no such command: leptos",
 # measured on PR #9's first build). Both caches are still declared here, which is what keeps
 # the install warm across builds.
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,target=/opt/cargo-leptos \
-    --mount=type=cache,target=/src/target \
+RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-web \
+    --mount=type=cache,target=/opt/cargo-leptos,id=cargo-leptos-web \
+    --mount=type=cache,target=/src/target,id=cargo-target-web \
     cargo install cargo-leptos --version 0.3.11 --locked --root /opt/cargo-leptos \
     && cargo leptos build --release --frontend-only --cargo-locked \
     && mkdir -p /out/site \
