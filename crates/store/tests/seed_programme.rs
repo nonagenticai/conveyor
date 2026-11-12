@@ -80,7 +80,11 @@ async fn seed_programme_links_the_registered_issues() {
     .fetch_one(&db.super_pool)
     .await
     .expect("S12 issues");
-    assert_eq!(issues, serde_json::json!([16, 41, 42, 43]));
+    // The public repo re-created every issue, so these numbers are the PUBLIC ones. The authority
+    // is `docs/design/data/issues.json` (the exported registry) → `seed/programme.json`
+    // (`scripts/build-programme-seed.py`); this assertion must follow it, never the retired
+    // private numbering ([16, 41, 42, 43] / [38] before the flip).
+    assert_eq!(issues, serde_json::json!([6, 26, 27, 28]));
 
     let spec: serde_json::Value = sqlx::query_scalar(
         "SELECT meta -> 'issues' FROM project WHERE tenant_id = $1 AND key = 'SPEC-V2'",
@@ -89,7 +93,7 @@ async fn seed_programme_links_the_registered_issues() {
     .fetch_one(&db.super_pool)
     .await
     .expect("SPEC-V2 issues");
-    assert_eq!(spec, serde_json::json!([38]));
+    assert_eq!(spec, serde_json::json!([24]));
 
     // Every project carries the plan and track that let the design site render the programme.
     let missing: i64 = sqlx::query_scalar(
