@@ -119,9 +119,21 @@ jobs:
       - name: start Postgres 18 and Redis (the archetype's postgres_image / redis_image)
         run: |
           set -euo pipefail
-          docker run -d --name ci-pg \
+          # ⛔ Both storage choices here are load-bearing, and they are different resources.
+          #
+          # --shm-size: Docker's default /dev/shm is 64 MB and Postgres parallel workers allocate
+          # dynamic shared memory there. The first public run failed three prompt_catalogue tests
+          # with `53100 could not resize shared memory segment … No space left on device`
+          # (run 43313232334, dsm_impl.c). 1 GB is far above what this suite touches.
+          #
+          # NO --tmpfs for the data directory: a tmpfs is RAM-backed and capped at half the RAM
+          # (8 GB here), while 1225 tests each get a fresh migrated database. The second run died
+          # at test 1081 with `53100 could not extend file "base/…" (md.c)` — the tmpfs filled, not
+          # the disk. The container's writable layer is on the runner's 86 GB of free disk.
+          # --rm so the container and its data go at job end.
+          docker run -d --rm --name ci-pg \
             -e POSTGRES_PASSWORD=postgres \
-            --tmpfs /var/lib/postgresql \
+            --shm-size=1g \
             -p 127.0.0.1:5432:5432 \
             "$PG_IMAGE" -c fsync=off -c max_connections=300
           docker run -d --name ci-redis \
