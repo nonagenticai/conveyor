@@ -7,7 +7,7 @@ already-registered GitHub issues are the units and are linked from each project'
 Sources (all read-only):
   * `docs/plans/slices/S*.md` frontmatter — slice id, title, status, depends_on.
   * `docs/SPEC_V2.md` §12 when present — the T0–T17 slice list; a checked-in fallback is used
-    until SPEC_V2 lands on main (issue #38).
+    until SPEC_V2 lands on main (issue #24).
   * `gh issue list --state all` — the unit registry. An issue maps to a project by its `S##`
     label, its leading `S##`/`T##` title, or one of the explicit cross-cutting assignments.
 
@@ -34,29 +34,30 @@ PROGRAMME_NAME = "conveyor buildout"
 PROGRAMME_KEY = "conveyor-buildout"
 REPO_URL = "https://github.com/nonagenticai/conveyor"
 
-# The cross-cutting units that are not a `S##`/`T##` plan. Their issues are assigned by number.
+# The cross-cutting units that are not a `S##`/`T##` plan. Their issues are assigned by
+# number — these are the public repository's numbers after the 2026-11-12 recreation.
 CROSS_CUTTING = {
     "SPEC-V2": {
         "name": "SPEC V2 — the organisational operating model",
         "plan": "docs/SPEC_V2.md",
         "track": "programme",
-        "issues": [38],
+        "issues": [24],
     },
     "DESIGN-PUBLISH": {
         "name": "Publish the SPEC_V2 studio design pack, live",
         "plan": "docs/design/STUDIO-SPEC.md",
         "track": "programme",
-        "issues": [49, 51],
+        "issues": [32, 33, 36, 37],
     },
     "PLATFORM": {
         "name": "CI, runners and platform",
         "plan": "docs/plans/development-process-speed.md",
         "track": "programme",
-        "issues": [27, 32],
+        "issues": [17, 22],
     },
 }
 
-# SPEC_V2 §12, kept here until `docs/SPEC_V2.md` is on main (issue #38). The parser below
+# SPEC_V2 §12, kept here until `docs/SPEC_V2.md` is on main (issue #24). The parser below
 # prefers the live table; this list is the deterministic fallback.
 T_SLICES = [
     ("T0", "Model and contracts"),
