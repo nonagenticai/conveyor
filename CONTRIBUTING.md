@@ -16,7 +16,7 @@ agreement is required.
 
 1. Fork the repository and branch from `main` as `issue/<n>-<slug>`.
 2. Sign off every commit with `git commit -s`, certifying the Developer Certificate of Origin 1.1
-   (<https://developercertificate.org/>).
+   (DCO, <https://developercertificate.org/>).
 3. Run the local gate before opening the pull request.
 4. Open the pull request against `main`. Required checks and a maintainer review gate the merge.
 
