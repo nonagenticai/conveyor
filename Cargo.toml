@@ -82,7 +82,7 @@ reqwest = { version = "0.13.5", default-features = false, features = [
     # multipart/form-data (S09 §5.6).
     "multipart",
 ] }
-base64 = "0.22.1"
+base64 = "0.23.1"
 # `timestamptz` in Rust (job leases, event timestamps, licence expiry) and the schedule
 # next-run arithmetic. Pinned; the estate's agent-api uses the same crate.
 chrono = { version = "0.4.45", features = ["serde"] }

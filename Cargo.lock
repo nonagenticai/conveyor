@@ -690,7 +690,7 @@ name = "conveyor-actions"
 version = "0.1.0"
 dependencies = [
  "axum",
- "base64 0.22.1",
+ "base64 0.23.1",
  "bytes",
  "chrono",
  "conveyor-actions-derive",
@@ -737,7 +737,7 @@ name = "conveyor-api"
 version = "0.1.0"
 dependencies = [
  "axum",
- "base64 0.22.1",
+ "base64 0.23.1",
  "chrono",
  "conveyor-actions",
  "conveyor-auth",
@@ -769,7 +769,7 @@ name = "conveyor-auth"
 version = "0.1.0"
 dependencies = [
  "axum",
- "base64 0.22.1",
+ "base64 0.23.1",
  "chrono",
  "conveyor-domain",
  "conveyor-store",
@@ -864,7 +864,7 @@ dependencies = [
 name = "conveyor-store"
 version = "0.1.0"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "chacha20poly1305",
  "chrono",
  "conveyor-domain",
@@ -886,7 +886,7 @@ dependencies = [
 name = "conveyor-web"
 version = "0.1.0"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "chrono",
  "console_error_panic_hook",
  "js-sys",
