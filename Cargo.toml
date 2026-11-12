@@ -139,7 +139,7 @@ svg2pdf = { version = "0.13.0", default-features = false, features = ["text"] }
 # host fonts is (a) `usvg`/`resvg` pinned with `default-features = false`, so usvg's
 # `system-fonts` feature is off and the parser never scans the system on its own, and (b) the
 # renderer never calling `load_system_fonts()` — guarded by a source-scan test in `font.rs`.
-fontdb = "0.23.0"
+fontdb = "0.24.0"
 # XMI. `quick-xml` is a pull parser: it never resolves an external entity, and a `DOCTYPE`
 # arrives as `Event::DocType`, which the importer refuses (RM's exchange adapter does the same).
 quick-xml = "0.42.0"
