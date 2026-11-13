@@ -188,7 +188,7 @@ pub async fn seed_organisation(
                 }
                 None => {
                     let row = department_create(
-                        &mut *tx,
+                        &mut tx,
                         tenant,
                         &NewDepartment {
                             name: &department.name,

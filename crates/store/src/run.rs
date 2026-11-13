@@ -15,6 +15,10 @@ use uuid::Uuid;
 use crate::parent::{Parent, ParentError, ensure_optional_parent_tx, ensure_parent_tx};
 use crate::version_of;
 
+/// The parent row read `FOR UPDATE` before a child is created:
+/// `(card_id, depth, status, job_binding_id, release_hash)`.
+type ParentRow = (Option<Uuid>, i32, String, Option<Uuid>, Option<String>);
+
 /// A run to create.
 #[derive(Clone, Debug)]
 pub struct NewRun {
@@ -437,7 +441,7 @@ pub async fn insert_child_run_tx(
     // `FOR UPDATE` is what makes the parent's liveness and the child's insert one decision: a
     // concurrent `runs.cancel` (or the reaper) waits for this transaction, so a child can never
     // commit after its parent was cancelled — the insert then sees `cancelled` and refuses.
-    let parent: Option<(Option<Uuid>, i32, String, Option<Uuid>, Option<String>)> = sqlx::query_as(
+    let parent: Option<ParentRow> = sqlx::query_as(
         "SELECT card_id, depth, status, job_binding_id, release_hash
            FROM run WHERE tenant_id = $1 AND id = $2 FOR UPDATE",
     )
