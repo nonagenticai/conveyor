@@ -622,6 +622,20 @@ async fn migrate(
                 "programme seeded"
             );
         }
+
+        // T0: the organisation spine from the design fixtures — industries, the placed
+        // departments, the five described jobs and the §4.6 drafts, with one compiled
+        // release per job. Idempotent: a second run reports every row as skipped.
+        let organisation = seed::seed_organisation(&pool, tenant.as_deref()).await?;
+        for (slug, counts) in organisation {
+            tracing::info!(
+                tenant = %slug,
+                created = counts.created,
+                skipped = counts.skipped,
+                releases_published = counts.releases_published,
+                "organisation seeded"
+            );
+        }
     }
     // ⛔ NEVER part of `--seed`: a tenant's processes are content it chooses (accounting,
     // marketing, software development, …), not a universal default. This installs the shipped

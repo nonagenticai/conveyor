@@ -178,7 +178,11 @@ mod tests {
                 (37, "run tree workflow step".to_owned()),
                 // S06d: open connector kinds, per-channel action grants, the multicast dispatch
                 // ledger, and the `service` decider kind (0038_s06d_connector_standard.sql).
-                (38, "s06d connector standard".to_owned())
+                (38, "s06d connector standard".to_owned()),
+                // T0: the organisation spine — industry and the department placement, job
+                // catalogue, immutable release, binding, the card/run pins, and the
+                // decision-ladder tables (0039_organisation.sql, SPEC_V2 §4, §10.3, §12 T0).
+                (39, "organisation".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

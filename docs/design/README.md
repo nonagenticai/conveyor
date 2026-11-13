@@ -49,6 +49,12 @@ platform's public rows replace those fixtures on the pages that have a live sour
 and the email/token redaction. See [STUDIO-SPEC.md](STUDIO-SPEC.md) for sources,
 boundaries and verification.
 
+The **Organisation & Jobs** pages are the first destination whose mock data became the real seed:
+`seed/organisation.json` (transcribed from this pack's `v2.js` fixtures and SPEC_V2 §4.6) is an
+image input, compiled by `migrate --seed` into industries, the five ordered software departments
+and the catalogue positions, with one immutable release per described job. A publish never rewrites
+a seed: a seed change is a repository PR, a new image and a `migrate --seed` run.
+
 The pack is published at **https://nonagentic.ai/design/** by the `nonagentic_homepage`
 repository, which copies this directory verbatim into `dist/design/` and serves `studio.html` as
 `index.html`. Opening `studio.html` directly is still the offline entry point.

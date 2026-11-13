@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "note": "The design site's organisation fixtures become real rows (SPEC_V2 §4; T0 P4). Transcribed from docs/design/v2.js F.industries|departments|jobs and SPEC_V2 §4.6. Every tenant named here receives only its own rows.",
+  "industries": [
+    {
+      "key": "software",
+      "name": "Software",
+      "tenant": "nonagentic",
+      "note": "first tenant — IT development and operations"
+    },
+    {
+      "key": "health-technology-assessment",
+      "name": "Health technology assessment",
+      "tenant": "AHTAPol",
+      "note": "own tenant, own departments"
+    },
+    {
+      "key": "media",
+      "name": "Media",
+      "tenant": "w2v",
+      "note": "own tenant, own departments"
+    }
+  ],
+  "departments": [
+    { "key": "delivery", "name": "delivery", "industry": "software", "ordinal": 1, "is_primary": true, "first": "conveyor maintenance, feature delivery" },
+    { "key": "verification", "name": "verification", "industry": "software", "ordinal": 2, "is_primary": false, "first": "independent verification, eval authoring" },
+    { "key": "operations", "name": "operations", "industry": "software", "ordinal": 3, "is_primary": false, "first": "k8s/git incidents, runbooks, postmortems" },
+    { "key": "project_office", "name": "project office", "industry": "software", "ordinal": 4, "is_primary": false, "first": "charters, WBS, baselines, cadence" },
+    { "key": "improvement", "name": "improvement", "industry": "software", "ordinal": 5, "is_primary": false, "first": "interruptions, systemic fixes, instruments" }
+  ],
+  "jobs": [
+    {
+      "key": "backend_engineer",
+      "title": "Backend engineer",
+      "family": "engineering",
+      "industry": "software",
+      "department": "delivery",
+      "status": "active",
+      "definition": {
+        "charter": "Implement bounded backend changes; prove them with tests; propose a reviewable patch.",
+        "capabilities": ["delivery"],
+        "procedure_ref": "proc-implement",
+        "executor_kind": "internal_agent",
+        "model_ref": "router/medium",
+        "prompt_recipe": "implementation_role@4",
+        "knowledge": "base → software → delivery → backend",
+        "memory": "work-package hot + one digest",
+        "grants": ["coding_jobs.create", "coding_jobs.get", "test_runs.create"],
+        "binding": "toolkit coding@4 · ceiling write · credential coding.tenant",
+        "limits": "12 turns · 40k tokens · $2.50",
+        "gates": "design (conditional) · merge · deploy",
+        "authority": "implement, test, propose PR"
+      }
+    },
+    {
+      "key": "architect",
+      "title": "Architect",
+      "family": "architecture",
+      "industry": "software",
+      "department": "delivery",
+      "status": "active",
+      "definition": {
+        "charter": "Turn intent into architecture contracts and traceable decisions.",
+        "capabilities": ["architecture"],
+        "procedure_ref": "proc-arch",
+        "executor_kind": "internal_agent",
+        "model_ref": "router/high",
+        "prompt_recipe": "architecture_role@3",
+        "knowledge": "base → software → delivery → architecture",
+        "memory": "work-package hot + one digest",
+        "grants": ["models.create", "trace_links.create"],
+        "binding": "toolkit strata@2 · ceiling read · credential strata_rag.tenant",
+        "limits": "16 turns · 60k tokens · $4.00",
+        "gates": "design · architecture contract · closure",
+        "authority": "draft contracts and ADRs; no merge"
+      }
+    },
+    {
+      "key": "pm",
+      "title": "PM",
+      "family": "product",
+      "industry": "software",
+      "department": "project office",
+      "status": "active",
+      "definition": {
+        "charter": "Turn a request into a governed project; sequence work; route gates; close with evidence.",
+        "capabilities": ["project_management"],
+        "procedure_ref": "proc-pm",
+        "executor_kind": "procedure",
+        "model_ref": "laya + router/small",
+        "prompt_recipe": "pm_charter@2",
+        "knowledge": "base → software → project office",
+        "memory": "portfolio digest + project hot",
+        "grants": ["projects.create", "wbs.write", "approvals.request"],
+        "binding": "toolkit billing@1 · ceiling read · credential billing.tenant",
+        "limits": "8 turns · 20k tokens · $1.00",
+        "gates": "charter · baseline · change · closure",
+        "authority": "create/close project; never sole approver"
+      }
+    },
+    {
+      "key": "kanban_coach",
+      "title": "Kanban coach",
+      "family": "improvement",
+      "industry": "software",
+      "department": "improvement",
+      "status": "active",
+      "definition": {
+        "charter": "Protect flow; one interruption becomes exactly one coach card; bounded remedy or escalation.",
+        "capabilities": ["improvement"],
+        "procedure_ref": "proc-coach",
+        "executor_kind": "procedure",
+        "model_ref": "laya",
+        "prompt_recipe": "coach_triage@3",
+        "knowledge": "base → software → improvement",
+        "memory": "board hot + interruption digest",
+        "grants": ["cards.create", "cards.move", "coach.triage", "coach.remedy"],
+        "binding": "toolkit coding@4 · ceiling read · credential coding.tenant",
+        "limits": "closed sets · no LLM remedy",
+        "gates": "escalation only",
+        "authority": "triage + remedy within the closed set"
+      }
+    },
+    {
+      "key": "sre",
+      "title": "SRE / on-call",
+      "family": "operations",
+      "industry": "software",
+      "department": "operations",
+      "status": "active",
+      "definition": {
+        "charter": "Detect, triage, mitigate and learn from incidents in the conveyor and its dependencies.",
+        "capabilities": ["operations"],
+        "procedure_ref": "proc-incident",
+        "executor_kind": "internal_agent",
+        "model_ref": "router/medium",
+        "prompt_recipe": "incident_role@2",
+        "knowledge": "base → software → operations",
+        "memory": "incident hot + postmortem digest",
+        "grants": ["ops.k8s_read", "ops.k8s_restart", "ops.git_read"],
+        "binding": "toolkit ops@5 · ceiling destructive · credential ops.namespace",
+        "limits": "10 turns · 30k tokens · $3.00",
+        "gates": "destructive action · postmortem",
+        "authority": "read-first; write behind a gate"
+      }
+    },
+    { "key": "product_owner", "title": "Product owner", "family": "product", "industry": "software", "department": "delivery", "status": "draft", "definition": {} },
+    { "key": "tech_lead", "title": "Tech lead", "family": "engineering", "industry": "software", "department": "delivery", "status": "draft", "definition": {} },
+    { "key": "frontend_engineer", "title": "Frontend engineer", "family": "engineering", "industry": "software", "department": "delivery", "status": "draft", "definition": {} },
+    { "key": "data_engineer", "title": "Data engineer", "family": "engineering", "industry": "software", "department": "delivery", "status": "draft", "definition": {} },
+    { "key": "platform_engineer", "title": "Platform engineer", "family": "engineering", "industry": "software", "department": "delivery", "status": "draft", "definition": {} },
+    { "key": "reviewer", "title": "Reviewer", "family": "verification", "industry": "software", "department": "delivery", "status": "draft", "definition": {} },
+    { "key": "release_manager", "title": "Release manager", "family": "release", "industry": "software", "department": "delivery", "status": "draft", "definition": {} },
+    { "key": "technical_writer", "title": "Technical writer", "family": "knowledge", "industry": "software", "department": "delivery", "status": "draft", "definition": {} },
+    { "key": "qa_engineer", "title": "QA engineer", "family": "verification", "industry": "software", "department": "verification", "status": "draft", "definition": {} },
+    { "key": "security_reviewer", "title": "Security reviewer", "family": "verification", "industry": "software", "department": "verification", "status": "draft", "definition": {} },
+    { "key": "performance_engineer", "title": "Performance engineer", "family": "verification", "industry": "software", "department": "verification", "status": "draft", "definition": {} },
+    { "key": "incident_commander", "title": "Incident commander", "family": "operations", "industry": "software", "department": "operations", "status": "draft", "definition": {} },
+    { "key": "platform_operator", "title": "Platform operator", "family": "operations", "industry": "software", "department": "operations", "status": "draft", "definition": {} },
+    { "key": "programme_manager", "title": "Programme manager", "family": "product", "industry": "software", "department": "project office", "status": "draft", "definition": {} },
+    { "key": "portfolio_analyst", "title": "Portfolio analyst", "family": "product", "industry": "software", "department": "project office", "status": "draft", "definition": {} },
+    { "key": "kata_facilitator", "title": "Kata facilitator", "family": "improvement", "industry": "software", "department": "improvement", "status": "draft", "definition": {} },
+    { "key": "measurement_engineer", "title": "Measurement engineer", "family": "improvement", "industry": "software", "department": "improvement", "status": "draft", "definition": {} }
+  ]
+}

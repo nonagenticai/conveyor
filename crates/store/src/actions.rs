@@ -66,8 +66,28 @@ pub struct DepartmentRow {
     pub id: Uuid,
     pub name: String,
     pub parent_id: Option<Uuid>,
+    /// The industry the department belongs to (T0).
+    pub industry_id: Option<Uuid>,
+    /// 1-based order inside the industry (T0).
+    pub ordinal: Option<i32>,
+    /// The industry's primary department (T0).
+    pub is_primary: bool,
     pub version: i64,
     pub created_at: DateTime<Utc>,
+}
+
+/// A department to create (T0 adds the organisation placement).
+pub struct NewDepartment<'a> {
+    /// The department name (unique per tenant).
+    pub name: &'a str,
+    /// A parent department, when nested.
+    pub parent_id: Option<Uuid>,
+    /// The industry, when the department is part of one.
+    pub industry_id: Option<Uuid>,
+    /// 1-based order inside the industry.
+    pub ordinal: Option<i32>,
+    /// Whether this is the industry's primary department.
+    pub is_primary: bool,
 }
 
 /// One `audit_event` row.
@@ -454,7 +474,7 @@ pub async fn member_set_role(
 /// Every department of the tenant, ordered by name.
 pub async fn departments_list(conn: &mut PgConnection) -> Result<Vec<DepartmentRow>, sqlx::Error> {
     sqlx::query_as(
-        "SELECT id, name, parent_id, version, created_at
+        "SELECT id, name, parent_id, industry_id, ordinal, is_primary, version, created_at
            FROM department
           ORDER BY name, id",
     )
@@ -462,18 +482,16 @@ pub async fn departments_list(conn: &mut PgConnection) -> Result<Vec<DepartmentR
     .await
 }
 
-/// Insert a department, resolving `parent_id` in this tenant first.
+/// Insert a department, resolving `parent_id` and `industry_id` in this tenant first.
 ///
-/// The parent check is here, not in the handler: a caller that forgot it would hand a
-/// foreign id to `department_parent_fk` and the RI check (which bypasses RLS) would accept
-/// it. `None` is valid.
+/// The checks are here, not in the handler: a caller that forgot them would hand a foreign id
+/// to the FKs and the RI check (which bypasses RLS) would accept it. `None` is valid for both.
 pub async fn department_create(
     conn: &mut PgConnection,
     tenant: TenantId,
-    name: &str,
-    parent_id: Option<Uuid>,
+    input: &NewDepartment<'_>,
 ) -> Result<DepartmentRow, ActionParentError> {
-    if let Some(parent) = parent_id {
+    if let Some(parent) = input.parent_id {
         // `Parent` has no `Department` variant (a department is its own parent table), so
         // this is the same tenant-scoped EXISTS the helper performs.
         let present: bool = sqlx::query_scalar(
@@ -487,14 +505,29 @@ pub async fn department_create(
             return Err(ActionParentError::NotFound("department"));
         }
     }
+    if let Some(industry) = input.industry_id {
+        let present: bool = sqlx::query_scalar(
+            "SELECT EXISTS (SELECT 1 FROM industry WHERE tenant_id = $1 AND id = $2)",
+        )
+        .bind(tenant.as_uuid())
+        .bind(industry)
+        .fetch_one(&mut *conn)
+        .await?;
+        if !present {
+            return Err(ActionParentError::NotFound("industry"));
+        }
+    }
     let row: DepartmentRow = sqlx::query_as(
-        "INSERT INTO department (tenant_id, name, parent_id)
-         VALUES ($1, $2, $3)
-         RETURNING id, name, parent_id, version, created_at",
+        "INSERT INTO department (tenant_id, name, parent_id, industry_id, ordinal, is_primary)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id, name, parent_id, industry_id, ordinal, is_primary, version, created_at",
     )
     .bind(tenant.as_uuid())
-    .bind(name)
-    .bind(parent_id)
+    .bind(input.name)
+    .bind(input.parent_id)
+    .bind(input.industry_id)
+    .bind(input.ordinal)
+    .bind(input.is_primary)
     .fetch_one(&mut *conn)
     .await?;
     Ok(row)

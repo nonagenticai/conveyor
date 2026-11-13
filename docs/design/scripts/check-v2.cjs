@@ -242,8 +242,30 @@ const shot = (name) =>
       "change approval drafts a new baseline and leaves pins unchanged",
     );
 
+    // A live organisation payload flips the Organisation and Jobs ribbons and replaces their
+    // fixtures (T0). In DESIGN mode both pages keep the fixture catalogue.
+    const liveOrganisation = await page.evaluate(() => {
+      const snapshot = window.CONVEYOR_SNAPSHOT;
+      return Boolean(
+        snapshot &&
+          snapshot.schema === "design-snapshot/v1" &&
+          snapshot.organisation &&
+          (snapshot.organisation.industries || []).length,
+      );
+    });
+
     // 5. Organisation: dual control, decision ladder, refinement versions.
     await nav("organisation");
+    if (liveOrganisation) {
+      check((await content()).includes("LIVE"), "the organisation ribbon is LIVE");
+      check((await content()).includes("software"), "the live software industry is rendered");
+      check((await content()).includes("delivery"), "the live delivery department is rendered");
+    } else {
+      check(
+        (await content()).includes("V2 · PROPOSED"),
+        "the organisation ribbon is V2 · PROPOSED in DESIGN mode",
+      );
+    }
     await tab("organisation", "Approval policies");
     await action("self-approve");
     check(
@@ -264,24 +286,36 @@ const shot = (name) =>
 
     // 6. Jobs: immutable releases, bindings and the stale-binding refusal.
     await nav("jobs");
-    check((await content()).includes("software.delivery.backend_engineer"), "job catalogue");
-    await tab("jobs", "Releases");
-    await action("publish-release");
-    check(
-      (await content()).includes("Publish gate opened"),
-      "a draft release needs a publish gate",
-    );
-    await tab("jobs", "Bindings");
-    await action("stale");
-    check(
-      (await content()).includes("409 job_binding_stale"),
-      "a stale binding is refused before any model call",
-    );
-    await action("retire-binding");
-    check(
-      (await page.locator(".e-table tbody tr.selected").innerText()).includes("Retired"),
-      "retiring a binding keeps history",
-    );
+    if (liveOrganisation) {
+      check((await content()).includes("LIVE"), "the jobs ribbon is LIVE");
+      check(
+        (await content()).includes("backend_engineer"),
+        "the live job catalogue renders the seeded job",
+      );
+      check(
+        (await content()).includes("Published"),
+        "a live described job shows its published release",
+      );
+    } else {
+      check((await content()).includes("software.delivery.backend_engineer"), "job catalogue");
+      await tab("jobs", "Releases");
+      await action("publish-release");
+      check(
+        (await content()).includes("Publish gate opened"),
+        "a draft release needs a publish gate",
+      );
+      await tab("jobs", "Bindings");
+      await action("stale");
+      check(
+        (await content()).includes("409 job_binding_stale"),
+        "a stale binding is refused before any model call",
+      );
+      await action("retire-binding");
+      check(
+        (await page.locator(".e-table tbody tr.selected").innerText()).includes("Retired"),
+        "retiring a binding keeps history",
+      );
+    }
     await tab("jobs", "Legacy import");
     check(
       (await content()).includes("not the live model"),

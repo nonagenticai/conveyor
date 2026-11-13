@@ -46,6 +46,11 @@ pub struct NewRun {
     pub depth: i32,
     /// The process version the run pinned (CONTRACT §21); `1` for a non-process run.
     pub process_version: i64,
+    /// The job binding this run names (T0, §4.4). `None` for a run with no organisation pin.
+    pub job_binding_id: Option<Uuid>,
+    /// The release the caller claims the binding pins. Must equal the binding's pin; the store
+    /// refuses a mismatch `409 job_binding_stale` before the INSERT.
+    pub release_hash: Option<String>,
 }
 
 impl NewRun {
@@ -65,6 +70,8 @@ impl NewRun {
             workflow_step_id: None,
             depth: 0,
             process_version: 1,
+            job_binding_id: None,
+            release_hash: None,
         }
     }
 }
@@ -111,6 +118,27 @@ pub enum RunStoreError {
     /// The `(parent, step, attempt)` already exists (`uq_run_child_attempt`).
     #[error("the parent step already has a run at that attempt")]
     ChildAttemptExists,
+    /// The run named a retired (or draft) binding, or a release that is not its pin
+    /// (`409 job_binding_stale`, SPEC_V2 §4.4).
+    #[error(
+        "job_binding_stale: the binding pins release {binding_hash:?} but the run requested \
+         {requested_hash:?}"
+    )]
+    JobBindingStale {
+        /// The release hash the binding pins.
+        binding_hash: String,
+        /// The hash the caller named (the binding's own when the caller named none).
+        requested_hash: String,
+    },
+    /// A run that names a release must name the binding that pins it.
+    #[error("a run that names a release must name its job binding")]
+    ReleaseWithoutBinding,
+    /// The named binding does not exist in this tenant.
+    #[error("the job binding does not exist in this tenant")]
+    BindingNotFound,
+    /// The organisation spine refused the binding lookup.
+    #[error(transparent)]
+    Organisation(Box<crate::organisation::OrganisationStoreError>),
     /// The step bookkeeping the failure/cancel path also owes (one run tree is one unit of
     /// work, so failing a run skips its queued steps and cancels its live descendants).
     #[error(transparent)]
@@ -118,6 +146,24 @@ pub enum RunStoreError {
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
+}
+
+impl From<crate::organisation::OrganisationStoreError> for RunStoreError {
+    fn from(error: crate::organisation::OrganisationStoreError) -> Self {
+        use crate::organisation::OrganisationStoreError as Organisation;
+        match error {
+            Organisation::StaleRelease {
+                binding_hash,
+                requested_hash,
+            } => RunStoreError::JobBindingStale {
+                binding_hash,
+                requested_hash,
+            },
+            Organisation::NotFound("binding") => RunStoreError::BindingNotFound,
+            Organisation::Database(error) => RunStoreError::Database(error),
+            other => RunStoreError::Organisation(Box::new(other)),
+        }
+    }
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -310,6 +356,10 @@ fn constraint_of(error: &sqlx::Error) -> Option<&str> {
 ///
 /// `project_id` is required and resolved in the caller's tenant; `card_id` is optional and
 /// resolved when present (CONTRACT §2 — the FK alone does not enforce tenancy).
+///
+/// A run that names a `job_binding_id` resolves its pin HERE, before the INSERT: a retired or
+/// draft binding, or a `release_hash` that is not the binding's pin, is
+/// [`RunStoreError::JobBindingStale`] and nothing is written (SPEC_V2 §4.4, T0 P2.2).
 pub async fn insert_run_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -317,11 +367,26 @@ pub async fn insert_run_tx(
 ) -> Result<Run, RunStoreError> {
     ensure_parent_tx(conn, tenant, Parent::Project, input.project_id).await?;
     ensure_optional_parent_tx(conn, tenant, Parent::Card, input.card_id).await?;
+    let (job_binding_id, release_hash) = match input.job_binding_id {
+        Some(binding_id) => {
+            let (id, hash) = crate::organisation::resolve_binding_pin_tx(
+                conn,
+                tenant,
+                binding_id,
+                input.release_hash.as_deref(),
+            )
+            .await?;
+            (Some(id), Some(hash))
+        }
+        None if input.release_hash.is_some() => return Err(RunStoreError::ReleaseWithoutBinding),
+        None => (None, None),
+    };
     let sql = format!(
         "INSERT INTO run (tenant_id, card_id, project_id, status, attempt, correlation_id,
                           process_id, inputs, capability_id, capability_agent_id,
-                          parent_run_id, step_id, depth, process_version)
-         VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                          parent_run_id, step_id, depth, process_version,
+                          job_binding_id, release_hash)
+         VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
          RETURNING {COLUMNS}"
     );
     let row: RunRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -338,6 +403,8 @@ pub async fn insert_run_tx(
         .bind(input.step_id)
         .bind(input.depth)
         .bind(input.process_version)
+        .bind(job_binding_id)
+        .bind(release_hash.as_deref())
         .fetch_one(&mut *conn)
         .await
         .map_err(|error| {
@@ -370,14 +437,16 @@ pub async fn insert_child_run_tx(
     // `FOR UPDATE` is what makes the parent's liveness and the child's insert one decision: a
     // concurrent `runs.cancel` (or the reaper) waits for this transaction, so a child can never
     // commit after its parent was cancelled — the insert then sees `cancelled` and refuses.
-    let parent: Option<(Option<Uuid>, i32, String)> = sqlx::query_as(
-        "SELECT card_id, depth, status FROM run WHERE tenant_id = $1 AND id = $2 FOR UPDATE",
+    let parent: Option<(Option<Uuid>, i32, String, Option<Uuid>, Option<String>)> = sqlx::query_as(
+        "SELECT card_id, depth, status, job_binding_id, release_hash
+           FROM run WHERE tenant_id = $1 AND id = $2 FOR UPDATE",
     )
     .bind(tenant.as_uuid())
     .bind(parent_run_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let Some((parent_card_id, parent_depth, parent_status)) = parent else {
+    let Some((parent_card_id, parent_depth, parent_status, parent_binding, parent_release)) = parent
+    else {
         return Err(RunStoreError::NotFound);
     };
     let status = RunStatus::from_str(&parent_status)
@@ -433,8 +502,10 @@ pub async fn insert_child_run_tx(
     let sql = format!(
         "INSERT INTO run (tenant_id, card_id, project_id, status, attempt, correlation_id,
                           process_id, inputs, capability_id, capability_agent_id,
-                          parent_run_id, step_id, workflow_step_id, depth, process_version)
-         VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                          parent_run_id, step_id, workflow_step_id, depth, process_version,
+                          job_binding_id, release_hash)
+         VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+                 $16)
          RETURNING {COLUMNS}"
     );
     let row: RunRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -452,6 +523,10 @@ pub async fn insert_child_run_tx(
         .bind(workflow_step_id)
         .bind(depth)
         .bind(input.process_version)
+        // The parent's pin is authoritative: a child cannot change the binding mid-tree, and
+        // `input.job_binding_id`/`release_hash` are ignored exactly like `depth`.
+        .bind(parent_binding)
+        .bind(parent_release.as_deref())
         .fetch_one(&mut *conn)
         .await
         .map_err(|error| {

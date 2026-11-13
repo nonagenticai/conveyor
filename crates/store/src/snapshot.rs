@@ -65,16 +65,6 @@ pub async fn snapshot_tx(
     )
     .await?;
 
-    let departments = rows(
-        &mut *conn,
-        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.name), '[]'::jsonb) FROM (
-             SELECT id, name, parent_id, version, created_at, updated_at
-               FROM department WHERE tenant_id = $1
-         ) t",
-        tenant_id,
-    )
-    .await?;
-
     let boards = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id, t.position, t.id), '[]'::jsonb) FROM (
@@ -352,13 +342,10 @@ pub async fn snapshot_tx(
 
     Ok(SnapshotData {
         programme: json!({"programme": programme, "projects": projects}),
-        organisation: json!({
-            "industries": [],
-            "departments": departments,
-            "jobs": [],
-            "releases": [],
-            "bindings": []
-        }),
+        // T0: the organisation spine (§4) — industries, the placed departments, the job
+        // catalogue with its latest release's anatomy flattened onto each row, releases and
+        // bindings. Structural fields only (the publication privacy contract).
+        organisation: crate::organisation::organisation_json_tx(&mut *conn, tenant).await?,
         config: json!({
             "catalogue": catalogue,
             "capabilities": capabilities,

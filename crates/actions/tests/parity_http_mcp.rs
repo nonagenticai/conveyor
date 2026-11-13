@@ -91,6 +91,14 @@ struct Ctx {
     /// One executor spec on that capability, created once and never re-pointed: the
     /// deterministic `capability_agents.get` reads it from both transports.
     capability_agent_id: String,
+    /// T0's organisation anchor: one industry, its primary department, a described job, one
+    /// published release and one active binding. The deterministic organisation reads execute
+    /// twice against these rows; a mutating sample prepares its own fresh row.
+    industry_id: Uuid,
+    department_id: Uuid,
+    org_job_id: Uuid,
+    org_release_id: Uuid,
+    org_binding_id: Uuid,
     job: Mutex<Option<Uuid>>,
     /// The ids a `prepare` step wrote for this round, one queue per sample, popped once per
     /// round. They can never be static literals: every prepared row is created fresh.
@@ -1564,6 +1572,57 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
                 .expect("clear departments");
             tx.commit().await.expect("commit");
         }
+        // T0: the two job mutations and the binding retirement edit a LIVE row, so each round
+        // gets a fresh one (a fixed row would make round B a refusal compared with itself).
+        "job_catalogue.update" | "job_catalogue.retire" => {
+            let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+            let job_id: Uuid = sqlx::query_scalar(
+                "INSERT INTO job_catalogue
+                     (tenant_id, job_key, industry_id, family, title, status, definition)
+                 VALUES ($1, $2, $3, 'engineering', 'Parity job', 'active',
+                         '{\"charter\":\"parity\"}'::jsonb)
+                 RETURNING id",
+            )
+            .bind(ctx.tenant_id)
+            .bind(format!("parity_{}", Uuid::now_v7().simple()))
+            .bind(ctx.industry_id)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("prepare a job");
+            sqlx::query(
+                "INSERT INTO job_department (tenant_id, job_id, department_id, ordinal, is_primary)
+                 VALUES ($1, $2, $3, 1, true)",
+            )
+            .bind(ctx.tenant_id)
+            .bind(job_id)
+            .bind(ctx.department_id)
+            .execute(&mut *tx)
+            .await
+            .expect("prepare the job's placement");
+            tx.commit().await.expect("commit");
+            ctx.push(sample.name, job_id);
+        }
+        "job_bindings.retire" => {
+            let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+            let binding_id: Uuid = sqlx::query_scalar(
+                "INSERT INTO job_binding
+                     (tenant_id, job_id, release_id, release_hash, release_snapshot,
+                      capability_agent_id, executor_kind, status, meta)
+                 VALUES ($1, $2, $3, $4, '{\"anatomy\":{}}'::jsonb, $5,
+                         'internal_agent', 'active', '{}'::jsonb)
+                 RETURNING id",
+            )
+            .bind(ctx.tenant_id)
+            .bind(ctx.org_job_id)
+            .bind(ctx.org_release_id)
+            .bind("a".repeat(64))
+            .bind(Uuid::parse_str(&ctx.capability_agent_id).expect("the agent id is a uuid"))
+            .fetch_one(&mut *tx)
+            .await
+            .expect("prepare a binding");
+            tx.commit().await.expect("commit");
+            ctx.push(sample.name, binding_id);
+        }
         "invites.revoke" => {
             let id = seed_invite(pg, ctx).await;
             ctx.push(sample.name, id);
@@ -2286,6 +2345,107 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             Some("\"1\""),
         ),
         plain("departments.list", json!({}), None),
+        // ── T0: the organisation spine (SPEC_V2 §4) ────────────────────────────────────────
+        // Every read is anchored on the rows created once above; the three mutations of a
+        // live row prepare a FRESH row per round, because a fixed row would make round B a
+        // refusal compared against the same refusal.
+        {
+            let mut sample = plain("industries.get", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.industry_id}));
+            sample
+        },
+        plain("industries.list", json!({}), None),
+        {
+            // The key is unique per (tenant, key), so it must be minted per ROUND.
+            let mut sample = plain("industries.create", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| {
+                json!({
+                    "key": format!("parity-{}", Uuid::now_v7().simple()),
+                    "name": "Parity industry",
+                })
+            });
+            sample
+        },
+        {
+            let mut sample = plain("job_catalogue.get", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.org_job_id}));
+            sample
+        },
+        plain("job_catalogue.list", json!({}), None),
+        {
+            let mut sample = plain("job_catalogue.create", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_key": format!("parity_{}", Uuid::now_v7().simple()),
+                    "industry_id": ctx.industry_id,
+                    "family": "engineering",
+                    "title": "Parity job",
+                    "definition": {"charter": "parity"},
+                    "departments": [
+                        {"department_id": ctx.department_id, "ordinal": 1, "is_primary": true}
+                    ],
+                })
+            });
+            sample
+        },
+        {
+            let mut sample = on_prepared("job_catalogue.update", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({"id": ctx.pop("job_catalogue.update"), "version": 1, "title": "Parity job updated"})
+            });
+            sample
+        },
+        {
+            let mut sample = on_prepared("job_catalogue.retire", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({"id": ctx.pop("job_catalogue.retire"), "version": 1})
+            });
+            sample
+        },
+        {
+            let mut sample = plain("job_releases.list", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| json!({"job_id": ctx.org_job_id}));
+            sample
+        },
+        {
+            let mut sample = plain("job_releases.publish", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| json!({"job_id": ctx.org_job_id}));
+            sample
+        },
+        {
+            let mut sample = plain("job_bindings.list", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| json!({"job_id": ctx.org_job_id}));
+            sample
+        },
+        {
+            let mut sample = plain("job_bindings.get", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.org_binding_id}));
+            sample
+        },
+        {
+            let mut sample = plain("job_bindings.create", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_id": ctx.org_job_id,
+                    "release_id": ctx.org_release_id,
+                    "executor_kind": "internal_agent",
+                    "capability_agent_id": ctx.capability_agent_id,
+                })
+            });
+            sample
+        },
+        {
+            let mut sample = on_prepared("job_bindings.retire", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({"id": ctx.pop("job_bindings.retire"), "version": 1})
+            });
+            sample
+        },
+        {
+            let mut sample = plain("job_releases.retire", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.org_release_id}));
+            sample
+        },
         plain("departments.create", json!({"name": "engineering"}), None),
         plain("audit.list", json!({"limit": 10}), None),
         plain("jobs.list", json!({"limit": 10}), None),
@@ -4622,6 +4782,77 @@ async fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     let capability_agent_id = capability_agent_id.to_string();
     let capability_id = capability_id.to_string();
 
+    // T0's organisation anchor (SPEC_V2 §4): rows no sample re-points. Inserted as the superuser
+    // with explicit tenant ids, exactly like the other anchors above.
+    let org_industry: Uuid = sqlx::query_scalar(
+        "INSERT INTO industry (tenant_id, key, name)
+         VALUES ($1, 'software', 'Software') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity industry");
+    let org_department: Uuid = sqlx::query_scalar(
+        "INSERT INTO department (tenant_id, name, industry_id, ordinal, is_primary)
+         VALUES ($1, 'delivery', $2, 1, true) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(org_industry)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity department");
+    let org_job: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_catalogue
+             (tenant_id, job_key, industry_id, family, title, status, definition)
+         VALUES ($1, 'parity_job', $2, 'engineering', 'Parity job', 'active',
+                 '{\"charter\":\"parity\"}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(org_industry)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity job");
+    sqlx::query(
+        "INSERT INTO job_department (tenant_id, job_id, department_id, ordinal, is_primary)
+         VALUES ($1, $2, $3, 1, true)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(org_job)
+    .bind(org_department)
+    .execute(&pg.super_pool)
+    .await
+    .expect("seed the parity placement");
+    let org_release_hash = "a".repeat(64);
+    let org_release: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_release (tenant_id, job_id, release_hash, release_snapshot)
+         VALUES ($1, $2, $3, '{\"anatomy\":{\"charter\":\"parity\"}}'::jsonb) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(org_job)
+    .bind(&org_release_hash)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity release");
+    let org_binding: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_binding
+             (tenant_id, job_id, release_id, release_hash, release_snapshot,
+              capability_agent_id, executor_kind, status, meta)
+         VALUES ($1, $2, $3, $4, '{\"anatomy\":{\"charter\":\"parity\"}}'::jsonb, $5,
+                 'internal_agent', 'active', '{}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(org_job)
+    .bind(org_release)
+    .bind(&org_release_hash)
+    .bind(
+        Uuid::parse_str(&capability_agent_id).expect("the capability agent id is a uuid"),
+    )
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity binding");
+
     let bob_user = seed_member(&pg, &seeded, "bob").await;
     let ctx = Arc::new(Ctx {
         alice_user: seeded.user_id,
@@ -4646,6 +4877,11 @@ async fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         benchmark_run_b,
         capability_id,
         capability_agent_id,
+        industry_id: org_industry,
+        department_id: org_department,
+        org_job_id: org_job,
+        org_release_id: org_release,
+        org_binding_id: org_binding,
         job: Mutex::new(None),
         prepared: Mutex::new(HashMap::new()),
     });

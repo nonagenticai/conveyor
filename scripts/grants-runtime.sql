@@ -53,3 +53,10 @@ REVOKE UPDATE ON trace_link FROM conveyor_runtime;
 -- `model.prune`/`revision` retention DELETEs, and publishing supersedes the previous row with
 -- `UPDATE revision SET status = 'superseded'` (`crates/store/src/model.rs:1248`). Revoking
 -- either grant would make supersede or retention fail at runtime.
+
+-- T0 (0039): `job_release` is the immutable compiled release (SPEC_V2 §4.4, §10.3). Publishing
+-- again writes a NEW row; the only update a live row may take is retirement. The runtime role
+-- keeps UPDATE on the three bookkeeping columns only, and no DELETE at all — an application bug
+-- cannot rewrite the hash/snapshot that a binding and its runs pin.
+REVOKE UPDATE, DELETE ON job_release FROM conveyor_runtime;
+GRANT UPDATE (status, version, updated_at) ON job_release TO conveyor_runtime;

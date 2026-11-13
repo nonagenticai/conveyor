@@ -248,11 +248,17 @@ pub enum Scope {
     CapabilitiesRead,
     /// Configure an executor, bind a knowledge pack and write work-package memory.
     CapabilitiesWrite,
+    // T0 — the organisation spine (SPEC_V2 §4): industries, the job catalogue, releases and
+    // bindings. A read is open; a write is platform administration, like `departments:write`.
+    /// Read industries, the job catalogue, releases and bindings.
+    OrganisationRead,
+    /// Create and change industries, jobs, releases and bindings.
+    OrganisationWrite,
 }
 
 impl Scope {
     /// Every scope this build knows.
-    pub const ALL: [Scope; 63] = [
+    pub const ALL: [Scope; 65] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -316,6 +322,8 @@ impl Scope {
         Scope::WorkflowsWrite,
         Scope::CapabilitiesRead,
         Scope::CapabilitiesWrite,
+        Scope::OrganisationRead,
+        Scope::OrganisationWrite,
     ];
 
     /// The wire spelling (`<resource>:<verb>`).
@@ -384,6 +392,8 @@ impl Scope {
             Self::WorkflowsWrite => "workflows:write",
             Self::CapabilitiesRead => "capabilities:read",
             Self::CapabilitiesWrite => "capabilities:write",
+            Self::OrganisationRead => "organisation:read",
+            Self::OrganisationWrite => "organisation:write",
         }
     }
 
@@ -438,7 +448,8 @@ impl Scope {
             | Self::InferenceRead
             | Self::IntegrationsRead
             | Self::WorkflowsRead
-            | Self::CapabilitiesRead => true,
+            | Self::CapabilitiesRead
+            | Self::OrganisationRead => true,
             Self::RunsWrite
             | Self::ApprovalsWrite
             | Self::AndonWrite
@@ -469,7 +480,8 @@ impl Scope {
             | Self::ProjectsWrite
             | Self::BoardsWrite
             | Self::ListsWrite
-            | Self::CardsWrite => admin,
+            | Self::CardsWrite
+            | Self::OrganisationWrite => admin,
             // ⛔ NOT the `admin` predicate: that includes `Role::KataExecutor`, a machine
             // role, and a scope a machine holds cannot be a sign-off (CONTRACT §20 trap 1).
             Self::EvalsApprove => matches!(role, Role::Admin),
@@ -905,7 +917,9 @@ mod tests {
         assert_eq!(Scope::WorkflowsWrite.as_str(), "workflows:write");
         assert_eq!(Scope::CapabilitiesRead.as_str(), "capabilities:read");
         assert_eq!(Scope::CapabilitiesWrite.as_str(), "capabilities:write");
-        assert_eq!(Scope::ALL.len(), 63);
+        assert_eq!(Scope::OrganisationRead.as_str(), "organisation:read");
+        assert_eq!(Scope::OrganisationWrite.as_str(), "organisation:write");
+        assert_eq!(Scope::ALL.len(), 65);
     }
 
     #[test]

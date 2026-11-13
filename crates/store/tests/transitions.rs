@@ -555,6 +555,8 @@ async fn a_project_execution_is_create_or_return_and_the_index_refuses_a_second_
         workflow_step_id: None,
         depth: 0,
         process_version: 1,
+        job_binding_id: None,
+        release_hash: None,
     };
     let refused = insert_run_tx(&mut tx, tenant, &raw)
         .await
