@@ -110,7 +110,7 @@ rmcp = { version = "3.9.0", features = ["server", "transport-streamable-http-ser
 openapiv3 = "2.2.0"
 # rmcp and axum both speak http 1.x; the MCP credential resolver takes the header map.
 http = "1.3.1"
-syn = { version = "2.0.108", features = ["full"] }
+syn = { version = "3.0.9", features = ["full"] }
 quote = "1.0.41"
 proc-macro2 = "1.0.103"
 proptest = "1.12.0"
