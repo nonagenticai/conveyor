@@ -820,14 +820,17 @@ dependencies = [
  "axum",
  "clap",
  "conveyor-platform",
+ "reqwest",
  "serde",
  "serde_json",
+ "serde_yaml",
  "sqlx",
  "thiserror",
  "tokio",
  "tower",
  "tracing",
  "utoipa",
+ "uuid",
 ]
 
 [[package]]

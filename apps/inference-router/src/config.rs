@@ -15,7 +15,7 @@ pub const DEFAULT_PORT: u16 = 8150;
 pub const DEFAULT_PROVIDERS_CONFIG: &str = "/config/providers.yaml";
 
 /// Everything the process reads before it serves a request.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Config {
     /// The listener address (`BIND_ADDR`, else `0.0.0.0:$INFERENCE_ROUTER_PORT`).
     pub bind: SocketAddr,
@@ -27,6 +27,9 @@ pub struct Config {
     pub environment: String,
     /// `ENABLE_DOCS=true` (the live deployment sets it) or `environment == development`.
     pub docs_enabled: bool,
+    /// How long a request waits for a per-provider concurrency slot before it is shed as
+    /// `queue_rejected` (`PROVIDER_SLOT_WAIT_TIMEOUT`, default 30 s).
+    pub provider_slot_wait_seconds: f64,
 }
 
 #[derive(Debug, PartialEq, Eq, thiserror::Error)]
@@ -35,6 +38,8 @@ pub enum ConfigError {
     InvalidBind(String),
     #[error("INFERENCE_ROUTER_PORT is not a port number: {0}")]
     InvalidPort(String),
+    #[error("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT is not a positive number of seconds: {0}")]
+    InvalidSlotWait(String),
     #[error("INFERENCE_ROUTER_DATABASE_URL (or DATABASE_URL) is required to serve")]
     MissingDatabaseUrl,
 }
@@ -81,12 +86,26 @@ impl Config {
             || non_empty(lookup("ENABLE_DOCS"))
                 .is_some_and(|value| value.eq_ignore_ascii_case("true"));
 
+        let provider_slot_wait_seconds: f64 =
+            match non_empty(lookup("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT")) {
+                Some(raw) => raw
+                    .parse()
+                    .map_err(|_| ConfigError::InvalidSlotWait(raw.clone()))?,
+                None => 30.0,
+            };
+        if provider_slot_wait_seconds <= 0.0 || !provider_slot_wait_seconds.is_finite() {
+            return Err(ConfigError::InvalidSlotWait(
+                provider_slot_wait_seconds.to_string(),
+            ));
+        }
+
         Ok(Self {
             bind,
             database_url,
             providers_config_path,
             environment,
             docs_enabled,
+            provider_slot_wait_seconds,
         })
     }
 
@@ -126,6 +145,20 @@ mod tests {
         );
         assert_eq!(config.environment, "production");
         assert!(!config.docs_enabled);
+        assert_eq!(config.provider_slot_wait_seconds, 30.0);
+    }
+
+    #[test]
+    fn the_slot_wait_must_be_positive() {
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "0")]),
+            Err(ConfigError::InvalidSlotWait("0".to_owned()))
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "soon")]),
+            Err(ConfigError::InvalidSlotWait("soon".to_owned()))
+        );
+        assert!(parse(&[("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "45")]).is_ok());
     }
 
     #[test]

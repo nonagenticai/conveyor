@@ -106,7 +106,7 @@ mod tests {
 
     #[tokio::test]
     async fn the_health_routes_serve_the_captured_shapes() {
-        let app = crate::router::router();
+        let app = crate::router::router(crate::router::test_state());
 
         let cases = [
             ("/health", r#"{"status":"ok"}"#),
@@ -133,7 +133,7 @@ mod tests {
 
     #[tokio::test]
     async fn the_root_lists_the_metadata_fields() {
-        let response = crate::router::router()
+        let response = crate::router::router(crate::router::test_state())
             .oneshot(Request::get("/").body(Body::empty()).expect("request"))
             .await
             .expect("router answers");

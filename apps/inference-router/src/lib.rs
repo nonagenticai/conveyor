@@ -6,10 +6,14 @@
 //! to the capture, so the check can fail for the reason it exists.
 #![forbid(unsafe_code)]
 
+pub mod catalog;
 pub mod config;
 pub mod contract;
 pub mod db;
+pub mod provider;
 pub mod router;
+pub mod routing;
+pub mod state;
 
 /// The service name reported by `/` and the `service` log field.
 pub const SERVICE_NAME: &str = "inference-router";

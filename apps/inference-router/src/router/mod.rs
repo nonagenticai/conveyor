@@ -17,6 +17,8 @@ pub mod whoami;
 use axum::Router;
 use axum::routing::{get, patch, post};
 
+use crate::state::AppState;
+
 /// `(METHOD, path)` for every operation this service registers.
 pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/"),
@@ -137,7 +139,7 @@ pub fn openapi() -> utoipa::openapi::OpenApi {
 }
 
 /// The HTTP application the binary serves.
-pub fn router() -> Router {
+pub fn router(state: AppState) -> Router {
     Router::new()
         .route("/", get(health::root))
         .route("/health", get(health::health))
@@ -213,4 +215,18 @@ pub fn router() -> Router {
             "/api/admin/tenants/{tenant_id}/inference-policy/activate",
             post(admin::activate_inference_policy),
         )
+        .with_state(state)
+}
+
+/// The state the health tests need: no providers, defaults. Not for production.
+#[cfg(test)]
+pub(crate) fn test_state() -> AppState {
+    use std::time::Duration;
+
+    let config = crate::config::Config::from_lookup(|_| None).expect("defaults");
+    let catalog = crate::catalog::Catalog::from_yaml("providers: []\ndefault_chain: []\n")
+        .expect("an empty catalog");
+    let router = crate::routing::RouterService::new(catalog, Duration::from_secs(1))
+        .expect("no providers to build");
+    AppState::new(config, router)
 }

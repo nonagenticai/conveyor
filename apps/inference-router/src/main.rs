@@ -8,10 +8,13 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 use conveyor_inference_router::SERVICE_NAME;
+use conveyor_inference_router::catalog::Catalog;
 use conveyor_inference_router::config::Config;
 use conveyor_inference_router::contract;
 use conveyor_inference_router::db;
 use conveyor_inference_router::router::{self, ROUTES};
+use conveyor_inference_router::routing::RouterService;
+use conveyor_inference_router::state::AppState;
 
 #[derive(Debug, Parser)]
 #[command(
@@ -101,17 +104,24 @@ fn serve() -> ExitCode {
 async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
     let config = Config::from_env()?;
     // The service cannot serve without its own database. Refuse at startup, not at the first
-    // request; the migration slices wire the pool this guard protects.
+    // request; the ledger slice wires the pool this guard protects.
     config.database_url()?;
     conveyor_platform::telemetry::init(SERVICE_NAME);
+
+    // The catalog is deployment config and its refusals are part of the contract: an ambiguous
+    // alias or a missing owner-hardware credential fails the boot, exactly as it does live.
+    let catalog = Catalog::load(&config.providers_config_path)?;
+    let slot_wait = std::time::Duration::from_secs_f64(config.provider_slot_wait_seconds);
+    let router_service = RouterService::new(catalog, slot_wait)?;
     tracing::info!(
         environment = %config.environment,
         providers = %config.providers_config_path.display(),
         docs = config.docs_enabled,
         "serving"
     );
-    let listener = tokio::net::TcpListener::bind(config.bind).await?;
-    axum::serve(listener, router::router()).await?;
+    let state = AppState::new(config, router_service);
+    let listener = tokio::net::TcpListener::bind(state.config().bind).await?;
+    axum::serve(listener, router::router(state)).await?;
     Ok(())
 }
 
