@@ -57,6 +57,11 @@ pub async fn create_chat_completion(
     headers: HeaderMap,
     Json(request): Json<ChatCompletionRequest>,
 ) -> Response {
+    // The licence gate runs before anything is dialled: an unverifiable caller must never reach a
+    // provider or the ledger.
+    if let Err(refusal) = state.authorize(&headers).await {
+        return refusal.into_response();
+    }
     if request.stream {
         return Refusal::detail(
             StatusCode::NOT_IMPLEMENTED,

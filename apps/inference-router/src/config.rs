@@ -6,6 +6,8 @@
 //! variables (tests run in parallel in one process).
 
 use std::net::{Ipv4Addr, SocketAddr};
+
+use crate::auth::Mode;
 use std::path::PathBuf;
 
 /// The port the live service binds when `BIND_ADDR` is absent.
@@ -30,6 +32,15 @@ pub struct Config {
     /// How long a request waits for a per-provider concurrency slot before it is shed as
     /// `queue_rejected` (`PROVIDER_SLOT_WAIT_TIMEOUT`, default 30 s).
     pub provider_slot_wait_seconds: f64,
+    /// `INFERENCE_ROUTER_INTROSPECT_MODE` (`off` | `observe` | `enforce`); when unset, `enforce`
+    /// iff `INFERENCE_ROUTER_REQUIRE_CALLER_LICENSE` is true, else `off`.
+    pub introspect_mode: Mode,
+    /// `INFERENCE_ROUTER_LICENSE_INTROSPECT_URL` — the licences `/license/introspect` endpoint.
+    pub introspect_url: String,
+    /// `INFERENCE_ROUTER_LICENSE_INTROSPECT_TIMEOUT` (seconds, default 2).
+    pub introspect_timeout_seconds: f64,
+    /// `INFERENCE_ROUTER_LICENSE_INTROSPECT_FAIL_OPEN` (default true): an outage is not a verdict.
+    pub introspect_fail_open: bool,
 }
 
 #[derive(Debug, PartialEq, Eq, thiserror::Error)]
@@ -40,6 +51,10 @@ pub enum ConfigError {
     InvalidPort(String),
     #[error("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT is not a positive number of seconds: {0}")]
     InvalidSlotWait(String),
+    #[error("INFERENCE_ROUTER_INTROSPECT_MODE is not one of off/observe/enforce: {0}")]
+    InvalidIntrospectMode(String),
+    #[error("INFERENCE_ROUTER_LICENSE_INTROSPECT_TIMEOUT is not a number of seconds: {0}")]
+    InvalidIntrospectTimeout(String),
     #[error("INFERENCE_ROUTER_DATABASE_URL (or DATABASE_URL) is required to serve")]
     MissingDatabaseUrl,
 }
@@ -99,6 +114,26 @@ impl Config {
             ));
         }
 
+        let require_caller_license = non_empty(lookup("INFERENCE_ROUTER_REQUIRE_CALLER_LICENSE"))
+            .is_some_and(|value| value.eq_ignore_ascii_case("true"));
+        let introspect_mode = match non_empty(lookup("INFERENCE_ROUTER_INTROSPECT_MODE")) {
+            Some(raw) => Mode::parse(&raw).ok_or(ConfigError::InvalidIntrospectMode(raw))?,
+            None if require_caller_license => Mode::Enforce,
+            None => Mode::Off,
+        };
+        let introspect_url =
+            non_empty(lookup("INFERENCE_ROUTER_LICENSE_INTROSPECT_URL")).unwrap_or_default();
+        let introspect_timeout_seconds: f64 =
+            match non_empty(lookup("INFERENCE_ROUTER_LICENSE_INTROSPECT_TIMEOUT")) {
+                Some(raw) => raw
+                    .parse()
+                    .map_err(|_| ConfigError::InvalidIntrospectTimeout(raw.clone()))?,
+                None => 2.0,
+            };
+        let introspect_fail_open =
+            non_empty(lookup("INFERENCE_ROUTER_LICENSE_INTROSPECT_FAIL_OPEN"))
+                .is_none_or(|value| value.eq_ignore_ascii_case("true"));
+
         Ok(Self {
             bind,
             database_url,
@@ -106,6 +141,10 @@ impl Config {
             environment,
             docs_enabled,
             provider_slot_wait_seconds,
+            introspect_mode,
+            introspect_url,
+            introspect_timeout_seconds,
+            introspect_fail_open,
         })
     }
 
@@ -146,6 +185,37 @@ mod tests {
         assert_eq!(config.environment, "production");
         assert!(!config.docs_enabled);
         assert_eq!(config.provider_slot_wait_seconds, 30.0);
+    }
+
+    #[test]
+    fn the_introspection_mode_follows_the_live_rules() {
+        assert_eq!(parse(&[]).expect("defaults").introspect_mode, Mode::Off);
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_REQUIRE_CALLER_LICENSE", "true")])
+                .expect("legacy flag")
+                .introspect_mode,
+            Mode::Enforce
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_INTROSPECT_MODE", "observe")])
+                .expect("mode")
+                .introspect_mode,
+            Mode::Observe
+        );
+        // The explicit mode wins over the legacy flag.
+        assert_eq!(
+            parse(&[
+                ("INFERENCE_ROUTER_INTROSPECT_MODE", "off"),
+                ("INFERENCE_ROUTER_REQUIRE_CALLER_LICENSE", "true")
+            ])
+            .expect("mode wins")
+            .introspect_mode,
+            Mode::Off
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_INTROSPECT_MODE", "sometimes")]),
+            Err(ConfigError::InvalidIntrospectMode("sometimes".to_owned()))
+        );
     }
 
     #[test]
