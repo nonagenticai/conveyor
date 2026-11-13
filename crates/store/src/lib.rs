@@ -115,6 +115,9 @@ pub mod rbac;
 pub mod repository;
 pub mod retire;
 pub mod revision;
+// T0 (SPEC_V2 §4, §10.3): industry, job catalogue, immutable release, binding and the
+// `organisation` snapshot section.
+pub mod organisation;
 pub mod run;
 pub mod schedule;
 pub mod scope;
@@ -122,6 +125,7 @@ pub mod search;
 pub mod secret;
 pub mod seed;
 pub mod seed_benchmark;
+pub mod seed_organisation;
 pub mod seed_programme;
 pub mod snapshot;
 pub mod task;

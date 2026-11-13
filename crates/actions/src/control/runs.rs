@@ -199,6 +199,11 @@ async fn runs_create(
             workflow_step_id: None,
             depth: 0,
             process_version: 1,
+            // T0: a run may name the organisation binding (and the release it claims) it
+            // executes under. The store refuses a retired binding or a stale pin 409 before
+            // the INSERT (SPEC_V2 §4.4).
+            job_binding_id: input.job_binding_id,
+            release_hash: input.release_hash.clone(),
         },
     )
     .await

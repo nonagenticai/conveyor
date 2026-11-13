@@ -9,6 +9,7 @@ pub use conveyor_store::seed::{
     CatalogueExport, DEV_TENANTS, DEV_USERS, SeedError, catalogue_export, seed_catalogue,
 };
 pub use conveyor_store::seed_benchmark::seed_benchmark;
+pub use conveyor_store::seed_organisation::{OrganisationCounts, seed_organisation};
 pub use conveyor_store::seed_programme::{ProgrammeCounts, seed_programme};
 
 use conveyor_domain::TenantId;

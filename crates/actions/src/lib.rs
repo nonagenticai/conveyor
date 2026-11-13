@@ -44,6 +44,9 @@ pub mod mcp;
 pub mod memory;
 pub mod model;
 pub mod openapi;
+// T0 (SPEC_V2 §4, §10.4): the organisation spine — industries, the job catalogue, immutable
+// releases and bindings.
+pub mod organisation;
 pub mod portfolio;
 pub mod process;
 // SPEC D28 / CONTRACT §21: the SOP (procedure) that judges a process step.

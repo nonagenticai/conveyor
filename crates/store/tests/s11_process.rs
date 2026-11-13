@@ -695,6 +695,8 @@ async fn a_process_run_keeps_its_version_inputs_and_one_job_per_attempt() {
             workflow_step_id: None,
             depth: 0,
             process_version: 1,
+            job_binding_id: None,
+            release_hash: None,
         },
     )
     .await

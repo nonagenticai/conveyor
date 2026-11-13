@@ -199,6 +199,12 @@ pub struct DepartmentOut {
     pub name: String,
     /// The parent department, if any.
     pub parent_id: Option<String>,
+    /// The industry the department belongs to (T0).
+    pub industry_id: Option<String>,
+    /// 1-based order inside the industry (T0).
+    pub ordinal: Option<i32>,
+    /// Whether this is the industry's primary department (T0).
+    pub is_primary: bool,
     /// The row version.
     pub version: i64,
     /// When the row was created.
@@ -212,6 +218,12 @@ pub struct DepartmentsCreateIn {
     pub name: String,
     /// A parent department id, resolved under the caller's tenant.
     pub parent_id: Option<Uuid>,
+    /// The industry this department belongs to (T0, SPEC_V2 §4.1), resolved under the tenant.
+    pub industry_id: Option<Uuid>,
+    /// 1-based order inside the industry; the five department set uses 1..=5.
+    pub ordinal: Option<i32>,
+    /// Mark this as the industry's primary department (at most one per industry).
+    pub is_primary: Option<bool>,
 }
 
 /// `audit.list`.

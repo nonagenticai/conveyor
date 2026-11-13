@@ -231,3 +231,84 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
 
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+/// T0 P5.1: the seeded organisation spine is published, with the design site's keys.
+#[tokio::test]
+async fn organisation_is_populated_for_a_seeded_tenant() {
+    let db = common::TestDb::fresh().await;
+    sqlx::query("INSERT INTO tenant (slug, name) VALUES ('nonagentic', 'Nonagentic')")
+        .execute(&db.super_pool)
+        .await
+        .expect("tenant");
+    let counts =
+        conveyor_store::seed_organisation::seed_organisation(&db.super_pool, Some("nonagentic"))
+            .await
+            .expect("seed the organisation");
+    assert_eq!(counts.len(), 1);
+    assert_eq!(counts[0].1.releases_published, 5);
+
+    let dir = std::env::temp_dir().join(format!("conveyor-organisation-{}", Uuid::now_v7()));
+    std::fs::create_dir_all(&dir).expect("snapshot dir");
+    let issues_path = dir.join("issues.json");
+    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
+    let args = SnapshotArgs {
+        tenant: "nonagentic".to_owned(),
+        out: dir.clone(),
+        generated_at: Some("2026-11-13T00:00:00Z".to_owned()),
+        issues: issues_path,
+        feedback_url: "https://example.test/feedback".to_owned(),
+        database_url: None,
+        git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+    };
+    conveyor_server::snapshot::run_with_pool(&db.runtime, args)
+        .await
+        .expect("snapshot");
+
+    let raw = std::fs::read_to_string(dir.join("organisation.json")).expect("organisation.json");
+    let organisation: Value = serde_json::from_str(&raw).expect("organisation json");
+    assert_eq!(organisation["schema"], "design-snapshot/v1");
+    assert_eq!(
+        organisation["industries"].as_array().map(Vec::len),
+        Some(1),
+        "the software industry"
+    );
+    assert_eq!(
+        organisation["departments"].as_array().map(Vec::len),
+        Some(5),
+        "the five departments"
+    );
+    assert_eq!(
+        organisation["jobs"].as_array().map(Vec::len),
+        Some(22),
+        "five described jobs plus the §4.6 drafts"
+    );
+    assert_eq!(
+        organisation["releases"].as_array().map(Vec::len),
+        Some(5),
+        "one compiled release per described job"
+    );
+    let backend = organisation["jobs"]
+        .as_array()
+        .expect("jobs")
+        .iter()
+        .find(|job| job["key"] == "backend_engineer")
+        .expect("the backend row");
+    assert!(
+        backend["charter"]
+            .as_str()
+            .is_some_and(|charter| charter.contains("Implement bounded backend changes")),
+        "the release anatomy is flattened onto the job row: {backend}"
+    );
+    assert_eq!(backend["department_names"][0], "delivery");
+    assert_eq!(backend["status"], "active");
+    assert!(
+        !raw.contains("alice@") && !raw.contains("@example."),
+        "no email address reaches the public payload"
+    );
+    assert!(
+        !raw.contains("ghp_"),
+        "no credential-shaped value reaches the public payload"
+    );
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
