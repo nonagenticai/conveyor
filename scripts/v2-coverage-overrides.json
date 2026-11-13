@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "note": "Curated verdicts where the mechanical answer is misleading. Every override carries the reason it exists; the generator appends its own mechanical evidence.",
+  "overrides": {
+    "table:department": {
+      "verdict": "extend",
+      "note": "V1 has department (0001_platform). V2 adds industry_id, ordinal and is_primary instead of forking the concept (T0, SPEC §4.1)."
+    },
+    "actions:decision": {
+      "verdict": "new",
+      "note": "V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2)."
+    },
+    "actions:kata": {
+      "verdict": "new",
+      "note": "V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5."
+    },
+    "destination:Organisation": {
+      "verdict": "extend",
+      "note": "The page exists and renders fixtures; live industries/departments/jobs/releases/bindings arrive with T0 (#34)."
+    },
+    "destination:Procedures": {
+      "verdict": "extend",
+      "note": "The page and the V1 process/SOP tables exist; SOP/RDF/OWL ingestion, PKO editing and publish gates are T16."
+    },
+    "destination:Authoring": {
+      "verdict": "new",
+      "note": "A design study only: no authoring actions, no intake queue, no draft catalogue (T17)."
+    },
+    "destination:Portfolio": {
+      "verdict": "extend",
+      "note": "Live programme/project rows render today; shared config, WSJF backlog, cadence and capacity are fixture tabs (T1/T10)."
+    },
+    "destination:Plan": {
+      "verdict": "extend",
+      "note": "A design study today. The live Boards tab arrives with #57; WBS, baseline, registers and change control are T1."
+    },
+    "destination:Improve": {
+      "verdict": "extend",
+      "note": "The page exists and renders a design study; V1's eval/benchmark/kata rows are the instruments it will read (T5/T8)."
+    },
+    "destination:Operations": {
+      "verdict": "new",
+      "note": "A design study only: no incident/runbook/postmortem rows or operations actions (T7)."
+    },
+    "destination:Tools": {
+      "verdict": "new",
+      "note": "The page exists as a catalogue study; tool/toolkit/tool_binding/tool_call do not exist (T13)."
+    }
+  }
+}

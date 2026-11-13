@@ -35,13 +35,23 @@ cd "$root"
 #    here; check-docs.cjs gates the committed output without needing pandoc.
 python3 "$pack/scripts/build-docs.py"
 
-# 1. The programme and the issue registry are generated from the plans + GitHub.
+# 1. The programme, the plan seed and the issue registry are generated from the plans + GitHub.
+#    They are committed artefacts: a publish that changes them means the image's embedded copy
+#    and the published copy disagree, so it stops instead of shipping the drift.
 python3 "$root/scripts/build-programme-seed.py"
+python3 "$root/scripts/build-plan-seed.py"
 "$root/scripts/fetch-issues.sh" "$data/issues.json"
+if [ -n "$(git -C "$root" status --porcelain -- seed/programme.json seed/plans.json docs/design/data/issues.json docs/design/data/plan-seed.js)" ] && [ "${ALLOW_SEED_DRIFT:-0}" != "1" ]; then
+  echo "publish-data: generated seeds differ from the commit; commit them first" >&2
+  git -C "$root" status --short -- seed/programme.json seed/plans.json docs/design/data/issues.json docs/design/data/plan-seed.js >&2
+  echo "publish-data: set ALLOW_SEED_DRIFT=1 only to inspect this run" >&2
+  exit 1
+fi
 
 # 2. The rows come from the live database, not from a fixture.
 mkdir -p "$data"
 snapshot_args=(snapshot --tenant "$tenant" --out "$data" --issues "$data/issues.json")
+snapshot_args+=(--git-sha "$(git -C "$root" rev-parse HEAD)")
 if [ -n "${SNAPSHOT_DATABASE_URL:-}" ]; then
   snapshot_args+=(--database-url "$SNAPSHOT_DATABASE_URL")
 fi

@@ -114,7 +114,7 @@ pub async fn seed_programme(
 }
 
 /// The same target resolution `seed_catalogue` uses: one explicit slug, or every active tenant.
-async fn targets(
+pub(crate) async fn targets(
     pool: &PgPool,
     tenant_slug: Option<&str>,
 ) -> Result<Vec<(Uuid, String)>, SeedError> {

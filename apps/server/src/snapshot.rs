@@ -59,6 +59,9 @@ pub struct SnapshotArgs {
     /// The read-only database URL. Absent means `DATABASE_URL`; the admin command does not
     /// need the serving auth configuration.
     pub database_url: Option<String>,
+    /// The commit the published pack describes. Absent means `git rev-parse HEAD` in the
+    /// working directory; a pod has no checkout, so a publish passes it explicitly.
+    pub git_sha: Option<String>,
 }
 
 /// One written file.
@@ -136,7 +139,7 @@ pub async fn run_with_pool(
         .generated_at
         .clone()
         .unwrap_or_else(|| chrono::Utc::now().to_rfc3339());
-    let git_sha = git_sha();
+    let git_sha = args.git_sha.clone().unwrap_or_else(git_sha);
     let migration_version = store::MIGRATOR
         .iter()
         .last()
@@ -149,13 +152,20 @@ pub async fn run_with_pool(
         .unwrap_or_default();
 
     let mut tx = store::begin_scoped_read_only(pool, tenant).await?;
-    let data = store::snapshot::snapshot_tx(&mut tx, tenant).await?;
+    let mut data = store::snapshot::snapshot_tx(&mut tx, tenant).await?;
     tx.rollback().await?;
 
     let issues = read_issues(&args.issues)?;
     let feedback = feedback_issues(&issues);
 
     std::fs::create_dir_all(&args.out)?;
+
+    // The wrapper carries the same registry the per-file documents do: insert it before the
+    // wrapper is built, or the data panel and feedback list read a programme without it.
+    if let Some(object) = data.programme.as_object_mut() {
+        object.insert("issue_registry".to_owned(), issues.clone());
+        object.insert("feedback".to_owned(), Value::Array(feedback.clone()));
+    }
 
     // Build the combined wrapper before the per-file writes consume `data`'s fields.
     let snapshot_js = snapshot_js(
@@ -167,11 +177,7 @@ pub async fn run_with_pool(
     )?;
 
     let mut files = Vec::new();
-    let mut programme = data.programme;
-    if let Some(object) = programme.as_object_mut() {
-        object.insert("issue_registry".to_owned(), issues.clone());
-        object.insert("feedback".to_owned(), Value::Array(feedback.clone()));
-    }
+    let programme = data.programme;
     write_file(
         &args.out,
         "programme.json",

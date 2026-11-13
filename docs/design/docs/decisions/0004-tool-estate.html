@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0004 — The tool estate is in scope: one public monorepo · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0004-tool-estate.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0004--the-tool-estate-is-in-scope-one-public-monorepo">0004 — The tool estate is in scope: one public monorepo</h1>
+<p>Status: Accepted · Date: 2026-11-12 · Issue: #42</p>
+<h2 id="decision">Decision</h2>
+<p><code>conveyor</code> is one public monorepo. The platform and every tool it uses are written in Rust and live in this workspace. A legacy service stays external and bindable as a toolkit until it is rewritten, and joins the workspace on the day it is rewritten.</p>
+<p><strong>In scope for this repository:</strong></p>
+<ul>
+<li><code>inference-router</code></li>
+<li><code>licenses</code></li>
+<li><code>billing-service</code></li>
+<li>the <code>coding-*</code> fleet (behind <code>coding-gateway</code>)</li>
+<li>the w2v services and <code>video-compiler</code></li>
+<li><code>strata_ingest</code>, <code>strata_rag</code></li>
+</ul>
+<p><strong>Out of scope — they stay their own products and their own repositories:</strong></p>
+<ul>
+<li>the agent platform and <code>nonagenticai_mcp_server</code></li>
+<li><code>fr</code> / RM, Planka, Keycloak</li>
+<li><code>care-bus</code></li>
+<li><code>license-authz</code> — ingress enforcement; it keeps calling <code>licenses</code> over HTTP</li>
+<li><code>artifact_service</code> / <code>storage-api</code>, <code>provisioning</code>, <code>modality-gateway</code></li>
+</ul>
+<h2 id="repo-scope-is-not-tool-estate-membership">Repo scope is not tool-estate membership</h2>
+<p>These are two different lists and must not be conflated:</p>
+<ul>
+<li><strong>Repo scope</strong> — what code lives here. <code>inference-router</code> is in it.</li>
+<li><strong>Tool estate</strong> — what a conveyor job may call through the broker. <code>inference-router</code> is infrastructure, not a job tool; <code>strata_rag</code> and <code>strata_ingest</code> are both.</li>
+</ul>
+<p>Inclusion in this repository never grants a job a tool. The broker's bindings decide that.</p>
+<h2 id="shared-services-keep-independent-deployment">Shared services keep independent deployment</h2>
+<p>Several of the in-scope services are used by more than conveyor (the agent platform, care-bus, the ingress). Repo placement must not couple their release cadence to conveyor's:</p>
+<ul>
+<li>each service keeps its own container image, published per service, with an immutable digest;</li>
+<li>consumers other than conveyor pin a digest and do not build from this repository;</li>
+<li>the <code>strata_*</code> images stay independently published for the agent and care-bus apps;</li>
+<li>one service = one database = one role.</li>
+</ul>
+<h2 id="how-a-service-joins">How a service joins</h2>
+<p>Every absorption uses the same contract; the work is one issue per service:</p>
+<ol type="1">
+<li><strong>Capture the live contract</strong> — the served OpenAPI and a golden request/response set, pinned by date and image digest. Fixtures are synthetic; a public repository is never a fixture target.</li>
+<li><strong>Rewrite in Rust</strong> in <code>apps/&lt;service&gt;</code> — no line-port, and nothing bulk-imported from a private working tree.</li>
+<li><strong>Prove parity in three layers</strong> — an OpenAPI lock check, a golden replay, and a shadow diff over recorded live traffic with an explicit, justified tolerance list.</li>
+<li><strong>Cut over by flag</strong> — one environment variable per consumer; a regression is one flag away from the old path.</li>
+<li><strong>Record evidence and decommission last</strong> — the old repository is archived only when the last consumer is off it, never when conveyor alone has cut over.</li>
+</ol>
+<h2 id="licensing-and-contributions">Licensing and contributions</h2>
+<p>Apache-2.0 (see <code>LICENSE</code>). Contributions are accepted under the same terms by DCO sign-off (<code>git commit -s</code>); there is no CLA. Contributions are open to anyone, and required checks plus maintainer review gate every merge.</p>
+<h2 id="what-this-supersedes">What this supersedes</h2>
+<p><code>docs/SPEC.md</code> §2 and <code>parity/parity.yaml</code> (rows P-0006 onward) state that <code>licenses</code>, <code>billing_service</code> and <code>inference-router</code> are "never absorbed". That was the V1 scope. The owner's ruling of 2026-11-12 supersedes it for the services listed above.</p>
+<p>This decision does <strong>not</strong> edit <code>docs/SPEC.md</code>, <code>docs/SPEC_V2.md</code> or <code>parity/parity.yaml</code>. V1 and V2 remain the reference record; this ADR is the current scope. Where they disagree with this document, this document wins.</p>
+<p><code>docs/SPEC_V2.md</code> D58 already states that "the conveyor is one large repo: the platform plus every new or rewritten tool"; D54 and D60 add the w2v fleet and the AHTAPol/w2v tenancy. This ADR applies that direction to the services conveyor calls today.</p>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>The absorption backlog becomes ordinary units — one service each — instead of one programme-sized rewrite.</li>
+<li>The public CI grows a per-service image matrix; until that lands, the single <code>checks</code> job remains the fallback.</li>
+<li>The repository's dependency surface grows by the services' own dependencies, each under <code>cargo audit</code> and Dependabot.</li>
+<li>Services used by other products keep their own image and database; the monorepo does not become a distributed monolith.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0004-tool-estate.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

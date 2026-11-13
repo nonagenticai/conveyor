@@ -97,6 +97,15 @@ pub enum SeedError {
     /// The embedded programme document is not valid JSON (also a build-time constant).
     #[error("the embedded programme seed is not valid JSON: {0}")]
     ProgrammeDocument(String),
+    /// The embedded plan document is not valid JSON (also a build-time constant).
+    #[error("the embedded plan seed is not valid JSON: {0}")]
+    PlanDocument(String),
+    /// The plan seed names a row this tenant does not have.
+    #[error("the plan seed names no {0} row {1:?}")]
+    PlanMissing(&'static str, String),
+    /// The board helper refused a plan row.
+    #[error(transparent)]
+    Board(#[from] crate::board::BoardStoreError),
     /// The benchmark importer refused the artifact (a seed conflict, a bad row).
     #[error(transparent)]
     Benchmark(#[from] crate::benchmark::BenchmarkStoreError),
