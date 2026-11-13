@@ -440,8 +440,7 @@ mod tests {
         let err = cache
             .key("https://good.example/certs", "missing")
             .await
-            .err()
-            .expect("an unknown kid must fail");
+            .expect_err("an unknown kid must fail");
         assert!(matches!(err, AuthError::InvalidToken), "{err:?}");
         assert_eq!(source.calls(), 1, "an unknown kid must not stampede");
 
@@ -471,8 +470,7 @@ mod tests {
         let err = cache
             .key("https://good.example/certs", "k1")
             .await
-            .err()
-            .expect("a failed fetch must fail closed");
+            .expect_err("a failed fetch must fail closed");
         assert!(matches!(err, AuthError::JwksUnavailable(_)), "{err:?}");
         // The floor applies to failures too: a second call does not retry.
         let _ = cache.key("https://good.example/certs", "k1").await;
