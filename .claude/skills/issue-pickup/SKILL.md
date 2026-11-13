@@ -36,6 +36,10 @@ git log origin/main --grep "#N" --oneline
 All four empty → claim. Any non-empty → **resume**, never create a parallel branch. The issue's
 `state` must be `OPEN`: a closed issue is finished — do not claim it; find the next unit.
 
+The body's `## Claim` block is the fifth check: a body that names a branch and a HEAD is claimed,
+even when the branch list looks empty (an adopted `lane/*`/`slice/*` branch never matches
+`issue/N-*`).
+
 ### Definition-of-ready gate — before any claim
 
 An issue that fails its DoR is not claimable; a claim on an unready brief is how a session re-derives
@@ -72,6 +76,9 @@ gh issue comment N --body 'Claimed. Branch `issue/N-<slug>` at `<sha>`.'
 
 - The nonce is load-bearing: identical marker commits can share a SHA and make the loser's push
   look successful.
+- Write the `## Claim` block into the body in the same operation — branch, HEAD, session, updated,
+  `Adopted-from: —` — and update its HEAD on every push. The block is the claim another session can
+  read without cloning.
 - If the remote SHA is not yours, you lost: fetch the branch and join. Never force-push.
 - Refuse to create a branch in the shared root checkout. Work only in `.worktrees/issue-N`.
 - **Claims are unlimited.** The WIP cap is a PR cap, not a claim cap: `issue-pickup` never refuses
@@ -86,11 +93,16 @@ gh issue comment N --body 'Claimed. Branch `issue/N-<slug>` at `<sha>`.'
 3. `git fetch origin && git log --oneline origin/issue/N-* ^origin/main`; work in a worktree.
 4. Push to the **same** branch. Never create a second branch or PR for the same issue.
 
-### Adopted in-flight branch
+### Adoption — an in-flight branch or an abandoned claim
 
-If the issue predates its branch (`lane/*`, `slice/*`), record that branch in the issue body and
-work there. At ship time push its HEAD to a new `issue/N-<slug>` ref and open the PR from that:
-`block-duplicate-pr.py` refuses a PR from `slice/*`.
+- **An issue that predates its branch** (`lane/*`, `slice/*`): record that branch in the `## Claim`
+  block and work there. At ship time push its HEAD to a new `issue/N-<slug>` ref and open the PR
+  from that: `block-duplicate-pr.py` refuses a PR from `slice/*`.
+- **A claimed issue with 48 h of silence** (no push to its branch and no comment on the issue): the
+  claim is abandoned. Re-run the four checks, work on the **same** branch — never a parallel one,
+  never a force-push — post a takeover comment naming the branch and HEAD, and set `Adopted-from`
+  in the Claim block. No permission from the original session is needed; if it returns, it joins
+  the branch.
 
 ## Never
 
