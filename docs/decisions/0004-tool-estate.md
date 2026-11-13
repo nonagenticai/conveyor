@@ -1,6 +1,6 @@
 # 0004 — The tool estate is in scope: one public monorepo
 
-Status: Accepted · Date: 2026-11-12 · Issue: #42
+Status: Accepted · Date: 2026-11-12 · Issue: #42 · Amended by 0005 (2026-11-13): `strata_ingest` and `strata_rag` stay external repositories
 
 ## Decision
 
