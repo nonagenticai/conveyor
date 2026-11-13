@@ -8,7 +8,7 @@ before relying on it; none of it is a standing fact.
 
 ## Loki (the S0 access-log source)
 
-- Service: `loki.loki.svc.cluster.local:3100`, ClusterIP `192.0.2.11`.
+- Service: `localhost:3100`, ClusterIP `192.0.2.11`.
 - Labels: `container`, `filename`, `job`, `namespace`, `pod`, `service_name`, `stream`. Only job value: `kubernetes-pods`.
 - Ingress access logs live at `{namespace="istio-system", container="istio-proxy"}`. Line shape (measured):
   `[ts] "GET / HTTP/1.1" 200 - via_upstream - "-" 0 4540 86 58 "<x-forwarded-for>" "<ua>" "<request-id>" "fr.nonagentic.ai" ...`

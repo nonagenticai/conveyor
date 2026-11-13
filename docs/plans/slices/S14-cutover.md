@@ -72,7 +72,7 @@ removal (flows retired at S13; the idle process stays, see §9.9); `kata-n8n`.
 | namespace / service | `conveyor` / `conveyor.conveyor.svc.cluster.local:8930` |
 | host (D16) | `conveyor.nonagentic.ai` — a **new** host; `fr.nonagentic.ai` is not re-pointed |
 | DB | `conveyor`; `conveyor_migrate` owns the schema; `conveyor_runtime` is `NOSUPERUSER NOBYPASSRLS` |
-| URLs | `DATABASE_URL` → `pgbouncer.pgbouncer.svc.cluster.local:6432`; `DATABASE_MIGRATE_URL` → `postgres.example.com:5432` |
+| URLs | `DATABASE_URL` → `pgbouncer:6432`; `DATABASE_MIGRATE_URL` → `postgres.example.com:5432` |
 | PgBouncer | `conveyor = host=postgres.example.com port=5432 dbname=conveyor pool_size=12` (fr's shape) |
 | Keycloak (D13) | realm `conveyor`; `conveyor-web` public PKCE; `conveyor-backend` confidential service account |
 | licence | `app_key=conveyor`; `GET /licenses/active?tenant_id=&app_key=conveyor`; synced into `app_licence` |
