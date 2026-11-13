@@ -124,6 +124,13 @@ gh issue comment N --body &#39;Claimed. Branch `issue/N-&lt;slug&gt;` at `&lt;sh
 <li>If an in-flight branch predates its issue (<code>lane/*</code>, <code>slice/*</code>), record the branch in the issue body and adopt it. ⚠️ <code>block-duplicate-pr.py</code> refuses a PR from <code>slice/*</code>, so at ship time push the adopted HEAD to a new <code>issue/N-&lt;slug&gt;</code> ref and open the PR from that.</li>
 <li>If a PR already exists without an issue, create the issue for it (the full contract), record the branch and PR in the body, comment on the PR with the link, and add <code>Closes #N</code> to its body. The PR's owner keeps the work; never push to that branch. <code>conveyor#38</code> (PR #36) is the worked example.</li>
 </ul>
+<h2 id="the-console--a-front-door-not-a-second-protocol">The console — a front door, not a second protocol</h2>
+<p>The operator console at <code>conveyor.nonagentic.ai/design</code> can intake an issue as a card, move a card, comment, claim and release against the tenant's own rows. It is a <strong>front door to the platform</strong>, not a second delivery protocol:</p>
+<ul>
+<li>the GitHub issue is still the unit and the pushed branch is still the claim; a card created from the console carries <code>meta.issue</code> and is a view of the unit, never a substitute for it;</li>
+<li>the console cannot open a PR, merge, or edit a label — those stay the protocol above;</li>
+<li><code>conveyor admin intake</code> and the console both call <code>cards.create</code>, so the two paths cannot produce different rows.</li>
+</ul>
 <h2 id="work-and-gate">Work and gate</h2>
 <ul>
 <li>Commit freely on the issue branch (commits are free; branch pushes run no CI — the workflow triggers on <code>pull_request</code> and <code>push: main</code> only).</li>

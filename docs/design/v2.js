@@ -90,6 +90,454 @@ window.installV2 = function (api, enterprise) {
   const stale = (subject) =>
     `<div class="v2-code">409 ${subject}\nThe binding pins release 3f9c…a1. The requested release 7d20…c4 is not this binding's pin. No model call was made.</div>`;
 
+  /* ------------------------------------------------------------- operator console */
+  // Served by the app with a same-origin `/config.json`, console.js signs an operator in and
+  // the Plan surface reads and writes the platform's own rows. On the homepage mirror and
+  // from `file://` there is no config, `consoleOn()` is false, and the snapshot path below is
+  // exactly what it was. Nothing is simulated on this path: every control is an action.
+  const C = window.ConveyorConsole || null;
+  const consoleOn = () => !!(C && C.signedIn());
+  const cs = {
+    loaded: false,
+    loading: false,
+    error: null,
+    projects: [],
+    issues: [],
+    types: [],
+    byProject: {},
+    loadingProject: null,
+    lastError: null,
+  };
+  const consoleIssueUrl = (number) =>
+    `https://github.com/nonagenticai/conveyor/issues/${encodeURIComponent(number)}`;
+  const consoleIssueOf = (card) =>
+    card.issue != null ? card.issue : card.meta ? card.meta.issue : null;
+  const consoleError = (error) =>
+    (error && (error.detail || error.message)) || "The request failed.";
+  const consoleRank = (key) =>
+    /^S/.test(String(key)) ? 0 : /^T/.test(String(key)) ? 1 : 2;
+
+  function consoleReset() {
+    cs.loaded = false;
+    cs.loading = false;
+    cs.error = null;
+    cs.projects = [];
+    cs.issues = [];
+    cs.types = [];
+    cs.byProject = {};
+    cs.loadingProject = null;
+    cs.lastError = null;
+  }
+
+  async function consoleLoad() {
+    if (!consoleOn() || cs.loading) return;
+    cs.loading = true;
+    cs.error = null;
+    try {
+      const [projectPage, issueRows] = await Promise.all([
+        C.get("/api/projects?limit=200"),
+        C.issues(),
+      ]);
+      cs.projects = list(projectPage.items);
+      cs.issues = list(issueRows);
+      cs.loaded = true;
+      if (C.can("catalogues.list")) {
+        try {
+          const types = await C.action("catalogues.list", {
+            kind: "card_type",
+            page: { limit: 200 },
+          });
+          cs.types = list(types.items);
+        } catch (_) {
+          cs.types = [];
+        }
+      }
+    } catch (error) {
+      cs.error = error;
+    } finally {
+      cs.loading = false;
+      render();
+    }
+  }
+
+  async function consoleLoadProject(projectId) {
+    if (!consoleOn() || !projectId) return;
+    const current = cs.byProject[projectId];
+    if (current && !current.stale) return;
+    if (cs.loadingProject === projectId) return;
+    cs.loadingProject = projectId;
+    try {
+      const view = await C.get("/api/projects/" + encodeURIComponent(projectId));
+      const board = list(view.boards)[0];
+      if (!board) throw new Error("This project has no board.");
+      const [boardView, cardPage] = await Promise.all([
+        C.get("/api/boards/" + encodeURIComponent(board.id)),
+        C.get("/api/boards/" + encodeURIComponent(board.id) + "/cards?limit=200"),
+      ]);
+      cs.byProject[projectId] = {
+        board: boardView.board || board,
+        lists: list(boardView.lists).map((row) => row.list || row),
+        cards: list(cardPage.items),
+        stale: false,
+      };
+    } catch (error) {
+      cs.byProject[projectId] = { error };
+    } finally {
+      cs.loadingProject = null;
+      render();
+    }
+  }
+
+  function consoleRefresh(projectId) {
+    if (projectId) {
+      const current = cs.byProject[projectId];
+      cs.byProject[projectId] = current ? Object.assign({}, current, { stale: true }) : { stale: true };
+    }
+    render();
+    if (projectId) consoleLoadProject(projectId);
+  }
+
+  function consoleProjects() {
+    return [...cs.projects].sort(
+      (a, b) => consoleRank(a.key) - consoleRank(b.key) || String(a.key).localeCompare(String(b.key)),
+    );
+  }
+
+  function consoleSelected() {
+    const ordered = consoleProjects();
+    return ordered.find((row) => row.id === v.planProject) || ordered[0] || null;
+  }
+
+  function consoleIssueRows(project) {
+    const linked = list((project.meta || {}).issues);
+    const byNumber = new Map(cs.issues.map((row) => [String(row.number), row]));
+    return linked.map(
+      (number) =>
+        byNumber.get(String(number)) || {
+          number,
+          state: "UNKNOWN",
+          title: "Not in the published registry",
+          url: consoleIssueUrl(number),
+          labels: [],
+        },
+    );
+  }
+
+  async function consoleIntake(projectId, issueNumber) {
+    const project = cs.projects.find((row) => row.id === projectId);
+    const data = cs.byProject[projectId];
+    const issue = cs.issues.find((row) => String(row.number) === String(issueNumber));
+    if (!project || !data || data.error) {
+      toast("The project's board is not loaded yet");
+      return;
+    }
+    const lane = list(data.lists).find((row) => row.kind === "intake") || list(data.lists)[0];
+    if (!lane) {
+      toast("This board has no lane to intake into");
+      return;
+    }
+    const preferred = list(cs.types).find((row) => row.code === "architecture_task");
+    const type = v.intakeType || (preferred && preferred.code) || "architecture_task";
+    try {
+      await C.action("cards.create", {
+        board_id: data.board.id,
+        list_id: lane.id,
+        name: (issue && issue.title) || `Issue #${issueNumber}`,
+        card_type_code: type,
+        meta: {
+          issue: Number(issueNumber),
+          unit_key: project.key,
+          plan: (project.meta || {}).plan,
+        },
+      });
+    } catch (error) {
+      cs.lastError = error;
+      toast("Intake refused · " + consoleError(error));
+      render();
+      return;
+    }
+    cs.lastError = null;
+    toast(`Issue #${issueNumber} intaken as a card`);
+    consoleRefresh(projectId);
+  }
+
+  async function consoleMove(cardId) {
+    const select = document.getElementById("console-move");
+    if (!select) return;
+    const project = consoleSelected();
+    try {
+      const fresh = await C.get("/api/cards/" + encodeURIComponent(cardId));
+      await C.action("cards.move", { id: cardId, list_id: select.value }, { etag: fresh.card.version });
+    } catch (error) {
+      cs.lastError = error;
+      toast("Move refused · " + consoleError(error));
+      if (project) consoleRefresh(project.id);
+      return;
+    }
+    cs.lastError = null;
+    toast("Card moved");
+    const dialog = document.getElementById("dialog");
+    if (dialog && dialog.open) dialog.close();
+    if (project) consoleRefresh(project.id);
+  }
+
+  async function consoleComment(cardId) {
+    const input = document.getElementById("console-comment");
+    const body = (input && input.value ? input.value : "").trim();
+    if (!body) {
+      toast("A comment needs a body");
+      return;
+    }
+    const project = consoleSelected();
+    try {
+      await C.action("cards.comment", { id: cardId, body });
+    } catch (error) {
+      cs.lastError = error;
+      toast("Comment refused · " + consoleError(error));
+      return;
+    }
+    cs.lastError = null;
+    toast("Comment recorded");
+    if (project) consoleRefresh(project.id);
+    consoleCardDialog(cardId);
+  }
+
+  async function consoleClaim(cardId) {
+    const project = consoleSelected();
+    try {
+      const fresh = await C.get("/api/cards/" + encodeURIComponent(cardId));
+      await C.action("cards.claim", { card_id: cardId }, { etag: fresh.card.version });
+    } catch (error) {
+      cs.lastError = error;
+      toast("Claim refused · " + consoleError(error));
+      return;
+    }
+    cs.lastError = null;
+    toast("Card claimed");
+    if (project) consoleRefresh(project.id);
+    consoleCardDialog(cardId);
+  }
+
+  async function consoleRelease(cardId) {
+    const project = consoleSelected();
+    try {
+      await C.action("cards.release", { card_id: cardId });
+    } catch (error) {
+      cs.lastError = error;
+      toast("Release refused · " + consoleError(error));
+      return;
+    }
+    cs.lastError = null;
+    toast("Claim released");
+    if (project) consoleRefresh(project.id);
+    consoleCardDialog(cardId);
+  }
+
+  async function consoleCardDialog(cardId) {
+    if (!consoleOn()) return;
+    let view;
+    try {
+      view = await C.get("/api/cards/" + encodeURIComponent(cardId));
+    } catch (error) {
+      toast("Read refused · " + consoleError(error));
+      return;
+    }
+    const card = view.card;
+    const project = consoleSelected();
+    const data = project ? cs.byProject[project.id] : null;
+    const lanes = data ? list(data.lists) : [];
+    const comments = list(view.comments);
+    const issue = consoleIssueOf(card);
+    const body = `<div class="dialog-body console-dialog-body">${kv([
+      ["Type", `<span class="mono">${E(card.card_type_code)}</span>`],
+      ["Lane", E(((lanes.find((row) => row.id === card.list_id) || {}).name) || card.list_id)],
+      [
+        "Issue",
+        issue != null
+          ? `<a class="e-project-link" target="_blank" rel="noopener" href="${E(consoleIssueUrl(issue))}">#${E(issue)} ↗</a>`
+          : "—",
+      ],
+      ["Version", `<span class="mono">${E(card.version)}</span>`],
+      ["Claim", card.assignee_id ? E(card.assignee_id) : "unclaimed"],
+    ])}<div class="console-actions"><select id="console-move" aria-label="Target lane">${lanes
+      .map(
+        (lane) =>
+          `<option value="${E(lane.id)}" ${lane.id === card.list_id ? "selected" : ""}>${E(lane.name)}</option>`,
+      )
+      .join(
+        "",
+      )}</select>${button("Move", "console-move", `data-id="${E(card.id)}"`, "small", "arrow")}${
+      C.can("cards.claim")
+        ? button("Claim", "console-claim", `data-id="${E(card.id)}"`, "small", "shield")
+        : ""
+    }${
+      C.can("cards.release")
+        ? button("Release", "console-release", `data-id="${E(card.id)}"`, "small", "replay")
+        : ""
+    }</div><div><h3>Comments</h3>${
+      comments.length
+        ? comments
+            .map(
+              (comment) =>
+                `<div class="console-comment"><small>${E(comment.author_name || "service")} · ${E(short(comment.created_at, 16))}</small>${E(comment.body)}</div>`,
+            )
+            .join("")
+        : `<p class="muted">No comments yet.</p>`
+    }</div><label class="field full"><span>Comment</span><textarea id="console-comment" rows="3" placeholder="Record what changed or what you need"></textarea></label>${button(
+      "Comment",
+      "console-comment",
+      `data-id="${E(card.id)}"`,
+      "primary",
+      "message",
+    )}</div>`;
+    openDialog(card.name, body, btn("Close", "close-dialog"), true);
+  }
+
+  function consoleProjectSelect(project) {
+    return `<label class="e-select">Project <select data-v2-input="plan-project">${consoleProjects()
+      .map(
+        (row) =>
+          `<option value="${E(row.id)}" ${row.id === project.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`,
+      )
+      .join("")}</select></label>`;
+  }
+
+  /* The Plan · Boards tab on the operator console: the tenant's own projects, its boards,
+     its cards and its GitHub registry — read live, written through the action API. */
+  function consolePlanBoards() {
+    if (!cs.loaded) {
+      if (!cs.loading && !cs.error) consoleLoad();
+      return panel(
+        "Boards",
+        cs.error
+          ? note(`<strong>Read refused</strong> · ${E(consoleError(cs.error))}`, "bad")
+          : note("Loading the platform's own programme…"),
+      );
+    }
+    const project = consoleSelected();
+    if (!project) return panel("Boards", note("This tenant holds no projects."));
+    const select = consoleProjectSelect(project);
+    const data = cs.byProject[project.id];
+    if (!data || !data.board) {
+      consoleLoadProject(project.id);
+      return `${panel("Project", select)}${panel("Boards", note("Loading this project's board…"))}`;
+    }
+    if (data.error) {
+      return `${panel("Project", select)}${panel(
+        "Boards",
+        note(`<strong>Read refused</strong> · ${E(consoleError(data.error))}`, "bad"),
+      )}`;
+    }
+    const lanes = list(data.lists);
+    const cards = list(data.cards).filter((row) => !row.archived_at);
+    const issues = consoleIssueRows(project);
+    const intakeLane = lanes.find((row) => row.kind === "intake") || lanes[0];
+    const cardFor = (issue) =>
+      cards.find((card) => String(consoleIssueOf(card)) === String(issue.number));
+    const status = C.status();
+    const typeOptions = list(cs.types)
+      .map((row) => row.code)
+      .filter(Boolean)
+      .sort();
+    const selectedType =
+      v.intakeType ||
+      (typeOptions.includes("architecture_task") ? "architecture_task" : typeOptions[0]) ||
+      "architecture_task";
+    const typeSelect = `<div class="console-actions"><label class="mono muted">Intake card type</label><select data-v2-input="intake-type" aria-label="Card type">${
+      typeOptions.length
+        ? typeOptions
+            .map(
+              (code) =>
+                `<option value="${E(code)}" ${code === selectedType ? "selected" : ""}>${E(code)}</option>`,
+            )
+            .join("")
+        : `<option value="architecture_task">architecture_task</option>`
+    }</select></div>`;
+    const operator = panel(
+      "Operator",
+      `<p class="muted">Signed in as <strong>${E(status.name)}</strong> · tenant <span class="mono">${E(status.tenant)}</span>. Every control on this page calls the platform; nothing is simulated.</p>${typeSelect}${button(
+        "Reload board",
+        "console-reload",
+        `data-project="${E(project.id)}"`,
+        "small",
+        "replay",
+      )}${
+        cs.lastError
+          ? note(`<strong>Last action refused</strong> · ${E(consoleError(cs.lastError))}`, "bad")
+          : ""
+      }${note(
+        "This unit wires the card loop — intake an issue, move, comment, claim and release. Approvals, documents and evidence rows are separate units: the live tenant holds no approval rows yet, and published intermediate outputs need the document contract.",
+      )}`,
+    );
+    const issueRows = issues.map((issue) => {
+      const card = cardFor(issue);
+      const lane = card ? lanes.find((row) => row.id === card.list_id) : null;
+      const action =
+        card == null && intakeLane && C.can("cards.create")
+          ? button(
+              "Intake",
+              "console-intake",
+              `data-project="${E(project.id)}" data-issue="${E(issue.number)}"`,
+              "small",
+              "plus",
+            )
+          : card
+            ? `<span class="console-live">card</span>`
+            : "—";
+      return `<tr><td><a class="e-project-link" href="${E(issue.url || consoleIssueUrl(issue.number))}" target="_blank" rel="noopener">#${E(issue.number)} ↗</a> <strong>${E(issue.title)}</strong></td><td>${B(
+        issue.state === "CLOSED" ? "Closed" : issue.state === "OPEN" ? "Open" : issue.state,
+        issue.state === "CLOSED" ? "" : "amber",
+      )}</td><td>${
+        card ? `<strong>${E(card.name)}</strong><small class="mono">${E(lane ? lane.name : "")}</small>` : `<span class="muted">— not intaken</span>`
+      }</td><td>${action}</td></tr>`;
+    });
+    const issuePanel = panel(
+      `${project.key} · GitHub issues`,
+      issueRows.length
+        ? table(["Issue", "GitHub state", "Card", "Operate"], issueRows)
+        : `<p class="muted">No GitHub issues are registered for this project.</p>`,
+      B(`${issues.filter((row) => row.state === "OPEN").length} open`, "green"),
+    );
+    const lanePanels = lanes
+      .map((lane) => {
+        const laneCards = cards
+          .filter((row) => row.list_id === lane.id)
+          .sort((a, b) => Number(a.position) - Number(b.position));
+        const rows = laneCards.map((card) => {
+          const issue = consoleIssueOf(card);
+          return `<tr><td><button type="button" class="console-card-link" data-v2="console-card" data-id="${E(card.id)}"><strong>${E(card.name)}</strong></button><small class="mono">${E(card.card_type_code || "")}</small></td><td>${card.assignee_id ? B("claimed", "amber") : "—"}</td><td>${
+            issue != null
+              ? `<a class="e-project-link" href="${E(consoleIssueUrl(issue))}" target="_blank" rel="noopener">#${E(issue)} ↗</a>`
+              : "—"
+          }</td></tr>`;
+        });
+        return panel(
+          `${lane.name} · ${laneCards.length}`,
+          rows.length
+            ? table(["Card", "Claim", "Issue"], rows)
+            : `<p class="muted">No cards in this lane.</p>`,
+        );
+      })
+      .join("");
+    return `${panel(
+      "Project",
+      `${select}<p class="muted">Board <span class="mono">${E(data.board.name)}</span> · ${cards.length} cards · ${lanes.length} lanes · issues joined to the platform's own cards.</p>`,
+      `<span class="console-live">live</span>`,
+    )}${operator}${issuePanel}${lanePanels}`;
+  }
+
+  // A sign-in/out is a different surface: reset the cache and let the page re-render.
+  if (C) {
+    C.onChange(() => {
+      if (!C.signedIn()) consoleReset();
+      else {
+        cs.loaded = false;
+        cs.byProject = {};
+      }
+      render();
+    });
+  }
+
   // External feedback is a GitHub feature, not a service: the page links Discussions and a
   // prefilled issue, and the feedback issues themselves are published in the snapshot.
   const reportUrl = () => {
@@ -887,7 +1335,11 @@ window.installV2 = function (api, enterprise) {
   function plan() {
     const work = live ? (live.work || {}) : {};
     const liveBoards = list(work.boards).length > 0;
-    const tab = v.tab.plan || (liveBoards ? "Boards" : "WBS");
+    // On an origin that can sign in, Boards is the first surface even before signing in: that
+    // is where the sign-in prompt is. file:// and the snapshot-less homepage keep WBS.
+    const consoleCapable = !!(C && C.config());
+    const tab =
+      v.tab.plan || (liveBoards || consoleOn() || consoleCapable ? "Boards" : "WBS");
     const change = F.changes[0];
     const content =
       tab === "Boards"
@@ -901,7 +1353,9 @@ window.installV2 = function (api, enterprise) {
             : `<div class="v2-split"><div>${panel("Change control · CR-018", `<h3>${E(change.title)}</h3>${kv([["Changes baseline", E(change.baseline)], ["Impact", E(change.impact)], ["Recorded rationale", change.rationale ? E(change.rationale) : "<span class='e-amber'>required for approve or return</span>"], ["Existing run pins", "unchanged · a new attempt captures B4"]])}<textarea data-v2-input="rationale" rows="3" placeholder="Record the person's rationale" aria-label="Change rationale">${E(change.rationale)}</textarea><div class="row" style="margin-top:10px">${button("Approve new baseline", "change-approve", "", "primary", "shield")}${button("Return for analysis", "change-return", "", "", "replay")}</div>${v.review === "change-blocked" ? note("<strong>422 change_rationale_required</strong> · a person's rationale is required to approve or return a change request. No baseline moved.", "bad") : v.review === "change-ok" ? note("<strong>Approved locally</strong> · baseline B4 drafted; existing runs keep B3 pins. A new sample attempt captures B4.", "ok") : ""}`)}</div><div>${panel("Impact analysis", `${kv([["Scope", "2 deliverables"], ["Schedule", "+9 days"], ["Cost", "+€0.8m"], ["Risk", "medium · identity contract"], ["Approval", "human · programme gate"]])}${note("The change approval, the baseline review and the programme gate are separate decisions.")}`)}</div></div>`;
     const planRibbon =
       tab === "Boards"
-        ? ribbon("LIVE · GitHub issues are read at publish and joined to the conveyor's own cards and runs. A unit with no real card is shown as not intaken; nothing is seeded.", liveBoards)
+        ? consoleOn()
+          ? `<div class="v2-ribbon live" role="note"><strong>LIVE</strong><span>Operator console · the platform's own projects, boards and cards, joined to the GitHub issue registry. Signed in as ${E(C.status().name)} · tenant ${E(C.status().tenant)}.</span><span class="v2-src">API · no snapshot</span></div>`
+          : ribbon("LIVE · GitHub issues are read at publish and joined to the conveyor's own cards and runs. A unit with no real card is shown as not intaken; nothing is seeded.", liveBoards)
         : ribbon("V2 plan spine: wbs_node, project_baseline, project_register_item (six kinds), project_dependency and change control. Proposed in T1.");
     return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: the programme's GitHub issues joined to its real cards and runs, then the WBS, a frozen baseline against a computed forecast, one six-kind register and controlled change.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(["Boards", "WBS", "Baseline vs forecast", "Registers", "Change control"], tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}</div></div>`;
   }
@@ -910,12 +1364,17 @@ window.installV2 = function (api, enterprise) {
      publish) against the conveyor's own cards and runs. A unit with no real card is shown
      honestly as "not intaken"; nothing is fabricated to fill a lane. */
   function planBoards(work) {
+    if (consoleOn()) return consolePlanBoards();
     const prog = live ? live.programme || {} : {};
     const projects = list(prog.projects);
     if (!live || !projects.length) {
+      const signIn =
+        C && C.config()
+          ? `<div class="console-actions" style="margin-top:10px">${button("Sign in to operate the programme", "console-signin", "", "primary", "shield")}</div>`
+          : "";
       return panel(
         "Boards",
-        note("No published snapshot is loaded. The Plan boards are live-only: the published snapshot joins GitHub issues to the conveyor's own cards and runs. The WBS tab shows the proposed V2 plan spine."),
+        note(`No published snapshot is loaded. The Plan boards are live-only: the published snapshot joins GitHub issues to the conveyor's own cards and runs. The WBS tab shows the proposed V2 plan spine.${signIn}`),
       );
     }
     const registry = list((prog.issue_registry || {}).issues);
@@ -1552,6 +2011,11 @@ window.installV2 = function (api, enterprise) {
       render();
       return;
     }
+    const intakeType = event.target.closest('[data-v2-input="intake-type"]');
+    if (intakeType) {
+      v.intakeType = intakeType.value;
+      return;
+    }
     const el = event.target.closest('[data-v2-input="pko-search"]');
     if (!el) return;
     v.pkoQuery = el.value.trim().toLowerCase();
@@ -1562,6 +2026,36 @@ window.installV2 = function (api, enterprise) {
     if (!el) return;
     const d = el.dataset;
     switch (d.v2) {
+      /* operator console — every case below is a real action, never a local mutation */
+      case "console-signin":
+        if (C) C.signIn();
+        break;
+      case "console-reload":
+        // A reload is the whole read path, not just one board: the programme list is where a
+        // dead session (401) and a moved project are actually visible.
+        cs.loaded = false;
+        cs.byProject = {};
+        render();
+        consoleLoad();
+        break;
+      case "console-intake":
+        consoleIntake(d.project, d.issue);
+        break;
+      case "console-card":
+        consoleCardDialog(d.id);
+        break;
+      case "console-move":
+        consoleMove(d.id);
+        break;
+      case "console-comment":
+        consoleComment(d.id);
+        break;
+      case "console-claim":
+        consoleClaim(d.id);
+        break;
+      case "console-release":
+        consoleRelease(d.id);
+        break;
       case "tab":
         v.tab[d.key] = d.value;
         render();

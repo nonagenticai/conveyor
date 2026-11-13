@@ -76,12 +76,19 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-web \
     # only go stale (the development one says dev_auth: true).
     && rm -f /out/site/config.json \
     && cp apps/web/index.html apps/web/style.css /out/site/ \
-    # The SPEC_V2 studio design pack, published read-only at /design. Only the runtime files
-    # ship; scripts and Markdown stay in the repository. `index.html` is a build-time copy of
-    # studio.html so the static handler's directory index resolves /design/.
+    # The SPEC_V2 studio design pack, served at /design: the public snapshot publication on
+    # the homepage mirror, and the authenticated operator console at conveyor.nonagentic.ai.
+    # Only the runtime files ship; scripts and Markdown stay in the repository. The generated
+    # documents (`docs/`) and the data directory (the placeholder snapshot + the public issue
+    # registry) ship too: without them the console's Documents destination and data links 404.
+    # `index.html` is a build-time copy of studio.html so the static handler's directory index
+    # resolves /design/.
     && mkdir -p /out/site/design/assets /out/site/design/architecture/diagrams \
+       /out/site/design/data /out/site/design/docs \
     && cp docs/design/*.html docs/design/*.css docs/design/*.js /out/site/design/ \
     && cp -a docs/design/assets/. /out/site/design/assets/ \
+    && cp -a docs/design/data/. /out/site/design/data/ \
+    && cp -a docs/design/docs/. /out/site/design/docs/ \
     && cp docs/design/architecture/diagrams/*.svg /out/site/design/architecture/diagrams/ \
     && cp docs/design/studio.html /out/site/design/index.html
 

@@ -6,8 +6,8 @@
       "path": "docs/README.html",
       "source": "README.md",
       "section": "Root",
-      "sha256": "361ec9f62cfe31cbee865978331a4d63af14ac20c9651c949d1be86e872484ae",
-      "bytes": 801,
+      "sha256": "1a247d9523333267c850c808c15aa3605ec6842f77f26ec5d585daf8690782e8",
+      "bytes": 1697,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/README.md"
     },
     {
@@ -78,8 +78,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "7b01ab7d6435d85f4cde464e58ac284ba59f8227d55aa4d265afcb43ab789527",
-      "bytes": 5985,
+      "sha256": "48ad89474f328f64d42dce00fbf49e274dedd205c711a8733c8b6eb0d6d4dac1",
+      "bytes": 7113,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -87,8 +87,8 @@
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "9d0f75bb4c68004ff32fa99ce096eb646ca598a6309f02a5070fbdd50d009ac1",
-      "bytes": 66356,
+      "sha256": "88d023e8c4d3e479e40a194b1371662d5c2e7ea8d64b329f29f933306bffe18f",
+      "bytes": 68222,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -321,8 +321,8 @@
       "path": "docs/plans/02-source-map/40-live-state.html",
       "source": "docs/plans/02-source-map/40-live-state.md",
       "section": "Plans",
-      "sha256": "c770e31c6140e65114796eaa246076e6028518f22ca10522c263d1757242d362",
-      "bytes": 5561,
+      "sha256": "1b5d216b81810c6c9c80b6549017a6fe1bdddb1e433b6052e007368fc79b2a15",
+      "bytes": 5543,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-source-map/40-live-state.md"
     },
     {
@@ -339,8 +339,8 @@
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "620f42471f001d48a2bed09d37b771b3912ebbc7041469ada23fd560c8eddaf6",
-      "bytes": 16086,
+      "sha256": "4eb4bc690bc83080f8e8853a6b150100eba2f06eb253a74d35b9d38d6cbc1e67",
+      "bytes": 16770,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
@@ -519,8 +519,8 @@
       "path": "docs/plans/slices/S14-cutover.html",
       "source": "docs/plans/slices/S14-cutover.md",
       "section": "Plans",
-      "sha256": "dc3629e1d447f9a2eb5d2dcf889fce8977268c87b0923e059fc37649bad23602",
-      "bytes": 22668,
+      "sha256": "2b79a00469dfd59179faa7d88657b8989bc1c2f02a69980580e59f2e17f5661e",
+      "bytes": 22640,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S14-cutover.md"
     },
     {

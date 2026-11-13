@@ -150,6 +150,18 @@ gh issue comment N --body 'Claimed. Branch `issue/N-<slug>` at `<sha>`.'
   PR's owner keeps the work; never push to that branch. `conveyor#38` (PR #36) is the worked
   example.
 
+## The console — a front door, not a second protocol
+
+The operator console at `conveyor.nonagentic.ai/design` can intake an issue as a card, move a
+card, comment, claim and release against the tenant's own rows. It is a **front door to the
+platform**, not a second delivery protocol:
+
+- the GitHub issue is still the unit and the pushed branch is still the claim; a card created
+  from the console carries `meta.issue` and is a view of the unit, never a substitute for it;
+- the console cannot open a PR, merge, or edit a label — those stay the protocol above;
+- `conveyor admin intake` and the console both call `cards.create`, so the two paths cannot
+  produce different rows.
+
 ## Work and gate
 
 - Commit freely on the issue branch (commits are free; branch pushes run no CI — the workflow

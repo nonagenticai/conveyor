@@ -1630,6 +1630,30 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
       )();
     $("#main").innerHTML = html;
   }
+  // The operator console signs in and out after boot. Re-render through the normal path, and
+  // restore the destination console.js saved before the OIDC redirect (the query string
+  // returns without a hash). A page it does not know is not invented.
+  window.addEventListener("conveyor-console", () => {
+    const hash = location.hash.slice(1);
+    const known = [
+      "overview",
+      "projects",
+      "types",
+      "capabilities",
+      "processes",
+      "agents",
+      "tools",
+      "requirements",
+      "principles",
+      "models",
+      "decisions",
+      "runs",
+      "evals",
+      "usage",
+    ];
+    if (hash && (enterprise?.pages?.[hash] || known.includes(hash))) state.page = hash;
+    render();
+  });
   function evidenceMarkup(p, step, status) {
     if (p.id !== "portal")
       return '<div class="info-note">This step has no attached output in the sample fixture. Inspect Context for its source bindings and Tools for its declared actions.</div>';
