@@ -559,7 +559,7 @@ dependency repositories.
 |---|---|
 | **Triggers** | a user request (PM), a kata candidate, a security/eval finding, a dependency upgrade |
 | **Scope** | one repo and one lane per PR; scope is written into the charter before any branch |
-| **Procedure** | design note (structural changes only) → lane branch → implement via coding jobs → CI green (fmt, clippy `-D warnings`, tests, gitleaks) → independent review → merge gate → deploy → live verify → close |
+| **Procedure** | design note (structural changes only) → lane branch → implement via coding jobs → CI green (fmt, clippy `-D warnings`, tests, betterleaks) → independent review → merge gate → deploy → live verify → close |
 | **Tools** | the coding fleet's actions (`coding_jobs.create/get`), git/PR/CI status, the conveyor's own eval/benchmark actions |
 | **Gates** | design (if architecture/contract change), merge, deploy; rollback plan required |
 | **Never** | modify its own gates, approval policy, or the eval/benchmark instrument that measures it; force-push; merge with red CI; deploy without a live check |
@@ -846,7 +846,7 @@ The organisation's first real job is to change its own substrate. A development 
 2. **Design note** for structural changes (architecture contract, migration plan, rollback).
 3. **Lane branch** (`lane/<slug>`), one branch, at most one PR for the unit's life (house rule).
 4. **Implement** through coding jobs; the executor cannot merge.
-5. **Verify**: CI-equivalent locally first (fmt, clippy `-D warnings`, the full suite), then the pipeline; gitleaks;
+5. **Verify**: CI-equivalent locally first (fmt, clippy `-D warnings`, the full suite), then the pipeline; betterleaks;
    the relevant eval/benchmark if the change touches a measured surface.
 6. **Review**: an independent reviewer job; the reviewer cannot be the implementer.
 7. **Merge gate**: a human (or an earned auto-merge policy) approves; red CI is a refusal, never a retry-until-green.

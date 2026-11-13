@@ -33,31 +33,39 @@ permissions:
   contents: read
 
 jobs:
-  # Secret scan. Dir-mode fingerprints are what `.gitleaksignore` holds (see its header), and a
+  # Secret scan. Dir-mode fingerprints are what `.betterleaksignore` holds (see its header), and a
   # full-tree scan is the honest one for a repo whose whole point is being public.
-  gitleaks:
+  secret-scan:
     if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
-      - name: install gitleaks 8.30.1 (pinned, sha256-verified)
+      - name: install betterleaks 1.10.1 (pinned, sha256-verified)
         run: |
           set -euo pipefail
-          version=8.30.1
-          sha=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
-          curl -fsSL -o "$RUNNER_TEMP/gitleaks.tgz" \
-            "https://github.com/gitleaks/gitleaks/releases/download/v${version}/gitleaks_${version}_linux_x64.tar.gz"
-          echo "${sha}  $RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
-          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+          version=1.10.1
+          sha=c174b42d7aa60caf58c0c3e555c0e4bed01fe6b0d99a412bce777b5af4ce913e
+          curl -fsSL -o "$RUNNER_TEMP/betterleaks.tgz" \
+            "https://github.com/betterleaks/betterleaks/releases/download/v${version}/betterleaks_${version}_linux_x64.tar.gz"
+          echo "${sha}  $RUNNER_TEMP/betterleaks.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/betterleaks.tgz" -C "$RUNNER_TEMP" betterleaks
       - name: scan the tree
         run: |
           set -euo pipefail
-          "$RUNNER_TEMP/gitleaks" dir --redact --exit-code 1 --no-banner \
-            --gitleaks-ignore-path .gitleaksignore .
+          # ⛔ --config IS REQUIRED. betterleaks only auto-loads a target's own
+          # config under --unsafe-auto-load-config, so a bare `betterleaks dir`
+          # scans with the BUILT-IN defaults — which are not gitleaks' defaults:
+          # measured on this tree, 605 findings (600 generic-credential-uri on
+          # local dev DSNs, 5 generic-password on compose placeholders), none of
+          # them real. Passing the repo's config gives 0 AND makes CI agree with
+          # the local pre-commit/pre-push hooks, which have always used it.
+          "$RUNNER_TEMP/betterleaks" dir --redact --exit-code 1 --no-banner \
+            --config=.betterleaks.toml \
+            --gitleaks-ignore-path .betterleaksignore .
 
-  # Private infrastructure must not be published. gitleaks catches credentials; this catches the
-  # other half of the rule: internal hostnames, tailnet addresses and private repo paths.
+  # Private infrastructure must not be published. The secret scan catches credentials; this catches
+  # the other half of the rule: internal hostnames, tailnet addresses and private repo paths.
   # Run the same script locally before pushing: `bash scripts/ci/no-private-refs.sh`.
   no-private-refs:
     if: ${{ !github.event.repository.private }}

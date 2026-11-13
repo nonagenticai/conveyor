@@ -1,25 +1,25 @@
-# conveyor carries the fleet gitleaks rule set, so it can own its allowlist.
+# conveyor carries the fleet betterleaks rule set, so it can own its allowlist.
 # Rules are copied from the fleet config (gitops-production); only the block at the
 # end is repo-specific. A real credential is rotated, never allowlisted.
 
-# FLEET gitleaks config — used by every repo that does NOT carry its own
-# `.gitleaks.toml`.
+# FLEET betterleaks config — used by every repo that does NOT carry its own
+# `.betterleaks.toml`.
 #
 # Two consumers, one file:
-#   * CI  — `.github/actions/secret-scan/action.yml` feeds it to gitleaks via
-#           GITLEAKS_CONFIG_TOML. It ships inside the composite-action directory
+#   * CI  — `.github/actions/secret-scan/action.yml` feeds it to betterleaks via
+#           `--config`. It ships inside the composite-action directory
 #           precisely so it travels to consumer repos that have no gitops
 #           checkout.
-#   * local — `scripts/hooks/install.sh` copies it to `<repo>/.git/gitleaks-fleet.toml`
+#   * local — `scripts/hooks/install.sh` copies it to `<repo>/.git/betterleaks-fleet.toml`
 #           for the pre-commit / pre-push hooks.
 #
 # ⛔ This file is NOT used by gitops-production itself. Both the action and the
-# hooks prefer a repo-local `.gitleaks.toml` when one exists, so this repo keeps
+# hooks prefer a repo-local `.betterleaks.toml` when one exists, so this repo keeps
 # its own rules, its own allowlist and its own baseline. Do not "unify" them:
 # gitops has 33 adjudicated baseline entries that mean nothing anywhere else.
 #
 # ═══════════════════════════════════════════════════════════════════════════
-# WHY THIS IS NOT JUST A COPY OF .gitleaks.toml — three deltas, all measured
+# WHY THIS IS NOT JUST A COPY OF .betterleaks.toml — three deltas, all measured
 # ═══════════════════════════════════════════════════════════════════════════
 #
 # Replayed 2026-08-17 over 2026-05-17..2026-08-17 in all 72 repos that consume
@@ -28,7 +28,7 @@
 #
 #   config                                        repos with >=1 finding
 #   ------------------------------------------    ----------------------
-#   gitops-production/.gitleaks.toml verbatim              30 / 72
+#   gitops-production/.betterleaks.toml verbatim              30 / 72
 #   + the three deltas below                                8 / 72
 #
 # The 30/72 result is why the 2026-08-17 handoff recorded "propagating the rule
@@ -47,7 +47,7 @@
 # they contributed 12 hits total across 72 repos in 3 months.
 #
 # Losing it costs the "second net for keyword-adjacent shapes" that
-# .gitleaks.toml's comment describes. gitops-production keeps that net because
+# .betterleaks.toml's comment describes. gitops-production keeps that net because
 # it has a baseline to absorb the noise; the fleet has none and would need 72.
 #
 # ── delta 2: generated / vendored artefacts are excluded ────────────────────
@@ -65,17 +65,23 @@
 # ⚠️ When you add an exclusion here you are blinding 72 repos. Measure the
 # false-positive population first and write the number down, as above.
 
-title = "nonagentic fleet gitleaks config"
+title = "nonagentic fleet betterleaks config"
 
 [extend]
 useDefault = true
+# Two betterleaks defaults are not in gitleaks' defaults and fire on ordinary
+# local dev DSNs and `PASSWORD:` placeholders instead of credentials. Measured
+# on this repo at the 2026-11-13 swap: 605 findings (600 generic-credential-uri,
+# 5 generic-password), 0 of them real. Disabled by owner decision so the swap
+# does not change what this gate catches. See the fleet config for the full
+# measurement.
 # See delta 1. Verified honoured on 8.30.1: with this set, generic-api-key
 # findings went to zero while private-key / jwt / stripe / curl-auth-user still
 # fired in the same replay — so the rule is disabled, not the whole ruleset.
-disabledRules = ["generic-api-key"]
+disabledRules = ["generic-api-key", "generic-credential-uri", "generic-password"]
 
 # ============================================================================
-# Custom rules — MUST stay identical to gitops-production/.gitleaks.toml.
+# Custom rules — MUST stay identical to gitops-production/.betterleaks.toml.
 # tests/test-secret-scan-gate.py compares them field by field and fails on any
 # divergence, so a rule tightened in one file cannot silently rot in the other.
 # ============================================================================
@@ -130,7 +136,7 @@ description = "Nonagentic licences service token (secrets.token_urlsafe(32) = 43
 # only matches `KEYWORD <assign> "literal"`. A credential passed as an ARGUMENT
 # is invisible to all of them. Full derivation, the 200k-sample entropy
 # measurement behind 4.35, and the accepted residual misses are documented in
-# gitops-production/.gitleaks.toml — read that before changing anything here.
+# gitops-production/.betterleaks.toml — read that before changing anything here.
 regex = '''(?:^|[^A-Za-z0-9_/+=-])([A-Za-z0-9_-]{43})(?:[^A-Za-z0-9_/+=-]|$)'''
 secretGroup = 1
 entropy = 4.35
@@ -145,6 +151,7 @@ description = "Generated artefacts and known non-secret shapes, fleet-wide."
 paths = [
   # The baseline stores the secrets it recorded, so scanning it re-finds every
   # value it exists to suppress. Structural self-reference, not a leak.
+  '''\.betterleaks\.baseline\.json$''',
   '''\.gitleaks\.baseline\.json$''',
   # Sibling agent worktrees are full copies of the tree.
   '''^\.worktrees/''',
@@ -153,7 +160,7 @@ paths = [
   '''(^|/)(dist|build|out|coverage|node_modules|vendor|__snapshots__|\.next|\.svelte-kit|generated)/''',
   # Lockfiles: dense with base64 and sha hashes by construction.
   '''(^|/)(package-lock\.json|bun\.lock|yarn\.lock|pnpm-lock\.yaml|uv\.lock|poetry\.lock|Cargo\.lock|go\.sum)$''',
-  # Minified / binary / asset files. gitleaks emits no useful line context for
+  # Minified / binary / asset files. betterleaks emits no useful line context for
   # them and every hit measured was a hash.
   '''\.(min\.js|min\.css|map|svg|png|jpg|jpeg|gif|ico|woff2?|ttf|pdf)$''',
 ]
@@ -169,7 +176,7 @@ regexes = [
   # an unbounded bypass. `generic-api-key` captures a `[\w.-]{0,50}?` prefix, so
   # the variable NAME is inside the match: measured on a fixture, one identical
   # high-entropy value was DETECTED as `db_password:` and SUPPRESSED as
-  # `placeholder_db_password:`. Kept in lockstep with .gitleaks.toml, which
+  # `placeholder_db_password:`. Kept in lockstep with .betterleaks.toml, which
   # measured a delta of ZERO on removal. A real placeholder gets a path entry or
   # its own exact literal — never a bare English word.
   '''<REDACTED-''',
@@ -193,7 +200,7 @@ regexes = [
   # ⚠️ This is a SUPPRESSION, not a fix. The real fix is to stop shipping a
   # PAT-shaped literal from the backend models; until those four services
   # redeploy, every downstream spec still carries it.
-  # NB the regex must match what gitleaks CAPTURES, not the literal in the file:
+  # NB the regex must match what betterleaks CAPTURES, not the literal in the file:
   # `github-pat` captures `ghp_` + exactly 36 chars, so the finding is the
   # 40-char TRUNCATION of this 44-char example. Allowlisting the full literal
   # silently does nothing — measured against a fixture before shipping.
