@@ -174,8 +174,21 @@ const shot = (name) =>
       "dependency cycle is refused",
     );
 
-    // 4. Plan: change control refuses a missing rationale, then approves it.
+    // 4. Plan: the plan seed is the DESIGN fallback; change control keeps its contract.
     await nav("plan");
+    await tab("plan", "Boards");
+    check(
+      (await content()).includes("Plan seed · DESIGN"),
+      "the plan seed renders when no live boards exist",
+    );
+    check(
+      (await content()).includes("architecture_task.READY"),
+      "every plan unit names a real process",
+    );
+    check(
+      (await page.locator('[data-v2-input="plan-seed-project"]').count()) === 1,
+      "the plan seed is scoped by project",
+    );
     await tab("plan", "Change control");
     await action("change-approve");
     check(

@@ -1,0 +1,472 @@
+{
+  "version": 1,
+  "schema": "v2-coverage/v1",
+  "generated_from": [
+    "docs/SPEC_V2.md",
+    "migrations/*.sql",
+    "crates/actions/src/**",
+    "docs/design/v2.js"
+  ],
+  "verdicts": {
+    "exists": "implemented in code and backed by real rows",
+    "extend": "a partial implementation exists (a page, a table, or a prefix) that must be extended",
+    "new": "absent"
+  },
+  "counts": {
+    "extend": 10,
+    "new": 32
+  },
+  "rows": [
+    {
+      "id": "table:industry",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "industry",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE industry"
+      ]
+    },
+    {
+      "id": "table:department",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "department",
+      "verdict": "extend",
+      "evidence": [
+        "migrations: CREATE TABLE department"
+      ],
+      "note": "V1 has department (0001_platform). V2 adds industry_id, ordinal and is_primary instead of forking the concept (T0, SPEC §4.1)."
+    },
+    {
+      "id": "table:job_catalogue",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "job_catalogue",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE job_catalogue"
+      ]
+    },
+    {
+      "id": "table:job_release",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "job_release",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE job_release"
+      ]
+    },
+    {
+      "id": "table:job_binding",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "job_binding",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE job_binding"
+      ]
+    },
+    {
+      "id": "table:approval_policy",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "approval_policy",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE approval_policy"
+      ]
+    },
+    {
+      "id": "table:wbs_node",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "wbs_node",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE wbs_node"
+      ]
+    },
+    {
+      "id": "table:project_baseline",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "project_baseline",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE project_baseline"
+      ]
+    },
+    {
+      "id": "table:programme_cadence",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "programme_cadence",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE programme_cadence"
+      ]
+    },
+    {
+      "id": "table:project_register_item",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "project_register_item",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE project_register_item"
+      ]
+    },
+    {
+      "id": "table:decision",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "decision",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE decision"
+      ]
+    },
+    {
+      "id": "table:decision_option",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "decision_option",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE decision_option"
+      ]
+    },
+    {
+      "id": "table:decision_policy",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "decision_policy",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE decision_policy"
+      ]
+    },
+    {
+      "id": "table:lesson",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "lesson",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE lesson"
+      ]
+    },
+    {
+      "id": "table:project_dependency",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "project_dependency",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE project_dependency"
+      ]
+    },
+    {
+      "id": "table:decision_policy_refinement",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "decision_policy_refinement",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE decision_policy_refinement"
+      ]
+    },
+    {
+      "id": "table:laya_inference_config",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "laya_inference_config",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE laya_inference_config"
+      ]
+    },
+    {
+      "id": "table:pko_release",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "pko_release",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE pko_release"
+      ]
+    },
+    {
+      "id": "table:pko_entity",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "pko_entity",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE pko_entity"
+      ]
+    },
+    {
+      "id": "table:pko_relation",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "pko_relation",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE pko_relation"
+      ]
+    },
+    {
+      "id": "actions:programme/plan",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "programme/plan",
+      "verdict": "extend",
+      "evidence": [
+        "actions: baselines.* absent",
+        "actions: cadences.* absent",
+        "actions: programme_config.* absent",
+        "actions: programmes.* found (programmes.create, programmes.get, programmes.list…)",
+        "actions: project_dependencies.* absent",
+        "actions: registers.* absent",
+        "actions: wbs.* absent"
+      ]
+    },
+    {
+      "id": "actions:organisation",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "organisation",
+      "verdict": "extend",
+      "evidence": [
+        "actions: departments.* found (departments.create, departments.list)",
+        "actions: industries.* absent",
+        "actions: job_bindings.* absent",
+        "actions: job_releases.* absent",
+        "actions: jobs.* found (jobs.list, jobs.retry)"
+      ]
+    },
+    {
+      "id": "actions:procedures",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "procedures",
+      "verdict": "extend",
+      "evidence": [
+        "actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)",
+        "actions: pko.* absent",
+        "actions: procedures.* found (procedures.create, procedures.get, procedures.list…)"
+      ]
+    },
+    {
+      "id": "actions:authoring",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "authoring",
+      "verdict": "new",
+      "evidence": [
+        "actions: authoring.* absent"
+      ]
+    },
+    {
+      "id": "actions:approvals",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "approvals",
+      "verdict": "extend",
+      "evidence": [
+        "actions: approval_policies.* absent",
+        "actions: approvals.* found (approvals.decide, approvals.list, approvals.request)"
+      ]
+    },
+    {
+      "id": "actions:decision",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "decision",
+      "verdict": "new",
+      "evidence": [
+        "actions: decision_options.* absent",
+        "actions: decision_policies.* absent",
+        "actions: decisions.* found (decisions.create, decisions.get, decisions.list…)",
+        "actions: laya_configs.* absent"
+      ],
+      "note": "V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2)."
+    },
+    {
+      "id": "actions:PM",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "PM",
+      "verdict": "new",
+      "evidence": [
+        "actions: pm.* absent"
+      ]
+    },
+    {
+      "id": "actions:coach",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "coach",
+      "verdict": "new",
+      "evidence": [
+        "actions: coach.* absent"
+      ]
+    },
+    {
+      "id": "actions:kata",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "kata",
+      "verdict": "new",
+      "evidence": [
+        "actions: kata.* absent"
+      ],
+      "note": "V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5."
+    },
+    {
+      "id": "actions:development",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "development",
+      "verdict": "new",
+      "evidence": [
+        "actions: dev.* absent"
+      ]
+    },
+    {
+      "id": "actions:operations",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "operations",
+      "verdict": "new",
+      "evidence": [
+        "actions: ops.* absent"
+      ]
+    },
+    {
+      "id": "actions:tools",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "tools",
+      "verdict": "new",
+      "evidence": [
+        "actions: tool_authoring.* absent",
+        "actions: tool_bindings.* absent",
+        "actions: tool_calls.* absent",
+        "actions: toolkits.* absent",
+        "actions: tools.* absent"
+      ]
+    },
+    {
+      "id": "actions:memory",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "memory",
+      "verdict": "new",
+      "evidence": [
+        "actions: lessons.* absent"
+      ]
+    },
+    {
+      "id": "actions:metrics",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "metrics",
+      "verdict": "new",
+      "evidence": [
+        "actions: metrics.* absent"
+      ]
+    },
+    {
+      "id": "destination:Organisation",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Organisation",
+      "verdict": "extend",
+      "evidence": [
+        "docs/design/v2.js: page 'organisation' registered"
+      ],
+      "note": "The page exists and renders fixtures; live industries/departments/jobs/releases/bindings arrive with T0 (#34)."
+    },
+    {
+      "id": "destination:Procedures",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Procedures",
+      "verdict": "extend",
+      "evidence": [
+        "docs/design/v2.js: page 'procedures' registered"
+      ],
+      "note": "The page and the V1 process/SOP tables exist; SOP/RDF/OWL ingestion, PKO editing and publish gates are T16."
+    },
+    {
+      "id": "destination:Authoring",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Authoring",
+      "verdict": "new",
+      "evidence": [
+        "docs/design/v2.js: page 'authoring' registered"
+      ],
+      "note": "A design study only: no authoring actions, no intake queue, no draft catalogue (T17)."
+    },
+    {
+      "id": "destination:Portfolio",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Portfolio",
+      "verdict": "extend",
+      "evidence": [
+        "docs/design/v2.js: page 'portfolio' registered"
+      ],
+      "note": "Live programme/project rows render today; shared config, WSJF backlog, cadence and capacity are fixture tabs (T1/T10)."
+    },
+    {
+      "id": "destination:Plan",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Plan",
+      "verdict": "extend",
+      "evidence": [
+        "docs/design/v2.js: page 'plan' registered"
+      ],
+      "note": "A design study today. The live Boards tab arrives with #57; WBS, baseline, registers and change control are T1."
+    },
+    {
+      "id": "destination:Improve",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Improve",
+      "verdict": "extend",
+      "evidence": [
+        "docs/design/v2.js: page 'improve' registered"
+      ],
+      "note": "The page exists and renders a design study; V1's eval/benchmark/kata rows are the instruments it will read (T5/T8)."
+    },
+    {
+      "id": "destination:Operations",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Operations",
+      "verdict": "new",
+      "evidence": [
+        "docs/design/v2.js: page 'operations' registered"
+      ],
+      "note": "A design study only: no incident/runbook/postmortem rows or operations actions (T7)."
+    },
+    {
+      "id": "destination:Tools",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Tools",
+      "verdict": "new",
+      "evidence": [
+        "docs/design/v2.js: page 'toolkits' registered"
+      ],
+      "note": "The page exists as a catalogue study; tool/toolkit/tool_binding/tool_call do not exist (T13)."
+    }
+  ]
+}

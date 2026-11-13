@@ -53,8 +53,34 @@ CROSS_CUTTING = {
         "name": "CI, runners and platform",
         "plan": "docs/plans/development-process-speed.md",
         "track": "programme",
-        "issues": [17, 22],
+        # #55 (betterleaks) and #57 (the programme-spine unit) are platform work.
+        "issues": [17, 22, 55, 57],
     },
+}
+
+# SPEC_V2 §12 (the dependency sentence, kept as data because prose parsing is not a parser).
+# "T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 and T13;
+#  T7 after T2/T4 and T13; T9/T10 after T1/T3; T8 after T5; T11 continuous; T12 after all;
+#  T13 after T2; T14 after T13; T15 after T13 and T6; T16 after T2 and T13; T17 after T16 and T3."
+T_DEPENDS_ON = {
+    "T0": [],
+    "T1": ["T0"],
+    "T2": ["T1"],
+    "T3": ["T2"],
+    "T4": ["T3"],
+    "T5": ["T2", "S16", "S17", "S18", "S19", "S20"],
+    "T6": ["T5", "T13"],
+    "T7": ["T2", "T4", "T13"],
+    "T8": ["T5"],
+    "T9": ["T1", "T3"],
+    "T10": ["T1", "T3"],
+    "T11": [],
+    "T12": [f"T{n}" for n in range(18) if n != 12],
+    "T13": ["T2"],
+    "T14": ["T13"],
+    "T15": ["T13", "T6"],
+    "T16": ["T2", "T13"],
+    "T17": ["T16", "T3"],
 }
 
 # SPEC_V2 §12, kept here until `docs/SPEC_V2.md` is on main (issue #24). The parser below
@@ -82,17 +108,66 @@ T_SLICES = [
 
 FRONTMATTER = re.compile(r"^---\n(.*?)\n---\n", re.S)
 SLICE_FILE = re.compile(r"^(S\d{2}[a-z]?)-.+\.md$")
+COMMENT = re.compile(r"\s+#.*$")
 
 
-def read_frontmatter(path: Path) -> dict[str, str]:
+def parse_yaml_subset(block: str) -> dict[str, object]:
+    """The slice frontmatter is a small, regular YAML subset.
+
+    It is parsed here rather than with PyYAML so the generator has no dependency; the two
+    shapes that used to corrupt `seed/programme.json` are handled explicitly: an inline
+    `#` comment after a flow sequence (`S06a`) and a block sequence (`S06d`, `S19`).
+    """
+    fields: dict[str, object] = {}
+    key: str | None = None
+    items: list[str] | None = None
+    for raw in block.splitlines():
+        line = raw.rstrip()
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        head = re.match(r"^([A-Za-z_][\w-]*):\s*(.*)$", line)
+        if head:
+            if key is not None and items is not None:
+                fields[key] = items
+            key, value = head.group(1), COMMENT.sub("", head.group(2)).strip()
+            items = None
+            if value.startswith("[") and value.endswith("]"):
+                fields[key] = [
+                    part.strip().strip('"').strip("'")
+                    for part in value[1:-1].split(",")
+                    if part.strip()
+                ]
+                key = None
+            elif value == "":
+                items = []
+            else:
+                fields[key] = value.strip('"').strip("'")
+                key = None
+        elif line.lstrip().startswith("- ") and items is not None:
+            items.append(line.lstrip()[2:].strip().strip('"').strip("'"))
+    if key is not None and items is not None:
+        fields[key] = items
+    return fields
+
+
+def read_frontmatter(path: Path) -> dict[str, object]:
     match = FRONTMATTER.match(path.read_text())
     if not match:
         return {}
-    fields: dict[str, str] = {}
-    for line in match.group(1).splitlines():
-        if ":" in line and not line.startswith(" "):
-            key, value = line.split(":", 1)
-            fields[key.strip()] = value.strip().strip('"')
+    return parse_yaml_subset(match.group(1))
+
+
+def inline_fields(path: Path, key: str) -> dict[str, object]:
+    """S21 predates the frontmatter convention: its status/depends live in bold prose."""
+    text = path.read_text()
+    fields: dict[str, object] = {}
+    status = re.search(r"^\*\*Status:\*\*\s*`([^`]+)`", text, re.M)
+    if status:
+        fields["status"] = status.group(1).strip()
+    depends = re.search(r"^\*\*Depends on:\*\*\s*(.+)$", text, re.M)
+    if depends:
+        fields["depends_on"] = sorted(set(re.findall(r"S\d{2}[a-z]?", depends.group(1))))
+    fields.setdefault("slice", key)
     return fields
 
 
@@ -102,21 +177,20 @@ def slice_projects() -> list[dict]:
         match = SLICE_FILE.match(path.name)
         if not match:
             continue
-        fields = read_frontmatter(path)
-        key = fields.get("slice", match.group(1))
+        key = match.group(1)
+        fields = read_frontmatter(path) or inline_fields(path, key)
+        depends = fields.get("depends_on", [])
+        if isinstance(depends, str):
+            depends = [part.strip() for part in depends.strip("[]").split(",") if part.strip()]
         projects.append(
             {
-                "key": key,
+                "key": fields.get("slice", key),
                 "name": fields.get("title", key),
                 "description": f"Plan: docs/plans/slices/{path.name}",
                 "plan": f"docs/plans/slices/{path.name}",
                 "track": "v1",
                 "plan_status": fields.get("status", ""),
-                "depends_on": [
-                    value.strip()
-                    for value in fields.get("depends_on", "[]").strip("[]").split(",")
-                    if value.strip()
-                ],
+                "depends_on": depends,
                 "issues": [],
             }
         )
@@ -124,17 +198,36 @@ def slice_projects() -> list[dict]:
 
 
 def t_slice_projects() -> list[dict]:
-    """Prefer SPEC_V2 §12's table; fall back to the checked-in list."""
+    """Prefer SPEC_V2 §12's table; fall back to the checked-in list.
+
+    The table has three columns — key, title, gate — and the gate is the slice's acceptance
+    text. Dependencies come from the §12 sentence, kept in `T_DEPENDS_ON`.
+    """
     spec = ROOT / "docs/SPEC_V2.md"
-    slices = list(T_SLICES)
+    slices: list[tuple[str, str, str]] = [(code, title, "") for code, title in T_SLICES]
     if spec.exists():
         text = spec.read_text()
         section = text.split("## 12.", 1)
         if len(section) == 2:
             body = section[1].split("## 13.", 1)[0]
-            parsed = re.findall(r"\|\s*\*\*(T\d+)\*\*\s*\|\s*\*\*(.+?)\*\*", body)
+            parsed: list[tuple[str, str, str]] = []
+            for line in body.splitlines():
+                if not line.lstrip().startswith("|"):
+                    continue
+                cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+                if len(cells) < 3:
+                    continue
+                match = re.match(r"\*\*(T\d+)\*\*", cells[0])
+                if not match:
+                    continue
+                title = cells[1].removeprefix("**")
+                title = title.split("**", 1)[0]
+                # Drop the slice's "— goal" dash; the table's first sentence is the title.
+                title = re.sub(r"\s+", " ", title).strip()
+                gate = cells[2].strip()
+                parsed.append((match.group(1), title, gate))
             if parsed:
-                slices = [(code, re.sub(r"\s+", " ", title).strip()) for code, title in parsed]
+                slices = parsed
     return [
         {
             "key": code,
@@ -143,10 +236,11 @@ def t_slice_projects() -> list[dict]:
             "plan": "docs/SPEC_V2.md#12",
             "track": "v2",
             "plan_status": "draft",
-            "depends_on": [],
+            "depends_on": T_DEPENDS_ON.get(code, []),
+            "gate": gate,
             "issues": [],
         }
-        for code, title in slices
+        for code, title, gate in slices
     ]
 
 
@@ -199,6 +293,8 @@ def project_for_issue(issue: dict, projects_by_key: dict[str, dict]) -> str | No
 def derive_status(project: dict, issues: list[dict]) -> str:
     if project["key"] == "PLATFORM":
         return "active"  # a standing project: it is never "done"
+    if project.get("plan_status") == "superseded":
+        return "archived"
     open_issues = [issue for issue in issues if issue["state"] == "OPEN"]
     if open_issues:
         return "active"
@@ -276,6 +372,7 @@ def build() -> dict:
                     "depends_on": project["depends_on"],
                     "plan_status": project.get("plan_status", ""),
                     "status_source": "open GitHub issues + plan frontmatter",
+                    **({"gate": project["gate"]} if project.get("gate") else {}),
                 },
             }
         )
@@ -315,12 +412,24 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--write-docs", action="store_true", help="also write the plan→project header")
     parser.add_argument("--out", default=str(ROOT / "seed/programme.json"))
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="fail when the committed document differs from a fresh build (no write)",
+    )
     args = parser.parse_args()
 
     programme = build()
     out = Path(args.out)
+    rendered = json.dumps(programme, indent=2, ensure_ascii=False) + "\n"
+    if args.check:
+        current = out.read_text() if out.exists() else ""
+        if current != rendered:
+            sys.exit(f"build-programme-seed: {out} is stale; re-run without --check")
+        print(f"build-programme-seed: {out} is current")
+        return
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(programme, indent=2, ensure_ascii=False) + "\n")
+    out.write_text(rendered)
     print(
         f"build-programme-seed: wrote {out} — {len(programme['projects'])} projects, "
         f"{sum(len(p['meta']['issues']) for p in programme['projects'])} issue links"

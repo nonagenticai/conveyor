@@ -99,7 +99,13 @@ pub async fn snapshot_tx(
              SELECT c.id, c.board_id, c.list_id, c.card_type_id, c.parent_card_id, c.name,
                     c.position, c.due_at, c.archived_at, c.assignee_id,
                     u.display_name AS assignee_name, c.list_changed_at, c.created_by,
-                    c.version, c.created_at, c.updated_at
+                    c.version, c.created_at, c.updated_at,
+                    -- The plan seed's named keys only. `card.meta` is free-form JSONB and may
+                    -- hold a person's text; the public payload never selects the whole object.
+                    c.meta ->> 'unit_key' AS unit_key,
+                    c.meta -> 'issue' AS issue,
+                    c.meta ->> 'process_key' AS process_key,
+                    c.meta ->> 'plan' AS plan
                FROM card c LEFT JOIN app_user u ON u.id = c.assignee_id
               WHERE c.tenant_id = $1
          ) t",

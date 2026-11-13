@@ -6,8 +6,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/README.html",
       "source": "README.md",
       "section": "Root",
-      "sha256": "de97a8db6c1cd79adde5860fcf7ce8d95268d525c17ce41c78dd5b5fd82ac1cd",
-      "bytes": 520,
+      "sha256": "361ec9f62cfe31cbee865978331a4d63af14ac20c9651c949d1be86e872484ae",
+      "bytes": 801,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/README.md"
     },
     {
@@ -33,8 +33,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "d11e973f18f7cdfd2947e7ea9ae8d0f4bfc7e7e7e7caae8b456bfae23010ae5d",
-      "bytes": 140420,
+      "sha256": "0b3ae52ca47039c41e4c65a9950711fb061f3bf91a914548cfc89948ecc00831",
+      "bytes": 140426,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -65,12 +65,21 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0003-public-ci.md"
     },
     {
+      "title": "0004 — The tool estate is in scope: one public monorepo",
+      "path": "docs/decisions/0004-tool-estate.html",
+      "source": "docs/decisions/0004-tool-estate.md",
+      "section": "Decisions",
+      "sha256": "8a60f2580a4d509ac377e791dc1a4d9ac9263b742655df2acac75ea818197f99",
+      "bytes": 4264,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0004-tool-estate.md"
+    },
+    {
       "title": "Web UI design",
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "582ab62eb2a4047b24a55857ec34939ed4a80c8d099a3cbe9afeca48595541f8",
-      "bytes": 5672,
+      "sha256": "6ddefdceaf39b52b1d880a2ae5fa0437bdc1b284b638eef55e576dbd14624e03",
+      "bytes": 5879,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -78,8 +87,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "6a83daf96a1faea042278b8e83e427b4cfcc31ee2da280ca7b7e9678624e4b1f",
-      "bytes": 66044,
+      "sha256": "199f37d4c9f673ea2676f81067eabe6fc67c14d547c7c2a4632fbc52fcf6e24c",
+      "bytes": 66231,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -243,6 +252,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "bb9b5e1c319d68155857b6a1ecff9c0e6027f723177070a819cc5045bfa46a09",
       "bytes": 9280,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
+    },
+    {
+      "title": "V1 → SPECV2 coverage",
+      "path": "docs/evidence/v2-coverage.html",
+      "source": "docs/evidence/v2-coverage.md",
+      "section": "Evidence",
+      "sha256": "c1fca2d9c6cf447a8381dee0bcba2e9600853e362e801ae58c4cc8aa6ff6ac46",
+      "bytes": 7423,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
       "title": "00 — INDEX · conveyor implementation plans",

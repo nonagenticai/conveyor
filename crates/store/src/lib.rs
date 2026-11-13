@@ -121,6 +121,7 @@ pub mod search;
 pub mod secret;
 pub mod seed;
 pub mod seed_benchmark;
+pub mod seed_plans;
 pub mod seed_programme;
 pub mod snapshot;
 pub mod task;

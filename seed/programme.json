@@ -134,7 +134,7 @@
       "key": "S06a",
       "name": "mcp_server signed channel — both directions",
       "description": "Plan: docs/plans/slices/S06a-mcp-server-channel.md",
-      "status": "draft",
+      "status": "archived",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S06a-mcp-server-channel.md",
@@ -143,8 +143,7 @@
         "depends_on": [
           "S04",
           "S05",
-          "S06]   # S05 ships `projects.*`",
-          "which both properties (b) and the grammar call"
+          "S06"
         ],
         "plan_status": "superseded",
         "status_source": "open GitHub issues + plan frontmatter"
@@ -302,7 +301,7 @@
           "S03",
           "S04",
           "S06",
-          "S07]   # S07 owns `migrate --seed`: the card_type and gate codes this gate reads"
+          "S07"
         ],
         "plan_status": "built 2026-11-09 (steps 1–12); amended 2026-11-09 (process/step/SOP split — migration 0033)",
         "status_source": "open GitHub issues + plan frontmatter"
@@ -533,8 +532,13 @@
         "issues": [
           15
         ],
-        "depends_on": [],
-        "plan_status": "",
+        "depends_on": [
+          "S11",
+          "S13",
+          "S15",
+          "S16"
+        ],
+        "plan_status": "plan written 2026-11-09",
         "status_source": "open GitHub issues + plan frontmatter"
       }
     },
@@ -552,7 +556,8 @@
         ],
         "depends_on": [],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "a job is created in the conveyor, a release is published, a binding pins its hash, and a run on a retired binding refuses `409 job_binding_stale`; no concept has two stores; a test-only third executor kind registers without editing the run path"
       }
     },
     {
@@ -565,9 +570,12 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T0"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused"
       }
     },
     {
@@ -580,9 +588,12 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T1"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card"
       }
     },
     {
@@ -595,9 +606,12 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T2"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request"
       }
     },
     {
@@ -610,9 +624,12 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T3"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata"
       }
     },
     {
@@ -625,9 +642,17 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T2",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened"
       }
     },
     {
@@ -640,9 +665,13 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T5",
+          "T13"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "a real feature lands: lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested"
       }
     },
     {
@@ -655,9 +684,14 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T2",
+          "T4",
+          "T13"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable"
       }
     },
     {
@@ -670,9 +704,12 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T5"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine"
       }
     },
     {
@@ -685,9 +722,13 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T1",
+          "T3"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata"
       }
     },
     {
@@ -700,9 +741,13 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T1",
+          "T3"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons"
       }
     },
     {
@@ -717,7 +762,8 @@
         "issues": [],
         "depends_on": [],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "every metric and every metering level recomputes from rows; the reconciliation with `billing_service` is exact or opens an incident; a C0–C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged"
       }
     },
     {
@@ -730,9 +776,28 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T0",
+          "T1",
+          "T2",
+          "T3",
+          "T4",
+          "T5",
+          "T6",
+          "T7",
+          "T8",
+          "T9",
+          "T10",
+          "T11",
+          "T13",
+          "T14",
+          "T15",
+          "T16",
+          "T17"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget"
       }
     },
     {
@@ -745,9 +810,12 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T2"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt"
       }
     },
     {
@@ -760,9 +828,12 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T13"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish"
       }
     },
     {
@@ -775,9 +846,13 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T13",
+          "T6"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling"
       }
     },
     {
@@ -790,9 +865,13 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T2",
+          "T13"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a tenant edits a PKO entity and the change is versioned; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds"
       }
     },
     {
@@ -805,16 +884,20 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [],
-        "depends_on": [],
+        "depends_on": [
+          "T16",
+          "T3"
+        ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "open GitHub issues + plan frontmatter",
+        "gate": "a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant"
       }
     },
     {
       "key": "DESIGN-PUBLISH",
       "name": "Publish the SPEC_V2 studio design pack, live",
       "description": "Programme-level unit (plan: docs/design/STUDIO-SPEC.md)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/design/STUDIO-SPEC.md",
@@ -841,7 +924,13 @@
         "track": "programme",
         "issues": [
           17,
-          22
+          22,
+          43,
+          44,
+          45,
+          46,
+          55,
+          57
         ],
         "depends_on": [],
         "plan_status": "active",

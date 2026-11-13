@@ -741,7 +741,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>Procedure</strong></td>
-<td>design note (structural changes only) → lane branch → implement via coding jobs → CI green (fmt, clippy <code>-D warnings</code>, tests, gitleaks) → independent review → merge gate → deploy → live verify → close</td>
+<td>design note (structural changes only) → lane branch → implement via coding jobs → CI green (fmt, clippy <code>-D warnings</code>, tests, betterleaks) → independent review → merge gate → deploy → live verify → close</td>
 </tr>
 <tr>
 <td><strong>Tools</strong></td>
@@ -1304,7 +1304,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <li><strong>Design note</strong> for structural changes (architecture contract, migration plan, rollback).</li>
 <li><strong>Lane branch</strong> (<code>lane/&lt;slug&gt;</code>), one branch, at most one PR for the unit's life (house rule).</li>
 <li><strong>Implement</strong> through coding jobs; the executor cannot merge.</li>
-<li><strong>Verify</strong>: CI-equivalent locally first (fmt, clippy <code>-D warnings</code>, the full suite), then the pipeline; gitleaks; the relevant eval/benchmark if the change touches a measured surface.</li>
+<li><strong>Verify</strong>: CI-equivalent locally first (fmt, clippy <code>-D warnings</code>, the full suite), then the pipeline; betterleaks; the relevant eval/benchmark if the change touches a measured surface.</li>
 <li><strong>Review</strong>: an independent reviewer job; the reviewer cannot be the implementer.</li>
 <li><strong>Merge gate</strong>: a human (or an earned auto-merge policy) approves; red CI is a refusal, never a retry-until-green.</li>
 <li><strong>Deploy and verify live</strong>: rollout by image digest, <code>/health</code>, the slice's own acceptance check; a rollback plan exists before the deploy.</li>

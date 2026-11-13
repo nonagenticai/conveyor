@@ -2,9 +2,11 @@
 
 The latest design is **[studio.html](studio.html)** — the **SPEC_V2 organisational operating model**.
 Open it directly in a browser; no build or server is required. When `data/snapshot.js` is present
-(written by `conveyor snapshot`), the pages it covers render the conveyor's own rows and carry a
-`LIVE` ribbon with the snapshot hash and timestamp; an unwired destination keeps the
-`V2 · PROPOSED` ribbon. V1 surfaces implemented in the Rust app are unlabelled.
+(written by `conveyor snapshot`), the pages it covers render the conveyor's own rows — Portfolio,
+Organisation, Jobs, Metering and the Plan **Boards** tab — and carry a `LIVE` ribbon with the
+snapshot hash and timestamp; an unwired destination or tab keeps the `V2 · PROPOSED` ribbon.
+`data/plan-seed.js` is the committed plan seed and the Boards tab's DESIGN fallback: the same
+document the seeder installs. V1 surfaces implemented in the Rust app are unlabelled.
 
 - **Portfolio & plan:** the computed in-flight set, programme shared configuration, typed
   project-dependency edges, the WSJF backlog, PI cadence, capacity and per-project metering; then

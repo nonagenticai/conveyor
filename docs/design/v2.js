@@ -648,23 +648,38 @@ window.installV2 = function (api, enterprise) {
       const label = (status) =>
         ({ active: "Active", draft: "Draft", paused: "Paused", closed: "Closed", archived: "Archived" })[status] || status;
       const tone = (status) => (status === "active" ? "green" : status === "closed" || status === "archived" ? "" : "amber");
-      db.projects = projects.map((row) => ({
-        id: row.id,
-        key: row.key,
-        name: row.name,
-        description: row.description || "",
-        programme: row.programme_id,
-        type: row.project_type_code || "delivery",
-        phase: 0,
-        status: label(row.status),
-        tone: tone(row.status),
-        agents: [],
-        completed: 0,
-        total: 0,
-        spent: 0,
-        process: "feature",
-        symbol: "projects",
-      }));
+      // The board's cards are the project's plan units; a card is complete when its lane's
+      // kind is `done`. A snapshot without boards leaves the counts at zero, not at a guess.
+      const workBoards = list((live.work || {}).boards);
+      const workLists = list((live.work || {}).lists);
+      const workCards = list((live.work || {}).cards);
+      const doneLists = new Set(workLists.filter((row) => row.kind === "done").map((row) => row.id));
+      const countsFor = (projectId) => {
+        const board = workBoards.find((row) => row.project_id === projectId);
+        if (!board) return { completed: 0, total: 0 };
+        const mine = workCards.filter((row) => row.board_id === board.id && !row.archived_at);
+        return { completed: mine.filter((row) => doneLists.has(row.list_id)).length, total: mine.length };
+      };
+      db.projects = projects.map((row) => {
+        const progress = countsFor(row.id);
+        return {
+          id: row.id,
+          key: row.key,
+          name: row.name,
+          description: row.description || "",
+          programme: row.programme_id,
+          type: row.project_type_code || "delivery",
+          phase: 0,
+          status: label(row.status),
+          tone: tone(row.status),
+          agents: [],
+          completed: progress.completed,
+          total: progress.total,
+          spent: 0,
+          process: "feature",
+          symbol: "projects",
+        };
+      });
       count.projects = projects.length;
     }
     if (totals && (totals.calls || totals.total_tokens)) {
@@ -855,17 +870,80 @@ window.installV2 = function (api, enterprise) {
 
   /* ------------------------------------------------------------------ Plan */
   function plan() {
-    const tab = v.tab.plan || "WBS";
+    const work = live ? (live.work || {}) : {};
+    const liveBoards = list(work.boards).length > 0;
+    const tab = v.tab.plan || (liveBoards ? "Boards" : "WBS");
     const change = F.changes[0];
     const content =
-      tab === "WBS"
+      tab === "Boards"
+        ? planBoards(work, liveBoards)
+        : tab === "WBS"
         ? `${panel("Work breakdown", `${table(["WBS", "Kind", "Deliverable / work package", "Acceptance", "Evidence", "State"], F.wbs.map((n) => `<tr><td class="mono">${E(n.id)}</td><td>${E(n.kind)}</td><td><strong>${E(n.name)}</strong></td><td>${E(n.accept)}</td><td>${E(n.evidence)}</td><td>${B(n.state, n.state === "Accepted" ? "green" : n.state === "Blocked" ? "amber" : "")}</td></tr>`))}${note("A WBS node is accepted when its acceptance criteria are met by an artefact or run — not when a checkbox is ticked.")}`, B("5 nodes"))}`
         : tab === "Baseline vs forecast"
           ? `<div class="v2-split"><div>${panel("Baseline B3 (frozen)", `${kv([["Approved", E(F.baseline.approved)], ["Scope", E(F.baseline.scope)], ["Schedule", E(F.baseline.schedule)], ["Cost", E(F.baseline.cost)], ["State", B(F.baseline.state, "green")]])}${note("A baseline is a frozen, approved snapshot. It is not recomputed.")}`)}</div><div>${panel("Forecast (computed)", `${kv([["Scope", "44 deliverables <strong class='e-amber'>+2</strong>"], ["Schedule", "2026-12-27 <strong class='e-amber'>+9 d</strong>"], ["Cost", "€49.4m <strong class='e-amber'>+€0.8m</strong>"], ["Risk", "medium · identity contract"], ["Run pins", "unchanged · capability@17"]])}${note("Forecast is computed from current rows. A variance is not a change until a change request is approved.")}`)}</div></div>${note("Plan ≠ evidence: a deliverable needs an artefact/run, not a tick. Baseline ≠ forecast: a forecast never rewrites the approved baseline.", "ok")}`
           : tab === "Registers"
             ? `${panel("One generic register", `<p class="muted">One table, six kinds — risk · issue · assumption · dependency · benefit · change. The V1 lesson: five PM tables measured zero use.</p>${table(["ID", "Kind", "Title", "Owner", "Status", "Severity", "Link"], F.registers.map((r) => `<tr><td class="mono">${E(r.id)}</td><td>${B(r.kind)}</td><td>${E(r.title)}</td><td>${E(r.owner)}</td><td>${E(r.status)}</td><td>${E(r.severity)}</td><td><small>${E(r.note)}</small></td></tr>`))}`, button("New register item", "reg-new", "", "small", "plus"))}${note("A risk can open a mitigation card; a dependency can link two projects; a benefit is measured at closure (planned vs realised).")}`
             : `<div class="v2-split"><div>${panel("Change control · CR-018", `<h3>${E(change.title)}</h3>${kv([["Changes baseline", E(change.baseline)], ["Impact", E(change.impact)], ["Recorded rationale", change.rationale ? E(change.rationale) : "<span class='e-amber'>required for approve or return</span>"], ["Existing run pins", "unchanged · a new attempt captures B4"]])}<textarea data-v2-input="rationale" rows="3" placeholder="Record the person's rationale" aria-label="Change rationale">${E(change.rationale)}</textarea><div class="row" style="margin-top:10px">${button("Approve new baseline", "change-approve", "", "primary", "shield")}${button("Return for analysis", "change-return", "", "", "replay")}</div>${v.review === "change-blocked" ? note("<strong>422 change_rationale_required</strong> · a person's rationale is required to approve or return a change request. No baseline moved.", "bad") : v.review === "change-ok" ? note("<strong>Approved locally</strong> · baseline B4 drafted; existing runs keep B3 pins. A new sample attempt captures B4.", "ok") : ""}`)}</div><div>${panel("Impact analysis", `${kv([["Scope", "2 deliverables"], ["Schedule", "+9 days"], ["Cost", "+€0.8m"], ["Risk", "medium · identity contract"], ["Approval", "human · programme gate"]])}${note("The change approval, the baseline review and the programme gate are separate decisions.")}`)}</div></div>`;
-    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: WBS, a frozen baseline against a computed forecast, one six-kind register and controlled change.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${ribbon("V2 plan spine: wbs_node, project_baseline, project_register_item (six kinds), project_dependency and change control. Proposed in T1.")}${tabs(["WBS", "Baseline vs forecast", "Registers", "Change control"], tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}</div></div>`;
+    const planRibbon =
+      tab === "Boards"
+        ? ribbon("The programme's plan units are cards on their project's board, rendered from the conveyor's own rows. One card per registered issue; each names a real process.", liveBoards)
+        : ribbon("V2 plan spine: wbs_node, project_baseline, project_register_item (six kinds), project_dependency and change control. Proposed in T1.");
+    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: the programme's boards and cards, then the WBS, a frozen baseline against a computed forecast, one six-kind register and controlled change.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(["Boards", "WBS", "Baseline vs forecast", "Registers", "Change control"], tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}</div></div>`;
+  }
+
+  /* The plan units as real cards: project -> board -> lanes -> cards. LIVE when the snapshot
+     carries boards; otherwise the committed plan seed (the same document the seeder installs). */
+  function planBoards(work, liveBoards) {
+    if (liveBoards) {
+      const projects = list((live.programme || {}).projects);
+      if (!projects.length) return panel("Boards", note("The snapshot carries boards but no projects."));
+      const project = projects.find((row) => row.id === v.planProject) || projects[0];
+      const board = list(work.boards).find((row) => row.project_id === project.id);
+      if (!board) return panel(E(project.name), note("This project has no board in the snapshot."));
+      const lists = list(work.lists)
+        .filter((row) => row.board_id === board.id)
+        .sort((a, b) => Number(a.position) - Number(b.position));
+      const cards = list(work.cards).filter((row) => row.board_id === board.id && !row.archived_at);
+      const types = new Map(list(work.card_types).map((row) => [row.id, row]));
+      const runs = list(work.runs);
+      const lanes = lists
+        .map((lane) => {
+          const laneCards = cards
+            .filter((row) => row.list_id === lane.id)
+            .sort((a, b) => Number(a.position) - Number(b.position));
+          const rows = laneCards.map((card) => {
+            const type = types.get(card.card_type_id);
+            const run = runs
+              .filter((row) => row.card_id === card.id)
+              .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))[0];
+            const issue =
+              card.issue == null
+                ? "—"
+                : `<a class="e-project-link" href="https://github.com/nonagenticai/conveyor/issues/${E(card.issue)}" target="_blank" rel="noopener">#${E(card.issue)} ↗</a>`;
+            return `<tr><td><strong>${E(card.name)}</strong><small class="mono">${E(card.unit_key || "")}</small></td><td>${B(type ? type.code : "—")}</td><td class="mono">${E(card.process_key || "—")}</td><td>${issue}</td><td>${run ? B(run.status) : "—"}</td></tr>`;
+          });
+          return panel(
+            `${lane.name} · ${laneCards.length}`,
+            rows.length
+              ? table(["Card", "Type", "Process", "Issue", "Run"], rows)
+              : `<p class="muted">No cards in this lane.</p>`,
+          );
+        })
+        .join("");
+      return `${panel("Project", `<label class="e-select">Project <select data-v2-input="plan-project">${projects.map((row) => `<option value="${E(row.id)}" ${row.id === project.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`).join("")}</select></label><p class="muted">Board <span class="mono">${E(board.name)}</span> · ${cards.length} cards · ${lists.length} lanes · read from snapshot ${E(short((live || {}).payload_sha256))}.</p>`)}${lanes}`;
+    }
+    const seed = window.CONVEYOR_PLAN_SEED;
+    const projects = list((seed || {}).projects);
+    if (!projects.length) return panel("Boards", note("No plan seed is loaded; the design fallback is unavailable."));
+    const project = projects.find((row) => row.project_key === v.planSeedProject) || projects[0];
+    const rows = list(project.units).map(
+      (unit) =>
+        `<tr><td><strong>${E(unit.title)}</strong><small class="mono">${E(unit.unit_key)}</small></td><td>${B(unit.state === "CLOSED" ? "Done" : "Open", unit.state === "CLOSED" ? "" : "amber")}</td><td>${B(unit.card_type)}</td><td class="mono">${E(unit.process_key)}</td><td>${unit.issue == null ? "—" : "#" + E(unit.issue)}</td></tr>`,
+    );
+    return panel(
+      "Plan seed · DESIGN",
+      `<label class="e-select">Project <select data-v2-input="plan-seed-project">${projects.map((row) => `<option value="${E(row.project_key)}" ${row.project_key === project.project_key ? "selected" : ""}>${E(row.project_key)} · ${E(row.plan || "")}</option>`).join("")}</select></label>${table(["Unit", "State", "Card type", "Process", "Issue"], rows)}${note("The committed plan seed — the same document the seeder installs. Live rows replace it when a snapshot carries boards.")}`,
+    );
   }
 
   /* ------------------------------------------------------------------ Organisation */
@@ -1355,6 +1433,18 @@ window.installV2 = function (api, enterprise) {
 
   /* ------------------------------------------------------------------ events */
   document.addEventListener("change", (event) => {
+    const planProject = event.target.closest('[data-v2-input="plan-project"]');
+    if (planProject) {
+      v.planProject = planProject.value;
+      render();
+      return;
+    }
+    const planSeedProject = event.target.closest('[data-v2-input="plan-seed-project"]');
+    if (planSeedProject) {
+      v.planSeedProject = planSeedProject.value;
+      render();
+      return;
+    }
     const el = event.target.closest('[data-v2-input="pko-search"]');
     if (!el) return;
     v.pkoQuery = el.value.trim().toLowerCase();

@@ -354,89 +354,45 @@ pub(crate) async fn insert_board_from_template(
     let raw = template_code.unwrap_or(DEFAULT_TEMPLATE_CODE);
     let code = conveyor_domain::Code::parse(raw)
         .map_err(|error| invalid("board_template_code", "invalid_value", error.to_string()))?;
-    let template = store::catalogue::get_catalogue_entry_tx(
-        &mut *tx,
-        ctx.tenant,
-        CatalogueKind::BoardTemplate,
-        &code,
-    )
-    .await
-    .map_err(|error| {
-        tracing::error!(%error, "read board template");
-        ActionError::internal()
-    })?;
-    let kinds: Vec<String> = template
-        .filter(|entry| entry.is_active)
-        .as_ref()
-        .and_then(|entry| entry.meta.get("lists"))
-        .and_then(serde_json::Value::as_array)
-        .map(|lists| {
-            lists
-                .iter()
-                .filter_map(serde_json::Value::as_str)
-                .map(str::to_owned)
-                .collect::<Vec<String>>()
-        })
-        .unwrap_or_default();
-    if kinds.is_empty() {
-        return Err(ActionError::new(
-            409,
-            "board-template-missing",
-            format!(
-                "no active board_template catalogue row (code {raw:?}) lists any lane for this \
-                 tenant; run the catalogue seed (`migrate --dev-seed`)"
-            ),
-        ));
-    }
-
-    let board = store::board::insert_board_tx(
-        &mut *tx,
-        ctx.tenant,
-        &store::board::NewBoard {
-            project_id,
-            name: DEFAULT_BOARD_NAME.to_owned(),
-            position: rust_decimal::Decimal::ZERO,
-            settings: serde_json::json!({ "default_card_type_code": "feature" }),
-        },
-    )
-    .await
-    .map_err(|error| {
-        tracing::error!(%error, "insert board");
-        ActionError::internal()
-    })?;
-
-    let step = rust_decimal::Decimal::from(store::position::APPEND_STEP);
-    for (index, raw_kind) in kinds.iter().enumerate() {
-        let kind = super::parse_kind(raw_kind, "board_template.lists")?;
-        let position = step * rust_decimal::Decimal::from(index as u32 + 1);
-        let name = title_case(kind.as_str());
-        store::list::insert_list_tx(
-            &mut *tx,
-            ctx.tenant,
-            &store::list::NewList {
-                board_id: board.id,
-                name,
-                position,
-                kind,
-                color: None,
-                wip_limit: None,
-            },
-        )
+    let kinds = store::board::template_lanes_tx(&mut *tx, ctx.tenant, &code)
         .await
         .map_err(|error| {
-            tracing::error!(%error, kind = kind.as_str(), "insert template lane");
+            tracing::error!(%error, "read board template");
             ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "board-template-missing",
+                format!(
+                    "no active board_template catalogue row (code {raw:?}) lists any lane for this \
+                     tenant; run the catalogue seed (`migrate --dev-seed`)"
+                ),
+            )
         })?;
+    // Validate every kind before the first write, so an invalid template leaves no board.
+    for raw_kind in &kinds {
+        super::parse_kind(raw_kind, "board_template.lists")?;
     }
+    store::board::ensure_board_from_template_tx(
+        &mut *tx,
+        ctx.tenant,
+        project_id,
+        DEFAULT_BOARD_NAME,
+        &kinds,
+        serde_json::json!({ "default_card_type_code": "feature" }),
+    )
+    .await
+    .map_err(|error| match error {
+        store::board::BoardStoreError::UnknownLane(raw) => {
+            invalid("board_template.lists", "invalid_value", raw)
+        }
+        other => {
+            tracing::error!(%other, "insert board from template");
+            ActionError::internal()
+        }
+    })?;
     Ok(())
-}
-
-fn title_case(raw: &str) -> String {
-    let mut chars = raw.chars();
-    match chars.next() {
-        Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
-        None => String::new(),
-    }
 }
 
 /// One project with its boards.

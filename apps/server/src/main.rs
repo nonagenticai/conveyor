@@ -101,6 +101,10 @@ enum Command {
         /// The read-only database URL. Defaults to `DATABASE_URL`.
         #[arg(long)]
         database_url: Option<String>,
+        /// The commit the published pack describes. Defaults to `git rev-parse HEAD` in the
+        /// working directory; a pod has no checkout, so a publish passes it explicitly.
+        #[arg(long)]
+        git_sha: Option<String>,
     },
     /// Administrative operations (S14; S04 owns the action-registry commands).
     Admin {
@@ -393,6 +397,7 @@ async fn run(command: Command) -> Result<(), RunError> {
             issues,
             feedback_url,
             database_url,
+            git_sha,
         } => {
             let report = snapshot::run(snapshot::SnapshotArgs {
                 tenant,
@@ -401,6 +406,7 @@ async fn run(command: Command) -> Result<(), RunError> {
                 issues,
                 feedback_url,
                 database_url,
+                git_sha,
             })
             .await?;
             tracing::info!(
@@ -563,6 +569,19 @@ async fn migrate(
                 updated = counts.updated,
                 skipped = counts.skipped,
                 "programme seeded"
+            );
+        }
+        // The plan spine: one board per project and one card per plan unit, each card naming
+        // its process. Runs after the programme (the projects exist) and inside the catalogue
+        // block (the board template and card types exist).
+        let plans = seed::seed_plans(&pool, tenant.as_deref()).await?;
+        for (slug, counts) in plans {
+            tracing::info!(
+                tenant = %slug,
+                created = counts.created,
+                updated = counts.updated,
+                skipped = counts.skipped,
+                "plan cards seeded"
             );
         }
     }

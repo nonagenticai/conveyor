@@ -7,13 +7,16 @@
 //! FK alone would accept another tenant's project id.
 
 use chrono::{DateTime, Utc};
-use conveyor_domain::{Board, CardType, Code, CodeError, TenantId};
+use conveyor_domain::{Board, CardType, CatalogueKind, Code, CodeError, List, ListKind, TenantId};
 use rust_decimal::Decimal;
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
+use crate::catalogue::{CatalogueStoreError, get_catalogue_entry_tx};
+use crate::list::{ListStoreError, NewList, insert_list_tx};
 use crate::parent::{Parent, ParentError, ensure_parent_tx};
+use crate::position::APPEND_STEP;
 use crate::version_of;
 
 /// A board to create.
@@ -75,6 +78,18 @@ pub enum BoardStoreError {
     /// A referenced parent does not exist in this tenant.
     #[error(transparent)]
     Parent(#[from] ParentError),
+    /// A board template is absent, inactive, or declares no lane.
+    #[error("no active board template names a lane")]
+    TemplateMissing,
+    /// A board template lists a lane kind the domain does not know.
+    #[error("board template lists an unknown lane kind {0:?}")]
+    UnknownLane(String),
+    /// A lane insert failed.
+    #[error(transparent)]
+    List(#[from] ListStoreError),
+    /// The catalogue read failed.
+    #[error(transparent)]
+    Catalogue(#[from] CatalogueStoreError),
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -269,6 +284,109 @@ pub async fn list_boards_tx(
     .fetch_all(&mut *conn)
     .await?;
     Ok(rows.into_iter().map(Into::into).collect())
+}
+
+/// The lane kinds a live `board_template` row declares.
+///
+/// `None` means the template is absent, inactive, or names no lane — the caller refuses rather
+/// than inventing lanes (S5-D5). The kind strings are validated by the caller so the HTTP error
+/// stays `422 invalid_value` there, not a store error.
+pub async fn template_lanes_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    code: &Code,
+) -> Result<Option<Vec<String>>, BoardStoreError> {
+    let template = get_catalogue_entry_tx(conn, tenant, CatalogueKind::BoardTemplate, code)
+        .await?
+        .filter(|entry| entry.is_active);
+    let Some(entry) = template else {
+        return Ok(None);
+    };
+    let kinds: Vec<String> = entry
+        .meta
+        .get("lists")
+        .and_then(Value::as_array)
+        .map(|lists| {
+            lists
+                .iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default();
+    Ok((!kinds.is_empty()).then_some(kinds))
+}
+
+/// A board and its lanes, as created (or found) by [`ensure_board_from_template_tx`].
+#[derive(Clone, Debug)]
+pub struct BoardLanes {
+    /// The board row.
+    pub board: Board,
+    /// Its lanes, in template order.
+    pub lists: Vec<List>,
+}
+
+/// Ensure a project has the named board and every lane the template declares.
+///
+/// Idempotent by the schema's own keys: a board is `(tenant, project, name)`-unique, and each
+/// lane is found by `(board, kind)` before it is inserted. A partially created board is
+/// repaired lane by lane instead of being skipped. The caller owns the template resolution so
+/// `projects.create` keeps its exact `409`/`422` contract.
+pub async fn ensure_board_from_template_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+    name: &str,
+    kinds: &[String],
+    settings: Value,
+) -> Result<BoardLanes, BoardStoreError> {
+    let existing = list_boards_tx(conn, tenant, project_id).await?;
+    let board = match existing.into_iter().find(|board| board.name == name) {
+        Some(board) => board,
+        None => {
+            insert_board_tx(
+                conn,
+                tenant,
+                &NewBoard {
+                    project_id,
+                    name: name.to_owned(),
+                    position: Decimal::ZERO,
+                    settings,
+                },
+            )
+            .await?
+        }
+    };
+
+    let mut lists = Vec::with_capacity(kinds.len());
+    for (index, raw) in kinds.iter().enumerate() {
+        let kind = raw
+            .parse::<ListKind>()
+            .map_err(|_| BoardStoreError::UnknownLane(raw.clone()))?;
+        let list = match crate::list::list_of_kind_tx(conn, tenant, board.id, kind).await? {
+            Some(record) => record.list,
+            None => {
+                let position = Decimal::from(APPEND_STEP) * Decimal::from(index as u64 + 1);
+                insert_list_tx(
+                    conn,
+                    tenant,
+                    &NewList::new(board.id, title_case(kind.as_str()), position, kind),
+                )
+                .await?
+            }
+        };
+        lists.push(list);
+    }
+    Ok(BoardLanes { board, lists })
+}
+
+/// The lane display name from its kind (`intake` → `Intake`).
+fn title_case(raw: &str) -> String {
+    let mut chars = raw.chars();
+    match chars.next() {
+        Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+        None => String::new(),
+    }
 }
 
 /// The project type's card-type matrix (`catalogue_entry.meta.matrix`), when the row is
