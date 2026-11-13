@@ -822,6 +822,7 @@ dependencies = [
  "conveyor-platform",
  "serde",
  "serde_json",
+ "sqlx",
  "thiserror",
  "tokio",
  "tower",

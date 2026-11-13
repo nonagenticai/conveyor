@@ -10,6 +10,7 @@ use clap::{Parser, Subcommand};
 use conveyor_inference_router::SERVICE_NAME;
 use conveyor_inference_router::config::Config;
 use conveyor_inference_router::contract;
+use conveyor_inference_router::db;
 use conveyor_inference_router::router::{self, ROUTES};
 
 #[derive(Debug, Parser)]
@@ -35,6 +36,13 @@ struct Cli {
 enum Command {
     /// Serve HTTP. Never migrates implicitly.
     Serve,
+    /// Apply the embedded migrations to a fresh database.
+    Migrate {
+        /// Stamp `_sqlx_migrations` on a database already at the Python service's alembic head;
+        /// runs no DDL, and refuses a database that is not at that head.
+        #[arg(long)]
+        baseline: bool,
+    },
 }
 
 fn main() -> ExitCode {
@@ -44,6 +52,7 @@ fn main() -> ExitCode {
     }
     match cli.command.unwrap_or(Command::Serve) {
         Command::Serve => serve(),
+        Command::Migrate { baseline } => migrate(baseline),
     }
 }
 
@@ -103,5 +112,36 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
     );
     let listener = tokio::net::TcpListener::bind(config.bind).await?;
     axum::serve(listener, router::router()).await?;
+    Ok(())
+}
+
+fn migrate(baseline: bool) -> ExitCode {
+    match migrate_inner(baseline) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("error: {error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+#[tokio::main]
+async fn migrate_inner(baseline: bool) -> Result<(), Box<dyn std::error::Error>> {
+    let config = Config::from_env()?;
+    let url = config.database_url()?.to_owned();
+    let pool = db::connect(&url, 5).await?;
+    if baseline {
+        let stamped = db::baseline(&pool).await?;
+        eprintln!(
+            "baseline OK: {stamped} migration(s) stamped at {}",
+            db::ALEMBIC_HEAD
+        );
+    } else {
+        db::migrate(&pool).await?;
+        eprintln!(
+            "migrate OK: {} migration(s) embedded",
+            db::MIGRATOR.iter().count()
+        );
+    }
     Ok(())
 }

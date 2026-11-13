@@ -8,6 +8,7 @@
 
 pub mod config;
 pub mod contract;
+pub mod db;
 pub mod router;
 
 /// The service name reported by `/` and the `service` log field.
