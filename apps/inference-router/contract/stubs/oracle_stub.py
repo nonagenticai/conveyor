@@ -27,11 +27,33 @@ RESERVATION = "00000000-0000-4000-8000-0000000000d1"
 CREATED = 1700000000
 MODEL = "stub-model"
 
-# Tokens the licences stub understands. Anything else is an unknown token, which the live
-# licences API answers with 200 {"active": false} — never a transport error.
+# Tokens the licences stub understands. They are exactly 43 characters of [A-Za-z0-9_-]
+# because the live router only ever sends a LICENCE-SHAPED bearer to introspection; a shorter
+# token is treated as "not a licence" and never reaches this endpoint (measured: a 40-character
+# bearer produced a 200 completion and a 401 whoami, not an introspection call).
+# Tokens the licences stub understands. They are exactly 43 characters of [A-Za-z0-9_-]
+# because the live router only ever sends a LICENCE-SHAPED bearer to introspection; a shorter
+# token is treated as "not a licence" and never reaches this endpoint (measured: a 40-character
+# bearer produced a 200 completion and a 401 whoami, not an introspection call).
+def _tok(prefix: str) -> str:
+    token = prefix + "0" * (43 - len(prefix))
+    assert len(token) == 43, token
+    return token
+
+
+GOOD_TOKEN = _tok("stub-licence-token-")
+BAD_TOKEN = _tok("stub-licence-inactive-")
+OVER_TOKEN = _tok("stub-licence-over-")
+NOBUDGET_TOKEN = _tok("stub-licence-nobudget-")
+
+# token -> the tenant its licence vouches for; False is a known but inactive licence.
+# The tenant is what the budget gate is keyed on, so the over-budget case needs its own token:
+# with the gate armed, a verified licence OVERRIDES the X-Tenant-Id header (measured).
 TOKENS = {
-    "stub-licence-token-0000000000000000000001": True,
-    "stub-licence-inactive-00000000000000000002": False,
+    GOOD_TOKEN: TENANT,
+    OVER_TOKEN: TENANT_OVER_BUDGET,
+    NOBUDGET_TOKEN: TENANT_NO_BUDGET,
+    BAD_TOKEN: False,
 }
 
 USAGE = {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
@@ -144,19 +166,18 @@ class Handler(BaseHTTPRequestHandler):
 
     def introspect(self, request):
         token = str(request.get("token") or "")
-        if TOKENS.get(token) is True:
+        tenant = TOKENS.get(token)
+        if tenant:
             self._json(
                 200,
                 {
                     "active": True,
-                    "tenant_id": TENANT,
+                    "tenant_id": tenant,
                     "license_id": LICENSE,
                     "app": {"key": "inference-router"},
                     "expires_at": "2030-01-01T00:00:00Z",
                 },
             )
-        elif token in TOKENS:  # a known-but-inactive token: 200 with active false
-            self._json(200, {"active": False})
         else:
             self._json(200, {"active": False})
 

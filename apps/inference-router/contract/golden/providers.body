@@ -1,0 +1,15 @@
+{
+  "data": [
+    {
+      "cost_input_per_1m": 0.0,
+      "cost_output_per_1m": 0.0,
+      "default_model": "stub-model",
+      "name": "stub-openai",
+      "protocol": "openai"
+    }
+  ],
+  "default_chain": [
+    "stub-openai"
+  ],
+  "object": "list"
+}
