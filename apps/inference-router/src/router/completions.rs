@@ -10,7 +10,7 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 
 use crate::auth::CallerIdentity;
-use crate::config::PolicyMode;
+use crate::config::{GateMode, PolicyMode};
 use crate::contract::schemas::{
     ChatCompletionRequest, ChatCompletionResponse, HTTPValidationError,
 };
@@ -100,6 +100,17 @@ pub async fn create_chat_completion(
         Err(refusal) => return refusal.into_response(),
     };
     let hops = decision.as_ref().map(|decision| decision.hops.as_slice());
+    // The pre-spend gate is at ADMISSION: every path that can spend money passes through here
+    // first, including the failover attempts and the (future) canary forward.
+    let tenant = identity.tenant_id.as_deref().unwrap_or_default();
+    let gate = state
+        .deps()
+        .budget
+        .reserve(tenant, estimate_tokens(&request))
+        .await;
+    if state.config().budget_gate_mode == GateMode::Enforce && gate.reason.deniable() {
+        return budget_refusal(&gate).into_response();
+    }
     let outcome = state.router().complete(&request, x_provider, hops).await;
     // The write path runs on EVERY outcome, not only on success: a request that failed over spent
     // money on the attempts that did not serve it, and the cost bus is billed per attempt.
@@ -110,11 +121,53 @@ pub async fn create_chat_completion(
         &request,
         &outcome,
         decision.as_ref(),
+        gate.reservation_id.as_deref(),
     )
     .await;
     match outcome.response {
         Ok(response) => Json(response).into_response(),
         Err(refusal) => refusal.into_response(),
+    }
+}
+
+/// The reference's token estimate: `max(1, chars // 4)` over the prompt text, where a
+/// multi-part message contributes the sum of its `text` parts.
+fn estimate_tokens(request: &ChatCompletionRequest) -> i64 {
+    let mut chars = 0_i64;
+    for message in &request.messages {
+        match &message.content {
+            serde_json::Value::String(text) => chars += text.chars().count() as i64,
+            serde_json::Value::Array(parts) => {
+                for part in parts {
+                    if let Some(text) = part.get("text").and_then(|value| value.as_str()) {
+                        chars += text.chars().count() as i64;
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    (chars / 4).max(1)
+}
+
+/// The measured 429 body: FastAPI wraps the detail, and the detail carries the numbers so the
+/// caller can see how far over its cap it is rather than having to ask an operator.
+fn budget_refusal(decision: &crate::billing::GateDecision) -> Refusal {
+    Refusal {
+        status: StatusCode::TOO_MANY_REQUESTS,
+        body: serde_json::json!({
+            "detail": {
+                "error": {
+                    "message": "token budget exhausted for this tenant; the request was refused \
+                                before any provider was called",
+                    "type": "budget_exceeded",
+                    "reason": decision.reason.as_str(),
+                    "remaining_tokens": decision.remaining_tokens,
+                    "cap_tokens": decision.cap_tokens,
+                }
+            }
+        }),
+        headers: vec![("X-IR-Error-Classification", "budget_exceeded".to_owned())],
     }
 }
 
@@ -193,6 +246,7 @@ async fn record(
     request: &ChatCompletionRequest,
     outcome: &CompletionOutcome,
     decision: Option<&PolicyDecision>,
+    reservation_id: Option<&str>,
 ) {
     let served_hop = outcome.served_hop.as_ref();
     let context = CallContext {
@@ -235,7 +289,14 @@ async fn record(
     }
 
     for (index, attempt) in outcome.attempts.iter().enumerate() {
-        let event = cost_event(&context, request, served, attempt, index > 0);
+        let event = cost_event(
+            &context,
+            request,
+            served,
+            attempt,
+            index > 0,
+            reservation_id,
+        );
         state.deps().cost.emit(&event).await;
     }
 }
@@ -246,6 +307,7 @@ fn cost_event(
     served: Option<&ChatCompletionResponse>,
     attempt: &ProviderAttempt,
     fallback_used: bool,
+    reservation_id: Option<&str>,
 ) -> CostEvent {
     let usage = served.map(|response| &response.usage);
     CostEvent {
@@ -277,6 +339,9 @@ fn cost_event(
                 .map(|extra| serde_json::to_string(extra).unwrap_or_else(|_| "{}".to_owned()))
                 .unwrap_or_else(|| "{}".to_owned()),
         ),
+        // Billing releases a reservation only by its handle; naming it is what stops a
+        // settlement draining another caller's hold.
+        reservation_id: reservation_id.map(str::to_owned),
         project_id: context.project_id.clone(),
         card_id: context.card_id.clone(),
         execution_id: context.parent_execution_id.clone(),

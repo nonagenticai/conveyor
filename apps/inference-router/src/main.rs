@@ -131,12 +131,51 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
         budget_gate = ?config.budget_gate_mode,
         "serving"
     );
+    // The budget gate makes no call at all when the mode is off; otherwise it is one POST with a
+    // hard total timeout and no retries.
+    let budget: std::sync::Arc<dyn conveyor_inference_router::billing::BudgetGate> =
+        match config.budget_gate_mode {
+            conveyor_inference_router::config::GateMode::Off => {
+                std::sync::Arc::new(conveyor_inference_router::billing::AllowAllGate)
+            }
+            mode => std::sync::Arc::new(conveyor_inference_router::billing::HttpBudgetGate::new(
+                config.budget_gate_billing_base_url.clone(),
+                std::time::Duration::from_secs_f64(config.budget_gate_timeout_seconds),
+                config.budget_gate_reserve_ttl_seconds,
+                mode,
+            )?),
+        };
+    // The cost sink is a stated degradation when no URL is configured, never a silent no-op.
+    let cost: std::sync::Arc<dyn conveyor_inference_router::metering::CostSink> = match (
+        &config.metering_redis_url,
+        config.metering_costs_enabled,
+    ) {
+        (Some(url), true) => match conveyor_inference_router::metering::RedisCostSink::connect(
+            url,
+            config.metering_costs_stream.clone(),
+        )
+        .await
+        {
+            Ok(sink) => std::sync::Arc::new(sink),
+            Err(error) => {
+                tracing::warn!(%error, "metering is configured but Redis is unreachable; cost events are dropped");
+                std::sync::Arc::new(conveyor_inference_router::metering::NoopCostSink)
+            }
+        },
+        _ => {
+            tracing::info!(
+                "metering off: no INFERENCE_ROUTER_METERING_REDIS_URL or costs disabled"
+            );
+            std::sync::Arc::new(conveyor_inference_router::metering::NoopCostSink)
+        }
+    };
     // The budget gate and the cost sink are wired to their real implementations by the slices
     // that add them; until then the defaults are explicit rather than absent.
     let deps = AppDeps {
         ledger: Some(pool),
         policy,
-        ..AppDeps::default()
+        budget,
+        cost,
     };
     let state = AppState::with_deps(config, router_service, deps);
     let listener = tokio::net::TcpListener::bind(state.config().bind).await?;

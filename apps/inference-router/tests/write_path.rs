@@ -374,3 +374,198 @@ async fn a_policy_refusal_happens_before_anything_is_dialled_or_written() {
         .expect("count");
     assert_eq!(rows, 0, "a refused request must not reach the ledger");
 }
+
+/// The oracle's own 429 body for an over-budget tenant.
+const OVER_BUDGET_BODY: &str = include_str!("../contract/golden/completion_over_budget.body");
+
+/// A billing double that answers by the caller's tenant: `over` breaches, `nobudget` has no
+/// active budget (a 429 that must NOT refuse), anyone else is allowed with a handle.
+async fn billing_stub() -> std::net::SocketAddr {
+    async fn reserve(
+        axum::extract::State(_): axum::extract::State<()>,
+        headers: axum::http::HeaderMap,
+    ) -> axum::response::Response {
+        let tenant = headers
+            .get("x-tenant-id")
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or_default()
+            .to_owned();
+        if tenant.contains("over") {
+            return axum::response::IntoResponse::into_response((
+                axum::http::StatusCode::TOO_MANY_REQUESTS,
+                axum::Json(json!({"error": {"details": {
+                    "reason": "over_budget", "remaining_tokens": 0, "cap_tokens": 1000
+                }}})),
+            ));
+        }
+        if tenant.contains("nobudget") {
+            return axum::response::IntoResponse::into_response((
+                axum::http::StatusCode::TOO_MANY_REQUESTS,
+                axum::Json(json!({"error": {"details": {"reason": "no_active_budget"}}})),
+            ));
+        }
+        axum::response::IntoResponse::into_response(axum::Json(json!({"data": {
+            "allowed": true,
+            "remaining_tokens": 999999,
+            "cap_tokens": 1000000,
+            "reservation_id": "00000000-0000-4000-8000-0000000000d1"
+        }})))
+    }
+    let app = Router::new()
+        .route("/api/budget/reserve", post(reserve))
+        .with_state(());
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind billing stub");
+    let address = listener.local_addr().expect("address");
+    tokio::spawn(async move { axum::serve(listener, app).await.expect("billing stub") });
+    address
+}
+
+fn budget_config(billing: &str) -> Config {
+    let billing = billing.to_owned();
+    Config::from_lookup(move |key| match key {
+        "INFERENCE_ROUTER_BUDGET_GATE_MODE" => Some("enforce".to_owned()),
+        "INFERENCE_ROUTER_BUDGET_GATE_BILLING_BASE_URL" => Some(billing.clone()),
+        _ => None,
+    })
+    .expect("budget config")
+}
+
+async fn gated_state(
+    pool: sqlx::PgPool,
+    provider: std::net::SocketAddr,
+    billing: &str,
+    recorder: Arc<Recorder>,
+) -> AppState {
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{provider}/v1\n    model: stub-model\n    model_aliases:\n      stub-model: stub-model\ndefault_chain: [stub-openai]\n"
+    ))
+    .expect("catalog");
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let gate = conveyor_inference_router::billing::HttpBudgetGate::new(
+        billing.to_owned(),
+        Duration::from_millis(750),
+        60,
+        conveyor_inference_router::config::GateMode::Enforce,
+    )
+    .expect("gate");
+    AppState::with_deps(
+        budget_config(billing),
+        router,
+        AppDeps {
+            ledger: Some(pool),
+            budget: Arc::new(gate),
+            cost: recorder,
+            ..AppDeps::default()
+        },
+    )
+}
+
+fn tenant_headers(
+    builder: axum::http::request::Builder,
+    tenant: &str,
+) -> axum::http::request::Builder {
+    builder
+        .header("content-type", "application/json")
+        .header("x-tenant-id", tenant)
+}
+
+#[tokio::test]
+async fn an_over_budget_request_is_refused_with_the_measured_body() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+    let provider = stub_provider().await;
+    let billing = billing_stub().await;
+    let state = gated_state(
+        db.pool.clone(),
+        provider,
+        &format!("http://{billing}"),
+        Arc::new(Recorder::default()),
+    )
+    .await;
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            tenant_headers(Request::post("/api/chat/completions"), "over")
+                .body(attributed_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::TOO_MANY_REQUESTS);
+    let bytes = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+        .await
+        .expect("body");
+    let got: Value = serde_json::from_slice(&bytes).expect("json");
+    let want: Value = serde_json::from_str(OVER_BUDGET_BODY).expect("the golden body");
+    assert_eq!(got, want, "the refusal body must match the captured one");
+
+    // Refused at admission: nothing was dialled and nothing was written.
+    let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM inference_call")
+        .fetch_one(&db.pool)
+        .await
+        .expect("count");
+    assert_eq!(rows, 0);
+}
+
+#[tokio::test]
+async fn a_budget_that_is_not_armed_for_this_tenant_fails_open() {
+    // `no_active_budget` arrives as a 429 but is NOT a breach: the request is served.
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+    let provider = stub_provider().await;
+    let billing = billing_stub().await;
+    let recorder = Arc::new(Recorder::default());
+    let state = gated_state(
+        db.pool.clone(),
+        provider,
+        &format!("http://{billing}"),
+        recorder.clone(),
+    )
+    .await;
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            tenant_headers(Request::post("/api/chat/completions"), "nobudget")
+                .body(attributed_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+    assert_eq!(recorder.0.lock().expect("recorder").len(), 1);
+}
+
+#[tokio::test]
+async fn an_unreachable_billing_fails_open() {
+    // A port nothing listens on: transport error, allow, serve.
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+    let provider = stub_provider().await;
+    let state = gated_state(
+        db.pool.clone(),
+        provider,
+        "http://127.0.0.1:1",
+        Arc::new(Recorder::default()),
+    )
+    .await;
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            tenant_headers(
+                Request::post("/api/chat/completions"),
+                "00000000-0000-4000-8000-0000000000b4",
+            )
+            .body(attributed_request())
+            .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+}
