@@ -309,6 +309,26 @@ fn attributed(
     }
 }
 
+/// The reference's `capture_allowed`: `X-Capture: full` is honoured only when `X-App-Id` is on
+/// `INFERENCE_CAPTURE_ALLOWED_CALLERS`. Every identity header here is caller-asserted, which is
+/// exactly why the allowlist — not the header alone — is the gate. A refused request is served
+/// normally and stores hashes only.
+fn capture_allowed(headers: &HeaderMap, allowlist: &[String]) -> bool {
+    let requested = headers
+        .get("x-capture")
+        .and_then(|value| value.to_str().ok())
+        .is_some_and(|value| value.trim().eq_ignore_ascii_case("full"));
+    if !requested {
+        return false;
+    }
+    let app_id = headers
+        .get("x-app-id")
+        .and_then(|value| value.to_str().ok())
+        .unwrap_or("")
+        .trim();
+    !app_id.is_empty() && allowlist.iter().any(|caller| caller.trim() == app_id)
+}
+
 /// One ledger row for the served attempt, and one cost event per attempt.
 ///
 /// Both failures are logged and dropped: the reference never turns a write-path problem into a
@@ -323,7 +343,9 @@ async fn record(
     reservation_id: Option<&str>,
 ) {
     let served_hop = outcome.served_hop.as_ref();
-    let context = attributed(context, headers, decision, served_hop);
+    let mut context = attributed(context, headers, decision, served_hop);
+    context.capture_full =
+        capture_allowed(headers, &state.config().inference_capture_allowed_callers);
 
     let served = outcome.response.as_ref().ok();
     let served_attempt = outcome.attempts.iter().rev().find(|a| a.failure.is_none());
@@ -335,10 +357,7 @@ async fn record(
             &context,
             request,
             response,
-            attempt
-                .bodies
-                .as_ref()
-                .map(|bodies| bodies.request_text.as_str()),
+            attempt.bodies.as_ref(),
             attempt.latency.as_millis() as i64,
         );
         if let Err(error) = ledger::insert(pool, &row).await {

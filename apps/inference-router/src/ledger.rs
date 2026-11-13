@@ -19,6 +19,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::contract::schemas::{ChatCompletionRequest, ChatCompletionResponse};
+use crate::provider::UpstreamBodies;
 
 /// What the handler knows about the caller and the request, beyond the body itself.
 #[derive(Debug, Clone, Default)]
@@ -43,6 +44,9 @@ pub struct CallContext {
     pub hop_index: Option<i16>,
     pub hop_reason: Option<String>,
     pub key_owner: Option<String>,
+    /// `X-Capture: full` from an `X-App-Id` on `INFERENCE_CAPTURE_ALLOWED_CALLERS`. A streamed
+    /// request never captures, whatever this says (the reference forces it false on that path).
+    pub capture_full: bool,
 }
 
 /// One row's values, already shaped for the INSERT.
@@ -68,6 +72,12 @@ pub struct LedgerRow {
     pub latency_ms: i64,
     pub status: String,
     pub request_text_sha256: Option<String>,
+    /// The captured request/response, and the verbatim wire bytes, written only for a
+    /// non-streamed call whose caller opted in (`X-Capture: full`) and is allowlisted.
+    pub request_json: Option<Value>,
+    pub response_json: Option<Value>,
+    pub request_text: Option<String>,
+    pub response_text: Option<String>,
     pub traffic_source: &'static str,
     pub trace_id: Option<Uuid>,
     pub card_id: Option<String>,
@@ -222,6 +232,17 @@ pub fn request_sha256(request: &ChatCompletionRequest) -> String {
     sha256_hex(&canonical_json(&request_fingerprint(request)))
 }
 
+/// The captured request body: the fingerprint plus the model, exactly as the reference stores it
+/// (`canonical_json({"model": request.model, **fingerprint})`). The capture read recomputes
+/// `request_sha256` over this value minus `model`, so the two cannot drift.
+pub fn captured_request_json(request: &ChatCompletionRequest) -> Value {
+    let mut value = request_fingerprint(request);
+    if let Value::Object(object) = &mut value {
+        object.insert("model".to_owned(), Value::String(request.model.clone()));
+    }
+    value
+}
+
 pub fn response_sha256(response: &ChatCompletionResponse) -> String {
     sha256_hex(&canonical_json(&response_fingerprint(response)))
 }
@@ -249,9 +270,11 @@ impl LedgerRow {
         context: &CallContext,
         request: &ChatCompletionRequest,
         response: &ChatCompletionResponse,
-        request_text: Option<&str>,
+        bodies: Option<&UpstreamBodies>,
         latency_ms: i64,
     ) -> Self {
+        let request_text = bodies.map(|bodies| bodies.request_text.as_str());
+        let capture = context.capture_full;
         Self {
             tenant_id: uuid_of(context.tenant_id.as_deref()),
             correlation_id: context.correlation_id.clone(),
@@ -274,6 +297,19 @@ impl LedgerRow {
             latency_ms,
             status: "ok".to_owned(),
             request_text_sha256: request_text.map(sha256_hex),
+            request_json: capture.then(|| captured_request_json(request)),
+            response_json: capture
+                .then(|| serde_json::to_value(response).expect("a response serialises")),
+            request_text: if capture {
+                bodies.map(|bodies| bodies.request_text.clone())
+            } else {
+                None
+            },
+            response_text: if capture {
+                bodies.map(|bodies| bodies.response_text.clone())
+            } else {
+                None
+            },
             traffic_source: "live",
             trace_id: uuid_of(context.trace_id.as_deref()),
             card_id: context.card_id.clone(),
@@ -321,6 +357,10 @@ impl LedgerRow {
             latency_ms,
             status: stream.status.clone(),
             request_text_sha256: None,
+            request_json: None,
+            response_json: None,
+            request_text: None,
+            response_text: None,
             traffic_source: "live",
             trace_id: uuid_of(context.trace_id.as_deref()),
             card_id: context.card_id.clone(),
@@ -365,7 +405,8 @@ pub async fn insert(pool: &PgPool, row: &LedgerRow) -> Result<(), sqlx::Error> {
             request_text_sha256, traffic_source,
             trace_id, card_id, project_id, parent_execution_id,
             streamed, stream_status, response_json_valid,
-            policy_version, llm_setup, hop_index, hop_reason, key_owner
+            policy_version, llm_setup, hop_index, hop_reason, key_owner,
+            request_json, response_json, request_text, response_text
          ) VALUES (
             $1, $2, $3, $4,
             $5, $6, $7,
@@ -374,7 +415,8 @@ pub async fn insert(pool: &PgPool, row: &LedgerRow) -> Result<(), sqlx::Error> {
             $20, $21,
             $22, $23, $24, $25,
             $26, $27, $28,
-            $29, $30, $31, $32, $33
+            $29, $30, $31, $32, $33,
+            $34, $35, $36, $37
          )
          ON CONFLICT (request_id) WHERE request_id IS NOT NULL DO NOTHING",
     )
@@ -411,6 +453,10 @@ pub async fn insert(pool: &PgPool, row: &LedgerRow) -> Result<(), sqlx::Error> {
     .bind(row.hop_index)
     .bind(&row.hop_reason)
     .bind(&row.key_owner)
+    .bind(&row.request_json)
+    .bind(&row.response_json)
+    .bind(&row.request_text)
+    .bind(&row.response_text)
     .execute(pool)
     .await
     .map(|_| ())
@@ -466,5 +512,96 @@ mod tests {
             request_sha256(&request()),
             "86e40348206a3f554dd6bf74ed35eef822db7ffe9e84f731b33da1dfd6f45813"
         );
+    }
+
+    fn response() -> ChatCompletionResponse {
+        serde_json::from_value(json!({
+            "id": "chatcmpl-test",
+            "model": "stub-model",
+            "choices": [{"index": 0,
+                "message": {"role": "assistant", "content": "stub completion"},
+                "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
+        }))
+        .expect("a response")
+    }
+
+    fn bodies() -> UpstreamBodies {
+        UpstreamBodies {
+            request_text: r#"{"sent":true}"#.to_owned(),
+            response_text: r#"{"received":true}"#.to_owned(),
+        }
+    }
+
+    #[test]
+    fn a_captured_row_stores_the_bodies_and_the_wire_bytes() {
+        let context = CallContext {
+            capture_full: true,
+            ..CallContext::default()
+        };
+        let row = LedgerRow::served(&context, &request(), &response(), Some(&bodies()), 5);
+
+        let stored = row.request_json.clone().expect("request_json");
+        assert_eq!(stored["model"], json!("stub-model"));
+        assert!(row.response_json.is_some());
+        assert_eq!(row.request_text.as_deref(), Some(r#"{"sent":true}"#));
+        assert_eq!(row.response_text.as_deref(), Some(r#"{"received":true}"#));
+        // The hash is over the wire bytes and is written whether or not the body is captured.
+        assert_eq!(
+            row.request_text_sha256.as_deref(),
+            Some(sha256_hex(r#"{"sent":true}"#).as_str())
+        );
+        // The capture read recomputes the request hash over the stored body MINUS `model`;
+        // this is the property that makes `request_sha256_verified` true.
+        let mut without_model = stored;
+        without_model
+            .as_object_mut()
+            .expect("object")
+            .remove("model");
+        assert_eq!(
+            sha256_hex(&canonical_json(&without_model)),
+            row.request_sha256
+        );
+    }
+
+    #[test]
+    fn a_row_without_capture_stores_no_body_and_no_text() {
+        let row = LedgerRow::served(
+            &CallContext::default(),
+            &request(),
+            &response(),
+            Some(&bodies()),
+            5,
+        );
+        assert!(row.request_json.is_none());
+        assert!(row.response_json.is_none());
+        assert!(row.request_text.is_none());
+        assert!(row.response_text.is_none());
+        assert!(
+            row.request_text_sha256.is_some(),
+            "the hash is always written"
+        );
+    }
+
+    #[test]
+    fn a_streamed_row_never_stores_a_body_whatever_the_caller_asked() {
+        let context = CallContext {
+            capture_full: true,
+            ..CallContext::default()
+        };
+        let stream = StreamRow {
+            served_provider: Some("stub-openai"),
+            served_model: Some("stub-model"),
+            finish_reason: Some("stop"),
+            response_sha256: None,
+            response_json_valid: None,
+            status: "ok".to_owned(),
+            stream_status: Some("completed"),
+        };
+        let row = LedgerRow::streamed(&context, &request(), stream, 5);
+        assert!(row.request_json.is_none());
+        assert!(row.response_json.is_none());
+        assert!(row.request_text.is_none());
+        assert!(row.response_text.is_none());
     }
 }

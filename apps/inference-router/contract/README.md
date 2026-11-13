@@ -53,3 +53,38 @@ alias no policy-routed request can be captured at all (it is refused `400`
 `outside_policy`). The alias adds one row to the `models` and `provider_models`
 goldens, which is the only difference from the S9a capture.
 
+## The shadow — old vs candidate on a recorded request window
+
+`shadow.sh` replays a window of completion requests into the pinned old image and the
+Rust candidate, both behind the deterministic stub, and diffs the answers. The two
+replay targets are separate stacks built by `oracle.sh` and `candidate.sh`; the stub is
+stdout-deterministic, so two instances of it return the same body for the same request.
+
+```sh
+# a corpus is the captured window, one JSON object per line, or built from the goldens:
+./shadow.sh --from-golden golden --candidate "$CANDIDATE" --self-test
+# the cutover form (a real window; see the capture requirements below):
+./shadow.sh --live "$INFERENCE_LIVE" --candidate "$CANDIDATE" --since 2026-11-13T00:00:00Z
+```
+
+- `--live` fetches `/api/internal/inference-calls` and each `/{id}/capture`. The live
+  service stores a body **only** when the caller sends `X-Capture: full` **and** its
+  `X-App-Id` is on `INFERENCE_CAPTURE_ALLOWED_CALLERS`; a streamed row never captures.
+  The corpus is written to a temporary directory and is never committed — it can hold
+  live prompts. Set `INFERENCE_ROUTER_INTERNAL_SECRET` and `CAPTURE_APP_ID`.
+- The requested model is rewritten to `stub-model` unless it is already a stub alias:
+  the live catalog does not exist beside the stub. `model_rewrites` in the report says
+  how many cases this touched.
+- `shadow-report.json` carries `cases / equal / tolerated / unexplained` and one row per
+  case: `sha256(request)` and the differing JSON pointers. It never carries a body, a
+  prompt, a tenant or a call id.
+- Exit codes: `0` unexplained=0, `1` unexplained>0, `2` usage/transport, `3` no cases.
+  A vacuous zero is not a pass.
+- `--self-test` re-diffs the first case with one synthetic field added and fails unless
+  the comparator flags it.
+
+⚠️ The hermetic part of this file is proven; a **live** window needs the capture gate
+armed and callers that opt in. The first `#44` attempt measured zero captured bodies
+across 37,938 live rows, which is why the live run is an acceptance-blocked step of the
+cutover issue rather than a merge blocker here.
+
