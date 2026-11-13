@@ -1,0 +1,30 @@
+[package]
+name = "conveyor-inference-router"
+description = "OpenAI-compatible inference router: the captured contract, provider routing and the inference ledger."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "conveyor_inference_router"
+path = "src/lib.rs"
+
+[[bin]]
+name = "conveyor-inference-router"
+path = "src/main.rs"
+
+[dependencies]
+axum = { workspace = true }
+clap = { workspace = true }
+conveyor-platform = { path = "../../crates/platform" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+utoipa = { workspace = true }
+
+[dev-dependencies]
+tower = { workspace = true }

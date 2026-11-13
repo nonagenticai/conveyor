@@ -814,6 +814,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-inference-router"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "clap",
+ "conveyor-platform",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tower",
+ "tracing",
+ "utoipa",
+]
+
+[[package]]
 name = "conveyor-platform"
 version = "0.1.0"
 dependencies = [
