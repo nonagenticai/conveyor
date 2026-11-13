@@ -183,6 +183,18 @@ permission. Adoption is:
 it does not mutate anything. If the original session returns, it joins the branch — the branch's
 HEAD is the arbiter and the latest `<!-- handoff -->` comment is the state.
 
+## The console — a front door, not a second protocol
+
+The operator console at `conveyor.nonagentic.ai/design` can intake an issue as a card, move a
+card, comment, claim and release against the tenant's own rows. It is a **front door to the
+platform**, not a second delivery protocol:
+
+- the GitHub issue is still the unit and the pushed branch is still the claim; a card created
+  from the console carries `meta.issue` and is a view of the unit, never a substitute for it;
+- the console cannot open a PR, merge, or edit a label — those stay the protocol above;
+- `conveyor admin intake` and the console both call `cards.create`, so the two paths cannot
+  produce different rows.
+
 ## Work and gate
 
 - Commit freely on the issue branch (commits are free; branch pushes run no CI — the workflow
