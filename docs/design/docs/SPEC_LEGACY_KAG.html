@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>SPEC — legacy kag disposition (Rust rewrite) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_LEGACY_KAG.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="spec--legacy-kag-disposition-rust-rewrite">SPEC — legacy kag disposition (Rust rewrite)</h1>
+<p><strong>Repo:</strong> <code>nonagenticai/conveyor</code> · <strong>Location:</strong> <code>docs/SPEC_LEGACY_KAG.md</code> <strong>Date:</strong> 2026-11-11 · <strong>Status:</strong> draft for decision · owner direction 2026-11-11; amended 2026-11-13 (ADR 0005) <strong>Relationship to <code>SPEC_V2.md</code>:</strong> D54 records the direction — legacy kag is rewritten in Rust, not revived, and the home of each capability is decided <strong>here</strong>. This spec is not a V2 slice; V2 binds the surviving services as tools and does not depend on this spec's outcome.</p>
+<hr />
+<h2 id="1-purpose">1. Purpose</h2>
+<p>Decide, per legacy kag capability, whether it <strong>survives</strong> and <strong>where its Rust rewrite lives</strong>. The owner left three items explicitly undecided — <strong>neo4j, hirag and karma</strong> — and gave the surrounding rule: most other services either support those three (so their fate follows) or are already needed by w2v, the agent platform or the conveyor. Since <strong>w2v migrates into the conveyor</strong>, the w2v services are rewritten in Rust as they migrate.</p>
+<p>The question is not "how do we revive kag". <code>kag</code> is <strong>off</strong> (owner ruling 2026-10-29, reference only), every kag repository is archived, and nothing serves it. The question is which capabilities are still needed and where they belong.</p>
+<h2 id="2-constraints-owner-rulings">2. Constraints (owner rulings)</h2>
+<ol type="1">
+<li><strong>Rust, not a Python revival.</strong> Archived code is reference; a surviving capability is reimplemented.</li>
+<li><strong>Shared where both platforms need it.</strong> <code>strata_ingest</code> and <code>strata_rag</code> are the shared ingest/retrieval services; the conveyor uses them at least to the extent the agent platform already does (SPEC_V2 §11.2, D54).</li>
+<li><strong><code>strata_ingest</code> and <code>strata_rag</code> stay separate repositories</strong> (ADR 0005, 2026-11-13). They are already Rust, they are shared with the agent platform, and their release cadence and open-sourcing are decided separately. The conveyor binds them over HTTP; they are not workspace members.</li>
+<li><strong>The conveyor is the work system.</strong> A proposal/decision capability belongs to its decision ladder (rule → laya → generation → human), not to a separate service, unless a measured consumer outside the conveyor needs it.</li>
+<li><strong>w2v migrates into the conveyor</strong> and its services are rewritten in Rust, performed by the conveyor's development project (T6), not by a hand-built absorption lane (ADR 0005).</li>
+<li><strong>External data sources stay behind services</strong> (SPEC_V2 D42) until their own migration.</li>
+<li><strong>A capability with no live consumer is retired</strong>, not rewritten (P10). "It exists" is not a reason.</li>
+</ol>
+<h2 id="3-the-three-undecided-capabilities">3. The three undecided capabilities</h2>
+<h3 id="31-neo4j--the-graph-store">3.1 neo4j — the graph store</h3>
+<p><strong>What it is.</strong> The graph database behind the archived graph capability. Nothing serves it.</p>
+<p><strong>Question.</strong> Does any surviving capability need a property graph, and if so where does it live?</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Drop</strong></td>
+<td>no graph store; relational rows + <code>strata_rag</code> cover the need</td>
+<td>lowest ops cost; must prove no graph query is needed</td>
+</tr>
+<tr>
+<td><strong>B. Graph capability inside <code>strata_rag</code></strong></td>
+<td>a graph index beside the existing retrieval, one service</td>
+<td>Rust work in strata; one service to operate</td>
+</tr>
+<tr>
+<td><strong>C. Standalone Rust graph service</strong></td>
+<td>its own service and store</td>
+<td>highest build/ops cost; only with a measured query load</td>
+</tr>
+<tr>
+<td><strong>D. Keep an external graph database</strong></td>
+<td>unmanaged/self-run</td>
+<td>a non-Rust dependency on the critical path; needs an explicit exception</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Default recommendation:</strong> <strong>A</strong> until a measured need exists; <strong>B</strong> is the first choice if a need appears. A graph database is not a default.</p>
+<h3 id="32-hirag_service--retrieval">3.2 hirag_service — retrieval</h3>
+<p><strong>What it is.</strong> The archived retrieval service (hybrid retrieval by name; exact modes to be confirmed from the archive). Nothing serves it.</p>
+<p><strong>Question.</strong> Which of its retrieval modes does <code>strata_rag</code> not already provide, and where do the missing ones go?</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Fold into <code>strata_rag</code></strong></td>
+<td>reimplement the missing modes in the shared retrieval service; one retrieval path</td>
+</tr>
+<tr>
+<td><strong>B. Separate Rust service</strong></td>
+<td>a second retrieval service beside <code>strata_rag</code></td>
+</tr>
+<tr>
+<td><strong>C. Drop the covered modes, keep measured gaps</strong></td>
+<td>port only what <code>strata_rag</code> cannot do today</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Default recommendation:</strong> <strong>A/C</strong> — <code>strata_rag</code> is the shared retrieval system, so folding the missing modes into it is the default; a second service is justified only by a measured gap <code>strata_rag</code> cannot close (K4). The comparison is measured (same queries, same corpus), not asserted.</p>
+<h3 id="33-karma_service--proposals">3.3 karma_service — proposals</h3>
+<p><strong>What it is.</strong> Per the AHTAPol record, KARMA produces proposals that human or deterministic domain-policy actions in the owning services consume. Archived; nothing serves it. The exact proposal types are to be confirmed from the archive.</p>
+<p><strong>Question.</strong> Is a proposal capability still needed, and is it a service or a use of the conveyor's decision ladder?</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Fold into the conveyor</strong></td>
+<td>a proposal is an L2 generation plus an L1/L3 decision; the conveyor already records both</td>
+</tr>
+<tr>
+<td><strong>B. Rust service in strata</strong></td>
+<td>knowledge-side proposals used by more than the conveyor</td>
+</tr>
+<tr>
+<td><strong>C. Drop</strong></td>
+<td>no live consumer</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Default recommendation:</strong> <strong>A</strong> if a consumer exists (it is exactly the conveyor's decision ladder); <strong>C</strong> otherwise.</p>
+<h2 id="4-dependents--what-follows-the-three">4. Dependents — what follows the three</h2>
+<ul>
+<li>A service that <strong>supports</strong> neo4j/hirag/karma stays until its consumer migrates; its disposition follows the decision above, and it is listed here once the dependency edges are read from the archives.</li>
+<li>A service <strong>already needed</strong> by w2v, the agent platform or the conveyor stays; its Rust rewrite is sequenced with the w2v migration (§5), not with this spec.</li>
+<li>No capability is rewritten merely because it exists. Each surviving row needs a named consumer and a named replacement.</li>
+</ul>
+<h2 id="5-w2v-migration-into-the-conveyor">5. w2v migration into the conveyor</h2>
+<ul>
+<li>The w2v stage fleet is live and is a <strong>conveyor migration target</strong> (D54). The rewrite is performed by the conveyor itself as development-project work (T6), not by hand-built absorption issues (ADR 0005).</li>
+<li>Each stage is <strong>rewritten in Rust</strong> as it moves; until then the live service is bound through the conveyor broker as a tool (SPEC_V2 §11).</li>
+<li>The orchestrator's role — sequencing a deliverable run — becomes a conveyor procedure over cards/runs; it is not ported as a second scheduler.</li>
+<li>A stage moves only when its Rust replacement passes the same acceptance checks as the live stage; the two coexist behind the broker during the transition.</li>
+<li>Migration order is decided by measured use and coupling, not by code size.</li>
+</ul>
+<h2 id="6-decision-log">6. Decision log</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Decision</th>
+<th>State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>K1</strong></td>
+<td>Legacy kag is rewritten in Rust; no Python revival</td>
+<td><strong>Decided</strong> (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>K2</strong></td>
+<td>A separate spec decides the home of each capability</td>
+<td><strong>Decided</strong> (owner, 2026-11-11)</td>
+</tr>
+<tr>
+<td><strong>K3</strong></td>
+<td>neo4j</td>
+<td><strong>Open</strong> — options §3.1</td>
+</tr>
+<tr>
+<td><strong>K4</strong></td>
+<td>hirag_service</td>
+<td><strong>Open</strong> — options §3.2</td>
+</tr>
+<tr>
+<td><strong>K5</strong></td>
+<td>karma_service</td>
+<td><strong>Open</strong> — options §3.3</td>
+</tr>
+<tr>
+<td><strong>K6</strong></td>
+<td>w2v stage migration order</td>
+<td><strong>Open</strong> — §5</td>
+</tr>
+<tr>
+<td><strong>K7</strong></td>
+<td>First rewrite target</td>
+<td><strong>Open</strong> — after K3–K5</td>
+</tr>
+<tr>
+<td><strong>K8</strong></td>
+<td><code>strata_ingest</code> and <code>strata_rag</code> stay external repositories; their open-sourcing is a separate decision</td>
+<td><strong>Decided</strong> (owner, 2026-11-13; ADR 0005)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-non-goals">7. Non-goals</h2>
+<ul>
+<li>Reviving kag, its Python services or its n8n integration.</li>
+<li>A second retrieval path beside <code>strata_rag</code> unless K4 measures a gap it cannot close.</li>
+<li>A runtime dependency on any archived repository.</li>
+<li>Migrating a capability with no named consumer.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/SPEC_LEGACY_KAG.md</code> at build time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -29,6 +29,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC.md"
     },
     {
+      "title": "SPEC — legacy kag disposition (Rust rewrite)",
+      "path": "docs/SPEC_LEGACY_KAG.html",
+      "source": "docs/SPEC_LEGACY_KAG.md",
+      "section": "Spec",
+      "sha256": "34855f79d2ad308fa69809c617530edea53979e5cac8e7c52d71bab8116ba039",
+      "bytes": 7522,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_LEGACY_KAG.md"
+    },
+    {
       "title": "SPEC V2 — conveyor: the organisational operating model",
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
@@ -69,9 +78,18 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/decisions/0004-tool-estate.html",
       "source": "docs/decisions/0004-tool-estate.md",
       "section": "Decisions",
-      "sha256": "8a60f2580a4d509ac377e791dc1a4d9ac9263b742655df2acac75ea818197f99",
-      "bytes": 4264,
+      "sha256": "27d87a5b30989cc1436397cd13ea1fa49e6abe463f974c980d9a10929f448d65",
+      "bytes": 4357,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0004-tool-estate.md"
+    },
+    {
+      "title": "0005 — Absorption sequence, strata stays external, and conveyor-executed rewrites",
+      "path": "docs/decisions/0005-absorption-sequence-and-repo-scope.html",
+      "source": "docs/decisions/0005-absorption-sequence-and-repo-scope.md",
+      "section": "Decisions",
+      "sha256": "d058956231b4d25f7667edd9a2ac50cf141fa4d030088225a04fefc7b663ce50",
+      "bytes": 2816,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0005-absorption-sequence-and-repo-scope.md"
     },
     {
       "title": "Web UI design",
@@ -267,8 +285,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "3e228391201273738e144da7099bd6ff76bcf84ec78f686becc819f454b671a3",
-      "bytes": 248201,
+      "sha256": "034cc1338e531cca27e85b4470f8e7175804a2bffcdaf29795d1425736c35e8f",
+      "bytes": 248622,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -339,8 +357,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "4eb4bc690bc83080f8e8853a6b150100eba2f06eb253a74d35b9d38d6cbc1e67",
-      "bytes": 16770,
+      "sha256": "e25d9db04c33e90d94cdf3f5bc591c0ed3a5e28773c844192558447f6f5dc32b",
+      "bytes": 18762,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
