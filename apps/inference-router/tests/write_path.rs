@@ -746,3 +746,253 @@ async fn an_unvouched_delegation_keeps_the_callers_tenant() {
     assert_eq!(events[0].tenant_id.as_deref(), Some(CALLER_TENANT));
     assert_eq!(events[0].delegated_by, None);
 }
+
+// ── streaming ─────────────────────────────────────────────────────────────────────────────────
+
+/// A stub that answers a streaming request with the oracle's five frames plus `[DONE]`.
+async fn stream_stub_provider() -> std::net::SocketAddr {
+    async fn handler(axum::Json(body): axum::Json<Value>) -> axum::response::Response {
+        use axum::response::IntoResponse;
+
+        if body.get("stream").and_then(Value::as_bool).unwrap_or(false) {
+            let frames = [
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}"#,
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[{"index":0,"delta":{"content":"stub "},"finish_reason":null}]}"#,
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[{"index":0,"delta":{"content":"completion"},"finish_reason":null}]}"#,
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}"#,
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[],"usage":{"prompt_tokens":7,"completion_tokens":3,"total_tokens":10}}"#,
+                "data: [DONE]",
+            ];
+            let mut text = String::new();
+            for frame in frames {
+                text.push_str(frame);
+                text.push_str("\n\n");
+            }
+            return (
+                [(axum::http::header::CONTENT_TYPE, "text/event-stream")],
+                text,
+            )
+                .into_response();
+        }
+        axum::Json(json!({
+            "id": "chatcmpl-test",
+            "model": "stub-model",
+            "served_model": "stub-model",
+            "choices": [{"index": 0, "message": {"role": "assistant", "content": "stub completion"}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
+        }))
+        .into_response()
+    }
+    let app = Router::new().route("/v1/chat/completions", post(handler));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind stub");
+    let address = listener.local_addr().expect("address");
+    tokio::spawn(async move { axum::serve(listener, app).await.expect("stub serves") });
+    address
+}
+
+/// A stub whose provider always fails, so the stream never opens.
+async fn failing_stub_provider() -> std::net::SocketAddr {
+    async fn handler() -> axum::response::Response {
+        use axum::response::IntoResponse;
+        (
+            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+            axum::Json(
+                json!({"error": {"message": "stub provider failure", "type": "server_error"}}),
+            ),
+        )
+            .into_response()
+    }
+    let app = Router::new().route("/v1/chat/completions", post(handler));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind stub");
+    let address = listener.local_addr().expect("address");
+    tokio::spawn(async move { axum::serve(listener, app).await.expect("stub serves") });
+    address
+}
+
+async fn streaming_state(
+    pool: sqlx::PgPool,
+    address: std::net::SocketAddr,
+    recorder: Arc<Recorder>,
+) -> AppState {
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: stub-model\n    model_aliases:\n      stub-model: stub-model\ndefault_chain: [stub-openai]\n"
+    ))
+    .expect("catalog");
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let config = Config::from_lookup(|_| None).expect("defaults");
+    AppState::with_deps(
+        config,
+        router,
+        AppDeps {
+            ledger: Some(pool),
+            budget: Arc::new(AllowAllGate),
+            cost: recorder,
+            ..AppDeps::default()
+        },
+    )
+}
+
+fn stream_request() -> Body {
+    Body::from(
+        json!({
+            "model": "stub-model",
+            "messages": [{"role": "user", "content": "stream"}],
+            "max_tokens": 8,
+            "stream": true
+        })
+        .to_string(),
+    )
+}
+
+async fn wait_for_rows(pool: &sqlx::PgPool, want: i64) {
+    for _ in 0..200 {
+        let count: i64 = sqlx::query_scalar("SELECT count(*) FROM inference_call")
+            .fetch_one(pool)
+            .await
+            .expect("count");
+        if count >= want {
+            return;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    panic!("the streamed row was not written");
+}
+
+async fn wait_for_events(recorder: &Recorder, want: usize) {
+    for _ in 0..200 {
+        if recorder.0.lock().expect("recorder").len() >= want {
+            return;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    panic!("the streamed cost event was not emitted");
+}
+
+#[tokio::test]
+async fn a_stream_writes_one_completed_row_and_one_cost_event() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("the service's own migrations");
+    let address = stream_stub_provider().await;
+    let recorder = Arc::new(Recorder::default());
+    let state = streaming_state(db.pool.clone(), address, recorder.clone()).await;
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .body(stream_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+    let bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .expect("body");
+    let text = String::from_utf8(bytes.to_vec()).expect("utf8");
+    assert!(text.ends_with("data: [DONE]\n\n"));
+
+    wait_for_rows(&db.pool, 1).await;
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["streamed"], true);
+    assert_eq!(row["stream_status"], "completed");
+    assert_eq!(row["status"], "ok");
+    assert_eq!(row["served_provider"], "stub-openai");
+    assert_eq!(row["served_model"], "stub-model");
+    assert_eq!(row["finish_reason"], "stop");
+    // A streamed row never stores text.
+    assert_eq!(row["request_text_sha256"], Value::Null);
+    // The same generation hashes identically streamed and non-streamed.
+    assert_eq!(
+        row["response_sha256"],
+        "ba6f4f2b57c61a5dcf72a7b77e61340cfd9239c18f3e558200fb81b7d85637d1"
+    );
+
+    wait_for_events(&recorder, 1).await;
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 1);
+    assert_eq!(events[0].input_tokens, 7);
+    assert_eq!(events[0].output_tokens, 3);
+    assert_eq!(events[0].served_model.as_deref(), Some("stub-model"));
+}
+
+#[tokio::test]
+async fn an_aborted_stream_is_booked_as_a_client_disconnect() {
+    use futures_util::StreamExt;
+
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("the service's own migrations");
+    let address = stream_stub_provider().await;
+    let recorder = Arc::new(Recorder::default());
+    let state = streaming_state(db.pool.clone(), address, recorder.clone()).await;
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .body(stream_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+    let mut body = response.into_body().into_data_stream();
+    // Read one frame, then walk away: that is what a client disconnect looks like.
+    let _ = body.next().await;
+    drop(body);
+
+    wait_for_rows(&db.pool, 1).await;
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["streamed"], true);
+    assert_eq!(row["stream_status"], "client_disconnect");
+    assert_eq!(row["status"], "error");
+    assert!(row["response_sha256"].is_string());
+
+    wait_for_events(&recorder, 1).await;
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 1);
+    // The usage chunk never arrived, so the meter is zero, never a dropped event.
+    assert_eq!(events[0].input_tokens, 0);
+    assert_eq!(events[0].output_tokens, 0);
+}
+
+#[tokio::test]
+async fn a_stream_that_never_opens_is_one_row_with_its_http_code() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("the service's own migrations");
+    let address = failing_stub_provider().await;
+    let recorder = Arc::new(Recorder::default());
+    let state = streaming_state(db.pool.clone(), address, recorder.clone()).await;
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .body(stream_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    // `stub-model` is an alias exactly one provider declares, so the route is PINNED and a
+    // failure is returned, never answered by another model (502, the pinned refusal).
+    assert_eq!(response.status(), axum::http::StatusCode::BAD_GATEWAY);
+
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["streamed"], true);
+    assert_eq!(row["stream_status"], Value::Null);
+    assert_eq!(row["status"], "502");
+    // The failed attempt was still billed, at zero tokens.
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 1);
+    assert_eq!(events[0].output_tokens, 0);
+}

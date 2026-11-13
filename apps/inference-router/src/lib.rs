@@ -21,6 +21,7 @@ pub mod reads;
 pub mod router;
 pub mod routing;
 pub mod state;
+pub mod stream;
 
 /// The service name reported by `/` and the `service` log field.
 pub const SERVICE_NAME: &str = "inference-router";

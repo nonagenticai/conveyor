@@ -821,6 +821,7 @@ dependencies = [
  "chrono",
  "clap",
  "conveyor-platform",
+ "futures-util",
  "redis",
  "reqwest",
  "serde",

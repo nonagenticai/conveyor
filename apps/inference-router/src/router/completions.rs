@@ -4,21 +4,33 @@
 //! headers; every one is optional and a malformed value is simply absent — a bad header must
 //! never fail a customer's inference.
 
+use std::convert::Infallible;
+use std::pin::Pin;
+use std::task::{Context as TaskContext, Poll};
+use std::time::Instant;
+
 use axum::Json;
+use axum::body::{Body, Bytes};
 use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
+use futures_util::Stream;
 
 use crate::auth::{self, CallerIdentity, EffectiveTenant};
 use crate::config::{GateMode, PolicyMode};
+use crate::contract::chunks::ChatCompletionChunk;
 use crate::contract::schemas::{
-    ChatCompletionRequest, ChatCompletionResponse, HTTPValidationError,
+    ChatCompletionRequest, ChatCompletionResponse, HTTPValidationError, Usage,
 };
-use crate::ledger::{self, CallContext, LedgerRow};
+use crate::ledger::{self, CallContext, LedgerRow, StreamRow};
 use crate::metering::{CostEvent, ZERO_COST_USD};
 use crate::policy::{self, ResolvedHop};
-use crate::routing::{CompletionOutcome, ProviderAttempt, Refusal};
+use crate::provider::ChunkStream;
+use crate::routing::{CompletionOutcome, ProviderAttempt, Refusal, ServedHop, ServedStream};
 use crate::state::AppState;
+use crate::stream::{
+    STREAM_CLIENT_DISCONNECT, STREAM_COMPLETED, STREAM_UPSTREAM_ERROR, StreamCapture,
+};
 
 /// FastAPI's body-validation document. The common case is a missing required field, where the
 /// reference answers `{type: "missing", loc: ["body", field], msg: "Field required", input}`;
@@ -116,12 +128,7 @@ pub async fn create_chat_completion(
         Err(refusal) => return refusal.into_response(),
     };
     if request.stream {
-        return Refusal::detail(
-            StatusCode::NOT_IMPLEMENTED,
-            "Streaming is not implemented yet",
-            "stream_unsupported",
-        )
-        .into_response();
+        return stream_completion(state, headers, request, identity, effective).await;
     }
     let x_provider = headers
         .get("x-provider")
@@ -276,21 +283,15 @@ fn attribution(headers: &HeaderMap, name: &str) -> Option<String> {
         .map(str::to_owned)
 }
 
-/// One ledger row for the served attempt, and one cost event per attempt.
-///
-/// Both failures are logged and dropped: the reference never turns a write-path problem into a
-/// failed inference, and neither does this port.
-async fn record(
-    state: &AppState,
+/// Add the attribution headers and the policy hop to a call context. Shared by the
+/// non-streaming and the streaming write paths so the two rows cannot drift.
+fn attributed(
     context: CallContext,
     headers: &HeaderMap,
-    request: &ChatCompletionRequest,
-    outcome: &CompletionOutcome,
     decision: Option<&PolicyDecision>,
-    reservation_id: Option<&str>,
-) {
-    let served_hop = outcome.served_hop.as_ref();
-    let context = CallContext {
+    served_hop: Option<&ServedHop>,
+) -> CallContext {
+    CallContext {
         correlation_id: attribution(headers, "x-correlation-id"),
         worker_name: attribution(headers, "x-worker-name"),
         stage: attribution(headers, "x-stage"),
@@ -305,7 +306,24 @@ async fn record(
         hop_reason: served_hop.map(|hop| hop.reason.to_owned()),
         key_owner: served_hop.map(|hop| hop.key_owner.to_owned()),
         ..context
-    };
+    }
+}
+
+/// One ledger row for the served attempt, and one cost event per attempt.
+///
+/// Both failures are logged and dropped: the reference never turns a write-path problem into a
+/// failed inference, and neither does this port.
+async fn record(
+    state: &AppState,
+    context: CallContext,
+    headers: &HeaderMap,
+    request: &ChatCompletionRequest,
+    outcome: &CompletionOutcome,
+    decision: Option<&PolicyDecision>,
+    reservation_id: Option<&str>,
+) {
+    let served_hop = outcome.served_hop.as_ref();
+    let context = attributed(context, headers, decision, served_hop);
 
     let served = outcome.response.as_ref().ok();
     let served_attempt = outcome.attempts.iter().rev().find(|a| a.failure.is_none());
@@ -390,6 +408,374 @@ fn cost_event(
     }
 }
 
+// ── streaming ─────────────────────────────────────────────────────────────────────────────────
+
+/// The streamed completion path: policy, budget, dispatch, then an SSE body that relays every
+/// chunk unchanged and books exactly one row when the stream ends (completed, upstream error or
+/// client disconnect). A stream that never opens still books one row, with `stream_status` null
+/// and the HTTP code as its status.
+async fn stream_completion(
+    state: AppState,
+    headers: HeaderMap,
+    request: ChatCompletionRequest,
+    identity: CallerIdentity,
+    effective: EffectiveTenant,
+) -> Response {
+    let started = Instant::now();
+    let x_provider = headers
+        .get("x-provider")
+        .and_then(|value| value.to_str().ok());
+    let decision = match tenant_policy(&state, &identity, &effective, &request, x_provider).await {
+        Ok(decision) => decision,
+        Err(refusal) => return refusal.into_response(),
+    };
+    let hops = decision.as_ref().map(|decision| decision.hops.as_slice());
+    let tenant = effective.tenant_id.as_deref().unwrap_or_default();
+    let gate = state
+        .deps()
+        .budget
+        .reserve(tenant, estimate_tokens(&request))
+        .await;
+    if state.config().budget_gate_mode == GateMode::Enforce && gate.reason.deniable() {
+        return budget_refusal(&gate).into_response();
+    }
+    let outcome = state.router().stream(&request, x_provider, hops).await;
+    let context = attributed(
+        CallContext {
+            tenant_id: effective.tenant_id.clone(),
+            license_id: identity.license_id.clone(),
+            delegated_by: effective.delegated_by.clone(),
+            ..CallContext::default()
+        },
+        &headers,
+        decision.as_ref(),
+        outcome.served_hop.as_ref(),
+    );
+    match outcome.stream {
+        Ok(served) => {
+            let relay = RelayStream::new(
+                state,
+                context,
+                request,
+                outcome.attempts,
+                gate.reservation_id.clone(),
+                served,
+                started,
+            );
+            Response::builder()
+                .status(StatusCode::OK)
+                .header("content-type", "text/event-stream; charset=utf-8")
+                .header("cache-control", "no-cache")
+                .header("connection", "keep-alive")
+                .header("x-accel-buffering", "no")
+                .body(Body::from_stream(relay))
+                .expect("a static response head is valid")
+        }
+        Err(refusal) => {
+            record_unopened_stream(
+                &state,
+                context,
+                &request,
+                &outcome.attempts,
+                refusal.status,
+                gate.reservation_id.as_deref(),
+                started,
+            )
+            .await;
+            refusal.into_response()
+        }
+    }
+}
+
+/// The SSE body: relays each chunk unchanged, stamps the terminal chunk's `served_provider`,
+/// captures what was generated, and finalises the write once.
+struct RelayStream {
+    state: AppState,
+    context: CallContext,
+    request: ChatCompletionRequest,
+    attempts: Option<Vec<ProviderAttempt>>,
+    reservation_id: Option<String>,
+    first: Option<ChatCompletionChunk>,
+    rest: ChunkStream,
+    provider: String,
+    capture: StreamCapture,
+    started: Instant,
+    finished: bool,
+    sent_done: bool,
+}
+
+impl RelayStream {
+    fn new(
+        state: AppState,
+        context: CallContext,
+        request: ChatCompletionRequest,
+        attempts: Vec<ProviderAttempt>,
+        reservation_id: Option<String>,
+        served: ServedStream,
+        started: Instant,
+    ) -> Self {
+        Self {
+            state,
+            context,
+            request,
+            attempts: Some(attempts),
+            reservation_id,
+            first: Some(served.first),
+            rest: served.rest,
+            provider: served.provider,
+            capture: StreamCapture::default(),
+            started,
+            finished: false,
+            sent_done: false,
+        }
+    }
+
+    /// Capture and serialise one relayed chunk. The `served_provider` stamp happens BEFORE both,
+    /// because the client's frame and the row must agree on who served the call.
+    fn emit(&mut self, mut chunk: ChatCompletionChunk) -> Bytes {
+        if chunk.usage.is_some() {
+            chunk.served_provider = Some(self.provider.clone());
+        }
+        self.capture.feed(&chunk);
+        Bytes::from(chunk.to_sse())
+    }
+
+    /// Schedule the one write for this stream. Idempotent; the reference's `finalised` flag.
+    fn finalise(&mut self, status: &'static str) {
+        if self.finished {
+            return;
+        }
+        self.finished = true;
+        let Some(attempts) = self.attempts.take() else {
+            return;
+        };
+        let Ok(handle) = tokio::runtime::Handle::try_current() else {
+            tracing::warn!("stream ledger write skipped: no runtime at finalise");
+            return;
+        };
+        let state = self.state.clone();
+        let context = self.context.clone();
+        let request = self.request.clone();
+        let reservation_id = self.reservation_id.clone();
+        let started = self.started;
+        let capture = std::mem::take(&mut self.capture);
+        handle.spawn(async move {
+            finalise_stream(
+                state,
+                context,
+                request,
+                attempts,
+                reservation_id,
+                started,
+                capture,
+                status,
+            )
+            .await;
+        });
+    }
+}
+
+impl Stream for RelayStream {
+    type Item = Result<Bytes, Infallible>;
+
+    fn poll_next(self: Pin<&mut Self>, cx: &mut TaskContext<'_>) -> Poll<Option<Self::Item>> {
+        let this = self.get_mut();
+        if let Some(first) = this.first.take() {
+            return Poll::Ready(Some(Ok(this.emit(first))));
+        }
+        if this.sent_done {
+            return Poll::Ready(None);
+        }
+        let polled = this.rest.as_mut().poll_next(cx);
+        match polled {
+            Poll::Pending => Poll::Pending,
+            Poll::Ready(Some(Ok(chunk))) => Poll::Ready(Some(Ok(this.emit(chunk)))),
+            Poll::Ready(Some(Err(_))) => {
+                // The reference lets the provider error end the iterator; the capture records
+                // the hash of what did arrive and the row says `upstream_error`.
+                this.capture.mark_broken();
+                this.finalise(STREAM_UPSTREAM_ERROR);
+                Poll::Ready(None)
+            }
+            Poll::Ready(None) => {
+                // Set before the frame is yielded: reaching this line IS completion.
+                this.sent_done = true;
+                this.finalise(STREAM_COMPLETED);
+                Poll::Ready(Some(Ok(Bytes::from_static(b"data: [DONE]\n\n"))))
+            }
+        }
+    }
+}
+
+impl Drop for RelayStream {
+    fn drop(&mut self) {
+        // A consumer that stops polling is what "aborted" means.
+        self.finalise(STREAM_CLIENT_DISCONNECT);
+    }
+}
+
+/// The one write for a finished stream: the ledger row, then one cost event per attempt.
+#[allow(clippy::too_many_arguments)] // the eight values are the stream's whole final state
+async fn finalise_stream(
+    state: AppState,
+    context: CallContext,
+    request: ChatCompletionRequest,
+    attempts: Vec<ProviderAttempt>,
+    reservation_id: Option<String>,
+    started: Instant,
+    capture: StreamCapture,
+    status: &'static str,
+) {
+    let latency = started.elapsed().as_millis() as i64;
+    if let Some(pool) = state.deps().ledger.as_ref() {
+        let response_sha256 = capture.response_sha256();
+        let row = LedgerRow::streamed(
+            &context,
+            &request,
+            StreamRow {
+                served_provider: capture.served_provider.as_deref(),
+                served_model: capture.served_model.as_deref(),
+                finish_reason: capture.finish_reason(),
+                response_sha256: response_sha256.as_deref(),
+                response_json_valid: capture.response_json_valid(),
+                status: if status == STREAM_COMPLETED {
+                    "ok"
+                } else {
+                    "error"
+                }
+                .to_owned(),
+                stream_status: Some(status),
+            },
+            latency,
+        );
+        if let Err(error) = ledger::insert(pool, &row).await {
+            tracing::warn!(%error, "inference ledger write failed");
+        }
+    }
+    let served_attempt = attempts
+        .iter()
+        .rposition(|attempt| attempt.failure.is_none());
+    for (index, attempt) in attempts.iter().enumerate() {
+        let served = Some(index) == served_attempt;
+        let event = stream_cost_event(
+            &context,
+            &request,
+            attempt,
+            index > 0,
+            reservation_id.as_deref(),
+            if served { capture.usage.as_ref() } else { None },
+            if served {
+                capture.served_model.as_deref()
+            } else {
+                None
+            },
+            if served {
+                capture.provider_request_id.as_deref()
+            } else {
+                None
+            },
+        );
+        state.deps().cost.emit(&event).await;
+    }
+}
+
+/// One row for a stream that never opened: `streamed=true`, `stream_status` null, the HTTP code
+/// as its status. Failed attempts are still billed.
+async fn record_unopened_stream(
+    state: &AppState,
+    context: CallContext,
+    request: &ChatCompletionRequest,
+    attempts: &[ProviderAttempt],
+    status: StatusCode,
+    reservation_id: Option<&str>,
+    started: Instant,
+) {
+    let latency = started.elapsed().as_millis() as i64;
+    if let Some(pool) = state.deps().ledger.as_ref() {
+        let row = LedgerRow::streamed(
+            &context,
+            request,
+            StreamRow {
+                served_provider: None,
+                served_model: None,
+                finish_reason: None,
+                response_sha256: None,
+                response_json_valid: None,
+                status: status.as_u16().to_string(),
+                stream_status: None,
+            },
+            latency,
+        );
+        if let Err(error) = ledger::insert(pool, &row).await {
+            tracing::warn!(%error, "inference ledger write failed");
+        }
+    }
+    for (index, attempt) in attempts.iter().enumerate() {
+        let event = stream_cost_event(
+            &context,
+            request,
+            attempt,
+            index > 0,
+            reservation_id,
+            None,
+            None,
+            None,
+        );
+        state.deps().cost.emit(&event).await;
+    }
+}
+
+/// The streaming twin of `cost_event`: the metered usage comes from the terminal chunk rather
+/// than from a response body.
+#[allow(clippy::too_many_arguments)] // the served/total split is clearer than a bag struct here
+fn stream_cost_event(
+    context: &CallContext,
+    request: &ChatCompletionRequest,
+    attempt: &ProviderAttempt,
+    fallback_used: bool,
+    reservation_id: Option<&str>,
+    usage: Option<&Usage>,
+    served_model: Option<&str>,
+    provider_request_id: Option<&str>,
+) -> CostEvent {
+    CostEvent {
+        tenant_id: context.tenant_id.clone(),
+        license_id: context.license_id.clone(),
+        correlation_id: context.correlation_id.clone(),
+        stage: context.stage.clone(),
+        worker_name: context.worker_name.clone(),
+        service_key: crate::SERVICE_NAME.to_owned(),
+        cost_source: crate::SERVICE_NAME.to_owned(),
+        provider: attempt.provider.clone(),
+        model: attempt
+            .model_override
+            .clone()
+            .unwrap_or_else(|| request.model.clone()),
+        served_model: served_model.map(str::to_owned),
+        input_tokens: usage.map_or(0, |usage| usage.prompt_tokens),
+        output_tokens: usage.map_or(0, |usage| usage.completion_tokens),
+        cache_creation_input_tokens: usage.map_or(0, |usage| usage.cache_creation_input_tokens),
+        cache_read_input_tokens: usage.map_or(0, |usage| usage.cache_read_input_tokens),
+        cost_usd: ZERO_COST_USD.to_owned(),
+        latency_ms: attempt.latency.as_millis() as i64,
+        schema_id: Some("default".to_owned()),
+        fallback_used,
+        provider_request_id: provider_request_id.map(str::to_owned),
+        usage_extra: Some(
+            usage
+                .and_then(|usage| usage.usage_extra.as_ref())
+                .map(|extra| serde_json::to_string(extra).unwrap_or_else(|_| "{}".to_owned()))
+                .unwrap_or_else(|| "{}".to_owned()),
+        ),
+        reservation_id: reservation_id.map(str::to_owned),
+        project_id: context.project_id.clone(),
+        card_id: context.card_id.clone(),
+        execution_id: context.parent_execution_id.clone(),
+        delegated_by: context.delegated_by.clone(),
+        ..CostEvent::default()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::sync::Arc;
@@ -414,9 +800,33 @@ mod tests {
     async fn handler(
         axum::extract::State(stub): axum::extract::State<Arc<Stub>>,
         axum::Json(body): axum::Json<Value>,
-    ) -> axum::Json<Value> {
-        *stub.last.lock().await = Some(body);
-        axum::Json(stub.body.clone())
+    ) -> axum::response::Response {
+        use axum::response::IntoResponse;
+
+        *stub.last.lock().await = Some(body.clone());
+        if body.get("stream").and_then(Value::as_bool).unwrap_or(false) {
+            // The same five frames the oracle stub sends: four content/finish frames and the
+            // usage-bearing terminal frame, then [DONE].
+            let frames = [
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}"#,
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[{"index":0,"delta":{"content":"stub "},"finish_reason":null}]}"#,
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[{"index":0,"delta":{"content":"completion"},"finish_reason":null}]}"#,
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}"#,
+                r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[],"usage":{"prompt_tokens":7,"completion_tokens":3,"total_tokens":10}}"#,
+                "data: [DONE]",
+            ];
+            let mut text = String::new();
+            for frame in frames {
+                text.push_str(frame);
+                text.push_str("\n\n");
+            }
+            return (
+                [(axum::http::header::CONTENT_TYPE, "text/event-stream")],
+                text,
+            )
+                .into_response();
+        }
+        axum::Json(stub.body.clone()).into_response()
     }
 
     async fn state_with_stub() -> (AppState, Arc<Stub>) {
@@ -486,7 +896,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn streaming_is_refused_until_it_is_implemented() {
+    async fn a_stream_is_relayed_chunk_for_chunk_and_terminated() {
         let (state, _stub) = state_with_stub().await;
         let response = crate::router::router(state)
             .oneshot(
@@ -497,7 +907,27 @@ mod tests {
             )
             .await
             .expect("router answers");
-        assert_eq!(response.status(), axum::http::StatusCode::NOT_IMPLEMENTED);
+        assert_eq!(response.status(), axum::http::StatusCode::OK);
+        assert_eq!(
+            response
+                .headers()
+                .get("content-type")
+                .and_then(|value| value.to_str().ok()),
+            Some("text/event-stream; charset=utf-8")
+        );
+        let bytes = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+            .await
+            .expect("body");
+        let text = String::from_utf8(bytes.to_vec()).expect("utf8");
+
+        // Five data frames plus the terminator, in order.
+        assert_eq!(text.matches("data: ").count(), 6);
+        assert!(text.ends_with("data: [DONE]\n\n"));
+        assert!(text.contains("\"content\":\"stub \""));
+        // The router stamps the terminal usage chunk, so the client's frame and the row agree.
+        assert!(text.contains("\"served_provider\":\"pgx-local\""));
+        assert!(text.contains("\"served_model\":\"stub-model\""));
+        assert!(text.contains("\"provider_request_id\":\"chatcmpl-stub\""));
     }
 
     #[tokio::test]

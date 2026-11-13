@@ -9,11 +9,17 @@ use std::future::Future;
 use std::pin::Pin;
 
 use crate::catalog::ProviderEntry;
+use crate::contract::chunks::ChatCompletionChunk;
 use crate::contract::schemas::{ChatCompletionRequest, ChatCompletionResponse};
 
 pub mod openai;
 
 pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + Send + 'a>>;
+
+/// A parsed chunk stream. Owned end to end: the upstream response and the frame buffer move
+/// into it, so the caller keeps no borrow of the provider or the request.
+pub type ChunkStream =
+    Pin<Box<dyn futures_util::Stream<Item = Result<ChatCompletionChunk, UpstreamError>> + Send>>;
 
 /// The exact request body sent upstream and the exact response body received.
 #[derive(Debug, Clone)]
@@ -48,6 +54,9 @@ pub enum UpstreamError {
     Malformed { provider: String, body: String },
     #[error("provider {provider} returned no usable content")]
     Empty { provider: String, body: String },
+    /// The provider has no streaming implementation (test doubles).
+    #[error("provider {provider} does not implement streaming")]
+    Unsupported { provider: String },
 }
 
 impl UpstreamError {
@@ -66,6 +75,7 @@ impl UpstreamError {
             Self::Transport { .. } => "upstream_unreachable",
             Self::Malformed { .. } => "malformed_json",
             Self::Empty { .. } => "upstream_empty_response",
+            Self::Unsupported { .. } => "stream_unsupported",
         }
     }
 
@@ -76,7 +86,8 @@ impl UpstreamError {
             | Self::BadRequest { provider, .. }
             | Self::Transport { provider, .. }
             | Self::Malformed { provider, .. }
-            | Self::Empty { provider, .. } => provider,
+            | Self::Empty { provider, .. }
+            | Self::Unsupported { provider } => provider,
         }
     }
 
@@ -94,6 +105,7 @@ impl UpstreamError {
             Self::Transport { message, .. } => message.clone(),
             Self::Malformed { .. } => "malformed JSON from upstream".to_owned(),
             Self::Empty { .. } => "upstream returned empty choices".to_owned(),
+            Self::Unsupported { .. } => "provider does not implement streaming".to_owned(),
         }
     }
 }
@@ -137,6 +149,19 @@ pub trait Provider: Send + Sync {
         request: &'a ChatCompletionRequest,
         model_override: Option<&'a str>,
     ) -> BoxFuture<'a, Result<UpstreamResponse, UpstreamError>>;
+
+    /// Open one streamed completion and return its parsed chunk stream.
+    ///
+    /// The future resolves once the upstream has answered with a success status; an open
+    /// failure is this future's error, and a failure before the first chunk is the stream's
+    /// first item. The router reads one chunk before it decides the attempt served, so a
+    /// provider that accepts the connection and then errors still fails over exactly as the
+    /// reference does.
+    fn stream<'a>(
+        &'a self,
+        request: &'a ChatCompletionRequest,
+        model_override: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<ChunkStream, UpstreamError>>;
 }
 
 /// Build the trait object for an enabled catalog entry.

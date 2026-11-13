@@ -66,13 +66,18 @@ pub struct LedgerRow {
     pub request_sha256: String,
     pub response_sha256: Option<String>,
     pub latency_ms: i64,
-    pub status: &'static str,
+    pub status: String,
     pub request_text_sha256: Option<String>,
     pub traffic_source: &'static str,
     pub trace_id: Option<Uuid>,
     pub card_id: Option<String>,
     pub project_id: Option<Uuid>,
     pub parent_execution_id: Option<String>,
+    /// `true` for a streamed call; the text columns are always null then.
+    pub streamed: bool,
+    /// `completed`, `client_disconnect`, `upstream_error` or `timeout`; `None` for a
+    /// non-streaming row and for a stream that never opened.
+    pub stream_status: Option<&'static str>,
     pub response_json_valid: Option<bool>,
     pub policy_version: Option<i32>,
     pub llm_setup: Option<i16>,
@@ -267,13 +272,15 @@ impl LedgerRow {
             request_sha256: request_sha256(request),
             response_sha256: Some(response_sha256(response)),
             latency_ms,
-            status: "ok",
+            status: "ok".to_owned(),
             request_text_sha256: request_text.map(sha256_hex),
             traffic_source: "live",
             trace_id: uuid_of(context.trace_id.as_deref()),
             card_id: context.card_id.clone(),
             project_id: uuid_of(context.project_id.as_deref()),
             parent_execution_id: context.parent_execution_id.clone(),
+            streamed: false,
+            stream_status: None,
             response_json_valid: response_json_valid(response),
             policy_version: context.policy_version,
             llm_setup: context.llm_setup,
@@ -282,6 +289,67 @@ impl LedgerRow {
             key_owner: context.key_owner.clone(),
         }
     }
+
+    /// Build the row for a STREAMED request from what the in-memory capture accumulated.
+    ///
+    /// A streamed row never stores text, whatever the caller asked for: the reference forces
+    /// `capture_full = false` on this path, and the hashes are the evidence instead.
+    pub fn streamed(
+        context: &CallContext,
+        request: &ChatCompletionRequest,
+        stream: StreamRow<'_>,
+        latency_ms: i64,
+    ) -> Self {
+        Self {
+            tenant_id: uuid_of(context.tenant_id.as_deref()),
+            correlation_id: context.correlation_id.clone(),
+            caller_worker: context.worker_name.clone(),
+            requested_model: request.model.clone(),
+            served_provider: stream.served_provider.map(str::to_owned),
+            served_model: stream.served_model.map(str::to_owned),
+            served_model_root: None,
+            temperature: request.temperature,
+            seed: request.seed,
+            max_tokens: request.max_tokens.map(|value| value as i32),
+            repetition_penalty: request.repetition_penalty,
+            frequency_penalty: request.frequency_penalty,
+            finish_reason: stream.finish_reason.map(str::to_owned),
+            licence_id: context.license_id.clone(),
+            licence_source: context.license_id.as_ref().map(|_| "header"),
+            request_sha256: request_sha256(request),
+            response_sha256: stream.response_sha256.map(str::to_owned),
+            latency_ms,
+            status: stream.status.clone(),
+            request_text_sha256: None,
+            traffic_source: "live",
+            trace_id: uuid_of(context.trace_id.as_deref()),
+            card_id: context.card_id.clone(),
+            project_id: uuid_of(context.project_id.as_deref()),
+            parent_execution_id: context.parent_execution_id.clone(),
+            streamed: true,
+            stream_status: stream.stream_status,
+            response_json_valid: stream.response_json_valid,
+            policy_version: context.policy_version,
+            llm_setup: context.llm_setup,
+            hop_index: context.hop_index,
+            hop_reason: context.hop_reason.clone(),
+            key_owner: context.key_owner.clone(),
+        }
+    }
+}
+
+/// What the stream capture hands the ledger at the end of a streamed call.
+#[derive(Debug, Clone)]
+pub struct StreamRow<'a> {
+    pub served_provider: Option<&'a str>,
+    pub served_model: Option<&'a str>,
+    pub finish_reason: Option<&'a str>,
+    pub response_sha256: Option<&'a str>,
+    pub response_json_valid: Option<bool>,
+    /// `ok` when the stream completed, `error` for every other ending; a stream that never
+    /// opened carries its HTTP code instead.
+    pub status: String,
+    pub stream_status: Option<&'static str>,
 }
 
 /// Insert one row. Idempotent on `request_id`; a duplicate is not an error.
@@ -296,7 +364,7 @@ pub async fn insert(pool: &PgPool, row: &LedgerRow) -> Result<(), sqlx::Error> {
             licence_id, licence_source, request_sha256, response_sha256, latency_ms, status,
             request_text_sha256, traffic_source,
             trace_id, card_id, project_id, parent_execution_id,
-            streamed, response_json_valid,
+            streamed, stream_status, response_json_valid,
             policy_version, llm_setup, hop_index, hop_reason, key_owner
          ) VALUES (
             $1, $2, $3, $4,
@@ -305,8 +373,8 @@ pub async fn insert(pool: &PgPool, row: &LedgerRow) -> Result<(), sqlx::Error> {
             $14, $15, $16, $17, $18, $19,
             $20, $21,
             $22, $23, $24, $25,
-            false, $26,
-            $27, $28, $29, $30, $31
+            $26, $27, $28,
+            $29, $30, $31, $32, $33
          )
          ON CONFLICT (request_id) WHERE request_id IS NOT NULL DO NOTHING",
     )
@@ -328,13 +396,15 @@ pub async fn insert(pool: &PgPool, row: &LedgerRow) -> Result<(), sqlx::Error> {
     .bind(&row.request_sha256)
     .bind(&row.response_sha256)
     .bind(row.latency_ms)
-    .bind(row.status)
+    .bind(row.status.clone())
     .bind(&row.request_text_sha256)
     .bind(row.traffic_source)
     .bind(row.trace_id)
     .bind(&row.card_id)
     .bind(row.project_id)
     .bind(&row.parent_execution_id)
+    .bind(row.streamed)
+    .bind(row.stream_status)
     .bind(row.response_json_valid)
     .bind(row.policy_version)
     .bind(row.llm_setup)

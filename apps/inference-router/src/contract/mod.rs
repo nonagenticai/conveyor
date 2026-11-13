@@ -8,6 +8,7 @@
 
 use std::collections::BTreeSet;
 
+pub mod chunks;
 pub mod normalize;
 pub mod schemas;
 

@@ -10,6 +10,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use futures_util::StreamExt;
 use serde_json::{Map, Value, json};
 use tokio::sync::Semaphore;
 use uuid::Uuid;
@@ -172,6 +173,345 @@ impl Provider for OpenAiProvider {
             })
         })
     }
+
+    fn stream<'a>(
+        &'a self,
+        request: &'a ChatCompletionRequest,
+        model_override: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<super::ChunkStream, UpstreamError>> {
+        Box::pin(async move {
+            let model = model_override.unwrap_or(&self.model_id);
+            let payload = chat_payload(
+                request,
+                model,
+                true,
+                self.response_format_mode.as_deref(),
+                self.force_chat_template_kwargs,
+            );
+            let body = serde_json::to_string(&payload).expect("the payload serializes");
+
+            // The slot is held for the whole stream, not just the open: dropping the permit
+            // when the future returned would free a slot while the upstream was still
+            // generating. It rides the stream state and releases when the stream is dropped.
+            let permit = match &self.slot {
+                Some(semaphore) => {
+                    match tokio::time::timeout(self.slot_wait, semaphore.clone().acquire_owned())
+                        .await
+                    {
+                        Ok(Ok(permit)) => Some(permit),
+                        _ => {
+                            return Err(UpstreamError::QueueRejected {
+                                provider: self.name.clone(),
+                            });
+                        }
+                    }
+                }
+                None => None,
+            };
+
+            let url = format!("{}/chat/completions", self.endpoint);
+            let mut builder = self
+                .client
+                .post(&url)
+                .header("content-type", "application/json")
+                .header("accept", "text/event-stream")
+                .body(body)
+                .timeout(self.timeout);
+            if let Some(key) = &self.api_key {
+                builder = builder.header("authorization", format!("Bearer {key}"));
+            }
+            let response = builder
+                .send()
+                .await
+                .map_err(|error| UpstreamError::Transport {
+                    provider: self.name.clone(),
+                    message: describe_reqwest(&error),
+                })?;
+
+            let status = response.status();
+            if !status.is_success() {
+                let text = response.text().await.unwrap_or_default();
+                if status.as_u16() == 400 {
+                    return Err(UpstreamError::BadRequest {
+                        provider: self.name.clone(),
+                        message: upstream_message(&text),
+                    });
+                }
+                return Err(UpstreamError::Status {
+                    provider: self.name.clone(),
+                    status: status.as_u16(),
+                    body: text,
+                });
+            }
+
+            let source = response.bytes_stream().map(|item| {
+                item.map(|bytes| bytes.to_vec())
+                    .map_err(|error| describe_reqwest(&error))
+            });
+            Ok(sse_stream(
+                source,
+                self.name.clone(),
+                self.model_id.clone(),
+                request.model.clone(),
+                permit,
+            ))
+        })
+    }
+}
+
+/// One provider's SSE byte source, parsed into chunks.
+///
+/// The source is erased to `Result<Vec<u8>, String>` so the state is nameable without the
+/// `reqwest`/`bytes` types. Frames are split on `\n\n` **at the byte level** before UTF-8
+/// decoding: a multi-byte character split across two network reads must not corrupt the frame
+/// that follows it.
+fn sse_stream<S, B, E>(
+    source: S,
+    provider: String,
+    default_served_model: String,
+    requested_model: String,
+    permit: Option<tokio::sync::OwnedSemaphorePermit>,
+) -> super::ChunkStream
+where
+    S: futures_util::Stream<Item = Result<B, E>> + Send + 'static,
+    B: AsRef<[u8]> + Send + 'static,
+    E: Into<String> + Send + 'static,
+{
+    let source = source.map(|item| {
+        item.map(|bytes| bytes.as_ref().to_vec())
+            .map_err(Into::into)
+    });
+    let source: std::pin::Pin<
+        Box<dyn futures_util::Stream<Item = Result<Vec<u8>, String>> + Send>,
+    > = Box::pin(source);
+    let state = SseState {
+        source,
+        buffer: Vec::new(),
+        done: false,
+        provider,
+        default_served_model,
+        requested_model,
+        _permit: permit,
+    };
+    Box::pin(futures_util::stream::unfold(
+        state,
+        |mut state| async move {
+            loop {
+                if state.done {
+                    return None;
+                }
+                if let Some(frame) = state.take_frame() {
+                    match state.parse_frame(&frame) {
+                        Frame::Skip => continue,
+                        Frame::Done => {
+                            return None;
+                        }
+                        Frame::Chunk(chunk) => return Some((Ok(chunk), state)),
+                        Frame::Failure(error) => {
+                            state.done = true;
+                            return Some((Err(error), state));
+                        }
+                    }
+                }
+                match state.source.next().await {
+                    Some(Ok(bytes)) => state.buffer.extend_from_slice(&bytes),
+                    Some(Err(message)) => {
+                        state.done = true;
+                        return Some((
+                            Err(UpstreamError::Transport {
+                                provider: state.provider.clone(),
+                                message,
+                            }),
+                            state,
+                        ));
+                    }
+                    // An upstream that closes without `[DONE]` ends the stream, exactly as an
+                    // exhausted iterator does in the reference; the router books it as a
+                    // completion and the capture decides whether it looks complete.
+                    None => {
+                        return None;
+                    }
+                }
+            }
+        },
+    ))
+}
+
+struct SseState {
+    source: std::pin::Pin<Box<dyn futures_util::Stream<Item = Result<Vec<u8>, String>> + Send>>,
+    buffer: Vec<u8>,
+    done: bool,
+    provider: String,
+    default_served_model: String,
+    requested_model: String,
+    /// Held for the stream's lifetime; see `stream()`.
+    _permit: Option<tokio::sync::OwnedSemaphorePermit>,
+}
+
+enum Frame {
+    Skip,
+    Done,
+    Chunk(crate::contract::chunks::ChatCompletionChunk),
+    Failure(UpstreamError),
+}
+
+impl SseState {
+    fn take_frame(&mut self) -> Option<String> {
+        let position = self
+            .buffer
+            .windows(2)
+            .position(|window| window == b"\n\n")?;
+        let frame: Vec<u8> = self.buffer.drain(..position + 2).collect();
+        Some(String::from_utf8_lossy(&frame[..position]).into_owned())
+    }
+
+    fn parse_frame(&self, frame: &str) -> Frame {
+        let mut payload = String::new();
+        for line in frame.split('\n') {
+            let line = line.trim_end_matches('\r');
+            if let Some(rest) = line.strip_prefix("data:") {
+                if !payload.is_empty() {
+                    payload.push('\n');
+                }
+                payload.push_str(rest.trim_start());
+            }
+        }
+        if payload.is_empty() {
+            return Frame::Skip; // an SSE comment (`: keepalive`) or an empty frame
+        }
+        if payload.trim() == "[DONE]" {
+            return Frame::Done;
+        }
+        let Ok(value) = serde_json::from_str::<Value>(&payload) else {
+            return Frame::Failure(UpstreamError::Malformed {
+                provider: self.provider.clone(),
+                body: payload,
+            });
+        };
+        if !value.is_object() {
+            return Frame::Failure(UpstreamError::Malformed {
+                provider: self.provider.clone(),
+                body: payload,
+            });
+        }
+        match parse_openai_chunk(&value, &self.requested_model, &self.default_served_model) {
+            Ok(chunk) => Frame::Chunk(chunk),
+            Err(error) => Frame::Failure(error),
+        }
+    }
+}
+
+/// Parse one upstream chunk dict, with the reference's own rules.
+///
+/// `model` is the REQUESTED model (what the caller named); `served_model` and
+/// `provider_request_id` are populated only on the usage-bearing terminal chunk, and
+/// `served_provider` is left null for the router to stamp.
+fn parse_openai_chunk(
+    data: &Value,
+    requested_model: &str,
+    default_served_model: &str,
+) -> Result<crate::contract::chunks::ChatCompletionChunk, UpstreamError> {
+    use crate::contract::chunks::{ChatCompletionChunk, ChunkChoice, ChunkDelta, ToolCallDelta};
+
+    let choices: Vec<ChunkChoice> = data
+        .get("choices")
+        .and_then(Value::as_array)
+        .map(|choices| {
+            choices
+                .iter()
+                .map(|choice| {
+                    let delta = choice.get("delta").cloned().unwrap_or(Value::Null);
+                    ChunkChoice {
+                        index: choice.get("index").and_then(Value::as_i64).unwrap_or(0) as i32,
+                        delta: ChunkDelta {
+                            role: delta.get("role").and_then(Value::as_str).map(str::to_owned),
+                            content: delta
+                                .get("content")
+                                .and_then(Value::as_str)
+                                .map(str::to_owned),
+                            tool_calls: delta.get("tool_calls").and_then(Value::as_array).map(
+                                |calls| {
+                                    calls
+                                        .iter()
+                                        .map(|call| ToolCallDelta {
+                                            index: call
+                                                .get("index")
+                                                .and_then(Value::as_i64)
+                                                .unwrap_or(0)
+                                                as i32,
+                                            id: call
+                                                .get("id")
+                                                .and_then(Value::as_str)
+                                                .map(str::to_owned),
+                                            kind: call
+                                                .get("type")
+                                                .and_then(Value::as_str)
+                                                .map(str::to_owned),
+                                            function: call.get("function").cloned(),
+                                        })
+                                        .collect()
+                                },
+                            ),
+                        },
+                        finish_reason: choice
+                            .get("finish_reason")
+                            .and_then(Value::as_str)
+                            .map(str::to_owned),
+                    }
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    let usage = data
+        .get("usage")
+        .filter(|usage| !usage.is_null())
+        .map(|usage| Usage {
+            prompt_tokens: usage
+                .get("prompt_tokens")
+                .and_then(Value::as_i64)
+                .unwrap_or(0),
+            completion_tokens: usage
+                .get("completion_tokens")
+                .and_then(Value::as_i64)
+                .unwrap_or(0),
+            total_tokens: usage
+                .get("total_tokens")
+                .and_then(Value::as_i64)
+                .unwrap_or(0),
+            ..Usage::default()
+        });
+
+    let served_model = if usage.is_some() {
+        data.get("model")
+            .and_then(Value::as_str)
+            .map(str::to_owned)
+            .or_else(|| Some(default_served_model.to_owned()).filter(|model| !model.is_empty()))
+            .or_else(|| Some(requested_model.to_owned()))
+    } else {
+        None
+    };
+    let provider_request_id = if usage.is_some() {
+        data.get("id").and_then(Value::as_str).map(str::to_owned)
+    } else {
+        None
+    };
+
+    Ok(ChatCompletionChunk {
+        id: data
+            .get("id")
+            .and_then(Value::as_str)
+            .map(str::to_owned)
+            .unwrap_or_default(),
+        object: "chat.completion.chunk".to_owned(),
+        created: data.get("created").and_then(Value::as_i64).unwrap_or(0),
+        model: requested_model.to_owned(),
+        served_model,
+        served_provider: None,
+        provider_request_id,
+        choices,
+        usage,
+    })
 }
 
 fn describe_reqwest(error: &reqwest::Error) -> String {

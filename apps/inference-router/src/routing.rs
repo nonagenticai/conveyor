@@ -17,8 +17,10 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use axum::http::StatusCode;
+use futures_util::StreamExt;
 
 use crate::catalog::Catalog;
+use crate::contract::chunks::ChatCompletionChunk;
 use crate::contract::schemas::{ChatCompletionRequest, ChatCompletionResponse};
 use crate::policy::ResolvedHop;
 use crate::provider::{self, Provider, UpstreamError};
@@ -122,6 +124,23 @@ pub struct CompletionOutcome {
     pub served_hop: Option<ServedHop>,
 }
 
+/// A stream that opened: the first chunk is already consumed, exactly as the reference reads
+/// one chunk before it decides the attempt served (so a provider that accepts the connection
+/// and then fails still fails over).
+pub struct ServedStream {
+    pub first: ChatCompletionChunk,
+    pub rest: provider::ChunkStream,
+    pub provider: String,
+    pub model_override: Option<String>,
+}
+
+/// One streamed call: the opened stream (or the refusal), plus every attempt it made.
+pub struct StreamOutcome {
+    pub stream: Result<ServedStream, Refusal>,
+    pub attempts: Vec<ProviderAttempt>,
+    pub served_hop: Option<ServedHop>,
+}
+
 /// The providers, built once at boot.
 pub struct RouterService {
     catalog: Catalog,
@@ -189,6 +208,189 @@ impl RouterService {
                 attempts: Vec::new(),
                 served_hop: None,
             },
+        }
+    }
+
+    /// Serve one streamed completion. Dispatch is `complete`'s; the one difference is that a
+    /// provider counts as serving only after its first chunk arrives, which is also the
+    /// failover boundary.
+    pub async fn stream(
+        &self,
+        request: &ChatCompletionRequest,
+        x_provider: Option<&str>,
+        policy: Option<&[ResolvedHop]>,
+    ) -> StreamOutcome {
+        if let Some(hops) = policy {
+            return self.stream_policy(hops, request).await;
+        }
+        match self.route(request, x_provider) {
+            Route::Pinned {
+                provider,
+                model_override,
+            } => {
+                self.stream_pinned(&provider, model_override.as_deref(), request)
+                    .await
+            }
+            Route::Chain(chain) => self.stream_chain(&chain, request).await,
+            Route::Refused(refusal) => StreamOutcome {
+                stream: Err(refusal),
+                attempts: Vec::new(),
+                served_hop: None,
+            },
+        }
+    }
+
+    async fn stream_pinned(
+        &self,
+        name: &str,
+        model_override: Option<&str>,
+        request: &ChatCompletionRequest,
+    ) -> StreamOutcome {
+        let mut attempts = Vec::new();
+        let Some(provider) = self.providers.get(name) else {
+            return StreamOutcome {
+                stream: Err(Refusal::detail(
+                    StatusCode::BAD_REQUEST,
+                    format!("Unknown provider: {name}"),
+                    "unknown_provider",
+                )),
+                attempts,
+                served_hop: None,
+            };
+        };
+        let started = Instant::now();
+        let result = open_stream(provider, name, model_override, request).await;
+        attempts.push(attempt_of_stream(
+            name,
+            model_override,
+            started,
+            result.as_ref().err(),
+        ));
+        let stream = match result {
+            Ok(served) => Ok(served),
+            Err(error) => {
+                if let UpstreamError::BadRequest { message, .. } = &error {
+                    return StreamOutcome {
+                        stream: Err(Refusal::openai(
+                            StatusCode::BAD_REQUEST,
+                            message.clone(),
+                            "invalid_request_error",
+                        )),
+                        attempts,
+                        served_hop: None,
+                    };
+                }
+                let status = if matches!(error, UpstreamError::QueueRejected { .. }) {
+                    StatusCode::SERVICE_UNAVAILABLE
+                } else {
+                    StatusCode::BAD_GATEWAY
+                };
+                Err(Refusal::detail(
+                    status,
+                    format!("Pinned provider '{name}' failed: {}", error.describe()),
+                    error.classification(),
+                ))
+            }
+        };
+        StreamOutcome {
+            stream,
+            attempts,
+            served_hop: None,
+        }
+    }
+
+    async fn stream_chain(
+        &self,
+        chain: &[String],
+        request: &ChatCompletionRequest,
+    ) -> StreamOutcome {
+        let mut attempts = Vec::new();
+        let mut last: Option<UpstreamError> = None;
+        for name in chain {
+            let Some(provider) = self.providers.get(name) else {
+                continue;
+            };
+            let model_override = self
+                .catalog
+                .provider(name)
+                .and_then(|entry| entry.model_aliases.get(&request.model))
+                .map(String::as_str);
+            let started = Instant::now();
+            let result = open_stream(provider, name, model_override, request).await;
+            attempts.push(attempt_of_stream(
+                name,
+                model_override,
+                started,
+                result.as_ref().err(),
+            ));
+            match result {
+                Ok(served) => {
+                    return StreamOutcome {
+                        stream: Ok(served),
+                        attempts,
+                        served_hop: None,
+                    };
+                }
+                Err(error) => last = Some(error),
+            }
+        }
+        StreamOutcome {
+            stream: Err(exhausted(last)),
+            attempts,
+            served_hop: None,
+        }
+    }
+
+    async fn stream_policy(
+        &self,
+        hops: &[ResolvedHop],
+        request: &ChatCompletionRequest,
+    ) -> StreamOutcome {
+        let mut attempts = Vec::new();
+        let mut last: Option<UpstreamError> = None;
+        for hop in hops {
+            let Some(provider) = self.providers.get(&hop.hop.target.provider) else {
+                continue;
+            };
+            let model_override = Some(hop.hop.model.as_str());
+            let started = Instant::now();
+            let result =
+                open_stream(provider, &hop.hop.target.provider, model_override, request).await;
+            attempts.push(attempt_of_stream(
+                &hop.hop.target.provider,
+                model_override,
+                started,
+                result.as_ref().err(),
+            ));
+            match result {
+                Ok(served) => {
+                    return StreamOutcome {
+                        stream: Ok(served),
+                        attempts,
+                        served_hop: Some(ServedHop {
+                            index: hop.index,
+                            reason: if hop.index == 0 {
+                                "first"
+                            } else {
+                                "failover_error"
+                            },
+                            key_owner: key_owner(&hop.hop.target.kind),
+                        }),
+                    };
+                }
+                Err(error) => {
+                    let failover = hop.hop.failover_on_error;
+                    last = Some(error);
+                    if !failover {
+                        break;
+                    }
+                }
+            }
+        }
+        StreamOutcome {
+            stream: Err(exhausted(last)),
+            attempts,
+            served_hop: None,
         }
     }
 
@@ -474,6 +676,71 @@ fn attempt_of(
     }
 }
 
+/// Open a provider stream and consume its first chunk. The chunk is returned to the caller, not
+/// dropped: the client must receive it, and the relay's capture must see it.
+async fn open_stream(
+    provider: &Arc<dyn Provider>,
+    name: &str,
+    model_override: Option<&str>,
+    request: &ChatCompletionRequest,
+) -> Result<ServedStream, UpstreamError> {
+    let mut chunks = provider.stream(request, model_override).await?;
+    match chunks.next().await {
+        Some(Ok(first)) => Ok(ServedStream {
+            first,
+            rest: chunks,
+            provider: name.to_owned(),
+            model_override: model_override.map(str::to_owned),
+        }),
+        Some(Err(error)) => Err(error),
+        // The reference's `anext` raises StopAsyncIteration here and the attempt fails over.
+        None => Err(UpstreamError::Empty {
+            provider: name.to_owned(),
+            body: "stream ended before the first chunk".to_owned(),
+        }),
+    }
+}
+
+/// Snapshot a streamed attempt. A stream is never captured, so `bodies` stays `None`; the ledger
+/// hashes the request fingerprint instead of upstream text.
+fn attempt_of_stream(
+    provider: &str,
+    model_override: Option<&str>,
+    started: Instant,
+    failure: Option<&UpstreamError>,
+) -> ProviderAttempt {
+    ProviderAttempt {
+        provider: provider.to_owned(),
+        model_override: model_override.map(str::to_owned),
+        latency: started.elapsed(),
+        failure: failure.map(|error| AttemptFailure {
+            classification: error.classification(),
+            describe: error.describe(),
+        }),
+        bodies: None,
+    }
+}
+
+/// The refusal a chain or policy returns when every attempt failed.
+fn exhausted(last: Option<UpstreamError>) -> Refusal {
+    match last {
+        Some(error) => Refusal::detail(
+            StatusCode::SERVICE_UNAVAILABLE,
+            format!(
+                "All providers failed. Last error: {}: {}",
+                error.provider(),
+                error.describe()
+            ),
+            error.classification(),
+        ),
+        None => Refusal::detail(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "No providers available for this request",
+            "chain_empty",
+        ),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::BTreeMap;
@@ -537,6 +804,18 @@ mod tests {
                         }),
                     },
                 }
+            })
+        }
+
+        fn stream<'a>(
+            &'a self,
+            _request: &'a ChatCompletionRequest,
+            _model_override: Option<&'a str>,
+        ) -> provider::BoxFuture<'a, Result<provider::ChunkStream, UpstreamError>> {
+            Box::pin(async move {
+                Err(UpstreamError::Unsupported {
+                    provider: self.name.clone(),
+                })
             })
         }
     }
