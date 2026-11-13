@@ -1632,12 +1632,14 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
   }
   // The operator console signs in and out after boot. Re-render through the normal path, and
   // restore the destination console.js saved before the OIDC redirect (the query string
-  // returns without a hash). A page it does not know is not invented.
-  window.addEventListener("conveyor-console", () => {
-    const hash = location.hash.slice(1);
-    const known = [
+  // returns without a hash). ⛔ The restored value is a CONSTANT from this map, never the
+  // location hash itself: a hash is user input, and dispatching `pages[hash]` would let it
+  // name a method (CodeQL js/unvalidated-dynamic-method-call). An unknown hash stays put.
+  const CONSOLE_PAGES = new Map(
+    [
       "overview",
       "projects",
+      "project",
       "types",
       "capabilities",
       "processes",
@@ -1650,8 +1652,34 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
       "runs",
       "evals",
       "usage",
-    ];
-    if (hash && (enterprise?.pages?.[hash] || known.includes(hash))) state.page = hash;
+      "work",
+      "jobtypes",
+      "execution",
+      "assurance",
+      "constraints",
+      "knowledge",
+      "knowledge-design",
+      "memory",
+      "improvement",
+      "hillclimb",
+      "benchmarks",
+      "portfolio",
+      "plan",
+      "organisation",
+      "jobs",
+      "procedures",
+      "authoring",
+      "improve",
+      "operations",
+      "toolkits",
+      "metering",
+      "architecture",
+      "documents",
+    ].map((page) => [page, page]),
+  );
+  window.addEventListener("conveyor-console", () => {
+    const page = CONSOLE_PAGES.get(location.hash.slice(1));
+    if (page) state.page = page;
     render();
   });
   function evidenceMarkup(p, step, status) {
