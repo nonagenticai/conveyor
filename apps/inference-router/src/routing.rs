@@ -89,6 +89,10 @@ pub struct ProviderAttempt {
     pub latency: Duration,
     /// `None` when the attempt succeeded.
     pub failure: Option<AttemptFailure>,
+    /// The exact bytes that went upstream and came back, when the attempt produced a response.
+    /// The ledger hashes the request text even when capture is off, so the served attempt must
+    /// carry it.
+    pub bodies: Option<provider::UpstreamBodies>,
 }
 
 /// A failed attempt, reduced to what the ledger and the cost event may safely carry.
@@ -353,6 +357,7 @@ fn attempt_of(
             classification: error.classification(),
             describe: error.describe(),
         }),
+        bodies: result.as_ref().ok().map(|upstream| upstream.bodies.clone()),
     }
 }
 

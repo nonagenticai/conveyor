@@ -10,6 +10,9 @@
 
 use crate::provider::BoxFuture;
 
+/// The fixed decimal the reference sends (`0.00000000`), never a float.
+pub const ZERO_COST_USD: &str = "0.00000000";
+
 /// One provider attempt, as the cost bus sees it.
 ///
 /// Optional fields are optional because the reference omits them rather than sending nulls: an
@@ -68,5 +71,115 @@ pub struct NoopCostSink;
 impl CostSink for NoopCostSink {
     fn emit<'a>(&'a self, _event: &'a CostEvent) -> BoxFuture<'a, ()> {
         Box::pin(async {})
+    }
+}
+
+fn text(value: &Option<String>) -> String {
+    value.clone().unwrap_or_default()
+}
+
+impl CostEvent {
+    /// The stream entry, in the reference's field order. Order is not part of the consumer's
+    /// contract (it reads by field name) but it IS what the captured golden records, so keeping it
+    /// costs nothing and makes the comparison a byte diff.
+    ///
+    /// The six identity fields and `stage`/`worker_name` are ALWAYS present — empty when absent.
+    /// Only the attribution fields at the end are omitted entirely.
+    pub fn field_pairs(&self) -> Vec<(&'static str, String)> {
+        let mut fields = vec![
+            ("tenant_id", text(&self.tenant_id)),
+            ("license_id", text(&self.license_id)),
+            ("subject_id", text(&self.subject_id)),
+            ("correlation_id", text(&self.correlation_id)),
+            ("stage", text(&self.stage)),
+            ("worker_name", text(&self.worker_name)),
+            ("service_key", self.service_key.clone()),
+            ("cost_source", self.cost_source.clone()),
+            ("provider", self.provider.clone()),
+            ("model", self.model.clone()),
+            ("served_model", text(&self.served_model)),
+            ("input_tokens", self.input_tokens.to_string()),
+            ("output_tokens", self.output_tokens.to_string()),
+            (
+                "cache_creation_input_tokens",
+                self.cache_creation_input_tokens.to_string(),
+            ),
+            (
+                "cache_read_input_tokens",
+                self.cache_read_input_tokens.to_string(),
+            ),
+            ("cost_usd", self.cost_usd.clone()),
+            ("schema_id", text(&self.schema_id)),
+            (
+                "fallback_used",
+                if self.fallback_used { "true" } else { "false" }.to_owned(),
+            ),
+            ("provider_request_id", text(&self.provider_request_id)),
+            ("usage_extra", text(&self.usage_extra)),
+            ("latency_ms", self.latency_ms.to_string()),
+            (
+                "timestamp",
+                chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Micros, true),
+            ),
+            ("event_key", uuid::Uuid::now_v7().to_string()),
+        ];
+        for (name, value) in [
+            ("reservation_id", &self.reservation_id),
+            ("project_id", &self.project_id),
+            ("card_id", &self.card_id),
+            ("execution_id", &self.execution_id),
+            ("job_id", &self.job_id),
+            ("app_id", &self.app_id),
+            ("actor_id", &self.actor_id),
+            ("spend_scope", &self.spend_scope),
+            ("delegated_by", &self.delegated_by),
+        ] {
+            if let Some(value) = value {
+                fields.push((name, value.clone()));
+            }
+        }
+        fields
+    }
+}
+
+/// The Redis writer: `XADD <stream> MAXLEN ~100000 * <fields…>`.
+///
+/// Fire-and-forget by contract — the reference never fails a request because metering failed, and
+/// neither does this. A write error is logged and dropped.
+pub struct RedisCostSink {
+    connection: redis::aio::MultiplexedConnection,
+    stream: String,
+}
+
+impl RedisCostSink {
+    pub async fn connect(url: &str, stream: String) -> Result<Self, redis::RedisError> {
+        let client = redis::Client::open(url)?;
+        let connection = client.get_multiplexed_async_connection().await?;
+        Ok(Self { connection, stream })
+    }
+}
+
+impl CostSink for RedisCostSink {
+    fn emit<'a>(&'a self, event: &'a CostEvent) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            // Raw command, not `xadd_maxlen`: the argument order is the reference's and does not
+            // move when the client crate changes its helper signature.
+            let mut command = redis::cmd("XADD");
+            command
+                .arg(&self.stream)
+                .arg("MAXLEN")
+                .arg("~")
+                .arg(100_000_i64)
+                .arg("*");
+            for (field, value) in event.field_pairs() {
+                command.arg(field).arg(value);
+            }
+            let mut connection = self.connection.clone();
+            let result: Result<String, redis::RedisError> =
+                command.query_async(&mut connection).await;
+            if let Err(error) = result {
+                tracing::warn!(%error, stream = %self.stream, "cost event was not written");
+            }
+        })
     }
 }

@@ -818,12 +818,15 @@ name = "conveyor-inference-router"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "chrono",
  "clap",
  "conveyor-platform",
+ "redis",
  "reqwest",
  "serde",
  "serde_json",
  "serde_yaml",
+ "sha2 0.10.9",
  "sqlx",
  "thiserror",
  "tokio",

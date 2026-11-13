@@ -12,6 +12,7 @@ pub mod catalog;
 pub mod config;
 pub mod contract;
 pub mod db;
+pub mod ledger;
 pub mod metering;
 pub mod provider;
 pub mod router;
