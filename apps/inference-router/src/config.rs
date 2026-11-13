@@ -67,6 +67,10 @@ pub struct Config {
     pub internal_secret: Option<String>,
     /// `COMMERCIAL_PLATFORM_TENANT_IDS` — deliberately UNPREFIXED, matching the live manifest.
     pub commercial_platform_tenant_ids: Vec<String>,
+    /// `AUTH_DELEGATING_SUBJECTS` — the FLEET's allowlist of subjects permitted to name another
+    /// tenant via `X-Effective-Tenant-Id`. Deliberately UNPREFIXED: the same value is read by
+    /// the modality gateway and mlx_backend, so one list serves every hop.
+    pub auth_delegating_subjects: Vec<String>,
 }
 
 /// `INFERENCE_ROUTER_BUDGET_GATE_MODE`, exactly the reference's three states.
@@ -286,15 +290,13 @@ impl Config {
         let internal_secret = non_empty(lookup("INFERENCE_ROUTER_INTERNAL_SECRET"));
         // UNPREFIXED in the live manifest (it is shared with the workers deployment), so it is
         // read unprefixed here too.
-        let commercial_platform_tenant_ids = non_empty(lookup("COMMERCIAL_PLATFORM_TENANT_IDS"))
-            .map(|raw| {
-                raw.split(',')
-                    .map(str::trim)
-                    .filter(|id| !id.is_empty())
-                    .map(str::to_owned)
-                    .collect()
-            })
-            .unwrap_or_default();
+        let commercial_platform_tenant_ids = comma_list(lookup("COMMERCIAL_PLATFORM_TENANT_IDS"));
+        // The reference normalises the allowlist to lower case and does NOT validate the entries
+        // as UUIDs at boot: an unparsable entry simply never matches.
+        let auth_delegating_subjects = comma_list(lookup("AUTH_DELEGATING_SUBJECTS"))
+            .into_iter()
+            .map(|subject| subject.to_ascii_lowercase())
+            .collect();
 
         Ok(Self {
             bind,
@@ -319,6 +321,7 @@ impl Config {
             policy_epoch_poll_seconds,
             internal_secret,
             commercial_platform_tenant_ids,
+            auth_delegating_subjects,
         })
     }
 
@@ -332,6 +335,19 @@ impl Config {
 
 fn non_empty(value: Option<String>) -> Option<String> {
     value.filter(|value| !value.trim().is_empty())
+}
+
+/// A comma-separated list, trimmed with blanks dropped — the reference's normalisation.
+fn comma_list(value: Option<String>) -> Vec<String> {
+    value
+        .map(|raw| {
+            raw.split(',')
+                .map(str::trim)
+                .filter(|entry| !entry.is_empty())
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 #[cfg(test)]
@@ -359,6 +375,38 @@ mod tests {
         assert_eq!(config.environment, "production");
         assert!(!config.docs_enabled);
         assert_eq!(config.provider_slot_wait_seconds, 30.0);
+    }
+
+    #[test]
+    fn the_delegating_subject_allowlist_is_unprefixed_and_normalised() {
+        assert!(
+            parse(&[])
+                .expect("defaults")
+                .auth_delegating_subjects
+                .is_empty()
+        );
+        let config = parse(&[(
+            "AUTH_DELEGATING_SUBJECTS",
+            " 8382F0B3-C082-4F97-8D47-120CE5A18E05 ,, 01a0dd02-d324-77bb-acd8-7c31fb6e95ec ",
+        )])
+        .expect("allowlist parses");
+        assert_eq!(
+            config.auth_delegating_subjects,
+            vec![
+                "8382f0b3-c082-4f97-8d47-120ce5a18e05".to_owned(),
+                "01a0dd02-d324-77bb-acd8-7c31fb6e95ec".to_owned(),
+            ]
+        );
+        // A prefixed alias is not read: the deployment sets the fleet name only.
+        assert!(
+            parse(&[(
+                "INFERENCE_ROUTER_AUTH_DELEGATING_SUBJECTS",
+                "8382f0b3-c082-4f97-8d47-120ce5a18e05"
+            )])
+            .expect("prefixed name is simply unknown")
+            .auth_delegating_subjects
+            .is_empty()
+        );
     }
 
     #[test]

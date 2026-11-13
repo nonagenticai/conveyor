@@ -59,6 +59,9 @@ pub struct Licence {
     pub license_id: String,
     pub app: Option<String>,
     pub expires_at: Option<String>,
+    /// The subject the licence server says this token belongs to. Only ever read off the
+    /// server's answer; `X-Subject-Id` is never a substitute.
+    pub subject_id: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -75,6 +78,136 @@ pub struct CallerIdentity {
     pub license_id: Option<String>,
     /// True only when the licence server vouched for the token on THIS request.
     pub verified: bool,
+    /// The subject a verified licence belongs to. `None` on every asserted path — a caller
+    /// cannot vouch for itself, so `X-Subject-Id` never lands here.
+    pub subject_id: Option<String>,
+}
+
+/// The tenant a request is FOR, and who delegated it there.
+///
+/// `tenant_id` is the caller's own tenant for every outcome except `honoured`. `delegated_by` is
+/// set only when an allow-listed, introspected subject named another tenant, and rides the cost
+/// event so billing can tell a tenant's own spend from spend a platform incurred on its behalf.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EffectiveTenant {
+    pub tenant_id: Option<String>,
+    pub delegated_by: Option<String>,
+}
+
+const NIL_UUID_HEX: &str = "00000000000000000000000000000000";
+
+/// Authorization schemes that make a value a CREDENTIAL, not an identifier. Matching only
+/// `bearer` would let a `Basic` value — a plaintext password — through the guard written to stop
+/// exactly that.
+const CREDENTIAL_SCHEMES: [&str; 8] = [
+    "bearer",
+    "basic",
+    "digest",
+    "negotiate",
+    "token",
+    "apikey",
+    "hmac",
+    "aws4-hmac-sha256",
+];
+
+/// True for the nil-UUID sentinel in any spelling (dashed, undashed, braced, `urn:uuid:`,
+/// any case). Honouring one would make a real tenant's compute unbillable.
+fn is_unattributable(value: &str) -> bool {
+    let mut normalised = value.trim().to_ascii_lowercase();
+    if let Some(rest) = normalised.strip_prefix("urn:uuid:") {
+        normalised = rest.to_owned();
+    }
+    let without_braces = normalised.strip_prefix('{').unwrap_or(&normalised);
+    let without_braces = without_braces.strip_suffix('}').unwrap_or(without_braces);
+    without_braces.replace('-', "") == NIL_UUID_HEX
+}
+
+/// True when the value parses as a UUID in one of the spellings the reference accepts
+/// (hyphenated, simple, braced, `urn:uuid:`).
+fn is_uuid(value: &str) -> bool {
+    uuid::Uuid::parse_str(value.trim()).is_ok()
+}
+
+/// True when `asserted` names the caller's own tenant in any UUID spelling. Both sides must be
+/// real UUIDs and neither may be the nil sentinel, so `self` can only mean "a real tenant named
+/// itself".
+fn is_own_tenant(asserted: &str, caller_tenant: &str) -> bool {
+    if is_unattributable(asserted) || is_unattributable(caller_tenant) {
+        return false;
+    }
+    match (
+        uuid::Uuid::parse_str(asserted.trim()),
+        uuid::Uuid::parse_str(caller_tenant.trim()),
+    ) {
+        (Ok(asserted), Ok(caller)) => asserted == caller,
+        _ => false,
+    }
+}
+
+/// The lower-cased auth scheme when the value is `Authorization`-shaped, else `None`.
+fn credential_scheme(value: &str) -> Option<&'static str> {
+    let trimmed = value.trim();
+    let (scheme, rest) = trimmed.split_once(' ')?;
+    if rest.trim().is_empty() {
+        return None;
+    }
+    let lowered = scheme.to_ascii_lowercase();
+    CREDENTIAL_SCHEMES
+        .iter()
+        .copied()
+        .find(|candidate| *candidate == lowered)
+}
+
+/// Resolve the tenant a request is FOR — the reference's `effective_delegation`, in one place.
+///
+/// Honouring a delegation moves a bill onto a tenant the caller merely named, so it requires an
+/// **introspected** subject on the fleet allowlist. Everything else lands on the caller's own
+/// tenant: dropped, never refused (this service is meter-and-allow; a billing bug must not become
+/// an outage), and never forged.
+pub fn effective_tenant(
+    header_value: Option<&str>,
+    vouched_subject: Option<&str>,
+    caller_tenant: Option<&str>,
+    allowlist: &[String],
+) -> EffectiveTenant {
+    let own = |tenant: Option<&str>| EffectiveTenant {
+        tenant_id: tenant
+            .filter(|value| !value.trim().is_empty())
+            .map(str::to_owned),
+        delegated_by: None,
+    };
+    let Some(caller) = caller_tenant.filter(|value| !value.trim().is_empty()) else {
+        return own(None);
+    };
+    let Some(asserted) = header_value
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    else {
+        return own(Some(caller));
+    };
+    if is_own_tenant(asserted, caller) {
+        return own(Some(caller));
+    }
+    let subject = vouched_subject
+        .map(|value| value.trim().to_ascii_lowercase())
+        .filter(|value| !value.is_empty());
+    let allowlisted = subject.as_deref().is_some_and(|subject| {
+        allowlist
+            .iter()
+            .any(|allowed| allowed.trim().eq_ignore_ascii_case(subject))
+    });
+    if !allowlisted {
+        return own(Some(caller));
+    }
+    // The asserted tenant is caller-supplied and is never logged before these checks: a
+    // delegating caller that fat-fingered its own licence token here must not leak it.
+    if credential_scheme(asserted).is_some() || is_unattributable(asserted) || !is_uuid(asserted) {
+        return own(Some(caller));
+    }
+    EffectiveTenant {
+        tenant_id: Some(asserted.to_owned()),
+        delegated_by: subject,
+    }
 }
 
 fn bearer_value(raw: Option<&str>) -> Option<String> {
@@ -211,6 +344,9 @@ struct Payload {
     license_id: Option<String>,
     app: Option<AppInfo>,
     expires_at: Option<String>,
+    /// The licence server's answer to "who is this token?": the only value allowed to vouch for
+    /// a cross-tenant delegation.
+    subject_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -282,6 +418,7 @@ impl Introspector {
             license_id,
             app: payload.app.and_then(|app| app.key),
             expires_at: payload.expires_at,
+            subject_id: payload.subject_id,
         })
     }
 }
@@ -316,6 +453,7 @@ pub async fn authorize(
             .map(str::to_owned),
         license_id: None,
         verified: false,
+        subject_id: None,
     };
     if mode == Mode::Off {
         // The inert path: no header is read, no request is made.
@@ -334,6 +472,7 @@ pub async fn authorize(
             tenant_id: Some(licence.tenant_id.clone()),
             license_id: Some(licence.license_id.clone()),
             verified: true,
+            subject_id: licence.subject_id.clone(),
         }),
         Verdict::Denied => {
             if mode == Mode::Enforce {
@@ -564,5 +703,107 @@ mod tests {
             .await
             .expect("off");
         assert!(!identity.verified);
+    }
+
+    const SUBJECT: &str = "8382f0b3-c082-4f97-8d47-120ce5a18e05";
+    const TENANT: &str = "0195f48b-d000-7000-8000-000000000001";
+    const OTHER: &str = "0195f48b-d000-7000-8000-0000000000b2";
+
+    fn allowlist() -> Vec<String> {
+        vec![SUBJECT.to_owned()]
+    }
+
+    fn own(tenant: &str) -> EffectiveTenant {
+        EffectiveTenant {
+            tenant_id: Some(tenant.to_owned()),
+            delegated_by: None,
+        }
+    }
+
+    #[test]
+    fn without_the_header_the_caller_keeps_its_own_tenant() {
+        assert_eq!(
+            effective_tenant(None, Some(SUBJECT), Some(TENANT), &allowlist()),
+            own(TENANT)
+        );
+        // No caller tenant at all: nothing to delegate FROM, and nothing is invented.
+        assert_eq!(
+            effective_tenant(Some(OTHER), Some(SUBJECT), None, &allowlist()),
+            EffectiveTenant {
+                tenant_id: None,
+                delegated_by: None
+            }
+        );
+    }
+
+    #[test]
+    fn naming_your_own_tenant_is_not_a_delegation() {
+        // The same UUID in a different spelling is still `self` — and needs no vouching.
+        assert_eq!(
+            effective_tenant(
+                Some("0195F48B-D000-7000-8000-000000000001"),
+                None,
+                Some(TENANT),
+                &allowlist()
+            ),
+            own(TENANT)
+        );
+    }
+
+    #[test]
+    fn a_cross_tenant_assertion_without_a_vouched_allow_listed_subject_is_dropped() {
+        // No introspected subject (fail-open, observe, off) — the header is not evidence.
+        assert_eq!(
+            effective_tenant(Some(OTHER), None, Some(TENANT), &allowlist()),
+            own(TENANT)
+        );
+        // A vouched subject that is not on the fleet allowlist cannot delegate either.
+        assert_eq!(
+            effective_tenant(
+                Some(OTHER),
+                Some("01a0dd02-d324-77bb-acd8-7c31fb6e95ec"),
+                Some(TENANT),
+                &allowlist()
+            ),
+            own(TENANT)
+        );
+    }
+
+    #[test]
+    fn a_vouched_allow_listed_subject_is_honoured() {
+        // Case is normalised on both sides; `delegated_by` is the lower-cased subject.
+        let decision = effective_tenant(
+            Some(OTHER),
+            Some("8382F0B3-C082-4F97-8D47-120CE5A18E05"),
+            Some(TENANT),
+            &allowlist(),
+        );
+        assert_eq!(
+            decision,
+            EffectiveTenant {
+                tenant_id: Some(OTHER.to_owned()),
+                delegated_by: Some(SUBJECT.to_owned()),
+            }
+        );
+    }
+
+    #[test]
+    fn an_invalid_assertion_is_dropped_even_from_a_vouched_subject() {
+        let dropped = |value: &str| {
+            assert_eq!(
+                effective_tenant(Some(value), Some(SUBJECT), Some(TENANT), &allowlist()),
+                own(TENANT),
+                "{value} must never be honoured as a tenant"
+            );
+        };
+        // The nil sentinel in every spelling it is documented to arrive in.
+        dropped("00000000-0000-0000-0000-000000000000");
+        dropped("00000000000000000000000000000000");
+        dropped("{00000000-0000-0000-0000-000000000000}");
+        dropped("urn:uuid:00000000-0000-0000-0000-000000000000");
+        // Not a UUID at all, and a credential that must never be treated as an identifier.
+        dropped("not-a-tenant");
+        dropped("Bearer 00000000-0000-0000-0000-0000000000b2");
+        dropped("   ");
     }
 }

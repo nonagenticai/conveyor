@@ -52,6 +52,10 @@ TOKEN="$(tok stub-licence-token-)"
 BAD_TOKEN="$(tok stub-licence-inactive-)"
 OVER_TOKEN="$(tok stub-licence-over-)"
 NOBUDGET_TOKEN="$(tok stub-licence-nobudget-)"
+# A licence held by a platform service on the fleet delegation allowlist, used by the one case
+# that names a different tenant (AUTH_DELEGATING_SUBJECTS is set by oracle.sh).
+DELEGATED_TOKEN="$(tok stub-licence-delegated-)"
+DELEGATED_TENANT="00000000-0000-4000-8000-0000000000b2"
 TENANT="00000000-0000-4000-8000-0000000000a1"
 TENANT_OVER="00000000-0000-4000-8000-0000000000ba"
 TENANT_NOBUDGET="00000000-0000-4000-8000-0000000000cb"
@@ -128,6 +132,14 @@ request completion_attributed POST /api/chat/completions "${json[@]}" "${auth[@]
 
 request completion_stream POST /api/chat/completions "${json[@]}" "${auth[@]}" \
   -d '{"model":"stub-model","messages":[{"role":"user","content":"stream"}],"max_tokens":8,"stream":true}'
+
+# The tenant a request is FOR is the delegated one: the licence server vouches for the
+# allow-listed subject, and `X-Effective-Tenant-Id` names another tenant. Its ledger row is the
+# parity target for `delegated_by` and the effective `tenant_id`.
+request completion_delegated POST /api/chat/completions "${json[@]}" \
+  -H "authorization: Bearer $DELEGATED_TOKEN" \
+  -H "X-Effective-Tenant-Id: $DELEGATED_TENANT" \
+  -d '{"model":"stub-model","messages":[{"role":"user","content":"delegated"}],"max_tokens":8}'
 
 request completion_bad_token POST /api/chat/completions "${json[@]}" \
   -H "authorization: Bearer $BAD_TOKEN" \

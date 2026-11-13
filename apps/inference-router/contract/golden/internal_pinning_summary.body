@@ -3,7 +3,7 @@
     {
       "caller": null,
       "last_at": "TIMESTAMP",
-      "n": 3,
+      "n": 4,
       "pinned_n": 0,
       "temperature_zero_n": 0
     },
@@ -18,7 +18,7 @@
   "since": "TIMESTAMP",
   "source": "all",
   "totals": {
-    "n": 4,
+    "n": 5,
     "pinned_n": 0,
     "temperature_zero_n": 0
   }

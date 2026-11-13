@@ -323,8 +323,8 @@
     {
       "day": "DATE",
       "licensed_share": 1.0,
-      "n": 4,
-      "n_licence_recorded": 4,
+      "n": 5,
+      "n_licence_recorded": 5,
       "requested_model": "stub-model",
       "seed_share": 0.0,
       "served_model_root": null,

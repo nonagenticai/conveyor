@@ -45,6 +45,11 @@ GOOD_TOKEN = _tok("stub-licence-token-")
 BAD_TOKEN = _tok("stub-licence-inactive-")
 OVER_TOKEN = _tok("stub-licence-over-")
 NOBUDGET_TOKEN = _tok("stub-licence-nobudget-")
+# A licence held by a PLATFORM service that is allowed to name the tenant a call is FOR. The
+# subject is the fleet allowlist entry the live deployment arms (AUTH_DELEGATING_SUBJECTS).
+DELEGATING_SUBJECT = "8382f0b3-c082-4f97-8d47-120ce5a18e05"
+DELEGATED_TENANT = "00000000-0000-4000-8000-0000000000b2"
+DELEGATED_TOKEN = _tok("stub-licence-delegated-")
 
 # token -> the tenant its licence vouches for; False is a known but inactive licence.
 # The tenant is what the budget gate is keyed on, so the over-budget case needs its own token:
@@ -54,7 +59,12 @@ TOKENS = {
     OVER_TOKEN: TENANT_OVER_BUDGET,
     NOBUDGET_TOKEN: TENANT_NO_BUDGET,
     BAD_TOKEN: False,
+    DELEGATED_TOKEN: TENANT,
 }
+
+# The licence server's own answer to "who is this token?" — returned ONLY for the delegating
+# token, so every other captured response is unchanged.
+SUBJECTS = {DELEGATED_TOKEN: DELEGATING_SUBJECT}
 
 USAGE = {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
 CONTENT = "stub completion"
@@ -168,16 +178,16 @@ class Handler(BaseHTTPRequestHandler):
         token = str(request.get("token") or "")
         tenant = TOKENS.get(token)
         if tenant:
-            self._json(
-                200,
-                {
-                    "active": True,
-                    "tenant_id": tenant,
-                    "license_id": LICENSE,
-                    "app": {"key": "inference-router"},
-                    "expires_at": "2030-01-01T00:00:00Z",
-                },
-            )
+            payload = {
+                "active": True,
+                "tenant_id": tenant,
+                "license_id": LICENSE,
+                "app": {"key": "inference-router"},
+                "expires_at": "2030-01-01T00:00:00Z",
+            }
+            if token in SUBJECTS:
+                payload["subject_id"] = SUBJECTS[token]
+            self._json(200, payload)
         else:
             self._json(200, {"active": False})
 

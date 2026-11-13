@@ -3,7 +3,9 @@
 #
 #   oracle.sh [--prefix NAME] [--keep] [--down]
 #             [--tenant UUID] [--policy FILE]
-#             [--ledger-out FILE] [--cost-out FILE] [--capture [--capture-out DIR]]
+#             [--ledger-out FILE] [--cost-out FILE]
+#             [--delegated-ledger-out FILE] [--delegated-cost-out FILE]
+#             [--capture [--capture-out DIR]]
 #
 # The oracle is the reference implementation. Everything the Rust rewrite is measured against is
 # captured HERE, never from the rewrite: `capture-goldens.sh` and `verify.sh` both take its URL.
@@ -31,13 +33,15 @@ down=0
 policy=""
 ledger_out=""
 cost_out=""
+delegated_ledger_out=""
+delegated_cost_out=""
 capture=0
 capture_out="$here/golden"
 tenant="00000000-0000-4000-8000-0000000000a1"   # the stub's tenant (contract/stubs/oracle_stub.py)
 request_model=""                                 # "" => resolved after arg parsing
 
 usage() {
-    sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' >&2
+    sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//' >&2
     exit 2
 }
 
@@ -50,6 +54,8 @@ while [ $# -gt 0 ]; do
         --policy) policy="${2:-}"; shift 2 ;;
         --ledger-out) ledger_out="${2:-}"; shift 2 ;;
         --cost-out) cost_out="${2:-}"; shift 2 ;;
+        --delegated-ledger-out) delegated_ledger_out="${2:-}"; shift 2 ;;
+        --delegated-cost-out) delegated_cost_out="${2:-}"; shift 2 ;;
         --request-model) request_model="${2:-}"; shift 2 ;;
         --capture) capture=1; shift ;;
         --capture-out) capture_out="${2:-}"; shift 2 ;;
@@ -137,6 +143,7 @@ docker run -d --name "$oracle" --network "$net" -p 127.0.0.1::8150 \
     -e INFERENCE_ROUTER_BUDGET_GATE_BILLING_BASE_URL="http://${stub}:9100" \
     -e INFERENCE_ROUTER_POLICY_MODE=on \
     -e INFERENCE_ROUTER_INTERNAL_SECRET=stub-internal-secret \
+    -e AUTH_DELEGATING_SUBJECTS=8382f0b3-c082-4f97-8d47-120ce5a18e05 \
     -e INFERENCE_ROUTER_METERING_REDIS_URL="redis://${redis}:6379/0" \
     -e INFERENCE_ROUTER_METERING_COSTS_ENABLED=true \
     -e INFERENCE_ROUTER_METERING_COSTS_STREAM=billing:costs \
@@ -167,6 +174,7 @@ psql_run() { docker exec -i "$pg" psql -U postgres -d inference_router -v ON_ERR
 echo "oracle:  $url"
 echo "psql:    docker exec -i $pg psql -U postgres -d inference_router"
 echo "token:   $(tok stub-licence-token-)"
+echo "delegated token: $(tok stub-licence-delegated-)"
 
 if [ -n "$policy" ]; then
     [ -f "$policy" ] || { echo "--policy file not found: $policy" >&2; exit 2; }
@@ -235,6 +243,36 @@ if [ -n "$cost_out" ]; then
                { if (field != "timestamp" && field != "event_key" && field != "latency_ms") print field "\n" $0 }' \
         >"$cost_out"
     echo "cost:    $cost_out"
+fi
+
+# The delegating completion, captured as the LAST request so `--delegated-ledger-out` reads its
+# row. Headers and body are the `completion_delegated` golden's, byte for byte. Run this WITHOUT
+# `--capture` when dumping artifacts (the capture's own completions would otherwise own the
+# newest rows); the delegated cost dump uses XREVRANGE, so a stray earlier event cannot win.
+if [ -n "$delegated_ledger_out" ] || [ -n "$delegated_cost_out" ]; then
+    token="$(tok stub-licence-delegated-)"
+    curl -fsS -o /dev/null -X POST "$url/api/chat/completions" \
+        -H 'content-type: application/json' \
+        -H "authorization: Bearer $token" \
+        -H 'X-Effective-Tenant-Id: 00000000-0000-4000-8000-0000000000b2' \
+        -H 'X-Correlation-Id: 00000000-0000-4000-8000-0000000000e2' \
+        -H 'X-Worker-Name: delegated-worker' \
+        -d '{"model":"stub-model","messages":[{"role":"user","content":"delegated"}],"max_tokens":8}'
+fi
+
+if [ -n "$delegated_ledger_out" ]; then
+    psql_run -Atc "SELECT row_to_json(t) FROM (SELECT * FROM inference_call ORDER BY id DESC LIMIT 1) t" \
+        | jq -S 'del(.id, .created_at, .latency_ms, .request_id)' >"$delegated_ledger_out"
+    echo "ledger:  $delegated_ledger_out (delegated)"
+fi
+
+if [ -n "$delegated_cost_out" ]; then
+    docker exec "$redis" redis-cli --raw XREVRANGE billing:costs + - COUNT 1 \
+        | awk 'NR==1 { next }
+               NR%2==0 { field=$0; next }
+               { if (field != "timestamp" && field != "event_key" && field != "latency_ms") print field "\n" $0 }' \
+        >"$delegated_cost_out"
+    echo "cost:    $delegated_cost_out (delegated)"
 fi
 
 if [ "$keep" = 1 ]; then

@@ -569,3 +569,180 @@ async fn an_unreachable_billing_fails_open() {
         .expect("router answers");
     assert_eq!(response.status(), axum::http::StatusCode::OK);
 }
+
+// --- effective-tenant delegation (S8a.0) -------------------------------------------
+//
+// `AUTH_DELEGATING_SUBJECTS` is armed in the live deployment, so a platform service can name the
+// tenant a call is FOR. Only an INTROSPECTED subject may vouch; anything else keeps the caller's
+// own tenant. The billed tenant and the cost event's `delegated_by` are what these assert.
+
+const LICENCE_TOKEN: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+const CALLER_TENANT: &str = "00000000-0000-4000-8000-0000000000a1";
+const DELEGATED_TENANT: &str = "00000000-0000-4000-8000-0000000000b2";
+const DELEGATING_SUBJECT: &str = "8382f0b3-c082-4f97-8d47-120ce5a18e05";
+const OTHER_SUBJECT: &str = "01a0dd02-d324-77bb-acd8-7c31fb6e95ec";
+
+async fn stub_licences(subject: &str) -> std::net::SocketAddr {
+    let payload = json!({
+        "active": true,
+        "tenant_id": CALLER_TENANT,
+        "license_id": "00000000-0000-4000-8000-0000000000c1",
+        "app": {"key": "inference-router"},
+        "expires_at": "2030-01-01T00:00:00Z",
+        "subject_id": subject,
+    });
+    async fn handler(
+        axum::extract::State(payload): axum::extract::State<Value>,
+    ) -> axum::Json<Value> {
+        axum::Json(payload)
+    }
+    let app = Router::new()
+        .route("/license/introspect", post(handler))
+        .with_state(payload);
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind licences");
+    let address = listener.local_addr().expect("address");
+    tokio::spawn(async move {
+        axum::serve(listener, app)
+            .await
+            .expect("licences stub serves")
+    });
+    address
+}
+
+async fn delegation_state(
+    pool: sqlx::PgPool,
+    provider: std::net::SocketAddr,
+    licences: std::net::SocketAddr,
+    allowlist: &str,
+    recorder: Arc<Recorder>,
+) -> AppState {
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{provider}/v1\n    model: stub-model\n    model_aliases:\n      stub-model: stub-model\ndefault_chain: [stub-openai]\n"
+    ))
+    .expect("catalog");
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let url = format!("http://{licences}/license/introspect");
+    let allowlist = allowlist.to_owned();
+    let config = Config::from_lookup(move |key| match key {
+        "INFERENCE_ROUTER_INTROSPECT_MODE" => Some("enforce".to_owned()),
+        "INFERENCE_ROUTER_LICENSE_INTROSPECT_URL" => Some(url.clone()),
+        "AUTH_DELEGATING_SUBJECTS" => Some(allowlist.clone()),
+        _ => None,
+    })
+    .expect("delegation config");
+    AppState::with_deps(
+        config,
+        router,
+        AppDeps {
+            ledger: Some(pool),
+            budget: Arc::new(AllowAllGate),
+            cost: recorder,
+            ..AppDeps::default()
+        },
+    )
+}
+
+fn delegated_request() -> axum::http::request::Builder {
+    Request::post("/api/chat/completions")
+        .header("content-type", "application/json")
+        .header("authorization", format!("Bearer {LICENCE_TOKEN}"))
+        .header("x-effective-tenant-id", DELEGATED_TENANT)
+}
+
+/// The `completion_delegated` golden's body, byte for byte — the fingerprints below are the
+/// oracle's for exactly this request (`contract/golden/ledger_delegated.json`).
+fn delegated_body() -> Body {
+    Body::from(
+        json!({
+            "model": "stub-model",
+            "messages": [{"role": "user", "content": "delegated"}],
+            "max_tokens": 8
+        })
+        .to_string(),
+    )
+}
+
+async fn one_row(pool: &sqlx::PgPool) -> Value {
+    sqlx::query_scalar("SELECT row_to_json(t) FROM (SELECT * FROM inference_call LIMIT 1) t")
+        .fetch_one(pool)
+        .await
+        .expect("a ledger row")
+}
+
+#[tokio::test]
+async fn a_vouched_delegation_moves_the_billed_tenant_and_stamps_delegated_by() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+    let provider = stub_provider().await;
+    let licences = stub_licences(DELEGATING_SUBJECT).await;
+    let recorder = Arc::new(Recorder::default());
+    let state = delegation_state(
+        db.pool.clone(),
+        provider,
+        licences,
+        DELEGATING_SUBJECT,
+        recorder.clone(),
+    )
+    .await;
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(delegated_request().body(delegated_body()).expect("request"))
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+
+    let row = one_row(&db.pool).await;
+    // The oracle's own row for this request: the billed tenant is the DELEGATED one, the licence
+    // still belongs to the caller, and the fingerprints are unchanged by delegation.
+    assert_eq!(row["tenant_id"], DELEGATED_TENANT);
+    assert_eq!(row["licence_id"], "00000000-0000-4000-8000-0000000000c1");
+    assert_eq!(
+        row["request_sha256"],
+        "4b5b9232f60197f46d643854e179f2df84c99bded7cc7aee97fc1cfea4568eec"
+    );
+    assert_eq!(
+        row["response_sha256"],
+        "ba6f4f2b57c61a5dcf72a7b77e61340cfd9239c18f3e558200fb81b7d85637d1"
+    );
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 1);
+    assert_eq!(events[0].tenant_id.as_deref(), Some(DELEGATED_TENANT));
+    assert_eq!(events[0].delegated_by.as_deref(), Some(DELEGATING_SUBJECT));
+}
+
+#[tokio::test]
+async fn an_unvouched_delegation_keeps_the_callers_tenant() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+    let provider = stub_provider().await;
+    // The licence server vouches for a subject that is NOT on the fleet allowlist.
+    let licences = stub_licences(OTHER_SUBJECT).await;
+    let recorder = Arc::new(Recorder::default());
+    let state = delegation_state(
+        db.pool.clone(),
+        provider,
+        licences,
+        DELEGATING_SUBJECT,
+        recorder.clone(),
+    )
+    .await;
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(delegated_request().body(delegated_body()).expect("request"))
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["tenant_id"], CALLER_TENANT);
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 1);
+    assert_eq!(events[0].tenant_id.as_deref(), Some(CALLER_TENANT));
+    assert_eq!(events[0].delegated_by, None);
+}

@@ -9,7 +9,7 @@ use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 
-use crate::auth::CallerIdentity;
+use crate::auth::{CallerIdentity, EffectiveTenant, effective_tenant};
 use crate::config::{GateMode, PolicyMode};
 use crate::contract::schemas::{
     ChatCompletionRequest, ChatCompletionResponse, HTTPValidationError,
@@ -83,6 +83,16 @@ pub async fn create_chat_completion(
         Ok(identity) => identity,
         Err(refusal) => return refusal.into_response(),
     };
+    // Whose request this is: the caller's own tenant, or one a vouched allow-listed subject
+    // named. Resolved once, before any policy, budget or ledger decision, so all three agree.
+    let effective = effective_tenant(
+        headers
+            .get("x-effective-tenant-id")
+            .and_then(|value| value.to_str().ok()),
+        identity.subject_id.as_deref(),
+        identity.tenant_id.as_deref(),
+        &state.config().auth_delegating_subjects,
+    );
     if request.stream {
         return Refusal::detail(
             StatusCode::NOT_IMPLEMENTED,
@@ -95,14 +105,14 @@ pub async fn create_chat_completion(
         .get("x-provider")
         .and_then(|value| value.to_str().ok());
     // Policy routing is resolved AFTER the tenant is final and BEFORE anything can spend.
-    let decision = match tenant_policy(&state, &identity, &request, x_provider).await {
+    let decision = match tenant_policy(&state, &identity, &effective, &request, x_provider).await {
         Ok(decision) => decision,
         Err(refusal) => return refusal.into_response(),
     };
     let hops = decision.as_ref().map(|decision| decision.hops.as_slice());
     // The pre-spend gate is at ADMISSION: every path that can spend money passes through here
     // first, including the failover attempts and the (future) canary forward.
-    let tenant = identity.tenant_id.as_deref().unwrap_or_default();
+    let tenant = effective.tenant_id.as_deref().unwrap_or_default();
     let gate = state
         .deps()
         .budget
@@ -114,9 +124,18 @@ pub async fn create_chat_completion(
     let outcome = state.router().complete(&request, x_provider, hops).await;
     // The write path runs on EVERY outcome, not only on success: a request that failed over spent
     // money on the attempts that did not serve it, and the cost bus is billed per attempt.
+    // The "who" half of the context is decided here; `record` fills in the attribution and
+    // policy fields. Seven arguments is clippy's limit — bundling the identity fields keeps the
+    // write path inside it without an allow.
+    let context = CallContext {
+        tenant_id: effective.tenant_id.clone(),
+        license_id: identity.license_id.clone(),
+        delegated_by: effective.delegated_by.clone(),
+        ..CallContext::default()
+    };
     record(
         &state,
-        &identity,
+        context,
         &headers,
         &request,
         &outcome,
@@ -178,27 +197,23 @@ fn budget_refusal(decision: &crate::billing::GateDecision) -> Refusal {
 async fn tenant_policy(
     state: &AppState,
     identity: &CallerIdentity,
+    effective: &EffectiveTenant,
     request: &ChatCompletionRequest,
     x_provider: Option<&str>,
 ) -> Result<Option<PolicyDecision>, Refusal> {
     if state.config().policy_mode != PolicyMode::On {
         return Ok(None);
     }
-    let Some(tenant) = identity.tenant_id.as_deref() else {
+    let Some(tenant) = effective.tenant_id.as_deref() else {
         return Ok(None);
     };
-    let listed = state
-        .config()
-        .commercial_platform_tenant_ids
-        .iter()
-        .any(|id| id.eq_ignore_ascii_case(tenant));
-    if listed && identity.verified {
+    if proven_platform_tenant(state, identity, tenant) {
         return Ok(None);
     }
     let Some(active) = state.deps().policy.get_active(tenant).await else {
         return Ok(None);
     };
-    if active.requires_proven_tenant() && !identity.verified {
+    if active.requires_proven_tenant() && !proven_tenant(identity, tenant) {
         let mut refusal = Refusal::detail(
             StatusCode::UNAUTHORIZED,
             TENANT_NOT_PROVEN,
@@ -224,6 +239,29 @@ async fn tenant_policy(
     }
 }
 
+/// True when a verified licence on THIS request names exactly `tenant`.
+///
+/// Delegation deliberately does not help here: a licence for the delegating service names THAT
+/// service's tenant, so a policy for the delegated tenant still requires a token for it.
+fn proven_tenant(identity: &CallerIdentity, tenant: &str) -> bool {
+    identity.verified
+        && identity
+            .tenant_id
+            .as_deref()
+            .is_some_and(|own| own.trim().eq_ignore_ascii_case(tenant.trim()))
+}
+
+/// The commercial-platform rule: the EFFECTIVE tenant is listed **and** proven to be itself on
+/// this request. An asserted header is never proof.
+fn proven_platform_tenant(state: &AppState, identity: &CallerIdentity, tenant: &str) -> bool {
+    state
+        .config()
+        .commercial_platform_tenant_ids
+        .iter()
+        .any(|id| id.eq_ignore_ascii_case(tenant))
+        && proven_tenant(identity, tenant)
+}
+
 /// Read an attribution header. Absent, non-UTF-8 and blank all mean "the caller sent none" — the
 /// ledger distinguishes that from an empty value, and a bad header never fails the request.
 fn attribution(headers: &HeaderMap, name: &str) -> Option<String> {
@@ -241,7 +279,7 @@ fn attribution(headers: &HeaderMap, name: &str) -> Option<String> {
 /// failed inference, and neither does this port.
 async fn record(
     state: &AppState,
-    identity: &CallerIdentity,
+    context: CallContext,
     headers: &HeaderMap,
     request: &ChatCompletionRequest,
     outcome: &CompletionOutcome,
@@ -250,8 +288,6 @@ async fn record(
 ) {
     let served_hop = outcome.served_hop.as_ref();
     let context = CallContext {
-        tenant_id: identity.tenant_id.clone(),
-        license_id: identity.license_id.clone(),
         correlation_id: attribution(headers, "x-correlation-id"),
         worker_name: attribution(headers, "x-worker-name"),
         stage: attribution(headers, "x-stage"),
@@ -265,6 +301,7 @@ async fn record(
         hop_index: served_hop.map(|hop| hop.index),
         hop_reason: served_hop.map(|hop| hop.reason.to_owned()),
         key_owner: served_hop.map(|hop| hop.key_owner.to_owned()),
+        ..context
     };
 
     let served = outcome.response.as_ref().ok();
@@ -345,6 +382,7 @@ fn cost_event(
         project_id: context.project_id.clone(),
         card_id: context.card_id.clone(),
         execution_id: context.parent_execution_id.clone(),
+        delegated_by: context.delegated_by.clone(),
         ..CostEvent::default()
     }
 }

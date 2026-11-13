@@ -23,8 +23,12 @@ use crate::contract::schemas::{ChatCompletionRequest, ChatCompletionResponse};
 /// What the handler knows about the caller and the request, beyond the body itself.
 #[derive(Debug, Clone, Default)]
 pub struct CallContext {
+    /// The EFFECTIVE tenant (after `X-Effective-Tenant-Id` resolution), not the raw caller.
     pub tenant_id: Option<String>,
     pub license_id: Option<String>,
+    /// The vouched subject that delegated this call to another tenant; `None` otherwise. Rides
+    /// the cost event only — the reference's ledger table has no such column.
+    pub delegated_by: Option<String>,
     pub correlation_id: Option<String>,
     pub worker_name: Option<String>,
     /// The caller's stage label (`X-Stage`). Carried by the cost event; the ledger has no column.
