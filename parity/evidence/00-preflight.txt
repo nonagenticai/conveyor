@@ -26,7 +26,7 @@ no prune/delete/write. No docker containers touched.
    kanban           35 base tables  (33 domain + migration/migration_lock)
    Command: select count(*) from pg_stat_user_tables where schemaname='public';
 
-5. LOKI (from master; service loki.loki.svc.cluster.local:3100, ClusterIP 192.0.2.11)
+5. LOKI (from master; service localhost:3100, ClusterIP 192.0.2.11)
    Labels: container, filename, job, namespace, pod, service_name, stream. Only job=kubernetes-pods.
    Selector used: {namespace="istio-system",container="istio-proxy"}   (ingress access log, text format)
    Retention: 24h  => every sample is a 24-hour sample, never a history.

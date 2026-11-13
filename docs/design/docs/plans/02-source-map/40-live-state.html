@@ -28,7 +28,7 @@
 <p>Measured while writing the plan set, from <code>mini3</code>. Every number below is a reading with its command — re-measure before relying on it; none of it is a standing fact.</p>
 <h2 id="loki-the-s0-access-log-source">Loki (the S0 access-log source)</h2>
 <ul>
-<li>Service: <code>loki.loki.svc.cluster.local:3100</code>, ClusterIP <code>192.0.2.11</code>.</li>
+<li>Service: <code>localhost:3100</code>, ClusterIP <code>192.0.2.11</code>.</li>
 <li>Labels: <code>container</code>, <code>filename</code>, <code>job</code>, <code>namespace</code>, <code>pod</code>, <code>service_name</code>, <code>stream</code>. Only job value: <code>kubernetes-pods</code>.</li>
 <li>Ingress access logs live at <code>{namespace="istio-system", container="istio-proxy"}</code>. Line shape (measured): <code>[ts] "GET / HTTP/1.1" 200 - via_upstream - "-" 0 4540 86 58 "&lt;x-forwarded-for&gt;" "&lt;ua&gt;" "&lt;request-id&gt;" "fr.nonagentic.ai" ...</code> The host and path are plain quoted fields; per-path counts are a LogQL metric query over that selector.</li>
 <li>⛔ <strong>Retention is <code>24h</code></strong> (<code>gitops-production/clusters/strato/services/loki/loki/configmap-loki-config.yaml</code>, <code>retention_period: 24h</code>, config revision <code>2026-10-14-retention-24h-2gb-cap</code>). <strong>The access log is a 24-hour sample, not a history.</strong> S0 must label its evidence accordingly; it cannot answer "used at all this quarter" from Loki.</li>

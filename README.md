@@ -1,5 +1,9 @@
 # conveyor
 
+[![CI](https://github.com/nonagenticai/conveyor/actions/workflows/ci-public.yml/badge.svg)](https://github.com/nonagenticai/conveyor/actions/workflows/ci-public.yml)
+[![Release](https://img.shields.io/github/v/release/nonagenticai/conveyor)](https://github.com/nonagenticai/conveyor/releases)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
 The new conveyor: one Rust application (workspace in `crates/` and `apps/`), Postgres 18, Leptos
 web UI.
 
@@ -15,3 +19,19 @@ Work is claimed by a GitHub issue. The queue is `gh issue list --label unit --st
 
 Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md) · Security: [`SECURITY.md`](SECURITY.md) ·
 Conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) · Licence: Apache-2.0 ([`LICENSE`](LICENSE)).
+
+## Security
+
+Report vulnerabilities privately through the repository's Security tab — see
+[`SECURITY.md`](SECURITY.md). Do not open a public issue for a security problem.
+
+## Contributing
+
+Issues and pull requests are welcome. See
+[`CONTRIBUTING.md`](https://github.com/nonagenticai/.github/blob/main/CONTRIBUTING.md) for the
+organisation-wide rules; setup, test and lint commands are in this README. Commits carry DCO
+sign-off.
+
+## License
+
+Apache-2.0 — see [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
