@@ -174,21 +174,48 @@ const shot = (name) =>
       "dependency cycle is refused",
     );
 
-    // 4. Plan: the plan seed is the DESIGN fallback; change control keeps its contract.
+    // 4. Plan: Boards renders the live snapshot when it carries boards, otherwise the
+    //    committed plan seed. Change control keeps its contract in both modes.
     await nav("plan");
+    const liveBoards = await page.evaluate(() => {
+      const snapshot = window.CONVEYOR_SNAPSHOT;
+      return Boolean(
+        snapshot &&
+          snapshot.schema === "design-snapshot/v1" &&
+          snapshot.work &&
+          (snapshot.work.boards || []).length,
+      );
+    });
     await tab("plan", "Boards");
-    check(
-      (await content()).includes("Plan seed · DESIGN"),
-      "the plan seed renders when no live boards exist",
-    );
-    check(
-      (await content()).includes("architecture_task.READY"),
-      "every plan unit names a real process",
-    );
-    check(
-      (await page.locator('[data-v2-input="plan-seed-project"]').count()) === 1,
-      "the plan seed is scoped by project",
-    );
+    if (liveBoards) {
+      check(
+        (await content()).includes("read from snapshot"),
+        "the live Boards tab renders the snapshot's boards",
+      );
+      check(
+        (await content()).includes("architecture_task.READY"),
+        "the live cards name their real process",
+      );
+      check(
+        (await page.locator('[data-v2-input="plan-project"]').count()) === 1,
+        "the live boards are scoped by project",
+      );
+      const first = await page.locator('[data-v2-input="plan-project"] option').first().innerText();
+      check(first.startsWith("S"), "the live boards open on the first S plan");
+    } else {
+      check(
+        (await content()).includes("Plan seed · DESIGN"),
+        "the plan seed renders when no live boards exist",
+      );
+      check(
+        (await content()).includes("architecture_task.READY"),
+        "every plan unit names a real process",
+      );
+      check(
+        (await page.locator('[data-v2-input="plan-seed-project"]').count()) === 1,
+        "the plan seed is scoped by project",
+      );
+    }
     await tab("plan", "Change control");
     await action("change-approve");
     check(
