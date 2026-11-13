@@ -68,7 +68,11 @@ anything. The shape is `.github/ISSUE_TEMPLATE/unit.md`.
    - every part has ≥1 scenario carrying a `Verify:` command or test target;
    - the chosen state label matches the Dependencies table (`status:blocked` iff a `blocked-by` is
      open; an `acceptance-blocked-by` alone must not block);
-   - no sentence is copied from the plan or audit (`git grep -F` a sample).
+   - no sentence is copied from the plan or audit (`git grep -F` a sample);
+- the body carries no `scripts/ci/no-private-refs.sh` HARD pattern and no private repository slug:
+  read the pattern set from that script (never retype it), and `gh repo view <slug> --json
+  visibility` must be `PUBLIC` for every repository the body names. Name a private service by its
+  public role (“the licensing service”), never by its repository path.
 
 7. **Create the issue** with exactly one status label:
    ```bash

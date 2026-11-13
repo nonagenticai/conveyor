@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0005 — Absorption sequence, strata stays external, and conveyor-executed rewrites · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0005-absorption-sequence-and-repo-scope.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0005--absorption-sequence-strata-stays-external-and-conveyor-executed-rewrites">0005 — Absorption sequence, strata stays external, and conveyor-executed rewrites</h1>
+<p>Status: Accepted · Date: 2026-11-13 · Issue: #66</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><strong>The absorption sequence is fixed:</strong> inference-router (#44) → licenses (#45) → billing-service (#46). The V2 product spine (T1–T3, T13) is queued behind them; it is not the current thrust.</li>
+<li><strong><code>strata_ingest</code> and <code>strata_rag</code> stay separate repositories.</strong> They are already Rust, they are shared with the agent platform, and their release cadence and open-sourcing are decided separately. The conveyor binds them over HTTP. This supersedes ADR 0004's inclusion of those two services in this repository.</li>
+<li><strong>The <code>coding-*</code> fleet and the w2v services are rewritten by the conveyor itself</strong>, not by hand-built absorption lanes. They are programme goals, not a queue of manual rewrites: T13 (tool platform) and T6 (development project) are what enable them, and the first proof is one service rewritten end to end by a conveyor job. No absorption issue is opened for them until that proof exists.</li>
+<li><strong>The public tracker is the only tracker.</strong> Internal programme work stays in the public issue queue, sanitized: no hostname, address, private repository slug or private path in an issue body or comment. No private programme repository is created.</li>
+</ol>
+<h2 id="context">Context</h2>
+<p>ADR 0004 defined the tool estate and said every in-scope service joins this repository when it is rewritten in Rust. That stands for the services the conveyor calls today. It did not decide <strong>who performs</strong> a rewrite, and it put two services in scope that are shared with another product and are already Rust.</p>
+<p>Measured 2026-11-13: <code>strata_ingest</code> and <code>strata_rag</code> are Rust and private, and both the agent platform and the conveyor use them. The coding fleet is public Python behind <code>coding-gateway</code>; the w2v fleet is private Python plus a TypeScript frontend.</p>
+<h2 id="what-this-supersedes">What this supersedes</h2>
+<ul>
+<li>ADR 0004's in-scope list: <code>strata_ingest</code> and <code>strata_rag</code> remain <strong>tool-estate</strong> members but are not repository scope. Every other entry in 0004 stands.</li>
+<li>ADR 0004's "how a service joins" procedure is unchanged for the hand-performed absorptions (#44–#46). It does not describe the conveyor-executed rewrites, which follow the T6 development project path and land in this repository when the conveyor produces them.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>After #44 the next two units are #45 and #46; the product spine waits.</li>
+<li>The two strata services keep their own deploys, and their source stays private until a separate open-sourcing decision.</li>
+<li>The coding and w2v rewrites appear in the programme as goals with named enabling slices, not as issues that can be claimed today.</li>
+<li>Issue hygiene becomes part of the delivery protocol: checked at creation and reported by the sweep.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0005-absorption-sequence-and-repo-scope.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

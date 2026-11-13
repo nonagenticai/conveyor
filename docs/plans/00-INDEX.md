@@ -9,6 +9,12 @@ Run the `issue-pickup` skill before creating any branch. One issue = one branch 
 plan's remaining work is **one issue** (owner rule 2026-11-11), unless an explicit ≤5 split is written down.
 `03-DELIVERY.md` is the authority.
 
+**Queue status 2026-11-13.** The V1 `S##` plans and the three absorption units (#44–#46) are
+registered. The V2 `T1–T17` slices are **not yet queued**: `seed/programme.json` carries each
+project's gate and `depends_on`, and `SPEC_V2.md` §12 carries its scope; registering them is the
+next queue-truth unit after #44. ADR 0005 fixes the order — absorption first (#44 → #45 → #46),
+the product spine behind it.
+
 ## Programme `conveyor-buildout`
 
 The whole SPEC_V2 buildout is **one programme**. Every current plan is a **project** in it and the

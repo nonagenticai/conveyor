@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="0004--the-tool-estate-is-in-scope-one-public-monorepo">0004 — The tool estate is in scope: one public monorepo</h1>
-<p>Status: Accepted · Date: 2026-11-12 · Issue: #42</p>
+<p>Status: Accepted · Date: 2026-11-12 · Issue: #42 · Amended by 0005 (2026-11-13): <code>strata_ingest</code> and <code>strata_rag</code> stay external repositories</p>
 <h2 id="decision">Decision</h2>
 <p><code>conveyor</code> is one public monorepo. The platform and every tool it uses are written in Rust and live in this workspace. A legacy service stays external and bindable as a toolkit until it is rewritten, and joins the workspace on the day it is rewritten.</p>
 <p><strong>In scope for this repository:</strong></p>

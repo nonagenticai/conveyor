@@ -1,0 +1,117 @@
+/* The operator console. Nothing here changes the public pack: the chip only appears when
+   console.js found a same-origin /config.json, and the console panels only replace snapshot
+   rows when a bearer is held in memory. */
+
+.console-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font: 10px var(--mono);
+  letter-spacing: 0.2px;
+  cursor: pointer;
+}
+.console-chip:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.console-chip i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--faint);
+}
+.console-chip[data-state="in"] {
+  color: var(--ink);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.console-chip[data-state="in"] i {
+  background: var(--accent);
+}
+.console-chip small {
+  font-size: 8px;
+  color: var(--faint);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.console-chip[data-state="in"] small {
+  color: var(--accent);
+}
+
+.console-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 9px var(--mono);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.console-live::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.console-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.console-actions select,
+.console-actions input {
+  font: 11px var(--sans);
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 5px 7px;
+  max-width: 260px;
+}
+.console-card-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 2px;
+}
+.console-card-link:hover {
+  text-decoration-color: var(--accent);
+}
+.console-dialog-body {
+  display: grid;
+  gap: 12px;
+  padding: 4px 18px 18px;
+}
+.console-dialog-body h3 {
+  font-size: 13px;
+  margin: 0;
+}
+.console-dialog-body .kv {
+  margin: 0;
+}
+.console-comment {
+  border-left: 2px solid var(--line);
+  padding: 4px 0 4px 10px;
+  margin: 4px 0;
+  font-size: 12px;
+}
+.console-comment small {
+  display: block;
+  color: var(--faint);
+  font: 9px var(--mono);
+}
