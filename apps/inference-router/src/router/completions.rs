@@ -9,7 +9,7 @@ use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 
-use crate::auth::{CallerIdentity, EffectiveTenant, effective_tenant};
+use crate::auth::{self, CallerIdentity, EffectiveTenant};
 use crate::config::{GateMode, PolicyMode};
 use crate::contract::schemas::{
     ChatCompletionRequest, ChatCompletionResponse, HTTPValidationError,
@@ -79,20 +79,12 @@ pub async fn create_chat_completion(
 ) -> Response {
     // The licence gate runs before anything is dialled: an unverifiable caller must never reach a
     // provider or the ledger.
-    let identity = match state.authorize(&headers).await {
-        Ok(identity) => identity,
-        Err(refusal) => return refusal.into_response(),
-    };
     // Whose request this is: the caller's own tenant, or one a vouched allow-listed subject
     // named. Resolved once, before any policy, budget or ledger decision, so all three agree.
-    let effective = effective_tenant(
-        headers
-            .get("x-effective-tenant-id")
-            .and_then(|value| value.to_str().ok()),
-        identity.subject_id.as_deref(),
-        identity.tenant_id.as_deref(),
-        &state.config().auth_delegating_subjects,
-    );
+    let (identity, effective) = match state.caller(&headers).await {
+        Ok(caller) => caller,
+        Err(refusal) => return refusal.into_response(),
+    };
     if request.stream {
         return Refusal::detail(
             StatusCode::NOT_IMPLEMENTED,
@@ -207,13 +199,17 @@ async fn tenant_policy(
     let Some(tenant) = effective.tenant_id.as_deref() else {
         return Ok(None);
     };
-    if proven_platform_tenant(state, identity, tenant) {
+    if auth::has_commercial_access(
+        &state.config().commercial_platform_tenant_ids,
+        identity,
+        Some(tenant),
+    ) {
         return Ok(None);
     }
     let Some(active) = state.deps().policy.get_active(tenant).await else {
         return Ok(None);
     };
-    if active.requires_proven_tenant() && !proven_tenant(identity, tenant) {
+    if active.requires_proven_tenant() && !auth::proven_tenant(identity, tenant) {
         let mut refusal = Refusal::detail(
             StatusCode::UNAUTHORIZED,
             TENANT_NOT_PROVEN,
@@ -237,29 +233,6 @@ async fn tenant_policy(
             "outside_policy",
         )),
     }
-}
-
-/// True when a verified licence on THIS request names exactly `tenant`.
-///
-/// Delegation deliberately does not help here: a licence for the delegating service names THAT
-/// service's tenant, so a policy for the delegated tenant still requires a token for it.
-fn proven_tenant(identity: &CallerIdentity, tenant: &str) -> bool {
-    identity.verified
-        && identity
-            .tenant_id
-            .as_deref()
-            .is_some_and(|own| own.trim().eq_ignore_ascii_case(tenant.trim()))
-}
-
-/// The commercial-platform rule: the EFFECTIVE tenant is listed **and** proven to be itself on
-/// this request. An asserted header is never proof.
-fn proven_platform_tenant(state: &AppState, identity: &CallerIdentity, tenant: &str) -> bool {
-    state
-        .config()
-        .commercial_platform_tenant_ids
-        .iter()
-        .any(|id| id.eq_ignore_ascii_case(tenant))
-        && proven_tenant(identity, tenant)
 }
 
 /// Read an attribution header. Absent, non-UTF-8 and blank all mean "the caller sent none" — the

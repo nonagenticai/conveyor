@@ -76,6 +76,30 @@ impl AppState {
         .await
     }
 
+    /// The caller AND the tenant the request is FOR. Every token-spending and tenant-scoped
+    /// route resolves both here, so completions and the listings can never disagree.
+    pub async fn caller(
+        &self,
+        headers: &HeaderMap,
+    ) -> Result<(CallerIdentity, auth::EffectiveTenant), Refusal> {
+        let identity = self.authorize(headers).await?;
+        let effective = auth::effective_tenant(
+            headers
+                .get("x-effective-tenant-id")
+                .and_then(|value| value.to_str().ok()),
+            identity.subject_id.as_deref(),
+            identity.tenant_id.as_deref(),
+            &self.config.auth_delegating_subjects,
+        );
+        Ok((identity, effective))
+    }
+
+    /// `/api/whoami` asks the licence server directly: fresh, uncached, and without the app
+    /// check (it REPORTS the app, and lets the caller judge it).
+    pub fn introspector(&self) -> &Introspector {
+        &self.introspector
+    }
+
     pub fn config(&self) -> &Config {
         &self.config
     }

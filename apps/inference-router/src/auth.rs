@@ -158,6 +158,34 @@ fn credential_scheme(value: &str) -> Option<&'static str> {
         .find(|candidate| *candidate == lowered)
 }
 
+/// True when a verified licence on THIS request names exactly `tenant`.
+///
+/// Delegation deliberately does not help: a licence for the delegating service names THAT
+/// service's tenant, so a policy for the delegated tenant still requires a token for it.
+pub fn proven_tenant(identity: &CallerIdentity, tenant: &str) -> bool {
+    identity.verified
+        && identity
+            .tenant_id
+            .as_deref()
+            .is_some_and(|own| own.trim().eq_ignore_ascii_case(tenant.trim()))
+}
+
+/// The reference's commercial-access rule: the EFFECTIVE tenant is listed **and** proven to be
+/// itself on this request. An asserted header is never proof.
+pub fn has_commercial_access(
+    commercial_platform_tenant_ids: &[String],
+    identity: &CallerIdentity,
+    tenant: Option<&str>,
+) -> bool {
+    let Some(tenant) = tenant else {
+        return false;
+    };
+    commercial_platform_tenant_ids
+        .iter()
+        .any(|id| id.eq_ignore_ascii_case(tenant.trim()))
+        && proven_tenant(identity, tenant)
+}
+
 /// Resolve the tenant a request is FOR — the reference's `effective_delegation`, in one place.
 ///
 /// Honouring a delegation moves a bill onto a tenant the caller merely named, so it requires an
@@ -381,6 +409,13 @@ impl Introspector {
             .expect("cache lock")
             .store(token, &verdict, now);
         judge(verdict)
+    }
+
+    /// Resolve a token WITHOUT the cache and WITHOUT the app check — `/api/whoami` reports what
+    /// the licence server says about the token itself, so a revoked token reads 401 at once and
+    /// a wrong app is reported rather than judged.
+    pub async fn resolve_fresh(&self, token: &str) -> Verdict {
+        self.introspect(token).await
     }
 
     async fn introspect(&self, token: &str) -> Verdict {

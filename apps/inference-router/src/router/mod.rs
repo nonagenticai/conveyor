@@ -146,6 +146,10 @@ pub fn router(state: AppState) -> Router {
         .route("/health/live", get(health::liveness))
         .route("/health/ready", get(health::readiness))
         .route("/api/models", get(models::list_models))
+        // The OpenAI-SDK alias: worker_management's provider model-list calls `GET /v1/models`.
+        // Deliberately NOT in `ROUTES`/utoipa — the reference registers it
+        // `include_in_schema=False`, and `--check-lock` compares against the captured 27.
+        .route("/v1/models", get(models::list_models))
         .route("/api/providers", get(providers::list_providers))
         .route(
             "/api/providers/{name}/models",

@@ -179,7 +179,12 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
     };
     let state = AppState::with_deps(config, router_service, deps);
     let listener = tokio::net::TcpListener::bind(state.config().bind).await?;
-    axum::serve(listener, router::router(state)).await?;
+    // Connect info is what /api/whoami rate-limits on: the CLIENT HOST, never the token.
+    axum::serve(
+        listener,
+        router::router(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .await?;
     Ok(())
 }
 
