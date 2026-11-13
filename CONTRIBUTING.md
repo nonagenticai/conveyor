@@ -32,9 +32,9 @@ cargo test --doc --locked
 cargo audit
 ```
 
-The tests need Postgres 18 and Redis. The `checks` job shows the exact container commands; locally,
-bind them to a free port rather than the defaults so two checkouts can run at once. A single
-wrapper, `scripts/ci/gate.sh`, lands with the workspace baseline; until then run the commands above.
+The tests need Postgres 18 and Redis. The `checks` job shows the exact container commands; the
+wrapper `scripts/ci/gate.sh` runs the same commands with an ephemeral Postgres 18 and Redis on
+random local ports, and removes them on exit.
 For the design pack, run `node docs/design/scripts/check-docs.cjs` and the other
 `docs/design/scripts/check-*.cjs` checks.
 

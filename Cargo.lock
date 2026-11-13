@@ -813,6 +813,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-platform"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "serde_json",
+ "sqlx",
+ "thiserror",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "conveyor-render"
 version = "0.1.0"
 dependencies = [
