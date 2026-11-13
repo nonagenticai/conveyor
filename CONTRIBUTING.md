@@ -40,7 +40,7 @@ For the design pack, run `node docs/design/scripts/check-docs.cjs` and the other
 
 ## What never lands
 
-- A credential, a private hostname, a private address or a private repository path. gitleaks and
+- A credential, a private hostname, a private address or a private repository path. betterleaks and
   `scripts/ci/no-private-refs.sh` run on every change; a hit fails CI.
 - Code imported from a private repository. A rewritten service is written against a captured
   contract with synthetic fixtures.
