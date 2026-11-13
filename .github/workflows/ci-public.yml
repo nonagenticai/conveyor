@@ -238,3 +238,39 @@ jobs:
             docker push "$ref:$tag"
           done
           echo "pushed $ref:$sha $ref:$run $ref:latest"
+
+  # Proves the generic service template (`docker/Dockerfile.service`), which the root `image`
+  # job never exercises: that job builds the deployable, this one builds one package's binary
+  # through the template every absorbed service will ship with. The probe needs no database, so
+  # the smoke is "build, start, answer /health".
+  service-image:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      IMG: conveyor-service:ci
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: build
+        run: |
+          set -euo pipefail
+          docker build --file docker/Dockerfile.service \
+            --build-arg PACKAGE=conveyor-platform \
+            --build-arg BIN=conveyor-health \
+            --tag "$IMG" .
+
+      - name: smoke
+        run: |
+          set -euo pipefail
+          docker run -d --rm --name svc -e BIND_ADDR=0.0.0.0:8080 -p 127.0.0.1::8080 "$IMG"
+          port="$(docker port svc 8080/tcp | head -1 | sed 's/.*://')"
+          for _ in $(seq 1 30); do
+            curl -fsS "http://127.0.0.1:${port}/health" >/dev/null 2>&1 && break
+            sleep 1
+          done
+          out="$(curl -fsS "http://127.0.0.1:${port}/health")"
+          docker rm -f svc
+          echo "$out"
+          [[ "$out" == *'"status":"ok"'* ]]
+          [[ "$out" == *'"service":"conveyor-health"'* ]]
