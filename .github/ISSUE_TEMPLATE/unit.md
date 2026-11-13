@@ -18,6 +18,17 @@ outcome, not the plan's objective.>
 <`docs/plans/slices/S##-*.md` §… · its `00-INDEX.md` row · `docs/evidence/2026-11-10-plan-audit.md`
 §W…/V…. Links only — never paste plan prose.>
 
+## Claim
+<Written at claim time; HEAD updated on every push. Leave the em-dashes while the issue is ready.>
+
+| Field | Value |
+|---|---|
+| Branch | — |
+| HEAD | — |
+| Session | — |
+| Updated | — |
+| Adopted-from | — |
+
 ## References
 | Kind | Reference | Resolves at |
 |---|---|---|

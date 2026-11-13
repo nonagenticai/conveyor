@@ -88,7 +88,7 @@ prose or a checklist is not a blocker line. The number is an issue, never a PR.
 
 | state | label | meaning |
 |---|---|---|
-| ready | `status:ready` | open, no linked PR, no remote branch — safe to claim |
+| ready | `status:ready` | open, no `## Claim` block, no live branch for it, no linked PR — safe to claim |
 | claimed | `status:claimed` | branch pushed + claim comment; work in progress, no PR yet |
 | in review | (native) | one non-draft PR open with `Closes #n` |
 | blocked | `status:blocked` | body carries a plain `Blocker: #N` line naming an open issue; do not claim |
@@ -118,6 +118,9 @@ git log origin/main --grep "#N" --oneline     # already merged
 All four must be empty. If any is non-empty the issue is claimed: **join it**, do not create a
 parallel branch.
 
+The body's `## Claim` block is the fifth check: a body that names a branch and a HEAD is claimed,
+even when the branch list looks empty. Read it before the branch list.
+
 Then check the issue's **Definition of ready** (above). If it fails, do not create a branch: comment
 the exact gaps (missing headings, a reference that does not resolve, a part with no `Verify:`
 scenario, a `Blocker:` line that disagrees with the label) and stop — or fix the body first if you
@@ -135,6 +138,19 @@ gh issue edit N --add-label status:claimed --remove-label status:ready
 gh issue comment N --body 'Claimed. Branch `issue/N-<slug>` at `<sha>`.'
 ```
 
+Write the `## Claim` block in the same operation — it is the machine-readable half of the claim:
+
+| Field | Value |
+|---|---|
+| Branch | `issue/N-<slug>` |
+| HEAD | `<sha>` |
+| Session | `<host>/<agent> (claim nonce <nonce>)` |
+| Updated | `<YYYY-MM-DD>` |
+| Adopted-from | `<previous claim>` or — |
+
+Update the HEAD field on **every push**. A session that sees `status:ready` plus a Claim block has
+found a claim, not a stale label.
+
 - The marker commit **must carry a unique nonce**. Two sessions' "empty" marker commits can
   otherwise share parent/message/second and therefore the same SHA; the loser's push then
   succeeds as "up to date" and both believe they claimed.
@@ -149,6 +165,23 @@ gh issue comment N --body 'Claimed. Branch `issue/N-<slug>` at `<sha>`.'
   branch and PR in the body, comment on the PR with the link, and add `Closes #N` to its body. The
   PR's owner keeps the work; never push to that branch. `conveyor#38` (PR #36) is the worked
   example.
+
+## Abandonment and adoption
+
+A claim is **abandoned** when 48 hours have passed since both the last push to its branch and the
+last comment on its issue. A claim that is merely idle is not abandoned — a status comment holds it,
+and waiting on CI or on a blocker is normal.
+
+Any session may adopt an abandoned claim after the four checks, without the original session's
+permission. Adoption is:
+
+- work on the **same** branch; never create a parallel branch and never force-push;
+- post a takeover comment naming the branch and HEAD you found;
+- record `Adopted-from` in the `## Claim` block, and update it as you push.
+
+`/issue-sweep` reports an abandoned claim (class `abandoned-claim`) and names the adoption action;
+it does not mutate anything. If the original session returns, it joins the branch — the branch's
+HEAD is the arbiter and the latest `<!-- handoff -->` comment is the state.
 
 ## Work and gate
 
@@ -266,9 +299,10 @@ Default priority is issue-number order; a dependency blocker always overrides it
 `status:blocked` issue. Blockers are named in the body; when the blocker lands, the owner of that
 issue flips it to `status:ready`.
 
-For the whole-queue truth report — ready-with-branch, claimed-without-branch, PR-without-`Closes`,
-open-issue-with-merged-PR, and the branch-to-issue map — run the `/issue-sweep` skill. It reports
-and never edits; the owning session flips its own labels.
+For the whole-queue truth report — ready-with-branch, claimed-without-branch, abandoned-claim,
+PR-without-`Closes`, open-issue-with-merged-PR, and the branch-to-issue map — run the
+`/issue-sweep` skill. It reports and never edits; the owning session (or an adopter, after the 48 h
+silence) flips its own labels.
 
 ## Issue creation
 
@@ -279,6 +313,12 @@ per unfinished slice plan** from `.github/ISSUE_TEMPLATE/unit.md` — the full c
 summary. It self-checks before `gh issue create`: required headings, every path resolves, every part
 has a `Verify:` scenario, and the chosen label matches the Dependencies table. A split is the
 documented exception (max 5).
+
+**Issue hygiene is part of the contract.** No issue body or comment may carry a
+`scripts/ci/no-private-refs.sh` HARD pattern, a private repository slug, an internal hostname or an
+address. Name a private service by its public role (“the licensing service”), never by its
+repository path. `issue-create` checks the body before creating it; `/issue-sweep` reports a
+leaking body or comment as drift.
 
 ⚠️ **Historical:** while the integration train (#9) was open, every code issue was `status:blocked`
 with `Blocker: #26`. #9 merged on 2026-11-11 and its files (`control/approvals.rs`,
