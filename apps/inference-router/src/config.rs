@@ -65,6 +65,15 @@ pub struct Config {
     pub policy_epoch_poll_seconds: f64,
     /// `INFERENCE_ROUTER_INTERNAL_SECRET` — the six `/api/internal/*` reads' shared secret.
     pub internal_secret: Option<String>,
+    /// `INFERENCE_ROUTER_INTERNAL_PUBLIC_HOST_SUFFIXES` — Host suffixes that mean the request
+    /// came through the PUBLIC ingress; `/api/internal/*` answers 404 for them.
+    pub internal_public_host_suffixes: Vec<String>,
+    /// `INFERENCE_ROUTER_WHOAMI_RATE_LIMIT_PER_MINUTE` — per client host, per pod.
+    pub whoami_rate_limit_per_minute: u32,
+    /// `INFERENCE_CAPTURE_ALLOWED_CALLERS` — deliberately UNPREFIXED (the reference aliases it).
+    /// `X-App-Id` values allowed to read a captured body; empty means every capture read is 403,
+    /// which is the live deployment's state and the captured golden.
+    pub inference_capture_allowed_callers: Vec<String>,
     /// `COMMERCIAL_PLATFORM_TENANT_IDS` — deliberately UNPREFIXED, matching the live manifest.
     pub commercial_platform_tenant_ids: Vec<String>,
     /// `AUTH_DELEGATING_SUBJECTS` — the FLEET's allowlist of subjects permitted to name another
@@ -140,6 +149,8 @@ pub enum ConfigError {
     InvalidPolicyCacheTtl(String),
     #[error("INFERENCE_ROUTER_POLICY_EPOCH_POLL_SECONDS is not a number in (0, 5]: {0}")]
     InvalidPolicyEpochPoll(String),
+    #[error("INFERENCE_ROUTER_WHOAMI_RATE_LIMIT_PER_MINUTE must be at least 1: {0}")]
+    InvalidWhoamiRateLimit(String),
 }
 
 impl Config {
@@ -288,6 +299,25 @@ impl Config {
         }
 
         let internal_secret = non_empty(lookup("INFERENCE_ROUTER_INTERNAL_SECRET"));
+        let internal_public_host_suffixes =
+            match non_empty(lookup("INFERENCE_ROUTER_INTERNAL_PUBLIC_HOST_SUFFIXES")) {
+                Some(raw) => comma_list(Some(raw)),
+                None => vec!["nonagentic.ai".to_owned()],
+            };
+        let whoami_rate_limit_per_minute: u32 =
+            match non_empty(lookup("INFERENCE_ROUTER_WHOAMI_RATE_LIMIT_PER_MINUTE")) {
+                Some(raw) => raw
+                    .parse()
+                    .map_err(|_| ConfigError::InvalidWhoamiRateLimit(raw.clone()))?,
+                None => 60,
+            };
+        if whoami_rate_limit_per_minute < 1 {
+            return Err(ConfigError::InvalidWhoamiRateLimit(
+                whoami_rate_limit_per_minute.to_string(),
+            ));
+        }
+        let inference_capture_allowed_callers =
+            comma_list(lookup("INFERENCE_CAPTURE_ALLOWED_CALLERS"));
         // UNPREFIXED in the live manifest (it is shared with the workers deployment), so it is
         // read unprefixed here too.
         let commercial_platform_tenant_ids = comma_list(lookup("COMMERCIAL_PLATFORM_TENANT_IDS"));
@@ -320,6 +350,9 @@ impl Config {
             policy_cache_ttl_seconds,
             policy_epoch_poll_seconds,
             internal_secret,
+            internal_public_host_suffixes,
+            whoami_rate_limit_per_minute,
+            inference_capture_allowed_callers,
             commercial_platform_tenant_ids,
             auth_delegating_subjects,
         })
@@ -406,6 +439,45 @@ mod tests {
             .expect("prefixed name is simply unknown")
             .auth_delegating_subjects
             .is_empty()
+        );
+    }
+
+    #[test]
+    fn the_internal_guard_config_matches_the_live_defaults() {
+        let config = parse(&[]).expect("defaults");
+        assert_eq!(
+            config.internal_public_host_suffixes,
+            vec!["nonagentic.ai".to_owned()]
+        );
+        assert_eq!(config.whoami_rate_limit_per_minute, 60);
+        assert!(config.inference_capture_allowed_callers.is_empty());
+
+        let configured = parse(&[
+            (
+                "INFERENCE_ROUTER_INTERNAL_PUBLIC_HOST_SUFFIXES",
+                ".nonagentic.ai, merqi.nl",
+            ),
+            ("INFERENCE_ROUTER_WHOAMI_RATE_LIMIT_PER_MINUTE", "5"),
+            ("INFERENCE_CAPTURE_ALLOWED_CALLERS", " fr , coding "),
+        ])
+        .expect("configured");
+        assert_eq!(
+            configured.internal_public_host_suffixes,
+            vec![".nonagentic.ai".to_owned(), "merqi.nl".to_owned()]
+        );
+        assert_eq!(configured.whoami_rate_limit_per_minute, 5);
+        assert_eq!(
+            configured.inference_capture_allowed_callers,
+            vec!["fr".to_owned(), "coding".to_owned()]
+        );
+
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_WHOAMI_RATE_LIMIT_PER_MINUTE", "0")]),
+            Err(ConfigError::InvalidWhoamiRateLimit("0".to_owned()))
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_WHOAMI_RATE_LIMIT_PER_MINUTE", "soon")]),
+            Err(ConfigError::InvalidWhoamiRateLimit("soon".to_owned()))
         );
     }
 

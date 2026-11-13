@@ -3,12 +3,20 @@
 //! Auth is the shared `X-Internal-Secret` (fail closed: 503 when unconfigured, 401 on a missing or
 //! wrong header). The reads land with the ledger slice; the contract is fixed here.
 
-use axum::http::StatusCode;
+use axum::extract::State;
+use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 use serde::Deserialize;
 use utoipa::IntoParams;
 
 use crate::contract::schemas::{AnyObject, HTTPValidationError};
+use crate::routing::Refusal;
+use crate::state::AppState;
+
+/// The shared `X-Internal-Secret` guard, refused before anything else runs.
+fn guard(state: &AppState, headers: &HeaderMap) -> Result<(), Refusal> {
+    crate::internal::require(headers, state.config())
+}
 
 fn default_call_limit() -> u32 {
     100
@@ -118,7 +126,10 @@ pub struct TimelineQuery {
         (status = 422, body = HTTPValidationError)
     )
 )]
-pub async fn list_inference_calls() -> Response {
+pub async fn list_inference_calls(State(state): State<AppState>, headers: HeaderMap) -> Response {
+    if let Err(refusal) = guard(&state, &headers) {
+        return refusal.into_response();
+    }
     StatusCode::NOT_IMPLEMENTED.into_response()
 }
 
@@ -136,7 +147,10 @@ pub async fn list_inference_calls() -> Response {
         (status = 422, body = HTTPValidationError)
     )
 )]
-pub async fn pinning_summary() -> Response {
+pub async fn pinning_summary(State(state): State<AppState>, headers: HeaderMap) -> Response {
+    if let Err(refusal) = guard(&state, &headers) {
+        return refusal.into_response();
+    }
     StatusCode::NOT_IMPLEMENTED.into_response()
 }
 
@@ -154,7 +168,10 @@ pub async fn pinning_summary() -> Response {
         (status = 422, body = HTTPValidationError)
     )
 )]
-pub async fn repeat_groups() -> Response {
+pub async fn repeat_groups(State(state): State<AppState>, headers: HeaderMap) -> Response {
+    if let Err(refusal) = guard(&state, &headers) {
+        return refusal.into_response();
+    }
     StatusCode::NOT_IMPLEMENTED.into_response()
 }
 
@@ -172,7 +189,10 @@ pub async fn repeat_groups() -> Response {
         (status = 422, body = HTTPValidationError)
     )
 )]
-pub async fn calls_summary() -> Response {
+pub async fn calls_summary(State(state): State<AppState>, headers: HeaderMap) -> Response {
+    if let Err(refusal) = guard(&state, &headers) {
+        return refusal.into_response();
+    }
     StatusCode::NOT_IMPLEMENTED.into_response()
 }
 
@@ -191,7 +211,10 @@ pub async fn calls_summary() -> Response {
         (status = 422, body = HTTPValidationError)
     )
 )]
-pub async fn capture_call() -> Response {
+pub async fn capture_call(State(state): State<AppState>, headers: HeaderMap) -> Response {
+    if let Err(refusal) = guard(&state, &headers) {
+        return refusal.into_response();
+    }
     StatusCode::NOT_IMPLEMENTED.into_response()
 }
 
@@ -209,6 +232,9 @@ pub async fn capture_call() -> Response {
         (status = 422, body = HTTPValidationError)
     )
 )]
-pub async fn served_models_timeline() -> Response {
+pub async fn served_models_timeline(State(state): State<AppState>, headers: HeaderMap) -> Response {
+    if let Err(refusal) = guard(&state, &headers) {
+        return refusal.into_response();
+    }
     StatusCode::NOT_IMPLEMENTED.into_response()
 }
