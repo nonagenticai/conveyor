@@ -8,6 +8,9 @@
 
 use std::collections::BTreeSet;
 
+pub mod normalize;
+pub mod schemas;
+
 /// The captured OpenAPI 3.1 document (26 paths, 35 schemas).
 pub const LOCK_JSON: &str = include_str!("../../contract/openapi.lock.json");
 
@@ -87,6 +90,18 @@ pub fn check_with(
     }
     for extra in published.difference(&declared) {
         problems.push(format!("documented but not registered: {extra}"));
+    }
+
+    // The document itself, under the projection documented in `normalize`.
+    let expected = normalize::normalize(captured);
+    let actual = normalize::normalize(served);
+    if expected != actual {
+        let diffs = normalize::diff(&expected, &actual);
+        problems.push(format!(
+            "document drift ({} difference(s)): {}",
+            diffs.len(),
+            diffs.join(" | ")
+        ));
     }
 
     if problems.is_empty() {
@@ -188,19 +203,67 @@ mod tests {
         );
     }
 
+    /// The components are checked on their own while the route slices land, so a schema
+    /// difference is reported as a schema difference and not buried under missing operations.
     #[test]
-    fn the_current_scaffold_truthfully_reports_the_routes_it_lacks() {
+    fn the_components_match_the_capture() {
         let served = serde_json::to_value(crate::router::openapi()).expect("serialises");
-        let error = check(&served, crate::router::ROUTES)
-            .expect_err("the contract is not complete until the migration slices land");
+        let captured = lock().expect("capture");
+        let expected = normalize::normalize(&captured)["components"].clone();
+        let actual = normalize::normalize(&served)["components"].clone();
+        let diffs = normalize::diff(&expected, &actual);
+        assert!(diffs.is_empty(), "{}", diffs.join("\n"));
+    }
+
+    fn served() -> serde_json::Value {
+        serde_json::to_value(crate::router::openapi()).expect("serialises")
+    }
+
+    #[test]
+    fn the_served_contract_matches_the_capture() {
+        check(&served(), crate::router::ROUTES).expect("the served contract equals the capture");
+    }
+
+    /// The gate must be able to fail. A check that only ever passes is not a check.
+    #[test]
+    fn a_dropped_route_fails_even_when_the_declaration_is_dropped_with_it() {
+        let mut drifted = served();
+        drifted["paths"]
+            .as_object_mut()
+            .expect("paths")
+            .remove("/api/chat/completions");
+        let routes: Vec<(&str, &str)> = crate::router::ROUTES
+            .iter()
+            .copied()
+            .filter(|(_, path)| *path != "/api/chat/completions")
+            .collect();
+        let error = check(&drifted, &routes).expect_err("a dropped route must fail");
+        assert!(error.to_string().contains("document drift"), "{error}");
+    }
+
+    #[test]
+    fn a_dropped_schema_property_fails() {
+        let mut drifted = served();
+        drifted["components"]["schemas"]["ChatCompletionRequest"]["properties"]
+            .as_object_mut()
+            .expect("properties")
+            .remove("model");
+        let error =
+            check(&drifted, crate::router::ROUTES).expect_err("a dropped property must fail");
         let message = error.to_string();
         assert!(
-            message.contains("not registered: POST /api/chat/completions"),
+            message.contains("ChatCompletionRequest/properties/model"),
             "{message}"
         );
-        assert!(
-            message.contains("not registered: GET /api/models"),
-            "{message}"
-        );
+    }
+
+    #[test]
+    fn a_changed_property_type_fails() {
+        let mut drifted = served();
+        drifted["components"]["schemas"]["ChatCompletionRequest"]["properties"]["stream"]["type"] =
+            serde_json::json!("string");
+        let error = check(&drifted, crate::router::ROUTES).expect_err("a changed type must fail");
+        let message = error.to_string();
+        assert!(message.contains("/properties/stream/type"), "{message}");
     }
 }
