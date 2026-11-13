@@ -96,13 +96,16 @@ async fn every_internal_route_is_not_found_through_the_public_ingress() {
 
 #[tokio::test]
 async fn the_right_secret_reaches_the_handler() {
-    // The handlers are still 501 stubs in this slice: reaching one is the proof the guard
-    // passed. S8a.3 replaces the 501 with the read.
+    // Reaching the handler is the proof the guard passed. This state has no ledger pool, so the
+    // five reads answer 503 — and /capture answers 403, because its allowlist is empty (the live
+    // state). Either way the answer is NOT the guard's 401/503/404.
     for path in ROUTES {
-        assert_eq!(
-            get(state(Some(SECRET)), path, &[("x-internal-secret", SECRET)]).await,
-            StatusCode::NOT_IMPLEMENTED,
-            "{path}"
-        );
+        let status = get(state(Some(SECRET)), path, &[("x-internal-secret", SECRET)]).await;
+        let expected = if path.ends_with("/capture") {
+            StatusCode::FORBIDDEN
+        } else {
+            StatusCode::SERVICE_UNAVAILABLE
+        };
+        assert_eq!(status, expected, "{path}");
     }
 }

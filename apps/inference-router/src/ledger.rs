@@ -88,11 +88,11 @@ fn uuid_of(value: Option<&str>) -> Option<Uuid> {
 }
 
 /// Canonical JSON: sorted keys (serde_json's map is ordered) and compact separators.
-fn canonical_json(value: &Value) -> String {
+pub(crate) fn canonical_json(value: &Value) -> String {
     serde_json::to_string(value).expect("a JSON value always serialises")
 }
 
-fn sha256_hex(text: &str) -> String {
+pub(crate) fn sha256_hex(text: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(text.as_bytes());
     format!("{:x}", hasher.finalize())
