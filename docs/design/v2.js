@@ -897,7 +897,13 @@ window.installV2 = function (api, enterprise) {
     if (liveBoards) {
       const projects = list((live.programme || {}).projects);
       if (!projects.length) return panel("Boards", note("The snapshot carries boards but no projects."));
-      const project = projects.find((row) => row.id === v.planProject) || projects[0];
+      // The snapshot orders projects by key, which puts the cross-cutting keys first. The
+      // plan surface opens on the buildout: S slices, then T slices, then the rest.
+      const rank = (key) => (/^S/.test(String(key)) ? 0 : /^T/.test(String(key)) ? 1 : 2);
+      const ordered = [...projects].sort(
+        (a, b) => rank(a.key) - rank(b.key) || String(a.key).localeCompare(String(b.key)),
+      );
+      const project = ordered.find((row) => row.id === v.planProject) || ordered[0];
       const board = list(work.boards).find((row) => row.project_id === project.id);
       if (!board) return panel(E(project.name), note("This project has no board in the snapshot."));
       const lists = list(work.lists)
@@ -930,7 +936,7 @@ window.installV2 = function (api, enterprise) {
           );
         })
         .join("");
-      return `${panel("Project", `<label class="e-select">Project <select data-v2-input="plan-project">${projects.map((row) => `<option value="${E(row.id)}" ${row.id === project.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`).join("")}</select></label><p class="muted">Board <span class="mono">${E(board.name)}</span> · ${cards.length} cards · ${lists.length} lanes · read from snapshot ${E(short((live || {}).payload_sha256))}.</p>`)}${lanes}`;
+      return `${panel("Project", `<label class="e-select">Project <select data-v2-input="plan-project">${ordered.map((row) => `<option value="${E(row.id)}" ${row.id === project.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`).join("")}</select></label><p class="muted">Board <span class="mono">${E(board.name)}</span> · ${cards.length} cards · ${lists.length} lanes · read from snapshot ${E(short((live || {}).payload_sha256))}.</p>`)}${lanes}`;
     }
     const seed = window.CONVEYOR_PLAN_SEED;
     const projects = list((seed || {}).projects);
