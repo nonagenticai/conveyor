@@ -1,0 +1,4 @@
+GET
+/api/providers/stub-openai/models
+-H
+authorization: Bearer stub-licence-token-000000000000000000000000

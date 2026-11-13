@@ -1,0 +1,4 @@
+GET
+/api/models
+-H
+authorization: Bearer stub-licence-token-000000000000000000000000

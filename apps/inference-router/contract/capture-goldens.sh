@@ -57,50 +57,18 @@ TENANT_OVER="00000000-0000-4000-8000-0000000000ba"
 TENANT_NOBUDGET="00000000-0000-4000-8000-0000000000cb"
 SECRET="stub-internal-secret"
 
-# normalize: the only transforms allowed. Each one removes a value that is true of THIS run and
-# false of the next — never a difference between two implementations.
-normalize() {
-    jq -S '
-      # Epoch clocks: the old service stamps "created" with time.time().
-      if type == "object" then
-        walk(
-          if type == "object" and has("created") and (.created | type) == "number"
-          then .created = 0 else . end
-        )
-      else . end
-      # Durations and generated ids, wherever they appear.
-      | walk(
-          if type == "object" then
-            with_entries(
-              if (.key | test("(^|_)(latency_ms|duration_ms|elapsed_ms)$"))
-              then .value = 0
-              else . end
-            )
-          else . end
-        )
-      # Any RFC3339 timestamp, and any bare date (the timeline day bucket).
-      | walk(
-          if type == "string" and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}")
-          then "TIMESTAMP"
-          elif type == "string" and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
-          then "DATE" else . end
-        )
-    ' 2>/dev/null || cat
-}
+# normalize: the one shared normaliser — see normalize.sh for its contract.
+# shellcheck source=normalize.sh
+. "$here/normalize.sh"
 
 record() { # record <name> <status> <content-type> <body-file>
     local name="$1" status="$2" ctype="$3" bodyfile="$4" norm
     if printf '%s' "$ctype" | grep -q 'text/event-stream'; then
-        # SSE: normalise each data line independently, keep the framing byte-for-byte.
-        norm="$(sed 's/^data: //' "$bodyfile" | while IFS= read -r line; do
-            if [ "$line" = "[DONE]" ] || [ -z "$line" ]; then printf '%s\n' "$line"
-            else printf 'data: %s\n' "$(printf '%s' "$line" | normalize | jq -c . 2>/dev/null || printf '%s' "$line")"
-            fi
-        done)"
+        norm="$(normalize_sse < "$bodyfile")"
     else
         norm="$(normalize < "$bodyfile")"
     fi
-    printf '%s' "$norm" > "$out/$name.body"
+    printf '%s\n' "$norm" > "$out/$name.body"
     printf '%s\n' "$status" > "$out/$name.status"
     printf '%s\n' "$ctype" > "$out/$name.content-type"
     printf '  %-34s %s\n' "$name" "$status"
@@ -109,6 +77,12 @@ record() { # record <name> <status> <content-type> <body-file>
 request() { # request <name> <method> <path> [curl args...]
     local name="$1" method="$2" path="$3"; shift 3
     local body status ctype tmp
+    # The request is recorded WITH the golden (method, path, then the curl args one per line,
+    # none of which contains a newline). verify.sh replays from this file, so the case list
+    # exists once and a golden can never be checked against a request it was not captured from.
+    # `printf '%s\n'` with NO arguments still prints one blank line, which would become an empty
+    # curl argument ("blank argument where content is expected"), so the args are conditional.
+    { printf '%s\n%s\n' "$method" "$path"; [ "$#" -eq 0 ] || printf '%s\n' "$@"; } > "$out/$name.request"
     tmp="$(mktemp)"
     status="$(curl -sS -o "$tmp" -D /tmp/ir-hdr.$$ -w '%{http_code}' -X "$method" "$live$path" "$@")" || status="000"
     ctype="$(awk 'BEGIN{IGNORECASE=1} /^content-type:/{sub(/^[^:]*:[[:space:]]*/,""); print; exit}' /tmp/ir-hdr.$$ | tr -d '\r')"
@@ -175,7 +149,11 @@ request completion_no_active_budget POST /api/chat/completions "${json[@]}" \
 
 # --- internal reads ----------------------------------------------------------------------
 internal=(-H "X-Internal-Secret: $SECRET")
-request internal_calls            GET '/api/internal/inference-calls?limit=2' "${internal[@]}"
+# Filtered by correlation, not "the two most recent": the streamed ledger row is written by a
+# background task, so its commit can land after the next request's row. A recency-ordered golden
+# is therefore a race, not a contract (measured: capture and verify disagreed on which row was
+# newest while every request hash was stable).
+request internal_calls            GET '/api/internal/inference-calls?correlation_id=00000000-0000-4000-8000-0000000000e1' "${internal[@]}"
 request internal_summary          GET /api/internal/inference-calls/summary "${internal[@]}"
 request internal_pinning_summary  GET /api/internal/inference-calls/pinning-summary "${internal[@]}"
 request internal_repeat_groups    GET /api/internal/inference-calls/repeat-groups "${internal[@]}"

@@ -1,0 +1,4 @@
+GET
+/api/internal/inference-calls/summary
+-H
+X-Internal-Secret: stub-internal-secret

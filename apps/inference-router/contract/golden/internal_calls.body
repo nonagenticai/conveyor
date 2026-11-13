@@ -1,45 +1,21 @@
 {
   "as_of": "TIMESTAMP",
-  "limit": 2,
+  "limit": 100,
   "rows": [
     {
       "at": "TIMESTAMP",
-      "caller": null,
+      "caller": "golden-worker",
       "captured": false,
-      "correlation_id": null,
+      "correlation_id": "00000000-0000-4000-8000-0000000000e1",
       "finish_reason": "stop",
       "frequency_penalty": null,
-      "id": 7,
+      "id": 5,
       "latency_ms": 0,
       "licence_id": "00000000-0000-4000-8000-0000000000c1",
       "licence_source": "header",
       "max_tokens": 8,
       "repetition_penalty": null,
-      "request_sha256": "0e324967edcb3c54f764126d0d435040b908db840581ef4b44fe334f5b757d49",
-      "requested_model": "stub-model",
-      "response_sha256": "ba6f4f2b57c61a5dcf72a7b77e61340cfd9239c18f3e558200fb81b7d85637d1",
-      "seed": null,
-      "served_model": "stub-model",
-      "served_model_root": null,
-      "served_provider": "stub-openai",
-      "status": "ok",
-      "temperature": 0.1,
-      "tenant_id": "00000000-0000-4000-8000-0000000000cb"
-    },
-    {
-      "at": "TIMESTAMP",
-      "caller": null,
-      "captured": false,
-      "correlation_id": null,
-      "finish_reason": "stop",
-      "frequency_penalty": null,
-      "id": 6,
-      "latency_ms": 0,
-      "licence_id": "00000000-0000-4000-8000-0000000000c1",
-      "licence_source": "header",
-      "max_tokens": 8,
-      "repetition_penalty": null,
-      "request_sha256": "9419e2d968e8938055b08c8c238c5c14759212e1421b772fff9b72d421e8e5df",
+      "request_sha256": "86e40348206a3f554dd6bf74ed35eef822db7ffe9e84f731b33da1dfd6f45813",
       "requested_model": "stub-model",
       "response_sha256": "ba6f4f2b57c61a5dcf72a7b77e61340cfd9239c18f3e558200fb81b7d85637d1",
       "seed": null,
@@ -52,5 +28,5 @@
     }
   ],
   "source": "inference_call",
-  "total": 7
+  "total": 1
 }
