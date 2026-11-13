@@ -114,16 +114,28 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
     let slot_wait = std::time::Duration::from_secs_f64(config.provider_slot_wait_seconds);
     let router_service = RouterService::new(catalog, slot_wait)?;
     let pool = db::connect(&database_url, 5).await?;
+    // The policy store polls `policy_epoch` and clears its cache when it moves; no LISTEN/NOTIFY
+    // (the database is reached through a transaction-pooling pgbouncer).
+    let policy = std::sync::Arc::new(conveyor_inference_router::policy::PolicyStore::new(
+        Some(pool.clone()),
+        std::time::Duration::from_secs_f64(config.policy_cache_ttl_seconds),
+    ));
+    tokio::spawn(std::sync::Arc::clone(&policy).run_epoch_poller(
+        std::time::Duration::from_secs_f64(config.policy_epoch_poll_seconds),
+    ));
     tracing::info!(
         environment = %config.environment,
         providers = %config.providers_config_path.display(),
         docs = config.docs_enabled,
+        policy = ?config.policy_mode,
+        budget_gate = ?config.budget_gate_mode,
         "serving"
     );
     // The budget gate and the cost sink are wired to their real implementations by the slices
     // that add them; until then the defaults are explicit rather than absent.
     let deps = AppDeps {
         ledger: Some(pool),
+        policy,
         ..AppDeps::default()
     };
     let state = AppState::with_deps(config, router_service, deps);

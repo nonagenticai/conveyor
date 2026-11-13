@@ -45,6 +45,7 @@ async fn stub_provider() -> std::net::SocketAddr {
         axum::Json(json!({
             "id": "chatcmpl-test",
             "model": "stub-model",
+            "served_model": "stub-model",
             "choices": [{"index": 0, "message": {"role": "assistant", "content": "stub completion"}, "finish_reason": "stop"}],
             "usage": {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
         }))
@@ -93,6 +94,7 @@ async fn a_served_request_writes_its_row_and_one_cost_event() {
             ledger: Some(db.pool.clone()),
             budget: Arc::new(AllowAllGate),
             cost: recorder.clone(),
+            ..AppDeps::default()
         },
     );
 
@@ -225,6 +227,7 @@ async fn a_database_failure_never_fails_the_customers_request() {
             ledger: Some(db.pool.clone()),
             budget: Arc::new(AllowAllGate),
             cost: Arc::new(Recorder::default()),
+            ..AppDeps::default()
         },
     );
     let response = conveyor_inference_router::router::router(state)
@@ -237,4 +240,137 @@ async fn a_database_failure_never_fails_the_customers_request() {
         .await
         .expect("router answers");
     assert_eq!(response.status(), axum::http::StatusCode::OK);
+}
+
+/// The oracle's own policy document (`contract/stubs/policy-local.json`) — the same bytes the
+/// pinned image was seeded with. Using the file, not a copy of its shape, is the point.
+const POLICY_DOC: &str = include_str!("../contract/stubs/policy-local.json");
+
+const TENANT: &str = "00000000-0000-4000-8000-0000000000a1";
+
+async fn seed_policy(pool: &sqlx::PgPool, doc: &str) {
+    let tenant = uuid::Uuid::parse_str(TENANT).expect("tenant uuid");
+    let doc: Value = serde_json::from_str(doc).expect("a policy document");
+    sqlx::query(
+        "INSERT INTO tenant_inference_policy_version (tenant_id, version, doc, doc_sha256, actor_kind, actor_ref_hash)
+         VALUES ($1, 1, $2, 'test', 'test', 'test')",
+    )
+    .bind(tenant)
+    .bind(&doc)
+    .execute(pool)
+    .await
+    .expect("the version row");
+    sqlx::query("INSERT INTO tenant_inference_policy (tenant_id, active_version) VALUES ($1, 1)")
+        .bind(tenant)
+        .execute(pool)
+        .await
+        .expect("the active row");
+}
+
+fn policy_config() -> Config {
+    Config::from_lookup(|key| (key == "INFERENCE_ROUTER_POLICY_MODE").then(|| "on".to_owned()))
+        .expect("policy mode on")
+}
+
+async fn policy_state(pool: sqlx::PgPool, address: std::net::SocketAddr) -> AppState {
+    let policy_store = Arc::new(conveyor_inference_router::policy::PolicyStore::new(
+        Some(pool.clone()),
+        Duration::from_secs(15),
+    ));
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: stub-model\n    model_aliases:\n      stub-model: stub-model\n      local-llm: stub-model\ndefault_chain: [stub-openai]\n"
+    ))
+    .expect("catalog");
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    AppState::with_deps(
+        policy_config(),
+        router,
+        AppDeps {
+            ledger: Some(pool),
+            budget: Arc::new(AllowAllGate),
+            cost: Arc::new(Recorder::default()),
+            policy: policy_store,
+        },
+    )
+}
+
+fn policy_request(model: &str) -> Body {
+    Body::from(
+        json!({
+            "model": model,
+            "messages": [{"role": "user", "content": "attributed"}],
+            "max_tokens": 8
+        })
+        .to_string(),
+    )
+}
+
+fn policy_headers() -> axum::http::request::Builder {
+    Request::post("/api/chat/completions")
+        .header("content-type", "application/json")
+        .header("x-tenant-id", TENANT)
+}
+
+#[tokio::test]
+async fn a_policy_routed_request_records_the_hop_it_took() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+    seed_policy(&db.pool, POLICY_DOC).await;
+
+    let address = stub_provider().await;
+    let state = policy_state(db.pool.clone(), address).await;
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            policy_headers()
+                // The policy's platform hop is named by the reserved model.
+                .body(policy_request("local-llm"))
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+
+    let row: Value =
+        sqlx::query_scalar("SELECT row_to_json(t) FROM (SELECT * FROM inference_call LIMIT 1) t")
+            .fetch_one(&db.pool)
+            .await
+            .expect("a ledger row");
+    // The oracle's own policy-routed row (`contract/golden/ledger_policy_routed.json`).
+    assert_eq!(row["requested_model"], "local-llm");
+    assert_eq!(row["served_model"], "stub-model");
+    assert_eq!(row["policy_version"], 1);
+    assert_eq!(row["llm_setup"], 1);
+    assert_eq!(row["hop_index"], 0);
+    assert_eq!(row["hop_reason"], "first");
+    assert_eq!(row["key_owner"], "platform");
+}
+
+#[tokio::test]
+async fn a_policy_refusal_happens_before_anything_is_dialled_or_written() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+    seed_policy(&db.pool, POLICY_DOC).await;
+
+    let address = stub_provider().await;
+    let state = policy_state(db.pool.clone(), address).await;
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            policy_headers()
+                // A concrete model the policy does not name: refused, not served outside it.
+                .body(policy_request("stub-model"))
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::BAD_REQUEST);
+
+    let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM inference_call")
+        .fetch_one(&db.pool)
+        .await
+        .expect("count");
+    assert_eq!(rows, 0, "a refused request must not reach the ledger");
 }

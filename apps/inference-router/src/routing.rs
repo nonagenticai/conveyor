@@ -20,6 +20,7 @@ use axum::http::StatusCode;
 
 use crate::catalog::Catalog;
 use crate::contract::schemas::{ChatCompletionRequest, ChatCompletionResponse};
+use crate::policy::ResolvedHop;
 use crate::provider::{self, Provider, UpstreamError};
 
 /// The `X-IR-Error-Classification` header, exactly as the live service spells it.
@@ -103,11 +104,22 @@ pub struct AttemptFailure {
     pub describe: String,
 }
 
+/// The hop that served a policy-routed request, as the ledger records it.
+#[derive(Debug, Clone)]
+pub struct ServedHop {
+    pub index: i16,
+    /// `first` for the head of the chain, `failover_error` for anything reached after a failure.
+    pub reason: &'static str,
+    pub key_owner: &'static str,
+}
+
 /// One completion call: the answer (or the refusal), plus every attempt it made on the way.
 #[derive(Debug)]
 pub struct CompletionOutcome {
     pub response: Result<ChatCompletionResponse, Refusal>,
     pub attempts: Vec<ProviderAttempt>,
+    /// `Some` only when a tenant inference policy routed the request.
+    pub served_hop: Option<ServedHop>,
 }
 
 /// The providers, built once at boot.
@@ -151,11 +163,18 @@ impl RouterService {
     }
 
     /// Serve one non-streaming completion, with every attempt it made.
+    ///
+    /// `policy` wins over the `X-Provider` pin and the alias auto-pin: a tenant with an active
+    /// policy is routed by it, and the pin has already narrowed the hops during resolution.
     pub async fn complete(
         &self,
         request: &ChatCompletionRequest,
         x_provider: Option<&str>,
+        policy: Option<&[ResolvedHop]>,
     ) -> CompletionOutcome {
+        if let Some(hops) = policy {
+            return self.complete_policy(hops, request).await;
+        }
         match self.route(request, x_provider) {
             Route::Pinned {
                 provider,
@@ -168,6 +187,7 @@ impl RouterService {
             Route::Refused(refusal) => CompletionOutcome {
                 response: Err(refusal),
                 attempts: Vec::new(),
+                served_hop: None,
             },
         }
     }
@@ -251,6 +271,7 @@ impl RouterService {
                     "unknown_provider",
                 )),
                 attempts,
+                served_hop: None,
             };
         };
         let started = Instant::now();
@@ -272,6 +293,7 @@ impl RouterService {
                             "invalid_request_error",
                         )),
                         attempts,
+                        served_hop: None,
                     };
                 }
                 let status = if matches!(error, UpstreamError::QueueRejected { .. }) {
@@ -286,7 +308,11 @@ impl RouterService {
                 ))
             }
         };
-        CompletionOutcome { response, attempts }
+        CompletionOutcome {
+            response,
+            attempts,
+            served_hop: None,
+        }
     }
 
     async fn complete_chain(
@@ -315,6 +341,7 @@ impl RouterService {
                     return CompletionOutcome {
                         response: Ok(response),
                         attempts,
+                        served_hop: None,
                     };
                 }
                 Err(error) => {
@@ -338,7 +365,93 @@ impl RouterService {
                 "chain_empty",
             )),
         };
-        CompletionOutcome { response, attempts }
+        CompletionOutcome {
+            response,
+            attempts,
+            served_hop: None,
+        }
+    }
+    /// Dispatch a policy-routed request through the resolved hops, in order.
+    ///
+    /// A hop that fails is followed only when the policy says `failover_on_error`; otherwise the
+    /// chain stops there and the caller sees the 503. Every attempt is recorded either way.
+    async fn complete_policy(
+        &self,
+        hops: &[ResolvedHop],
+        request: &ChatCompletionRequest,
+    ) -> CompletionOutcome {
+        let mut attempts = Vec::new();
+        let mut last: Option<UpstreamError> = None;
+        for hop in hops {
+            let Some(provider) = self.providers.get(&hop.hop.target.provider) else {
+                continue;
+            };
+            let model_override = Some(hop.hop.model.as_str());
+            let started = Instant::now();
+            let result = provider.complete(request, model_override).await;
+            attempts.push(attempt_of(
+                &hop.hop.target.provider,
+                model_override,
+                started,
+                &result,
+            ));
+            match result {
+                Ok(upstream) => {
+                    let mut response = upstream.response;
+                    response.served_provider = Some(hop.hop.target.provider.clone());
+                    return CompletionOutcome {
+                        response: Ok(response),
+                        attempts,
+                        served_hop: Some(ServedHop {
+                            index: hop.index,
+                            reason: if hop.index == 0 {
+                                "first"
+                            } else {
+                                "failover_error"
+                            },
+                            key_owner: key_owner(&hop.hop.target.kind),
+                        }),
+                    };
+                }
+                Err(error) => {
+                    let failover = hop.hop.failover_on_error;
+                    last = Some(error);
+                    if !failover {
+                        break;
+                    }
+                }
+            }
+        }
+        let response = match last {
+            Some(error) => Err(Refusal::detail(
+                StatusCode::SERVICE_UNAVAILABLE,
+                format!(
+                    "All providers failed. Last error: {}: {}",
+                    error.provider(),
+                    error.describe()
+                ),
+                error.classification(),
+            )),
+            None => Err(Refusal::detail(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "No providers available for this request",
+                "chain_empty",
+            )),
+        };
+        CompletionOutcome {
+            response,
+            attempts,
+            served_hop: None,
+        }
+    }
+}
+
+/// `inference_call.key_owner`: which party's credential a hop would spend.
+fn key_owner(kind: &str) -> &'static str {
+    match kind {
+        "owner" => "owner",
+        "byo" => "byo",
+        _ => "platform",
     }
 }
 
@@ -498,7 +611,7 @@ default_chain: [pgx-local, deepseek]
     #[tokio::test]
     async fn an_alias_auto_pins_to_its_owner() {
         let response = service(Ok(()))
-            .complete(&request("tier-high"), None)
+            .complete(&request("tier-high"), None, None)
             .await
             .response
             .expect("completion");
@@ -509,7 +622,7 @@ default_chain: [pgx-local, deepseek]
     async fn an_x_provider_pin_is_honoured_and_a_failure_is_not_failed_over() {
         let service = service(Err(("status", "boom")));
         let error = service
-            .complete(&request("local-llm"), Some("pgx-local"))
+            .complete(&request("local-llm"), Some("pgx-local"), None)
             .await
             .response
             .expect_err("pinned failure");
@@ -524,7 +637,7 @@ default_chain: [pgx-local, deepseek]
         // Even with a chain that would retry, the call was pinned.
         let request = request("tier-high");
         let error = service
-            .complete(&request, Some("pgx-local"))
+            .complete(&request, Some("pgx-local"), None)
             .await
             .response
             .expect_err("pinned");
@@ -534,7 +647,7 @@ default_chain: [pgx-local, deepseek]
     #[tokio::test]
     async fn an_unknown_pin_is_a_400() {
         let error = service(Ok(()))
-            .complete(&request("m"), Some("ghost"))
+            .complete(&request("m"), Some("ghost"), None)
             .await
             .response
             .expect_err("unknown");
@@ -577,7 +690,7 @@ default_chain: [pgx-local]
             slot_wait: Duration::from_secs(1),
         };
         let error = service
-            .complete(&request("deepseek-v4-flash"), None)
+            .complete(&request("deepseek-v4-flash"), None, None)
             .await
             .response
             .expect_err("nothing can serve it");
@@ -590,7 +703,7 @@ default_chain: [pgx-local]
     async fn a_non_alias_model_rides_the_chain_and_a_failure_is_a_503() {
         let service = service(Err(("status", "boom")));
         let error = service
-            .complete(&request("some-worker-name"), None)
+            .complete(&request("some-worker-name"), None, None)
             .await
             .response
             .expect_err("chain");
@@ -608,7 +721,7 @@ default_chain: [pgx-local]
     async fn a_bad_request_is_passed_through_as_a_400_envelope() {
         let service = service(Err(("bad_request", "prompt too long")));
         let error = service
-            .complete(&request("local-llm"), Some("pgx-local"))
+            .complete(&request("local-llm"), Some("pgx-local"), None)
             .await
             .response
             .expect_err("400");
@@ -621,7 +734,7 @@ default_chain: [pgx-local]
     async fn every_attempt_is_recorded_even_when_the_request_fails() {
         // A failed request still made an attempt that the cost bus must bill.
         let outcome = service(Err(("status", "boom")))
-            .complete(&request("local-llm"), Some("pgx-local"))
+            .complete(&request("local-llm"), Some("pgx-local"), None)
             .await;
         assert!(outcome.response.is_err());
         assert_eq!(outcome.attempts.len(), 1);
@@ -633,7 +746,9 @@ default_chain: [pgx-local]
         assert_eq!(failure.classification, "upstream_5xx");
 
         // A served request records the attempt with no failure.
-        let outcome = service(Ok(())).complete(&request("tier-high"), None).await;
+        let outcome = service(Ok(()))
+            .complete(&request("tier-high"), None, None)
+            .await;
         assert!(outcome.response.is_ok());
         assert_eq!(outcome.attempts.len(), 1);
         assert!(outcome.attempts[0].failure.is_none());

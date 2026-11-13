@@ -10,13 +10,30 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 
 use crate::auth::CallerIdentity;
+use crate::config::PolicyMode;
 use crate::contract::schemas::{
     ChatCompletionRequest, ChatCompletionResponse, HTTPValidationError,
 };
 use crate::ledger::{self, CallContext, LedgerRow};
 use crate::metering::{CostEvent, ZERO_COST_USD};
+use crate::policy::{self, ResolvedHop};
 use crate::routing::{CompletionOutcome, ProviderAttempt, Refusal};
 use crate::state::AppState;
+
+/// The reference's fixed 400 body for a request its policy cannot serve.
+const CUSTOMER_UNAVAILABLE: &str = "The requested provider or model is not available to this \
+                                    tenant. Request model 'local-llm'.";
+
+/// The measured 401 body when a policy demands a proven tenant and the caller is not.
+const TENANT_NOT_PROVEN: &str =
+    "Caller licence could not be introspected; caller is not authorised";
+
+/// What a policy decided for this request, beyond the hops themselves.
+struct PolicyDecision {
+    hops: Vec<ResolvedHop>,
+    version: i32,
+    llm_setup: i16,
+}
 
 #[utoipa::path(
     post,
@@ -77,13 +94,80 @@ pub async fn create_chat_completion(
     let x_provider = headers
         .get("x-provider")
         .and_then(|value| value.to_str().ok());
-    let outcome = state.router().complete(&request, x_provider).await;
+    // Policy routing is resolved AFTER the tenant is final and BEFORE anything can spend.
+    let decision = match tenant_policy(&state, &identity, &request, x_provider).await {
+        Ok(decision) => decision,
+        Err(refusal) => return refusal.into_response(),
+    };
+    let hops = decision.as_ref().map(|decision| decision.hops.as_slice());
+    let outcome = state.router().complete(&request, x_provider, hops).await;
     // The write path runs on EVERY outcome, not only on success: a request that failed over spent
     // money on the attempts that did not serve it, and the cost bus is billed per attempt.
-    record(&state, &identity, &headers, &request, &outcome).await;
+    record(
+        &state,
+        &identity,
+        &headers,
+        &request,
+        &outcome,
+        decision.as_ref(),
+    )
+    .await;
     match outcome.response {
         Ok(response) => Json(response).into_response(),
         Err(refusal) => refusal.into_response(),
+    }
+}
+
+/// The tenant's active policy, if one applies to this request.
+///
+/// A policy applies only when `POLICY_MODE=on`, the caller is not a PROVEN platform tenant, and
+/// the tenant actually has one. An asserted platform id is a customer: its policy applies.
+async fn tenant_policy(
+    state: &AppState,
+    identity: &CallerIdentity,
+    request: &ChatCompletionRequest,
+    x_provider: Option<&str>,
+) -> Result<Option<PolicyDecision>, Refusal> {
+    if state.config().policy_mode != PolicyMode::On {
+        return Ok(None);
+    }
+    let Some(tenant) = identity.tenant_id.as_deref() else {
+        return Ok(None);
+    };
+    let listed = state
+        .config()
+        .commercial_platform_tenant_ids
+        .iter()
+        .any(|id| id.eq_ignore_ascii_case(tenant));
+    if listed && identity.verified {
+        return Ok(None);
+    }
+    let Some(active) = state.deps().policy.get_active(tenant).await else {
+        return Ok(None);
+    };
+    if active.requires_proven_tenant() && !identity.verified {
+        let mut refusal = Refusal::detail(
+            StatusCode::UNAUTHORIZED,
+            TENANT_NOT_PROVEN,
+            "tenant_not_proven",
+        );
+        refusal
+            .headers
+            .push(("WWW-Authenticate", "Bearer".to_owned()));
+        return Err(refusal);
+    }
+    let model_explicit = request.model != policy::DEFAULT_MODEL;
+    match policy::resolve(&active.doc, &request.model, model_explicit, x_provider) {
+        Some(hops) => Ok(Some(PolicyDecision {
+            hops,
+            version: active.version,
+            llm_setup: active.llm_setup(),
+        })),
+        None => Err(Refusal::detail(
+            StatusCode::BAD_REQUEST,
+            CUSTOMER_UNAVAILABLE,
+            "outside_policy",
+        )),
     }
 }
 
@@ -108,7 +192,9 @@ async fn record(
     headers: &HeaderMap,
     request: &ChatCompletionRequest,
     outcome: &CompletionOutcome,
+    decision: Option<&PolicyDecision>,
 ) {
+    let served_hop = outcome.served_hop.as_ref();
     let context = CallContext {
         tenant_id: identity.tenant_id.clone(),
         license_id: identity.license_id.clone(),
@@ -119,7 +205,12 @@ async fn record(
         card_id: attribution(headers, "x-aa-card-id"),
         project_id: attribution(headers, "x-project-id"),
         parent_execution_id: attribution(headers, "x-aa-parent-exec"),
-        ..CallContext::default()
+        // Only a policy-routed request carries these; a global-routed one leaves them null.
+        policy_version: decision.map(|decision| decision.version),
+        llm_setup: decision.map(|decision| decision.llm_setup),
+        hop_index: served_hop.map(|hop| hop.index),
+        hop_reason: served_hop.map(|hop| hop.reason.to_owned()),
+        key_owner: served_hop.map(|hop| hop.key_owner.to_owned()),
     };
 
     let served = outcome.response.as_ref().ok();

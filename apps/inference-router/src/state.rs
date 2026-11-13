@@ -10,6 +10,7 @@ use crate::auth::{self, CallerIdentity, Introspector};
 use crate::billing::{AllowAllGate, BudgetGate};
 use crate::config::Config;
 use crate::metering::{CostSink, NoopCostSink};
+use crate::policy::PolicyStore;
 use crate::routing::{Refusal, RouterService};
 
 /// The request-path collaborators that talk to other services.
@@ -21,6 +22,8 @@ pub struct AppDeps {
     pub ledger: Option<PgPool>,
     pub budget: Arc<dyn BudgetGate>,
     pub cost: Arc<dyn CostSink>,
+    /// No pool is `None` only in unit and health tests, where no tenant can have a policy.
+    pub policy: Arc<PolicyStore>,
 }
 
 impl Default for AppDeps {
@@ -29,6 +32,7 @@ impl Default for AppDeps {
             ledger: None,
             budget: Arc::new(AllowAllGate),
             cost: Arc::new(NoopCostSink),
+            policy: Arc::new(PolicyStore::new(None, std::time::Duration::from_secs(15))),
         }
     }
 }
