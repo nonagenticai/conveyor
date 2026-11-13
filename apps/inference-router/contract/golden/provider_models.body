@@ -7,6 +7,10 @@
     {
       "id": "alias-model",
       "object": "model"
+    },
+    {
+      "id": "local-llm",
+      "object": "model"
     }
   ],
   "object": "list",

@@ -18,3 +18,34 @@ the same commit:
 
 `capture.sh` needs `curl`, `jq` and `shasum` (or `sha256sum`). The service address
 is supplied at capture time and is never stored in this tree.
+
+## The oracle — reproducing the capture
+
+`capture.sh` talks to a *running* service. The service the goldens come from is the
+**pinned old image**, booted as a throwaway stack by `oracle.sh`:
+
+```sh
+./oracle.sh                      # boots postgres:18 + redis + the stub + the pinned image
+./oracle.sh --capture            # ... and runs capture-goldens.sh against it
+./oracle.sh --down               # remove everything (a non---keep run does this itself)
+```
+
+The image is pulled **by digest** from `manifest.json`. The database starts empty and
+the image migrates it to alembic `0016` in its own lifespan, exactly as a fresh
+production replica does. `--policy <doc>` seeds a tenant inference policy before the
+capture; `--ledger-out` / `--cost-out` record the oracle's own `inference_call` row
+and `billing:costs` stream entry for one request.
+
+`golden/ledger_*.json` and `golden/cost_*.txt` are those artifacts with only the
+genuinely volatile fields removed (clock, duration, per-request uuid). They are the
+parity targets for the Rust write path; `request_sha256`/`response_sha256` are kept
+because they are deterministic for a fixed request. Re-running the launcher from a
+clean state reproduces every one of them byte-for-byte.
+
+⚠️ `stubs/oracle-providers.yaml` carries `local-llm: stub-model`. A tenant policy's
+platform hop is required to name the reserved model `local-llm`, and the router
+matches a **concrete** requested model against the hop's own model, so without that
+alias no policy-routed request can be captured at all (it is refused `400`
+`outside_policy`). The alias adds one row to the `models` and `provider_models`
+goldens, which is the only difference from the S9a capture.
+
