@@ -162,8 +162,10 @@ services:
 
   strata-rag:
     profiles: ["strata"]
-    build:
-      context: ../strata_rag
+    # The public repository must not build a private sibling checkout. This profile runs the
+    # privately published image; core development does not need it. Pin a digest when using it:
+    #   export STRATA_RAG_IMAGE=<registry>/strata-rag@sha256:...
+    image: ${STRATA_RAG_IMAGE:-ghcr.io/nonagenticai/strata-rag:private}
     environment:
       STRATA_DATABASE_URL: postgres://strata_rag:strata_rag@strata-db:5440/strata_rag
       # `*:` = multi-tenant service caller; each request names its tenant in X-Tenant-Id.

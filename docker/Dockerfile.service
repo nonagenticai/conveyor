@@ -1,0 +1,47 @@
+# Generic service image: one workspace package's binary.
+#
+#   docker build -f docker/Dockerfile.service \
+#     --build-arg PACKAGE=conveyor-server --build-arg BIN=conveyor -t conveyor-server .
+#
+# Public base images only, pinned by digest: this file is built by the public CI and by outside
+# contributors. An estate build may override BASE_IMAGE without editing the file.
+# RUST_TOOLCHAIN must equal rust-toolchain.toml (the `checks` job asserts the root Dockerfile;
+# this file states the same value).
+ARG RUST_TOOLCHAIN=1.99.0
+ARG BASE_IMAGE=docker.io/library/debian:12-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
+
+FROM ${BASE_IMAGE} AS build
+ARG RUST_TOOLCHAIN
+ARG PACKAGE
+ARG BIN
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# cmake/perl: aws-lc-sys (rustls' default crypto provider, via sqlx and reqwest).
+# hadolint ignore=DL3008
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential ca-certificates cmake curl perl pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+ENV RUSTUP_HOME=/usr/local/rustup CARGO_HOME=/usr/local/cargo PATH=/usr/local/cargo/bin:$PATH
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh -s -- -y --no-modify-path --profile minimal --default-toolchain "${RUST_TOOLCHAIN}" \
+    && rustc --version
+
+WORKDIR /src
+COPY . .
+# `-p`/`--bin` (never a bare workspace build): a broken sibling crate must not block this image.
+# The cache ids are explicit and distinct from the root Dockerfile's stages; BuildKit builds
+# independent stages in parallel and a default id is the target path.
+RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-service \
+    --mount=type=cache,target=/src/target,id=cargo-target-service \
+    cargo build --release --locked -p "${PACKAGE}" --bin "${BIN}" \
+    && install -D -m 0755 "target/release/${BIN}" /out/service
+
+FROM ${BASE_IMAGE} AS runtime
+# hadolint ignore=DL3008
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=build /out/service /usr/local/bin/service
+ENV BIND_ADDR=0.0.0.0:8080
+EXPOSE 8080
+ENTRYPOINT ["/usr/local/bin/service"]

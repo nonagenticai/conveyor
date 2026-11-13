@@ -1,27 +1,17 @@
-# conveyor — the workspace. **Eleven** members: the process engine's crates, the RETAINED
-# workflow engine (`crates/workflow`, the tool-sequence executor) and `crates/bus`.
+# conveyor — the workspace. Members are the globs below: every crate under `crates/` and every
+# app under `apps/`. A new service is a directory, not an edit to this file; the count is whatever
+# `cargo metadata` reports.
 #
 # S01 closed 2026-11-08: Leptos CSR/WASM (docs/decisions/0001-ui-stack.md); `apps/web` is a
 # dependency-free placeholder until S12 builds the screens.
 #
 # S13 adds `crates/bus` (CONTRACT §1, amended 2026-11-09: the care-bus replaces the DAG engine).
-# The contract's count is ten, and it stays ten once `crates/workflow` retires with the last DAG
-# flow; until that deletion happens this tree genuinely has eleven members, so the list — not the
-# contract — is the count a reader can verify.
+# `crates/workflow` retires with the last DAG flow; until then the workspace genuinely has both.
 [workspace]
 resolver = "3"
 members = [
-    "crates/domain",
-    "crates/store",
-    "crates/api",
-    "crates/actions",
-    "crates/actions-derive",
-    "crates/auth",
-    "crates/render",
-    "crates/bus",
-    "crates/workflow",
-    "apps/server",
-    "apps/web",
+    "crates/*",
+    "apps/*",
 ]
 
 [workspace.package]
