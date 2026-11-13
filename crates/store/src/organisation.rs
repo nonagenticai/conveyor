@@ -480,18 +480,20 @@ pub async fn job_placements_tx(
         .await
 }
 
-/// The rules a placement must satisfy: 1..=n, exactly one primary (§4.1, P1.3).
+/// The rules a placement must satisfy: 1..=n, exactly one primary, and the primary is FIRST
+/// (SPEC_V2 §4.1: an industry's departments are ordered, primary first).
 fn placement_is_contiguous(departments: &[PlacementIn]) -> bool {
     if departments.is_empty() {
         return false;
     }
     let mut ordinals: Vec<i32> = departments.iter().map(|row| row.ordinal).collect();
     ordinals.sort_unstable();
-    ordinals
+    let numbered = ordinals
         .iter()
         .enumerate()
-        .all(|(index, ordinal)| *ordinal == i32::try_from(index).unwrap_or(i32::MAX) + 1)
-        && departments.iter().filter(|row| row.is_primary).count() == 1
+        .all(|(index, ordinal)| *ordinal == i32::try_from(index).unwrap_or(i32::MAX) + 1);
+    let primaries: Vec<&PlacementIn> = departments.iter().filter(|row| row.is_primary).collect();
+    numbered && primaries.len() == 1 && primaries[0].ordinal == 1
 }
 
 async fn ensure_placement_tx(
