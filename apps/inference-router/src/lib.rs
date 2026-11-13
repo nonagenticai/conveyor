@@ -7,6 +7,7 @@
 #![forbid(unsafe_code)]
 
 pub mod admin_auth;
+pub mod admin_policy;
 pub mod auth;
 pub mod billing;
 pub mod catalog;

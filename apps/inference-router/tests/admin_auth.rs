@@ -313,15 +313,15 @@ async fn a_human_without_an_admin_role_is_403() {
 
 #[tokio::test]
 async fn a_valid_pair_reaches_the_handler() {
-    // 501 is this slice's body placeholder: the point is that the auth layers passed.
+    // The catalogue needs no database: reaching it as 200 is the proof the auth layers passed.
     for roles in [vec!["super_admin"], vec!["tenant_admin"]] {
-        let (status, _) = request(
+        let (status, body) = request(
             state(configured()),
             "/api/admin/catalog",
             &admin_headers(&sa_token(), &user_token(&roles, Some("tenant-a"))),
         )
         .await;
-        assert_eq!(status, StatusCode::NOT_IMPLEMENTED, "{roles:?}");
+        assert_eq!(status, StatusCode::OK, "{roles:?}: {body}");
     }
 }
 
