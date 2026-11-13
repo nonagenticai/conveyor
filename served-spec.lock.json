@@ -55,7 +55,7 @@
     "POST /api/actions/cards.archive/invocations": "a22af0bb3ab11f8d944849e26909caa9d66f997ca6024d301f7dd07e1af28ab9",
     "POST /api/actions/cards.claim/invocations": "a2cce9ebaded65c428056ccea1c4b4f180d6e33ab234f55094d8800aef2540a4",
     "POST /api/actions/cards.comment/invocations": "a2a1a48fd93eb5d191da6d9ba152a4223850342767f30eb8bc087105367f8f2d",
-    "POST /api/actions/cards.create/invocations": "56b657f717b7dea6a3a580dfb8097a21839ffc144209d1ec5baf1c5994c8e25f",
+    "POST /api/actions/cards.create/invocations": "7a46595ecbcef5ddf7bf639b5cdc2b9b429146088a8a2819c0370ec45c578547",
     "POST /api/actions/cards.duplicate/invocations": "ce5e9dfb8d536b388e0c02fd367db8deaea8816d18b40116cb6581e9364f896b",
     "POST /api/actions/cards.get/invocations": "499a6f347a0966f37952e207f22490be403603f6b7c49f0139dab858dd5d580b",
     "POST /api/actions/cards.list/invocations": "dee303fe0d292184e6bd1e935fdf06aff2834171dcff4954e418922c1cae3f4b",

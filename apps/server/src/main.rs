@@ -194,8 +194,59 @@ enum AdminCommand {
         #[arg(long, conflicts_with = "mint", required_unless_present = "mint")]
         token_stdin: bool,
     },
+    /// Invoke one action through the same engine as `POST /api/actions/<name>/invocations`.
+    Action {
+        #[command(subcommand)]
+        command: ActionCommand,
+    },
+    /// Intake a GitHub issue as a card on a project's board.
+    Intake {
+        /// The tenant slug.
+        #[arg(long)]
+        tenant: String,
+        /// The project key (`T0`, `S00`, …).
+        #[arg(long)]
+        project: String,
+        /// The GitHub issue number.
+        #[arg(long)]
+        issue: i64,
+        /// The card name (the issue title).
+        #[arg(long)]
+        title: String,
+        /// The card type's stable code.
+        #[arg(long = "card-type")]
+        card_type: String,
+        /// The process key recorded in the card meta.
+        #[arg(long = "process-key")]
+        process_key: Option<String>,
+        /// The plan path recorded in the card meta.
+        #[arg(long)]
+        plan: Option<String>,
+    },
+    /// Archive the retired plan-seed cards. Idempotent and tenant-scoped.
+    RetirePlanSeed {
+        /// The tenant slug.
+        #[arg(long)]
+        tenant: String,
+    },
     /// Seal every pre-`0014` plaintext webhook signing secret under the tenant KEK. Idempotent.
     ResealWebhooks,
+}
+
+#[derive(Debug, Subcommand)]
+enum ActionCommand {
+    /// Invoke one internal action as the tenant's service actor.
+    Invoke {
+        /// The tenant slug.
+        #[arg(long)]
+        tenant: String,
+        /// The action name (`cards.create`, `process_runs.start`, …).
+        #[arg(long)]
+        name: String,
+        /// A file holding `{"input": …}` or the bare input document.
+        #[arg(long)]
+        input: PathBuf,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -571,19 +622,6 @@ async fn migrate(
                 "programme seeded"
             );
         }
-        // The plan spine: one board per project and one card per plan unit, each card naming
-        // its process. Runs after the programme (the projects exist) and inside the catalogue
-        // block (the board template and card types exist).
-        let plans = seed::seed_plans(&pool, tenant.as_deref()).await?;
-        for (slug, counts) in plans {
-            tracing::info!(
-                tenant = %slug,
-                created = counts.created,
-                updated = counts.updated,
-                skipped = counts.skipped,
-                "plan cards seeded"
-            );
-        }
     }
     // ⛔ NEVER part of `--seed`: a tenant's processes are content it chooses (accounting,
     // marketing, software development, …), not a universal default. This installs the shipped
@@ -842,6 +880,80 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     "secret": filled.secret,
                     "source": filled.source,
                     "expires_at": filled.expires_at,
+                })
+            );
+        }
+        AdminCommand::RetirePlanSeed { tenant } => {
+            let tenant_id = store::tenants::id_by_slug(&pool, &tenant)
+                .await?
+                .ok_or_else(|| RunError::Refused(format!("no tenant {tenant:?}")))?;
+            let report = admin::retire_plan_seed::run(&pool, tenant_id, &config.app_key)
+                .await
+                .map_err(|error| RunError::Refused(error.to_string()))?;
+            println!("{}", report.json());
+            if !report.ok() {
+                return Err(RunError::Exit(
+                    1,
+                    format!(
+                        "{} seeded card(s) could not be archived",
+                        report.failed.len()
+                    ),
+                ));
+            }
+        }
+        AdminCommand::Action {
+            command:
+                ActionCommand::Invoke {
+                    tenant,
+                    name,
+                    input,
+                },
+        } => {
+            let tenant_id = store::tenants::id_by_slug(&pool, &tenant)
+                .await?
+                .ok_or_else(|| RunError::Refused(format!("no tenant {tenant:?}")))?;
+            let document: serde_json::Value = serde_json::from_slice(&std::fs::read(&input)?)?;
+            let input = document.get("input").cloned().unwrap_or(document);
+            let caller = admin::action::ActionCaller::new(&pool, tenant_id, &config.app_key)
+                .await
+                .map_err(|error| RunError::Refused(error.to_string()))?;
+            let output = caller
+                .call(&name, input, None)
+                .await
+                .map_err(|error| RunError::Refused(error.to_string()))?;
+            println!("{}", serde_json::to_string_pretty(&output)?);
+        }
+        AdminCommand::Intake {
+            tenant,
+            project,
+            issue,
+            title,
+            card_type,
+            process_key,
+            plan,
+        } => {
+            let tenant_id = store::tenants::id_by_slug(&pool, &tenant)
+                .await?
+                .ok_or_else(|| RunError::Refused(format!("no tenant {tenant:?}")))?;
+            let report = admin::intake::run(
+                &pool,
+                tenant_id,
+                &project,
+                issue,
+                &title,
+                &card_type,
+                process_key.as_deref(),
+                plan.as_deref(),
+                &config.app_key,
+            )
+            .await
+            .map_err(|error| RunError::Refused(error.to_string()))?;
+            println!(
+                "{}",
+                serde_json::json!({
+                    "card_id": report.card_id,
+                    "board_id": report.board_id,
+                    "list_id": report.list_id,
                 })
             );
         }

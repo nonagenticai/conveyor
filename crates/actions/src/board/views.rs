@@ -693,6 +693,10 @@ pub struct CardCreateIn {
     /// A parent card on the same board.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_card_id: Option<Uuid>,
+    /// Free-form card metadata. Must be a JSON object of at most 16 KiB; this is where a
+    /// real intake records its `issue` / `unit_key` / `process_key` / `plan` link.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Value>,
 }
 
 /// `cards.update`. Absent members are unchanged.
