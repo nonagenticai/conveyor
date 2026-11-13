@@ -1,0 +1,17 @@
+# The oracle's provider catalog: one OpenAI-compatible provider, pointed at the capture stub.
+# Synthetic only — no live endpoint, no key. Mounted over the image's baked /config/providers.yaml.
+providers:
+  - name: stub-openai
+    enabled: true
+    customer_eligible: true
+    protocol: openai
+    endpoint: http://ir44-stub:9100/v1
+    model: stub-model
+    timeout: 30
+    max_concurrent: 8
+    cost_input_per_1m: 0
+    cost_output_per_1m: 0
+    model_aliases:
+      stub-model: stub-model
+      alias-model: stub-model
+default_chain: [stub-openai]
