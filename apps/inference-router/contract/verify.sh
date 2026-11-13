@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Replay the captured golden set against a candidate service and count unexplained differences.
 #
-#   verify.sh --candidate http://HOST:PORT [--golden DIR] [--tolerances FILE]
+#   verify.sh --candidate http://HOST:PORT [--golden DIR] [--tolerances FILE] [--only GLOB]...
+#
+# --only restricts the replay to case names matching a shell glob, and may be repeated. Without
+# it EVERY golden is replayed — the default is the full set, never a subset.
 #
 # The candidate is the Rust rewrite (or any build of it). A case passes when its status, its
 # content-type family and its normalised body equal the capture. Anything else is UNEXPLAINED:
@@ -16,16 +19,18 @@ here="$(cd "$(dirname "$0")" && pwd)"
 candidate=""
 golden="$here/golden"
 tolerances="$here/tolerances.json"
+only=()
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --candidate) candidate="${2:-}"; shift 2 ;;
         --golden) golden="${2:-}"; shift 2 ;;
         --tolerances) tolerances="${2:-}"; shift 2 ;;
-        *) echo "usage: $0 --candidate URL [--golden DIR] [--tolerances FILE]" >&2; exit 2 ;;
+        --only) only+=("${2:-}"); shift 2 ;;
+        *) echo "usage: $0 --candidate URL [--golden DIR] [--tolerances FILE] [--only GLOB]..." >&2; exit 2 ;;
     esac
 done
-[ -n "$candidate" ] || { echo "usage: $0 --candidate URL [--golden DIR] [--tolerances FILE]" >&2; exit 2; }
+[ -n "$candidate" ] || { echo "usage: $0 --candidate URL [--golden DIR] [--tolerances FILE] [--only GLOB]..." >&2; exit 2; }
 candidate="${candidate%/}"
 command -v jq >/dev/null || { echo "missing jq" >&2; exit 2; }
 command -v curl >/dev/null || { echo "missing curl" >&2; exit 2; }
@@ -78,6 +83,17 @@ failed=""
 for req in "$golden"/*.request; do
     [ -e "$req" ] || continue
     name="$(basename "$req" .request)"
+    if [ "${#only[@]}" -gt 0 ]; then
+        selected=0
+        for pattern in "${only[@]}"; do
+            # shellcheck disable=SC2053
+            if [[ "$name" == $pattern ]]; then
+                selected=1
+                break
+            fi
+        done
+        [ "$selected" = 1 ] || continue
+    fi
     total=$((total + 1))
 
     mapfile -t lines < "$req"

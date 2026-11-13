@@ -153,7 +153,10 @@ pub async fn capture(pool: &PgPool, call_id: i64) -> Result<Option<Value>, sqlx:
 /// `GET /api/internal/served-models/timeline` — one row per UTC day × model × root × provider,
 /// with empty days present and every share NULL rather than zero.
 pub async fn timeline(pool: &PgPool, days: i32) -> Result<Value, sqlx::Error> {
-    sqlx::query_scalar(
+    // The shares are computed HERE, not in SQL: Python emits `json.dumps(1.0)` as `1.0`, while
+    // Postgres's float8 output prints the same value as `1`, and the normaliser (correctly) does
+    // not rewrite either. serde_json's float repr matches Python's for both 1.0 and 2/3.
+    let rows: Value = sqlx::query_scalar(
         "WITH days AS (
             SELECT generate_series(
               (now() AT TIME ZONE 'UTC')::date - ($1::int - 1),
@@ -172,29 +175,61 @@ pub async fn timeline(pool: &PgPool, days: i32) -> Result<Value, sqlx::Error> {
          )
          SELECT json_build_object(
             'as_of', now(),
-            'source', 'inference_call',
-            'window', json_build_object('days', $1::int, 'tz', 'UTC'),
-            'series', COALESCE(json_agg(json_build_object(
+            'rows', COALESCE(json_agg(json_build_object(
                 'day', to_char(d.day, 'YYYY-MM-DD'),
                 'requested_model', a.requested_model,
                 'served_model_root', a.served_model_root,
                 'served_provider', a.served_provider,
                 'n', COALESCE(a.n, 0),
-                't0_share', CASE WHEN COALESCE(a.n, 0) = 0 THEN NULL
-                                 ELSE COALESCE(a.n_t0, 0)::float8 / a.n::float8 END,
-                'seed_share', CASE WHEN COALESCE(a.n, 0) = 0 THEN NULL
-                                   ELSE COALESCE(a.n_seed, 0)::float8 / a.n::float8 END,
-                'licensed_share', CASE WHEN a.n_licence_recorded IS NULL OR a.n_licence_recorded = 0
-                                       THEN NULL
-                                       ELSE COALESCE(a.n_licensed, 0)::float8 / a.n_licence_recorded::float8 END,
-                'n_licence_recorded', COALESCE(a.n_licence_recorded, 0)
+                'n_t0', COALESCE(a.n_t0, 0),
+                'n_seed', COALESCE(a.n_seed, 0),
+                'n_licence_recorded', COALESCE(a.n_licence_recorded, 0),
+                'n_licensed', COALESCE(a.n_licensed, 0)
               ) ORDER BY d.day, a.requested_model NULLS FIRST, a.served_model_root NULLS FIRST,
                 a.served_provider NULLS FIRST), '[]'::json)
          ) FROM days d LEFT JOIN agg a ON a.day = d.day",
     )
     .bind(days)
     .fetch_one(pool)
-    .await
+    .await?;
+
+    let series: Vec<Value> = rows["rows"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|row| {
+            let n = row["n"].as_i64().unwrap_or(0);
+            let n_licence_recorded = row["n_licence_recorded"].as_i64().unwrap_or(0);
+            json!({
+                "day": row["day"],
+                "requested_model": row["requested_model"],
+                "served_model_root": row["served_model_root"],
+                "served_provider": row["served_provider"],
+                "n": n,
+                "t0_share": share(row["n_t0"].as_i64().unwrap_or(0), n),
+                "seed_share": share(row["n_seed"].as_i64().unwrap_or(0), n),
+                "licensed_share": share(row["n_licensed"].as_i64().unwrap_or(0), n_licence_recorded),
+                "n_licence_recorded": n_licence_recorded,
+            })
+        })
+        .collect();
+
+    Ok(json!({
+        "as_of": rows["as_of"],
+        "source": "inference_call",
+        "window": {"days": days, "tz": "UTC"},
+        "series": series,
+    }))
+}
+
+/// `num/den`, or NULL when there is nothing to divide — never a fabricated 0.
+fn share(numerator: i64, denominator: i64) -> Option<f64> {
+    if denominator == 0 {
+        None
+    } else {
+        Some(numerator as f64 / denominator as f64)
+    }
 }
 
 /// Filters for the repeat-group report.

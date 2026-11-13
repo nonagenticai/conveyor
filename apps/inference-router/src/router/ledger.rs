@@ -382,7 +382,7 @@ pub async fn calls_summary(
 )]
 pub async fn capture_call(
     State(state): State<AppState>,
-    Path(call_id): Path<i64>,
+    Path(call_id): Path<String>,
     headers: HeaderMap,
 ) -> Response {
     if let Err(refusal) = guard(&state, &headers) {
@@ -408,6 +408,14 @@ pub async fn capture_call(
         )
         .into_response();
     }
+    // The path is parsed AFTER the auth checks: FastAPI resolves dependencies first, and the
+    // captured golden proves it — a non-numeric id with no allowlisted caller is 403, not 422.
+    let call_id: i64 = match call_id.parse() {
+        Ok(call_id) => call_id,
+        Err(_) => {
+            return validation_error("call_id", "Input should be a valid integer").into_response();
+        }
+    };
     let pool = match pool(&state) {
         Ok(pool) => pool,
         Err(refusal) => return refusal.into_response(),

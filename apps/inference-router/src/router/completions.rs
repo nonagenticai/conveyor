@@ -20,6 +20,29 @@ use crate::policy::{self, ResolvedHop};
 use crate::routing::{CompletionOutcome, ProviderAttempt, Refusal};
 use crate::state::AppState;
 
+/// FastAPI's body-validation document. The common case is a missing required field, where the
+/// reference answers `{type: "missing", loc: ["body", field], msg: "Field required", input}`;
+/// anything else is the same envelope with a generic message (no golden covers it).
+fn validation_refusal(body: &[u8], error: &serde_json::Error) -> Refusal {
+    let message = error.to_string();
+    let (kind, msg, field) = match message.strip_prefix("missing field `") {
+        Some(rest) => ("missing", "Field required", rest.split('`').next()),
+        None => ("value_error", "Input should be valid", None),
+    };
+    let mut loc = vec![serde_json::json!("body")];
+    if let Some(field) = field {
+        loc.push(serde_json::json!(field));
+    }
+    let input: serde_json::Value = serde_json::from_slice(body).unwrap_or(serde_json::Value::Null);
+    Refusal {
+        status: StatusCode::UNPROCESSABLE_ENTITY,
+        body: serde_json::json!({
+            "detail": [{"type": kind, "loc": loc, "msg": msg, "input": input}]
+        }),
+        headers: Vec::new(),
+    }
+}
+
 /// The reference's fixed 400 body for a request its policy cannot serve.
 const CUSTOMER_UNAVAILABLE: &str = "The requested provider or model is not available to this \
                                     tenant. Request model 'local-llm'.";
@@ -75,8 +98,15 @@ struct PolicyDecision {
 pub async fn create_chat_completion(
     State(state): State<AppState>,
     headers: HeaderMap,
-    Json(request): Json<ChatCompletionRequest>,
+    body: axum::body::Bytes,
 ) -> Response {
+    // Parsed here, not by axum's `Json` extractor: FastAPI answers an invalid body with a 422
+    // JSON document (`detail[0] = {type, loc, msg, input}`), while axum's rejection is a
+    // text/plain 400. The captured `completion_validation` golden is the former.
+    let request: ChatCompletionRequest = match serde_json::from_slice(&body) {
+        Ok(request) => request,
+        Err(error) => return validation_refusal(&body, &error).into_response(),
+    };
     // The licence gate runs before anything is dialled: an unverifiable caller must never reach a
     // provider or the ledger.
     // Whose request this is: the caller's own tenant, or one a vouched allow-listed subject
@@ -468,5 +498,31 @@ mod tests {
             .await
             .expect("router answers");
         assert_eq!(response.status(), axum::http::StatusCode::NOT_IMPLEMENTED);
+    }
+
+    #[tokio::test]
+    async fn an_invalid_body_is_the_reference_422_document() {
+        let (state, _stub) = state_with_stub().await;
+        let response = crate::router::router(state)
+            .oneshot(
+                Request::post("/api/chat/completions")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"model":"stub-model"}"#))
+                    .expect("request"),
+            )
+            .await
+            .expect("router answers");
+        assert_eq!(
+            response.status(),
+            axum::http::StatusCode::UNPROCESSABLE_ENTITY
+        );
+        let bytes = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+            .await
+            .expect("body");
+        let body: Value = serde_json::from_slice(&bytes).expect("json");
+        assert_eq!(body["detail"][0]["type"], "missing");
+        assert_eq!(body["detail"][0]["loc"], json!(["body", "messages"]));
+        assert_eq!(body["detail"][0]["msg"], "Field required");
+        assert_eq!(body["detail"][0]["input"], json!({"model": "stub-model"}));
     }
 }
