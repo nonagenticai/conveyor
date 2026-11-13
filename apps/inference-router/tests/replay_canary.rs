@@ -1,8 +1,9 @@
 //! `/api/replay/*` and `/api/canary/*` — CRUD parity with the reference routers.
 //!
-//! The oracle is the private reference checkout at `inference-router` @ f9f236e:
-//! `src/routers/replay.py`, `src/routers/canary.py` and `src/security.py`. The two bodies the
-//! capture pins are asserted verbatim (the missing-tenant 401 and the canary no-row 404).
+//! The oracle is the reference checkout pinned in the issue (its path and commit are withheld
+//! from the public tree): `src/routers/replay.py`, `src/routers/canary.py` and
+//! `src/security.py`. The two bodies the capture pins are asserted verbatim (the missing-tenant
+//! 401 and the canary no-row 404).
 
 mod common;
 
@@ -158,6 +159,42 @@ async fn replay_list_refuses_a_missing_tenant_with_the_live_body() {
     );
 }
 
+/// The reference's ordering: absent OR the nil sentinel is unauthenticated (401); anything else
+/// that is not a uuid is a bad request (400), and the header is never trimmed.
+#[tokio::test]
+async fn the_strict_tenant_gate_is_401_absent_or_sentinel_and_400_malformed() {
+    let (_db, state) = state().await;
+
+    let (status, body) = call(
+        &state,
+        get_as(
+            "/api/replay/invocation-log",
+            "00000000-0000-0000-0000-000000000000",
+        ),
+    )
+    .await;
+    assert_eq!(status, StatusCode::UNAUTHORIZED);
+    assert_eq!(
+        body,
+        json!({"detail": "Missing or unresolved X-Tenant-Id; caller is not authenticated"})
+    );
+
+    let (status, body) = call(&state, get_as("/api/replay/invocation-log", "not-a-uuid")).await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert_eq!(
+        body,
+        json!({"detail": "Malformed X-Tenant-Id; expected a uuid"})
+    );
+
+    // A padded uuid is present-but-malformed to the reference, not a valid tenant.
+    let (status, _) = call(
+        &state,
+        get_as("/api/replay/invocation-log", &format!(" {TENANT_A} ")),
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+}
+
 #[tokio::test]
 async fn replay_list_is_scoped_to_the_caller_tenant_and_filters() {
     let (db, state) = state().await;
@@ -280,6 +317,18 @@ async fn replay_patch_backfills_by_id_and_hides_another_tenants_row() {
         body,
         json!({"detail": format!("replay_invocation_log row {LOG_ID} not found")})
     );
+    // The 404 is not a no-op: the row still belongs to tenant A, untouched.
+    let untouched: Value = sqlx::query_scalar(
+        "SELECT row_to_json(t) FROM (SELECT validation_passed, judge_score \
+           FROM replay_invocation_log WHERE id = $1::uuid AND tenant_id = $2::uuid) t",
+    )
+    .bind(LOG_ID)
+    .bind(TENANT_A)
+    .fetch_one(&db.pool)
+    .await
+    .expect("the cross-tenant refusal left the row");
+    assert_eq!(untouched["validation_passed"], Value::Null);
+    assert_eq!(untouched["judge_score"], Value::Null);
 
     let (status, body) = call(
         &state,

@@ -59,10 +59,11 @@ pub(crate) fn validation_error(entry: serde_json::Value) -> Refusal {
 /// reference binds into `WHERE tenant_id = :tenant`, and it always comes from the header, never
 /// from a query parameter.
 pub(crate) fn require_caller(headers: &HeaderMap) -> Result<uuid::Uuid, Refusal> {
+    // No trim: the reference's order is absent-or-sentinel (401) THEN uuid (400), and a padded
+    // uuid is not a uuid to it. Trimming here would silently accept one.
     let raw = headers
         .get("x-tenant-id")
         .and_then(|value| value.to_str().ok())
-        .map(str::trim)
         .unwrap_or("");
     if raw.is_empty() || raw == UNATTRIBUTED_TENANT_ID {
         return Err(Refusal::detail(
