@@ -70,7 +70,7 @@
 <tr>
 <td>ready</td>
 <td><code>status:ready</code></td>
-<td>open, no linked PR, no remote branch — safe to claim</td>
+<td>open, no <code>## Claim</code> block, no live branch for it, no linked PR — safe to claim</td>
 </tr>
 <tr>
 <td>claimed</td>
@@ -108,6 +108,7 @@ gh pr list --state all --search &quot;#N&quot;          # any PR that closes it
 git ls-remote --heads origin &quot;issue/N-*&quot;      # any live branch for it
 git log origin/main --grep &quot;#N&quot; --oneline     # already merged</code></pre>
 <p>All four must be empty. If any is non-empty the issue is claimed: <strong>join it</strong>, do not create a parallel branch.</p>
+<p>The body's <code>## Claim</code> block is the fifth check: a body that names a branch and a HEAD is claimed, even when the branch list looks empty. Read it before the branch list.</p>
 <p>Then check the issue's <strong>Definition of ready</strong> (above). If it fails, do not create a branch: comment the exact gaps (missing headings, a reference that does not resolve, a part with no <code>Verify:</code> scenario, a <code>Blocker:</code> line that disagrees with the label) and stop — or fix the body first if you are its author. Claiming an unready brief is how a session re-derives the plan inside a branch.</p>
 <p>Claiming (unclaimed case):</p>
 <pre class="bash"><code>git fetch origin
@@ -117,12 +118,60 @@ git push -u origin issue/N-&lt;slug&gt;
 git ls-remote --heads origin refs/heads/issue/N-&lt;slug&gt;   # MUST equal git rev-parse HEAD
 gh issue edit N --add-label status:claimed --remove-label status:ready
 gh issue comment N --body &#39;Claimed. Branch `issue/N-&lt;slug&gt;` at `&lt;sha&gt;`.&#39;</code></pre>
+<p>Write the <code>## Claim</code> block in the same operation — it is the machine-readable half of the claim:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Branch</td>
+<td><code>issue/N-&lt;slug&gt;</code></td>
+</tr>
+<tr>
+<td>HEAD</td>
+<td><code>&lt;sha&gt;</code></td>
+</tr>
+<tr>
+<td>Session</td>
+<td><code>&lt;host&gt;/&lt;agent&gt; (claim nonce &lt;nonce&gt;)</code></td>
+</tr>
+<tr>
+<td>Updated</td>
+<td><code>&lt;YYYY-MM-DD&gt;</code></td>
+</tr>
+<tr>
+<td>Adopted-from</td>
+<td><code>&lt;previous claim&gt;</code> or —</td>
+</tr>
+</tbody>
+</table>
+<p>Update the HEAD field on <strong>every push</strong>. A session that sees <code>status:ready</code> plus a Claim block has found a claim, not a stale label.</p>
 <ul>
 <li>The marker commit <strong>must carry a unique nonce</strong>. Two sessions' "empty" marker commits can otherwise share parent/message/second and therefore the same SHA; the loser's push then succeeds as "up to date" and both believe they claimed.</li>
 <li>Verify the remote SHA after pushing. If it is not yours, you lost the race: fetch the branch and join; <strong>never force-push</strong>.</li>
 <li>Work only in <code>.worktrees/issue-&lt;n&gt;</code>. Never create a branch or commit in the shared root checkout — another session's branch is checked out there.</li>
 <li>If an in-flight branch predates its issue (<code>lane/*</code>, <code>slice/*</code>), record the branch in the issue body and adopt it. ⚠️ <code>block-duplicate-pr.py</code> refuses a PR from <code>slice/*</code>, so at ship time push the adopted HEAD to a new <code>issue/N-&lt;slug&gt;</code> ref and open the PR from that.</li>
 <li>If a PR already exists without an issue, create the issue for it (the full contract), record the branch and PR in the body, comment on the PR with the link, and add <code>Closes #N</code> to its body. The PR's owner keeps the work; never push to that branch. <code>conveyor#38</code> (PR #36) is the worked example.</li>
+</ul>
+<h2 id="abandonment-and-adoption">Abandonment and adoption</h2>
+<p>A claim is <strong>abandoned</strong> when 48 hours have passed since both the last push to its branch and the last comment on its issue. A claim that is merely idle is not abandoned — a status comment holds it, and waiting on CI or on a blocker is normal.</p>
+<p>Any session may adopt an abandoned claim after the four checks, without the original session's permission. Adoption is:</p>
+<ul>
+<li>work on the <strong>same</strong> branch; never create a parallel branch and never force-push;</li>
+<li>post a takeover comment naming the branch and HEAD you found;</li>
+<li>record <code>Adopted-from</code> in the <code>## Claim</code> block, and update it as you push.</li>
+</ul>
+<p><code>/issue-sweep</code> reports an abandoned claim (class <code>abandoned-claim</code>) and names the adoption action; it does not mutate anything. If the original session returns, it joins the branch — the branch's HEAD is the arbiter and the latest <code>&lt;!-- handoff --&gt;</code> comment is the state.</p>
+<h2 id="the-console--a-front-door-not-a-second-protocol">The console — a front door, not a second protocol</h2>
+<p>The operator console at <code>conveyor.nonagentic.ai/design</code> can intake an issue as a card, move a card, comment, claim and release against the tenant's own rows. It is a <strong>front door to the platform</strong>, not a second delivery protocol:</p>
+<ul>
+<li>the GitHub issue is still the unit and the pushed branch is still the claim; a card created from the console carries <code>meta.issue</code> and is a view of the unit, never a substitute for it;</li>
+<li>the console cannot open a PR, merge, or edit a label — those stay the protocol above;</li>
+<li><code>conveyor admin intake</code> and the console both call <code>cards.create</code>, so the two paths cannot produce different rows.</li>
 </ul>
 <h2 id="work-and-gate">Work and gate</h2>
 <ul>
@@ -210,9 +259,10 @@ gh issue list --state open --label status:claimed
 # open unit PRs and the WIP count
 gh pr list --state open --json number,headRefName,title</code></pre>
 <p>Default priority is issue-number order; a dependency blocker always overrides it. Do not claim a <code>status:blocked</code> issue. Blockers are named in the body; when the blocker lands, the owner of that issue flips it to <code>status:ready</code>.</p>
-<p>For the whole-queue truth report — ready-with-branch, claimed-without-branch, PR-without-<code>Closes</code>, open-issue-with-merged-PR, and the branch-to-issue map — run the <code>/issue-sweep</code> skill. It reports and never edits; the owning session flips its own labels.</p>
+<p>For the whole-queue truth report — ready-with-branch, claimed-without-branch, abandoned-claim, PR-without-<code>Closes</code>, open-issue-with-merged-PR, and the branch-to-issue map — run the <code>/issue-sweep</code> skill. It reports and never edits; the owning session (or an adopter, after the 48 h silence) flips its own labels.</p>
 <h2 id="issue-creation">Issue creation</h2>
 <p>Use the <code>/issue-create</code> skill. It reads the slice plan + its <code>00-INDEX.md</code> row + the relevant <code>W</code>/<code>V</code> section of <code>docs/evidence/2026-11-10-plan-audit.md</code>, dedupes against issues, PRs, branches and merged commits, <strong>verifies every reference at the baseline</strong>, then writes <strong>one issue per unfinished slice plan</strong> from <code>.github/ISSUE_TEMPLATE/unit.md</code> — the full contract above, not a summary. It self-checks before <code>gh issue create</code>: required headings, every path resolves, every part has a <code>Verify:</code> scenario, and the chosen label matches the Dependencies table. A split is the documented exception (max 5).</p>
+<p><strong>Issue hygiene is part of the contract.</strong> No issue body or comment may carry a <code>scripts/ci/no-private-refs.sh</code> HARD pattern, a private repository slug, an internal hostname or an address. Name a private service by its public role (“the licensing service”), never by its repository path. <code>issue-create</code> checks the body before creating it; <code>/issue-sweep</code> reports a leaking body or comment as drift.</p>
 <p>⚠️ <strong>Historical:</strong> while the integration train (#9) was open, every code issue was <code>status:blocked</code> with <code>Blocker: #26</code>. #9 merged on 2026-11-11 and its files (<code>control/approvals.rs</code>, <code>eval/signoffs.rs</code>, <code>workflow/agent.rs</code>, <code>workflow/node.rs</code>, <code>migrate.rs</code>, <code>served-spec.lock.json</code> and migrations <code>0037</code>/<code>0038</code>) are on main. There is no blanket blocker now: a <code>status:blocked</code> issue names its own open <code>Blocker: #N</code>, and an issue whose only wait is the live proof is <code>status:ready</code> with <code>acceptance-blocked-by: #18</code>.</p>
 <h2 id="retired-terms">Retired terms</h2>
 <p><code>lane</code> and <code>slice</code> remain as vocabulary for branches and for repos that do not use an issue queue. Here, a lane is not a unit of work: the issue is. A "train" is an owner-declared exception, never the default, and needs its own issue and acceptance.</p>

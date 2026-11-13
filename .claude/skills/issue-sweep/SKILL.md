@@ -40,7 +40,7 @@ For every open `unit` issue, exactly one class:
 | Class | Test |
 |---|---|
 | **ready** | `status:ready`, no live `issue/<N>-*` head, no open PR whose body closes it, no merged commit naming it |
-| **claimed** | `status:claimed` **and** a live branch (an `issue/<N>-*` head, or an adopted `lane/*`/`slice/*` branch recorded in the body or a comment) |
+| **claimed** | `status:claimed` **and** a live branch (an `issue/<N>-*` head, or a branch named in the `## Claim` block or a comment) |
 | **in review** | no status label **and** one non-draft open PR whose body carries `Closes #<N>` |
 | **blocked** | `status:blocked` and a plain `Blocker: #<M>` line naming an **open** issue |
 | **needs human** | `status:needs-human` — list it, do not judge it |
@@ -58,6 +58,13 @@ Then the **drift** set — a row here is a lie the next session would act on:
    issue body/comment.
 7. **blocked-with-closed-blocker** — `status:blocked` whose `Blocker: #<M>` is closed.
 8. **orphan** — a `unit` issue with no status label, no PR, and no live branch.
+9. **abandoned-claim** — `status:claimed` with a live branch, but no push to that branch and no
+   issue comment for 48 hours. The claim is adoptable (see `issue-pickup`); a status comment resets
+   the clock, so waiting on CI or a blocker is not abandonment.
+
+For 9, compare the branch's last commit time (`git log -1 --format=%cI origin/<branch>`) with the
+issue's last comment time (`gh issue view <N> --json comments --jq '.comments[-1].createdAt'`);
+both must be older than 48 hours.
 
 ## Report
 

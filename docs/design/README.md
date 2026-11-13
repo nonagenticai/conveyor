@@ -9,6 +9,14 @@ The Plan **Boards** tab is a join, not a seed: it renders each project's GitHub 
 issue registry fetched at publish, joined to the conveyor's own cards and runs. A unit with no real
 card is shown as **not intaken**. V1 surfaces implemented in the Rust app are unlabelled.
 
+**Two surfaces, one pack.** Published at **https://nonagentic.ai/design/** the pack is the
+read-only public snapshot: no accounts, no backend call, the privacy contract unchanged. Served by
+the app itself at **https://conveyor.nonagentic.ai/design/** the same pack is the **operator
+console**: `console.js` finds the same-origin `/config.json`, signs in against the realm the server
+already trusts (auth-code + PKCE S256, token in memory), and the Plan **Boards** tab reads and
+writes the platform's own rows — intake an issue as a card, move it, comment, claim and release.
+Signed out, or on the homepage, nothing changes: no API request and no write control.
+
 - **Portfolio & plan:** the computed in-flight set, programme shared configuration, typed
   project-dependency edges, the WSJF backlog, PI cadence, capacity and per-project metering; then
   WBS, frozen baseline vs computed forecast, one six-kind register and controlled change.
@@ -57,7 +65,12 @@ a seed: a seed change is a repository PR, a new image and a `migrate --seed` run
 
 The pack is published at **https://nonagentic.ai/design/** by the `nonagentic_homepage`
 repository, which copies this directory verbatim into `dist/design/` and serves `studio.html` as
-`index.html`. Opening `studio.html` directly is still the offline entry point.
+`index.html`. Opening `studio.html` directly is still the offline entry point. The app image also
+serves the pack at `/design`: the web stage copies the generated documents (`docs/`) and the data
+directory (the placeholder snapshot and the public issue registry) beside the runtime files, so
+the console's Documents destination and data links resolve. `node
+docs/design/scripts/check-console.cjs` is the console gate: a signed-out pack makes zero API
+requests, a signed-in one sends the actions it renders, and the 401/412 paths are rendered.
 
 ## Documents
 
