@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: install betterleaks 1.10.1 (pinned, sha256-verified)
         run: |
           set -euo pipefail
@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: scan tracked files
         run: bash scripts/ci/no-private-refs.sh
 
@@ -99,7 +99,7 @@ jobs:
       PG_IMAGE: postgres:18
       REDIS_IMAGE: library/redis:8.10.1-alpine
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: toolchain follows rust-toolchain.toml; assert the Dockerfile agrees
         run: |
@@ -113,7 +113,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           # Registry only: the target directory is multi-gigabyte and would thrash the 10 GB
           # cache budget. Compiling is what a free public runner is for.
@@ -203,7 +203,7 @@ jobs:
       # for the same reason.)
       IMG: conveyor:ci
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: build
         run: docker build --file Dockerfile --tag "$IMG" .

@@ -82,7 +82,7 @@ reqwest = { version = "0.13.5", default-features = false, features = [
     # multipart/form-data (S09 §5.6).
     "multipart",
 ] }
-base64 = "0.22.1"
+base64 = "0.23.1"
 # `timestamptz` in Rust (job leases, event timestamps, licence expiry) and the schedule
 # next-run arithmetic. Pinned; the estate's agent-api uses the same crate.
 chrono = { version = "0.4.45", features = ["serde"] }
@@ -110,7 +110,7 @@ rmcp = { version = "3.9.0", features = ["server", "transport-streamable-http-ser
 openapiv3 = "2.2.0"
 # rmcp and axum both speak http 1.x; the MCP credential resolver takes the header map.
 http = "1.3.1"
-syn = { version = "2.0.108", features = ["full"] }
+syn = { version = "3.0.9", features = ["full"] }
 quote = "1.0.41"
 proc-macro2 = "1.0.103"
 proptest = "1.12.0"
@@ -139,7 +139,7 @@ svg2pdf = { version = "0.13.0", default-features = false, features = ["text"] }
 # host fonts is (a) `usvg`/`resvg` pinned with `default-features = false`, so usvg's
 # `system-fonts` feature is off and the parser never scans the system on its own, and (b) the
 # renderer never calling `load_system_fonts()` — guarded by a source-scan test in `font.rs`.
-fontdb = "0.23.0"
+fontdb = "0.24.0"
 # XMI. `quick-xml` is a pull parser: it never resolves an external entity, and a `DOCTYPE`
 # arrives as `Event::DocType`, which the importer refuses (RM's exchange adapter does the same).
 quick-xml = "0.42.0"
