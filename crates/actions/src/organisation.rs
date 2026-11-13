@@ -585,7 +585,11 @@ async fn job_catalogue_create(
     let title = input.title.trim();
     if job_key.is_empty() || title.is_empty() {
         return Err(invalid(
-            if job_key.is_empty() { "job_key" } else { "title" },
+            if job_key.is_empty() {
+                "job_key"
+            } else {
+                "title"
+            },
             "required",
             "must not be empty",
         ));
@@ -634,15 +638,10 @@ async fn job_catalogue_update(
         meta: input.meta,
         departments: input.departments.as_deref().map(placement_in),
     };
-    let row = store::organisation::job_update_tx(
-        &mut *tx,
-        ctx.tenant,
-        input.id,
-        input.version,
-        &patch,
-    )
-    .await
-    .map_err(|error| organisation_error(error, "job_catalogue.update"))?;
+    let row =
+        store::organisation::job_update_tx(&mut *tx, ctx.tenant, input.id, input.version, &patch)
+            .await
+            .map_err(|error| organisation_error(error, "job_catalogue.update"))?;
     job_view(&mut *tx, ctx.tenant, &row).await
 }
 
@@ -663,10 +662,9 @@ async fn job_catalogue_retire(
     ctx: HandlerCtx,
     input: JobRetireIn,
 ) -> Result<JobOut, ActionError> {
-    let row =
-        store::organisation::job_retire_tx(&mut *tx, ctx.tenant, input.id, input.version)
-            .await
-            .map_err(|error| organisation_error(error, "job_catalogue.retire"))?;
+    let row = store::organisation::job_retire_tx(&mut *tx, ctx.tenant, input.id, input.version)
+        .await
+        .map_err(|error| organisation_error(error, "job_catalogue.retire"))?;
     job_view(&mut *tx, ctx.tenant, &row).await
 }
 
@@ -810,8 +808,7 @@ async fn job_bindings_create(
     ctx: HandlerCtx,
     input: BindingCreateIn,
 ) -> Result<BindingOut, ActionError> {
-    let executor_kind = ExecutorKind::parse(input.executor_kind.trim())
-        .map_err(executor_error)?;
+    let executor_kind = ExecutorKind::parse(input.executor_kind.trim()).map_err(executor_error)?;
     let status = status_in(input.status.as_deref())?;
     let row = store::organisation::job_binding_create_tx(
         &mut *tx,
@@ -850,14 +847,10 @@ async fn job_bindings_retire(
     ctx: HandlerCtx,
     input: BindingRetireIn,
 ) -> Result<BindingOut, ActionError> {
-    let row = store::organisation::job_binding_retire_tx(
-        &mut *tx,
-        ctx.tenant,
-        input.id,
-        input.version,
-    )
-    .await
-    .map_err(|error| organisation_error(error, "job_bindings.retire"))?;
+    let row =
+        store::organisation::job_binding_retire_tx(&mut *tx, ctx.tenant, input.id, input.version)
+            .await
+            .map_err(|error| organisation_error(error, "job_bindings.retire"))?;
     Ok(binding_view(&row))
 }
 

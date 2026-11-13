@@ -240,12 +240,10 @@ async fn organisation_is_populated_for_a_seeded_tenant() {
         .execute(&db.super_pool)
         .await
         .expect("tenant");
-    let counts = conveyor_store::seed_organisation::seed_organisation(
-        &db.super_pool,
-        Some("nonagentic"),
-    )
-    .await
-    .expect("seed the organisation");
+    let counts =
+        conveyor_store::seed_organisation::seed_organisation(&db.super_pool, Some("nonagentic"))
+            .await
+            .expect("seed the organisation");
     assert_eq!(counts.len(), 1);
     assert_eq!(counts[0].1.releases_published, 5);
 

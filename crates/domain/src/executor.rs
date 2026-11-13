@@ -250,7 +250,10 @@ mod tests {
     #[test]
     fn the_builtin_registry_serves_exactly_the_two_live_kinds() {
         let registry = Registry::builtin();
-        assert_eq!(registry.kinds().collect::<Vec<_>>(), vec![INTERNAL_AGENT, PROCEDURE]);
+        assert_eq!(
+            registry.kinds().collect::<Vec<_>>(),
+            vec![INTERNAL_AGENT, PROCEDURE]
+        );
         assert!(registry.require(&ExecutorKind::procedure()).is_ok());
         assert!(registry.require(&ExecutorKind::internal_agent()).is_ok());
     }
@@ -313,7 +316,10 @@ mod tests {
             process_id: Some(agent),
             capability_agent_id: None,
         };
-        assert_eq!(registry.validate(&internal), Err(BindingError::MissingAgent));
+        assert_eq!(
+            registry.validate(&internal),
+            Err(BindingError::MissingAgent)
+        );
     }
 
     #[test]

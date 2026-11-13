@@ -80,7 +80,10 @@ mod tests {
     #[test]
     fn the_release_hash_is_the_crate_canonical_hash() {
         let snapshot = json!({"job": "backend_engineer", "pins": {"model": "m", "process": "p"}});
-        assert_eq!(release_hash(&snapshot), crate::compare::content_hash(&snapshot));
+        assert_eq!(
+            release_hash(&snapshot),
+            crate::compare::content_hash(&snapshot)
+        );
         assert_eq!(release_hash(&snapshot), release_hash(&snapshot));
         assert_eq!(release_hash(&snapshot).len(), 64);
     }

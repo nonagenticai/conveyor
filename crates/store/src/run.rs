@@ -445,7 +445,8 @@ pub async fn insert_child_run_tx(
     .bind(parent_run_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let Some((parent_card_id, parent_depth, parent_status, parent_binding, parent_release)) = parent
+    let Some((parent_card_id, parent_depth, parent_status, parent_binding, parent_release)) =
+        parent
     else {
         return Err(RunStoreError::NotFound);
     };

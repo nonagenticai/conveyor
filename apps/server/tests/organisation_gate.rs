@@ -15,11 +15,11 @@ use conveyor_domain::TenantId;
 use conveyor_domain::executor::{ExecutorKind, Registry};
 use conveyor_domain::organisation::BindingStatus;
 use conveyor_store::actions::{NewDepartment, department_create};
+use conveyor_store::begin_scoped;
 use conveyor_store::organisation::{
     NewBinding, NewIndustry, NewJob, PlacementIn, industry_create_tx, job_binding_create_tx,
     job_create_tx, job_release_publish_tx,
 };
-use conveyor_store::begin_scoped;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -323,11 +323,9 @@ async fn a_binding_without_an_executor_is_422_and_a_viewer_is_403() {
     let error = refused.expect_err("a binding with no executor is refused");
     assert_eq!(error.status, 422, "{}", error.detail);
     assert!(
-        error
-            .errors
-            .iter()
-            .any(|field| field.code == "missing_process"
-                || field.code == "binding_without_executor"),
+        error.errors.iter().any(
+            |field| field.code == "missing_process" || field.code == "binding_without_executor"
+        ),
         "the refusal names the missing executor: {:?}",
         error.errors
     );

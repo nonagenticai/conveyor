@@ -18,6 +18,7 @@ use conveyor_domain::TenantId;
 use conveyor_domain::executor::{BindingConfig, BindingError, Executor, ExecutorKind, Registry};
 use conveyor_domain::organisation::{BindingStatus, release_hash};
 use conveyor_store::actions::{NewDepartment, department_create};
+use conveyor_store::begin_scoped;
 use conveyor_store::organisation::{
     NewBinding, NewIndustry, NewJob, OrganisationStoreError, PlacementIn, compile_release_tx,
     industry_create_tx, job_binding_create_tx, job_binding_retire_tx, job_create_tx,
@@ -25,7 +26,6 @@ use conveyor_store::organisation::{
 };
 use conveyor_store::run::{NewRun, RunStoreError, insert_run_tx};
 use conveyor_store::seed_organisation::seed_organisation;
-use conveyor_store::begin_scoped;
 use serde_json::json;
 use uuid::Uuid;
 
@@ -240,10 +240,7 @@ async fn job_departments_are_ordered_and_placement_is_validated() {
     )
     .await;
     assert!(
-        matches!(
-            two_primaries,
-            Err(OrganisationStoreError::InvalidPlacement)
-        ),
+        matches!(two_primaries, Err(OrganisationStoreError::InvalidPlacement)),
         "exactly one primary is required: {two_primaries:?}"
     );
 
@@ -340,9 +337,10 @@ async fn release_hash_is_deterministic_and_publish_is_idempotent() {
     // Rotation is allowed and touches only the bookkeeping columns; the runtime role has no
     // UPDATE on `release_hash`/`release_snapshot` (scripts/grants-runtime.sql), so this also
     // proves the column grant the migration promises.
-    let retired = conveyor_store::organisation::job_release_retire_tx(&mut tx, org.tenant, published.id)
-        .await
-        .expect("retire the release");
+    let retired =
+        conveyor_store::organisation::job_release_retire_tx(&mut tx, org.tenant, published.id)
+            .await
+            .expect("retire the release");
     assert_eq!(retired.status, "retired");
     assert_eq!(retired.release_hash, published.release_hash);
     assert_eq!(retired.release_snapshot, published.release_snapshot);
@@ -421,14 +419,13 @@ async fn a_run_pins_its_binding_and_a_retired_or_mismatched_pin_is_refused() {
         }
         other => panic!("a mismatched pin must be refused, got {other:?}"),
     }
-    let runs_on_binding: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM run WHERE tenant_id = $1 AND job_binding_id = $2",
-    )
-    .bind(org.tenant.as_uuid())
-    .bind(binding.id)
-    .fetch_one(&mut *tx)
-    .await
-    .expect("count runs");
+    let runs_on_binding: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM run WHERE tenant_id = $1 AND job_binding_id = $2")
+            .bind(org.tenant.as_uuid())
+            .bind(binding.id)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("count runs");
     assert_eq!(runs_on_binding, 1, "the refusal wrote no run");
     tx.commit().await.expect("commit");
 
@@ -539,14 +536,20 @@ async fn seed_organisation_is_idempotent_and_the_seeded_anatomy_compiles() {
     let first = seed_organisation(&db.super_pool, Some("nonagentic"))
         .await
         .expect("first seed");
-    let counts = first.first().map(|(_, counts)| *counts).expect("one tenant");
+    let counts = first
+        .first()
+        .map(|(_, counts)| *counts)
+        .expect("one tenant");
     assert_eq!(counts.created, 28, "1 industry + 5 departments + 22 jobs");
     assert_eq!(counts.releases_published, 5, "the five described jobs");
 
     let second = seed_organisation(&db.super_pool, Some("nonagentic"))
         .await
         .expect("second seed");
-    let counts = second.first().map(|(_, counts)| *counts).expect("one tenant");
+    let counts = second
+        .first()
+        .map(|(_, counts)| *counts)
+        .expect("one tenant");
     assert_eq!(counts.created, 0, "a second run creates nothing");
     assert_eq!(counts.skipped, 28);
     assert_eq!(counts.releases_published, 0);
@@ -607,12 +610,16 @@ async fn ahtapol_receives_only_its_industry() {
     let counts = seed_organisation(&db.super_pool, Some("AHTAPol"))
         .await
         .expect("seed AHTAPol");
-    let counts = counts.first().map(|(_, counts)| *counts).expect("one tenant");
+    let counts = counts
+        .first()
+        .map(|(_, counts)| *counts)
+        .expect("one tenant");
     assert_eq!(counts.created, 1, "its own industry only");
-    let industries: i64 =
-        sqlx::query_scalar("SELECT count(*) FROM industry WHERE key = 'health-technology-assessment'")
-            .fetch_one(&db.super_pool)
-            .await
-            .expect("count industries");
+    let industries: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM industry WHERE key = 'health-technology-assessment'",
+    )
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("count industries");
     assert_eq!(industries, 1);
 }

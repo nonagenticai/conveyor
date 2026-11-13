@@ -2390,16 +2390,15 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         },
         {
             let mut sample = on_prepared("job_catalogue.update", None);
-            sample.input = Box::new(|ctx: &Ctx| {
-                json!({"id": ctx.pop("job_catalogue.update"), "version": 1, "title": "Parity job updated"})
-            });
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("job_catalogue.update"), "version": 1, "title": "Parity job updated"}),
+            );
             sample
         },
         {
             let mut sample = on_prepared("job_catalogue.retire", None);
-            sample.input = Box::new(|ctx: &Ctx| {
-                json!({"id": ctx.pop("job_catalogue.retire"), "version": 1})
-            });
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"id": ctx.pop("job_catalogue.retire"), "version": 1}));
             sample
         },
         {
@@ -2436,9 +2435,8 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         },
         {
             let mut sample = on_prepared("job_bindings.retire", None);
-            sample.input = Box::new(|ctx: &Ctx| {
-                json!({"id": ctx.pop("job_bindings.retire"), "version": 1})
-            });
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"id": ctx.pop("job_bindings.retire"), "version": 1}));
             sample
         },
         {
@@ -4846,9 +4844,7 @@ async fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     .bind(org_job)
     .bind(org_release)
     .bind(&org_release_hash)
-    .bind(
-        Uuid::parse_str(&capability_agent_id).expect("the capability agent id is a uuid"),
-    )
+    .bind(Uuid::parse_str(&capability_agent_id).expect("the capability agent id is a uuid"))
     .fetch_one(&pg.super_pool)
     .await
     .expect("seed the parity binding");

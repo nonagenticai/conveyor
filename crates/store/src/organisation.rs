@@ -180,8 +180,7 @@ pub struct BindingRow {
     pub updated_at: DateTime<Utc>,
 }
 
-const INDUSTRY_COLUMNS: &str =
-    "id, key, name, status, meta, version, created_at, updated_at";
+const INDUSTRY_COLUMNS: &str = "id, key, name, status, meta, version, created_at, updated_at";
 const JOB_COLUMNS: &str = "id, job_key, industry_id, family, title, status, definition, meta, \
                            version, created_at, updated_at";
 const RELEASE_COLUMNS: &str =
@@ -300,9 +299,7 @@ pub async fn industry_get_tx(
     tenant: TenantId,
     id: Uuid,
 ) -> Result<IndustryRow, OrganisationStoreError> {
-    let sql = format!(
-        "SELECT {INDUSTRY_COLUMNS} FROM industry WHERE tenant_id = $1 AND id = $2"
-    );
+    let sql = format!("SELECT {INDUSTRY_COLUMNS} FROM industry WHERE tenant_id = $1 AND id = $2");
     sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(id)
@@ -316,9 +313,8 @@ pub async fn industries_list_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
 ) -> Result<Vec<IndustryRow>, sqlx::Error> {
-    let sql = format!(
-        "SELECT {INDUSTRY_COLUMNS} FROM industry WHERE tenant_id = $1 ORDER BY key, id"
-    );
+    let sql =
+        format!("SELECT {INDUSTRY_COLUMNS} FROM industry WHERE tenant_id = $1 ORDER BY key, id");
     sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .fetch_all(&mut *conn)
@@ -334,13 +330,12 @@ pub async fn job_create_tx(
     input: &NewJob,
 ) -> Result<JobRow, OrganisationStoreError> {
     // The industry must resolve in THIS tenant: the FK bypasses RLS.
-    let industry: Option<Uuid> = sqlx::query_scalar(
-        "SELECT id FROM industry WHERE tenant_id = $1 AND id = $2",
-    )
-    .bind(tenant.as_uuid())
-    .bind(input.industry_id)
-    .fetch_optional(&mut *conn)
-    .await?;
+    let industry: Option<Uuid> =
+        sqlx::query_scalar("SELECT id FROM industry WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(input.industry_id)
+            .fetch_optional(&mut *conn)
+            .await?;
     if industry.is_none() {
         return Err(OrganisationStoreError::NotFound("industry"));
     }
@@ -435,9 +430,7 @@ pub async fn job_get_tx(
     tenant: TenantId,
     id: Uuid,
 ) -> Result<JobRow, OrganisationStoreError> {
-    let sql = format!(
-        "SELECT {JOB_COLUMNS} FROM job_catalogue WHERE tenant_id = $1 AND id = $2"
-    );
+    let sql = format!("SELECT {JOB_COLUMNS} FROM job_catalogue WHERE tenant_id = $1 AND id = $2");
     sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(id)
@@ -656,9 +649,7 @@ pub async fn job_release_get_tx(
     tenant: TenantId,
     id: Uuid,
 ) -> Result<ReleaseRow, OrganisationStoreError> {
-    let sql = format!(
-        "SELECT {RELEASE_COLUMNS} FROM job_release WHERE tenant_id = $1 AND id = $2"
-    );
+    let sql = format!("SELECT {RELEASE_COLUMNS} FROM job_release WHERE tenant_id = $1 AND id = $2");
     sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(id)
@@ -786,9 +777,7 @@ pub async fn job_binding_get_tx(
     tenant: TenantId,
     id: Uuid,
 ) -> Result<BindingRow, OrganisationStoreError> {
-    let sql = format!(
-        "SELECT {BINDING_COLUMNS} FROM job_binding WHERE tenant_id = $1 AND id = $2"
-    );
+    let sql = format!("SELECT {BINDING_COLUMNS} FROM job_binding WHERE tenant_id = $1 AND id = $2");
     sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(id)
@@ -834,7 +823,9 @@ pub async fn resolve_binding_pin_tx(
     .fetch_optional(&mut *conn)
     .await?;
     let (status, binding_hash) = row.ok_or(OrganisationStoreError::NotFound("binding"))?;
-    let status: BindingStatus = status.parse().map_err(OrganisationStoreError::UnknownStatus)?;
+    let status: BindingStatus = status
+        .parse()
+        .map_err(OrganisationStoreError::UnknownStatus)?;
     let requested = requested_hash.unwrap_or(&binding_hash).to_owned();
     if !status.is_usable_for_new_runs() || requested != binding_hash {
         return Err(OrganisationStoreError::StaleRelease {
@@ -917,9 +908,11 @@ pub async fn organisation_json_tx(
             "department_names": placements.iter().map(|p| p.department_name.clone()).collect::<Vec<_>>(),
             "release_hash": latest_release.map(|release| release.release_hash.clone()),
         });
-        if let (Some(release), Some(object)) =
-            (latest_release, row.as_object_mut())
-            && let Some(anatomy) = release.release_snapshot.get("anatomy").and_then(Value::as_object)
+        if let (Some(release), Some(object)) = (latest_release, row.as_object_mut())
+            && let Some(anatomy) = release
+                .release_snapshot
+                .get("anatomy")
+                .and_then(Value::as_object)
         {
             for (key, value) in anatomy {
                 object.insert(key.clone(), value.clone());
@@ -936,8 +929,10 @@ pub async fn organisation_json_tx(
         job_rows.push(row);
     }
 
-    let job_keys: std::collections::BTreeMap<Uuid, &str> =
-        jobs.iter().map(|job| (job.id, job.job_key.as_str())).collect();
+    let job_keys: std::collections::BTreeMap<Uuid, &str> = jobs
+        .iter()
+        .map(|job| (job.id, job.job_key.as_str()))
+        .collect();
 
     Ok(json!({
         "industries": industries.iter().map(|row| json!({
@@ -989,10 +984,19 @@ mod tests {
 
     #[test]
     fn a_contiguous_placement_needs_one_primary() {
-        assert!(placement_is_contiguous(&[placement(1, true), placement(2, false)]));
+        assert!(placement_is_contiguous(&[
+            placement(1, true),
+            placement(2, false)
+        ]));
         assert!(!placement_is_contiguous(&[placement(1, false)]));
-        assert!(!placement_is_contiguous(&[placement(1, true), placement(3, false)]));
-        assert!(!placement_is_contiguous(&[placement(2, true), placement(1, false)]));
+        assert!(!placement_is_contiguous(&[
+            placement(1, true),
+            placement(3, false)
+        ]));
+        assert!(!placement_is_contiguous(&[
+            placement(2, true),
+            placement(1, false)
+        ]));
         assert!(!placement_is_contiguous(&[]));
     }
 
