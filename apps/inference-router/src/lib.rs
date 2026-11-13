@@ -7,10 +7,12 @@
 #![forbid(unsafe_code)]
 
 pub mod auth;
+pub mod billing;
 pub mod catalog;
 pub mod config;
 pub mod contract;
 pub mod db;
+pub mod metering;
 pub mod provider;
 pub mod router;
 pub mod routing;

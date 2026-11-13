@@ -41,6 +41,71 @@ pub struct Config {
     pub introspect_timeout_seconds: f64,
     /// `INFERENCE_ROUTER_LICENSE_INTROSPECT_FAIL_OPEN` (default true): an outage is not a verdict.
     pub introspect_fail_open: bool,
+    /// `INFERENCE_ROUTER_METERING_REDIS_URL` — the cost bus. Absent means metering is off, and the
+    /// boot log says so; it is never a silent no-op.
+    pub metering_redis_url: Option<String>,
+    /// `INFERENCE_ROUTER_METERING_COSTS_ENABLED` (the reference defaults to true).
+    pub metering_costs_enabled: bool,
+    /// `INFERENCE_ROUTER_METERING_COSTS_STREAM` (the reference default; the live deployment sets
+    /// `billing:costs`).
+    pub metering_costs_stream: String,
+    /// `INFERENCE_ROUTER_BUDGET_GATE_MODE` — `off` makes no call at all.
+    pub budget_gate_mode: GateMode,
+    /// `INFERENCE_ROUTER_BUDGET_GATE_BILLING_BASE_URL` — billing's `/api/budget/reserve` origin.
+    pub budget_gate_billing_base_url: String,
+    /// `INFERENCE_ROUTER_BUDGET_GATE_TIMEOUT_SECONDS` — the WHOLE reserve call, no retries.
+    pub budget_gate_timeout_seconds: f64,
+    /// `INFERENCE_ROUTER_BUDGET_GATE_RESERVE_TTL_SECONDS` — billing accepts 5..=600.
+    pub budget_gate_reserve_ttl_seconds: i64,
+    /// `INFERENCE_ROUTER_POLICY_MODE` — `store` runs the store and admin API but routes globally.
+    pub policy_mode: PolicyMode,
+    /// `INFERENCE_ROUTER_POLICY_CACHE_TTL_SECONDS` — bounds staleness with the epoch poll.
+    pub policy_cache_ttl_seconds: f64,
+    /// `INFERENCE_ROUTER_POLICY_EPOCH_POLL_SECONDS` — no LISTEN/NOTIFY: pgbouncer pools.
+    pub policy_epoch_poll_seconds: f64,
+    /// `INFERENCE_ROUTER_INTERNAL_SECRET` — the six `/api/internal/*` reads' shared secret.
+    pub internal_secret: Option<String>,
+    /// `COMMERCIAL_PLATFORM_TENANT_IDS` — deliberately UNPREFIXED, matching the live manifest.
+    pub commercial_platform_tenant_ids: Vec<String>,
+}
+
+/// `INFERENCE_ROUTER_BUDGET_GATE_MODE`, exactly the reference's three states.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum GateMode {
+    Off,
+    Shadow,
+    Enforce,
+}
+
+impl GateMode {
+    fn parse(raw: &str) -> Option<Self> {
+        match raw.trim().to_ascii_lowercase().as_str() {
+            "off" => Some(Self::Off),
+            "shadow" => Some(Self::Shadow),
+            "enforce" => Some(Self::Enforce),
+            _ => None,
+        }
+    }
+}
+
+/// `INFERENCE_ROUTER_POLICY_MODE`. `store` is the rollback position: the policy store and the
+/// admin API are live, routing ignores policies.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PolicyMode {
+    Off,
+    Store,
+    On,
+}
+
+impl PolicyMode {
+    fn parse(raw: &str) -> Option<Self> {
+        match raw.trim().to_ascii_lowercase().as_str() {
+            "off" => Some(Self::Off),
+            "store" => Some(Self::Store),
+            "on" => Some(Self::On),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, thiserror::Error)]
@@ -57,6 +122,20 @@ pub enum ConfigError {
     InvalidIntrospectTimeout(String),
     #[error("INFERENCE_ROUTER_DATABASE_URL (or DATABASE_URL) is required to serve")]
     MissingDatabaseUrl,
+    #[error("INFERENCE_ROUTER_BUDGET_GATE_MODE is not one of off/shadow/enforce: {0}")]
+    InvalidBudgetGateMode(String),
+    #[error("INFERENCE_ROUTER_POLICY_MODE is not one of off/store/on: {0}")]
+    InvalidPolicyMode(String),
+    #[error(
+        "INFERENCE_ROUTER_BUDGET_GATE_TIMEOUT_SECONDS is not a positive number of seconds: {0}"
+    )]
+    InvalidBudgetTimeout(String),
+    #[error("INFERENCE_ROUTER_BUDGET_GATE_RESERVE_TTL_SECONDS is not 5..=600: {0}")]
+    InvalidReserveTtl(String),
+    #[error("INFERENCE_ROUTER_POLICY_CACHE_TTL_SECONDS is not a number in (0, 60]: {0}")]
+    InvalidPolicyCacheTtl(String),
+    #[error("INFERENCE_ROUTER_POLICY_EPOCH_POLL_SECONDS is not a number in (0, 5]: {0}")]
+    InvalidPolicyEpochPoll(String),
 }
 
 impl Config {
@@ -134,6 +213,89 @@ impl Config {
             non_empty(lookup("INFERENCE_ROUTER_LICENSE_INTROSPECT_FAIL_OPEN"))
                 .is_none_or(|value| value.eq_ignore_ascii_case("true"));
 
+        let metering_redis_url = non_empty(lookup("INFERENCE_ROUTER_METERING_REDIS_URL"));
+        let metering_costs_enabled = non_empty(lookup("INFERENCE_ROUTER_METERING_COSTS_ENABLED"))
+            .is_none_or(|value| value.eq_ignore_ascii_case("true"));
+        // The reference default; the live deployment overrides it with `billing:costs`. A fresh
+        // deploy must never write to the retired `metering:costs` name.
+        let metering_costs_stream = non_empty(lookup("INFERENCE_ROUTER_METERING_COSTS_STREAM"))
+            .unwrap_or_else(|| "improvement-loop:costs".to_owned());
+
+        let budget_gate_mode = match non_empty(lookup("INFERENCE_ROUTER_BUDGET_GATE_MODE")) {
+            Some(raw) => GateMode::parse(&raw).ok_or(ConfigError::InvalidBudgetGateMode(raw))?,
+            None => GateMode::Off,
+        };
+        let budget_gate_billing_base_url = non_empty(lookup(
+            "INFERENCE_ROUTER_BUDGET_GATE_BILLING_BASE_URL",
+        ))
+        .unwrap_or_else(|| "http://billing-service.billing.svc.cluster.local:8157".to_owned());
+        let budget_gate_timeout_seconds: f64 =
+            match non_empty(lookup("INFERENCE_ROUTER_BUDGET_GATE_TIMEOUT_SECONDS")) {
+                Some(raw) => raw
+                    .parse()
+                    .map_err(|_| ConfigError::InvalidBudgetTimeout(raw.clone()))?,
+                None => 0.75,
+            };
+        if budget_gate_timeout_seconds <= 0.0 || !budget_gate_timeout_seconds.is_finite() {
+            return Err(ConfigError::InvalidBudgetTimeout(
+                budget_gate_timeout_seconds.to_string(),
+            ));
+        }
+        let budget_gate_reserve_ttl_seconds: i64 =
+            match non_empty(lookup("INFERENCE_ROUTER_BUDGET_GATE_RESERVE_TTL_SECONDS")) {
+                Some(raw) => raw
+                    .parse()
+                    .map_err(|_| ConfigError::InvalidReserveTtl(raw.clone()))?,
+                None => 60,
+            };
+        if !(5..=600).contains(&budget_gate_reserve_ttl_seconds) {
+            return Err(ConfigError::InvalidReserveTtl(
+                budget_gate_reserve_ttl_seconds.to_string(),
+            ));
+        }
+
+        let policy_mode = match non_empty(lookup("INFERENCE_ROUTER_POLICY_MODE")) {
+            Some(raw) => PolicyMode::parse(&raw).ok_or(ConfigError::InvalidPolicyMode(raw))?,
+            None => PolicyMode::Off,
+        };
+        let policy_cache_ttl_seconds: f64 =
+            match non_empty(lookup("INFERENCE_ROUTER_POLICY_CACHE_TTL_SECONDS")) {
+                Some(raw) => raw
+                    .parse()
+                    .map_err(|_| ConfigError::InvalidPolicyCacheTtl(raw.clone()))?,
+                None => 15.0,
+            };
+        if policy_cache_ttl_seconds <= 0.0 || policy_cache_ttl_seconds > 60.0 {
+            return Err(ConfigError::InvalidPolicyCacheTtl(
+                policy_cache_ttl_seconds.to_string(),
+            ));
+        }
+        let policy_epoch_poll_seconds: f64 =
+            match non_empty(lookup("INFERENCE_ROUTER_POLICY_EPOCH_POLL_SECONDS")) {
+                Some(raw) => raw
+                    .parse()
+                    .map_err(|_| ConfigError::InvalidPolicyEpochPoll(raw.clone()))?,
+                None => 5.0,
+            };
+        if policy_epoch_poll_seconds <= 0.0 || policy_epoch_poll_seconds > 5.0 {
+            return Err(ConfigError::InvalidPolicyEpochPoll(
+                policy_epoch_poll_seconds.to_string(),
+            ));
+        }
+
+        let internal_secret = non_empty(lookup("INFERENCE_ROUTER_INTERNAL_SECRET"));
+        // UNPREFIXED in the live manifest (it is shared with the workers deployment), so it is
+        // read unprefixed here too.
+        let commercial_platform_tenant_ids = non_empty(lookup("COMMERCIAL_PLATFORM_TENANT_IDS"))
+            .map(|raw| {
+                raw.split(',')
+                    .map(str::trim)
+                    .filter(|id| !id.is_empty())
+                    .map(str::to_owned)
+                    .collect()
+            })
+            .unwrap_or_default();
+
         Ok(Self {
             bind,
             database_url,
@@ -145,6 +307,18 @@ impl Config {
             introspect_url,
             introspect_timeout_seconds,
             introspect_fail_open,
+            metering_redis_url,
+            metering_costs_enabled,
+            metering_costs_stream,
+            budget_gate_mode,
+            budget_gate_billing_base_url,
+            budget_gate_timeout_seconds,
+            budget_gate_reserve_ttl_seconds,
+            policy_mode,
+            policy_cache_ttl_seconds,
+            policy_epoch_poll_seconds,
+            internal_secret,
+            commercial_platform_tenant_ids,
         })
     }
 
@@ -302,5 +476,92 @@ mod tests {
                 .expect("parses")
                 .docs_enabled
         );
+    }
+
+    #[test]
+    fn write_path_defaults_match_the_reference() {
+        let config = parse(&[]).expect("defaults parse");
+        assert_eq!(config.metering_redis_url, None);
+        assert!(config.metering_costs_enabled);
+        assert_eq!(config.metering_costs_stream, "improvement-loop:costs");
+        assert_eq!(config.budget_gate_mode, GateMode::Off);
+        assert_eq!(
+            config.budget_gate_billing_base_url,
+            "http://billing-service.billing.svc.cluster.local:8157"
+        );
+        assert_eq!(config.budget_gate_timeout_seconds, 0.75);
+        assert_eq!(config.budget_gate_reserve_ttl_seconds, 60);
+        assert_eq!(config.policy_mode, PolicyMode::Off);
+        assert_eq!(config.policy_cache_ttl_seconds, 15.0);
+        assert_eq!(config.policy_epoch_poll_seconds, 5.0);
+        assert_eq!(config.internal_secret, None);
+        assert!(config.commercial_platform_tenant_ids.is_empty());
+    }
+
+    #[test]
+    fn the_live_deployments_write_path_values_parse() {
+        let config = parse(&[
+            (
+                "INFERENCE_ROUTER_METERING_REDIS_URL",
+                "redis://redis:6379/0",
+            ),
+            ("INFERENCE_ROUTER_METERING_COSTS_ENABLED", "false"),
+            ("INFERENCE_ROUTER_METERING_COSTS_STREAM", "billing:costs"),
+            ("INFERENCE_ROUTER_BUDGET_GATE_MODE", "enforce"),
+            (
+                "INFERENCE_ROUTER_BUDGET_GATE_BILLING_BASE_URL",
+                "http://billing:8157",
+            ),
+            ("INFERENCE_ROUTER_POLICY_MODE", "on"),
+            ("INFERENCE_ROUTER_INTERNAL_SECRET", "synthetic"),
+            ("COMMERCIAL_PLATFORM_TENANT_IDS", "a, b ,,c"),
+        ])
+        .expect("live values parse");
+        assert_eq!(
+            config.metering_redis_url.as_deref(),
+            Some("redis://redis:6379/0")
+        );
+        assert!(!config.metering_costs_enabled);
+        assert_eq!(config.metering_costs_stream, "billing:costs");
+        assert_eq!(config.budget_gate_mode, GateMode::Enforce);
+        assert_eq!(config.budget_gate_billing_base_url, "http://billing:8157");
+        assert_eq!(config.policy_mode, PolicyMode::On);
+        assert_eq!(config.internal_secret.as_deref(), Some("synthetic"));
+        // Blank and empty entries are dropped, spaces trimmed.
+        assert_eq!(config.commercial_platform_tenant_ids, vec!["a", "b", "c"]);
+    }
+
+    #[test]
+    fn the_write_path_options_fail_closed() {
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_BUDGET_GATE_MODE", "sometimes")]),
+            Err(ConfigError::InvalidBudgetGateMode("sometimes".to_owned()))
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_POLICY_MODE", "half")]),
+            Err(ConfigError::InvalidPolicyMode("half".to_owned()))
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_BUDGET_GATE_TIMEOUT_SECONDS", "0")]),
+            Err(ConfigError::InvalidBudgetTimeout("0".to_owned()))
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_BUDGET_GATE_RESERVE_TTL_SECONDS", "4")]),
+            Err(ConfigError::InvalidReserveTtl("4".to_owned()))
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_BUDGET_GATE_RESERVE_TTL_SECONDS", "601")]),
+            Err(ConfigError::InvalidReserveTtl("601".to_owned()))
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_POLICY_CACHE_TTL_SECONDS", "61")]),
+            Err(ConfigError::InvalidPolicyCacheTtl("61".to_owned()))
+        );
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_POLICY_EPOCH_POLL_SECONDS", "6")]),
+            Err(ConfigError::InvalidPolicyEpochPoll("6".to_owned()))
+        );
+        assert!(parse(&[("INFERENCE_ROUTER_BUDGET_GATE_MODE", "shadow")]).is_ok());
+        assert!(parse(&[("INFERENCE_ROUTER_POLICY_MODE", "store")]).is_ok());
     }
 }

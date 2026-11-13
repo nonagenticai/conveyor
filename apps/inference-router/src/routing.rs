@@ -14,7 +14,7 @@
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use axum::http::StatusCode;
 
@@ -77,6 +77,35 @@ impl axum::response::IntoResponse for Refusal {
     }
 }
 
+/// One dispatch attempt, in the order it happened. This is the unit the cost bus is billed on:
+/// a request that fails over spends money on every attempt, not only on the one that served it.
+#[derive(Debug, Clone)]
+pub struct ProviderAttempt {
+    pub provider: String,
+    /// The upstream model id this attempt was sent with (`None` = the provider's default).
+    pub model_override: Option<String>,
+    /// Measured around the provider call, so it includes the concurrency-slot wait — what the
+    /// caller actually waited for.
+    pub latency: Duration,
+    /// `None` when the attempt succeeded.
+    pub failure: Option<AttemptFailure>,
+}
+
+/// A failed attempt, reduced to what the ledger and the cost event may safely carry.
+/// `UpstreamError` is not `Clone`, and the chain keeps the last one to build its refusal.
+#[derive(Debug, Clone)]
+pub struct AttemptFailure {
+    pub classification: &'static str,
+    pub describe: String,
+}
+
+/// One completion call: the answer (or the refusal), plus every attempt it made on the way.
+#[derive(Debug)]
+pub struct CompletionOutcome {
+    pub response: Result<ChatCompletionResponse, Refusal>,
+    pub attempts: Vec<ProviderAttempt>,
+}
+
 /// The providers, built once at boot.
 pub struct RouterService {
     catalog: Catalog,
@@ -117,12 +146,12 @@ impl RouterService {
         self.slot_wait
     }
 
-    /// Serve one non-streaming completion.
+    /// Serve one non-streaming completion, with every attempt it made.
     pub async fn complete(
         &self,
         request: &ChatCompletionRequest,
         x_provider: Option<&str>,
-    ) -> Result<ChatCompletionResponse, Refusal> {
+    ) -> CompletionOutcome {
         match self.route(request, x_provider) {
             Route::Pinned {
                 provider,
@@ -132,7 +161,10 @@ impl RouterService {
                     .await
             }
             Route::Chain(chain) => self.complete_chain(&chain, request).await,
-            Route::Refused(refusal) => Err(refusal),
+            Route::Refused(refusal) => CompletionOutcome {
+                response: Err(refusal),
+                attempts: Vec::new(),
+            },
         }
     }
 
@@ -203,17 +235,24 @@ impl RouterService {
         name: &str,
         model_override: Option<&str>,
         request: &ChatCompletionRequest,
-    ) -> Result<ChatCompletionResponse, Refusal> {
+    ) -> CompletionOutcome {
+        let mut attempts = Vec::new();
         let Some(provider) = self.providers.get(name) else {
             // `route` only pins an enabled provider; this is unreachable, but the refusal is the
             // same one the caller would have received for an unknown name.
-            return Err(Refusal::detail(
-                StatusCode::BAD_REQUEST,
-                format!("Unknown provider: {name}"),
-                "unknown_provider",
-            ));
+            return CompletionOutcome {
+                response: Err(Refusal::detail(
+                    StatusCode::BAD_REQUEST,
+                    format!("Unknown provider: {name}"),
+                    "unknown_provider",
+                )),
+                attempts,
+            };
         };
-        match provider.complete(request, model_override).await {
+        let started = Instant::now();
+        let result = provider.complete(request, model_override).await;
+        attempts.push(attempt_of(name, model_override, started, &result));
+        let response = match result {
             Ok(upstream) => {
                 let mut response = upstream.response;
                 response.served_provider = Some(name.to_owned());
@@ -222,11 +261,14 @@ impl RouterService {
             Err(error) => {
                 if let UpstreamError::BadRequest { message, .. } = &error {
                     // A 400 is the REQUEST's fault: pass the upstream's own reason through.
-                    return Err(Refusal::openai(
-                        StatusCode::BAD_REQUEST,
-                        message.clone(),
-                        "invalid_request_error",
-                    ));
+                    return CompletionOutcome {
+                        response: Err(Refusal::openai(
+                            StatusCode::BAD_REQUEST,
+                            message.clone(),
+                            "invalid_request_error",
+                        )),
+                        attempts,
+                    };
                 }
                 let status = if matches!(error, UpstreamError::QueueRejected { .. }) {
                     StatusCode::SERVICE_UNAVAILABLE
@@ -239,14 +281,16 @@ impl RouterService {
                     error.classification(),
                 ))
             }
-        }
+        };
+        CompletionOutcome { response, attempts }
     }
 
     async fn complete_chain(
         &self,
         chain: &[String],
         request: &ChatCompletionRequest,
-    ) -> Result<ChatCompletionResponse, Refusal> {
+    ) -> CompletionOutcome {
+        let mut attempts = Vec::new();
         let mut last: Option<UpstreamError> = None;
         for name in chain {
             let Some(provider) = self.providers.get(name) else {
@@ -257,18 +301,24 @@ impl RouterService {
                 .provider(name)
                 .and_then(|entry| entry.model_aliases.get(&request.model))
                 .map(String::as_str);
-            match provider.complete(request, model_override).await {
+            let started = Instant::now();
+            let result = provider.complete(request, model_override).await;
+            attempts.push(attempt_of(name, model_override, started, &result));
+            match result {
                 Ok(upstream) => {
                     let mut response = upstream.response;
                     response.served_provider = Some(name.clone());
-                    return Ok(response);
+                    return CompletionOutcome {
+                        response: Ok(response),
+                        attempts,
+                    };
                 }
                 Err(error) => {
                     last = Some(error);
                 }
             }
         }
-        match last {
+        let response = match last {
             Some(error) => Err(Refusal::detail(
                 StatusCode::SERVICE_UNAVAILABLE,
                 format!(
@@ -283,7 +333,26 @@ impl RouterService {
                 "No providers available for this request",
                 "chain_empty",
             )),
-        }
+        };
+        CompletionOutcome { response, attempts }
+    }
+}
+
+/// Snapshot one attempt before its result is consumed: the chain keeps the last error.
+fn attempt_of(
+    provider: &str,
+    model_override: Option<&str>,
+    started: Instant,
+    result: &Result<provider::UpstreamResponse, UpstreamError>,
+) -> ProviderAttempt {
+    ProviderAttempt {
+        provider: provider.to_owned(),
+        model_override: model_override.map(str::to_owned),
+        latency: started.elapsed(),
+        failure: result.as_ref().err().map(|error| AttemptFailure {
+            classification: error.classification(),
+            describe: error.describe(),
+        }),
     }
 }
 
@@ -426,6 +495,7 @@ default_chain: [pgx-local, deepseek]
         let response = service(Ok(()))
             .complete(&request("tier-high"), None)
             .await
+            .response
             .expect("completion");
         assert_eq!(response.served_provider.as_deref(), Some("pgx-local"));
     }
@@ -436,6 +506,7 @@ default_chain: [pgx-local, deepseek]
         let error = service
             .complete(&request("local-llm"), Some("pgx-local"))
             .await
+            .response
             .expect_err("pinned failure");
         assert_eq!(error.status, StatusCode::BAD_GATEWAY);
         assert!(
@@ -450,6 +521,7 @@ default_chain: [pgx-local, deepseek]
         let error = service
             .complete(&request, Some("pgx-local"))
             .await
+            .response
             .expect_err("pinned");
         assert_eq!(error.status, StatusCode::BAD_GATEWAY);
     }
@@ -459,6 +531,7 @@ default_chain: [pgx-local, deepseek]
         let error = service(Ok(()))
             .complete(&request("m"), Some("ghost"))
             .await
+            .response
             .expect_err("unknown");
         assert_eq!(error.status, StatusCode::BAD_REQUEST);
         assert_eq!(error.body["detail"], "Unknown provider: ghost");
@@ -501,6 +574,7 @@ default_chain: [pgx-local]
         let error = service
             .complete(&request("deepseek-v4-flash"), None)
             .await
+            .response
             .expect_err("nothing can serve it");
         assert_eq!(error.status, StatusCode::SERVICE_UNAVAILABLE);
         assert_eq!(error.headers[0].0, CLASSIFICATION_HEADER);
@@ -513,6 +587,7 @@ default_chain: [pgx-local]
         let error = service
             .complete(&request("some-worker-name"), None)
             .await
+            .response
             .expect_err("chain");
         assert_eq!(error.status, StatusCode::SERVICE_UNAVAILABLE);
         assert!(
@@ -530,9 +605,33 @@ default_chain: [pgx-local]
         let error = service
             .complete(&request("local-llm"), Some("pgx-local"))
             .await
+            .response
             .expect_err("400");
         assert_eq!(error.status, StatusCode::BAD_REQUEST);
         assert_eq!(error.body["error"]["message"], "prompt too long");
         assert_eq!(error.body["error"]["type"], "invalid_request_error");
+    }
+
+    #[tokio::test]
+    async fn every_attempt_is_recorded_even_when_the_request_fails() {
+        // A failed request still made an attempt that the cost bus must bill.
+        let outcome = service(Err(("status", "boom")))
+            .complete(&request("local-llm"), Some("pgx-local"))
+            .await;
+        assert!(outcome.response.is_err());
+        assert_eq!(outcome.attempts.len(), 1);
+        assert_eq!(outcome.attempts[0].provider, "pgx-local");
+        let failure = outcome.attempts[0]
+            .failure
+            .as_ref()
+            .expect("a failed attempt");
+        assert_eq!(failure.classification, "upstream_5xx");
+
+        // A served request records the attempt with no failure.
+        let outcome = service(Ok(())).complete(&request("tier-high"), None).await;
+        assert!(outcome.response.is_ok());
+        assert_eq!(outcome.attempts.len(), 1);
+        assert!(outcome.attempts[0].failure.is_none());
+        assert_eq!(outcome.attempts[0].provider, "pgx-local");
     }
 }

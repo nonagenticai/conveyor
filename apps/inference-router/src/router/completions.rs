@@ -73,7 +73,9 @@ pub async fn create_chat_completion(
     let x_provider = headers
         .get("x-provider")
         .and_then(|value| value.to_str().ok());
-    match state.router().complete(&request, x_provider).await {
+    // The attempts are carried out of routing for the write path (one cost event each); the
+    // ledger slice consumes them.
+    match state.router().complete(&request, x_provider).await.response {
         Ok(response) => Json(response).into_response(),
         Err(refusal) => refusal.into_response(),
     }

@@ -14,7 +14,7 @@ use conveyor_inference_router::contract;
 use conveyor_inference_router::db;
 use conveyor_inference_router::router::{self, ROUTES};
 use conveyor_inference_router::routing::RouterService;
-use conveyor_inference_router::state::AppState;
+use conveyor_inference_router::state::{AppDeps, AppState};
 
 #[derive(Debug, Parser)]
 #[command(
@@ -104,8 +104,8 @@ fn serve() -> ExitCode {
 async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
     let config = Config::from_env()?;
     // The service cannot serve without its own database. Refuse at startup, not at the first
-    // request; the ledger slice wires the pool this guard protects.
-    config.database_url()?;
+    // request; the pool this guard protects is opened immediately below.
+    let database_url = config.database_url()?.to_owned();
     conveyor_platform::telemetry::init(SERVICE_NAME);
 
     // The catalog is deployment config and its refusals are part of the contract: an ambiguous
@@ -113,13 +113,20 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
     let catalog = Catalog::load(&config.providers_config_path)?;
     let slot_wait = std::time::Duration::from_secs_f64(config.provider_slot_wait_seconds);
     let router_service = RouterService::new(catalog, slot_wait)?;
+    let pool = db::connect(&database_url, 5).await?;
     tracing::info!(
         environment = %config.environment,
         providers = %config.providers_config_path.display(),
         docs = config.docs_enabled,
         "serving"
     );
-    let state = AppState::new(config, router_service);
+    // The budget gate and the cost sink are wired to their real implementations by the slices
+    // that add them; until then the defaults are explicit rather than absent.
+    let deps = AppDeps {
+        ledger: Some(pool),
+        ..AppDeps::default()
+    };
+    let state = AppState::with_deps(config, router_service, deps);
     let listener = tokio::net::TcpListener::bind(state.config().bind).await?;
     axum::serve(listener, router::router(state)).await?;
     Ok(())
