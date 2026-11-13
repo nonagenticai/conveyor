@@ -40,37 +40,6 @@ if (!fs.existsSync(dataDir)) {
   process.exit(0);
 }
 
-// The plan seed is committed beside the snapshot (not a snapshot output), so it is checked in
-// both modes: it must be a valid assignment and it must carry no private value.
-const planSeedPath = path.join(dataDir, "plan-seed.js");
-if (fs.existsSync(planSeedPath)) {
-  const text = fs.readFileSync(planSeedPath, "utf8");
-  try {
-    const json = text
-      .replace(/^[\s\S]*?window\.CONVEYOR_PLAN_SEED = /, "")
-      .replace(/;\s*$/, "");
-    const value = JSON.parse(json);
-    if (value.schema !== "design-plan-seed/v1" || !Array.isArray(value.projects)) {
-      bad("plan-seed.js payload has the wrong schema");
-    } else {
-      ok("plan-seed.js is a valid plan-seed assignment");
-    }
-  } catch (error) {
-    bad(`plan-seed.js payload does not parse: ${error.message}`);
-  }
-  if (EMAIL.test(text)) bad("plan-seed.js carries an email address");
-  if (TOKEN.test(text)) bad("plan-seed.js carries a credential-shaped string");
-  if (IP.test(text)) bad("plan-seed.js carries an IP address");
-  if (HOME_PATH.test(text)) bad("plan-seed.js carries a home-directory path");
-  if (!EMAIL.test(text) && !TOKEN.test(text) && !IP.test(text) && !HOME_PATH.test(text)) {
-    ok("plan-seed.js carries no email, credential, IP or home path");
-  }
-} else {
-  bad("plan-seed.js is absent");
-}
-// The DESIGN-mode early exit below must not swallow a plan-seed failure.
-if (failures.length) report();
-
 const manifestPath = path.join(dataDir, "manifest.json");
 const snapshotJsPath = path.join(dataDir, "snapshot.js");
 if (!fs.existsSync(manifestPath)) {
@@ -203,7 +172,6 @@ const studioPath = path.join(root, "studio.html");
 if (fs.existsSync(studioPath)) {
   const html = fs.readFileSync(studioPath, "utf8");
   const dataAt = html.indexOf('src="data/snapshot.js"');
-  const planAt = html.indexOf('src="data/plan-seed.js"');
   const v2At = html.indexOf('src="v2.js"');
   if (dataAt === -1) {
     bad("studio.html does not load data/snapshot.js");
@@ -211,13 +179,6 @@ if (fs.existsSync(studioPath)) {
     bad("studio.html must load data/snapshot.js before v2.js");
   } else {
     ok("studio.html loads data/snapshot.js before v2.js");
-  }
-  if (planAt === -1) {
-    bad("studio.html does not load data/plan-seed.js");
-  } else if (v2At === -1 || planAt > v2At) {
-    bad("studio.html must load data/plan-seed.js before v2.js");
-  } else {
-    ok("studio.html loads data/plan-seed.js before v2.js");
   }
 }
 

@@ -5,8 +5,9 @@ Open it directly in a browser; no build or server is required. When `data/snapsh
 (written by `conveyor snapshot`), the pages it covers render the conveyor's own rows — Portfolio,
 Organisation, Jobs, Metering and the Plan **Boards** tab — and carry a `LIVE` ribbon with the
 snapshot hash and timestamp; an unwired destination or tab keeps the `V2 · PROPOSED` ribbon.
-`data/plan-seed.js` is the committed plan seed and the Boards tab's DESIGN fallback: the same
-document the seeder installs. V1 surfaces implemented in the Rust app are unlabelled.
+The Plan **Boards** tab is a join, not a seed: it renders each project's GitHub issues from the
+issue registry fetched at publish, joined to the conveyor's own cards and runs. A unit with no real
+card is shown as **not intaken**. V1 surfaces implemented in the Rust app are unlabelled.
 
 - **Portfolio & plan:** the computed in-flight set, programme shared configuration, typed
   project-dependency edges, the WSJF backlog, PI cadence, capacity and per-project metering; then

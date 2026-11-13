@@ -174,27 +174,27 @@ const shot = (name) =>
       "dependency cycle is refused",
     );
 
-    // 4. Plan: Boards renders the live snapshot when it carries boards, otherwise the
-    //    committed plan seed. Change control keeps its contract in both modes.
+    // 4. Plan: Boards renders the published snapshot's GitHub-issue join; in DESIGN mode it
+    //    says so explicitly. Change control keeps its contract in both modes.
     await nav("plan");
-    const liveBoards = await page.evaluate(() => {
+    const livePlan = await page.evaluate(() => {
       const snapshot = window.CONVEYOR_SNAPSHOT;
       return Boolean(
         snapshot &&
           snapshot.schema === "design-snapshot/v1" &&
-          snapshot.work &&
-          (snapshot.work.boards || []).length,
+          snapshot.programme &&
+          (snapshot.programme.projects || []).length,
       );
     });
     await tab("plan", "Boards");
-    if (liveBoards) {
+    if (livePlan) {
       check(
-        (await content()).includes("read from snapshot"),
-        "the live Boards tab renders the snapshot's boards",
+        (await content()).includes("GitHub issues"),
+        "the live Boards tab lists the project's GitHub issues",
       );
       check(
-        (await content()).includes("architecture_task.READY"),
-        "the live cards name their real process",
+        (await content()).includes("linked issues"),
+        "the live header names the issue registry and the snapshot",
       );
       check(
         (await page.locator('[data-v2-input="plan-project"]').count()) === 1,
@@ -202,18 +202,28 @@ const shot = (name) =>
       );
       const first = await page.locator('[data-v2-input="plan-project"] option').first().innerText();
       check(first.startsWith("S"), "the live boards open on the first S plan");
+      const t0 = await page
+        .locator('[data-v2-input="plan-project"] option', { hasText: "T0 ·" })
+        .first()
+        .getAttribute("value");
+      check(Boolean(t0), "the T0 project is selectable");
+      if (t0) {
+        await page.selectOption('[data-v2-input="plan-project"]', t0);
+        const t0Content = await content();
+        check(t0Content.includes("#34"), "T0 lists its real GitHub issue");
+        check(
+          t0Content.includes("architecture_task.READY"),
+          "the T0 card names its real process",
+        );
+      }
     } else {
       check(
-        (await content()).includes("Plan seed · DESIGN"),
-        "the plan seed renders when no live boards exist",
+        (await content()).includes("No published snapshot is loaded"),
+        "the Boards tab is live-only and says so in DESIGN mode",
       );
       check(
-        (await content()).includes("architecture_task.READY"),
-        "every plan unit names a real process",
-      );
-      check(
-        (await page.locator('[data-v2-input="plan-seed-project"]').count()) === 1,
-        "the plan seed is scoped by project",
+        (await page.locator('[data-v2-input="plan-seed-project"]').count()) === 0,
+        "no plan seed is loaded",
       );
     }
     await tab("plan", "Change control");

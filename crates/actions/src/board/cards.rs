@@ -61,6 +61,26 @@ async fn cards_create(
         return Err(invalid("name", "required", "must not be empty"));
     }
 
+    let meta = match input.meta {
+        None => serde_json::Value::Object(serde_json::Map::new()),
+        Some(value) if !value.is_object() => {
+            return Err(invalid("meta", "invalid_value", "must be a JSON object"));
+        }
+        Some(value) => {
+            let size = serde_json::to_vec(&value)
+                .map(|bytes| bytes.len())
+                .unwrap_or(usize::MAX);
+            if size > 16 * 1024 {
+                return Err(invalid(
+                    "meta",
+                    "too_large",
+                    "meta must be at most 16 KiB when serialized",
+                ));
+            }
+            value
+        }
+    };
+
     let lane = store::list::get_list_record_tx(&mut *tx, ctx.tenant, input.list_id)
         .await
         .map_err(|error| crate::board::list_error(error, "cards.create"))?
@@ -120,7 +140,7 @@ async fn cards_create(
             } else {
                 Some(ctx.actor_id)
             },
-            meta: serde_json::Value::Object(serde_json::Map::new()),
+            meta,
         },
     )
     .await

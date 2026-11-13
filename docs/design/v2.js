@@ -653,6 +653,18 @@ window.installV2 = function (api, enterprise) {
       const workBoards = list((live.work || {}).boards);
       const workLists = list((live.work || {}).lists);
       const workCards = list((live.work || {}).cards);
+      // The real plan progress is GitHub's: the linked issues' closed/total. Cards are the
+      // execution handle, not the plan; a snapshot with no cards does not erase the issues.
+      const registry = list((prog.issue_registry || {}).issues);
+      const issueByNumber = new Map(registry.map((row) => [String(row.number), row]));
+      const issueProgress = (row) => {
+        const linked = list((row.meta || {}).issues);
+        if (!linked.length) return null;
+        const closed = linked.filter(
+          (number) => (issueByNumber.get(String(number)) || {}).state === "CLOSED",
+        ).length;
+        return { completed: closed, total: linked.length };
+      };
       const doneLists = new Set(workLists.filter((row) => row.kind === "done").map((row) => row.id));
       const countsFor = (projectId) => {
         const board = workBoards.find((row) => row.project_id === projectId);
@@ -662,6 +674,7 @@ window.installV2 = function (api, enterprise) {
       };
       db.projects = projects.map((row) => {
         const progress = countsFor(row.id);
+        const issues = issueProgress(row);
         return {
           id: row.id,
           key: row.key,
@@ -673,8 +686,10 @@ window.installV2 = function (api, enterprise) {
           status: label(row.status),
           tone: tone(row.status),
           agents: [],
-          completed: progress.completed,
-          total: progress.total,
+          completed: issues ? issues.completed : progress.completed,
+          total: issues ? issues.total : progress.total,
+          cards: progress.total,
+          issues: issues ? issues.total : 0,
           spent: 0,
           process: "feature",
           symbol: "projects",
@@ -851,7 +866,7 @@ window.installV2 = function (api, enterprise) {
     const scoped = projects().filter((p) => p.programme === v.programme);
     const rows = scoped.map(
       (p) =>
-        `<tr><td><strong>${E(p.name)}</strong><small>${E(p.key)} · ${E(p.stream || p.type)}</small></td><td>${E(p.enterprisePhase || p.status)}</td><td><div class="v2-bar"><i style="width:${Math.round(((p.completed || 0) / (p.total || 1)) * 100)}%"></i></div><small>${p.completed || 0} / ${p.total || 0}</small></td><td>${B(p.blocks ? p.blocks + " open" : "Clear", p.blocks ? "amber" : "green")}</td><td>${p.live || 0}</td><td>${money(p.spent || 0)}</td></tr>`,
+        `<tr><td><strong>${E(p.name)}</strong><small>${E(p.key)} · ${E(p.stream || p.type)}</small></td><td>${E(p.enterprisePhase || p.status)}</td><td><div class="v2-bar"><i style="width:${Math.round(((p.completed || 0) / (p.total || 1)) * 100)}%"></i></div><small>${p.completed || 0} / ${p.total || 0}${p.issues ? ` issues · ${p.cards || 0} cards` : ""}</small></td><td>${B(p.blocks ? p.blocks + " open" : "Clear", p.blocks ? "amber" : "green")}</td><td>${p.live || 0}</td><td>${money(p.spent || 0)}</td></tr>`,
     );
     const content =
       tab === "In flight"
@@ -876,7 +891,7 @@ window.installV2 = function (api, enterprise) {
     const change = F.changes[0];
     const content =
       tab === "Boards"
-        ? planBoards(work, liveBoards)
+        ? planBoards(work)
         : tab === "WBS"
         ? `${panel("Work breakdown", `${table(["WBS", "Kind", "Deliverable / work package", "Acceptance", "Evidence", "State"], F.wbs.map((n) => `<tr><td class="mono">${E(n.id)}</td><td>${E(n.kind)}</td><td><strong>${E(n.name)}</strong></td><td>${E(n.accept)}</td><td>${E(n.evidence)}</td><td>${B(n.state, n.state === "Accepted" ? "green" : n.state === "Blocked" ? "amber" : "")}</td></tr>`))}${note("A WBS node is accepted when its acceptance criteria are met by an artefact or run — not when a checkbox is ticked.")}`, B("5 nodes"))}`
         : tab === "Baseline vs forecast"
@@ -886,70 +901,162 @@ window.installV2 = function (api, enterprise) {
             : `<div class="v2-split"><div>${panel("Change control · CR-018", `<h3>${E(change.title)}</h3>${kv([["Changes baseline", E(change.baseline)], ["Impact", E(change.impact)], ["Recorded rationale", change.rationale ? E(change.rationale) : "<span class='e-amber'>required for approve or return</span>"], ["Existing run pins", "unchanged · a new attempt captures B4"]])}<textarea data-v2-input="rationale" rows="3" placeholder="Record the person's rationale" aria-label="Change rationale">${E(change.rationale)}</textarea><div class="row" style="margin-top:10px">${button("Approve new baseline", "change-approve", "", "primary", "shield")}${button("Return for analysis", "change-return", "", "", "replay")}</div>${v.review === "change-blocked" ? note("<strong>422 change_rationale_required</strong> · a person's rationale is required to approve or return a change request. No baseline moved.", "bad") : v.review === "change-ok" ? note("<strong>Approved locally</strong> · baseline B4 drafted; existing runs keep B3 pins. A new sample attempt captures B4.", "ok") : ""}`)}</div><div>${panel("Impact analysis", `${kv([["Scope", "2 deliverables"], ["Schedule", "+9 days"], ["Cost", "+€0.8m"], ["Risk", "medium · identity contract"], ["Approval", "human · programme gate"]])}${note("The change approval, the baseline review and the programme gate are separate decisions.")}`)}</div></div>`;
     const planRibbon =
       tab === "Boards"
-        ? ribbon("The programme's plan units are cards on their project's board, rendered from the conveyor's own rows. One card per registered issue; each names a real process.", liveBoards)
+        ? ribbon("LIVE · GitHub issues are read at publish and joined to the conveyor's own cards and runs. A unit with no real card is shown as not intaken; nothing is seeded.", liveBoards)
         : ribbon("V2 plan spine: wbs_node, project_baseline, project_register_item (six kinds), project_dependency and change control. Proposed in T1.");
-    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: the programme's boards and cards, then the WBS, a frozen baseline against a computed forecast, one six-kind register and controlled change.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(["Boards", "WBS", "Baseline vs forecast", "Registers", "Change control"], tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}</div></div>`;
+    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: the programme's GitHub issues joined to its real cards and runs, then the WBS, a frozen baseline against a computed forecast, one six-kind register and controlled change.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(["Boards", "WBS", "Baseline vs forecast", "Registers", "Change control"], tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}</div></div>`;
   }
 
-  /* The plan units as real cards: project -> board -> lanes -> cards. LIVE when the snapshot
-     carries boards; otherwise the committed plan seed (the same document the seeder installs). */
-  function planBoards(work, liveBoards) {
-    if (liveBoards) {
-      const projects = list((live.programme || {}).projects);
-      if (!projects.length) return panel("Boards", note("The snapshot carries boards but no projects."));
-      // The snapshot orders projects by key, which puts the cross-cutting keys first. The
-      // plan surface opens on the buildout: S slices, then T slices, then the rest.
-      const rank = (key) => (/^S/.test(String(key)) ? 0 : /^T/.test(String(key)) ? 1 : 2);
-      const ordered = [...projects].sort(
-        (a, b) => rank(a.key) - rank(b.key) || String(a.key).localeCompare(String(b.key)),
+  /* The plan is a join, not a seed: the project's GitHub issues (the registry fetched at
+     publish) against the conveyor's own cards and runs. A unit with no real card is shown
+     honestly as "not intaken"; nothing is fabricated to fill a lane. */
+  function planBoards(work) {
+    const prog = live ? live.programme || {} : {};
+    const projects = list(prog.projects);
+    if (!live || !projects.length) {
+      return panel(
+        "Boards",
+        note("No published snapshot is loaded. The Plan boards are live-only: the published snapshot joins GitHub issues to the conveyor's own cards and runs. The WBS tab shows the proposed V2 plan spine."),
       );
-      const project = ordered.find((row) => row.id === v.planProject) || ordered[0];
-      const board = list(work.boards).find((row) => row.project_id === project.id);
-      if (!board) return panel(E(project.name), note("This project has no board in the snapshot."));
-      const lists = list(work.lists)
-        .filter((row) => row.board_id === board.id)
-        .sort((a, b) => Number(a.position) - Number(b.position));
-      const cards = list(work.cards).filter((row) => row.board_id === board.id && !row.archived_at);
-      const types = new Map(list(work.card_types).map((row) => [row.id, row]));
-      const runs = list(work.runs);
-      const lanes = lists
-        .map((lane) => {
-          const laneCards = cards
-            .filter((row) => row.list_id === lane.id)
-            .sort((a, b) => Number(a.position) - Number(b.position));
-          const rows = laneCards.map((card) => {
-            const type = types.get(card.card_type_id);
-            const run = runs
-              .filter((row) => row.card_id === card.id)
-              .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))[0];
-            const issue =
-              card.issue == null
-                ? "—"
-                : `<a class="e-project-link" href="https://github.com/nonagenticai/conveyor/issues/${E(card.issue)}" target="_blank" rel="noopener">#${E(card.issue)} ↗</a>`;
-            return `<tr><td><strong>${E(card.name)}</strong><small class="mono">${E(card.unit_key || "")}</small></td><td>${B(type ? type.code : "—")}</td><td class="mono">${E(card.process_key || "—")}</td><td>${issue}</td><td>${run ? B(run.status) : "—"}</td></tr>`;
-          });
-          return panel(
-            `${lane.name} · ${laneCards.length}`,
-            rows.length
-              ? table(["Card", "Type", "Process", "Issue", "Run"], rows)
-              : `<p class="muted">No cards in this lane.</p>`,
-          );
-        })
-        .join("");
-      return `${panel("Project", `<label class="e-select">Project <select data-v2-input="plan-project">${ordered.map((row) => `<option value="${E(row.id)}" ${row.id === project.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`).join("")}</select></label><p class="muted">Board <span class="mono">${E(board.name)}</span> · ${cards.length} cards · ${lists.length} lanes · read from snapshot ${E(short((live || {}).payload_sha256))}.</p>`)}${lanes}`;
     }
-    const seed = window.CONVEYOR_PLAN_SEED;
-    const projects = list((seed || {}).projects);
-    if (!projects.length) return panel("Boards", note("No plan seed is loaded; the design fallback is unavailable."));
-    const project = projects.find((row) => row.project_key === v.planSeedProject) || projects[0];
-    const rows = list(project.units).map(
-      (unit) =>
-        `<tr><td><strong>${E(unit.title)}</strong><small class="mono">${E(unit.unit_key)}</small></td><td>${B(unit.state === "CLOSED" ? "Done" : "Open", unit.state === "CLOSED" ? "" : "amber")}</td><td>${B(unit.card_type)}</td><td class="mono">${E(unit.process_key)}</td><td>${unit.issue == null ? "—" : "#" + E(unit.issue)}</td></tr>`,
+    const registry = list((prog.issue_registry || {}).issues);
+    const issueByNumber = new Map(registry.map((row) => [String(row.number), row]));
+    // The snapshot orders projects by key, which puts the cross-cutting keys first. The
+    // plan surface opens on the buildout: S slices, then T slices, then the rest.
+    const rank = (key) => (/^S/.test(String(key)) ? 0 : /^T/.test(String(key)) ? 1 : 2);
+    const ordered = [...projects].sort(
+      (a, b) => rank(a.key) - rank(b.key) || String(a.key).localeCompare(String(b.key)),
     );
-    return panel(
-      "Plan seed · DESIGN",
-      `<label class="e-select">Project <select data-v2-input="plan-seed-project">${projects.map((row) => `<option value="${E(row.project_key)}" ${row.project_key === project.project_key ? "selected" : ""}>${E(row.project_key)} · ${E(row.plan || "")}</option>`).join("")}</select></label>${table(["Unit", "State", "Card type", "Process", "Issue"], rows)}${note("The committed plan seed — the same document the seeder installs. Live rows replace it when a snapshot carries boards.")}`,
+    const project = ordered.find((row) => row.id === v.planProject) || ordered[0];
+    const board = list(work.boards).find((row) => row.project_id === project.id);
+    const lists = list(work.lists)
+      .filter((row) => row.board_id === (board || {}).id)
+      .sort((a, b) => Number(a.position) - Number(b.position));
+    const cards = list(work.cards).filter(
+      (row) => row.board_id === (board || {}).id && !row.archived_at,
     );
+    const types = new Map(list(work.card_types).map((row) => [row.id, row]));
+    const laneName = new Map(lists.map((row) => [row.id, row.name]));
+    const runs = list(work.runs);
+    const steps = list(work.run_steps);
+    const runFor = (card) =>
+      runs
+        .filter((row) => row.card_id === card.id)
+        .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))[0];
+    const linked = list((project.meta || {}).issues);
+    const issues = linked.map(
+      (number) =>
+        issueByNumber.get(String(number)) || {
+          number,
+          state: "UNKNOWN",
+          title: "Not in the published registry",
+          url: `https://github.com/nonagenticai/conveyor/issues/${number}`,
+          labels: [],
+        },
+    );
+    const open = issues.filter((row) => row.state === "OPEN").length;
+    const closed = issues.filter((row) => row.state === "CLOSED").length;
+    const statusOf = (issue) => {
+      const label = (issue.labels || [])
+        .map((row) => row.name)
+        .find((name) => String(name).startsWith("status:"));
+      return label ? label.slice("status:".length) : "";
+    };
+    const cardsFor = (issue) =>
+      cards.filter((row) => row.issue != null && String(row.issue) === String(issue.number));
+    const cardCell = (issue) => {
+      const mine = cardsFor(issue);
+      if (!mine.length) return '<span class="muted">— not intaken</span>';
+      return mine
+        .map((card) => {
+          const type = types.get(card.card_type_id);
+          return `<strong>${E(card.name)}</strong><small class="mono">${E(type ? type.code : "—")} · ${E(card.process_key || "no process")}</small>`;
+        })
+        .join("<br>");
+    };
+    const laneCell = (issue) => {
+      const mine = cardsFor(issue);
+      return mine.length
+        ? mine.map((card) => E(laneName.get(card.list_id) || "—")).join("<br>")
+        : "—";
+    };
+    const runCell = (issue) => {
+      const mine = cardsFor(issue)
+        .map((card) => runFor(card))
+        .filter(Boolean);
+      if (!mine.length) return "—";
+      return mine
+        .map(
+          (run) =>
+            `${B(run.status)}<small class="mono">${E(run.error_class || short(run.id, 8))}</small>`,
+        )
+        .join("<br>");
+    };
+    const evidenceCell = (issue) => {
+      const mine = cardsFor(issue)
+        .map((card) => runFor(card))
+        .filter(Boolean);
+      if (!mine.length) return "—";
+      return mine
+        .map(
+          (run) =>
+            `<span class="mono">${steps.filter((row) => row.run_id === run.id).length} step(s)</span>`,
+        )
+        .join("<br>");
+    };
+    const issueRows = issues.map(
+      (issue) =>
+        `<tr><td><a class="e-project-link" href="${E(issue.url)}" target="_blank" rel="noopener">#${E(issue.number)} ↗</a> <strong>${E(issue.title)}</strong></td><td>${B(issue.state === "CLOSED" ? "Closed" : issue.state === "OPEN" ? "Open" : issue.state, issue.state === "CLOSED" ? "" : "amber")}${statusOf(issue) ? ` <small class="mono">${E(statusOf(issue))}</small>` : ""}</td><td>${cardCell(issue)}</td><td>${laneCell(issue)}</td><td>${runCell(issue)}</td><td>${evidenceCell(issue)}</td></tr>`,
+    );
+    const issuePanel = panel(
+      `${project.key} · GitHub issues`,
+      issueRows.length
+        ? table(["Issue", "GitHub state", "Card", "Lane", "Run", "Evidence"], issueRows)
+        : `<p class="muted">No GitHub issues are registered for this project.</p>`,
+      B(`${open} open · ${closed} closed`),
+    );
+    const unlinked = cards.filter((row) => row.issue == null);
+    const unlinkedPanel = unlinked.length
+      ? panel(
+          "Cards without an issue link",
+          table(
+            ["Card", "Type", "Lane", "Run"],
+            unlinked.map((card) => {
+              const type = types.get(card.card_type_id);
+              const run = runFor(card);
+              return `<tr><td><strong>${E(card.name)}</strong><small class="mono">${E(card.process_key || "")}</small></td><td>${B(type ? type.code : "—")}</td><td>${E(laneName.get(card.list_id) || "—")}</td><td>${run ? B(run.status) : "—"}</td></tr>`;
+            }),
+          ),
+        )
+      : "";
+    const lanes = lists
+      .map((lane) => {
+        const laneCards = cards
+          .filter((row) => row.list_id === lane.id)
+          .sort((a, b) => Number(a.position) - Number(b.position));
+        const rows = laneCards.map((card) => {
+          const type = types.get(card.card_type_id);
+          const run = runFor(card);
+          const issue =
+            card.issue == null
+              ? "—"
+              : `<a class="e-project-link" href="https://github.com/nonagenticai/conveyor/issues/${E(card.issue)}" target="_blank" rel="noopener">#${E(card.issue)} ↗</a>`;
+          return `<tr><td><strong>${E(card.name)}</strong><small class="mono">${E(card.unit_key || "")}</small></td><td>${B(type ? type.code : "—")}</td><td class="mono">${E(card.process_key || "—")}</td><td>${issue}</td><td>${run ? B(run.status) : "—"}</td></tr>`;
+        });
+        return panel(
+          `${lane.name} · ${laneCards.length}`,
+          rows.length
+            ? table(["Card", "Type", "Process", "Issue", "Run"], rows)
+            : `<p class="muted">No cards in this lane.</p>`,
+        );
+      })
+      .join("");
+    const boardLine = board
+      ? `Board <span class="mono">${E(board.name)}</span> · ${cards.length} cards · ${lists.length} lanes`
+      : "This project has no board in the snapshot.";
+    return `${panel(
+      "Project",
+      `<label class="e-select">Project <select data-v2-input="plan-project">${ordered.map((row) => `<option value="${E(row.id)}" ${row.id === project.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`).join("")}</select></label><p class="muted">${boardLine} · ${issues.length} linked issues · registry fetched ${E(short(live.generated_at, 16) || "—")} · snapshot ${E(short(live.payload_sha256))}.</p>`,
+    )}${issuePanel}${unlinkedPanel}${lanes}`;
   }
 
   /* ------------------------------------------------------------------ Organisation */
@@ -1442,12 +1549,6 @@ window.installV2 = function (api, enterprise) {
     const planProject = event.target.closest('[data-v2-input="plan-project"]');
     if (planProject) {
       v.planProject = planProject.value;
-      render();
-      return;
-    }
-    const planSeedProject = event.target.closest('[data-v2-input="plan-seed-project"]');
-    if (planSeedProject) {
-      v.planSeedProject = planSeedProject.value;
       render();
       return;
     }

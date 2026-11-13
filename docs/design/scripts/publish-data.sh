@@ -35,10 +35,10 @@ cd "$root"
 #    here; check-docs.cjs gates the committed output without needing pandoc.
 python3 "$pack/scripts/build-docs.py"
 
-# 1. The issue registry is the only GitHub-derived input the snapshot needs. The programme and
-#    plan seeds are IMAGE INPUTS (`include_str!`), so they change only in a repository PR and
-#    never during a publish: regenerating them here would make the running binary and the
-#    published record disagree the moment an issue closes. Refresh the registry only.
+# 1. The issue registry is the only GitHub-derived input the snapshot needs. The programme seed
+#    is an IMAGE INPUT (`include_str!`), so it changes only in a repository PR and never during a
+#    publish. The plan seed is retired: execution state (boards, cards, runs) is never seeded, so
+#    there is no plan document to regenerate. Refresh the registry only.
 "$root/scripts/fetch-issues.sh" "$data/issues.json"
 
 # 2. The rows come from the live database, not from a fixture.
