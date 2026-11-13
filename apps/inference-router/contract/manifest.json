@@ -1,0 +1,9 @@
+{
+  "service": "inference-router",
+  "captured_at": "2026-11-13T10:20:46Z",
+  "image_digest": "sha256:723671a96af98111f16430ef4934370900962c04b1b6793f178d7a65ff70c58f",
+  "lock_sha256": "99953f1d681e53b7fadd6a5c9afa84251f7914fdd53185316efa9ccbe430fa78",
+  "openapi": "3.1.0",
+  "paths": 26,
+  "schemas": 35
+}

@@ -1,0 +1,24 @@
+POST
+/api/chat/completions
+-H
+content-type: application/json
+-H
+authorization: Bearer stub-licence-token-000000000000000000000000
+-H
+X-Tenant-Id: 00000000-0000-4000-8000-0000000000a1
+-H
+X-Correlation-Id: 00000000-0000-4000-8000-0000000000e1
+-H
+X-Worker-Name: golden-worker
+-H
+X-AA-Trace-Id: 00000000-0000-4000-8000-0000000000f6
+-H
+X-AA-Card-Id: 00000000-0000-4000-8000-0000000000f7
+-H
+X-Project-Id: 00000000-0000-4000-8000-0000000000f5
+-H
+X-AA-Parent-Exec: 00000000-0000-4000-8000-0000000000f8
+-H
+X-Stage: golden
+-d
+{"model":"stub-model","messages":[{"role":"user","content":"attributed"}],"max_tokens":8}

@@ -1,0 +1,45 @@
+{
+  "data": [
+    {
+      "has_grammar": false,
+      "has_json_schema": false,
+      "id": "default",
+      "object": "model",
+      "owned_by": "inference-router",
+      "provider_chain": [
+        "stub-openai"
+      ]
+    },
+    {
+      "has_grammar": false,
+      "has_json_schema": false,
+      "id": "stub-model",
+      "object": "model",
+      "owned_by": "inference-router",
+      "provider_chain": [
+        "stub-openai"
+      ]
+    },
+    {
+      "has_grammar": false,
+      "has_json_schema": false,
+      "id": "alias-model",
+      "object": "model",
+      "owned_by": "inference-router",
+      "provider_chain": [
+        "stub-openai"
+      ]
+    },
+    {
+      "has_grammar": false,
+      "has_json_schema": false,
+      "id": "local-llm",
+      "object": "model",
+      "owned_by": "inference-router",
+      "provider_chain": [
+        "stub-openai"
+      ]
+    }
+  ],
+  "object": "list"
+}

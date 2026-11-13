@@ -1,0 +1,2 @@
+GET
+/api/replay/invocation-log?limit=1

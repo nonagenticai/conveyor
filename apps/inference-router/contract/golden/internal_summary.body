@@ -1,0 +1,11 @@
+{
+  "as_of": "TIMESTAMP",
+  "last_row_at": "TIMESTAMP",
+  "rows_24h": 5,
+  "rows_total": 8,
+  "rows_window": 5,
+  "source": "inference_call",
+  "window": {
+    "days": 1
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "stub completion",
+        "reasoning_content": null,
+        "role": "assistant",
+        "tool_call_id": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 0,
+  "id": "chatcmpl-stub",
+  "model": "stub-model",
+  "object": "chat.completion",
+  "provider_request_id": "chatcmpl-stub",
+  "served_model": "stub-model",
+  "served_model_root": null,
+  "served_provider": "stub-openai",
+  "usage": {
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "completion_tokens": 3,
+    "prompt_tokens": 7,
+    "total_tokens": 10,
+    "usage_extra": null
+  }
+}

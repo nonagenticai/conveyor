@@ -1,0 +1,10 @@
+{
+  "note": "Every field excluded from comparison is named here with a reason, and verify.sh refuses a row that has none. An exclusion is a claim that a difference is not a property of the implementation; 'it differs' is never a reason.",
+  "tolerances": [
+    {
+      "case": "internal_calls",
+      "pointer": "/rows/0/id",
+      "reason": "the ledger surrogate primary key. Its value is how many rows this capture run happened to insert before this one, and the streamed row is written by a background task; the value is not a property of the query or of the rewrite."
+    }
+  ]
+}

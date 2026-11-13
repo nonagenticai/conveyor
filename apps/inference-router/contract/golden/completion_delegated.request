@@ -1,0 +1,10 @@
+POST
+/api/chat/completions
+-H
+content-type: application/json
+-H
+authorization: Bearer stub-licence-delegated-00000000000000000000
+-H
+X-Effective-Tenant-Id: 00000000-0000-4000-8000-0000000000b2
+-d
+{"model":"stub-model","messages":[{"role":"user","content":"delegated"}],"max_tokens":8}
