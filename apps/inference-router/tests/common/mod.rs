@@ -12,6 +12,7 @@
 #![allow(dead_code)]
 
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 use sqlx::postgres::PgPoolOptions;
@@ -19,6 +20,15 @@ use sqlx::{AssertSqlSafe, PgPool};
 use tokio::sync::OnceCell;
 
 const IMAGE: &str = "postgres:18";
+
+/// Disambiguates databases created in the same clock tick.
+///
+/// `pid + SystemTime::as_nanos()` is not unique on its own: the kernel's clock has a coarse
+/// underlying tick, so two tests starting together in one process (cargo runs them on parallel
+/// threads) can read the SAME nanosecond and both issue `CREATE DATABASE <same name>`. Measured
+/// 2026-11-13: `baseline_refuses_a_different_alembic_head` panicked with
+/// `duplicate key value violates unique constraint "pg_database_datname_index"`.
+static NEXT_DB: AtomicU64 = AtomicU64::new(0);
 
 struct Server {
     base: String,
@@ -164,12 +174,13 @@ pub async fn fresh() -> TestDb {
         .await
         .expect("connect to the shared test postgres server");
     let name = format!(
-        "ir_t_{}_{}",
+        "ir_t_{}_{}_{}",
         std::process::id(),
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .expect("clock")
-            .as_nanos()
+            .as_nanos(),
+        NEXT_DB.fetch_add(1, Ordering::Relaxed)
     );
     sqlx::query(AssertSqlSafe(format!("CREATE DATABASE \"{name}\"")))
         .execute(&admin)
