@@ -99,7 +99,13 @@ fi
 
 digest="$(jq -r '.image_digest' "$here/manifest.json")"
 [ "$digest" != "null" ] && [ -n "$digest" ] || { echo "manifest.json has no image_digest" >&2; exit 2; }
-image="registry.internal:5000/inference-router@${digest}"
+# The pinned image lives in the private registry; the host is the CALLER's, never this file's.
+registry="${ORACLE_REGISTRY:-}"
+[ -n "$registry" ] || {
+    echo "set ORACLE_REGISTRY to the private registry host:port (the pinned image is not public)" >&2
+    exit 2
+}
+image="${registry%/}/inference-router@${digest}"
 
 echo "==> pulling $image"
 docker pull "$image" >/dev/null

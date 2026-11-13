@@ -6,6 +6,7 @@
 //! to the capture, so the check can fail for the reason it exists.
 #![forbid(unsafe_code)]
 
+pub mod admin_auth;
 pub mod auth;
 pub mod billing;
 pub mod catalog;

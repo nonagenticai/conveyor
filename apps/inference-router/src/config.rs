@@ -64,10 +64,22 @@ pub struct Config {
     /// `INFERENCE_ROUTER_POLICY_EPOCH_POLL_SECONDS` — no LISTEN/NOTIFY: pgbouncer pools.
     pub policy_epoch_poll_seconds: f64,
     /// `INFERENCE_ROUTER_INTERNAL_SECRET` — the six `/api/internal/*` reads' shared secret.
-    pub internal_secret: Option<String>,
+    pub private_api_secret: Option<String>,
     /// `INFERENCE_ROUTER_INTERNAL_PUBLIC_HOST_SUFFIXES` — Host suffixes that mean the request
     /// came through the PUBLIC ingress; `/api/internal/*` answers 404 for them.
-    pub internal_public_host_suffixes: Vec<String>,
+    pub public_host_suffixes: Vec<String>,
+    /// `INFERENCE_ROUTER_KEYCLOAK_JWKS_URL` — verifies the service-account JWT on `/api/admin/*`.
+    /// Unset makes the admin API answer 503 (fail closed).
+    pub keycloak_jwks_url: Option<String>,
+    /// `INFERENCE_ROUTER_PORTAL_JWKS_URL` — verifies the forwarded portal JWT. Unset falls back
+    /// to `keycloak_jwks_url` (the reference's rule).
+    pub portal_jwks_url: Option<String>,
+    /// `INFERENCE_ROUTER_ADMIN_AZP_ALLOWLIST` — client ids (`azp`) whose service-account JWT may
+    /// call `/api/admin/*`. Empty makes the admin API answer 503.
+    pub admin_azp_allowlist: Vec<String>,
+    /// `INFERENCE_ROUTER_ADMIN_JWT_ISSUERS` — optional `iss` allowlist for `/api/admin/*`.
+    /// Empty means the issuer is not checked (the JWKS pins the realm).
+    pub admin_jwt_issuers: Vec<String>,
     /// `INFERENCE_ROUTER_WHOAMI_RATE_LIMIT_PER_MINUTE` — per client host, per pod.
     pub whoami_rate_limit_per_minute: u32,
     /// `INFERENCE_CAPTURE_ALLOWED_CALLERS` — deliberately UNPREFIXED (the reference aliases it).
@@ -298,12 +310,19 @@ impl Config {
             ));
         }
 
-        let internal_secret = non_empty(lookup("INFERENCE_ROUTER_INTERNAL_SECRET"));
-        let internal_public_host_suffixes =
+        let private_api_secret = non_empty(lookup("INFERENCE_ROUTER_INTERNAL_SECRET"));
+        let public_host_suffixes =
             match non_empty(lookup("INFERENCE_ROUTER_INTERNAL_PUBLIC_HOST_SUFFIXES")) {
                 Some(raw) => comma_list(Some(raw)),
                 None => vec!["nonagentic.ai".to_owned()],
             };
+        // The admin API's two token slots and its allowlists. The names are the live service's
+        // (`Settings` uses `INFERENCE_ROUTER_` as the pydantic prefix), and the 503 body names
+        // the FIELD names, exactly as the capture does.
+        let keycloak_jwks_url = non_empty(lookup("INFERENCE_ROUTER_KEYCLOAK_JWKS_URL"));
+        let portal_jwks_url = non_empty(lookup("INFERENCE_ROUTER_PORTAL_JWKS_URL"));
+        let admin_azp_allowlist = comma_list(lookup("INFERENCE_ROUTER_ADMIN_AZP_ALLOWLIST"));
+        let admin_jwt_issuers = comma_list(lookup("INFERENCE_ROUTER_ADMIN_JWT_ISSUERS"));
         let whoami_rate_limit_per_minute: u32 =
             match non_empty(lookup("INFERENCE_ROUTER_WHOAMI_RATE_LIMIT_PER_MINUTE")) {
                 Some(raw) => raw
@@ -349,8 +368,12 @@ impl Config {
             policy_mode,
             policy_cache_ttl_seconds,
             policy_epoch_poll_seconds,
-            internal_secret,
-            internal_public_host_suffixes,
+            private_api_secret,
+            public_host_suffixes,
+            keycloak_jwks_url,
+            portal_jwks_url,
+            admin_azp_allowlist,
+            admin_jwt_issuers,
             whoami_rate_limit_per_minute,
             inference_capture_allowed_callers,
             commercial_platform_tenant_ids,
@@ -446,7 +469,7 @@ mod tests {
     fn the_internal_guard_config_matches_the_live_defaults() {
         let config = parse(&[]).expect("defaults");
         assert_eq!(
-            config.internal_public_host_suffixes,
+            config.public_host_suffixes,
             vec!["nonagentic.ai".to_owned()]
         );
         assert_eq!(config.whoami_rate_limit_per_minute, 60);
@@ -462,7 +485,7 @@ mod tests {
         ])
         .expect("configured");
         assert_eq!(
-            configured.internal_public_host_suffixes,
+            configured.public_host_suffixes,
             vec![".nonagentic.ai".to_owned(), "merqi.nl".to_owned()]
         );
         assert_eq!(configured.whoami_rate_limit_per_minute, 5);
@@ -478,6 +501,60 @@ mod tests {
         assert_eq!(
             parse(&[("INFERENCE_ROUTER_WHOAMI_RATE_LIMIT_PER_MINUTE", "soon")]),
             Err(ConfigError::InvalidWhoamiRateLimit("soon".to_owned()))
+        );
+    }
+
+    #[test]
+    fn the_admin_auth_settings_use_the_live_prefixed_names() {
+        let defaults = parse(&[]).expect("defaults");
+        assert_eq!(defaults.keycloak_jwks_url, None);
+        assert_eq!(defaults.portal_jwks_url, None);
+        assert!(defaults.admin_azp_allowlist.is_empty());
+        assert!(defaults.admin_jwt_issuers.is_empty());
+
+        let configured = parse(&[
+            (
+                "INFERENCE_ROUTER_KEYCLOAK_JWKS_URL",
+                "https://auth.example/realms/portal/certs",
+            ),
+            (
+                "INFERENCE_ROUTER_PORTAL_JWKS_URL",
+                "https://auth.example/realms/portal/certs",
+            ),
+            (
+                "INFERENCE_ROUTER_ADMIN_AZP_ALLOWLIST",
+                "sa-a, sa-b ,,provisioning-sa",
+            ),
+            (
+                "INFERENCE_ROUTER_ADMIN_JWT_ISSUERS",
+                "https://auth.example/realms/portal",
+            ),
+        ])
+        .expect("admin settings parse");
+        assert_eq!(
+            configured.keycloak_jwks_url.as_deref(),
+            Some("https://auth.example/realms/portal/certs")
+        );
+        assert_eq!(
+            configured.portal_jwks_url.as_deref(),
+            Some("https://auth.example/realms/portal/certs")
+        );
+        assert_eq!(
+            configured.admin_azp_allowlist,
+            vec!["sa-a", "sa-b", "provisioning-sa"]
+        );
+        assert_eq!(
+            configured.admin_jwt_issuers,
+            vec!["https://auth.example/realms/portal"]
+        );
+
+        // The unprefixed FIELD name is not an environment variable: the live deployment sets the
+        // prefixed name only (pydantic's `env_prefix`).
+        assert!(
+            parse(&[("KEYCLOAK_JWKS_URL", "https://auth.example/certs")])
+                .expect("unknown names are ignored")
+                .keycloak_jwks_url
+                .is_none()
         );
     }
 
@@ -614,7 +691,7 @@ mod tests {
         assert_eq!(config.policy_mode, PolicyMode::Off);
         assert_eq!(config.policy_cache_ttl_seconds, 15.0);
         assert_eq!(config.policy_epoch_poll_seconds, 5.0);
-        assert_eq!(config.internal_secret, None);
+        assert_eq!(config.private_api_secret, None);
         assert!(config.commercial_platform_tenant_ids.is_empty());
     }
 
@@ -646,7 +723,7 @@ mod tests {
         assert_eq!(config.budget_gate_mode, GateMode::Enforce);
         assert_eq!(config.budget_gate_billing_base_url, "http://billing:8157");
         assert_eq!(config.policy_mode, PolicyMode::On);
-        assert_eq!(config.internal_secret.as_deref(), Some("synthetic"));
+        assert_eq!(config.private_api_secret.as_deref(), Some("synthetic"));
         // Blank and empty entries are dropped, spaces trimmed.
         assert_eq!(config.commercial_platform_tenant_ids, vec!["a", "b", "c"]);
     }

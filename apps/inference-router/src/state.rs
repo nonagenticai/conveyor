@@ -6,6 +6,7 @@ use std::time::Duration;
 use axum::http::HeaderMap;
 use sqlx::PgPool;
 
+use crate::admin_auth::{AdminVerifier, production_source};
 use crate::auth::{self, CallerIdentity, Introspector};
 use crate::billing::{AllowAllGate, BudgetGate};
 use crate::config::Config;
@@ -43,6 +44,7 @@ pub struct AppState {
     router: Arc<RouterService>,
     introspector: Arc<Introspector>,
     deps: Arc<AppDeps>,
+    admin: Arc<AdminVerifier>,
 }
 
 impl AppState {
@@ -52,7 +54,30 @@ impl AppState {
     }
 
     /// The real constructor: every collaborator supplied by the caller.
+    ///
+    /// The admin verifier is built from the same config; tests that need a fixed key set use
+    /// [`AppState::with_admin`] instead of mutating process-global environment.
     pub fn with_deps(config: Config, router: RouterService, deps: AppDeps) -> Self {
+        let admin = Arc::new(AdminVerifier::from_config(&config, production_source()));
+        Self::assemble(config, router, deps, admin)
+    }
+
+    /// A constructor with an injected admin verifier (integration tests).
+    pub fn with_admin(
+        config: Config,
+        router: RouterService,
+        deps: AppDeps,
+        admin: Arc<AdminVerifier>,
+    ) -> Self {
+        Self::assemble(config, router, deps, admin)
+    }
+
+    fn assemble(
+        config: Config,
+        router: RouterService,
+        deps: AppDeps,
+        admin: Arc<AdminVerifier>,
+    ) -> Self {
         let introspector = Introspector::new(
             config.introspect_url.clone(),
             Duration::from_secs_f64(config.introspect_timeout_seconds),
@@ -62,6 +87,7 @@ impl AppState {
             router: Arc::new(router),
             introspector: Arc::new(introspector),
             deps: Arc::new(deps),
+            admin,
         }
     }
 
@@ -110,5 +136,10 @@ impl AppState {
 
     pub fn deps(&self) -> &AppDeps {
         &self.deps
+    }
+
+    /// The `/api/admin/*` verifier. Every admin handler calls it before doing anything else.
+    pub fn admin(&self) -> &AdminVerifier {
+        &self.admin
     }
 }

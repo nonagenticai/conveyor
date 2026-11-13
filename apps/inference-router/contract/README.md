@@ -25,12 +25,16 @@ is supplied at capture time and is never stored in this tree.
 **pinned old image**, booted as a throwaway stack by `oracle.sh`:
 
 ```sh
+export ORACLE_REGISTRY=<private-registry-host:port>   # the pinned image is not public
 ./oracle.sh                      # boots postgres:18 + redis + the stub + the pinned image
 ./oracle.sh --capture            # ... and runs capture-goldens.sh against it
 ./oracle.sh --down               # remove everything (a non---keep run does this itself)
 ```
 
-The image is pulled **by digest** from `manifest.json`. The database starts empty and
+The image is pulled **by digest** from `manifest.json`, from the registry the caller names
+in `ORACLE_REGISTRY`; no registry host is recorded in this tree. Contributors without
+access to that image can still run the parity harness against a candidate — the committed
+goldens are the oracle's recorded answers. The database starts empty and
 the image migrates it to alembic `0016` in its own lifespan, exactly as a fresh
 production replica does. `--policy <doc>` seeds a tenant inference policy before the
 capture; `--ledger-out` / `--cost-out` record the oracle's own `inference_call` row

@@ -19,8 +19,10 @@ path = "src/main.rs"
 axum = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }
+conveyor-auth = { path = "../../crates/auth" }
 conveyor-platform = { path = "../../crates/platform" }
 futures-util = { workspace = true }
+jsonwebtoken = { workspace = true }
 redis = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
@@ -35,4 +37,5 @@ utoipa = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
+base64 = { workspace = true }
 tower = { workspace = true }

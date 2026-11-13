@@ -26,19 +26,19 @@ pub const SECRET_INVALID: &str = "invalid X-Internal-Secret";
 
 /// Refuse the request, or return `Ok(())` for the six handlers to proceed.
 pub fn require(headers: &HeaderMap, config: &Config) -> Result<(), Refusal> {
-    if request_is_public(headers, &config.internal_public_host_suffixes) {
+    if request_is_public(headers, &config.public_host_suffixes) {
         return Err(Refusal::detail(
             StatusCode::NOT_FOUND,
             NOT_FOUND,
             "internal_public_host",
         ));
     }
-    let expected = config.internal_secret.as_deref().unwrap_or("").trim();
+    let expected = config.private_api_secret.as_deref().unwrap_or("").trim();
     if expected.is_empty() {
         return Err(Refusal::detail(
             StatusCode::SERVICE_UNAVAILABLE,
             SECRET_UNCONFIGURED,
-            "internal_secret_unconfigured",
+            "private_api_secret_unconfigured",
         ));
     }
     let presented = headers
@@ -50,14 +50,17 @@ pub fn require(headers: &HeaderMap, config: &Config) -> Result<(), Refusal> {
         return Err(Refusal::detail(
             StatusCode::UNAUTHORIZED,
             SECRET_INVALID,
-            "internal_secret_invalid",
+            "private_api_secret_invalid",
         ));
     }
     Ok(())
 }
 
 /// True when `Host` or any `X-Forwarded-Host` value ends with a public suffix.
-fn request_is_public(headers: &HeaderMap, suffixes: &[String]) -> bool {
+///
+/// Shared with `/api/admin/*`: the reference refuses a public ingress host there for the same
+/// reason, and a second copy of this rule is how the two surfaces drift apart.
+pub(crate) fn request_is_public(headers: &HeaderMap, suffixes: &[String]) -> bool {
     for name in ["host", "x-forwarded-host"] {
         let Some(raw) = headers.get(name).and_then(|value| value.to_str().ok()) else {
             continue;
@@ -192,8 +195,11 @@ mod tests {
         // X-Forwarded-Host is checked too, including a comma-separated chain.
         let refusal = require(
             &headers(&[
-                ("host", "inference-router.internal"),
-                ("x-forwarded-host", "edge.internal, api.nonagentic.ai"),
+                ("host", "inference-router.svc.cluster.local"),
+                (
+                    "x-forwarded-host",
+                    "edge.svc.cluster.local, api.nonagentic.ai",
+                ),
                 ("x-internal-secret", "stub-internal-secret"),
             ]),
             &config,
@@ -214,7 +220,7 @@ mod tests {
     fn in_cluster_hosts_are_not_public() {
         let config = config(Some("stub-internal-secret"));
         for host in [
-            "inference-router.internal",
+            "inference-router.svc.cluster.local",
             "inference-router.default.svc.cluster.local",
             "127.0.0.1:8150",
         ] {
