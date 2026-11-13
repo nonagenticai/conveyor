@@ -105,7 +105,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           # Registry only: the target directory is multi-gigabyte and would thrash the 10 GB
           # cache budget. Compiling is what a free public runner is for.
