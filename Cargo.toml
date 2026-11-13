@@ -128,7 +128,7 @@ insta = { version = "1.49.0", features = ["json"] }
 # faces are vendored in `crates/render/fonts/` and embedded with `include_bytes!`.
 # `memmap-fonts` is off for the same reason (a file-backed face is a filesystem dependency).
 # `raster-images`/`image` are off: the renderer emits vector shapes and text, never bitmaps.
-resvg = { version = "0.45.1", default-features = false, features = ["text"] }
+resvg = { version = "0.49.0", default-features = false, features = ["text"] }
 usvg = { version = "0.45.1", default-features = false, features = ["text"] }
 svg2pdf = { version = "0.13.0", default-features = false, features = ["text"] }
 # `usvg::Options::fontdb` is an `Arc<fontdb::Database>`, and the renderer must register the
