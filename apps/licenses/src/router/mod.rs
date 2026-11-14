@@ -10,6 +10,7 @@
 //! protected by default" true.
 
 pub mod catalogue_apps;
+pub mod catalogue_plans;
 pub mod health;
 pub mod internal_bundles;
 pub mod internal_ensure;
@@ -69,6 +70,13 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/licenses/{license_id}/tokens"),
     ("POST", "/licenses/{license_id}/operator-token"),
     ("POST", "/licenses/{license_id}/regenerate-token"),
+    ("DELETE", "/plans/{plan_id}"),
+    ("GET", "/plans"),
+    ("GET", "/plans/{plan_id}"),
+    ("PATCH", "/plans/{plan_id}"),
+    ("POST", "/plans"),
+    ("GET", "/regions"),
+    ("POST", "/regions"),
     ("GET", "/tenants"),
     ("POST", "/tenants"),
     ("GET", "/tenants/{name_or_id}"),
@@ -88,6 +96,13 @@ pub const ROUTES: &[(&str, &str)] = &[
         catalogue_apps::list_app_licenses,
         catalogue_apps::list_app_plans,
         catalogue_apps::list_apps,
+        catalogue_plans::create_plan,
+        catalogue_plans::create_region,
+        catalogue_plans::delete_plan,
+        catalogue_plans::get_plan,
+        catalogue_plans::list_plans,
+        catalogue_plans::list_regions,
+        catalogue_plans::update_plan,
         health::health,
         health::liveness,
         health::readiness,
@@ -125,6 +140,10 @@ pub const ROUTES: &[(&str, &str)] = &[
         catalogue_apps::AppCreate,
         catalogue_apps::AppResponse,
         catalogue_apps::PlanResponse,
+        catalogue_plans::PlanCreate,
+        catalogue_plans::PlanUpdate,
+        catalogue_plans::RegionCreate,
+        catalogue_plans::RegionResponse,
         health::ErrorResponse,
         health::HealthResponse,
         health::LivenessResponse,
@@ -194,6 +213,20 @@ pub fn router(state: AppState) -> Router {
             get(catalogue_apps::list_app_licenses),
         )
         .route("/apps/{app_id}/plans", get(catalogue_apps::list_app_plans))
+        .route(
+            "/plans",
+            get(catalogue_plans::list_plans).post(catalogue_plans::create_plan),
+        )
+        .route(
+            "/plans/{plan_id}",
+            get(catalogue_plans::get_plan)
+                .patch(catalogue_plans::update_plan)
+                .delete(catalogue_plans::delete_plan),
+        )
+        .route(
+            "/regions",
+            get(catalogue_plans::list_regions).post(catalogue_plans::create_region),
+        )
         .route("/health", get(health::health))
         .route("/health/live", get(health::liveness))
         .route("/health/ready", get(health::readiness))

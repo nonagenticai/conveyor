@@ -808,7 +808,7 @@ pub async fn delete_app(
         return Err(Refusal::detail(StatusCode::NOT_FOUND, "App not found"));
     };
     // Before the 409: a non-issuer must not learn the blast radius either.
-    authorize_app_admin(pool, &user, uid, "app_delete").await?;
+    authorize_app_admin(pool, &user, uid, "app_delete", "Failed to delete app").await?;
 
     if radius.licenses > 0 && confirm_licenses != Some(radius.licenses) {
         // Fail CLOSED. The destruction is unrecoverable and this service has no audit
@@ -877,16 +877,19 @@ pub async fn delete_app(
 
 /// `_authorize_app_admin`: the caller's owner must ISSUE the app. `cross_owner` bypasses,
 /// audited. A DB fault is the route's 500, never a pass.
-async fn authorize_app_admin(
+///
+/// Shared with the catalogue PLAN routes; `message` is the calling route's static 500 text.
+pub(crate) async fn authorize_app_admin(
     pool: &PgPool,
     user: &User,
     app_id: Uuid,
     action: &str,
+    message: &'static str,
 ) -> Result<(), Refusal> {
     let owner = issuance::require_known_owner(user)?;
     let issuers = issuance::app_issuers(pool, app_id).await.map_err(|error| {
-        tracing::error!(%error, "Failed to delete app");
-        internal_error("Failed to delete app")
+        tracing::error!(%error, message, "app admin authorization failed");
+        internal_error(message)
     })?;
     if issuers.iter().any(|issuer| issuer == &owner) {
         return Ok(());
