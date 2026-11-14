@@ -235,7 +235,10 @@ pub fn confidence_interval(
         IntervalMethod::Bootstrap => {
             let n_bootstrap = n_bootstrap.min(MAX_BOOTSTRAP);
             let mut rng = SplitMix64::new(42);
-            let mut boot = Vec::with_capacity(n_bootstrap as usize);
+            // Constant capacity, not a per-request one: the allocation is 800 KB whatever the
+            // caller asked for, so the memory bound is a fact in the code rather than an argument
+            // CodeQL has to follow through `min`. The clamp above still bounds the CPU.
+            let mut boot = Vec::with_capacity(MAX_BOOTSTRAP as usize);
             for _ in 0..n_bootstrap {
                 let mut total = 0.0;
                 for _ in 0..values.len() {

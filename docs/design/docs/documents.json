@@ -33,8 +33,8 @@
       "path": "docs/SPEC_LEGACY_KAG.html",
       "source": "docs/SPEC_LEGACY_KAG.md",
       "section": "Spec",
-      "sha256": "34855f79d2ad308fa69809c617530edea53979e5cac8e7c52d71bab8116ba039",
-      "bytes": 7522,
+      "sha256": "1853ef15d0a0143a03c977abbbd6d2596892b4cd08415022472e5703f5b03f1a",
+      "bytes": 7588,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_LEGACY_KAG.md"
     },
     {
@@ -92,12 +92,21 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0005-absorption-sequence-and-repo-scope.md"
     },
     {
+      "title": "0006 — The tool estate completes in this workspace, grouped by runtime shape",
+      "path": "docs/decisions/0006-tool-absorption-grouping.html",
+      "source": "docs/decisions/0006-tool-absorption-grouping.md",
+      "section": "Decisions",
+      "sha256": "adc8b99c210be970b1d8931dee11aa9f71b3a6b024c59bfdf628dff6539736cd",
+      "bytes": 6657,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0006-tool-absorption-grouping.md"
+    },
+    {
       "title": "Web UI design",
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "b623a23bb0084b49b2190235e03be978f40c84c0b1341b4828b0eae717e95092",
-      "bytes": 9167,
+      "sha256": "e250dc0be07992cc666ba12248e1764d6336b5cbd955a5a65e1db5a91402461c",
+      "bytes": 10228,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -294,8 +303,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "034cc1338e531cca27e85b4470f8e7175804a2bffcdaf29795d1425736c35e8f",
-      "bytes": 248622,
+      "sha256": "8a62a18c5f0adb70847481a66387f5fbc846c3f88a1db007d0f2227afffd3d68",
+      "bytes": 248838,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -369,6 +378,15 @@
       "sha256": "7b6c06b72ef3cb4554451e42827a05e6813f58c46c347d0c092f23ee2b6ff917",
       "bytes": 19851,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
+    },
+    {
+      "title": "Rust development process: audit and improvement plan",
+      "path": "docs/plans/development-process-speed.html",
+      "source": "docs/plans/development-process-speed.md",
+      "section": "Plans",
+      "sha256": "0fd6fbcd6407105487ab6c6eb5db8815323059273cf15cdc63ac225219b30fb3",
+      "bytes": 17028,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/development-process-speed.md"
     },
     {
       "title": "S12 handoff — Connectors and the interaction inbox (S06d)",

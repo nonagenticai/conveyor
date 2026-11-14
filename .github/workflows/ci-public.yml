@@ -114,6 +114,41 @@ jobs:
       - name: scan tracked files
         run: bash scripts/ci/no-private-refs.sh
 
+  # The design pack's own gates. The pack is the requirement, so its claims are checked like
+  # code: `build-coverage.py --check` proves coverage.json still matches the tree (and the gate
+  # refuses a dead action, a missing page row, an uncovered project or a missing evidence path);
+  # the eight pack checks render the surfaces; `build-docs.py --check` needs no pandoc.
+  #
+  # Playwright is pinned and installed here: six checks launch a headless chromium, and the
+  # pack has no package.json of its own.
+  design-pack:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: install playwright (pinned) and chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.62.1
+          npx playwright install --with-deps chromium
+      - name: the pack's data and claims
+        run: |
+          python3 scripts/build-coverage.py --check
+          node docs/design/scripts/check-coverage.cjs --self-test
+          node docs/design/scripts/check-data.cjs
+          node docs/design/scripts/check-docs.cjs
+          python3 docs/design/scripts/build-docs.py --check
+      - name: the pack's surfaces
+        run: |
+          node docs/design/scripts/check-console.cjs
+          node docs/design/scripts/check-v2.cjs
+          node docs/design/scripts/check-studio.cjs
+          node docs/design/scripts/check-learning.cjs
+          node docs/design/scripts/check-workbench.cjs
+          node docs/design/scripts/check-architecture.cjs
+
   # Code gates, copied step-for-step from the archetype's rust-library job and from the resolved
   # settings in the legacy `ci.yml` at the time of the public flip: fmt, clippy -D warnings, nextest
   # + doctests, cargo audit. `CARGO_PROFILE_DEV_DEBUG=0` is the archetype's `profile_dev_debug: "0"`

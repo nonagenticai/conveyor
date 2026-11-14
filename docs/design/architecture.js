@@ -477,6 +477,7 @@ window.ArchitecturePack = (function () {
     ["Projects", "projects", "Project · WBS node · work package (card)", "§5.1–§5.5", "R"],
     ["Contribute", "contribute", "GitHub issue registry · ready units · claim protocol · feedback", "§10.5, 03-DELIVERY", "R"],
     ["Plan & WBS", "plan", "wbs_node · project_baseline · register · change control", "§5.3–§5.5", "P"],
+    ["Validation", "validation", "Measured coverage · tranche · units · gap list · the gate", "§12, coverage.json", "R"],
     ["Execution room", "execution", "Run · prompt compiler · tool panel · explain context", "§7.7, §10.5", "R + P"],
     ["Decision inbox", "decisions", "Approval · gate · dual control · decided_by_kind", "§5.4", "R"],
     ["Run history", "runs", "Run · step · attempt · two executor kinds", "§4.5, §5.1", "R"],
