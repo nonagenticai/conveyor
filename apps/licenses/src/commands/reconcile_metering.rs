@@ -12,6 +12,12 @@
 //!   scraped and there is no audit table, so `kubectl logs` IS the audit trail;
 //! - exit 0 converged, 1 not converged, 2 config / DB / billing transport failure.
 //!
+//! ⚠️ THE RUNNER IS SHARED WITH THE HTTP ROUTE. `POST /licenses/admin/metering/reconcile`
+//! (`router::licence_admin::reconcile_metering_provisioning`) calls the SAME
+//! [`run_metering_reconcile`], so the operator route and the CronJob cannot drift apart. The
+//! route contributes exactly the `license-admin` guard, the query parameters and the actor name;
+//! the sweep is one implementation.
+//!
 //! THE SWEEP is the reference's: the independent `live_budget_owing_licenses` count first (a fact
 //! about the estate, not about what the sweep just did), then the live/owing selection ordered by
 //! `created_at` and limited, skipped when `metering_verified_at` is set unless `revalidate`.
@@ -47,8 +53,10 @@
 
 use std::collections::{BTreeMap, HashMap};
 
+use serde::Serialize;
 use serde_json::{Map, Value, json};
 use sqlx::PgPool;
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use super::RunOutcome;
@@ -87,17 +95,21 @@ const STARTUP_KIND: &str = "startup_config";
 ///
 /// ⚠️ Hand-written SQL ON PURPOSE, verbatim from the script: if it reused the sweep's own
 /// selection the guard could not fail — any drift would move both numbers together.
+///
+/// `$1` is the licence-id narrowing: `NULL` is no filter, and an EMPTY array selects nothing
+/// (the reference's `License.id.in_([])`), never silently "no filter".
 const LIVE_BUDGET_OWING_SQL: &str = "SELECT count(*) FROM license l \
        JOIN plan p ON p.id = l.plan_id \
       WHERE l.status = 'active' \
         AND (l.expires_at IS NULL OR l.expires_at > now()) \
         AND (p.quota_monthly IS NOT NULL OR p.token_budget_monthly IS NOT NULL \
              OR l.quota_override IS NOT NULL OR l.token_budget_override IS NOT NULL) \
-        AND ($1::uuid IS NULL OR l.id = $1)";
+        AND ($1::uuid[] IS NULL OR l.id = ANY($1))";
 
 /// The sweep's selection: LIVE, effective metering owes billing something, ordered by
 /// `created_at` (the reference's `ORDER BY License.created_at`, no tie-breaker), limited.
 /// `$4` is the `revalidate` flag: true re-examines already-stamped licences.
+/// `$2` is the licence-id narrowing, with the same `NULL`/empty-array rule as the count.
 const SELECT_GAPS_SQL: &str = "SELECT l.id, l.tenant_id, p.id, p.quota_monthly, \
             p.token_budget_monthly, l.token_budget_override, l.quota_override, \
             t.budget_currency::text, a.id, a.name \
@@ -109,7 +121,7 @@ const SELECT_GAPS_SQL: &str = "SELECT l.id, l.tenant_id, p.id, p.quota_monthly, 
         AND (l.expires_at IS NULL OR l.expires_at > $1) \
         AND (p.quota_monthly IS NOT NULL OR p.token_budget_monthly IS NOT NULL \
              OR l.quota_override IS NOT NULL OR l.token_budget_override IS NOT NULL) \
-        AND ($2::uuid IS NULL OR l.id = $2) \
+        AND ($2::uuid[] IS NULL OR l.id = ANY($2)) \
         AND ($4::boolean OR l.metering_verified_at IS NULL) \
       ORDER BY l.created_at ASC \
       LIMIT $3";
@@ -285,66 +297,171 @@ pub async fn run_with(
             }
         },
     };
-    match sweep(&url, &settings, wanted, &billing).await {
-        Ok(sweep) => outcome(&settings, sweep),
+    let wanted_ids = wanted.map(|id| vec![id]);
+    let pool = match crate::db::connect(&url, 1).await {
+        Ok(pool) => pool,
         Err(error) => {
-            // The exception goes to stderr; stdout keeps the one static JSON line.
             eprintln!("reconcile-metering: the sweep could not complete: {error}");
-            failure(
+            return failure(
                 Some(&settings.actor),
                 settings.license_id.as_deref(),
                 SWEEP_FAILED,
                 DB_ERROR_KIND,
-            )
+            );
         }
-    }
+    };
+    // The script's independent count runs BEFORE the sweep: it must be a fact about the
+    // estate, not about what the sweep just did to it.
+    let live = match count_live_budget_owing(&pool, wanted_ids.as_deref()).await {
+        Ok(live) => live,
+        Err(error) => {
+            eprintln!("reconcile-metering: the sweep could not complete: {error}");
+            pool.close().await;
+            return failure(
+                Some(&settings.actor),
+                settings.license_id.as_deref(),
+                SWEEP_FAILED,
+                DB_ERROR_KIND,
+            );
+        }
+    };
+    let result = match run_metering_reconcile(
+        &pool,
+        settings.limit,
+        settings.revalidate,
+        settings.dry_run,
+        settings.force_plan_quota,
+        wanted_ids.as_deref(),
+        &settings.actor,
+        &billing,
+    )
+    .await
+    {
+        Ok(result) => result,
+        Err(error) => {
+            // The exception goes to stderr; stdout keeps the one static JSON line.
+            eprintln!("reconcile-metering: the sweep could not complete: {error}");
+            pool.close().await;
+            return failure(
+                Some(&settings.actor),
+                settings.license_id.as_deref(),
+                SWEEP_FAILED,
+                DB_ERROR_KIND,
+            );
+        }
+    };
+    pool.close().await;
+    outcome(&settings, live, result)
 }
 
-/// One sweep's facts, exactly the reference `MeteringReconcileResult` plus the independent count.
-struct Sweep {
-    live_budget_owing: i64,
-    scanned: usize,
-    repaired: Vec<String>,
-    failed: Vec<String>,
-    uncovered_budget: Vec<String>,
-    unknown_budget: Vec<String>,
-    budgets_created: i64,
-    budget_drift: Vec<String>,
-    budgets_updated: i64,
-    already_covered: i64,
-    budgets_skipped_sentinel: i64,
-    budgets_skipped_money_tenant: i64,
-    uncovered_quota: Vec<String>,
-    quota_drift: Vec<String>,
-    unknown_quota: Vec<String>,
-    unknown_quota_reasons: BTreeMap<String, i64>,
-    quotas_pushed: i64,
-    quotas_already_configured: i64,
-    quotas_overwritten: i64,
+/// `MeteringReconcileResult` (`main.py`): the outcome of one metering reconcile sweep.
+///
+/// The wire shape is the reference's: five REQUIRED fields (no default) and every other field
+/// carrying a default. Both the HTTP route and the command payload are built from this one type.
+#[derive(Debug, Clone, Serialize, ToSchema)]
+pub struct MeteringReconcileResult {
+    /// Licences the sweep examined.
+    pub scanned: i64,
+    /// Licences that came out VERIFIED — a CONVERGED count, not a count of writes.
+    pub repaired: i64,
+    /// Licences the sweep could not converge.
+    pub failed: i64,
+    pub repaired_license_ids: Vec<String>,
+    pub failed_license_ids: Vec<String>,
+    /// Licences that OWE billing a token budget and for which billing reported no active
+    /// `source='license_sync'` row AT THE MOMENT IT WAS ASKED.
+    #[schema(required = false, default = json!([]))]
+    pub uncovered_budget_license_ids: Vec<String>,
+    /// Licences whose coverage billing would not disclose. Nothing was created for these.
+    #[schema(required = false, default = json!([]))]
+    pub unknown_budget_license_ids: Vec<String>,
+    /// Budgets this sweep actually created in billing.
+    #[schema(required = false, default = 0)]
+    pub budgets_created: i64,
+    /// Licences whose active `license_sync` budget DIFFERS from the effective budget.
+    #[schema(required = false, default = json!([]))]
+    pub budget_drift_license_ids: Vec<String>,
+    /// Budgets this sweep UPDATED in billing to the effective value.
+    #[schema(required = false, default = 0)]
+    pub budgets_updated: i64,
+    /// Licences that owed a budget and billing already held one — no write, no repair.
+    #[schema(required = false, default = 0)]
+    pub already_covered: i64,
+    /// Licences skipped because billing refuses budgets for its sentinel tenant by design.
+    #[schema(required = false, default = 0)]
+    pub budgets_skipped_sentinel: i64,
+    /// Licences skipped because the tenant's budget is MONEY (migration 043).
+    #[schema(required = false, default = 0)]
+    pub budgets_skipped_money_tenant: i64,
+    /// Quota configs this sweep CREATED in billing.
+    #[schema(required = false, default = 0)]
+    pub quotas_pushed: i64,
+    /// Licences that owe a quota and for which billing held no row at the moment it was asked.
+    #[schema(required = false, default = json!([]))]
+    pub uncovered_quota_license_ids: Vec<String>,
+    /// Licences where billing's quota DIFFERS and was LEFT ALONE (an operator override).
+    #[schema(required = false, default = json!([]))]
+    pub quota_drift_license_ids: Vec<String>,
+    /// Licences whose configured quota billing would not disclose; they fail closed.
+    #[schema(required = false, default = json!([]))]
+    pub unknown_quota_license_ids: Vec<String>,
+    /// WHY those quotas were unreadable, counted by cause.
+    #[schema(required = false, default = json!({}))]
+    pub unknown_quota_reasons: BTreeMap<String, i64>,
+    /// Licences whose billing quota already equals the effective value — no write.
+    #[schema(required = false, default = 0)]
+    pub quotas_already_configured: i64,
+    /// Quota rows this sweep OVERWROTE because `force_plan_quota` was set.
+    #[schema(required = false, default = 0)]
+    pub quotas_overwritten: i64,
+    #[schema(required = false, default = false)]
+    pub dry_run: bool,
+}
+
+/// The independent count the anti-vacuity guard compares `scanned` against.
+///
+/// Counted BEFORE the sweep (the script calls it before `run_metering_reconcile`), so it is a
+/// fact about the estate, not about what the sweep just did to it.
+pub(crate) async fn count_live_budget_owing(
+    pool: &PgPool,
+    license_ids: Option<&[Uuid]>,
+) -> Result<i64, sqlx::Error> {
+    let ids = license_ids.map(<[Uuid]>::to_vec);
+    sqlx::query_scalar(LIVE_BUDGET_OWING_SQL)
+        .bind(ids)
+        .fetch_one(pool)
+        .await
+}
+
+/// THE RUNNER — the reference's `run_metering_reconcile`.
+///
+/// It carries NO HTTP and NO auth: `POST /licenses/admin/metering/reconcile` and the
+/// `reconcile-metering` CronJob both call it, so the two cannot drift apart.
+///
+/// `license_ids` NARROWS the selection and never widens it: `None` is no id filter, and an
+/// EMPTY slice selects nothing — the reference's `License.id.in_([])` — never silently "no
+/// filter".
+// The reference's own signature is these eight keyword arguments, and the route and the command
+// must pass exactly them; bundling them would hide the sweep's contract behind a struct.
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn run_metering_reconcile(
+    pool: &PgPool,
+    limit: i64,
+    revalidate: bool,
     dry_run: bool,
-}
-
-/// `live_budget_owing` → selection → per-licence read/repair/stamp, in that order.
-async fn sweep(
-    url: &str,
-    settings: &Settings,
-    wanted: Option<Uuid>,
+    force_plan_quota: bool,
+    license_ids: Option<&[Uuid]>,
+    actor: &str,
     billing: &MeteringProvisioner,
-) -> Result<Sweep, sqlx::Error> {
-    let pool = crate::db::connect(url, 1).await?;
-    // Counted BEFORE the sweep: it must be a fact about the estate, not about what the sweep
-    // just did to it.
-    let live_budget_owing: i64 = sqlx::query_scalar(LIVE_BUDGET_OWING_SQL)
-        .bind(wanted)
-        .fetch_one(&pool)
-        .await?;
+) -> Result<MeteringReconcileResult, sqlx::Error> {
+    let wanted_ids = license_ids.map(<[Uuid]>::to_vec);
     let now = chrono::Utc::now();
     let gaps: Vec<GapRow> = sqlx::query_as(SELECT_GAPS_SQL)
         .bind(now)
-        .bind(wanted)
-        .bind(settings.limit)
-        .bind(settings.revalidate)
-        .fetch_all(&pool)
+        .bind(wanted_ids)
+        .bind(limit)
+        .bind(revalidate)
+        .fetch_all(pool)
         .await?;
     // `len(gaps)` in the reference's result. Captured before the loop consumes the vector.
     let scanned = gaps.len();
@@ -372,12 +489,12 @@ async fn sweep(
             "reconcile-metering: examining {} live licence(s) whose billing coverage has not \
              been verified (requested by {}, dry_run={}, revalidate={}, force_plan_quota={})",
             gaps.len(),
-            settings.actor,
-            settings.dry_run,
-            settings.revalidate,
-            settings.force_plan_quota
+            actor,
+            dry_run,
+            revalidate,
+            force_plan_quota
         );
-        if settings.force_plan_quota {
+        if force_plan_quota {
             eprintln!(
                 "reconcile-metering: force_plan_quota=true — an existing billing quota that \
                  differs from the licence's effective value WILL be overwritten."
@@ -464,13 +581,13 @@ async fn sweep(
                                 eprintln!(
                                     "reconcile-metering: billing budget for license={lic} \
                                      tenant={tenant} differs from the effective budget {budget}{}",
-                                    if settings.dry_run {
+                                    if dry_run {
                                         " — dry run, nothing pushed"
                                     } else {
                                         " — pushing the upsert"
                                     }
                                 );
-                                if !settings.dry_run {
+                                if !dry_run {
                                     budget_ok = billing
                                         .push_token_budget(
                                             license_id,
@@ -493,7 +610,7 @@ async fn sweep(
                             }
                             BudgetCase::Absent => {
                                 uncovered_budget.push(lic.clone());
-                                if !settings.dry_run {
+                                if !dry_run {
                                     budget_ok = billing
                                         .push_token_budget(
                                             license_id,
@@ -534,7 +651,7 @@ async fn sweep(
                     }
                     QuotaState::Absent => {
                         uncovered_quota.push(lic.clone());
-                        if !settings.dry_run {
+                        if !dry_run {
                             quota_ok = billing
                                 .push_quota_config(
                                     license_id,
@@ -554,14 +671,14 @@ async fn sweep(
                         let current = read.quota_monthly.unwrap_or(quota);
                         if current == quota {
                             quotas_already_configured += 1;
-                        } else if settings.force_plan_quota {
+                        } else if force_plan_quota {
                             quota_drift.push(lic.clone());
                             eprintln!(
                                 "reconcile-metering OVERWRITING an operator quota for \
                                  license={lic} tenant={tenant}: billing held quota_monthly={current}, \
                                  forcing the plan default {quota} because force_plan_quota=true."
                             );
-                            if !settings.dry_run {
+                            if !dry_run {
                                 quota_ok = billing
                                     .push_quota_config(
                                         license_id,
@@ -591,11 +708,11 @@ async fn sweep(
                 }
             }
 
-            if settings.dry_run {
+            if dry_run {
                 continue;
             }
             let stamped = if budget_ok && quota_ok {
-                stamp_verified(&pool, license_id).await
+                stamp_verified(pool, license_id).await
             } else {
                 false
             };
@@ -611,8 +728,6 @@ async fn sweep(
             }
         }
     }
-    pool.close().await;
-
     eprintln!(
         "reconcile-metering complete: scanned={} repaired(converged)={} failed={} \
          uncovered_budgets={} unknown_budgets={} budgets_created={} budget_drift={} \
@@ -638,30 +753,31 @@ async fn sweep(
         quotas_pushed,
         quotas_already_configured,
         quotas_overwritten,
-        settings.dry_run
+        dry_run
     );
 
-    Ok(Sweep {
-        live_budget_owing,
-        scanned,
-        repaired,
-        failed,
-        uncovered_budget,
-        unknown_budget,
+    Ok(MeteringReconcileResult {
+        scanned: scanned as i64,
+        repaired: repaired.len() as i64,
+        failed: failed.len() as i64,
+        repaired_license_ids: repaired,
+        failed_license_ids: failed,
+        uncovered_budget_license_ids: uncovered_budget,
+        unknown_budget_license_ids: unknown_budget,
         budgets_created,
-        budget_drift,
+        budget_drift_license_ids: budget_drift,
         budgets_updated,
         already_covered,
         budgets_skipped_sentinel,
         budgets_skipped_money_tenant,
-        uncovered_quota,
-        quota_drift,
-        unknown_quota,
+        uncovered_quota_license_ids: uncovered_quota,
+        quota_drift_license_ids: quota_drift,
+        unknown_quota_license_ids: unknown_quota,
         unknown_quota_reasons,
         quotas_pushed,
         quotas_already_configured,
         quotas_overwritten,
-        dry_run: settings.dry_run,
+        dry_run,
     })
 }
 
@@ -696,23 +812,22 @@ async fn stamp_verified(pool: &PgPool, license_id: Uuid) -> bool {
 
 /// The script's `_classify`, verbatim: `(exit_code, reason)`. Order matters — the unknown legs
 /// are transport failures, then real failures, then the measure-only legs, then the two
-/// anti-vacuity legs.
-fn classify(sweep: &Sweep, limit: i64) -> (i32, String) {
-    let live = sweep.live_budget_owing;
-    if !sweep.unknown_budget.is_empty() {
+/// anti-vacuity legs. `live` is the independent count taken BEFORE the sweep.
+fn classify(result: &MeteringReconcileResult, limit: i64, live: i64) -> (i32, String) {
+    if !result.unknown_budget_license_ids.is_empty() {
         return (
             EXIT_TRANSPORT,
             format!(
                 "billing would not disclose coverage for {} licence(s); nothing was created for \
                  them and their coverage remains UNKNOWN",
-                sweep.unknown_budget.len()
+                result.unknown_budget_license_ids.len()
             ),
         );
     }
-    if !sweep.unknown_quota.is_empty() {
+    if !result.unknown_quota_license_ids.is_empty() {
         // The reason breakdown rides in the exit message because THIS STRING is what the
         // failing CronJob shows an operator.
-        let hint = if sweep.unknown_quota_reasons.contains_key("foreign_tenant") {
+        let hint = if result.unknown_quota_reasons.contains_key("foreign_tenant") {
             " foreign_tenant means billing holds a request_quota_config row under a DIFFERENT \
              tenant, so the licence's tenant of record has diverged: compare \
              licenses.license.tenant_id against billing.request_quota_config.tenant_id for those \
@@ -725,35 +840,35 @@ fn classify(sweep: &Sweep, limit: i64) -> (i32, String) {
             format!(
                 "billing would not disclose the configured quota for {} licence(s); nothing was \
                  pushed for them and their quota remains UNKNOWN. By cause: {}.{hint}",
-                sweep.unknown_quota.len(),
-                python_dict(&sweep.unknown_quota_reasons)
+                result.unknown_quota_license_ids.len(),
+                python_dict(&result.unknown_quota_reasons)
             ),
         );
     }
-    if !sweep.failed.is_empty() {
+    if !result.failed_license_ids.is_empty() {
         return (
             EXIT_NOT_CONVERGED,
             format!(
                 "{} licence(s) could not be converged: {}",
-                sweep.failed.len(),
-                python_list(&sweep.failed)
+                result.failed_license_ids.len(),
+                python_list(&result.failed_license_ids)
             ),
         );
     }
-    if sweep.dry_run && !sweep.uncovered_quota.is_empty() {
+    if result.dry_run && !result.uncovered_quota_license_ids.is_empty() {
         return (
             EXIT_NOT_CONVERGED,
             format!(
                 "NOT CONVERGED (measure-only): {} of {} scanned licence(s) have no \
                  request_quota_config row in billing: {}. Re-run without RECONCILE_DRY_RUN to \
                  create them.",
-                sweep.uncovered_quota.len(),
-                sweep.scanned,
-                python_list(&sweep.uncovered_quota)
+                result.uncovered_quota_license_ids.len(),
+                result.scanned,
+                python_list(&result.uncovered_quota_license_ids)
             ),
         );
     }
-    if sweep.dry_run && !sweep.uncovered_budget.is_empty() {
+    if result.dry_run && !result.uncovered_budget_license_ids.is_empty() {
         return (
             EXIT_NOT_CONVERGED,
             format!(
@@ -761,13 +876,13 @@ fn classify(sweep: &Sweep, limit: i64) -> (i32, String) {
                  license_sync budget in billing: {}. A dry run writes nothing, so this is the \
                  coverage answer, not a list of what was attempted. Re-run without \
                  RECONCILE_DRY_RUN to repair them.",
-                sweep.uncovered_budget.len(),
-                sweep.scanned,
-                python_list(&sweep.uncovered_budget)
+                result.uncovered_budget_license_ids.len(),
+                result.scanned,
+                python_list(&result.uncovered_budget_license_ids)
             ),
         );
     }
-    if sweep.scanned == 0 && live > 0 {
+    if result.scanned == 0 && live > 0 {
         return (
             EXIT_NOT_CONVERGED,
             format!(
@@ -779,7 +894,7 @@ fn classify(sweep: &Sweep, limit: i64) -> (i32, String) {
             ),
         );
     }
-    if sweep.scanned as i64 == limit && live > limit {
+    if result.scanned == limit && live > limit {
         return (
             EXIT_NOT_CONVERGED,
             format!(
@@ -795,8 +910,12 @@ fn classify(sweep: &Sweep, limit: i64) -> (i32, String) {
 }
 
 /// The script's payload: the literals, then `**result.model_dump()`, sorted by the serialiser.
-fn outcome(settings: &Settings, sweep: Sweep) -> RunOutcome {
-    let (code, reason) = classify(&sweep, settings.limit);
+fn outcome(
+    settings: &Settings,
+    live_budget_owing: i64,
+    result: MeteringReconcileResult,
+) -> RunOutcome {
+    let (code, reason) = classify(&result, settings.limit, live_budget_owing);
     let mut payload = Map::new();
     payload.insert("event".to_owned(), json!(EVENT));
     payload.insert("actor".to_owned(), json!(settings.actor));
@@ -809,66 +928,72 @@ fn outcome(settings: &Settings, sweep: Sweep) -> RunOutcome {
     payload.insert("license_id".to_owned(), json!(settings.license_id));
     payload.insert(
         "live_budget_owing_licenses".to_owned(),
-        json!(sweep.live_budget_owing),
+        json!(live_budget_owing),
     );
     payload.insert("exit_code".to_owned(), json!(code));
     payload.insert("reason".to_owned(), json!(reason));
 
     // `MeteringReconcileResult`, key for key.
-    payload.insert("scanned".to_owned(), json!(sweep.scanned));
-    payload.insert("repaired".to_owned(), json!(sweep.repaired.len()));
-    payload.insert("failed".to_owned(), json!(sweep.failed.len()));
-    payload.insert("repaired_license_ids".to_owned(), json!(sweep.repaired));
-    payload.insert("failed_license_ids".to_owned(), json!(sweep.failed));
+    payload.insert("scanned".to_owned(), json!(result.scanned));
+    payload.insert("repaired".to_owned(), json!(result.repaired));
+    payload.insert("failed".to_owned(), json!(result.failed));
+    payload.insert(
+        "repaired_license_ids".to_owned(),
+        json!(result.repaired_license_ids),
+    );
+    payload.insert(
+        "failed_license_ids".to_owned(),
+        json!(result.failed_license_ids),
+    );
     payload.insert(
         "uncovered_budget_license_ids".to_owned(),
-        json!(sweep.uncovered_budget),
+        json!(result.uncovered_budget_license_ids),
     );
     payload.insert(
         "unknown_budget_license_ids".to_owned(),
-        json!(sweep.unknown_budget),
+        json!(result.unknown_budget_license_ids),
     );
-    payload.insert("budgets_created".to_owned(), json!(sweep.budgets_created));
+    payload.insert("budgets_created".to_owned(), json!(result.budgets_created));
     payload.insert(
         "budget_drift_license_ids".to_owned(),
-        json!(sweep.budget_drift),
+        json!(result.budget_drift_license_ids),
     );
-    payload.insert("budgets_updated".to_owned(), json!(sweep.budgets_updated));
-    payload.insert("already_covered".to_owned(), json!(sweep.already_covered));
+    payload.insert("budgets_updated".to_owned(), json!(result.budgets_updated));
+    payload.insert("already_covered".to_owned(), json!(result.already_covered));
     payload.insert(
         "budgets_skipped_sentinel".to_owned(),
-        json!(sweep.budgets_skipped_sentinel),
+        json!(result.budgets_skipped_sentinel),
     );
     payload.insert(
         "budgets_skipped_money_tenant".to_owned(),
-        json!(sweep.budgets_skipped_money_tenant),
+        json!(result.budgets_skipped_money_tenant),
     );
-    payload.insert("quotas_pushed".to_owned(), json!(sweep.quotas_pushed));
+    payload.insert("quotas_pushed".to_owned(), json!(result.quotas_pushed));
     payload.insert(
         "uncovered_quota_license_ids".to_owned(),
-        json!(sweep.uncovered_quota),
+        json!(result.uncovered_quota_license_ids),
     );
     payload.insert(
         "quota_drift_license_ids".to_owned(),
-        json!(sweep.quota_drift),
+        json!(result.quota_drift_license_ids),
     );
     payload.insert(
         "unknown_quota_license_ids".to_owned(),
-        json!(sweep.unknown_quota),
+        json!(result.unknown_quota_license_ids),
     );
     payload.insert(
         "unknown_quota_reasons".to_owned(),
-        json!(sweep.unknown_quota_reasons),
+        json!(result.unknown_quota_reasons),
     );
     payload.insert(
         "quotas_already_configured".to_owned(),
-        json!(sweep.quotas_already_configured),
+        json!(result.quotas_already_configured),
     );
     payload.insert(
         "quotas_overwritten".to_owned(),
-        json!(sweep.quotas_overwritten),
+        json!(result.quotas_overwritten),
     );
-    payload.insert("dry_run".to_owned(), json!(sweep.dry_run));
+    payload.insert("dry_run".to_owned(), json!(result.dry_run));
     RunOutcome {
         code,
         payload: Value::Object(payload),

@@ -148,11 +148,24 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
              billing mirrors; the sync-from-licenses sweep remains the backstop"
         );
     }
+    // `POST /licenses/admin/metering/reconcile` runs the same sweep the CronJob command runs;
+    // the billing client is attached as an extension, so the route answers 500 (never a silent
+    // no-op) when billing is not configured.
+    let mut app = router::router(state);
+    match conveyor_licenses::billing::metering::MeteringProvisioner::from_env() {
+        Some(metering) => {
+            app = app.layer(axum::Extension(std::sync::Arc::new(metering)));
+        }
+        None => tracing::warn!(
+            "METERING_SERVICE_URL unset or unusable: POST /licenses/admin/metering/reconcile \
+             will answer 500"
+        ),
+    }
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{port}")).await?;
     tracing::info!(port, %environment, %version, "serving");
     axum::serve(
         listener,
-        router::router(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
+        app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
     )
     .await?;
     Ok(())
