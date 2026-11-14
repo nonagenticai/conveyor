@@ -168,6 +168,55 @@ if (fs.existsSync(issuesPath)) {
   if (leaked === 0) ok("issues.json carries no bodies or authors");
 }
 
+const organisationPath = path.join(dataDir, "organisation.json");
+if (fs.existsSync(organisationPath)) {
+  let organisation;
+  try {
+    organisation = JSON.parse(fs.readFileSync(organisationPath, "utf8"));
+  } catch (error) {
+    bad(`organisation.json does not parse: ${error.message}`);
+  }
+  if (organisation) {
+    const arrays = ["industries", "departments", "jobs", "releases", "bindings"];
+    const missing = arrays.filter((key) => !Array.isArray(organisation[key]));
+    if (missing.length) {
+      bad(`organisation.json is missing array(s): ${missing.join(", ")}`);
+    } else {
+      const { industries, departments, jobs, releases, bindings } = organisation;
+      const jobIds = new Set(jobs.map((job) => job.id));
+      const releaseHashes = new Set(releases.map((release) => release.release_hash));
+      const badStatus = (row, allowed) => !allowed.includes(row.status);
+      const jobProblems = jobs.filter(
+        (job) => !job.key || !job.name || badStatus(job, ["draft", "active", "retired"]),
+      );
+      const releaseProblems = releases.filter(
+        (release) =>
+          !/^[0-9a-f]{64}$/.test(String(release.release_hash || "")) ||
+          !jobIds.has(release.job_id) ||
+          badStatus(release, ["published", "retired"]),
+      );
+      const bindingProblems = bindings.filter(
+        (binding) =>
+          !binding.executor_kind ||
+          !jobIds.has(binding.job_id) ||
+          !releaseHashes.has(binding.release_hash) ||
+          badStatus(binding, ["draft", "active", "retired"]),
+      );
+      if (jobProblems.length) bad(`${jobProblems.length} job row(s) are missing a key/title/status`);
+      if (releaseProblems.length) bad(`${releaseProblems.length} release row(s) are malformed or orphaned`);
+      if (bindingProblems.length) bad(`${bindingProblems.length} binding row(s) are malformed or orphaned`);
+      if (!jobProblems.length && !releaseProblems.length && !bindingProblems.length) {
+        ok(
+          `organisation: ${industries.length} industries / ${departments.length} departments / ` +
+            `${jobs.length} jobs / ${releases.length} releases / ${bindings.length} bindings`,
+        );
+      }
+    }
+  }
+} else {
+  bad("organisation.json is absent while data/ exists");
+}
+
 const studioPath = path.join(root, "studio.html");
 if (fs.existsSync(studioPath)) {
   const html = fs.readFileSync(studioPath, "utf8");

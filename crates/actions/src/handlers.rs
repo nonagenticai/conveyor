@@ -70,6 +70,9 @@ fn department_view(row: &store::actions::DepartmentRow) -> DepartmentOut {
         id: row.id.to_string(),
         name: row.name.clone(),
         parent_id: row.parent_id.map(|id| id.to_string()),
+        industry_id: row.industry_id.map(|id| id.to_string()),
+        ordinal: row.ordinal,
+        is_primary: row.is_primary,
         version: row.version,
         created_at: row.created_at,
     }
@@ -493,10 +496,19 @@ async fn departments_create(
     }
     // The store resolves the parent in THIS tenant before the FK sees it (the RI check
     // bypasses RLS and would otherwise accept another tenant's id).
-    let row =
-        store::actions::department_create(&mut *tx, ctx.tenant, input.name.trim(), input.parent_id)
-            .await
-            .map_err(|error| parent_error(error, "departments.create"))?;
+    let row = store::actions::department_create(
+        &mut *tx,
+        ctx.tenant,
+        &store::actions::NewDepartment {
+            name: input.name.trim(),
+            parent_id: input.parent_id,
+            industry_id: input.industry_id,
+            ordinal: input.ordinal,
+            is_primary: input.is_primary.unwrap_or(false),
+        },
+    )
+    .await
+    .map_err(|error| parent_error(error, "departments.create"))?;
     let version = conveyor_domain::Version::new(u64::try_from(row.version).unwrap_or(1))
         .unwrap_or(conveyor_domain::Version::INITIAL);
     Ok(HandlerOutput::created(department_view(&row)).with_etag(version.etag()))

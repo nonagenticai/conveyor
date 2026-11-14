@@ -233,6 +233,10 @@ fn variant_path(kind: &str, value: &str) -> syn::Result<String> {
         // is intersected with the caller's own scopes at readiness (CONTRACT §17).
         ("scope", "capabilities:read") => "CapabilitiesRead",
         ("scope", "capabilities:write") => "CapabilitiesWrite",
+        // T0. The organisation spine's pair (SPEC_V2 §4): a read is open, a write is platform
+        // administration like `departments:write`.
+        ("scope", "organisation:read") => "OrganisationRead",
+        ("scope", "organisation:write") => "OrganisationWrite",
         (kind, other) => {
             return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),

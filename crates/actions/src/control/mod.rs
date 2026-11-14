@@ -126,6 +126,27 @@ pub fn run_error(error: store::RunStoreError, action: &str) -> ActionError {
             "run.child_attempt_exists",
             "this parent step already has a run at that attempt",
         ),
+        store::RunStoreError::JobBindingStale {
+            binding_hash,
+            requested_hash,
+        } => ActionError::new(
+            409,
+            "job_binding_stale",
+            format!(
+                "the binding pins release {binding_hash} but the run requested {requested_hash}; \
+                 publish a new release and bind it"
+            ),
+        ),
+        store::RunStoreError::ReleaseWithoutBinding => invalid(
+            "release_hash",
+            "binding_required",
+            "a run that names a release must name the job binding that pins it",
+        ),
+        store::RunStoreError::BindingNotFound => ActionError::resource_not_found("such binding"),
+        store::RunStoreError::Organisation(error) => {
+            tracing::error!(%error, action, "the organisation spine refused the run's binding");
+            ActionError::internal()
+        }
         store::RunStoreError::Parent(parent) => parent_error(parent, action),
         // The run's own bookkeeping (its step skip / descendant sweep) refused. The action layer
         // never names this directly, so it is an internal failure, not a caller's mistake.
