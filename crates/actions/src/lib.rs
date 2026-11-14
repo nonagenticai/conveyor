@@ -50,6 +50,9 @@ pub mod process;
 pub mod procedure;
 // SPEC D30 / CONTRACT §21: the user-facing process map — two read actions.
 pub mod process_map;
+
+/// Programme ordering: the dependency gate shared by the two run-start paths.
+mod programme;
 // SPEC D27: prompt compilation — one catalogue, three surfaces (agent.run, copilot, prompt audit).
 pub mod prompt;
 // S16: the prompt-audit surface and its deterministic scan.

@@ -9,7 +9,7 @@
       "key": "S00",
       "name": "Usage inventory → parity/parity.yaml",
       "description": "Plan: docs/plans/slices/S00-usage-inventory.md",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S00-usage-inventory.md",
@@ -17,14 +17,16 @@
         "issues": [],
         "depends_on": [],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 0
       }
     },
     {
       "key": "S01",
       "name": "UI spike — Leptos CSR vs Leptos SSR",
       "description": "Plan: docs/plans/slices/S01-ui-spike.md",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S01-ui-spike.md",
@@ -32,7 +34,9 @@
         "issues": [],
         "depends_on": [],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 0
       }
     },
     {
@@ -51,14 +55,16 @@
           "S00"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 1
       }
     },
     {
       "key": "S03",
       "name": "Domain and schema — aggregates, state machines, baseline domain migration",
       "description": "Plan: docs/plans/slices/S03-domain-schema.md",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S03-domain-schema.md",
@@ -68,7 +74,9 @@
           "S02"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 2
       }
     },
     {
@@ -88,14 +96,16 @@
           "S03"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 3
       }
     },
     {
       "key": "S05",
       "name": "Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
       "description": "Plan: docs/plans/slices/S05-board.md",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S05-board.md",
@@ -106,7 +116,9 @@
           "S04"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 4
       }
     },
     {
@@ -127,7 +139,9 @@
           "S05"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 5
       }
     },
     {
@@ -146,14 +160,16 @@
           "S06"
         ],
         "plan_status": "superseded",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "archived",
+        "tranche": 6
       }
     },
     {
       "key": "S06b",
       "name": "Agent direct interface — the conveyor's own MCP surface",
       "description": "Plan: docs/plans/slices/S06b-agent-direct-interface.md",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S06b-agent-direct-interface.md",
@@ -165,7 +181,9 @@
           "S06"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 6
       }
     },
     {
@@ -185,7 +203,9 @@
           "S06b"
         ],
         "plan_status": "built 2026-11-09",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 7
       }
     },
     {
@@ -207,14 +227,16 @@
           "S06c"
         ],
         "plan_status": "built",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 8
       }
     },
     {
       "key": "S07",
       "name": "Requirements, catalogues, revisions, quality scoring, search",
       "description": "Plan: docs/plans/slices/S07-requirements-search.md",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S07-requirements-search.md",
@@ -225,14 +247,16 @@
           "S04"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 4
       }
     },
     {
       "key": "S08",
       "name": "Governance, modelling, render and export",
       "description": "Plan: docs/plans/slices/S08-governance-modelling.md",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S08-governance-modelling.md",
@@ -244,14 +268,16 @@
           "S07"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 5
       }
     },
     {
       "key": "S09",
       "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
       "description": "Plan: docs/plans/slices/S09-documents-integrations.md",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S09-documents-integrations.md",
@@ -262,14 +288,16 @@
           "S04"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 4
       }
     },
     {
       "key": "S10",
       "name": "Copilot / AG-UI — one action surface, proposals, conversations",
       "description": "Plan: docs/plans/slices/S10-copilot-ag-ui.md",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S10-copilot-ag-ui.md",
@@ -282,7 +310,9 @@
           "S06"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 6
       }
     },
     {
@@ -304,7 +334,9 @@
           "S07"
         ],
         "plan_status": "built 2026-11-09 (steps 1–12); amended 2026-11-09 (process/step/SOP split — migration 0033)",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 6
       }
     },
     {
@@ -337,7 +369,9 @@
           "S18"
         ],
         "plan_status": "built",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 10
       }
     },
     {
@@ -359,7 +393,9 @@
           "S15"
         ],
         "plan_status": "built (2026-11-10; session 2 closed W4/W5/D29, the catalogue E2E and the BYO token path; session 3 closed the step contract, gate/call seed content, the run lifecycle, the judge record, map authoring, the bus replay proof and the install path; the DAG plan is superseded; the engine is retained — owner ruling 2026-11-09)",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 8
       }
     },
     {
@@ -382,7 +418,9 @@
           "S13"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "partial",
+        "tranche": 11
       }
     },
     {
@@ -404,7 +442,9 @@
           "S11"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 7
       }
     },
     {
@@ -427,7 +467,9 @@
           "S11"
         ],
         "plan_status": "built 2026-11-09",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 7
       }
     },
     {
@@ -449,7 +491,9 @@
           "S09"
         ],
         "plan_status": "built 2026-11-09",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 5
       }
     },
     {
@@ -471,7 +515,9 @@
           "S17"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 9
       }
     },
     {
@@ -498,7 +544,9 @@
           "S16"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 8
       }
     },
     {
@@ -517,7 +565,9 @@
           "S19"
         ],
         "plan_status": "planned",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 9
       }
     },
     {
@@ -539,7 +589,9 @@
           "S16"
         ],
         "plan_status": "plan written 2026-11-09",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "partial",
+        "tranche": 9
       }
     },
     {
@@ -556,7 +608,9 @@
         ],
         "depends_on": [],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 0,
         "gate": "a job is created in the conveyor, a release is published, a binding pins its hash, and a run on a retired binding refuses `409 job_binding_stale`; no concept has two stores; a test-only third executor kind registers without editing the run path"
       }
     },
@@ -564,17 +618,21 @@
       "key": "T1",
       "name": "Plan spine",
       "description": "SPEC_V2 slice T1 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          72
+        ],
         "depends_on": [
           "T0"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 1,
         "gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused"
       }
     },
@@ -582,17 +640,21 @@
       "key": "T2",
       "name": "Decision ladder",
       "description": "SPEC_V2 slice T2 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          73
+        ],
         "depends_on": [
           "T1"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 2,
         "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card"
       }
     },
@@ -600,17 +662,21 @@
       "key": "T3",
       "name": "PM job",
       "description": "SPEC_V2 slice T3 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          74
+        ],
         "depends_on": [
           "T2"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 3,
         "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request"
       }
     },
@@ -618,17 +684,21 @@
       "key": "T4",
       "name": "Kanban coach",
       "description": "SPEC_V2 slice T4 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          75
+        ],
         "depends_on": [
           "T3"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 4,
         "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata"
       }
     },
@@ -636,12 +706,14 @@
       "key": "T5",
       "name": "Kata",
       "description": "SPEC_V2 slice T5 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          77
+        ],
         "depends_on": [
           "T2",
           "S16",
@@ -651,7 +723,9 @@
           "S20"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 10,
         "gate": "a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened"
       }
     },
@@ -659,18 +733,22 @@
       "key": "T6",
       "name": "Development project",
       "description": "SPEC_V2 slice T6 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          80
+        ],
         "depends_on": [
           "T5",
           "T13"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 11,
         "gate": "a real feature lands: lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested"
       }
     },
@@ -678,19 +756,23 @@
       "key": "T7",
       "name": "Operations",
       "description": "SPEC_V2 slice T7 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          78
+        ],
         "depends_on": [
           "T2",
           "T4",
           "T13"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 5,
         "gate": "an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable"
       }
     },
@@ -698,17 +780,21 @@
       "key": "T8",
       "name": "Organisational memory",
       "description": "SPEC_V2 slice T8 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          79
+        ],
         "depends_on": [
           "T5"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 11,
         "gate": "a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine"
       }
     },
@@ -716,18 +802,22 @@
       "key": "T9",
       "name": "TOGAF profile",
       "description": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          81
+        ],
         "depends_on": [
           "T1",
           "T3"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 4,
         "gate": "an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata"
       }
     },
@@ -735,18 +825,22 @@
       "key": "T10",
       "name": "SAFe cadence",
       "description": "SPEC_V2 slice T10 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          82
+        ],
         "depends_on": [
           "T1",
           "T3"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 4,
         "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons"
       }
     },
@@ -754,15 +848,19 @@
       "key": "T11",
       "name": "Metrics, metering and maturity",
       "description": "SPEC_V2 slice T11 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          84
+        ],
         "depends_on": [],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 0,
         "gate": "every metric and every metering level recomputes from rows; the reconciliation with `billing_service` is exact or opens an incident; a C0–C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged"
       }
     },
@@ -770,12 +868,14 @@
       "key": "T12",
       "name": "One organisation loop",
       "description": "SPEC_V2 slice T12 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          88
+        ],
         "depends_on": [
           "T0",
           "T1",
@@ -796,7 +896,9 @@
           "T17"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 13,
         "gate": "one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget"
       }
     },
@@ -804,17 +906,21 @@
       "key": "T13",
       "name": "Tool platform",
       "description": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          76
+        ],
         "depends_on": [
           "T2"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 3,
         "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt"
       }
     },
@@ -822,17 +928,21 @@
       "key": "T14",
       "name": "Estate toolkits",
       "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          83
+        ],
         "depends_on": [
           "T13"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 4,
         "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish"
       }
     },
@@ -840,18 +950,22 @@
       "key": "T15",
       "name": "Tool authoring and BYO",
       "description": "SPEC_V2 slice T15 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          86
+        ],
         "depends_on": [
           "T13",
           "T6"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 12,
         "gate": "a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling"
       }
     },
@@ -859,18 +973,22 @@
       "key": "T16",
       "name": "SOP, RDF/OWL and process-document ingestion",
       "description": "SPEC_V2 slice T16 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          85
+        ],
         "depends_on": [
           "T2",
           "T13"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 4,
         "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a tenant edits a PKO entity and the change is versioned; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds"
       }
     },
@@ -878,18 +996,22 @@
       "key": "T17",
       "name": "Tenant asset authoring",
       "description": "SPEC_V2 slice T17 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
-        "issues": [],
+        "issues": [
+          87
+        ],
         "depends_on": [
           "T16",
           "T3"
         ],
         "plan_status": "draft",
-        "status_source": "open GitHub issues + plan frontmatter",
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 5,
         "gate": "a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant"
       }
     },
@@ -897,7 +1019,7 @@
       "key": "DESIGN-PUBLISH",
       "name": "Publish the SPEC_V2 studio design pack, live",
       "description": "Programme-level unit (plan: docs/design/STUDIO-SPEC.md)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/design/STUDIO-SPEC.md",
@@ -906,11 +1028,16 @@
           32,
           33,
           36,
-          37
+          37,
+          89,
+          97,
+          103
         ],
         "depends_on": [],
         "plan_status": "active",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 0
       }
     },
     {
@@ -930,11 +1057,17 @@
           45,
           46,
           55,
-          57
+          57,
+          71,
+          93,
+          95,
+          102
         ],
         "depends_on": [],
         "plan_status": "active",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "standing",
+        "tranche": 0
       }
     },
     {
@@ -951,7 +1084,9 @@
         ],
         "depends_on": [],
         "plan_status": "active",
-        "status_source": "open GitHub issues + plan frontmatter"
+        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "measured_status": "built",
+        "tranche": 0
       }
     }
   ]

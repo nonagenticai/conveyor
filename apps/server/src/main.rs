@@ -343,6 +343,20 @@ enum ActionsCommand {
         #[arg(long)]
         tenant: String,
     },
+    /// Print the compiled action registry. No database, no configuration.
+    ///
+    /// This is the coverage gate's source of truth: `docs/design/data/actions.json` is this
+    /// command's output, and `crates/actions/tests/registry.rs` fails when it drifts from the
+    /// compiled registry. A source grep cannot see specs built by a helper (`chat_spec`), so
+    /// the gate reads this dump, never the source.
+    Dump {
+        /// Emit one JSON document (`{"version":1,"actions":[…]}`) instead of one name per line.
+        #[arg(long)]
+        json: bool,
+        /// Also write the document here.
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -744,6 +758,43 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                 Err(message) => Err(RunError::Exit(2, message)),
             };
         }
+        // The dump is a pure registry read like `fixture` and `diff`: it must run in a bare
+        // workspace with no database, because the coverage gate runs it before anything
+        // connects.
+        AdminCommand::Actions {
+            command: ActionsCommand::Dump { json, out },
+        } => {
+            let mut names = conveyor_actions::registry::registry().names();
+            names.sort_unstable();
+            let text = if json {
+                let mut text = serde_json::to_string_pretty(&serde_json::json!({
+                    "version": 1,
+                    "actions": names,
+                }))?;
+                text.push('\n');
+                text
+            } else {
+                let mut text = names.join("\n");
+                text.push('\n');
+                text
+            };
+            match out {
+                Some(path) => {
+                    if let Some(parent) = path.parent()
+                        && !parent.as_os_str().is_empty()
+                    {
+                        std::fs::create_dir_all(parent)?;
+                    }
+                    std::fs::write(&path, text)?;
+                    println!(
+                        "{}",
+                        serde_json::json!({ "path": path, "actions": names.len() })
+                    );
+                }
+                None => print!("{text}"),
+            }
+            return Ok(());
+        }
         _ => {}
     }
 
@@ -799,6 +850,15 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                 store::actions::registry_revoke_others(&mut tx, &name, version).await?;
                 tx.commit().await?;
                 println!("approved {} v{}", row.name, row.spec_version);
+            }
+            // The dump is handled before the database connection; this arm exists only to keep
+            // the match exhaustive, and returning early is the correct behaviour if that ever
+            // moves.
+            ActionsCommand::Dump { .. } => {
+                return Err(RunError::Refused(
+                    "actions dump must run without a database; it is handled before the connect"
+                        .into(),
+                ));
             }
         },
         AdminCommand::Import {

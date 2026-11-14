@@ -2476,7 +2476,7 @@ window.installV2 = function (api, enterprise) {
           ? snapshotProjects().length
           : db.projects.length;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Non-Agentic AI<small>Organisation workspace</small></span><span>⌄</span></div><nav>
-      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", projectCount)}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
+      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", projectCount)}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
       <div class="nav-group"><div class="nav-label">ORGANISATION</div>${N("organisation", "Organisation", "layers")}${N("jobs", "Jobs", "board", F.jobs.length)}${N("agents", "Agents", "agent")}${N("toolkits", "Tools", "tools")}${N("types", "Project types", "grid")}</div>
       <div class="nav-group"><div class="nav-label">PROCEDURES &amp; AUTHORING</div>${N("procedures", "Procedures", "flow")}${N("capabilities", "Capabilities", "layers")}${N("authoring", "Authoring", "book")}</div>
       <div class="nav-group"><div class="nav-label">GOVERN &amp; DESIGN</div>${N("assurance", "Assurance &amp; baselines", "shield")}${N("constraints", "Flow &amp; constraints", "branch")}${N("requirements", "Requirements", "file")}${N("principles", "Principles", "book")}${N("models", "Architecture &amp; UML", "model")}${N("architecture", "System architecture", "model")}${N("documents", "Documents", "file")}</div>
@@ -2638,6 +2638,97 @@ window.installV2 = function (api, enterprise) {
                 ? `<div class="v2-split"><div>${panel("PI-2026.4 cadence", `${flow([["PI planning", "draft cards from backlog by WSJF within WIP"], ["System demo", "each deliverable exhibits evidence; no demo, no credit"], ["Inspect & adapt", "retro produces lessons and kata candidates"]])}${note("A programme_cadence row materialises the next cadence's draft cards. Cards are ordered by WSJF and bounded by the tenant's WIP limits; a person approves the plan.")}`)}</div><div>${panel("Capacity", `${table(["Team", "Members", "WIP", "Used"], [["Delivery", "7", "14", "11"], ["Verification", "3", "6", "5"], ["Operations", "3", "6", "2"], ["Project office", "3", "6", "4"]].map((r) => `<tr><td>${E(r[0])}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`))}${note("WIP is a pressure valve, not a report: a breach is a coach card and a laya remedy.")}`)}</div></div>`
                 : `${panel("Metering · " + programme().name, `${table(["Level", "Tokens", "Cost", "Tool spend", "Budget"], [["Programme", "9.6M", "$214.20", "$21.40", "54%"], ["Project: Identity & access", "3.1M", "$68.40", "$7.20", "41%"], ["Project: Citizen services", "4.2M", "$101.10", "$9.80", "57%"], ["Project: Core services", "2.3M", "$44.70", "$4.40", "48%"]].map((r) => `<tr><td>${E(r[0])}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`))}${note("Cost is derived at read time from <span class='mono'>inference_call</span> and <span class='mono'>tool_call</span>; tokens are stored, money is not. The same derivation feeds the API.")}`, route("Open metering", "metering", "small", "chart"))}`;
     return `<div class="page enterprise">${heading("Portfolio", "Every project and programme in flight for the tenant, its shared configuration, dependency graph, WSJF backlog and measured spend.", `${route("Plan & WBS", "plan", "", "board")}${route("Organisation", "organisation", "", "layers")}`, "PORTFOLIO & PLAN")}${ribbon("Portfolio is a computed read model (D49); programme shared config, cadence and metering are proposed V2 aggregates.", count.programmes > 0)}<div class="e-programmes">${F.programmes.map((p) => `<button class="e-programme ${p.id === v.programme ? "selected" : ""}" data-v2="programme" data-id="${p.id}" aria-pressed="${p.id === v.programme}"><span class="e-programme-top"><span class="mono">${p.key}</span>${B(p.tone === "green" ? "On track" : "Attention", p.tone)}</span><strong>${E(p.name)}</strong><small>${projects().filter((x) => x.programme === p.id).length} projects · ${E(p.cadence)}</small></button>`).join("")}</div><div class="e-scopebar"><div>${I("layers")}<strong>${E(programme().name)}</strong>${B("V2 portfolio", "green")}<span class="muted">${E(programme().note)}</span></div><div><span class="mono muted">${E(programme().cadence)} · ${E(programme().budget)}</span></div></div>${tabs(["In flight", "Programmes", "Shared config & dependencies", "Backlog & WSJF", "Cadence & capacity", "Metering"], tab, "portfolio")}${content}${dataPanel()}</div>`;
+  }
+
+  /* -------------------------------------------------------------- Validation */
+  // The measured programme: every status comes from `docs/design/data/coverage.json`, which
+  // `scripts/build-coverage.py` derives from the slice frontmatter, the migrations, the
+  // compiled registry dump and this file. The page renders the data; it never computes a
+  // status, so the published claim and the gate cannot disagree.
+  function validation() {
+    const cov = window.CONVEYOR_COVERAGE || null;
+    const tab = v.tab.validation || "Programme";
+    if (!cov) {
+      return `<div class="page enterprise">${heading("Validation", "The programme measured against its own plans — projects, tranches, screens and the gap list.", "", "PLAN")}${note("No coverage data is loaded. Run <span class='mono'>python3 scripts/build-coverage.py</span> and ship <span class='mono'>data/coverage.js</span>.", "bad")}</div>`;
+    }
+    const projects = cov.projects || [];
+    const screens = cov.screens || [];
+    const tone = (status) =>
+      status === "built" || status === "live" || status === "standing"
+        ? "green"
+        : status === "partial" || status === "mixed"
+          ? "amber"
+          : "";
+    const units = (u) =>
+      `${u.open} open${u.claimed ? ` · ${u.claimed} claimed` : ""}${u.blocked ? ` · ${u.blocked} blocked` : ""}`;
+    const summary = `<div class="v2-split"><div>${panel(
+      "Programme",
+      `${kv([
+        ["Projects", `${cov.summary.projects.total}`],
+        ["Built", `${cov.summary.projects.by_status.built}`],
+        ["Partial", `${cov.summary.projects.by_status.partial}`],
+        ["Proposed (V2)", `${cov.summary.projects.by_status.proposed}`],
+        ["Uncovered", `${cov.summary.projects.uncovered.length}`],
+      ])}${note(
+        "A project is <strong>built</strong> when every artefact its plan declares exists; <strong>partial</strong> when some do; <strong>proposed</strong> when its V2 slice has no code. A non-built project with no open unit fails the gate.",
+        "ok",
+      )}`,
+    )}</div><div>${panel(
+      "Surfaces",
+      `${kv([
+        ["Screens", `${cov.summary.screens.total}`],
+        ["Live", `${cov.summary.screens.by_status.live}`],
+        ["Mixed", `${cov.summary.screens.by_status.mixed}`],
+        ["Proposed", `${cov.summary.screens.by_status.proposed}`],
+        ["Legacy V1", `${cov.summary.screens.by_status.legacy}`],
+      ])}${note(
+        "A <strong>live</strong> screen reads or writes the platform; <strong>mixed</strong> means part of the page is real; <strong>proposed</strong> is a V2 destination with no backend call; <strong>legacy</strong> is a retained V1 surface.",
+        "ok",
+      )}`,
+    )}</div></div>`;
+    const tranches = [...new Set(projects.map((p) => p.tranche))].sort((a, b) => a - b);
+    const programme = tranches
+      .map((tranche) => {
+        const rows = projects.filter((p) => p.tranche === tranche);
+        return panel(
+          `Tranche ${tranche} · ${rows.length} project${rows.length === 1 ? "" : "s"}`,
+          table(
+            ["Project", "Track", "Status", "Measured t/a/m", "Units", "Blocked by", "Gap"],
+            rows.map(
+              (p) =>
+                `<tr><td><strong>${E(p.key)}</strong><small>${E(p.name)}</small></td><td>${E(p.track)}</td><td>${B(p.status, tone(p.status))}</td><td class="mono">${p.measured.tables[0]}/${p.measured.tables[1]} · ${p.measured.actions[0]}/${p.measured.actions[1]} · ${p.measured.modules[0]}/${p.measured.modules[1]}</td><td>${E(units(p.units))}</td><td>${p.blocked_by.length ? p.blocked_by.map((k) => `<code>${E(k)}</code>`).join(" ") : "—"}</td><td><small>${p.gap ? E(p.gap) : "—"}</small></td></tr>`,
+            ),
+          ),
+          B(`${rows.filter((p) => p.status === "built").length} built`, "green"),
+        );
+      })
+      .join("");
+    const screenRows = table(
+      ["Screen", "Status", "Evidence", "Gap"],
+      screens.map(
+        (s) =>
+          `<tr><td><strong>${E(s.title)}</strong><small>${E(s.key)}</small></td><td>${B(s.status, tone(s.status))}</td><td><small>${s.evidence.map((e) => `<code>${E(e)}</code>`).join(" ")}</small></td><td><small>${s.gap ? E(s.gap) : "—"}</small></td></tr>`,
+      ),
+    );
+    const actionRows = table(
+      ["Action", "Invoked at"],
+      cov.actions_invoked.map(
+        (a) =>
+          `<tr><td class="mono">${E(a.name)}</td><td><small>v2.js:${a.line}</small></td></tr>`,
+      ),
+    );
+    const content =
+      tab === "Programme"
+        ? `<div>${programme}</div>`
+        : tab === "Screens"
+          ? panel("Surfaces", `${screenRows}${note("Every row resolves in the pack; a missing page or an unknown status fails <span class='mono'>check-coverage.cjs</span>.")}`)
+          : panel("Actions invoked by the pack", `${actionRows}${note("Every name resolves in the compiled registry dump <span class='mono'>docs/design/data/actions.json</span>.")}`);
+    return `<div class="page enterprise">${heading(
+      "Validation",
+      "The programme measured against its own plans: every project's status with evidence, its tranche, its units and its gap; every screen's real-versus-proposed state.",
+      `${route("Portfolio", "portfolio", "", "projects")}${route("Plan & WBS", "plan", "", "board")}`,
+      "PLAN",
+    )}<div class="v2-ribbon live" role="note"><strong>MEASURED</strong><span>Every status is derived from the slice frontmatter, the migrations, the compiled registry dump and this pack; <span class="mono">check-coverage.cjs</span> is the gate.</span><span class="v2-src">docs/design/data/coverage.json</span></div>${summary}${tabs(["Programme", "Screens", "Actions"], tab, "validation")}${content}</div>`;
   }
 
   /* ------------------------------------------------------------------ Plan */
@@ -3344,6 +3435,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
   const pages = {
     portfolio,
     plan,
+    validation,
     projects: projectsPage,
     contribute: contributePage,
     organisation,
@@ -3393,6 +3485,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
   const titles = {
     portfolio: "Portfolio",
     plan: "Plan & WBS",
+    validation: "Validation",
     projects: "Projects",
     contribute: "Contribute",
     organisation: "Organisation",

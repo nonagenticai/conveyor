@@ -9,11 +9,13 @@ Run the `issue-pickup` skill before creating any branch. One issue = one branch 
 plan's remaining work is **one issue** (owner rule 2026-11-11), unless an explicit ≤5 split is written down.
 `03-DELIVERY.md` is the authority.
 
-**Queue status 2026-11-13.** The V1 `S##` plans and the three absorption units (#44–#46) are
-registered. The V2 `T1–T17` slices are **not yet queued**: `seed/programme.json` carries each
-project's gate and `depends_on`, and `SPEC_V2.md` §12 carries its scope; registering them is the
-next queue-truth unit after #44. ADR 0005 fixes the order — absorption first (#44 → #45 → #46),
-the product spine behind it.
+**Queue status 2026-11-14.** The V1 `S##` plans, the V2 `T0–T17` slices and the three
+cross-cutting projects are registered. The V2 units are #34 (T0) and #72–#88 (T1–T17);
+`seed/programme.json` links them and `scripts/build-programme-seed.py` regenerates that mapping.
+`docs/design/data/coverage.json` is the measured status and tranche of every project — the
+slice frontmatter, the migrations, the compiled action registry and `v2.js` are the evidence,
+and `docs/design/scripts/check-coverage.cjs` is the gate. ADR 0005 still fixes the absorption
+order — absorption first (#44 → #45 → #46), the product spine behind it.
 
 ## Programme `conveyor-buildout`
 
