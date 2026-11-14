@@ -954,6 +954,10 @@ async fn regenerate_on_a_licence_that_never_had_a_token_applies_the_new_mint_pol
 #[tokio::test]
 async fn regenerate_inherits_the_latest_replaced_expiry() {
     let db = seeded().await;
+    // Postgres stores timestamptz at MICROSECOND precision; the in-memory source carries
+    // nanoseconds. The assertion below compares at microseconds for that reason (nextest
+    // exposed the raw comparison in CI: the row's microsecond round-trip vs the nanosecond
+    // source differed whenever Utc::now() ended in a non-zero sub-microsecond).
     let soon = Utc::now() + Duration::days(10);
     let later = Utc::now() + Duration::days(20);
     insert_token(&db, TOKEN, "ten-day", Some(soon), false, None, None, &[]).await;
@@ -978,7 +982,13 @@ async fn regenerate_inherits_the_latest_replaced_expiry() {
             .fetch_one(&db.pool)
             .await
             .expect("new token");
-    assert_eq!(new_expiry, Some(later));
+    // Postgres stores timestamptz at MICROSECOND precision while the in-memory value carries
+    // nanoseconds; compare at the precision the row can hold. (nextest exposed the raw
+    // comparison in CI: microsecond round-trip vs the nanosecond source.)
+    assert_eq!(
+        new_expiry.map(|expiry| expiry.timestamp_micros()),
+        Some(later.timestamp_micros())
+    );
 
     let live: i64 = sqlx::query_scalar("SELECT count(*) FROM token WHERE NOT revoked")
         .fetch_one(&db.pool)

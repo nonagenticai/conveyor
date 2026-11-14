@@ -3,8 +3,9 @@ licenses — live served OpenAPI vs the captured lock
 
 Measured 2026-11-14, from the master host, against the LIVE service:
 
-  ssh -i <deploy key> admin@<master> \
-    "curl -sk --max-time 15 https://licenses.internal/openapi.json" > live.json
+  # the service address is an in-cluster name, redacted for the public tree
+  ssh -i <deploy key> <login>@<master> \
+    "curl -sk --max-time 15 https://<licenses-service>/openapi.json" > live.json
   jq -S . live.json > live.sorted.json
   jq -S . apps/licenses/contract/openapi.lock.json > lock.sorted.json
   sha256sum live.sorted.json lock.sorted.json
