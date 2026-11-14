@@ -1,0 +1,15 @@
+{
+  "detail": [
+    {
+      "input": {
+        "model": "stub-model"
+      },
+      "loc": [
+        "body",
+        "messages"
+      ],
+      "msg": "Field required",
+      "type": "missing"
+    }
+  ]
+}

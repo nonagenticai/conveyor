@@ -1,0 +1,8 @@
+POST
+/api/chat/completions
+-H
+content-type: application/json
+-H
+authorization: Bearer stub-licence-over-0000000000000000000000000
+-d
+{"model":"stub-model","messages":[{"role":"user","content":"hi"}],"max_tokens":8}

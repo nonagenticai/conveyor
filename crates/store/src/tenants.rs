@@ -6,7 +6,7 @@
 //! `BYPASSRLS` role to cross tenants with (S2-D3).
 
 use conveyor_domain::{IdError, TenantId};
-use sqlx::PgPool;
+use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
 /// Every `active` tenant id, ordered for a deterministic poll.
@@ -28,4 +28,24 @@ pub async fn id_by_slug(pool: &PgPool, slug: &str) -> Result<Option<TenantId>, s
         .await?;
     row.map(|(id,)| TenantId::from_uuid(id).map_err(|e: IdError| sqlx::Error::Decode(Box::new(e))))
         .transpose()
+}
+
+/// One tenant slug by id (`None` when absent).
+///
+/// `tenant` is the one table with no `tenant_id` and no RLS, so this read needs no scope. The
+/// publish job carries a tenant id and must name the tenant slug in the snapshot it writes.
+pub async fn slug_by_id(pool: &PgPool, id: Uuid) -> Result<Option<String>, sqlx::Error> {
+    let mut conn = pool.acquire().await?;
+    slug_by_id_tx(&mut conn, id).await
+}
+
+/// [`slug_by_id`] on the caller's connection (the action path already holds one).
+pub async fn slug_by_id_tx(
+    conn: &mut PgConnection,
+    id: Uuid,
+) -> Result<Option<String>, sqlx::Error> {
+    sqlx::query_scalar("SELECT slug FROM tenant WHERE id = $1")
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await
 }

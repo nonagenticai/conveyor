@@ -176,6 +176,8 @@ async fn eval_runs_export(
             status: "active".to_owned(),
             object_key: Some(key.clone()),
             content_hash: Some(content_hash.clone()),
+            card_id: None,
+            body: None,
             external_ref: None,
             meta: json!({
                 "content_type": "application/gzip",
@@ -184,6 +186,7 @@ async fn eval_runs_export(
                 "eval_run_id": run.id,
                 "variant": run.variant.as_str(),
             }),
+            publishable: false,
         },
     )
     .await

@@ -73,6 +73,8 @@ const shot = (name) =>
     for (const id of [
       "portfolio",
       "plan",
+      "projects",
+      "contribute",
       "organisation",
       "jobs",
       "procedures",
@@ -93,6 +95,8 @@ const shot = (name) =>
     for (const [id, title] of [
       ["portfolio", "Portfolio"],
       ["plan", "Plan & WBS"],
+      ["projects", "Projects"],
+      ["contribute", "Contribute"],
       ["organisation", "Organisation"],
       ["jobs", "Jobs"],
       ["procedures", "Procedures"],
@@ -118,6 +122,36 @@ const shot = (name) =>
     check(
       (await page.locator('a[href="docs/SPEC_V2.html"]').count()) === 1,
       "documents index links SPEC_V2 as HTML",
+    );
+    // 2b-ii. Platform outputs: a published index adds the group and its page link; the committed
+    // placeholder (a clean checkout) adds nothing.
+    await page.evaluate(() => {
+      window.CONVEYOR_OUTPUTS = {
+        schema: "design-outputs/v1",
+        generated_at: "2026-11-13T00:00:00Z",
+        outputs: [
+          {
+            id: "o-1",
+            title: "Published note",
+            project_id: "p-1",
+            project_key: "S02",
+            project_name: "Skeleton",
+            path: "docs/output-o-1.html",
+            updated_at: "2026-11-13T00:00:00Z",
+          },
+        ],
+      };
+    });
+    await page.locator('#sidebar [data-page="documents"]').first().click();
+    await page.waitForTimeout(200);
+    check(
+      (await page.locator("#main").textContent()).includes("Platform outputs"),
+      "documents show the platform-outputs group",
+    );
+    check((await content()).includes("Published note"), "documents list the published output");
+    check(
+      (await page.locator('a[href="docs/output-o-1.html"]').count()) === 1,
+      "the published output links its standalone page",
     );
     // 2c. A generated document is a standalone page: chrome present, heading rendered,
     //     no external request (it must open from file://).
@@ -569,6 +603,7 @@ const shot = (name) =>
     for (const id of [
       "portfolio",
       "plan",
+      "contribute",
       "organisation",
       "jobs",
       "procedures",

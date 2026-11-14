@@ -1,0 +1,11 @@
+{
+  "detail": {
+    "error": {
+      "cap_tokens": 1000,
+      "message": "token budget exhausted for this tenant; the request was refused before any provider was called",
+      "reason": "over_budget",
+      "remaining_tokens": 0,
+      "type": "budget_exceeded"
+    }
+  }
+}

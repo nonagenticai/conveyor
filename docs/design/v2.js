@@ -107,6 +107,20 @@ window.installV2 = function (api, enterprise) {
     byProject: {},
     loadingProject: null,
     lastError: null,
+    outputs: {},
+    outputsLoading: null,
+    repositories: [],
+    repositoriesLoaded: false,
+    publishRepo: null,
+    publishStatus: null,
+    publishTimer: null,
+    programme: null,
+    runs: [],
+    runsLoaded: false,
+    runsLoading: false,
+    runDetail: {},
+    runDetailLoading: null,
+    loadingAll: false,
   };
   const consoleIssueUrl = (number) =>
     `https://github.com/nonagenticai/conveyor/issues/${encodeURIComponent(number)}`;
@@ -127,6 +141,21 @@ window.installV2 = function (api, enterprise) {
     cs.byProject = {};
     cs.loadingProject = null;
     cs.lastError = null;
+    cs.outputs = {};
+    cs.outputsLoading = null;
+    cs.repositories = [];
+    cs.repositoriesLoaded = false;
+    cs.publishRepo = null;
+    cs.publishStatus = null;
+    cs.programme = null;
+    cs.runs = [];
+    cs.runsLoaded = false;
+    cs.runsLoading = false;
+    cs.runDetail = {};
+    cs.runDetailLoading = null;
+    cs.loadingAll = false;
+    if (cs.publishTimer) clearTimeout(cs.publishTimer);
+    cs.publishTimer = null;
   }
 
   async function consoleLoad() {
@@ -141,6 +170,15 @@ window.installV2 = function (api, enterprise) {
       cs.projects = list(projectPage.items);
       cs.issues = list(issueRows);
       cs.loaded = true;
+      if (C.can("programmes.list")) {
+        try {
+          const programmes = await C.action("programmes.list", { page: { limit: 10 } });
+          cs.programme = list(programmes.items)[0] || null;
+        } catch (_) {
+          cs.programme = null;
+        }
+      }
+      if (C.can("runs.list")) consoleLoadRuns();
       if (C.can("catalogues.list")) {
         try {
           const types = await C.action("catalogues.list", {
@@ -197,6 +235,20 @@ window.installV2 = function (api, enterprise) {
     if (projectId) consoleLoadProject(projectId);
   }
 
+  // The programme table can show a project's card progress only once its board is loaded. The
+  // public pack carries every board; the app does not, so this loads them on request.
+  async function consoleLoadAllBoards() {
+    if (!consoleOn() || cs.loadingAll) return;
+    cs.loadingAll = true;
+    render();
+    for (const project of consoleProjects()) {
+      const data = cs.byProject[project.id];
+      if (!data || data.stale || data.error) await consoleLoadProject(project.id);
+    }
+    cs.loadingAll = false;
+    render();
+  }
+
   function consoleProjects() {
     return [...cs.projects].sort(
       (a, b) => consoleRank(a.key) - consoleRank(b.key) || String(a.key).localeCompare(String(b.key)),
@@ -248,6 +300,7 @@ window.installV2 = function (api, enterprise) {
           issue: Number(issueNumber),
           unit_key: project.key,
           plan: (project.meta || {}).plan,
+          process_key: `${type}.READY`,
         },
       });
     } catch (error) {
@@ -400,6 +453,988 @@ window.installV2 = function (api, enterprise) {
           `<option value="${E(row.id)}" ${row.id === project.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`,
       )
       .join("")}</select></label>`;
+  }
+
+  /* ------------------------------------------------------------- programme workspace */
+  // The Projects destination: live from the platform when the console is signed in, read-only
+  // from the published snapshot on the homepage. Every write below is an action; a control that
+  // cannot be called is not rendered (or is rendered disabled with the reason).
+
+  const planHref = (plan) => {
+    const raw = String(plan || "").trim();
+    if (!raw) return "";
+    return "docs/" + raw.replace(/^docs\//, "").replace(/\.md(?=#|$)/, ".html");
+  };
+  const projectIssues = (project) => list((project.meta || {}).issues);
+  const issueLabels = (issue) =>
+    list(issue.labels)
+      .map((label) => (typeof label === "string" ? label : label && label.name))
+      .filter(Boolean);
+  const isFeedback = (issue) => issueLabels(issue).includes("feedback");
+  const orderedProjects = (rows) =>
+    [...list(rows)].sort(
+      (a, b) => consoleRank(a.key) - consoleRank(b.key) || String(a.key).localeCompare(String(b.key)),
+    );
+  const snapshotProjects = () => orderedProjects(list(((live || {}).programme || {}).projects));
+
+  // Signed in, every programme surface reads the tenant's own rows; on the public pack the
+  // snapshot's real rows; on a clean checkout the design study's fixtures. The ribbon says
+  // which one is in front of the reader.
+  const consoleRibbon = (scope, active) =>
+    active
+      ? `<div class="v2-ribbon live" role="note"><strong>LIVE</strong><span>${scope}</span><span class="v2-src">${
+          consoleOn() ? "API · no snapshot" : liveSrc
+        }</span></div>`
+      : ribbon(scope, false);
+  const runTone = (status) =>
+    status === "succeeded"
+      ? "green"
+      : status === "failed"
+        ? "bad"
+        : status === "waiting_approval"
+          ? "amber"
+          : "";
+  const runLive = (status) => ["queued", "running", "waiting_approval"].includes(status);
+  const runWhen = (run) => run.started_at || run.created_at || run.updated_at || "";
+  const projectKeyOf = (id) => {
+    const row = [...consoleProjects(), ...snapshotProjects()].find((p) => p.id === id);
+    return row ? row.key : short(id || "", 8);
+  };
+  const cardOf = (id) => {
+    for (const pid of Object.keys(cs.byProject || {})) {
+      const found = list((cs.byProject[pid] || {}).cards).find((card) => card.id === id);
+      if (found) return found;
+    }
+    return list(((live || {}).work || {}).cards).find((card) => card.id === id) || null;
+  };
+  const outputCell = (output) => {
+    if (output == null) return `<span class="muted">—</span>`;
+    const value = typeof output === "object" ? output.output || output : output;
+    const url =
+      (value && (value.pr_url || value.url || value.pull_request_url)) ||
+      (typeof output === "object" && output ? output.pr_url : null);
+    if (url) {
+      return `<a class="e-project-link" href="${E(url)}" target="_blank" rel="noopener">open ↗</a>`;
+    }
+    const text = typeof value === "string" ? value : JSON.stringify(value);
+    return `<span class="mono">${E(short(text, 90))}</span>`;
+  };
+
+  async function consoleLoadOutputs(projectId) {
+    if (!consoleOn() || !projectId || cs.outputsLoading === projectId) return;
+    if (cs.outputs[projectId]) return; // already loaded; a refresh deletes the key first
+    cs.outputsLoading = projectId;
+    try {
+      const page = await C.action("documents.list", {
+        project_id: projectId,
+        page: { limit: 100 },
+      });
+      cs.outputs[projectId] = { items: list(page.items), error: null };
+    } catch (error) {
+      cs.outputs[projectId] = { items: [], error };
+    } finally {
+      cs.outputsLoading = null;
+      render();
+    }
+  }
+
+  async function consoleLoadRepositories() {
+    if (!consoleOn() || cs.repositoriesLoaded) return;
+    try {
+      const page = await C.action("repositories.list", {});
+      cs.repositories = list(page.items);
+      cs.repositoriesLoaded = true;
+      let stored = "";
+      try {
+        stored = localStorage.getItem("conveyor.publish.repository") || "";
+      } catch (_) {
+        /* a private window may refuse; the selection is then per-render */
+      }
+      const found = cs.repositories.find((row) => row.id === stored);
+      const homepage = cs.repositories.find((row) => /nonagentic_homepage/.test(row.url || ""));
+      cs.publishRepo = found
+        ? found.id
+        : homepage
+          ? homepage.id
+          : (cs.repositories[0] || {}).id || null;
+    } catch (error) {
+      cs.repositories = [];
+      cs.repositoriesLoaded = true;
+      cs.lastError = error;
+    }
+    render();
+  }
+
+  const selectedRepository = () => cs.repositories.find((row) => row.id === cs.publishRepo) || null;
+
+  function consoleSelectRepository(id) {
+    cs.publishRepo = id || null;
+    try {
+      if (id) localStorage.setItem("conveyor.publish.repository", id);
+    } catch (_) {
+      /* per-render selection only */
+    }
+    cs.publishStatus = null;
+    render();
+    if (id) consolePollPublish(id, 0);
+  }
+
+  async function consolePollPublish(repositoryId, attempt) {
+    if (!consoleOn() || !repositoryId) return;
+    if (cs.publishTimer) clearTimeout(cs.publishTimer);
+    try {
+      const status = await C.action("publish.status", { repository_id: repositoryId });
+      cs.publishStatus = status;
+      render();
+      if ((status.state === "pending" || status.state === "running") && attempt < 150) {
+        cs.publishTimer = setTimeout(() => consolePollPublish(repositoryId, attempt + 1), 2000);
+      }
+    } catch (error) {
+      cs.publishStatus = { state: "error", error: consoleError(error) };
+      render();
+    }
+  }
+
+  async function consoleStartPublish() {
+    const repo = selectedRepository();
+    if (!repo) {
+      toast("Select a publish target first");
+      return;
+    }
+    if (!repo.credential_secret_id) {
+      toast("This repository has no token; save one first");
+      return;
+    }
+    try {
+      const started = await C.action("publish.start", { repository_id: repo.id });
+      cs.publishStatus = { state: started.state, job_id: started.job_id };
+      toast(started.already_running ? "A publish is already running" : "Publish enqueued");
+      render();
+      consolePollPublish(repo.id, 0);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Publish refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  /* ------------------------------------------------------------- execution room */
+  // The runs API already returns everything the room needs: `runs.list` filters by status and
+  // card, `runs.get` carries the steps, the gates, the process and the inputs. No control below
+  // is simulated; each one is the action it names.
+  async function consoleLoadRuns() {
+    if (!consoleOn() || cs.runsLoading) return;
+    cs.runsLoading = true;
+    try {
+      const page = await C.action("runs.list", { page: { limit: 200 } });
+      cs.runs = list(page.items);
+      cs.runsLoaded = true;
+    } catch (error) {
+      cs.runs = [];
+      cs.runsLoaded = true;
+      cs.lastError = error;
+    } finally {
+      cs.runsLoading = false;
+      render();
+    }
+  }
+
+  async function consoleRunOpen(id) {
+    if (!consoleOn() || !id) return;
+    v.runId = id;
+    if (cs.runDetail[id] && !cs.runDetail[id].error) {
+      render();
+      return;
+    }
+    cs.runDetailLoading = id;
+    render();
+    try {
+      cs.runDetail[id] = await C.action("runs.get", { id });
+    } catch (error) {
+      cs.runDetail[id] = { error };
+    } finally {
+      cs.runDetailLoading = null;
+      render();
+    }
+  }
+
+  function consoleRunCancel(id) {
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">Cancelling run <span class="mono">${E(short(id, 12))}</span> voids its pending gates. Its rows survive.</p><label class="field full"><span>Reason</span><textarea id="run-cancel-reason" rows="3" placeholder="Why this run is cancelled"></textarea></label></div>`;
+    openDialog(
+      "Cancel run",
+      body,
+      `${button("Cancel run", "run-cancel-save", `data-id="${E(id)}"`, "primary", "replay")}${btn("Close", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleRunCancelSave(id) {
+    const reason = (document.getElementById("run-cancel-reason") || {}).value || "";
+    try {
+      await C.action("runs.cancel", { id, reason: reason.trim() || null });
+      closeWorkspaceDialog();
+      delete cs.runDetail[id];
+      toast("Run cancelled");
+      if (v.runId === id) v.runId = null;
+      consoleLoadRuns();
+    } catch (error) {
+      cs.lastError = error;
+      toast("Cancel refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  function consoleApprovalDecide(approvalId, decision) {
+    const label = decision === "approve" ? "Approve gate" : "Reject gate";
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">The decision is recorded against the gate; the same approver cannot decide it twice.</p><label class="field full"><span>Note</span><textarea id="approval-note" rows="3" placeholder="Why you decided this"></textarea></label></div>`;
+    openDialog(
+      label,
+      body,
+      `${button(label, "approval-save", `data-id="${E(approvalId)}" data-decision="${E(decision)}"`, "primary", "shield")}${btn("Close", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleApprovalSave(approvalId, decision) {
+    const note = (document.getElementById("approval-note") || {}).value || "";
+    try {
+      await C.action("approvals.decide", {
+        approval_id: approvalId,
+        decision,
+        note: note.trim() || null,
+      });
+      closeWorkspaceDialog();
+      toast(decision === "approve" ? "Gate approved" : "Gate rejected");
+      if (v.runId) delete cs.runDetail[v.runId];
+      consoleLoadRuns();
+      if (v.runId) consoleRunOpen(v.runId);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Decision refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  async function consoleStartRun(cardId, processKey) {
+    if (!processKey) {
+      toast("This card has no process binding");
+      return;
+    }
+    try {
+      const run = await C.action("process_runs.start", {
+        card_id: cardId,
+        process_key: processKey,
+        inputs: {},
+      });
+      cs.lastError = null;
+      toast(`Run ${short(run.id, 8)} · ${run.status || "queued"}`);
+      v.runId = run.id;
+      v.tab.execution = "All";
+      navigate("execution");
+      consoleLoadRuns();
+      consoleRunOpen(run.id);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Start refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  function projectsPage() {
+    const signed = consoleOn();
+    const canSignIn = !!(C && C.config());
+    if (signed && !cs.loaded && !cs.loading && !cs.error) consoleLoad();
+    const rows = signed ? consoleProjects() : snapshotProjects();
+    const actions = signed
+      ? C.can("projects.create")
+        ? button("New project", "project-new", "", "small", "plus")
+        : ""
+      : canSignIn
+        ? button("Sign in to operate", "console-signin", "", "primary", "shield")
+        : "";
+    if (!rows.length) {
+      return `<div class="page enterprise">${heading("Projects", "The programme's projects; live when signed in, read-only from the published snapshot on the public site.", actions, "PORTFOLIO & PLAN")}${panel(
+        "Projects",
+        signed
+          ? cs.error
+            ? note(`<strong>Read refused</strong> · ${E(consoleError(cs.error))}`, "bad")
+            : note("Loading the tenant's projects…")
+          : note("No published snapshot is loaded. Sign in to operate the live programme."),
+      )}</div>`;
+    }
+    const current =
+      rows.find((row) => row.id === v.projectPage) ||
+      rows.find((row) => /^S/.test(String(row.key))) ||
+      rows[0];
+    if (signed) {
+      consoleLoadProject(current.id);
+      consoleLoadOutputs(current.id);
+      consoleLoadRepositories();
+    }
+    const select = signed
+      ? `<label class="e-select">Project <select data-v2-input="project-page">${rows
+          .map(
+            (row) =>
+              `<option value="${E(row.id)}" ${row.id === current.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`,
+          )
+          .join("")}</select></label>`
+      : "";
+    const plan = planHref((current.meta || {}).plan);
+    const repo = current.repo_url
+      ? `<a class="e-project-link" href="${E(current.repo_url)}" target="_blank" rel="noopener">repository ↗</a>`
+      : "—";
+    const head = panel(
+      `${E(current.key)} · ${E(current.name)}`,
+      `${select}${
+        current.description ? `<p class="muted">${E(current.description)}</p>` : ""
+      }${kv([
+        [
+          "Status",
+          B(
+            current.status || "draft",
+            current.status === "active"
+              ? "green"
+              : current.status === "closed" || current.status === "archived"
+                ? ""
+                : "amber",
+          ),
+        ],
+        ["Repository", repo],
+        ["Plan", plan ? `<a class="e-project-link" href="${E(plan)}">${E((current.meta || {}).plan)} ↗</a>` : `<span class="muted">—</span>`],
+        ["Linked issues", `${projectIssues(current).length}`],
+      ])}${
+        signed
+          ? `<div class="console-actions">${C.can("projects.update") ? button("Edit project", "project-edit", `data-id="${E(current.id)}"`, "small", "edit") : ""}${C.can("projects.close") ? button("Close project", "project-close", `data-id="${E(current.id)}"`, "small", "archive") : ""}</div>`
+          : ""
+      }`,
+      signed ? `<span class="console-live">live</span>` : "",
+    );
+    const detail = signed ? projectWorkspace(current) : projectReadOnly(current, rows);
+    return `<div class="page enterprise">${heading(
+      "Projects",
+      "The programme's projects — each with its board, plan, issues, outputs and publish state. Live when signed in; a public snapshot otherwise.",
+      actions,
+      "PORTFOLIO & PLAN",
+    )}${head}${detail}</div>`;
+  }
+
+  function projectReadOnly(current, rows) {
+    const body = rows
+      .map(
+        (row) =>
+          `<tr><td><button type="button" class="console-card-link" data-v2="project-select" data-id="${E(row.id)}"><strong>${E(row.key)}</strong> ${E(row.name)}</button></td><td>${B(
+            row.status || "draft",
+            row.status === "active" ? "green" : row.status === "closed" || row.status === "archived" ? "" : "amber",
+          )}</td><td><small>${E(((row.meta || {}).track) || "")}</small></td><td>${
+            planHref((row.meta || {}).plan)
+              ? `<a class="e-project-link" href="${E(planHref((row.meta || {}).plan))}">plan ↗</a>`
+              : "—"
+          }</td></tr>`,
+      )
+      .join("");
+    return panel(
+      "All projects",
+      `${table(["Project", "Status", "Track", "Plan"], [body])}${note(
+        "This is the published snapshot, read-only. Sign in at the app origin to edit a project, compose outputs or publish.",
+      )}`,
+      B(`${rows.length} projects`, "green"),
+    );
+  }
+
+  function projectWorkspace(project) {
+    const data = cs.byProject[project.id];
+    const issues = consoleIssueRows(project);
+    const board = data && data.board
+      ? panel(
+          `${project.key} · Board`,
+          `${kv([
+            ["Board", E(data.board.name)],
+            ["Lanes", String(list(data.lists).length)],
+            ["Cards", String(list(data.cards).filter((row) => !row.archived_at).length)],
+          ])}${route("Open in Plan", "plan", "small", "board")}`,
+        )
+      : panel(
+          "Board",
+          data && data.error
+            ? note(`<strong>Read refused</strong> · ${E(consoleError(data.error))}`, "bad")
+            : note("Loading this project's board…"),
+        );
+    const issueRows = issues.map(
+      (issue) =>
+        `<tr><td><a class="e-project-link" href="${E(issue.url || consoleIssueUrl(issue.number))}" target="_blank" rel="noopener">#${E(issue.number)} ↗</a> <strong>${E(issue.title)}</strong></td><td>${B(
+          issue.state === "CLOSED" ? "Closed" : issue.state === "OPEN" ? "Open" : issue.state,
+          issue.state === "CLOSED" ? "" : "amber",
+        )}</td></tr>`,
+    );
+    const issuePanel = panel(
+      `${project.key} · Linked issues`,
+      issueRows.length
+        ? table(["Issue", "GitHub state"], issueRows)
+        : `<p class="muted">No GitHub issues are linked to this project. Intake a feedback issue below, or add issues to the project meta.</p>`,
+      B(`${issues.filter((row) => row.state === "OPEN").length} open`, "green"),
+    );
+    const lanes = data ? list(data.lists) : [];
+    const laneName = new Map(lanes.map((row) => [row.id, row.name]));
+    const laneKind = new Map(lanes.map((row) => [row.id, row.kind]));
+    const runsByCard = new Map();
+    list(cs.runs).forEach((run) => {
+      if (run.card_id && !runsByCard.has(run.card_id)) runsByCard.set(run.card_id, run);
+    });
+    const processOf = (card) => (card.meta || {}).process_key || card.process_key || "";
+    const typeOf = (card) =>
+      list(cs.types).find((row) => row.code === card.card_type_code) || null;
+    const expectedOutputs = (card) =>
+      list(((typeOf(card) || {}).definition || {}).outputs);
+    const cardRows = (data && !data.error ? list(data.cards) : [])
+      .filter((card) => !card.archived_at)
+      .map((card) => {
+        const processKey = processOf(card);
+        const run = runsByCard.get(card.id);
+        const issue = (card.meta || {}).issue;
+        return `<tr><td><button type="button" class="console-card-link" data-v2="console-card" data-id="${E(card.id)}"><strong>${E(card.name)}</strong></button><small class="mono">${E(card.card_type_code)}</small></td><td>${E(laneName.get(card.list_id) || laneKind.get(card.list_id) || "—")}</td><td class="mono">${E(processKey || "not bound")}</td><td>${
+          run
+            ? `<button type="button" class="console-card-link" data-v2="run-open" data-id="${E(run.id)}">${B(run.status, runTone(run.status))}</button>`
+            : "—"
+        }</td><td><small>${E(expectedOutputs(card).join(" · ") || "—")}</small></td><td><div class="console-actions">${
+          processKey && C.can("process_runs.start") && !(run && runLive(run.status))
+            ? button("Start run", "run-start", `data-id="${E(card.id)}" data-key="${E(processKey)}"`, "small", "run")
+            : ""
+        }${
+          C.can("documents.compose")
+            ? button("Output", "output-card", `data-id="${E(card.id)}" data-project="${E(project.id)}"`, "small", "file")
+            : ""
+        }${
+          issue != null
+            ? `<a class="e-project-link" href="${E(consoleIssueUrl(issue))}" target="_blank" rel="noopener">#${E(issue)} ↗</a>`
+            : ""
+        }</div></td></tr>`;
+      });
+    const cardPanel =
+      data && !data.error
+        ? panel(
+            `${project.key} · Cards`,
+            cardRows.length
+              ? table(["Card", "Lane", "Process", "Latest run", "Expected outputs", "Operate"], cardRows)
+              : `<p class="muted">No open card. Intake an issue from the feedback panel; intake binds the card type's READY process.</p>`,
+            B(`${cardRows.length} open`, cardRows.length ? "green" : ""),
+          )
+        : "";
+    const failure = cs.lastError
+      ? note(`<strong>Last refusal</strong> · ${E(consoleError(cs.lastError))}`, "bad")
+      : "";
+    return `${failure}${board}${cardPanel}${issuePanel}${projectOutputs(project)}${projectFeedback(project)}${publishingPanel()}`;
+  }
+
+  function projectOutputs(project) {
+    const state = cs.outputs[project.id];
+    if (!state) return panel("Outputs", note("Loading this project's outputs…"));
+    if (state.error) {
+      return panel(
+        "Outputs",
+        note(`<strong>Read refused</strong> · ${E(consoleError(state.error))}`, "bad"),
+      );
+    }
+    const rows = state.items.map((doc) => {
+      const actions = [
+        C.can("documents.get")
+          ? button("Read", "output-read", `data-id="${E(doc.id)}"`, "small", "file")
+          : "",
+        C.can("documents.update")
+          ? button("Edit", "output-edit", `data-id="${E(doc.id)}"`, "small", "edit")
+          : "",
+        C.can("documents.update")
+          ? button(
+              doc.publishable ? "Unpublish" : "Publish",
+              "output-publish",
+              `data-id="${E(doc.id)}" data-public="${doc.publishable ? "1" : "0"}" data-version="${E(doc.version)}"`,
+              "small",
+              "shield",
+            )
+          : "",
+      ].join("");
+      return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)} · ${E(doc.content_type || "text/markdown")}</small></td><td>${B(
+        doc.publishable ? "public" : "private",
+        doc.publishable ? "green" : "",
+      )}</td><td><small>${E(short(doc.updated_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
+    });
+    return panel(
+      `${project.key} · Outputs`,
+      rows.length
+        ? table(["Output", "Visibility", "Updated", "Operate"], rows)
+        : `<p class="muted">No output yet. An output is a design note, evidence record or decision bound to this project and, optionally, a card.</p>`,
+      C.can("documents.compose")
+        ? button("Compose output", "output-new", `data-project="${E(project.id)}"`, "small", "plus")
+        : "",
+    );
+  }
+
+  function projectFeedback(project) {
+    const feedback = cs.issues.filter(isFeedback);
+    const target = v.feedbackProject || project.id;
+    const picker = `<label class="e-select">Intake into <select data-v2-input="feedback-project">${consoleProjects()
+      .map(
+        (row) =>
+          `<option value="${E(row.id)}" ${row.id === target ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`,
+      )
+      .join("")}</select></label>`;
+    const intakeType =
+      v.intakeType ||
+      (list(cs.types).find((row) => row.code === "architecture_task") || {}).code ||
+      "architecture_task";
+    const typePicker = `<label class="e-select">Card type <select data-v2-input="intake-type" aria-label="Intake card type">${list(cs.types)
+      .map(
+        (row) =>
+          `<option value="${E(row.code)}" ${row.code === intakeType ? "selected" : ""}>${E(row.code)}</option>`,
+      )
+      .join("")}</select></label>`;
+    const rows = feedback.map(
+      (issue) =>
+        `<tr><td><a class="e-project-link" href="${E(issue.url || consoleIssueUrl(issue.number))}" target="_blank" rel="noopener">#${E(
+          issue.number,
+        )} ↗</a> <strong>${E(issue.title)}</strong></td><td>${B(
+          issue.state === "CLOSED" ? "Closed" : "Open",
+          issue.state === "CLOSED" ? "" : "amber",
+        )}</td><td>${
+          C.can("cards.create")
+            ? button("Intake", "feedback-intake", `data-issue="${E(issue.number)}"`, "small", "plus")
+            : "—"
+        }</td></tr>`,
+    );
+    return panel(
+      "Public feedback",
+      `${picker}${typePicker}${
+        rows.length
+          ? table(["Feedback issue", "GitHub state", "Operate"], rows)
+          : `<p class="muted">No feedback issue is registered yet. The public feedback template opens one on GitHub.</p>`
+      }${note(
+        "Feedback stays a GitHub issue. Intake creates a card in the chosen project's intake lane and records the issue number on it; the issue itself is not modified.",
+      )}`,
+      B(`${feedback.length} feedback`, feedback.length ? "amber" : ""),
+    );
+  }
+
+  function publishingPanel() {
+    if (!consoleOn()) return "";
+    if (!cs.repositoriesLoaded) {
+      consoleLoadRepositories();
+      return panel("Publishing", note("Loading publish targets…"));
+    }
+    const repo = selectedRepository();
+    const status = cs.publishStatus || null;
+    if (repo && !status) consolePollPublish(repo.id, 0);
+    const repoSelect = `<label class="e-select">Publish target <select data-v2-input="publish-repository"><option value="">— choose a repository —</option>${cs.repositories
+      .map(
+        (row) =>
+          `<option value="${E(row.id)}" ${row.id === cs.publishRepo ? "selected" : ""}>${E(row.url)}${
+            row.credential_secret_id ? "" : " · no token"
+          }</option>`,
+      )
+      .join("")}</select></label>`;
+    const connect = !(C.can("secrets.create") && C.can("repositories.create"))
+      ? ""
+      : `<details class="console-details"><summary>Connect a homepage repository</summary><label class="field full"><span>Repository URL</span><input id="publish-url" value="https://github.com/nonagenticai/nonagentic_homepage" spellcheck="false"></label><label class="field full"><span>Default branch</span><input id="publish-branch" value="main" spellcheck="false"></label><label class="field full"><span>Fine-grained token (contents:write, pull_requests:write)</span><input id="publish-token" type="password" autocomplete="off"></label><p class="muted">The token is sealed in the tenant's secret store and never returned.</p>${button(
+      "Save target",
+      "publish-connect",
+      "",
+      "small",
+      "plus",
+    )}</details>`;
+    const rotate = repo && C.can("repositories.update") && C.can("secrets.create")
+      ? `<details class="console-details"><summary>Rotate this target's token</summary><label class="field full"><span>New token</span><input id="publish-rotate-token" type="password" autocomplete="off"></label>${button(
+          "Save token",
+          "publish-rotate",
+          "",
+          "small",
+          "shield",
+        )}</details>`
+      : "";
+    const statusLine = status
+      ? kv([
+          [
+            "State",
+            B(
+              status.state,
+              status.state === "succeeded"
+                ? "green"
+                : status.state === "failed" || status.state === "dead" || status.state === "error"
+                  ? "bad"
+                  : "amber",
+            ),
+          ],
+          [
+            "Pull request",
+            status.pr_url
+              ? `<a class="e-project-link" href="${E(status.pr_url)}" target="_blank" rel="noopener">open ↗</a>`
+              : "—",
+          ],
+          ["Generated", E(status.generated_at || "—")],
+          ["Outputs", status.outputs == null ? "—" : String(status.outputs)],
+          ...(status.error ? [["Error", E(status.error)]] : []),
+        ])
+      : note("Select a target to read its latest publish state.");
+    const reason = !repo
+      ? "Choose or connect a repository first"
+      : !repo.credential_secret_id
+        ? "This repository has no token"
+        : !C.can("publish.start")
+          ? "You are not allowed to publish"
+          : "";
+    const publishControl = reason
+      ? `<button type="button" class="btn primary" disabled title="${E(reason)}">${I("upload")}Publish the design site</button>`
+      : button("Publish the design site", "publish-start", "", "primary", "upload");
+    return panel(
+      "Publishing",
+      `${repoSelect}${statusLine}<div class="console-actions">${publishControl}${button(
+        "Refresh status",
+        "publish-refresh",
+        "",
+        "small",
+        "replay",
+      )}</div>${connect}${rotate}${note(
+        "Publish builds the pack from the platform's rows and every publishable output, then opens a pull request on the homepage repository. A person merges it; the button never merges.",
+      )}`,
+      repo ? `<span class="console-live">GitHub PR</span>` : "",
+    );
+  }
+
+  /* ------------------------------------------------------------- workspace actions */
+  const closeWorkspaceDialog = () => {
+    const dialog = document.getElementById("dialog");
+    if (dialog && dialog.open) dialog.close();
+  };
+  const projectById = (id) => cs.projects.find((row) => row.id === id) || null;
+
+  function consoleProjectNew() {
+    if (!consoleOn()) return;
+    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" placeholder="The part of the conveyor this project delivers"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3"></textarea></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" placeholder="docs/plans/slices/S00-usage-inventory.md" spellcheck="false"></label></div>`;
+    openDialog(
+      "New project",
+      body,
+      `${button("Create", "project-create", "", "primary", "plus")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleProjectCreate() {
+    const title = (document.getElementById("project-name") || {}).value || "";
+    const description = (document.getElementById("project-description") || {}).value || "";
+    const plan = (document.getElementById("project-plan") || {}).value || "";
+    if (!title.trim()) {
+      toast("A project needs a name");
+      return;
+    }
+    const programme = (cs.projects[0] || {}).programme_id || null;
+    try {
+      const created = await C.action("projects.create", {
+        title: title.trim(),
+        description: description.trim(),
+        programme_id: programme,
+      });
+      closeWorkspaceDialog();
+      cs.loaded = false;
+      cs.byProject = {};
+      v.projectPage = created && created.project ? created.project.id : null;
+      toast("Project created");
+      render();
+      consoleLoad();
+    } catch (error) {
+      cs.lastError = error;
+      toast("Create refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  function consoleProjectEdit(id) {
+    const project = projectById(id);
+    if (!project) return;
+    const statuses = ["draft", "active", "paused", "closed", "archived"];
+    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" value="${E(project.name)}"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3">${E(project.description || "")}</textarea></label><label class="field full"><span>Status</span><select id="project-status">${statuses
+      .map(
+        (status) =>
+          `<option value="${status}" ${status === project.status ? "selected" : ""}>${status}</option>`,
+      )
+      .join("")}</select></label><label class="field full"><span>Repository URL</span><input id="project-repo" value="${E(project.repo_url || "")}" spellcheck="false"></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" value="${E(((project.meta || {}).plan) || "")}" spellcheck="false"></label><p class="muted">Saving merges the plan into the project's existing meta; other keys are preserved.</p></div>`;
+    openDialog(
+      `${project.key} · edit`,
+      body,
+      `${button("Save", "project-save", `data-id="${E(project.id)}"`, "primary", "shield")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleProjectSave(id) {
+    const project = projectById(id);
+    if (!project) return;
+    const name = (document.getElementById("project-name") || {}).value || "";
+    const description = (document.getElementById("project-description") || {}).value || "";
+    const status = (document.getElementById("project-status") || {}).value || project.status;
+    const repoUrl = (document.getElementById("project-repo") || {}).value || "";
+    const plan = (document.getElementById("project-plan") || {}).value || "";
+    if (!name.trim()) {
+      toast("A project needs a name");
+      return;
+    }
+    try {
+      await C.action(
+        "projects.update",
+        {
+          id: project.id,
+          name: name.trim(),
+          description: description.trim(),
+          status,
+          repo_url: repoUrl.trim(),
+          meta: { plan: plan.trim() },
+        },
+        { etag: project.version },
+      );
+      closeWorkspaceDialog();
+      cs.loaded = false;
+      cs.byProject = {};
+      toast("Project updated");
+      render();
+      consoleLoad();
+    } catch (error) {
+      cs.lastError = error;
+      toast("Edit refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  function consoleProjectClose(id) {
+    const project = projectById(id);
+    if (!project) return;
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">Closing <strong>${E(project.key)}</strong> is a status transition; the row and its history survive.</p><label class="field full"><span>Reason</span><textarea id="project-close-reason" rows="3" placeholder="Why this project is closing"></textarea></label></div>`;
+    openDialog(
+      `Close ${project.key}`,
+      body,
+      `${button("Close project", "project-close-save", `data-id="${E(project.id)}"`, "primary", "archive")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleProjectCloseSave(id) {
+    const reason = (document.getElementById("project-close-reason") || {}).value || "";
+    try {
+      await C.action("projects.close", { id, reason: reason.trim() || null });
+      closeWorkspaceDialog();
+      cs.loaded = false;
+      cs.byProject = {};
+      toast("Project closed");
+      render();
+      consoleLoad();
+    } catch (error) {
+      cs.lastError = error;
+      toast("Close refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  function consoleOutputNew(projectId, cardId) {
+    v.outputCard = cardId || null;
+    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}<label class="field full"><span>Title</span><input id="output-title" placeholder="What this output records"></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why."></textarea></label><label class="check"><input id="output-publishable" type="checkbox"> Publish this output on the public design site</label><p class="muted">The body is capped at 256 KiB. It starts private unless you tick the box.</p></div>`;
+    openDialog(
+      "Compose output",
+      body,
+      `${button("Save output", "output-save", `data-project="${E(projectId)}"`, "primary", "plus")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleOutputSave(projectId) {
+    const title = (document.getElementById("output-title") || {}).value || "";
+    const body = (document.getElementById("output-body") || {}).value || "";
+    const publishable = !!(document.getElementById("output-publishable") || {}).checked;
+    if (!title.trim() || !body.trim()) {
+      toast("An output needs a title and a body");
+      return;
+    }
+    try {
+      await C.action("documents.compose", {
+        project_id: projectId,
+        card_id: v.outputCard || undefined,
+        title: title.trim(),
+        body,
+        publishable,
+      });
+      v.outputCard = null;
+      closeWorkspaceDialog();
+      toast(publishable ? "Output saved and marked public" : "Output saved (private)");
+      delete cs.outputs[projectId];
+      consoleLoadOutputs(projectId);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Compose refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  async function consoleOutputEdit(id) {
+    let doc;
+    try {
+      doc = await C.action("documents.get", { id });
+    } catch (error) {
+      toast("Read refused · " + consoleError(error));
+      return;
+    }
+    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Title</span><input id="output-title" value="${E(doc.title)}"></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10">${E(doc.body || "")}</textarea></label><label class="check"><input id="output-publishable" type="checkbox" ${doc.publishable ? "checked" : ""}> Publish this output on the public design site</label><p class="muted">Version ${E(doc.version)} · content hash <span class="mono">${E(short(doc.content_hash, 12))}</span></p></div>`;
+    openDialog(
+      `Edit · ${doc.title}`,
+      body,
+      `${button("Save changes", "output-update", `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`, "primary", "shield")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleOutputUpdate(id, version) {
+    const title = (document.getElementById("output-title") || {}).value || "";
+    const body = (document.getElementById("output-body") || {}).value || "";
+    const publishable = !!(document.getElementById("output-publishable") || {}).checked;
+    if (!title.trim() || !body.trim()) {
+      toast("An output needs a title and a body");
+      return;
+    }
+    try {
+      const updated = await C.action(
+        "documents.update",
+        { id, title: title.trim(), body, publishable },
+        { etag: Number(version) },
+      );
+      closeWorkspaceDialog();
+      toast("Output updated");
+      const projectId = updated.project_id;
+      if (projectId) {
+        delete cs.outputs[projectId];
+        consoleLoadOutputs(projectId);
+      }
+    } catch (error) {
+      cs.lastError = error;
+      toast("Update refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  async function consoleOutputPublish(id, publishable, version) {
+    try {
+      const updated = await C.action(
+        "documents.update",
+        { id, publishable },
+        { etag: Number(version) },
+      );
+      toast(publishable ? "Output marked public" : "Output unpublished");
+      const projectId = updated.project_id;
+      if (projectId) {
+        delete cs.outputs[projectId];
+        consoleLoadOutputs(projectId);
+      }
+    } catch (error) {
+      cs.lastError = error;
+      toast("Publish flag refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  async function consoleOutputRead(id) {
+    try {
+      const doc = await C.action("documents.get", { id });
+      const body = `<div class="dialog-body console-dialog-body">${kv([
+        ["Status", B(doc.publishable ? "public" : "private", doc.publishable ? "green" : "")],
+        ["Version", `<span class="mono">${E(doc.version)}</span>`],
+        ["Content type", E(doc.content_type || "text/markdown")],
+        ["Updated", E(doc.updated_at)],
+      ])}<pre class="console-output-body">${E(doc.body || "(no body)")}</pre></div>`;
+      openDialog(doc.title, body, btn("Close", "close-dialog"), true);
+    } catch (error) {
+      toast("Read refused · " + consoleError(error));
+    }
+  }
+
+  async function consoleFeedbackIntake(issueNumber) {
+    const select = document.querySelector('[data-v2-input="feedback-project"]');
+    const projectId = select ? select.value : "";
+    if (!projectId) {
+      toast("Choose the project to intake into");
+      return;
+    }
+    v.feedbackProject = projectId;
+    if (!cs.byProject[projectId] || !cs.byProject[projectId].board) {
+      await consoleLoadProject(projectId);
+    }
+    await consoleIntake(projectId, issueNumber);
+  }
+
+  function consolePublishConnect() {
+    const url = (document.getElementById("publish-url") || {}).value || "";
+    const branch = (document.getElementById("publish-branch") || {}).value || "main";
+    const token = (document.getElementById("publish-token") || {}).value || "";
+    if (!url.trim() || !token.trim()) {
+      toast("A repository URL and a token are required");
+      return;
+    }
+    (async () => {
+      try {
+        const secret = await C.action("secrets.create", {
+          name: `publish.github_token.${Date.now()}`,
+          value: token.trim(),
+        });
+        const repo = await C.action("repositories.create", {
+          url: url.trim(),
+          default_branch: branch.trim() || "main",
+          credential_secret_id: secret.id,
+        });
+        cs.repositoriesLoaded = false;
+        await consoleLoadRepositories();
+        consoleSelectRepository(repo.id);
+        toast("Publish target connected");
+      } catch (error) {
+        cs.lastError = error;
+        toast("Connect refused · " + consoleError(error));
+        render();
+      }
+    })();
+  }
+
+  function consolePublishRotate() {
+    const repo = selectedRepository();
+    const token = (document.getElementById("publish-rotate-token") || {}).value || "";
+    if (!repo) {
+      toast("Select a publish target first");
+      return;
+    }
+    if (!token.trim()) {
+      toast("A new token is required");
+      return;
+    }
+    (async () => {
+      try {
+        const secret = await C.action("secrets.create", {
+          name: `publish.github_token.${Date.now()}`,
+          value: token.trim(),
+        });
+        await C.action(
+          "repositories.update",
+          { id: repo.id, credential_secret_id: secret.id },
+          { etag: repo.version },
+        );
+        cs.repositoriesLoaded = false;
+        await consoleLoadRepositories();
+        consoleSelectRepository(repo.id);
+        toast("Publish token rotated");
+      } catch (error) {
+        cs.lastError = error;
+        toast("Rotate refused · " + consoleError(error));
+        render();
+      }
+    })();
+  }
+
+  function consolePublishRefresh() {
+    const repo = selectedRepository();
+    if (!repo) {
+      toast("Select a publish target first");
+      return;
+    }
+    cs.publishStatus = null;
+    consolePollPublish(repo.id, 0);
   }
 
   /* The Plan · Boards tab on the operator console: the tenant's own projects, its boards,
@@ -1241,7 +2276,7 @@ window.installV2 = function (api, enterprise) {
 
   // V2 §10.5: the run inspector gains a tools panel — which tool version was called,
   // with which credential alias, what it returned — plus the binding and release pin.
-  function executionPage() {
+  function executionStudy() {
     const calls = F.toolCalls
       .filter((c) => c.run === "RUN-151")
       .map(
@@ -1286,6 +2321,128 @@ window.installV2 = function (api, enterprise) {
       explain;
     return legacy.execution().replace(/<\/div>\s*$/, panelHtml + "</div>");
   }
+  /* -------------------------------------------------------------- execution room (live) */
+  function runDetailPanel(id) {
+    const detail = cs.runDetail[id];
+    if (!detail) {
+      return panel(
+        `Run ${short(id, 8)}`,
+        note(cs.runDetailLoading === id ? "Loading the run's trace…" : "Select a run."),
+      );
+    }
+    if (detail.error) {
+      return panel(
+        `Run ${short(id, 8)}`,
+        note(`<strong>Read refused</strong> · ${E(consoleError(detail.error))}`, "bad"),
+      );
+    }
+    const run = detail.run || {};
+    const steps = list(detail.steps);
+    const approvals = list(detail.approvals);
+    const stepRows = steps.map(
+      (step) =>
+        `<tr><td class="mono">${E(step.position)}.${E(step.attempt || 1)}</td><td class="mono">${E(step.action)}</td><td>${B(step.status, step.status === "succeeded" ? "green" : step.status === "failed" ? "bad" : "amber")}</td><td>${outputCell(step.output)}</td><td><small>${E(step.error ? short(step.error, 70) : step.judge ? "judged" : "—")}</small></td></tr>`,
+    );
+    const approvalRows = approvals.map(
+      (approval) =>
+        `<tr><td class="mono">${E(approval.gate)}</td><td>${B(approval.status, approval.status === "pending" ? "amber" : approval.status === "approved" ? "green" : "bad")}</td><td>${E(approval.required_decisions)}</td><td>${
+          approval.status === "pending" && C.can("approvals.decide")
+            ? `<div class="console-actions">${button("Approve", "approval-approve", `data-id="${E(approval.id)}"`, "small", "shield")}${button("Reject", "approval-reject", `data-id="${E(approval.id)}"`, "small", "archive")}</div>`
+            : "—"
+        }</td></tr>`,
+    );
+    const summary = kv([
+      ["Status", B(run.status || "—", runTone(run.status))],
+      ["Project", E(projectKeyOf(run.project_id))],
+      ["Card", run.card_id && cardOf(run.card_id) ? E(cardOf(run.card_id).name) : E(run.card_id || "—")],
+      ["Process", detail.process ? `${E(detail.process.title)} · v${E(detail.process.version)}` : "—"],
+      ["Attempt", E(run.attempt || 1)],
+      ["Started", E(short(runWhen(run), 19))],
+      ["Finished", E(short(run.finished_at || "—", 19))],
+      ["Error", run.error_message ? `${E(run.error_class || "error")} · ${E(short(run.error_message, 120))}` : "—"],
+    ]);
+    const children = list((detail.tree || {}).children);
+    return panel(
+      `Run ${short(id, 8)} · trace`,
+      `${summary}${
+        steps.length
+          ? table(["#", "Action", "Status", "Output", "Judge / error"], stepRows)
+          : note("No step has been recorded yet. A run with no step is queued or failed before dispatch.")
+      }${
+        approvals.length
+          ? `<h3>Gates</h3>${table(["Gate", "State", "Quorum", "Decide"], approvalRows)}`
+          : ""
+      }${
+        children.length
+          ? `<h3>Child runs</h3>${table(
+              ["Run", "Status", "Depth"],
+              children.map(
+                (child) =>
+                  `<tr><td><button type="button" class="console-card-link" data-v2="run-open" data-id="${E(child.id)}">${E(short(child.id, 8))}</button></td><td>${B(child.status, runTone(child.status))}</td><td>${E(child.depth)}</td></tr>`,
+              ),
+            )}`
+          : ""
+      }${note(`Inputs: <span class="mono">${E(short(JSON.stringify(detail.inputs || {}), 300))}</span>`)}<div class="console-actions">${
+        runLive(run.status) && C.can("runs.cancel")
+          ? button("Cancel run", "run-cancel", `data-id="${E(id)}"`, "small", "replay")
+          : ""
+      }${button("Refresh", "run-refresh", `data-id="${E(id)}"`, "small", "replay")}</div>`,
+      B(run.status || "—", runTone(run.status)),
+    );
+  }
+
+  function consoleExecutionPage() {
+    const signed = consoleOn();
+    if (signed && !cs.runsLoaded && !cs.runsLoading) consoleLoadRuns();
+    const tab = v.tab.execution || "All";
+    const filter =
+      {
+        All: null,
+        Running: "running",
+        "Waiting approval": "waiting_approval",
+        Failed: "failed",
+        Succeeded: "succeeded",
+        Queued: "queued",
+      }[tab] || null;
+    const runs = signed ? cs.runs : list(((live || {}).work || {}).runs);
+    const shown = runs.filter((run) => (filter ? run.status === filter : true));
+    const rows = shown.map((run) => {
+      const card = run.card_id ? cardOf(run.card_id) : null;
+      return `<tr><td><button type="button" class="console-card-link" data-v2="run-open" data-id="${E(run.id)}">${E(short(run.id, 8))}</button></td><td>${E(projectKeyOf(run.project_id))}</td><td>${card ? E(card.name) : "—"}</td><td>${B(run.status, runTone(run.status))}</td><td>${E(run.attempt || 1)}</td><td><small>${E(short(runWhen(run), 19))}</small></td><td>${run.error_message ? E(short(run.error_message, 60)) : "—"}</td></tr>`;
+    });
+    const queue = panel(
+      "Runs",
+      `${
+        rows.length
+          ? table(["Run", "Project", "Card", "Status", "Attempt", "Started", "Error"], rows)
+          : note(
+              signed
+                ? "No run matches this filter. Start one from a card on Projects or Plan."
+                : "The published snapshot carries no run yet. Sign in at the app origin to see the tenant's runs.",
+            )
+      }${signed && !cs.runsLoaded ? note("Loading the tenant's runs…") : ""}`,
+      signed ? button("Refresh", "run-refresh", "", "small", "replay") : "",
+    );
+    const detail = signed && v.runId ? runDetailPanel(v.runId) : "";
+    return `<div class="page enterprise">${heading(
+      "Execution room",
+      "Every run the programme has started: its steps, the tools it called, the gates it waits on and the outputs it produced.",
+      `${route("Projects", "projects", "", "projects")}${route("Plan & WBS", "plan", "", "board")}`,
+      "PORTFOLIO & PLAN",
+    )}${consoleRibbon(
+      signed
+        ? "Runs, steps and gates read from the platform's own rows. A run starts from a card; every control is an action."
+        : "The runs the published snapshot carries, read-only.",
+      signed || !!live,
+    )}${signed ? tabs(["All", "Running", "Waiting approval", "Failed", "Succeeded", "Queued"], tab, "execution") : ""}${queue}${detail}</div>`;
+  }
+
+  // Signed in, or published with a snapshot, the room is real; offline it stays the design
+  // study, clearly labelled PROPOSED.
+  function executionPage() {
+    return consoleOn() || live ? consoleExecutionPage() : executionStudy();
+  }
+
   const projects = () => db.projects.filter((p) => p.programme);
   const programme = () => F.programmes.find((p) => p.id === v.programme) || F.programmes[0];
   const job = () => F.jobs.find((j) => j.id === v.job) || F.jobs[0];
@@ -1298,8 +2455,14 @@ window.installV2 = function (api, enterprise) {
 
   /* ------------------------------------------------------------------ sidebar */
   function sidebar() {
+    const projectCount =
+      consoleOn() && cs.projects.length
+        ? cs.projects.length
+        : live
+          ? snapshotProjects().length
+          : db.projects.length;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Non-Agentic AI<small>Organisation workspace</small></span><span>⌄</span></div><nav>
-      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", db.projects.length)}${N("plan", "Plan & WBS", "board")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
+      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", projectCount)}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
       <div class="nav-group"><div class="nav-label">ORGANISATION</div>${N("organisation", "Organisation", "layers")}${N("jobs", "Jobs", "board", F.jobs.length)}${N("agents", "Agents", "agent")}${N("toolkits", "Tools", "tools")}${N("types", "Project types", "grid")}</div>
       <div class="nav-group"><div class="nav-label">PROCEDURES &amp; AUTHORING</div>${N("procedures", "Procedures", "flow")}${N("capabilities", "Capabilities", "layers")}${N("authoring", "Authoring", "book")}</div>
       <div class="nav-group"><div class="nav-label">GOVERN &amp; DESIGN</div>${N("assurance", "Assurance &amp; baselines", "shield")}${N("constraints", "Flow &amp; constraints", "branch")}${N("requirements", "Requirements", "file")}${N("principles", "Principles", "book")}${N("models", "Architecture &amp; UML", "model")}${N("architecture", "System architecture", "model")}${N("documents", "Documents", "file")}</div>
@@ -1309,7 +2472,137 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------------ Portfolio */
+  // Signed in, the portfolio is the tenant's own programme read from the API. The public pack
+  // keeps the snapshot's real rows through the live override below; a clean checkout keeps the
+  // design study. The signed-in page never renders a fixture project or a fixture programme.
+  function consolePortfolio() {
+    if (!cs.loaded && !cs.loading && !cs.error) consoleLoad();
+    const rows = consoleProjects();
+    const index = new Map(cs.issues.map((row) => [String(row.number), row]));
+    const programme = cs.programme || { name: "conveyor buildout", status: "active" };
+    const tab = v.tab.portfolio || "In flight";
+    const statusTone = (status) =>
+      status === "active"
+        ? "green"
+        : status === "closed" || status === "archived"
+          ? ""
+          : "amber";
+    const unitStats = (project) => {
+      const linked = list((project.meta || {}).issues);
+      const issues = linked.map((number) => index.get(String(number))).filter(Boolean);
+      return {
+        total: linked.length,
+        open: issues.filter((row) => (row.state || "OPEN") === "OPEN").length,
+        ready: issues.filter((row) => issueLabels(row).includes("status:ready")).length,
+        claimed: issues.filter((row) => issueLabels(row).includes("status:claimed")).length,
+        blocked: issues.filter((row) => issueLabels(row).includes("status:blocked")).length,
+      };
+    };
+    const cardStats = (project) => {
+      const data = cs.byProject[project.id];
+      if (!data || data.error || !data.cards) return null;
+      const kinds = new Map(list(data.lists).map((row) => [row.id, row.kind]));
+      const mine = list(data.cards).filter((row) => !row.archived_at);
+      return {
+        done: mine.filter((row) => ["done", "archive"].includes(kinds.get(row.list_id))).length,
+        total: mine.length,
+      };
+    };
+    const inFlight = rows.map((project) => {
+      const units = unitStats(project);
+      const cards = cardStats(project);
+      const plan = planHref((project.meta || {}).plan);
+      return `<tr><td><strong>${E(project.name)}</strong><small>${E(project.key)} · ${E(
+        (project.meta || {}).track || project.project_type_code || "",
+      )}</small></td><td>${B(project.status || "draft", statusTone(project.status))}</td><td><small>${
+        units.open
+      } open / ${units.total} linked</small></td><td>${
+        cards ? `${cards.done} / ${cards.total}` : `<span class="muted">open a project</span>`
+      }</td><td>${B(
+        units.blocked ? units.blocked + " blocked" : "Clear",
+        units.blocked ? "amber" : "green",
+      )}</td><td>${
+        plan ? `<a class="e-project-link" href="${E(plan)}">plan ↗</a>` : "—"
+      }</td></tr>`;
+    });
+    const deps = [];
+    rows.forEach((project) =>
+      list((project.meta || {}).depends_on).forEach((key) => {
+        const dep = rows.find((row) => row.key === key) || null;
+        deps.push(
+          `<tr><td class="mono">${E(project.key)}</td><td>→</td><td class="mono">${E(key)}</td><td>${E(
+            dep ? dep.name : "not in this tenant",
+          )}</td><td>${B(
+            dep ? dep.status : "missing",
+            dep && (dep.status === "closed" || dep.status === "archived") ? "green" : "amber",
+          )}</td></tr>`,
+        );
+      }),
+    );
+    const totals = (pick) => rows.reduce((sum, project) => sum + pick(unitStats(project)), 0);
+    const summary = kv([
+      ["Programme", `${E(programme.name)} ${B(programme.status || "active", "green")}`],
+      [
+        "Projects",
+        `${rows.length} · ${rows.filter((p) => p.status === "active").length} active · ${
+          rows.filter((p) => p.status === "draft").length
+        } draft · ${
+          rows.filter((p) => p.status === "closed" || p.status === "archived").length
+        } closed`,
+      ],
+      [
+        "Units",
+        `${totals((u) => u.open)} open · ${totals((u) => u.ready)} ready · ${totals(
+          (u) => u.claimed,
+        )} claimed · ${totals((u) => u.blocked)} blocked`,
+      ],
+      ["Cards", `${rows.filter((p) => cardStats(p)).length} project boards loaded`],
+    ]);
+    const content =
+      tab === "Dependencies"
+        ? panel(
+            "Project dependencies",
+            deps.length
+              ? `${table(["Project", "", "Depends on", "Name", "State"], deps)}${note(
+                  "The edges are the seed's <span class='mono'>meta.depends_on</span> keys joined to the tenant's projects. A project-level dependency row (typed <span class='mono'>blocks | needs | supersedes | informs</span>, cycle refused) is the T1 aggregate and does not exist yet.",
+                )}`
+              : note("No project declares a dependency."),
+            B(`${deps.length} edges`),
+          )
+        : tab === "Programme"
+          ? panel(
+              "Programme",
+              `${summary}${note(
+                "Shared configuration, WSJF, cadence and metering are V2 aggregates (T1/T10/T11) that do not exist yet. This page shows the rows the platform owns today.",
+              )}`,
+              B(programme.status || "active", "green"),
+            )
+          : panel(
+              "In-flight portfolio",
+              `${table(["Project", "Status", "Units", "Cards", "Blockers", "Plan"], inFlight)}${note(
+                "Every row is a tenant project. Units are the GitHub issues linked on the project; cards are the project's board; a card is complete when its lane kind is done or archive.",
+              )}`,
+              `${B(`${rows.length} projects`, "green")}${button(
+                "Load all boards",
+                "programme-load-boards",
+                "",
+                "small",
+                "board",
+              )}`,
+            );
+    return `<div class="page enterprise">${heading(
+      "Portfolio",
+      "The programme's real projects, their linked units, their boards and their dependency edges.",
+      `${route("Projects", "projects", "", "projects")}${route("Plan & WBS", "plan", "", "board")}`,
+      "PORTFOLIO & PLAN",
+    )}${consoleRibbon(
+      "Projects, units, boards and dependency edges read from the platform's own rows.",
+      true,
+    )}${summary}${tabs(["In flight", "Dependencies", "Programme"], tab, "portfolio")}${content}</div>`;
+  }
+
   function portfolio() {
+    if (consoleOn()) return consolePortfolio();
     const tab = v.tab.portfolio || "In flight";
     const scoped = projects().filter((p) => p.programme === v.programme);
     const rows = scoped.map(
@@ -1941,9 +3234,102 @@ window.installV2 = function (api, enterprise) {
     return `<div class="page enterprise">${heading("Metering", "Roll-ups at tenant, department, programme, project and job; drill-down to run, step and tool call; one derivation reconciled with billing.", `${route("Portfolio", "portfolio", "", "layers")}${route("Measure", "usage", "", "chart")}`, "MEASURE & IMPROVE")}${ribbon("V2 metering (D52): read models over inference_call and tool_call, attribution, C0–C5 metrics and billing reconciliation. Proposed in T11.", count.calls > 0)}${tabs(["Roll-ups", "Attribution", "Metrics & maturity"], tab, "metering")}${content}</div>`;
   }
 
+  /* ------------------------------------------------------------------ Contribute */
+  // The public path into the programme. It reads the issue registry at publish and writes
+  // nothing; a claim and a design report both happen on GitHub.
+  function contributePage() {
+    const signed = consoleOn();
+    if (signed && !cs.loaded && !cs.loading && !cs.error) consoleLoad();
+    const registry = signed
+      ? cs.issues
+      : list((((live || {}).programme || {}).issue_registry || {}).issues);
+    const openRows = registry.filter((issue) => (issue.state || "OPEN") === "OPEN");
+    const withLabel = (label) =>
+      openRows.filter((issue) => issueLabels(issue).includes(label));
+    const ready = withLabel("status:ready");
+    const claimed = withLabel("status:claimed");
+    const blocked = withLabel("status:blocked");
+    const rows = signed ? consoleProjects() : snapshotProjects();
+    const owner = new Map();
+    rows.forEach((project) =>
+      list((project.meta || {}).issues).forEach((number) =>
+        owner.set(String(number), project),
+      ),
+    );
+    const groups = new Map();
+    ready.forEach((issue) => {
+      const project = owner.get(String(issue.number));
+      const key = project ? project.key : "Unassigned";
+      if (!groups.has(key)) groups.set(key, { project, issues: [] });
+      groups.get(key).issues.push(issue);
+    });
+    const panels = [...groups.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, group]) =>
+        panel(
+          `${E(key)} · ready units`,
+          table(
+            ["Issue", "Unit", "Labels"],
+            group.issues.map(
+              (issue) =>
+                `<tr><td><a class="e-project-link" href="${E(
+                  issue.url || consoleIssueUrl(issue.number),
+                )}" target="_blank" rel="noopener">#${E(issue.number)} ↗</a></td><td><strong>${E(
+                  issue.title,
+                )}</strong></td><td><small>${E(issueLabels(issue).join(" · "))}</small></td></tr>`,
+            ),
+          ),
+          B(`${group.issues.length} ready`, "green"),
+        ),
+      );
+    const summary = `<div class="metrics">${[
+      [openRows.length, "Open units", `${claimed.length} claimed · ${blocked.length} blocked`, "green"],
+      [ready.length, "Ready to claim", "no branch, no PR, no claim comment", "purple"],
+      [
+        blocked.length,
+        "Blocked",
+        "a plain Blocker: line names an open issue",
+        blocked.length ? "orange" : "green",
+      ],
+    ]
+      .map(
+        ([value, label, sub, tone]) =>
+          `<div class="metric"><div class="label"><i class="dot ${tone}"></i>${E(
+            label,
+          )}</div><div class="metric-number">${E(value)}</div><small>${E(sub)}</small></div>`,
+      )
+      .join("")}</div>`;
+    const protocol = panel(
+      "How a unit is claimed",
+      `<p class="muted">The claim is four empty checks, a pushed branch and a comment. Until all four are empty the unit is someone else's; join it, never start a parallel branch.</p><pre class="v2-code">gh issue view N --json state,labels,comments,closedByPullRequestsReferences
+gh pr list --state all --search "#N"
+git ls-remote --heads origin "issue/N-*"
+git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mono">issue/N-&lt;slug&gt;</span>, add <span class="mono">status:claimed</span> and a comment naming the branch and HEAD. One issue is one branch and exactly one PR with <span class="mono">Closes #N</span>. A contributor without write access comments with the plan; a maintainer applies the claim.</p><div class="toolbar"><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=unit.md" target="_blank" rel="noopener">Propose a unit ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=feedback.yml" target="_blank" rel="noopener">Report design feedback ↗</a><a class="btn" href="${E(
+        (live || {}).feedback_url || "https://github.com/nonagenticai/conveyor/discussions",
+      )}" target="_blank" rel="noopener">Discuss ↗</a><a class="btn" href="docs/plans/03-DELIVERY.html">Delivery contract ↗</a></div>`,
+      B(`${ready.length} ready`, ready.length ? "green" : ""),
+    );
+    return `<div class="page enterprise">${heading(
+      "Contribute",
+      "The programme is public. Take a ready unit, send a design report, or discuss the design; claims and code live on GitHub.",
+      `${route("Projects", "projects", "", "projects")}`,
+      "PORTFOLIO & PLAN",
+    )}${consoleRibbon(
+      "Ready units are read from the GitHub issue registry at publish; this page writes nothing.",
+      registry.length > 0,
+    )}${summary}${
+      panels.join("") ||
+      note(
+        "No ready unit is published right now. A unit becomes <span class='mono'>status:ready</span> when its dependencies are met.",
+      )
+    }${protocol}</div>`;
+  }
+
   const pages = {
     portfolio,
     plan,
+    projects: projectsPage,
+    contribute: contributePage,
     organisation,
     jobs,
     procedures,
@@ -1991,6 +3377,8 @@ window.installV2 = function (api, enterprise) {
   const titles = {
     portfolio: "Portfolio",
     plan: "Plan & WBS",
+    projects: "Projects",
+    contribute: "Contribute",
     organisation: "Organisation",
     jobs: "Jobs",
     procedures: "Procedures",
@@ -2005,6 +3393,26 @@ window.installV2 = function (api, enterprise) {
 
   /* ------------------------------------------------------------------ events */
   document.addEventListener("change", (event) => {
+    const projectPage = event.target.closest('[data-v2-input="project-page"]');
+    if (projectPage) {
+      v.projectPage = projectPage.value;
+      v.feedbackProject = null;
+      render();
+      consoleLoadProject(projectPage.value);
+      consoleLoadOutputs(projectPage.value);
+      return;
+    }
+    const feedbackProject = event.target.closest('[data-v2-input="feedback-project"]');
+    if (feedbackProject) {
+      v.feedbackProject = feedbackProject.value;
+      render();
+      return;
+    }
+    const publishRepo = event.target.closest('[data-v2-input="publish-repository"]');
+    if (publishRepo) {
+      consoleSelectRepository(publishRepo.value);
+      return;
+    }
     const planProject = event.target.closest('[data-v2-input="plan-project"]');
     if (planProject) {
       v.planProject = planProject.value;
@@ -2055,6 +3463,104 @@ window.installV2 = function (api, enterprise) {
         break;
       case "console-release":
         consoleRelease(d.id);
+        break;
+      /* programme workspace — every case below is a real action */
+      case "project-select":
+        v.projectPage = d.id;
+        v.feedbackProject = null;
+        render();
+        if (consoleOn()) {
+          consoleLoadProject(d.id);
+          consoleLoadOutputs(d.id);
+        }
+        break;
+      case "project-new":
+        consoleProjectNew();
+        break;
+      case "project-edit":
+        consoleProjectEdit(d.id);
+        break;
+      case "project-create":
+        consoleProjectCreate();
+        break;
+      case "project-save":
+        consoleProjectSave(d.id);
+        break;
+      case "project-close":
+        consoleProjectClose(d.id);
+        break;
+      case "project-close-save":
+        consoleProjectCloseSave(d.id);
+        break;
+      /* execution room — every case is the action it names */
+      case "run-start":
+        consoleStartRun(d.id, d.key);
+        break;
+      case "programme-load-boards":
+        consoleLoadAllBoards();
+        break;
+      case "run-open":
+        consoleRunOpen(d.id);
+        break;
+      case "run-cancel":
+        consoleRunCancel(d.id);
+        break;
+      case "run-cancel-save":
+        consoleRunCancelSave(d.id);
+        break;
+      case "run-refresh":
+        if (d.id) {
+          delete cs.runDetail[d.id];
+          consoleRunOpen(d.id);
+        } else {
+          cs.runsLoaded = false;
+          consoleLoadRuns();
+        }
+        break;
+      case "approval-approve":
+        consoleApprovalDecide(d.id, "approve");
+        break;
+      case "approval-reject":
+        consoleApprovalDecide(d.id, "reject");
+        break;
+      case "approval-save":
+        consoleApprovalSave(d.id, d.decision);
+        break;
+      case "output-card":
+        consoleOutputNew(d.project, d.id);
+        break;
+      case "output-new":
+        consoleOutputNew(d.project);
+        break;
+      case "output-save":
+        consoleOutputSave(d.project);
+        break;
+      case "output-edit":
+        consoleOutputEdit(d.id);
+        break;
+      case "output-update":
+        consoleOutputUpdate(d.id, d.version);
+        break;
+      case "output-publish":
+        consoleOutputPublish(d.id, d.public !== "1", d.version);
+        break;
+      case "output-read":
+        consoleOutputRead(d.id);
+        break;
+      case "feedback-intake":
+        consoleFeedbackIntake(d.issue);
+        break;
+      case "publish-start":
+        consoleStartPublish();
+        break;
+      case "publish-refresh":
+        consolePublishRefresh();
+        break;
+      case "publish-connect":
+        consolePublishConnect();
+        break;
+      case "publish-rotate":
+        consolePublishRotate();
         break;
       case "tab":
         v.tab[d.key] = d.value;

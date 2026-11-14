@@ -1,0 +1,62 @@
+{
+  "source": {
+    "kind": "corpus",
+    "window": {
+      "since": null,
+      "until": null
+    },
+    "corpus_sha256": "98fd3cf54b07e47075d94d113db6380eea8602862cfa532deee64057c3766c87"
+  },
+  "model_rewrites": 0,
+  "cases": 9,
+  "equal": 9,
+  "tolerated": 0,
+  "unexplained": 0,
+  "rows": [
+    {
+      "case": "09f8941d3a93cd15c987dca1f414cbf5385d7e2a2a4413794bb6805272d205f1",
+      "verdict": "equal",
+      "differing": []
+    },
+    {
+      "case": "5c72ee516d9b2b0a92772d9f751cc1e3a01a1ad54310d802f2ab166164e82844",
+      "verdict": "equal",
+      "differing": []
+    },
+    {
+      "case": "dc6dfc2ea12c3adc16fd1eab5bb3876f46ebbac3e996eb793a8e02c75a5d77e4",
+      "verdict": "equal",
+      "differing": []
+    },
+    {
+      "case": "10512749559af6acfdd8dba017af7d6b13caa80951cf2d4b74aa1d433358db29",
+      "verdict": "equal",
+      "differing": []
+    },
+    {
+      "case": "10512749559af6acfdd8dba017af7d6b13caa80951cf2d4b74aa1d433358db29",
+      "verdict": "equal",
+      "differing": []
+    },
+    {
+      "case": "10512749559af6acfdd8dba017af7d6b13caa80951cf2d4b74aa1d433358db29",
+      "verdict": "equal",
+      "differing": []
+    },
+    {
+      "case": "6769d5ee7fbceeda1c937923d94403c51ee1916b2ada653442a880b1ffed126a",
+      "verdict": "equal",
+      "differing": []
+    },
+    {
+      "case": "5c72ee516d9b2b0a92772d9f751cc1e3a01a1ad54310d802f2ab166164e82844",
+      "verdict": "equal",
+      "differing": []
+    },
+    {
+      "case": "4a6ad7366bae2e515aad73e6c0fbbfb64e2a881fe913e72ab1541bdfc6e29784",
+      "verdict": "equal",
+      "differing": []
+    }
+  ]
+}

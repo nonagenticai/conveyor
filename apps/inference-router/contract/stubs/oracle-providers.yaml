@@ -1,0 +1,24 @@
+# The oracle's provider catalog: one OpenAI-compatible provider, pointed at the capture stub.
+# Synthetic only — no live endpoint, no key. Mounted over the image's baked /config/providers.yaml.
+providers:
+  - name: stub-openai
+    enabled: true
+    customer_eligible: true
+    protocol: openai
+    endpoint: http://ir44-stub:9100/v1
+    model: stub-model
+    timeout: 30
+    max_concurrent: 8
+    cost_input_per_1m: 0
+    cost_output_per_1m: 0
+    model_aliases:
+      stub-model: stub-model
+      alias-model: stub-model
+      # A tenant inference policy's PLATFORM hop MUST name the reserved model `local-llm`
+      # (services/inference_policy.py::PLATFORM_MODEL), and the router resolves the hop against
+      # this catalog before dispatch. Without this alias a platform policy is refused with
+      # 400 `outside_policy` ("Request model 'local-llm'"), so the policy-routed golden could
+      # never be captured. In production the platform provider IS the local model, so the alias
+      # stands in for it here. It adds one row to the `models` and `provider_models` goldens.
+      local-llm: stub-model
+default_chain: [stub-openai]

@@ -1,0 +1,71 @@
+{
+  "as_of": "TIMESTAMP",
+  "grouped_on": "request_sha256",
+  "groups": [
+    {
+      "callers": [
+        null
+      ],
+      "first_at": "TIMESTAMP",
+      "last_at": "TIMESTAMP",
+      "n_calls": 2,
+      "n_distinct_responses": 1,
+      "request_sha256": "0e324967edcb3c54f764126d0d435040b908db840581ef4b44fe334f5b757d49",
+      "requested_models": [
+        "stub-model"
+      ],
+      "served_models_n": 1,
+      "served_providers": [
+        "stub-openai"
+      ],
+      "served_roots": [
+        null
+      ],
+      "sources": [
+        "live"
+      ]
+    }
+  ],
+  "limit": 100,
+  "source": "inference_call",
+  "summary": {
+    "by_source": {
+      "benchmark": {
+        "calls": 0,
+        "disagreeing": 0,
+        "groups": 0
+      },
+      "live": {
+        "calls": 2,
+        "disagreeing": 0,
+        "groups": 1
+      },
+      "unknown": {
+        "calls": 0,
+        "disagreeing": 0,
+        "groups": 0
+      }
+    },
+    "callers": [
+      {
+        "caller": null,
+        "calls": 2,
+        "disagreeing": 0,
+        "groups": 1
+      }
+    ],
+    "calls": 2,
+    "disagreeing": 0,
+    "groups": 1,
+    "straddling_groups": 0,
+    "unhashed_calls": 0
+  },
+  "window": {
+    "caller": null,
+    "seeded": null,
+    "served_provider": null,
+    "since": "TIMESTAMP",
+    "temperature": null,
+    "traffic_source": "all"
+  }
+}

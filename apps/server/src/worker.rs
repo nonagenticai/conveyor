@@ -498,36 +498,56 @@ pub async fn run_kind(
             // document pointing at nothing.
             if let Some(record) = record
                 && record.status == "deleted"
-                && let Some(key) = record.object_key.clone()
             {
-                let objects = conveyor_actions::integrations::objects::Objects::from_env()
-                    .ok_or_else(|| JobFailure::permanent("object storage is not configured"))?;
-                objects
-                    .delete(&key)
-                    .await
-                    .map_err(|error| JobFailure::retryable(format!("object storage: {error}")))?;
-                store::document::clear_object_tx(&mut tx, tenant, document_id)
-                    .await
-                    .map_err(|error| {
-                        JobFailure::retryable(format!("clear the object key: {error}"))
-                    })?;
-                let event = store::NewEvent {
-                    topic: format!("document:{document_id}"),
-                    event_type: "document.updated".to_owned(),
-                    aggregate_type: "document".to_owned(),
-                    aggregate_id: document_id,
-                    payload: serde_json::json!({"id": document_id, "changed": ["object_key"]}),
-                    correlation_id: None,
-                    causation_id: None,
-                };
-                store::outbox::append(&mut tx, tenant, &event)
-                    .await
-                    .map_err(|error| {
-                        JobFailure::retryable(format!("append the purge event: {error}"))
-                    })?;
-                tracing::info!(tenant = %tenant, document = %document_id, "document.purge");
+                let had_object = record.object_key.is_some();
+                let had_body = record.body.is_some();
+                if had_object || had_body {
+                    // A text output has no object; only an object-backed document needs the store.
+                    if let Some(key) = record.object_key.clone() {
+                        let objects = conveyor_actions::integrations::objects::Objects::from_env()
+                            .ok_or_else(|| {
+                                JobFailure::permanent("object storage is not configured")
+                            })?;
+                        objects.delete(&key).await.map_err(|error| {
+                            JobFailure::retryable(format!("object storage: {error}"))
+                        })?;
+                    }
+                    store::document::clear_object_tx(&mut tx, tenant, document_id)
+                        .await
+                        .map_err(|error| {
+                            JobFailure::retryable(format!("clear the document content: {error}"))
+                        })?;
+                    let mut changed = Vec::new();
+                    if had_object {
+                        changed.push("object_key");
+                    }
+                    if had_body {
+                        changed.push("body");
+                    }
+                    let event = store::NewEvent {
+                        topic: format!("document:{document_id}"),
+                        event_type: "document.updated".to_owned(),
+                        aggregate_type: "document".to_owned(),
+                        aggregate_id: document_id,
+                        payload: serde_json::json!({"id": document_id, "changed": changed}),
+                        correlation_id: None,
+                        causation_id: None,
+                    };
+                    store::outbox::append(&mut tx, tenant, &event)
+                        .await
+                        .map_err(|error| {
+                            JobFailure::retryable(format!("append the purge event: {error}"))
+                        })?;
+                    tracing::info!(tenant = %tenant, document = %document_id, "document.purge");
+                }
             }
             tx.commit().await.map_err(db)?;
+        }
+        // The console's Publish button: build the public pack and open the homepage PR. The job
+        // has one attempt (the action enqueues `max_attempts = 1`), so a failure after the PR is
+        // opened is dead with the URL in `last_error`, never a second PR.
+        "publish.design" => {
+            crate::publish::run(pool, tenant, payload).await?;
         }
         "action_invocation.prune" => {
             let deleted = store::prune::action_invocation_prune(
@@ -795,8 +815,8 @@ pub async fn run_kind(
                  card.claim, approval.expire, delivery.send, approval.closed.emit, \
                  quality.score, model.validate, copilot.turn.reap, copilot.proposal.sweep, \
                  copilot.proposal.execute, benchmark.run.poll, benchmark.reap, \
-                 eval.case.run, eval.regrade, eval.grade, eval.run.tick, eval.reap and \
-                 memory.consolidate"
+                 eval.case.run, eval.regrade, eval.grade, eval.run.tick, eval.reap, \
+                 document.purge, publish.design and memory.consolidate"
             )));
         }
     }

@@ -1,0 +1,6 @@
+POST
+/api/chat/completions
+-H
+content-type: application/json
+-d
+{"model":"stub-model","messages":[{"role":"user","content":"hi"}]}

@@ -9,7 +9,7 @@
 //! is a new row, and the old one is deleted — which is what keeps `repository.linked` events unambiguous.
 
 use conveyor_store as store;
-use conveyor_store::repository::{NewRepository, RepositoryRecord};
+use conveyor_store::repository::{NewRepository, RepositoryPatch, RepositoryRecord};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -186,6 +186,86 @@ async fn repositories_get(
         .await
         .map_err(|error| repository_error(error, "repositories.get"))?
         .ok_or_else(|| ActionError::resource_not_found("such repository"))?;
+    let etag = crate::control::etag_of(record.version.get() as i64);
+    Ok(HandlerOutput::ok(RepositoryOut::from(record)).with_etag(etag))
+}
+
+/// The update input. `url` and `provider` are immutable: they are the repository's identity.
+/// A credential is rotated by naming a new sealed secret; the previous value does not survive.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct RepositoryUpdateIn {
+    /// The repository id.
+    pub id: Uuid,
+    /// The new default branch.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default_branch: Option<String>,
+    /// The provider's installation handle.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub installation_ref: Option<String>,
+    /// The new credential secret, resolved in the caller's tenant.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub credential_secret_id: Option<Uuid>,
+}
+
+/// Change a repository's branch, installation handle or credential.
+#[crate::action(
+    name = "repositories.update",
+    version = 1,
+    kind = "internal",
+    scopes = ["documents:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn repositories_update(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: RepositoryUpdateIn,
+) -> Result<HandlerOutput<RepositoryOut>, ActionError> {
+    let action = "repositories.update";
+    let current = store::repository::get_repository_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| repository_error(error, action))?
+        .ok_or_else(|| ActionError::resource_not_found("such repository"))?;
+    let expected = crate::control::require_precondition_with(
+        &ctx,
+        action,
+        serde_json::to_value(RepositoryOut::from(current)).unwrap_or(serde_json::Value::Null),
+    )?;
+    if input.default_branch.is_none()
+        && input.installation_ref.is_none()
+        && input.credential_secret_id.is_none()
+    {
+        return Err(invalid(
+            "id",
+            "invalid_value",
+            "nothing to update: supply default_branch, installation_ref or credential_secret_id",
+        ));
+    }
+    if let Some(branch) = input.default_branch.as_deref()
+        && branch.trim().is_empty()
+    {
+        return Err(invalid("default_branch", "required", "must not be empty"));
+    }
+    let patch = RepositoryPatch {
+        default_branch: input.default_branch.map(|branch| branch.trim().to_owned()),
+        installation_ref: input.installation_ref.map(Some),
+        credential_secret_id: input.credential_secret_id.map(Some),
+    };
+    let record =
+        store::repository::update_repository_tx(&mut *tx, ctx.tenant, input.id, expected, &patch)
+            .await
+            .map_err(|error| repository_error(error, action))?;
+    emit_document_event(
+        &mut *tx,
+        &ctx,
+        "repository.updated",
+        record.id,
+        json!({"id": record.id, "url": record.url}),
+    )
+    .await?;
     let etag = crate::control::etag_of(record.version.get() as i64);
     Ok(HandlerOutput::ok(RepositoryOut::from(record)).with_etag(etag))
 }

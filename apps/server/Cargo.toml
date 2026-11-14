@@ -36,6 +36,8 @@ serde_json = { workspace = true }
 regex = { workspace = true }
 # The eval audit writes its control scores as `NUMERIC`; the conversion stays in Rust.
 rust_decimal = { workspace = true }
+# Platform outputs: the publish-time Markdown -> HTML renderer.
+pulldown-cmark = { workspace = true }
 # The sandbox Job name's truncation hash.
 sha2 = { workspace = true }
 thiserror = { workspace = true }

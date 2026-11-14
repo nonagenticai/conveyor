@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "setup": "local",
+  "byo_mode": "local_allowed",
+  "tiers": {
+    "medium": [
+      {
+        "target": { "kind": "platform", "provider": "stub-openai" },
+        "model": "local-llm",
+        "failover_on_error": true,
+        "failover_on_validation": false
+      }
+    ]
+  },
+  "tier_inheritance": "nearest_larger_then_smaller"
+}

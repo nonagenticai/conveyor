@@ -11,7 +11,7 @@
 
 use conveyor_domain::{CatalogueKind, ListKind};
 use conveyor_store as store;
-use conveyor_store::project::NewProject;
+use conveyor_store::project::{NewProject, ProjectPatch};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -24,7 +24,7 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::process::views::ProcessRunStartIn;
 use crate::spec::HandlerOutput;
 
-use super::{ProjectCloseIn, ProjectCreateIn, ProjectExecuteIn, views::IdIn};
+use super::{ProjectCloseIn, ProjectCreateIn, ProjectExecuteIn, ProjectUpdateIn, views::IdIn};
 
 /// The board every new project gets. One board per project today, but the FK is the
 /// contract, not a 1:1 assumption (data-arch §2.3).
@@ -459,6 +459,132 @@ async fn projects_close(
         .await
         .map_err(|error| store_error(error, "projects.close"))?;
     Ok(project_view(&project, &boards))
+}
+
+/// Edit a project's own fields. Version-guarded: a stale `If-Match` writes nothing.
+#[crate::action(
+    name = "projects.update",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn projects_update(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProjectUpdateIn,
+) -> Result<HandlerOutput<ProjectView>, ActionError> {
+    let action = "projects.update";
+    let project = load_project(tx, ctx.tenant, input.id).await?;
+    let boards = store::board::list_boards_tx(&mut *tx, ctx.tenant, project.id)
+        .await
+        .map_err(|error| store_error(error, action))?;
+    let expected = crate::control::require_precondition_with(
+        &ctx,
+        action,
+        serde_json::to_value(project_view(&project, &boards)).unwrap_or(serde_json::Value::Null),
+    )?;
+    if let Some(name) = input.name.as_deref()
+        && name.trim().is_empty()
+    {
+        return Err(invalid("name", "required", "must not be empty"));
+    }
+    if let Some(status) = input.status.as_deref()
+        && !matches!(
+            status,
+            "draft" | "active" | "paused" | "closed" | "archived"
+        )
+    {
+        return Err(invalid(
+            "status",
+            "invalid_value",
+            "must be draft, active, paused, closed or archived",
+        ));
+    }
+    let mut changed = Vec::new();
+    if input.name.is_some() {
+        changed.push("name");
+    }
+    if input.description.is_some() {
+        changed.push("description");
+    }
+    if input.status.is_some() {
+        changed.push("status");
+    }
+    if input.repo_url.is_some() {
+        changed.push("repo_url");
+    }
+    if input.meta.is_some() {
+        changed.push("meta");
+    }
+    if changed.is_empty() {
+        return Err(invalid(
+            "name",
+            "invalid_value",
+            "nothing to update: supply name, description, status, repo_url or meta",
+        ));
+    }
+    // Metadata is merged, not replaced: the seed owns keys this action does not (`issues`,
+    // `depends_on`, `plan_status`), and an edit must not erase them.
+    let meta = input.meta.map(|extra| {
+        let mut merged = project.meta.clone();
+        if let (serde_json::Value::Object(target), serde_json::Value::Object(source)) =
+            (&mut merged, extra)
+        {
+            for (key, value) in source {
+                target.insert(key, value);
+            }
+        }
+        merged
+    });
+    let patch = ProjectPatch {
+        name: input.name.map(|name| name.trim().to_owned()),
+        description: input.description,
+        status: input.status,
+        repo_url: input.repo_url,
+        meta,
+    };
+    let updated = store::project::update_project_tx(
+        &mut *tx, ctx.tenant, input.id, expected, &patch,
+    )
+    .await
+    .map_err(|error| match error {
+        store::project::ProjectStoreError::NotFound => ActionError::resource_not_found("project"),
+        store::project::ProjectStoreError::VersionMismatch { current } => {
+            ActionError::precondition(format!(
+                "{action}: the project is at version {}, not the version the caller supplied",
+                current.get()
+            ))
+        }
+        other => {
+            tracing::error!(error = %other, "update project");
+            ActionError::internal()
+        }
+    })?;
+    let boards = store::board::list_boards_tx(&mut *tx, ctx.tenant, updated.id)
+        .await
+        .map_err(|error| store_error(error, action))?;
+    let event = store::NewEvent {
+        topic: format!("project:{}", updated.id),
+        event_type: "project.updated".to_owned(),
+        aggregate_type: "project".to_owned(),
+        aggregate_id: updated.id,
+        payload: serde_json::json!({"id": updated.id, "changed": changed}),
+        correlation_id: None,
+        causation_id: None,
+    };
+    store::outbox::append(&mut *tx, ctx.tenant, &event)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "append project event");
+            ActionError::internal()
+        })?;
+    let etag = crate::control::etag_of(i64::try_from(updated.version.get()).unwrap_or(i64::MAX));
+    Ok(HandlerOutput::ok(project_view(&updated, &boards)).with_etag(etag))
 }
 
 async fn load_project(

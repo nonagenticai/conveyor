@@ -149,6 +149,7 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     let args = SnapshotArgs {
         tenant: "snap".to_owned(),
         out: dir.clone(),
+        outputs_dir: None,
         generated_at: Some("2026-11-12T00:00:00Z".to_owned()),
         issues: issues_path,
         feedback_url: "https://example.test/feedback".to_owned(),
@@ -254,6 +255,7 @@ async fn organisation_is_populated_for_a_seeded_tenant() {
     let args = SnapshotArgs {
         tenant: "nonagentic".to_owned(),
         out: dir.clone(),
+        outputs_dir: None,
         generated_at: Some("2026-11-13T00:00:00Z".to_owned()),
         issues: issues_path,
         feedback_url: "https://example.test/feedback".to_owned(),

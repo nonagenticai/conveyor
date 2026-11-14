@@ -729,7 +729,7 @@ are additive.
 |---|---|---|---|
 | Today / programme control | `overview` | Delivery map, integrated plan, gate readiness | R |
 | **Portfolio** | `portfolio` | In flight, programmes, shared config & dependencies, backlog & WSJF, cadence & capacity, metering | **P** |
-| Projects | `projects` | project list and workbench | R |
+| Projects | `projects` | live/snapshot programme workspace: project list, board, plan, linked issues, text outputs, public feedback, publish | R (V1 fixture retired; #70 live/snapshot) |
 | **Plan** | `plan` | WBS, baseline vs forecast, registers, change control | **P** |
 | Execution room | `execution` | activity, evidence, context, tools, explain-context manifest | R + P tools / explain context |
 | Decision inbox | `decisions` | approvals | R |
@@ -825,10 +825,17 @@ The pack has two deployments with different contracts:
   is held in memory, ADR 0001) and calls the API the server already serves. The Plan **Boards**
   tab then renders the tenant's own projects, boards and cards from the read routes and offers
   the real card loop — `cards.create` (intake an issue), `cards.move`, `cards.comment`,
-  `cards.claim`, `cards.release` — gated by `GET /api/actions` and by the session. Every control
-  produces the action request it names; nothing is simulated on this path. Signed out (and on any
-  origin with no config, including `file://` and the homepage) there is no API request and no
-  write control.
+  `cards.claim`, `cards.release` — gated by `GET /api/actions` and by the session. The
+  **Projects** destination adds the programme workspace: project create/edit/close
+  (`projects.update` under If-Match), a card's **Start run** (`process_runs.start`, bound by the
+  card's `meta.process_key`), text outputs (`documents.compose` / `documents.update`, with the
+  `publishable` flag), feedback intake and **Publish**. Start run and the Execution room
+  (`runs.list`, `runs.get`, `runs.cancel`, `approvals.decide`) are the same actions the V1 web
+  screens use; the old `projects.execute` stub is no longer rendered. Publish enqueues
+  `publish.design`, which builds the pack and opens a pull request on the homepage repository;
+  the console never merges it. Every control produces the action request it names; nothing is
+  simulated on this path. Signed out (and on any origin with no config, including `file://` and
+  the homepage) there is no API request and no write control.
 
 The image's web stage copies the generated documents (`docs/`) and the data directory beside the
 runtime files, so the console's Documents destination and data links resolve. The console gate is
@@ -837,9 +844,9 @@ the signed-in pack is asserted to send the intake/move/comment/claim/release req
 401/412 paths are asserted to be rendered rather than retried. `check-studio.cjs` keeps asserting
 zero external network dependencies for the offline study.
 
-Approvals, gates, document/evidence authoring and the publish pipeline are **not** wired here.
-The live tenant holds no approval rows yet, and published intermediate outputs need their own
-document contract; both are separate units. Native dialogs, text-labelled status, keyboard
+Runs, steps, gates and text outputs are wired. The live tenant still has no run and no approval
+row, so the Execution room renders an honest empty queue until one starts; binary artefacts and
+object storage remain a separate unit. Native dialogs, text-labelled status, keyboard
 navigation, reduced motion and internal scrolling support the interaction study. Wider WBS tables,
 models, timelines and graphs keep internal scroll.
 

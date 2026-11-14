@@ -55,9 +55,11 @@ use serde_json::{Value, json};
 /// 269 + 7 → **276**; whoever merges last re-derives it.
 /// **S18 step 2 adds 1**: `benchmark_runs.trend`. **S13 adds 11**: the SOP's six, the two
 /// `process_maps.*`, `laya.judge` and the two `eval_grades.*`. 277 → **288**.
-/// **T0 adds 15**: `industries.*` (3), `job_catalogue.*` (5), `job_releases.*` (3) and
-/// `job_bindings.*` (4) — the organisation spine (SPEC_V2 §4, §10.4). 299 → **314**.
-const EXPECTED: [&str; 314] = [
+/// **#70 adds 5 internal**: `documents.compose`, `projects.update`, `publish.start`,
+/// `publish.status` and `repositories.update`. 299 → **304**.
+/// **T0 adds 15 internal**: `industries.*` (3), `job_catalogue.*` (5), `job_releases.*` (3) and
+/// `job_bindings.*` (4) — the organisation spine (SPEC_V2 §4, §10.4). 304 → **319**.
+const EXPECTED: [&str; 319] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -129,6 +131,7 @@ const EXPECTED: [&str; 314] = [
     "decisions.update",
     "departments.create",
     "departments.list",
+    "documents.compose",
     "documents.create",
     "documents.delete",
     "documents.download",
@@ -296,6 +299,7 @@ const EXPECTED: [&str; 314] = [
     "projects.create",
     "projects.execute",
     "projects.get",
+    "projects.update",
     "prompt_audits.check",
     "prompt_audits.get",
     "prompt_audits.list",
@@ -303,6 +307,8 @@ const EXPECTED: [&str; 314] = [
     "prompt_findings.decide",
     "prompt_findings.list",
     "providers.list",
+    "publish.start",
+    "publish.status",
     "quality.score",
     "repositories.create",
     "repositories.delete",
@@ -310,6 +316,7 @@ const EXPECTED: [&str; 314] = [
     "repositories.link",
     "repositories.list",
     "repositories.unlink",
+    "repositories.update",
     "requirements.compare",
     "requirements.create",
     "requirements.get",
@@ -400,8 +407,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // retire`) so a tenant can author a map and have it validated; before this only the two
     // reads existed and the domain validator was unreachable through the API.
     // The external count moves exactly once, at step 8 — every other addition is internal.
-    // T0 adds 15 internal actions (the organisation spine), so 284 → 299.
-    assert_eq!((internal, external), (299, 15));
+    // T0 adds 15 internal actions (the organisation spine), so 289 → 304.
+    assert_eq!((internal, external), (304, 15));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

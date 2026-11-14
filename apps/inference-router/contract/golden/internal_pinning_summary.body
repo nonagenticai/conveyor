@@ -1,0 +1,25 @@
+{
+  "callers": [
+    {
+      "caller": null,
+      "last_at": "TIMESTAMP",
+      "n": 4,
+      "pinned_n": 0,
+      "temperature_zero_n": 0
+    },
+    {
+      "caller": "golden-worker",
+      "last_at": "TIMESTAMP",
+      "n": 1,
+      "pinned_n": 0,
+      "temperature_zero_n": 0
+    }
+  ],
+  "since": "TIMESTAMP",
+  "source": "all",
+  "totals": {
+    "n": 5,
+    "pinned_n": 0,
+    "temperature_zero_n": 0
+  }
+}

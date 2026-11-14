@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "id": "stub-model",
+      "object": "model"
+    },
+    {
+      "id": "alias-model",
+      "object": "model"
+    },
+    {
+      "id": "local-llm",
+      "object": "model"
+    }
+  ],
+  "object": "list",
+  "provider": "stub-openai"
+}

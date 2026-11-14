@@ -1665,6 +1665,7 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
       "benchmarks",
       "portfolio",
       "plan",
+      "contribute",
       "organisation",
       "jobs",
       "procedures",
@@ -1678,6 +1679,13 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
     ].map((page) => [page, page]),
   );
   window.addEventListener("conveyor-console", () => {
+    const page = CONSOLE_PAGES.get(location.hash.slice(1));
+    if (page) state.page = page;
+    render();
+  });
+  // A direct hash change (a pasted #projects link, back/forward) navigates through the same
+  // constant map. A hash is user input; an unknown one stays put rather than naming a method.
+  window.addEventListener("hashchange", () => {
     const page = CONSOLE_PAGES.get(location.hash.slice(1));
     if (page) state.page = page;
     render();

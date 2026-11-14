@@ -1,0 +1,7 @@
+{
+  "active": true,
+  "app": "inference-router",
+  "expires_at": "TIMESTAMP",
+  "license_id": "00000000-0000-4000-8000-0000000000c1",
+  "tenant_id": "00000000-0000-4000-8000-0000000000a1"
+}

@@ -1,0 +1,11 @@
+data: {"choices":[{"delta":{"content":"","role":"assistant","tool_calls":null},"finish_reason":null,"index":0}],"created":0,"id":"chatcmpl-stub","model":"stub-model","object":"chat.completion.chunk","provider_request_id":null,"served_model":null,"served_provider":null,"usage":null}
+
+data: {"choices":[{"delta":{"content":"stub ","role":null,"tool_calls":null},"finish_reason":null,"index":0}],"created":0,"id":"chatcmpl-stub","model":"stub-model","object":"chat.completion.chunk","provider_request_id":null,"served_model":null,"served_provider":null,"usage":null}
+
+data: {"choices":[{"delta":{"content":"completion","role":null,"tool_calls":null},"finish_reason":null,"index":0}],"created":0,"id":"chatcmpl-stub","model":"stub-model","object":"chat.completion.chunk","provider_request_id":null,"served_model":null,"served_provider":null,"usage":null}
+
+data: {"choices":[{"delta":{"content":null,"role":null,"tool_calls":null},"finish_reason":"stop","index":0}],"created":0,"id":"chatcmpl-stub","model":"stub-model","object":"chat.completion.chunk","provider_request_id":null,"served_model":null,"served_provider":null,"usage":null}
+
+data: {"choices":[],"created":0,"id":"chatcmpl-stub","model":"stub-model","object":"chat.completion.chunk","provider_request_id":"chatcmpl-stub","served_model":"stub-model","served_provider":"stub-openai","usage":{"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"completion_tokens":3,"prompt_tokens":7,"total_tokens":10,"usage_extra":null}}
+
+[DONE]

@@ -1,0 +1,4 @@
+GET
+/api/internal/served-models/timeline
+-H
+X-Internal-Secret: stub-internal-secret

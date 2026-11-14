@@ -475,6 +475,7 @@ window.ArchitecturePack = (function () {
     ["Programme control", "overview", "Portfolio read model · programme cadence", "§5.1, §8.2", "R"],
     ["Portfolio", "portfolio", "Computed portfolio · programme shared config · dependencies · WSJF · metering", "§5.1, §5.5, §8.2, D49", "P"],
     ["Projects", "projects", "Project · WBS node · work package (card)", "§5.1–§5.5", "R"],
+    ["Contribute", "contribute", "GitHub issue registry · ready units · claim protocol · feedback", "§10.5, 03-DELIVERY", "R"],
     ["Plan & WBS", "plan", "wbs_node · project_baseline · register · change control", "§5.3–§5.5", "P"],
     ["Execution room", "execution", "Run · prompt compiler · tool panel · explain context", "§7.7, §10.5", "R + P"],
     ["Decision inbox", "decisions", "Approval · gate · dual control · decided_by_kind", "§5.4", "R"],

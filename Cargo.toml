@@ -93,6 +93,13 @@ futures-util = "0.3.34"
 schemars = { version = "1.2.3", features = ["derive", "chrono04", "uuid1"] }
 inventory = "0.3.25"
 sha2 = "0.10.9"
+# GitHub's Git Data API addresses blobs by their git SHA-1 (`sha1("blob <len>\0" + bytes)`), so the
+# publish delta can skip an unchanged file without fetching it.
+sha1 = "0.11.0"
+# Platform outputs: the one Markdown -> HTML renderer used at publish time. Raw HTML in a body is
+# neutralised by the renderer's event filter (see apps/server/src/publish_outputs.rs), never by
+# trusting the author.
+pulldown-cmark = "0.13.6"
 # S17: the log parsers and the verdict ladder are ports of swebench 5.0.2's regexes; the
 # benchmark's number is only as faithful as the pattern that produced it.
 regex = "1.13.1"

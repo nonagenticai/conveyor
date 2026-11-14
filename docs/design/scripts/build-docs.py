@@ -257,6 +257,22 @@ def write_index(payload: dict) -> None:
         + ";\n",
         encoding="utf-8",
     )
+    write_outputs_placeholder()
+
+
+# Platform outputs are generated at publish time, into this same directory. The clean checkout
+# carries the null placeholder so `studio.html` can load it from `file://`; a publish overwrites
+# it with `window.CONVEYOR_OUTPUTS = {schema:"design-outputs/v1", …}`.
+OUTPUTS_PLACEHOLDER = """// Placeholder. `conveyor snapshot --outputs-dir docs/design/docs` overwrites this file with the
+// published-output index (`window.CONVEYOR_OUTPUTS = {schema: "design-outputs/v1", …}`). A null
+// payload means no platform output has been published.
+window.CONVEYOR_OUTPUTS = null;
+"""
+
+
+def write_outputs_placeholder() -> None:
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "outputs.js").write_text(OUTPUTS_PLACEHOLDER, encoding="utf-8")
 
 
 def read_index() -> dict | None:
@@ -322,6 +338,7 @@ def main() -> int:
         for error in errors:
             print("  " + error, file=sys.stderr)
         return 1
+    write_outputs_placeholder()
     if args.verify_render:
         snapshot = {
             path.relative_to(OUT): path.read_bytes()
@@ -334,6 +351,7 @@ def main() -> int:
         if errors:
             print("build-docs: unresolved links on re-render: " + "; ".join(errors), file=sys.stderr)
             return 1
+        write_outputs_placeholder()
         drift = [
             str(rel)
             for rel, data in snapshot.items()

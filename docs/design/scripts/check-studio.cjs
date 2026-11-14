@@ -92,22 +92,13 @@ const shot = (name) =>
     (await page.locator(".e-gate-list > button").count()) === 6,
     "six governance gates",
   );
+  // #70: the Projects destination is the live/snapshot programme surface, not the V1 fixture.
+  // A clean checkout has no snapshot, so the honest state is the empty prompt; the console gate
+  // (`check-console.cjs`) covers the signed-in project page and every write.
   await nav("projects");
   ok(
-    (await page.locator(".e-table tbody tr").count()) === 12,
-    "twelve independent projects across programmes",
-  );
-  await old("create-project");
-  await page
-    .locator('#project-form [name="name"]')
-    .fill("Enterprise validation project");
-  await page
-    .locator('#project-form [name="description"]')
-    .fill("A governed enterprise transformation project.");
-  await page.locator('button[form="project-form"]').click();
-  ok(
-    await has("Enterprise validation project"),
-    "existing project creation retained",
+    await has("No published snapshot is loaded"),
+    "projects is the live/snapshot destination, not a fixture",
   );
   await nav("work");
   ok(

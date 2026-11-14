@@ -17,6 +17,22 @@ already trusts (auth-code + PKCE S256, token in memory), and the Plan **Boards**
 writes the platform's own rows — intake an issue as a card, move it, comment, claim and release.
 Signed out, or on the homepage, nothing changes: no API request and no write control.
 
+The **Projects** destination is the programme workspace: the tenant's projects, a project's board,
+plan link and linked issues, its cards with their process binding and the card type's expected
+outputs, its text **outputs** (compose, edit, publish flag) and the public feedback inbox. Intake
+binds the card type's READY process (`meta.process_key`), so a card can **Start run**
+(`process_runs.start`) and open in the Execution room. Signed in it can edit a project
+(`projects.update`, If-Match), compose an output and **Publish** — which enqueues a job that builds
+the pack and opens a pull request on the homepage repository; it never merges. On the homepage the
+same page is read-only from the snapshot.
+
+The **Execution room** lists the tenant's runs (`runs.list`), renders one run's steps, tool calls,
+gates and outputs (`runs.get`), cancels a live run (`runs.cancel`) and decides a pending gate
+(`approvals.decide`). **Portfolio** signed in reads the real programme from the API — projects,
+linked units, loaded boards and `meta.depends_on` edges — never the design fixtures. **Contribute**
+is the public entry point: it lists the `status:ready` units from the issue registry, the four-check
+claim protocol and the feedback/Discussions links; it writes nothing.
+
 - **Portfolio & plan:** the computed in-flight set, programme shared configuration, typed
   project-dependency edges, the WSJF backlog, PI cadence, capacity and per-project metering; then
   WBS, frozen baseline vs computed forecast, one six-kind register and controlled change.
@@ -47,9 +63,10 @@ Signed out, or on the homepage, nothing changes: no API request and no write con
   and pre-rendered — the page has no runtime Mermaid dependency.
 - **Documents:** every tracked design/spec/plan/evidence document is rendered from Markdown to a
   standalone HTML page under `docs/` and listed by the Documents destination.
-- **Retained V1 surfaces:** programme control, projects, boards, execution, decisions, requirements,
+- **Retained V1 surfaces:** programme control, boards, execution, decisions, requirements,
   principles, ArchiMate/UML, assurance, baselines, TOC (optional reasoning study), knowledge design,
-  eight memory levels, and the tenant-administration screens documented in `STUDIO-SPEC.md`.
+  eight memory levels, and the tenant-administration screens documented in `STUDIO-SPEC.md`. The
+  **Projects** destination is the live/snapshot programme workspace, not the retired V1 fixture.
 
 Without a snapshot, every service result is an offline fixture. With `data/snapshot.js`, the
 platform's public rows replace those fixtures on the pages that have a live source;
@@ -86,12 +103,23 @@ local stylesheet, no fetch — so they work from `file://` and from the publishe
 - The Documents destination in `studio.html` reads `docs/documents.js`. Without that file (a clean
   checkout before generation) the destination says so instead of rendering a broken list.
 
+**Platform outputs** are the second document source: a publishable text output is rendered at
+publish time to `docs/output-<id>.html` and indexed by `docs/outputs.js`
+(`window.CONVEYOR_OUTPUTS = {schema:"design-outputs/v1", …}`); the Documents destination adds a
+**Platform outputs** group. A clean checkout carries the null placeholder and shows no group; a
+body is rendered with raw HTML neutralised, so the public page has no executable markup from an
+author.
+
 ## Feedback
 
 The public surface is GitHub, not a service. `studio.html` links the repository's **Discussions**
 and opens a prefilled issue with the `feedback` label from every page; the snapshot's
 `manifest.feedback_url` carries the target, and `data/feedback.json` publishes the feedback issues
 that exist. The issue template is `.github/ISSUE_TEMPLATE/feedback.yml`.
+
+The console lists the `feedback`-labelled issues on the Projects destination and can **intake** one
+into a project's intake lane (`cards.create` carrying `meta.issue`); the issue stays the GitHub
+unit and is not modified.
 
 ## Retired studies
 
