@@ -365,7 +365,10 @@ fn literal_field(
         Some(value) => value,
     };
     if let Value::String(raw) = value
-        && let Some(choice) = allowed.iter().copied().find(|choice| *choice == raw.as_str())
+        && let Some(choice) = allowed
+            .iter()
+            .copied()
+            .find(|choice| *choice == raw.as_str())
     {
         return Ok(Some(choice));
     }
@@ -387,10 +390,7 @@ fn literal_field(
     })))
 }
 
-fn bool_field(
-    object: &serde_json::Map<String, Value>,
-    field: &str,
-) -> Result<bool, Refusal> {
+fn bool_field(object: &serde_json::Map<String, Value>, field: &str) -> Result<bool, Refusal> {
     let Some(value) = object.get(field) else {
         return Err(body_error(json!({
             "type": "missing",
@@ -471,8 +471,7 @@ fn parse_archive(body: &Bytes) -> Result<bool, Refusal> {
 
 fn parse_budget_currency(body: &Bytes) -> Result<&'static str, Refusal> {
     let object = body_object(body)?;
-    literal_field(&object, "budget_currency", &BUDGET_CURRENCIES, true)?
-        .ok_or_else(internal_error)
+    literal_field(&object, "budget_currency", &BUDGET_CURRENCIES, true)?.ok_or_else(internal_error)
 }
 
 fn parse_cost_centre(body: &Bytes) -> Result<Option<String>, Refusal> {
@@ -776,13 +775,10 @@ pub async fn register_tenant(
         return Err(internal_error());
     };
     let id = Uuid::try_parse(&tenant_id).map_err(|_| internal_error())?;
-    if let Some(existing) = tenants_crud::get_tenant(pool, id)
-        .await
-        .map_err(|error| {
-            tracing::error!(%error, "Failed to register tenant");
-            internal_error()
-        })?
-    {
+    if let Some(existing) = tenants_crud::get_tenant(pool, id).await.map_err(|error| {
+        tracing::error!(%error, "Failed to register tenant");
+        internal_error()
+    })? {
         if existing.owner_key != owner {
             if user.cross_owner {
                 tenants_crud::audit_cross_owner(&user, "tenant_register", &existing);
@@ -822,17 +818,20 @@ pub async fn register_tenant(
         budget_currency: parsed.budget_currency,
         owner_key: &owner,
     };
-    let row = tenants_crud::ensure_tenant(pool, &new).await.map_err(|error| {
-        match error {
-            TenantWriteError::NameTaken => name_taken(&parsed.name, " by this app"),
-            // `ensure_tenant`'s ClientSafeError arms: the message is caller-authored
-            // (the id and the caller's own body), so the route may echo it.
-            TenantWriteError::PrincipalId(message) | TenantWriteError::InvalidValue(message) => {
-                Refusal::detail(StatusCode::CONFLICT, message)
+    let row = tenants_crud::ensure_tenant(pool, &new)
+        .await
+        .map_err(|error| {
+            match error {
+                TenantWriteError::NameTaken => name_taken(&parsed.name, " by this app"),
+                // `ensure_tenant`'s ClientSafeError arms: the message is caller-authored
+                // (the id and the caller's own body), so the route may echo it.
+                TenantWriteError::PrincipalId(message)
+                | TenantWriteError::InvalidValue(message) => {
+                    Refusal::detail(StatusCode::CONFLICT, message)
+                }
+                other => database_error(other),
             }
-            other => database_error(other),
-        }
-    })?;
+        })?;
     tracing::info!(
         tenant = %row.id,
         name = %row.name,
@@ -880,8 +879,8 @@ pub async fn rename_tenant(
     let Some(pool) = state.pool.as_ref() else {
         return Err(internal_error());
     };
-    let tenant = tenants_crud::resolve_owned_tenant(pool, &user, &name_or_id, "tenant_rename")
-        .await?;
+    let tenant =
+        tenants_crud::resolve_owned_tenant(pool, &user, &name_or_id, "tenant_rename").await?;
     let updated = tenants_crud::rename_tenant(pool, tenant.id, &new_name)
         .await
         .map_err(|error| match error {
@@ -942,8 +941,8 @@ pub async fn set_tenant_archived(
     let Some(pool) = state.pool.as_ref() else {
         return Err(internal_error());
     };
-    let tenant = tenants_crud::resolve_owned_tenant(pool, &user, &name_or_id, "tenant_archive")
-        .await?;
+    let tenant =
+        tenants_crud::resolve_owned_tenant(pool, &user, &name_or_id, "tenant_archive").await?;
     let selected = tenant.id.to_string();
     let updated = tenants_crud::set_tenant_archived(pool, tenant.id, archived)
         .await
@@ -1114,19 +1113,19 @@ pub async fn set_tenant_budget_currency(
 ) -> Result<Json<TenantResponse>, Refusal> {
     require_any_realm_role(
         &user,
-        &["license-admin", "license-manager", BUDGET_CURRENCY_CHANGE_ROLE],
+        &[
+            "license-admin",
+            "license-manager",
+            BUDGET_CURRENCY_CHANGE_ROLE,
+        ],
     )?;
     let currency = parse_budget_currency(&body)?;
     let Some(pool) = state.pool.as_ref() else {
         return Err(internal_error());
     };
-    let tenant = tenants_crud::resolve_owned_tenant(
-        pool,
-        &user,
-        &name_or_id,
-        "tenant_budget_currency",
-    )
-    .await?;
+    let tenant =
+        tenants_crud::resolve_owned_tenant(pool, &user, &name_or_id, "tenant_budget_currency")
+            .await?;
     let mut actor = user.sub.clone();
     let mut allow_change = user.has_realm_role(BUDGET_CURRENCY_CHANGE_ROLE);
     if let Some(forwarded) = forwarded_authority(&state, &user, &headers, &tenant).await? {
@@ -1202,25 +1201,16 @@ pub async fn set_tenant_cost_centre(
     let Some(pool) = state.pool.as_ref() else {
         return Err(internal_error());
     };
-    let tenant = tenants_crud::resolve_owned_tenant(
-        pool,
-        &user,
-        &name_or_id,
-        "tenant_cost_centre",
-    )
-    .await?;
-    let updated = tenants_crud::set_tenant_cost_centre(
-        pool,
-        tenant.id,
-        cost_centre.as_deref(),
-    )
-    .await
-    .map_err(|error| match error {
-        TenantWriteError::InvalidCostCentre(message) => {
-            Refusal::detail(StatusCode::UNPROCESSABLE_ENTITY, message)
-        }
-        other => database_error(other),
-    })?;
+    let tenant =
+        tenants_crud::resolve_owned_tenant(pool, &user, &name_or_id, "tenant_cost_centre").await?;
+    let updated = tenants_crud::set_tenant_cost_centre(pool, tenant.id, cost_centre.as_deref())
+        .await
+        .map_err(|error| match error {
+            TenantWriteError::InvalidCostCentre(message) => {
+                Refusal::detail(StatusCode::UNPROCESSABLE_ENTITY, message)
+            }
+            other => database_error(other),
+        })?;
     let Some(row) = updated else {
         return Err(tenant_not_found());
     };

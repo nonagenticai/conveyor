@@ -41,8 +41,8 @@ use uuid::Uuid;
 
 use crate::auth::User;
 use crate::db::issuance::require_known_owner;
-use crate::error::Refusal;
 use crate::db::owners::owner_can_access_tenant;
+use crate::error::Refusal;
 
 /// `models.TENANT_KINDS` / `ck_tenants_kind`.
 pub const TENANT_KINDS: [&str; 5] = ["customer", "internal", "service", "test", "unclassified"];
@@ -50,7 +50,14 @@ pub const TENANT_KINDS: [&str; 5] = ["customer", "internal", "service", "test", 
 pub const BUDGET_CURRENCIES: [&str; 3] = ["EUR", "USD", "CAD"];
 /// `models.COST_CENTRES` / `ck_tenants_cost_centre`. A CLOSED vocabulary: this is a
 /// join key, and an unlisted value cannot be told apart from a typo.
-pub const COST_CENTRES: [&str; 6] = ["service", "tests", "customers", "ci", "improvement", "merqi"];
+pub const COST_CENTRES: [&str; 6] = [
+    "service",
+    "tests",
+    "customers",
+    "ci",
+    "improvement",
+    "merqi",
+];
 /// `models.PLATFORM_OWNER` — never granted its own tenants (it owns them).
 pub const PLATFORM_OWNER: &str = "platform";
 /// `models.PLATFORM_GRANT_BY` — the `granted_by` on the platform's automatic grant.
@@ -197,9 +204,7 @@ pub async fn resolve_scoped(
         return Ok(Scoped::NotFound);
     }
     if cross_owner {
-        let sql = format!(
-            "{SELECT_TENANT} WHERE t.name = $1 AND t.archived_at IS NULL LIMIT 2"
-        );
+        let sql = format!("{SELECT_TENANT} WHERE t.name = $1 AND t.archived_at IS NULL LIMIT 2");
         let rows: Vec<TenantRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
             .bind(name_or_id)
             .fetch_all(pool)
@@ -404,11 +409,10 @@ fn unique_violation(error: &sqlx::Error) -> Option<&str> {
 
 /// `_require_owner_row` — a named owner must exist (`tenant_owner.key`).
 async fn require_owner_row(pool: &PgPool, owner_key: &str) -> Result<(), TenantWriteError> {
-    let found: Option<String> =
-        sqlx::query_scalar("SELECT key FROM tenant_owner WHERE key = $1")
-            .bind(owner_key)
-            .fetch_optional(pool)
-            .await?;
+    let found: Option<String> = sqlx::query_scalar("SELECT key FROM tenant_owner WHERE key = $1")
+        .bind(owner_key)
+        .fetch_optional(pool)
+        .await?;
     match found {
         Some(_) => Ok(()),
         None => Err(TenantWriteError::UnknownOwner),
@@ -731,17 +735,14 @@ pub async fn set_tenant_archived(
         }
     }
     let updated: Option<TenantRow> = if archived && tenant.archived_at.is_none() {
-        let sql = format!(
-            "UPDATE tenants SET archived_at = now() WHERE id = $1 {RETURNING_TENANT}"
-        );
+        let sql =
+            format!("UPDATE tenants SET archived_at = now() WHERE id = $1 {RETURNING_TENANT}");
         sqlx::query_as(sqlx::AssertSqlSafe(sql))
             .bind(tenant.id)
             .fetch_optional(&mut *tx)
             .await?
     } else if !archived {
-        let sql = format!(
-            "UPDATE tenants SET archived_at = NULL WHERE id = $1 {RETURNING_TENANT}"
-        );
+        let sql = format!("UPDATE tenants SET archived_at = NULL WHERE id = $1 {RETURNING_TENANT}");
         sqlx::query_as(sqlx::AssertSqlSafe(sql))
             .bind(tenant.id)
             .fetch_optional(&mut *tx)
@@ -822,9 +823,7 @@ pub async fn set_tenant_budget_currency(
         let _ = tx.rollback().await;
         return Err(BudgetCurrencyError::Immutable);
     }
-    let sql = format!(
-        "UPDATE tenants SET budget_currency = $2 WHERE id = $1 {RETURNING_TENANT}"
-    );
+    let sql = format!("UPDATE tenants SET budget_currency = $2 WHERE id = $1 {RETURNING_TENANT}");
     let updated: Option<TenantRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant_id)
         .bind(budget_currency)
@@ -863,9 +862,7 @@ pub async fn set_tenant_cost_centre(
             COST_CENTRES.join(", ")
         )));
     }
-    let sql = format!(
-        "UPDATE tenants SET cost_centre = $2 WHERE id = $1 {RETURNING_TENANT}"
-    );
+    let sql = format!("UPDATE tenants SET cost_centre = $2 WHERE id = $1 {RETURNING_TENANT}");
     Ok(sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant_id)
         .bind(cost_centre)

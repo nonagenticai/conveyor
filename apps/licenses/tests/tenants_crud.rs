@@ -248,10 +248,8 @@ async fn seeded() -> common::TestDb {
         .expect("tenant");
     }
     // An ACTIVE grant on T1 to w2v (the grantee case) and a REVOKED one on T2 to w2v.
-    for (tenant, grantee, revoked) in [
-        (T1, "w2v", None),
-        (T2, "w2v", Some("2026-03-01T00:00:00Z")),
-    ] {
+    for (tenant, grantee, revoked) in [(T1, "w2v", None), (T2, "w2v", Some("2026-03-01T00:00:00Z"))]
+    {
         sqlx::query(
             "INSERT INTO tenant_app_grant (tenant_id, grantee_owner_key, granted_by, revoked_at)
              VALUES ($1, $2, 'test', $3::timestamptz)",
@@ -265,13 +263,11 @@ async fn seeded() -> common::TestDb {
     }
 
     // One licence + token on T1: archiving must leave all of them intact.
-    sqlx::query(
-        "INSERT INTO app (id, key, name, created_at) VALUES ($1, 'demo', 'Demo', now())",
-    )
-    .bind(APP)
-    .execute(&db.pool)
-    .await
-    .expect("app");
+    sqlx::query("INSERT INTO app (id, key, name, created_at) VALUES ($1, 'demo', 'Demo', now())")
+        .bind(APP)
+        .execute(&db.pool)
+        .await
+        .expect("app");
     sqlx::query(
         "INSERT INTO plan (id, app_id, code, name, created_at)
          VALUES ($1, $2, 'basic', 'Basic', now())",
@@ -341,10 +337,7 @@ async fn the_listing_is_role_scoped_filtered_and_ordered() {
     )
     .await;
     assert_eq!(status, StatusCode::OK, "{body}");
-    assert_eq!(
-        ids(&body),
-        uuids(&[T7, T6, T5, T4, T3, T2, T1])
-    );
+    assert_eq!(ids(&body), uuids(&[T7, T6, T5, T4, T3, T2, T1]));
 
     // The captured eleven-property row, explicit nulls included.
     let acme = body
@@ -372,24 +365,44 @@ async fn the_listing_is_role_scoped_filtered_and_ordered() {
     );
 
     // A license-admin owned by fr sees what fr may ACT ON: owned + actively granted only.
-    let (status, body) = get_json(route(&db, user(&["license-admin"], None, Some("fr"))), "/tenants").await;
+    let (status, body) = get_json(
+        route(&db, user(&["license-admin"], None, Some("fr"))),
+        "/tenants",
+    )
+    .await;
     assert_eq!(status, StatusCode::OK, "{body}");
     assert_eq!(ids(&body), uuids(&[T7, T5, T1]));
     // w2v owns nothing but holds the ACTIVE grant on T1; its revoked T2 grant is not access.
-    let (status, body) = get_json(route(&db, user(&["license-admin"], None, Some("w2v"))), "/tenants").await;
+    let (status, body) = get_json(
+        route(&db, user(&["license-admin"], None, Some("w2v"))),
+        "/tenants",
+    )
+    .await;
     assert_eq!(status, StatusCode::OK, "{body}");
     assert_eq!(ids(&body), uuids(&[T1]));
 
     // A plain license-reader is its own tenant only — and needs a tenant context at all.
-    let (status, body) = get_json(route(&db, user(&["license-reader"], Some(T1), None)), "/tenants").await;
+    let (status, body) = get_json(
+        route(&db, user(&["license-reader"], Some(T1), None)),
+        "/tenants",
+    )
+    .await;
     assert_eq!(status, StatusCode::OK, "{body}");
     assert_eq!(ids(&body), uuids(&[T1]));
-    let (status, body) = get_json(route(&db, user(&["license-reader"], None, None)), "/tenants").await;
+    let (status, body) = get_json(
+        route(&db, user(&["license-reader"], None, None)),
+        "/tenants",
+    )
+    .await;
     assert_eq!(status, StatusCode::UNAUTHORIZED, "{body}");
     assert_eq!(body, json!({"detail": "Missing tenant context"}));
 
     // license-manager is not a read role here.
-    let (status, body) = get_json(route(&db, user(&["license-manager"], None, None)), "/tenants").await;
+    let (status, body) = get_json(
+        route(&db, user(&["license-manager"], None, None)),
+        "/tenants",
+    )
+    .await;
     assert_eq!(status, StatusCode::FORBIDDEN, "{body}");
     assert_eq!(
         body,
@@ -430,7 +443,10 @@ async fn create_mints_a_tenant_with_the_platform_grant_and_is_idempotent_by_exte
     assert!(body["external_ref"].is_null());
     assert!(body["archived_at"].is_null());
     assert!(
-        body["created_at"].as_str().expect("created_at").ends_with("+00:00"),
+        body["created_at"]
+            .as_str()
+            .expect("created_at")
+            .ends_with("+00:00"),
         "{body}"
     );
     let id = Uuid::try_parse(body["id"].as_str().expect("id")).expect("uuid");
@@ -513,7 +529,10 @@ async fn create_mints_a_tenant_with_the_platform_grant_and_is_idempotent_by_exte
     )
     .await;
     assert_eq!(status, StatusCode::FORBIDDEN, "{body}");
-    assert_eq!(body, json!({"detail": "One of roles required: license-admin, license-manager"}));
+    assert_eq!(
+        body,
+        json!({"detail": "One of roles required: license-admin, license-manager"})
+    );
     for (payload, entry_type, loc) in [
         (json!({}), "missing", json!(["body", "name"])),
         (
@@ -534,7 +553,11 @@ async fn create_mints_a_tenant_with_the_platform_grant_and_is_idempotent_by_exte
             Some(payload.clone()),
         )
         .await;
-        assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "{payload}: {body}");
+        assert_eq!(
+            status,
+            StatusCode::UNPROCESSABLE_ENTITY,
+            "{payload}: {body}"
+        );
         assert_eq!(body["detail"][0]["type"], entry_type, "{payload}: {body}");
         assert_eq!(body["detail"][0]["loc"], loc, "{payload}: {body}");
     }
@@ -565,7 +588,10 @@ async fn register_is_an_idempotent_upsert_scoped_to_the_owner() {
         "SELECT count(*) FROM tenant_app_grant WHERE grantee_owner_key = 'platform'",
     )
     .await;
-    assert_eq!(grants, 1, "one platform grant per non-platform tenant created");
+    assert_eq!(
+        grants, 1,
+        "one platform grant per non-platform tenant created"
+    );
 
     // Idempotent: the same id returns 200 UNCHANGED; a grantee's body name is ignored.
     let (status, body) = send(
@@ -635,7 +661,12 @@ async fn register_is_an_idempotent_upsert_scoped_to_the_owner() {
     )
     .await;
     assert_eq!(status, StatusCode::BAD_REQUEST, "{body}");
-    assert!(body["detail"].as_str().expect("detail").contains("Invalid path tenant_id 'not-a-uuid'"));
+    assert!(
+        body["detail"]
+            .as_str()
+            .expect("detail")
+            .contains("Invalid path tenant_id 'not-a-uuid'")
+    );
 
     // A Keycloak principal id may never be registered as a tenant.
     let principal = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_2888);
@@ -725,14 +756,25 @@ async fn get_resolves_by_id_or_name_and_never_leaks_a_foreign_tenant() {
         assert_eq!(body, json!({"detail": "Tenant not found"}));
     }
     // No tenant context at all is a 401.
-    let (status, body) = get_json(route(&db, user(&["license-reader"], None, None)), "/tenants/acme").await;
+    let (status, body) = get_json(
+        route(&db, user(&["license-reader"], None, None)),
+        "/tenants/acme",
+    )
+    .await;
     assert_eq!(status, StatusCode::UNAUTHORIZED, "{body}");
     assert_eq!(body, json!({"detail": "Missing tenant context"}));
 
     // A role that may not read is refused with the reference's detail.
-    let (status, body) = get_json(route(&db, user(&["license-manager"], Some(T1), None)), "/tenants/acme").await;
+    let (status, body) = get_json(
+        route(&db, user(&["license-manager"], Some(T1), None)),
+        "/tenants/acme",
+    )
+    .await;
     assert_eq!(status, StatusCode::FORBIDDEN, "{body}");
-    assert_eq!(body, json!({"detail": "One of roles required: license-admin, license-reader"}));
+    assert_eq!(
+        body,
+        json!({"detail": "One of roles required: license-admin, license-reader"})
+    );
 }
 
 #[tokio::test]
@@ -1132,11 +1174,12 @@ async fn cost_centre_is_validated_against_the_closed_vocabulary() {
     .await;
     assert_eq!(status, StatusCode::OK, "{body}");
     assert_eq!(body["cost_centre"], "ci");
-    let stored: Option<String> = sqlx::query_scalar("SELECT cost_centre FROM tenants WHERE id = $1")
-        .bind(T7)
-        .fetch_one(&db.pool)
-        .await
-        .expect("row");
+    let stored: Option<String> =
+        sqlx::query_scalar("SELECT cost_centre FROM tenants WHERE id = $1")
+            .bind(T7)
+            .fetch_one(&db.pool)
+            .await
+            .expect("row");
     assert_eq!(stored.as_deref(), Some("ci"));
 
     // `null` CLEARS the value deliberately.
