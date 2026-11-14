@@ -65,6 +65,13 @@ fn project_error(error: store::project::ProjectStoreError, action: &str) -> Acti
             "conflict",
             "every derived key for this title is taken; supply an explicit `key`",
         ),
+        store::project::ProjectStoreError::NotFound => ActionError::resource_not_found("project"),
+        store::project::ProjectStoreError::VersionMismatch { current } => {
+            ActionError::precondition(format!(
+                "{action}: the project is at version {}, not the version the caller supplied",
+                current.get()
+            ))
+        }
         store::project::ProjectStoreError::Database(error) => store_error(error, action),
     }
 }

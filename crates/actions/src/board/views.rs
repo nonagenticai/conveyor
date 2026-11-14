@@ -115,6 +115,32 @@ pub struct ProjectCloseIn {
     pub reason: Option<String>,
 }
 
+/// `projects.update` — a version-guarded edit of the project's own fields.
+///
+/// Every field is optional; a field that is absent is unchanged. `status` uses the same vocabulary
+/// as the table (`draft | active | paused | closed | archived`); closing and archiving have their
+/// own action (`projects.close`), so this is for an explicit edit, not the close transition.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProjectUpdateIn {
+    /// The project id.
+    pub id: Uuid,
+    /// The new display name.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// The new description.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    /// The new status.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+    /// The source repository.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub repo_url: Option<String>,
+    /// Metadata merged into the row (keys absent from the patch are preserved).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Value>,
+}
+
 /// `projects.execute` — start (or re-attach to) the project's durable execution task.
 ///
 /// The action is S06c's task *start*: over `/mcp` it returns `resultType:"task"` whose task id

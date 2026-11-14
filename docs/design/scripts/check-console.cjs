@@ -52,6 +52,19 @@ const PROJECT = {
 
 function freshState() {
   return {
+    project: JSON.parse(JSON.stringify(PROJECT)),
+    documents: [],
+    repositories: [],
+    publish: null,
+    issues: [
+      {
+        number: 9,
+        title: "The Plan board needs a per-project filter",
+        state: "OPEN",
+        url: "https://github.com/nonagenticai/conveyor/issues/9",
+        labels: [{ name: "feedback" }],
+      },
+    ],
     cards: [
       {
         id: "c-1",
@@ -78,6 +91,7 @@ function freshState() {
     requests: [],
     failProjects: 0,
     failMove: 0,
+    failDocument: 0,
   };
 }
 
@@ -108,6 +122,10 @@ function startServer({ config, state }) {
       if (!config) return json(res, 404, { title: "Not Found" });
       return json(res, 200, config);
     }
+    if (pathname === "/data/issues.json") {
+      // A feedback issue the panel can intake into a project.
+      return json(res, 200, { issues: state.issues });
+    }
     if (pathname.startsWith("/api/")) {
       state.requests.push({ method: req.method, path: `${pathname}${url.search}`, headers: req.headers });
       if (pathname === "/api/me" && req.method === "GET") {
@@ -126,6 +144,17 @@ function startServer({ config, state }) {
           "cards.claim",
           "cards.release",
           "catalogues.list",
+          "documents.compose",
+          "documents.get",
+          "documents.list",
+          "documents.update",
+          "projects.update",
+          "publish.start",
+          "publish.status",
+          "repositories.create",
+          "repositories.list",
+          "repositories.update",
+          "secrets.create",
         ];
         return json(res, 200, {
           actions: names.map((name) => ({
@@ -142,10 +171,10 @@ function startServer({ config, state }) {
       }
       if (pathname === "/api/projects" && req.method === "GET") {
         if (state.failProjects) return json(res, state.failProjects, { title: "Unauthorized", detail: "authentication required" });
-        return json(res, 200, { items: [PROJECT], next_cursor: null });
+        return json(res, 200, { items: [state.project], next_cursor: null });
       }
       if (pathname === "/api/projects/p-s02" && req.method === "GET") {
-        return json(res, 200, { project: PROJECT, boards: [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }] });
+        return json(res, 200, { project: state.project, boards: [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }] });
       }
       if (pathname === "/api/boards/b-s02" && req.method === "GET") {
         return json(res, 200, boardView());
@@ -170,16 +199,20 @@ function startServer({ config, state }) {
           const input = body.input || {};
           assert.equal(input.board_id, "b-s02", "cards.create sends the board");
           assert.equal(input.list_id, "l-intake", "cards.create sends the intake lane");
-          assert.equal(input.meta && input.meta.issue, 3, "cards.create carries the issue link");
+          assert.ok(
+            ["3", "9"].includes(String(input.meta && input.meta.issue)),
+            "cards.create carries the issue link",
+          );
           assert.equal(input.card_type_code, "architecture_task", "cards.create sends the card type");
+          const id = `c-${state.cards.length + 1}`;
           state.cards.push({
-            id: "c-2",
+            id,
             board_id: "b-s02",
             list_id: input.list_id,
             card_type_code: input.card_type_code,
             name: input.name,
             description: "",
-            position: 2,
+            position: state.cards.length + 1,
             parent_card_id: null,
             due_at: null,
             due_done_at: null,
@@ -192,7 +225,7 @@ function startServer({ config, state }) {
             created_at: "2026-11-13T00:00:00Z",
             updated_at: "2026-11-13T00:00:00Z",
           });
-          json(res, 201, { id: "c-2", name: input.name, version: 1 });
+          json(res, 201, { id, name: input.name, version: 1 });
         });
         return;
       }
@@ -242,6 +275,181 @@ function startServer({ config, state }) {
           card.assignee_id = null;
           card.version += 1;
           json(res, 200, card);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/projects.update/invocations") {
+        return readBody(req, (body) => {
+          try {
+            const input = body.input || {};
+            assert.equal(input.id, "p-s02", "projects.update names the project");
+            assert.equal(req.headers["if-match"], `"${state.project.version}"`, "projects.update carries If-Match");
+            for (const key of ["name", "description", "status", "repo_url"]) {
+              if (input[key] !== undefined) state.project[key] = input[key];
+            }
+            if (input.meta) state.project.meta = Object.assign({}, state.project.meta, input.meta);
+            state.project.version += 1;
+            json(res, 200, {
+              project: state.project,
+              boards: [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }],
+            });
+          } catch (error) {
+            console.error("stub projects.update:", error);
+            json(res, 500, { title: "Internal", detail: String(error) });
+          }
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.project_id, "p-s02", "documents.list is scoped to the project");
+          const items = state.documents.map((doc) => {
+            const summary = Object.assign({}, doc);
+            delete summary.body;
+            return summary;
+          });
+          json(res, 200, { items, next_cursor: null });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.compose/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.project_id, "p-s02", "documents.compose is scoped to the project");
+          assert.ok(input.title && input.body, "documents.compose sends a title and a body");
+          const doc = {
+            id: `d-${state.documents.length + 1}`,
+            project_id: input.project_id,
+            card_id: input.card_id || null,
+            kind: "document",
+            title: input.title,
+            status: "active",
+            content_type: "text/markdown",
+            size_bytes: input.body.length,
+            content_hash: "a".repeat(64),
+            body: input.body,
+            external_ref: null,
+            meta: {},
+            publishable: !!input.publishable,
+            version: 1,
+            created_at: "2026-11-13T00:00:00Z",
+            updated_at: "2026-11-13T00:00:00Z",
+          };
+          state.documents.unshift(doc);
+          json(res, 201, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.get/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          if (!doc) return json(res, 404, { title: "Not Found", detail: "no such document" });
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.update/invocations") {
+        return readBody(req, (body) => {
+          if (state.failDocument) {
+            return json(res, state.failDocument, {
+              title: "Precondition Failed",
+              detail: "documents.update: the row moved",
+            });
+          }
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.update names a real document");
+          assert.equal(req.headers["if-match"], `"${doc.version}"`, "documents.update carries If-Match");
+          if (body.input.title !== undefined) doc.title = body.input.title;
+          if (body.input.body !== undefined) {
+            doc.body = body.input.body;
+            doc.size_bytes = body.input.body.length;
+          }
+          if (body.input.publishable !== undefined) doc.publishable = body.input.publishable;
+          doc.version += 1;
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/repositories.list/invocations") {
+        return readBody(req, () => json(res, 200, { items: state.repositories }));
+      }
+      if (pathname === "/api/actions/secrets.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.ok(input.name && input.value, "secrets.create sends a name and a value");
+          json(res, 201, {
+            id: `s-${Date.now()}`,
+            name: input.name,
+            scope: input.scope || "tenant",
+            key_id: "k-1",
+            version: 1,
+            created_at: "2026-11-13T00:00:00Z",
+          });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/repositories.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.ok(input.url, "repositories.create sends a URL");
+          const repo = {
+            id: `r-${state.repositories.length + 1}`,
+            provider: "github",
+            url: input.url,
+            default_branch: input.default_branch || "main",
+            installation_ref: null,
+            credential_secret_id: input.credential_secret_id || null,
+            version: 1,
+            created_at: "2026-11-13T00:00:00Z",
+            updated_at: "2026-11-13T00:00:00Z",
+          };
+          state.repositories.push(repo);
+          json(res, 201, repo);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/repositories.update/invocations") {
+        return readBody(req, (body) => {
+          const repo = state.repositories.find((row) => row.id === body.input.id);
+          assert.ok(repo, "repositories.update names a real repository");
+          assert.equal(req.headers["if-match"], `"${repo.version}"`, "repositories.update carries If-Match");
+          if (body.input.credential_secret_id !== undefined) {
+            repo.credential_secret_id = body.input.credential_secret_id;
+          }
+          repo.version += 1;
+          json(res, 200, repo);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/publish.start/invocations") {
+        return readBody(req, (body) => {
+          const repo = state.repositories.find((row) => row.id === body.input.repository_id);
+          assert.ok(repo, "publish.start names a real repository");
+          assert.ok(repo.credential_secret_id, "publish.start targets a repository with a token");
+          state.publish = { state: "pending", job_id: "j-1", pr_url: null };
+          json(res, 200, { job_id: "j-1", state: "pending", already_running: false });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/publish.status/invocations") {
+        return readBody(req, (body) => {
+          if (!state.publish) {
+            return json(res, 200, {
+              state: "none",
+              job_id: null,
+              pr_url: null,
+              error: null,
+              generated_at: null,
+              snapshot_sha256: null,
+              outputs: null,
+            });
+          }
+          state.publish.state = "succeeded";
+          state.publish.pr_url = "https://github.com/nonagenticai/nonagentic_homepage/pull/7";
+          state.publish.generated_at = "2026-11-13T00:00:00Z";
+          state.publish.snapshot_sha256 = "b".repeat(64);
+          state.publish.outputs = 1;
+          json(res, 200, state.publish);
         });
         return;
       }
@@ -315,6 +523,23 @@ function readBody(req, done) {
         "no write control without a config",
       );
       assert.equal(homepage.requests.length, 0, "no API request without a config");
+      await page.goto(`http://127.0.0.1:${homepageServer.port}/studio.html#projects`);
+      await page.waitForSelector(".page");
+      assert.equal(
+        await page.locator('[data-v2="console-signin"]').count(),
+        0,
+        "no sign-in on the homepage projects page",
+      );
+      assert.equal(
+        await page
+          .locator(
+            '[data-v2="project-new"], [data-v2="project-edit"], [data-v2="project-close"], [data-v2="project-execute"], [data-v2="output-new"], [data-v2="publish-start"]',
+          )
+          .count(),
+        0,
+        "no workspace write control without a config",
+      );
+      assert.equal(homepage.requests.length, 0, "no API request from the homepage projects page");
       await page.screenshot({ path: shot("console-homepage.png"), fullPage: true });
       await page.close();
     }
@@ -332,6 +557,18 @@ function readBody(req, done) {
         "no write control before signing in",
       );
       assert.equal(signedOutState.requests.length, 0, "no API request before signing in");
+      await page.goto(`http://127.0.0.1:${signedOutServer.port}/studio.html#projects`);
+      await page.waitForSelector('[data-v2="console-signin"]');
+      assert.equal(
+        await page
+          .locator(
+            '[data-v2="project-new"], [data-v2="project-edit"], [data-v2="project-close"], [data-v2="project-execute"], [data-v2="output-new"], [data-v2="publish-start"]',
+          )
+          .count(),
+        0,
+        "no workspace write control before signing in",
+      );
+      assert.equal(signedOutState.requests.length, 0, "no API request on the signed-out projects page");
       await page.close();
     }
 
@@ -384,9 +621,96 @@ function readBody(req, done) {
       await page.waitForSelector("text=Claim released");
       assert.equal(consoleState.cards.find((row) => row.id === "c-1").assignee_id, null);
 
-      // 412 is rendered, not retried
+      // ── the programme workspace: project edit, output, feedback, publish ─────────────
       await page.click('#dialog [data-action="close-dialog"]');
       await page.waitForFunction(() => !document.getElementById("dialog").open);
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#projects`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForSelector('[data-v2-input="project-page"]');
+      assert.match(
+        await page.locator('[data-v2-input="project-page"]').innerText(),
+        /S02/,
+        "the project page lists the tenant's projects",
+      );
+
+      await page.click('[data-v2="project-edit"][data-id="p-s02"]');
+      await page.waitForSelector("#project-name");
+      await page.fill("#project-name", "Skeleton — edited in the console");
+      await page.click('[data-v2="project-save"][data-id="p-s02"]');
+      await page.waitForSelector("text=Project updated");
+      assert.ok(
+        consoleState.requests.some((row) => row.path === "/api/actions/projects.update/invocations"),
+        "projects.update was sent",
+      );
+      assert.equal(
+        consoleState.project.name,
+        "Skeleton — edited in the console",
+        "the stub applied the edit",
+      );
+
+      await page.waitForSelector('[data-v2="output-new"][data-project="p-s02"]');
+      await page.click('[data-v2="output-new"][data-project="p-s02"]');
+      await page.waitForSelector("#output-title");
+      await page.fill("#output-title", "S02 design note");
+      await page.fill("#output-body", "# Design note\n\nA decision recorded from the console.");
+      await page.check("#output-publishable");
+      await page.click('[data-v2="output-save"][data-project="p-s02"]');
+      await page.waitForSelector("text=Output saved and marked public");
+      assert.ok(
+        consoleState.requests.some((row) => row.path === "/api/actions/documents.compose/invocations"),
+        "documents.compose was sent",
+      );
+      await page.waitForSelector('[data-v2="output-read"][data-id="d-1"]');
+      assert.match(await page.locator("#main").innerText(), /S02 design note/, "the output is listed");
+
+      await page.click('[data-v2="output-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Output unpublished");
+      assert.ok(
+        consoleState.requests.some((row) => row.path === "/api/actions/documents.update/invocations"),
+        "documents.update was sent",
+      );
+      assert.equal(consoleState.documents[0].publishable, false, "the publish flag crossed the wire");
+
+      await page.click('[data-v2="feedback-intake"][data-issue="9"]');
+      await page.waitForSelector("text=Issue #9 intaken as a card");
+      assert.ok(
+        consoleState.cards.some((card) => card.meta && card.meta.issue === 9),
+        "the feedback issue became a card",
+      );
+
+      assert.ok(
+        (await page.locator('button[disabled]:has-text("Publish the design site")').count()) >= 1,
+        "publish is disabled without a target",
+      );
+      await page.click("summary:has-text('Connect a homepage repository')");
+      await page.fill("#publish-token", "ghp_test_token");
+      await page.click('[data-v2="publish-connect"]');
+      await page.waitForSelector("text=Publish target connected");
+      assert.ok(
+        consoleState.requests.some((row) => row.path === "/api/actions/repositories.create/invocations"),
+        "repositories.create was sent",
+      );
+      await page.waitForSelector('[data-v2="publish-start"]');
+      await page.click('[data-v2="publish-start"]');
+      await page.waitForSelector("text=Publish enqueued");
+      await page.waitForSelector(
+        'a[href="https://github.com/nonagenticai/nonagentic_homepage/pull/7"]',
+      );
+      assert.ok(
+        consoleState.requests.some((row) => row.path === "/api/actions/publish.start/invocations"),
+        "publish.start was sent",
+      );
+      assert.equal(
+        consoleState.publish.pr_url,
+        "https://github.com/nonagenticai/nonagentic_homepage/pull/7",
+        "the stub reports the PR",
+      );
+
+      // back to the Plan board for the 412/401 honesty checks
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#plan`);
+      await page.waitForSelector('[data-v2-input="plan-project"]');
+
+      // 412 is rendered, not retried
       consoleState.failMove = 412;
       await page.waitForTimeout(150);
       await page.click('[data-v2="console-card"][data-id="c-1"]');
@@ -407,7 +731,10 @@ function readBody(req, done) {
       await page.close();
     }
 
-    console.log("check-console: 3 servers · homepage + signed-out 0 API requests · signed-in intake/move/comment/claim/release");
+    console.log(
+      "check-console: 3 servers · homepage + signed-out 0 API requests · signed-in cards, projects," +
+        " outputs, feedback and publish",
+    );
     console.log("check-console: 412 and 401 paths rendered; 0 unhandled page errors");
   } finally {
     await browser.close();

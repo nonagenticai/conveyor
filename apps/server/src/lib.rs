@@ -14,6 +14,8 @@ pub mod eval_worker;
 pub mod export;
 pub mod memory_consolidate;
 pub mod prompt_audit_run;
+pub mod publish;
+pub mod publish_outputs;
 pub mod sandbox;
 pub mod seed;
 pub mod shutdown;

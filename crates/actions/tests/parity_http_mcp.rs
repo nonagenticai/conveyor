@@ -1594,7 +1594,7 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
                 ctx.push(sample.name, finding_id);
             }
         }
-        "projects.close" | "projects.execute" => {
+        "projects.close" | "projects.execute" | "projects.update" => {
             let id = seed_project(pg, ctx).await;
             ctx.push(sample.name, id);
         }
@@ -1995,7 +1995,10 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
                 .await
                 .expect("clear the parity repository");
         }
-        "repositories.get" | "repositories.delete" | "repositories.link" => {
+        "repositories.get"
+        | "repositories.delete"
+        | "repositories.link"
+        | "repositories.update" => {
             let id = seed_repository(pg, ctx).await;
             ctx.push(sample.name, id);
         }
@@ -2328,6 +2331,32 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             expect_status: None,
         },
         on_prepared("projects.close", None),
+        Sample {
+            // A fresh project at version 1; the sample edits its own row, so the two transports
+            // compare one edit and one replay.
+            name: "projects.update",
+            input: Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("projects.update"), "name": "Parity project (edited)"}),
+            ),
+            if_match: Some("\"1\""),
+            prepare: true,
+            deterministic: false,
+            expect_status: Some(200),
+        },
+        // The publish action's refusal without a configured repository is still one contract on
+        // both transports; the configured path is covered by `publish_job` and the live proof.
+        expecting(
+            plain("publish.start", json!({"repository_id": Uuid::nil()}), None),
+            404,
+        ),
+        expecting(
+            plain(
+                "publish.status",
+                json!({"repository_id": Uuid::nil()}),
+                None,
+            ),
+            200,
+        ),
         read_of("boards.get", "board_id"),
         plain(
             "boards.set_member",
@@ -3137,6 +3166,17 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         on_prepared("repositories.get", None),
+        Sample {
+            // A fresh repository at version 1; the edit and its replay compare one change.
+            name: "repositories.update",
+            input: Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("repositories.update"), "default_branch": "trunk"}),
+            ),
+            if_match: Some("\"1\""),
+            prepare: true,
+            deterministic: false,
+            expect_status: Some(200),
+        },
         plain("repositories.list", json!({}), None),
         on_prepared("repositories.delete", Some("\"1\"")),
         {
@@ -3200,6 +3240,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 "content_base64": "aGVsbG8gcGFyaXR5",
             }),
             None,
+        ),
+        expecting(
+            plain(
+                "documents.compose",
+                json!({"title": "Parity output", "body": "# Parity\n\nA note from the console."}),
+                None,
+            ),
+            201,
         ),
         plain(
             "documents.report",

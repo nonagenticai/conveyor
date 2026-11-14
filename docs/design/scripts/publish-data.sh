@@ -44,6 +44,7 @@ python3 "$pack/scripts/build-docs.py"
 # 2. The rows come from the live database, not from a fixture.
 mkdir -p "$data"
 snapshot_args=(snapshot --tenant "$tenant" --out "$data" --issues "$data/issues.json")
+snapshot_args+=(--outputs-dir "$pack/docs")
 snapshot_args+=(--git-sha "$(git -C "$root" rev-parse HEAD)")
 if [ -n "${SNAPSHOT_DATABASE_URL:-}" ]; then
   snapshot_args+=(--database-url "$SNAPSHOT_DATABASE_URL")
