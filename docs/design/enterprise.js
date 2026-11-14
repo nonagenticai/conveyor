@@ -647,10 +647,14 @@ window.installEnterprise = function (api) {
     }),
   );
   const selectedProgramme = () =>
-    programmeDefs.find((p) => p.id === x.programme);
-  const scopeProjects = () =>
-    db.projects.filter((p) => p.programme === x.programme);
-  const project = () => byId("projects", x.project) || scopeProjects()[0];
+    programmeDefs.find((p) => p.id === x.programme) ||
+    (db.programmes || [])[0] ||
+    programmeDefs[0];
+  const scopeProjects = () => {
+    const rows = db.projects.filter((p) => p.programme === selectedProgramme().id);
+    return rows.length ? rows : db.projects;
+  };
+  const project = () => byId("projects", x.project) || scopeProjects()[0] || db.projects[0];
   const packages = [
     {
       id: "WP-2048",
@@ -971,8 +975,9 @@ window.installEnterprise = function (api) {
     return `<div class="e-table-scroll"><table class="e-table"><thead><tr><th>Project / workstream</th><th>Lifecycle</th><th>Delivery</th><th>Live</th><th>Blockers</th></tr></thead><tbody>${pp.map((p) => `<tr class="${x.project === p.id ? "selected" : ""}"><td><button class="e-project-link" data-e="select-project" data-id="${p.id}"><span class="e-project-glyph">${I(p.symbol)}</span><span><strong>${E(p.name)}</strong><small>${E(p.key)} · ${E(p.stream || "New workstream")}</small></span></button></td><td>${E(p.enterprisePhase || "Initiate")}</td><td><div class="e-progress"><i style="width:${Math.round((p.completed / p.total) * 100)}%"></i></div><small>${fmt(p.completed)} / ${fmt(p.total)}</small></td><td><span class="e-live">${p.live || 0}</span></td><td>${p.blocks ? B(p.blocks + " open", "amber") : B("Clear", "green")}</td></tr>`).join("")}</tbody></table></div>`;
   }
   function deliveryMap() {
-    const p = project(),
-      rows = packages.filter((w) => w.project === p.id);
+    const p = project();
+    if (!p) return empty("No programme projects are published in this snapshot.");
+    const rows = packages.filter((w) => w.project === p.id);
     return `<div class="e-main-grid"><div class="e-stack">${panel("Workstreams & projects", projectRows(scopeProjects()), `<span class="mono muted">${scopeProjects().length} projects</span>`)}${panel("Cross-project dependencies", `<div class="e-dependencies"><div><span class="e-number">01</span><div><strong>${x.programme === "civic" ? "Trust & identity" : x.programme === "resilience" ? "Zero-trust platform" : "Enterprise knowledge fabric"}</strong><small>Target architecture contract</small></div><span class="e-dep-arrow">→</span><div><strong>${x.programme === "civic" ? "Common data foundation" : x.programme === "resilience" ? "Cloud landing zones" : "Agent operating model"}</strong><small>${x.programme === "civic" ? "Identifier & ownership model" : "Approved dependency contract"}</small></div>${B("Critical chain", "amber")}</div><div><span class="e-number">02</span><div><strong>${x.programme === "civic" ? "Common data foundation" : x.programme === "resilience" ? "Cloud landing zones" : "Agent operating model"}</strong><small>Contract baseline</small></div><span class="e-dep-arrow">→</span><div><strong>${x.programme === "civic" ? "Service orchestration" : x.programme === "resilience" ? "Operational continuity" : "Usage insights"}</strong><small>Wave 2 integration gate</small></div>${B("12 days float")}</div></div>`, eb("Explore constraint", "goto-constraints", "", "quiet small", "arrow"))}</div><aside class="e-stack">${panel("Project focus", `<div class="e-focus"><span class="eyebrow">${E(p.key)} / ${E(p.stream || "")}</span><h2>${E(p.name)}</h2><p>${E(p.description)}</p><dl class="kv"><dt>Accountable</dt><dd>${p.id === "identity" ? "Enterprise architecture lead" : "Workstream lead"}</dd><dt>Current phase</dt><dd>${E(p.enterprisePhase || "Initiate")}</dd><dt>Published baseline</dt><dd>B${x.baseline} · scope, schedule & evidence</dd><dt>Next control point</dt><dd>Architecture contract review</dd></dl><div class="e-callout"><strong>${p.blocks || 0} blockers · ${p.live || 0} jobs in flight</strong><p>${p.id === "identity" ? "Unresolved delegation constraint is holding the architecture contract and two downstream workstreams." : "Inspect evidence and dependency readiness before releasing the next work package."}</p></div><div class="e-stack">${btn("Open project workbench", "open-project", `data-id="${p.id}"`, "primary", "arrow")}${eb("Inspect work breakdown", "project-work", `data-id="${p.id}"`, "", "board")}</div></div>`)}${panel("Next board decision", `<div class="e-focus"><span class="eyebrow e-amber">GATE G3 · ARCHITECTURE CONTRACT</span><h3>Accept the next architecture baseline?</h3><p>${p.blocks || 0} project blockers. Review model validation, requirements coverage and accountable sign-off before progression.</p><div class="e-pins">${pins()}</div>${route("Open assurance pack", "assurance", "small", "shield")}</div>`)}</aside></div>`;
   }
   function integratedPlan() {
