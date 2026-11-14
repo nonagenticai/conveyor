@@ -217,10 +217,7 @@ fn sized_string(
     Ok(value)
 }
 
-fn optional_string(
-    object: &Map<String, Value>,
-    field: &str,
-) -> Result<Option<String>, Refusal> {
+fn optional_string(object: &Map<String, Value>, field: &str) -> Result<Option<String>, Refusal> {
     match object.get(field) {
         None | Some(Value::Null) => Ok(None),
         Some(Value::String(text)) => Ok(Some(text.clone())),
@@ -495,8 +492,7 @@ pub async fn create_offering(
         .map_err(|error| {
             tracing::error!(%error, "Failed to create offering");
             internal_error("Failed to create offering")
-        })?
-    {
+        })? {
         CreateOffering::Upserted(row) => {
             let row = *row;
             tracing::info!(

@@ -370,7 +370,12 @@ async fn create_requires_license_admin_and_app_ownership() {
     assert_eq!(offering_count(&db).await, 0);
 
     // cross_owner bypasses the issuer rule, audited.
-    let (status, body) = post(app_state_route(&db, cross_owner()), "/offerings", FULL_CREATE()).await;
+    let (status, body) = post(
+        app_state_route(&db, cross_owner()),
+        "/offerings",
+        FULL_CREATE(),
+    )
+    .await;
     assert_eq!(status, StatusCode::OK, "{body}");
     assert_eq!(offering_count(&db).await, 1);
 }
@@ -717,11 +722,7 @@ async fn delete_requires_license_admin_and_app_ownership() {
     )
     .await;
 
-    let (status, body) = delete(
-        app_state_route(&db, reader()),
-        "/offerings/alpha/free",
-    )
-    .await;
+    let (status, body) = delete(app_state_route(&db, reader()), "/offerings/alpha/free").await;
     assert_eq!(status, StatusCode::FORBIDDEN);
     assert_eq!(body, json!({"detail": "Role 'license-admin' required"}));
 
@@ -739,11 +740,7 @@ async fn delete_requires_license_admin_and_app_ownership() {
         }})
     );
 
-    let (status, body) = delete(
-        app_state_route(&db, cross_owner()),
-        "/offerings/alpha/free",
-    )
-    .await;
+    let (status, body) = delete(app_state_route(&db, cross_owner()), "/offerings/alpha/free").await;
     assert_eq!(status, StatusCode::OK, "{body}");
     assert_eq!(body["deleted"], true);
     assert_eq!(offering_count(&db).await, 0);
@@ -762,10 +759,7 @@ async fn both_reads_are_license_admin_only() {
 
 #[tokio::test]
 async fn a_missing_pool_is_each_routes_static_500() {
-    let app = route(
-        conveyor_licenses::router::test_state(),
-        admin("owner-a"),
-    );
+    let app = route(conveyor_licenses::router::test_state(), admin("owner-a"));
 
     let (status, body) = post(app.clone(), "/offerings", FULL_CREATE()).await;
     assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
