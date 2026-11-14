@@ -57,7 +57,9 @@ use serde_json::{Value, json};
 /// `process_maps.*`, `laya.judge` and the two `eval_grades.*`. 277 → **288**.
 /// **#70 adds 5 internal**: `documents.compose`, `projects.update`, `publish.start`,
 /// `publish.status` and `repositories.update`. 299 → **304**.
-const EXPECTED: [&str; 304] = [
+/// **#92 adds 1 internal**: `card_types.list` — the read `catalogues.list` cannot serve,
+/// because `card_type` is deliberately not one of the eleven catalogue namespaces. 304 → **305**.
+const EXPECTED: [&str; 305] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -87,6 +89,7 @@ const EXPECTED: [&str; 304] = [
     "capability_agents.get",
     "capability_agents.list",
     "capability_agents.update",
+    "card_types.list",
     "cards.add_label",
     "cards.archive",
     "cards.claim",
@@ -390,7 +393,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // retire`) so a tenant can author a map and have it validated; before this only the two
     // reads existed and the domain validator was unreachable through the API.
     // The external count moves exactly once, at step 8 — every other addition is internal.
-    assert_eq!((internal, external), (289, 15));
+    // #92 adds `card_types.list` (internal, read): 289 → 290.
+    assert_eq!((internal, external), (290, 15));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
