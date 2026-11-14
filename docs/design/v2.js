@@ -179,12 +179,9 @@ window.installV2 = function (api, enterprise) {
         }
       }
       if (C.can("runs.list")) consoleLoadRuns();
-      if (C.can("catalogues.list")) {
+      if (C.can("card_types.list")) {
         try {
-          const types = await C.action("catalogues.list", {
-            kind: "card_type",
-            page: { limit: 200 },
-          });
+          const types = await C.action("card_types.list", {});
           cs.types = list(types.items);
         } catch (_) {
           cs.types = [];
@@ -289,7 +286,11 @@ window.installV2 = function (api, enterprise) {
       return;
     }
     const preferred = list(cs.types).find((row) => row.code === "architecture_task");
-    const type = v.intakeType || (preferred && preferred.code) || "architecture_task";
+    const type = v.intakeType || (preferred && preferred.code) || (list(cs.types)[0] || {}).code;
+    if (!type) {
+      toast("No card type is available for this tenant; nothing was intaken");
+      return;
+    }
     try {
       await C.action("cards.create", {
         board_id: data.board.id,
@@ -507,12 +508,24 @@ window.installV2 = function (api, enterprise) {
     }
     return list(((live || {}).work || {}).cards).find((card) => card.id === id) || null;
   };
+  // A link taken from a run output is data, not markup: only http(s) is a link. A
+  // `javascript:` or `data:` value renders as text, because the console holds a session in
+  // this origin and a click on an agent-authored value must never execute here.
+  const safeUrl = (value) => {
+    try {
+      const url = new URL(String(value), window.location.origin);
+      return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
+    } catch (_) {
+      return null;
+    }
+  };
   const outputCell = (output) => {
     if (output == null) return `<span class="muted">—</span>`;
     const value = typeof output === "object" ? output.output || output : output;
-    const url =
+    const raw =
       (value && (value.pr_url || value.url || value.pull_request_url)) ||
       (typeof output === "object" && output ? output.pr_url : null);
+    const url = raw ? safeUrl(raw) : null;
     if (url) {
       return `<a class="e-project-link" href="${E(url)}" target="_blank" rel="noopener">open ↗</a>`;
     }
@@ -980,7 +993,8 @@ window.installV2 = function (api, enterprise) {
     const intakeType =
       v.intakeType ||
       (list(cs.types).find((row) => row.code === "architecture_task") || {}).code ||
-      "architecture_task";
+      (list(cs.types)[0] || {}).code ||
+      "";
     const typePicker = `<label class="e-select">Card type <select data-v2-input="intake-type" aria-label="Intake card type">${list(cs.types)
       .map(
         (row) =>
@@ -1477,7 +1491,7 @@ window.installV2 = function (api, enterprise) {
     const selectedType =
       v.intakeType ||
       (typeOptions.includes("architecture_task") ? "architecture_task" : typeOptions[0]) ||
-      "architecture_task";
+      "";
     const typeSelect = `<div class="console-actions"><label class="mono muted">Intake card type</label><select data-v2-input="intake-type" aria-label="Card type">${
       typeOptions.length
         ? typeOptions
@@ -1486,7 +1500,7 @@ window.installV2 = function (api, enterprise) {
                 `<option value="${E(code)}" ${code === selectedType ? "selected" : ""}>${E(code)}</option>`,
             )
             .join("")
-        : `<option value="architecture_task">architecture_task</option>`
+        : `<option value="" disabled>no card type in this tenant</option>`
     }</select></div>`;
     const operator = panel(
       "Operator",
@@ -2479,7 +2493,9 @@ window.installV2 = function (api, enterprise) {
     if (!cs.loaded && !cs.loading && !cs.error) consoleLoad();
     const rows = consoleProjects();
     const index = new Map(cs.issues.map((row) => [String(row.number), row]));
-    const programme = cs.programme || { name: "conveyor buildout", status: "active" };
+    // No programme row is a real answer for a tenant: render the absence. Naming a fixture
+    // programme here is how the page would keep looking live after the row was gone.
+    const programme = cs.programme || null;
     const tab = v.tab.portfolio || "In flight";
     const statusTone = (status) =>
       status === "active"
@@ -2541,7 +2557,7 @@ window.installV2 = function (api, enterprise) {
     );
     const totals = (pick) => rows.reduce((sum, project) => sum + pick(unitStats(project)), 0);
     const summary = kv([
-      ["Programme", `${E(programme.name)} ${B(programme.status || "active", "green")}`],
+      ["Programme", programme ? `${E(programme.name)} ${B(programme.status || "active", "green")}` : `<span class="muted">no programme row</span>`],
       [
         "Projects",
         `${rows.length} · ${rows.filter((p) => p.status === "active").length} active · ${
@@ -2575,7 +2591,7 @@ window.installV2 = function (api, enterprise) {
               `${summary}${note(
                 "Shared configuration, WSJF, cadence and metering are V2 aggregates (T1/T10/T11) that do not exist yet. This page shows the rows the platform owns today.",
               )}`,
-              B(programme.status || "active", "green"),
+              B(programme ? programme.status || "active" : "no programme row", programme ? "green" : ""),
             )
           : panel(
               "In-flight portfolio",

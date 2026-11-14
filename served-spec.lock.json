@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "561217cbbafe8c844db59ba476943b183560206337032a4683f803d3c358eeba",
+    "GET /api/actions": "c39bf656d7a82b60d80e34309e74821e93baed96ad096e5eb4f65f727da9f0b8",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -51,6 +51,7 @@
     "POST /api/actions/capability_agents.get/invocations": "6277e0b49f0ed73434708272a1ad73b04e4b4e1aa44954dcbab7509a5829bb04",
     "POST /api/actions/capability_agents.list/invocations": "b658eac9b5aca78836a6a5dcf738a2be1a1766e56ec2dc615b722cde50abe0b3",
     "POST /api/actions/capability_agents.update/invocations": "77a2675f77164610beec47e938662661c4ca4f55cc8b176c61a6a0a4e79ade51",
+    "POST /api/actions/card_types.list/invocations": "b6a2cf9b91cc76bba51f0716b44434bbaf82543544b63bd8e00c6274103a47dd",
     "POST /api/actions/cards.add_label/invocations": "2cf93bc52b473c03b83c76d6921e4844bc9eb84611fe27f9a1d35335c40af814",
     "POST /api/actions/cards.archive/invocations": "a22af0bb3ab11f8d944849e26909caa9d66f997ca6024d301f7dd07e1af28ab9",
     "POST /api/actions/cards.claim/invocations": "a2cce9ebaded65c428056ccea1c4b4f180d6e33ab234f55094d8800aef2540a4",
