@@ -9,6 +9,7 @@
 //! a verified credential. Applying it here (rather than per route) is what makes "a new route is
 //! protected by default" true.
 
+pub mod catalogue_apps;
 pub mod health;
 pub mod internal_bundles;
 pub mod internal_ensure;
@@ -34,6 +35,12 @@ use crate::state::AppState;
 
 /// `(METHOD, path)` for every operation this service registers.
 pub const ROUTES: &[(&str, &str)] = &[
+    ("DELETE", "/apps/{app_id}"),
+    ("GET", "/apps"),
+    ("GET", "/apps/{app_id}"),
+    ("GET", "/apps/{app_id}/licenses"),
+    ("GET", "/apps/{app_id}/plans"),
+    ("POST", "/apps"),
     ("GET", "/health"),
     ("GET", "/health/live"),
     ("GET", "/health/ready"),
@@ -66,6 +73,12 @@ pub const ROUTES: &[(&str, &str)] = &[
 #[derive(utoipa::OpenApi)]
 #[openapi(
     paths(
+        catalogue_apps::create_app,
+        catalogue_apps::delete_app,
+        catalogue_apps::get_app,
+        catalogue_apps::list_app_licenses,
+        catalogue_apps::list_app_plans,
+        catalogue_apps::list_apps,
         health::health,
         health::liveness,
         health::readiness,
@@ -92,6 +105,9 @@ pub const ROUTES: &[(&str, &str)] = &[
         user_licenses::list_user_licenses
     ),
     components(schemas(
+        catalogue_apps::AppCreate,
+        catalogue_apps::AppResponse,
+        catalogue_apps::PlanResponse,
         health::ErrorResponse,
         health::HealthResponse,
         health::LivenessResponse,
@@ -140,6 +156,22 @@ pub fn openapi() -> utoipa::openapi::OpenApi {
 /// The HTTP application the binary serves.
 pub fn router(state: AppState) -> Router {
     Router::new()
+        .route(
+            "/apps",
+            get(catalogue_apps::list_apps).post(catalogue_apps::create_app),
+        )
+        .route(
+            "/apps/{app_id}",
+            get(catalogue_apps::get_app).delete(catalogue_apps::delete_app),
+        )
+        .route(
+            "/apps/{app_id}/licenses",
+            get(catalogue_apps::list_app_licenses),
+        )
+        .route(
+            "/apps/{app_id}/plans",
+            get(catalogue_apps::list_app_plans),
+        )
         .route("/health", get(health::health))
         .route("/health/live", get(health::liveness))
         .route("/health/ready", get(health::readiness))

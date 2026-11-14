@@ -149,7 +149,7 @@ pub struct LicenseBudgetUpdate {
 }
 
 /// `_enrich_license_response`: the licence row plus BOTH nested objects.
-fn response(row: LicenceRow, now: DateTime<Utc>) -> LicenseResponse {
+pub(crate) fn response(row: LicenceRow, now: DateTime<Utc>) -> LicenseResponse {
     let app = match (row.app_key, row.app_name) {
         (Some(key), Some(name)) => Some(AppInfo {
             id: row.app_id.to_string(),
@@ -218,8 +218,8 @@ fn optional_uuid(raw: Option<&str>) -> Result<Option<uuid::Uuid>, Refusal> {
 }
 
 /// Pydantic's lax boolean parsing (`true/false/1/0/yes/no/on/off`, case-insensitive) for
-/// the natively-typed `include_deleted` query parameter.
-fn parse_bool(field: &str, raw: &str) -> Result<bool, Refusal> {
+/// the natively-typed query parameter. Shared with the catalogue app routes.
+pub(crate) fn parse_bool(field: &str, raw: &str) -> Result<bool, Refusal> {
     match raw.trim().to_ascii_lowercase().as_str() {
         "true" | "1" | "yes" | "on" => Ok(true),
         "false" | "0" | "no" | "off" => Ok(false),
