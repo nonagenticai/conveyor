@@ -1,0 +1,26 @@
+licenses — live served OpenAPI vs the captured lock
+====================================================
+
+Measured 2026-11-14, from the master host, against the LIVE service:
+
+  ssh -i <deploy key> admin@<master> \
+    "curl -sk --max-time 15 https://licenses.internal/openapi.json" > live.json
+  jq -S . live.json > live.sorted.json
+  jq -S . apps/licenses/contract/openapi.lock.json > lock.sorted.json
+  sha256sum live.sorted.json lock.sorted.json
+
+Result:
+
+  9c70313503614e7ddd0f197402c8b89a70d663e3bd54e5ac6e94a969f96413d8  live.sorted.json
+  9c70313503614e7ddd0f197402c8b89a70d663e3bd54e5ac6e94a969f96413d8  lock.sorted.json
+
+  cmp: identical
+
+Live image at that measurement:
+
+  ghcr.io/nonagenticai/licenses:latest@sha256:20dd796a9260708f19730ccb3dc01726567e1ef8c3a8ec9e22629190881ab8df
+
+The live digest has moved since the capture (the lock was captured from
+sha256:13093d39… on 2026-11-14), but the served document is byte-identical to
+the capture after JSON key sorting: the move is a rebuild, not a contract
+change. The lock is therefore the live contract, and no re-capture is required.

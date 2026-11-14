@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="licenses-absorption--evidence-2026-11-14">licenses absorption — evidence (2026-11-14)</h1>
-<p>Issue #45 · head <code>9f50438</code> · branch <code>issue/45-licenses</code>. The reference service is pinned by commit and by image digest; no private hostname, address, token or tenant identifier appears in this file.</p>
+<p>Issue #45 · measurements taken at <code>4f9b03e</code> on branch <code>issue/45-licenses</code>; commits after that point touch only this document and the generated design pack. The reference service is pinned by commit and by image digest; no private hostname, address, token or tenant identifier appears in this file.</p>
 <h2 id="the-reference-and-its-pin">The reference and its pin</h2>
 <table>
 <thead>
@@ -117,7 +117,7 @@
 <tbody>
 <tr>
 <td>P1.1 capture the document</td>
-<td><code>contract/manifest.json</code> records date, digest, lock sha256, 43/60/57; <code>compare-report.txt</code> says <code>compare: byte-identical after jq -S</code> against the pin's <code>docs/openapi.json</code></td>
+<td><code>contract/manifest.json</code> records date, digest, lock sha256, 43/60/57; <code>compare-report.txt</code> says <code>compare: byte-identical after jq -S</code> against the pin's <code>docs/openapi.json</code>. The LIVE service (image <code>20dd796a…</code>, moved since the capture) serves a document that is also byte-identical after <code>jq -S</code> to the lock — sha256 <code>9c703135…</code> on both sides, <code>contract/live-compare.txt</code>, measured 2026-11-14</td>
 <td><code>apps/licenses/contract/</code></td>
 </tr>
 <tr>
@@ -128,7 +128,7 @@
 <tr>
 <td>P2.1 served document equals the lock</td>
 <td><code>conveyor-licenses --check-lock</code> → <code>lock OK: 60 operations</code> on stderr, exit 0: all 60 captured operations are served and the served document matches the lock under the contract projection. The flag runs before configuration and touches no database</td>
-<td><code>9f50438</code> (re-measured after the test flip; same result)</td>
+<td><code>4f9b03e</code> (re-measured after the test flip and the two main merges; same result)</td>
 </tr>
 <tr>
 <td>P2.2 migrations equal the live schema</td>
@@ -157,7 +157,7 @@
 </tr>
 <tr>
 <td>P3.1 golden replay, captured corpus</td>
-<td>The default <code>golden/</code> corpus now exists: <strong>6 read-only, in-contract cases</strong> captured from the live reference service and replayed against <code>conveyor-licenses</code>. Scope: <code>GET /health</code>, <code>GET /health/live</code>, <code>GET /health/ready</code>, the unknown-token <code>POST /license/introspect</code> (200, <code>active:false</code>, <code>reason:"token_not_found"</code>), and the two unauthenticated 401s (<code>GET /licenses/active?tenant_id=…&amp;app_key=…</code>, <code>GET /licenses/user/&lt;uuid&gt;</code>). No production tenant, app key or token is in the corpus; authenticated success cases need a synthetic seed and remain integration-test and #95 coverage. Capture: <code>apps/licenses/contract/capture-golden.sh --live http://127.0.0.1:18544 --out apps/licenses/contract/golden</code> against a port-forward to the service pod — deliberately <strong>not</strong> through the public ingress host, whose istio ext-authz filter answers its own <code>text/plain</code> 401 (<code>Unauthorized: Bearer token required</code>, no <code>WWW-Authenticate</code>) before the application sees the request (measured 2026-11-14); the application's own 401 is the captured JSON envelope <code>{"error":{"message":"Missing authentication token","status":401}}</code>. Replay: throwaway <code>postgres:18.6</code> (container <code>slice45-licenses-pg</code>, host port 59315), <code>conveyor-licenses migrate</code> → <code>migrate OK: 1 migration(s) embedded</code>, <code>serve</code> on port 18545, then <code>bash apps/licenses/contract/verify.sh --candidate http://127.0.0.1:18545</code>: every case <code>ok</code>, <strong><code>cases=6 unexplained=0</code></strong>, exit 0. Candidate build: binary sha256 <code>70f3aaab4ecff9a1bdead02d928ff786d2d49a2347092634495bba261335420b</code>, built by <code>rbuild -- build -p conveyor-licenses --locked</code> from the tree whose Rust sources are <code>32f9dbd</code> (this slice adds only <code>contract/capture-golden.sh</code>, <code>contract/golden/</code> and this document). No tolerance was needed: the six cases matched without excusing anything, and <code>tolerances.json</code> stayed empty</td>
+<td>The default <code>golden/</code> corpus now exists: <strong>6 read-only, in-contract cases</strong> captured from the live reference service and replayed against <code>conveyor-licenses</code>. Scope: <code>GET /health</code>, <code>GET /health/live</code>, <code>GET /health/ready</code>, the unknown-token <code>POST /license/introspect</code> (200, <code>active:false</code>, <code>reason:"token_not_found"</code>), and the two unauthenticated 401s (<code>GET /licenses/active?tenant_id=…&amp;app_key=…</code>, <code>GET /licenses/user/&lt;uuid&gt;</code>). No production tenant, app key or token is in the corpus; authenticated success cases need a synthetic seed and remain integration-test and #95 coverage. Capture: <code>apps/licenses/contract/capture-golden.sh --live http://127.0.0.1:18544 --out apps/licenses/contract/golden</code> against a port-forward to the service pod — deliberately <strong>not</strong> through the public ingress host, whose istio ext-authz filter answers its own <code>text/plain</code> 401 (<code>Unauthorized: Bearer token required</code>, no <code>WWW-Authenticate</code>) before the application sees the request (measured 2026-11-14); the application's own 401 is the captured JSON envelope <code>{"error":{"message":"Missing authentication token","status":401}}</code>. Replay: throwaway <code>postgres:18.6</code> (container <code>slice45-licenses-pg</code>, host port 59315), <code>conveyor-licenses migrate</code> → <code>migrate OK: 1 migration(s) embedded</code>, <code>serve</code> on port 18545, then <code>bash apps/licenses/contract/verify.sh --candidate http://127.0.0.1:18545</code>: every case <code>ok</code>, <strong><code>cases=6 unexplained=0</code></strong>, exit 0. Candidate build: binary sha256 <code>70f3aaab4ecff9a1bdead02d928ff786d2d49a2347092634495bba261335420b</code>, built by <code>rbuild -- build -p conveyor-licenses --locked</code> from the tree at <code>a0e757b</code> (the test-flip commit; this slice adds only <code>contract/capture-golden.sh</code>, <code>contract/golden/</code> and this document — no Rust change). No tolerance was needed: the six cases matched without excusing anything, and <code>tolerances.json</code> stayed empty</td>
 <td><code>apps/licenses/contract/golden/</code>, <code>apps/licenses/contract/capture-golden.sh</code></td>
 </tr>
 <tr>
@@ -216,7 +216,7 @@
 <td>live licences whose effective metering owes billing: <code>status='active' AND (expires_at IS NULL OR expires_at &gt; now())</code> and any of plan quota/token budget/licence overrides non-null; optional <code>RECONCILE_LICENSE_ID</code> narrowing; ordered by <code>created_at</code>, limit 500, skipping already-stamped licences unless <code>RECONCILE_REVALIDATE</code></td>
 <td>read-before-write: <code>GET /api/budget/list/{tenant}</code> — create absent, re-push a different <code>budget_tokens</code>, leave an unreadable list UNKNOWN; <code>GET /api/quota/check</code> — create absent, leave and report drift unless <code>RECONCILE_FORCE_PLAN_QUOTA</code>; stamps verified coverage. The same runner serves <code>POST /licenses/admin/metering/reconcile</code></td>
 <td>0 converged; 1 not converged (unknown coverage, failures, dry-run uncovereds, vacuous/truncated); 2 config/DB/transport</td>
-<td><code>tests/command_reconcile_metering.rs</code> (10 tests; <code>an_uncovered_licence_gets_both_rows_created_and_is_stamped</code>, <code>a_dry_run_reads_but_pushes_nothing_and_reports_the_same_counts</code>); <code>tests/reconcile_route.rs</code> (5 tests, 4 passed / 1 failed; the armed repair <code>an_armed_run_repairs_and_stamps_the_named_licence_only</code> passes, the stale <code>the_lock_check_never_names_this_route</code> fails — see below)</td>
+<td><code>tests/command_reconcile_metering.rs</code> (10 tests; <code>an_uncovered_licence_gets_both_rows_created_and_is_stamped</code>, <code>a_dry_run_reads_but_pushes_nothing_and_reports_the_same_counts</code>); <code>tests/reconcile_route.rs</code> (5 tests, all passing at this head; its lock assertion expects success after <code>a0e757b</code> — the earlier failure and its fix are recorded below)</td>
 </tr>
 </tbody>
 </table>
@@ -284,7 +284,7 @@
 </table>
 <p>Tests: <code>tests/command_argv.rs</code> (6 tests) — the refusal payload is asserted byte-for-byte, the extra-word revoke run asserts the sweep actually runs, and the no-argument path asserts the config refusal rather than the argv refusal.</p>
 <h2 id="test-inventory">Test inventory</h2>
-<p>Measured on m1 at <code>9f50438</code> (a throwaway Postgres 18 cluster per run): <code>rbuild -- test -p conveyor-licenses --locked</code> → <strong>350 passed, 0 failed</strong> across 36 test binaries, exit 0. The per-target counts below are from the complete run:</p>
+<p>Measured on m1 at <code>4f9b03e</code> (a throwaway Postgres 18 cluster per run): <code>rbuild -- test -p conveyor-licenses --locked</code> → <strong>350 passed, 0 failed</strong> across 36 test binaries, exit 0. The per-target counts below are from the complete run:</p>
 <table>
 <thead>
 <tr>
@@ -483,12 +483,14 @@
 </table>
 <h3 id="the-two-stale-port-is-incomplete-assertions-resolved-in-a0e757b">The two stale "port is incomplete" assertions (resolved in <code>a0e757b</code>)</h3>
 <ul>
-<li><code>contract::tests::the_lock_check_names_the_unported_operations</code> — <code>apps/licenses/src/contract/mod.rs:143-176</code>. It does <code>check(&amp;served(), ROUTES).expect_err("the port is incomplete by construction in slice 1")</code>; with 60 of 60 operations served, <code>check</code> returns <code>Ok(())</code>, so it panics at line 146: <code>the port is incomplete by construction in slice 1: ()</code>.</li>
-<li><code>tests/reconcile_route.rs::the_lock_check_never_names_this_route</code> — panics at line 530: <code>the port is incomplete by construction: ()</code>.</li>
+<li><code>contract::tests::the_lock_check_names_the_unported_operations</code> — formerly in <code>apps/licenses/src/contract/mod.rs</code> (the test was renamed; the line range was 143-176). It did <code>check(&amp;served(), ROUTES).expect_err("the port is incomplete by construction in slice 1")</code>; with 60 of 60 operations served, <code>check</code> returns <code>Ok(())</code>, so it panicked: <code>the port is incomplete by construction in slice 1: ()</code>.</li>
+<li><code>tests/reconcile_route.rs::the_lock_check_never_names_this_route</code> — the <code>expect_err</code> assertion at :524 (the test function begins at :530) panicked: <code>the port is incomplete by construction: ()</code>.</li>
 </ul>
 <p>Both encoded the slice-era state in which <code>--check-lock</code> HAD to fail. <strong>Resolved in <code>a0e757b</code></strong>: the contract test is now <code>the_lock_check_accepts_the_complete_port</code> (asserts <code>check</code> returns Ok) and the reconcile-route test calls <code>check(...).expect("the served contract equals the capture")</code>. The crate's test command is green after that change; the remaining DoD gate is the full workspace suite at the PR head, recorded in the PR.</p>
 <h2 id="recorded-deviations">Recorded deviations</h2>
 <ul>
+<li><strong>Guarded request-path invariants.</strong> <code>apps/licenses/src/router/internal_ensure.rs:573,650-652</code> and <code>apps/licenses/src/auth.rs:653</code> use <code>expect</code>/<code>unreachable!</code> after a check that makes the bad state impossible; disclosed for completeness. The only added <code>.unwrap()</code>s are test-only (<code>db/tokens.rs</code>). There are no <code>todo!()</code>, <code>unimplemented!()</code>, <code>panic!</code> or <code>#[ignore]</code> in the crate.</li>
+<li><strong>Shared transport change.</strong> This lane also extends <code>crates/auth/src/service.rs</code> with <code>with_timeout</code>/<code>delete</code> for the billing client's transport; the licenses billing tests exercise both. The <code>crates/auth</code> crate has no unit test of its own for the two methods.</li>
 <li><strong>Offering markup and access refusals.</strong> Both failures answer the reference's <strong>502</strong> and restore the prior posture; pinned by <code>tests/tenant_offerings.rs::a_rejected_markup_restores_the_posture_and_answers_502</code> and <code>::an_access_refusal_restores_the_prior_posture_and_answers_502</code>.</li>
 <li><strong>CLI JSON is compact.</strong> <code>serde_json::to_string</code>, not the script's <code>json.dumps</code> spacing; key order is the sorted order the scripts used (<code>sort_keys=True</code>). The refusal usage line names the Rust binary (<code>conveyor-licenses &lt;subcommand&gt;</code>) because that is the program being invoked; the reference printed the script's basename.</li>
 <li><strong>axum versus FastAPI on query-parameter syntax.</strong> FastAPI rejects some malformed/repeated query parameters with a 422 <code>HTTPValidationError</code>; axum's extractor can answer 400. The schemas are aligned to <code>HTTPValidationError.detail</code> where a body is validated, and the split is documented per route; it is not claimed that every extractor-level rejection is byte-identical.</li>
