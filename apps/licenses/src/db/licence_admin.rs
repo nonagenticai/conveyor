@@ -193,10 +193,7 @@ pub async fn live_budget_for_push(
 /// Clearing the stamp is the reconcile sweep's repair signal: it selects licences whose
 /// billing mirror may be stale. A failure here is logged by the caller and is NOT fatal —
 /// the reference leaves the row as it is and the next sweep re-examines it anyway.
-pub async fn clear_metering_verified(
-    pool: &PgPool,
-    license_id: Uuid,
-) -> Result<u64, sqlx::Error> {
+pub async fn clear_metering_verified(pool: &PgPool, license_id: Uuid) -> Result<u64, sqlx::Error> {
     let result = sqlx::query("UPDATE license SET metering_verified_at = NULL WHERE id = $1")
         .bind(license_id)
         .execute(pool)

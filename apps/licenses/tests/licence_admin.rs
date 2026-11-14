@@ -170,7 +170,13 @@ async fn budget_push(
     headers: HeaderMap,
     Json(body): Json<Value>,
 ) -> StatusCode {
-    record_billing(&stub, "POST", "/api/budget".to_owned(), &headers, Some(body));
+    record_billing(
+        &stub,
+        "POST",
+        "/api/budget".to_owned(),
+        &headers,
+        Some(body),
+    );
     StatusCode::from_u16(*stub.budget_status.lock().expect("stub lock")).expect("status")
 }
 
@@ -922,7 +928,11 @@ async fn a_budget_change_pushes_the_new_effective_value() {
     assert_eq!(body["token_budget_override"], 5000);
 
     let calls = wait_for_billing(&stub, |calls| {
-        calls.iter().filter(|call| call.path == "/api/budget").count() == 1
+        calls
+            .iter()
+            .filter(|call| call.path == "/api/budget")
+            .count()
+            == 1
     })
     .await;
     let push = calls
@@ -953,7 +963,11 @@ async fn a_budget_change_pushes_the_new_effective_value() {
     .await;
     assert_eq!(status, StatusCode::OK, "{same}");
     let calls = wait_for_billing(&stub, |calls| {
-        calls.iter().filter(|call| call.path == "/api/budget").count() == 2
+        calls
+            .iter()
+            .filter(|call| call.path == "/api/budget")
+            .count()
+            == 2
     })
     .await;
     let pushes: Vec<&BillingCall> = calls
@@ -1029,11 +1043,7 @@ async fn a_cleared_override_with_no_plan_budget_tears_the_cap_down() {
     .await;
     assert_eq!(status, StatusCode::OK, "{body}");
     let calls = wait_for_billing(&stub, |calls| {
-        calls
-            .iter()
-            .filter(|call| call.method == "DELETE")
-            .count()
-            == 2
+        calls.iter().filter(|call| call.method == "DELETE").count() == 2
     })
     .await;
     assert_eq!(
