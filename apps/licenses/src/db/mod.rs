@@ -13,6 +13,7 @@
 //! truth, and `migrations/0001_baseline.sql` is its `pg_dump --schema-only`.
 
 pub mod active;
+pub mod bundle_ensure;
 pub mod bundles;
 pub mod dependencies;
 pub mod issuance;
