@@ -13,6 +13,7 @@ pub mod health;
 pub mod internal_bundles;
 pub mod internal_reads;
 pub mod internal_seat;
+pub mod licence_tokens;
 pub mod licenses;
 pub mod observability;
 pub mod schemas;
@@ -44,6 +45,9 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/licenses/user/{subject_id}"),
     ("POST", "/license/introspect"),
     ("POST", "/license/revoke"),
+    ("POST", "/licenses/{license_id}/tokens"),
+    ("POST", "/licenses/{license_id}/operator-token"),
+    ("POST", "/licenses/{license_id}/regenerate-token"),
 ];
 
 #[derive(utoipa::OpenApi)]
@@ -59,6 +63,9 @@ pub const ROUTES: &[(&str, &str)] = &[
         internal_reads::internal_list_licenses,
         internal_reads::internal_list_tenants,
         internal_seat::internal_tenant_seat_count,
+        licence_tokens::create_license_token,
+        licence_tokens::create_operator_token,
+        licence_tokens::regenerate_license_token,
         licenses::active,
         tokens::introspect,
         tokens::revoke,
@@ -75,6 +82,10 @@ pub const ROUTES: &[(&str, &str)] = &[
         internal_reads::InternalSubjectResponse,
         internal_reads::InternalTenantResponse,
         internal_seat::InternalSeatCountResponse,
+        licence_tokens::OperatorTokenResponse,
+        licence_tokens::RegenerateTokenResponse,
+        licence_tokens::TokenCreateResponse,
+        licence_tokens::TokenType,
         schemas::HTTPValidationError,
         schemas::ValidationError,
         tokens::TokenIntrospectRequest,
@@ -136,6 +147,18 @@ pub fn router(state: AppState) -> Router {
         )
         .route("/license/introspect", post(tokens::introspect))
         .route("/license/revoke", post(tokens::revoke))
+        .route(
+            "/licenses/{license_id}/tokens",
+            post(licence_tokens::create_license_token),
+        )
+        .route(
+            "/licenses/{license_id}/operator-token",
+            post(licence_tokens::create_operator_token),
+        )
+        .route(
+            "/licenses/{license_id}/regenerate-token",
+            post(licence_tokens::regenerate_license_token),
+        )
         // The live service also answers `/licenses/health` (a gateway-prefix alias it registers
         // with `include_in_schema=False`), so it is registered here but is not in `ROUTES`.
         .route("/licenses/health", get(health::health))
