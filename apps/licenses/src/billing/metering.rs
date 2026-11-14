@@ -384,6 +384,66 @@ impl MeteringProvisioner {
         })
     }
 
+    /// `POST path` for a CONFIG write, returning the LAST HTTP status billing answered with, or
+    /// `None` when billing was never reached.
+    ///
+    /// This is `_provision_offering_markup` / `_provision_access_charge`'s contract, which the
+    /// typed [`Self::post`] above cannot express: the caller turns the status into an operator
+    /// message, and "billing refused this" (a status) must stay distinguishable from "billing did
+    /// not answer" (`None`). A transport error on a later attempt does NOT erase an earlier
+    /// status — "billing said 503 then the socket died" is more useful than "never reached".
+    ///
+    /// The retry rule is the reference's: only [`RETRYABLE`] statuses and non-deterministic
+    /// transport faults get a second attempt; a 4xx verdict and a builder error do not.
+    pub async fn post_config_status(
+        &self,
+        path: &str,
+        tenant_id: Uuid,
+        body: &Value,
+    ) -> Option<u16> {
+        let authorization = self.authorization().await;
+        let mut last_status: Option<u16> = None;
+        for attempt in 0..2 {
+            let mut request = self
+                .http
+                .post(format!("{}{path}", self.base_url))
+                .header("X-Tenant-Id", tenant_id.to_string())
+                .json(body);
+            if let Some(header) = authorization.as_deref() {
+                request = request.header(reqwest::header::AUTHORIZATION, header);
+            }
+            match request.send().await {
+                Ok(response) => {
+                    let status = response.status();
+                    last_status = Some(status.as_u16());
+                    if status.is_success() {
+                        return last_status;
+                    }
+                    if !RETRYABLE.contains(&status.as_u16()) {
+                        return last_status;
+                    }
+                    tracing::warn!(
+                        path,
+                        status = status.as_u16(),
+                        "billing config write returned a retryable status"
+                    );
+                }
+                Err(error) => {
+                    // A builder error (unsupported protocol, invalid URL) is raised before any
+                    // I/O and re-raises identically; a retry would be a wasted second.
+                    tracing::warn!(path, %error, attempt, "billing config write transport error");
+                    if error.is_builder() {
+                        return last_status;
+                    }
+                }
+            }
+            if attempt == 0 {
+                tokio::time::sleep(RETRY_DELAY).await;
+            }
+        }
+        last_status
+    }
+
     /// `GET /api/budget/list/{tenant}` — the reference's `_fetch_license_sync_budget_ids`.
     ///
     /// Maps each licence billing already covers with an ACTIVE `source='license_sync'` budget to
