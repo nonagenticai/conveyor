@@ -110,7 +110,11 @@ pub(crate) fn canonical_json(value: &Value) -> String {
 pub(crate) fn sha256_hex(text: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(text.as_bytes());
-    format!("{:x}", hasher.finalize())
+    hasher
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<String>()
 }
 
 /// The part of a request that determines what the model samples (`request_fingerprint`).
