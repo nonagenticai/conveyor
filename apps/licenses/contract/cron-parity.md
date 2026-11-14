@@ -14,9 +14,12 @@ we compared:
    normalized to `<set-by-run>` only when it falls inside that run's wall-clock window;
 4. every HTTP request the billing stub received (method, path, query, body, `X-Tenant-Id`).
 
-**Result: 7 of 8 command×mode pairs are EQUAL. `reconcile-metering` armed DIFFERS on one column:
-Python's metering stamp also bumps `license.updated_at`; the Rust stamp does not.** No code was
-changed; see [The mismatch](#the-mismatch).
+**Pre-fix result: 7 of 8 command×mode pairs were EQUAL. `reconcile-metering` armed DIFFERED on one
+column: Python's metering stamp also bumped `license.updated_at`; the Rust stamp did not.** That
+mismatch was fixed in `19c0cee`, and the pair was re-run against the fixed binary: **all 8 pairs
+are now EQUAL** — see
+[Re-run after the `updated_at` fix](#re-run-after-the-updated_at-fix). The sections below keep the
+pre-fix record; [The mismatch](#the-mismatch) documents the original divergence.
 
 Reproduction inputs live beside this file: [`parity/seed.sql`](parity/seed.sql),
 [`parity/billing-stub.py`](parity/billing-stub.py), [`parity/dump.sql`](parity/dump.sql),
@@ -294,6 +297,142 @@ Cause, read from the two sources:
 
 That is a genuine row-effect difference, not a clock artefact: the run-window normalizer only
 rewrites timestamps that fall inside `[start, finish]`; the Rust values are the seeded values,
-weeks old. It was reported, not fixed: no source code was changed by this slice. Consumers that
-treat `updated_at` as the licence's last-change marker will see a reconcile stamp as a change in
-Python and no change in Rust.
+weeks old. It was reported by the pre-fix slice, not fixed there. Consumers that treat
+`updated_at` as the licence's last-change marker saw a reconcile stamp as a change in Python and
+no change in Rust.
+
+**Status: fixed at `19c0cee`.** All four raw metering stamp/clear UPDATE sites now also set
+`updated_at = now()` (`billing/metering.rs`, `commands/reconcile_metering.rs`,
+`db/licence_admin.rs`, `db/catalogue_plans.rs`). The same-seed re-run in the next section shows
+both implementations changing `updated_at` on the same four licences, with no remaining
+difference.
+
+---
+
+## Re-run after the `updated_at` fix
+
+The fix landed at `19c0ceea0bbcfe619e10ee1dcc957b86b9d7fcd1` (`fix: metering stamps advance
+updated_at like the reference ORM (#45)`), branch `slice/45/cron-parity-rerun`. The pair that
+differed — and, because the harness makes it cheap, all four commands — was re-run against a
+binary built from that commit. The committed harness under [`parity/`](parity/) was used
+unchanged; the method, seed, stub and comparator are those in §Method and environment.
+
+### Candidate binary
+
+```sh
+RBUILD_SLOTS=1 rbuild -- build -p conveyor-licenses --locked
+# Finished `dev` profile [unoptimized] target(s) in 0.29s
+# (warm slot; the first, cold build compiled the dependency set in 1m25s)
+```
+
+Build host (m1): `~/build/slice-45-parity-rerun/target/debug/conveyor-licenses`.
+macOS has no `sha256sum`; `shasum -a 256` reported:
+
+```
+71b8b2ddcd6f55e7ba99da0a258decf91c4f5bf90936a917e5044880a1464826
+```
+
+The hash was re-read after the whole matrix and was identical, so every run below executed that
+binary.
+
+### Environment and exact commands
+
+Ephemeral `postgres:18` container `cron-parity-pg` on `127.0.0.1:25432` (8000 untouched); one
+migration into `parity_py` with the candidate binary; one application of `parity/seed.sql` into
+`parity_tpl`; every run reset from that template. The billing stub ran on 8347. m1 reached both
+through reverse SSH tunnels:
+
+```sh
+ssh -N -R 25432:127.0.0.1:25432 -R 8347:127.0.0.1:8347 m1
+```
+
+```sh
+# schema + seeded template
+RBUILD_SLOTS=1 rbuild -- \
+  --config 'env.DATABASE_URL="postgres://parity:parity@127.0.0.1:25432/parity_py"' \
+  run -p conveyor-licenses --locked -- migrate        # migrate OK: 1 migration(s) embedded
+psql -U parity -d parity_py -v ON_ERROR_STOP=1 -f parity/seed.sql
+psql -U parity -d parity -c 'CREATE DATABASE parity_tpl TEMPLATE parity_py'
+
+# per run: reset the implementation's database from the template, fresh stub, then
+# the Python reference
+env ENVIRONMENT=production \
+    DATABASE_URL="postgresql+psycopg://parity:parity@127.0.0.1:25432/parity_py?sslmode=disable" \
+    METERING_SERVICE_URL="http://127.0.0.1:8347" CORS_ALLOWED_ORIGINS="http://localhost:3000" \
+    KEYCLOAK_URL="http://127.0.0.1:9" LOG_LEVEL=ERROR \
+    <ACTOR>=parity-cron <DRY_RUN_KNOB>=true|false REAP_GRACE_DAYS=30 \
+    RECONCILE_REVALIDATE=false \
+    /Users/mini3/Movies/licenses/.venv/bin/python scripts/<script>.py
+
+# Rust subcommand (RBUILD_SLOTS=1 pins the warm slot the build and migrate used)
+RBUILD_SLOTS=1 rbuild -- \
+    --config 'env.DATABASE_URL="postgres://parity:parity@127.0.0.1:25432/parity_rs"' \
+    --config 'env.METERING_SERVICE_URL="http://127.0.0.1:8347"' \
+    --config 'env.<DRY_RUN_KNOB>="true|false"' --config 'env.<ACTOR>="parity-cron"' \
+    --config 'env.REAP_GRACE_DAYS="30"' --config 'env.RECONCILE_REVALIDATE="false"' \
+    run -p conveyor-licenses --locked -- <subcommand>
+
+# verdict
+python3 parity/compare.py <command> <mode> \
+    <py.json> <rs.json> <py.rc> <rs.rc> <py_rows.json> <rs_rows.json> \
+    <py_calls.jsonl> <rs_calls.jsonl> <py_start> <py_finish> <rs_start> <rs_finish>
+```
+
+The per-command actor and dry-run knobs are exactly those in §1–§4. The matrix ran
+2026-11-14 23:04–23:06 UTC.
+
+### How `updated_at` is compared
+
+The exact instant is deliberately **not** compared across the two runs:
+
+- **Changed vs seed (primary evidence).** `SELECT id, updated_at FROM license ORDER BY id` was
+  taken from `parity_tpl` before the matrix (the template every run is cloned from), and again
+  from each run's own database afterwards. The comparison is per-licence "changed vs unchanged
+  from the seeded value"; the two implementations' new instants are not compared with each other.
+- **`compare.py` (secondary).** A timestamp is normalized to `<set-by-run>` only when it falls
+  inside that implementation's own `[start, finish]` window; otherwise it must stay byte-identical
+  to the seed. A pair is therefore EQUAL when **both changed the column** or **both preserved it**.
+  Two clocks producing two different instants is not a difference.
+
+### Result
+
+All 8 command×mode pairs are EQUAL.
+
+| Command | dry | armed |
+|---|---|---|
+| expire-stale | EQUAL | EQUAL |
+| reap-expired | EQUAL | EQUAL |
+| revoke-expired-tokens | EQUAL | EQUAL |
+| reconcile-metering | EQUAL | **EQUAL** (pre-fix: DIFFERS) |
+
+For every pair: both exit codes equal, `payload_diff={}`, `row_diff={}`,
+`billing_calls_equal=true`.
+
+`reconcile-metering` armed — both implementations changed `updated_at` from the seed on exactly
+the four stamped licences, and on no other licence:
+
+| Licence | Seed `updated_at` | Python after run | Rust after run |
+|---|---|---|---|
+| L2 `…0002` | `2026-10-25 23:04:28.031444+00` | `2026-11-14 23:04:40.266535+00` | `2026-11-14 23:04:49.280514+00` |
+| L3 `…0003` | `2026-10-26 23:04:28.031444+00` | `2026-11-14 23:04:40.294491+00` | `2026-11-14 23:04:49.309234+00` |
+| L10 `…0010` | `2026-11-10 23:04:28.031444+00` | `2026-11-14 23:04:40.316040+00` | `2026-11-14 23:04:49.345563+00` |
+| L11 `…0011` | `2026-11-11 23:04:28.031444+00` | `2026-11-14 23:04:40.345495+00` | `2026-11-14 23:04:49.383061+00` |
+
+The two instants differ because they are two separate runs (Python's process clock vs the
+database's `now()`); that is expected, and it is exactly why the check is "changed vs seed", not
+"equal instant". The dry run changed nothing on either side. The other armed commands changed only
+their intended rows, identically in both implementations: `expire-stale` L1, `reap-expired` L5,
+`revoke-expired-tokens` no licence `updated_at` (only the token `revoked_at` values compared by
+the row dump).
+
+### Remaining differences
+
+None. `row_diff={}` for all four armed pairs, including `reconcile-metering`, which previously had
+the `license.updated_at` divergence. The container and both tunnels were removed afterwards; mini3
+and m1 ports 25432/8347 were verified free.
+
+Scope note: these four cron subcommands exercise the reconcile stamp site
+(`commands/reconcile_metering.rs`) and the expire/reap/revoke UPDATEs. The other three sites
+touched by the same fix — `billing/metering.rs` (`metering_provisioned_at`) and the metering
+clears in `db/licence_admin.rs` / `db/catalogue_plans.rs` — are not reached by these subcommands
+and are outside this artifact's scope.
