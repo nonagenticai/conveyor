@@ -194,10 +194,13 @@ pub async fn live_budget_for_push(
 /// billing mirror may be stale. A failure here is logged by the caller and is NOT fatal —
 /// the reference leaves the row as it is and the next sweep re-examines it anyway.
 pub async fn clear_metering_verified(pool: &PgPool, license_id: Uuid) -> Result<u64, sqlx::Error> {
-    let result = sqlx::query("UPDATE license SET metering_verified_at = NULL WHERE id = $1")
-        .bind(license_id)
-        .execute(pool)
-        .await?;
+    // `updated_at` advances too: the reference clears through the ORM row (`onupdate=utc_now`).
+    let result = sqlx::query(
+        "UPDATE license SET metering_verified_at = NULL, updated_at = now() WHERE id = $1",
+    )
+    .bind(license_id)
+    .execute(pool)
+    .await?;
     Ok(result.rows_affected())
 }
 

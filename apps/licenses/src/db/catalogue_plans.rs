@@ -428,11 +428,14 @@ pub async fn push_effective_token_budgets(
             repair = crate::billing::metering::METERING_RECONCILE_PATH,
             "token budget change NOT applied in billing"
         );
-        if let Err(error) =
-            sqlx::query("UPDATE license SET metering_verified_at = NULL WHERE id = $1")
-                .bind(license_id)
-                .execute(pool)
-                .await
+        // `updated_at` advances too: the reference clears through the ORM row
+        // (`onupdate=utc_now`).
+        if let Err(error) = sqlx::query(
+            "UPDATE license SET metering_verified_at = NULL, updated_at = now() WHERE id = $1",
+        )
+        .bind(license_id)
+        .execute(pool)
+        .await
         {
             tracing::warn!(
                 %error,

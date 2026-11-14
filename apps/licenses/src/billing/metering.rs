@@ -722,21 +722,28 @@ async fn app_display_name(pool: &PgPool, app_id: Uuid) -> Option<String> {
     }
 }
 
-/// `UPDATE license SET metering_provisioned_at = now()`.
+/// `UPDATE license SET metering_provisioned_at = now(), updated_at = now()`.
 ///
 /// A zero-row update means the licence row vanished between the read and the stamp; the reference
 /// reports that as a provisioning failure too, because nothing was recorded.
+///
+/// ⚠️ `updated_at` is set explicitly: the reference stamps through the SQLAlchemy `License` ORM
+/// row, whose `updated_at` column carries `onupdate=utc_now`, so every ORM stamp of a metering
+/// column also advances `updated_at`. A raw UPDATE that omits it is a real parity difference
+/// (measured by `contract/cron-parity.md` on the reconcile sweep's verified stamp).
 async fn stamp_provisioned(pool: &PgPool, license_id: Uuid) -> Result<(), MeteringError> {
-    let updated = sqlx::query("UPDATE license SET metering_provisioned_at = now() WHERE id = $1")
-        .bind(license_id)
-        .execute(pool)
-        .await
-        .map_err(|error| {
-            failure(format!(
-                "license={license_id} — the pushes were accepted but metering_provisioned_at \
+    let updated = sqlx::query(
+        "UPDATE license SET metering_provisioned_at = now(), updated_at = now() WHERE id = $1",
+    )
+    .bind(license_id)
+    .execute(pool)
+    .await
+    .map_err(|error| {
+        failure(format!(
+            "license={license_id} — the pushes were accepted but metering_provisioned_at \
                  could not be recorded: {error}"
-            ))
-        })?;
+        ))
+    })?;
     if updated.rows_affected() == 0 {
         return Err(failure(format!(
             "license={license_id} — the pushes were accepted but no licence row was stamped"

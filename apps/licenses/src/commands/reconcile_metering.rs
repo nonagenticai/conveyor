@@ -788,16 +788,24 @@ enum BudgetCase {
     Absent,
 }
 
-/// `_mark_metering_verified`: stamp `metering_verified_at` and NOTHING ELSE.
+/// `_mark_metering_verified`: stamp `metering_verified_at` (and, through the ORM's
+/// `onupdate`, `updated_at`).
 ///
 /// A zero-row update or a SQL failure is `false` — the licence goes to `failed`, which is what
 /// the reference does. It deliberately does not touch `metering_provisioned_at`: that column was
 /// baselined by migration 018 and is not a coverage signal.
+///
+/// ⚠️ `updated_at = now()` is REQUIRED for parity, not an extra: the reference updates the
+/// SQLAlchemy `License` row (`onupdate=utc_now`), so the stamp advances `updated_at`. The
+/// same-seed Python-vs-Rust run in `contract/cron-parity.md` caught the missing bump; without it
+/// any consumer using `updated_at` as a change marker sees a different row.
 async fn stamp_verified(pool: &PgPool, license_id: Uuid) -> bool {
-    match sqlx::query("UPDATE license SET metering_verified_at = now() WHERE id = $1")
-        .bind(license_id)
-        .execute(pool)
-        .await
+    match sqlx::query(
+        "UPDATE license SET metering_verified_at = now(), updated_at = now() WHERE id = $1",
+    )
+    .bind(license_id)
+    .execute(pool)
+    .await
     {
         Ok(done) => done.rows_affected() > 0,
         Err(error) => {
