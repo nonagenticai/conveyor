@@ -198,11 +198,15 @@ fn outcome(
             problems.push(format!("dry_run_mutated: before={before} after={after}"));
         }
         if before != 0 {
-            problems.push(format!("dry_run_found_expired_tokens: {before} still unrevoked"));
+            problems.push(format!(
+                "dry_run_found_expired_tokens: {before} still unrevoked"
+            ));
         }
     } else {
         if before != 0 && acted.is_empty() {
-            problems.push(format!("selected_nothing_while_{before}_expired_tokens_exist"));
+            problems.push(format!(
+                "selected_nothing_while_{before}_expired_tokens_exist"
+            ));
         }
         if acted.len() as i64 > before {
             problems.push(format!(
@@ -211,7 +215,9 @@ fn outcome(
             ));
         }
         if after != 0 {
-            problems.push(format!("left_behind: {after} still unrevoked (limit={limit})"));
+            problems.push(format!(
+                "left_behind: {after} still unrevoked (limit={limit})"
+            ));
         }
     }
 
@@ -263,7 +269,10 @@ fn env_flag(name: &str, default: bool) -> bool {
     let Some(raw) = var_trimmed(name) else {
         return default;
     };
-    !matches!(raw.to_ascii_lowercase().as_str(), "false" | "0" | "no" | "off")
+    !matches!(
+        raw.to_ascii_lowercase().as_str(),
+        "false" | "0" | "no" | "off"
+    )
 }
 
 fn env_limit() -> Result<i64, String> {

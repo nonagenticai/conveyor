@@ -377,10 +377,7 @@ async fn a_plan_that_owes_nothing_counts_complete_and_is_stamped() {
         .expect("nothing owed is complete");
 
     let calls = stub.calls();
-    assert!(
-        calls_at(&calls, "/api/budget").is_empty(),
-        "{calls:?}"
-    );
+    assert!(calls_at(&calls, "/api/budget").is_empty(), "{calls:?}");
     assert!(
         calls_at(&calls, "/api/quota/config").is_empty(),
         "{calls:?}"

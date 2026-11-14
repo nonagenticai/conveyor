@@ -30,7 +30,7 @@ use chrono::{DateTime, Duration, Utc};
 use conveyor_licenses::billing::BillingTeardown;
 use conveyor_licenses::commands::reap_expired::{Settings, run_from, run_with};
 use conveyor_licenses::db;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -429,7 +429,11 @@ async fn a_dry_run_is_the_default_and_reports_without_writing_or_calling_billing
     assert_eq!(payload["selected"], json!(3));
     assert_eq!(
         payload["selected_license_ids"],
-        json!([REAP_OLD.to_string(), REAP_NEW.to_string(), OUTSIDE.to_string()])
+        json!([
+            REAP_OLD.to_string(),
+            REAP_NEW.to_string(),
+            OUTSIDE.to_string()
+        ])
     );
     assert_eq!(payload["archived"], json!(0), "a dry run writes nothing");
     assert_eq!(payload["exit_code"], json!(1));
@@ -512,7 +516,11 @@ async fn an_armed_run_reaps_exactly_the_reapable_set_and_converges() {
     assert_eq!(payload["selected"], json!(3));
     assert_eq!(
         payload["selected_license_ids"],
-        json!([REAP_OLD.to_string(), REAP_NEW.to_string(), OUTSIDE.to_string()])
+        json!([
+            REAP_OLD.to_string(),
+            REAP_NEW.to_string(),
+            OUTSIDE.to_string()
+        ])
     );
     assert_eq!(payload["archived"], json!(3));
     assert_eq!(payload["exit_code"], json!(0));
@@ -616,7 +624,10 @@ async fn a_limit_smaller_than_the_reapable_count_truncates_the_sweep() {
     assert_eq!(payload["reapable_before"], json!(3));
     assert_eq!(payload["reapable_after"], json!(2));
     assert_eq!(payload["selected"], json!(1));
-    assert_eq!(payload["selected_license_ids"], json!([REAP_OLD.to_string()]));
+    assert_eq!(
+        payload["selected_license_ids"],
+        json!([REAP_OLD.to_string()])
+    );
     assert_eq!(payload["archived"], json!(1));
     assert_eq!(payload["exit_code"], json!(1));
     assert_eq!(
@@ -743,10 +754,9 @@ async fn a_missing_database_url_and_a_bad_env_value_are_config_failures() {
 
     // A typo must refuse, never quietly mean False, and the actor is still NULL because the
     // script reads REAP_ACTOR LAST.
-    let bad_bool = Settings::from_lookup(|name| {
-        (name == "REAP_DRY_RUN").then(|| "ture".to_owned())
-    })
-    .expect_err("a typo must refuse");
+    let bad_bool =
+        Settings::from_lookup(|name| (name == "REAP_DRY_RUN").then(|| "ture".to_owned()))
+            .expect_err("a typo must refuse");
     assert_eq!(bad_bool.actor, None);
     assert_eq!(
         bad_bool.error,
@@ -760,8 +770,10 @@ async fn a_missing_database_url_and_a_bad_env_value_are_config_failures() {
     );
     assert_eq!(bad_bool.outcome().payload["actor"], Value::Null);
 
-    let outcome =
-        run_from(None, |name| (name == "REAP_DRY_RUN").then(|| "ture".to_owned())).await;
+    let outcome = run_from(None, |name| {
+        (name == "REAP_DRY_RUN").then(|| "ture".to_owned())
+    })
+    .await;
     assert_eq!(outcome.code, 2, "{}", outcome.payload);
     assert_eq!(outcome.payload["actor"], Value::Null);
     assert_eq!(outcome.payload["error_kind"], "bad_reap_env");
@@ -780,10 +792,7 @@ async fn a_missing_database_url_and_a_bad_env_value_are_config_failures() {
     let too_big =
         Settings::from_lookup(|name| (name == "REAP_GRACE_DAYS").then(|| "3651".to_owned()))
             .expect_err("a bound must refuse");
-    assert_eq!(
-        too_big.error,
-        "REAP_GRACE_DAYS=3651 is outside 0..3650"
-    );
+    assert_eq!(too_big.error, "REAP_GRACE_DAYS=3651 is outside 0..3650");
 }
 
 /// The CronJob path, end to end: the real binary, a cleared environment, `DATABASE_URL` absent.

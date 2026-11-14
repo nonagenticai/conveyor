@@ -140,7 +140,10 @@ pub async fn list_licenses(
 /// `DatabaseManager.get_license`: one row, both joins, **no soft-delete filter** — the
 /// budget write must be able to reach a retained (soft-deleted) licence exactly as the
 /// reference does before authorizing the caller.
-pub async fn get_license(pool: &PgPool, license_id: Uuid) -> Result<Option<LicenceRow>, sqlx::Error> {
+pub async fn get_license(
+    pool: &PgPool,
+    license_id: Uuid,
+) -> Result<Option<LicenceRow>, sqlx::Error> {
     let sql = format!("SELECT {LICENCE_COLUMNS} {LICENCE_FROM} WHERE l.id = $1");
     sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(license_id)

@@ -336,8 +336,8 @@ pub async fn list_licenses(
     let subject_id = optional_uuid(query.subject_id.as_deref())?;
     let app_id = optional_uuid(query.app_id.as_deref())?;
     let plan_id = optional_uuid(query.plan_id.as_deref())?;
-    let tenant_id = uuid::Uuid::try_parse(&tenant)
-        .map_err(|_| internal_error("Failed to list licenses"))?;
+    let tenant_id =
+        uuid::Uuid::try_parse(&tenant).map_err(|_| internal_error("Failed to list licenses"))?;
 
     let Some(pool) = state.pool.as_ref() else {
         return Err(internal_error("Failed to list licenses"));
@@ -479,10 +479,9 @@ pub async fn set_license_budget(
     // fails the write and the top-level handler answers its 500. Reproduce that status
     // before the database sees a value it cannot store.
     let token_budget_override = match update.token_budget_override {
-        Some(value) => Some(
-            i32::try_from(value)
-                .map_err(|_| internal_error("Failed to set license budget"))?,
-        ),
+        Some(value) => {
+            Some(i32::try_from(value).map_err(|_| internal_error("Failed to set license budget"))?)
+        }
         None => None,
     };
 
@@ -511,16 +510,13 @@ pub async fn set_license_budget(
     .await?;
 
     let previous = license.token_budget_override;
-    let Some(updated) = licence_admin::set_token_budget_override(
-        pool,
-        license_id,
-        token_budget_override,
-    )
-    .await
-    .map_err(|error| {
-        tracing::error!(%error, "Failed to set license budget");
-        internal_error("Failed to set license budget")
-    })?
+    let Some(updated) =
+        licence_admin::set_token_budget_override(pool, license_id, token_budget_override)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "Failed to set license budget");
+                internal_error("Failed to set license budget")
+            })?
     else {
         // Raced a hard delete between the two statements.
         return Err(Refusal::detail(StatusCode::NOT_FOUND, "License not found"));

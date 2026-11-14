@@ -690,10 +690,12 @@ pub async fn internal_get_subject(
         Some(subject) => Some(subject),
         None => match uuid::Uuid::try_parse(&subject_id) {
             // A non-UUID string that matched no keycloak_sub is simply "not found".
-            Ok(id) => internal_reads::subject_by_id(pool, id).await.map_err(|error| {
-                tracing::error!(%error, "Failed to read subject");
-                internal_error("Failed to read subject")
-            })?,
+            Ok(id) => internal_reads::subject_by_id(pool, id)
+                .await
+                .map_err(|error| {
+                    tracing::error!(%error, "Failed to read subject");
+                    internal_error("Failed to read subject")
+                })?,
             Err(_) => None,
         },
     };

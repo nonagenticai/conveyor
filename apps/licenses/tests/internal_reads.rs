@@ -75,10 +75,7 @@ fn route(db: &common::TestDb, roles: &[&str]) -> Router {
     };
     Router::new()
         .route("/internal/apps", route_get(internal_list_apps))
-        .route(
-            "/internal/licenses",
-            route_get(internal_list_licenses),
-        )
+        .route("/internal/licenses", route_get(internal_list_licenses))
         .route(
             "/internal/licenses/{license_id}",
             route_get(internal_get_license),
@@ -87,10 +84,7 @@ fn route(db: &common::TestDb, roles: &[&str]) -> Router {
             "/internal/subjects/{subject_id}",
             route_get(internal_get_subject),
         )
-        .route(
-            "/internal/tenants",
-            route_get(internal_list_tenants),
-        )
+        .route("/internal/tenants", route_get(internal_list_tenants))
         .layer(axum::Extension(user))
         .with_state(state(db.pool.clone()))
 }
@@ -209,8 +203,26 @@ async fn seeded() -> common::TestDb {
     }
 
     for (id, app, code, name, rpm, burst, quota, budget) in [
-        (PLAN_A, APP_A, "basic", "Basic", 60, 10, Some(1000), Some(50_000_000)),
-        (PLAN_B, APP_B, "beta-basic", "Beta Basic", 120, 20, None, None),
+        (
+            PLAN_A,
+            APP_A,
+            "basic",
+            "Basic",
+            60,
+            10,
+            Some(1000),
+            Some(50_000_000),
+        ),
+        (
+            PLAN_B,
+            APP_B,
+            "beta-basic",
+            "Beta Basic",
+            120,
+            20,
+            None,
+            None,
+        ),
     ] {
         sqlx::query(
             "INSERT INTO plan
@@ -544,7 +556,11 @@ async fn licence_filters_follow_the_reference() {
             L_REVOKED.to_string(),
         ]
     );
-    let (_, body) = get(internal_route(&db), "/internal/licenses?include_deleted=true").await;
+    let (_, body) = get(
+        internal_route(&db),
+        "/internal/licenses?include_deleted=true",
+    )
+    .await;
     assert_eq!(
         ids(&body),
         vec![
@@ -633,7 +649,11 @@ async fn tenants_are_newest_first_with_service_actors_always_present() {
         ])
     );
 
-    let (status, body) = get(internal_route(&db), "/internal/tenants?include_archived=true").await;
+    let (status, body) = get(
+        internal_route(&db),
+        "/internal/tenants?include_archived=true",
+    )
+    .await;
     assert_eq!(status, StatusCode::OK);
     let rows = body.as_array().expect("array");
     assert_eq!(rows.len(), 4);
@@ -698,11 +718,7 @@ async fn subjects_resolve_by_keycloak_sub_then_id() {
     assert_eq!(body, human);
 
     // The local uuid7 id resolves to the same row.
-    let (status, body) = get(
-        internal_route(&db),
-        &format!("/internal/subjects/{HUMAN}"),
-    )
-    .await;
+    let (status, body) = get(internal_route(&db), &format!("/internal/subjects/{HUMAN}")).await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body, human);
 

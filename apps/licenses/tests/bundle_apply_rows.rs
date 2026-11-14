@@ -195,13 +195,15 @@ async fn adoption_is_a_compare_and_set_and_promotes_a_dependency_licence() {
         },
     )
     .await;
-    sqlx::query("UPDATE license SET updated_at = now() - interval '2 days' WHERE id IN ($1, $2, $3)")
-        .bind(LICENCE)
-        .bind(LICENCE2)
-        .bind(LICENCE3)
-        .execute(&db.pool)
-        .await
-        .expect("age the rows");
+    sqlx::query(
+        "UPDATE license SET updated_at = now() - interval '2 days' WHERE id IN ($1, $2, $3)",
+    )
+    .bind(LICENCE)
+    .bind(LICENCE2)
+    .bind(LICENCE3)
+    .execute(&db.pool)
+    .await
+    .expect("age the rows");
 
     let before = licence_row(&db, LICENCE).await;
     assert!(
@@ -213,7 +215,10 @@ async fn adoption_is_a_compare_and_set_and_promotes_a_dependency_licence() {
     let adopted = licence_row(&db, LICENCE).await;
     assert_eq!(adopted.bundle_id, Some(BUNDLE));
     assert!(!adopted.is_dependency);
-    assert!(adopted.updated_at > before.updated_at, "updated_at advances");
+    assert!(
+        adopted.updated_at > before.updated_at,
+        "updated_at advances"
+    );
 
     let before_dependency = licence_row(&db, LICENCE2).await;
     assert!(
@@ -290,10 +295,7 @@ async fn a_tenant_id_is_refused_as_a_new_subject_unless_the_tenant_already_trade
 
     match create_or_get_subject(&db.pool, &tenant_sub, "portal").await {
         Err(CreateSubjectError::Refused { message }) => {
-            assert!(
-                message.contains("already registered tenant"),
-                "{message}"
-            );
+            assert!(message.contains("already registered tenant"), "{message}");
         }
         other => panic!("expected the tenant-as-subject refusal, got {other:?}"),
     }

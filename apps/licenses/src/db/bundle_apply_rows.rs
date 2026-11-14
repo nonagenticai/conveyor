@@ -289,10 +289,7 @@ pub async fn attribute_subject_to_tenant(
 ///
 /// A unique violation of [`UQ_ACTIVE_TENANT_APP_SUBJECT`] is [`CreateLicenceError::LostRace`] —
 /// the caller re-reads the winner with [`resolve_lost_insert`]; everything else is a real fault.
-pub async fn create_license(
-    pool: &PgPool,
-    row: NewLicence,
-) -> Result<Uuid, CreateLicenceError> {
+pub async fn create_license(pool: &PgPool, row: NewLicence) -> Result<Uuid, CreateLicenceError> {
     let result: Result<Uuid, sqlx::Error> = sqlx::query_scalar(
         "INSERT INTO license (
              subject_id, app_id, plan_id, tenant_id, bundle_id, is_dependency,
@@ -405,14 +402,19 @@ fn subject_identifier_problem(value: &str) -> Option<&'static str> {
     if value.is_empty() {
         return Some("subject identifier must be a non-empty string");
     }
-    if value.chars().any(|ch| ch.is_whitespace() || ch.is_control()) {
+    if value
+        .chars()
+        .any(|ch| ch.is_whitespace() || ch.is_control())
+    {
         return Some("subject identifier must not contain whitespace or control characters");
     }
     if value.chars().count() > SUBJECT_SUB_MAX_LEN {
         return Some("subject identifier must be at most 255 characters");
     }
     if uuid_shaped_case(value) == Some(false) {
-        return Some("a UUID-shaped subject identifier must be lower case (the form Keycloak issues)");
+        return Some(
+            "a UUID-shaped subject identifier must be lower case (the form Keycloak issues)",
+        );
     }
     None
 }

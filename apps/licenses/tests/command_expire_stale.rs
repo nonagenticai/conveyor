@@ -16,7 +16,7 @@
 mod common;
 
 use chrono::{DateTime, Duration, Utc};
-use conveyor_licenses::commands::expire_stale::{run, run_from, run_with, Settings};
+use conveyor_licenses::commands::expire_stale::{Settings, run, run_from, run_with};
 use conveyor_licenses::db;
 use serde_json::json;
 use sqlx::PgPool;
@@ -258,9 +258,13 @@ async fn a_dry_run_is_the_default_and_reports_the_selected_ids() {
     );
     let blank = Settings::from_lookup(|name| (name == "EXPIRE_DRY_RUN").then(|| "   ".to_owned()))
         .expect("a blank value is the default");
-    assert!(blank.dry_run, "a blank EXPIRE_DRY_RUN must not arm the sweep");
-    let armed = Settings::from_lookup(|name| (name == "EXPIRE_DRY_RUN").then(|| "false".to_owned()))
-        .expect("an explicit false");
+    assert!(
+        blank.dry_run,
+        "a blank EXPIRE_DRY_RUN must not arm the sweep"
+    );
+    let armed =
+        Settings::from_lookup(|name| (name == "EXPIRE_DRY_RUN").then(|| "false".to_owned()))
+            .expect("an explicit false");
     assert!(!armed.dry_run);
 
     let db = seed_estate().await;
@@ -377,7 +381,10 @@ async fn a_limit_smaller_than_the_stale_count_truncates_the_sweep() {
     let payload = &outcome.payload;
     assert_eq!(payload["stale_before"], json!(2));
     assert_eq!(payload["selected"], json!(1));
-    assert_eq!(payload["selected_license_ids"], json!([STALE_OLD.to_string()]));
+    assert_eq!(
+        payload["selected_license_ids"],
+        json!([STALE_OLD.to_string()])
+    );
     assert_eq!(payload["transitioned"], json!(1));
     assert_eq!(payload["stale_after"], json!(1));
     assert_eq!(payload["exit_code"], json!(1));
@@ -428,10 +435,9 @@ async fn a_missing_database_url_is_a_config_failure() {
 
 #[tokio::test]
 async fn a_bad_expire_env_is_a_config_failure_with_the_scripts_message() {
-    let bad_bool = Settings::from_lookup(|name| {
-        (name == "EXPIRE_DRY_RUN").then(|| "ture".to_owned())
-    })
-    .expect_err("a typo must refuse, never mean false");
+    let bad_bool =
+        Settings::from_lookup(|name| (name == "EXPIRE_DRY_RUN").then(|| "ture".to_owned()))
+            .expect_err("a typo must refuse, never mean false");
     assert_eq!(bad_bool.actor, None, "the script reads the actor last");
     assert_eq!(
         bad_bool.error,
@@ -444,16 +450,16 @@ async fn a_bad_expire_env_is_a_config_failure_with_the_scripts_message() {
     );
     assert_eq!(bad_bool.outcome().code, 2);
 
-    let outcome =
-        run_from(None, |name| (name == "EXPIRE_DRY_RUN").then(|| "ture".to_owned())).await;
+    let outcome = run_from(None, |name| {
+        (name == "EXPIRE_DRY_RUN").then(|| "ture".to_owned())
+    })
+    .await;
     assert_eq!(outcome.code, 2, "{}", outcome.payload);
     assert_eq!(outcome.payload["error_kind"], "bad_expire_env");
     assert_eq!(outcome.payload["actor"], serde_json::Value::Null);
 
-    let bad_int = Settings::from_lookup(|name| {
-        (name == "EXPIRE_LIMIT").then(|| "abc".to_owned())
-    })
-    .expect_err("a non-integer must refuse");
+    let bad_int = Settings::from_lookup(|name| (name == "EXPIRE_LIMIT").then(|| "abc".to_owned()))
+        .expect_err("a non-integer must refuse");
     assert_eq!(bad_int.error, "EXPIRE_LIMIT='abc' is not an integer");
 
     let out_of_bounds =
@@ -461,14 +467,12 @@ async fn a_bad_expire_env_is_a_config_failure_with_the_scripts_message() {
             .expect_err("a bound must refuse");
     assert_eq!(out_of_bounds.error, "EXPIRE_LIMIT=0 is outside 1..5000");
 
-    let too_big =
-        Settings::from_lookup(|name| (name == "EXPIRE_LIMIT").then(|| "5001".to_owned()))
-            .expect_err("a bound must refuse");
+    let too_big = Settings::from_lookup(|name| (name == "EXPIRE_LIMIT").then(|| "5001".to_owned()))
+        .expect_err("a bound must refuse");
     assert_eq!(too_big.error, "EXPIRE_LIMIT=5001 is outside 1..5000");
 
-    let honoured =
-        Settings::from_lookup(|name| (name == "EXPIRE_LIMIT").then(|| "10".to_owned()))
-            .expect("10 is in bounds");
+    let honoured = Settings::from_lookup(|name| (name == "EXPIRE_LIMIT").then(|| "10".to_owned()))
+        .expect("10 is in bounds");
     assert_eq!(honoured.limit, 10);
 }
 

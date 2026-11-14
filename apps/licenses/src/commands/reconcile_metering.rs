@@ -78,8 +78,7 @@ const DB_ERROR_KIND: &str = "sqlx::Error";
 /// psycopg/SQLAlchemy's class name for the reference's malformed-canonical-id failure.
 const BAD_UUID_KIND: &str = "DataError";
 /// The port's `_load_app()` failure — see the module's ONE DELIBERATE DIVERGENCE note.
-const STARTUP_ERROR: &str =
-    "METERING_SERVICE_URL is missing or unusable — this sweep reads and writes billing, so it \
+const STARTUP_ERROR: &str = "METERING_SERVICE_URL is missing or unusable — this sweep reads and writes billing, so it \
      cannot start without it";
 /// The `error_kind` the reference attaches to that startup refusal.
 const STARTUP_KIND: &str = "startup_config";
@@ -181,10 +180,15 @@ impl Settings {
             license_id: None,
             error,
         };
-        let limit = env_int(&lookup, "RECONCILE_LIMIT", DEFAULT_LIMIT, MIN_LIMIT, MAX_LIMIT)
-            .map_err(bad)?;
-        let revalidate =
-            env_bool(&lookup, "RECONCILE_REVALIDATE", false).map_err(bad)?;
+        let limit = env_int(
+            &lookup,
+            "RECONCILE_LIMIT",
+            DEFAULT_LIMIT,
+            MIN_LIMIT,
+            MAX_LIMIT,
+        )
+        .map_err(bad)?;
+        let revalidate = env_bool(&lookup, "RECONCILE_REVALIDATE", false).map_err(bad)?;
         // DEFAULT FALSE, and the scheduled manifest must keep it false: true pushes the
         // effective quota over a differing billing row, destroying an operator override.
         let force_plan_quota =
@@ -814,10 +818,7 @@ fn outcome(settings: &Settings, sweep: Sweep) -> RunOutcome {
     payload.insert("scanned".to_owned(), json!(sweep.scanned));
     payload.insert("repaired".to_owned(), json!(sweep.repaired.len()));
     payload.insert("failed".to_owned(), json!(sweep.failed.len()));
-    payload.insert(
-        "repaired_license_ids".to_owned(),
-        json!(sweep.repaired),
-    );
+    payload.insert("repaired_license_ids".to_owned(), json!(sweep.repaired));
     payload.insert("failed_license_ids".to_owned(), json!(sweep.failed));
     payload.insert(
         "uncovered_budget_license_ids".to_owned(),
@@ -956,9 +957,7 @@ fn env_int<F: Fn(&str) -> Option<String>>(
         .parse()
         .map_err(|_| format!("{name}='{raw}' is not an integer"))?;
     if !(minimum..=maximum).contains(&value) {
-        return Err(format!(
-            "{name}={value} is outside {minimum}..{maximum}"
-        ));
+        return Err(format!("{name}={value} is outside {minimum}..{maximum}"));
     }
     Ok(value)
 }

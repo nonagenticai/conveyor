@@ -354,7 +354,10 @@ impl TeardownSummary {
         map.insert("teardown_mode".to_owned(), json!(self.mode));
         map.insert("teardown_attempted".to_owned(), json!(self.attempted));
         map.insert("teardown_quota_failed".to_owned(), json!(self.quota_failed));
-        map.insert("teardown_budget_failed".to_owned(), json!(self.budget_failed));
+        map.insert(
+            "teardown_budget_failed".to_owned(),
+            json!(self.budget_failed),
+        );
         map.insert(
             "teardown_unresolved_tenant".to_owned(),
             json!(self.unresolved_tenant),
@@ -544,7 +547,13 @@ fn classify(sweep: &Sweep, teardown: &Value) -> (i32, String) {
     let before = sweep.before;
     let after = sweep.after;
     let selected_len = sweep.selected.len();
-    let selected_repr = python_list(&sweep.selected.iter().map(Uuid::to_string).collect::<Vec<_>>());
+    let selected_repr = python_list(
+        &sweep
+            .selected
+            .iter()
+            .map(Uuid::to_string)
+            .collect::<Vec<_>>(),
+    );
 
     if selected_len as i64 > before {
         return (
@@ -643,7 +652,8 @@ fn classify(sweep: &Sweep, teardown: &Value) -> (i32, String) {
     let quota_failed = string_list(teardown, "teardown_quota_failed");
     let budget_failed = string_list(teardown, "teardown_budget_failed");
     let unresolved = string_list(teardown, "teardown_unresolved_tenant");
-    if !sweep.dry_run && (!quota_failed.is_empty() || !budget_failed.is_empty() || !unresolved.is_empty())
+    if !sweep.dry_run
+        && (!quota_failed.is_empty() || !budget_failed.is_empty() || !unresolved.is_empty())
     {
         return (
             EXIT_NOT_CONVERGED,
@@ -690,15 +700,21 @@ fn outcome(actor: &str, sweep: Sweep, teardown: Value) -> RunOutcome {
     payload.insert("selected".to_owned(), json!(sweep.selected.len()));
     payload.insert(
         "selected_license_ids".to_owned(),
-        json!(sweep
-            .selected
-            .iter()
-            .map(Uuid::to_string)
-            .collect::<Vec<_>>()),
+        json!(
+            sweep
+                .selected
+                .iter()
+                .map(Uuid::to_string)
+                .collect::<Vec<_>>()
+        ),
     );
     payload.insert(
         "archived".to_owned(),
-        json!(if sweep.dry_run { 0 } else { sweep.selected.len() }),
+        json!(if sweep.dry_run {
+            0
+        } else {
+            sweep.selected.len()
+        }),
     );
     if let Value::Object(teardown) = teardown {
         payload.extend(teardown);

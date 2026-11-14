@@ -71,7 +71,13 @@ impl Stub {
     }
 }
 
-fn record(stub: &Stub, method: &'static str, path: String, headers: &HeaderMap, body: Option<Value>) {
+fn record(
+    stub: &Stub,
+    method: &'static str,
+    path: String,
+    headers: &HeaderMap,
+    body: Option<Value>,
+) {
     let tenant = headers
         .get("x-tenant-id")
         .and_then(|value| value.to_str().ok())
@@ -111,7 +117,13 @@ async fn budget_push(
     headers: HeaderMap,
     Json(body): Json<Value>,
 ) -> axum::http::StatusCode {
-    record(&stub, "POST", "/api/budget".to_owned(), &headers, Some(body));
+    record(
+        &stub,
+        "POST",
+        "/api/budget".to_owned(),
+        &headers,
+        Some(body),
+    );
     axum::http::StatusCode::CREATED
 }
 
@@ -360,7 +372,10 @@ async fn an_uncovered_licence_gets_both_rows_created_and_is_stamped() {
     assert_eq!(payload["scanned"], json!(1));
     assert_eq!(payload["repaired"], json!(1));
     assert_eq!(payload["failed"], json!(0));
-    assert_eq!(payload["repaired_license_ids"], json!([LICENSE_A.to_string()]));
+    assert_eq!(
+        payload["repaired_license_ids"],
+        json!([LICENSE_A.to_string()])
+    );
     assert_eq!(
         payload["uncovered_budget_license_ids"],
         json!([LICENSE_A.to_string()])
@@ -418,7 +433,11 @@ async fn a_differing_billing_quota_is_left_alone_but_still_converges() {
 
     assert_eq!(outcome.code, 0);
     assert_eq!(payload["scanned"], json!(1));
-    assert_eq!(payload["repaired"], json!(1), "a deliberate override is not a failure");
+    assert_eq!(
+        payload["repaired"],
+        json!(1),
+        "a deliberate override is not a failure"
+    );
     assert_eq!(payload["quota_drift_license_ids"], json!([licence]));
     assert_eq!(payload["quotas_already_configured"], json!(0));
     assert_eq!(payload["quotas_pushed"], json!(0));
@@ -505,7 +524,10 @@ async fn revalidate_re_examines_a_stamped_licence() {
         "reason was {:?}",
         outcome.payload["reason"]
     );
-    assert!(stub.calls().is_empty(), "a zero-row sweep makes no billing call");
+    assert!(
+        stub.calls().is_empty(),
+        "a zero-row sweep makes no billing call"
+    );
 
     let mut knobs = settings();
     knobs.revalidate = true;
@@ -529,7 +551,10 @@ async fn a_dry_run_reads_but_pushes_nothing_and_reports_the_same_counts() {
     let outcome = run_with_stub(&db, knobs, &stub).await;
     let payload = &outcome.payload;
 
-    assert_eq!(outcome.code, 1, "a measure-only run over uncovered licences is not converged");
+    assert_eq!(
+        outcome.code, 1,
+        "a measure-only run over uncovered licences is not converged"
+    );
     assert_eq!(payload["dry_run"], json!(true));
     assert_eq!(payload["scanned"], json!(1));
     assert_eq!(
@@ -686,12 +711,7 @@ async fn missing_database_url_and_missing_billing_are_exit_two_with_static_error
     assert_eq!(outcome.payload["exit_code"], json!(2));
 
     // A missing billing client is the port's startup_config leg.
-    let outcome = run_with(
-        Some("postgres://unused".to_owned()),
-        settings(),
-        None,
-    )
-    .await;
+    let outcome = run_with(Some("postgres://unused".to_owned()), settings(), None).await;
     assert_eq!(outcome.code, 2);
     assert_eq!(sorted_keys(&outcome.payload), failure_keys());
     assert_eq!(outcome.payload["error_kind"], "startup_config");
@@ -705,7 +725,12 @@ async fn missing_database_url_and_missing_billing_are_exit_two_with_static_error
     // A malformed canary id fails before any sweep, never as "already fine".
     let mut knobs = settings();
     knobs.license_id = Some("not-a-uuid".to_owned());
-    let outcome = run_with(Some("postgres://unused".to_owned()), knobs, Some(provisioner(&base))).await;
+    let outcome = run_with(
+        Some("postgres://unused".to_owned()),
+        knobs,
+        Some(provisioner(&base)),
+    )
+    .await;
     assert_eq!(outcome.code, 2);
     assert_eq!(outcome.payload["license_id"], "not-a-uuid");
     assert_eq!(outcome.payload["error_kind"], "DataError");

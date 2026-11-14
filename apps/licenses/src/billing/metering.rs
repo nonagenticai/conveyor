@@ -284,7 +284,12 @@ impl MeteringProvisioner {
                 "app_name": app_name,
             });
             if let Err(error) = self
-                .post("/api/quota/config", tenant_id, &body, authorization.as_deref())
+                .post(
+                    "/api/quota/config",
+                    tenant_id,
+                    &body,
+                    authorization.as_deref(),
+                )
                 .await
             {
                 tracing::warn!(
@@ -391,10 +396,7 @@ impl MeteringProvisioner {
         authorization: Option<&str>,
     ) -> Option<HashMap<String, Option<i64>>> {
         let path = format!("/api/budget/list/{tenant_id}");
-        let value = match self
-            .get_json(&path, tenant_id, authorization)
-            .await
-        {
+        let value = match self.get_json(&path, tenant_id, authorization).await {
             Ok(value) => value,
             Err(error) => {
                 tracing::warn!(
@@ -434,13 +436,8 @@ impl MeteringProvisioner {
     ) -> QuotaRead {
         // Both values are UUIDs, so they need no percent-encoding. (reqwest 0.13 has no
         // `RequestBuilder::query`, and a hand-built query keeps this port dependency-free.)
-        let path = format!(
-            "/api/quota/check?license_id={license_id}&plan_id={plan_id}"
-        );
-        let error = match self
-            .get_json(&path, tenant_id, authorization)
-            .await
-        {
+        let path = format!("/api/quota/check?license_id={license_id}&plan_id={plan_id}");
+        let error = match self.get_json(&path, tenant_id, authorization).await {
             Ok(value) => return parse_quota_check(&value),
             Err(error) => error,
         };
@@ -619,16 +616,16 @@ async fn read_snapshot(
               WHERE p.id = $1",
     )
     .bind(plan_id)
-        .bind(license_id)
-        .bind(tenant_id)
-        .fetch_optional(pool)
-        .await
-        .map_err(|error| {
-            failure(format!(
-                "license={license_id} tenant={tenant_id} plan={plan_id} — could not read the \
+    .bind(license_id)
+    .bind(tenant_id)
+    .fetch_optional(pool)
+    .await
+    .map_err(|error| {
+        failure(format!(
+            "license={license_id} tenant={tenant_id} plan={plan_id} — could not read the \
                  metering inputs: {error}"
-            ))
-        })?;
+        ))
+    })?;
     Ok(row.map(
         |(
             plan_token_budget_monthly,

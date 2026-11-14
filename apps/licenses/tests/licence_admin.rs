@@ -172,7 +172,16 @@ async fn seeded() -> common::TestDb {
             .expect("app_issuer");
     }
     for (id, app, code, name, rpm, burst, quota, budget) in [
-        (PLAN, APP, "basic", "Basic", 60, 10, Some(1000), Some(50_000_000)),
+        (
+            PLAN,
+            APP,
+            "basic",
+            "Basic",
+            60,
+            10,
+            Some(1000),
+            Some(50_000_000),
+        ),
         (PLAN2, APP2, "basic-2", "Basic 2", 120, 20, None, None),
         (PLAN3, APP3, "basic-3", "Basic 3", 90, 15, None, None),
     ] {
@@ -209,10 +218,37 @@ async fn seeded() -> common::TestDb {
     for (id, subject, tenant, app, plan, status, created_at, deleted_at) in [
         // The caller's tenant.
         (L1, SUBJECT, TENANT, APP, PLAN, "active", "2026-01-02", None),
-        (L2, SUBJECT2, TENANT, APP2, PLAN2, "active", "2026-01-03", None),
-        (L3, SUBJECT2, TENANT, APP, PLAN, "revoked", "2026-01-04", None),
+        (
+            L2,
+            SUBJECT2,
+            TENANT,
+            APP2,
+            PLAN2,
+            "active",
+            "2026-01-03",
+            None,
+        ),
+        (
+            L3,
+            SUBJECT2,
+            TENANT,
+            APP,
+            PLAN,
+            "revoked",
+            "2026-01-04",
+            None,
+        ),
         // A foreign tenant: never listed by GET /licenses.
-        (L4, SUBJECT, TENANT2, APP, PLAN, "active", "2026-01-05", None),
+        (
+            L4,
+            SUBJECT,
+            TENANT2,
+            APP,
+            PLAN,
+            "active",
+            "2026-01-05",
+            None,
+        ),
         // Soft-deleted (retained): hidden unless include_deleted=true.
         (
             L5,
@@ -225,9 +261,27 @@ async fn seeded() -> common::TestDb {
             Some("2026-09-01"),
         ),
         // The foreign tenant's second licence, for the admin read.
-        (L6, SUBJECT2, TENANT2, APP2, PLAN2, "active", "2026-01-07", None),
+        (
+            L6,
+            SUBJECT2,
+            TENANT2,
+            APP2,
+            PLAN2,
+            "active",
+            "2026-01-07",
+            None,
+        ),
         // owner-a ISSUES APP3 but does not own TENANT2: tenant_not_accessible.
-        (L7, SUBJECT, TENANT2, APP3, PLAN3, "active", "2026-01-08", None),
+        (
+            L7,
+            SUBJECT,
+            TENANT2,
+            APP3,
+            PLAN3,
+            "active",
+            "2026-01-08",
+            None,
+        ),
     ] {
         sqlx::query(
             "INSERT INTO license
@@ -267,7 +321,10 @@ async fn the_listing_is_tenant_scoped_filtered_and_fully_enriched() {
     let (status, body) = get(route(&db, reader(TENANT)), "/licenses").await;
     assert_eq!(status, StatusCode::OK, "{body}");
     // The foreign tenant's licences (L4, L7) and the soft-deleted L5 are absent.
-    assert_eq!(ids(&body), vec![L1.to_string(), L2.to_string(), L3.to_string()]);
+    assert_eq!(
+        ids(&body),
+        vec![L1.to_string(), L2.to_string(), L3.to_string()]
+    );
 
     // The captured 22-property LicenseResponse, with BOTH nested objects populated.
     let row = body
@@ -414,7 +471,11 @@ async fn the_admin_read_crosses_tenants_and_toggles_soft_deleted_rows() {
     assert!(ids(&body).contains(&L5.to_string()));
 
     // The status filter composes with the flag.
-    let (_, body) = get(route(&db, operator(None)), "/licenses/admin/all?status=revoked").await;
+    let (_, body) = get(
+        route(&db, operator(None)),
+        "/licenses/admin/all?status=revoked",
+    )
+    .await;
     assert_eq!(ids(&body), vec![L3.to_string()]);
     let (_, body) = get(
         route(&db, operator(None)),
@@ -438,7 +499,10 @@ async fn the_admin_read_crosses_tenants_and_toggles_soft_deleted_rows() {
     )
     .await;
     assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "{body}");
-    assert_eq!(body["detail"][0]["loc"], json!(["query", "include_deleted"]));
+    assert_eq!(
+        body["detail"][0]["loc"],
+        json!(["query", "include_deleted"])
+    );
     assert_eq!(body["detail"][0]["type"], "bool_parsing");
 }
 
@@ -588,7 +652,12 @@ async fn the_budget_patch_refusals_are_the_references() {
     assert_eq!(stored, None);
 
     // `cross_owner` bypasses the two ownership locks, audited.
-    let mut crossing = user(&["license-admin"], "break-glass", Some(TENANT), Some("stranger"));
+    let mut crossing = user(
+        &["license-admin"],
+        "break-glass",
+        Some(TENANT),
+        Some("stranger"),
+    );
     crossing.cross_owner = true;
     let (status, body) = send(
         route(&db, crossing),
@@ -619,7 +688,11 @@ async fn the_budget_body_and_path_validation_is_fastapis_shape() {
 
     for (payload, entry_type, loc) in [
         // An omitted key is a 422, never a clear.
-        (json!({}), "missing", json!(["body", "token_budget_override"])),
+        (
+            json!({}),
+            "missing",
+            json!(["body", "token_budget_override"]),
+        ),
         (
             json!({"token_budget_override": -1}),
             "greater_than_equal",
@@ -644,7 +717,11 @@ async fn the_budget_body_and_path_validation_is_fastapis_shape() {
             Some(payload.clone()),
         )
         .await;
-        assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "{payload}: {body}");
+        assert_eq!(
+            status,
+            StatusCode::UNPROCESSABLE_ENTITY,
+            "{payload}: {body}"
+        );
         assert_eq!(body["detail"][0]["type"], entry_type, "{payload}: {body}");
         assert_eq!(body["detail"][0]["loc"], loc, "{payload}: {body}");
     }

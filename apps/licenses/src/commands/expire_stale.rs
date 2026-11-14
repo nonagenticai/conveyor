@@ -79,8 +79,7 @@ const SELECT_STALE_FOR_UPDATE_SQL: &str = "SELECT id, status FROM license \
 
 /// The sweep's bulk UPDATE, keyed on exactly the ids just locked. `AND status = 'active'` is the
 /// script's explicit re-qualification under READ COMMITTED, belt-and-braces.
-const EXPIRE_IDS_SQL: &str =
-    "UPDATE license SET status = 'expired', updated_at = $1 WHERE id = ANY($2) AND status = 'active'";
+const EXPIRE_IDS_SQL: &str = "UPDATE license SET status = 'expired', updated_at = $1 WHERE id = ANY($2) AND status = 'active'";
 
 /// The three environment knobs, resolved once.
 #[derive(Debug, Clone, PartialEq, Eq)]

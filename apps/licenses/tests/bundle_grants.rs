@@ -6,9 +6,7 @@
 mod common;
 
 use conveyor_licenses::db;
-use conveyor_licenses::db::bundle_grants::{
-    PLATFORM_OWNER, bundle_grantees, ensure_bundle_grants,
-};
+use conveyor_licenses::db::bundle_grants::{PLATFORM_OWNER, bundle_grantees, ensure_bundle_grants};
 use uuid::Uuid;
 
 const TENANT: Uuid = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0001);
@@ -130,20 +128,25 @@ async fn ensure(
     hold: bool,
     dependency_grants: &[(String, String)],
 ) -> Vec<String> {
-    ensure_bundle_grants(&db.pool, TENANT, bundle, granted_by, hold, dependency_grants)
-        .await
-        .expect("ensure_bundle_grants")
+    ensure_bundle_grants(
+        &db.pool,
+        TENANT,
+        bundle,
+        granted_by,
+        hold,
+        dependency_grants,
+    )
+    .await
+    .expect("ensure_bundle_grants")
 }
 
 async fn bundle_rows(db: &common::TestDb, bundle: Uuid) -> i64 {
-    sqlx::query_scalar(
-        "SELECT count(*) FROM tenant_bundle WHERE tenant_id = $1 AND bundle_id = $2",
-    )
-    .bind(TENANT)
-    .bind(bundle)
-    .fetch_one(&db.pool)
-    .await
-    .expect("tenant_bundle count")
+    sqlx::query_scalar("SELECT count(*) FROM tenant_bundle WHERE tenant_id = $1 AND bundle_id = $2")
+        .bind(TENANT)
+        .bind(bundle)
+        .fetch_one(&db.pool)
+        .await
+        .expect("tenant_bundle count")
 }
 
 async fn grants(db: &common::TestDb) -> Vec<String> {
@@ -201,11 +204,19 @@ async fn the_matrix_over_the_database_grants_least_privilege() {
     let db = seeded().await;
 
     // The tenant's own owner is the only issuer of `own`: no grant.
-    assert!(ensure(&db, BUNDLE_OWN, "owner-a", false, &[]).await.is_empty());
+    assert!(
+        ensure(&db, BUNDLE_OWN, "owner-a", false, &[])
+            .await
+            .is_empty()
+    );
     assert!(grants(&db).await.is_empty());
 
     // Several issuers, no platform: no grant at all (not even an app owner).
-    assert!(ensure(&db, BUNDLE_MULTI, "owner-a", false, &[]).await.is_empty());
+    assert!(
+        ensure(&db, BUNDLE_MULTI, "owner-a", false, &[])
+            .await
+            .is_empty()
+    );
     assert!(grants(&db).await.is_empty());
 
     // Several issuers including platform: platform, and only platform.
@@ -238,7 +249,11 @@ async fn several_bundled_apps_union_their_grantees_without_duplicates() {
     assert_eq!(grants(&db).await, vec!["owner-b".to_owned()]);
 
     // Nothing new on an identical second call.
-    assert!(ensure(&db, BUNDLE_UNION, "owner-a", false, &[]).await.is_empty());
+    assert!(
+        ensure(&db, BUNDLE_UNION, "owner-a", false, &[])
+            .await
+            .is_empty()
+    );
     assert_eq!(grants(&db).await.len(), 1);
 }
 
@@ -255,11 +270,19 @@ async fn the_hold_is_recorded_once_and_every_write_is_idempotent() {
     assert_eq!(grants(&db).await, vec!["owner-b".to_owned()]);
 
     // hold=true: the hold lands; the existing grant is not returned again.
-    assert!(ensure(&db, BUNDLE_SINGLE, "owner-a", true, &[]).await.is_empty());
+    assert!(
+        ensure(&db, BUNDLE_SINGLE, "owner-a", true, &[])
+            .await
+            .is_empty()
+    );
     assert_eq!(bundle_rows(&db, BUNDLE_SINGLE).await, 1);
 
     // A second identical call writes and returns nothing.
-    assert!(ensure(&db, BUNDLE_SINGLE, "owner-a", true, &[]).await.is_empty());
+    assert!(
+        ensure(&db, BUNDLE_SINGLE, "owner-a", true, &[])
+            .await
+            .is_empty()
+    );
     assert_eq!(bundle_rows(&db, BUNDLE_SINGLE).await, 1);
     assert_eq!(grants(&db).await, vec!["owner-b".to_owned()]);
 }
@@ -288,6 +311,10 @@ async fn dependency_grants_are_app_scoped_written_once_and_skip_the_tenant_owner
     assert_eq!(bundle_rows(&db, BUNDLE_DEPS).await, 0);
 
     // Idempotent: no new row, nothing returned.
-    assert!(ensure(&db, BUNDLE_DEPS, "owner-b", false, &deps).await.is_empty());
+    assert!(
+        ensure(&db, BUNDLE_DEPS, "owner-b", false, &deps)
+            .await
+            .is_empty()
+    );
     assert_eq!(dependency_rows(&db).await.len(), 1);
 }

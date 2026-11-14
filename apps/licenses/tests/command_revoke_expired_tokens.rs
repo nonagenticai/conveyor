@@ -12,7 +12,7 @@
 mod common;
 
 use chrono::{DateTime, Duration, Utc};
-use conveyor_licenses::commands::revoke_expired_tokens::{run, run_with, Settings};
+use conveyor_licenses::commands::revoke_expired_tokens::{Settings, run, run_with};
 use conveyor_licenses::db;
 use serde_json::json;
 use sqlx::PgPool;
@@ -114,8 +114,22 @@ async fn seed_estate() -> common::TestDb {
     .expect("license");
 
     let now = Utc::now();
-    insert_token(&db.pool, EXPIRED_OLD, Some(now - Duration::days(2)), false, None).await;
-    insert_token(&db.pool, EXPIRED_NEW, Some(now - Duration::days(1)), false, None).await;
+    insert_token(
+        &db.pool,
+        EXPIRED_OLD,
+        Some(now - Duration::days(2)),
+        false,
+        None,
+    )
+    .await;
+    insert_token(
+        &db.pool,
+        EXPIRED_NEW,
+        Some(now - Duration::days(1)),
+        false,
+        None,
+    )
+    .await;
     insert_token(&db.pool, LIVE, Some(now + Duration::days(1)), false, None).await;
     insert_token(&db.pool, LONG_LIVED, None, false, None).await;
     insert_token(
@@ -217,7 +231,10 @@ async fn an_armed_run_revokes_exactly_the_expired_set_and_converges() {
         assert!(revoked_at(&db.pool, id).await.is_none(), "{id}: revoked_at");
     }
     // The historical audit record survives a sweep.
-    assert_eq!(revoked_at(&db.pool, ALREADY_REVOKED).await, Some(pre_revoked_at));
+    assert_eq!(
+        revoked_at(&db.pool, ALREADY_REVOKED).await,
+        Some(pre_revoked_at)
+    );
 }
 
 #[tokio::test]
