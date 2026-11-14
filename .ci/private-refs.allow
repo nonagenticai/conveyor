@@ -17,3 +17,4 @@
 docs/design/scripts/build-docs.py:re\.compile          # the redaction rules, not a reference
 docs/design/scripts/check-docs.cjs:\.internal hostname # the assertion label, not a reference
 docs/design/studio.css:agent-avatar\.internal          # CSS class name, not a hostname
+apps/research/src/fetch.rs:\.internal                   # the SSRF guard's own blocklist suffix, not a hostname
