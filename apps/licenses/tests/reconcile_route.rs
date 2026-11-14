@@ -517,10 +517,11 @@ async fn an_armed_run_repairs_and_stamps_the_named_licence_only() {
 }
 
 /// The lock check is the contract gate: this route closes exactly one of the captured
-/// operations, so the "not registered" gap shrinks from 40 to 39, this route is never named,
-/// and the operation's query parameters and result schema are the capture's byte for byte.
+/// operations and is never named as unregistered on any tree, and its query parameters and
+/// result schema are the capture's byte for byte. The absolute gap count is deliberately not
+/// asserted — sibling slices move it as they land.
 #[test]
-fn the_lock_check_names_39_unported_operations_after_this_route() {
+fn the_lock_check_never_names_this_route() {
     use conveyor_licenses::contract::normalize::normalize;
 
     let captured = conveyor_licenses::contract::lock().expect("the embedded capture parses");
@@ -536,15 +537,13 @@ fn the_lock_check_names_39_unported_operations_after_this_route() {
         !message.contains("documented but not registered: POST /licenses/admin/metering/reconcile"),
         "{message}"
     );
-    // The first problem is prefixed by the error's own sentence, so strip it before splitting.
-    let problems = message
-        .strip_prefix("the served contract drifted from the capture: ")
-        .unwrap_or(&message);
-    let missing = problems
-        .split("; ")
-        .filter(|problem| problem.starts_with("not registered: "))
-        .count();
-    assert_eq!(missing, 39, "{message}");
+    // The absolute unported count is NOT asserted: sibling routes land on other slices and
+    // move it. What must hold on this tree is that this operation is registered and served —
+    // the two asserts above — and that the route set declares it.
+    assert!(
+        conveyor_licenses::router::ROUTES.contains(&("POST", "/licenses/admin/metering/reconcile")),
+        "the route must be declared in ROUTES"
+    );
 
     // The operation itself: the five query parameters, the wire-typed defaults and the
     // `MeteringReconcileResult` schema must be exactly the capture's (headers and prose aside).
