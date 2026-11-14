@@ -276,8 +276,28 @@ const shot = (name) =>
       "change approval drafts a new baseline and leaves pins unchanged",
     );
 
+    // A live organisation payload flips the Organisation and Jobs ribbons and replaces their
+    // fixtures (T0). In DESIGN mode both pages keep the fixture catalogue.
+    const liveOrganisation = await page.evaluate(() => {
+      const snapshot = window.CONVEYOR_SNAPSHOT;
+      return Boolean(
+        snapshot &&
+          snapshot.schema === "design-snapshot/v1" &&
+          snapshot.organisation &&
+          (snapshot.organisation.industries || []).length,
+      );
+    });
+
     // 5. Organisation: dual control, decision ladder, refinement versions.
     await nav("organisation");
+    if (liveOrganisation) {
+      check((await content()).includes("LIVE"), "the organisation ribbon is LIVE");
+    } else {
+      check(
+        (await content()).includes("V2 · PROPOSED"),
+        "the organisation ribbon is V2 · PROPOSED in DESIGN mode",
+      );
+    }
     await tab("organisation", "Approval policies");
     await action("self-approve");
     check(
@@ -298,24 +318,42 @@ const shot = (name) =>
 
     // 6. Jobs: immutable releases, bindings and the stale-binding refusal.
     await nav("jobs");
-    check((await content()).includes("software.delivery.backend_engineer"), "job catalogue");
-    await tab("jobs", "Releases");
-    await action("publish-release");
-    check(
-      (await content()).includes("Publish gate opened"),
-      "a draft release needs a publish gate",
-    );
-    await tab("jobs", "Bindings");
-    await action("stale");
-    check(
-      (await content()).includes("409 job_binding_stale"),
-      "a stale binding is refused before any model call",
-    );
-    await action("retire-binding");
-    check(
-      (await page.locator(".e-table tbody tr.selected").innerText()).includes("Retired"),
-      "retiring a binding keeps history",
-    );
+    if (liveOrganisation) {
+      check((await content()).includes("LIVE"), "the jobs ribbon is LIVE");
+      check(
+        (await content()).includes("backend_engineer"),
+        "the live job catalogue renders the seeded job",
+      );
+      check(
+        (await content()).includes("Published"),
+        "a live described job shows its published release",
+      );
+      await tab("jobs", "Departments");
+      check(
+        (await content()).toLowerCase().includes("delivery"),
+        "the live departments render",
+      );
+      await tab("jobs", "Catalogue");
+    } else {
+      check((await content()).includes("software.delivery.backend_engineer"), "job catalogue");
+      await tab("jobs", "Releases");
+      await action("publish-release");
+      check(
+        (await content()).includes("Publish gate opened"),
+        "a draft release needs a publish gate",
+      );
+      await tab("jobs", "Bindings");
+      await action("stale");
+      check(
+        (await content()).includes("409 job_binding_stale"),
+        "a stale binding is refused before any model call",
+      );
+      await action("retire-binding");
+      check(
+        (await page.locator(".e-table tbody tr.selected").innerText()).includes("Retired"),
+        "retiring a binding keeps history",
+      );
+    }
     await tab("jobs", "Legacy import");
     check(
       (await content()).includes("not the live model"),
@@ -507,13 +545,34 @@ const shot = (name) =>
       "a never-refused gate is flagged",
     );
 
-    // 12b. The run inspector gains the V2 tools panel and the binding/release pin.
+    // 12b. The run inspector: the live Execution room when the snapshot carries runs,
+    // otherwise the V2 tools-panel fixture.
+    const liveRuns = await page.evaluate(() => {
+      const snapshot = window.CONVEYOR_SNAPSHOT;
+      return Boolean(
+        snapshot &&
+          snapshot.schema === "design-snapshot/v1" &&
+          snapshot.work &&
+          (snapshot.work.runs || []).length,
+      );
+    });
     await nav("execution");
-    check(
-      (await content()).includes("Run binding & tools") &&
-        (await content()).includes("3f9c"),
-      "run inspector exposes the tools panel and release pin",
-    );
+    if (liveRuns) {
+      check(
+        (await content()).includes("Execution room"),
+        "the live execution room lists the snapshot's runs",
+      );
+      check(
+        (await content()).includes("RUN"),
+        "the live run table names its runs",
+      );
+    } else {
+      check(
+        (await content()).includes("Run binding & tools") &&
+          (await content()).includes("3f9c"),
+        "run inspector exposes the tools panel and release pin",
+      );
+    }
     await page.setViewportSize({ width: 390, height: 1060 });
     await nav("execution");
     check(!(await overflow()), "execution tools panel fits at 390px");

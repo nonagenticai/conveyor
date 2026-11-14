@@ -55,6 +55,11 @@ pub mod inference;
 // S15: the work-package memory vocabularies and the digest a consolidation derives.
 pub mod memory;
 pub mod model;
+// T0 (SPEC_V2 §4.5, D61): the internal Executor seam — the kind vocabulary, the two live
+// implementations' validation contract, and the registry. Behaviour is T2's.
+pub mod executor;
+// T0 (SPEC_V2 §4.1–§4.4): the organisation spine's release hash and binding vocabulary.
+pub mod organisation;
 pub mod plan;
 pub mod process;
 // SPEC D28 / CONTRACT §21: the procedure (SOP) a step is judged against.
