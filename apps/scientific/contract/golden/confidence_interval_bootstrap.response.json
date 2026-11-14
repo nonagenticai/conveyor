@@ -1,0 +1,8 @@
+{
+  "ci_lower": 1.8,
+  "ci_upper": 4.2,
+  "computation_time_ms": 50.92,
+  "confidence_level": 0.95,
+  "mean": 3.0,
+  "method": "bootstrap"
+}
