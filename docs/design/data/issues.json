@@ -5,7 +5,7 @@
       "title": "programme: the measured truth measures V2 slices (T0 built, not proposed)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/123",
-      "updatedAt": "2026-11-14T22:28:12Z",
+      "updatedAt": "2026-11-14T22:36:40Z",
       "labels": [
         {
           "name": "unit",
@@ -113,17 +113,17 @@
     {
       "number": 116,
       "title": "estate: absorb lean4-prover \u2014 contract, the crate moves into apps/lean4-prover",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/116",
-      "updatedAt": "2026-11-14T22:03:34Z",
+      "updatedAt": "2026-11-14T22:54:23Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -176,9 +176,9 @@
     {
       "number": 105,
       "title": "estate: absorb scientific-processor \u2014 contract, Rust rewrite in apps/scientific, parity",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/105",
-      "updatedAt": "2026-11-14T18:06:04Z",
+      "updatedAt": "2026-11-14T22:31:55Z",
       "labels": [
         {
           "name": "unit",
