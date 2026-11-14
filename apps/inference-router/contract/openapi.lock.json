@@ -1,0 +1,3597 @@
+{
+  "components": {
+    "schemas": {
+      "Body_activate_inference_policy_api_admin_tenants__tenant_id__inference_policy_activate_post": {
+        "properties": {
+          "version": {
+            "minimum": 1.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "Body_activate_inference_policy_api_admin_tenants__tenant_id__inference_policy_activate_post",
+        "type": "object"
+      },
+      "ChatCompletionRequest": {
+        "description": "OpenAI-compatible /api/chat/completions request body.",
+        "properties": {
+          "enable_reasoning": {
+            "default": false,
+            "description": "Opt in to chain-of-thought / reasoning emission on reasoning models (Nemotron-V3, DeepSeek-R1). Default False because reasoning eats max_tokens budget; truncation strands the answer mid-<think>. Set True only for judge-style workers that want the reasoning trace in response_message.reasoning_content.",
+            "title": "Enable Reasoning",
+            "type": "boolean"
+          },
+          "frequency_penalty": {
+            "anyOf": [
+              {
+                "maximum": 2.0,
+                "minimum": -2.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "OpenAI-standard frequency penalty. Forwarded verbatim to OpenAI-compatible upstreams when set, omitted when None. Not sent to Anthropic. Recorded in the ``inference_call`` ledger.",
+            "title": "Frequency Penalty"
+          },
+          "max_tokens": {
+            "anyOf": [
+              {
+                "maximum": 16384.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Maximum number of tokens to generate in the response. Accepts the OpenAI-modern `max_completion_tokens` alias because pydantic-ai 1.x and openai-python 2.x both serialise the field under that name; without the alias the field arrived as None and vLLM defaulted to `max_model_len - prompt` (~8000), which blew past IR's 600s ReadTimeout on every structured-output call and tripped the breaker (2026-05-19 trust.pdf incident). Capped at 16384 as a hard ceiling: on 2026-05-13 an uncapped request from WM let vLLM (Nemotron-3 on SM120/GB10) fill the remaining ~130k tokens of its 131k context window and crashed in a CUTLASS TMA-WS FP4-MoE kernel. This bound is the last line of defense — callers that send oversized values get a clean 422 instead of triggering an engine restart.",
+            "title": "Max Tokens"
+          },
+          "messages": {
+            "description": "List of chat messages forming the conversation",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "title": "Messages",
+            "type": "array"
+          },
+          "model": {
+            "default": "gemma",
+            "description": "Model or schema ID to route the request to",
+            "title": "Model",
+            "type": "string"
+          },
+          "repetition_penalty": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 10.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "vLLM sampling extension (1.0 = no penalty). Forwarded verbatim to OpenAI-compatible upstreams (vLLM behind pgx-local) when set and omitted when None -- same contract as ``seed``: an absent value leaves the upstream body byte-identical. Not sent to Anthropic. Recorded in the ``inference_call`` ledger.",
+            "title": "Repetition Penalty"
+          },
+          "response_format": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResponseFormat"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Structured output spec. When type=='json_schema', the router fingerprints the schema content to derive a schema_id and auto-registers a routing rule."
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "maximum": 9.223372036854776E+18,
+                "minimum": -9.223372036854776E+18,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sampling seed, forwarded verbatim to every OpenAI-compatible upstream (vLLM, DeepSeek, xAI) when set, and omitted from the upstream body when None -- so an absent seed changes nothing. The Anthropic Messages API has no seed parameter; it is not sent there. Bounded to a signed 64-bit integer because it is recorded in the ``inference_call`` ledger's BIGINT column.",
+            "title": "Seed"
+          },
+          "stream": {
+            "default": false,
+            "description": "Whether to stream the response as server-sent events",
+            "title": "Stream",
+            "type": "boolean"
+          },
+          "temperature": {
+            "default": 0.1,
+            "description": "Sampling temperature (0.0 = deterministic, 2.0 = maximum randomness)",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Temperature",
+            "type": "number"
+          },
+          "tool_choice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "OpenAI tool_choice control: 'none' / 'auto' / 'required' or {'type':'function','function':{'name':'…'}} to force one tool. Forwarded unchanged when set.",
+            "title": "Tool Choice"
+          },
+          "tools": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ToolSpec"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "OpenAI tool declarations. Forwarded unchanged to providers that support tool/function calling. vLLM with --enable-auto-tool-choice and a matching --tool-call-parser handles these; DeepSeek/Claude honor their own provider semantics.",
+            "title": "Tools"
+          }
+        },
+        "required": [
+          "messages"
+        ],
+        "title": "ChatCompletionRequest",
+        "type": "object"
+      },
+      "ChatCompletionResponse": {
+        "description": "OpenAI-compatible /api/chat/completions response body.",
+        "properties": {
+          "choices": {
+            "description": "List of generated completion choices",
+            "items": {
+              "$ref": "#/components/schemas/Choice"
+            },
+            "title": "Choices",
+            "type": "array"
+          },
+          "created": {
+            "description": "Unix timestamp of when the completion was created",
+            "title": "Created",
+            "type": "integer"
+          },
+          "id": {
+            "description": "Unique identifier for this completion",
+            "title": "Id",
+            "type": "string"
+          },
+          "model": {
+            "description": "Echoes the requested model alias (``request.model``) — the same field a direct OpenAI-compatible endpoint would return, so callers can swap IR for one without changing how they read this. The actual upstream model id is on ``served_model``.",
+            "title": "Model",
+            "type": "string"
+          },
+          "object": {
+            "default": "chat.completion",
+            "description": "Object type, always 'chat.completion'",
+            "title": "Object",
+            "type": "string"
+          },
+          "provider_request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The upstream provider's request id (e.g. Anthropic ``msg_…``). Used by metering_service to reconcile against provider invoices.",
+            "title": "Provider Request Id"
+          },
+          "served_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The actual model id the upstream provider served (e.g. 'claude-3-5-sonnet-20241022'). Distinct from ``model`` which echoes the requested alias. metering_service uses this to look up exact pricing.",
+            "title": "Served Model"
+          },
+          "served_model_root": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The concrete weights behind ``served_model``: vLLM's ``/models`` ``root`` (``served_model`` is only the served NAME, e.g. 'local-llm'). The same value the ``inference_call`` ledger row records, so a caller has per-call provenance without joining the ledger. None when the provider publishes no root (hosted APIs), the lookup failed, or the call was not ledgered -- never guessed.",
+            "title": "Served Model Root"
+          },
+          "served_provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The upstream provider that actually served this request (e.g. 'deepseek', 'pgx-local'). Distinct from the routing alias echoed in ``model`` — failover means the alias does not identify who answered. billing prices on the ``(served_provider, served_model)`` pair, so callers should forward this verbatim rather than re-deriving it from a local alias table. None when unknown.",
+            "title": "Served Provider"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage",
+            "description": "Token usage statistics for the request"
+          }
+        },
+        "required": [
+          "model",
+          "choices"
+        ],
+        "title": "ChatCompletionResponse",
+        "type": "object"
+      },
+      "ChatMessage": {
+        "description": "A single chat message in the conversation.\n\nOpenAI's chat-completion spec defines ``content`` as either a plain\nstring OR a list of typed content parts (``{type: text, text: ...}``,\n``{type: image_url, image_url: ...}``) for multimodal input. We\naccept both on the request side and pass them through untouched to\nthe upstream provider — vision-capable models (claude, gpt-4o,\ngemini, gemma-4) consume the list form natively.\n\nOn the response side, models always emit plain string content, so\nresponse-handling code at use sites narrows with a runtime\nisinstance check.",
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Message content. Either plain text (string) or a list of OpenAI-compat content parts for multimodal input. May be None on responses from reasoning models that emit only reasoning_content (e.g. Nemotron-V3, DeepSeek-R1) — downstream should fall back to reasoning_content.",
+            "title": "Content"
+          },
+          "reasoning_content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Reasoning trace extracted by vLLM's --reasoning-parser. Populated on responses from reasoning models that separate chain-of-thought from the final answer.",
+            "title": "Reasoning Content"
+          },
+          "role": {
+            "description": "Role of the message sender (system, user, assistant, or tool)",
+            "enum": [
+              "system",
+              "user",
+              "assistant",
+              "tool"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "tool_call_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "On request messages with role='tool', the id of the tool_call this message answers. None for other roles.",
+            "title": "Tool Call Id"
+          },
+          "tool_calls": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ToolCall"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tool/function calls the model emitted. Present on responses when the model invoked a tool from request.tools; None otherwise.",
+            "title": "Tool Calls"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "ChatMessage",
+        "type": "object"
+      },
+      "Choice": {
+        "description": "A single completion choice.",
+        "properties": {
+          "finish_reason": {
+            "default": "stop",
+            "description": "Reason generation stopped (stop, length, content_filter, tool_calls)",
+            "title": "Finish Reason",
+            "type": "string"
+          },
+          "index": {
+            "default": 0,
+            "description": "Index of this choice in the list",
+            "title": "Index",
+            "type": "integer"
+          },
+          "message": {
+            "$ref": "#/components/schemas/ChatMessage",
+            "description": "The generated chat message"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "Choice",
+        "type": "object"
+      },
+      "ConfigurePromptCanaryRequest": {
+        "description": "Body for ``POST /api/canary/prompt/configure``.\n\nAll fields are required. Field-level validation handles the easy\ninvariants; cross-field invariants (``canary_version != active_version``,\n``canary_ends_at > canary_started_at``) are checked in the route handler\nso the error envelope mirrors promote-prompt's HTTP 400 shape rather\nthan FastAPI's 422.",
+        "properties": {
+          "active_version": {
+            "minimum": 1.0,
+            "title": "Active Version",
+            "type": "integer"
+          },
+          "canary_ends_at": {
+            "format": "date-time",
+            "title": "Canary Ends At",
+            "type": "string"
+          },
+          "canary_percent": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Canary Percent",
+            "type": "integer"
+          },
+          "canary_started_at": {
+            "format": "date-time",
+            "title": "Canary Started At",
+            "type": "string"
+          },
+          "canary_version": {
+            "minimum": 1.0,
+            "title": "Canary Version",
+            "type": "integer"
+          },
+          "rollback_thresholds": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Rollback Thresholds",
+            "type": "object"
+          },
+          "worker_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Worker Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_name",
+          "active_version",
+          "canary_version",
+          "canary_percent",
+          "canary_started_at",
+          "canary_ends_at",
+          "rollback_thresholds"
+        ],
+        "title": "ConfigurePromptCanaryRequest",
+        "type": "object"
+      },
+      "ConfigurePromptCanaryResponse": {
+        "description": "Response after a successful configure (the upserted row).",
+        "properties": {
+          "active_version": {
+            "title": "Active Version",
+            "type": "integer"
+          },
+          "canary_ends_at": {
+            "format": "date-time",
+            "title": "Canary Ends At",
+            "type": "string"
+          },
+          "canary_percent": {
+            "title": "Canary Percent",
+            "type": "integer"
+          },
+          "canary_started_at": {
+            "format": "date-time",
+            "title": "Canary Started At",
+            "type": "string"
+          },
+          "canary_version": {
+            "title": "Canary Version",
+            "type": "integer"
+          },
+          "rollback_thresholds": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Rollback Thresholds",
+            "type": "object"
+          },
+          "worker_name": {
+            "title": "Worker Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_name",
+          "active_version",
+          "canary_version",
+          "canary_percent",
+          "canary_started_at",
+          "canary_ends_at",
+          "rollback_thresholds"
+        ],
+        "title": "ConfigurePromptCanaryResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "description": "Basic health check response.",
+        "properties": {
+          "status": {
+            "default": "ok",
+            "description": "Health status of the service",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "InvocationLogListResponse": {
+        "description": "Newest-first page of replay invocation-log rows.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/InvocationLogRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rows",
+          "count"
+        ],
+        "title": "InvocationLogListResponse",
+        "type": "object"
+      },
+      "InvocationLogRow": {
+        "description": "One replay invocation outcome, with the per-tuple payload triple.\n\n``input`` (request messages) + ``actual`` (response content) are captured at\ninvocation time; ``expected`` is backfilled by the replay runner via PATCH.\nAny of the three may be null for rows predating the C5 columns / before the\nexpected backfill.",
+        "properties": {
+          "actual": {
+            "title": "Actual"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "expected": {
+            "title": "Expected"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "judge_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Judge Score"
+          },
+          "latency_ms": {
+            "title": "Latency Ms",
+            "type": "integer"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "validation_passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validation Passed"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "worker_name": {
+            "title": "Worker Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "correlation_id",
+          "worker_name",
+          "version",
+          "started_at",
+          "latency_ms",
+          "validation_passed",
+          "judge_score"
+        ],
+        "title": "InvocationLogRow",
+        "type": "object"
+      },
+      "JsonSchemaSpec": {
+        "description": "Inner object of OpenAI's response_format=json_schema.",
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Human-readable alias used as the auto-generated schema_id prefix",
+            "title": "Name"
+          },
+          "schema": {
+            "additionalProperties": true,
+            "description": "JSON Schema for structured output",
+            "title": "Schema",
+            "type": "object"
+          },
+          "strict": {
+            "default": false,
+            "description": "If True, provider must enforce schema exactly",
+            "title": "Strict",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "schema"
+        ],
+        "title": "JsonSchemaSpec",
+        "type": "object"
+      },
+      "LivenessResponse": {
+        "description": "Kubernetes liveness probe response.",
+        "properties": {
+          "alive": {
+            "default": true,
+            "description": "Whether the service process is alive",
+            "title": "Alive",
+            "type": "boolean"
+          }
+        },
+        "title": "LivenessResponse",
+        "type": "object"
+      },
+      "ModelListResponse": {
+        "description": "OpenAI-compatible /api/models response.",
+        "properties": {
+          "data": {
+            "description": "List of available models",
+            "items": {
+              "$ref": "#/components/schemas/ModelObject"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "object": {
+            "default": "list",
+            "description": "Object type, always 'list'",
+            "title": "Object",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ModelListResponse",
+        "type": "object"
+      },
+      "ModelObject": {
+        "description": "A single model entry in the /api/models list.",
+        "properties": {
+          "has_grammar": {
+            "default": false,
+            "description": "Whether this model has a GBNF grammar defined",
+            "title": "Has Grammar",
+            "type": "boolean"
+          },
+          "has_json_schema": {
+            "default": false,
+            "description": "Whether this model has a JSON Schema for guided output",
+            "title": "Has Json Schema",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Model or schema identifier",
+            "title": "Id",
+            "type": "string"
+          },
+          "object": {
+            "default": "model",
+            "description": "Object type, always 'model'",
+            "title": "Object",
+            "type": "string"
+          },
+          "owned_by": {
+            "default": "inference-router",
+            "description": "Organization or service that owns this model",
+            "title": "Owned By",
+            "type": "string"
+          },
+          "provider_chain": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ordered list of providers in the failover chain",
+            "title": "Provider Chain"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ModelObject",
+        "type": "object"
+      },
+      "PatchInvocationLogRequest": {
+        "description": "Body for ``PATCH /api/replay/invocation-log/{id}``.\n\nBoth fields are optional; supply only what's now known. Sending an\nempty body is a 400 (caller bug — nothing to update).",
+        "properties": {
+          "expected": {
+            "description": "The expected output (per-tuple), backfilled by the replay runner",
+            "title": "Expected"
+          },
+          "judge_score": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional LLM-judge score in [0.0, 1.0]",
+            "title": "Judge Score"
+          },
+          "validation_passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the replay output validated against the schema",
+            "title": "Validation Passed"
+          }
+        },
+        "title": "PatchInvocationLogRequest",
+        "type": "object"
+      },
+      "PatchInvocationLogResponse": {
+        "description": "Response confirming the update.",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "judge_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Judge Score"
+          },
+          "validation_passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validation Passed"
+          }
+        },
+        "required": [
+          "id",
+          "validation_passed",
+          "judge_score"
+        ],
+        "title": "PatchInvocationLogResponse",
+        "type": "object"
+      },
+      "PromotePromptRequest": {
+        "description": "Body for ``POST /api/canary/promote-prompt``.",
+        "properties": {
+          "worker_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Worker Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_name"
+        ],
+        "title": "PromotePromptRequest",
+        "type": "object"
+      },
+      "PromotePromptResponse": {
+        "description": "Response after a successful promote.",
+        "properties": {
+          "active_version": {
+            "title": "Active Version",
+            "type": "integer"
+          },
+          "worker_name": {
+            "title": "Worker Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_name",
+          "active_version"
+        ],
+        "title": "PromotePromptResponse",
+        "type": "object"
+      },
+      "PromptCanaryState": {
+        "description": "Current state of a worker's prompt_canary_routing row.",
+        "properties": {
+          "active_version": {
+            "title": "Active Version",
+            "type": "integer"
+          },
+          "canary_ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canary Ends At"
+          },
+          "canary_percent": {
+            "title": "Canary Percent",
+            "type": "integer"
+          },
+          "canary_started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canary Started At"
+          },
+          "canary_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canary Version"
+          },
+          "rollback_thresholds": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Rollback Thresholds",
+            "type": "object"
+          },
+          "worker_name": {
+            "title": "Worker Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_name",
+          "active_version",
+          "canary_version",
+          "canary_percent",
+          "canary_started_at",
+          "canary_ends_at",
+          "rollback_thresholds"
+        ],
+        "title": "PromptCanaryState",
+        "type": "object"
+      },
+      "ProviderListResponse": {
+        "description": "Response body for GET /api/providers.",
+        "properties": {
+          "data": {
+            "description": "Providers loaded from the ConfigMap catalog",
+            "items": {
+              "$ref": "#/components/schemas/ProviderObject"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "default_chain": {
+            "description": "Ordered default failover chain when no routing rule pins providers",
+            "items": {
+              "type": "string"
+            },
+            "title": "Default Chain",
+            "type": "array"
+          },
+          "object": {
+            "default": "list",
+            "description": "Object type, always 'list'",
+            "title": "Object",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "default_chain"
+        ],
+        "title": "ProviderListResponse",
+        "type": "object"
+      },
+      "ProviderModelListResponse": {
+        "description": "Response body for GET /api/providers/{name}/models.",
+        "properties": {
+          "data": {
+            "description": "Models available on this provider",
+            "items": {
+              "$ref": "#/components/schemas/ProviderModelObject"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "object": {
+            "default": "list",
+            "description": "Object type, always 'list'",
+            "title": "Object",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Provider name this list belongs to",
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "data"
+        ],
+        "title": "ProviderModelListResponse",
+        "type": "object"
+      },
+      "ProviderModelObject": {
+        "description": "A single model entry returned by /api/providers/{name}/models.",
+        "properties": {
+          "id": {
+            "description": "Model identifier as sent to the upstream provider",
+            "title": "Id",
+            "type": "string"
+          },
+          "object": {
+            "default": "model",
+            "description": "Object type, always 'model'",
+            "title": "Object",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ProviderModelObject",
+        "type": "object"
+      },
+      "ProviderObject": {
+        "description": "A single provider entry in the /api/providers list.",
+        "properties": {
+          "cost_input_per_1m": {
+            "description": "USD cost per 1M input tokens",
+            "title": "Cost Input Per 1M",
+            "type": "number"
+          },
+          "cost_output_per_1m": {
+            "description": "USD cost per 1M output tokens",
+            "title": "Cost Output Per 1M",
+            "type": "number"
+          },
+          "default_model": {
+            "description": "Model used when no explicit model is supplied",
+            "title": "Default Model",
+            "type": "string"
+          },
+          "name": {
+            "description": "Provider identifier (matches names in fallback chains)",
+            "title": "Name",
+            "type": "string"
+          },
+          "protocol": {
+            "description": "Wire protocol: openai, anthropic, or vllm",
+            "title": "Protocol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "protocol",
+          "default_model",
+          "cost_input_per_1m",
+          "cost_output_per_1m"
+        ],
+        "title": "ProviderObject",
+        "type": "object"
+      },
+      "ReadinessResponse": {
+        "description": "Readiness check response.",
+        "properties": {
+          "ready": {
+            "description": "True when the service can take traffic",
+            "title": "Ready",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ready"
+        ],
+        "title": "ReadinessResponse",
+        "type": "object"
+      },
+      "ResponseFormat": {
+        "description": "OpenAI-compatible structured output spec.",
+        "properties": {
+          "json_schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JsonSchemaSpec"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Present only when type == 'json_schema'"
+          },
+          "type": {
+            "default": "text",
+            "description": "Output format kind",
+            "enum": [
+              "text",
+              "json_object",
+              "json_schema"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "ResponseFormat",
+        "type": "object"
+      },
+      "RollbackPromptRequest": {
+        "description": "Body for ``POST /api/canary/rollback-prompt``.",
+        "properties": {
+          "worker_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Worker Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_name"
+        ],
+        "title": "RollbackPromptRequest",
+        "type": "object"
+      },
+      "RollbackPromptResponse": {
+        "description": "Response after a successful operator rollback (reverted-to active version).",
+        "properties": {
+          "active_version": {
+            "title": "Active Version",
+            "type": "integer"
+          },
+          "worker_name": {
+            "title": "Worker Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_name",
+          "active_version"
+        ],
+        "title": "RollbackPromptResponse",
+        "type": "object"
+      },
+      "ToolCall": {
+        "description": "One tool/function call requested by the model.\n\nOpenAI's chat-completion spec defines this as the structured handle\nthat lets the application execute the tool and return results in a\nfollow-up turn.",
+        "properties": {
+          "function": {
+            "$ref": "#/components/schemas/ToolCallFunction"
+          },
+          "id": {
+            "description": "Provider-assigned id, used to correlate the tool result",
+            "title": "Id",
+            "type": "string"
+          },
+          "type": {
+            "const": "function",
+            "default": "function",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "function"
+        ],
+        "title": "ToolCall",
+        "type": "object"
+      },
+      "ToolCallFunction": {
+        "description": "Function payload of an OpenAI tool_call.",
+        "properties": {
+          "arguments": {
+            "description": "JSON-encoded argument string emitted by the model (not parsed)",
+            "title": "Arguments",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the tool function the model invoked",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "arguments"
+        ],
+        "title": "ToolCallFunction",
+        "type": "object"
+      },
+      "ToolFunctionSpec": {
+        "description": "Function declaration inside a request.tools[*] entry.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Human-readable description",
+            "title": "Description"
+          },
+          "name": {
+            "description": "Tool function name; must match what the model emits",
+            "title": "Name",
+            "type": "string"
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "description": "JSON Schema describing the function's argument shape",
+            "title": "Parameters",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "parameters"
+        ],
+        "title": "ToolFunctionSpec",
+        "type": "object"
+      },
+      "ToolSpec": {
+        "description": "One entry in request.tools — the OpenAI tool declaration.",
+        "properties": {
+          "function": {
+            "$ref": "#/components/schemas/ToolFunctionSpec"
+          },
+          "type": {
+            "const": "function",
+            "default": "function",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "function"
+        ],
+        "title": "ToolSpec",
+        "type": "object"
+      },
+      "Usage": {
+        "description": "Token usage information.\n\nBeyond the OpenAI-standard prompt/completion/total tokens, this carries\nthe raw signal metering_service needs to recompute cost from a central\npricing table: Anthropic prompt-cache token classes (priced separately)\nand an opaque ``usage_extra`` bag for newer token classes (reasoning /\nthinking / image tokens) that providers may surface over time.",
+        "properties": {
+          "cache_creation_input_tokens": {
+            "default": 0,
+            "description": "Anthropic prompt-cache: input tokens written to the cache (priced ~1.25× standard input). 0 for providers without prompt cache.",
+            "title": "Cache Creation Input Tokens",
+            "type": "integer"
+          },
+          "cache_read_input_tokens": {
+            "default": 0,
+            "description": "Anthropic prompt-cache: input tokens read from the cache (priced ~0.10× standard input). 0 for providers without prompt cache.",
+            "title": "Cache Read Input Tokens",
+            "type": "integer"
+          },
+          "completion_tokens": {
+            "default": 0,
+            "description": "Number of tokens in the generated response",
+            "title": "Completion Tokens",
+            "type": "integer"
+          },
+          "prompt_tokens": {
+            "default": 0,
+            "description": "Number of tokens in the prompt",
+            "title": "Prompt Tokens",
+            "type": "integer"
+          },
+          "total_tokens": {
+            "default": 0,
+            "description": "Total tokens used (prompt + completion)",
+            "title": "Total Tokens",
+            "type": "integer"
+          },
+          "usage_extra": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional bag of provider-specific token classes that should affect billing (reasoning_tokens, thinking_tokens, image_tokens). None when no extras are present.",
+            "title": "Usage Extra"
+          }
+        },
+        "title": "Usage",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "WhoamiResponse": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "app": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "App"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "license_id": {
+            "title": "License Id",
+            "type": "string"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "active",
+          "tenant_id",
+          "license_id",
+          "app",
+          "expires_at"
+        ],
+        "title": "WhoamiResponse",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "OpenAI-compatible inference proxy with intelligent routing and failover across configurable provider backends.",
+    "title": "inference-router",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Root endpoint with service metadata.",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Root  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Root",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/admin/catalog": {
+      "get": {
+        "description": "What a policy may name. ``owner`` is empty until gate 1c (TODO).",
+        "operationId": "get_catalog_api_admin_catalog_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Catalog Api Admin Catalog Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Catalog",
+        "tags": [
+          "admin-tenants"
+        ]
+      }
+    },
+    "/api/admin/tenants/{tenant_id}/calls": {
+      "get": {
+        "description": "IR ledger read-back (the provisioning smoke's proof, never an HTTP 200).",
+        "operationId": "list_tenant_calls_api_admin_tenants__tenant_id__calls_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "title": "Tenant Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "correlation_id",
+            "required": true,
+            "schema": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Correlation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Tenant Calls Api Admin Tenants  Tenant Id  Calls Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Tenant Calls",
+        "tags": [
+          "admin-tenants"
+        ]
+      }
+    },
+    "/api/admin/tenants/{tenant_id}/inference-policy": {
+      "get": {
+        "operationId": "get_inference_policy_api_admin_tenants__tenant_id__inference_policy_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "title": "Tenant Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Inference Policy Api Admin Tenants  Tenant Id  Inference Policy Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Inference Policy",
+        "tags": [
+          "admin-tenants"
+        ]
+      },
+      "put": {
+        "description": "Validate, store as a new version and activate -- or report ``unchanged``.",
+        "operationId": "put_inference_policy_api_admin_tenants__tenant_id__inference_policy_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "title": "Tenant Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "title": "Doc"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Put Inference Policy Api Admin Tenants  Tenant Id  Inference Policy Put"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Inference Policy",
+        "tags": [
+          "admin-tenants"
+        ]
+      }
+    },
+    "/api/admin/tenants/{tenant_id}/inference-policy/activate": {
+      "post": {
+        "operationId": "activate_inference_policy_api_admin_tenants__tenant_id__inference_policy_activate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "title": "Tenant Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_activate_inference_policy_api_admin_tenants__tenant_id__inference_policy_activate_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Activate Inference Policy Api Admin Tenants  Tenant Id  Inference Policy Activate Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Activate Inference Policy",
+        "tags": [
+          "admin-tenants"
+        ]
+      }
+    },
+    "/api/canary/promote-prompt": {
+      "post": {
+        "description": "Collapses ``canary_version`` into ``active_version`` and clears all canary state for the worker. The actual prompt swap is performed in worker_management — this endpoint only flips the local routing pointer.",
+        "operationId": "promote_prompt_api_canary_promote_prompt_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "default": "unknown",
+              "title": "X-License-Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromotePromptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotePromptResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Promote a prompt canary to the new active version",
+        "tags": [
+          "canary"
+        ]
+      }
+    },
+    "/api/canary/prompt/configure": {
+      "post": {
+        "description": "Writes/updates the ``prompt_canary_routing`` row for *worker_name*. The auto-rollback monitor reads these rows and clears the canary fields if observed metrics breach ``rollback_thresholds``. Re-calling this endpoint within an active window updates the existing row (UPSERT) so the prompt-loop can extend the window or change the split percent without first promoting/aborting.\n\n``rollback_thresholds`` accepts exactly the keys the monitor enforces — ``failure_rate`` (0-1 fraction, 0.05 == 5%), ``p95_latency_ms`` (milliseconds) and ``cost_usd`` (US dollars); each is a max, breached when observed > threshold. Anything else is a 400. NOTE: ``cost_usd`` is accepted but cannot currently breach — canary replies are served by worker_management, which has no priced provider entry, so attributed cost is always 0.0. The monitor logs ``canary_cost_threshold_unenforceable`` when one is configured.",
+        "operationId": "configure_prompt_canary_api_canary_prompt_configure_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "default": "unknown",
+              "title": "X-License-Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurePromptCanaryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigurePromptCanaryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Configure (upsert) a K%-split prompt canary window",
+        "tags": [
+          "canary"
+        ]
+      }
+    },
+    "/api/canary/prompt/{worker_name}": {
+      "get": {
+        "description": "Returns the current row for *worker_name*. The QA subflow polls this during the observation window: if ``canary_version`` is NULL when it previously had a value, the auto-rollback monitor cleared it (rollback fired). Returns 404 if no row exists.",
+        "operationId": "get_prompt_canary_state_api_canary_prompt__worker_name__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "worker_name",
+            "required": true,
+            "schema": {
+              "title": "Worker Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "default": "00000000-0000-0000-0000-000000000000",
+              "title": "X-Tenant-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "default": "unknown",
+              "title": "X-License-Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromptCanaryState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read the current prompt_canary_routing state for a worker",
+        "tags": [
+          "canary"
+        ]
+      }
+    },
+    "/api/canary/rollback-prompt": {
+      "post": {
+        "description": "Clears all canary state for the worker, reverting routing to the known-good active_version. Bypasses the autonomous regression monitor — an operator (via fr) triggers this directly. Idempotent: re-calling on an already-cleared row returns the same active_version.",
+        "operationId": "rollback_prompt_api_canary_rollback_prompt_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "default": "unknown",
+              "title": "X-License-Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RollbackPromptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RollbackPromptResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Operator-triggered rollback of a prompt canary to the active version",
+        "tags": [
+          "canary"
+        ]
+      }
+    },
+    "/api/chat/completions": {
+      "post": {
+        "description": "OpenAI-compatible chat completion endpoint with intelligent routing and failover across vLLM, DeepSeek, and Claude.",
+        "operationId": "create_chat_completion_api_chat_completions_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Job-Id",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Job-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-App-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-App-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Subject-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Subject-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Actor-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Project-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Project-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Spend-Scope",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Spend-Scope"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Effective-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Effective-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Provider",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Provider"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Worker-Name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Worker-Name"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Correlation-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-AA-Trace-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Aa-Trace-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-AA-Card-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Aa-Card-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-AA-Parent-Exec",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Aa-Parent-Exec"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-AA-Prompt-Version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Aa-Prompt-Version"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-AA-Prompt-Sha256",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Aa-Prompt-Sha256"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-AA-Context",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Aa-Context"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Stage"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Replay-Mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Replay-Mode"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Worker-Version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Worker-Version"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Capture",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Capture"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-License-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create a chat completion",
+        "tags": [
+          "completions"
+        ]
+      }
+    },
+    "/api/internal/inference-calls": {
+      "get": {
+        "description": "Ledger rows, newest first. ``total`` counts every match, not just the page.\n\nNever returns request/response bodies -- ``captured`` says whether\n``/{id}/capture`` has one.",
+        "operationId": "list_inference_calls_api_internal_inference_calls_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "correlation_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Correlation Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "caller",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Caller"
+            }
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "until",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Secret"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Inference Calls Api Internal Inference Calls Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Inference Calls",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/internal/inference-calls/pinning-summary": {
+      "get": {
+        "description": "How much traffic in the window is pinned (``temperature = 0`` and a seed).\n\nCounts every call in the window, not only ``status = 'ok'`` ones --\npinning is a request property, independent of outcome. ``source`` is the\nsame filter, with the same NULL-as-``unknown`` handling, as\n``repeat-groups``. ``callers`` is ordered by ``n`` descending.",
+        "operationId": "inference_call_pinning_summary_api_internal_inference_calls_pinning_summary_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "pattern": "^(benchmark|live|unknown|all)$",
+              "title": "Source",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Secret"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Inference Call Pinning Summary Api Internal Inference Calls Pinning Summary Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Inference Call Pinning Summary",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/internal/inference-calls/repeat-groups": {
+      "get": {
+        "description": "Identical requests answered more than once, and whether the answers agree.\n\n``temperature`` is an equality on the stored temperature (rows with a NULL\ntemperature are excluded once it is given); ``caller``, ``served_provider``\nand ``source`` filter calls before grouping. ``seeded=true`` restricts to\ncalls with a non-NULL ``seed``, ``seeded=false`` to calls with a NULL\n``seed``; omitted, no filter. ``summary`` covers every group in the\nwindow, not just the page; groups are ordered disagreeing first, then\nnewest ``last_at``. Each group reports ``served_models_n`` (see the\n``_REPEAT_GROUPS_CTE`` comment for how a NULL served model is counted);\n``summary.straddling_groups`` is the count of groups where that is > 1.\nSee the block comment above for ``source``, ``summary.by_source`` and\n``summary.callers``.",
+        "operationId": "inference_call_repeat_groups_api_internal_inference_calls_repeat_groups_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "temperature",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Temperature"
+            }
+          },
+          {
+            "in": "query",
+            "name": "caller",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Caller"
+            }
+          },
+          {
+            "in": "query",
+            "name": "served_provider",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Served Provider"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "pattern": "^(benchmark|live|unknown|all)$",
+              "title": "Source",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "seeded",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Seeded"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Secret"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Inference Call Repeat Groups Api Internal Inference Calls Repeat Groups Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Inference Call Repeat Groups",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/internal/inference-calls/summary": {
+      "get": {
+        "description": "Liveness of the ledger for the ILS producers panel.",
+        "operationId": "inference_calls_summary_api_internal_inference_calls_summary_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 90,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Secret"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Inference Calls Summary Api Internal Inference Calls Summary Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Inference Calls Summary",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/internal/inference-calls/{call_id}/capture": {
+      "get": {
+        "description": "The captured request/response of one row; 404 if it was not captured.\n\n``request`` is what the ledger stored: ``{\"model\": ..., **fingerprint}``.\n``request_sha256`` hashes the fingerprint WITHOUT ``model``, and\n``request_sha256_verified`` says whether re-hashing the stored body (canonical\nJSON, sorted keys) reproduces it -- so a consumer freezing a tuple from this\nbody knows whether it round-tripped JSONB exactly.\n\n``request_text`` / ``response_text`` are the EXACT bytes sent to and\nreceived from the provider (key order preserved; replay these, not\n``request``). ``request_text_verified`` says whether sha256(request_text)\nequals the stored ``request_text_sha256``; NULL when no text was stored.",
+        "operationId": "get_inference_call_capture_api_internal_inference_calls__call_id__capture_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "call_id",
+            "required": true,
+            "schema": {
+              "title": "Call Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Secret"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-App-Id",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-App-Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Inference Call Capture Api Internal Inference Calls  Call Id  Capture Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Inference Call Capture",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/internal/served-models/timeline": {
+      "get": {
+        "description": "Per UTC day x requested_model x served root x served provider.",
+        "operationId": "served_models_timeline_api_internal_served_models_timeline_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 90,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Secret"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Served Models Timeline Api Internal Served Models Timeline Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Served Models Timeline",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/models": {
+      "get": {
+        "description": "List available models.\n\nSourced from the live provider catalog (``app.state.provider_catalog``),\nnot a hard-coded list, so it never drifts from the deployed ConfigMap:\n\n* A ``default`` entry whose chain is the effective default failover chain\n  (catalog ``default_chain`` minus any disabled provider — mirrors the\n  ``effective_default_chain`` computed in ``main.py``).\n* One entry per model id served by each *enabled* provider (its default\n  ``model`` plus its stable aliases, via ``ProviderEntry.model_ids()``),\n  pinned to the provider that serves it. This is what makes the abstract\n  ``local-llm`` name discoverable here.\n\nTENANT-SCOPED (owner ruling 2026-10-01, ``services.tenant_policy``): for a\nCUSTOMER tenant (anything not a platform tenant, including a missing/nil\n``X-Tenant-Id``) only providers that tenant may be routed to are listed,\nCommercial providers are listed only for a PROVEN commercial-platform\ntenant (``TenantPolicy.has_commercial_access``: listed in\n``COMMERCIAL_PLATFORM_TENANT_IDS`` AND proven by a verified licence token\non this request): an asserted platform ``X-Tenant-Id`` without proof gets\nthe customer view.\n\nThe tenant is resolved by ``security.require_listing_tenant`` -- the same\nintrospection + delegation rule the completions route applies -- so a\nheader completions would not honour cannot buy the platform view here.",
+        "operationId": "list_models_api_models_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-License-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Effective-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Effective-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Subject-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Subject-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Worker-Name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Worker-Name"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-App-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-App-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Models",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/providers": {
+      "get": {
+        "description": "Return the catalog providers this tenant may be routed to.\n\nA platform (or commercial-granted) tenant sees the whole catalog; a CUSTOMER\ntenant -- including a missing/nil ``X-Tenant-Id`` -- sees only\n``customer_eligible`` providers (owner ruling 2026-10-01).",
+        "operationId": "list_providers_api_providers_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-License-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Effective-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Effective-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Subject-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Subject-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Worker-Name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Worker-Name"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-App-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-App-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Providers",
+        "tags": [
+          "providers"
+        ]
+      }
+    },
+    "/api/providers/{name}/models": {
+      "get": {
+        "description": "Return the models exposed by a single provider.\n\nSource of truth is the optional ``models`` field on the ProviderEntry.\nWhen that list is empty, the provider's default ``model`` is returned as\nthe single entry.",
+        "operationId": "list_provider_models_api_providers__name__models_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-License-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Effective-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Effective-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Subject-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Subject-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Worker-Name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Worker-Name"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-App-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-App-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderModelListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Provider Models",
+        "tags": [
+          "providers"
+        ]
+      }
+    },
+    "/api/replay/invocation-log": {
+      "get": {
+        "description": "Read-only view over ``replay_invocation_log`` for the prompt-improvement cockpit's failed-examples surface. Filter by ``worker_name`` / ``version`` and set ``only_failed=true`` to return just schema-failing invocations. Scoped to the caller's own tenant — the mesh-injected identity decides which rows are visible and it cannot be overridden by a query parameter.",
+        "operationId": "list_invocation_log_api_replay_invocation_log_get",
+        "parameters": [
+          {
+            "description": "Filter by worker name.",
+            "in": "query",
+            "name": "worker_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by worker name.",
+              "title": "Worker Name"
+            }
+          },
+          {
+            "description": "Filter by prompt version.",
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by prompt version.",
+              "title": "Version"
+            }
+          },
+          {
+            "description": "Return only rows where validation_passed is false (failed examples).",
+            "in": "query",
+            "name": "only_failed",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Return only rows where validation_passed is false (failed examples).",
+              "title": "Only Failed",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "default": "unknown",
+              "title": "X-License-Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvocationLogListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List replay invocation-log rows (per-invocation outcomes)",
+        "tags": [
+          "replay"
+        ]
+      }
+    },
+    "/api/replay/invocation-log/by-correlation/{correlation_id}": {
+      "patch": {
+        "description": "The replay runner correlates its verdict to an inference via the ``correlation_id`` it issued — it never learns the row's UUID primary key. This endpoint backfills ``expected`` (and optionally ``validation_passed`` / ``judge_score``) on the row carrying that correlation_id, using the ``replay_invocation_log_corr`` index. A 404 surfaces a broken correlation chain loudly. Scoped to the caller's own tenant: another tenant's row is a 404.",
+        "operationId": "patch_invocation_log_by_correlation_api_replay_invocation_log_by_correlation__correlation_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "correlation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Correlation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "default": "unknown",
+              "title": "X-License-Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchInvocationLogRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatchInvocationLogResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Backfill a replay invocation log row keyed by correlation_id",
+        "tags": [
+          "replay"
+        ]
+      }
+    },
+    "/api/replay/invocation-log/{log_id}": {
+      "patch": {
+        "description": "Replay runners write the row at invocation time but learn the validation outcome later (after schema check + LLM judge). This endpoint backfills ``validation_passed`` and/or ``judge_score`` without re-inserting. Scoped to the caller's own tenant: another tenant's row is a 404.",
+        "operationId": "patch_invocation_log_api_replay_invocation_log__log_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "log_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Log Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-License-Id",
+            "required": false,
+            "schema": {
+              "default": "unknown",
+              "title": "X-License-Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchInvocationLogRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatchInvocationLogResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update validation outcome on a replay invocation log row",
+        "tags": [
+          "replay"
+        ]
+      }
+    },
+    "/api/whoami": {
+      "get": {
+        "operationId": "whoami_api_whoami_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhoamiResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Whoami",
+        "tags": [
+          "whoami"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Basic health check endpoint.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health check",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Kubernetes liveness probe. Always returns 200 if the process is alive.",
+        "operationId": "liveness_health_live_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LivenessResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness probe",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Readiness probe. The router has no peer dependency to gate on.",
+        "operationId": "readiness_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readiness probe",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}
