@@ -33,8 +33,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_LEGACY_KAG.html",
       "source": "docs/SPEC_LEGACY_KAG.md",
       "section": "Spec",
-      "sha256": "34855f79d2ad308fa69809c617530edea53979e5cac8e7c52d71bab8116ba039",
-      "bytes": 7522,
+      "sha256": "1853ef15d0a0143a03c977abbbd6d2596892b4cd08415022472e5703f5b03f1a",
+      "bytes": 7588,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_LEGACY_KAG.md"
     },
     {
@@ -90,6 +90,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "d058956231b4d25f7667edd9a2ac50cf141fa4d030088225a04fefc7b663ce50",
       "bytes": 2816,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0005-absorption-sequence-and-repo-scope.md"
+    },
+    {
+      "title": "0006 — The tool estate completes in this workspace, grouped by runtime shape",
+      "path": "docs/decisions/0006-tool-absorption-grouping.html",
+      "source": "docs/decisions/0006-tool-absorption-grouping.md",
+      "section": "Decisions",
+      "sha256": "adc8b99c210be970b1d8931dee11aa9f71b3a6b024c59bfdf628dff6539736cd",
+      "bytes": 6657,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0006-tool-absorption-grouping.md"
     },
     {
       "title": "Web UI design",

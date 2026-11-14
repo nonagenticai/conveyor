@@ -54,6 +54,12 @@ serde_json = "1.0.154"
 # compile time by `crates/store` so a deployment carries it without the `seed/` directory.
 serde_yaml = "0.9.34"
 include_dir = "0.7.4"
+# The evidence tools' statistics: the standard normal and Student's t, whose quantiles the old
+# service read from scipy. A hand-rolled inverse CDF would be a second source of numerical truth.
+statrs = "0.18.0"
+# `contract/tolerances.toml` is data a test reads, not a build input: a tolerance declared in code
+# would be a tolerance the reader cannot see next to the fixture it excuses.
+toml = "1.2.1"
 tower = { version = "0.5", features = ["util"] }
 tower-http = { version = "0.7.1", features = ["trace"] }
 uuid = { version = "1.28.0", features = ["v7", "v5", "serde"] }

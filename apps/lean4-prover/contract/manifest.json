@@ -1,0 +1,13 @@
+{
+  "service": "lean4-prover",
+  "captured_at": "2026-11-14T20:39:37Z",
+  "source_commit": "3492708",
+  "image_digest": "sha256:65d4daf319f9c695ff66424765e76c31a98924f23281bf12aa4f78942c5d0415",
+  "lock_sha256": "d88f7a805eb8ab2eadd01f0cb1c5ceaca8a5048785c3fa1d402fb636d5454651",
+  "openapi": "3.1.0",
+  "captured_paths": 7,
+  "paths": 7,
+  "schemas": 8,
+  "operations": 7,
+  "dropped": []
+}

@@ -1,0 +1,15 @@
+{
+  "ci_lower": 0.130583,
+  "ci_upper": 0.803388,
+  "computation_time_ms": 0.14,
+  "heterogeneity_i_squared": 0.7579,
+  "heterogeneity_q": 8.2623,
+  "method": "random",
+  "pooled_effect": 0.466986,
+  "pooled_se": 0.171637,
+  "study_weights": [
+    13.181818,
+    9.446254,
+    11.317073
+  ]
+}

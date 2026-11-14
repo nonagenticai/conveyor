@@ -129,7 +129,7 @@ ladder); **C** otherwise.
 | **K4** | hirag_service | **Open** — options §3.2 |
 | **K5** | karma_service | **Open** — options §3.3 |
 | **K6** | w2v stage migration order | **Open** — §5 |
-| **K7** | First rewrite target | **Open** — after K3–K5 |
+| **K7** | First rewrite target | **Decided** — the scientific research service, in `apps/scientific` (ADR 0006, issue #105) |
 | **K8** | `strata_ingest` and `strata_rag` stay external repositories; their open-sourcing is a separate decision | **Decided** (owner, 2026-11-13; ADR 0005) |
 
 ## 7. Non-goals
