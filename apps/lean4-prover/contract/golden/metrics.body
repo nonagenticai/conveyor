@@ -1,0 +1,24 @@
+# HELP gpu_admission_active Lean runs currently holding the prove lane
+# TYPE gpu_admission_active gauge
+gpu_admission_active{lane="prove"} 0
+# HELP gpu_admission_waiting Requests waiting for the prove lane
+# TYPE gpu_admission_waiting gauge
+gpu_admission_waiting{lane="prove"} 0
+# HELP gpu_admission_admitted_total Requests admitted to the prove lane
+# TYPE gpu_admission_admitted_total counter
+gpu_admission_admitted_total 1
+# HELP gpu_admission_rejected_total Requests refused by the prove lane (503)
+# TYPE gpu_admission_rejected_total counter
+gpu_admission_rejected_total 0
+# HELP lean4_prover_requests_total HTTP requests served
+# TYPE lean4_prover_requests_total counter
+lean4_prover_requests_total 2084
+# HELP lean4_prover_lean_timeouts_total Lean runs killed after exceeding their timeout
+# TYPE lean4_prover_lean_timeouts_total counter
+lean4_prover_lean_timeouts_total 0
+# HELP lean4_prover_auth_rejected_total Requests refused by the licence gate (401)
+# TYPE lean4_prover_auth_rejected_total counter
+lean4_prover_auth_rejected_total 2
+# HELP lean4_prover_auth_unavailable_total Requests refused because the licences service could not be reached (503)
+# TYPE lean4_prover_auth_unavailable_total counter
+lean4_prover_auth_unavailable_total 0
