@@ -1,0 +1,15 @@
+{
+  "service": "scientific",
+  "captured_at": "2026-11-14T17:09:38Z",
+  "source_commit": "7d9905933405f1a8b568c5e29c64926c764bb75d",
+  "image_digest": "sha256:23a326812f2ea41af88cca11dee3bae630f193eaffdd5705c67f8ce50ceff301",
+  "lock_sha256": "43b636fd02a029612c62ff4ace061f1e6071ee1c103ebf1c5629a57e672fe83e",
+  "openapi": "3.1.0",
+  "captured_paths": 31,
+  "paths": 25,
+  "schemas": 47,
+  "dropped": [
+    "/api/topology/*",
+    "/api/explain/*"
+  ]
+}

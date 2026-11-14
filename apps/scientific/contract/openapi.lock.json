@@ -1,0 +1,3129 @@
+{
+  "components": {
+    "parameters": {
+      "TenantIdHeader": {
+        "description": "Tenant identifier (defaults to configured DEFAULT_TENANT_ID).",
+        "example": "0195f48b-d000-7000-8000-000000000001",
+        "in": "header",
+        "name": "X-Tenant-Id",
+        "required": false,
+        "schema": {
+          "default": "0195f48b-d000-7000-8000-000000000001",
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "AuthorityRequest": {
+        "properties": {
+          "algorithm": {
+            "default": "pagerank",
+            "pattern": "^(pagerank|eigenvector)$",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "If set, scope centrality to subgraph around this node",
+            "title": "Entity Id"
+          },
+          "max_hops": {
+            "default": 2,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Max Hops",
+            "type": "integer"
+          },
+          "top_k": {
+            "default": 20,
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Top K",
+            "type": "integer"
+          }
+        },
+        "title": "AuthorityRequest",
+        "type": "object"
+      },
+      "AuthorityResponse": {
+        "properties": {
+          "algorithm": {
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "entity_count": {
+            "title": "Entity Count",
+            "type": "integer"
+          },
+          "scores": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Scores",
+            "type": "object"
+          },
+          "top_entities": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Top Entities",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "scores",
+          "top_entities",
+          "entity_count",
+          "computation_time_ms"
+        ],
+        "title": "AuthorityResponse",
+        "type": "object"
+      },
+      "CacheClearResponse": {
+        "properties": {
+          "cleared": {
+            "title": "Cleared",
+            "type": "boolean"
+          },
+          "previous_size": {
+            "title": "Previous Size",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cleared",
+          "previous_size"
+        ],
+        "title": "CacheClearResponse",
+        "type": "object"
+      },
+      "CacheInvalidateRequest": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "title": "CacheInvalidateRequest",
+        "type": "object"
+      },
+      "CacheStatsResponse": {
+        "properties": {
+          "hit_rate": {
+            "title": "Hit Rate",
+            "type": "number"
+          },
+          "hits": {
+            "title": "Hits",
+            "type": "integer"
+          },
+          "max_entries": {
+            "title": "Max Entries",
+            "type": "integer"
+          },
+          "misses": {
+            "title": "Misses",
+            "type": "integer"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "ttl_seconds": {
+            "title": "Ttl Seconds",
+            "type": "number"
+          }
+        },
+        "required": [
+          "size",
+          "max_entries",
+          "ttl_seconds",
+          "hits",
+          "misses",
+          "hit_rate"
+        ],
+        "title": "CacheStatsResponse",
+        "type": "object"
+      },
+      "CoVeRequest": {
+        "properties": {
+          "claim_node_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Claim Node Id"
+          },
+          "claim_text": {
+            "maxLength": 5000,
+            "title": "Claim Text",
+            "type": "string"
+          },
+          "num_questions": {
+            "default": 5,
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Num Questions",
+            "type": "integer"
+          },
+          "source_authority_threshold": {
+            "default": 0.5,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Source Authority Threshold",
+            "type": "number"
+          }
+        },
+        "required": [
+          "claim_text"
+        ],
+        "title": "CoVeRequest",
+        "type": "object"
+      },
+      "CoVeResponse": {
+        "properties": {
+          "claim_text": {
+            "title": "Claim Text",
+            "type": "string"
+          },
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "degraded": {
+            "default": false,
+            "description": "True when an LLM call (question generation or evaluation) failed, so the verdict rests on fallback questions / forced 'inconclusive' rather than a full chain-of-verification.",
+            "title": "Degraded",
+            "type": "boolean"
+          },
+          "overall_verdict": {
+            "enum": [
+              "verified",
+              "disputed",
+              "inconclusive"
+            ],
+            "title": "Overall Verdict",
+            "type": "string"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/VerificationQuestion"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "refuting_evidence": {
+            "title": "Refuting Evidence",
+            "type": "integer"
+          },
+          "supporting_evidence": {
+            "title": "Supporting Evidence",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "claim_text",
+          "questions",
+          "overall_verdict",
+          "confidence",
+          "supporting_evidence",
+          "refuting_evidence",
+          "computation_time_ms"
+        ],
+        "title": "CoVeResponse",
+        "type": "object"
+      },
+      "CommunityRequest": {
+        "properties": {
+          "algorithm": {
+            "default": "louvain",
+            "pattern": "^(louvain|leiden|label_propagation)$",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "min_community_size": {
+            "default": 3,
+            "minimum": 1.0,
+            "title": "Min Community Size",
+            "type": "integer"
+          },
+          "parameters": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parameters"
+          }
+        },
+        "title": "CommunityRequest",
+        "type": "object"
+      },
+      "CommunityResponse": {
+        "properties": {
+          "algorithm": {
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "community_sizes": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Community Sizes",
+            "type": "object"
+          },
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "entity_communities": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Entity Communities",
+            "type": "object"
+          },
+          "modularity": {
+            "title": "Modularity",
+            "type": "number"
+          },
+          "number_of_communities": {
+            "title": "Number Of Communities",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "algorithm",
+          "entity_communities",
+          "community_sizes",
+          "number_of_communities",
+          "modularity",
+          "computation_time_ms"
+        ],
+        "title": "CommunityResponse",
+        "type": "object"
+      },
+      "ConfidenceIntervalRequest": {
+        "properties": {
+          "confidence_level": {
+            "default": 0.95,
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence Level",
+            "type": "number"
+          },
+          "method": {
+            "default": "bootstrap",
+            "pattern": "^(bootstrap|normal)$",
+            "title": "Method",
+            "type": "string"
+          },
+          "n_bootstrap": {
+            "default": 10000,
+            "maximum": 100000.0,
+            "minimum": 100.0,
+            "title": "N Bootstrap",
+            "type": "integer"
+          },
+          "values": {
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 100000,
+            "minItems": 2,
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "values"
+        ],
+        "title": "ConfidenceIntervalRequest",
+        "type": "object"
+      },
+      "ConfidenceIntervalResponse": {
+        "properties": {
+          "ci_lower": {
+            "title": "Ci Lower",
+            "type": "number"
+          },
+          "ci_upper": {
+            "title": "Ci Upper",
+            "type": "number"
+          },
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "confidence_level": {
+            "title": "Confidence Level",
+            "type": "number"
+          },
+          "mean": {
+            "title": "Mean",
+            "type": "number"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mean",
+          "ci_lower",
+          "ci_upper",
+          "confidence_level",
+          "method",
+          "computation_time_ms"
+        ],
+        "title": "ConfidenceIntervalResponse",
+        "type": "object"
+      },
+      "ContradictionPair": {
+        "properties": {
+          "net_support_score": {
+            "description": "(supporting - refuting) / (supporting + refuting)",
+            "title": "Net Support Score",
+            "type": "number"
+          },
+          "refuting_nodes": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Refuting Nodes",
+            "type": "array"
+          },
+          "supporting_nodes": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Supporting Nodes",
+            "type": "array"
+          },
+          "target_id": {
+            "title": "Target Id",
+            "type": "string"
+          },
+          "target_label": {
+            "title": "Target Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_id",
+          "target_label",
+          "supporting_nodes",
+          "refuting_nodes",
+          "net_support_score"
+        ],
+        "title": "ContradictionPair",
+        "type": "object"
+      },
+      "ContradictionRequest": {
+        "properties": {
+          "entity_id": {
+            "description": "Node ID to check for contradictions",
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "max_hops": {
+            "default": 2,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Max Hops",
+            "type": "integer"
+          },
+          "min_confidence": {
+            "default": 0.0,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Min Confidence",
+            "type": "number"
+          }
+        },
+        "required": [
+          "entity_id"
+        ],
+        "title": "ContradictionRequest",
+        "type": "object"
+      },
+      "ContradictionResponse": {
+        "properties": {
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "contradiction_pairs": {
+            "items": {
+              "$ref": "#/components/schemas/ContradictionPair"
+            },
+            "title": "Contradiction Pairs",
+            "type": "array"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "total_contradictions": {
+            "title": "Total Contradictions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "entity_id",
+          "contradiction_pairs",
+          "total_contradictions",
+          "computation_time_ms"
+        ],
+        "title": "ContradictionResponse",
+        "type": "object"
+      },
+      "FormalTranslateRequest": {
+        "properties": {
+          "claim_text": {
+            "maxLength": 5000,
+            "title": "Claim Text",
+            "type": "string"
+          },
+          "target_language": {
+            "default": "z3",
+            "enum": [
+              "lean4",
+              "z3",
+              "sympy"
+            ],
+            "title": "Target Language",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_text"
+        ],
+        "title": "FormalTranslateRequest",
+        "type": "object"
+      },
+      "FormalTranslateResponse": {
+        "properties": {
+          "claim_text": {
+            "title": "Claim Text",
+            "type": "string"
+          },
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "formal_expression": {
+            "title": "Formal Expression",
+            "type": "string"
+          },
+          "target_language": {
+            "title": "Target Language",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_text",
+          "formal_expression",
+          "target_language",
+          "confidence",
+          "computation_time_ms"
+        ],
+        "title": "FormalTranslateResponse",
+        "type": "object"
+      },
+      "FormalVerifyRequest": {
+        "properties": {
+          "formal_expression": {
+            "maxLength": 5000,
+            "title": "Formal Expression",
+            "type": "string"
+          },
+          "language": {
+            "default": "z3",
+            "enum": [
+              "lean4",
+              "z3",
+              "sympy"
+            ],
+            "title": "Language",
+            "type": "string"
+          }
+        },
+        "required": [
+          "formal_expression"
+        ],
+        "title": "FormalVerifyRequest",
+        "type": "object"
+      },
+      "FormalVerifyResponse": {
+        "properties": {
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "counterexample": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counterexample"
+          },
+          "expression": {
+            "title": "Expression",
+            "type": "string"
+          },
+          "is_valid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Valid"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "lean_elaboration": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lean Elaboration"
+          },
+          "proof": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proof"
+          }
+        },
+        "required": [
+          "expression",
+          "language",
+          "computation_time_ms"
+        ],
+        "title": "FormalVerifyResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthStatus": {
+        "description": "Health check response.",
+        "properties": {
+          "services": {
+            "additionalProperties": true,
+            "description": "Status of backend services",
+            "title": "Services",
+            "type": "object"
+          },
+          "status": {
+            "description": "Service status: healthy, degraded, or unhealthy",
+            "title": "Status",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "Timestamp (ISO 8601)",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "timestamp"
+        ],
+        "title": "HealthStatus",
+        "type": "object"
+      },
+      "IntegrityComponent": {
+        "properties": {
+          "effective_weight": {
+            "default": 0.0,
+            "description": "The weight this component actually contributed. Equals `weight` when nothing was inapplicable; 0.0 for a component that holds no number; larger than `weight` when it absorbed an inapplicable component's share. Present so a renormalized composite stays auditable from the response alone.",
+            "title": "Effective Weight",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "None when this component holds no number. A null score is NOT a low score — read `status` to learn whether it was unmeasurable (backend outage) or inapplicable (nothing to measure).",
+            "title": "Score"
+          },
+          "status": {
+            "default": "measured",
+            "description": "'measured' — `score` is a real value. 'not_applicable' — the metric is undefined for this entity (e.g. no incoming edges), so its weight is redistributed over the applicable components. 'unavailable' — the measurement failed, so the composite is null and is never persisted.",
+            "enum": [
+              "measured",
+              "not_applicable",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "weight": {
+            "description": "Configured weight, as supplied by settings. Never rescaled.",
+            "title": "Weight",
+            "type": "number"
+          },
+          "weighted_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "None when `score` is None — there is nothing to weight.",
+            "title": "Weighted Score"
+          }
+        },
+        "required": [
+          "name",
+          "weight"
+        ],
+        "title": "IntegrityComponent",
+        "type": "object"
+      },
+      "IntegrityRequest": {
+        "properties": {
+          "entity_id": {
+            "description": "Node ID to compute integrity score for",
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "include_cove": {
+            "default": false,
+            "title": "Include Cove",
+            "type": "boolean"
+          },
+          "include_ragas": {
+            "default": false,
+            "title": "Include Ragas",
+            "type": "boolean"
+          },
+          "include_topology": {
+            "default": true,
+            "title": "Include Topology",
+            "type": "boolean"
+          },
+          "max_hops": {
+            "default": 2,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Max Hops",
+            "type": "integer"
+          },
+          "write_back": {
+            "default": false,
+            "description": "Write integrity score back to the knowledge graph node",
+            "title": "Write Back",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "entity_id"
+        ],
+        "title": "IntegrityRequest",
+        "type": "object"
+      },
+      "IntegrityResponse": {
+        "properties": {
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/IntegrityComponent"
+            },
+            "title": "Components",
+            "type": "array"
+          },
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "degraded": {
+            "default": false,
+            "description": "True exactly when `integrity_score` is null — either a component could not be measured, or no positive component was applicable at all. Read `degraded_reason` for which. An entity with nothing to cite is NOT degraded.",
+            "title": "Degraded",
+            "type": "boolean"
+          },
+          "degraded_components": {
+            "description": "Names of the components that could not be measured (status 'unavailable'). May be empty on a degraded response when the cause was that nothing was applicable rather than that something failed.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Degraded Components",
+            "type": "array"
+          },
+          "degraded_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Human-readable explanation of why the composite could not be computed.",
+            "title": "Degraded Reason"
+          },
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "integrity_score": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "None when at least one component could not be MEASURED, or when no positive component was applicable at all. A null score is NOT a low score and is never written back to the graph. An entity that merely has nothing to cite still receives a real score — see not_applicable_components.",
+            "title": "Integrity Score"
+          },
+          "not_applicable_components": {
+            "description": "Names of the components whose metric is undefined for this entity (status 'not_applicable'). NOT a degradation: the composite is renormalized over the remaining components and IS persisted. Populated even on a degraded response, so the two reasons stay distinguishable.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Not Applicable Components",
+            "type": "array"
+          }
+        },
+        "required": [
+          "entity_id",
+          "components",
+          "computation_time_ms"
+        ],
+        "title": "IntegrityResponse",
+        "type": "object"
+      },
+      "LivenessStatus": {
+        "description": "Liveness probe response.",
+        "properties": {
+          "alive": {
+            "description": "Whether service is alive",
+            "title": "Alive",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "alive"
+        ],
+        "title": "LivenessStatus",
+        "type": "object"
+      },
+      "MetaAnalysisRequest": {
+        "properties": {
+          "confidence_level": {
+            "default": 0.95,
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence Level",
+            "type": "number"
+          },
+          "method": {
+            "default": "random",
+            "pattern": "^(fixed|random)$",
+            "title": "Method",
+            "type": "string"
+          },
+          "studies": {
+            "items": {
+              "$ref": "#/components/schemas/StudyResult"
+            },
+            "minItems": 2,
+            "title": "Studies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "studies"
+        ],
+        "title": "MetaAnalysisRequest",
+        "type": "object"
+      },
+      "MetaAnalysisResponse": {
+        "properties": {
+          "ci_lower": {
+            "title": "Ci Lower",
+            "type": "number"
+          },
+          "ci_upper": {
+            "title": "Ci Upper",
+            "type": "number"
+          },
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "heterogeneity_i_squared": {
+            "title": "Heterogeneity I Squared",
+            "type": "number"
+          },
+          "heterogeneity_q": {
+            "title": "Heterogeneity Q",
+            "type": "number"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "pooled_effect": {
+            "title": "Pooled Effect",
+            "type": "number"
+          },
+          "pooled_se": {
+            "title": "Pooled Se",
+            "type": "number"
+          },
+          "study_weights": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Study Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "pooled_effect",
+          "pooled_se",
+          "ci_lower",
+          "ci_upper",
+          "heterogeneity_q",
+          "heterogeneity_i_squared",
+          "method",
+          "study_weights",
+          "computation_time_ms"
+        ],
+        "title": "MetaAnalysisResponse",
+        "type": "object"
+      },
+      "PipelineBatchRequest": {
+        "properties": {
+          "batch_size": {
+            "default": 50,
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Batch Size",
+            "type": "integer"
+          },
+          "max_hops": {
+            "default": 2,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Max Hops",
+            "type": "integer"
+          },
+          "write_back": {
+            "default": true,
+            "title": "Write Back",
+            "type": "boolean"
+          }
+        },
+        "title": "PipelineBatchRequest",
+        "type": "object"
+      },
+      "PipelineResponse": {
+        "properties": {
+          "entities_queued": {
+            "default": 0,
+            "title": "Entities Queued",
+            "type": "integer"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "message": {
+            "default": "",
+            "title": "Message",
+            "type": "string"
+          },
+          "status": {
+            "default": "accepted",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "PipelineResponse",
+        "type": "object"
+      },
+      "PipelineStatusResponse": {
+        "properties": {
+          "failed_total": {
+            "default": 0,
+            "title": "Failed Total",
+            "type": "integer"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "processed_total": {
+            "default": 0,
+            "title": "Processed Total",
+            "type": "integer"
+          },
+          "queue_depth": {
+            "default": 0,
+            "title": "Queue Depth",
+            "type": "integer"
+          },
+          "running": {
+            "default": false,
+            "title": "Running",
+            "type": "boolean"
+          },
+          "throughput_per_minute": {
+            "default": 0.0,
+            "title": "Throughput Per Minute",
+            "type": "number"
+          }
+        },
+        "title": "PipelineStatusResponse",
+        "type": "object"
+      },
+      "PipelineTriggerRequest": {
+        "properties": {
+          "entity_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Entity Ids",
+            "type": "array"
+          },
+          "run_cove": {
+            "default": false,
+            "title": "Run Cove",
+            "type": "boolean"
+          },
+          "run_formal": {
+            "default": false,
+            "title": "Run Formal",
+            "type": "boolean"
+          },
+          "write_back": {
+            "default": true,
+            "title": "Write Back",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "entity_ids"
+        ],
+        "title": "PipelineTriggerRequest",
+        "type": "object"
+      },
+      "PipelineWebhookPayload": {
+        "properties": {
+          "entity_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Entity Ids",
+            "type": "array"
+          },
+          "event_type": {
+            "enum": [
+              "node_created",
+              "node_updated",
+              "edge_created",
+              "edge_updated"
+            ],
+            "title": "Event Type",
+            "type": "string"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp"
+          }
+        },
+        "required": [
+          "event_type",
+          "entity_ids"
+        ],
+        "title": "PipelineWebhookPayload",
+        "type": "object"
+      },
+      "ProofStoreRequest": {
+        "properties": {
+          "expression": {
+            "title": "Expression",
+            "type": "string"
+          },
+          "is_valid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Valid"
+          },
+          "language": {
+            "default": "z3",
+            "enum": [
+              "lean4",
+              "z3",
+              "sympy"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
+          "proof": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proof"
+          }
+        },
+        "required": [
+          "expression"
+        ],
+        "title": "ProofStoreRequest",
+        "type": "object"
+      },
+      "RagasRequest": {
+        "properties": {
+          "answer": {
+            "maxLength": 10000,
+            "title": "Answer",
+            "type": "string"
+          },
+          "contexts": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Contexts",
+            "type": "array"
+          },
+          "question": {
+            "maxLength": 2000,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question",
+          "answer",
+          "contexts"
+        ],
+        "title": "RagasRequest",
+        "type": "object"
+      },
+      "RagasResponse": {
+        "properties": {
+          "answer_relevancy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer Relevancy"
+          },
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "context_precision": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context Precision"
+          },
+          "degraded": {
+            "default": false,
+            "description": "True when one or more metrics could not be computed (backend outage / malformed response). Null metrics are NOT real scores.",
+            "title": "Degraded",
+            "type": "boolean"
+          },
+          "factual_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Factual Accuracy"
+          },
+          "faithfulness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Faithfulness"
+          }
+        },
+        "required": [
+          "computation_time_ms"
+        ],
+        "title": "RagasResponse",
+        "type": "object"
+      },
+      "ReadinessStatus": {
+        "description": "Readiness probe response.",
+        "properties": {
+          "ready": {
+            "description": "Whether service is ready",
+            "title": "Ready",
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Reason if not ready",
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "ready"
+        ],
+        "title": "ReadinessStatus",
+        "type": "object"
+      },
+      "SandboxJobStatus": {
+        "properties": {
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "execution_time_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Time Ms"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "result_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Url"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "timeout"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "status",
+          "created_at"
+        ],
+        "title": "SandboxJobStatus",
+        "type": "object"
+      },
+      "SandboxRequest": {
+        "properties": {
+          "code": {
+            "maxLength": 50000,
+            "title": "Code",
+            "type": "string"
+          },
+          "input_data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Data"
+          },
+          "language": {
+            "const": "python",
+            "default": "python",
+            "title": "Language",
+            "type": "string"
+          },
+          "timeout_seconds": {
+            "default": 60,
+            "maximum": 300.0,
+            "minimum": 5.0,
+            "title": "Timeout Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "SandboxRequest",
+        "type": "object"
+      },
+      "StudyResult": {
+        "properties": {
+          "effect_size": {
+            "title": "Effect Size",
+            "type": "number"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "sample_size": {
+            "exclusiveMinimum": 0.0,
+            "title": "Sample Size",
+            "type": "integer"
+          },
+          "standard_error": {
+            "exclusiveMinimum": 0.0,
+            "title": "Standard Error",
+            "type": "number"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional manual weight override",
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "effect_size",
+          "standard_error",
+          "sample_size"
+        ],
+        "title": "StudyResult",
+        "type": "object"
+      },
+      "SubgraphRequest": {
+        "properties": {
+          "entity_id": {
+            "description": "Central node ID for subgraph extraction",
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "max_hops": {
+            "default": 2,
+            "description": "Maximum traversal depth",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Max Hops",
+            "type": "integer"
+          },
+          "max_nodes": {
+            "default": 500,
+            "description": "Maximum nodes to return",
+            "maximum": 5000.0,
+            "minimum": 1.0,
+            "title": "Max Nodes",
+            "type": "integer"
+          },
+          "min_confidence": {
+            "default": 0.0,
+            "description": "Minimum edge confidence",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Min Confidence",
+            "type": "number"
+          },
+          "relationship_types": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by relationship types (e.g. SUPPORTS, REFUTES)",
+            "title": "Relationship Types"
+          }
+        },
+        "required": [
+          "entity_id"
+        ],
+        "title": "SubgraphRequest",
+        "type": "object"
+      },
+      "SubgraphResponse": {
+        "properties": {
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "edge_count": {
+            "title": "Edge Count",
+            "type": "integer"
+          },
+          "edges": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "max_hops_used": {
+            "title": "Max Hops Used",
+            "type": "integer"
+          },
+          "node_count": {
+            "title": "Node Count",
+            "type": "integer"
+          },
+          "nodes": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Nodes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "entity_id",
+          "nodes",
+          "edges",
+          "node_count",
+          "edge_count",
+          "max_hops_used",
+          "computation_time_ms"
+        ],
+        "title": "SubgraphResponse",
+        "type": "object"
+      },
+      "SubgraphXJobStatus": {
+        "properties": {
+          "computation_time_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Computation Time Ms"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "progress": {
+            "default": 0.0,
+            "title": "Progress",
+            "type": "number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "status"
+        ],
+        "title": "SubgraphXJobStatus",
+        "type": "object"
+      },
+      "SubgraphXRequest": {
+        "properties": {
+          "model_type": {
+            "default": "gcn",
+            "enum": [
+              "gcn",
+              "gat",
+              "graphsage"
+            ],
+            "title": "Model Type",
+            "type": "string"
+          },
+          "node_id": {
+            "title": "Node Id",
+            "type": "string"
+          },
+          "num_iterations": {
+            "default": 20,
+            "maximum": 100.0,
+            "minimum": 5.0,
+            "title": "Num Iterations",
+            "type": "integer"
+          },
+          "subgraph_size": {
+            "default": 5,
+            "maximum": 20.0,
+            "minimum": 2.0,
+            "title": "Subgraph Size",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "node_id"
+        ],
+        "title": "SubgraphXRequest",
+        "type": "object"
+      },
+      "TimeSeriesPoint": {
+        "properties": {
+          "timestamp": {
+            "title": "Timestamp",
+            "type": "number"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "timestamp",
+          "value"
+        ],
+        "title": "TimeSeriesPoint",
+        "type": "object"
+      },
+      "TrendRequest": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/TimeSeriesPoint"
+            },
+            "maxItems": 10000,
+            "minItems": 3,
+            "title": "Data",
+            "type": "array"
+          },
+          "test": {
+            "default": "mann_kendall",
+            "pattern": "^(mann_kendall|linear_regression)$",
+            "title": "Test",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "TrendRequest",
+        "type": "object"
+      },
+      "TrendResponse": {
+        "properties": {
+          "computation_time_ms": {
+            "title": "Computation Time Ms",
+            "type": "number"
+          },
+          "intercept": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intercept"
+          },
+          "p_value": {
+            "title": "P Value",
+            "type": "number"
+          },
+          "slope": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slope"
+          },
+          "statistic": {
+            "title": "Statistic",
+            "type": "number"
+          },
+          "trend": {
+            "description": "increasing | decreasing | no_trend",
+            "title": "Trend",
+            "type": "string"
+          }
+        },
+        "required": [
+          "trend",
+          "p_value",
+          "statistic",
+          "computation_time_ms"
+        ],
+        "title": "TrendResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VerificationQuestion": {
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "source_authority_score": {
+            "default": 0.0,
+            "title": "Source Authority Score",
+            "type": "number"
+          },
+          "source_node_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Node Ids",
+            "type": "array"
+          },
+          "verdict": {
+            "default": "inconclusive",
+            "enum": [
+              "supports",
+              "refutes",
+              "inconclusive"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "VerificationQuestion",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "bearerFormat": "JWT",
+        "description": "Enter Bearer <token>",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Scientific data processing, topology analysis, verification (CoVe, RAGAS), statistical meta-analysis, explainability (SubgraphX), formal reasoning, and sandboxed code execution over knowledge graphs. Auth via Istio-forwarded headers; controlled by ENABLE_AUTH.",
+    "title": "Scientific Processor API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/cache/clear": {
+      "post": {
+        "description": "Clear the calling tenant's cached entries.\n\nScoped to the caller: other tenants' entries, and keys with no tenant segment,\nare left untouched. `previous_size` reports how many of the caller's entries\nwere removed.",
+        "operationId": "cache_clear",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CacheClearResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Cache Clear",
+        "tags": [
+          "cache"
+        ]
+      }
+    },
+    "/api/cache/invalidate": {
+      "post": {
+        "description": "Invalidate a specific cache entry owned by the calling tenant.",
+        "operationId": "cache_invalidate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheInvalidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Cache Invalidate",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Cache Invalidate",
+        "tags": [
+          "cache"
+        ]
+      }
+    },
+    "/api/cache/stats": {
+      "get": {
+        "description": "Return cache hit/miss statistics.",
+        "operationId": "cache_stats",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CacheStatsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Cache Stats",
+        "tags": [
+          "cache"
+        ]
+      }
+    },
+    "/api/formal/proofs/{claim_id}": {
+      "get": {
+        "description": "Retrieve existing proofs for a claim.",
+        "operationId": "formal_get_proofs",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "claim_id",
+            "required": true,
+            "schema": {
+              "title": "Claim Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Formal Get Proofs",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Proofs",
+        "tags": [
+          "formal"
+        ]
+      },
+      "post": {
+        "description": "Store a formal proof for a claim.",
+        "operationId": "formal_create_proof",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "claim_id",
+            "required": true,
+            "schema": {
+              "title": "Claim Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProofStoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Formal Create Proof",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Proof",
+        "tags": [
+          "formal"
+        ]
+      }
+    },
+    "/api/formal/translate": {
+      "post": {
+        "description": "Translate a natural-language claim to a formal logic representation.",
+        "operationId": "formal_translate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FormalTranslateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormalTranslateResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "gpu_busy",
+                  "retry_after": 10
+                }
+              }
+            },
+            "description": "lean4-prover GPU busy; retry after the `Retry-After` header (seconds)."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Translate To Formal",
+        "tags": [
+          "formal"
+        ]
+      }
+    },
+    "/api/formal/verify": {
+      "post": {
+        "description": "Verify a formal-logic expression using Z3, SymPy, or Lean 4.",
+        "operationId": "formal_verify",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FormalVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormalVerifyResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "gpu_busy",
+                  "retry_after": 10
+                }
+              }
+            },
+            "description": "lean4-prover GPU busy; retry after the `Retry-After` header (seconds)."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Verify Formal",
+        "tags": [
+          "formal"
+        ]
+      }
+    },
+    "/api/pipeline/anomalies": {
+      "get": {
+        "description": "Get entities with significant score drops.",
+        "operationId": "pipeline_anomalies",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "threshold",
+            "required": false,
+            "schema": {
+              "default": 0.2,
+              "title": "Threshold",
+              "type": "number"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Pipeline Anomalies",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Anomalies",
+        "tags": [
+          "pipeline"
+        ]
+      }
+    },
+    "/api/pipeline/batch": {
+      "post": {
+        "description": "Find and verify all unscored entities in the graph.",
+        "operationId": "pipeline_batch",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PipelineBatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Pipeline Batch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Batch Verification",
+        "tags": [
+          "pipeline"
+        ]
+      }
+    },
+    "/api/pipeline/history/{entity_id}": {
+      "get": {
+        "description": "Get verification score history for an entity.",
+        "operationId": "pipeline_history",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entity_id",
+            "required": true,
+            "schema": {
+              "title": "Entity Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Pipeline History",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Entity History",
+        "tags": [
+          "pipeline"
+        ]
+      }
+    },
+    "/api/pipeline/status": {
+      "get": {
+        "description": "Get pipeline health, queue depth, throughput.",
+        "operationId": "pipeline_status",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PipelineStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Pipeline Status",
+        "tags": [
+          "pipeline"
+        ]
+      }
+    },
+    "/api/pipeline/trigger": {
+      "post": {
+        "description": "Manually trigger verification for specific entity IDs.",
+        "operationId": "pipeline_trigger",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PipelineTriggerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Pipeline Trigger",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Trigger Verification",
+        "tags": [
+          "pipeline"
+        ]
+      }
+    },
+    "/api/pipeline/webhook": {
+      "post": {
+        "description": "Receive graph change notifications and trigger verification.",
+        "operationId": "pipeline_webhook",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PipelineWebhookPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PipelineResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Webhook Notification",
+        "tags": [
+          "pipeline"
+        ]
+      }
+    },
+    "/api/sandbox/execute": {
+      "post": {
+        "description": "Submit code for sandboxed execution.",
+        "operationId": "sandbox_execute",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SandboxRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Sandbox Execute",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Execute Sandbox",
+        "tags": [
+          "sandbox"
+        ]
+      }
+    },
+    "/api/sandbox/jobs/{job_id}": {
+      "get": {
+        "description": "Get status of a sandboxed execution job.",
+        "operationId": "sandbox_get_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SandboxJobStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Sandbox Job",
+        "tags": [
+          "sandbox"
+        ]
+      }
+    },
+    "/api/sandbox/results/{job_id}": {
+      "get": {
+        "description": "Retrieve results from a completed sandboxed execution.",
+        "operationId": "sandbox_get_results",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Sandbox Get Results",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Sandbox Results",
+        "tags": [
+          "sandbox"
+        ]
+      }
+    },
+    "/api/stats/confidence-interval": {
+      "post": {
+        "description": "Compute confidence intervals for aggregated effect sizes.",
+        "operationId": "statistics_confidence_interval",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfidenceIntervalRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfidenceIntervalResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Compute Confidence Interval",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/stats/meta-analysis": {
+      "post": {
+        "description": "Run fixed/random-effects meta-analysis over a set of study results.",
+        "operationId": "statistics_meta_analysis",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetaAnalysisRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetaAnalysisResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Run Meta Analysis",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/stats/trend": {
+      "post": {
+        "description": "Detect temporal trends in scientific evidence.",
+        "operationId": "statistics_trend",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrendRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Detect Trend",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/verify/cove": {
+      "post": {
+        "description": "Run Chain-of-Verification (CoVe) on a claim.\n\nGenerates verification questions, searches the knowledge graph for\nsupporting/refuting evidence, and aggregates a verdict.",
+        "operationId": "verification_cove",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoVeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoVeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Verify Cove",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/api/verify/integrity": {
+      "post": {
+        "description": "Compute composite integrity score combining citation, cross-ref, community, authority, and contradiction signals.",
+        "operationId": "verification_integrity",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegrityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrityResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Compute Integrity",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/api/verify/ragas": {
+      "post": {
+        "description": "Run RAGAS faithfulness evaluation on a question-answer-context tuple.\n\nComputes faithfulness, answer relevancy, context precision, and factual accuracy.",
+        "operationId": "verification_ragas",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RagasRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RagasResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Verify Ragas",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Health check — queries backend services and returns aggregate status.",
+        "operationId": "health_check",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Liveness probe — always returns alive.",
+        "operationId": "health_liveness",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LivenessStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Readiness probe — checks critical backend dependencies.\n\nReturns 503 when a critical dependency is unhealthy, so an httpGet probe\ncan actually observe the failure.",
+        "operationId": "health_readiness",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessStatus"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Readiness",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/status": {
+      "get": {
+        "description": "Lightweight status endpoint for gateway proxy health checks.",
+        "operationId": "health_status",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Status",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Status Check",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}
