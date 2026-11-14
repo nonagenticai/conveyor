@@ -1,0 +1,10 @@
+{
+  "service": "licenses",
+  "captured_at": "2026-11-14T07:35:25Z",
+  "image_digest": "sha256:13093d39f55999d2092a5ac60ebb61104fdc22057bf63d168313dbe5c740cee5",
+  "lock_sha256": "9c70313503614e7ddd0f197402c8b89a70d663e3bd54e5ac6e94a969f96413d8",
+  "openapi": "3.1.0",
+  "paths": 43,
+  "methods": 60,
+  "schemas": 57
+}
