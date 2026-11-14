@@ -33,6 +33,8 @@
 //! port has no equivalent marker. The residue is the same either way, and the same sweep clears
 //! both; it is named here rather than silently omitted.
 
+pub mod metering;
+
 use std::time::Duration;
 
 use conveyor_auth::oauth::ClientCredentials;

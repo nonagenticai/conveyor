@@ -26,6 +26,7 @@ conveyor-platform = { path = "../../crates/platform" }
 getrandom = "0.3"
 jsonwebtoken = { workspace = true }
 metrics-exporter-prometheus = { workspace = true }
+reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 sha2 = { workspace = true }
