@@ -151,6 +151,59 @@ pub async fn get_license(
         .await
 }
 
+/// What the post-update token-budget push reads for ONE licence.
+#[derive(Debug, sqlx::FromRow)]
+pub struct LiveBudgetRow {
+    pub tenant_id: Uuid,
+    pub token_budget_override: Option<i32>,
+    pub plan_token_budget_monthly: Option<i32>,
+    /// `tenants.budget_currency`; `Some` means a MONEY tenant, which owes no token budget.
+    pub budget_currency: Option<String>,
+}
+
+/// The reference's `push_effective_token_budgets` selection, narrowed to one licence:
+/// `status='active'`, not soft-deleted, not past `expires_at`.
+///
+/// `None` is "not selected", NOT a failure: a revoked, archived or expired licence is never
+/// pushed, and the route still answers 200 for the edit (the push is after the response).
+pub async fn live_budget_for_push(
+    pool: &PgPool,
+    license_id: Uuid,
+) -> Result<Option<LiveBudgetRow>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT l.tenant_id,
+                l.token_budget_override,
+                p.token_budget_monthly AS plan_token_budget_monthly,
+                t.budget_currency::text
+           FROM license l
+           JOIN plan p ON p.id = l.plan_id
+           LEFT JOIN tenants t ON t.id = l.tenant_id
+          WHERE l.id = $1
+            AND l.status = 'active'
+            AND l.deleted_at IS NULL
+            AND (l.expires_at IS NULL OR l.expires_at > now())",
+    )
+    .bind(license_id)
+    .fetch_optional(pool)
+    .await
+}
+
+/// `_stamp_license_metering(..., {metering_verified_at: None}, ...)` after a failed push.
+///
+/// Clearing the stamp is the reconcile sweep's repair signal: it selects licences whose
+/// billing mirror may be stale. A failure here is logged by the caller and is NOT fatal —
+/// the reference leaves the row as it is and the next sweep re-examines it anyway.
+pub async fn clear_metering_verified(
+    pool: &PgPool,
+    license_id: Uuid,
+) -> Result<u64, sqlx::Error> {
+    let result = sqlx::query("UPDATE license SET metering_verified_at = NULL WHERE id = $1")
+        .bind(license_id)
+        .execute(pool)
+        .await?;
+    Ok(result.rows_affected())
+}
+
 /// `DatabaseManager.set_license_token_budget_override`: UPDATE-only, one column.
 ///
 /// `None` CLEARS the override (back to the plan's value). `updated_at` advances only when
