@@ -1,0 +1,312 @@
+{
+  "components": {
+    "schemas": {
+      "CheckRequest": {
+        "properties": {
+          "source": {
+            "maxLength": 100000,
+            "type": "string"
+          },
+          "timeout": {
+            "maximum": 120,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "type": "object"
+      },
+      "CheckResponse": {
+        "$ref": "#/components/schemas/DiagnosticResponse"
+      },
+      "DiagnosticResponse": {
+        "properties": {
+          "computation_time_ms": {
+            "type": "number"
+          },
+          "diagnostics": {
+            "items": {
+              "$ref": "#/components/schemas/LeanDiagnostic"
+            },
+            "type": "array"
+          },
+          "elaborated_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "proven": {
+            "type": "boolean"
+          },
+          "stderr": {
+            "type": "string"
+          },
+          "stdout": {
+            "type": "string"
+          },
+          "successful_tactic": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "valid": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ElaborateRequest": {
+        "properties": {
+          "context": {
+            "maxLength": 100000,
+            "type": "string"
+          },
+          "term": {
+            "maxLength": 50000,
+            "type": "string"
+          },
+          "timeout": {
+            "maximum": 120,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "term"
+        ],
+        "type": "object"
+      },
+      "ElaborateResponse": {
+        "$ref": "#/components/schemas/DiagnosticResponse"
+      },
+      "LeanDiagnostic": {
+        "properties": {
+          "column": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "line": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "message"
+        ],
+        "type": "object"
+      },
+      "ProveRequest": {
+        "properties": {
+          "imports": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "tactics": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "theorem": {
+            "maxLength": 50000,
+            "type": "string"
+          },
+          "timeout": {
+            "maximum": 120,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "theorem"
+        ],
+        "type": "object"
+      },
+      "ProveResponse": {
+        "$ref": "#/components/schemas/DiagnosticResponse"
+      }
+    },
+    "securitySchemes": {
+      "LicenceToken": {
+        "description": "Licence token as 'Bearer <token>'. Introspected against the licenses service; the tenant is taken from the licence, never from a header. 'Authorization: Bearer <token>' is also accepted.",
+        "in": "header",
+        "name": "X-Tenant-Id",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "description": "Lean 4 formal verification as a REST API. Every compute call must carry a licence token (X-Tenant-Id: Bearer <token>), introspected against the licenses service.",
+    "title": "Lean4 Prover API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/check": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckResponse"
+                }
+              }
+            },
+            "description": "Result"
+          },
+          "401": {
+            "description": "Missing, invalid or inactive licence"
+          },
+          "422": {
+            "description": "Request violates a documented bound"
+          },
+          "503": {
+            "description": "Prove lane saturated, or licences service unavailable"
+          }
+        },
+        "security": [
+          {
+            "LicenceToken": []
+          }
+        ],
+        "summary": "Typecheck Lean 4 source"
+      }
+    },
+    "/api/elaborate": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ElaborateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElaborateResponse"
+                }
+              }
+            },
+            "description": "Result"
+          },
+          "401": {
+            "description": "Missing, invalid or inactive licence"
+          },
+          "422": {
+            "description": "Request violates a documented bound"
+          },
+          "503": {
+            "description": "Prove lane saturated, or licences service unavailable"
+          }
+        },
+        "security": [
+          {
+            "LicenceToken": []
+          }
+        ],
+        "summary": "Elaborate a Lean 4 term"
+      }
+    },
+    "/api/prove": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProveResponse"
+                }
+              }
+            },
+            "description": "Result"
+          },
+          "401": {
+            "description": "Missing, invalid or inactive licence"
+          },
+          "422": {
+            "description": "Request violates a documented bound"
+          },
+          "503": {
+            "description": "Prove lane saturated, or licences service unavailable"
+          }
+        },
+        "security": [
+          {
+            "LicenceToken": []
+          }
+        ],
+        "summary": "Prove a theorem with tactics"
+      }
+    },
+    "/health": {
+      "get": {
+        "security": [],
+        "summary": "Full health check"
+      }
+    },
+    "/health/live": {
+      "get": {
+        "security": [],
+        "summary": "Liveness probe"
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "security": [],
+        "summary": "Readiness probe"
+      }
+    },
+    "/metrics": {
+      "get": {
+        "security": [],
+        "summary": "Prometheus metrics"
+      }
+    }
+  }
+}
