@@ -32,6 +32,14 @@ Issues and pull requests are welcome. See
 organisation-wide rules; setup, test and lint commands are in this README. Commits carry DCO
 sign-off.
 
+## Licensing
+
+The code in this repository is Apache-2.0 and needs no licence key to build, test or run.
+`LICENCES_BASE_URL` is **optional**: unset, licence sync is unavailable and every other job
+runs unaffected. With it set, sync failures are retried and never written on a guess.
+
+The licensing stack is public too — [`licenses`](https://github.com/nonagenticai/licenses) (entitlements, plans and tokens) and [`license-authz`](https://github.com/nonagenticai/license-authz) (the Envoy `ext_authz` enforcement point). Neither is required to run this code.
+
 ## License
 
 Apache-2.0 — see [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
