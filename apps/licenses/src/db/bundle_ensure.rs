@@ -6,7 +6,10 @@
 //! helpers from `models.py` (:1293 `service_subject_*`, :1317/:1339 `is_*_subject`).
 //!
 //! This module decides; it never writes, holds no lock, and mounts no route. `apply` (the inserts,
-//! adopts and grants) and the HTTP route are a later card. Reads it shares with the bundle-token
+//! adopts, grants and metering) lives in [`super::bundle_ensure_apply`]; the HTTP route is a later
+//! card. The fields `apply` fills on [`EnsurePlan`] / [`AppPlan`] (`grants_created`, `lost_race`,
+//! `unmetered`, `applied`, `metering_pending`) are declared here so a dry run can report them
+//! empty. Reads it shares with the bundle-token
 //! route are documented on [`crate::db::bundles`]; the one read added here,
 //! [`tenant_app_licences`], is `DatabaseManager.list_tenant_app_licences` (:6709) widened to the
 //! fields a decision needs.
@@ -72,6 +75,9 @@ pub struct AppPlan {
     pub refuse_reason: Option<RefuseReason>,
     /// Set for `exists` / `adopt`: the plan the held licence is on.
     pub existing_plan_id: Option<Uuid>,
+    /// Set by `apply` for an insert whose metering push did not complete (the reference's
+    /// `metering_pending`); the reconcile sweep repairs the licence.
+    pub metering_pending: String,
 }
 
 /// What `plan` decided for the whole bundle (read-only).
@@ -92,6 +98,16 @@ pub struct EnsurePlan {
     /// `(owner, app)` APP-SCOPED dependency grants the apply step must write: every walked
     /// `app_requires` edge plus the bundle's `bundle_caller` pairs.
     pub dependency_grants: Vec<(String, String)>,
+    /// Filled by `apply`: the owner keys newly granted access to the tenant by this ensure.
+    pub grants_created: Vec<String>,
+    /// Filled by `apply`: app keys whose adoption lost its compare-and-set, or whose insert lost
+    /// to a licence not carrying this bundle; each is REFUSE `lost_race`.
+    pub lost_race: Vec<String>,
+    /// Filled by `apply`: `<app key> <licence id>: <why>` for each inserted licence whose billing
+    /// push did not complete. The reconcile sweep repairs them.
+    pub unmetered: Vec<String>,
+    /// `apply` ran. A dry run leaves this false.
+    pub applied: bool,
 }
 
 impl EnsurePlan {
@@ -148,8 +164,8 @@ impl RefuseReason {
     }
 }
 
-/// The whole-request refusal codes. `ensure_in_progress` belongs to `apply`'s tenant lock, a later
-/// card; `lost_race` is an `apply` refusal reason, never produced by this read-only layer.
+/// The whole-request refusal codes. `ensure_in_progress` is `apply`'s tenant lock expiring;
+/// `lost_race` is a per-app refusal reason, never produced by this read-only layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EnsureErrorCode {
     TenantNotFound,
@@ -158,6 +174,10 @@ pub enum EnsureErrorCode {
     BundleNotFound,
     BundleEmpty,
     DependencyCycle,
+    /// Another ensure for the same tenant still holds the advisory lock ([`ENSURE_LOCK_TIMEOUT`]).
+    ///
+    /// [`ENSURE_LOCK_TIMEOUT`]: super::bundle_ensure_apply::ENSURE_LOCK_TIMEOUT
+    EnsureInProgress,
 }
 
 impl EnsureErrorCode {
@@ -169,6 +189,7 @@ impl EnsureErrorCode {
             Self::BundleNotFound => "bundle_not_found",
             Self::BundleEmpty => "bundle_empty",
             Self::DependencyCycle => "dependency_cycle",
+            Self::EnsureInProgress => "ensure_in_progress",
         }
     }
 }
@@ -448,6 +469,7 @@ fn app_plan(app_key: &str, app_id: Uuid, action: AppAction) -> AppPlan {
         plan_id: None,
         refuse_reason: None,
         existing_plan_id: None,
+        metering_pending: String::new(),
         dependency: false,
     }
 }
@@ -882,5 +904,9 @@ pub async fn plan(
         quota_override,
         token_budget_override,
         dependency_grants: dependency_grants.into_iter().collect(),
+        grants_created: Vec::new(),
+        lost_race: Vec::new(),
+        unmetered: Vec::new(),
+        applied: false,
     })
 }

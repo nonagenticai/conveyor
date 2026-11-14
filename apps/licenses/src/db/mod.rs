@@ -15,6 +15,7 @@
 pub mod active;
 pub mod bundle_apply_rows;
 pub mod bundle_ensure;
+pub mod bundle_ensure_apply;
 pub mod bundle_grants;
 pub mod bundles;
 pub mod dependencies;
