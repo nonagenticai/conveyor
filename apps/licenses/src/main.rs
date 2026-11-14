@@ -9,7 +9,7 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 use conveyor_licenses::SERVICE_NAME;
 use conveyor_licenses::auth::JwtVerifier;
-use conveyor_licenses::commands::revoke_expired_tokens;
+use conveyor_licenses::commands::{expire_stale, revoke_expired_tokens};
 use conveyor_licenses::config::Config;
 use conveyor_licenses::contract;
 use conveyor_licenses::db;
@@ -49,6 +49,9 @@ enum Command {
     /// Revoke time-expired-but-still-unrevoked tokens across the estate: env-configured, one JSON
     /// line on stdout, exit 0 converged / 1 not converged / 2 config-or-DB failure.
     RevokeExpiredTokens,
+    /// Expire time-expired-but-still-active licences across the estate: env-configured, one JSON
+    /// line on stdout, exit 0 converged / 1 not converged / 2 config-or-DB failure.
+    ExpireStale,
 }
 
 fn main() -> ExitCode {
@@ -60,6 +63,7 @@ fn main() -> ExitCode {
         Command::Serve => serve(),
         Command::Migrate { baseline } => migrate(baseline),
         Command::RevokeExpiredTokens => revoke_expired_tokens_cli(),
+        Command::ExpireStale => expire_stale_cli(),
     }
 }
 
@@ -190,6 +194,32 @@ fn revoke_expired_tokens_cli() -> ExitCode {
     let outcome = runtime.block_on(revoke_expired_tokens::run(
         std::env::var("DATABASE_URL").ok(),
     ));
+    // serde_json's object map is a BTreeMap here (no `preserve_order`), so keys come out sorted,
+    // exactly like the script's `json.dumps(..., sort_keys=True)`.
+    match serde_json::to_string(&outcome.payload) {
+        Ok(json) => println!("{json}"),
+        Err(error) => {
+            eprintln!("error: cannot serialise the outcome: {error}");
+            return ExitCode::FAILURE;
+        }
+    }
+    ExitCode::from(u8::try_from(outcome.code).unwrap_or(1))
+}
+
+/// `expire-stale`: the same CronJob contract as `revoke-expired-tokens` — one JSON line on
+/// stdout on EVERY path (config failures included), with the verdict carried by the exit code.
+fn expire_stale_cli() -> ExitCode {
+    let runtime = match tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+    {
+        Ok(runtime) => runtime,
+        Err(error) => {
+            eprintln!("error: cannot start the async runtime: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let outcome = runtime.block_on(expire_stale::run(std::env::var("DATABASE_URL").ok()));
     // serde_json's object map is a BTreeMap here (no `preserve_order`), so keys come out sorted,
     // exactly like the script's `json.dumps(..., sort_keys=True)`.
     match serde_json::to_string(&outcome.payload) {

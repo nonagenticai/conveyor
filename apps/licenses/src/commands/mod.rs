@@ -5,6 +5,7 @@
 //! `kubectl logs` IS the audit trail. Each command therefore keeps the script's key names rather
 //! than inventing Rust-shaped ones.
 
+pub mod expire_stale;
 pub mod revoke_expired_tokens;
 
 /// A command's verdict: the process exit code and the one object printed to stdout.
