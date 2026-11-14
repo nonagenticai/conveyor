@@ -19,6 +19,7 @@ pub mod licence_tokens;
 pub mod licenses;
 pub mod observability;
 pub mod schemas;
+pub mod tenants_crud;
 pub mod tokens;
 pub mod user_licenses;
 
@@ -61,6 +62,14 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/licenses/{license_id}/tokens"),
     ("POST", "/licenses/{license_id}/operator-token"),
     ("POST", "/licenses/{license_id}/regenerate-token"),
+    ("GET", "/tenants"),
+    ("POST", "/tenants"),
+    ("GET", "/tenants/{name_or_id}"),
+    ("PATCH", "/tenants/{name_or_id}"),
+    ("PUT", "/tenants/{tenant_id}"),
+    ("PATCH", "/tenants/{name_or_id}/archive"),
+    ("PUT", "/tenants/{name_or_id}/budget-currency"),
+    ("PATCH", "/tenants/{name_or_id}/cost-centre"),
 ];
 
 #[derive(utoipa::OpenApi)]
@@ -87,6 +96,14 @@ pub const ROUTES: &[(&str, &str)] = &[
         licenses::active,
         tokens::introspect,
         tokens::revoke,
+        tenants_crud::create_tenant,
+        tenants_crud::get_tenant,
+        tenants_crud::list_tenants,
+        tenants_crud::register_tenant,
+        tenants_crud::rename_tenant,
+        tenants_crud::set_tenant_archived,
+        tenants_crud::set_tenant_budget_currency,
+        tenants_crud::set_tenant_cost_centre,
         user_licenses::create_user_license,
         user_licenses::delete_user_licenses,
         user_licenses::list_user_licenses
@@ -114,6 +131,13 @@ pub const ROUTES: &[(&str, &str)] = &[
         MeteringReconcileResult,
         schemas::HTTPValidationError,
         schemas::ValidationError,
+        tenants_crud::TenantArchiveUpdate,
+        tenants_crud::TenantBudgetCurrencyUpdate,
+        tenants_crud::TenantCostCentreUpdate,
+        tenants_crud::TenantCreate,
+        tenants_crud::TenantRegister,
+        tenants_crud::TenantRename,
+        tenants_crud::TenantResponse,
         tokens::TokenIntrospectRequest,
         tokens::TokenIntrospectResponse,
         tokens::TokenRevokeRequest,
@@ -127,6 +151,7 @@ pub const ROUTES: &[(&str, &str)] = &[
     tags(
         (name = "health", description = "Health and readiness probes"),
         (name = "licenses", description = "Licenses and entitlements"),
+        (name = "tenants", description = "Tenant registry"),
         (name = "tokens", description = "API token introspection and revocation")
     )
 )]
@@ -205,6 +230,32 @@ pub fn router(state: AppState) -> Router {
         .route(
             "/licenses/{license_id}/regenerate-token",
             post(licence_tokens::regenerate_license_token),
+        )
+        .route(
+            "/tenants",
+            get(tenants_crud::list_tenants).post(tenants_crud::create_tenant),
+        )
+        // `/tenants/{name_or_id}` and `/tenants/{tenant_id}` are the SAME actual selector:
+        // the capture spells the PUT's parameter `tenant_id`, and axum refuses two wildcard
+        // NAMES at one path position, so the three methods share the one route. The
+        // documented path stays the capture's, in `ROUTES` and in the utoipa annotation.
+        .route(
+            "/tenants/{name_or_id}",
+            get(tenants_crud::get_tenant)
+                .patch(tenants_crud::rename_tenant)
+                .put(tenants_crud::register_tenant),
+        )
+        .route(
+            "/tenants/{name_or_id}/archive",
+            patch(tenants_crud::set_tenant_archived),
+        )
+        .route(
+            "/tenants/{name_or_id}/budget-currency",
+            axum::routing::put(tenants_crud::set_tenant_budget_currency),
+        )
+        .route(
+            "/tenants/{name_or_id}/cost-centre",
+            patch(tenants_crud::set_tenant_cost_centre),
         )
         // The live service also answers `/licenses/health` (a gateway-prefix alias it registers
         // with `include_in_schema=False`), so it is registered here but is not in `ROUTES`.
