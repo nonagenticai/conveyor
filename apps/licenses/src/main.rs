@@ -9,7 +9,9 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 use conveyor_licenses::SERVICE_NAME;
 use conveyor_licenses::auth::JwtVerifier;
-use conveyor_licenses::commands::{expire_stale, reap_expired, revoke_expired_tokens};
+use conveyor_licenses::commands::{
+    expire_stale, reap_expired, reconcile_metering, revoke_expired_tokens,
+};
 use conveyor_licenses::config::Config;
 use conveyor_licenses::contract;
 use conveyor_licenses::db;
@@ -56,6 +58,9 @@ enum Command {
     /// across the estate: env-configured, one JSON line on stdout, exit 0 converged / 1 not
     /// converged / 2 config-or-DB failure.
     ReapExpired,
+    /// Measure each live licence's metering coverage against billing and repair it: env-configured,
+    /// one JSON line on stdout, exit 0 converged / 1 not converged / 2 config-or-transport failure.
+    ReconcileMetering,
 }
 
 fn main() -> ExitCode {
@@ -69,6 +74,7 @@ fn main() -> ExitCode {
         Command::RevokeExpiredTokens => revoke_expired_tokens_cli(),
         Command::ExpireStale => expire_stale_cli(),
         Command::ReapExpired => reap_expired_cli(),
+        Command::ReconcileMetering => reconcile_metering_cli(),
     }
 }
 
@@ -225,6 +231,32 @@ fn expire_stale_cli() -> ExitCode {
         }
     };
     let outcome = runtime.block_on(expire_stale::run(std::env::var("DATABASE_URL").ok()));
+    // serde_json's object map is a BTreeMap here (no `preserve_order`), so keys come out sorted,
+    // exactly like the script's `json.dumps(..., sort_keys=True)`.
+    match serde_json::to_string(&outcome.payload) {
+        Ok(json) => println!("{json}"),
+        Err(error) => {
+            eprintln!("error: cannot serialise the outcome: {error}");
+            return ExitCode::FAILURE;
+        }
+    }
+    ExitCode::from(u8::try_from(outcome.code).unwrap_or(1))
+}
+
+/// `reconcile-metering`: the same CronJob contract as `reap-expired` — one JSON line on stdout
+/// on EVERY path (config failures included), with the verdict carried by the exit code.
+fn reconcile_metering_cli() -> ExitCode {
+    let runtime = match tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+    {
+        Ok(runtime) => runtime,
+        Err(error) => {
+            eprintln!("error: cannot start the async runtime: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let outcome = runtime.block_on(reconcile_metering::run(std::env::var("DATABASE_URL").ok()));
     // serde_json's object map is a BTreeMap here (no `preserve_order`), so keys come out sorted,
     // exactly like the script's `json.dumps(..., sort_keys=True)`.
     match serde_json::to_string(&outcome.payload) {

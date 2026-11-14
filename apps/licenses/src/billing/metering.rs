@@ -29,6 +29,7 @@
 //! [`super::BillingTeardown`], and [`ServiceError`] for the same failure vocabulary and retry
 //! rule.
 
+use std::collections::HashMap;
 use std::time::Duration;
 
 use conveyor_auth::oauth::ClientCredentials;
@@ -308,7 +309,7 @@ impl MeteringProvisioner {
     }
 
     /// The bearer for both pushes, or `None` when no credential is configured or minting failed.
-    async fn authorization(&self) -> Option<String> {
+    pub async fn authorization(&self) -> Option<String> {
         let creds = self.creds.as_ref()?;
         match creds.authorization().await {
             Ok(header) => Some(header),
@@ -359,6 +360,204 @@ impl MeteringProvisioner {
                 Err(error) => {
                     // A builder error (unsupported protocol, invalid URL) is raised before any
                     // I/O and re-raises identically; never spend the retry on it.
+                    let could_differ = !error.is_builder();
+                    let error = ServiceError::Unavailable {
+                        service: "billing",
+                        error: error.to_string(),
+                    };
+                    if attempt == 0 && could_differ {
+                        tokio::time::sleep(RETRY_DELAY).await;
+                        continue;
+                    }
+                    return Err(error);
+                }
+            }
+        }
+        Err(ServiceError::Unavailable {
+            service: "billing",
+            error: "no attempt was made".to_owned(),
+        })
+    }
+
+    /// `GET /api/budget/list/{tenant}` — the reference's `_fetch_license_sync_budget_ids`.
+    ///
+    /// Maps each licence billing already covers with an ACTIVE `source='license_sync'` budget to
+    /// that row's `budget_tokens` for the monthly period, or `None` when the licence is covered but
+    /// no monthly value could be read. `None` for the whole map means billing did not answer:
+    /// "unknown" is NOT "empty", and creating on an unknown state is how a duplicate row happens.
+    pub async fn fetch_license_sync_budget_ids(
+        &self,
+        tenant_id: Uuid,
+        authorization: Option<&str>,
+    ) -> Option<HashMap<String, Option<i64>>> {
+        let path = format!("/api/budget/list/{tenant_id}");
+        let value = match self
+            .get_json(&path, tenant_id, authorization)
+            .await
+        {
+            Ok(value) => value,
+            Err(error) => {
+                tracing::warn!(
+                    tenant = %tenant_id,
+                    status = %status_of(&error),
+                    %error,
+                    "could not read billing budgets; coverage UNKNOWN, no budget will be created"
+                );
+                return None;
+            }
+        };
+        match license_sync_budget_values(&value) {
+            Some(covered) => Some(covered),
+            None => {
+                tracing::warn!(
+                    tenant = %tenant_id,
+                    "could not parse billing's budget list; coverage UNKNOWN"
+                );
+                None
+            }
+        }
+    }
+
+    /// `GET /api/quota/check?license_id=…&plan_id=…` — the reference's
+    /// `_fetch_quota_config_monthly`.
+    ///
+    /// The plan value is deliberately NOT sent as a fallback query param: billing echoes it when
+    /// it holds no row, which would make "absent" indistinguishable from "present and equal".
+    /// A 404 is `unknown`/`foreign_tenant`, never `absent` — billing's only 404 on that route is
+    /// its foreign-owner rule, which proves a row exists under a DIFFERENT tenant.
+    pub async fn fetch_quota_config_monthly(
+        &self,
+        license_id: Uuid,
+        plan_id: Uuid,
+        tenant_id: Uuid,
+        authorization: Option<&str>,
+    ) -> QuotaRead {
+        // Both values are UUIDs, so they need no percent-encoding. (reqwest 0.13 has no
+        // `RequestBuilder::query`, and a hand-built query keeps this port dependency-free.)
+        let path = format!(
+            "/api/quota/check?license_id={license_id}&plan_id={plan_id}"
+        );
+        let error = match self
+            .get_json(&path, tenant_id, authorization)
+            .await
+        {
+            Ok(value) => return parse_quota_check(&value),
+            Err(error) => error,
+        };
+        // The reference's QUOTA_UNKNOWN_REASONS, counted from the failure that survived the one
+        // bounded retry. OBSERVABILITY ONLY: every reason fails closed identically.
+        let reason = match &error {
+            ServiceError::Refused { status: 404, .. } => "foreign_tenant".to_owned(),
+            ServiceError::Refused { status, .. } => format!("http_{status}"),
+            ServiceError::Unavailable { .. } => "transport".to_owned(),
+            ServiceError::Body { .. } => "unreadable_payload".to_owned(),
+            ServiceError::Token(_) | ServiceError::Unconfigured(_) => "transport".to_owned(),
+        };
+        tracing::warn!(
+            license = %license_id,
+            tenant = %tenant_id,
+            %error,
+            reason = %reason,
+            "could not read billing's quota config; the configured quota is UNKNOWN and nothing \
+             will be pushed for this licence"
+        );
+        QuotaRead {
+            state: QuotaState::Unknown,
+            quota_monthly: None,
+            unknown_reason: Some(reason),
+        }
+    }
+
+    /// `POST /api/budget` — billing's licence-keyed `license_sync` upsert. True iff accepted.
+    ///
+    /// Call only when the read said billing holds nothing for this licence, or when the value it
+    /// holds differs from the licence's effective budget. A redundant POST does not duplicate the
+    /// row, it MUTATES the cap in place.
+    pub async fn push_token_budget(
+        &self,
+        license_id: Uuid,
+        tenant_id: Uuid,
+        budget_tokens: i64,
+        authorization: Option<&str>,
+    ) -> bool {
+        let body = json!({
+            "tenant_id": tenant_id.to_string(),
+            "license_id": license_id.to_string(),
+            "budget_tokens": budget_tokens,
+            "period": "monthly",
+            "source": "license_sync",
+        });
+        self.post("/api/budget", tenant_id, &body, authorization)
+            .await
+            .is_ok()
+    }
+
+    /// `POST /api/quota/config` — create a missing row, or (force_plan_quota only) overwrite a
+    /// differing one. True iff accepted.
+    ///
+    /// `app_id` is load-bearing: billing's resolver ignores any quota row whose `app_id` is NULL,
+    /// so a repair without it reopens the gap one field lower down.
+    pub async fn push_quota_config(
+        &self,
+        license_id: Uuid,
+        tenant_id: Uuid,
+        quota_monthly: i64,
+        app_id: Option<Uuid>,
+        app_name: Option<&str>,
+        authorization: Option<&str>,
+    ) -> bool {
+        let body = json!({
+            // Required by billing's QuotaConfigRequest; FastAPI never populates a body model
+            // from a header, so a header-only tenant is a deterministic 422.
+            "tenant_id": tenant_id.to_string(),
+            "license_id": license_id.to_string(),
+            "quota_monthly": quota_monthly,
+            "app_id": app_id.map(|id| id.to_string()),
+            "app_name": app_name,
+        });
+        self.post("/api/quota/config", tenant_id, &body, authorization)
+            .await
+            .is_ok()
+    }
+
+    /// `GET path` with `X-Tenant-Id`, the bearer when one was minted, and one bounded retry.
+    ///
+    /// Retry rule is [`retryable`], the same one the pushes use: a 4xx is a verdict. A 2xx whose
+    /// body is not JSON is `ServiceError::Body` and is NOT retried — the reference parses after
+    /// its retry loop.
+    async fn get_json(
+        &self,
+        path: &str,
+        tenant_id: Uuid,
+        authorization: Option<&str>,
+    ) -> Result<Value, ServiceError> {
+        for attempt in 0..2 {
+            let mut request = self
+                .http
+                .get(format!("{}{path}", self.base_url))
+                .header("X-Tenant-Id", tenant_id.to_string());
+            if let Some(header) = authorization {
+                request = request.header(reqwest::header::AUTHORIZATION, header);
+            }
+            match request.send().await {
+                Ok(response) => {
+                    let status = response.status();
+                    if status.is_success() {
+                        return response.json::<Value>().await.map_err(|error| {
+                            ServiceError::Body {
+                                service: "billing",
+                                error: error.to_string(),
+                            }
+                        });
+                    }
+                    let error = failure_for_status(status);
+                    if attempt == 0 && retryable(&error) {
+                        tokio::time::sleep(RETRY_DELAY).await;
+                        continue;
+                    }
+                    return Err(error);
+                }
+                Err(error) => {
                     let could_differ = !error.is_builder();
                     let error = ServiceError::Unavailable {
                         service: "billing",
@@ -487,6 +686,134 @@ async fn stamp_provisioned(pool: &PgPool, license_id: Uuid) -> Result<(), Meteri
         )));
     }
     Ok(())
+}
+
+/// The reference's `QuotaConfigState` tri-state. `Unknown` is NOT `Absent`, and the two must
+/// never collapse: treating an unanswered read as absent turns the fail-closed guard back into
+/// the unconditional overwrite it replaced.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum QuotaState {
+    Present,
+    Absent,
+    Unknown,
+}
+
+/// What billing currently holds in `request_quota_config` for one licence.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QuotaRead {
+    pub state: QuotaState,
+    /// Billing's `quota_monthly`; `Some` exactly when `state` is [`QuotaState::Present`].
+    pub quota_monthly: Option<i64>,
+    /// The reference's `QUOTA_UNKNOWN_REASONS` label, on `Unknown` only.
+    pub unknown_reason: Option<String>,
+}
+
+fn unknown_quota(reason: &str) -> QuotaRead {
+    QuotaRead {
+        state: QuotaState::Unknown,
+        quota_monthly: None,
+        unknown_reason: Some(reason.to_owned()),
+    }
+}
+
+/// The reference's `_fetch_quota_config_monthly` payload parse.
+///
+/// A dict payload must carry a dict `data`; anything else is `unreadable_payload`. `quota_monthly`
+/// missing and `quota_monthly: null` both mean "billing found no durable row", because no fallback
+/// param was sent.
+fn parse_quota_check(value: &Value) -> QuotaRead {
+    let Value::Object(payload) = value else {
+        return unknown_quota("unreadable_payload");
+    };
+    let Some(Value::Object(row)) = payload.get("data") else {
+        return unknown_quota("unreadable_payload");
+    };
+    match row.get("quota_monthly") {
+        None | Some(Value::Null) => QuotaRead {
+            state: QuotaState::Absent,
+            quota_monthly: None,
+            unknown_reason: None,
+        },
+        Some(value) => match json_int(value) {
+            Some(quota) => QuotaRead {
+                state: QuotaState::Present,
+                quota_monthly: Some(quota),
+                unknown_reason: None,
+            },
+            None => unknown_quota("unreadable_payload"),
+        },
+    }
+}
+
+/// The reference's `_fetch_license_sync_budget_ids` payload parse: licence id → monthly
+/// `budget_tokens`, or `None` for a covered licence whose monthly value could not be read.
+///
+/// Only `active` rows with `source='license_sync'` count as coverage. `None` means the payload
+/// could not be read at all (an unknown, never an empty list).
+fn license_sync_budget_values(value: &Value) -> Option<HashMap<String, Option<i64>>> {
+    let empty = Value::Array(Vec::new());
+    // The reference: `payload.get("data") if isinstance(payload, dict) else payload`, then
+    // `rows or []` — so an object without `data` folds to empty, exactly as it does there.
+    let rows = match value {
+        Value::Object(object) => object.get("data").unwrap_or(&empty),
+        other => other,
+    };
+    let array = rows.as_array()?;
+    let mut covered: HashMap<String, Option<i64>> = HashMap::new();
+    for row in array {
+        let Value::Object(row) = row else { continue };
+        if row.get("source").and_then(Value::as_str) != Some("license_sync") {
+            continue;
+        }
+        if !row.get("active").map(is_truthy).unwrap_or(false) {
+            continue;
+        }
+        let Some(license_id) = row.get("license_id").filter(|value| is_truthy(value)) else {
+            continue;
+        };
+        let key = match license_id {
+            Value::String(text) => text.clone(),
+            other => other.to_string(),
+        };
+        let monthly = row
+            .get("period")
+            .and_then(Value::as_str)
+            .unwrap_or("monthly")
+            == "monthly";
+        match (monthly, row.get("budget_tokens")) {
+            (true, Some(value)) if !value.is_null() => {
+                covered.insert(key, Some(json_int(value)?));
+            }
+            _ => {
+                covered.entry(key).or_insert(None);
+            }
+        }
+    }
+    Some(covered)
+}
+
+/// Python truthiness for a JSON value (`not row.get("active")` / `if not row_license_id`).
+fn is_truthy(value: &Value) -> bool {
+    match value {
+        Value::Null => false,
+        Value::Bool(flag) => *flag,
+        Value::Number(number) => number.as_f64().map(|value| value != 0.0).unwrap_or(true),
+        Value::String(text) => !text.is_empty(),
+        Value::Array(items) => !items.is_empty(),
+        Value::Object(object) => !object.is_empty(),
+    }
+}
+
+/// Python's `int(value)` over a billing scalar, or `None` where it would raise.
+fn json_int(value: &Value) -> Option<i64> {
+    match value {
+        Value::Number(number) => number
+            .as_i64()
+            .or_else(|| number.as_f64().map(|value| value as i64)),
+        Value::String(text) => text.trim().parse().ok(),
+        Value::Bool(flag) => Some(i64::from(*flag)),
+        _ => None,
+    }
 }
 
 /// Whether re-sending the same request after `error` could give a different answer.
