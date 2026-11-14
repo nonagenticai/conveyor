@@ -126,10 +126,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          node-version: "22"
+          persist-credentials: false
       - name: install playwright (pinned) and chromium
         run: |
           npm install --no-save --no-package-lock playwright@1.62.1
