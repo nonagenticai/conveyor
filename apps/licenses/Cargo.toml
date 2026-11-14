@@ -1,0 +1,32 @@
+[package]
+name = "conveyor-licenses"
+description = "The licensing service: tenants, licences, apps and tokens, rewritten in Rust against the captured contract."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "conveyor_licenses"
+path = "src/lib.rs"
+
+[[bin]]
+name = "conveyor-licenses"
+path = "src/main.rs"
+
+[dependencies]
+axum = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+conveyor-platform = { path = "../../crates/platform" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sqlx = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+utoipa = { workspace = true }
+
+[dev-dependencies]
+tower = { workspace = true }
