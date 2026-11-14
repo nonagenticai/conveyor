@@ -97,6 +97,15 @@ pub enum SeedError {
     /// The embedded programme document is not valid JSON (also a build-time constant).
     #[error("the embedded programme seed is not valid JSON: {0}")]
     ProgrammeDocument(String),
+    /// The embedded organisation document is not valid JSON (also a build-time constant).
+    #[error("the embedded organisation seed is not valid JSON: {0}")]
+    OrganisationDocument(String),
+    /// The organisation spine refused a seed row.
+    #[error(transparent)]
+    Organisation(#[from] crate::organisation::OrganisationStoreError),
+    /// A seeded department's industry or parent did not resolve.
+    #[error(transparent)]
+    ActionParent(#[from] crate::actions::ActionParentError),
     /// The benchmark importer refused the artifact (a seed conflict, a bad row).
     #[error(transparent)]
     Benchmark(#[from] crate::benchmark::BenchmarkStoreError),
