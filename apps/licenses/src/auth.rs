@@ -24,7 +24,7 @@
 use std::sync::Arc;
 
 use axum::extract::{Request, State};
-use axum::http::StatusCode;
+use axum::http::{Method, StatusCode};
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 use conveyor_auth::jwks::{FetchFuture, JwksCache, JwksSource, unverified_iss};
@@ -312,6 +312,19 @@ fn is_excluded(path: &str) -> bool {
             .any(|prefix| path.starts_with(prefix))
 }
 
+/// `_BYO_MODE_OPEN_ROUTES`: `^/tenants/(?P<selector>[^/]+)/byo-mode$`, on the path with its
+/// trailing slash already stripped.
+///
+/// The EXACT route shape only — a bare `ends_with("/byo-mode")` would auth-exempt any GET
+/// path ending in `/byo-mode`, an over-broad hole on a financial-services boundary. The
+/// selector must then parse as a UUID *as this service resolves one* (`_is_tenant_uuid`
+/// uses `uuid.UUID`, i.e. `Uuid::try_parse` here): a tokenless NAME lookup would be a
+/// name-to-UUID oracle for anyone on the pod CIDR.
+fn byo_mode_open_selector(path: &str) -> Option<&str> {
+    let selector = path.strip_prefix("/tenants/")?.strip_suffix("/byo-mode")?;
+    (!selector.is_empty() && !selector.contains('/')).then_some(selector)
+}
+
 fn is_protected(path: &str) -> bool {
     PROTECTED_PREFIXES
         .iter()
@@ -329,6 +342,22 @@ pub async fn authenticate(
         let trimmed = raw.trim_end_matches('/');
         if trimmed.is_empty() { "/" } else { trimmed }.to_owned()
     };
+    // The byo-mode lookup BY UUID is an intentionally-open S2S endpoint (`worker_management`
+    // and billing call it on the trusted network with NO token). A NAME selector is NOT
+    // exempt: it falls through to the normal auth path below (`/tenants` is protected), so a
+    // valid bearer still resolves by name and a missing one gets the usual 401.
+    if request.method() == Method::GET
+        && let Some(selector) = byo_mode_open_selector(&path)
+    {
+        if uuid::Uuid::try_parse(selector).is_ok() {
+            return next.run(request).await;
+        }
+        tracing::warn!(
+            selector = %selector,
+            %path,
+            "byo_mode_open_route_name_lookup: refused tokenless exemption"
+        );
+    }
     if is_excluded(&path) || !is_protected(&path) {
         return next.run(request).await;
     }

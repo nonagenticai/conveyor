@@ -19,6 +19,7 @@ pub mod licence_tokens;
 pub mod licenses;
 pub mod observability;
 pub mod schemas;
+pub mod tenant_byo;
 pub mod tokens;
 pub mod user_licenses;
 
@@ -59,6 +60,11 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/licenses/{license_id}/tokens"),
     ("POST", "/licenses/{license_id}/operator-token"),
     ("POST", "/licenses/{license_id}/regenerate-token"),
+    ("GET", "/tenants/{name_or_id}/byo-mode"),
+    ("PATCH", "/tenants/{name_or_id}/byo-mode"),
+    ("GET", "/tenants/{name_or_id}/apps/{app_key}/byo-mode"),
+    ("PUT", "/tenants/{name_or_id}/apps/{app_key}/byo-mode"),
+    ("DELETE", "/tenants/{name_or_id}/apps/{app_key}/byo-mode"),
 ];
 
 #[derive(utoipa::OpenApi)]
@@ -75,6 +81,11 @@ pub const ROUTES: &[(&str, &str)] = &[
         internal_reads::internal_list_licenses,
         internal_reads::internal_list_tenants,
         internal_seat::internal_tenant_seat_count,
+        tenant_byo::clear_tenant_app_byo_mode,
+        tenant_byo::get_tenant_app_byo_mode,
+        tenant_byo::get_tenant_byo_mode,
+        tenant_byo::set_tenant_app_byo_mode,
+        tenant_byo::set_tenant_byo_mode,
         licence_admin::list_admin_licenses,
         licence_admin::list_licenses,
         licence_admin::set_license_budget,
@@ -110,6 +121,12 @@ pub const ROUTES: &[(&str, &str)] = &[
         licence_tokens::TokenType,
         schemas::HTTPValidationError,
         schemas::ValidationError,
+        tenant_byo::TenantAppByoModeClearResponse,
+        tenant_byo::TenantAppByoModeResponse,
+        tenant_byo::TenantByoModeResponse,
+        tenant_byo::TenantByoModeUpdate,
+        tenant_byo::TenantOfferingRecord,
+        tenant_byo::TenantResponse,
         tokens::TokenIntrospectRequest,
         tokens::TokenIntrospectResponse,
         tokens::TokenRevokeRequest,
@@ -197,6 +214,16 @@ pub fn router(state: AppState) -> Router {
         .route(
             "/licenses/{license_id}/regenerate-token",
             post(licence_tokens::regenerate_license_token),
+        )
+        .route(
+            "/tenants/{name_or_id}/byo-mode",
+            get(tenant_byo::get_tenant_byo_mode).patch(tenant_byo::set_tenant_byo_mode),
+        )
+        .route(
+            "/tenants/{name_or_id}/apps/{app_key}/byo-mode",
+            get(tenant_byo::get_tenant_app_byo_mode)
+                .put(tenant_byo::set_tenant_app_byo_mode)
+                .delete(tenant_byo::clear_tenant_app_byo_mode),
         )
         // The live service also answers `/licenses/health` (a gateway-prefix alias it registers
         // with `include_in_schema=False`), so it is registered here but is not in `ROUTES`.

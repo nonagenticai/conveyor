@@ -25,6 +25,7 @@ pub mod licence_admin;
 pub mod licence_tokens;
 pub mod owners;
 pub mod seat;
+pub mod tenant_byo;
 pub mod tokens;
 pub mod user_licenses;
 
