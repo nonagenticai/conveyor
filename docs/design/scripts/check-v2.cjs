@@ -292,8 +292,6 @@ const shot = (name) =>
     await nav("organisation");
     if (liveOrganisation) {
       check((await content()).includes("LIVE"), "the organisation ribbon is LIVE");
-      check((await content()).includes("software"), "the live software industry is rendered");
-      check((await content()).includes("delivery"), "the live delivery department is rendered");
     } else {
       check(
         (await content()).includes("V2 · PROPOSED"),
@@ -330,6 +328,12 @@ const shot = (name) =>
         (await content()).includes("Published"),
         "a live described job shows its published release",
       );
+      await tab("jobs", "Departments");
+      check(
+        (await content()).toLowerCase().includes("delivery"),
+        "the live departments render",
+      );
+      await tab("jobs", "Catalogue");
     } else {
       check((await content()).includes("software.delivery.backend_engineer"), "job catalogue");
       await tab("jobs", "Releases");
@@ -541,13 +545,34 @@ const shot = (name) =>
       "a never-refused gate is flagged",
     );
 
-    // 12b. The run inspector gains the V2 tools panel and the binding/release pin.
+    // 12b. The run inspector: the live Execution room when the snapshot carries runs,
+    // otherwise the V2 tools-panel fixture.
+    const liveRuns = await page.evaluate(() => {
+      const snapshot = window.CONVEYOR_SNAPSHOT;
+      return Boolean(
+        snapshot &&
+          snapshot.schema === "design-snapshot/v1" &&
+          snapshot.work &&
+          (snapshot.work.runs || []).length,
+      );
+    });
     await nav("execution");
-    check(
-      (await content()).includes("Run binding & tools") &&
-        (await content()).includes("3f9c"),
-      "run inspector exposes the tools panel and release pin",
-    );
+    if (liveRuns) {
+      check(
+        (await content()).includes("Execution room"),
+        "the live execution room lists the snapshot's runs",
+      );
+      check(
+        (await content()).includes("RUN"),
+        "the live run table names its runs",
+      );
+    } else {
+      check(
+        (await content()).includes("Run binding & tools") &&
+          (await content()).includes("3f9c"),
+        "run inspector exposes the tools panel and release pin",
+      );
+    }
     await page.setViewportSize({ width: 390, height: 1060 });
     await nav("execution");
     check(!(await overflow()), "execution tools panel fits at 390px");
