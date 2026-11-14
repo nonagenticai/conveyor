@@ -215,6 +215,15 @@ impl SplitMix64 {
     }
 }
 
+/// The contract's upper bound on `n_bootstrap` (`contract/openapi.lock.json`: 100…100 000).
+///
+/// The router validates the request against it, but this function is public and a direct caller is
+/// not the router: without the clamp, `u32::MAX` would both size an allocation from an untrusted
+/// number (a multi-gigabyte `Vec`, CodeQL alert on the PR) and spin 4.3 billion resamples. A bound
+/// the contract already declares belongs in the code that does the work, not only in the layer that
+/// parses the request.
+pub const MAX_BOOTSTRAP: u32 = 100_000;
+
 pub fn confidence_interval(
     values: &[f64],
     confidence_level: f64,
@@ -224,6 +233,7 @@ pub fn confidence_interval(
     let m = mean(values);
     let (lower, upper) = match method {
         IntervalMethod::Bootstrap => {
+            let n_bootstrap = n_bootstrap.min(MAX_BOOTSTRAP);
             let mut rng = SplitMix64::new(42);
             let mut boot = Vec::with_capacity(n_bootstrap as usize);
             for _ in 0..n_bootstrap {
@@ -380,6 +390,18 @@ pub fn trend(points: &[TimeSeriesPoint], test: TrendTest) -> Trend {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The clamp is not cosmetic: an unbounded `n_bootstrap` would size an allocation from a
+    /// caller-supplied number. The seeded PRNG makes "clamped to the contract maximum" observable
+    /// without a timing assertion.
+    #[test]
+    fn an_unbounded_bootstrap_count_is_clamped_to_the_contract_maximum() {
+        let values = [1.0, 2.0, 3.0, 4.0, 5.0];
+        let at_max = confidence_interval(&values, 0.95, IntervalMethod::Bootstrap, MAX_BOOTSTRAP);
+        let past_max = confidence_interval(&values, 0.95, IntervalMethod::Bootstrap, u32::MAX);
+        assert_eq!(past_max.ci_lower, at_max.ci_lower);
+        assert_eq!(past_max.ci_upper, at_max.ci_upper);
+    }
 
     #[test]
     fn the_standard_normal_quantile_is_where_it_should_be() {
