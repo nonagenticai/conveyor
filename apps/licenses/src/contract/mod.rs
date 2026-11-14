@@ -137,42 +137,13 @@ mod tests {
         serde_json::to_value(crate::router::openapi()).expect("serialises")
     }
 
-    /// Slice 1 of the port is the contract, the schema and the health surface. The check must
-    /// name every operation still missing, and must not report the routes that are served — a
-    /// positive assertion on the gap is what replaces a silently skipped test.
+    /// The port is COMPLETE: the served document and the declared route set agree with the
+    /// capture, so the check returns Ok. This test asserted the opposite (the gap list) while
+    /// the port was in progress; at completion the gate that matters is that it accepts.
     #[test]
-    fn the_lock_check_names_the_unported_operations() {
-        let error = check(&served(), crate::router::ROUTES)
-            .expect_err("the port is incomplete by construction in slice 1");
-        let message = error.to_string();
-        // Ported in slice 2: not missing, and no schema drift through the shared model.
-        assert!(
-            !message.contains("not registered: GET /licenses/active"),
-            "{message}"
-        );
-        // The gap itself shrinks with every wave, so it is asserted generically; pinning one
-        // route turns this test red for the right reason and teaches nothing. The negative
-        // assertions below are the durable half: a ported route must never be reported.
-        assert!(
-            message.contains("not registered: ")
-                || message.contains("documented but not registered: "),
-            "{message}"
-        );
-        // Introspect IS ported: it must not be reported as missing, and its schema must not
-        // drift. This is the assertion that moves with each slice.
-        assert!(
-            !message.contains("not registered: POST /license/introspect"),
-            "{message}"
-        );
-        assert!(
-            !message.contains("documented but not registered: POST /license/introspect"),
-            "{message}"
-        );
-        assert!(!message.contains("TokenIntrospectResponse"), "{message}");
-        assert!(
-            !message.contains("not registered: GET /health"),
-            "{message}"
-        );
+    fn the_lock_check_accepts_the_complete_port() {
+        check(&served(), crate::router::ROUTES)
+            .expect("the served contract equals the capture: 60 operations, no drift");
     }
 
     #[test]

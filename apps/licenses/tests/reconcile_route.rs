@@ -526,20 +526,9 @@ fn the_lock_check_never_names_this_route() {
 
     let captured = conveyor_licenses::contract::lock().expect("the embedded capture parses");
     let served = serde_json::to_value(conveyor_licenses::router::openapi()).expect("openapi");
-    let error = conveyor_licenses::contract::check(&served, conveyor_licenses::router::ROUTES)
-        .expect_err("the port is incomplete by construction");
-    let message = error.to_string();
-    assert!(
-        !message.contains("not registered: POST /licenses/admin/metering/reconcile"),
-        "{message}"
-    );
-    assert!(
-        !message.contains("documented but not registered: POST /licenses/admin/metering/reconcile"),
-        "{message}"
-    );
-    // The absolute unported count is NOT asserted: sibling routes land on other slices and
-    // move it. What must hold on this tree is that this operation is registered and served —
-    // the two asserts above — and that the route set declares it.
+    conveyor_licenses::contract::check(&served, conveyor_licenses::router::ROUTES)
+        .expect("the served contract equals the capture");
+    // This operation must be registered and served, and the route set must declare it.
     assert!(
         conveyor_licenses::router::ROUTES.contains(&("POST", "/licenses/admin/metering/reconcile")),
         "the route must be declared in ROUTES"
