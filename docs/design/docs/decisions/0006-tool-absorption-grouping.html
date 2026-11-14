@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0006 — The tool estate completes in this workspace, grouped by runtime shape · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0006-tool-absorption-grouping.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0006--the-tool-estate-completes-in-this-workspace-grouped-by-runtime-shape">0006 — The tool estate completes in this workspace, grouped by runtime shape</h1>
+<p>Status: Accepted · Date: 2026-11-14 · Issue: #105</p>
+<h2 id="decision">Decision</h2>
+<p>Owner direction, 2026-11-14: <strong>every tool the conveyor calls is Rust in this workspace</strong>, and thin tools are combined where that makes sense. Orchestration and frontend work is out of scope — the conveyor is both.</p>
+<ol type="1">
+<li><p><strong>The remaining tool estate joins <code>apps/</code></strong>, grouped as follows. A group is one deployable with one image, one database and one role; the toolkits it publishes stay separate catalogue entries.</p>
+<table>
+<thead>
+<tr>
+<th>App</th>
+<th>Absorbs</th>
+<th>Grouping reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apps/scientific</code></td>
+<td>the scientific research service (:8808), the evidence-review service (:8810)</td>
+<td>one evidence family — meta-analysis, survival, PRISMA screening; CPU-bound, no browser, no GPU</td>
+</tr>
+<tr>
+<td><code>apps/research</code></td>
+<td>the web-scraper service (:9119), the media-discovery service (:8809)</td>
+<td>outbound web fetchers; IO-bound, no numerics stack</td>
+</tr>
+<tr>
+<td><code>apps/media</code></td>
+<td>the separable media services — html-render, slide, video-production, frontend-test-runner (Chromium); video-compiler, video-analyzer (ffmpeg); tts-gateway, youtube-upload (thin)</td>
+<td>grouped <strong>by runtime</strong>, because they do not share one. Corrected 2026-11-14: the "w2v stages" are not services — they live in <code>w2v_orchestrator/src/services/stages/</code> (18 directories), i.e. inside the orchestrator that is out of scope, and <code>w2v_common</code> is a library, not a service</td>
+</tr>
+<tr>
+<td><code>apps/lean4-prover</code></td>
+<td>the Lean 4 prover (already Rust)</td>
+<td>crate moves in; the deployable stays separate — 10.6 GB of toolchain state and a node pin</td>
+</tr>
+<tr>
+<td><code>apps/coding</code></td>
+<td>the <code>coding-*</code> fleet</td>
+<td>already being rewritten in its own Rust repository; <strong>join that work, never a second rewrite</strong></td>
+</tr>
+<tr>
+<td>in flight</td>
+<td><code>apps/inference-router</code> (merged), <code>apps/licenses</code> (#45), <code>apps/billing-service</code> (#46)</td>
+<td>ADR 0004/0005</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>The combining rule.</strong> Combine two services when they share runtime shape, job family and caller. Keep them apart when one needs a heavy runtime the other does not (the Lean toolchain, a browser) or when their scale shape differs. Three Python services becoming one small Rust deployable is the point; folding a model server into a statistics service is not.</p></li>
+<li><p><strong>Sequence.</strong> <code>apps/scientific</code> (the dead service, largest deletion first) → <code>apps/lean4-prover</code> (cheapest) → <code>apps/research</code> → <code>apps/media</code> → <code>apps/coding</code>. ADR 0005's rule that the w2v and coding rewrites are performed by the conveyor's own development project stands; this ADR fixes only their destination.</p></li>
+<li><p><strong><code>scientific-processor</code> carries only what has a live upstream.</strong> Two drops, one test — an operation whose only data source no longer exists, or whose runtime already exists as another conveyor tool, is not ported. A capability with no live consumer is retired, not rewritten (P10). If any of it is ever wanted back it is a new capability with a live upstream, never a restoration of the capture.</p>
+<ul>
+<li><strong>The graph surface.</strong> <code>/api/topology</code> and <code>/api/explain</code>, the graph services behind them (centrality, community, subgraph, subgraphx, contradiction), and the graph-adapter and discovery-engine clients. Their store was destroyed on 2026-11-01.</li>
+<li><strong>The graph-dependent operations</strong> (<code>verify/cove</code>, <code>verify/integrity</code>, <code>pipeline/trigger|webhook|batch</code>): the same store, reached through the same two dead clients.</li>
+<li><strong>The sandbox</strong> (<code>sandbox/execute|jobs|results</code>): a second code-execution runtime when the conveyor already dispatches execution as <code>coding_jobs.create</code> / <code>coding_jobs.get</code>.</li>
+<li><strong>Consequence — no database.</strong> With the sandbox and the pipeline producers gone, nothing in the surviving service writes a row. It ships with no Postgres and no migration.</li>
+<li><strong><code>z3</code>/<code>sympy</code> verification is refused by name</strong> (<code>422 language_not_supported</code>). Not because the sandbox owned it — it did not: the old service evaluated those expressions in-process with an AST allowlist interpreter over the <code>z3</code> and <code>sympy</code> libraries. The reason is that there is no faithful Rust equivalent in this workspace: <code>z3</code> would mean binding libz3, and <code>sympy</code> has no Rust counterpart. <strong>Known deviation:</strong> the captured default for <code>language</code> is <code>z3</code>, so a caller that omits the field is refused here where the old service answered. Translation to both languages is unaffected — it is a model call, not an evaluation.</li>
+</ul>
+<p>The lock therefore carries 18 of the captured 26 operations. No live consumer is lost: the Deployment has been at <code>replicas: 0</code> since 2026-11-01.</p></li>
+</ol>
+<h2 id="context">Context</h2>
+<p>ADR 0004 named the tool estate but listed only the three services it was written about. ADR 0005 fixed the absorption order for those three and left <code>docs/SPEC_LEGACY_KAG.md</code> K7 (first rewrite target) open. Meanwhile the kag-era survivors (<code>webscraper</code>, <code>media_discovery</code>, <code>scientific_processor</code>, <code>lean4_prover</code>) and the w2v stage fleet had no owner, no grouping and no order — which is how a programme of twenty Python services becomes twenty separate hand-built lanes.</p>
+<p>Measured 2026-11-14: <code>apps/</code> held <code>inference-router</code>, <code>server</code>, <code>web</code>; the four kag-era services and every media service are separate Python repositories (the w2v <em>stages</em> are orchestrator code, not repositories — see the corrected <code>apps/media</code> row); <code>nonagenticai/coding</code> is already Rust and under active construction.</p>
+<h2 id="what-this-supersedes">What this supersedes</h2>
+<ul>
+<li><code>docs/SPEC_LEGACY_KAG.md</code> <strong>K7</strong> becomes decided by consequence: the first target is the scientific research service. K3–K5 (neo4j, hirag, karma) stay open and are unaffected — decision 4 above does not decide them, it observes that the graph adapter has no data and no consumer.</li>
+<li>ADR 0004's in-scope list grows by the kag-era survivors, the w2v stage fleet and the video compiler. ADR 0004's "how a service joins" procedure and ADR 0005's exceptions (the two strata services stay external; coding and w2v are conveyor-executed) are unchanged.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>One issue per app; the first is #105 (<code>apps/scientific</code>). The toolkits a group publishes keep their §11.2 identities, so the broker's catalogue does not learn the deployment topology.</li>
+<li><code>strata_ingest</code> and <code>strata_rag</code> remain external repositories (ADR 0005 §2). The mini model servers (TTS, ASR, image generation, VLM) stay remote HTTP hosts bound as toolkits: they are model servers, not tool code, and the already-converted ones are not touched again.</li>
+<li>A group's image is built by <code>docker/Dockerfile.service</code> and published by the per-service CI row, which lands only after the package is on <code>main</code> (#99's rule).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0006-tool-absorption-grouping.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
