@@ -58,6 +58,11 @@ const LOST_INSERT_EXISTS_NOTE: &str =
 const LOST_INSERT_REFUSE_NOTE: &str =
     "insert lost a concurrent race to a licence not carrying this bundle";
 
+/// Recorded as `metering_pending` when no provisioner exists (`METERING_SERVICE_URL` unset): the
+/// licence is live and unmetered, and the nightly reconcile sweep is its only repair path.
+const METERING_NOT_CONFIGURED: &str =
+    "metering not configured (METERING_SERVICE_URL unset); the reconcile sweep repairs it";
+
 /// `tenant_lock_key`: the text hashed (`hashtextextended(_, 0)`) into the tenant's lock key.
 ///
 /// The dependency release path takes the SAME key (`crate::db::dependencies`), deliberately: an
@@ -166,6 +171,20 @@ pub async fn apply(
     granted_by: &str,
     meter: &MeteringProvisioner,
 ) -> Result<(), EnsureError> {
+    apply_with(pool, ep, provisioned_by, granted_by, Some(meter)).await
+}
+
+/// [`apply`] with an OPTIONAL provisioner: `None` means `METERING_SERVICE_URL` is unset, so every
+/// inserted licence is recorded metering-pending (only the reconcile sweep can repair it) rather
+/// than failing a licence that is already live.
+#[allow(clippy::too_many_arguments)]
+async fn apply_with(
+    pool: &PgPool,
+    ep: &mut EnsurePlan,
+    provisioned_by: &str,
+    granted_by: &str,
+    meter: Option<&MeteringProvisioner>,
+) -> Result<(), EnsureError> {
     // ⛔ The hold and the grants FIRST, in their own single transaction, before any licence.
     ep.grants_created = ensure_bundle_grants(
         pool,
@@ -196,18 +215,23 @@ pub async fn apply(
             continue;
         };
         // ⛔ A metering failure must NEVER fail the request: the licence is live, the stamp stays
-        // NULL, and the reconcile sweep repairs it.
-        if let Err(error) = meter
-            .provision(
-                pool,
-                license_id,
-                context.tenant_id,
-                plan_id,
-                Some(app.app_id),
-            )
-            .await
-        {
-            let why = error.to_string();
+        // NULL, and the reconcile sweep repairs it. With no provisioner configured there was no
+        // push at all, which is the same unmetered state.
+        let failure = match meter {
+            Some(meter) => meter
+                .provision(
+                    pool,
+                    license_id,
+                    context.tenant_id,
+                    plan_id,
+                    Some(app.app_id),
+                )
+                .await
+                .err()
+                .map(|error| error.to_string()),
+            None => Some(METERING_NOT_CONFIGURED.to_owned()),
+        };
+        if let Some(why) = failure {
             app.metering_pending = why.clone();
             unmetered.push(format!("{} {license_id}: {why}", app.app_key));
         }
@@ -360,6 +384,36 @@ pub async fn plan_and_apply(
     granted_by: &str,
     meter: &MeteringProvisioner,
 ) -> Result<EnsurePlan, EnsureError> {
+    plan_and_apply_with(
+        pool,
+        tenant_id,
+        bundle_key,
+        plans,
+        quota_override,
+        apply,
+        token_budget_override,
+        provisioned_by,
+        granted_by,
+        Some(meter),
+    )
+    .await
+}
+
+/// [`plan_and_apply`] with an OPTIONAL provisioner, for the HTTP route: `None` (no
+/// `METERING_SERVICE_URL`) records every insert metering-pending instead of pushing.
+#[allow(clippy::too_many_arguments)] // the reference's surface: the route passes them all
+pub async fn plan_and_apply_with(
+    pool: &PgPool,
+    tenant_id: Uuid,
+    bundle_key: &str,
+    plans: &[String],
+    quota_override: Option<i32>,
+    apply: bool,
+    token_budget_override: Option<i32>,
+    provisioned_by: &str,
+    granted_by: &str,
+    meter: Option<&MeteringProvisioner>,
+) -> Result<EnsurePlan, EnsureError> {
     if !apply {
         return plan(
             pool,
@@ -385,7 +439,7 @@ pub async fn plan_and_apply(
             token_budget_override,
         )
         .await?;
-        self::apply(pool, &mut ep, provisioned_by, granted_by, meter).await?;
+        apply_with(pool, &mut ep, provisioned_by, granted_by, meter).await?;
         Ok::<EnsurePlan, EnsureError>(ep)
     }
     .await;

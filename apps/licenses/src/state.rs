@@ -13,6 +13,7 @@ use sqlx::PgPool;
 
 use crate::auth::JwtVerifier;
 use crate::billing::BillingTeardown;
+use crate::billing::metering::MeteringProvisioner;
 use crate::config::Config;
 
 #[derive(Clone)]
@@ -25,6 +26,10 @@ pub struct AppState {
     /// billing's mirror teardown. `None` when `METERING_SERVICE_URL` is unset — the reference
     /// warns and skips in that case too, and a revoke must never fail because of it.
     pub billing: Option<Arc<BillingTeardown>>,
+    /// billing's metering provisioner. `None` when `METERING_SERVICE_URL` is unset or unusable:
+    /// a licence is still created (the ensure route), its `metering_provisioned_at` stays NULL,
+    /// and the reconcile sweep repairs it.
+    pub metering: Option<Arc<MeteringProvisioner>>,
 }
 
 impl AppState {
@@ -38,12 +43,19 @@ impl AppState {
             config: Arc::new(config),
             verifier: Arc::new(verifier),
             billing: None,
+            metering: None,
         }
     }
 
     /// Attach the billing teardown client (tests and the binary's serve path).
     pub fn with_billing(mut self, billing: Arc<BillingTeardown>) -> Self {
         self.billing = Some(billing);
+        self
+    }
+
+    /// Attach the metering provisioner (tests and the binary's serve path).
+    pub fn with_metering(mut self, metering: Arc<MeteringProvisioner>) -> Self {
+        self.metering = Some(metering);
         self
     }
 }

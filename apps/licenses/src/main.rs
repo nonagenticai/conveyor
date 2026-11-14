@@ -148,6 +148,15 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
              billing mirrors; the sync-from-licenses sweep remains the backstop"
         );
     }
+    if let Some(metering) = conveyor_licenses::billing::metering::MeteringProvisioner::from_env() {
+        state = state.with_metering(std::sync::Arc::new(metering));
+    } else {
+        tracing::warn!(
+            "METERING_SERVICE_URL unset or unusable: bundle-ensure inserts will be recorded \
+             metering-pending; POST {} remains the repair path",
+            conveyor_licenses::billing::metering::METERING_RECONCILE_PATH
+        );
+    }
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{port}")).await?;
     tracing::info!(port, %environment, %version, "serving");
     axum::serve(
