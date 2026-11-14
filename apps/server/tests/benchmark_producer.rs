@@ -342,7 +342,11 @@ async fn the_producer_drives_the_real_loop_and_records_the_patch() {
     assert_eq!(patch.as_deref(), Some(DIFF.trim()));
     let mut hasher = Sha256::new();
     hasher.update(DIFF.trim().as_bytes());
-    let expected = format!("{:x}", hasher.finalize());
+    let expected = hasher
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<String>();
     assert_eq!(sha.as_deref(), Some(expected.as_str()));
     assert_eq!(attempts, 1);
 
