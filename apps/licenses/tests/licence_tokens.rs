@@ -809,7 +809,12 @@ async fn regenerate_revokes_the_old_tokens_and_returns_a_usable_replacement() {
             .fetch_one(&db.pool)
             .await
             .expect("new token");
-    assert_eq!(new_expiry, Some(old_expiry));
+    // Same precision rule as `regenerate_inherits_the_latest_replaced_expiry`: the row holds
+    // microseconds, `old_expiry` carries nanoseconds.
+    assert_eq!(
+        new_expiry.map(|expiry| expiry.timestamp_micros()),
+        Some(old_expiry.timestamp_micros())
+    );
 
     // And it is a real credential: introspection answers ACTIVE.
     match db::tokens::introspect(&db.pool, &raw)
