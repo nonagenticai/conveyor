@@ -460,6 +460,36 @@ pub struct CardsListIn {
     pub page: crate::views::PageIn,
 }
 
+/// `card_types.list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CardTypesListIn {
+    /// Include retired types. Retired types stay readable but cannot be chosen for a new card.
+    #[serde(default)]
+    pub include_inactive: bool,
+    /// The list is whole-catalogue and issues no cursor; a supplied one is a `422`.
+    #[serde(default)]
+    pub page: crate::views::PageIn,
+}
+
+/// One card type as the read returns it.
+///
+/// `definition` is the row's whole type document — `outputs`, `acceptance`, `inputs`,
+/// `human_task` and `rules` (S03 §5) — so a client renders the expected outputs and the
+/// acceptance gates from the same row the server will enforce.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CardTypeOut {
+    /// The row id.
+    pub id: String,
+    /// The stable code the project-type matrix and every card are keyed by.
+    pub code: String,
+    /// The display label.
+    pub label: String,
+    /// Retired types stay readable but cannot be chosen.
+    pub is_active: bool,
+    /// The whole type document.
+    pub definition: Value,
+}
+
 /// `comments.update`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CommentUpdateIn {
