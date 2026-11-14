@@ -20,6 +20,7 @@ axum = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }
 conveyor-auth = { path = "../../crates/auth" }
+conveyor-domain = { path = "../../crates/domain" }
 conveyor-platform = { path = "../../crates/platform" }
 jsonwebtoken = { workspace = true }
 metrics-exporter-prometheus = { workspace = true }

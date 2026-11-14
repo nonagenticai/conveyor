@@ -10,6 +10,7 @@
 //! diffs the result against `contract/schema.lock.sql`.
 
 pub mod auth;
+pub mod billing;
 pub mod config;
 pub mod contract;
 pub mod db;

@@ -119,7 +119,15 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
         config.trusted_issuers.clone(),
         conveyor_licenses::auth::production_source(),
     );
-    let state = AppState::new(pool, config, verifier);
+    let mut state = AppState::new(pool, config, verifier);
+    if let Some(billing) = conveyor_licenses::billing::BillingTeardown::from_env() {
+        state = state.with_billing(std::sync::Arc::new(billing));
+    } else {
+        tracing::warn!(
+            "METERING_SERVICE_URL unset or unusable: revoked licences will not tear down their \
+             billing mirrors; the sync-from-licenses sweep remains the backstop"
+        );
+    }
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{port}")).await?;
     tracing::info!(port, %environment, %version, "serving");
     axum::serve(

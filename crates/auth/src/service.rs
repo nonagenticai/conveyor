@@ -118,6 +118,20 @@ impl ServiceHttp {
         base_url: Option<&str>,
         creds: Option<ClientCredentials>,
     ) -> Result<Self, ServiceError> {
+        Self::with_timeout(name, base_url, creds, SERVICE_TIMEOUT)
+    }
+
+    /// Build with an explicit per-request timeout.
+    ///
+    /// The revoke teardown is the reason: it runs after the response is already committed and
+    /// must never pin a task for the provisioning client's 20 s, so it uses 5 s — the same
+    /// budget the reference's `httpx.AsyncClient(timeout=5.0)` gives the same calls.
+    pub fn with_timeout(
+        name: &'static str,
+        base_url: Option<&str>,
+        creds: Option<ClientCredentials>,
+        timeout: Duration,
+    ) -> Result<Self, ServiceError> {
         let base = base_url.map(str::trim).unwrap_or_default();
         if base.is_empty() {
             return Err(ServiceError::Unconfigured(match name {
@@ -134,7 +148,7 @@ impl ServiceHttp {
             });
         }
         let http = reqwest::Client::builder()
-            .timeout(SERVICE_TIMEOUT)
+            .timeout(timeout)
             .build()
             .map_err(|error| ServiceError::Unavailable {
                 service: name,
@@ -203,6 +217,29 @@ impl ServiceHttp {
             builder = builder.header(reqwest::header::AUTHORIZATION, header);
         }
         Ok(self.send(builder).await?.1)
+    }
+
+    /// `DELETE path`, with the bearer when one is configured and `X-Tenant-Id` when a tenant is
+    /// named. Returns the status and body.
+    ///
+    /// A `404` arrives as [`ServiceError::Refused`]: the caller decides what it means (billing's
+    /// budget delete is idempotent and treats it as success; its quota route has no such case and
+    /// treats it as a version skew).
+    pub async fn delete(
+        &self,
+        path: &str,
+        tenant: Option<TenantId>,
+    ) -> Result<(u16, Value), ServiceError> {
+        let url = format!("{}{}", self.base_url, path);
+        let mut builder = self.http.delete(&url);
+        if let Some(creds) = &self.creds {
+            let header = creds.authorization().await.map_err(ServiceError::Token)?;
+            builder = builder.header(reqwest::header::AUTHORIZATION, header);
+        }
+        if let Some(tenant) = tenant {
+            builder = builder.header("X-Tenant-Id", tenant.to_string());
+        }
+        self.send(builder).await
     }
 
     async fn send(&self, builder: reqwest::RequestBuilder) -> Result<(u16, Value), ServiceError> {

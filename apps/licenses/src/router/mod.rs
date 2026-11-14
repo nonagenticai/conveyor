@@ -124,5 +124,6 @@ pub fn test_state() -> AppState {
             service_actor_id: None,
         }),
         verifier: Arc::new(JwtVerifier::new(Vec::new(), Arc::new(UnavailableJwks))),
+        billing: None,
     }
 }

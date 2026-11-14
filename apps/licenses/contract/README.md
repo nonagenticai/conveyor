@@ -44,9 +44,30 @@ Production can be re-dumped with:
 sudo -u postgres pg_dump --schema-only --no-owner --no-privileges --no-tablespaces -d licenses
 ```
 
+## The parity harness — `normalize.sh`, `verify.sh`, `shadow.sh`, `tolerances.json`
+
+`normalize.sh` is the one normaliser: it masks only values that cannot be stable across runs — a
+minted token, any RFC3339 timestamp or bare date. It never rewrites a value into the one the
+candidate happens to produce; that is what `tolerances.json` is for, and every tolerance carries
+a reason (a row without one fails the run).
+
+`verify.sh --candidate URL` replays a `golden/` directory (one `.request` / `.status` /
+`.content-type` / `.body` group per case) and counts unexplained differences. `shadow.sh
+--corpus FILE --candidate URL` does the same for a recorded JSONL corpus and writes
+`shadow-report.json` with hashed case ids only — no bodies, tokens or tenant ids.
+
+⛔ `shadow.sh --live` exits 3 by design. The Python service captures no request bodies — its
+`licenses.access` line logs method, path, status, duration and caller and nothing else — so an
+organic window cannot be recorded. The probe window belongs to the deployment (#95).
+
+Neither runner treats an empty corpus as a pass: `cases=0` is exit 3.
+
+`shadow.sh --self-test --corpus …` proves the comparator can fail: identical bodies compare
+equal and a one-field mutation is unexplained. `stubs/synthetic-corpus.jsonl` is the fixture it
+uses.
+
 ## Still to come (the parity slice)
 
-`capture-goldens.sh`, `oracle.sh`, `normalize.sh`, `tolerances.json` and `shadow.sh` follow the
-`apps/inference-router/contract/` shape. They need the pinned old image booted with a synthetic
-seed; the golden set must never carry a production tenant, app key or token. Until they land,
-`--check-lock` is the only gate in this directory.
+`capture-goldens.sh` and `oracle.sh` (the pinned old image booted with a synthetic seed) populate
+`golden/`; the golden set must never carry a production tenant, app key or token. Until it lands,
+`--check-lock` and the harness self-test are the gates in this directory.

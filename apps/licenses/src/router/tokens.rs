@@ -388,6 +388,13 @@ pub async fn revoke(
 
     match outcome {
         dependencies::Outcome::Revoked { released_ids } => {
+            // billing's two mirrors, spawned — never awaited. The revocation is already
+            // committed; a billing outage must not delay or veto it. Each released dependency
+            // licence owes the same pair. Reference: `main.py:4304-4334`.
+            if let Some(billing) = state.billing.as_ref() {
+                let released: Vec<String> = released_ids.iter().map(Uuid::to_string).collect();
+                billing.spawn_teardowns(&tenant, &license_id.to_string(), &released);
+            }
             let mut message = "License and all tokens revoked successfully".to_owned();
             if !released_ids.is_empty() {
                 message.push_str(&format!(
