@@ -136,6 +136,7 @@ jobs:
       - name: the pack's data and claims
         run: |
           python3 scripts/build-coverage.py --check
+          python3 scripts/build-v2-coverage.py --check
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs
           node docs/design/scripts/check-docs.cjs
