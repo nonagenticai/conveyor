@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>licenses absorption — evidence (2026-11-14) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-14-licenses-absorption.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="licenses-absorption--evidence-2026-11-14">licenses absorption — evidence (2026-11-14)</h1>
+<p>Issue #45 · head <code>9f50438</code> · branch <code>issue/45-licenses</code>. The reference service is pinned by commit and by image digest; no private hostname, address, token or tenant identifier appears in this file.</p>
+<h2 id="the-reference-and-its-pin">The reference and its pin</h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reference repository</td>
+<td><code>nonagenticai/licenses</code> @ <code>4e8a08d25a239c5bd5c563e8fc5f49d6576e71e4</code> — the commit the live image's <code>sha-4e8a08d</code> tag names</td>
+</tr>
+<tr>
+<td>Local checkout</td>
+<td><code>4885666</code>. <code>git diff --stat 4e8a08d..HEAD -- main.py models.py services/</code> is EMPTY and the worktree is clean for those paths: the service surface is byte-identical to the pin (measured 2026-11-14)</td>
+</tr>
+<tr>
+<td>Capture</td>
+<td><code>contract/manifest.json</code> — <code>captured_at</code> 2026-11-14T07:35:25Z, image <code>sha256:13093d39f55999d2092a5ac60ebb61104fdc22057bf63d168313dbe5c740cee5</code>, lock sha256 <code>9c70313503614e7ddd0f197402c8b89a70d663e3bd54e5ac6e94a969f96413d8</code>, OpenAPI 3.1.0, 43 paths / 60 operations / 57 schemas</td>
+</tr>
+<tr>
+<td>Live image (measured 2026-11-14)</td>
+<td>Deployment <code>licenses</code> 2/2 Running <code>sha256:20dd796a9260708f19730ccb3dc01726567e1ef8c3a8ec9e22629190881ab8df</code></td>
+</tr>
+<tr>
+<td>Live database and role (measured)</td>
+<td>database <code>licenses</code>, owner <code>licenses_user_v2</code>; that role is the service's own pair, and this unit keeps it — the rewrite is the same service, not a new one</td>
+</tr>
+</tbody>
+</table>
+<p>The live pods have moved past the captured digest since the capture at 07:35Z. The lock remains the contract this unit ports against (60 operations); the live digest is a fact for the #95 window, not a reason to re-capture. The capture was byte-identical after <code>jq -S</code> to <code>docs/openapi.json</code> at the pin (<code>contract/compare-report.txt</code>).</p>
+<h2 id="consumers-and-their-calls">Consumers and their calls</h2>
+<table>
+<thead>
+<tr>
+<th>Consumer</th>
+<th>Calls today</th>
+<th>Consuming source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>conveyor backend</td>
+<td><code>POST /internal/tenants/{id}/bundle-token</code>, <code>GET /licenses/active</code>, <code>POST /license/introspect</code></td>
+<td><code>apps/server/src/admin/upstream_tokens.rs:12,92</code>; <code>apps/server/src/worker.rs:171-187,574-594</code>; <code>crates/auth/src/licence.rs:14-18,197-251</code> (<code>LICENCES_BASE_URL</code>)</td>
+</tr>
+<tr>
+<td>agent platform — runtime</td>
+<td><code>POST /internal/tenants/{id}/bundle-token</code>; <code>POST /internal/tenants/{id}/bundles/{key}/ensure</code></td>
+<td><code>agent/crates/agent-api/src/tenants/app_licence.rs</code> (the minter); <code>agent/crates/agent-api/src/licenses_admin.rs:371</code> (ensure); <code>agent/crates/agent-api/src/config.rs:182,321,1194</code></td>
+</tr>
+<tr>
+<td>agent platform — signup</td>
+<td><code>PUT /tenants/{id}</code>, <code>POST /licenses/user/{sub}</code>, <code>POST /licenses/{id}/tokens</code>, <code>GET /apps/{key}</code>, <code>GET /apps/{key}/plans</code>, <code>GET /regions</code></td>
+<td><code>agent/crates/agent-api/src/licenses_admin.rs:168-333</code> (<code>register_tenant</code>, <code>create_licence</code>, <code>mint</code>, <code>app_and_plan</code>, <code>region_id</code>); driven by <code>agent/crates/agent-api/src/signup/provisioning.rs</code>; the tests' fake mirrors the same calls at <code>agent/crates/agent-api/tests/common/fakes.rs:558-560</code></td>
+</tr>
+<tr>
+<td>portal-bff</td>
+<td><code>GET /licenses/user/{sub}</code>, <code>POST /licenses/user/{sub}</code>, <code>GET /licenses/admin/all</code>, <code>POST /licenses/{id}/regenerate-token</code></td>
+<td><code>portal-bff/src/routes/licenses.py:109,205,237,348</code></td>
+</tr>
+<tr>
+<td>worker_management</td>
+<td>the one tokenless BYO route: <code>GET /tenants/{uuid}/byo-mode</code> on the trusted network, failing open on any non-200. The auth exemption is the exact route shape and a UUID selector only (<code>byo_mode_open_selector</code>, <code>apps/licenses/src/auth.rs:315-326</code>); a name selector is an ordinary 401, and the write variants and the per-app paths keep their role gates</td>
+<td>contract: <code>apps/licenses/src/router/tenant_byo.rs:13-20,273-277,301-305</code>. The WM checkout is absent under <code>~/Movies</code> (measured), so no WM source line is cited</td>
+</tr>
+<tr>
+<td>billing</td>
+<td><code>GET /internal/licenses</code></td>
+<td><code>billing_service/src/services/licence_budget_reconcile.py:205</code>; <code>billing_service/src/services/attribution_audit.py:452-463</code>; <code>billing_service/src/services/quota.py:269</code></td>
+</tr>
+<tr>
+<td>four CronJobs</td>
+<td>the same image with <code>python scripts/&lt;job&gt;.py</code>, no arguments</td>
+<td><code>gitops-production/clusters/strato/services/licenses/cronjob-expire-stale-licences.yaml</code>, <code>…-reap-expired-licences.yaml</code>, <code>…-revoke-expired-tokens.yaml</code>, <code>…-metering-reconcile.yaml</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>license-authz</code> is deliberately absent: it enforces at the ingress and keeps calling this service over HTTP. It is out of scope (issue #45, Out of scope).</p>
+<h2 id="what-each-45-scenario-shows">What each #45 scenario shows</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Result</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1.1 capture the document</td>
+<td><code>contract/manifest.json</code> records date, digest, lock sha256, 43/60/57; <code>compare-report.txt</code> says <code>compare: byte-identical after jq -S</code> against the pin's <code>docs/openapi.json</code></td>
+<td><code>apps/licenses/contract/</code></td>
+</tr>
+<tr>
+<td>P1.2 synthetic fixtures, no private refs</td>
+<td><code>bash scripts/ci/no-private-refs.sh</code> → <code>OK: no private infrastructure references in 1499 tracked files (6 allowlisted)</code>, exit 0 (scan before this file was staged). The fixtures are <code>contract/stubs/synthetic-corpus.jsonl</code>; case ids in a shadow report are hashes of <code>method path body</code></td>
+<td>this head</td>
+</tr>
+<tr>
+<td>P2.1 served document equals the lock</td>
+<td><code>conveyor-licenses --check-lock</code> → <code>lock OK: 60 operations</code> on stderr, exit 0: all 60 captured operations are served and the served document matches the lock under the contract projection. The flag runs before configuration and touches no database</td>
+<td><code>9f50438</code> (re-measured after the test flip; same result)</td>
+</tr>
+<tr>
+<td>P2.2 migrations equal the live schema</td>
+<td><code>bash apps/licenses/contract/schema-diff.sh</code> → <code>schema OK: the migrations produce the live schema</code>, exit 0. The script applies <code>migrations/0001_baseline.sql</code> in one transaction to a throwaway <code>postgres:18.6</code>, dumps it with the live dump's options and diffs it against <code>contract/schema.lock.sql</code> (22 tables; 24 relations including the two <code>pg_stat_statements</code> views; the Rust ledger, ownership, privileges and tablespaces are excluded by construction). <code>CHECK</code> expressions are compared as token streams so deparse-only parenthesisation cannot fail the diff. <code>tests/migrations.rs</code> then pins <code>migrate</code> and <code>migrate --baseline</code> against a fresh database</td>
+<td>this head</td>
+</tr>
+<tr>
+<td>P2.3 the mint envelope</td>
+<td><code>a_mint_returns_the_seven_fields_and_the_raw_token_introspects</code>: <code>POST …/bundle-token?app=demo</code> answers 201 with <code>{token, expires_at, tenant_id, bundle, app, license_id, token_id}</code> — the raw token is 43 base64url chars with no padding, only its SHA-256 is stored, and the raw token introspects 200 on the same licence</td>
+<td><code>apps/licenses/tests/internal_bundles.rs:236-295</code></td>
+</tr>
+<tr>
+<td>P2b.1 four recurring commands' row effects</td>
+<td>the effect table below; each command has an armed-transition test and a dry-run/vacuity test</td>
+<td><code>apps/licenses/tests/command_*.rs</code>, <code>billing_teardown.rs</code></td>
+</tr>
+<tr>
+<td>P2b.2 command shapes and exit codes</td>
+<td>the argv/exit table below; the reference's asymmetry is reproduced</td>
+<td><code>apps/licenses/tests/command_argv.rs</code></td>
+</tr>
+<tr>
+<td>P3.1 golden replay (<code>contract/verify.sh</code>)</td>
+<td><strong>NOT MEASURED at <code>32f9dbd</code>: there was no <code>golden/</code> set</strong> (the measured capture is the next row). <code>verify.sh --candidate …</code> printed <code>cases=0 in apps/licenses/contract/golden (not captured yet) — a vacuous zero is not a pass</code> and exited 3. The comparator is proven non-vacuous by <code>shadow.sh --self-test</code>: <code>self-test ok: identical bodies compare equal; a mutated field is unexplained</code>, exit 0</td>
+<td><code>32f9dbd</code></td>
+</tr>
+<tr>
+<td>P3.1 golden replay, captured corpus</td>
+<td>The default <code>golden/</code> corpus now exists: <strong>6 read-only, in-contract cases</strong> captured from the live reference service and replayed against <code>conveyor-licenses</code>. Scope: <code>GET /health</code>, <code>GET /health/live</code>, <code>GET /health/ready</code>, the unknown-token <code>POST /license/introspect</code> (200, <code>active:false</code>, <code>reason:"token_not_found"</code>), and the two unauthenticated 401s (<code>GET /licenses/active?tenant_id=…&amp;app_key=…</code>, <code>GET /licenses/user/&lt;uuid&gt;</code>). No production tenant, app key or token is in the corpus; authenticated success cases need a synthetic seed and remain integration-test and #95 coverage. Capture: <code>apps/licenses/contract/capture-golden.sh --live http://127.0.0.1:18544 --out apps/licenses/contract/golden</code> against a port-forward to the service pod — deliberately <strong>not</strong> through the public ingress host, whose istio ext-authz filter answers its own <code>text/plain</code> 401 (<code>Unauthorized: Bearer token required</code>, no <code>WWW-Authenticate</code>) before the application sees the request (measured 2026-11-14); the application's own 401 is the captured JSON envelope <code>{"error":{"message":"Missing authentication token","status":401}}</code>. Replay: throwaway <code>postgres:18.6</code> (container <code>slice45-licenses-pg</code>, host port 59315), <code>conveyor-licenses migrate</code> → <code>migrate OK: 1 migration(s) embedded</code>, <code>serve</code> on port 18545, then <code>bash apps/licenses/contract/verify.sh --candidate http://127.0.0.1:18545</code>: every case <code>ok</code>, <strong><code>cases=6 unexplained=0</code></strong>, exit 0. Candidate build: binary sha256 <code>70f3aaab4ecff9a1bdead02d928ff786d2d49a2347092634495bba261335420b</code>, built by <code>rbuild -- build -p conveyor-licenses --locked</code> from the tree whose Rust sources are <code>32f9dbd</code> (this slice adds only <code>contract/capture-golden.sh</code>, <code>contract/golden/</code> and this document). No tolerance was needed: the six cases matched without excusing anything, and <code>tolerances.json</code> stayed empty</td>
+<td><code>apps/licenses/contract/golden/</code>, <code>apps/licenses/contract/capture-golden.sh</code></td>
+</tr>
+<tr>
+<td>P3.2 live shadow window</td>
+<td><strong>NOT MEASURABLE, moved to #95.</strong> The service captures no request bodies: its <code>licenses.access</code> line carries <code>method, path, status, duration_ms, azp, realm, owner</code> and nothing else, and the pinned source has no <code>X-Capture</code> surface (measured 2026-11-14 at 09:57Z against the live pods and the pin; recorded on #45). The live pod's own log tail, read 2026-11-14, carries request lines of the form <code>INFO: … "GET /health/ready HTTP/1.1" 200 OK</code> — method, path, status, no body. <code>shadow.sh --live</code> therefore exits 3 by design and says so. The harness that would consume a window is built and proven: <code>shadow.sh</code> ranks cases by <code>sha256(method path body)</code>, <code>normalize.sh</code> masks only minted tokens and RFC3339 timestamps, <code>verify.sh</code>/<code>shadow.sh</code> treat <code>cases=0</code> as exit 3, and <code>--self-test</code> reports <code>self-test ok: identical bodies compare equal; a mutated field is unexplained</code></td>
+<td><code>apps/licenses/contract/shadow.sh</code>, <code>tolerances.json</code>; #95</td>
+</tr>
+<tr>
+<td>P3.3 every tolerance carries a reason</td>
+<td>`jq '[.tolerances[]</td>
+<td>select((.reason // "") == "")]</td>
+</tr>
+<tr>
+<td>P4 cutover</td>
+<td>moved to #95; this unit ships no deployment and no production call</td>
+<td>#95</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-four-recurring-commands-p2b1">The four recurring commands (P2b.1)</h2>
+<p>All four write <strong>one JSON line on stdout on every path</strong>, including configuration failures; the verdict rides the exit code. Configuration is environment-only, so the CronJob manifest remains the only knob. Every sweep compares an independent hand-written count with its own selection at one captured instant, so a broken or vacuous selection cannot read as success.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Selection predicate</th>
+<th>Row effects</th>
+<th>Exit codes</th>
+<th>Rust test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>expire-stale</code></td>
+<td><code>license.status = 'active' AND expires_at IS NOT NULL AND expires_at &lt; $now</code>, oldest first, <code>LIMIT EXPIRE_LIMIT</code> (default 500, 1..=5000). Armed only, <code>FOR UPDATE</code> plus a re-check of <code>status='active'</code></td>
+<td><code>UPDATE license SET status='expired', updated_at=$now WHERE id = ANY($ids) AND status='active'</code> in one transaction. A dry run takes no locks and writes nothing (and is NOT converged while stale rows exist)</td>
+<td>0 converged; 1 not converged (dry-run-over-stale, vacuous, truncated, over-fired, dry-run-wrote); 2 config/DB</td>
+<td><code>tests/command_expire_stale.rs</code> (6 tests; <code>an_armed_run_expires_exactly_the_stale_set_and_converges</code>, <code>a_dry_run_is_the_default_and_reports_the_selected_ids</code>)</td>
+</tr>
+<tr>
+<td><code>reap-expired</code></td>
+<td><code>license.status = 'expired' AND expires_at IS NOT NULL AND expires_at &lt; now - REAP_GRACE_DAYS</code> (default 30 days), oldest first, limit 500. Armed only, <code>FOR UPDATE</code> plus a re-check of <code>status='expired'</code></td>
+<td><code>UPDATE license SET status='revoked', revoked_at=COALESCE(revoked_at,$now), updated_at=$now WHERE id = ANY($ids) AND status='expired'</code>; after the commit, tears down billing's quota mirror and <code>license_sync</code> token budget per archived licence (4 concurrent). A dry run reports <code>teardown_would_call</code> and sends nothing; a missing <code>METERING_SERVICE_URL</code> is <code>skipped</code> and un-converged</td>
+<td>0 converged; 1 not converged (including billing residue and the skipped-teardown manifest defect); 2 config/DB</td>
+<td><code>tests/command_reap_expired.rs</code> (7 tests; <code>an_armed_run_reaps_exactly_the_reapable_set_and_converges</code>, <code>a_billing_failure_does_not_change_the_reap_but_is_visible_in_the_payload</code>); <code>tests/billing_teardown.rs</code> (6 tests)</td>
+</tr>
+<tr>
+<td><code>revoke-expired-tokens</code></td>
+<td><code>token.revoked = false AND expires_at IS NOT NULL AND expires_at &lt; $now</code>, oldest first, limit 500</td>
+<td><code>UPDATE token SET revoked = true, revoked_at = $now WHERE id = ANY($ids)</code> in one transaction; a dry run writes nothing and is not converged while expired tokens exist</td>
+<td>0 converged; 1 not converged; 2 config/DB</td>
+<td><code>tests/command_revoke_expired_tokens.rs</code> (5 tests; <code>an_armed_run_revokes_exactly_the_expired_set_and_converges</code>, <code>a_dry_run_writes_nothing_and_reports_the_scripts_problems</code>)</td>
+</tr>
+<tr>
+<td><code>reconcile-metering</code></td>
+<td>live licences whose effective metering owes billing: <code>status='active' AND (expires_at IS NULL OR expires_at &gt; now())</code> and any of plan quota/token budget/licence overrides non-null; optional <code>RECONCILE_LICENSE_ID</code> narrowing; ordered by <code>created_at</code>, limit 500, skipping already-stamped licences unless <code>RECONCILE_REVALIDATE</code></td>
+<td>read-before-write: <code>GET /api/budget/list/{tenant}</code> — create absent, re-push a different <code>budget_tokens</code>, leave an unreadable list UNKNOWN; <code>GET /api/quota/check</code> — create absent, leave and report drift unless <code>RECONCILE_FORCE_PLAN_QUOTA</code>; stamps verified coverage. The same runner serves <code>POST /licenses/admin/metering/reconcile</code></td>
+<td>0 converged; 1 not converged (unknown coverage, failures, dry-run uncovereds, vacuous/truncated); 2 config/DB/transport</td>
+<td><code>tests/command_reconcile_metering.rs</code> (10 tests; <code>an_uncovered_licence_gets_both_rows_created_and_is_stamped</code>, <code>a_dry_run_reads_but_pushes_nothing_and_reports_the_same_counts</code>); <code>tests/reconcile_route.rs</code> (5 tests, 4 passed / 1 failed; the armed repair <code>an_armed_run_repairs_and_stamps_the_named_licence_only</code> passes, the stale <code>the_lock_check_never_names_this_route</code> fails — see below)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="command-shapes-and-exit-codes-p2b2">Command shapes and exit codes (P2b.2)</h2>
+<p>The reference scripts are invoked with <strong>no arguments</strong>. Three inspect <code>sys.argv</code> and refuse any extra token with a usage line on stderr, one <code>_fail</code> JSON line on stdout and exit 2; <code>revoke_expired_tokens.py</code> never looks at <code>sys.argv</code>, so extra words are ignored and the sweep runs. The Rust binary applies that table <strong>before clap</strong>, so the CronJob path is unchanged, and clap-only niceties cannot erase the audit line.</p>
+<table>
+<thead>
+<tr>
+<th>Invocation</th>
+<th>stdout</th>
+<th>stderr</th>
+<th>exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conveyor-licenses expire-stale</code></td>
+<td>one JSON line (the run's audit line, or its own config refusal)</td>
+<td>—</td>
+<td>0/1/2</td>
+</tr>
+<tr>
+<td><code>conveyor-licenses expire-stale surplus</code></td>
+<td><code>{"actor":null,"error":"this job takes no arguments; configure it via EXPIRE_* env","event":"expire_stale_licenses","exit_code":2}</code></td>
+<td><code>usage: conveyor-licenses expire-stale (configured via EXPIRE_* env)</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>conveyor-licenses reap-expired surplus</code></td>
+<td>the same shape with the <code>reap_expired_licenses</code> event and <code>REAP_*</code></td>
+<td>the matching usage line</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>conveyor-licenses reconcile-metering surplus</code></td>
+<td>the same shape plus <code>"license_id":null</code></td>
+<td>the matching usage line</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>conveyor-licenses revoke-expired-tokens surplus</code></td>
+<td>the real sweep's one JSON line; the extra word is dropped (flags are still handed to clap)</td>
+<td>—</td>
+<td>0/1/2</td>
+</tr>
+<tr>
+<td><code>conveyor-licenses --check-lock</code></td>
+<td>empty</td>
+<td><code>lock OK: 60 operations</code> or <code>error: …</code></td>
+<td>0/1</td>
+</tr>
+<tr>
+<td><code>conveyor-licenses --print-openapi</code></td>
+<td>the document</td>
+<td>—</td>
+<td>0/1</td>
+</tr>
+<tr>
+<td><code>serve</code>, <code>migrate</code>, <code>migrate --baseline</code></td>
+<td>unchanged</td>
+<td><code>migrate OK: …</code> / <code>baseline OK: …</code></td>
+<td>0/1</td>
+</tr>
+</tbody>
+</table>
+<p>Tests: <code>tests/command_argv.rs</code> (6 tests) — the refusal payload is asserted byte-for-byte, the extra-word revoke run asserts the sweep actually runs, and the no-argument path asserts the config refusal rather than the argv refusal.</p>
+<h2 id="test-inventory">Test inventory</h2>
+<p>Measured on m1 at <code>9f50438</code> (a throwaway Postgres 18 cluster per run): <code>rbuild -- test -p conveyor-licenses --locked</code> → <strong>350 passed, 0 failed</strong> across 36 test binaries, exit 0. The per-target counts below are from the complete run:</p>
+<table>
+<thead>
+<tr>
+<th>Test target</th>
+<th style="text-align: right;">Tests</th>
+<th style="text-align: right;">Failed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/lib.rs</code> (unit)</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>src/main.rs</code> (unit)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/billing_metering.rs</code></td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/billing_teardown.rs</code></td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/bundle_apply_rows.rs</code></td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/bundle_ensure_apply.rs</code></td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/bundle_ensure_plan.rs</code></td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/bundle_grants.rs</code></td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/catalogue_apps.rs</code></td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/catalogue_offerings.rs</code></td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/catalogue_plans.rs</code></td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/command_argv.rs</code></td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/command_expire_stale.rs</code></td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/command_reap_expired.rs</code></td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/command_reconcile_metering.rs</code></td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/command_revoke_expired_tokens.rs</code></td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/contract_drift.rs</code></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/dependencies.rs</code></td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/internal_bundles.rs</code></td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/internal_ensure.rs</code></td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/internal_reads.rs</code></td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/internal_seat.rs</code></td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/introspect.rs</code></td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/issuance.rs</code></td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/licence_admin.rs</code></td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/licence_tokens.rs</code></td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/metrics.rs</code></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/migrations.rs</code></td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/reconcile_route.rs</code></td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/revoke.rs</code></td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/tenant_byo.rs</code></td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/tenant_offerings.rs</code></td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/tenants_crud.rs</code></td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/user_licence_writes.rs</code></td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>tests/user_licences.rs</code></td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Doc-tests</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td style="text-align: right;"><strong>350</strong></td>
+<td style="text-align: right;"><strong>0</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-two-stale-port-is-incomplete-assertions-resolved-in-a0e757b">The two stale "port is incomplete" assertions (resolved in <code>a0e757b</code>)</h3>
+<ul>
+<li><code>contract::tests::the_lock_check_names_the_unported_operations</code> — <code>apps/licenses/src/contract/mod.rs:143-176</code>. It does <code>check(&amp;served(), ROUTES).expect_err("the port is incomplete by construction in slice 1")</code>; with 60 of 60 operations served, <code>check</code> returns <code>Ok(())</code>, so it panics at line 146: <code>the port is incomplete by construction in slice 1: ()</code>.</li>
+<li><code>tests/reconcile_route.rs::the_lock_check_never_names_this_route</code> — panics at line 530: <code>the port is incomplete by construction: ()</code>.</li>
+</ul>
+<p>Both encoded the slice-era state in which <code>--check-lock</code> HAD to fail. <strong>Resolved in <code>a0e757b</code></strong>: the contract test is now <code>the_lock_check_accepts_the_complete_port</code> (asserts <code>check</code> returns Ok) and the reconcile-route test calls <code>check(...).expect("the served contract equals the capture")</code>. The crate's test command is green after that change; the remaining DoD gate is the full workspace suite at the PR head, recorded in the PR.</p>
+<h2 id="recorded-deviations">Recorded deviations</h2>
+<ul>
+<li><strong>Offering markup and access refusals.</strong> Both failures answer the reference's <strong>502</strong> and restore the prior posture; pinned by <code>tests/tenant_offerings.rs::a_rejected_markup_restores_the_posture_and_answers_502</code> and <code>::an_access_refusal_restores_the_prior_posture_and_answers_502</code>.</li>
+<li><strong>CLI JSON is compact.</strong> <code>serde_json::to_string</code>, not the script's <code>json.dumps</code> spacing; key order is the sorted order the scripts used (<code>sort_keys=True</code>). The refusal usage line names the Rust binary (<code>conveyor-licenses &lt;subcommand&gt;</code>) because that is the program being invoked; the reference printed the script's basename.</li>
+<li><strong>axum versus FastAPI on query-parameter syntax.</strong> FastAPI rejects some malformed/repeated query parameters with a 422 <code>HTTPValidationError</code>; axum's extractor can answer 400. The schemas are aligned to <code>HTTPValidationError.detail</code> where a body is validated, and the split is documented per route; it is not claimed that every extractor-level rejection is byte-identical.</li>
+<li><strong>Implemented but untested.</strong> The app-create unique-key race (<code>lost_race</code>) and the byo-mode 503 <code>byo_mode_unresolved</code> fault path are implemented; no test drives either fault at this head.</li>
+<li><strong>Forwarded-token arm.</strong> It uses the service verifier's configured trusted issuers (<code>KEYCLOAK_TRUSTED_ISSUERS</code>/<code>KEYCLOAK_URL</code>); it does not add a second, forwarded-token-specific trust list. A caller whose issuer is not in that list is refused on both arms.</li>
+<li><strong><code>released_by_revoke_of</code></strong> records the subject UUID itself, not the <code>subject:&lt;uuid&gt;</code> spelling.</li>
+</ul>
+<p>None of these is hidden behind a tolerance: <code>tolerances.json</code> is empty, so every one is either a difference in a field a golden case would compare or an arm with no case yet.</p>
+<h2 id="cutover-handoff-to-95">Cutover handoff to #95</h2>
+<ol type="1">
+<li><strong>Image.</strong> The <code>apps/licenses</code> image row is expected from the publish job's matrix once this PR merges; no Rust licenses image exists before that merge. #95 pins the digest it deploys.</li>
+<li><strong>Conveyor.</strong> Set <code>LICENCES_BASE_URL</code> to the deployed Service; the three call sites in <code>apps/server/src/{admin/upstream_tokens.rs,worker.rs}</code> and <code>crates/auth/src/licence.rs</code> are the only wiring, and the env value is the rollback flag.</li>
+<li><strong>CronJobs.</strong> Switch each job's command from <code>python scripts/&lt;job&gt;.py</code> to <code>conveyor-licenses expire-stale|reap-expired|revoke-expired-tokens|reconcile-metering</code>; schedules, env and the one-JSON-line contract stay. The argv table above is the proof that no schedule or argument change is required.</li>
+<li><strong>Database.</strong> <code>migrate --baseline</code> stamps a database already at the Python head without running DDL; the live pair (<code>licenses</code> / <code>licenses_user_v2</code>) is kept.</li>
+<li><strong>Probe window.</strong> #95 P3.1/P3.2 records the live window. Because the service captures no request bodies, a live window must come from the candidate's own traffic; and the recorded golden set (<code>capture-goldens.sh</code>/<code>oracle.sh</code> from a pinned synthetic seed) is the missing input for <code>verify.sh</code>'s <code>unexplained=0</code> leg. Neither is claimed here.</li>
+<li><strong>Retirement.</strong> <code>nonagenticai/licenses</code> is not archived until every consumer in the table above is off it. <code>license-authz</code> is not a consumer to switch; it stays external.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-14-licenses-absorption.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

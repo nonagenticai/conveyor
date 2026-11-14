@@ -96,8 +96,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "b623a23bb0084b49b2190235e03be978f40c84c0b1341b4828b0eae717e95092",
-      "bytes": 9167,
+      "sha256": "7abd00428ef00a0c2bf16113988c0c3bd0324b0c5366619156a037969cdb3d8b",
+      "bytes": 9642,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -135,6 +135,15 @@
       "sha256": "b86c0d474d47e5ccf8ade98c3555728e44d6f35901694e9de7016b7218fc28bb",
       "bytes": 6631,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-13-inference-router-absorption.md"
+    },
+    {
+      "title": "licenses absorption — evidence (2026-11-14)",
+      "path": "docs/evidence/2026-11-14-licenses-absorption.html",
+      "source": "docs/evidence/2026-11-14-licenses-absorption.md",
+      "section": "Evidence",
+      "sha256": "4e4def8186f7af008c5ce0b304ebd572232dcec210309cf68ed7a3ac457244db",
+      "bytes": 22126,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-14-licenses-absorption.md"
     },
     {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
