@@ -11,6 +11,7 @@
 
 pub mod health;
 pub mod internal_bundles;
+pub mod internal_reads;
 pub mod internal_seat;
 pub mod licenses;
 pub mod observability;
@@ -32,6 +33,11 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/health"),
     ("GET", "/health/live"),
     ("GET", "/health/ready"),
+    ("GET", "/internal/apps"),
+    ("GET", "/internal/licenses"),
+    ("GET", "/internal/licenses/{license_id}"),
+    ("GET", "/internal/subjects/{subject_id}"),
+    ("GET", "/internal/tenants"),
     ("GET", "/internal/tenants/{tenant_id}/seat-count"),
     ("POST", "/internal/tenants/{tenant_id}/bundle-token"),
     ("GET", "/licenses/active"),
@@ -47,6 +53,11 @@ pub const ROUTES: &[(&str, &str)] = &[
         health::liveness,
         health::readiness,
         internal_bundles::internal_mint_tenant_bundle_token,
+        internal_reads::internal_get_license,
+        internal_reads::internal_get_subject,
+        internal_reads::internal_list_apps,
+        internal_reads::internal_list_licenses,
+        internal_reads::internal_list_tenants,
         internal_seat::internal_tenant_seat_count,
         licenses::active,
         tokens::introspect,
@@ -59,6 +70,10 @@ pub const ROUTES: &[(&str, &str)] = &[
         health::LivenessResponse,
         health::ReadinessResponse,
         internal_bundles::BundleTokenResponse,
+        internal_reads::InternalAppResponse,
+        internal_reads::InternalLicenseResponse,
+        internal_reads::InternalSubjectResponse,
+        internal_reads::InternalTenantResponse,
         internal_seat::InternalSeatCountResponse,
         schemas::HTTPValidationError,
         schemas::ValidationError,
@@ -89,6 +104,23 @@ pub fn router(state: AppState) -> Router {
         .route("/health", get(health::health))
         .route("/health/live", get(health::liveness))
         .route("/health/ready", get(health::readiness))
+        .route("/internal/apps", get(internal_reads::internal_list_apps))
+        .route(
+            "/internal/licenses",
+            get(internal_reads::internal_list_licenses),
+        )
+        .route(
+            "/internal/licenses/{license_id}",
+            get(internal_reads::internal_get_license),
+        )
+        .route(
+            "/internal/subjects/{subject_id}",
+            get(internal_reads::internal_get_subject),
+        )
+        .route(
+            "/internal/tenants",
+            get(internal_reads::internal_list_tenants),
+        )
         .route(
             "/internal/tenants/{tenant_id}/seat-count",
             get(internal_seat::internal_tenant_seat_count),
