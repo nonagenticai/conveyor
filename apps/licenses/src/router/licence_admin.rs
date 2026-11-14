@@ -7,6 +7,12 @@
 //! | `GET /licenses` | `main.py::list_licenses` |
 //! | `GET /licenses/admin/all` | `main.py::list_all_licenses_admin` |
 //! | `PATCH /licenses/{license_id}/budget` | `main.py::set_license_budget` |
+//! | `POST /licenses/admin/metering/reconcile` | `main.py::reconcile_metering_provisioning` |
+//!
+//! The reconcile route is a THIN WRAPPER over
+//! `commands::reconcile_metering::run_metering_reconcile` — the same runner the
+//! `reconcile-metering` CronJob command calls — so the operator route and the scheduled sweep
+//! cannot drift apart.
 //!
 //! Enrichment is `_enrich_license_response`: the `app` **and** `plan` objects are both
 //! populated here (the user-licence route deliberately never populates a plan).
@@ -27,6 +33,9 @@
 //! `"License not found"`, and anything unexpected is **500** with the reference's static
 //! per-route message.
 
+use std::collections::BTreeMap;
+use std::sync::Arc;
+
 use axum::Extension;
 use axum::Json;
 use axum::body::Bytes;
@@ -38,6 +47,8 @@ use serde_json::{Value, json};
 use utoipa::ToSchema;
 
 use crate::auth::{User, get_tenant_id, require_any_realm_role};
+use crate::billing::metering::MeteringProvisioner;
+use crate::commands::reconcile_metering::{MeteringReconcileResult, run_metering_reconcile};
 use crate::db::internal_reads::effective_status;
 use crate::db::issuance;
 use crate::db::licence_admin::{self, LicenceFilters, LicenceRow};
@@ -80,6 +91,44 @@ pub struct AdminLicensesQuery {
     #[serde(default)]
     #[param(value_type = bool, default = false)]
     pub include_deleted: Option<String>,
+}
+
+/// `POST /licenses/admin/metering/reconcile` query parameters.
+///
+/// Documented as FastAPI publishes them. Extraction is by hand (`BTreeMap<String, String>`) so
+/// each refusal is FastAPI's 422 body rather than axum's rejection. `license_id` is a plain
+/// STRING on the wire — the reference's `str | None` — and a non-UUID value is its 400.
+#[derive(Debug, Deserialize, utoipa::IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct ReconcileMeteringQuery {
+    /// Max licences repaired in one sweep
+    #[serde(default)]
+    #[param(default = 500, minimum = 1, maximum = 5000)]
+    pub limit: i64,
+    /// Re-examine licences already stamped metering_verified_at instead of skipping them. Use
+    /// to re-measure coverage on demand.
+    #[serde(default)]
+    #[param(default = false)]
+    pub revalidate: bool,
+    /// Measure coverage against billing and report it, writing nothing — no pushes to billing,
+    /// no stamps.
+    #[serde(default)]
+    #[param(default = false)]
+    pub dry_run: bool,
+    /// DESTRUCTIVE, default off. Push the licence's EFFECTIVE quota (its `quota_override`, else
+    /// `plan.quota_monthly`) over a billing quota row that DIFFERS from it, destroying the
+    /// hand-set billing value that made it differ. Without this, a divergent row is left alone
+    /// and reported in `quota_drift_license_ids`. Has no effect where billing holds no row
+    /// (that is a plain create) or where the configured quota could not be read.
+    #[serde(default)]
+    #[param(default = false)]
+    pub force_plan_quota: bool,
+    /// Restrict the sweep to this ONE licence id (a canary). Narrows the normal selection,
+    /// never widens it: a licence that is not live, or whose EFFECTIVE metering (override or
+    /// plan) owes billing nothing, is still not swept. 400 if not a UUID. Omit to sweep the
+    /// estate.
+    #[param(nullable = true)]
+    pub license_id: Option<String>,
 }
 
 /// `LicenseBudgetUpdate` (`main.py`): set or clear one licence's own monthly token budget.
@@ -538,4 +587,155 @@ pub async fn set_license_budget(
     );
 
     Ok(Json(response(updated, Utc::now())))
+}
+
+/// FastAPI's 422 entry for one query parameter.
+fn query_error(field: &str, kind: &str, message: &str, input: Value) -> Refusal {
+    Refusal::detail(
+        StatusCode::UNPROCESSABLE_ENTITY,
+        json!([{
+            "type": kind,
+            "loc": ["query", field],
+            "msg": message,
+            "input": input,
+        }]),
+    )
+}
+
+/// `limit: int = Query(500, ge=1, le=5000)`.
+fn parse_limit(raw: Option<&str>) -> Result<i64, Refusal> {
+    let Some(value) = raw else {
+        return Ok(500);
+    };
+    match value.parse::<i64>() {
+        Ok(number) if number < 1 => Err(query_error(
+            "limit",
+            "greater_than_equal",
+            "Input should be greater than or equal to 1",
+            json!(number),
+        )),
+        Ok(number) if number > 5_000 => Err(query_error(
+            "limit",
+            "less_than_equal",
+            "Input should be less than or equal to 5000",
+            json!(number),
+        )),
+        Ok(number) => Ok(number),
+        Err(_) => Err(query_error(
+            "limit",
+            "int_parsing",
+            "Input should be a valid integer, unable to parse string as an integer",
+            json!(value),
+        )),
+    }
+}
+
+/// The reference's `user.preferred_username or user.sub`, the sweep's audit actor.
+fn actor(user: &User) -> &str {
+    if user.preferred_username.is_empty() {
+        &user.sub
+    } else {
+        &user.preferred_username
+    }
+}
+
+/// `POST /licenses/admin/metering/reconcile` — measure each live licence's metering coverage
+/// AGAINST BILLING and repair it, estate-wide.
+///
+/// Requires `license-admin` (realm role only). Deliberately cross-tenant, like
+/// `GET /licenses/admin/all`: the caller is the platform-admin surface acting for a cross-tenant
+/// operator, and the gap this repairs is estate-wide.
+///
+/// A THIN WRAPPER in code: it contributes exactly the guard, the five query parameters and the
+/// actor name. All behaviour lives in `run_metering_reconcile`, the same runner the scheduled
+/// `reconcile-metering` command uses, so the route and the CronJob cannot drift apart. The
+/// scheduled path exists because the licences service account does NOT hold `license-admin` and
+/// never should.
+///
+/// `license_id` NARROWS the selection and never widens it; `revalidate=true` re-examines
+/// already-stamped licences; `dry_run=true` measures and writes nothing; `force_plan_quota=true`
+/// is the default-off, DESTRUCTIVE opt-in to push the effective quota over a divergent billing
+/// row.
+#[utoipa::path(
+    post,
+    path = "/licenses/admin/metering/reconcile",
+    tag = "licenses",
+    operation_id = "reconcile_metering_provisioning",
+    summary = "Reconcile Metering Provisioning",
+    description = "Measure each live licence's metering coverage AGAINST BILLING, and repair it.\n\nRequires `license-admin`. Deliberately cross-tenant, same as `GET /licenses/admin/all` — the caller is the platform-admin surface acting for a cross-tenant operator, and the gap this repairs is estate-wide.\n\nA THIN WRAPPER in code: it contributes exactly two things, the `license-admin` check and the actor name for the audit log line. All behaviour lives in `run_metering_reconcile`, so this route and the scheduled `reconcile-metering` command cannot drift apart.",
+    params(
+        ReconcileMeteringQuery,
+        ("X-Tenant-Id" = Option<String>, Header, description = "Tenant identifier. Omit to accept the service-side default; when sent, it must be the caller's own tenant id.")
+    ),
+    responses(
+        (status = 200, body = MeteringReconcileResult),
+        (status = 400, body = ErrorResponse),
+        (status = 401, body = ErrorResponse),
+        (status = 403, body = ErrorResponse),
+        (status = 404, body = ErrorResponse),
+        (status = 422, body = HTTPValidationError),
+        (status = 500, body = ErrorResponse)
+    )
+)]
+pub async fn reconcile_metering_provisioning(
+    State(state): State<AppState>,
+    Extension(user): Extension<User>,
+    Query(raw): Query<BTreeMap<String, String>>,
+    metering: Option<Extension<Arc<MeteringProvisioner>>>,
+) -> Result<Json<MeteringReconcileResult>, Refusal> {
+    // `require_any_role("license-admin")`: realm roles only, the reference's exact detail text.
+    // FastAPI solves this dependency BEFORE it validates query parameters, so it wins over a 422.
+    require_any_realm_role(&user, &["license-admin"])?;
+
+    let limit = parse_limit(raw.get("limit").map(String::as_str))?;
+    let revalidate = match raw.get("revalidate") {
+        Some(value) => parse_bool("revalidate", value)?,
+        None => false,
+    };
+    let dry_run = match raw.get("dry_run") {
+        Some(value) => parse_bool("dry_run", value)?,
+        None => false,
+    };
+    let force_plan_quota = match raw.get("force_plan_quota") {
+        Some(value) => parse_bool("force_plan_quota", value)?,
+        None => false,
+    };
+    // The runner's own refusal: a typo'd canary id must never be read as "that licence is
+    // already fine". An empty value is a string, so it is refused exactly like any other
+    // non-UUID instead of quietly meaning "no filter".
+    let license_ids = match raw.get("license_id") {
+        None => None,
+        Some(value) => match uuid::Uuid::try_parse(value) {
+            Ok(id) => Some(vec![id]),
+            Err(_) => {
+                return Err(Refusal::detail(
+                    StatusCode::BAD_REQUEST,
+                    "license_id must be a UUID",
+                ));
+            }
+        },
+    };
+
+    let Some(pool) = state.pool.as_ref() else {
+        return Err(internal_error("Metering reconcile scan failed"));
+    };
+    let Some(Extension(billing)) = metering else {
+        return Err(internal_error("Metering reconcile is not configured"));
+    };
+    let result = run_metering_reconcile(
+        pool,
+        limit,
+        revalidate,
+        dry_run,
+        force_plan_quota,
+        license_ids.as_deref(),
+        actor(&user),
+        billing.as_ref(),
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "Metering reconcile scan failed");
+        internal_error("Metering reconcile scan failed")
+    })?;
+    Ok(Json(result))
 }

@@ -28,6 +28,7 @@ use axum::Router;
 use axum::routing::{get, patch, post};
 
 use crate::auth::{JwtVerifier, UnavailableJwks};
+use crate::commands::reconcile_metering::MeteringReconcileResult;
 use crate::config::Config;
 use crate::state::AppState;
 
@@ -50,6 +51,7 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/licenses"),
     ("GET", "/licenses/active"),
     ("GET", "/licenses/admin/all"),
+    ("POST", "/licenses/admin/metering/reconcile"),
     ("GET", "/licenses/user/{subject_id}"),
     ("POST", "/licenses/user/{subject_id}"),
     ("DELETE", "/licenses/user/{subject_id}"),
@@ -77,6 +79,7 @@ pub const ROUTES: &[(&str, &str)] = &[
         internal_seat::internal_tenant_seat_count,
         licence_admin::list_admin_licenses,
         licence_admin::list_licenses,
+        licence_admin::reconcile_metering_provisioning,
         licence_admin::set_license_budget,
         licence_tokens::create_license_token,
         licence_tokens::create_operator_token,
@@ -108,6 +111,7 @@ pub const ROUTES: &[(&str, &str)] = &[
         licence_tokens::RegenerateTokenResponse,
         licence_tokens::TokenCreateResponse,
         licence_tokens::TokenType,
+        MeteringReconcileResult,
         schemas::HTTPValidationError,
         schemas::ValidationError,
         tokens::TokenIntrospectRequest,
@@ -172,6 +176,10 @@ pub fn router(state: AppState) -> Router {
         .route(
             "/licenses/admin/all",
             get(licence_admin::list_admin_licenses),
+        )
+        .route(
+            "/licenses/admin/metering/reconcile",
+            post(licence_admin::reconcile_metering_provisioning),
         )
         .route("/licenses/active", get(licenses::active))
         .route(

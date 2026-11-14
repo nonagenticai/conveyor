@@ -148,20 +148,30 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
              billing mirrors; the sync-from-licenses sweep remains the backstop"
         );
     }
-    if let Some(metering) = conveyor_licenses::billing::metering::MeteringProvisioner::from_env() {
-        state = state.with_metering(std::sync::Arc::new(metering));
-    } else {
-        tracing::warn!(
-            "METERING_SERVICE_URL unset or unusable: created licences will not be metered and \
-             bundle-ensure inserts are recorded metering-pending; POST {} remains the repair path",
+    // One metering client, two readers: the user-licence and bundle-ensure routes read it from
+    // the state; `POST /licenses/admin/metering/reconcile` (which runs the same sweep as the
+    // CronJob command) reads it from an extension and answers 500 — never a silent no-op —
+    // when billing is not configured.
+    let metering = conveyor_licenses::billing::metering::MeteringProvisioner::from_env()
+        .map(std::sync::Arc::new);
+    match &metering {
+        Some(provisioner) => state = state.with_metering(provisioner.clone()),
+        None => tracing::warn!(
+            "METERING_SERVICE_URL unset or unusable: created licences will not be metered, \
+             bundle-ensure inserts are recorded metering-pending, and \
+             POST /licenses/admin/metering/reconcile answers 500; POST {} remains the repair path",
             conveyor_licenses::billing::metering::METERING_RECONCILE_PATH
-        );
+        ),
+    }
+    let mut app = router::router(state);
+    if let Some(provisioner) = metering {
+        app = app.layer(axum::Extension(provisioner));
     }
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{port}")).await?;
     tracing::info!(port, %environment, %version, "serving");
     axum::serve(
         listener,
-        router::router(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
+        app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
     )
     .await?;
     Ok(())
