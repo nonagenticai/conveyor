@@ -739,7 +739,9 @@ async fn a_rejected_markup_restores_the_posture_and_answers_502() {
         "a 4xx is a verdict, not retried"
     );
     assert!(
-        !pushed.iter().any(|call| call.path == "/api/config/access-charges"),
+        !pushed
+            .iter()
+            .any(|call| call.path == "/api/config/access-charges"),
         "the request stops at the failed markup write"
     );
 
@@ -778,7 +780,9 @@ async fn a_rejected_markup_restores_the_posture_and_answers_502() {
         "one bounded retry for a retryable status"
     );
     assert!(
-        !pushed.iter().any(|call| call.path == "/api/config/access-charges"),
+        !pushed
+            .iter()
+            .any(|call| call.path == "/api/config/access-charges"),
         "the request stops at the failed markup write"
     );
 

@@ -757,8 +757,10 @@ pub async fn provision_tenant_offering(
                     "Billing rejected the markup-rule write (HTTP {status}); provisioning rolled \
                      back"
                 ),
-                None => "Could not reach billing to write the markup rule; provisioning rolled back"
-                    .to_owned(),
+                None => {
+                    "Could not reach billing to write the markup rule; provisioning rolled back"
+                        .to_owned()
+                }
             };
             return Err(Refusal::detail(StatusCode::BAD_GATEWAY, detail));
         }
