@@ -8,14 +8,19 @@
 
 mod common;
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
-use axum::Router;
 use axum::body::Body;
-use axum::http::{Method, Request, StatusCode};
-use axum::routing::{get as route_get, patch};
+use axum::extract::{Path, State as AxumState};
+use axum::http::{HeaderMap, Method, Request, StatusCode};
+use axum::response::IntoResponse;
+use axum::routing::{delete, get as route_get, patch, post as route_post};
+use axum::{Json, Router};
 use chrono::{DateTime, Utc};
 use conveyor_licenses::auth::{JwtVerifier, UnavailableJwks, User};
+use conveyor_licenses::billing::BillingTeardown;
+use conveyor_licenses::billing::metering::MeteringProvisioner;
 use conveyor_licenses::config::Config;
 use conveyor_licenses::db;
 use conveyor_licenses::router::licence_admin::{
@@ -83,6 +88,170 @@ fn route(db: &common::TestDb, user: User) -> Router {
         .route("/licenses/{license_id}/budget", patch(set_license_budget))
         .layer(axum::Extension(user))
         .with_state(state(db.pool.clone()))
+}
+
+/// The budget route with BOTH billing clients pointed at `base`.
+fn route_with_billing(db: &common::TestDb, user: User, base: &str) -> Router {
+    let state = state(db.pool.clone())
+        .with_metering(Arc::new(
+            MeteringProvisioner::new(base, None).expect("metering provisioner"),
+        ))
+        .with_billing(Arc::new(
+            BillingTeardown::new(base, None).expect("billing teardown"),
+        ));
+    Router::new()
+        .route("/licenses/{license_id}/budget", patch(set_license_budget))
+        .layer(axum::Extension(user))
+        .with_state(state)
+}
+
+// ---------------------------------------------------------------------------------------------
+// The billing stub: records every call and answers with configured statuses/rows.
+// ---------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, PartialEq)]
+struct BillingCall {
+    method: &'static str,
+    path: String,
+    tenant: Option<String>,
+    body: Option<Value>,
+}
+
+#[derive(Clone)]
+struct BillingStub {
+    calls: Arc<Mutex<Vec<BillingCall>>>,
+    budget_status: Arc<Mutex<u16>>,
+    rows: Arc<Mutex<Vec<Value>>>,
+}
+
+impl BillingStub {
+    fn new() -> Self {
+        Self {
+            calls: Arc::new(Mutex::new(Vec::new())),
+            budget_status: Arc::new(Mutex::new(200)),
+            rows: Arc::new(Mutex::new(Vec::new())),
+        }
+    }
+
+    fn calls(&self) -> Vec<BillingCall> {
+        self.calls.lock().expect("stub lock").clone()
+    }
+
+    fn set_budget_status(&self, status: u16) {
+        *self.budget_status.lock().expect("stub lock") = status;
+    }
+
+    fn set_rows(&self, rows: Vec<Value>) {
+        *self.rows.lock().expect("stub lock") = rows;
+    }
+}
+
+fn record_billing(
+    stub: &BillingStub,
+    method: &'static str,
+    path: String,
+    headers: &HeaderMap,
+    body: Option<Value>,
+) {
+    let tenant = headers
+        .get("x-tenant-id")
+        .and_then(|value| value.to_str().ok())
+        .map(str::to_owned);
+    stub.calls.lock().expect("stub lock").push(BillingCall {
+        method,
+        path,
+        tenant,
+        body,
+    });
+}
+
+async fn budget_push(
+    AxumState(stub): AxumState<BillingStub>,
+    headers: HeaderMap,
+    Json(body): Json<Value>,
+) -> StatusCode {
+    record_billing(&stub, "POST", "/api/budget".to_owned(), &headers, Some(body));
+    StatusCode::from_u16(*stub.budget_status.lock().expect("stub lock")).expect("status")
+}
+
+async fn budget_list(
+    AxumState(stub): AxumState<BillingStub>,
+    headers: HeaderMap,
+    Path(tenant): Path<String>,
+) -> axum::response::Response {
+    record_billing(
+        &stub,
+        "GET",
+        format!("/api/budget/list/{tenant}"),
+        &headers,
+        None,
+    );
+    let rows = stub.rows.lock().expect("stub lock").clone();
+    Json(json!({"data": rows})).into_response()
+}
+
+async fn budget_delete(
+    AxumState(stub): AxumState<BillingStub>,
+    headers: HeaderMap,
+    Path(budget_id): Path<String>,
+) -> StatusCode {
+    record_billing(
+        &stub,
+        "DELETE",
+        format!("/api/budget/{budget_id}"),
+        &headers,
+        None,
+    );
+    StatusCode::OK
+}
+
+async fn start_billing_stub(stub: BillingStub) -> String {
+    let app = Router::new()
+        .route("/api/budget", route_post(budget_push))
+        .route("/api/budget/list/{tenant_id}", route_get(budget_list))
+        .route("/api/budget/{budget_id}", delete(budget_delete))
+        .with_state(stub);
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind stub");
+    let address = listener.local_addr().expect("stub address");
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    format!("http://{address}")
+}
+
+/// Poll until `predicate` holds: the push is SPAWNED, so it lands after the response.
+async fn wait_for_billing(
+    stub: &BillingStub,
+    predicate: impl Fn(&[BillingCall]) -> bool,
+) -> Vec<BillingCall> {
+    for _ in 0..100 {
+        let calls = stub.calls();
+        if predicate(&calls) {
+            return calls;
+        }
+        tokio::time::sleep(Duration::from_millis(50)).await;
+    }
+    let calls = stub.calls();
+    panic!("billing calls did not arrive; seen: {calls:?}");
+}
+
+/// Poll until the failed push has cleared the licence's verified stamp.
+async fn wait_for_verified_cleared(db: &common::TestDb, license_id: Uuid) -> bool {
+    for _ in 0..100 {
+        let stamp: Option<DateTime<Utc>> =
+            sqlx::query_scalar("SELECT metering_verified_at FROM license WHERE id = $1")
+                .bind(license_id)
+                .fetch_one(&db.pool)
+                .await
+                .expect("stamp state");
+        if stamp.is_none() {
+            return true;
+        }
+        tokio::time::sleep(Duration::from_millis(50)).await;
+    }
+    false
 }
 
 async fn send(app: Router, method: Method, path: &str, body: Option<Value>) -> (StatusCode, Value) {
@@ -734,4 +903,199 @@ async fn the_budget_body_and_path_validation_is_fastapis_shape() {
             .await
             .expect("read back");
     assert_eq!(stored, None);
+}
+
+#[tokio::test]
+async fn a_budget_change_pushes_the_new_effective_value() {
+    let db = seeded().await;
+    let stub = BillingStub::new();
+    let base = start_billing_stub(stub.clone()).await;
+
+    let (status, body) = send(
+        route_with_billing(&db, operator(Some("owner-a")), &base),
+        Method::PATCH,
+        &format!("/licenses/{L1}/budget"),
+        Some(json!({"token_budget_override": 5000, "reason": "cap"})),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK, "{body}");
+    assert_eq!(body["token_budget_override"], 5000);
+
+    let calls = wait_for_billing(&stub, |calls| {
+        calls.iter().filter(|call| call.path == "/api/budget").count() == 1
+    })
+    .await;
+    let push = calls
+        .iter()
+        .find(|call| call.path == "/api/budget")
+        .expect("the budget push");
+    assert_eq!(push.method, "POST");
+    assert_eq!(push.tenant, Some(TENANT.to_string()));
+    assert_eq!(
+        push.body,
+        Some(json!({
+            "tenant_id": TENANT.to_string(),
+            "license_id": L1.to_string(),
+            "budget_tokens": 5000,
+            "period": "monthly",
+            "source": "license_sync",
+        }))
+    );
+
+    // The SAME value again: the reference's push is unconditional — the dirty-check makes the
+    // UPDATE a no-op, not the POST — so a repeat PATCH pushes again.
+    let (status, same) = send(
+        route_with_billing(&db, operator(Some("owner-a")), &base),
+        Method::PATCH,
+        &format!("/licenses/{L1}/budget"),
+        Some(json!({"token_budget_override": 5000})),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK, "{same}");
+    let calls = wait_for_billing(&stub, |calls| {
+        calls.iter().filter(|call| call.path == "/api/budget").count() == 2
+    })
+    .await;
+    let pushes: Vec<&BillingCall> = calls
+        .iter()
+        .filter(|call| call.path == "/api/budget")
+        .collect();
+    assert_eq!(pushes[1].body, pushes[0].body);
+}
+
+#[tokio::test]
+async fn a_cleared_override_with_no_plan_budget_tears_the_cap_down() {
+    let db = seeded().await;
+    // L1's plan carries NO token budget, so clearing the override leaves the licence unlimited.
+    sqlx::query("UPDATE plan SET token_budget_monthly = NULL WHERE id = $1")
+        .bind(PLAN)
+        .execute(&db.pool)
+        .await
+        .expect("clear the plan budget");
+    let stub = BillingStub::new();
+    // Only the active `license_sync` row for L1 is the teardown's business.
+    stub.set_rows(vec![
+        json!({"id": "budget-l1", "source": "license_sync", "active": true, "license_id": L1.to_string()}),
+        json!({"id": "budget-manual", "source": "manual", "active": true, "license_id": L1.to_string()}),
+    ]);
+    let base = start_billing_stub(stub.clone()).await;
+
+    // Effective `None` is the reference's teardown leg.
+    let (status, body) = send(
+        route_with_billing(&db, operator(Some("owner-a")), &base),
+        Method::PATCH,
+        &format!("/licenses/{L1}/budget"),
+        Some(json!({"token_budget_override": null})),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK, "{body}");
+    assert!(body["token_budget_override"].is_null());
+
+    let calls = wait_for_billing(&stub, |calls| {
+        calls.iter().any(|call| call.method == "DELETE")
+    })
+    .await;
+    let list = calls
+        .iter()
+        .find(|call| call.method == "GET")
+        .expect("the budget list read");
+    assert_eq!(list.path, format!("/api/budget/list/{TENANT}"));
+    assert_eq!(list.tenant, Some(TENANT.to_string()));
+    let delete = calls
+        .iter()
+        .find(|call| call.method == "DELETE")
+        .expect("the teardown");
+    assert_eq!(delete.path, "/api/budget/budget-l1");
+    assert_eq!(delete.tenant, Some(TENANT.to_string()));
+    assert!(
+        calls.iter().all(|call| call.path != "/api/budget"),
+        "an unlimited licence owes no push: {calls:?}"
+    );
+
+    // The NEGATIVE effective value shares that leg: a route body cannot carry one (422), so a
+    // negative PLAN value is the only way this route sees it — it must be torn down, never
+    // pushed as a negative cap.
+    sqlx::query("UPDATE plan SET token_budget_monthly = -5 WHERE id = $1")
+        .bind(PLAN)
+        .execute(&db.pool)
+        .await
+        .expect("a negative plan budget");
+    let (status, body) = send(
+        route_with_billing(&db, operator(Some("owner-a")), &base),
+        Method::PATCH,
+        &format!("/licenses/{L1}/budget"),
+        Some(json!({"token_budget_override": null})),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK, "{body}");
+    let calls = wait_for_billing(&stub, |calls| {
+        calls
+            .iter()
+            .filter(|call| call.method == "DELETE")
+            .count()
+            == 2
+    })
+    .await;
+    assert_eq!(
+        calls
+            .iter()
+            .filter(|call| call.path == "/api/budget")
+            .count(),
+        0,
+        "a negative budget must never be pushed: {calls:?}"
+    );
+}
+
+#[tokio::test]
+async fn a_billing_failure_leaves_the_response_unchanged_and_clears_the_verified_stamp() {
+    let db = seeded().await;
+    sqlx::query("UPDATE license SET metering_verified_at = '2026-05-01T00:00:00Z' WHERE id = $1")
+        .bind(L1)
+        .execute(&db.pool)
+        .await
+        .expect("seed the verified stamp");
+    let stub = BillingStub::new();
+    stub.set_budget_status(500);
+    let base = start_billing_stub(stub.clone()).await;
+
+    let (status, body) = send(
+        route_with_billing(&db, operator(Some("owner-a")), &base),
+        Method::PATCH,
+        &format!("/licenses/{L1}/budget"),
+        Some(json!({"token_budget_override": 6000, "reason": "raise"})),
+    )
+    .await;
+    // The failure contract: the edit succeeded and the response is untouched — the push runs
+    // after the response and can never fail it.
+    assert_eq!(status, StatusCode::OK, "{body}");
+    assert_eq!(body["token_budget_override"], 6000);
+    assert_eq!(body["metering_verified_at"], "2026-05-01T00:00:00+00:00");
+
+    // A 5xx is retried exactly once, like every other billing push in this service.
+    let calls = wait_for_billing(&stub, |calls| calls.len() >= 2).await;
+    assert_eq!(
+        calls
+            .iter()
+            .filter(|call| call.path == "/api/budget")
+            .count(),
+        2,
+        "{calls:?}"
+    );
+
+    // The reconcile sweep's repair signal.
+    assert!(
+        wait_for_verified_cleared(&db, L1).await,
+        "a failed push must clear metering_verified_at"
+    );
+    let stored: Option<i32> =
+        sqlx::query_scalar("SELECT token_budget_override FROM license WHERE id = $1")
+            .bind(L1)
+            .fetch_one(&db.pool)
+            .await
+            .expect("read back");
+    assert_eq!(
+        stored,
+        Some(6000),
+        "the edit itself is committed and must not be rolled back by the push"
+    );
 }

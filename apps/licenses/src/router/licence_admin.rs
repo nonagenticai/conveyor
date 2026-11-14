@@ -47,7 +47,10 @@ use serde_json::{Value, json};
 use utoipa::ToSchema;
 
 use crate::auth::{User, get_tenant_id, require_any_realm_role};
-use crate::billing::metering::MeteringProvisioner;
+use crate::billing::metering::{
+    BILLING_SENTINEL_TENANT_IDS, METERING_FAILURE_MARKER, METERING_RECONCILE_PATH,
+    MeteringProvisioner, effective_metering_values,
+};
 use crate::commands::reconcile_metering::{MeteringReconcileResult, run_metering_reconcile};
 use crate::db::internal_reads::effective_status;
 use crate::db::issuance;
@@ -482,8 +485,10 @@ pub async fn list_admin_licenses(
 ///
 /// `token_budget_override=null` clears the override and returns the licence to the plan's
 /// budget. `reason` is optional and lands on the audit line. The column is written and
-/// committed before the response; the reference's post-response billing push is not part
-/// of this slice.
+/// committed before the response; the effective budget is then pushed to billing AFTER the
+/// response (`push_effective_token_budgets`), so billing/Redis enforce the new cap
+/// immediately. A billing failure never changes this response — the licence is left
+/// repairable by the reconcile sweep.
 #[utoipa::path(
     patch,
     path = "/licenses/{license_id}/budget",
@@ -586,7 +591,189 @@ pub async fn set_license_budget(
         "license_budget_override_changed"
     );
 
+    // The reference's BackgroundTasks call: after the write has committed, after the response
+    // (spawned, never awaited), and never able to change the response.
+    spawn_effective_budget_push(
+        &state,
+        updated.id,
+        previous,
+        token_budget_override,
+        update.reason.clone(),
+    );
+
     Ok(Json(response(updated, Utc::now())))
+}
+
+/// Python's `str()` for the reference's `int | None` values inside the push reason.
+fn py_budget(value: Option<i32>) -> String {
+    value.map_or_else(|| "None".to_owned(), |value| value.to_string())
+}
+
+/// The reference's exact `push_effective_token_budgets` reason string:
+/// `license <id> token_budget_override <previous> -> <new>[ (<reason>)]`.
+fn budget_push_reason(
+    license_id: uuid::Uuid,
+    previous: Option<i32>,
+    new: Option<i32>,
+    reason: Option<&str>,
+) -> String {
+    let mut text = format!(
+        "license {license_id} token_budget_override {} -> {}",
+        py_budget(previous),
+        py_budget(new)
+    );
+    if let Some(note) = reason.filter(|note| !note.is_empty()) {
+        text.push_str(&format!(" ({note})"));
+    }
+    text
+}
+
+/// Schedule the reference's post-response `push_effective_token_budgets` for ONE licence.
+///
+/// SPAWNED, never awaited — the reference runs it in `BackgroundTasks`, after the response, so
+/// a billing outage can neither delay nor fail the edit. With billing unconfigured the push is
+/// skipped (the reconcile sweep is the backstop), exactly as the create path treats an absent
+/// `METERING_SERVICE_URL`.
+fn spawn_effective_budget_push(
+    state: &AppState,
+    license_id: uuid::Uuid,
+    previous: Option<i32>,
+    new: Option<i32>,
+    reason: Option<String>,
+) {
+    let Some(metering) = state.metering.clone() else {
+        tracing::warn!(
+            license = %license_id,
+            repair = METERING_RECONCILE_PATH,
+            "METERING_SERVICE_URL unset or unusable: the token budget change is not pushed to \
+             billing; the reconcile sweep remains the repair path"
+        );
+        return;
+    };
+    let Some(pool) = state.pool.clone() else {
+        return;
+    };
+    let billing = state.billing.clone();
+    let reason = budget_push_reason(license_id, previous, new, reason.as_deref());
+    tokio::spawn(async move {
+        push_effective_budget(pool, metering, billing, license_id, reason).await;
+    });
+}
+
+/// `push_effective_token_budgets(license_ids=[id], reason=...)`, one licence.
+///
+/// The reference's legs, in its order: the LIVE selection, the money-tenant skip, billing's
+/// sentinel skip, then `effective_metering_values` — a value `>= 0` pushes `POST /api/budget`,
+/// `None`/negative tears the stale cap down. A failure is never propagated: it logs
+/// [`METERING_FAILURE_MARKER`] and clears `metering_verified_at` so the reconcile sweep
+/// selects and repairs the licence.
+async fn push_effective_budget(
+    pool: sqlx::PgPool,
+    metering: Arc<MeteringProvisioner>,
+    billing: Option<Arc<crate::billing::BillingTeardown>>,
+    license_id: uuid::Uuid,
+    reason: String,
+) {
+    let row = match licence_admin::live_budget_for_push(&pool, license_id).await {
+        Ok(Some(row)) => row,
+        // Not live (revoked / archived / expired): the reference's selection never pushes it.
+        Ok(None) => return,
+        Err(error) => {
+            tracing::error!(
+                marker = METERING_FAILURE_MARKER,
+                license = %license_id,
+                %error,
+                repair = METERING_RECONCILE_PATH,
+                "token budget re-push could not select the licence — nothing pushed"
+            );
+            return;
+        }
+    };
+    let tenant = row.tenant_id;
+    let (budget, _quota) = effective_metering_values(
+        row.token_budget_override,
+        None,
+        row.plan_token_budget_monthly,
+        None,
+    );
+
+    if let Some(currency) = row.budget_currency.as_deref() {
+        tracing::info!(
+            license = %license_id,
+            tenant = %tenant,
+            budget_currency = currency,
+            reason = %reason,
+            "token budget re-push skipped_money_tenant: a money tenant owes no token budget"
+        );
+        return;
+    }
+    let tenant_key = tenant.to_string();
+    if BILLING_SENTINEL_TENANT_IDS.contains(&tenant_key.as_str()) {
+        tracing::info!(
+            license = %license_id,
+            tenant = %tenant,
+            reason = %reason,
+            "token budget re-push skipped_sentinel: billing refuses budgets for this tenant"
+        );
+        return;
+    }
+
+    let applied = match budget.filter(|value| *value >= 0) {
+        Some(budget_tokens) => {
+            let authorization = metering.authorization().await;
+            metering
+                .push_token_budget(
+                    license_id,
+                    tenant,
+                    i64::from(budget_tokens),
+                    authorization.as_deref(),
+                )
+                .await
+        }
+        // `None` (unlimited) and a negative value both owe a TEARDOWN: a cap left active in
+        // billing would keep enforcing a limit the licence no longer has.
+        None => match billing.as_ref() {
+            Some(billing) => {
+                billing
+                    .teardown_budget(&tenant_key, &license_id.to_string())
+                    .await
+            }
+            // The binary builds both clients from the same variable, so production cannot
+            // reach this; fail closed so the sweep repairs any test-only skew.
+            None => false,
+        },
+    };
+
+    if applied {
+        tracing::info!(
+            license = %license_id,
+            tenant = %tenant,
+            effective_token_budget = ?budget,
+            reason = %reason,
+            "token budget re-push applied in billing"
+        );
+        return;
+    }
+
+    tracing::error!(
+        marker = METERING_FAILURE_MARKER,
+        license = %license_id,
+        tenant = %tenant,
+        effective_token_budget = ?budget,
+        reason = %reason,
+        repair = METERING_RECONCILE_PATH,
+        "token budget change NOT applied in billing; clearing metering_verified_at so the \
+         reconcile sweep repairs it"
+    );
+    if let Err(error) = licence_admin::clear_metering_verified(&pool, license_id).await {
+        tracing::error!(
+            marker = METERING_FAILURE_MARKER,
+            license = %license_id,
+            %error,
+            repair = METERING_RECONCILE_PATH,
+            "could not clear metering_verified_at after a failed token budget push"
+        );
+    }
 }
 
 /// FastAPI's 422 entry for one query parameter.
