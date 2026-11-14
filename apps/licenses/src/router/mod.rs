@@ -10,6 +10,7 @@
 //! protected by default" true.
 
 pub mod catalogue_apps;
+pub mod catalogue_offerings;
 pub mod catalogue_plans;
 pub mod health;
 pub mod internal_bundles;
@@ -71,6 +72,10 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/licenses/{license_id}/tokens"),
     ("POST", "/licenses/{license_id}/operator-token"),
     ("POST", "/licenses/{license_id}/regenerate-token"),
+    ("DELETE", "/offerings/{app_key}/{code}"),
+    ("GET", "/offerings"),
+    ("GET", "/offerings/{app_key}/{code}"),
+    ("POST", "/offerings"),
     ("DELETE", "/plans/{plan_id}"),
     ("GET", "/plans"),
     ("GET", "/plans/{plan_id}"),
@@ -103,6 +108,10 @@ pub const ROUTES: &[(&str, &str)] = &[
         catalogue_apps::list_app_licenses,
         catalogue_apps::list_app_plans,
         catalogue_apps::list_apps,
+        catalogue_offerings::create_offering,
+        catalogue_offerings::delete_offering,
+        catalogue_offerings::get_offering,
+        catalogue_offerings::list_offerings,
         catalogue_plans::create_plan,
         catalogue_plans::create_region,
         catalogue_plans::delete_plan,
@@ -153,6 +162,10 @@ pub const ROUTES: &[(&str, &str)] = &[
         catalogue_apps::AppCreate,
         catalogue_apps::AppResponse,
         catalogue_apps::PlanResponse,
+        catalogue_offerings::OfferingCreate,
+        catalogue_offerings::OfferingDeleteResponse,
+        catalogue_offerings::OfferingListResponse,
+        catalogue_offerings::OfferingResponse,
         catalogue_plans::PlanCreate,
         catalogue_plans::PlanUpdate,
         catalogue_plans::RegionCreate,
@@ -230,6 +243,14 @@ pub fn router(state: AppState) -> Router {
             get(catalogue_apps::list_app_licenses),
         )
         .route("/apps/{app_id}/plans", get(catalogue_apps::list_app_plans))
+        .route(
+            "/offerings",
+            get(catalogue_offerings::list_offerings).post(catalogue_offerings::create_offering),
+        )
+        .route(
+            "/offerings/{app_key}/{code}",
+            get(catalogue_offerings::get_offering).delete(catalogue_offerings::delete_offering),
+        )
         .route(
             "/plans",
             get(catalogue_plans::list_plans).post(catalogue_plans::create_plan),
