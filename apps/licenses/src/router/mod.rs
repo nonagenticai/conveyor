@@ -45,6 +45,8 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/licenses/active"),
     ("GET", "/licenses/admin/all"),
     ("GET", "/licenses/user/{subject_id}"),
+    ("POST", "/licenses/user/{subject_id}"),
+    ("DELETE", "/licenses/user/{subject_id}"),
     ("PATCH", "/licenses/{license_id}/budget"),
     ("POST", "/license/introspect"),
     ("POST", "/license/revoke"),
@@ -69,6 +71,8 @@ pub const ROUTES: &[(&str, &str)] = &[
         licenses::active,
         tokens::introspect,
         tokens::revoke,
+        user_licenses::create_user_license,
+        user_licenses::delete_user_licenses,
         user_licenses::list_user_licenses
     ),
     components(schemas(
@@ -90,6 +94,8 @@ pub const ROUTES: &[(&str, &str)] = &[
         tokens::TokenRevokeRequest,
         tokens::TokenRevokeResponse,
         user_licenses::AppInfo,
+        user_licenses::DeleteLicensesResponse,
+        user_licenses::LicenseCreate,
         user_licenses::LicenseResponse,
         user_licenses::PlanInfo
     )),
@@ -145,7 +151,9 @@ pub fn router(state: AppState) -> Router {
         .route("/licenses/active", get(licenses::active))
         .route(
             "/licenses/user/{subject_id}",
-            get(user_licenses::list_user_licenses),
+            get(user_licenses::list_user_licenses)
+                .post(user_licenses::create_user_license)
+                .delete(user_licenses::delete_user_licenses),
         )
         .route(
             "/licenses/{license_id}/budget",
@@ -182,5 +190,6 @@ pub fn test_state() -> AppState {
         }),
         verifier: Arc::new(JwtVerifier::new(Vec::new(), Arc::new(UnavailableJwks))),
         billing: None,
+        metering: None,
     }
 }

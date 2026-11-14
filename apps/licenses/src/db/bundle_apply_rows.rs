@@ -127,6 +127,23 @@ pub async fn create_or_get_subject(
     keycloak_sub: &str,
     keycloak_realm: &str,
 ) -> Result<Uuid, CreateSubjectError> {
+    create_or_get_subject_for_mint(pool, keycloak_sub, keycloak_realm, false).await
+}
+
+/// [`create_or_get_subject`] with the `self_tenant_mint` statement exposed.
+///
+/// ⛔ Only `POST /licenses/user/{subject_id}` sets it, derived from `subject_id == tenant_id`
+/// (compared case-folded, from THIS call and nothing else). The reference's guard refuses a
+/// `keycloak_sub` that is already a `tenants.id` — except on that documented portal-bff path,
+/// where the tenant the licence is minted for IS the subject id and the mint guard has already
+/// established it is a registered tenant. Refusing it would turn a billing-hygiene guard into an
+/// outage on a live path. Every other caller keeps the strict behaviour (`self_tenant_mint=false`).
+pub async fn create_or_get_subject_for_mint(
+    pool: &PgPool,
+    keycloak_sub: &str,
+    keycloak_realm: &str,
+    self_tenant_mint: bool,
+) -> Result<Uuid, CreateSubjectError> {
     let problem = subject_identifier_problem(keycloak_sub);
     let case_only = problem.is_some() && uuid_shaped_case(keycloak_sub).is_some();
     if let Some(problem) = problem
@@ -179,18 +196,25 @@ pub async fn create_or_get_subject(
         // that has ever traded (a licence under it, ANY status) is spared; one that never has is
         // refused. An exempted collision is still a violation being born, so it is logged ERROR.
         let tenant_id = Uuid::parse_str(keycloak_sub).ok();
-        let exempt = match tenant_id {
-            Some(tenant_id) => tenant_has_licences(pool, tenant_id).await?,
-            None => false,
-        };
+        let exempt = self_tenant_mint
+            || match tenant_id {
+                Some(tenant_id) => tenant_has_licences(pool, tenant_id).await?,
+                None => false,
+            };
         if exempt {
             tracing::error!(
                 keycloak_sub,
                 keycloak_realm,
                 tenant_name,
+                exemption = if self_tenant_mint {
+                    "self_tenant_mint"
+                } else {
+                    "tenant_has_licences"
+                },
                 "create_or_get_subject: ADMITTING a subject whose id is ALREADY a tenant — \
-                 the tenant is pre-existing and already trading, so refusing would break a live \
-                 mint path; this IS the tenant/subject violation, reported not prevented"
+                 the identity is pre-existing (or this is the documented self-tenant mint), so \
+                 refusing would break a live mint path; this IS the tenant/subject violation, \
+                 reported not prevented"
             );
         } else {
             tracing::error!(
