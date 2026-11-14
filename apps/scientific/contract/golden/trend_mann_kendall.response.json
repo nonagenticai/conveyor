@@ -1,0 +1,8 @@
+{
+  "computation_time_ms": 0.6,
+  "intercept": null,
+  "p_value": 0.004434,
+  "slope": 1.0,
+  "statistic": 0.857143,
+  "trend": "increasing"
+}

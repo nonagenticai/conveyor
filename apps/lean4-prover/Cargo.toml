@@ -1,0 +1,36 @@
+[package]
+name = "conveyor-lean4-prover"
+description = "Lean 4 formal verification as a REST API: the captured prover contract, licence-gated admission and the Lean runner."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "conveyor_lean4_prover"
+path = "src/lib.rs"
+
+[[bin]]
+name = "conveyor-lean4-prover"
+path = "src/main.rs"
+
+[dependencies]
+axum = { workspace = true }
+clap = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tower-http = { workspace = true, features = ["cors"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.191"
+
+[dev-dependencies]
+http-body-util = "0.1.5"
+tempfile = "3.27.0"
+tower = { workspace = true }
