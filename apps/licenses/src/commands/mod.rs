@@ -7,6 +7,7 @@
 
 pub mod expire_stale;
 pub mod reap_expired;
+pub mod reconcile_metering;
 pub mod revoke_expired_tokens;
 
 /// A command's verdict: the process exit code and the one object printed to stdout.
