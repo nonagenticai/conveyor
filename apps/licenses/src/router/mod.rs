@@ -10,6 +10,7 @@
 //! protected by default" true.
 
 pub mod health;
+pub mod internal_bundles;
 pub mod internal_seat;
 pub mod licenses;
 pub mod observability;
@@ -32,6 +33,7 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/health/live"),
     ("GET", "/health/ready"),
     ("GET", "/internal/tenants/{tenant_id}/seat-count"),
+    ("POST", "/internal/tenants/{tenant_id}/bundle-token"),
     ("GET", "/licenses/active"),
     ("GET", "/licenses/user/{subject_id}"),
     ("POST", "/license/introspect"),
@@ -44,6 +46,7 @@ pub const ROUTES: &[(&str, &str)] = &[
         health::health,
         health::liveness,
         health::readiness,
+        internal_bundles::internal_mint_tenant_bundle_token,
         internal_seat::internal_tenant_seat_count,
         licenses::active,
         tokens::introspect,
@@ -55,6 +58,7 @@ pub const ROUTES: &[(&str, &str)] = &[
         health::HealthResponse,
         health::LivenessResponse,
         health::ReadinessResponse,
+        internal_bundles::BundleTokenResponse,
         internal_seat::InternalSeatCountResponse,
         schemas::HTTPValidationError,
         schemas::ValidationError,
@@ -88,6 +92,10 @@ pub fn router(state: AppState) -> Router {
         .route(
             "/internal/tenants/{tenant_id}/seat-count",
             get(internal_seat::internal_tenant_seat_count),
+        )
+        .route(
+            "/internal/tenants/{tenant_id}/bundle-token",
+            post(internal_bundles::internal_mint_tenant_bundle_token),
         )
         .route("/licenses/active", get(licenses::active))
         .route(

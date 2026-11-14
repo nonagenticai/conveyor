@@ -256,6 +256,25 @@ fn visit(
     Ok(())
 }
 
+/// `services/app_requires.py::closure` for a route outside this module: every app reachable from
+/// `roots` (excluding the roots), or the cycle's path. A thin wrapper over the private [`closure`]
+/// so its behaviour cannot drift; `edges` is the `(app, required, caller)` list
+/// [`app_requirements`](crate::db::bundles::app_requirements) returns.
+pub fn app_requires_deps(
+    roots: &[String],
+    edges: &[(String, String, String)],
+) -> Result<Vec<String>, Vec<String>> {
+    let edges: Vec<Edge> = edges
+        .iter()
+        .map(|(app, required, caller)| Edge {
+            app: app.clone(),
+            required: required.clone(),
+            caller: caller.clone(),
+        })
+        .collect();
+    closure(roots, &edges).map(|reached| reached.deps)
+}
+
 /// `_licences_requiring_app`: the tenant's active non-dependency licences whose `app_requires`
 /// closure reaches `app_id`, ordered as the roots are (`created_at, id`). A root on a cycle counts
 /// as requiring it.
