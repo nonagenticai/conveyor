@@ -122,7 +122,7 @@
 </tr>
 <tr>
 <td>P1.2 synthetic fixtures, no private refs</td>
-<td><code>bash scripts/ci/no-private-refs.sh</code> → <code>OK: no private infrastructure references in 1499 tracked files (6 allowlisted)</code>, exit 0 (scan before this file was staged). The fixtures are <code>contract/stubs/synthetic-corpus.jsonl</code>; case ids in a shadow report are hashes of <code>method path body</code></td>
+<td><code>bash scripts/ci/no-private-refs.sh</code> → exit 0, <code>OK: no private infrastructure references in &lt;N&gt; tracked files (6 allowlisted)</code> (the script prints the live count; the 2026-11-14 run reported 1525 while this file was being added — the count rises with every tracked file, so it is not pinned). The fixtures are <code>contract/stubs/synthetic-corpus.jsonl</code> and <code>contract/golden/</code> (all-zero UUIDs, <code>golden-unknown-app</code>, <code>golden-synthetic-unknown-token</code>); case ids in a shadow report are hashes of <code>method path body</code></td>
 <td>this head</td>
 </tr>
 <tr>
