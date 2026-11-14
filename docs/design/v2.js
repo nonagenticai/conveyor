@@ -2138,6 +2138,10 @@ window.installV2 = function (api, enterprise) {
         tone: row.status === "active" ? "green" : "amber",
         note: row.status || "live programme row",
       }));
+      // The enterprise pages share `db`; they select a programme by id and must see the
+      // live rows (T0 publish surfaced the blank default route: the fixture id "civic"
+      // matched no live project and `project()` was undefined).
+      db.programmes = F.programmes.map((row) => ({ ...row, horizon: "—" }));
       count.programmes = programmes.length;
       v.programme = F.programmes[0].id;
     }
