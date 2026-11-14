@@ -96,8 +96,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "7abd00428ef00a0c2bf16113988c0c3bd0324b0c5366619156a037969cdb3d8b",
-      "bytes": 9642,
+      "sha256": "e250dc0be07992cc666ba12248e1764d6336b5cbd955a5a65e1db5a91402461c",
+      "bytes": 10228,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -303,8 +303,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "034cc1338e531cca27e85b4470f8e7175804a2bffcdaf29795d1425736c35e8f",
-      "bytes": 248622,
+      "sha256": "8a62a18c5f0adb70847481a66387f5fbc846c3f88a1db007d0f2227afffd3d68",
+      "bytes": 248838,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -378,6 +378,15 @@
       "sha256": "7b6c06b72ef3cb4554451e42827a05e6813f58c46c347d0c092f23ee2b6ff917",
       "bytes": 19851,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
+    },
+    {
+      "title": "Rust development process: audit and improvement plan",
+      "path": "docs/plans/development-process-speed.html",
+      "source": "docs/plans/development-process-speed.md",
+      "section": "Plans",
+      "sha256": "0fd6fbcd6407105487ab6c6eb5db8815323059273cf15cdc63ac225219b30fb3",
+      "bytes": 17028,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/development-process-speed.md"
     },
     {
       "title": "S12 handoff — Connectors and the interaction inbox (S06d)",

@@ -848,3 +848,29 @@ fn no_prompt_action_holds_processes_write() {
         );
     }
 }
+
+/// The coverage gate reads `docs/design/data/actions.json`, never a source grep: a spec built
+/// through a helper (`chat_spec("completions.create")`) is invisible to a regex. This test is
+/// the binding between the committed file and the compiled registry — regenerate with
+/// `conveyor admin actions dump --json --out docs/design/data/actions.json`.
+#[test]
+fn committed_action_dump_matches_the_registry() {
+    let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../docs/design/data/actions.json");
+    let raw = std::fs::read_to_string(&path)
+        .unwrap_or_else(|error| panic!("read {}: {error}", path.display()));
+    let document: Value = serde_json::from_str(&raw).expect("actions.json is a JSON document");
+    let committed: Vec<String> = document["actions"]
+        .as_array()
+        .expect("actions.json has an `actions` array")
+        .iter()
+        .map(|value| value.as_str().expect("every action is a string").to_owned())
+        .collect();
+    let mut expected: Vec<String> = registry().names().into_iter().map(str::to_owned).collect();
+    expected.sort_unstable();
+    assert_eq!(
+        committed, expected,
+        "docs/design/data/actions.json is stale; run \
+         `conveyor admin actions dump --json --out docs/design/data/actions.json`"
+    );
+}

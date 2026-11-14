@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Rust development process: audit and improvement plan · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/development-process-speed.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="rust-development-process-audit-and-improvement-plan">Rust development process: audit and improvement plan</h1>
+<p>Audit date: 2026-11-10. Conveyor checkout: <code>0ace3ee</code>, branch <code>lane/train-2026-11-09</code>. This is a proposal; no hooks, workflows, repository settings, or cluster resources were changed during the audit.</p>
+<h2 id="findings-supported-by-this-repository-and-github">Findings supported by this repository and GitHub</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Observed state</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local hooks</td>
+<td>Installed <code>.git/hooks/pre-commit</code> and <code>pre-push</code> come from <code>gitops-production/scripts/hooks</code>. They dispatch Python/Node checks, with no Rust commands. The latest local logs show a secret scan followed by the unsupported-project skip.</td>
+<td>Full Rust compilation in these hooks does not explain current local commit latency. Measure a slow commit before removing checks.</td>
+</tr>
+<tr>
+<td>Workspace</td>
+<td>Ten members; Rust 1.99.0 is pinned in the toolchain file, manifest, Dockerfile, and caller workflow.</td>
+<td>Splitting a monolithic crate into a workspace is already done.</td>
+</tr>
+<tr>
+<td>Debug configuration</td>
+<td>Root <code>[profile.dev]</code> uses <code>debug = 1</code>; shared CI uses <code>CARGO_PROFILE_DEV_DEBUG=line-tables-only</code>; the custom test command changes it to <code>0</code>.</td>
+<td>Debug reduction already exists. Clippy and tests have different effective profile settings. The root comment calls <code>debug = 1</code> line tables only, but those are distinct Cargo settings.</td>
+</tr>
+<tr>
+<td>CI structure</td>
+<td><code>.github/workflows/ci.yml</code> calls shared <code>rust-service.yml@main</code>, which calls <code>rust-library.yml@main</code>. Docker build and Rust checks run alongside each other. Formatting, Clippy, tests, and audit are sequential inside the heavy check job.</td>
+<td>Important changes belong in <code>gitops-production</code>, not only this repository.</td>
+</tr>
+<tr>
+<td>Incremental compilation</td>
+<td>Shared CI already sets <code>CARGO_INCREMENTAL=0</code>.</td>
+<td>No new optimization to apply here. Keep local incremental compilation available.</td>
+</tr>
+<tr>
+<td>Actions cache</td>
+<td>The cache API returned no saved caches. Shared CI restores Cargo caches, but saves only on non-PR runs after successful preceding steps and a disk-headroom check.</td>
+<td>Cache configuration does not establish that usable cache entries exist.</td>
+</tr>
+<tr>
+<td>Compiler cache</td>
+<td>Repository secret names for MinIO-backed sccache exist, added November 9. Recent jobs successfully executed the sccache installation step.</td>
+<td>This optimization is already being rolled out. Cache hits, misses, errors, and end-to-end benefit remain unverified.</td>
+</tr>
+<tr>
+<td>Heavy runners</td>
+<td>GitOps <code>runner-large-helmrelease.yaml</code> configures <code>maxRunners: 2</code>, a runner CPU limit of 4, memory limit of 16 GiB, and work volume limit of 20 GiB. Current shared Rust CI defaults Cargo build jobs to 8.</td>
+<td>More jobs or higher compiler concurrency may increase contention. Validate deployed settings and CPU throttling before tuning.</td>
+</tr>
+<tr>
+<td>Integration targets</td>
+<td>Store has 40 top-level integration files, actions 51, API 51, server 22: 164 separate executables across those four packages.</td>
+<td>Repeated compilation/linking and fixture startup deserve measurement before further splitting production crates.</td>
+</tr>
+<tr>
+<td>Database fixtures</td>
+<td>Server/store and actions harnesses use a process-local <code>OnceCell</code> for Postgres and a process-local mutex for database setup. Each test gets a fresh database and migrations. <code>TEST_DATABASE_URL</code> can select an externally started test server.</td>
+<td>A shared CI server is feasible, but setup must become safe across processes.</td>
+</tr>
+<tr>
+<td>Git process</td>
+<td>PRs target both the integration train and other lane branches; PR #5 targets main. Every PR triggers the same full reusable service workflow.</td>
+<td>Stacked work can repeatedly validate overlapping code and compete for the same runner pool.</td>
+</tr>
+</tbody>
+</table>
+<p>The shared GitOps main SHA observed near the end of inspection was <code>322bbdcf334131517662756ce431395407c93f76</code>. Older runs examined here referenced <code>7609bb5509a411d9c60d8200a976b97925d89ba4</code>. Configuration is changing during this incident, so compare resolved workflow revisions when evaluating improvements.</p>
+<h3 id="measured-delays">Measured delays</h3>
+<p><a href="https://github.com/nonagenticai/conveyor/actions/runs/42680838271">Run 42680838271</a> took approximately 102.2 minutes from creation to completion:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th style="text-align: right;">Observed duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Run creation to heavy Rust job start</td>
+<td style="text-align: right;">75.1 minutes</td>
+</tr>
+<tr>
+<td>Heavy Rust job</td>
+<td style="text-align: right;">27.1 minutes</td>
+</tr>
+<tr>
+<td>Clippy step</td>
+<td style="text-align: right;">4.8 minutes</td>
+</tr>
+<tr>
+<td>Entire test step</td>
+<td style="text-align: right;">18.9 minutes</td>
+</tr>
+<tr>
+<td>Test step start to first tests executing</td>
+<td style="text-align: right;">About 9.8 minutes</td>
+</tr>
+<tr>
+<td>First tests executing to test failure</td>
+<td style="text-align: right;">About 9.1 minutes</td>
+</tr>
+<tr>
+<td>Docker job, running separately</td>
+<td style="text-align: right;">8.3 minutes</td>
+</tr>
+</tbody>
+</table>
+<p>The test log contains 88 completed binary summaries whose reported runtimes sum to about 544 seconds before the renderer golden test fails. This is a partial failed run, not a measurement of the complete passing suite. The first 9.8 minutes include build preparation, compilation, and linking; Cargo timings are needed to separate those costs.</p>
+<p><a href="https://github.com/nonagenticai/conveyor/actions/runs/42767949297">Run 42767949297</a> started its Rust job promptly but that job was cancelled after about 95 minutes. Its log was unavailable, so its stall cannot be attributed confidently to compilation, tests, sccache, or resource pressure. A nested secret-scan job also failed during setup. Raising timeouts alone does not resolve either condition.</p>
+<p>The 40-run snapshot contained 25 cancelled runs, 13 failures, one queued run, and one running run, with no successes. Cancellations include superseded revisions; this is evidence of churn, not a claim that 25 runs failed correctness checks.</p>
+<h3 id="limits-of-the-audit">Limits of the audit</h3>
+<p>Cluster API access timed out, including an escalated retry. Runner limits above are desired GitOps configuration, not verified live capacity. GitHub branch protection and ruleset endpoints returned HTTP 403 with a plan-upgrade message; required checks could not be verified. Repository metadata reports auto-merge disabled. The inspected PR list contained no merged PRs, so post-merge latency was reviewed from workflow structure rather than measured deployments.</p>
+<h2 id="review-of-geminis-advice">Review of Gemini's advice</h2>
+<ul>
+<li><strong>Fast hooks and CI-owned full checks:</strong> a useful general approach, but the installed hooks already do no Rust compilation. Add useful cheap Rust feedback rather than removing nonexistent Rust gates.</li>
+<li><strong>Changed crates:</strong> useful for local feedback, but <code>cargo check -p X</code> checks X and its dependencies, not downstream consumers. Full CI coverage must remain until dependency-aware selection is demonstrated safe.</li>
+<li><strong>Documentation filtering:</strong> useful. Rust UI changes are code changes; configuration, SQL, fixtures, embedded files, and build scripts can also affect compilation or behavior. Use a narrow documentation-only classification and treat unknown paths as requiring full validation.</li>
+<li><strong>Swatinem/rust-cache:</strong> a reasonable implementation, not a solution by itself. Existing cache policy, branch scope, failure paths, and disk limits explain why replacing the cache action alone may accomplish little. Its default policy also removes workspace and incremental artifacts.</li>
+<li><strong>Disable CI incremental and reduce debug info:</strong> already implemented. Prefer explicit Cargo profile settings over another global <code>RUSTFLAGS</code> change.</li>
+<li><strong>Parallel CI jobs:</strong> formatting should move to a light runner. Splitting every compiler command or adding a shard matrix immediately would put more pressure on the configured two-slot heavy pool.</li>
+<li><strong>Nextest:</strong> promising after fixture work. It runs each test in a separate process, so today's process-local server cache would become a container per test process. A shared server without cross-process coordination would expose concurrent role updates. Nextest also requires a separate doctest pass.</li>
+<li><strong>Faster linker:</strong> Linux <code>x86_64-unknown-linux-gnu</code> already defaults to LLD from Rust 1.90. Blanket claims that default linkers are single-threaded or that macOS should automatically switch to LLD are too broad. Measure linking first.</li>
+<li><strong>Parallel frontend and Cranelift:</strong> optional experiments requiring nightly support in the documented configurations. They add another toolchain and cache variant; they are not the first response to runner queues. A claimed fixed percentage improvement is not transferable to this workspace.</li>
+<li><strong>Dev LTO:</strong> there is no custom dev LTO setting here; Cargo's unoptimized dev defaults already avoid the proposed whole-program optimization problem.</li>
+</ul>
+<h2 id="proposed-implementation-sequence">Proposed implementation sequence</h2>
+<h3 id="1-establish-trustworthy-feedback-and-stop-unnecessary-heavy-runs">1. Establish trustworthy feedback and stop unnecessary heavy runs</h3>
+<p>Owner: shared CI changes in <code>gitops-production</code>; caller rules and developer commands in <code>conveyor</code>.</p>
+<ol type="1">
+<li>Record queue time separately from execution. Split test compilation (<code>cargo test --workspace --locked --no-run --timings</code>) from execution while preserving the exact test set and the nonzero-test guard. Upload Cargo timings, test logs, sccache statistics, and disk usage on failure where the runner lives long enough to upload them. Collect pod termination evidence outside the pod so eviction and runner-agent failures remain diagnosable.</li>
+<li>Extract formatting and cheap source checks into the light runner tier. Preserve the existing parallel Docker/check structure. Remove the duplicate nested secret scan through an explicit shared-workflow option that retains the outer scan; standalone Rust library consumers must keep their scan.</li>
+<li>Add an always-running change classifier and final gate. Documentation-only edits should run cheap checks and skip compilation/image creation. The final gate must verify the classifier and every applicable check; a failed dependency must fail it. Avoid skipping an entire required workflow with <code>paths-ignore</code>.</li>
+<li>Retain same-PR supersession cancellation. Introduce explicit readiness for expensive validation of lane PRs, such as ready-for-review or a validation label, while the train remains fully validated. Publish clear status explaining deferred validation. Adopt this only with agreement on how lanes enter the train; merging a lane must not bypass final combined validation.</li>
+<li>Add versioned local Rust commands: formatting, scoped checking, one integration target, and full verification. Keep commit checks to secrets and formatting; do not put Docker or full compilation in every commit/push. Formatting must handle partially staged files without silently staging unrelated edits.</li>
+</ol>
+<p>Validation: compare docs-only, Rust, SQL, fixture, UI, deleted-file, and unknown-path changes. Confirm that failures and cancelled dependencies fail the final gate. Confirm lane readiness transitions trigger the expected full run.</p>
+<h3 id="2-make-existing-caches-effective-and-resource-use-predictable">2. Make existing caches effective and resource use predictable</h3>
+<p>Owner: primarily <code>gitops-production</code>, with profile/caller changes in <code>conveyor</code>.</p>
+<ol type="1">
+<li>Verify MinIO sccache reads and writes using two runs of the same revision, then a small code edit. Report hit/miss counts, noncacheable reasons, and errors. Installation success is not the acceptance criterion. sccache does not cache final linker invocations or metadata-only checks, so it cannot eliminate all Clippy work or repeated integration-executable linking.</li>
+<li>Establish one effective CI debug configuration for Clippy and tests. Benchmark <code>debug=0</code> against line tables with disk headroom recorded. Preserve local debugging and incremental builds. The profile alignment reduces configuration variation but does not make Clippy and test compilation identical.</li>
+<li>Make Cargo registry/download caching usable before the first successful main deployment. Review controlled PR cache writes and cache ownership separately from compiled artifacts. Do not require a huge target archive to fit beside itself on the bounded work volume. Avoid cache writes from untrusted PR code into a cache trusted for releases.</li>
+<li>Measure Cargo jobs 4 versus 8 against actual CPU limits and throttling. Inspect host capacity before increasing runner slots. Keep a main/deployment capacity budget so lane traffic cannot monopolize all heavy runners.</li>
+<li>Pilot durable Docker caching. The current caller leaves registry build caching disabled; its Dockerfile copies all source before compiling and uses local BuildKit cache mounts. Ephemeral builders need an explicit persistence strategy. Registry layer caching and Cargo cache mounts are different mechanisms. Evaluate a dependency layer, such as a cargo-chef recipe, or persistent builders/sccache; prove reuse after an application-source edit on a fresh builder.</li>
+</ol>
+<p>Validation: cold run, repeated identical run, one Rust-file edit, and lockfile change. Compare queue, Clippy, compilation, execution, image build, peak disk, and cache transfer costs separately. Check the same cases on a failure path.</p>
+<h3 id="3-reduce-integration-test-build-and-database-setup-costs">3. Reduce integration-test build and database setup costs</h3>
+<p>Owner: <code>conveyor</code> harness/targets, followed by shared CI runner selection.</p>
+<ol type="1">
+<li>Benchmark consolidating related integration files into a few explicit suites per package. Preserve test discovery and names, avoid compiling modules both independently and inside a suite, and retain intentionally separate process tests. Compare test inventories and link counts before expanding the pilot.</li>
+<li>Start one disposable Postgres 18 per CI job and pass its superuser test URL through the existing <code>TEST_DATABASE_URL</code> mechanism. Preserve fresh databases, runtime/owner role separation, and RLS assertions. Bootstrap shared roles once or serialize cluster-wide setup with a database advisory lock held on the same connection. A Rust mutex alone is insufficient across processes.</li>
+<li>Pilot a migrated template database for ordinary tests if migration replay is material. Retain dedicated tests that run the real migration chain and role scripts from empty state. Keep template ownership and privileges equivalent to the existing fixture contract.</li>
+<li>Enable nextest with explicitly bounded concurrency after shared setup is safe. Preserve doctests, the nonzero-test guard, and cleanup on failure/cancellation. The current custom <code>test_command</code> bypasses the shared <code>test_runner</code> selection; expose the debug profile as an input and remove that override before expecting <code>test_runner: nextest</code> to take effect.</li>
+</ol>
+<p>Validation: compare complete test inventories; run tenancy, privilege, migration, and concurrency tests repeatedly under the selected parallelism. Measure Postgres container count and memory. Keep ignored live-service tests under their existing policy; do not silently remove gates to obtain a faster result.</p>
+<h3 id="4-simplify-the-merge-path-after-the-full-suite-is-reliable">4. Simplify the merge path after the full suite is reliable</h3>
+<p>Owner: repository process/settings plus shared deployment workflow.</p>
+<p>Use the train as the final integration gate while stacked lanes are active. Check the combined revision before merging, avoid repeated update/merge/recheck churn, and keep main deployment gated by successful validation. Confirm actual protection capabilities before relying on a merge queue; none was verified in this audit.</p>
+<p>Initially retain post-merge validation. Later consider promoting an already-built, validated immutable image only when its source tree, merge result, configuration, and provenance match the revision being shipped. A green PR head alone does not establish that the eventual merge result is covered.</p>
+<p>Version shared workflows deliberately so performance comparisons are repeatable. Pinning only the outer caller does not freeze nested <code>@main</code> calls; version the nested workflow/action references consistently.</p>
+<h2 id="acceptance-targets">Acceptance targets</h2>
+<p>These are proposed budgets, not predicted speedups:</p>
+<ul>
+<li>Commit hooks: warm p95 under 5 seconds; no full Rust build or Docker startup.</li>
+<li>Documentation-only PR: feedback within 2 minutes under normal runner availability.</li>
+<li>Heavy-runner queue: p95 under 2 minutes after traffic and capacity are balanced.</li>
+<li>Warm full Rust validation: initial target under 15 minutes; tighten from measured compile and execution costs after the harness pilot.</li>
+<li>Evidence: every full run reports phase durations and cache effectiveness; runner loss has an external termination record.</li>
+<li>Correctness: unchanged intended test coverage, doctests, tenant isolation, privilege checks, migration coverage, and deployment gating.</li>
+</ul>
+<h2 id="primary-references">Primary references</h2>
+<ul>
+<li><a href="https://doc.rust-lang.org/cargo/reference/profiles.html">Cargo profiles</a></li>
+<li><a href="https://doc.rust-lang.org/cargo/commands/cargo-test.html">Cargo test execution</a></li>
+<li><a href="https://github.com/Swatinem/rust-cache/blob/master/README.md">Rust cache behavior</a></li>
+<li><a href="https://github.com/mozilla/sccache/blob/main/docs/Rust.md">sccache Rust limitations</a></li>
+<li><a href="https://nexte.st/docs/running/">Nextest execution model</a></li>
+<li><a href="https://blog.rust-lang.org/2025/09/01/rust-lld-on-1.90.0-stable/">LLD default from Rust 1.90</a></li>
+<li><a href="https://blog.rust-lang.org/2023/11/09/parallel-rustc/">Parallel compiler frontend</a></li>
+<li><a href="https://github.com/rust-lang/rustc_codegen_cranelift">Cranelift setup and limitations</a></li>
+<li><a href="https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs">GitHub skipped workflow behavior</a></li>
+<li><a href="https://docs.docker.com/build/cache/optimize/">Docker cache persistence</a></li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/development-process-speed.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
