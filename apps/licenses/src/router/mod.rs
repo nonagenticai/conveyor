@@ -13,6 +13,7 @@ pub mod health;
 pub mod internal_bundles;
 pub mod internal_reads;
 pub mod internal_seat;
+pub mod licence_admin;
 pub mod licenses;
 pub mod observability;
 pub mod schemas;
@@ -22,7 +23,7 @@ pub mod user_licenses;
 use std::sync::Arc;
 
 use axum::Router;
-use axum::routing::{get, post};
+use axum::routing::{get, patch, post};
 
 use crate::auth::{JwtVerifier, UnavailableJwks};
 use crate::config::Config;
@@ -40,8 +41,11 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/internal/tenants"),
     ("GET", "/internal/tenants/{tenant_id}/seat-count"),
     ("POST", "/internal/tenants/{tenant_id}/bundle-token"),
+    ("GET", "/licenses"),
     ("GET", "/licenses/active"),
+    ("GET", "/licenses/admin/all"),
     ("GET", "/licenses/user/{subject_id}"),
+    ("PATCH", "/licenses/{license_id}/budget"),
     ("POST", "/license/introspect"),
     ("POST", "/license/revoke"),
 ];
@@ -59,6 +63,9 @@ pub const ROUTES: &[(&str, &str)] = &[
         internal_reads::internal_list_licenses,
         internal_reads::internal_list_tenants,
         internal_seat::internal_tenant_seat_count,
+        licence_admin::list_admin_licenses,
+        licence_admin::list_licenses,
+        licence_admin::set_license_budget,
         licenses::active,
         tokens::introspect,
         tokens::revoke,
@@ -75,6 +82,7 @@ pub const ROUTES: &[(&str, &str)] = &[
         internal_reads::InternalSubjectResponse,
         internal_reads::InternalTenantResponse,
         internal_seat::InternalSeatCountResponse,
+        licence_admin::LicenseBudgetUpdate,
         schemas::HTTPValidationError,
         schemas::ValidationError,
         tokens::TokenIntrospectRequest,
@@ -129,10 +137,19 @@ pub fn router(state: AppState) -> Router {
             "/internal/tenants/{tenant_id}/bundle-token",
             post(internal_bundles::internal_mint_tenant_bundle_token),
         )
+        .route("/licenses", get(licence_admin::list_licenses))
+        .route(
+            "/licenses/admin/all",
+            get(licence_admin::list_admin_licenses),
+        )
         .route("/licenses/active", get(licenses::active))
         .route(
             "/licenses/user/{subject_id}",
             get(user_licenses::list_user_licenses),
+        )
+        .route(
+            "/licenses/{license_id}/budget",
+            patch(licence_admin::set_license_budget),
         )
         .route("/license/introspect", post(tokens::introspect))
         .route("/license/revoke", post(tokens::revoke))
