@@ -20,6 +20,7 @@ pub mod licence_tokens;
 pub mod licenses;
 pub mod observability;
 pub mod schemas;
+pub mod tenant_offerings;
 pub mod tenants_crud;
 pub mod tokens;
 pub mod user_licenses;
@@ -77,6 +78,12 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("PATCH", "/tenants/{name_or_id}/archive"),
     ("PUT", "/tenants/{name_or_id}/budget-currency"),
     ("PATCH", "/tenants/{name_or_id}/cost-centre"),
+    ("GET", "/tenants/{name_or_id}/grants"),
+    ("PUT", "/tenants/{name_or_id}/grants/{owner_key}"),
+    ("DELETE", "/tenants/{name_or_id}/grants/{owner_key}"),
+    ("GET", "/tenants/{name_or_id}/offerings"),
+    ("POST", "/tenants/{name_or_id}/offerings/{app_key}/{code}"),
+    ("DELETE", "/tenants/{name_or_id}/offerings/{app_key}/{code}"),
 ];
 
 #[derive(utoipa::OpenApi)]
@@ -117,6 +124,12 @@ pub const ROUTES: &[(&str, &str)] = &[
         tenants_crud::set_tenant_archived,
         tenants_crud::set_tenant_budget_currency,
         tenants_crud::set_tenant_cost_centre,
+        tenant_offerings::delete_tenant_grant,
+        tenant_offerings::list_tenant_grants,
+        tenant_offerings::list_tenant_offerings,
+        tenant_offerings::provision_tenant_offering,
+        tenant_offerings::put_tenant_grant,
+        tenant_offerings::unprovision_tenant_offering,
         user_licenses::create_user_license,
         user_licenses::delete_user_licenses,
         user_licenses::list_user_licenses
@@ -147,6 +160,10 @@ pub const ROUTES: &[(&str, &str)] = &[
         MeteringReconcileResult,
         schemas::HTTPValidationError,
         schemas::ValidationError,
+        tenant_offerings::TenantGrantResponse,
+        tenant_offerings::TenantOfferingProvisionResponse,
+        tenant_offerings::TenantOfferingRecord,
+        tenant_offerings::TenantOfferingUnprovisionResponse,
         tenants_crud::TenantArchiveUpdate,
         tenants_crud::TenantBudgetCurrencyUpdate,
         tenants_crud::TenantCostCentreUpdate,
@@ -285,6 +302,24 @@ pub fn router(state: AppState) -> Router {
         .route(
             "/tenants/{name_or_id}/cost-centre",
             patch(tenants_crud::set_tenant_cost_centre),
+        )
+        .route(
+            "/tenants/{name_or_id}/grants",
+            get(tenant_offerings::list_tenant_grants),
+        )
+        .route(
+            "/tenants/{name_or_id}/grants/{owner_key}",
+            axum::routing::put(tenant_offerings::put_tenant_grant)
+                .delete(tenant_offerings::delete_tenant_grant),
+        )
+        .route(
+            "/tenants/{name_or_id}/offerings",
+            get(tenant_offerings::list_tenant_offerings),
+        )
+        .route(
+            "/tenants/{name_or_id}/offerings/{app_key}/{code}",
+            post(tenant_offerings::provision_tenant_offering)
+                .delete(tenant_offerings::unprovision_tenant_offering),
         )
         // The live service also answers `/licenses/health` (a gateway-prefix alias it registers
         // with `include_in_schema=False`), so it is registered here but is not in `ROUTES`.
