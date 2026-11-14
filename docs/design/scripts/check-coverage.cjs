@@ -13,7 +13,7 @@
  *   - every V2 slice resolves to its SPEC_V2 §12 row;
  *   - every V2 slice is declared in `scripts/v2-slice-artefacts.json` (artefacts, or an
  *     explicit evidence+gap row), its measured counts agree with its status, and no artefact
- *     is credited to two slices;
+ *     is credited to two V2 slices (the generator refuses a V1↔V2 duplicate);
  *   - every project's units exist in the issue registry;
  *   - the seed and the coverage agree on the project set, and no dependency dangles;
  *   - no non-built project is without an open unit.

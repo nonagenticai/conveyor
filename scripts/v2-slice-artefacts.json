@@ -1,11 +1,10 @@
 {
   "version": 1,
-  "note": "What each V2 slice (SPEC_V2 §12) must deliver, so the programme measures it instead of assuming `proposed`. A slice with `tables`/`actions`/`modules` is measured against migrations, the compiled registry dump and the tree. A behavioural slice with no named schema object carries an explicit `evidence` + `gap` row and stays curated. Artefacts are credited to exactly one slice; the decision-ladder TABLES are T0's (SPEC §12's T0 row) and are never T2's.",
+  "note": "What each V2 slice (SPEC_V2 §12) must deliver, so the programme measures it instead of assuming `proposed`. A slice with `tables`/`actions`/`modules` is measured against migrations, the compiled registry dump and the tree. A behavioural slice with no named schema object carries an explicit `evidence` + `gap` row and stays curated. Credit only what the slice FIRST delivers: an artefact a V1 slice already declared is not re-credited (its extension is the concept map's `extend` verdict), and the generator refuses a cross-track duplicate. The decision-ladder TABLES are T0's (SPEC §12's T0 row) and are never T2's.",
   "slices": {
     "T0": {
       "tables": [
         "industry",
-        "department",
         "job_catalogue",
         "job_release",
         "job_binding",
@@ -16,8 +15,6 @@
         "laya_inference_config"
       ],
       "actions": [
-        "departments.create",
-        "departments.list",
         "industries.create",
         "industries.get",
         "industries.list",

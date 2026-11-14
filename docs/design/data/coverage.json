@@ -188,7 +188,7 @@
       "tranche": 0,
       "units": {
         "blocked": 8,
-        "claimed": 5,
+        "claimed": 4,
         "numbers": [
           17,
           22,
@@ -202,7 +202,6 @@
           93,
           95,
           102,
-          105,
           116,
           117,
           118,
@@ -211,7 +210,7 @@
           122,
           123
         ],
-        "open": 15,
+        "open": 14,
         "ready": 2,
         "unknown": 0
       }
@@ -1372,23 +1371,22 @@
         "crates/domain/src/executor.rs",
         "crates/domain/src/organisation.rs",
         "crates/store/src/organisation.rs",
-        "migrations/0001_platform.sql",
         "migrations/0040_organisation.sql"
       ],
       "gap": null,
       "key": "T0",
       "measured": {
         "actions": [
-          17,
-          17
+          15,
+          15
         ],
         "modules": [
           3,
           3
         ],
         "tables": [
-          10,
-          10
+          9,
+          9
         ]
       },
       "name": "Model and contracts",

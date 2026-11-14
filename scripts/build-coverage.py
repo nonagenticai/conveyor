@@ -198,9 +198,16 @@ def module_path(root: pathlib.Path, name: str) -> str | None:
     `interaction` is store, `board` is actions), so the search walks every `src` tree rather
     than guessing one crate. The path it returns is the evidence the gate checks.
     """
-    # An exact repo-relative path is itself the evidence (V2 slice declarations name files).
+    # An exact repo-relative path is itself the evidence (V2 slice declarations name files),
+    # but only inside a crate or app's `src` tree: `README.md` is not a module.
     exact = root / name
-    if exact.is_file() or exact.is_dir():
+    parts = pathlib.PurePosixPath(name).parts
+    if (
+        len(parts) >= 3
+        and parts[0] in ("crates", "apps")
+        and parts[2] == "src"
+        and (exact.is_file() or exact.is_dir())
+    ):
         return exact.relative_to(root).as_posix()
     # A crate or app whose NAME is the module (`domain`, `store`): the crate root is the
     # evidence, not a directory under some other crate's `src`.
@@ -361,6 +368,46 @@ def v2_artefacts(root: pathlib.Path) -> dict[str, dict]:
     if not isinstance(slices, dict) or not slices:
         raise SystemExit("coverage: scripts/v2-slice-artefacts.json has no `slices` object")
     return slices
+
+
+def v1_credited(projects: list[dict], root: pathlib.Path) -> dict[str, str]:
+    """Every artefact a V1 slice declares, mapped to the slice that first delivers it."""
+    credited: dict[str, str] = {}
+    for project in projects:
+        if project.get("meta", {}).get("track") != "v1":
+            continue
+        plan = project.get("meta", {}).get("plan", "")
+        plan_path = root / plan if plan else None
+        fields = parse_frontmatter(read(plan_path)) if plan_path and plan_path.exists() else {}
+        for kind, names in (
+            ("table", field_list(fields, "adds_tables")),
+            ("action", field_list(fields, "adds_actions")),
+            ("module", field_list(fields, "adds_modules")),
+        ):
+            for name in names:
+                credited.setdefault(f"{kind}:{name}", project["key"])
+    return credited
+
+
+def refuse_cross_track_credits(
+    v2: dict[str, dict], projects: list[dict], root: pathlib.Path
+) -> None:
+    """A V2 slice may not credit an artefact a V1 slice already declared as its own."""
+    owned = v1_credited(projects, root)
+    for key in sorted(v2):
+        declaration = v2[key]
+        for kind, names in (
+            ("table", declaration.get("tables", []) or []),
+            ("action", declaration.get("actions", []) or []),
+            ("module", declaration.get("modules", []) or []),
+        ):
+            for name in names:
+                artefact = f"{kind}:{name}"
+                if artefact in owned:
+                    raise SystemExit(
+                        f"coverage: {key} credits {artefact}, already delivered by V1 "
+                        f"{owned[artefact]}; credit only what the slice first delivers"
+                    )
 
 
 def measure_declared(
@@ -531,6 +578,7 @@ def build(root: pathlib.Path) -> dict:
     tables = table_index(root)
     projects = seed["projects"]
     v2 = v2_artefacts(root)
+    refuse_cross_track_credits(v2, projects, root)
     levels, cycles = tranches(projects)
 
     rows: list[dict] = []
