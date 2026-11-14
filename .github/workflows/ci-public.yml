@@ -40,7 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: install betterleaks 1.10.1 (pinned, sha256-verified)
         run: |
           set -euo pipefail
@@ -64,6 +66,40 @@ jobs:
             --config=.betterleaks.toml \
             --gitleaks-ignore-path .betterleaksignore .
 
+  # Static analysis of these workflow files themselves: actionlint + zizmor, the same
+  # gate and the same pins as ci-workflows' `lint` job. zizmor runs with the auditor
+  # persona at medium and above — a finding here is a supply-chain defect, not style.
+  lint:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: actionlint (pinned release tarball, checksum verified)
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+          ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          url="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          curl -fsSL --retry 3 --max-time 60 "$url" -o "$tmp/actionlint.tar.gz"
+          echo "${ACTIONLINT_SHA256}  $tmp/actionlint.tar.gz" | sha256sum -c -
+          tar -xzf "$tmp/actionlint.tar.gz" -C "$tmp" actionlint
+          "$tmp/actionlint" -color
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: false
+
+      - name: zizmor (pinned, auditor persona, gates medium and above)
+        run: uvx zizmor==1.32.0 --persona=auditor --min-severity=medium --format=plain .
+
   # Private infrastructure must not be published. The secret scan catches credentials; this catches
   # the other half of the rule: internal hostnames, tailnet addresses and private repo paths.
   # Run the same script locally before pushing: `bash scripts/ci/no-private-refs.sh`.
@@ -72,7 +108,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: scan tracked files
         run: bash scripts/ci/no-private-refs.sh
 
@@ -99,7 +137,9 @@ jobs:
       PG_IMAGE: postgres:18
       REDIS_IMAGE: library/redis:8.10.1-alpine
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: toolchain follows rust-toolchain.toml; assert the Dockerfile agrees
         run: |
@@ -113,7 +153,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/cache@v6
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           # Registry only: the target directory is multi-gigabyte and would thrash the 10 GB
           # cache budget. Compiling is what a free public runner is for.
@@ -202,8 +242,13 @@ jobs:
       # and classifies a bare `conveyor:ci` as a Docker Hub ref. (The archetype's IMAGE_REF exists
       # for the same reason.)
       IMG: conveyor:ci
+      # `github.actor` reaches `run:` only through the environment — interpolating it
+      # directly is zizmor's template-injection finding (auditor persona, high).
+      GH_ACTOR: ${{ github.actor }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: build
         run: docker build --file Dockerfile --tag "$IMG" .
@@ -230,7 +275,7 @@ jobs:
         run: |
           set -euo pipefail
           ref="ghcr.io/${{ github.repository }}"
-          echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "${{ github.token }}" | docker login ghcr.io -u "$GH_ACTOR" --password-stdin
           sha="sha-${GITHUB_SHA::7}"
           run="$(printf 'main-%06d' "${{ github.run_number }}")"
           for tag in "$sha" "$run" latest; do
@@ -250,7 +295,9 @@ jobs:
     env:
       IMG: conveyor-service:ci
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: build
         run: |
@@ -304,8 +351,11 @@ jobs:
             image: conveyor-inference-router
     env:
       IMG: conveyor-service:ci
+      GH_ACTOR: ${{ github.actor }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: build
         run: |
@@ -327,7 +377,7 @@ jobs:
         run: |
           set -euo pipefail
           ref="ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}"
-          echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "${{ github.token }}" | docker login ghcr.io -u "$GH_ACTOR" --password-stdin
           sha="sha-${GITHUB_SHA::7}"
           run="$(printf 'main-%06d' "${{ github.run_number }}")"
           for tag in "$sha" "$run" latest; do
