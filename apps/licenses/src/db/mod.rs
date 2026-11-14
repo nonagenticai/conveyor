@@ -22,6 +22,7 @@ pub mod dependencies;
 pub mod internal_reads;
 pub mod issuance;
 pub mod licence_admin;
+pub mod licence_tokens;
 pub mod owners;
 pub mod seat;
 pub mod tokens;

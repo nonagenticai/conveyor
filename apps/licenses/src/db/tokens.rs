@@ -141,7 +141,7 @@ fn token_is_valid(revoked: bool, expires_at: Option<DateTime<Utc>>, now: DateTim
 }
 
 /// `License.effective_status`: stored status resolved against the time window.
-fn effective_status(
+pub(crate) fn effective_status(
     stored: &str,
     starts_at: Option<DateTime<Utc>>,
     expires_at: Option<DateTime<Utc>>,
