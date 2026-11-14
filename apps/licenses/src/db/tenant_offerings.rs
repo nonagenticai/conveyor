@@ -31,13 +31,12 @@
 //! - provisioning writes the per-(tenant, product) posture row and pushes the offering's usage
 //!   policy to billing (`POST /api/config/markup-rules`), then the access charge
 //!   (`POST /api/config/access-charges`) when the offering is priced or bundles an allowance;
-//! - ⛔ **the markup push never fails the request** (the card's rule, and this service's billing
-//!   convention): its failure is recorded loudly with [`MARKUP_RULE_PROVISION_FAILURE_MARKER`] and
-//!   the route still answers 200 with `markup_rule_provisioned: false`. The ACCESS push keeps the
-//!   reference's semantics: on failure the posture row is restored to what it was before this call
-//!   (a prior value written back, or the row deleted when this call created it) and the route
-//!   answers 502 naming billing's status. A markup rule accepted earlier in the request survives an
-//!   access failure — billing exposes no markup-rule delete — and the 502 says so.
+//! - **a failed billing write rolls back the local posture and answers 502** — both pushes, exactly
+//!   as the reference does. The posture row is restored to what it was before this call (a prior
+//!   value written back, or the row deleted when this call created it), and the 502 names the failed
+//!   write and billing's status (or says billing could not be reached). Rollback is PARTIAL: a markup
+//!   rule accepted earlier in the request SURVIVES a later access-charge failure — billing exposes no
+//!   markup-rule delete — and that 502 says so explicitly rather than claiming a clean rollback.
 
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
@@ -55,7 +54,8 @@ use crate::error::Refusal;
 pub const MARKUP_RULES_PATH: &str = "/api/config/markup-rules";
 /// The billing route `_provision_access_charge` posts to.
 pub const ACCESS_CHARGES_PATH: &str = "/api/config/access-charges";
-/// One greppable marker for every markup push this service could not get accepted.
+/// One greppable marker for every markup push this service could not get accepted (the refusal is
+/// followed by a posture restore and a 502 — it never reaches the caller as a `200`).
 pub const MARKUP_RULE_PROVISION_FAILURE_MARKER: &str = "MARKUP_RULE_PROVISION_FAILED";
 
 /// The per-app setting actions that only REMOVE state: a revoked bundle licence still admits the
@@ -680,9 +680,10 @@ async fn push_config(
 /// `provision_tenant_offering` — materialize an offering's usage policy (+ access charge) on a
 /// tenant, plus the local posture row.
 ///
-/// ⛔ The markup push NEVER fails this route (see the module docs): a refusal or an unreachable
-/// billing is recorded with [`MARKUP_RULE_PROVISION_FAILURE_MARKER`] and provisioning continues
-/// with `markup_rule_provisioned: false`. The ACCESS push keeps the reference's rollback + 502.
+/// Both billing pushes keep the reference's rollback: a refusal or an unreachable billing restores
+/// the posture this call overwrote (or deletes the row it created) and answers 502 with the
+/// reference's exact detail. A markup rule accepted earlier SURVIVES a later access failure —
+/// billing has no markup-rule delete — and that 502 says so.
 pub async fn provision_tenant_offering(
     pool: &PgPool,
     user: &User,
@@ -731,7 +732,8 @@ pub async fn provision_tenant_offering(
         if billing_write_succeeded(status) {
             markup_rule_provisioned = true;
         } else {
-            // RECORDED, never fatal: the route still succeeds. `status` is billing's last HTTP
+            // The reference's rollback: undo the posture override so the tenant is not
+            // half-provisioned, then report the failed write. `status` is billing's last HTTP
             // answer; `None` means billing was never reached (or no client is configured).
             tracing::error!(
                 marker = MARKUP_RULE_PROVISION_FAILURE_MARKER,
@@ -739,9 +741,26 @@ pub async fn provision_tenant_offering(
                 app = app_key,
                 code,
                 status = ?status,
-                "billing markup-rule provision failed; the posture row stands and provisioning \
-                 continues (no rollback, no failed request)"
+                "billing rejected the markup-rule write; restoring the posture and answering 502"
             );
+            restore_tenant_app_posture(
+                pool,
+                posture.tenant_id,
+                app_key,
+                posture.prior_byo_mode.as_deref(),
+                posture.prior_offering_code.as_deref(),
+            )
+            .await
+            .map_err(|error| database_fault(error, "restore_tenant_app_posture"))?;
+            let detail = match status {
+                Some(status) => format!(
+                    "Billing rejected the markup-rule write (HTTP {status}); provisioning rolled \
+                     back"
+                ),
+                None => "Could not reach billing to write the markup rule; provisioning rolled back"
+                    .to_owned(),
+            };
+            return Err(Refusal::detail(StatusCode::BAD_GATEWAY, detail));
         }
     }
 

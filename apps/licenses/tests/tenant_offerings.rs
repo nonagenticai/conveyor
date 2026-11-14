@@ -4,8 +4,8 @@
 //! records the path, headers and JSON body of every push. The assertions pin the reference's exact
 //! statuses, refusal bodies and wire shapes (explicit nulls included), and the billing push
 //! semantics: the markup route/body, one bounded retry for a retryable status, no retry for a 4xx
-//! verdict, a recorded markup failure that leaves the route successful, and the access-charge
-//! rollback + 502.
+//! verdict, a rejected or unreachable markup write that restores the posture and answers 502, and
+//! an access-charge failure whose 502 must still name the markup rule it left behind.
 
 mod common;
 
@@ -688,12 +688,23 @@ async fn provisioning_writes_the_posture_and_pushes_the_exact_markup_and_access_
 }
 
 #[tokio::test]
-async fn a_markup_refusal_is_recorded_and_the_route_still_succeeds() {
+async fn a_rejected_markup_restores_the_posture_and_answers_502() {
+    // A prior posture this request OVERWROTE must be written back, not destroyed.
     let db = seeded().await;
+    sqlx::query(
+        "INSERT INTO tenant_app_byo_mode
+             (tenant_id, app_id, byo_mode, offering_code, created_at, updated_at)
+         VALUES ($1, $2, 'local_allowed', 'old-code', now(), now())",
+    )
+    .bind(T1)
+    .bind(APP)
+    .execute(&db.pool)
+    .await
+    .expect("prior posture");
+
     let stub = Stub::new();
     stub.set_markup_status(403);
     let base = start_stub(stub.clone()).await;
-
     let (status, body) = send(
         route(
             &db,
@@ -706,30 +717,40 @@ async fn a_markup_refusal_is_recorded_and_the_route_still_succeeds() {
     .await;
     assert_eq!(
         status,
-        StatusCode::OK,
-        "the markup push never fails the request: {body}"
+        StatusCode::BAD_GATEWAY,
+        "the reference fails the request on a markup refusal: {body}"
     );
-    assert_eq!(body["markup_rule_provisioned"], Value::Bool(false));
-    assert_eq!(body["access_charge_provisioned"], Value::Bool(true));
+    assert_eq!(
+        body,
+        json!({"detail": "Billing rejected the markup-rule write (HTTP 403); provisioning rolled back"})
+    );
     assert_eq!(
         posture(&db.pool, T1, "demo").await,
-        Some(("byo_required".to_owned(), Some("gold".to_owned()))),
-        "the posture row stands: no rollback on a markup failure"
+        Some(("local_allowed".to_owned(), Some("old-code".to_owned()))),
+        "the overwritten posture is written back"
     );
-    let markup_calls = stub
-        .calls()
-        .into_iter()
-        .filter(|call| call.path == "/api/config/markup-rules")
-        .count();
-    assert_eq!(markup_calls, 1, "a 4xx is a verdict, not retried");
+    let pushed = stub.calls();
+    assert_eq!(
+        pushed
+            .iter()
+            .filter(|call| call.path == "/api/config/markup-rules")
+            .count(),
+        1,
+        "a 4xx is a verdict, not retried"
+    );
+    assert!(
+        !pushed.iter().any(|call| call.path == "/api/config/access-charges"),
+        "the request stops at the failed markup write"
+    );
 
-    // A RETRYABLE status gets exactly one more attempt.
+    // A RETRYABLE 5xx on a row this request CREATED: one bounded retry, then the row is deleted.
+    let fresh = seeded().await;
     let retry_stub = Stub::new();
-    retry_stub.set_markup_status(503);
+    retry_stub.set_markup_status(500);
     let retry_base = start_stub(retry_stub.clone()).await;
     let (status, body) = send(
         route(
-            &db,
+            &fresh,
             user(&["license-admin"], Some("fr")),
             Some(Arc::new(provisioner(&retry_base))),
         ),
@@ -737,14 +758,48 @@ async fn a_markup_refusal_is_recorded_and_the_route_still_succeeds() {
         "/tenants/acme/offerings/demo/gold",
     )
     .await;
-    assert_eq!(status, StatusCode::OK, "{body}");
-    assert_eq!(body["markup_rule_provisioned"], Value::Bool(false));
-    let markup_calls = retry_stub
-        .calls()
-        .into_iter()
-        .filter(|call| call.path == "/api/config/markup-rules")
-        .count();
-    assert_eq!(markup_calls, 2, "one bounded retry for a retryable status");
+    assert_eq!(status, StatusCode::BAD_GATEWAY, "{body}");
+    assert_eq!(
+        body,
+        json!({"detail": "Billing rejected the markup-rule write (HTTP 500); provisioning rolled back"})
+    );
+    assert_eq!(
+        posture(&fresh.pool, T1, "demo").await,
+        None,
+        "a row this request created is deleted on rollback"
+    );
+    let pushed = retry_stub.calls();
+    assert_eq!(
+        pushed
+            .iter()
+            .filter(|call| call.path == "/api/config/markup-rules")
+            .count(),
+        2,
+        "one bounded retry for a retryable status"
+    );
+    assert!(
+        !pushed.iter().any(|call| call.path == "/api/config/access-charges"),
+        "the request stops at the failed markup write"
+    );
+
+    // Transport / no client: the `None` arm, with the reference's other exact detail.
+    let unreachable_db = seeded().await;
+    let (status, body) = send(
+        route(&unreachable_db, user(&["license-admin"], Some("fr")), None),
+        Method::POST,
+        "/tenants/acme/offerings/demo/gold",
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_GATEWAY, "{body}");
+    assert_eq!(
+        body,
+        json!({"detail": "Could not reach billing to write the markup rule; provisioning rolled back"})
+    );
+    assert_eq!(
+        posture(&unreachable_db.pool, T1, "demo").await,
+        None,
+        "a row this request created is deleted on rollback"
+    );
 }
 
 #[tokio::test]
@@ -792,6 +847,50 @@ async fn an_access_refusal_restores_the_prior_posture_and_answers_502() {
         .count();
     assert_eq!(access_calls, 2, "500 is retryable, then the 502");
 
+    // A markup rule accepted moments earlier SURVIVES the access failure — billing has no
+    // markup-rule delete — and the 502 says so instead of claiming a clean rollback.
+    let with_markup = seeded().await;
+    let stub = Stub::new();
+    stub.set_access_status(500);
+    let base = start_stub(stub.clone()).await;
+    let (status, body) = send(
+        route(
+            &with_markup,
+            user(&["license-admin"], Some("fr")),
+            Some(Arc::new(provisioner(&base))),
+        ),
+        Method::POST,
+        "/tenants/acme/offerings/demo/gold",
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_GATEWAY, "{body}");
+    assert_eq!(
+        body,
+        json!({"detail": "Billing rejected the access-charge write (HTTP 500); the posture override was rolled back. The markup rule written earlier in this request was NOT removed (billing has no markup-rule delete) — re-provision to overwrite it."})
+    );
+    assert_eq!(
+        posture(&with_markup.pool, T1, "demo").await,
+        None,
+        "the posture row this request created is still deleted"
+    );
+    let pushed = stub.calls();
+    assert_eq!(
+        pushed
+            .iter()
+            .filter(|call| call.path == "/api/config/markup-rules")
+            .count(),
+        1,
+        "the accepted markup rule is left in place: the 502 tells the truth"
+    );
+    assert_eq!(
+        pushed
+            .iter()
+            .filter(|call| call.path == "/api/config/access-charges")
+            .count(),
+        2,
+        "500 is retryable, then the 502"
+    );
+
     // The rollback arm for a row this request CREATED is a delete.
     let fresh = seeded().await;
     let unreachable = send(
@@ -810,28 +909,6 @@ async fn an_access_refusal_restores_the_prior_posture_and_answers_502() {
         None,
         "a created row is deleted"
     );
-}
-
-#[tokio::test]
-async fn an_markup_failure_alone_never_reaches_the_502() {
-    let db = seeded().await;
-    let stub = Stub::new();
-    stub.set_markup_status(400);
-    stub.set_access_status(200);
-    let base = start_stub(stub).await;
-    let (status, body) = send(
-        route(
-            &db,
-            user(&["license-admin"], Some("fr")),
-            Some(Arc::new(provisioner(&base))),
-        ),
-        Method::POST,
-        "/tenants/acme/offerings/demo/gold",
-    )
-    .await;
-    assert_eq!(status, StatusCode::OK, "{body}");
-    assert_eq!(body["markup_rule_provisioned"], Value::Bool(false));
-    assert_eq!(body["access_charge_provisioned"], Value::Bool(true));
 }
 
 // ---------------------------------------------------------------------------------------------
