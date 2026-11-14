@@ -13,8 +13,12 @@
 //! truth, and `migrations/0001_baseline.sql` is its `pg_dump --schema-only`.
 
 pub mod active;
+pub mod dependencies;
+pub mod issuance;
 pub mod owners;
+pub mod seat;
 pub mod tokens;
+pub mod user_licenses;
 
 use sqlx::migrate::Migrator;
 use sqlx::{PgPool, Postgres, Transaction};

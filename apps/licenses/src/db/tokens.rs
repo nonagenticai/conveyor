@@ -24,6 +24,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::auth::{LICENSE_TOKEN_ROLES, User};
+use crate::db::issuance::LicenceRow;
 
 /// `TOKEN_LAST_USED_THROTTLE_SECONDS`, default 60 (the live Deployment sets nothing).
 const LAST_USED_THROTTLE_SECONDS: i64 = 60;
@@ -435,6 +436,112 @@ pub async fn authenticate_opaque(
             .collect(),
         ..User::default()
     }))
+}
+
+/// `models.py::DatabaseManager.revoke_token_for_tenant` (:9561) — the outcome of the
+/// token-revoke write.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RevokeOutcome {
+    /// At least one LIVE row was transitioned to revoked.
+    Revoked,
+    /// The tenant owns rows for this hash and every one was already revoked; nothing was written.
+    AlreadyRevoked,
+    /// No such token, or none of its rows belongs to this tenant — deliberately one outcome.
+    NotFound,
+}
+
+/// `revoke_token_for_tenant`: revoke EVERY row `tenant_id` owns that carries `raw_token`'s hash.
+///
+/// Returns `(outcome, count)` where `count` is how many rows this call actually transitioned
+/// (`0` for `AlreadyRevoked` and `NotFound`). One transaction resolves ownership and writes, so a
+/// licence cannot be re-tenanted between the two; rows on the same hash belonging to ANOTHER
+/// tenant are left alone. An already-revoked row keeps its `revoked_at` (the audit record of when
+/// the credential was actually killed).
+pub async fn revoke_token_for_tenant(
+    pool: &PgPool,
+    raw_token: &str,
+    tenant_id: &str,
+) -> Result<(RevokeOutcome, u64), sqlx::Error> {
+    // A non-UUID tenant can own no row; the reference's string comparison answers the same.
+    let Ok(tenant_id) = Uuid::try_parse(tenant_id) else {
+        return Ok((RevokeOutcome::NotFound, 0));
+    };
+    let hash = hash_token(raw_token);
+    let mut tx = pool.begin().await?;
+
+    // Multiplicity is operator evidence: a raw token is NOT unique in this schema, and the
+    // reference warns when one hash sits on several rows. Counted across every tenant because
+    // the reference fetches them all before applying its tenant predicate.
+    let shared: i64 = sqlx::query_scalar("SELECT count(*) FROM token WHERE token_hash = $1")
+        .bind(&hash)
+        .fetch_one(&mut *tx)
+        .await?;
+    if shared > 1 {
+        tracing::warn!(
+            token_hash = %hash,
+            rows = shared,
+            site = "revoke_token_for_tenant",
+            "token hash is not unique"
+        );
+    }
+
+    // The write set, in the reference's TOKEN_HASH_PICK_ORDER, locked for the update.
+    let owned: Vec<(Uuid, bool)> = sqlx::query_as(
+        "SELECT t.id, t.revoked
+           FROM token t
+           JOIN license l ON l.id = t.license_id
+          WHERE t.token_hash = $1
+            AND l.tenant_id = $2
+          ORDER BY t.revoked DESC, t.expires_at ASC NULLS LAST, t.created_at ASC, t.id ASC
+            FOR UPDATE OF t",
+    )
+    .bind(&hash)
+    .bind(tenant_id)
+    .fetch_all(&mut *tx)
+    .await?;
+
+    if owned.is_empty() {
+        tx.rollback().await?;
+        return Ok((RevokeOutcome::NotFound, 0));
+    }
+    let live: Vec<Uuid> = owned
+        .iter()
+        .filter(|(_id, revoked)| !revoked)
+        .map(|(id, _revoked)| *id)
+        .collect();
+    if live.is_empty() {
+        tx.rollback().await?;
+        return Ok((RevokeOutcome::AlreadyRevoked, 0));
+    }
+
+    let revoked = sqlx::query(
+        "UPDATE token SET revoked = true, revoked_at = $2
+          WHERE id = ANY($1) AND revoked = false",
+    )
+    .bind(live.as_slice())
+    .bind(Utc::now())
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
+    tx.commit().await?;
+    Ok((RevokeOutcome::Revoked, revoked))
+}
+
+/// `get_license` as `/license/revoke` uses it: the row the tenant-ownership check and the
+/// revoke authorizers decide on. Deliberately no `deleted_at` predicate, matching the reference's
+/// revoke path (the dependency engine itself also revokes a soft-deleted row on request).
+pub async fn licence_for_revoke(
+    pool: &PgPool,
+    license_id: Uuid,
+) -> Result<Option<LicenceRow>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT id, tenant_id, app_id, subject_id, status, is_dependency, bundle_id
+           FROM license
+          WHERE id = $1",
+    )
+    .bind(license_id)
+    .fetch_optional(pool)
+    .await
 }
 
 #[cfg(test)]

@@ -10,9 +10,12 @@
 //! protected by default" true.
 
 pub mod health;
+pub mod internal_seat;
 pub mod licenses;
+pub mod observability;
 pub mod schemas;
 pub mod tokens;
+pub mod user_licenses;
 
 use std::sync::Arc;
 
@@ -28,8 +31,11 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/health"),
     ("GET", "/health/live"),
     ("GET", "/health/ready"),
+    ("GET", "/internal/tenants/{tenant_id}/seat-count"),
     ("GET", "/licenses/active"),
+    ("GET", "/licenses/user/{subject_id}"),
     ("POST", "/license/introspect"),
+    ("POST", "/license/revoke"),
 ];
 
 #[derive(utoipa::OpenApi)]
@@ -38,18 +44,27 @@ pub const ROUTES: &[(&str, &str)] = &[
         health::health,
         health::liveness,
         health::readiness,
+        internal_seat::internal_tenant_seat_count,
         licenses::active,
-        tokens::introspect
+        tokens::introspect,
+        tokens::revoke,
+        user_licenses::list_user_licenses
     ),
     components(schemas(
         health::ErrorResponse,
         health::HealthResponse,
         health::LivenessResponse,
         health::ReadinessResponse,
+        internal_seat::InternalSeatCountResponse,
         schemas::HTTPValidationError,
         schemas::ValidationError,
         tokens::TokenIntrospectRequest,
-        tokens::TokenIntrospectResponse
+        tokens::TokenIntrospectResponse,
+        tokens::TokenRevokeRequest,
+        tokens::TokenRevokeResponse,
+        user_licenses::AppInfo,
+        user_licenses::LicenseResponse,
+        user_licenses::PlanInfo
     )),
     tags(
         (name = "health", description = "Health and readiness probes"),
@@ -70,11 +85,23 @@ pub fn router(state: AppState) -> Router {
         .route("/health", get(health::health))
         .route("/health/live", get(health::liveness))
         .route("/health/ready", get(health::readiness))
+        .route(
+            "/internal/tenants/{tenant_id}/seat-count",
+            get(internal_seat::internal_tenant_seat_count),
+        )
         .route("/licenses/active", get(licenses::active))
+        .route(
+            "/licenses/user/{subject_id}",
+            get(user_licenses::list_user_licenses),
+        )
         .route("/license/introspect", post(tokens::introspect))
+        .route("/license/revoke", post(tokens::revoke))
         // The live service also answers `/licenses/health` (a gateway-prefix alias it registers
         // with `include_in_schema=False`), so it is registered here but is not in `ROUTES`.
         .route("/licenses/health", get(health::health))
+        // `/metrics` is a Prometheus scrape endpoint, not a documented JSON operation: no
+        // `ROUTES` entry, no `OpenApi` path. `--check-lock` must not see it.
+        .route("/metrics", get(observability::metrics))
         .with_state(state.clone())
         .layer(axum::middleware::from_fn_with_state(
             state,

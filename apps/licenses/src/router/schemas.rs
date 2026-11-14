@@ -23,5 +23,9 @@ pub struct ValidationError {
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct HTTPValidationError {
-    pub detail: Option<Vec<ValidationError>>,
+    // The captured model has no default and no `required` entry: the field is optional, but its
+    // schema is a plain array, never a nullable union. A bare `Vec` plus `required = false` is
+    // the only spelling that produces both facts.
+    #[schema(required = false)]
+    pub detail: Vec<ValidationError>,
 }

@@ -150,8 +150,12 @@ mod tests {
             !message.contains("not registered: GET /licenses/active"),
             "{message}"
         );
+        // The gap itself shrinks with every wave, so it is asserted generically; pinning one
+        // route turns this test red for the right reason and teaches nothing. The negative
+        // assertions below are the durable half: a ported route must never be reported.
         assert!(
-            message.contains("not registered: POST /license/revoke"),
+            message.contains("not registered: ")
+                || message.contains("documented but not registered: "),
             "{message}"
         );
         // Introspect IS ported: it must not be reported as missing, and its schema must not

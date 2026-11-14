@@ -12,17 +12,19 @@
 
 use axum::Json;
 use axum::extract::State;
-use axum::extract::{ConnectInfo, FromRequestParts};
+use axum::extract::{ConnectInfo, Extension, FromRequestParts};
 use axum::http::StatusCode;
 use axum::http::request::Parts;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{Value, json};
 use std::convert::Infallible;
 use std::net::SocketAddr;
 use utoipa::ToSchema;
+use uuid::Uuid;
 
-use crate::auth::bearer;
-use crate::db::tokens::{ActiveIntrospection, Inactive, Outcome};
+use crate::auth::{User, bearer, require_any_realm_role, require_tenant_id};
+use crate::db::tokens::{ActiveIntrospection, Inactive, Outcome, RevokeOutcome};
+use crate::db::{dependencies, issuance};
 use crate::error::Refusal;
 use crate::router::health::ErrorResponse;
 use crate::router::schemas::HTTPValidationError;
@@ -216,4 +218,240 @@ pub async fn introspect(
 
 fn internal_error() -> Refusal {
     Refusal::detail(StatusCode::INTERNAL_SERVER_ERROR, "Internal server error")
+}
+
+/// Request to revoke a token
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct TokenRevokeRequest {
+    /// Raw token to revoke
+    pub token: Option<String>,
+    /// License ID to revoke all tokens
+    pub license_id: Option<String>,
+}
+
+/// Response from token revocation
+#[derive(Debug, Serialize, ToSchema)]
+pub struct TokenRevokeResponse {
+    pub revoked: bool,
+    pub message: String,
+    // The reference model is `list[str] = Field(default_factory=list)`: the field is NOT
+    // nullable and is always serialised, as `[]` when nothing was released. `Option` here only
+    // keeps it out of the OpenAPI `required` list; `value_type` keeps the schema an array.
+    /// Ids of the tenant's dependency licences revoked with this licence because no remaining active licence requires them (app_requires closure).
+    #[schema(value_type = Vec<String>)]
+    pub released_dependency_ids: Option<Vec<String>>,
+}
+
+/// `POST /license/revoke` — revoke a raw token, or a licence and all its tokens.
+///
+/// Two arms, exactly as the reference:
+///
+/// - `token`: known-owner check, then issuance authorization over EVERY licence of the tenant
+///   carrying the hash (`_authorize_token_revoke`), then one transaction that revokes every
+///   matching row. A non-empty `token` wins over `license_id`.
+/// - `license_id`: tenant ownership (`"License not found"` for unknown OR foreign — one message,
+///   so the route cannot be used to probe another tenant), `_authorize_licence_revoke` with the
+///   dependency widening, then the dependency-release engine.
+#[utoipa::path(
+    post,
+    path = "/license/revoke",
+    tag = "tokens",
+    operation_id = "revoke_token",
+    summary = "Revoke Token Or License",
+    description = "Revoke a token or all tokens for a license\n\nRequires 'license-admin' or 'license-manager' role\nVerifies tenant ownership before revocation",
+    params(
+        ("X-Tenant-Id" = Option<String>, Header, description = "Tenant identifier. Omit to accept the service-side default; when sent, it must be the caller's own tenant id.")
+    ),
+    request_body = TokenRevokeRequest,
+    responses(
+        (status = 200, body = TokenRevokeResponse),
+        (status = 400, body = ErrorResponse),
+        (status = 401, body = ErrorResponse),
+        (status = 403, body = ErrorResponse),
+        (status = 404, body = ErrorResponse),
+        (status = 409, body = ErrorResponse),
+        (status = 422, body = HTTPValidationError),
+        (status = 500, body = ErrorResponse)
+    )
+)]
+pub async fn revoke(
+    State(state): State<AppState>,
+    Extension(user): Extension<User>,
+    Json(request): Json<TokenRevokeRequest>,
+) -> Result<Json<TokenRevokeResponse>, Refusal> {
+    // The reference resolves both FastAPI dependencies before the handler body runs, so a
+    // wrong role or a missing tenant wins over any body semantics.
+    let tenant = require_tenant_id(&user)?;
+    require_any_realm_role(&user, &["license-admin", "license-manager"])?;
+    let Some(pool) = state.pool.as_ref() else {
+        return Err(revocation_failed("no database connection"));
+    };
+    // `require_tenant_id` already validated the shape; keep the reference's ValueError answer.
+    let tenant_uuid = Uuid::try_parse(&tenant).map_err(|_| bad_request("Invalid UUID"))?;
+
+    // Python truthiness: an empty string is not a provided field.
+    let token = request.token.as_deref().filter(|value| !value.is_empty());
+    let license_id = request
+        .license_id
+        .as_deref()
+        .filter(|value| !value.is_empty());
+
+    if let Some(raw_token) = token {
+        // `_authorize_token_revoke`: the known-owner gate is unconditional, the licence walk
+        // only when the tenant owns a row for this hash.
+        issuance::require_known_owner(&user)?;
+        let licences = issuance::licences_for_token_hash_in_tenant(pool, raw_token, &tenant)
+            .await
+            .map_err(revocation_failed)?;
+        if !licences.is_empty() {
+            issuance::authorize_licence_revoke(
+                pool,
+                &user,
+                &licences,
+                Some(tenant_uuid),
+                "token_revoke",
+                false,
+            )
+            .await?;
+        }
+
+        let (outcome, revoked_count) =
+            crate::db::tokens::revoke_token_for_tenant(pool, raw_token, &tenant)
+                .await
+                .map_err(revocation_failed)?;
+        let (revoked, message) = match outcome {
+            RevokeOutcome::Revoked if revoked_count > 1 => (
+                true,
+                format!(
+                    "Token revoked successfully ({revoked_count} token records shared this \
+                     token; all were revoked)"
+                ),
+            ),
+            RevokeOutcome::Revoked => (true, "Token revoked successfully".to_owned()),
+            // Idempotent: the caller asked for a state the row is already in.
+            RevokeOutcome::AlreadyRevoked => (true, "Token was already revoked".to_owned()),
+            // "not_found" also covers "not your tenant", on purpose.
+            RevokeOutcome::NotFound => (false, "Token not found or already invalid".to_owned()),
+        };
+        return Ok(Json(TokenRevokeResponse {
+            revoked,
+            message,
+            released_dependency_ids: Some(Vec::new()),
+        }));
+    }
+
+    let Some(raw_license_id) = license_id else {
+        return Err(bad_request(
+            "Either 'token' or 'license_id' must be provided",
+        ));
+    };
+    let license_id = Uuid::try_parse(raw_license_id).map_err(|_| bad_request("Invalid UUID"))?;
+
+    // Tenant ownership BEFORE any authorization, with one message for unknown and foreign.
+    let Some(licence) = crate::db::tokens::licence_for_revoke(pool, license_id)
+        .await
+        .map_err(revocation_failed)?
+    else {
+        return Ok(Json(license_not_found()));
+    };
+    if licence.tenant_id != tenant_uuid {
+        return Ok(Json(license_not_found()));
+    }
+
+    // Issuer rule, or the tenant owner over bundle-minted / dependency rows.
+    issuance::authorize_licence_revoke(
+        pool,
+        &user,
+        std::slice::from_ref(&licence),
+        Some(tenant_uuid),
+        "licence_revoke",
+        true,
+    )
+    .await?;
+
+    // A still-required DEPENDENCY licence is a 409 for every caller except the cross-owner
+    // break-glass, which may force it (the engine logs `dependency_force_revoked`).
+    let refuse_required = licence.is_dependency && !user.cross_owner;
+    let actor = if user.sub.is_empty() {
+        user.azp.clone().unwrap_or_default()
+    } else {
+        user.sub.clone()
+    };
+    let outcome = dependencies::revoke_license_releasing_dependencies(
+        pool,
+        license_id,
+        &actor,
+        refuse_required,
+    )
+    .await
+    .map_err(revocation_failed)?;
+
+    match outcome {
+        dependencies::Outcome::Revoked { released_ids } => {
+            let mut message = "License and all tokens revoked successfully".to_owned();
+            if !released_ids.is_empty() {
+                message.push_str(&format!(
+                    "; {} dependency licence(s) no longer required were released",
+                    released_ids.len()
+                ));
+            }
+            Ok(Json(TokenRevokeResponse {
+                revoked: true,
+                message,
+                released_dependency_ids: Some(released_ids.iter().map(Uuid::to_string).collect()),
+            }))
+        }
+        // The row vanished between the ownership read and the engine's own read.
+        dependencies::Outcome::NotFound => Ok(Json(license_not_found())),
+        dependencies::Outcome::DependencyStillRequired { required_by } => {
+            let required_by: Vec<Value> = required_by
+                .iter()
+                .map(|row| {
+                    json!({
+                        "license_id": row.license_id.to_string(),
+                        "tenant_id": row.tenant_id.to_string(),
+                        "app_key": row.app_key,
+                    })
+                })
+                .collect();
+            Err(Refusal::detail(
+                StatusCode::CONFLICT,
+                json!({
+                    "code": "dependency_still_required",
+                    // `error` mirrors `code`: this service's 409 discriminator key.
+                    "error": "dependency_still_required",
+                    "license_id": raw_license_id,
+                    "required_by": required_by,
+                    "message": "a remaining active licence on this tenant still requires this \
+                                dependency; revoke that licence and the dependency is released",
+                }),
+            ))
+        }
+        dependencies::Outcome::EnsureInProgress => Err(Refusal::detail(
+            StatusCode::CONFLICT,
+            json!({
+                "code": "ensure_in_progress",
+                "error": "ensure_in_progress",
+                "license_id": raw_license_id,
+                "message": "a bundle ensure for this tenant is running; retry",
+            }),
+        )),
+    }
+}
+
+fn license_not_found() -> TokenRevokeResponse {
+    TokenRevokeResponse {
+        revoked: false,
+        message: "License not found".to_owned(),
+        released_dependency_ids: Some(Vec::new()),
+    }
+}
+
+fn bad_request(message: &'static str) -> Refusal {
+    Refusal::detail(StatusCode::BAD_REQUEST, message)
+}
+
+fn revocation_failed(error: impl std::fmt::Display) -> Refusal {
+    tracing::error!(error = %error, "Revocation failed");
+    Refusal::detail(StatusCode::INTERNAL_SERVER_ERROR, "Revocation failed")
 }

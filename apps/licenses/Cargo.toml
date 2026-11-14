@@ -22,6 +22,7 @@ clap = { workspace = true }
 conveyor-auth = { path = "../../crates/auth" }
 conveyor-platform = { path = "../../crates/platform" }
 jsonwebtoken = { workspace = true }
+metrics-exporter-prometheus = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 sha2 = { workspace = true }
