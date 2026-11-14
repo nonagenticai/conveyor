@@ -359,6 +359,10 @@ pub(crate) async fn process_runs_start(
         depth: 0,
         // The run pins the process version it executes (CONTRACT §21).
         process_version: process.version,
+        // A process run carries no job binding of its own (T0): the pin is a run's property,
+        // and process runs get theirs from the caller's card once T2 wires it.
+        job_binding_id: None,
+        release_hash: None,
     };
     let run = match input.parent_run_id {
         Some(parent) => {

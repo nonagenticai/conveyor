@@ -328,6 +328,7 @@ fn s08_owns_no_principles_or_decisions_action() {
     // programmes and stakeholders. The count moves only when a slice ADDS scopes — S09 added six (documents, secrets, integrations),
     // S11 added two (`processes:read|write`); S16 added two (`inference:read|write`); S17 added
     // two (`benchmarks:read|write`); S19 added three (`evals:read|write|approve`); S13 added two
-    // (`workflows:read|write`); S15 added two (`capabilities:read|write`).
-    assert_eq!(conveyor_actions::Scope::ALL.len(), 63);
+    // (`workflows:read|write`); S15 added two (`capabilities:read|write`); T0 added two
+    // (`organisation:read|write`).
+    assert_eq!(conveyor_actions::Scope::ALL.len(), 65);
 }
