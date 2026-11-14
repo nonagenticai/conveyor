@@ -8,13 +8,34 @@ Nothing here is regenerated from the rewrite.
 
 | File | What it is |
 |---|---|
-| `openapi.lock.json` | the contract the service must serve (25 paths, 26 operations) |
-| `manifest.json` | when it was captured, from which commit and image digest, and the lock's sha256 |
-| `drop.jq` | the two graph surfaces this rewrite does not carry, with the reason |
+| `openapi.lock.json` | the contract the service must serve (17 paths, 18 operations) |
+| `manifest.json` | when it was captured, from which commit and image digest, the lock's sha256, and every path the filter dropped |
+| `drop.jq` | the surfaces this rewrite does not carry, with the reason for each |
 | `capture.sh` | captures the lock from a running old service |
 | `run-local.sh` | boots the old service with the dead graph/discovery clients stubbed (`ENVIRONMENT=development`) |
 | `capture-goldens.sh` | captures synthetic request/response pairs into `golden/` |
 | `tolerances.toml` | every declared float tolerance and every ignored field |
+
+## What is not carried, and why
+
+Two tests, one decision, applied the same way: an operation whose only data source no longer exists,
+or whose runtime already exists as another conveyor tool, is not ported.
+
+- **The graph surfaces** — `/api/topology/*`, `/api/explain/*`.
+- **The graph-dependent operations** — `verify/cove` and `verify/integrity` (the discovery engine and
+  the graph adapter), `pipeline/trigger|webhook|batch` (they ask the graph which entities to read).
+  The store was destroyed on 2026-11-01 and both backends are gone.
+- **The sandbox** — `sandbox/execute|jobs|results` would be a second code-execution runtime; the
+  conveyor already dispatches execution through the coding service.
+
+No live consumer exists for any of them: the Deployment has been at `replicas: 0` for 188 days.
+
+## Goldens cannot cover everything
+
+A golden is the old service's own answer to a fixed input, which is only meaningful when the answer
+is a function of that input. The ten routes that call a model, a prover or an object store are
+therefore proven by contract tests in their modules instead, and `tests/parity.rs` names every one of
+them so the gap cannot widen silently.
 
 ## Reproducing the capture
 

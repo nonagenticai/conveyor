@@ -42,6 +42,11 @@ curl -fsS --max-time 30 "$live/openapi.json" -o "$raw"
 raw_paths="$(jq -S '.paths | length' "$raw")"
 jq -S . "$raw" | jq -S -f "$here/drop.jq" > "$out/openapi.lock.json"
 
+# What the filter removed, computed from the two documents rather than restated here: a manifest
+# that repeats the filter's list can drift from it, and the exact paths are the evidence.
+dropped="$(jq -n --slurpfile raw "$raw" --slurpfile lock "$out/openapi.lock.json" \
+    '($raw[0].paths | keys) - ($lock[0].paths | keys)')"
+
 if command -v shasum >/dev/null 2>&1; then
     lock_sha="$(shasum -a 256 "$out/openapi.lock.json" | cut -d' ' -f1)"
 else
@@ -56,9 +61,10 @@ jq -n \
     --argjson raw_paths "$raw_paths" \
     --argjson paths "$(jq '.paths | length' "$out/openapi.lock.json")" \
     --argjson schemas "$(jq '.components.schemas | length' "$out/openapi.lock.json")" \
+    --argjson dropped "$dropped" \
     '{service:"scientific", captured_at:$at, source_commit:$commit, image_digest:$digest, lock_sha256:$sha,
       openapi:"3.1.0", captured_paths:$raw_paths, paths:$paths, schemas:$schemas,
-      dropped:["/api/topology/*","/api/explain/*"]}' \
+      dropped:$dropped}' \
     > "$out/manifest.json"
 
 echo "wrote $out/openapi.lock.json ($lock_sha) and $out/manifest.json"

@@ -15,7 +15,7 @@ conveyor is both.
    |---|---|---|
    | `apps/scientific` | the scientific research service (:8808), the evidence-review service (:8810) | one evidence family — meta-analysis, survival, PRISMA screening; CPU-bound, no browser, no GPU |
    | `apps/research` | the web-scraper service (:9119), the media-discovery service (:8809) | outbound web fetchers; IO-bound, no numerics stack |
-   | `apps/media` | the w2v stage fleet (analysis, content, ai-content-generation, slide, html-render, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, tts-gateway) and the video-compiler service; their shared library becomes `crates/media` | one ffmpeg/render chain; the orchestrator's sequencing becomes procedures, not a service |
+   | `apps/media` | the separable media services — html-render, slide, video-production, frontend-test-runner (Chromium); video-compiler, video-analyzer (ffmpeg); tts-gateway, youtube-upload (thin) | grouped **by runtime**, because they do not share one. Corrected 2026-11-14: the "w2v stages" are not services — they live in `w2v_orchestrator/src/services/stages/` (18 directories), i.e. inside the orchestrator that is out of scope, and `w2v_common` is a library, not a service |
    | `apps/lean4-prover` | the Lean 4 prover (already Rust) | crate moves in; the deployable stays separate — 10.6 GB of toolchain state and a node pin |
    | `apps/coding` | the `coding-*` fleet | already being rewritten in its own Rust repository; **join that work, never a second rewrite** |
    | in flight | `apps/inference-router` (merged), `apps/licenses` (#45), `apps/billing-service` (#46) | ADR 0004/0005 |
@@ -30,12 +30,25 @@ conveyor is both.
    coding rewrites are performed by the conveyor's own development project stands; this ADR fixes
    only their destination.
 
-4. **`scientific-processor` drops its graph surface.** The `/api/topology` and `/api/explain`
-   routes, the graph services behind them (centrality, community, subgraph, subgraphx,
-   contradiction), and the graph-adapter and discovery-engine clients are **not ported**. Their only
-   upstream's data was destroyed on 2026-11-01, nothing serves them, and no consumer exists. A
-   capability with no live consumer is retired, not rewritten (P10). If that capability is ever
-   wanted back it is a new one with a live upstream, never a restoration of the capture.
+4. **`scientific-processor` carries only what has a live upstream.** Two drops, one test — an
+   operation whose only data source no longer exists, or whose runtime already exists as another
+   conveyor tool, is not ported. A capability with no live consumer is retired, not rewritten (P10).
+   If any of it is ever wanted back it is a new capability with a live upstream, never a restoration
+   of the capture.
+   - **The graph surface.** `/api/topology` and `/api/explain`, the graph services behind them
+     (centrality, community, subgraph, subgraphx, contradiction), and the graph-adapter and
+     discovery-engine clients. Their store was destroyed on 2026-11-01.
+   - **The graph-dependent operations** (`verify/cove`, `verify/integrity`,
+     `pipeline/trigger|webhook|batch`): the same store, reached through the same two dead clients.
+   - **The sandbox** (`sandbox/execute|jobs|results`): a second code-execution runtime when the
+     conveyor already dispatches execution as `coding_jobs.create` / `coding_jobs.get`.
+   - **Consequence — no database.** With the sandbox and the pipeline producers gone, nothing in the
+     surviving service writes a row. It ships with no Postgres and no migration, and `verify` answers
+     `422 language_not_supported` for `z3`/`sympy` because their evaluation was the retired Python
+     sandbox's, not a library a Rust port can reimplement faithfully.
+
+   The lock therefore carries 18 of the captured 26 operations. No live consumer is lost: the
+   Deployment has been at `replicas: 0` since 2026-11-01.
 
 ## Context
 
@@ -47,7 +60,8 @@ order — which is how a programme of twenty Python services becomes twenty sepa
 lanes.
 
 Measured 2026-11-14: `apps/` held `inference-router`, `server`, `web`; the four kag-era services and
-every w2v stage are separate Python repositories; `nonagenticai/coding` is already Rust and under
+every media service are separate Python repositories (the w2v *stages* are orchestrator code, not
+repositories — see the corrected `apps/media` row); `nonagenticai/coding` is already Rust and under
 active construction.
 
 ## What this supersedes

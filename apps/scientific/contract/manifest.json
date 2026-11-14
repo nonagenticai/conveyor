@@ -1,15 +1,27 @@
 {
   "service": "scientific",
-  "captured_at": "2026-11-14T17:09:38Z",
+  "captured_at": "2026-11-14T17:38:58Z",
   "source_commit": "7d9905933405f1a8b568c5e29c64926c764bb75d",
   "image_digest": "sha256:23a326812f2ea41af88cca11dee3bae630f193eaffdd5705c67f8ce50ceff301",
-  "lock_sha256": "43b636fd02a029612c62ff4ace061f1e6071ee1c103ebf1c5629a57e672fe83e",
+  "lock_sha256": "d1bd15de0ea0faa6d622625544a3e6e480233cb40d4e419093ae8a414600ae6e",
   "openapi": "3.1.0",
   "captured_paths": 31,
-  "paths": 25,
+  "paths": 17,
   "schemas": 47,
   "dropped": [
-    "/api/topology/*",
-    "/api/explain/*"
+    "/api/explain/jobs/{job_id}",
+    "/api/explain/subgraphx",
+    "/api/pipeline/batch",
+    "/api/pipeline/trigger",
+    "/api/pipeline/webhook",
+    "/api/sandbox/execute",
+    "/api/sandbox/jobs/{job_id}",
+    "/api/sandbox/results/{job_id}",
+    "/api/topology/authority",
+    "/api/topology/communities",
+    "/api/topology/contradictions",
+    "/api/topology/subgraph",
+    "/api/verify/cove",
+    "/api/verify/integrity"
   ]
 }
