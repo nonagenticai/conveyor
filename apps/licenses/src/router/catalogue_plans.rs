@@ -206,11 +206,7 @@ fn optional_string(
 }
 
 /// Required, non-null UUID (`app_id`).
-fn required_uuid(
-    object: &Map<String, Value>,
-    field: &str,
-    whole: &Value,
-) -> Result<Uuid, Refusal> {
+fn required_uuid(object: &Map<String, Value>, field: &str, whole: &Value) -> Result<Uuid, Refusal> {
     match object.get(field) {
         None => Err(body_error(json!({
             "type": "missing",
@@ -222,10 +218,7 @@ fn required_uuid(
     }
 }
 
-fn optional_uuid(
-    object: &Map<String, Value>,
-    field: &str,
-) -> Result<Option<Uuid>, Refusal> {
+fn optional_uuid(object: &Map<String, Value>, field: &str) -> Result<Option<Uuid>, Refusal> {
     match object.get(field) {
         None | Some(Value::Null) => Ok(None),
         Some(value) => parse_uuid(field, value).map(Some),
@@ -565,7 +558,14 @@ pub async fn create_plan(
             format!("App {} not found", plan.app_id),
         ));
     }
-    authorize_app_admin(pool, &user, plan.app_id, "plan_create", "Failed to create plan").await?;
+    authorize_app_admin(
+        pool,
+        &user,
+        plan.app_id,
+        "plan_create",
+        "Failed to create plan",
+    )
+    .await?;
 
     if let Some(region_id) = plan.region_id {
         let region = catalogue_plans::get_region(pool, region_id)

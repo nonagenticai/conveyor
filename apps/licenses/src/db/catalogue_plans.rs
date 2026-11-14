@@ -215,10 +215,7 @@ pub async fn list_plans(
     if let Some(region_id) = region_id {
         builder.push(" AND region_id = ").push_bind(region_id);
     }
-    builder
-        .build_query_as::<PlanRow>()
-        .fetch_all(pool)
-        .await
+    builder.build_query_as::<PlanRow>().fetch_all(pool).await
 }
 
 /// `DatabaseManager.update_plan`: write only the fields that were SENT.
@@ -262,7 +259,10 @@ pub async fn update_plan(
     }
     builder.push(" WHERE id = ").push_bind(plan_id);
     builder.push(" RETURNING ").push(PLAN_COLUMNS);
-    builder.build_query_as::<PlanRow>().fetch_optional(pool).await
+    builder
+        .build_query_as::<PlanRow>()
+        .fetch_optional(pool)
+        .await
 }
 
 /// `DatabaseManager.delete_plan`: a hard delete, refused while a licence references the plan.
@@ -270,10 +270,7 @@ pub async fn update_plan(
 /// The reference checks the licence count and then deletes (there is no transaction); a licence
 /// inserted between the two makes the DELETE raise the FK's `23503`, which the route reports as
 /// its 500 — the same shape the reference produces.
-pub async fn delete_plan(
-    pool: &PgPool,
-    plan_id: Uuid,
-) -> Result<DeletePlanOutcome, sqlx::Error> {
+pub async fn delete_plan(pool: &PgPool, plan_id: Uuid) -> Result<DeletePlanOutcome, sqlx::Error> {
     let exists: Option<Uuid> = sqlx::query_scalar("SELECT id FROM plan WHERE id = $1")
         .bind(plan_id)
         .fetch_optional(pool)

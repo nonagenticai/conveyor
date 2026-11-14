@@ -101,33 +101,19 @@ fn cross_owner() -> User {
 }
 
 /// The seven routes alone, with the caller the middleware would have built.
-fn route(
-    db: &common::TestDb,
-    caller: User,
-    metering: Option<Arc<MeteringProvisioner>>,
-) -> Router {
+fn route(db: &common::TestDb, caller: User, metering: Option<Arc<MeteringProvisioner>>) -> Router {
     Router::new()
         .route("/plans", route_get(list_plans).post(create_plan))
         .route(
             "/plans/{plan_id}",
-            route_get(get_plan)
-                .patch(update_plan)
-                .delete(delete_plan),
+            route_get(get_plan).patch(update_plan).delete(delete_plan),
         )
-        .route(
-            "/regions",
-            route_get(list_regions).post(create_region),
-        )
+        .route("/regions", route_get(list_regions).post(create_region))
         .layer(axum::Extension(caller))
         .with_state(app_state(db.pool.clone(), metering))
 }
 
-async fn send(
-    app: Router,
-    method: Method,
-    path: &str,
-    body: Option<Value>,
-) -> (StatusCode, Value) {
+async fn send(app: Router, method: Method, path: &str, body: Option<Value>) -> (StatusCode, Value) {
     let request = Request::builder().method(method).uri(path);
     let request = match body {
         Some(body) => request
@@ -205,7 +191,11 @@ async fn seeded() -> common::TestDb {
         .expect("instant")
         .with_timezone(&chrono::Utc);
 
-    for (owner, name) in [("owner-a", "Owner A"), ("owner-b", "Owner B"), ("owner-c", "Owner C")] {
+    for (owner, name) in [
+        ("owner-a", "Owner A"),
+        ("owner-b", "Owner B"),
+        ("owner-c", "Owner C"),
+    ] {
         sqlx::query("INSERT INTO tenant_owner (key, display_name) VALUES ($1, $2)")
             .bind(owner)
             .bind(name)
@@ -213,7 +203,10 @@ async fn seeded() -> common::TestDb {
             .await
             .expect("tenant_owner");
     }
-    for (id, name, owner) in [(TENANT_A, "tenant-a", "owner-a"), (TENANT_B, "tenant-b", "owner-b")] {
+    for (id, name, owner) in [
+        (TENANT_A, "tenant-a", "owner-a"),
+        (TENANT_B, "tenant-b", "owner-b"),
+    ] {
         sqlx::query(
             "INSERT INTO tenants (id, name, created_at, owner_key, byo_mode)
              VALUES ($1, $2, now(), $3, 'local_allowed')",
@@ -263,21 +256,55 @@ async fn seeded() -> common::TestDb {
         (REGION_US, "us", "United States", true),
         (REGION_OFF, "apac", "Asia Pacific", false),
     ] {
-        sqlx::query("INSERT INTO region (id, code, name, active, created_at) VALUES ($1,$2,$3,$4,$5)")
-            .bind(id)
-            .bind(code)
-            .bind(name)
-            .bind(active)
-            .bind(instant)
-            .execute(&db.pool)
-            .await
-            .expect("region");
+        sqlx::query(
+            "INSERT INTO region (id, code, name, active, created_at) VALUES ($1,$2,$3,$4,$5)",
+        )
+        .bind(id)
+        .bind(code)
+        .bind(name)
+        .bind(active)
+        .bind(instant)
+        .execute(&db.pool)
+        .await
+        .expect("region");
     }
     for (id, app, code, name, region, budget, revoked) in [
-        (PLAN_BASIC, APP_ALPHA, "basic", "Basic", None, Some(50_000_000), false),
-        (PLAN_REGIONED, APP_ALPHA, "eu-plan", "EU Plan", Some(REGION_EU), Some(10), false),
-        (PLAN_REVOKED, APP_ALPHA, "legacy", "Legacy", None, None, true),
-        (PLAN_PUSH, APP_ZETA, "push", "Push", None, Some(50_000_000), false),
+        (
+            PLAN_BASIC,
+            APP_ALPHA,
+            "basic",
+            "Basic",
+            None,
+            Some(50_000_000),
+            false,
+        ),
+        (
+            PLAN_REGIONED,
+            APP_ALPHA,
+            "eu-plan",
+            "EU Plan",
+            Some(REGION_EU),
+            Some(10),
+            false,
+        ),
+        (
+            PLAN_REVOKED,
+            APP_ALPHA,
+            "legacy",
+            "Legacy",
+            None,
+            None,
+            true,
+        ),
+        (
+            PLAN_PUSH,
+            APP_ZETA,
+            "push",
+            "Push",
+            None,
+            Some(50_000_000),
+            false,
+        ),
     ] {
         sqlx::query(
             "INSERT INTO plan
@@ -583,7 +610,10 @@ async fn create_plan_returns_the_exact_shape_with_the_metered_defaults() {
     )
     .await;
     assert_eq!(status, StatusCode::NOT_FOUND);
-    assert_eq!(body, json!({"detail": format!("App {missing_app} not found")}));
+    assert_eq!(
+        body,
+        json!({"detail": format!("App {missing_app} not found")})
+    );
 
     let missing_region = Uuid::from_u128(98);
     let (status, body) = post(
@@ -598,7 +628,10 @@ async fn create_plan_returns_the_exact_shape_with_the_metered_defaults() {
     )
     .await;
     assert_eq!(status, StatusCode::NOT_FOUND);
-    assert_eq!(body, json!({"detail": format!("Region {missing_region} not found")}));
+    assert_eq!(
+        body,
+        json!({"detail": format!("Region {missing_region} not found")})
+    );
 
     // Role and app-ownership guards, in the reference's order.
     let (status, body) = post(
@@ -743,14 +776,13 @@ async fn update_plan_writes_only_the_fields_the_caller_sent() {
     for (payload, expected) in [
         (json!({}), json!("No fields to update")),
         (json!({"unknown": 1}), json!("No fields to update")),
-        (json!({"revoked": null}), json!("revoked must be true or false")),
+        (
+            json!({"revoked": null}),
+            json!("revoked must be true or false"),
+        ),
     ] {
-        let (status, body) = patch(
-            route(&db, admin("owner-a"), None),
-            &path,
-            payload.clone(),
-        )
-        .await;
+        let (status, body) =
+            patch(route(&db, admin("owner-a"), None), &path, payload.clone()).await;
         assert_eq!(status, StatusCode::BAD_REQUEST, "{payload}");
         assert_eq!(body, json!({"detail": expected}));
     }
@@ -856,7 +888,11 @@ async fn a_failed_billing_push_never_fails_the_update() {
         json!({"token_budget_monthly": 70_000_000}),
     )
     .await;
-    assert_eq!(status, StatusCode::OK, "a billing fault must not reach the caller: {body}");
+    assert_eq!(
+        status,
+        StatusCode::OK,
+        "a billing fault must not reach the caller: {body}"
+    );
     assert_eq!(body["token_budget_monthly"], 70_000_000);
 
     // The reference clears the verification stamp on failure so the reconcile sweep repairs it.
@@ -876,18 +912,15 @@ async fn list_plans_hides_revoked_and_applies_both_filters() {
     let db = seeded().await;
     let (status, body) = get(route(&db, reader(), None), "/plans").await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(
-        ids(&body),
-        {
-            let mut expected = vec![
-                PLAN_BASIC.to_string(),
-                PLAN_REGIONED.to_string(),
-                PLAN_PUSH.to_string(),
-            ];
-            expected.sort();
-            expected
-        }
-    );
+    assert_eq!(ids(&body), {
+        let mut expected = vec![
+            PLAN_BASIC.to_string(),
+            PLAN_REGIONED.to_string(),
+            PLAN_PUSH.to_string(),
+        ];
+        expected.sort();
+        expected
+    });
 
     let (status, body) = get(
         route(&db, admin("owner-a"), None),
@@ -895,14 +928,11 @@ async fn list_plans_hides_revoked_and_applies_both_filters() {
     )
     .await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(
-        ids(&body),
-        {
-            let mut expected = vec![PLAN_BASIC.to_string(), PLAN_REGIONED.to_string()];
-            expected.sort();
-            expected
-        }
-    );
+    assert_eq!(ids(&body), {
+        let mut expected = vec![PLAN_BASIC.to_string(), PLAN_REGIONED.to_string()];
+        expected.sort();
+        expected
+    });
 
     let (status, body) = get(
         route(&db, admin("owner-a"), None),
@@ -932,11 +962,7 @@ async fn list_plans_hides_revoked_and_applies_both_filters() {
 #[tokio::test]
 async fn get_plan_returns_one_row_and_404s_otherwise() {
     let db = seeded().await;
-    let (status, body) = get(
-        route(&db, reader(), None),
-        &format!("/plans/{PLAN_BASIC}"),
-    )
-    .await;
+    let (status, body) = get(route(&db, reader(), None), &format!("/plans/{PLAN_BASIC}")).await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(
         body,
@@ -1053,13 +1079,16 @@ async fn create_region_is_idempotent_by_code() {
     )
     .await;
     assert_eq!(status, StatusCode::OK, "{body}");
-    assert_eq!(body, json!({
-        "id": REGION_EU.to_string(),
-        "code": "eu",
-        "name": "Europe",
-        "active": true,
-        "created_at": CREATED
-    }));
+    assert_eq!(
+        body,
+        json!({
+            "id": REGION_EU.to_string(),
+            "code": "eu",
+            "name": "Europe",
+            "active": true,
+            "created_at": CREATED
+        })
+    );
 
     let (status, body) = post(
         route(&db, admin("owner-a"), None),
@@ -1126,29 +1155,27 @@ async fn list_regions_defaults_to_active_only() {
 
     let (status, body) = get(route(&db, reader(), None), "/regions").await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(
-        ids(&body),
-        {
-            let mut expected = vec![REGION_EU.to_string(), REGION_US.to_string()];
-            expected.sort();
-            expected
-        }
-    );
+    assert_eq!(ids(&body), {
+        let mut expected = vec![REGION_EU.to_string(), REGION_US.to_string()];
+        expected.sort();
+        expected
+    });
 
-    let (status, body) = get(route(&db, admin("owner-a"), None), "/regions?active_only=false").await;
+    let (status, body) = get(
+        route(&db, admin("owner-a"), None),
+        "/regions?active_only=false",
+    )
+    .await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(
-        ids(&body),
-        {
-            let mut expected = vec![
-                REGION_EU.to_string(),
-                REGION_US.to_string(),
-                REGION_OFF.to_string(),
-            ];
-            expected.sort();
-            expected
-        }
-    );
+    assert_eq!(ids(&body), {
+        let mut expected = vec![
+            REGION_EU.to_string(),
+            REGION_US.to_string(),
+            REGION_OFF.to_string(),
+        ];
+        expected.sort();
+        expected
+    });
 
     let (status, body) = get(
         route(&db, admin("owner-a"), None),
