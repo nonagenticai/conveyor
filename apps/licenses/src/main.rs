@@ -8,6 +8,7 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 use conveyor_licenses::SERVICE_NAME;
+use conveyor_licenses::auth::JwtVerifier;
 use conveyor_licenses::config::Config;
 use conveyor_licenses::contract;
 use conveyor_licenses::db;
@@ -101,18 +102,31 @@ fn serve() -> ExitCode {
 #[tokio::main]
 async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
     let config = Config::from_env()?;
+    let port = config.port;
+    let environment = config.environment.clone();
+    let version = config.version.clone();
     let database_url = config.database_url()?.to_owned();
     conveyor_platform::telemetry::init(SERVICE_NAME);
     let pool = db::connect(&database_url, 5).await?;
-    let state = AppState::new(pool, config.environment.clone(), config.version.clone());
-    let listener = tokio::net::TcpListener::bind(config.bind()).await?;
-    tracing::info!(
-        port = config.port,
-        environment = %config.environment,
-        version = %config.version,
-        "serving"
+    if config.trusted_issuers.is_empty() {
+        // Fail closed and say why: with no allowlist every JWT is refused, which is the
+        // reference's behaviour but must not be mistaken for "auth is off".
+        tracing::warn!(
+            "no trusted JWT issuer configured (KEYCLOAK_TRUSTED_ISSUERS / KEYCLOAK_URL unset): every JWT will be refused"
+        );
+    }
+    let verifier = JwtVerifier::new(
+        config.trusted_issuers.clone(),
+        conveyor_licenses::auth::production_source(),
     );
-    axum::serve(listener, router::router(state)).await?;
+    let state = AppState::new(pool, config, verifier);
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{port}")).await?;
+    tracing::info!(port, %environment, %version, "serving");
+    axum::serve(
+        listener,
+        router::router(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .await?;
     Ok(())
 }
 

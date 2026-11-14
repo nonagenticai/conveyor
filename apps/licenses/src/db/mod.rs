@@ -12,6 +12,10 @@
 //! and `scripts/apply_migrations.py` only runs pending files. The live database is therefore the
 //! truth, and `migrations/0001_baseline.sql` is its `pg_dump --schema-only`.
 
+pub mod active;
+pub mod owners;
+pub mod tokens;
+
 use sqlx::migrate::Migrator;
 use sqlx::{PgPool, Postgres, Transaction};
 

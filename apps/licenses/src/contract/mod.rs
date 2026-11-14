@@ -145,14 +145,26 @@ mod tests {
         let error = check(&served(), crate::router::ROUTES)
             .expect_err("the port is incomplete by construction in slice 1");
         let message = error.to_string();
+        // Ported in slice 2: not missing, and no schema drift through the shared model.
         assert!(
-            message.contains("not registered: GET /licenses/active"),
+            !message.contains("not registered: GET /licenses/active"),
             "{message}"
         );
         assert!(
-            message.contains("not registered: POST /license/introspect"),
+            message.contains("not registered: POST /license/revoke"),
             "{message}"
         );
+        // Introspect IS ported: it must not be reported as missing, and its schema must not
+        // drift. This is the assertion that moves with each slice.
+        assert!(
+            !message.contains("not registered: POST /license/introspect"),
+            "{message}"
+        );
+        assert!(
+            !message.contains("documented but not registered: POST /license/introspect"),
+            "{message}"
+        );
+        assert!(!message.contains("TokenIntrospectResponse"), "{message}");
         assert!(
             !message.contains("not registered: GET /health"),
             "{message}"

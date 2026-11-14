@@ -19,14 +19,18 @@ path = "src/main.rs"
 axum = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }
+conveyor-auth = { path = "../../crates/auth" }
 conveyor-platform = { path = "../../crates/platform" }
+jsonwebtoken = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+sha2 = { workspace = true }
 sqlx = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 utoipa = { workspace = true }
+uuid = { workspace = true }
 
 [dev-dependencies]
 tower = { workspace = true }

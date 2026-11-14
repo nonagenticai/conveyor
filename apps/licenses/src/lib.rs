@@ -9,9 +9,11 @@
 //! `pg_dump --schema-only`; `contract/schema-diff.sh` applies it to a throwaway Postgres 18.6 and
 //! diffs the result against `contract/schema.lock.sql`.
 
+pub mod auth;
 pub mod config;
 pub mod contract;
 pub mod db;
+pub mod error;
 pub mod router;
 pub mod state;
 

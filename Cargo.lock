@@ -848,15 +848,19 @@ dependencies = [
  "axum",
  "chrono",
  "clap",
+ "conveyor-auth",
  "conveyor-platform",
+ "jsonwebtoken",
  "serde",
  "serde_json",
+ "sha2 0.10.9",
  "sqlx",
  "thiserror",
  "tokio",
  "tower",
  "tracing",
  "utoipa",
+ "uuid",
 ]
 
 [[package]]
