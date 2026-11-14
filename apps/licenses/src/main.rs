@@ -152,8 +152,8 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
         state = state.with_metering(std::sync::Arc::new(metering));
     } else {
         tracing::warn!(
-            "METERING_SERVICE_URL unset or unusable: created licences will not be metered; \
-             POST {} remains the repair path",
+            "METERING_SERVICE_URL unset or unusable: created licences will not be metered and \
+             bundle-ensure inserts are recorded metering-pending; POST {} remains the repair path",
             conveyor_licenses::billing::metering::METERING_RECONCILE_PATH
         );
     }

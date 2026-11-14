@@ -11,6 +11,7 @@
 
 pub mod health;
 pub mod internal_bundles;
+pub mod internal_ensure;
 pub mod internal_reads;
 pub mod internal_seat;
 pub mod licence_admin;
@@ -42,6 +43,10 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/internal/tenants"),
     ("GET", "/internal/tenants/{tenant_id}/seat-count"),
     ("POST", "/internal/tenants/{tenant_id}/bundle-token"),
+    (
+        "POST",
+        "/internal/tenants/{tenant_id}/bundles/{bundle_key}/ensure",
+    ),
     ("GET", "/licenses"),
     ("GET", "/licenses/active"),
     ("GET", "/licenses/admin/all"),
@@ -63,6 +68,7 @@ pub const ROUTES: &[(&str, &str)] = &[
         health::liveness,
         health::readiness,
         internal_bundles::internal_mint_tenant_bundle_token,
+        internal_ensure::internal_ensure_tenant_bundle,
         internal_reads::internal_get_license,
         internal_reads::internal_get_subject,
         internal_reads::internal_list_apps,
@@ -88,6 +94,10 @@ pub const ROUTES: &[(&str, &str)] = &[
         health::LivenessResponse,
         health::ReadinessResponse,
         internal_bundles::BundleTokenResponse,
+        internal_ensure::BundleEnsureApp,
+        internal_ensure::BundleEnsureRefusal,
+        internal_ensure::BundleEnsureRequest,
+        internal_ensure::BundleEnsureResponse,
         internal_reads::InternalAppResponse,
         internal_reads::InternalLicenseResponse,
         internal_reads::InternalSubjectResponse,
@@ -153,6 +163,10 @@ pub fn router(state: AppState) -> Router {
         .route(
             "/internal/tenants/{tenant_id}/bundle-token",
             post(internal_bundles::internal_mint_tenant_bundle_token),
+        )
+        .route(
+            "/internal/tenants/{tenant_id}/bundles/{bundle_key}/ensure",
+            post(internal_ensure::internal_ensure_tenant_bundle),
         )
         .route("/licenses", get(licence_admin::list_licenses))
         .route(

@@ -26,9 +26,10 @@ pub struct AppState {
     /// billing's mirror teardown. `None` when `METERING_SERVICE_URL` is unset — the reference
     /// warns and skips in that case too, and a revoke must never fail because of it.
     pub billing: Option<Arc<BillingTeardown>>,
-    /// billing's metering provisioner. `None` when `METERING_SERVICE_URL` is unset or unusable;
-    /// a licence is still created, its `metering_provisioned_at` stays NULL, and the reconcile
-    /// sweep repairs it. A metering failure never delays or changes the 201.
+    /// billing's metering provisioner. `None` when `METERING_SERVICE_URL` is unset or unusable:
+    /// a licence is still created (the user-licence route or a bundle-ensure insert), its
+    /// `metering_provisioned_at` stays NULL / the app is reported metering-pending, and the
+    /// reconcile sweep repairs it. A metering failure never delays or changes the response.
     pub metering: Option<Arc<MeteringProvisioner>>,
 }
 
