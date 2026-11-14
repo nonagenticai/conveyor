@@ -2819,6 +2819,8 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         plain("decisions.list", json!({"limit": 10}), None),
+        // Deterministic: the tenant's seeded card-type catalogue, read whole.
+        plain("card_types.list", json!({}), None),
         plain(
             "catalogues.list",
             json!({"kind": "phase", "limit": 10}),
@@ -3993,6 +3995,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 | "principles.list"
                 | "principles.list_conflicts"
                 | "decisions.list"
+                | "card_types.list"
                 | "catalogues.list"
                 | "search.query"
                 | "trace_links.list"

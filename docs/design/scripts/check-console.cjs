@@ -270,6 +270,7 @@ function startServer({ config, state, snapshot }) {
           "cards.comment",
           "cards.claim",
           "cards.release",
+          "card_types.list",
           "catalogues.list",
           "approvals.decide",
           "approvals.list",
@@ -326,6 +327,32 @@ function startServer({ config, state, snapshot }) {
           comments: state.comments[id] || [],
           task_lists: [],
           custom_field_values: [],
+        });
+      }
+      if (pathname === "/api/actions/card_types.list/invocations") {
+        // The read `catalogues.list` cannot serve: card_type is not one of the eleven
+        // catalogue namespaces. The definitions carry the outputs the card table renders.
+        return json(res, 200, {
+          items: [
+            {
+              id: "ct-1",
+              code: "architecture_task",
+              label: "Architecture task",
+              is_active: true,
+              definition: {
+                outputs: ["draft_artifact_id", "reviewed_artifact_id"],
+                acceptance: [],
+              },
+            },
+            {
+              id: "ct-2",
+              code: "bdd_test_development",
+              label: "BDD test development",
+              is_active: true,
+              definition: { outputs: ["pr_url", "head_sha", "merge_sha"], acceptance: [] },
+            },
+          ],
+          next_cursor: null,
         });
       }
       if (pathname === "/api/actions/cards.create/invocations") {
@@ -796,6 +823,14 @@ function readBody(req, done) {
         "no workspace write control before signing in",
       );
       assert.equal(signedOutState.requests.length, 0, "no API request on the signed-out projects page");
+      await page.goto(`http://127.0.0.1:${signedOutServer.port}/studio.html#execution`);
+      await page.waitForSelector(".page");
+      assert.equal(signedOutState.requests.length, 0, "no API request on the signed-out execution page");
+      assert.equal(
+        await page.locator('[data-v2="run-cancel"], [data-v2="approval-approve"]').count(),
+        0,
+        "no execution control before signing in",
+      );
       await page.close();
     }
 
@@ -884,6 +919,17 @@ function readBody(req, done) {
         await page.locator('[data-v2-input="project-page"]').innerText(),
         /S02/,
         "the project page lists the tenant's projects",
+      );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/card_types.list/invocations",
+        ),
+        "the console reads card_types.list, not a catalogue namespace",
+      );
+      assert.match(
+        await page.locator("#main").innerText(),
+        /draft_artifact_id/,
+        "a card's expected outputs render from its type definition",
       );
 
       await page.click('[data-v2="project-edit"][data-id="p-s02"]');
@@ -1040,6 +1086,11 @@ function readBody(req, done) {
       await page.waitForSelector("#console-move");
       await page.click('[data-v2="console-move"][data-id="c-1"]');
       await page.waitForSelector("text=Move refused");
+      assert.match(
+        await page.locator("#main").innerText(),
+        /Last action refused/,
+        "the refusal renders on the page, not only as a toast",
+      );
       consoleState.failMove = 0;
 
       // 401 clears the session and the page tells the truth
