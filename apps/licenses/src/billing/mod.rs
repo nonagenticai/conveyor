@@ -184,7 +184,23 @@ impl BillingTeardown {
         for attempt in 0..2 {
             match self.http.get(&list_path, Some(tenant_id)).await {
                 Ok(value) => {
-                    budget_ids = Some(license_sync_budget_ids(&value, license_id));
+                    let Some(ids) = license_sync_budget_ids(&value, license_id) else {
+                        // A 200 whose shape is neither `{"data": [...]}` nor a bare array is an
+                        // UNREADABLE list, not an empty one. The reference's `or []` folds this
+                        // into "nothing to tear down"; that is the residue becoming invisible
+                        // instead of merely present, so this port fails closed here.
+                        tracing::error!(
+                            marker = TOKEN_BUDGET_TEARDOWN_FAILURE_MARKER,
+                            license = license_id,
+                            tenant,
+                            status = "list_unreadable_shape",
+                            repair = RECONCILE_PATH,
+                            "the licence IS revoked but billing's budget list answered an \
+                             unrecognisable shape, so it may still hold live spending power for it"
+                        );
+                        return false;
+                    };
+                    budget_ids = Some(ids);
                     break;
                 }
                 Err(error) => {
@@ -267,20 +283,19 @@ impl BillingTeardown {
 /// Billing's list includes inactive rows and every other source, so all three filters are
 /// load-bearing. A row whose `id` is not a string is skipped rather than stringified: this
 /// service sends it straight back as a path segment.
-fn license_sync_budget_ids(value: &Value, license_id: &str) -> Vec<String> {
+fn license_sync_budget_ids(value: &Value, license_id: &str) -> Option<Vec<String>> {
     let rows = value
         .get("data")
         .and_then(Value::as_array)
-        .or_else(|| value.as_array());
-    let Some(rows) = rows else {
-        return Vec::new();
-    };
-    rows.iter()
-        .filter(|row| row.get("source").and_then(Value::as_str) == Some("license_sync"))
-        .filter(|row| row.get("active").and_then(Value::as_bool) == Some(true))
-        .filter(|row| row.get("license_id").and_then(Value::as_str) == Some(license_id))
-        .filter_map(|row| row.get("id").and_then(Value::as_str).map(str::to_owned))
-        .collect()
+        .or_else(|| value.as_array())?;
+    Some(
+        rows.iter()
+            .filter(|row| row.get("source").and_then(Value::as_str) == Some("license_sync"))
+            .filter(|row| row.get("active").and_then(Value::as_bool) == Some(true))
+            .filter(|row| row.get("license_id").and_then(Value::as_str) == Some(license_id))
+            .filter_map(|row| row.get("id").and_then(Value::as_str).map(str::to_owned))
+            .collect(),
+    )
 }
 
 fn tenant_id(raw: &str) -> Option<TenantId> {
@@ -355,7 +370,7 @@ mod tests {
         ]});
         assert_eq!(
             license_sync_budget_ids(&value, "lic-1"),
-            vec!["keep".to_owned()]
+            Some(vec!["keep".to_owned()])
         );
     }
 
@@ -364,12 +379,25 @@ mod tests {
         let value = json!([
             {"id": "a", "source": "license_sync", "active": true, "license_id": "x"}
         ]);
-        assert_eq!(license_sync_budget_ids(&value, "x"), vec!["a".to_owned()]);
+        assert_eq!(
+            license_sync_budget_ids(&value, "x"),
+            Some(vec!["a".to_owned()])
+        );
     }
 
     #[test]
-    fn an_unreadable_shape_yields_no_rows() {
-        assert!(license_sync_budget_ids(&json!({"rows": []}), "x").is_empty());
+    fn a_genuinely_empty_list_is_empty_not_unreadable() {
+        assert_eq!(
+            license_sync_budget_ids(&json!({"data": []}), "x"),
+            Some(Vec::new())
+        );
+    }
+
+    #[test]
+    fn an_unrecognisable_shape_is_unreadable_not_empty() {
+        // A 200 must not read as "nothing to tear down" just because its shape drifted.
+        assert_eq!(license_sync_budget_ids(&json!({"rows": []}), "x"), None);
+        assert_eq!(license_sync_budget_ids(&json!("oops"), "x"), None);
     }
 
     #[test]

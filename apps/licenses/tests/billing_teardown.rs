@@ -513,6 +513,21 @@ async fn a_404_on_a_budget_delete_counts_as_success() {
 }
 
 #[tokio::test]
+async fn a_404_on_a_quota_delete_is_residue_not_success() {
+    // Unlike billing's idempotent budget delete, the quota route has no "already gone" answer:
+    // its delete says 200 `{deleted:"0"}` when no row existed, so a 404 is a version skew.
+    let stub = Stub::new(Vec::new());
+    stub.set_quota_status(404);
+    let base = start_stub(stub.clone()).await;
+    let billing = BillingTeardown::new(&base, None).expect("billing client");
+
+    let ok = billing
+        .teardown_quota(&TENANT.to_string(), &LICENSE.to_string())
+        .await;
+    assert!(!ok, "a 404 on the quota route must not read as success");
+}
+
+#[tokio::test]
 async fn an_unreadable_budget_list_is_a_failure_not_an_empty_success() {
     let stub = Stub::new(budget_rows());
     stub.set_list_status(503);
