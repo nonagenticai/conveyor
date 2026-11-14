@@ -393,7 +393,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // retire`) so a tenant can author a map and have it validated; before this only the two
     // reads existed and the domain validator was unreachable through the API.
     // The external count moves exactly once, at step 8 — every other addition is internal.
-    assert_eq!((internal, external), (289, 15));
+    // #92 adds `card_types.list` (internal, read): 289 → 290.
+    assert_eq!((internal, external), (290, 15));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
