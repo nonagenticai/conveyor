@@ -6,15 +6,27 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # zizmor dependabot-cooldown: a compromised release is usually yanked within days.
+    # Security updates are exempt from cooldown by design.
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # zizmor dependabot-cooldown: a compromised release is usually yanked within days.
+    # Security updates are exempt from cooldown by design.
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # zizmor dependabot-cooldown: a compromised release is usually yanked within days.
+    # Security updates are exempt from cooldown by design.
+    cooldown:
+      default-days: 7
