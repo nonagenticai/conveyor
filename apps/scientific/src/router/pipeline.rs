@@ -71,6 +71,12 @@ pub async fn history(
     Path(entity_id): Path<String>,
 ) -> Result<Json<Value>, Failure> {
     let tenant = caller_tenant(&headers)?;
+    if !crate::router::safe_segment(&entity_id) {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            Json(json!({"detail": "entity_id is not an entity identifier"})),
+        ));
+    }
     let prefix = format!("history/{tenant}/{entity_id}/");
     let entries = load(&state, &prefix).await?;
     let total = entries.len();
@@ -249,6 +255,18 @@ mod tests {
         .expect("empty");
         assert_eq!(body["total"], 0);
         assert_eq!(body["entity_id"], "e1");
+    }
+
+    #[tokio::test]
+    async fn an_entity_id_that_cannot_be_a_key_segment_is_a_400() {
+        let result = history(
+            State(state_without_store()),
+            with_tenant("t1"),
+            Path("../other".to_owned()),
+        )
+        .await;
+        let (status, _) = result.expect_err("refused");
+        assert_eq!(status, StatusCode::BAD_REQUEST);
     }
 
     #[tokio::test]

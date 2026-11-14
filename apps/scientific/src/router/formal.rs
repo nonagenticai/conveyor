@@ -453,6 +453,12 @@ pub async fn create_proof(
     Json(body): Json<ProofStoreRequest>,
 ) -> Result<Json<ProofStored>, FormalFailure> {
     let tenant = caller_tenant(&headers)?;
+    if !crate::router::safe_segment(&claim_id) {
+        return Err(detail(
+            StatusCode::BAD_REQUEST,
+            "claim_id is not a claim identifier",
+        ));
+    }
     let created_at = chrono::Utc::now().format("%Y%m%dT%H%M%SZ").to_string();
     let key = format!("proofs/{claim_id}/{created_at}.json");
     let record = json!({
@@ -490,6 +496,12 @@ pub async fn get_proofs(
     Path(claim_id): Path<String>,
 ) -> Result<Json<Value>, FormalFailure> {
     let tenant = caller_tenant(&headers)?;
+    if !crate::router::safe_segment(&claim_id) {
+        return Err(detail(
+            StatusCode::BAD_REQUEST,
+            "claim_id is not a claim identifier",
+        ));
+    }
     let prefix = format!("proofs/{claim_id}/");
     let keys = objects::list(state.objects.as_ref(), &prefix)
         .await
@@ -650,6 +662,20 @@ mod tests {
             result.expect_err("no store"),
             FormalFailure::Refusal((StatusCode::INTERNAL_SERVER_ERROR, _))
         ));
+    }
+
+    #[tokio::test]
+    async fn a_claim_id_that_cannot_be_a_key_segment_is_a_400() {
+        let result = get_proofs(
+            State(state()),
+            with_tenant("t1"),
+            Path("../other".to_owned()),
+        )
+        .await;
+        match result.expect_err("refused") {
+            FormalFailure::Refusal((status, _)) => assert_eq!(status, StatusCode::BAD_REQUEST),
+            other => panic!("expected a refusal, got {other:?}"),
+        }
     }
 
     #[test]

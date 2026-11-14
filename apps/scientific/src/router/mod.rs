@@ -22,12 +22,27 @@ pub mod verify;
 /// A refusal whose body is the shape the old FastAPI service answered with.
 pub type Failure = (StatusCode, Json<Value>);
 
+/// A value that is safe to interpolate into an object key as one segment.
+///
+/// The history and proof keys are built by string interpolation (`history/{tenant}/{entity}/…`), so
+/// a caller-supplied `..` or `/` would move the prefix rather than select inside it — one tenant
+/// reading another's records. The old service interpolated the same way and inherited the escape;
+/// this port refuses the value instead, with the shape a path parameter can produce.
+pub fn safe_segment(value: &str) -> bool {
+    !value.is_empty()
+        && value.len() <= 200
+        && value != "."
+        && value != ".."
+        && !value.contains('/')
+        && !value.contains('\\')
+}
+
 /// The caller's tenant, from the one header that carries it.
 ///
 /// Fail-closed on purpose: this service has no configured default tenant, and a sentinel identity
 /// is exactly the thing that makes a cross-tenant mistake invisible.
 pub fn caller_tenant(headers: &HeaderMap) -> Result<String, Failure> {
-    headers
+    let tenant = headers
         .get("x-tenant-id")
         .and_then(|value| value.to_str().ok())
         .filter(|value| !value.is_empty())
@@ -37,7 +52,14 @@ pub fn caller_tenant(headers: &HeaderMap) -> Result<String, Failure> {
                 StatusCode::BAD_REQUEST,
                 Json(json!({"detail": "X-Tenant-Id is required"})),
             )
-        })
+        })?;
+    if !safe_segment(&tenant) {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            Json(json!({"detail": "X-Tenant-Id is not a tenant identifier"})),
+        ));
+    }
+    Ok(tenant)
 }
 
 /// Every operation this service serves, in the spelling the contract uses.
@@ -145,4 +167,37 @@ pub fn router(state: Shared) -> Router {
         .route("/api/pipeline/history/{entity_id}", get(pipeline::history))
         .route("/api/pipeline/anomalies", get(pipeline::anomalies))
         .with_state(state)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn tenant_headers(value: &str) -> HeaderMap {
+        let mut headers = HeaderMap::new();
+        headers.insert("x-tenant-id", value.parse().expect("header value"));
+        headers
+    }
+
+    #[test]
+    fn a_segment_that_can_move_the_prefix_is_refused() {
+        assert!(safe_segment("0195f48b-d000-7000-8000-000000000001"));
+        assert!(safe_segment("entity_1"));
+        for bad in ["", ".", "..", "../other", "a/b", "a\\b"] {
+            assert!(!safe_segment(bad), "{bad:?} must not be a key segment");
+        }
+        assert!(!safe_segment(&"x".repeat(201)));
+    }
+
+    #[test]
+    fn a_tenant_that_is_not_an_identifier_is_a_400() {
+        let (status, _) = caller_tenant(&tenant_headers("../other")).expect_err("refused");
+        assert_eq!(status, StatusCode::BAD_REQUEST);
+        let (status, _) = caller_tenant(&HeaderMap::new()).expect_err("refused");
+        assert_eq!(status, StatusCode::BAD_REQUEST);
+        assert_eq!(
+            caller_tenant(&tenant_headers("t1")).expect("accepted"),
+            "t1"
+        );
+    }
 }
