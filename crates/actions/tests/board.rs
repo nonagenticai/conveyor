@@ -788,3 +788,92 @@ async fn projects_create_without_a_board_template_is_a_409_and_writes_nothing() 
 
     running.shutdown().await;
 }
+
+/// The programme's declared order is enforced at the project task: a project whose
+/// `meta.depends_on` names an open project cannot start a run; closing the dependency unblocks.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn projects_execute_refuses_an_open_dependency() {
+    let (pg, running, seeded) = fixture().await;
+
+    let (status, dependency) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({"title": format!("Dependency {}", Uuid::now_v7().simple())}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{dependency}");
+    let dependency_id = id_of(output(&dependency), "id");
+    let dependency_key = id_of(output(&dependency), "key");
+
+    let (status, dependent) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({"title": format!("Dependent {}", Uuid::now_v7().simple())}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{dependent}");
+    let dependent_id = id_of(output(&dependent), "id");
+
+    let mut tx = begin_scoped(&pg.owner, seeded.tenant)
+        .await
+        .expect("scoped transaction");
+    sqlx::query("UPDATE project SET meta = meta || $2::jsonb WHERE id = $1")
+        .bind(Uuid::parse_str(&dependent_id).expect("project uuid"))
+        .bind(json!({"depends_on": [&dependency_key]}).to_string())
+        .execute(&mut *tx)
+        .await
+        .expect("merge depends_on");
+    tx.commit().await.expect("commit depends_on");
+
+    let (status, body) = running
+        .invoke(
+            "projects.execute",
+            "dev:alice",
+            json!({"project_id": dependent_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "blocked_by", "{body}");
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains(&dependency_key),
+        "{body}"
+    );
+
+    let (status, closed) = running
+        .invoke(
+            "projects.close",
+            "dev:alice",
+            json!({"id": dependency_id, "reason": "dependency met for the test"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{closed}");
+
+    let (status, body) = running
+        .invoke(
+            "projects.execute",
+            "dev:alice",
+            json!({"project_id": dependent_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+}

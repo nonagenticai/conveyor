@@ -47,14 +47,18 @@ CROSS_CUTTING = {
         "name": "Publish the SPEC_V2 studio design pack, live",
         "plan": "docs/design/STUDIO-SPEC.md",
         "track": "programme",
-        "issues": [32, 33, 36, 37],
+        # #89 (the V2 registration in the seed/index), #97 (the console's live engine proof)
+        # and #103 (the measured programme truth) are the pack/console surface.
+        "issues": [32, 33, 36, 37, 89, 97, 103],
     },
     "PLATFORM": {
         "name": "CI, runners and platform",
         "plan": "docs/plans/development-process-speed.md",
         "track": "programme",
-        # #55 (betterleaks) and #57 (the programme-spine unit) are platform work.
-        "issues": [17, 22, 55, 57],
+        # #43–#46 are the estate absorptions, #55 betterleaks, #57 the programme spine,
+        # #71 the inference-router cutover, #93 public collaboration, #95 the licences
+        # cutover and #102 the CI action pinning.
+        "issues": [17, 22, 43, 44, 45, 46, 55, 57, 71, 93, 95, 102],
     },
 }
 
@@ -290,14 +294,34 @@ def project_for_issue(issue: dict, projects_by_key: dict[str, dict]) -> str | No
     return None
 
 
-def derive_status(project: dict, issues: list[dict]) -> str:
+def coverage_statuses() -> dict[str, dict]:
+    """The measured coverage rows, keyed by project. Absent means `status_source` falls back."""
+    path = ROOT / "docs/design/data/coverage.json"
+    if not path.exists():
+        return {}
+    document = json.loads(path.read_text())
+    return {row["key"]: row for row in document.get("projects", [])}
+
+
+def derive_status(project: dict, issues: list[dict], coverage: dict[str, dict]) -> str:
+    """Prefer the measured status over plan prose; the GitHub issue state still decides active.
+
+    A built/archived/standing project with no open unit is closed (or archived); any project
+    with an open unit is active; a measured-unbuilt project with no unit stays draft. Without a
+    coverage row the old plan-frontmatter rule applies, so the generator still works alone.
+    """
     if project["key"] == "PLATFORM":
         return "active"  # a standing project: it is never "done"
-    if project.get("plan_status") == "superseded":
+    measured = coverage.get(project["key"], {}).get("status", "")
+    if measured == "archived" or project.get("plan_status") == "superseded":
         return "archived"
     open_issues = [issue for issue in issues if issue["state"] == "OPEN"]
+    if measured in ("built", "standing"):
+        return "active" if open_issues else "closed"
     if open_issues:
         return "active"
+    if measured in ("partial", "planned", "absent", "proposed"):
+        return "draft"
     if project.get("plan_status", "").startswith("built") or project.get("plan_status") == "active":
         return "closed"
     return "draft"
@@ -350,6 +374,7 @@ def build() -> dict:
             return (match.group(1), int(match.group(2)), match.group(3))
         return ("Z", 0, project["key"])
 
+    coverage = coverage_statuses()
     out_projects = []
     for project in sorted(projects, key=project_order):
         project_issues = sorted(issues_by_project.get(project["key"], []), key=lambda i: i["number"])
@@ -358,12 +383,13 @@ def build() -> dict:
             if number not in numbers:
                 numbers.append(number)
         numbers.sort()
+        measured = coverage.get(project["key"], {})
         out_projects.append(
             {
                 "key": project["key"],
                 "name": project["name"],
                 "description": project["description"],
-                "status": derive_status(project, project_issues),
+                "status": derive_status(project, project_issues, coverage),
                 "repo_url": REPO_URL,
                 "meta": {
                     "plan": project["plan"],
@@ -371,7 +397,9 @@ def build() -> dict:
                     "issues": numbers,
                     "depends_on": project["depends_on"],
                     "plan_status": project.get("plan_status", ""),
-                    "status_source": "open GitHub issues + plan frontmatter",
+                    "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+                    "measured_status": measured.get("status", ""),
+                    "tranche": measured.get("tranche", 0),
                     **({"gate": project["gate"]} if project.get("gate") else {}),
                 },
             }
