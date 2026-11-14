@@ -103,22 +103,6 @@ async fn board_and_lane(running: &support::Running) -> (String, String) {
     (board, lane)
 }
 
-/// One active project with no dependencies: a blocker in the dependency-gate tests.
-async fn create_project(running: &support::Running) -> (String, String) {
-    let (status, created) = running
-        .invoke(
-            "projects.create",
-            TOKEN,
-            json!({"title": format!("Dependency {}", Uuid::now_v7().simple())}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "{created}");
-    (text(output(&created), "id"), text(output(&created), "key"))
-}
-
 /// Merge `patch` into the project's meta through the tenant-scoped transaction.
 async fn merge_meta(
     pg: &support::Pg,
