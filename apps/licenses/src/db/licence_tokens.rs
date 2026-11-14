@@ -281,7 +281,8 @@ pub fn resolve_new_token_expiry(
     tenant_keys: &BTreeSet<String>,
     now: DateTime<Utc>,
 ) -> Result<Option<DateTime<Utc>>, RefusalCode> {
-    if let Some(refusal) = token_expiry_refusal(token_type, expires_at.is_some(), long_lived, tenant_keys)
+    if let Some(refusal) =
+        token_expiry_refusal(token_type, expires_at.is_some(), long_lived, tenant_keys)
     {
         return Err(refusal);
     }
@@ -379,9 +380,7 @@ pub fn is_active(licence: &MintLicence, now: DateTime<Utc>) -> bool {
 
 /// `_inherited_rotation_expiry`: any perpetual predecessor keeps the replacement perpetual;
 /// otherwise the LATEST replaced expiry; nothing replaced is `None` (a new mint, not perpetual).
-pub fn inherited_rotation_expiry(
-    replaced: &[Option<DateTime<Utc>>],
-) -> Option<DateTime<Utc>> {
+pub fn inherited_rotation_expiry(replaced: &[Option<DateTime<Utc>>]) -> Option<DateTime<Utc>> {
     if replaced.is_empty() || replaced.iter().any(Option::is_none) {
         return None;
     }
@@ -438,14 +437,9 @@ pub async fn create_token(
     } else {
         BTreeSet::new()
     };
-    let expires_at = resolve_new_token_expiry(
-        token_type,
-        expires_at,
-        long_lived,
-        &tenant_keys,
-        Utc::now(),
-    )
-    .map_err(CreateTokenError::Policy)?;
+    let expires_at =
+        resolve_new_token_expiry(token_type, expires_at, long_lived, &tenant_keys, Utc::now())
+            .map_err(CreateTokenError::Policy)?;
 
     let raw_token = generate_token().map_err(CreateTokenError::Random)?;
     let row: TokenRow = sqlx::query_as(INSERT_TOKEN)
@@ -613,7 +607,10 @@ mod tests {
             token_expiry_refusal("internal", true, Some(&ok), &keys),
             Some(RefusalCode::LongLivedWithExpiry)
         );
-        assert_eq!(token_expiry_refusal("internal", false, Some(&ok), &keys), None);
+        assert_eq!(
+            token_expiry_refusal("internal", false, Some(&ok), &keys),
+            None
+        );
     }
 
     #[test]
@@ -626,7 +623,10 @@ mod tests {
         );
 
         let allowed = BTreeSet::from(["n8n-dev".to_owned()]);
-        assert_eq!(token_expiry_refusal("api", false, Some(&ok), &allowed), None);
+        assert_eq!(
+            token_expiry_refusal("api", false, Some(&ok), &allowed),
+            None
+        );
 
         let implicit = LongLivedRegistration {
             owner: "m4 / commonpractice".to_owned(),
@@ -647,7 +647,10 @@ mod tests {
         let now = Utc::now();
         let keys = BTreeSet::new();
         let resolved = resolve_new_token_expiry("api", None, None, &keys, now).expect("allowed");
-        let days = resolved.expect("defaulted").signed_duration_since(now).num_days();
+        let days = resolved
+            .expect("defaulted")
+            .signed_duration_since(now)
+            .num_days();
         assert!((364..=365).contains(&days), "{days}");
         assert_eq!(
             resolve_new_token_expiry("api", Some(now), None, &keys, now).expect("explicit"),
@@ -659,9 +662,7 @@ mod tests {
     fn the_implicit_client_qualifies_only_for_an_expiry_less_api_mint() {
         let issuer = Some(SECURE_APPS_ISSUER);
         let client = Some("commonpractice-licenses-admin");
-        assert!(
-            implicit_long_lived_registration(issuer, client, "api", false, false).is_some()
-        );
+        assert!(implicit_long_lived_registration(issuer, client, "api", false, false).is_some());
         assert!(implicit_long_lived_registration(issuer, client, "api", true, false).is_none());
         assert!(implicit_long_lived_registration(issuer, client, "api", false, true).is_none());
         assert!(
@@ -669,8 +670,14 @@ mod tests {
                 .is_none()
         );
         assert!(
-            implicit_long_lived_registration(Some("https://auth.example/realms/portal"), client, "api", false, false)
-                .is_none()
+            implicit_long_lived_registration(
+                Some("https://auth.example/realms/portal"),
+                client,
+                "api",
+                false,
+                false
+            )
+            .is_none()
         );
     }
 

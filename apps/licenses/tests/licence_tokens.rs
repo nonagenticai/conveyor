@@ -185,13 +185,22 @@ async fn insert_token(
     .bind(revoked.then(Utc::now))
     .bind(long_lived_owner)
     .bind(long_lived_reason)
-    .bind(roles.iter().map(|role| (*role).to_owned()).collect::<Vec<String>>())
+    .bind(
+        roles
+            .iter()
+            .map(|role| (*role).to_owned())
+            .collect::<Vec<String>>(),
+    )
     .execute(&db.pool)
     .await
     .expect("token");
 }
 
-async fn request(app: axum::Router, uri: &str, header: Option<(&str, &str)>) -> (StatusCode, Value) {
+async fn request(
+    app: axum::Router,
+    uri: &str,
+    header: Option<(&str, &str)>,
+) -> (StatusCode, Value) {
     let mut builder = Request::post(uri);
     if let Some((name, value)) = header {
         builder = builder.header(name, value);
@@ -286,7 +295,10 @@ async fn an_api_token_without_expiry_gets_the_bounded_default() {
         .fetch_one(&db.pool)
         .await
         .expect("token row");
-    assert_eq!(hash, db::tokens::hash_token(body["token"].as_str().expect("raw")));
+    assert_eq!(
+        hash,
+        db::tokens::hash_token(body["token"].as_str().expect("raw"))
+    );
     assert_eq!(token_type, "api");
     assert!(granted_roles.is_empty());
     assert_eq!(owner, None);
@@ -630,15 +642,22 @@ async fn an_operator_token_carries_platform_admin_and_a_short_expiry() {
     assert_eq!(body["long_lived_owner"], Value::Null);
 
     let token_id = Uuid::try_parse(body["token_id"].as_str().expect("token_id")).expect("uuid");
-    let (hash, roles, expires_at, token_type): (String, Vec<String>, Option<DateTime<Utc>>, String) =
-        sqlx::query_as(
-            "SELECT token_hash, granted_roles, expires_at, token_type FROM token WHERE id = $1",
-        )
-        .bind(token_id)
-        .fetch_one(&db.pool)
-        .await
-        .expect("token row");
-    assert_eq!(hash, db::tokens::hash_token(body["token"].as_str().expect("raw")));
+    let (hash, roles, expires_at, token_type): (
+        String,
+        Vec<String>,
+        Option<DateTime<Utc>>,
+        String,
+    ) = sqlx::query_as(
+        "SELECT token_hash, granted_roles, expires_at, token_type FROM token WHERE id = $1",
+    )
+    .bind(token_id)
+    .fetch_one(&db.pool)
+    .await
+    .expect("token row");
+    assert_eq!(
+        hash,
+        db::tokens::hash_token(body["token"].as_str().expect("raw"))
+    );
     assert_eq!(roles, vec!["platform-admin".to_owned()]);
     assert_eq!(token_type, "api");
     let seconds = expires_at
@@ -793,7 +812,10 @@ async fn regenerate_revokes_the_old_tokens_and_returns_a_usable_replacement() {
     assert_eq!(new_expiry, Some(old_expiry));
 
     // And it is a real credential: introspection answers ACTIVE.
-    match db::tokens::introspect(&db.pool, &raw).await.expect("introspect") {
+    match db::tokens::introspect(&db.pool, &raw)
+        .await
+        .expect("introspect")
+    {
         db::tokens::Outcome::Active(active) => {
             assert_eq!(active.license_id, LICENSE.to_string());
             assert!(active.roles.is_empty());
@@ -838,7 +860,17 @@ async fn regenerate_answers_not_your_license_for_a_foreign_tenant() {
 #[tokio::test]
 async fn regenerate_refuses_a_dead_licence_before_destroying_anything() {
     let db = seeded().await;
-    insert_token(&db, TOKEN, "live-token", Some(Utc::now() + Duration::days(5)), false, None, None, &[]).await;
+    insert_token(
+        &db,
+        TOKEN,
+        "live-token",
+        Some(Utc::now() + Duration::days(5)),
+        false,
+        None,
+        None,
+        &[],
+    )
+    .await;
     sqlx::query("UPDATE license SET status = 'revoked' WHERE id = $1")
         .bind(LICENSE)
         .execute(&db.pool)

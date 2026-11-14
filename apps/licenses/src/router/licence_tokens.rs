@@ -32,13 +32,13 @@ use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
 
 use crate::auth::{User, get_tenant_id, require_any_realm_role};
+use crate::db::issuance;
 use crate::db::licence_tokens::{
     self as store, CreateTokenError, MintLicence, OPERATOR_GRANTABLE_ROLES,
     OPERATOR_TOKEN_DEFAULT_TTL_MINUTES, OPERATOR_TOKEN_MAX_TTL_MINUTES, RefusalCode,
     RegenerateError,
 };
 use crate::db::tokens::{effective_status, py_iso};
-use crate::db::issuance;
 use crate::error::Refusal;
 use crate::router::health::ErrorResponse;
 use crate::router::schemas::HTTPValidationError;
@@ -114,7 +114,10 @@ pub struct RegenerateTokenResponse {
     /// The RAW replacement token — returned exactly once.
     pub token: String,
     /// Unused by clients; present because the captured model serialises its default.
-    #[schema(required = false, default = "Save this token - it won't be shown again")]
+    #[schema(
+        required = false,
+        default = "Save this token - it won't be shown again"
+    )]
     pub message: String,
     /// When the new token expires; null means perpetual (until revoked).
     #[schema(value_type = Option<chrono::DateTime<chrono::Utc>>)]
@@ -360,7 +363,11 @@ fn dependency_refusal(licence: &MintLicence) -> Refusal {
 }
 
 /// `_license_state_detail`: the state fields of a 409 `license_not_active` body.
-fn license_not_active_detail(license_id: &str, licence: &MintLicence, now: chrono::DateTime<Utc>) -> Value {
+fn license_not_active_detail(
+    license_id: &str,
+    licence: &MintLicence,
+    now: chrono::DateTime<Utc>,
+) -> Value {
     json!({
         "error": "license_not_active",
         "license_id": license_id,
@@ -705,22 +712,16 @@ pub async fn create_operator_token(
     }
 
     let expires_at = now + Duration::minutes(ttl_minutes);
-    let (token, raw_token) = store::create_token(
-        pool,
-        license_uuid,
-        "api",
-        Some(expires_at),
-        &roles,
-        None,
-    )
-    .await
-    .map_err(|error| match error {
-        CreateTokenError::Policy(refusal) => Refusal::detail(
-            StatusCode::UNPROCESSABLE_ENTITY,
-            json!({"error": refusal.code(), "remedy": refusal.remedy()}),
-        ),
-        other => failure(other, "Failed to create operator token"),
-    })?;
+    let (token, raw_token) =
+        store::create_token(pool, license_uuid, "api", Some(expires_at), &roles, None)
+            .await
+            .map_err(|error| match error {
+                CreateTokenError::Policy(refusal) => Refusal::detail(
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                    json!({"error": refusal.code(), "remedy": refusal.remedy()}),
+                ),
+                other => failure(other, "Failed to create operator token"),
+            })?;
 
     tracing::warn!(
         actor_sub = %user.sub,
@@ -806,10 +807,7 @@ pub async fn regenerate_license_token(
     };
     // Ownership here is 403, not the mint route's 404.
     if licence.tenant_id.to_string() != tenant_id {
-        return Err(Refusal::detail(
-            StatusCode::FORBIDDEN,
-            "Not your license",
-        ));
+        return Err(Refusal::detail(StatusCode::FORBIDDEN, "Not your license"));
     }
 
     issuance::authorize_issuance(
@@ -838,45 +836,46 @@ pub async fn regenerate_license_token(
         ));
     }
 
-    let (_revoked_count, token, raw_token) = store::regenerate_token_for_license(pool, license_uuid)
-        .await
-        .map_err(|error| match error {
-            RegenerateError::AllTokensExpired { newest_expiry } => {
-                tracing::warn!(
-                    licence = %license_id,
-                    newest_expiry = ?newest_expiry,
-                    "Refusing to regenerate: every unrevoked token has expired"
-                );
-                Refusal::detail(
-                    StatusCode::CONFLICT,
-                    json!({
-                        "error": "all_tokens_expired",
-                        "license_id": license_uuid.to_string(),
-                        "remedy": "mint a new token via POST /licenses/{license_id}/tokens",
-                    }),
-                )
-            }
-            RegenerateError::AllTokensRevoked { revoked_count } => {
-                tracing::warn!(
-                    licence = %license_id,
-                    revoked_count,
-                    "Refusing to regenerate: every token is revoked"
-                );
-                Refusal::detail(
-                    StatusCode::CONFLICT,
-                    json!({
-                        "error": "all_tokens_revoked",
-                        "license_id": license_uuid.to_string(),
-                        "remedy": "mint a new token via POST /licenses/{license_id}/tokens",
-                    }),
-                )
-            }
-            RegenerateError::Policy(refusal) => Refusal::detail(
-                StatusCode::UNPROCESSABLE_ENTITY,
-                json!({"error": refusal.code(), "remedy": refusal.remedy()}),
-            ),
-            other => failure(other, "Failed to regenerate token"),
-        })?;
+    let (_revoked_count, token, raw_token) =
+        store::regenerate_token_for_license(pool, license_uuid)
+            .await
+            .map_err(|error| match error {
+                RegenerateError::AllTokensExpired { newest_expiry } => {
+                    tracing::warn!(
+                        licence = %license_id,
+                        newest_expiry = ?newest_expiry,
+                        "Refusing to regenerate: every unrevoked token has expired"
+                    );
+                    Refusal::detail(
+                        StatusCode::CONFLICT,
+                        json!({
+                            "error": "all_tokens_expired",
+                            "license_id": license_uuid.to_string(),
+                            "remedy": "mint a new token via POST /licenses/{license_id}/tokens",
+                        }),
+                    )
+                }
+                RegenerateError::AllTokensRevoked { revoked_count } => {
+                    tracing::warn!(
+                        licence = %license_id,
+                        revoked_count,
+                        "Refusing to regenerate: every token is revoked"
+                    );
+                    Refusal::detail(
+                        StatusCode::CONFLICT,
+                        json!({
+                            "error": "all_tokens_revoked",
+                            "license_id": license_uuid.to_string(),
+                            "remedy": "mint a new token via POST /licenses/{license_id}/tokens",
+                        }),
+                    )
+                }
+                RegenerateError::Policy(refusal) => Refusal::detail(
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                    json!({"error": refusal.code(), "remedy": refusal.remedy()}),
+                ),
+                other => failure(other, "Failed to regenerate token"),
+            })?;
 
     tracing::info!(license_id = %license_id, "Regenerated token");
 
