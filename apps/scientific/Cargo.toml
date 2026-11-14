@@ -1,0 +1,37 @@
+[package]
+name = "conveyor-scientific"
+description = "The evidence tools: the captured scientific-processor contract, statistics and cache."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "conveyor_scientific"
+path = "src/lib.rs"
+
+[[bin]]
+name = "conveyor-scientific"
+path = "src/main.rs"
+
+[dependencies]
+axum = { workspace = true }
+bytes = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+conveyor-platform = { path = "../../crates/platform" }
+futures-util = { workspace = true }
+object_store = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+statrs = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+utoipa = { workspace = true }
+
+[dev-dependencies]
+toml = { workspace = true }
+tower = { workspace = true }

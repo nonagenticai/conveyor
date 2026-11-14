@@ -15,8 +15,8 @@
       "note": "V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5."
     },
     "destination:Organisation": {
-      "verdict": "extend",
-      "note": "The page exists and renders fixtures; live industries/departments/jobs/releases/bindings arrive with T0 (#34)."
+      "verdict": "exists",
+      "note": "The page renders the tenant's live industry, department, job, release and binding rows (T0, #34/#65)."
     },
     "destination:Procedures": {
       "verdict": "extend",
@@ -32,7 +32,7 @@
     },
     "destination:Plan": {
       "verdict": "extend",
-      "note": "A design study today. The live Boards tab arrives with #57; WBS, baseline, registers and change control are T1."
+      "note": "The live Boards tab renders real boards and cards (#57); WBS, baseline, registers and change control are T1."
     },
     "destination:Improve": {
       "verdict": "extend",

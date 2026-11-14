@@ -13,8 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "extend": 10,
-    "new": 32
+    "exists": 11,
+    "extend": 8,
+    "new": 23
   },
   "rows": [
     {
@@ -22,9 +23,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "industry",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE industry"
+        "migrations: CREATE TABLE industry"
       ]
     },
     {
@@ -43,9 +44,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "job_catalogue",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE job_catalogue"
+        "migrations: CREATE TABLE job_catalogue"
       ]
     },
     {
@@ -53,9 +54,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "job_release",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE job_release"
+        "migrations: CREATE TABLE job_release"
       ]
     },
     {
@@ -63,9 +64,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "job_binding",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE job_binding"
+        "migrations: CREATE TABLE job_binding"
       ]
     },
     {
@@ -123,9 +124,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "decision",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE decision"
+        "migrations: CREATE TABLE decision"
       ]
     },
     {
@@ -133,9 +134,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "decision_option",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE decision_option"
+        "migrations: CREATE TABLE decision_option"
       ]
     },
     {
@@ -143,9 +144,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "decision_policy",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE decision_policy"
+        "migrations: CREATE TABLE decision_policy"
       ]
     },
     {
@@ -173,9 +174,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "decision_policy_refinement",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE decision_policy_refinement"
+        "migrations: CREATE TABLE decision_policy_refinement"
       ]
     },
     {
@@ -183,9 +184,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "laya_inference_config",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE laya_inference_config"
+        "migrations: CREATE TABLE laya_inference_config"
       ]
     },
     {
@@ -239,12 +240,12 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "organisation",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "actions: departments.* found (departments.create, departments.list)",
-        "actions: industries.* absent",
-        "actions: job_bindings.* absent",
-        "actions: job_releases.* absent",
+        "actions: industries.* found (industries.create, industries.get, industries.list)",
+        "actions: job_bindings.* found (job_bindings.create, job_bindings.get, job_bindings.list…)",
+        "actions: job_releases.* found (job_releases.list, job_releases.publish, job_releases.retire)",
         "actions: jobs.* found (jobs.list, jobs.retry)"
       ]
     },
@@ -385,11 +386,11 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Organisation",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "docs/design/v2.js: page 'organisation' registered"
       ],
-      "note": "The page exists and renders fixtures; live industries/departments/jobs/releases/bindings arrive with T0 (#34)."
+      "note": "The page renders the tenant's live industry, department, job, release and binding rows (T0, #34/#65)."
     },
     {
       "id": "destination:Procedures",
@@ -433,7 +434,7 @@
       "evidence": [
         "docs/design/v2.js: page 'plan' registered"
       ],
-      "note": "A design study today. The live Boards tab arrives with #57; WBS, baseline, registers and change control are T1."
+      "note": "The live Boards tab renders real boards and cards (#57); WBS, baseline, registers and change control are T1."
     },
     {
       "id": "destination:Improve",

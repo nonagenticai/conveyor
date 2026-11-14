@@ -1,0 +1,22 @@
+# Declared parity tolerances.
+#
+# A golden replay that compared floats exactly would be a different claim than the one this unit
+# makes: the port must reproduce the old service's *numbers*, at the precision its API published,
+# from different libraries. Every tolerance here is a justified exception, and a field that is
+# neither exact nor listed fails the run.
+
+[default]
+# The old API rounded to 6 decimals; a reimplementation using a different libm may differ in the
+# last digit. An absolute tolerance at half of that last digit is the honest declaration.
+absolute = 0.000001
+
+[ignored]
+# Wall-clock measurements cannot be replayed, and the health timestamp is a clock reading.
+fields = ["computation_time_ms", "timestamp"]
+
+# The old bootstrap drew from numpy's `default_rng(42)`; this one draws from a local SplitMix64.
+# Both are valid percentile bootstraps over the same data, and the bounds differ by sampling noise,
+# not by method. The rest of the response (the mean) is exact.
+[case.confidence_interval_bootstrap]
+absolute = 0.15
+why = "a different seeded PRNG draws different resamples; the estimator and the percentile method are identical"

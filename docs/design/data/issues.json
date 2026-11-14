@@ -1,6 +1,23 @@
 {
   "issues": [
     {
+      "number": 123,
+      "title": "programme: the measured truth measures V2 slices (T0 built, not proposed)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/123",
+      "updatedAt": "2026-11-14T23:14:29Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 122,
       "title": "P0 \u2014 the reuse map, the architecture/analysis pack and the per-project inception standard",
       "state": "OPEN",
@@ -39,7 +56,7 @@
       "title": "P0 \u2014 the programme definition project and its gate",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/120",
-      "updatedAt": "2026-11-14T21:51:34Z",
+      "updatedAt": "2026-11-14T22:15:48Z",
       "labels": [
         {
           "name": "unit",
@@ -96,17 +113,17 @@
     {
       "number": 116,
       "title": "estate: absorb lean4-prover \u2014 contract, the crate moves into apps/lean4-prover",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/116",
-      "updatedAt": "2026-11-14T20:27:43Z",
+      "updatedAt": "2026-11-14T22:54:23Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -159,9 +176,9 @@
     {
       "number": 105,
       "title": "estate: absorb scientific-processor \u2014 contract, Rust rewrite in apps/scientific, parity",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/105",
-      "updatedAt": "2026-11-14T18:06:04Z",
+      "updatedAt": "2026-11-14T22:31:55Z",
       "labels": [
         {
           "name": "unit",
@@ -845,7 +862,7 @@
       "title": "estate: absorb licenses \u2014 contract, Rust rewrite, parity",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/45",
-      "updatedAt": "2026-11-14T21:29:16Z",
+      "updatedAt": "2026-11-14T23:10:08Z",
       "labels": [
         {
           "name": "unit",

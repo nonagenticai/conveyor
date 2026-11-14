@@ -1,0 +1,2 @@
+POST /api/check
+{"source":"theorem t : True := by trivial"}
