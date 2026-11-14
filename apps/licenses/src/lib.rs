@@ -11,6 +11,7 @@
 
 pub mod auth;
 pub mod billing;
+pub mod commands;
 pub mod config;
 pub mod contract;
 pub mod db;
