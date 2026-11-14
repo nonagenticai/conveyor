@@ -35,6 +35,57 @@ pub struct Config {
     pub inference_router_url: Option<String>,
     /// The downstream the verification helpers call for embeddings.
     pub pytorch_backend_url: Option<String>,
+    /// This service's own licence, sent as the `Authorization` bearer on lean4-prover calls.
+    ///
+    /// lean4-prover rejects a tokenless call. The old service refused to boot without it; here an
+    /// absent value is a refusal at the call site that names the variable, which is testable
+    /// without a process-wide environment.
+    pub downstream_license_token: Option<String>,
+    /// The object store the proofs and the verification history live in. `None` means "not
+    /// configured", and every route that reads it answers empty rather than failing — the old
+    /// service's behaviour, kept because it is what makes the routes usable before the cutover.
+    pub objects: Option<ObjectsConfig>,
+}
+
+/// The MinIO/S3 endpoint and credentials, under the old service's variable names.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ObjectsConfig {
+    /// The endpoint as written in the environment. A bare `host:port` is read as `http://`; the
+    /// HTTPS form is kept when the variable names it.
+    pub endpoint: String,
+    pub bucket: String,
+    pub access_key: String,
+    pub secret_key: String,
+}
+
+impl ObjectsConfig {
+    fn from_lookup(vars: &[(String, String)]) -> Option<Self> {
+        let endpoint = lookup(vars, "SCIENTIFIC_PROCESSOR_MINIO_ENDPOINT")?.to_owned();
+        let access_key = lookup(vars, "SCIENTIFIC_PROCESSOR_MINIO_ACCESS_KEY")?.to_owned();
+        if endpoint.is_empty() || access_key.is_empty() {
+            return None;
+        }
+        Some(Self {
+            endpoint,
+            bucket: lookup(vars, "SCIENTIFIC_PROCESSOR_MINIO_BUCKET")
+                .unwrap_or("scientific-processor")
+                .to_owned(),
+            access_key,
+            secret_key: lookup(vars, "SCIENTIFIC_PROCESSOR_MINIO_SECRET_KEY")
+                .unwrap_or_default()
+                .to_owned(),
+        })
+    }
+
+    /// The endpoint with a scheme, because `object_store` requires one and the old variable did
+    /// not carry it.
+    pub fn url(&self) -> String {
+        if self.endpoint.contains("://") {
+            self.endpoint.clone()
+        } else {
+            format!("http://{}", self.endpoint)
+        }
+    }
 }
 
 fn lookup<'a>(vars: &'a [(String, String)], name: &str) -> Option<&'a str> {
@@ -79,6 +130,9 @@ impl Config {
                 .map(str::to_owned),
             pytorch_backend_url: lookup(vars, "SCIENTIFIC_PROCESSOR_PYTORCH_BACKEND_URL")
                 .map(str::to_owned),
+            downstream_license_token: lookup(vars, "SCIENTIFIC_PROCESSOR_DOWNSTREAM_LICENSE_TOKEN")
+                .map(str::to_owned),
+            objects: ObjectsConfig::from_lookup(vars),
         })
     }
 
@@ -127,5 +181,31 @@ mod tests {
         let error = Config::from_lookup(&vars(&[("BIND_ADDR", "not-an-address")]))
             .expect_err("must refuse");
         assert!(matches!(error, ConfigError::InvalidBind(_)));
+    }
+
+    #[test]
+    fn the_object_store_is_read_under_the_old_names() {
+        let config = Config::from_lookup(&vars(&[
+            (
+                "SCIENTIFIC_PROCESSOR_MINIO_ENDPOINT",
+                "objects.example:9000",
+            ),
+            ("SCIENTIFIC_PROCESSOR_MINIO_ACCESS_KEY", "key"),
+            ("SCIENTIFIC_PROCESSOR_MINIO_SECRET_KEY", "secret"),
+        ]))
+        .expect("parses");
+        let objects = config.objects.expect("configured");
+        assert_eq!(objects.bucket, "scientific-processor");
+        assert_eq!(objects.url(), "http://objects.example:9000");
+    }
+
+    #[test]
+    fn a_bare_endpoint_without_a_key_is_not_a_store() {
+        let config = Config::from_lookup(&vars(&[(
+            "SCIENTIFIC_PROCESSOR_MINIO_ENDPOINT",
+            "objects.example:9000",
+        )]))
+        .expect("parses");
+        assert!(config.objects.is_none());
     }
 }

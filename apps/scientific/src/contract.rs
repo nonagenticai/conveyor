@@ -2,7 +2,7 @@
 
 use std::collections::BTreeSet;
 
-/// The captured OpenAPI 3.1 document (25 paths, 26 operations after the drop in `contract/drop.jq`).
+/// The captured OpenAPI 3.1 document (17 paths, 18 operations after the drop in `contract/drop.jq`).
 pub const LOCK_JSON: &str = include_str!("../contract/openapi.lock.json");
 
 /// The HTTP methods a path item may carry, in OpenAPI's own spelling.
@@ -99,11 +99,18 @@ mod tests {
         let document = lock().expect("the embedded capture parses");
         assert_eq!(document["openapi"], "3.1.0");
         let ops = operations(&document);
-        // 25 paths, 26 operations: `/api/formal/proofs/{claim_id}` carries both GET and POST.
-        assert_eq!(ops.len(), 26);
+        // 17 paths, 18 operations: `/api/formal/proofs/{claim_id}` carries both GET and POST.
+        assert_eq!(ops.len(), 18);
         assert!(ops.contains("POST /api/stats/meta-analysis"));
+        // The graph surfaces and the dead-upstream operations are not carried.
         assert!(!ops.iter().any(|op| op.contains("/api/topology")));
         assert!(!ops.iter().any(|op| op.contains("/api/explain")));
+        assert!(!ops.iter().any(|op| op.contains("/api/verify/cove")));
+        assert!(!ops.iter().any(|op| op.contains("/api/verify/integrity")));
+        assert!(!ops.iter().any(|op| op.contains("/api/pipeline/trigger")));
+        assert!(!ops.iter().any(|op| op.contains("/api/pipeline/webhook")));
+        assert!(!ops.iter().any(|op| op.contains("/api/pipeline/batch")));
+        assert!(!ops.iter().any(|op| op.contains("/api/sandbox")));
     }
 
     #[test]

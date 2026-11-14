@@ -9,8 +9,10 @@
 #![forbid(unsafe_code)]
 
 pub mod cache;
+pub mod clients;
 pub mod config;
 pub mod contract;
+pub mod pipeline;
 pub mod router;
 pub mod state;
 pub mod stats;

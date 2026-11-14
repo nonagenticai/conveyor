@@ -887,9 +887,12 @@ name = "conveyor-scientific"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "bytes",
  "chrono",
  "clap",
  "conveyor-platform",
+ "futures-util",
+ "object_store",
  "reqwest",
  "serde",
  "serde_json",

@@ -13,9 +13,8 @@ use serde_json::{Value, json};
 use utoipa::ToSchema;
 
 use crate::cache::key_tenant;
+use crate::router::{Failure, caller_tenant};
 use crate::state::Shared;
-
-pub type Failure = (StatusCode, Json<Value>);
 
 #[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
 pub struct CacheStatsResponse {
@@ -40,18 +39,10 @@ pub struct CacheClearResponse {
 
 /// The caller's tenant. Fail-closed: this service has no configured default tenant, and a sentinel
 /// identity is exactly the thing that makes a cross-tenant mistake invisible.
-fn caller_tenant(headers: &HeaderMap) -> Result<String, Failure> {
-    headers
-        .get("x-tenant-id")
-        .and_then(|value| value.to_str().ok())
-        .filter(|value| !value.is_empty())
-        .map(str::to_owned)
-        .ok_or((
-            StatusCode::BAD_REQUEST,
-            Json(json!({"detail": "X-Tenant-Id is required"})),
-        ))
-}
-
+///
+/// The check itself lives in [`crate::router::caller_tenant`]; this module's routes are the reason
+/// it exists, and `403` — never `404` — is the answer to a key that belongs to someone else,
+/// because the check reads the caller's string only and never probes the map.
 /// `GET /api/cache/stats`
 #[utoipa::path(
     get,

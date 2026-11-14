@@ -206,37 +206,80 @@ async fn golden_replay_matches_the_capture() {
     assert_eq!(checked, routes().len());
 }
 
-#[test]
-fn the_undropped_surface_is_not_covered_by_goldens_yet() {
-    // Named explicitly so the gap is visible: the surviving `/api/verify`, `/api/formal`,
-    // `/api/sandbox` and `/api/pipeline` operations have no route yet and therefore no golden.
-    // They are the next slice's, and `--check-lock` names every one of them on every run.
-    let pending = [
-        "POST /api/verify/cove",
-        "POST /api/verify/integrity",
+/// Every operation that has no golden, and why a golden cannot exist.
+///
+/// A golden is the old service's own answer to a fixed input. That is only meaningful when the
+/// answer is a function of the input: a clock reading, a process counter, or a number a model
+/// produced is not. Naming each one here is what stops "no golden" from silently becoming "not
+/// checked" — every entry has a unit or contract test in its own module instead.
+const DECLARED_UNCAPTURABLE: &[(&str, &str)] = &[
+    ("GET /health", "reports a clock reading"),
+    (
+        "GET /health/live",
+        "reports a clock reading and a process counter",
+    ),
+    ("GET /health/ready", "probes live downstreams"),
+    (
+        "GET /api/cache/stats",
+        "process state, not an answer to the request",
+    ),
+    (
+        "POST /api/cache/invalidate",
+        "process state, not an answer to the request",
+    ),
+    (
+        "POST /api/cache/clear",
+        "process state, not an answer to the request",
+    ),
+    (
         "POST /api/verify/ragas",
-        "POST /api/formal/translate",
-        "POST /api/formal/verify",
+        "three upstream calls; a capture would record one model answer, not replay a function",
+    ),
+    ("POST /api/formal/translate", "a model call in every branch"),
+    ("POST /api/formal/verify", "a proof search on a live prover"),
+    (
         "GET /api/formal/proofs/{claim_id}",
+        "reads object-store contents the process did not compute",
+    ),
+    (
         "POST /api/formal/proofs/{claim_id}",
-        "POST /api/sandbox/execute",
-        "GET /api/sandbox/jobs/{job_id}",
-        "GET /api/sandbox/results/{job_id}",
-        "POST /api/pipeline/trigger",
-        "POST /api/pipeline/batch",
-        "POST /api/pipeline/webhook",
-        "GET /api/pipeline/status",
-        "GET /api/pipeline/anomalies",
+        "writes an object; the answer carries a fresh timestamp",
+    ),
+    ("GET /api/pipeline/status", "process counters"),
+    (
         "GET /api/pipeline/history/{entity_id}",
-    ];
+        "reads object-store contents the process did not compute",
+    ),
+    (
+        "GET /api/pipeline/anomalies",
+        "reads object-store contents the process did not compute",
+    ),
+];
+
+#[test]
+fn every_registered_operation_is_either_replayed_or_declared() {
+    let replayed: std::collections::BTreeSet<&str> = routes().values().copied().collect();
+    let declared: std::collections::BTreeSet<&str> =
+        DECLARED_UNCAPTURABLE.iter().map(|(op, _)| *op).collect();
+
+    for &(method, path) in router::ROUTES {
+        let operation = format!("{method} {path}");
+        let covered = replayed.contains(path) || declared.contains(operation.as_str());
+        assert!(
+            covered,
+            "{operation} has neither a golden nor a declared reason it cannot have one"
+        );
+    }
+
+    // And no declaration outlives its route: a dropped operation must not keep a slot in this list.
     let registered: Vec<String> = router::ROUTES
         .iter()
         .map(|(method, path)| format!("{method} {path}"))
         .collect();
-    for operation in pending {
+    for (operation, why) in DECLARED_UNCAPTURABLE {
         assert!(
-            !registered.iter().any(|row| row == operation),
-            "{operation} is registered now — give it a golden instead of this list entry"
+            registered.iter().any(|row| row == operation),
+            "{operation} is declared uncapturable but no longer registered ({why})"
         );
     }
 }
