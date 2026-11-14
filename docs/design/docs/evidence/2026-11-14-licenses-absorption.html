@@ -142,7 +142,7 @@
 </tr>
 <tr>
 <td>P2b.1 four recurring commands' row effects</td>
-<td><strong>same-seed Python-vs-Rust run</strong>: <code>contract/cron-parity.md</code> + <code>contract/parity/</code> — each implementation ran against its own database reset from one seeded template; 8 pairs (4 commands × dry/armed) compared on every licence/token field plus the billing calls. Pre-fix 7 EQUAL; the eighth exposed one real divergence — the reference's ORM stamp advances <code>license.updated_at</code>, the Rust raw UPDATEs did not — fixed at the four metering stamp/clear sites and re-run (the re-run section of <code>cron-parity.md</code> records the fixed result). The effect table below and each command's armed/dry tests remain the unit-level gate</td>
+<td><strong>same-seed Python-vs-Rust run</strong>: <code>contract/cron-parity.md</code> + <code>contract/parity/</code> — each implementation ran against its own database reset from one seeded template; 8 pairs (4 commands × dry/armed) compared on every licence/token field plus the billing calls. Pre-fix 7 EQUAL; the eighth exposed one real divergence — the reference's ORM stamp advances <code>license.updated_at</code>, the Rust raw UPDATEs did not — fixed at the four metering stamp/clear sites and re-run → <strong>all 8 pairs EQUAL</strong> (the re-run section of <code>cron-parity.md</code> records the fixed candidate sha and the per-pair result; the <code>updated_at</code> comparison is "changed vs seed" in both implementations). The effect table below and each command's armed/dry tests remain the unit-level gate</td>
 <td><code>apps/licenses/contract/cron-parity.md</code>, <code>apps/licenses/contract/parity/</code>, <code>apps/licenses/tests/command_*.rs</code>, <code>billing_teardown.rs</code></td>
 </tr>
 <tr>

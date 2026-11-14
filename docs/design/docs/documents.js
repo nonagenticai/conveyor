@@ -141,8 +141,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-14-licenses-absorption.html",
       "source": "docs/evidence/2026-11-14-licenses-absorption.md",
       "section": "Evidence",
-      "sha256": "0075a3aa69bcc703c48b0a992b7ebfe403f04384fa02c7d2515dfe2f17cea2cd",
-      "bytes": 24233,
+      "sha256": "7845610b509f02858589c5bd1cc0a801246bb01b829b8ba24567fccd2bce2aab",
+      "bytes": 24364,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-14-licenses-absorption.md"
     },
     {
