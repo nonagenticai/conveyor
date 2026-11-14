@@ -55,7 +55,9 @@ use serde_json::{Value, json};
 /// 269 + 7 → **276**; whoever merges last re-derives it.
 /// **S18 step 2 adds 1**: `benchmark_runs.trend`. **S13 adds 11**: the SOP's six, the two
 /// `process_maps.*`, `laya.judge` and the two `eval_grades.*`. 277 → **288**.
-const EXPECTED: [&str; 299] = [
+/// **#70 adds 5 internal**: `documents.compose`, `projects.update`, `publish.start`,
+/// `publish.status` and `repositories.update`. 299 → **304**.
+const EXPECTED: [&str; 304] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -127,6 +129,7 @@ const EXPECTED: [&str; 299] = [
     "decisions.update",
     "departments.create",
     "departments.list",
+    "documents.compose",
     "documents.create",
     "documents.delete",
     "documents.download",
@@ -279,6 +282,7 @@ const EXPECTED: [&str; 299] = [
     "projects.create",
     "projects.execute",
     "projects.get",
+    "projects.update",
     "prompt_audits.check",
     "prompt_audits.get",
     "prompt_audits.list",
@@ -286,6 +290,8 @@ const EXPECTED: [&str; 299] = [
     "prompt_findings.decide",
     "prompt_findings.list",
     "providers.list",
+    "publish.start",
+    "publish.status",
     "quality.score",
     "repositories.create",
     "repositories.delete",
@@ -293,6 +299,7 @@ const EXPECTED: [&str; 299] = [
     "repositories.link",
     "repositories.list",
     "repositories.unlink",
+    "repositories.update",
     "requirements.compare",
     "requirements.create",
     "requirements.get",
@@ -383,7 +390,7 @@ fn the_registry_is_exactly_the_declared_set() {
     // retire`) so a tenant can author a map and have it validated; before this only the two
     // reads existed and the domain validator was unreachable through the API.
     // The external count moves exactly once, at step 8 — every other addition is internal.
-    assert_eq!((internal, external), (284, 15));
+    assert_eq!((internal, external), (289, 15));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

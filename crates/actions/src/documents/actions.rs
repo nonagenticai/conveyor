@@ -21,7 +21,8 @@ use uuid::Uuid;
 
 use super::{
     ALLOWED_CONTENT_TYPES, DOCUMENT_CREATED, DOCUMENT_DELETED, DOCUMENT_PURGE_KIND,
-    DOCUMENT_UPDATED, MAX_UPLOAD_BYTES, document_error, emit_document_event, invalid,
+    DOCUMENT_UPDATED, MAX_OUTPUT_BYTES, MAX_UPLOAD_BYTES, document_error, emit_document_event,
+    invalid,
 };
 use crate::integrations::objects::{Objects, key_for};
 use crate::invoke::{ActionError, HandlerCtx};
@@ -54,6 +55,8 @@ pub struct DocumentOut {
     pub id: String,
     /// The owning project.
     pub project_id: Option<String>,
+    /// The owning card, when the output is attached to one.
+    pub card_id: Option<String>,
     /// `document | report | export`.
     pub kind: String,
     /// The display title.
@@ -64,12 +67,16 @@ pub struct DocumentOut {
     pub content_type: Option<String>,
     /// The byte length, from `meta`.
     pub size_bytes: Option<i64>,
-    /// The sha256 of the bytes, lowercase hex.
+    /// The sha256 of the bytes or the body, lowercase hex.
     pub content_hash: Option<String>,
+    /// The Markdown body of a text output. Omitted from list rows.
+    pub body: Option<String>,
     /// The external ingestion reference.
     pub external_ref: Option<String>,
     /// Free metadata.
     pub meta: Value,
+    /// Whether the public snapshot may carry this row.
+    pub publishable: bool,
     /// The optimistic-concurrency version (`ETag`).
     pub version: i64,
     /// When the row was created.
@@ -89,14 +96,17 @@ impl From<store::document::DocumentRecord> for DocumentOut {
         Self {
             id: record.id.to_string(),
             project_id: record.project_id.map(|id| id.to_string()),
+            card_id: record.card_id.map(|id| id.to_string()),
             kind: record.kind,
             title: record.title,
             status: record.status,
             content_type,
             size_bytes,
             content_hash: record.content_hash,
+            body: record.body,
             external_ref: record.external_ref,
             meta: record.meta,
+            publishable: record.publishable,
             version: i64::try_from(record.version.get()).unwrap_or(i64::MAX),
             created_at: record.created_at,
             updated_at: record.updated_at,
@@ -192,8 +202,11 @@ async fn documents_create(
             status: "active".to_owned(),
             object_key: Some(key.clone()),
             content_hash: Some(content_hash),
+            card_id: None,
+            body: None,
             external_ref: None,
             meta,
+            publishable: false,
         },
     )
     .await
@@ -215,6 +228,128 @@ async fn documents_create(
         DOCUMENT_CREATED,
         created.id,
         json!({"id": created.id, "version": created.version.get()}),
+    )
+    .await?;
+    let etag = etag(created.version.get());
+    Ok(HandlerOutput::created(DocumentOut::from(created)).with_etag(etag))
+}
+
+// ── documents.compose ─────────────────────────────────────────────────────────────────────
+
+/// The compose input: a Markdown output bound to a project and/or a card.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct DocumentComposeIn {
+    /// The display title.
+    pub title: String,
+    /// The owning project, when the output belongs to one. Inferred from the card when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_id: Option<Uuid>,
+    /// The owning card, when the output is attached to one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<Uuid>,
+    /// The Markdown body.
+    pub body: String,
+    /// Whether the public snapshot may carry this output. Default false.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publishable: Option<bool>,
+    /// Free metadata, merged beside the server-owned content facts.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Value>,
+}
+
+/// Compose one text output — no object store involved.
+///
+/// A text output is a `document` row with `body` set and `object_key` null. The body is capped at
+/// 256 KiB and the row starts unpublished: existence is not publication.
+#[crate::action(
+    name = "documents.compose",
+    version = 1,
+    kind = "internal",
+    scopes = ["documents:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn documents_compose(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: DocumentComposeIn,
+) -> Result<HandlerOutput<DocumentOut>, ActionError> {
+    let action = "documents.compose";
+    let title = input.title.trim();
+    if title.is_empty() {
+        return Err(invalid("title", "required", "must not be empty"));
+    }
+    if input.body.trim().is_empty() {
+        return Err(invalid("body", "required", "must not be empty"));
+    }
+    if input.body.len() > MAX_OUTPUT_BYTES {
+        return Err(ActionError::new(
+            413,
+            "payload_too_large",
+            format!(
+                "the output body is {} bytes; the cap is {MAX_OUTPUT_BYTES}",
+                input.body.len()
+            ),
+        ));
+    }
+    let project_id = match (input.project_id, input.card_id) {
+        (Some(project), Some(card)) => {
+            let card_project = store::document::card_project_tx(&mut *tx, ctx.tenant, card)
+                .await
+                .map_err(|error| crate::control::store_error(error, action))?
+                .ok_or_else(|| ActionError::resource_not_found("such card"))?;
+            if card_project != project {
+                return Err(ActionError::resource_not_found("such card in this project"));
+            }
+            Some(project)
+        }
+        (Some(project), None) => Some(project),
+        (None, Some(card)) => Some(
+            store::document::card_project_tx(&mut *tx, ctx.tenant, card)
+                .await
+                .map_err(|error| crate::control::store_error(error, action))?
+                .ok_or_else(|| ActionError::resource_not_found("such card"))?,
+        ),
+        (None, None) => None,
+    };
+    let content_hash = hex(&Sha256::digest(input.body.as_bytes()));
+    let mut meta = match input.meta {
+        None => json!({}),
+        Some(value) if value.is_object() => value,
+        Some(_) => return Err(invalid("meta", "invalid_value", "must be an object")),
+    };
+    meta["content_type"] = json!("text/markdown");
+    meta["size_bytes"] = json!(input.body.len() as i64);
+    meta["sha256"] = json!(content_hash);
+    let created = store::document::create_document_tx(
+        &mut *tx,
+        ctx.tenant,
+        &NewDocument {
+            id: Uuid::now_v7(),
+            project_id,
+            card_id: input.card_id,
+            kind: "document".to_owned(),
+            title: title.to_owned(),
+            status: "active".to_owned(),
+            object_key: None,
+            content_hash: Some(content_hash),
+            body: Some(input.body),
+            external_ref: None,
+            meta,
+            publishable: input.publishable.unwrap_or(false),
+        },
+    )
+    .await
+    .map_err(|error| document_error(error, action))?;
+    emit_document_event(
+        &mut *tx,
+        &ctx,
+        DOCUMENT_CREATED,
+        created.id,
+        json!({"id": created.id, "version": created.version.get(), "text": true}),
     )
     .await?;
     let etag = etag(created.version.get());
@@ -263,9 +398,15 @@ pub struct DocumentListIn {
     /// Only this project's documents.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub project_id: Option<Uuid>,
+    /// Only this card's documents.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<Uuid>,
     /// Only this kind (`document | report | export`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kind: Option<String>,
+    /// Only publishable rows, or only unpublishable ones.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publishable: Option<bool>,
     /// The cursor and page size.
     #[serde(flatten)]
     pub page: PageIn,
@@ -303,7 +444,9 @@ async fn documents_list(
     };
     let filter = DocumentFilter {
         project_id: input.project_id,
+        card_id: input.card_id,
         kind: input.kind,
+        publishable: input.publishable,
     };
     let (rows, next_cursor) =
         store::document::list_documents_tx(&mut *tx, ctx.tenant, &filter, &page)
@@ -353,6 +496,27 @@ async fn documents_download(
     input: DocumentIdIn,
 ) -> Result<HandlerOutput<DocumentDownloadOut>, ActionError> {
     let action = "documents.download";
+    // A text output has no object: serve the body itself. The bytes path below is unchanged for
+    // object-backed documents, so the hash verification and the object-store error vocabulary stay
+    // exactly where they were.
+    let record = store::document::get_document_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| document_error(error, action))?
+        .ok_or_else(|| ActionError::resource_not_found("such document"))?;
+    if record.object_key.is_none() {
+        if let (Some(body), Some(hash)) = (record.body.as_deref(), record.content_hash.as_deref())
+            && record.status == "active"
+        {
+            return Ok(HandlerOutput::ok(DocumentDownloadOut {
+                id: record.id.to_string(),
+                content_type: "text/markdown".to_owned(),
+                content_base64: base64::engine::general_purpose::STANDARD.encode(body.as_bytes()),
+                content_hash: hash.to_owned(),
+                byte_len: body.len() as i64,
+            }));
+        }
+        return Err(ActionError::resource_not_found("such document bytes"));
+    }
     let loaded = fetch_bytes(&mut *tx, ctx.tenant, input.id, action).await?;
     Ok(HandlerOutput::ok(DocumentDownloadOut {
         id: loaded.id.to_string(),
@@ -376,6 +540,16 @@ pub struct DocumentUpdateIn {
     /// The new metadata (replaced whole).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<Value>,
+    /// The new Markdown body of a text output. A byte-backed document refuses this: its content is
+    /// the object and a new payload is a new document.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub body: Option<String>,
+    /// The owning card, when the caller attaches the output.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<Uuid>,
+    /// Whether the public snapshot may carry this row.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publishable: Option<bool>,
 }
 
 /// Update a document's title and/or metadata.
@@ -410,36 +584,99 @@ async fn documents_update(
     {
         return Err(invalid("title", "required", "must not be empty"));
     }
+    if let Some(body) = input.body.as_deref() {
+        if body.trim().is_empty() {
+            return Err(invalid("body", "required", "must not be empty"));
+        }
+        if body.len() > MAX_OUTPUT_BYTES {
+            return Err(ActionError::new(
+                413,
+                "payload_too_large",
+                format!(
+                    "the output body is {} bytes; the cap is {MAX_OUTPUT_BYTES}",
+                    body.len()
+                ),
+            ));
+        }
+        if current.object_key.is_some() {
+            return Err(ActionError::new(
+                409,
+                "content_immutable",
+                "this document's content is an object; a text body cannot replace it",
+            ));
+        }
+    }
+    if let Some(card_id) = input.card_id
+        && !store::document::card_belongs_tx(&mut *tx, ctx.tenant, card_id, current.project_id)
+            .await
+            .map_err(|error| crate::control::store_error(error, action))?
+    {
+        return Err(ActionError::resource_not_found("such card in this project"));
+    }
+    let meta_changed = input.meta.is_some();
     let mut changed = Vec::new();
     if input.title.is_some() {
         changed.push("title");
     }
-    if input.meta.is_some() {
+    if meta_changed {
         changed.push("meta");
     }
-    if changed.is_empty() {
-        return Err(invalid("title", "invalid_value", "nothing to update"));
+    if input.body.is_some() {
+        changed.push("body");
     }
+    if input.publishable.is_some() {
+        changed.push("publishable");
+    }
+    if input.card_id.is_some() {
+        changed.push("card_id");
+    }
+    if changed.is_empty() {
+        return Err(invalid(
+            "title",
+            "invalid_value",
+            "nothing to update: supply title, meta, body, card_id or publishable",
+        ));
+    }
+    let body = input.body;
+    let content_hash = body
+        .as_deref()
+        .map(|body| hex(&Sha256::digest(body.as_bytes())));
+    let meta = {
+        // Metadata is merged, never replaced: `content_type` and `size_bytes` are the row's own
+        // facts and a caller that only wanted to rename a document must not silently drop them.
+        let mut merged = current.meta.clone();
+        if let Some(Value::Object(source)) = input.meta
+            && let Value::Object(target) = &mut merged
+        {
+            for (key, value) in source {
+                // ⛔ Server-owned facts. Only the content path may set them: a caller who can
+                // rewrite `content_type` chooses how the byte route serves the document (an
+                // accepted PDF re-labelled `text/html` is stored XSS at the app origin), and
+                // `size_bytes`/`sha256` would stop describing the content that was validated.
+                if matches!(key.as_str(), "content_type" | "size_bytes" | "sha256") {
+                    continue;
+                }
+                target.insert(key, value);
+            }
+        }
+        if let Some(body) = body.as_deref() {
+            merged["content_type"] = json!("text/markdown");
+            merged["size_bytes"] = json!(body.len() as i64);
+            merged["sha256"] = json!(content_hash.clone().unwrap_or_default());
+        }
+        if meta_changed || body.is_some() {
+            Some(merged)
+        } else {
+            None
+        }
+    };
     let patch = DocumentPatch {
         title: input.title.map(|title| title.trim().to_owned()),
-        // Metadata is merged, never replaced: `content_type` and `size_bytes` are the row's own facts and a
-        // caller that only wanted to rename a document must not silently drop them.
-        meta: input.meta.map(|extra| {
-            let mut merged = current.meta.clone();
-            if let (Value::Object(target), Value::Object(source)) = (&mut merged, extra) {
-                for (key, value) in source {
-                    // ⛔ Server-owned facts. Only the upload path may set them: a caller who can
-                    // rewrite `content_type` chooses how the byte route serves the document (an
-                    // accepted PDF re-labelled `text/html` is stored XSS at the app origin), and
-                    // `size_bytes`/`sha256` would stop describing the bytes that were validated.
-                    if matches!(key.as_str(), "content_type" | "size_bytes" | "sha256") {
-                        continue;
-                    }
-                    target.insert(key, value);
-                }
-            }
-            merged
-        }),
+        meta,
+        body,
+        content_hash,
+        card_id: input.card_id,
+        publishable: input.publishable,
     };
     let updated =
         store::document::update_document_tx(&mut *tx, ctx.tenant, input.id, expected, &patch)
@@ -719,8 +956,11 @@ async fn documents_report(
             status: "active".to_owned(),
             object_key: None,
             content_hash: None,
+            card_id: None,
+            body: None,
             external_ref: None,
             meta: json!({"window_days": window_days, "params": {"project_id": input.project_id}}),
+            publishable: false,
         },
     )
     .await

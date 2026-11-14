@@ -185,15 +185,30 @@ HEAD is the arbiter and the latest `<!-- handoff -->` comment is the state.
 
 ## The console — a front door, not a second protocol
 
-The operator console at `conveyor.nonagentic.ai/design` can intake an issue as a card, move a
-card, comment, claim and release against the tenant's own rows. It is a **front door to the
-platform**, not a second delivery protocol:
+The operator console at `conveyor.nonagentic.ai/design` runs the programme's day-to-day surfaces
+against the tenant's own rows. It is a **front door to the platform**, not a second delivery
+protocol:
 
+- **Projects** are live: an operator can create, edit (`projects.update`, If-Match), close and
+  execute a project. The plan stays the repository's Markdown document; the project's `meta.plan`
+  is a link, never a copy.
+- **Outputs** are text rows on the `document` table, attached to a project and optionally a card.
+  An output is **private until a person marks it publishable**; the public snapshot carries only
+  published, active rows, and the publish path renders each one to static HTML.
+- **Feedback** is a `feedback`-labelled GitHub issue. The console can intake it into a project's
+  intake lane (`cards.create` carrying `meta.issue`); the issue itself is not modified.
+- **Publish** enqueues `publish.design`, which rebuilds the pack and opens a pull request on the
+  homepage repository. The button never merges: the PR is the human gate, and the public site is
+  deployed by the homepage pipeline.
 - the GitHub issue is still the unit and the pushed branch is still the claim; a card created
   from the console carries `meta.issue` and is a view of the unit, never a substitute for it;
-- the console cannot open a PR, merge, or edit a label — those stay the protocol above;
+- the console cannot open a delivery PR, merge, or edit a label — those stay the protocol above;
 - `conveyor admin intake` and the console both call `cards.create`, so the two paths cannot
   produce different rows.
+
+A published output is **not** evidence of delivery: the DoD still requires the unit's acceptance
+command and a merged PR. The console records what the programme knows; it does not shorten the
+gate.
 
 ## Work and gate
 

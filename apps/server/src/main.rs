@@ -89,6 +89,10 @@ enum Command {
         /// The output directory.
         #[arg(long, default_value = "docs/design/data")]
         out: PathBuf,
+        /// Also render every publishable platform output into this directory
+        /// (`docs/design/docs`). Absent means the data snapshot only.
+        #[arg(long)]
+        outputs_dir: Option<PathBuf>,
         /// A fixed RFC 3339 timestamp (byte-identical re-runs). Defaults to now.
         #[arg(long)]
         generated_at: Option<String>,
@@ -444,6 +448,7 @@ async fn run(command: Command) -> Result<(), RunError> {
         Command::Snapshot {
             tenant,
             out,
+            outputs_dir,
             generated_at,
             issues,
             feedback_url,
@@ -453,6 +458,7 @@ async fn run(command: Command) -> Result<(), RunError> {
             let report = snapshot::run(snapshot::SnapshotArgs {
                 tenant,
                 out,
+                outputs_dir,
                 generated_at,
                 issues,
                 feedback_url,

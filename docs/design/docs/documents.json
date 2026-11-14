@@ -96,8 +96,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "48ad89474f328f64d42dce00fbf49e274dedd205c711a8733c8b6eb0d6d4dac1",
-      "bytes": 7113,
+      "sha256": "127e64e6a09920e9c308571da2c41f1497fd3b48e1200eae9376b667c2976b03",
+      "bytes": 8402,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -105,8 +105,8 @@
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "88d023e8c4d3e479e40a194b1371662d5c2e7ea8d64b329f29f933306bffe18f",
-      "bytes": 68222,
+      "sha256": "9a013ef33f23d6756de51fdafab369f67063734a08fbb034ece8e425d17e9b33",
+      "bytes": 68746,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -357,8 +357,8 @@
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "e25d9db04c33e90d94cdf3f5bc591c0ed3a5e28773c844192558447f6f5dc32b",
-      "bytes": 18762,
+      "sha256": "7b6c06b72ef3cb4554451e42827a05e6813f58c46c347d0c092f23ee2b6ff917",
+      "bytes": 19851,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
