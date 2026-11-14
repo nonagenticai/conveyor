@@ -632,6 +632,9 @@ async fn projects_execute(
             ),
         ));
     }
+    // The programme's declared order is enforced here, not in the console: a project whose
+    // `meta.depends_on` names an open project cannot start a run.
+    crate::programme::assert_dependencies_met(&mut *tx, ctx.tenant, project.id).await?;
     let (run, created) = store::run::create_project_execution_tx(&mut *tx, ctx.tenant, project.id)
         .await
         .map_err(|error| run_error(error, "projects.execute"))?;

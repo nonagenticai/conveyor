@@ -50,7 +50,7 @@ fn slug(body: &Value) -> &str {
 }
 
 /// A project with its template board, and that board's `active` lane.
-async fn board_and_lane(running: &support::Running) -> (String, String) {
+async fn board_lane_project(running: &support::Running) -> (String, String, String, String) {
     let (status, created) = running
         .invoke(
             "projects.create",
@@ -63,6 +63,7 @@ async fn board_and_lane(running: &support::Running) -> (String, String) {
         .await;
     assert_eq!(status, 201, "{created}");
     let project_id = text(output(&created), "id");
+    let project_key = text(output(&created), "key");
 
     let (status, view) = running
         .invoke(
@@ -94,7 +95,47 @@ async fn board_and_lane(running: &support::Running) -> (String, String) {
         .iter()
         .find(|row| row["list"]["kind"] == "active")
         .unwrap_or_else(|| panic!("no active lane in {board}"));
-    (board_id, text(&lane["list"], "id"))
+    (project_id, project_key, board_id, text(&lane["list"], "id"))
+}
+
+async fn board_and_lane(running: &support::Running) -> (String, String) {
+    let (_, _, board, lane) = board_lane_project(running).await;
+    (board, lane)
+}
+
+/// One active project with no dependencies: a blocker in the dependency-gate tests.
+async fn create_project(running: &support::Running) -> (String, String) {
+    let (status, created) = running
+        .invoke(
+            "projects.create",
+            TOKEN,
+            json!({"title": format!("Dependency {}", Uuid::now_v7().simple())}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    (text(output(&created), "id"), text(output(&created), "key"))
+}
+
+/// Merge `patch` into the project's meta through the tenant-scoped transaction.
+async fn merge_meta(
+    pg: &support::Pg,
+    tenant: conveyor_store::TenantId,
+    project_id: &str,
+    patch: Value,
+) {
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
+        .await
+        .expect("scoped transaction");
+    sqlx::query("UPDATE project SET meta = meta || $2::jsonb WHERE id = $1")
+        .bind(Uuid::parse_str(project_id).expect("project uuid"))
+        .bind(patch.to_string())
+        .execute(&mut *tx)
+        .await
+        .expect("merge project meta");
+    tx.commit().await.expect("commit project meta");
 }
 
 async fn create_card(
@@ -707,4 +748,68 @@ async fn seeded_tenant(pg: &support::Pg) -> Uuid {
         .fetch_one(&pg.super_pool)
         .await
         .expect("the fixture tenant")
+}
+
+/// The programme's order is enforced at the card start: a card on a project whose
+/// `meta.depends_on` names an open project is refused `409 blocked_by`, and closing the
+/// dependency lets the same start through.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn start_refuses_a_card_on_a_blocked_project() {
+    let (pg, running, seeded) = fixture().await;
+    let sop = support::publish_sop(&running, "process-start-blocked-sop").await;
+    let (dependency_id, dependency_key) = create_project(&running).await;
+    let (project_id, _project_key, board, lane) = board_lane_project(&running).await;
+    merge_meta(
+        &pg,
+        seeded.tenant,
+        &project_id,
+        json!({"depends_on": [&dependency_key]}),
+    )
+    .await;
+    let card = create_card(&running, &board, &lane, "feature").await;
+    let (_, process, _) = create_process(
+        &running,
+        "dev-start-blocked",
+        &sop,
+        Some("feature"),
+        two_steps(),
+    )
+    .await;
+    publish(&running, &process).await;
+
+    let (status, _, body) = start(
+        &running,
+        json!({"card_id": card, "process_id": process}),
+        None,
+    )
+    .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(slug(&body), "blocked_by", "{body}");
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains(&dependency_key),
+        "{body}"
+    );
+
+    let (status, closed) = running
+        .invoke(
+            "projects.close",
+            TOKEN,
+            json!({"id": dependency_id, "reason": "dependency met for the test"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{closed}");
+
+    let (status, _, body) = start(
+        &running,
+        json!({"card_id": card, "process_id": process}),
+        None,
+    )
+    .await;
+    assert!(status == 200 || status == 201, "{body}");
 }
