@@ -14,6 +14,7 @@
 
 pub mod active;
 pub mod bundle_ensure;
+pub mod bundle_grants;
 pub mod bundles;
 pub mod dependencies;
 pub mod internal_reads;
