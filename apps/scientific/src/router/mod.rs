@@ -124,6 +124,7 @@ pub const ROUTES: &[(&str, &str)] = &[
         stats::TrendResponse,
         verify::RagasRequest,
         verify::RagasResponse,
+        formal::Language,
         formal::FormalTranslateRequest,
         formal::FormalTranslateResponse,
         formal::FormalVerifyRequest,

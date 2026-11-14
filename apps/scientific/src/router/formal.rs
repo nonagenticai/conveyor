@@ -5,12 +5,16 @@
 //! **The prover answers back-pressure, not failure.** A saturated GPU is `503 gpu_busy` with a
 //! `Retry-After`; the caller re-drives. That is a `FormalFailure::Busy`, never a `500`.
 //!
-//! **Only Lean 4 is verified here.** The old service evaluated `z3` and `sympy` expressions through
-//! its Python sandbox executor; there is no faithful Rust equivalent, and the one live prover in
-//! the estate is Lean 4. A `z3` or `sympy` verification is therefore refused by name
-//! (`422 language_not_supported`) instead of answered with a guess. Translation to those languages
-//! still works — that is a model call, not an evaluation — which is why `translate` accepts all
-//! three and `verify` accepts one.
+//! **Only Lean 4 is verified here.** `z3` and `sympy` verification parsed a caller-supplied Python
+//! expression with an AST allowlist interpreter over the `z3` and `sympy` libraries — an in-process
+//! Python evaluator, not the sandbox. There is no faithful Rust equivalent in this workspace: `z3`
+//! would mean binding libz3, and `sympy` has no Rust counterpart. Rather than answer with a guess,
+//! `verify` refuses those two by name (`422 language_not_supported`).
+//!
+//! ⚠️ The captured default for `language` is `z3`, so a caller that omits it is refused here where
+//! the old service answered. That is a known, documented deviation (`docs/decisions/0006` §4), not
+//! an oversight — and the reason `translate` still accepts all three: it is a model call, not an
+//! evaluation.
 
 use std::time::Instant;
 
@@ -107,11 +111,43 @@ fn gpu_busy(retry_after: u32) -> FormalFailure {
     FormalFailure::Busy { retry_after }
 }
 
+/// A language the contract names, declared as an enum in the served document.
+///
+/// It stays a string at deserialisation so an unknown value reaches the handler and is refused with
+/// the contract's `{"detail": …}` body — a serde enum would answer a plain-text rejection instead,
+/// and the document would still have to carry the enum either way.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct Language(pub String);
+
+impl Default for Language {
+    fn default() -> Self {
+        Self("z3".to_owned())
+    }
+}
+
+impl utoipa::PartialSchema for Language {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        use utoipa::openapi::schema::{ObjectBuilder, Type};
+        ObjectBuilder::new()
+            .schema_type(Type::String)
+            .enum_values(Some(["lean4", "z3", "sympy"].map(serde_json::Value::from)))
+            .default(Some(serde_json::Value::from("z3")))
+            .into()
+    }
+}
+
+impl utoipa::ToSchema for Language {
+    fn name() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed("Language")
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
 pub struct FormalTranslateRequest {
     pub claim_text: String,
-    #[serde(default = "default_language")]
-    pub target_language: String,
+    #[serde(default)]
+    pub target_language: Language,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
@@ -126,8 +162,8 @@ pub struct FormalTranslateResponse {
 #[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
 pub struct FormalVerifyRequest {
     pub formal_expression: String,
-    #[serde(default = "default_language")]
-    pub language: String,
+    #[serde(default)]
+    pub language: Language,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
@@ -146,8 +182,8 @@ pub struct ProofStoreRequest {
     pub expression: String,
     #[serde(default)]
     pub is_valid: Option<bool>,
-    #[serde(default = "default_language")]
-    pub language: String,
+    #[serde(default)]
+    pub language: Language,
     #[serde(default)]
     pub proof: Option<String>,
 }
@@ -156,10 +192,6 @@ pub struct ProofStoreRequest {
 #[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
 pub struct ProofStored {
     pub key: String,
-}
-
-fn default_language() -> String {
-    "z3".to_owned()
 }
 
 fn known_language(language: &str) -> bool {
@@ -190,10 +222,10 @@ pub async fn translate(
             "claim_text exceeds 5000 characters",
         ));
     }
-    if !known_language(&body.target_language) {
+    if !known_language(&body.target_language.0) {
         return Err(detail(
             StatusCode::UNPROCESSABLE_ENTITY,
-            format!("unknown target_language: {}", body.target_language),
+            format!("unknown target_language: {}", body.target_language.0),
         ));
     }
     let started = Instant::now();
@@ -205,7 +237,7 @@ pub async fn translate(
     })?;
     let tenant = optional_tenant(&headers);
 
-    let response = if body.target_language == "lean4" {
+    let response = if body.target_language.0 == "lean4" {
         translate_lean4(
             inference,
             state.lean4.as_ref(),
@@ -216,13 +248,13 @@ pub async fn translate(
         .await?
     } else {
         let prompt = TRANSLATE_PROMPT
-            .replace("{language}", &body.target_language)
+            .replace("{language}", &body.target_language.0)
             .replace("{claim_text}", &body.claim_text);
         let raw = inference
             .chat(
                 &prompt,
                 1024,
-                &format!("sp-formal-translate-{}", body.target_language),
+                &format!("sp-formal-translate-{}", body.target_language.0),
                 tenant,
             )
             .await
@@ -235,7 +267,7 @@ pub async fn translate(
         FormalTranslateResponse {
             claim_text: body.claim_text.clone(),
             formal_expression: extract_expression(&raw),
-            target_language: body.target_language.clone(),
+            target_language: body.target_language.0.clone(),
             confidence: 0.8,
             computation_time_ms: millis(started),
         }
@@ -272,48 +304,26 @@ async fn translate_lean4(
         });
     };
 
-    let mut confidence = 0.9;
+    // One elaboration, then — if it did not type-check — one retry with the compiler's own errors
+    // in the prompt. A successful elaboration is 0.9 whether it happened on the first or the second
+    // attempt; only a code that never type-checked is 0.0. A transport failure to the prover is an
+    // elaboration failure here, not a shelving: `Busy` is the only signal that means "come back".
     for attempt in 0..=LEAN4_RETRIES {
-        match lean4.elaborate(&expression).await {
+        let errors = match lean4.elaborate(&expression).await {
             Ok(result) if result.get("success").and_then(Value::as_bool) == Some(true) => {
                 return Ok(FormalTranslateResponse {
                     claim_text: claim_text.to_owned(),
                     formal_expression: expression,
                     target_language: "lean4".to_owned(),
-                    confidence,
+                    confidence: 0.9,
                     computation_time_ms: millis(started),
                 });
             }
-            Ok(result) => {
-                if attempt == LEAN4_RETRIES {
-                    return Ok(FormalTranslateResponse {
-                        claim_text: claim_text.to_owned(),
-                        formal_expression: expression,
-                        target_language: "lean4".to_owned(),
-                        confidence: 0.0,
-                        computation_time_ms: millis(started),
-                    });
-                }
-                let errors = result
-                    .get("errors")
-                    .map(errors_as_text)
-                    .unwrap_or_else(|| "elaboration failed".to_owned());
-                let retry = LEAN4_RETRY_PROMPT
-                    .replace("{claim_text}", claim_text)
-                    .replace("{previous_code}", &expression)
-                    .replace("{errors}", &errors);
-                let raw = inference
-                    .chat(&retry, 2048, "sp-formal-translate-lean4", tenant)
-                    .await
-                    .map_err(|_| {
-                        detail(
-                            StatusCode::INTERNAL_SERVER_ERROR,
-                            "Formal translation failed",
-                        )
-                    })?;
-                expression = extract_expression(&raw);
-                confidence = 0.0;
-            }
+            Ok(result) => result
+                .get("errors")
+                .map(errors_as_text)
+                .filter(|text| !text.is_empty())
+                .unwrap_or_else(|| "elaboration failed".to_owned()),
             Err(Lean4Error::Busy { retry_after }) => return Err(gpu_busy(retry_after)),
             Err(Lean4Error::MissingLicence | Lean4Error::Unconfigured) => {
                 return Err(detail(
@@ -321,28 +331,40 @@ async fn translate_lean4(
                     "Formal translation failed",
                 ));
             }
-            // A transport failure is an elaboration failure, not a shelving: the old client made
-            // the same distinction and retried once with "elaboration request failed".
-            Err(Lean4Error::Upstream(_)) => {
-                if attempt == LEAN4_RETRIES {
-                    return Ok(FormalTranslateResponse {
-                        claim_text: claim_text.to_owned(),
-                        formal_expression: expression,
-                        target_language: "lean4".to_owned(),
-                        confidence: 0.0,
-                        computation_time_ms: millis(started),
-                    });
-                }
-                confidence = 0.0;
-            }
+            Err(Lean4Error::Upstream(_)) => "elaboration request failed".to_owned(),
+        };
+
+        if attempt == LEAN4_RETRIES {
+            return Ok(FormalTranslateResponse {
+                claim_text: claim_text.to_owned(),
+                formal_expression: expression,
+                target_language: "lean4".to_owned(),
+                confidence: 0.0,
+                computation_time_ms: millis(started),
+            });
         }
+
+        let retry = LEAN4_RETRY_PROMPT
+            .replace("{claim_text}", claim_text)
+            .replace("{previous_code}", &expression)
+            .replace("{errors}", &errors);
+        let raw = inference
+            .chat(&retry, 2048, "sp-formal-translate-lean4", tenant)
+            .await
+            .map_err(|_| {
+                detail(
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Formal translation failed",
+                )
+            })?;
+        expression = extract_expression(&raw);
     }
 
     Ok(FormalTranslateResponse {
         claim_text: claim_text.to_owned(),
         formal_expression: expression,
         target_language: "lean4".to_owned(),
-        confidence,
+        confidence: 0.0,
         computation_time_ms: millis(started),
     })
 }
@@ -370,19 +392,19 @@ pub async fn verify(
             "formal_expression exceeds 5000 characters",
         ));
     }
-    if !known_language(&body.language) {
+    if !known_language(&body.language.0) {
         return Err(detail(
             StatusCode::UNPROCESSABLE_ENTITY,
-            format!("unknown language: {}", body.language),
+            format!("unknown language: {}", body.language.0),
         ));
     }
-    if body.language != "lean4" {
+    if body.language.0 != "lean4" {
         return Err(detail(
             StatusCode::UNPROCESSABLE_ENTITY,
             format!(
-                "language_not_supported: {} expressions were evaluated by the retired Python \
-                 sandbox; only lean4 is verified here",
-                body.language
+                "language_not_supported: {} was an in-process Python library evaluation \
+                 with no Rust equivalent; only lean4 is verified here",
+                body.language.0
             ),
         ));
     }
@@ -391,7 +413,7 @@ pub async fn verify(
     let Some(lean4) = state.lean4.as_ref() else {
         return Ok(Json(FormalVerifyResponse {
             expression: body.formal_expression,
-            language: body.language,
+            language: body.language.0,
             is_valid: None,
             counterexample: None,
             proof: Some("Lean4 prover not configured".to_owned()),
@@ -427,7 +449,7 @@ pub async fn verify(
 
     Ok(Json(FormalVerifyResponse {
         expression: body.formal_expression,
-        language: body.language,
+        language: body.language.0,
         is_valid,
         counterexample: None,
         proof,
@@ -467,7 +489,7 @@ pub async fn create_proof(
         "created_at": created_at,
         "tenant_id": tenant,
         "expression": body.expression,
-        "language": body.language,
+        "language": body.language.0,
         "is_valid": body.is_valid,
         "proof": body.proof,
     });
@@ -591,13 +613,46 @@ mod tests {
         headers
     }
 
+    /// Serve a stub on an ephemeral port and return its base URL.
+    async fn serve(app: axum::Router) -> String {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("ephemeral port");
+        let addr = listener.local_addr().expect("address");
+        tokio::spawn(async move {
+            axum::serve(listener, app).await.expect("serves");
+        });
+        format!("http://{addr}")
+    }
+
+    /// State whose two model/prover dependencies are the stubs.
+    fn state_for(inference: &str, lean4: &str) -> Shared {
+        let vars = vec![
+            (
+                "SCIENTIFIC_PROCESSOR_INFERENCE_ROUTER_URL".to_owned(),
+                inference.to_owned(),
+            ),
+            (
+                "SCIENTIFIC_PROCESSOR_LEAN4_PROVER_URL".to_owned(),
+                lean4.to_owned(),
+            ),
+            (
+                "SCIENTIFIC_PROCESSOR_DOWNSTREAM_LICENSE_TOKEN".to_owned(),
+                "licence".to_owned(),
+            ),
+        ];
+        Arc::new(AppState::new(
+            Config::from_lookup(&vars).expect("the environment parses"),
+        ))
+    }
+
     #[tokio::test]
     async fn a_non_lean_language_is_refused_by_name() {
         let result = verify(
             State(state()),
             Json(FormalVerifyRequest {
                 formal_expression: "x > 0".to_owned(),
-                language: "z3".to_owned(),
+                language: Language("z3".to_owned()),
             }),
         )
         .await;
@@ -622,7 +677,7 @@ mod tests {
             State(state()),
             Json(FormalVerifyRequest {
                 formal_expression: "theorem t : True := by trivial".to_owned(),
-                language: "lean4".to_owned(),
+                language: Language("lean4".to_owned()),
             }),
         )
         .await
@@ -636,7 +691,7 @@ mod tests {
         let body = ProofStoreRequest {
             expression: "x = x".to_owned(),
             is_valid: Some(true),
-            language: "lean4".to_owned(),
+            language: Language("lean4".to_owned()),
             proof: None,
         };
         let result = create_proof(
@@ -676,6 +731,91 @@ mod tests {
             FormalFailure::Refusal((status, _)) => assert_eq!(status, StatusCode::BAD_REQUEST),
             other => panic!("expected a refusal, got {other:?}"),
         }
+    }
+
+    #[tokio::test]
+    async fn a_failed_elaboration_retries_once_and_a_successful_retry_keeps_its_confidence() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+
+        // One model answer, and a prover that rejects the first attempt and accepts the second —
+        // the ladder the old service had.
+        let calls = Arc::new(AtomicUsize::new(0));
+        let counter = Arc::clone(&calls);
+        let model = axum::Router::new().route(
+            "/api/chat/completions",
+            axum::routing::post(|| async {
+                axum::Json(json!({"choices": [
+                    {"message": {"content": "theorem t : True := by trivial"}}
+                ]}))
+            }),
+        );
+        let prover = axum::Router::new().route(
+            "/api/elaborate",
+            axum::routing::post(move || {
+                let counter = Arc::clone(&counter);
+                async move {
+                    let attempt = counter.fetch_add(1, Ordering::SeqCst);
+                    axum::Json(if attempt == 0 {
+                        json!({"success": false, "errors": ["unknown tactic"]})
+                    } else {
+                        json!({"success": true, "errors": []})
+                    })
+                }
+            }),
+        );
+        let (model_url, prover_url) = (serve(model).await, serve(prover).await);
+
+        let Json(body) = translate(
+            State(state_for(&model_url, &prover_url)),
+            HeaderMap::new(),
+            Json(FormalTranslateRequest {
+                claim_text: "one plus one is two".to_owned(),
+                target_language: Language("lean4".to_owned()),
+            }),
+        )
+        .await
+        .expect("answered");
+
+        assert_eq!(
+            body.confidence, 0.9,
+            "a successful retry is still a checked term"
+        );
+        assert_eq!(body.formal_expression, "theorem t : True := by trivial");
+        assert_eq!(
+            calls.load(Ordering::SeqCst),
+            2,
+            "the retry must actually happen"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_prover_transport_failure_is_an_elaboration_failure_not_a_shelving() {
+        let model = axum::Router::new().route(
+            "/api/chat/completions",
+            axum::routing::post(|| async {
+                axum::Json(json!({"choices": [{"message": {"content": "theorem t : True := by trivial"}}]}))
+            }),
+        );
+        let prover = axum::Router::new().route(
+            "/api/elaborate",
+            axum::routing::post(|| async { StatusCode::INTERNAL_SERVER_ERROR }),
+        );
+        let (model_url, prover_url) = (serve(model).await, serve(prover).await);
+
+        let Json(body) = translate(
+            State(state_for(&model_url, &prover_url)),
+            HeaderMap::new(),
+            Json(FormalTranslateRequest {
+                claim_text: "one plus one is two".to_owned(),
+                target_language: Language("lean4".to_owned()),
+            }),
+        )
+        .await
+        .expect("answered");
+
+        // Not a 503: only `gpu_busy` means "come back". An unreachable prover is a code that was
+        // never checked, which is what the old service answered too.
+        assert_eq!(body.confidence, 0.0);
     }
 
     #[test]

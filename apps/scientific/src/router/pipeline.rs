@@ -123,7 +123,7 @@ pub async fn anomalies(
 
     let mut anomalies = Vec::new();
     for (entity_id, keys) in by_entity {
-        let entries = load_keys(&state, &keys).await?;
+        let entries = load_keys(&state, &keys).await;
         if entries.len() < 2 {
             continue;
         }
@@ -156,15 +156,22 @@ async fn load(state: &Shared, prefix: &str) -> Result<Vec<Value>, Failure> {
     let keys = objects::list(state.objects.as_ref(), prefix)
         .await
         .map_err(upstream_failure)?;
-    load_keys(state, &keys).await
+    Ok(load_keys(state, &keys).await)
 }
 
-async fn load_keys(state: &Shared, keys: &[String]) -> Result<Vec<Value>, Failure> {
+async fn load_keys(state: &Shared, keys: &[String]) -> Vec<Value> {
     let mut entries = Vec::new();
     for key in keys {
-        let body = objects::get(state.objects.as_ref(), key)
-            .await
-            .map_err(upstream_failure)?;
+        // One unreadable object is one missing record, not a broken history: the old service
+        // skipped the object it could not download, and an answer that hides the other twenty
+        // because the twenty-first was deleted between the list and the get is a worse answer.
+        let body = match objects::get(state.objects.as_ref(), key).await {
+            Ok(body) => body,
+            Err(error) => {
+                tracing::warn!(%key, %error, "skipping an unreadable history record");
+                continue;
+            }
+        };
         for line in String::from_utf8_lossy(&body).lines() {
             if line.trim().is_empty() {
                 continue;
@@ -183,7 +190,7 @@ async fn load_keys(state: &Shared, keys: &[String]) -> Result<Vec<Value>, Failur
             .unwrap_or("")
             .to_owned()
     });
-    Ok(entries)
+    entries
 }
 
 fn round4(value: f64) -> f64 {

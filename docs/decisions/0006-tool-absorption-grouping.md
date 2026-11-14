@@ -43,9 +43,14 @@ conveyor is both.
    - **The sandbox** (`sandbox/execute|jobs|results`): a second code-execution runtime when the
      conveyor already dispatches execution as `coding_jobs.create` / `coding_jobs.get`.
    - **Consequence — no database.** With the sandbox and the pipeline producers gone, nothing in the
-     surviving service writes a row. It ships with no Postgres and no migration, and `verify` answers
-     `422 language_not_supported` for `z3`/`sympy` because their evaluation was the retired Python
-     sandbox's, not a library a Rust port can reimplement faithfully.
+     surviving service writes a row. It ships with no Postgres and no migration.
+   - **`z3`/`sympy` verification is refused by name** (`422 language_not_supported`). Not because
+     the sandbox owned it — it did not: the old service evaluated those expressions in-process with
+     an AST allowlist interpreter over the `z3` and `sympy` libraries. The reason is that there is no
+     faithful Rust equivalent in this workspace: `z3` would mean binding libz3, and `sympy` has no
+     Rust counterpart. **Known deviation:** the captured default for `language` is `z3`, so a caller
+     that omits the field is refused here where the old service answered. Translation to both
+     languages is unaffected — it is a model call, not an evaluation.
 
    The lock therefore carries 18 of the captured 26 operations. No live consumer is lost: the
    Deployment has been at `replicas: 0` since 2026-11-01.
