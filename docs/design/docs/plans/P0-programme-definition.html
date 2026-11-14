@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>P0 — Programme definition · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="p0--programme-definition">P0 — Programme definition</h1>
+<p>Programme project: P0 · issues #120, #121, #122</p>
+<p><strong>Track:</strong> programme · <strong>Capabilities:</strong> architecture, programme management, project management, business analysis · <strong>Gate:</strong> the definition set is published and adopted; no V2 delivery project starts before it.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>Design the programme that delivers the full conveyor, following MSP's <em>Defining a Programme</em>: the vision, blueprint, business case, programme plan, governance, reuse map and project briefs. P0 is a project of the programme it defines, so every artefact in this set is an intermediate output stored on P0 in the console and published on the design site.</p>
+<p>The programme does not start T1–T17 until this set is accepted. The gate is the programme's, not a document's: a delivery project's brief is the contract it is held to.</p>
+<h2 id="2-starting-state-measured-at-the-p0-baseline">2. Starting state (measured at the P0 baseline)</h2>
+<ul>
+<li>V1 is far implemented: 25 measured-built slices, 2 partial (S14, S21); the Rust workspace, the action registry, the board/card/run/approval/document aggregates and the public design pack.</li>
+<li>T0's organisation spine merged (#65, migration 0040, <code>organisation.*</code> actions, release hash and binding pin); its measured coverage row is corrected by this unit's seed change.</li>
+<li>The programme seed has 47 projects and no programme-definition project. T1–T17 are proposed and blocked by their SPEC_V2 §12 edges.</li>
+<li><code>docs/SPEC_V2.md</code> is the design record; <code>docs/SPEC.md</code> is the V1 build record. Neither is a programme plan; P0 produces the plan that adopts them.</li>
+</ul>
+<h2 id="3-the-definition-set-the-projects-outputs">3. The definition set (the project's outputs)</h2>
+<ol type="1">
+<li><strong>Vision / mandate</strong> — what the conveyor programme is for, the outcomes, the boundary.</li>
+<li><strong>Blueprint</strong> — the target architecture and operating model: aggregates, services, the action registry, the data model, the deployment estate. The to-be the projects deliver.</li>
+<li><strong>Business case</strong> — why now, the benefit map, cost/risk posture, the public/opt-in licensing frame.</li>
+<li><strong>Programme plan</strong> — tranches, the definitive project list and sequencing. It adopts and updates the existing seed; it does not invent a parallel list.</li>
+<li><strong>Governance &amp; organisation</strong> — roles, decision ladder, assurance, the unit protocol.</li>
+<li><strong>Reuse map</strong> — what exists and may be reused: the conveyor V1 tree (tables, actions, modules, processes), the estate's absorbed services and modules, the seeded catalogues, the upstream crates. For each: reuse candidate, boundary, licence/contract constraint.</li>
+<li><strong>Project briefs</strong> — one per delivery project: outcome, boundaries, dependencies, acceptance, capabilities, plan link, reuse sources to analyse, and the two inception units below.</li>
+<li><strong>Architecture / analysis pack</strong> — current-state analysis, options, risks, dependency map.</li>
+</ol>
+<h2 id="4-the-project-brief-template-mandatory">4. The project brief template (mandatory)</h2>
+<p>Every delivery project's brief carries:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Outcome</td>
+<td>One sentence: what is true after the project that is not true now</td>
+</tr>
+<tr>
+<td>Boundary</td>
+<td>Out of scope, and which existing surfaces it must not fork</td>
+</tr>
+<tr>
+<td>Reuse sources</td>
+<td>Paths inside conveyor; estate services/modules; upstream crates. Each with the analysis question</td>
+</tr>
+<tr>
+<td>Inception units</td>
+<td><code>analysis</code> and <code>architecture</code>, the project's first two claims</td>
+</tr>
+<tr>
+<td>Dependencies</td>
+<td>Typed: blocked-by, acceptance-blocked-by, blocks, related</td>
+</tr>
+<tr>
+<td>Acceptance</td>
+<td>BDD scenario per part with a <code>Verify:</code> command</td>
+</tr>
+<tr>
+<td>Capabilities</td>
+<td>The organisation positions/capabilities that own it</td>
+</tr>
+<tr>
+<td>Plan</td>
+<td>The slice/S## plan path, or the T## SPEC_V2 section</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-the-inception-standard-per-delivery-project">5. The inception standard (per delivery project)</h2>
+<p><strong>Analysis</strong> — current state and reuse: for the project's capability, inventory the code that already exists (inside the conveyor repo, in the wider estate, and upstream), the contract and licence constraints, the build-vs-reuse decision, and the risks. It cites <code>path:symbol</code> inside the repo; outside, it names the capability, not a private host or URL.</p>
+<p><strong>Architecture</strong> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance. It must fit the blueprint; a deviation is a decision record, not a silent fork.</p>
+<p>Both are documents on the project with <code>meta.category</code> set. They are published when accepted. A project without both published is an inception gap; its build units are not claimed.</p>
+<h2 id="6-acceptance">6. Acceptance</h2>
+<ul>
+<li>The eight artefacts are published as documents on P0.</li>
+<li>The programme plan lists 48 projects (P0 + 47) with tranches and dependencies.</li>
+<li>Every delivery brief carries reuse sources and the two inception units.</li>
+<li>The Validation page shows P0 at tranche 0 and T1–T17 <code>blocked_by: [P0]</code>.</li>
+<li><code>check-coverage</code> passes; the seed regen is idempotent; this plan is indexed by <code>build-docs</code>.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/P0-programme-definition.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

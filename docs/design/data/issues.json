@@ -1,11 +1,188 @@
 {
   "issues": [
     {
+      "number": 122,
+      "title": "P0 \u2014 the reuse map, the architecture/analysis pack and the per-project inception standard",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/122",
+      "updatedAt": "2026-11-14T21:50:51Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 121,
+      "title": "P0 \u2014 author the programme definition set",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/121",
+      "updatedAt": "2026-11-14T21:50:49Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 120,
+      "title": "P0 \u2014 the programme definition project and its gate",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/120",
+      "updatedAt": "2026-11-14T21:51:34Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 118,
+      "title": "estate: absorb media-discovery into apps/research \u2014 contract, own schema, 23 operations",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/118",
+      "updatedAt": "2026-11-14T21:01:13Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 117,
+      "title": "estate: absorb webscraper into apps/research \u2014 contract, the static path in Rust, named refusals",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/117",
+      "updatedAt": "2026-11-14T21:33:33Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 116,
+      "title": "estate: absorb lean4-prover \u2014 contract, the crate moves into apps/lean4-prover",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/116",
+      "updatedAt": "2026-11-14T20:27:43Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 113,
+      "title": "design: the live Programme control page renders with live programme rows",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/113",
+      "updatedAt": "2026-11-14T20:18:01Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 111,
+      "title": "design: the check-v2 LIVE assertions match the rendered pages",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/111",
+      "updatedAt": "2026-11-14T19:21:24Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 105,
+      "title": "estate: absorb scientific-processor \u2014 contract, Rust rewrite in apps/scientific, parity",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/105",
+      "updatedAt": "2026-11-14T18:06:04Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
       "number": 103,
       "title": "programme: measure the plan, derive the tranches, publish the truth",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/103",
-      "updatedAt": "2026-11-14T16:51:42Z",
+      "updatedAt": "2026-11-14T21:50:10Z",
       "labels": [
         {
           "name": "unit",
@@ -20,9 +197,9 @@
     {
       "number": 102,
       "title": "ci: pin third-party actions by SHA and gate the workflows with actionlint + zizmor",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/102",
-      "updatedAt": "2026-11-14T16:47:15Z",
+      "updatedAt": "2026-11-14T17:53:34Z",
       "labels": [
         {
           "name": "unit",
@@ -135,9 +312,9 @@
     {
       "number": 89,
       "title": "queue: make the V2 registration true in the index and the programme seed",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/89",
-      "updatedAt": "2026-11-13T22:54:34Z",
+      "updatedAt": "2026-11-14T21:50:10Z",
       "labels": [
         {
           "name": "documentation",
@@ -668,7 +845,7 @@
       "title": "estate: absorb licenses \u2014 contract, Rust rewrite, parity",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/45",
-      "updatedAt": "2026-11-14T16:38:34Z",
+      "updatedAt": "2026-11-14T21:29:16Z",
       "labels": [
         {
           "name": "unit",
@@ -819,9 +996,9 @@
     {
       "number": 34,
       "title": "T0 \u2014 the organisation spine: industry, job catalogue, immutable release, binding",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/34",
-      "updatedAt": "2026-11-14T16:50:26Z",
+      "updatedAt": "2026-11-14T21:18:27Z",
       "labels": [
         {
           "name": "unit",

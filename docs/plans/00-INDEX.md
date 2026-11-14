@@ -25,6 +25,8 @@ registered GitHub issues are its units. `seed/programme.json` is the mapping of 
 
 - `S00`–`S21` — the V1 slice plans in `slices/` (including the `S06a`–`S06d` variants);
 - `T0`–`T17` — the SPEC_V2 slices (`docs/SPEC_V2.md` §12);
+- `P0` — the programme definition (`docs/plans/P0-programme-definition.md`), the first project
+  and the gate T1–T17 depend on (issues #120–#122);
 - `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM` — the cross-cutting units.
 
 Each project carries `meta.plan`, `meta.track` and `meta.issues`; each slice plan carries a
