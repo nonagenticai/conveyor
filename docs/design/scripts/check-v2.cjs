@@ -73,6 +73,8 @@ const shot = (name) =>
     for (const id of [
       "portfolio",
       "plan",
+      "projects",
+      "contribute",
       "organisation",
       "jobs",
       "procedures",
@@ -93,6 +95,8 @@ const shot = (name) =>
     for (const [id, title] of [
       ["portfolio", "Portfolio"],
       ["plan", "Plan & WBS"],
+      ["projects", "Projects"],
+      ["contribute", "Contribute"],
       ["organisation", "Organisation"],
       ["jobs", "Jobs"],
       ["procedures", "Procedures"],
@@ -565,6 +569,7 @@ const shot = (name) =>
     for (const id of [
       "portfolio",
       "plan",
+      "contribute",
       "organisation",
       "jobs",
       "procedures",
