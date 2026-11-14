@@ -151,7 +151,10 @@ async fn eval_runs_export(
         ));
     }
 
-    let content_hash = format!("{:x}", Sha256::digest(&bytes));
+    let content_hash = Sha256::digest(&bytes)
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<String>();
     let objects = Objects::from_env().ok_or_else(|| {
         crate::documents::object_error(
             crate::integrations::objects::ObjectError::Unavailable,

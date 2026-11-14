@@ -157,7 +157,11 @@ pub fn idempotency_key(email: &str, tenant_slug: &str) -> String {
     hasher.update(email.trim().to_ascii_lowercase().as_bytes());
     hasher.update([0u8]);
     hasher.update(tenant_slug.trim().as_bytes());
-    let hex = format!("{:x}", hasher.finalize());
+    let hex = hasher
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<String>();
     format!("conveyor-provision-v1-{}", &hex[..32])
 }
 
