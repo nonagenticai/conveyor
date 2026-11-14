@@ -598,7 +598,7 @@
       "key": "T0",
       "name": "Model and contracts",
       "description": "SPEC_V2 slice T0 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -609,7 +609,7 @@
         "depends_on": [],
         "plan_status": "draft",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 0,
         "gate": "a job is created in the conveyor, a release is published, a binding pins its hash, and a run on a retired binding refuses `409 job_binding_stale`; no concept has two stores; a test-only third executor kind registers without editing the run path"
       }
@@ -1061,7 +1061,15 @@
           71,
           93,
           95,
-          102
+          102,
+          105,
+          116,
+          117,
+          118,
+          120,
+          121,
+          122,
+          123
         ],
         "depends_on": [],
         "plan_status": "active",

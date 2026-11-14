@@ -11,12 +11,16 @@
  *   - every invoked action resolves in the compiled registry dump;
  *   - every v2.js page has a coverage row and no row names a page that does not exist;
  *   - every V2 slice resolves to its SPEC_V2 §12 row;
+ *   - every V2 slice is declared in `scripts/v2-slice-artefacts.json` (artefacts, or an
+ *     explicit evidence+gap row), its measured counts agree with its status, and no artefact
+ *     is credited to two slices;
  *   - every project's units exist in the issue registry;
  *   - the seed and the coverage agree on the project set, and no dependency dangles;
  *   - no non-built project is without an open unit.
  *
  * `--self-test` proves the gate refuses: a bad action, a missing page row, an uncovered
- * project and a missing evidence path each exit non-zero.
+ * project, a missing evidence path and a V2 slice that claims `built` with a missing
+ * artefact each exit non-zero.
  *
  * Run: node docs/design/scripts/check-coverage.cjs [--self-test]
  */
@@ -106,6 +110,77 @@ function validate(document, context) {
     assert.equal(project.units.unknown, 0, `${project.key} has an unknown unit state`);
   }
 
+  // The V2 declaration: every slice is declared, every declared artefact is credited once, and
+  // the measured counts are honest. This is what stops `track === "v2"` becoming a hardcoded
+  // `proposed` again.
+  const declared = context.v2art;
+  const credited = new Map();
+  const v2Projects = document.projects.filter((project) => project.track === "v2");
+  for (const project of v2Projects) {
+    const declaration = declared[project.key];
+    assert(declaration, `${project.key} has no declaration in scripts/v2-slice-artefacts.json`);
+    const artefacts = [
+      ...(declaration.tables || []).map((name) => `table:${name}`),
+      ...(declaration.actions || []).map((name) => `action:${name}`),
+      ...(declaration.modules || []).map((name) => `module:${name}`),
+    ];
+    for (const artefact of artefacts) {
+      assert(
+        !credited.has(artefact),
+        `${artefact} is credited to both ${credited.get(artefact)} and ${project.key}`,
+      );
+      credited.set(artefact, project.key);
+    }
+    if (artefacts.length === 0) {
+      assert(
+        Array.isArray(declaration.evidence) && declaration.evidence.length > 0,
+        `${project.key} declares no artefacts and no evidence row`,
+      );
+      assert(declaration.gap, `${project.key} declares no artefacts and no gap`);
+      assert(
+        project.status === "proposed" || project.status === "planned",
+        `${project.key} is curated but its measured status is ${project.status}`,
+      );
+      continue;
+    }
+    const measured = [
+      project.measured.tables,
+      project.measured.actions,
+      project.measured.modules,
+    ];
+    const counted = measured.reduce((sum, [, total]) => sum + total, 0);
+    const present = measured.reduce((sum, [found]) => sum + found, 0);
+    assert.equal(
+      counted,
+      artefacts.length,
+      `${project.key} measures ${counted} of ${artefacts.length} declared artefacts`,
+    );
+    if (project.status === "built") {
+      assert.equal(
+        present,
+        counted,
+        `${project.key} is built with ${present}/${counted} artefacts present`,
+      );
+    } else if (project.status === "partial") {
+      assert(
+        present > 0 && present < counted,
+        `${project.key} is partial with ${present}/${counted} artefacts present`,
+      );
+    } else {
+      assert.equal(
+        present,
+        0,
+        `${project.key} is ${project.status} with ${present} artefacts present`,
+      );
+    }
+  }
+  for (const key of Object.keys(declared)) {
+    assert(
+      v2Projects.some((project) => project.key === key),
+      `scripts/v2-slice-artefacts.json names unknown slice ${key}`,
+    );
+  }
+
   const seedKeys = new Set(seed.projects.map((project) => project.key));
   assert.deepEqual(
     [...projectKeys].sort(),
@@ -169,6 +244,7 @@ function load() {
     seed: JSON.parse(read("seed/programme.json")),
     spec: read("docs/SPEC_V2.md"),
     v2: read("docs/design/v2.js"),
+    v2art: JSON.parse(read("scripts/v2-slice-artefacts.json")).slices,
   };
 }
 
@@ -200,7 +276,12 @@ function main() {
     refuse("a missing evidence path", (copy) =>
       copy.projects[0].evidence.push("no/such/evidence.json"),
     );
-    console.log("check-coverage: self-test 4/4 refusals");
+    refuse("a V2 slice built with a missing artefact", (copy) => {
+      const row = copy.projects.find((project) => project.key === "T0");
+      assert(row, "self-test: T0 is not in coverage.json");
+      row.measured.tables = [0, row.measured.tables[1]];
+    });
+    console.log("check-coverage: self-test 5/5 refusals");
   }
 }
 

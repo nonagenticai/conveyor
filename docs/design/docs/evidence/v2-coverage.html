@@ -37,17 +37,17 @@
 <tr>
 <td><code>exists</code></td>
 <td>implemented in code and backed by real rows</td>
-<td>0</td>
+<td>11</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a partial implementation exists (a page, a table, or a prefix) that must be extended</td>
-<td>10</td>
+<td>8</td>
 </tr>
 <tr>
 <td><code>new</code></td>
 <td>absent</td>
-<td>32</td>
+<td>23</td>
 </tr>
 </tbody>
 </table>
@@ -69,8 +69,8 @@
 <td>§10.3</td>
 <td>table</td>
 <td>industry</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE industry</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE industry</td>
 </tr>
 <tr>
 <td><code>table:department</code></td>
@@ -85,24 +85,24 @@
 <td>§10.3</td>
 <td>table</td>
 <td>job_catalogue</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE job_catalogue</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE job_catalogue</td>
 </tr>
 <tr>
 <td><code>table:job_release</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>job_release</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE job_release</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE job_release</td>
 </tr>
 <tr>
 <td><code>table:job_binding</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>job_binding</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE job_binding</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE job_binding</td>
 </tr>
 <tr>
 <td><code>table:approval_policy</code></td>
@@ -149,24 +149,24 @@
 <td>§10.3</td>
 <td>table</td>
 <td>decision</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE decision</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE decision</td>
 </tr>
 <tr>
 <td><code>table:decision_option</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>decision_option</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE decision_option</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE decision_option</td>
 </tr>
 <tr>
 <td><code>table:decision_policy</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>decision_policy</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE decision_policy</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE decision_policy</td>
 </tr>
 <tr>
 <td><code>table:lesson</code></td>
@@ -189,16 +189,16 @@
 <td>§10.3</td>
 <td>table</td>
 <td>decision_policy_refinement</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE decision_policy_refinement</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE decision_policy_refinement</td>
 </tr>
 <tr>
 <td><code>table:laya_inference_config</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>laya_inference_config</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE laya_inference_config</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE laya_inference_config</td>
 </tr>
 <tr>
 <td><code>table:pko_release</code></td>
@@ -237,8 +237,8 @@
 <td>§10.4</td>
 <td>actions</td>
 <td>organisation</td>
-<td><code>extend</code></td>
-<td>actions: departments.* found (departments.create, departments.list)<br>actions: industries.* absent<br>actions: job_bindings.* absent<br>actions: job_releases.* absent<br>actions: jobs.* found (jobs.list, jobs.retry)</td>
+<td><code>exists</code></td>
+<td>actions: departments.* found (departments.create, departments.list)<br>actions: industries.* found (industries.create, industries.get, industries.list)<br>actions: job_bindings.* found (job_bindings.create, job_bindings.get, job_bindings.list…)<br>actions: job_releases.* found (job_releases.list, job_releases.publish, job_releases.retire)<br>actions: jobs.* found (jobs.list, jobs.retry)</td>
 </tr>
 <tr>
 <td><code>actions:procedures</code></td>
@@ -341,8 +341,8 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Organisation</td>
-<td><code>extend</code></td>
-<td>docs/design/v2.js: page 'organisation' registered<br><em>The page exists and renders fixtures; live industries/departments/jobs/releases/bindings arrive with T0 (#34).</em></td>
+<td><code>exists</code></td>
+<td>docs/design/v2.js: page 'organisation' registered<br><em>The page renders the tenant's live industry, department, job, release and binding rows (T0, #34/#65).</em></td>
 </tr>
 <tr>
 <td><code>destination:Procedures</code></td>
@@ -374,7 +374,7 @@
 <td>destination</td>
 <td>Plan</td>
 <td><code>extend</code></td>
-<td>docs/design/v2.js: page 'plan' registered<br><em>A design study today. The live Boards tab arrives with #57; WBS, baseline, registers and change control are T1.</em></td>
+<td>docs/design/v2.js: page 'plan' registered<br><em>The live Boards tab renders real boards and cards (#57); WBS, baseline, registers and change control are T1.</em></td>
 </tr>
 <tr>
 <td><code>destination:Improve</code></td>

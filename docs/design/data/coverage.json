@@ -136,7 +136,7 @@
       "tranche": 0,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           32,
           33,
@@ -146,8 +146,8 @@
           97,
           103
         ],
-        "open": 3,
-        "ready": 1,
+        "open": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -187,8 +187,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 3,
-        "claimed": 2,
+        "blocked": 8,
+        "claimed": 5,
         "numbers": [
           17,
           22,
@@ -201,10 +201,18 @@
           71,
           93,
           95,
-          102
+          102,
+          105,
+          116,
+          117,
+          118,
+          120,
+          121,
+          122,
+          123
         ],
-        "open": 8,
-        "ready": 3,
+        "open": 15,
+        "ready": 2,
         "unknown": 0
       }
     },
@@ -1361,22 +1369,26 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/domain/src/executor.rs",
+        "crates/domain/src/organisation.rs",
+        "crates/store/src/organisation.rs",
+        "migrations/0001_platform.sql",
+        "migrations/0040_organisation.sql"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": null,
       "key": "T0",
       "measured": {
         "actions": [
-          0,
-          0
+          17,
+          17
         ],
         "modules": [
-          0,
-          0
+          3,
+          3
         ],
         "tables": [
-          0,
-          0
+          10,
+          10
         ]
       },
       "name": "Model and contracts",
@@ -1389,28 +1401,26 @@
         "T11"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 0,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           34
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
     },
     {
-      "blocked_by": [
-        "T0"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "table wbs_node, table project_baseline, table project_register_item, table project_dependency, table programme_cadence",
       "key": "T1",
       "measured": {
         "actions": [
@@ -1423,7 +1433,7 @@
         ],
         "tables": [
           0,
-          0
+          5
         ]
       },
       "name": "Plan spine",
@@ -1453,7 +1463,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no backlog materialisation, PI planning, demo or inspect-and-adapt cadence",
       "key": "T10",
       "measured": {
         "actions": [
@@ -1499,7 +1509,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no metrics roll-ups, metering drill-down or billing reconciliation (continuous)",
       "key": "T11",
       "measured": {
         "actions": [
@@ -1541,7 +1551,6 @@
     },
     {
       "blocked_by": [
-        "T0",
         "T1",
         "T10",
         "T11",
@@ -1562,7 +1571,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "the one-organisation acceptance loop is not built",
       "key": "T12",
       "measured": {
         "actions": [
@@ -1602,7 +1611,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "table tool, table toolkit, table tool_binding, table tool_call",
       "key": "T13",
       "measured": {
         "actions": [
@@ -1615,7 +1624,7 @@
         ],
         "tables": [
           0,
-          0
+          4
         ]
       },
       "name": "Tool platform",
@@ -1645,7 +1654,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no estate toolkit published with a probe and a live call",
       "key": "T14",
       "measured": {
         "actions": [
@@ -1694,7 +1703,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no tool authoring, OpenAPI draft import or BYO tool binding",
       "key": "T15",
       "measured": {
         "actions": [
@@ -1735,7 +1744,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "table pko_release, table pko_entity, table pko_relation",
       "key": "T16",
       "measured": {
         "actions": [
@@ -1748,7 +1757,7 @@
         ],
         "tables": [
           0,
-          0
+          3
         ]
       },
       "name": "SOP, RDF/OWL and process-document ingestion",
@@ -1784,7 +1793,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no tenant asset authoring intake or review queue",
       "key": "T17",
       "measured": {
         "actions": [
@@ -1829,7 +1838,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "the decision tables exist as T0 schema; no decision-ladder evaluation, laya client or generation split (T2 behaviour)",
       "key": "T2",
       "measured": {
         "actions": [
@@ -1871,7 +1880,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no PM job: no charter, WBS, baseline, staffing, gate routing or closure run",
       "key": "T3",
       "measured": {
         "actions": [
@@ -1914,7 +1923,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no interruption taxonomy, closed remedy set or coach card",
       "key": "T4",
       "measured": {
         "actions": [
@@ -1962,7 +1971,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no kata.* action family and no measured procedure-change loop",
       "key": "T5",
       "measured": {
         "actions": [
@@ -2005,7 +2014,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no development-project path over conveyor and a dependency repo",
       "key": "T6",
       "measured": {
         "actions": [
@@ -2050,7 +2059,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no incident, runbook or postmortem rows and no operations tool call set",
       "key": "T7",
       "measured": {
         "actions": [
@@ -2095,7 +2104,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "table lesson",
       "key": "T8",
       "measured": {
         "actions": [
@@ -2108,7 +2117,7 @@
         ],
         "tables": [
           0,
-          0
+          1
         ]
       },
       "name": "Organisational memory",
@@ -2139,7 +2148,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no architecture project type and no TOGAF phase contracts",
       "key": "T9",
       "measured": {
         "actions": [
@@ -2395,16 +2404,16 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 25,
+        "built": 26,
         "partial": 2,
         "planned": 0,
-        "proposed": 18,
+        "proposed": 17,
         "standing": 1
       },
       "total": 47,
       "uncovered": [],
-      "with_open_units": 33,
-      "without_open_units": 14
+      "with_open_units": 32,
+      "without_open_units": 15
     },
     "screens": {
       "actions_invoked": 22,
