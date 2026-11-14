@@ -1,0 +1,2 @@
+POST /api/scrape/url
+{"url":"http://127.0.0.1:18900/article2.html","no_cache":true}

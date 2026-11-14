@@ -1,0 +1,2 @@
+POST /api/scrape/url
+{"url":"http://127.0.0.1:18900/list.html","no_cache":true,"extraction_schema":{"name":"cards","baseSelector":".card","fields":[{"name":"name","selector":".name"},{"name":"price","selector":".price"}]}}
