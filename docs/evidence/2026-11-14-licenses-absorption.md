@@ -1,6 +1,6 @@
 # licenses absorption — evidence (2026-11-14)
 
-Issue #45 · head `32f9dbd` · branch `issue/45-licenses` (slice `slice/45/evidence`). The
+Issue #45 · head `9f50438` · branch `issue/45-licenses`. The
 reference service is pinned by commit and by image digest; no private hostname, address, token or
 tenant identifier appears in this file.
 
@@ -40,7 +40,7 @@ over HTTP. It is out of scope (issue #45, Out of scope).
 |---|---|---|
 | P1.1 capture the document | `contract/manifest.json` records date, digest, lock sha256, 43/60/57; `compare-report.txt` says `compare: byte-identical after jq -S` against the pin's `docs/openapi.json` | `apps/licenses/contract/` |
 | P1.2 synthetic fixtures, no private refs | `bash scripts/ci/no-private-refs.sh` → `OK: no private infrastructure references in 1499 tracked files (6 allowlisted)`, exit 0 (scan before this file was staged). The fixtures are `contract/stubs/synthetic-corpus.jsonl`; case ids in a shadow report are hashes of `method path body` | this head |
-| P2.1 served document equals the lock | `conveyor-licenses --check-lock` → `lock OK: 60 operations` on stderr, exit 0: all 60 captured operations are served and the served document matches the lock under the contract projection. The flag runs before configuration and touches no database | `32f9dbd` |
+| P2.1 served document equals the lock | `conveyor-licenses --check-lock` → `lock OK: 60 operations` on stderr, exit 0: all 60 captured operations are served and the served document matches the lock under the contract projection. The flag runs before configuration and touches no database | `9f50438` (re-measured after the test flip; same result) |
 | P2.2 migrations equal the live schema | `bash apps/licenses/contract/schema-diff.sh` → `schema OK: the migrations produce the live schema`, exit 0. The script applies `migrations/0001_baseline.sql` in one transaction to a throwaway `postgres:18.6`, dumps it with the live dump's options and diffs it against `contract/schema.lock.sql` (22 tables; 24 relations including the two `pg_stat_statements` views; the Rust ledger, ownership, privileges and tablespaces are excluded by construction). `CHECK` expressions are compared as token streams so deparse-only parenthesisation cannot fail the diff. `tests/migrations.rs` then pins `migrate` and `migrate --baseline` against a fresh database | this head |
 | P2.3 the mint envelope | `a_mint_returns_the_seven_fields_and_the_raw_token_introspects`: `POST …/bundle-token?app=demo` answers 201 with `{token, expires_at, tenant_id, bundle, app, license_id, token_id}` — the raw token is 43 base64url chars with no padding, only its SHA-256 is stored, and the raw token introspects 200 on the same licence | `apps/licenses/tests/internal_bundles.rs:236-295` |
 | P2b.1 four recurring commands' row effects | the effect table below; each command has an armed-transition test and a dry-run/vacuity test | `apps/licenses/tests/command_*.rs`, `billing_teardown.rs` |
@@ -90,13 +90,13 @@ config refusal rather than the argv refusal.
 
 ## Test inventory
 
-Measured on m1 at `32f9dbd` (a throwaway Postgres 18 cluster per run). The first run,
-`rbuild -- test -p conveyor-licenses --locked`, stops at the lib target with 44 passed / 1 failed.
-The counts below are from the same command with `--no-fail-fast`, so every integration target ran:
+Measured on m1 at `9f50438` (a throwaway Postgres 18 cluster per run):
+`rbuild -- test -p conveyor-licenses --locked` → **350 passed, 0 failed** across 36 test
+binaries, exit 0. The per-target counts below are from the complete run:
 
 | Test target | Tests | Failed |
 |---|---:|---:|
-| `src/lib.rs` (unit) | 45 | 1 |
+| `src/lib.rs` (unit) | 45 | 0 |
 | `src/main.rs` (unit) | 0 | 0 |
 | `tests/billing_metering.rs` | 7 | 0 |
 | `tests/billing_teardown.rs` | 6 | 0 |
@@ -124,7 +124,7 @@ The counts below are from the same command with `--no-fail-fast`, so every integ
 | `tests/licence_tokens.rs` | 33 | 0 |
 | `tests/metrics.rs` | 1 | 0 |
 | `tests/migrations.rs` | 6 | 0 |
-| `tests/reconcile_route.rs` | 5 | 1 |
+| `tests/reconcile_route.rs` | 5 | 0 |
 | `tests/revoke.rs` | 7 | 0 |
 | `tests/tenant_byo.rs` | 6 | 0 |
 | `tests/tenant_offerings.rs` | 8 | 0 |
@@ -132,9 +132,9 @@ The counts below are from the same command with `--no-fail-fast`, so every integ
 | `tests/user_licence_writes.rs` | 9 | 0 |
 | `tests/user_licences.rs` | 6 | 0 |
 | Doc-tests | 0 | 0 |
-| **Total** | **350** | **2** |
+| **Total** | **350** | **0** |
 
-### The two failures are stale "port is incomplete" assertions
+### The two stale "port is incomplete" assertions (resolved in `a0e757b`)
 
 - `contract::tests::the_lock_check_names_the_unported_operations` — `apps/licenses/src/contract/mod.rs:143-176`.
   It does `check(&served(), ROUTES).expect_err("the port is incomplete by construction in slice 1")`;
@@ -143,11 +143,11 @@ The counts below are from the same command with `--no-fail-fast`, so every integ
 - `tests/reconcile_route.rs::the_lock_check_never_names_this_route` — panics at line 530:
   `the port is incomplete by construction: ()`.
 
-Both encode the slice-era state in which `--check-lock` HAD to fail. The green check is the
-intended end state; the two failures are not a serving regression, but the crate's test command
-is non-zero, so the issue's "repo gate green at the exact head" DoD is not met at `32f9dbd`.
-Fixing them is a code change; this slice is documentation-only and records the red gate rather
-than hiding it.
+Both encoded the slice-era state in which `--check-lock` HAD to fail. **Resolved in `a0e757b`**:
+the contract test is now `the_lock_check_accepts_the_complete_port` (asserts `check` returns Ok)
+and the reconcile-route test calls `check(...).expect("the served contract equals the capture")`.
+The crate's test command is green after that change; the remaining DoD gate is the full workspace
+suite at the PR head, recorded in the PR.
 
 ## Recorded deviations
 
