@@ -789,10 +789,10 @@ async fn the_role_guard_refuses_every_internal_route() {
 ///
 /// The comparison runs through the SAME shrink-only projection `--check-lock` uses, so this pins
 /// what that check will compare once the rest of the document is ported. Header parameters are
-/// dropped from both sides: the capture encodes `X-Tenant-Id` as a `$ref` into
-/// `components.parameters`, which the projection treats as an opaque parameter, while utoipa
-/// emits it inline — a representation difference with no wire meaning (an HTTP header is always a
-/// string and both declare it optional), and the same one every already-ported route carries.
+/// removed from both sides here: the capture encodes `X-Tenant-Id` as a `$ref` into
+/// `components.parameters` while utoipa emits it inline (the projection resolves the reference, so
+/// the two now compare equal regardless), and this test is about the five operations' own
+/// parameters and response schemas.
 #[test]
 fn the_five_operations_match_the_captured_contract() {
     use conveyor_licenses::contract::normalize::normalize;

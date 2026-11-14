@@ -29,6 +29,10 @@
 //! 10. Numeric `format` (`int32`, `int64`, `float`, `double`) is dropped: JSON numbers carry no
 //!     width, and the `type` distinction (`integer` vs `number`) is still compared. `uuid`,
 //!     `date-time` and every other format are compared.
+//! 11. A parameter `$ref` into the same document's `components.parameters` is resolved before
+//!     projection, on both sides: the capture spells the shared `X-Tenant-Id` header as a `$ref`
+//!     and utoipa inlines the identical parameter. A reference that does not resolve is projected
+//!     as `{"ref": <name>}`, so a dangling reference still differs from one that resolved.
 
 use serde_json::{Map, Value, json};
 
@@ -55,7 +59,7 @@ fn paths(document: &Value) -> Value {
         let mut operations = Map::new();
         for method in METHODS {
             if let Some(operation) = item.get(method) {
-                operations.insert(method.to_owned(), self::operation(operation));
+                operations.insert(method.to_owned(), self::operation(operation, document));
             }
         }
         out.insert(path.clone(), Value::Object(operations));
@@ -63,11 +67,17 @@ fn paths(document: &Value) -> Value {
     Value::Object(out)
 }
 
-fn operation(operation: &Value) -> Value {
+fn operation(operation: &Value, document: &Value) -> Value {
+    let components = document.get("components");
     let mut parameters: Vec<Value> = operation
         .get("parameters")
         .and_then(Value::as_array)
-        .map(|items| items.iter().map(parameter).collect())
+        .map(|items| {
+            items
+                .iter()
+                .map(|item| parameter(item, components))
+                .collect()
+        })
         .unwrap_or_default();
     parameters.sort_by_key(Value::to_string);
     json!({
@@ -77,7 +87,27 @@ fn operation(operation: &Value) -> Value {
     })
 }
 
-fn parameter(parameter: &Value) -> Value {
+/// Project one parameter, resolving a `$ref` into `components.parameters` first (rule 11).
+///
+/// The reference's `TenantIdHeader` is a component; utoipa emits the same parameter inline. The
+/// two describe one wire parameter, so they must compare equal. A reference whose target is absent
+/// keeps a `{"ref": …}` projection instead of turning into an empty parameter — the dangling
+/// reference is the difference, and it must remain visible.
+fn parameter(parameter: &Value, components: Option<&Value>) -> Value {
+    if let Some(reference) = parameter.get("$ref").and_then(Value::as_str) {
+        let name = reference.rsplit('/').next().unwrap_or(reference);
+        let Some(target) = components
+            .and_then(|components| components.get("parameters"))
+            .and_then(|parameters| parameters.get(name))
+        else {
+            return json!({"ref": name});
+        };
+        return concrete_parameter(target);
+    }
+    concrete_parameter(parameter)
+}
+
+fn concrete_parameter(parameter: &Value) -> Value {
     let location = parameter.get("in").and_then(Value::as_str).unwrap_or("");
     let mut out = Map::new();
     out.insert(
@@ -483,5 +513,97 @@ mod tests {
             diffs.iter().any(|row| row.contains("/required")),
             "{diffs:?}"
         );
+    }
+
+    /// Rule 11: the capture's `$ref` parameter and utoipa's inline spelling are one parameter.
+    #[test]
+    fn a_parameter_ref_and_its_inline_equivalent_normalize_equal() {
+        let referenced = json!({
+            "paths": {"/apps": {"get": {"parameters": [
+                {"$ref": "#/components/parameters/TenantIdHeader"}
+            ]}}},
+            "components": {
+                "parameters": {"TenantIdHeader": {
+                    "name": "X-Tenant-Id",
+                    "in": "header",
+                    "required": false,
+                    "schema": {"type": "string"}
+                }},
+                "schemas": {}
+            }
+        });
+        let inline = json!({
+            "paths": {"/apps": {"get": {"parameters": [
+                {"name": "X-Tenant-Id", "in": "header", "required": false}
+            ]}}},
+            "components": {"schemas": {}}
+        });
+        assert_eq!(normalize(&referenced), normalize(&inline));
+        assert!(diff(&normalize(&referenced), &normalize(&inline)).is_empty());
+    }
+
+    /// Rule 11 resolves the reference; it does not make the parameter's contract disappear. A real
+    /// name / location / required difference must still be named after resolution.
+    #[test]
+    fn a_resolved_parameter_that_differs_still_differs() {
+        let referenced = json!({
+            "paths": {"/apps": {"get": {"parameters": [
+                {"$ref": "#/components/parameters/TenantIdHeader"}
+            ]}}},
+            "components": {
+                "parameters": {"TenantIdHeader": {
+                    "name": "X-Tenant-Id",
+                    "in": "header",
+                    "required": false
+                }},
+                "schemas": {}
+            }
+        });
+        for (field, changed) in [
+            (
+                "name",
+                json!({"name": "X-Other-Id", "in": "header", "required": false}),
+            ),
+            (
+                "in",
+                json!({"name": "X-Tenant-Id", "in": "query", "required": false}),
+            ),
+            (
+                "required",
+                json!({"name": "X-Tenant-Id", "in": "header", "required": true}),
+            ),
+        ] {
+            let served = json!({
+                "paths": {"/apps": {"get": {"parameters": [changed]}}},
+                "components": {"schemas": {}}
+            });
+            let diffs = diff(&normalize(&referenced), &normalize(&served));
+            assert!(
+                diffs
+                    .iter()
+                    .any(|row| row.contains(&format!("/parameters/0/{field}"))),
+                "{field} change was not named: {diffs:?}"
+            );
+        }
+    }
+
+    /// A reference with no target must not collapse into an empty parameter and compare equal to
+    /// a real one: the dangling reference is itself a difference.
+    #[test]
+    fn an_unresolved_parameter_ref_stays_visible() {
+        let dangling = json!({
+            "paths": {"/apps": {"get": {"parameters": [
+                {"$ref": "#/components/parameters/Missing"}
+            ]}}},
+            "components": {"schemas": {}}
+        });
+        let resolved = json!({
+            "paths": {"/apps": {"get": {"parameters": [
+                {"name": "X-Tenant-Id", "in": "header", "required": false}
+            ]}}},
+            "components": {"schemas": {}}
+        });
+        let diffs = diff(&normalize(&resolved), &normalize(&dangling));
+        assert!(!diffs.is_empty(), "a dangling $ref must stay visible");
     }
 }

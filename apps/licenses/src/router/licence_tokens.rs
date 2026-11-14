@@ -398,7 +398,7 @@ fn license_not_active_detail(
         (status = 403, body = ErrorResponse),
         (status = 404, body = ErrorResponse),
         (status = 409, body = ErrorResponse),
-        (status = 422, body = HTTPValidationError),
+        (status = 422, body = ErrorResponse),
         (status = 500, body = ErrorResponse)
     )
 )]

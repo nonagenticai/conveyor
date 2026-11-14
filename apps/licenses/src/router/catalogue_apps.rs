@@ -152,12 +152,15 @@ pub struct AppPlansQuery {
 
 /// `DELETE /apps/{app_id}` query parameters, documentation-only: the handler extracts the
 /// raw map so an invalid value is FastAPI's 422 body, not axum's rejection.
+///
+/// `nullable` is the capture's: Pydantic spells an optional bounded integer as
+/// `anyOf: [{type: integer, minimum: 0}, {type: "null"}]`, not a bare nullable-free integer.
 #[derive(IntoParams)]
 #[into_params(parameter_in = Query)]
 pub struct DeleteAppQuery {
     /// Acknowledge the blast radius: the exact live licence count, as returned by an
     /// unconfirmed 409.
-    #[param(minimum = 0)]
+    #[param(nullable = true, minimum = 0)]
     pub confirm_licenses: Option<i64>,
 }
 

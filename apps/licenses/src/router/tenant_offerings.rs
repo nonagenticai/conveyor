@@ -216,7 +216,7 @@ pub async fn put_tenant_grant(
         (status = 401, body = ErrorResponse),
         (status = 403, body = ErrorResponse),
         (status = 404, body = ErrorResponse),
-        (status = 422, body = ErrorResponse),
+        (status = 422, body = HTTPValidationError),
         (status = 500, body = ErrorResponse)
     )
 )]

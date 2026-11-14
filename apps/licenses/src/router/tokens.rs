@@ -38,6 +38,17 @@ pub struct TokenIntrospectRequest {
     pub token: String,
 }
 
+/// The captured `subject_kind` closed set: `tenant` for a tenant-level holder, `member` for a
+/// person. Schema-only: the field stays a `String` on the wire, so an unexpected stored value is
+/// still serialised rather than rejected. Inlined (with `Option`) so the served document carries
+/// the capture's `anyOf: [{type: string, enum: [...]}, {type: "null"}]`, not a `$ref`.
+#[derive(Debug, ToSchema)]
+#[schema(rename_all = "lowercase")]
+pub enum SubjectKind {
+    Tenant,
+    Member,
+}
+
 /// The captured `TokenIntrospectResponse`, field for field and in the model's order.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct TokenIntrospectResponse {
@@ -47,6 +58,7 @@ pub struct TokenIntrospectResponse {
     pub subject_id: Option<String>,
     pub subject_keycloak_sub: Option<String>,
     pub subject_actor_sub: Option<String>,
+    #[schema(value_type = Option<SubjectKind>, inline)]
     pub subject_kind: Option<String>,
     pub byo_mode: Option<String>,
     #[schema(value_type = Option<Object>)]
@@ -238,7 +250,7 @@ pub struct TokenRevokeResponse {
     // nullable and is always serialised, as `[]` when nothing was released. `Option` here only
     // keeps it out of the OpenAPI `required` list; `value_type` keeps the schema an array.
     /// Ids of the tenant's dependency licences revoked with this licence because no remaining active licence requires them (app_requires closure).
-    #[schema(value_type = Vec<String>)]
+    #[schema(value_type = Vec<String>, required = false)]
     pub released_dependency_ids: Option<Vec<String>>,
 }
 
