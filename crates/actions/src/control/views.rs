@@ -74,6 +74,15 @@ pub struct RunCreateIn {
     /// Links the run to the trigger that created it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub correlation_id: Option<Uuid>,
+    /// The organisation binding the run executes under (T0, SPEC_V2 §4.4). When present, the
+    /// run records the binding and the release it pins; a retired binding or a stale pin is
+    /// refused `409 job_binding_stale` before the run is written.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<Uuid>,
+    /// The release the caller expects the binding to pin. Must equal the binding's pin; omit to
+    /// accept the binding's own.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub release_hash: Option<String>,
 }
 
 /// `runs.finish` — how the run ended.

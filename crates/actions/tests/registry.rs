@@ -59,7 +59,9 @@ use serde_json::{Value, json};
 /// `publish.status` and `repositories.update`. 299 → **304**.
 /// **#92 adds 1 internal**: `card_types.list` — the read `catalogues.list` cannot serve,
 /// because `card_type` is deliberately not one of the eleven catalogue namespaces. 304 → **305**.
-const EXPECTED: [&str; 305] = [
+/// **T0 adds 15 internal**: `industries.*` (3), `job_catalogue.*` (5), `job_releases.*` (3) and
+/// `job_bindings.*` (4) — the organisation spine (SPEC_V2 §4, §10.4). 305 → **320**.
+const EXPECTED: [&str; 320] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -189,12 +191,27 @@ const EXPECTED: [&str; 305] = [
     "fixtures.slow",
     "fixtures.timeout",
     "graphs.list",
+    "industries.create",
+    "industries.get",
+    "industries.list",
     "inference.chat",
     "inference_calls.list",
     "inference_usage.report",
     "invites.create",
     "invites.list",
     "invites.revoke",
+    "job_bindings.create",
+    "job_bindings.get",
+    "job_bindings.list",
+    "job_bindings.retire",
+    "job_catalogue.create",
+    "job_catalogue.get",
+    "job_catalogue.list",
+    "job_catalogue.retire",
+    "job_catalogue.update",
+    "job_releases.list",
+    "job_releases.publish",
+    "job_releases.retire",
     "jobs.list",
     "jobs.retry",
     "knowledge.query",
@@ -393,8 +410,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // retire`) so a tenant can author a map and have it validated; before this only the two
     // reads existed and the domain validator was unreachable through the API.
     // The external count moves exactly once, at step 8 — every other addition is internal.
-    // #92 adds `card_types.list` (internal, read): 289 → 290.
-    assert_eq!((internal, external), (290, 15));
+    // #92 adds `card_types.list` (internal, read): 289 → 290; T0 adds 15 internal actions
+    // (the organisation spine): 290 → 305.
+    assert_eq!((internal, external), (305, 15));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
