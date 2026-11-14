@@ -128,6 +128,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-12-delivery-system.md"
     },
     {
+      "title": "inference-router absorption — evidence (2026-11-13)",
+      "path": "docs/evidence/2026-11-13-inference-router-absorption.html",
+      "source": "docs/evidence/2026-11-13-inference-router-absorption.md",
+      "section": "Evidence",
+      "sha256": "b86c0d474d47e5ccf8ade98c3555728e44d6f35901694e9de7016b7218fc28bb",
+      "bytes": 6631,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-13-inference-router-absorption.md"
+    },
+    {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
       "path": "docs/evidence/D23-EVAL-CALLER.html",
       "source": "docs/evidence/D23-EVAL-CALLER.md",
