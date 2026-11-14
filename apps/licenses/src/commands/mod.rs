@@ -6,6 +6,7 @@
 //! than inventing Rust-shaped ones.
 
 pub mod expire_stale;
+pub mod reap_expired;
 pub mod revoke_expired_tokens;
 
 /// A command's verdict: the process exit code and the one object printed to stdout.

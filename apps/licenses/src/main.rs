@@ -9,7 +9,7 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 use conveyor_licenses::SERVICE_NAME;
 use conveyor_licenses::auth::JwtVerifier;
-use conveyor_licenses::commands::{expire_stale, revoke_expired_tokens};
+use conveyor_licenses::commands::{expire_stale, reap_expired, revoke_expired_tokens};
 use conveyor_licenses::config::Config;
 use conveyor_licenses::contract;
 use conveyor_licenses::db;
@@ -52,6 +52,10 @@ enum Command {
     /// Expire time-expired-but-still-active licences across the estate: env-configured, one JSON
     /// line on stdout, exit 0 converged / 1 not converged / 2 config-or-DB failure.
     ExpireStale,
+    /// Archive terminally-expired licences to `revoked` and tear down their billing mirrors
+    /// across the estate: env-configured, one JSON line on stdout, exit 0 converged / 1 not
+    /// converged / 2 config-or-DB failure.
+    ReapExpired,
 }
 
 fn main() -> ExitCode {
@@ -64,6 +68,7 @@ fn main() -> ExitCode {
         Command::Migrate { baseline } => migrate(baseline),
         Command::RevokeExpiredTokens => revoke_expired_tokens_cli(),
         Command::ExpireStale => expire_stale_cli(),
+        Command::ReapExpired => reap_expired_cli(),
     }
 }
 
@@ -220,6 +225,32 @@ fn expire_stale_cli() -> ExitCode {
         }
     };
     let outcome = runtime.block_on(expire_stale::run(std::env::var("DATABASE_URL").ok()));
+    // serde_json's object map is a BTreeMap here (no `preserve_order`), so keys come out sorted,
+    // exactly like the script's `json.dumps(..., sort_keys=True)`.
+    match serde_json::to_string(&outcome.payload) {
+        Ok(json) => println!("{json}"),
+        Err(error) => {
+            eprintln!("error: cannot serialise the outcome: {error}");
+            return ExitCode::FAILURE;
+        }
+    }
+    ExitCode::from(u8::try_from(outcome.code).unwrap_or(1))
+}
+
+/// `reap-expired`: the same CronJob contract as `expire-stale` — one JSON line on stdout on
+/// EVERY path (config failures included), with the verdict carried by the exit code.
+fn reap_expired_cli() -> ExitCode {
+    let runtime = match tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+    {
+        Ok(runtime) => runtime,
+        Err(error) => {
+            eprintln!("error: cannot start the async runtime: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let outcome = runtime.block_on(reap_expired::run(std::env::var("DATABASE_URL").ok()));
     // serde_json's object map is a BTreeMap here (no `preserve_order`), so keys come out sorted,
     // exactly like the script's `json.dumps(..., sort_keys=True)`.
     match serde_json::to_string(&outcome.payload) {
