@@ -114,6 +114,13 @@ window.installV2 = function (api, enterprise) {
     publishRepo: null,
     publishStatus: null,
     publishTimer: null,
+    programme: null,
+    runs: [],
+    runsLoaded: false,
+    runsLoading: false,
+    runDetail: {},
+    runDetailLoading: null,
+    loadingAll: false,
   };
   const consoleIssueUrl = (number) =>
     `https://github.com/nonagenticai/conveyor/issues/${encodeURIComponent(number)}`;
@@ -140,6 +147,13 @@ window.installV2 = function (api, enterprise) {
     cs.repositoriesLoaded = false;
     cs.publishRepo = null;
     cs.publishStatus = null;
+    cs.programme = null;
+    cs.runs = [];
+    cs.runsLoaded = false;
+    cs.runsLoading = false;
+    cs.runDetail = {};
+    cs.runDetailLoading = null;
+    cs.loadingAll = false;
     if (cs.publishTimer) clearTimeout(cs.publishTimer);
     cs.publishTimer = null;
   }
@@ -156,6 +170,15 @@ window.installV2 = function (api, enterprise) {
       cs.projects = list(projectPage.items);
       cs.issues = list(issueRows);
       cs.loaded = true;
+      if (C.can("programmes.list")) {
+        try {
+          const programmes = await C.action("programmes.list", { page: { limit: 10 } });
+          cs.programme = list(programmes.items)[0] || null;
+        } catch (_) {
+          cs.programme = null;
+        }
+      }
+      if (C.can("runs.list")) consoleLoadRuns();
       if (C.can("catalogues.list")) {
         try {
           const types = await C.action("catalogues.list", {
@@ -212,6 +235,20 @@ window.installV2 = function (api, enterprise) {
     if (projectId) consoleLoadProject(projectId);
   }
 
+  // The programme table can show a project's card progress only once its board is loaded. The
+  // public pack carries every board; the app does not, so this loads them on request.
+  async function consoleLoadAllBoards() {
+    if (!consoleOn() || cs.loadingAll) return;
+    cs.loadingAll = true;
+    render();
+    for (const project of consoleProjects()) {
+      const data = cs.byProject[project.id];
+      if (!data || data.stale || data.error) await consoleLoadProject(project.id);
+    }
+    cs.loadingAll = false;
+    render();
+  }
+
   function consoleProjects() {
     return [...cs.projects].sort(
       (a, b) => consoleRank(a.key) - consoleRank(b.key) || String(a.key).localeCompare(String(b.key)),
@@ -263,6 +300,7 @@ window.installV2 = function (api, enterprise) {
           issue: Number(issueNumber),
           unit_key: project.key,
           plan: (project.meta || {}).plan,
+          process_key: `${type}.READY`,
         },
       });
     } catch (error) {
@@ -439,6 +477,49 @@ window.installV2 = function (api, enterprise) {
     );
   const snapshotProjects = () => orderedProjects(list(((live || {}).programme || {}).projects));
 
+  // Signed in, every programme surface reads the tenant's own rows; on the public pack the
+  // snapshot's real rows; on a clean checkout the design study's fixtures. The ribbon says
+  // which one is in front of the reader.
+  const consoleRibbon = (scope, active) =>
+    active
+      ? `<div class="v2-ribbon live" role="note"><strong>LIVE</strong><span>${scope}</span><span class="v2-src">${
+          consoleOn() ? "API · no snapshot" : liveSrc
+        }</span></div>`
+      : ribbon(scope, false);
+  const runTone = (status) =>
+    status === "succeeded"
+      ? "green"
+      : status === "failed"
+        ? "bad"
+        : status === "waiting_approval"
+          ? "amber"
+          : "";
+  const runLive = (status) => ["queued", "running", "waiting_approval"].includes(status);
+  const runWhen = (run) => run.started_at || run.created_at || run.updated_at || "";
+  const projectKeyOf = (id) => {
+    const row = [...consoleProjects(), ...snapshotProjects()].find((p) => p.id === id);
+    return row ? row.key : short(id || "", 8);
+  };
+  const cardOf = (id) => {
+    for (const pid of Object.keys(cs.byProject || {})) {
+      const found = list((cs.byProject[pid] || {}).cards).find((card) => card.id === id);
+      if (found) return found;
+    }
+    return list(((live || {}).work || {}).cards).find((card) => card.id === id) || null;
+  };
+  const outputCell = (output) => {
+    if (output == null) return `<span class="muted">—</span>`;
+    const value = typeof output === "object" ? output.output || output : output;
+    const url =
+      (value && (value.pr_url || value.url || value.pull_request_url)) ||
+      (typeof output === "object" && output ? output.pr_url : null);
+    if (url) {
+      return `<a class="e-project-link" href="${E(url)}" target="_blank" rel="noopener">open ↗</a>`;
+    }
+    const text = typeof value === "string" ? value : JSON.stringify(value);
+    return `<span class="mono">${E(short(text, 90))}</span>`;
+  };
+
   async function consoleLoadOutputs(projectId) {
     if (!consoleOn() || !projectId || cs.outputsLoading === projectId) return;
     if (cs.outputs[projectId]) return; // already loaded; a refresh deletes the key first
@@ -537,6 +618,128 @@ window.installV2 = function (api, enterprise) {
     }
   }
 
+  /* ------------------------------------------------------------- execution room */
+  // The runs API already returns everything the room needs: `runs.list` filters by status and
+  // card, `runs.get` carries the steps, the gates, the process and the inputs. No control below
+  // is simulated; each one is the action it names.
+  async function consoleLoadRuns() {
+    if (!consoleOn() || cs.runsLoading) return;
+    cs.runsLoading = true;
+    try {
+      const page = await C.action("runs.list", { page: { limit: 200 } });
+      cs.runs = list(page.items);
+      cs.runsLoaded = true;
+    } catch (error) {
+      cs.runs = [];
+      cs.runsLoaded = true;
+      cs.lastError = error;
+    } finally {
+      cs.runsLoading = false;
+      render();
+    }
+  }
+
+  async function consoleRunOpen(id) {
+    if (!consoleOn() || !id) return;
+    v.runId = id;
+    if (cs.runDetail[id] && !cs.runDetail[id].error) {
+      render();
+      return;
+    }
+    cs.runDetailLoading = id;
+    render();
+    try {
+      cs.runDetail[id] = await C.action("runs.get", { id });
+    } catch (error) {
+      cs.runDetail[id] = { error };
+    } finally {
+      cs.runDetailLoading = null;
+      render();
+    }
+  }
+
+  function consoleRunCancel(id) {
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">Cancelling run <span class="mono">${E(short(id, 12))}</span> voids its pending gates. Its rows survive.</p><label class="field full"><span>Reason</span><textarea id="run-cancel-reason" rows="3" placeholder="Why this run is cancelled"></textarea></label></div>`;
+    openDialog(
+      "Cancel run",
+      body,
+      `${button("Cancel run", "run-cancel-save", `data-id="${E(id)}"`, "primary", "replay")}${btn("Close", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleRunCancelSave(id) {
+    const reason = (document.getElementById("run-cancel-reason") || {}).value || "";
+    try {
+      await C.action("runs.cancel", { id, reason: reason.trim() || null });
+      closeWorkspaceDialog();
+      delete cs.runDetail[id];
+      toast("Run cancelled");
+      if (v.runId === id) v.runId = null;
+      consoleLoadRuns();
+    } catch (error) {
+      cs.lastError = error;
+      toast("Cancel refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  function consoleApprovalDecide(approvalId, decision) {
+    const label = decision === "approve" ? "Approve gate" : "Reject gate";
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">The decision is recorded against the gate; the same approver cannot decide it twice.</p><label class="field full"><span>Note</span><textarea id="approval-note" rows="3" placeholder="Why you decided this"></textarea></label></div>`;
+    openDialog(
+      label,
+      body,
+      `${button(label, "approval-save", `data-id="${E(approvalId)}" data-decision="${E(decision)}"`, "primary", "shield")}${btn("Close", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleApprovalSave(approvalId, decision) {
+    const note = (document.getElementById("approval-note") || {}).value || "";
+    try {
+      await C.action("approvals.decide", {
+        approval_id: approvalId,
+        decision,
+        note: note.trim() || null,
+      });
+      closeWorkspaceDialog();
+      toast(decision === "approve" ? "Gate approved" : "Gate rejected");
+      if (v.runId) delete cs.runDetail[v.runId];
+      consoleLoadRuns();
+      if (v.runId) consoleRunOpen(v.runId);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Decision refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  async function consoleStartRun(cardId, processKey) {
+    if (!processKey) {
+      toast("This card has no process binding");
+      return;
+    }
+    try {
+      const run = await C.action("process_runs.start", {
+        card_id: cardId,
+        process_key: processKey,
+        inputs: {},
+      });
+      cs.lastError = null;
+      toast(`Run ${short(run.id, 8)} · ${run.status || "queued"}`);
+      v.runId = run.id;
+      v.tab.execution = "All";
+      navigate("execution");
+      consoleLoadRuns();
+      consoleRunOpen(run.id);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Start refused · " + consoleError(error));
+      render();
+    }
+  }
+
   function projectsPage() {
     const signed = consoleOn();
     const canSignIn = !!(C && C.config());
@@ -601,7 +804,7 @@ window.installV2 = function (api, enterprise) {
         ["Linked issues", `${projectIssues(current).length}`],
       ])}${
         signed
-          ? `<div class="console-actions">${C.can("projects.update") ? button("Edit project", "project-edit", `data-id="${E(current.id)}"`, "small", "edit") : ""}${C.can("projects.close") ? button("Close project", "project-close", `data-id="${E(current.id)}"`, "small", "archive") : ""}${C.can("projects.execute") ? button("Execute", "project-execute", `data-id="${E(current.id)}"`, "small", "run") : ""}</div>`
+          ? `<div class="console-actions">${C.can("projects.update") ? button("Edit project", "project-edit", `data-id="${E(current.id)}"`, "small", "edit") : ""}${C.can("projects.close") ? button("Close project", "project-close", `data-id="${E(current.id)}"`, "small", "archive") : ""}</div>`
           : ""
       }`,
       signed ? `<span class="console-live">live</span>` : "",
@@ -670,7 +873,56 @@ window.installV2 = function (api, enterprise) {
         : `<p class="muted">No GitHub issues are linked to this project. Intake a feedback issue below, or add issues to the project meta.</p>`,
       B(`${issues.filter((row) => row.state === "OPEN").length} open`, "green"),
     );
-    return `${board}${issuePanel}${projectOutputs(project)}${projectFeedback(project)}${publishingPanel()}`;
+    const lanes = data ? list(data.lists) : [];
+    const laneName = new Map(lanes.map((row) => [row.id, row.name]));
+    const laneKind = new Map(lanes.map((row) => [row.id, row.kind]));
+    const runsByCard = new Map();
+    list(cs.runs).forEach((run) => {
+      if (run.card_id && !runsByCard.has(run.card_id)) runsByCard.set(run.card_id, run);
+    });
+    const processOf = (card) => (card.meta || {}).process_key || card.process_key || "";
+    const typeOf = (card) =>
+      list(cs.types).find((row) => row.code === card.card_type_code) || null;
+    const expectedOutputs = (card) =>
+      list(((typeOf(card) || {}).definition || {}).outputs);
+    const cardRows = (data && !data.error ? list(data.cards) : [])
+      .filter((card) => !card.archived_at)
+      .map((card) => {
+        const processKey = processOf(card);
+        const run = runsByCard.get(card.id);
+        const issue = (card.meta || {}).issue;
+        return `<tr><td><button type="button" class="console-card-link" data-v2="console-card" data-id="${E(card.id)}"><strong>${E(card.name)}</strong></button><small class="mono">${E(card.card_type_code)}</small></td><td>${E(laneName.get(card.list_id) || laneKind.get(card.list_id) || "—")}</td><td class="mono">${E(processKey || "not bound")}</td><td>${
+          run
+            ? `<button type="button" class="console-card-link" data-v2="run-open" data-id="${E(run.id)}">${B(run.status, runTone(run.status))}</button>`
+            : "—"
+        }</td><td><small>${E(expectedOutputs(card).join(" · ") || "—")}</small></td><td><div class="console-actions">${
+          processKey && C.can("process_runs.start") && !(run && runLive(run.status))
+            ? button("Start run", "run-start", `data-id="${E(card.id)}" data-key="${E(processKey)}"`, "small", "run")
+            : ""
+        }${
+          C.can("documents.compose")
+            ? button("Output", "output-card", `data-id="${E(card.id)}" data-project="${E(project.id)}"`, "small", "file")
+            : ""
+        }${
+          issue != null
+            ? `<a class="e-project-link" href="${E(consoleIssueUrl(issue))}" target="_blank" rel="noopener">#${E(issue)} ↗</a>`
+            : ""
+        }</div></td></tr>`;
+      });
+    const cardPanel =
+      data && !data.error
+        ? panel(
+            `${project.key} · Cards`,
+            cardRows.length
+              ? table(["Card", "Lane", "Process", "Latest run", "Expected outputs", "Operate"], cardRows)
+              : `<p class="muted">No open card. Intake an issue from the feedback panel; intake binds the card type's READY process.</p>`,
+            B(`${cardRows.length} open`, cardRows.length ? "green" : ""),
+          )
+        : "";
+    const failure = cs.lastError
+      ? note(`<strong>Last refusal</strong> · ${E(consoleError(cs.lastError))}`, "bad")
+      : "";
+    return `${failure}${board}${cardPanel}${issuePanel}${projectOutputs(project)}${projectFeedback(project)}${publishingPanel()}`;
   }
 
   function projectOutputs(project) {
@@ -725,6 +977,16 @@ window.installV2 = function (api, enterprise) {
           `<option value="${E(row.id)}" ${row.id === target ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`,
       )
       .join("")}</select></label>`;
+    const intakeType =
+      v.intakeType ||
+      (list(cs.types).find((row) => row.code === "architecture_task") || {}).code ||
+      "architecture_task";
+    const typePicker = `<label class="e-select">Card type <select data-v2-input="intake-type" aria-label="Intake card type">${list(cs.types)
+      .map(
+        (row) =>
+          `<option value="${E(row.code)}" ${row.code === intakeType ? "selected" : ""}>${E(row.code)}</option>`,
+      )
+      .join("")}</select></label>`;
     const rows = feedback.map(
       (issue) =>
         `<tr><td><a class="e-project-link" href="${E(issue.url || consoleIssueUrl(issue.number))}" target="_blank" rel="noopener">#${E(
@@ -740,7 +1002,7 @@ window.installV2 = function (api, enterprise) {
     );
     return panel(
       "Public feedback",
-      `${picker}${
+      `${picker}${typePicker}${
         rows.length
           ? table(["Feedback issue", "GitHub state", "Operate"], rows)
           : `<p class="muted">No feedback issue is registered yet. The public feedback template opens one on GitHub.</p>`
@@ -967,20 +1229,9 @@ window.installV2 = function (api, enterprise) {
     }
   }
 
-  async function consoleProjectExecute(id) {
-    try {
-      const run = await C.action("projects.execute", { project_id: id });
-      toast(`Execution ${run.id || "started"} · ${run.status || "queued"}`);
-      render();
-    } catch (error) {
-      cs.lastError = error;
-      toast("Execute refused · " + consoleError(error));
-      render();
-    }
-  }
-
-  function consoleOutputNew(projectId) {
-    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Title</span><input id="output-title" placeholder="What this output records"></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why."></textarea></label><label class="check"><input id="output-publishable" type="checkbox"> Publish this output on the public design site</label><p class="muted">The body is capped at 256 KiB. It starts private unless you tick the box.</p></div>`;
+  function consoleOutputNew(projectId, cardId) {
+    v.outputCard = cardId || null;
+    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}<label class="field full"><span>Title</span><input id="output-title" placeholder="What this output records"></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why."></textarea></label><label class="check"><input id="output-publishable" type="checkbox"> Publish this output on the public design site</label><p class="muted">The body is capped at 256 KiB. It starts private unless you tick the box.</p></div>`;
     openDialog(
       "Compose output",
       body,
@@ -1000,10 +1251,12 @@ window.installV2 = function (api, enterprise) {
     try {
       await C.action("documents.compose", {
         project_id: projectId,
+        card_id: v.outputCard || undefined,
         title: title.trim(),
         body,
         publishable,
       });
+      v.outputCard = null;
       closeWorkspaceDialog();
       toast(publishable ? "Output saved and marked public" : "Output saved (private)");
       delete cs.outputs[projectId];
@@ -2023,7 +2276,7 @@ window.installV2 = function (api, enterprise) {
 
   // V2 §10.5: the run inspector gains a tools panel — which tool version was called,
   // with which credential alias, what it returned — plus the binding and release pin.
-  function executionPage() {
+  function executionStudy() {
     const calls = F.toolCalls
       .filter((c) => c.run === "RUN-151")
       .map(
@@ -2068,6 +2321,128 @@ window.installV2 = function (api, enterprise) {
       explain;
     return legacy.execution().replace(/<\/div>\s*$/, panelHtml + "</div>");
   }
+  /* -------------------------------------------------------------- execution room (live) */
+  function runDetailPanel(id) {
+    const detail = cs.runDetail[id];
+    if (!detail) {
+      return panel(
+        `Run ${short(id, 8)}`,
+        note(cs.runDetailLoading === id ? "Loading the run's trace…" : "Select a run."),
+      );
+    }
+    if (detail.error) {
+      return panel(
+        `Run ${short(id, 8)}`,
+        note(`<strong>Read refused</strong> · ${E(consoleError(detail.error))}`, "bad"),
+      );
+    }
+    const run = detail.run || {};
+    const steps = list(detail.steps);
+    const approvals = list(detail.approvals);
+    const stepRows = steps.map(
+      (step) =>
+        `<tr><td class="mono">${E(step.position)}.${E(step.attempt || 1)}</td><td class="mono">${E(step.action)}</td><td>${B(step.status, step.status === "succeeded" ? "green" : step.status === "failed" ? "bad" : "amber")}</td><td>${outputCell(step.output)}</td><td><small>${E(step.error ? short(step.error, 70) : step.judge ? "judged" : "—")}</small></td></tr>`,
+    );
+    const approvalRows = approvals.map(
+      (approval) =>
+        `<tr><td class="mono">${E(approval.gate)}</td><td>${B(approval.status, approval.status === "pending" ? "amber" : approval.status === "approved" ? "green" : "bad")}</td><td>${E(approval.required_decisions)}</td><td>${
+          approval.status === "pending" && C.can("approvals.decide")
+            ? `<div class="console-actions">${button("Approve", "approval-approve", `data-id="${E(approval.id)}"`, "small", "shield")}${button("Reject", "approval-reject", `data-id="${E(approval.id)}"`, "small", "archive")}</div>`
+            : "—"
+        }</td></tr>`,
+    );
+    const summary = kv([
+      ["Status", B(run.status || "—", runTone(run.status))],
+      ["Project", E(projectKeyOf(run.project_id))],
+      ["Card", run.card_id && cardOf(run.card_id) ? E(cardOf(run.card_id).name) : E(run.card_id || "—")],
+      ["Process", detail.process ? `${E(detail.process.title)} · v${E(detail.process.version)}` : "—"],
+      ["Attempt", E(run.attempt || 1)],
+      ["Started", E(short(runWhen(run), 19))],
+      ["Finished", E(short(run.finished_at || "—", 19))],
+      ["Error", run.error_message ? `${E(run.error_class || "error")} · ${E(short(run.error_message, 120))}` : "—"],
+    ]);
+    const children = list((detail.tree || {}).children);
+    return panel(
+      `Run ${short(id, 8)} · trace`,
+      `${summary}${
+        steps.length
+          ? table(["#", "Action", "Status", "Output", "Judge / error"], stepRows)
+          : note("No step has been recorded yet. A run with no step is queued or failed before dispatch.")
+      }${
+        approvals.length
+          ? `<h3>Gates</h3>${table(["Gate", "State", "Quorum", "Decide"], approvalRows)}`
+          : ""
+      }${
+        children.length
+          ? `<h3>Child runs</h3>${table(
+              ["Run", "Status", "Depth"],
+              children.map(
+                (child) =>
+                  `<tr><td><button type="button" class="console-card-link" data-v2="run-open" data-id="${E(child.id)}">${E(short(child.id, 8))}</button></td><td>${B(child.status, runTone(child.status))}</td><td>${E(child.depth)}</td></tr>`,
+              ),
+            )}`
+          : ""
+      }${note(`Inputs: <span class="mono">${E(short(JSON.stringify(detail.inputs || {}), 300))}</span>`)}<div class="console-actions">${
+        runLive(run.status) && C.can("runs.cancel")
+          ? button("Cancel run", "run-cancel", `data-id="${E(id)}"`, "small", "replay")
+          : ""
+      }${button("Refresh", "run-refresh", `data-id="${E(id)}"`, "small", "replay")}</div>`,
+      B(run.status || "—", runTone(run.status)),
+    );
+  }
+
+  function consoleExecutionPage() {
+    const signed = consoleOn();
+    if (signed && !cs.runsLoaded && !cs.runsLoading) consoleLoadRuns();
+    const tab = v.tab.execution || "All";
+    const filter =
+      {
+        All: null,
+        Running: "running",
+        "Waiting approval": "waiting_approval",
+        Failed: "failed",
+        Succeeded: "succeeded",
+        Queued: "queued",
+      }[tab] || null;
+    const runs = signed ? cs.runs : list(((live || {}).work || {}).runs);
+    const shown = runs.filter((run) => (filter ? run.status === filter : true));
+    const rows = shown.map((run) => {
+      const card = run.card_id ? cardOf(run.card_id) : null;
+      return `<tr><td><button type="button" class="console-card-link" data-v2="run-open" data-id="${E(run.id)}">${E(short(run.id, 8))}</button></td><td>${E(projectKeyOf(run.project_id))}</td><td>${card ? E(card.name) : "—"}</td><td>${B(run.status, runTone(run.status))}</td><td>${E(run.attempt || 1)}</td><td><small>${E(short(runWhen(run), 19))}</small></td><td>${run.error_message ? E(short(run.error_message, 60)) : "—"}</td></tr>`;
+    });
+    const queue = panel(
+      "Runs",
+      `${
+        rows.length
+          ? table(["Run", "Project", "Card", "Status", "Attempt", "Started", "Error"], rows)
+          : note(
+              signed
+                ? "No run matches this filter. Start one from a card on Projects or Plan."
+                : "The published snapshot carries no run yet. Sign in at the app origin to see the tenant's runs.",
+            )
+      }${signed && !cs.runsLoaded ? note("Loading the tenant's runs…") : ""}`,
+      signed ? button("Refresh", "run-refresh", "", "small", "replay") : "",
+    );
+    const detail = signed && v.runId ? runDetailPanel(v.runId) : "";
+    return `<div class="page enterprise">${heading(
+      "Execution room",
+      "Every run the programme has started: its steps, the tools it called, the gates it waits on and the outputs it produced.",
+      `${route("Projects", "projects", "", "projects")}${route("Plan & WBS", "plan", "", "board")}`,
+      "PORTFOLIO & PLAN",
+    )}${consoleRibbon(
+      signed
+        ? "Runs, steps and gates read from the platform's own rows. A run starts from a card; every control is an action."
+        : "The runs the published snapshot carries, read-only.",
+      signed || !!live,
+    )}${signed ? tabs(["All", "Running", "Waiting approval", "Failed", "Succeeded", "Queued"], tab, "execution") : ""}${queue}${detail}</div>`;
+  }
+
+  // Signed in, or published with a snapshot, the room is real; offline it stays the design
+  // study, clearly labelled PROPOSED.
+  function executionPage() {
+    return consoleOn() || live ? consoleExecutionPage() : executionStudy();
+  }
+
   const projects = () => db.projects.filter((p) => p.programme);
   const programme = () => F.programmes.find((p) => p.id === v.programme) || F.programmes[0];
   const job = () => F.jobs.find((j) => j.id === v.job) || F.jobs[0];
@@ -2080,8 +2455,14 @@ window.installV2 = function (api, enterprise) {
 
   /* ------------------------------------------------------------------ sidebar */
   function sidebar() {
+    const projectCount =
+      consoleOn() && cs.projects.length
+        ? cs.projects.length
+        : live
+          ? snapshotProjects().length
+          : db.projects.length;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Non-Agentic AI<small>Organisation workspace</small></span><span>⌄</span></div><nav>
-      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", db.projects.length)}${N("plan", "Plan & WBS", "board")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
+      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", projectCount)}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
       <div class="nav-group"><div class="nav-label">ORGANISATION</div>${N("organisation", "Organisation", "layers")}${N("jobs", "Jobs", "board", F.jobs.length)}${N("agents", "Agents", "agent")}${N("toolkits", "Tools", "tools")}${N("types", "Project types", "grid")}</div>
       <div class="nav-group"><div class="nav-label">PROCEDURES &amp; AUTHORING</div>${N("procedures", "Procedures", "flow")}${N("capabilities", "Capabilities", "layers")}${N("authoring", "Authoring", "book")}</div>
       <div class="nav-group"><div class="nav-label">GOVERN &amp; DESIGN</div>${N("assurance", "Assurance &amp; baselines", "shield")}${N("constraints", "Flow &amp; constraints", "branch")}${N("requirements", "Requirements", "file")}${N("principles", "Principles", "book")}${N("models", "Architecture &amp; UML", "model")}${N("architecture", "System architecture", "model")}${N("documents", "Documents", "file")}</div>
@@ -2091,7 +2472,137 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------------ Portfolio */
+  // Signed in, the portfolio is the tenant's own programme read from the API. The public pack
+  // keeps the snapshot's real rows through the live override below; a clean checkout keeps the
+  // design study. The signed-in page never renders a fixture project or a fixture programme.
+  function consolePortfolio() {
+    if (!cs.loaded && !cs.loading && !cs.error) consoleLoad();
+    const rows = consoleProjects();
+    const index = new Map(cs.issues.map((row) => [String(row.number), row]));
+    const programme = cs.programme || { name: "conveyor buildout", status: "active" };
+    const tab = v.tab.portfolio || "In flight";
+    const statusTone = (status) =>
+      status === "active"
+        ? "green"
+        : status === "closed" || status === "archived"
+          ? ""
+          : "amber";
+    const unitStats = (project) => {
+      const linked = list((project.meta || {}).issues);
+      const issues = linked.map((number) => index.get(String(number))).filter(Boolean);
+      return {
+        total: linked.length,
+        open: issues.filter((row) => (row.state || "OPEN") === "OPEN").length,
+        ready: issues.filter((row) => issueLabels(row).includes("status:ready")).length,
+        claimed: issues.filter((row) => issueLabels(row).includes("status:claimed")).length,
+        blocked: issues.filter((row) => issueLabels(row).includes("status:blocked")).length,
+      };
+    };
+    const cardStats = (project) => {
+      const data = cs.byProject[project.id];
+      if (!data || data.error || !data.cards) return null;
+      const kinds = new Map(list(data.lists).map((row) => [row.id, row.kind]));
+      const mine = list(data.cards).filter((row) => !row.archived_at);
+      return {
+        done: mine.filter((row) => ["done", "archive"].includes(kinds.get(row.list_id))).length,
+        total: mine.length,
+      };
+    };
+    const inFlight = rows.map((project) => {
+      const units = unitStats(project);
+      const cards = cardStats(project);
+      const plan = planHref((project.meta || {}).plan);
+      return `<tr><td><strong>${E(project.name)}</strong><small>${E(project.key)} · ${E(
+        (project.meta || {}).track || project.project_type_code || "",
+      )}</small></td><td>${B(project.status || "draft", statusTone(project.status))}</td><td><small>${
+        units.open
+      } open / ${units.total} linked</small></td><td>${
+        cards ? `${cards.done} / ${cards.total}` : `<span class="muted">open a project</span>`
+      }</td><td>${B(
+        units.blocked ? units.blocked + " blocked" : "Clear",
+        units.blocked ? "amber" : "green",
+      )}</td><td>${
+        plan ? `<a class="e-project-link" href="${E(plan)}">plan ↗</a>` : "—"
+      }</td></tr>`;
+    });
+    const deps = [];
+    rows.forEach((project) =>
+      list((project.meta || {}).depends_on).forEach((key) => {
+        const dep = rows.find((row) => row.key === key) || null;
+        deps.push(
+          `<tr><td class="mono">${E(project.key)}</td><td>→</td><td class="mono">${E(key)}</td><td>${E(
+            dep ? dep.name : "not in this tenant",
+          )}</td><td>${B(
+            dep ? dep.status : "missing",
+            dep && (dep.status === "closed" || dep.status === "archived") ? "green" : "amber",
+          )}</td></tr>`,
+        );
+      }),
+    );
+    const totals = (pick) => rows.reduce((sum, project) => sum + pick(unitStats(project)), 0);
+    const summary = kv([
+      ["Programme", `${E(programme.name)} ${B(programme.status || "active", "green")}`],
+      [
+        "Projects",
+        `${rows.length} · ${rows.filter((p) => p.status === "active").length} active · ${
+          rows.filter((p) => p.status === "draft").length
+        } draft · ${
+          rows.filter((p) => p.status === "closed" || p.status === "archived").length
+        } closed`,
+      ],
+      [
+        "Units",
+        `${totals((u) => u.open)} open · ${totals((u) => u.ready)} ready · ${totals(
+          (u) => u.claimed,
+        )} claimed · ${totals((u) => u.blocked)} blocked`,
+      ],
+      ["Cards", `${rows.filter((p) => cardStats(p)).length} project boards loaded`],
+    ]);
+    const content =
+      tab === "Dependencies"
+        ? panel(
+            "Project dependencies",
+            deps.length
+              ? `${table(["Project", "", "Depends on", "Name", "State"], deps)}${note(
+                  "The edges are the seed's <span class='mono'>meta.depends_on</span> keys joined to the tenant's projects. A project-level dependency row (typed <span class='mono'>blocks | needs | supersedes | informs</span>, cycle refused) is the T1 aggregate and does not exist yet.",
+                )}`
+              : note("No project declares a dependency."),
+            B(`${deps.length} edges`),
+          )
+        : tab === "Programme"
+          ? panel(
+              "Programme",
+              `${summary}${note(
+                "Shared configuration, WSJF, cadence and metering are V2 aggregates (T1/T10/T11) that do not exist yet. This page shows the rows the platform owns today.",
+              )}`,
+              B(programme.status || "active", "green"),
+            )
+          : panel(
+              "In-flight portfolio",
+              `${table(["Project", "Status", "Units", "Cards", "Blockers", "Plan"], inFlight)}${note(
+                "Every row is a tenant project. Units are the GitHub issues linked on the project; cards are the project's board; a card is complete when its lane kind is done or archive.",
+              )}`,
+              `${B(`${rows.length} projects`, "green")}${button(
+                "Load all boards",
+                "programme-load-boards",
+                "",
+                "small",
+                "board",
+              )}`,
+            );
+    return `<div class="page enterprise">${heading(
+      "Portfolio",
+      "The programme's real projects, their linked units, their boards and their dependency edges.",
+      `${route("Projects", "projects", "", "projects")}${route("Plan & WBS", "plan", "", "board")}`,
+      "PORTFOLIO & PLAN",
+    )}${consoleRibbon(
+      "Projects, units, boards and dependency edges read from the platform's own rows.",
+      true,
+    )}${summary}${tabs(["In flight", "Dependencies", "Programme"], tab, "portfolio")}${content}</div>`;
+  }
+
   function portfolio() {
+    if (consoleOn()) return consolePortfolio();
     const tab = v.tab.portfolio || "In flight";
     const scoped = projects().filter((p) => p.programme === v.programme);
     const rows = scoped.map(
@@ -2723,10 +3234,102 @@ window.installV2 = function (api, enterprise) {
     return `<div class="page enterprise">${heading("Metering", "Roll-ups at tenant, department, programme, project and job; drill-down to run, step and tool call; one derivation reconciled with billing.", `${route("Portfolio", "portfolio", "", "layers")}${route("Measure", "usage", "", "chart")}`, "MEASURE & IMPROVE")}${ribbon("V2 metering (D52): read models over inference_call and tool_call, attribution, C0–C5 metrics and billing reconciliation. Proposed in T11.", count.calls > 0)}${tabs(["Roll-ups", "Attribution", "Metrics & maturity"], tab, "metering")}${content}</div>`;
   }
 
+  /* ------------------------------------------------------------------ Contribute */
+  // The public path into the programme. It reads the issue registry at publish and writes
+  // nothing; a claim and a design report both happen on GitHub.
+  function contributePage() {
+    const signed = consoleOn();
+    if (signed && !cs.loaded && !cs.loading && !cs.error) consoleLoad();
+    const registry = signed
+      ? cs.issues
+      : list((((live || {}).programme || {}).issue_registry || {}).issues);
+    const openRows = registry.filter((issue) => (issue.state || "OPEN") === "OPEN");
+    const withLabel = (label) =>
+      openRows.filter((issue) => issueLabels(issue).includes(label));
+    const ready = withLabel("status:ready");
+    const claimed = withLabel("status:claimed");
+    const blocked = withLabel("status:blocked");
+    const rows = signed ? consoleProjects() : snapshotProjects();
+    const owner = new Map();
+    rows.forEach((project) =>
+      list((project.meta || {}).issues).forEach((number) =>
+        owner.set(String(number), project),
+      ),
+    );
+    const groups = new Map();
+    ready.forEach((issue) => {
+      const project = owner.get(String(issue.number));
+      const key = project ? project.key : "Unassigned";
+      if (!groups.has(key)) groups.set(key, { project, issues: [] });
+      groups.get(key).issues.push(issue);
+    });
+    const panels = [...groups.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, group]) =>
+        panel(
+          `${E(key)} · ready units`,
+          table(
+            ["Issue", "Unit", "Labels"],
+            group.issues.map(
+              (issue) =>
+                `<tr><td><a class="e-project-link" href="${E(
+                  issue.url || consoleIssueUrl(issue.number),
+                )}" target="_blank" rel="noopener">#${E(issue.number)} ↗</a></td><td><strong>${E(
+                  issue.title,
+                )}</strong></td><td><small>${E(issueLabels(issue).join(" · "))}</small></td></tr>`,
+            ),
+          ),
+          B(`${group.issues.length} ready`, "green"),
+        ),
+      );
+    const summary = `<div class="metrics">${[
+      [openRows.length, "Open units", `${claimed.length} claimed · ${blocked.length} blocked`, "green"],
+      [ready.length, "Ready to claim", "no branch, no PR, no claim comment", "purple"],
+      [
+        blocked.length,
+        "Blocked",
+        "a plain Blocker: line names an open issue",
+        blocked.length ? "orange" : "green",
+      ],
+    ]
+      .map(
+        ([value, label, sub, tone]) =>
+          `<div class="metric"><div class="label"><i class="dot ${tone}"></i>${E(
+            label,
+          )}</div><div class="metric-number">${E(value)}</div><small>${E(sub)}</small></div>`,
+      )
+      .join("")}</div>`;
+    const protocol = panel(
+      "How a unit is claimed",
+      `<p class="muted">The claim is four empty checks, a pushed branch and a comment. Until all four are empty the unit is someone else's; join it, never start a parallel branch.</p><pre class="v2-code">gh issue view N --json state,labels,comments,closedByPullRequestsReferences
+gh pr list --state all --search "#N"
+git ls-remote --heads origin "issue/N-*"
+git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mono">issue/N-&lt;slug&gt;</span>, add <span class="mono">status:claimed</span> and a comment naming the branch and HEAD. One issue is one branch and exactly one PR with <span class="mono">Closes #N</span>. A contributor without write access comments with the plan; a maintainer applies the claim.</p><div class="toolbar"><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=unit.md" target="_blank" rel="noopener">Propose a unit ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=feedback.yml" target="_blank" rel="noopener">Report design feedback ↗</a><a class="btn" href="${E(
+        (live || {}).feedback_url || "https://github.com/nonagenticai/conveyor/discussions",
+      )}" target="_blank" rel="noopener">Discuss ↗</a><a class="btn" href="docs/plans/03-DELIVERY.html">Delivery contract ↗</a></div>`,
+      B(`${ready.length} ready`, ready.length ? "green" : ""),
+    );
+    return `<div class="page enterprise">${heading(
+      "Contribute",
+      "The programme is public. Take a ready unit, send a design report, or discuss the design; claims and code live on GitHub.",
+      `${route("Projects", "projects", "", "projects")}`,
+      "PORTFOLIO & PLAN",
+    )}${consoleRibbon(
+      "Ready units are read from the GitHub issue registry at publish; this page writes nothing.",
+      registry.length > 0,
+    )}${summary}${
+      panels.join("") ||
+      note(
+        "No ready unit is published right now. A unit becomes <span class='mono'>status:ready</span> when its dependencies are met.",
+      )
+    }${protocol}</div>`;
+  }
+
   const pages = {
     portfolio,
     plan,
     projects: projectsPage,
+    contribute: contributePage,
     organisation,
     jobs,
     procedures,
@@ -2775,6 +3378,7 @@ window.installV2 = function (api, enterprise) {
     portfolio: "Portfolio",
     plan: "Plan & WBS",
     projects: "Projects",
+    contribute: "Contribute",
     organisation: "Organisation",
     jobs: "Jobs",
     procedures: "Procedures",
@@ -2888,8 +3492,42 @@ window.installV2 = function (api, enterprise) {
       case "project-close-save":
         consoleProjectCloseSave(d.id);
         break;
-      case "project-execute":
-        consoleProjectExecute(d.id);
+      /* execution room — every case is the action it names */
+      case "run-start":
+        consoleStartRun(d.id, d.key);
+        break;
+      case "programme-load-boards":
+        consoleLoadAllBoards();
+        break;
+      case "run-open":
+        consoleRunOpen(d.id);
+        break;
+      case "run-cancel":
+        consoleRunCancel(d.id);
+        break;
+      case "run-cancel-save":
+        consoleRunCancelSave(d.id);
+        break;
+      case "run-refresh":
+        if (d.id) {
+          delete cs.runDetail[d.id];
+          consoleRunOpen(d.id);
+        } else {
+          cs.runsLoaded = false;
+          consoleLoadRuns();
+        }
+        break;
+      case "approval-approve":
+        consoleApprovalDecide(d.id, "approve");
+        break;
+      case "approval-reject":
+        consoleApprovalDecide(d.id, "reject");
+        break;
+      case "approval-save":
+        consoleApprovalSave(d.id, d.decision);
+        break;
+      case "output-card":
+        consoleOutputNew(d.project, d.id);
         break;
       case "output-new":
         consoleOutputNew(d.project);

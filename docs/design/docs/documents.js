@@ -96,8 +96,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "127e64e6a09920e9c308571da2c41f1497fd3b48e1200eae9376b667c2976b03",
-      "bytes": 8402,
+      "sha256": "b623a23bb0084b49b2190235e03be978f40c84c0b1341b4828b0eae717e95092",
+      "bytes": 9167,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -105,8 +105,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "9a013ef33f23d6756de51fdafab369f67063734a08fbb034ece8e425d17e9b33",
-      "bytes": 68746,
+      "sha256": "515ba0c7d84e201e1b0221d32ce268c5f0e765b7726ac678dcae764aac7bef67",
+      "bytes": 69023,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -126,6 +126,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "04752e02e8bfa15e67e133d8edcdac98c67cb3d91398c0e73f531a9401c928b3",
       "bytes": 5564,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-12-delivery-system.md"
+    },
+    {
+      "title": "inference-router absorption — evidence (2026-11-13)",
+      "path": "docs/evidence/2026-11-13-inference-router-absorption.html",
+      "source": "docs/evidence/2026-11-13-inference-router-absorption.md",
+      "section": "Evidence",
+      "sha256": "b86c0d474d47e5ccf8ade98c3555728e44d6f35901694e9de7016b7218fc28bb",
+      "bytes": 6631,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-13-inference-router-absorption.md"
     },
     {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",

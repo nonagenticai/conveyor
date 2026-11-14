@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>inference-router absorption — evidence (2026-11-13) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-13-inference-router-absorption.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="inference-router-absorption--evidence-2026-11-13">inference-router absorption — evidence (2026-11-13)</h1>
+<p>Issue #44 · head <code>7c139b8</code> · branch <code>issue/44-inference-router</code>. The reference service is pinned by digest; no private hostname, slug, address or path appears in this file.</p>
+<h2 id="the-contract">The contract</h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contract capture</td>
+<td><code>contract/manifest.json</code> — <code>captured_at</code> 2026-11-13T10:20:46Z</td>
+</tr>
+<tr>
+<td>Pinned image</td>
+<td><code>sha256:723671a96af98111f16430ef4934370900962c04b1b6793f178d7a65ff70c58f</code></td>
+</tr>
+<tr>
+<td>Lock sha256</td>
+<td><code>99953f1d681e53b7fadd6a5c9afa84251f7914fdd53185316efa9ccbe430fa78</code></td>
+</tr>
+<tr>
+<td>Served document</td>
+<td><code>--check-lock</code> → <code>lock OK: 27 operations</code> (26 paths in the captured document; the service registers 27 operations across them)</td>
+</tr>
+</tbody>
+</table>
+<p>The lock was captured from the running service and re-captured from the pinned image by <code>contract/oracle.sh</code>; the S9a capture recorded on #44 measured the oracle's normalised <code>/openapi.json</code> hashing to the lock's sha256.</p>
+<h2 id="parity--the-three-layers">Parity — the three layers</h2>
+<h3 id="1-golden-replay-hermetic-every-case">1. Golden replay (hermetic, every case)</h3>
+<p><code>contract/verify.sh --candidate &lt;local&gt;</code> replays the 30 recorded cases through the stub:</p>
+<pre><code>cases=30 unexplained=0</code></pre>
+<p>Every response matches after the shared normaliser; the one tolerance is named with its reason (<code>contract/tolerances.json</code>), and <code>verify.sh</code> refuses a tolerance with a blank reason. <code>jq -e '.tolerances[] | select(.reason == null or .reason == "")'</code> returns no rows.</p>
+<h3 id="2-shadow-replay-hermetic-the-completion-corpus">2. Shadow replay (hermetic, the completion corpus)</h3>
+<p><code>contract/shadow.sh</code> replays a recorded request window into the pinned old image and the Rust candidate, both behind the same deterministic stub, and diffs the normalised answers. <code>contract/shadow-report.json</code> is the committed report — hashed case ids only, no bodies:</p>
+<pre><code>cases=9 equal=9 tolerated=0 unexplained=0</code></pre>
+<p>Those 9 are every <code>POST /api/chat/completions</code> case in the golden set, replayed across the wire rather than parser-to-parser. <code>--self-test</code> re-diffs the first case with one synthetic field added and fails unless the comparator flags it; it flagged it.</p>
+<p>The <code>--live</code> form (<code>--live URL --candidate URL</code>) was exercised end to end against a local capture-enabled instance: one recorded call was fetched through <code>/api/internal/inference-calls/{id}/capture</code> and replayed — <code>cases=1 equal=1 unexplained=0</code>. The live <strong>production</strong> window is not obtainable today; see below.</p>
+<h3 id="3-the-live-window--measured-deferred-to-71">3. The live window — measured, deferred to #71</h3>
+<p>Measured 2026-11-13 against the running service and its database:</p>
+<table>
+<thead>
+<tr>
+<th>Measurement</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inference_call</code> rows</td>
+<td>37,938</td>
+</tr>
+<tr>
+<td>Rows with a captured body (<code>request_json</code>/<code>request_text</code>)</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>Most recent row</td>
+<td>2026-11-08 17:21 +01</td>
+</tr>
+<tr>
+<td>Pod logs in the last 24 h</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<p>The capture gate is not the allowlist alone: a body is stored only when the <strong>caller</strong> sends <code>X-Capture: full</code> <strong>and</strong> its <code>X-App-Id</code> is on <code>INFERENCE_CAPTURE_ALLOWED_CALLERS</code>, and a streamed row never captures. No live caller sends the header, and there has been no completion traffic since 2026-11-08. Arming the allowlist therefore records nothing.</p>
+<p>Owner decision, 2026-11-13: #44 closes on the hermetic evidence above. The live window becomes an acceptance-blocked scenario of the deployment sibling <strong>#71</strong>, where capture can be armed and the traffic is actually being switched. This is recorded on #44 P3.2; no synthetic substitute is claimed as a live window.</p>
+<h2 id="the-defect-this-work-found">The defect this work found</h2>
+<p>The port declared <code>X-Capture</code> on the completions route and served the capture read, but <strong>nothing ever wrote the capture columns</strong>. After cutover the capture route and the replay surfaces it feeds would have been dead — silently, because the read answers <code>404 not_captured</code>.</p>
+<p>It was found by building the shadow harness and recording a call through it: the call answered <code>captured=false</code> on a live process while the source looked complete.</p>
+<p>Fixed at <code>7c139b8</code>:</p>
+<ul>
+<li><code>apps/inference-router/src/ledger.rs</code> — the row now carries <code>request_json</code> (the fingerprint plus <code>model</code>), <code>response_json</code>, <code>request_text</code> and <code>response_text</code>; the insert writes them. The stored request minus <code>model</code> re-hashes to <code>request_sha256</code>, which is what the read's <code>request_sha256_verified</code> checks.</li>
+<li><code>apps/inference-router/src/router/completions.rs</code> — <code>capture_allowed</code>: <code>X-Capture: full</code> from an allowlisted <code>X-App-Id</code>. A refused capture serves the request normally and stores hashes only. A streamed row never captures (the reference forces it false on that path).</li>
+<li><code>apps/inference-router/tests/capture_write.rs</code> — 3 tests: the allowlisted store→read round trip (both integrity flags true), no header stores nothing and the read answers <code>404 not captured</code>, and an unlisted <code>X-App-Id</code> stores nothing.</li>
+</ul>
+<p>The success path is not in the golden set: the captured <code>internal_capture</code> case is the 403 refusal, and the oracle harness cannot arm its allowlist yet. The behaviour is pinned by the tests against the reference's source, and the limitation is stated rather than hidden.</p>
+<h2 id="what-each-44-scenario-shows">What each #44 scenario shows</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Result</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1.1 capture the document</td>
+<td>lock served by the pinned image; <code>--check-lock</code> green</td>
+<td><code>contract/manifest.json</code>, <code>--check-lock</code></td>
+</tr>
+<tr>
+<td>P1.2 synthetic/scrubbed goldens</td>
+<td><code>no-private-refs.sh</code> OK over 1,382 tracked files</td>
+<td>this head</td>
+</tr>
+<tr>
+<td>P2.1 served document equals the lock</td>
+<td><code>lock OK: 27 operations</code></td>
+<td><code>7c139b8</code></td>
+</tr>
+<tr>
+<td>P2.2 migrations equal the live schema</td>
+<td><code>schema OK: the migrations produce the live schema</code></td>
+<td>live dump, this head</td>
+</tr>
+<tr>
+<td>P2.3 package tests</td>
+<td>103 lib + 13 admin_auth + 10 admin_policy + 3 capture + 4 catalogue + 4 internal_guard + 7 internal_reads + 6 migrations + 13 replay_canary + 12 write_path; 0 failed</td>
+<td><code>7c139b8</code></td>
+</tr>
+<tr>
+<td>P3.1 golden replay</td>
+<td><code>cases=30 unexplained=0</code></td>
+<td><code>7c139b8</code></td>
+</tr>
+<tr>
+<td>P3.2 live window</td>
+<td>harness proven (9/9, self-test fails on a mutation); live leg acceptance-blocked by #71</td>
+<td><code>7c139b8</code>, #71</td>
+</tr>
+<tr>
+<td>P3.3 tolerances carry reasons</td>
+<td>no rows</td>
+<td><code>7c139b8</code></td>
+</tr>
+<tr>
+<td>P4.1/P4.2 cutover + rollback</td>
+<td>moved to #71</td>
+<td>#71</td>
+</tr>
+</tbody>
+</table>
+<h2 id="consumers-and-their-state">Consumers and their state</h2>
+<table>
+<thead>
+<tr>
+<th>Consumer</th>
+<th>Use today</th>
+<th>Cutover state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fr</code></td>
+<td>replay invocation-log read over <code>INFERENCE_ROUTER_URL</code></td>
+<td>still the live Python service</td>
+</tr>
+<tr>
+<td>the conveyor server</td>
+<td><code>CONVEYOR_EXTERNAL_INFERENCE_URL</code></td>
+<td>not deployed in the cluster yet</td>
+</tr>
+<tr>
+<td>the agent platform</td>
+<td>completions (named in #44)</td>
+<td>still the live Python service</td>
+</tr>
+</tbody>
+</table>
+<p>No consumer is switched by this issue. The cutover, its per-consumer order and the rollback are #71's.</p>
+<h2 id="cutover-and-rollback">Cutover and rollback</h2>
+<p>Recorded in #71, not here: this issue ships no deployment and no production call. The one-flag rollback is <code>CONVEYOR_EXTERNAL_INFERENCE_URL</code> back to the old service, with no code change.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-13-inference-router-absorption.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -274,3 +274,64 @@ jobs:
           echo "$out"
           [[ "$out" == *'"status":"ok"'* ]]
           [[ "$out" == *'"service":"conveyor-health"'* ]]
+
+  # Publishes one image per absorbed service ON MAIN. `service-image` above proves the template
+  # and throws the build away; this job is what a deployment pins a digest from. MAIN ONLY: a fork
+  # PR can edit `runs-on`, and this job holds `packages: write`, so it must never run on a PR.
+  #
+  # The smoke is `--check-lock`, not `/health`: both binaries need a database and Keycloak to
+  # serve, and `--check-lock` runs before configuration is read and fails on contract drift — so
+  # an image that disagrees with the captured lock can never be published.
+  #
+  # ⛔ A MATRIX ROW MAY ONLY NAME A PACKAGE THAT IS ON `main`. Every absorbed service is merged
+  # before it is deployed, so its row lands with (or after) its absorption, never before — a row
+  # for a branch-only crate turns every main push red in a job whose failure is unrelated to the
+  # push. `conveyor-licenses` is the next row, added when its absorption merges.
+  publish-service-images:
+    if: ${{ !github.event.repository.private && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-latest
+    # One cold Rust build per matrix entry; the server `image` job above allows 60.
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: conveyor-inference-router
+            bin: conveyor-inference-router
+            image: conveyor-inference-router
+    env:
+      IMG: conveyor-service:ci
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: build
+        run: |
+          set -euo pipefail
+          docker build --file docker/Dockerfile.service \
+            --build-arg PACKAGE=${{ matrix.package }} \
+            --build-arg BIN=${{ matrix.bin }} \
+            --tag "$IMG" .
+
+      - name: smoke
+        run: |
+          set -euo pipefail
+          docker run --rm "$IMG" --version
+          docker run --rm "$IMG" --check-lock
+
+      # Same tag shape as the server image: `sha-*` is the immutable rollback record, `main-*`
+      # the run ordinal, `latest` what an ImagePolicy tracks.
+      - name: push to ghcr.io
+        run: |
+          set -euo pipefail
+          ref="ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}"
+          echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          sha="sha-${GITHUB_SHA::7}"
+          run="$(printf 'main-%06d' "${{ github.run_number }}")"
+          for tag in "$sha" "$run" latest; do
+            docker tag "$IMG" "$ref:$tag"
+            docker push "$ref:$tag"
+          done
+          echo "pushed $ref:$sha $ref:$run $ref:latest"
