@@ -115,3 +115,32 @@
   color: var(--faint);
   font: 9px var(--mono);
 }
+
+/* The programme workspace's own surfaces (Projects · outputs · publish). They reuse the pack's
+   panels, tables and dialogs; only the two new primitives need a rule. */
+.console-details {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.console-details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+}
+.console-details[open] > summary {
+  margin-bottom: 8px;
+}
+.console-output-body {
+  max-height: 46vh;
+  overflow: auto;
+  margin: 10px 0 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 12px/1.5 var(--mono);
+}

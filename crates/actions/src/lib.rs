@@ -54,6 +54,7 @@ pub mod process_map;
 pub mod prompt;
 // S16: the prompt-audit surface and its deterministic scan.
 pub mod prompt_audit;
+pub mod publish;
 pub mod rbac;
 pub mod registry;
 pub mod spec;

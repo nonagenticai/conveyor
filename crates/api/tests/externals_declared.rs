@@ -55,14 +55,18 @@ fn no_handler_calls_a_service_directly() {
     //   * `webhook.rs`   — S06d's generic connector transport. The delivery worker owns its retries,
     //     backoff and terminal state; the same shape as `channels.rs`, and the adapter never runs as
     //     a `HandlerRef::External` action.
+    //   * `github.rs`   — #70's publish transport behind the `publish.design` worker job. The job owns
+    //     the attempt/dead-letter and records the PR result; no action handler calls it, and the token
+    //     is opened only inside the job. Added 2026-11-13.
     // A new name here is a decision, not an accident: the list is compared exactly.
-    const ALLOWED: [&str; 6] = [
+    const ALLOWED: [&str; 7] = [
         "invoke.rs",
         "webhooks.rs",
         "channels.rs",
         "ingest.rs",
         "strata.rs",
         "webhook.rs",
+        "github.rs",
     ];
 
     let mut offenders = Vec::new();

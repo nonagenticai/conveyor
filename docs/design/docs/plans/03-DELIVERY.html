@@ -167,12 +167,17 @@ gh issue comment N --body &#39;Claimed. Branch `issue/N-&lt;slug&gt;` at `&lt;sh
 </ul>
 <p><code>/issue-sweep</code> reports an abandoned claim (class <code>abandoned-claim</code>) and names the adoption action; it does not mutate anything. If the original session returns, it joins the branch — the branch's HEAD is the arbiter and the latest <code>&lt;!-- handoff --&gt;</code> comment is the state.</p>
 <h2 id="the-console--a-front-door-not-a-second-protocol">The console — a front door, not a second protocol</h2>
-<p>The operator console at <code>conveyor.nonagentic.ai/design</code> can intake an issue as a card, move a card, comment, claim and release against the tenant's own rows. It is a <strong>front door to the platform</strong>, not a second delivery protocol:</p>
+<p>The operator console at <code>conveyor.nonagentic.ai/design</code> runs the programme's day-to-day surfaces against the tenant's own rows. It is a <strong>front door to the platform</strong>, not a second delivery protocol:</p>
 <ul>
+<li><strong>Projects</strong> are live: an operator can create, edit (<code>projects.update</code>, If-Match), close and execute a project. The plan stays the repository's Markdown document; the project's <code>meta.plan</code> is a link, never a copy.</li>
+<li><strong>Outputs</strong> are text rows on the <code>document</code> table, attached to a project and optionally a card. An output is <strong>private until a person marks it publishable</strong>; the public snapshot carries only published, active rows, and the publish path renders each one to static HTML.</li>
+<li><strong>Feedback</strong> is a <code>feedback</code>-labelled GitHub issue. The console can intake it into a project's intake lane (<code>cards.create</code> carrying <code>meta.issue</code>); the issue itself is not modified.</li>
+<li><strong>Publish</strong> enqueues <code>publish.design</code>, which rebuilds the pack and opens a pull request on the homepage repository. The button never merges: the PR is the human gate, and the public site is deployed by the homepage pipeline.</li>
 <li>the GitHub issue is still the unit and the pushed branch is still the claim; a card created from the console carries <code>meta.issue</code> and is a view of the unit, never a substitute for it;</li>
-<li>the console cannot open a PR, merge, or edit a label — those stay the protocol above;</li>
+<li>the console cannot open a delivery PR, merge, or edit a label — those stay the protocol above;</li>
 <li><code>conveyor admin intake</code> and the console both call <code>cards.create</code>, so the two paths cannot produce different rows.</li>
 </ul>
+<p>A published output is <strong>not</strong> evidence of delivery: the DoD still requires the unit's acceptance command and a merged PR. The console records what the programme knows; it does not shorten the gate.</p>
 <h2 id="work-and-gate">Work and gate</h2>
 <ul>
 <li>Commit freely on the issue branch (commits are free; branch pushes run no CI — the workflow triggers on <code>pull_request</code> and <code>push: main</code> only).</li>

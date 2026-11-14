@@ -30,6 +30,8 @@ pub struct DocumentRecord {
     pub id: Uuid,
     /// The owning project, when the document belongs to one.
     pub project_id: Option<Uuid>,
+    /// The owning card, when the output belongs to one.
+    pub card_id: Option<Uuid>,
     /// `document | report | export`.
     pub kind: String,
     /// The display title.
@@ -38,12 +40,16 @@ pub struct DocumentRecord {
     pub status: String,
     /// The object key, when the document has bytes.
     pub object_key: Option<String>,
-    /// The sha256 of the bytes, lowercase hex.
+    /// The sha256 of the bytes or the body, lowercase hex.
     pub content_hash: Option<String>,
+    /// The Markdown body, when this is a text output. Never set beside `object_key`.
+    pub body: Option<String>,
     /// The external ingestion reference (strata's job id).
     pub external_ref: Option<String>,
     /// Free metadata (`content_type`, `size_bytes`, report parameters).
     pub meta: Value,
+    /// Whether the public snapshot may carry this row.
+    pub publishable: bool,
     /// The optimistic-concurrency version (`ETag`).
     pub version: Version,
     /// When the row was created.
@@ -59,6 +65,8 @@ pub struct NewDocument {
     pub id: Uuid,
     /// The owning project, resolved in the caller's tenant.
     pub project_id: Option<Uuid>,
+    /// The owning card, resolved in the caller's tenant.
+    pub card_id: Option<Uuid>,
     /// `document | report | export`.
     pub kind: String,
     /// The display title.
@@ -67,12 +75,16 @@ pub struct NewDocument {
     pub status: String,
     /// The object key, when bytes were stored.
     pub object_key: Option<String>,
-    /// The sha256 of the bytes.
+    /// The sha256 of the bytes or the body.
     pub content_hash: Option<String>,
+    /// The Markdown body, when this is a text output.
+    pub body: Option<String>,
     /// The external reference.
     pub external_ref: Option<String>,
     /// Free metadata.
     pub meta: Value,
+    /// Whether the public snapshot may carry this row.
+    pub publishable: bool,
 }
 
 /// What an update may change. Bytes and kind are immutable: a new payload is a new document.
@@ -82,6 +94,14 @@ pub struct DocumentPatch {
     pub title: Option<String>,
     /// The new metadata (replaced whole, like every `meta` in this workspace).
     pub meta: Option<Value>,
+    /// The new Markdown body, when the caller changes the content.
+    pub body: Option<String>,
+    /// The sha256 of the new body; required beside `body`.
+    pub content_hash: Option<String>,
+    /// The owning card, when the caller links the output.
+    pub card_id: Option<Uuid>,
+    /// Whether the public snapshot may carry this row.
+    pub publishable: Option<bool>,
 }
 
 /// A list filter: both fields are optional and combine with AND.
@@ -89,8 +109,12 @@ pub struct DocumentPatch {
 pub struct DocumentFilter {
     /// Only this project's documents.
     pub project_id: Option<Uuid>,
+    /// Only this card's documents.
+    pub card_id: Option<Uuid>,
     /// Only this kind.
     pub kind: Option<String>,
+    /// Only publishable rows, or only unpublishable ones.
+    pub publishable: Option<bool>,
 }
 
 /// One page request: an opaque `(updated_at, id)` cursor and a limit.
@@ -135,11 +159,18 @@ pub enum DocumentStoreError {
     Database(#[from] sqlx::Error),
 }
 
-const DOCUMENT_COLUMNS: &str = "id, project_id, kind, title, status, object_key, content_hash, \
-                                external_ref, meta, version, created_at, updated_at";
+const DOCUMENT_COLUMNS: &str = "id, project_id, card_id, kind, title, status, object_key, \
+                                content_hash, body, external_ref, meta, publishable, version, \
+                                created_at, updated_at";
+
+/// The list projection omits `body`: a page of outputs must not carry every body. The placeholder
+/// keeps the row tuple one type, and `DocumentOut` reports `body: None` for a list row.
+const DOCUMENT_LIST_COLUMNS: &str = "id, project_id, card_id, kind, title, status, object_key, content_hash, NULL::text AS body, \
+     external_ref, meta, publishable, version, created_at, updated_at";
 
 type DocumentRow = (
     Uuid,
+    Option<Uuid>,
     Option<Uuid>,
     String,
     String,
@@ -147,7 +178,9 @@ type DocumentRow = (
     Option<String>,
     Option<String>,
     Option<String>,
+    Option<String>,
     Value,
+    bool,
     i64,
     DateTime<Utc>,
     DateTime<Utc>,
@@ -158,16 +191,19 @@ impl From<DocumentRow> for DocumentRecord {
         Self {
             id: row.0,
             project_id: row.1,
-            kind: row.2,
-            title: row.3,
-            status: row.4,
-            object_key: row.5,
-            content_hash: row.6,
-            external_ref: row.7,
-            meta: row.8,
-            version: crate::version_of(row.9),
-            created_at: row.10,
-            updated_at: row.11,
+            card_id: row.2,
+            kind: row.3,
+            title: row.4,
+            status: row.5,
+            object_key: row.6,
+            content_hash: row.7,
+            body: row.8,
+            external_ref: row.9,
+            meta: row.10,
+            publishable: row.11,
+            version: crate::version_of(row.12),
+            created_at: row.13,
+            updated_at: row.14,
         }
     }
 }
@@ -187,23 +223,33 @@ pub async fn create_document_tx(
         )
         .await?;
     }
+    crate::parent::ensure_optional_parent_tx(
+        &mut *conn,
+        tenant,
+        crate::parent::Parent::Card,
+        input.card_id,
+    )
+    .await?;
     let sql = format!(
-        "INSERT INTO document (id, tenant_id, project_id, kind, title, status, object_key, \
-                               content_hash, external_ref, meta)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        "INSERT INTO document (id, tenant_id, project_id, card_id, kind, title, status, \
+                               object_key, content_hash, body, external_ref, meta, publishable)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          RETURNING {DOCUMENT_COLUMNS}"
     );
     let row: DocumentRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(input.id)
         .bind(tenant.as_uuid())
         .bind(input.project_id)
+        .bind(input.card_id)
         .bind(&input.kind)
         .bind(&input.title)
         .bind(&input.status)
         .bind(&input.object_key)
         .bind(&input.content_hash)
+        .bind(&input.body)
         .bind(&input.external_ref)
         .bind(&input.meta)
+        .bind(input.publishable)
         .fetch_one(&mut *conn)
         .await?;
     Ok(row.into())
@@ -238,13 +284,15 @@ pub async fn list_documents_tx(
     };
     // One statement, one fetch of limit+1: the extra row answers "is there a next page" without a count.
     let sql = format!(
-        "SELECT {DOCUMENT_COLUMNS} FROM document
+        "SELECT {DOCUMENT_LIST_COLUMNS} FROM document
           WHERE tenant_id = $1
             AND ($2::uuid IS NULL OR project_id = $2)
-            AND ($3::text IS NULL OR kind = $3)
-            AND ($4::timestamptz IS NULL OR (updated_at, id) < ($4::timestamptz, $5::uuid))
+            AND ($3::uuid IS NULL OR card_id = $3)
+            AND ($4::text IS NULL OR kind = $4)
+            AND ($5::boolean IS NULL OR publishable = $5)
+            AND ($6::timestamptz IS NULL OR (updated_at, id) < ($6::timestamptz, $7::uuid))
           ORDER BY updated_at DESC, id DESC
-          LIMIT $6"
+          LIMIT $8"
     );
     let (cursor_at, cursor_id) = match &cursor {
         Some((key, id)) => {
@@ -258,7 +306,9 @@ pub async fn list_documents_tx(
     let rows: Vec<DocumentRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(filter.project_id)
+        .bind(filter.card_id)
         .bind(filter.kind.as_deref())
+        .bind(filter.publishable)
         .bind(cursor_at)
         .bind(cursor_id)
         .bind(limit + 1)
@@ -274,6 +324,28 @@ pub async fn list_documents_tx(
         None
     };
     Ok((records, next))
+}
+
+/// Every published, active text output, oldest first.
+///
+/// This is the publish path's read: the filter is the publication decision (`publishable AND
+/// status='active'`), and a body is required because an output page has something to render.
+/// There is deliberately no page: a tenant's published output set is small, and a publish must
+/// see all of it to build one complete index.
+pub async fn list_published_outputs_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+) -> Result<Vec<DocumentRecord>, DocumentStoreError> {
+    let sql = format!(
+        "SELECT {DOCUMENT_COLUMNS} FROM document
+          WHERE tenant_id = $1 AND publishable AND status = 'active' AND body IS NOT NULL
+          ORDER BY created_at, id"
+    );
+    let rows: Vec<DocumentRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .fetch_all(&mut *conn)
+        .await?;
+    Ok(rows.into_iter().map(Into::into).collect())
 }
 
 /// Update the title and/or metadata of one document, at the caller's version.
@@ -292,9 +364,20 @@ pub async fn update_document_tx(
     }
     let title = patch.title.clone().unwrap_or(current.title.clone());
     let meta = patch.meta.clone().unwrap_or(current.meta.clone());
+    let body = patch.body.clone().or(current.body.clone());
+    // A hash is only meaningful beside the body it describes. A caller that changes the body
+    // supplies the new hash; a caller that does not keeps the stored one.
+    let content_hash = if patch.body.is_some() {
+        patch.content_hash.clone()
+    } else {
+        current.content_hash.clone()
+    };
+    let card_id = patch.card_id.or(current.card_id);
+    let publishable = patch.publishable.unwrap_or(current.publishable);
     let sql = format!(
         "UPDATE document
-            SET title = $3, meta = $4, version = version + 1, updated_at = now()
+            SET title = $3, meta = $4, body = $5, content_hash = $6, card_id = $7,
+                publishable = $8, version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2
           RETURNING {DOCUMENT_COLUMNS}"
     );
@@ -303,6 +386,10 @@ pub async fn update_document_tx(
         .bind(id)
         .bind(title)
         .bind(meta)
+        .bind(body)
+        .bind(content_hash)
+        .bind(card_id)
+        .bind(publishable)
         .fetch_one(&mut *conn)
         .await?;
     Ok(row.into())
@@ -393,7 +480,10 @@ pub async fn set_external_ref_tx(
     Ok(row.into())
 }
 
-/// Clear the object pointer of a tombstoned document — the `document.purge` job's write.
+/// Clear the content of a tombstoned document — the `document.purge` job's write.
+///
+/// Clears the object pointer **and** the text body: a delete is a tombstone for either content
+/// kind, and a purged row must not keep a body the bytes path has already lost.
 ///
 /// Refuses a row that is not `deleted`: purging an active document would orphan live bytes.
 pub async fn clear_object_tx(
@@ -403,8 +493,9 @@ pub async fn clear_object_tx(
 ) -> Result<bool, DocumentStoreError> {
     let affected = sqlx::query(
         "UPDATE document
-            SET object_key = NULL, updated_at = now()
-          WHERE tenant_id = $1 AND id = $2 AND status = 'deleted' AND object_key IS NOT NULL",
+            SET object_key = NULL, body = NULL, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = 'deleted'
+            AND (object_key IS NOT NULL OR body IS NOT NULL)",
     )
     .bind(tenant.as_uuid())
     .bind(id)
@@ -429,4 +520,52 @@ async fn lock_document_tx(
         .fetch_optional(&mut *conn)
         .await?;
     row.map(Into::into).ok_or(DocumentStoreError::NotFound)
+}
+
+/// `true` when `card_id` is this tenant's, and — when `project_id` is supplied — the card's board
+/// belongs to that project.
+///
+/// A single-column FK enforces neither: `document.card_id` names a card row, and the card's board
+/// is the only link to a project. The action layer calls this before it binds an output to a card.
+pub async fn card_belongs_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+    project_id: Option<Uuid>,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS (
+             SELECT 1
+               FROM card c
+               JOIN board b ON b.id = c.board_id AND b.tenant_id = c.tenant_id
+              WHERE c.tenant_id = $1 AND c.id = $2
+                AND ($3::uuid IS NULL OR b.project_id = $3)
+         )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .bind(project_id)
+    .fetch_one(&mut *conn)
+    .await
+}
+
+/// The project a card belongs to, or `None` when the card is absent from this tenant.
+///
+/// `documents.compose` uses this to infer the owning project when the caller supplies a card but
+/// no project: an output attached to a card belongs to that card's project.
+pub async fn card_project_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+) -> Result<Option<Uuid>, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT b.project_id
+           FROM card c
+           JOIN board b ON b.id = c.board_id AND b.tenant_id = c.tenant_id
+          WHERE c.tenant_id = $1 AND c.id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .fetch_optional(&mut *conn)
+    .await
 }

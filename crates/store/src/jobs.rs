@@ -394,6 +394,32 @@ pub async fn enqueue_tx(
     Ok(id.map(|(id,)| id))
 }
 
+/// Record a handler's result on the job row (`payload.result`), for a reader that must learn what
+/// the work produced without a second event table.
+///
+/// Used by `publish.design`: the PR URL is the result the console polls for. It is written before
+/// the worker's fenced `finish_succeeded`, so a reader sees either the result or the finish order
+/// the queue's own state; neither is a claim that the other happened.
+pub async fn record_result(
+    pool: &PgPool,
+    tenant: TenantId,
+    job_id: Uuid,
+    result: Value,
+) -> Result<(), sqlx::Error> {
+    let mut tx = begin_scoped(pool, tenant).await?;
+    sqlx::query(
+        "UPDATE job
+            SET payload = payload || jsonb_build_object('result', $3::jsonb), updated_at = now()
+          WHERE id = $1 AND tenant_id = $2",
+    )
+    .bind(job_id)
+    .bind(tenant.as_uuid())
+    .bind(result)
+    .execute(&mut *tx)
+    .await?;
+    tx.commit().await
+}
+
 fn truncate(error: &str) -> String {
     error.chars().take(MAX_ERROR_CHARS).collect()
 }

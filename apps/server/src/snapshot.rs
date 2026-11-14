@@ -50,6 +50,9 @@ pub struct SnapshotArgs {
     pub tenant: String,
     /// The output directory (`docs/design/data` by default).
     pub out: PathBuf,
+    /// When set, also render every publishable platform output into this directory
+    /// (`docs/design/docs`). Absent means the data snapshot only.
+    pub outputs_dir: Option<PathBuf>,
     /// A fixed RFC 3339 timestamp, for a byte-identical re-run. Defaults to now.
     pub generated_at: Option<String>,
     /// The committed `gh issue list` registry (`issues.json`).
@@ -90,6 +93,8 @@ pub struct SnapshotReport {
     pub generated_at: String,
     /// The `manifest.json` sha256, for the caller's log line.
     pub manifest_sha256: String,
+    /// Platform output pages written beside the data, when `outputs_dir` was set.
+    pub outputs: usize,
 }
 
 /// Why a snapshot could not be written.
@@ -110,6 +115,9 @@ pub enum SnapshotError {
     /// A value could not be serialised.
     #[error("json: {0}")]
     Json(#[from] serde_json::Error),
+    /// A publishable output page or index could not be written.
+    #[error(transparent)]
+    PublishOutputs(#[from] crate::publish_outputs::PublishOutputsError),
 }
 
 /// Read one tenant and write every snapshot file.
@@ -237,6 +245,14 @@ pub async fn run_with_pool(
     // pages render; the raw JSON files stay beside it for sharing and diffing.
     write_bytes(&args.out, "snapshot.js", snapshot_js.as_bytes(), &mut files)?;
 
+    // Platform outputs are a separate, publishable-only projection. They land beside the tracked
+    // documents (`docs/design/docs`), not in the data directory, and the pack mirrors both.
+    let mut outputs = 0usize;
+    if let Some(dir) = args.outputs_dir.as_deref() {
+        outputs = crate::publish_outputs::write_outputs(pool, tenant, &generated_at, dir).await?;
+        tracing::info!(outputs, dir = %dir.display(), "platform outputs written");
+    }
+
     files.sort_by(|a, b| a.path.cmp(&b.path));
 
     let manifest = json!({
@@ -260,6 +276,7 @@ pub async fn run_with_pool(
         files,
         generated_at,
         manifest_sha256,
+        outputs,
     })
 }
 

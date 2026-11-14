@@ -6,7 +6,7 @@
 //! RLS, and every parent id (`programme_id`, `owner_user_id`) is resolved in the caller's
 //! scope first — a single-column FK does not enforce tenancy (CONTRACT §2).
 
-use conveyor_domain::{Programme, Project, TenantId};
+use conveyor_domain::{Programme, Project, TenantId, Version};
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -79,6 +79,21 @@ impl NewProject {
     }
 }
 
+/// What `projects.update` may change. An absent field is unchanged.
+#[derive(Clone, Debug, Default)]
+pub struct ProjectPatch {
+    /// The display name.
+    pub name: Option<String>,
+    /// The description.
+    pub description: Option<String>,
+    /// The status, validated by the action before this call.
+    pub status: Option<String>,
+    /// The source repository.
+    pub repo_url: Option<String>,
+    /// Metadata merged into the row; keys absent from the patch are preserved.
+    pub meta: Option<Value>,
+}
+
 /// Why a programme/project write failed.
 #[derive(Debug, thiserror::Error)]
 pub enum ProjectStoreError {
@@ -93,6 +108,15 @@ pub enum ProjectStoreError {
     KeyExhausted {
         /// The base slug the caller's title produced.
         base: String,
+    },
+    /// No such project in this tenant.
+    #[error("the project does not exist in this tenant")]
+    NotFound,
+    /// The row moved; the caller's `If-Match` is stale.
+    #[error("the project is at version {current}, not the expected version")]
+    VersionMismatch {
+        /// The version the row holds now.
+        current: Version,
     },
     /// The database refused the statement.
     #[error(transparent)]
@@ -223,6 +247,66 @@ pub async fn get_project_tx(
     .fetch_optional(&mut *conn)
     .await?;
     Ok(row.map(Into::into))
+}
+
+/// Edit a project's own fields at the caller's version.
+///
+/// The version guard is in the UPDATE, not only in the read: two callers that read the same version
+/// cannot both write, and the loser receives the version the row now holds.
+pub async fn update_project_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: Version,
+    patch: &ProjectPatch,
+) -> Result<Project, ProjectStoreError> {
+    let current = get_project_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(ProjectStoreError::NotFound)?;
+    if current.version != expected {
+        return Err(ProjectStoreError::VersionMismatch {
+            current: current.version,
+        });
+    }
+    let name = patch.name.clone().unwrap_or(current.name.clone());
+    let description = patch
+        .description
+        .clone()
+        .unwrap_or(current.description.clone());
+    let status = patch.status.clone().unwrap_or(current.status.clone());
+    let repo_url = patch.repo_url.clone().or(current.repo_url.clone());
+    let meta = patch.meta.clone().unwrap_or(current.meta.clone());
+    let expected_raw = i64::try_from(expected.get()).unwrap_or(i64::MAX);
+    let row: Option<ProjectRow> = sqlx::query_as(
+        "UPDATE project
+            SET name = $3, description = $4, status = $5, repo_url = $6, meta = $7,
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $8
+          RETURNING id, key, name, description, status, programme_id, project_type_code,
+                    phase_code, owner_user_id, repo_url, meta, version",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(name)
+    .bind(description)
+    .bind(status)
+    .bind(repo_url)
+    .bind(meta)
+    .bind(expected_raw)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match row {
+        Some(row) => Ok(row.into()),
+        None => {
+            // The row moved between the read and the write (or was removed).
+            let current = get_project_tx(&mut *conn, tenant, id)
+                .await?
+                .ok_or(ProjectStoreError::NotFound)?;
+            Err(ProjectStoreError::VersionMismatch {
+                current: current.version,
+            })
+        }
+    }
 }
 
 // ── the S05 reads, the derived key and the close transition ─────────────────────────────

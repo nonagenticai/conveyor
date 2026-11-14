@@ -492,8 +492,11 @@ async fn store_log(
             status: "active".to_owned(),
             object_key: Some(key),
             content_hash: Some(hash),
+            card_id: None,
+            body: None,
             external_ref: None,
             meta: json!({ "benchmark_run_id": run_id, "instance_id": instance_id }),
+            publishable: false,
         },
     )
     .await

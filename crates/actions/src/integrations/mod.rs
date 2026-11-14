@@ -18,6 +18,7 @@
 //! ingest, source prune and platform-pack leaves. A transport, not an external action.
 
 pub mod external;
+pub mod github;
 pub mod inference;
 pub mod ingest;
 pub mod objects;

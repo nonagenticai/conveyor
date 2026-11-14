@@ -31,6 +31,10 @@ pub mod secrets;
 /// The upload cap, in bytes: 10 MiB exactly (S09 §5.2).
 pub const MAX_UPLOAD_BYTES: usize = 10 * 1024 * 1024;
 
+/// The text-output cap, in bytes: 256 KiB. An output is a design note, evidence record or
+/// decision, not a file; binary content stays on the 10 MiB object path.
+pub const MAX_OUTPUT_BYTES: usize = 256 * 1024;
+
 /// The content types a document may declare. `application/octet-stream` is deliberately absent.
 pub const ALLOWED_CONTENT_TYPES: [&str; 8] = [
     "application/pdf",

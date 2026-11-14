@@ -289,12 +289,16 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
+    // Only published, active outputs. The public snapshot is the one place a document leaves the
+    // tenant, so the filter is the publication decision — never "every row that exists". The
+    // projection is a white-list: id, owner, title and timestamps. A body, a content hash or free
+    // metadata would be a second, unintended disclosure.
     let documents = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
-             SELECT id, project_id, kind, title, status, content_hash, version, created_at,
-                    updated_at
-               FROM document WHERE tenant_id = $1
+             SELECT id, project_id, card_id, kind, title, updated_at, created_at
+               FROM document
+              WHERE tenant_id = $1 AND publishable AND status = 'active'
          ) t",
         tenant_id,
     )
