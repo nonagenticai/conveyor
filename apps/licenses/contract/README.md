@@ -66,8 +66,19 @@ Neither runner treats an empty corpus as a pass: `cases=0` is exit 3.
 equal and a one-field mutation is unexplained. `stubs/synthetic-corpus.jsonl` is the fixture it
 uses.
 
-## Still to come (the parity slice)
+## The golden corpus — `capture-golden.sh`, `golden/`
 
-`capture-goldens.sh` and `oracle.sh` (the pinned old image booted with a synthetic seed) populate
-`golden/`; the golden set must never carry a production tenant, app key or token. Until it lands,
-`--check-lock` and the harness self-test are the gates in this directory.
+`capture-golden.sh --live URL --out DIR` captures the 6-case read-only corpus in `golden/`: the
+three health probes, the unknown-token `POST /license/introspect`, and the two unauthenticated
+401s. Its case table is a hard allowlist — GET on those paths plus the one side-effect-free POST —
+and it asserts each expected status and a JSON body, so a wrong oracle fails the capture instead
+of becoming a "golden" nobody can explain.
+
+Point it at the service process through a loopback port-forward, not at the public ingress host:
+that host's istio ext-authz filter answers its own plain-text 401 before the application sees the
+request (measured 2026-11-14), and capturing through it would record the mesh's literal as the
+service contract. The application's own 401 is the JSON middleware envelope.
+
+The corpus carries no production tenant, app key or token. Authenticated success cases need a
+synthetic seed (a pinned old image with fixtures) and remain integration-test and #95 coverage.
+The gates in this directory are `--check-lock`, the harness self-test and the replay.
