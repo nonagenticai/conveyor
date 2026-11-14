@@ -18,6 +18,7 @@ pub mod bundle_ensure;
 pub mod bundle_ensure_apply;
 pub mod bundle_grants;
 pub mod bundles;
+pub mod catalogue_apps;
 pub mod dependencies;
 pub mod internal_reads;
 pub mod issuance;
