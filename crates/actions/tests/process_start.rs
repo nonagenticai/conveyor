@@ -802,10 +802,7 @@ async fn start_refuses_a_card_on_a_blocked_project() {
     assert_eq!(status, 409, "{body}");
     assert_eq!(slug(&body), "blocked_by", "{body}");
     assert!(
-        body["detail"]
-            .as_str()
-            .unwrap_or_default()
-            .contains("P0"),
+        body["detail"].as_str().unwrap_or_default().contains("P0"),
         "{body}"
     );
 
