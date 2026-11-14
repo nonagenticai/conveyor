@@ -193,10 +193,7 @@ pub fn router(state: AppState) -> Router {
             "/apps/{app_id}/licenses",
             get(catalogue_apps::list_app_licenses),
         )
-        .route(
-            "/apps/{app_id}/plans",
-            get(catalogue_apps::list_app_plans),
-        )
+        .route("/apps/{app_id}/plans", get(catalogue_apps::list_app_plans))
         .route("/health", get(health::health))
         .route("/health/live", get(health::liveness))
         .route("/health/ready", get(health::readiness))

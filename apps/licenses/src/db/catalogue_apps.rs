@@ -84,7 +84,9 @@ const PLAN_COLUMNS: &str = "\
 /// `ORDER BY key`.
 pub async fn list_apps(pool: &PgPool) -> Result<Vec<AppRow>, sqlx::Error> {
     let sql = format!("SELECT {APP_COLUMNS} FROM app WHERE revoked = false ORDER BY key");
-    sqlx::query_as(sqlx::AssertSqlSafe(sql)).fetch_all(pool).await
+    sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .fetch_all(pool)
+        .await
 }
 
 /// `DatabaseManager.get_app`: by primary key.
@@ -149,11 +151,10 @@ pub async fn list_app_licences(
 
 /// `DatabaseManager.owner_exists`: is this a `tenant_owner` key?
 pub async fn owner_exists(pool: &PgPool, owner_key: &str) -> Result<bool, sqlx::Error> {
-    let id: Option<String> =
-        sqlx::query_scalar("SELECT key FROM tenant_owner WHERE key = $1")
-            .bind(owner_key)
-            .fetch_optional(pool)
-            .await?;
+    let id: Option<String> = sqlx::query_scalar("SELECT key FROM tenant_owner WHERE key = $1")
+        .bind(owner_key)
+        .fetch_optional(pool)
+        .await?;
     Ok(id.is_some())
 }
 
@@ -212,11 +213,10 @@ pub async fn app_cascade_radius(
         return Ok(None);
     }
 
-    let licenses: i64 =
-        sqlx::query_scalar("SELECT count(*) FROM license WHERE app_id = $1")
-            .bind(app_id)
-            .fetch_one(pool)
-            .await?;
+    let licenses: i64 = sqlx::query_scalar("SELECT count(*) FROM license WHERE app_id = $1")
+        .bind(app_id)
+        .fetch_one(pool)
+        .await?;
     let tokens: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM token
           WHERE license_id IN (SELECT id FROM license WHERE app_id = $1)",

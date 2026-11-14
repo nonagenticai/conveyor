@@ -113,7 +113,10 @@ async fn send(app: Router, method: Method, path: &str, body: Option<Value>) -> (
     let bytes = axum::body::to_bytes(response.into_body(), 512 * 1024)
         .await
         .expect("body");
-    (status, serde_json::from_slice(&bytes).unwrap_or(Value::Null))
+    (
+        status,
+        serde_json::from_slice(&bytes).unwrap_or(Value::Null),
+    )
 }
 
 async fn post(app: Router, path: &str, body: Value) -> (StatusCode, Value) {
@@ -250,9 +253,25 @@ async fn seeded() -> common::TestDb {
             Some(1000),
             Some(50_000_000),
         ),
-        (PLAN_ALPHA_REVOKED, APP_ALPHA, "legacy", "Legacy", true, None, None),
+        (
+            PLAN_ALPHA_REVOKED,
+            APP_ALPHA,
+            "legacy",
+            "Legacy",
+            true,
+            None,
+            None,
+        ),
         (PLAN_ZETA, APP_ZETA, "plat", "Plat", false, None, None),
-        (PLAN_DELETE, APP_DELETE, "doomed", "Doomed", false, None, None),
+        (
+            PLAN_DELETE,
+            APP_DELETE,
+            "doomed",
+            "Doomed",
+            false,
+            None,
+            None,
+        ),
     ] {
         sqlx::query(
             "INSERT INTO plan
@@ -277,8 +296,22 @@ async fn seeded() -> common::TestDb {
         .expect("plan");
     }
     for (id, subject, tenant, app, plan, status) in [
-        (LIC_ALPHA_A, SUBJECT_A, TENANT_A, APP_ALPHA, PLAN_ALPHA, "active"),
-        (LIC_ALPHA_B, SUBJECT_B, TENANT_B, APP_ALPHA, PLAN_ALPHA, "active"),
+        (
+            LIC_ALPHA_A,
+            SUBJECT_A,
+            TENANT_A,
+            APP_ALPHA,
+            PLAN_ALPHA,
+            "active",
+        ),
+        (
+            LIC_ALPHA_B,
+            SUBJECT_B,
+            TENANT_B,
+            APP_ALPHA,
+            PLAN_ALPHA,
+            "active",
+        ),
         (LIC_ZETA, SUBJECT_A, TENANT_A, APP_ZETA, PLAN_ZETA, "active"),
         (
             LIC_DELETE_A,
@@ -393,10 +426,7 @@ async fn list_apps_is_the_non_revoked_catalogue_ordered_by_key() {
 #[tokio::test]
 async fn get_app_resolves_a_uuid_or_a_key_and_404s_otherwise() {
     let db = seeded().await;
-    for path in [
-        format!("/apps/{APP_ALPHA}"),
-        "/apps/alpha".to_owned(),
-    ] {
+    for path in [format!("/apps/{APP_ALPHA}"), "/apps/alpha".to_owned()] {
         let (status, body) = get(route(&db, admin("owner-a")), &path).await;
         assert_eq!(status, StatusCode::OK, "{path}");
         assert_eq!(
@@ -446,8 +476,11 @@ async fn list_app_plans_hides_revoked_unless_asked() {
         }])
     );
 
-    let (status, body) =
-        get(route(&db, admin("owner-a")), "/apps/alpha/plans?include_revoked=true").await;
+    let (status, body) = get(
+        route(&db, admin("owner-a")),
+        "/apps/alpha/plans?include_revoked=true",
+    )
+    .await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(ids(&body), {
         let mut expected = vec![PLAN_ALPHA.to_string(), PLAN_ALPHA_REVOKED.to_string()];
@@ -455,8 +488,11 @@ async fn list_app_plans_hides_revoked_unless_asked() {
         expected
     });
 
-    let (status, _) =
-        get(route(&db, admin("owner-a")), "/apps/alpha/plans?include_revoked=maybe").await;
+    let (status, _) = get(
+        route(&db, admin("owner-a")),
+        "/apps/alpha/plans?include_revoked=maybe",
+    )
+    .await;
     assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
     let (status, body) = get(route(&db, admin("owner-a")), "/apps/nope/plans").await;
     assert_eq!(status, StatusCode::NOT_FOUND);
@@ -466,8 +502,7 @@ async fn list_app_plans_hides_revoked_unless_asked() {
 #[tokio::test]
 async fn list_app_licenses_is_cross_tenant_for_admin_and_scoped_for_a_reader() {
     let db = seeded().await;
-    let (status, body) =
-        get(route(&db, admin("owner-a")), "/apps/alpha/licenses").await;
+    let (status, body) = get(route(&db, admin("owner-a")), "/apps/alpha/licenses").await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(ids(&body), {
         let mut expected = vec![LIC_ALPHA_A.to_string(), LIC_ALPHA_B.to_string()];
@@ -515,12 +550,10 @@ async fn list_app_licenses_is_cross_tenant_for_admin_and_scoped_for_a_reader() {
     );
 
     // A license-reader sees its own tenant only — the app id itself authorizes nothing.
-    let (status, body) =
-        get(route(&db, reader(TENANT_A)), "/apps/alpha/licenses").await;
+    let (status, body) = get(route(&db, reader(TENANT_A)), "/apps/alpha/licenses").await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(ids(&body), vec![LIC_ALPHA_A.to_string()]);
-    let (status, body) =
-        get(route(&db, reader(TENANT_B)), "/apps/alpha/licenses").await;
+    let (status, body) = get(route(&db, reader(TENANT_B)), "/apps/alpha/licenses").await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(ids(&body), vec![LIC_ALPHA_B.to_string()]);
 
@@ -554,7 +587,12 @@ async fn create_app_is_idempotent_and_carries_the_callers_owner_as_issuer() {
     );
     let created = Uuid::try_parse(&id).expect("a uuid");
     assert_eq!(
-        count(&db, "SELECT count(*) FROM app_issuer WHERE app_id = $1", created).await,
+        count(
+            &db,
+            "SELECT count(*) FROM app_issuer WHERE app_id = $1",
+            created
+        )
+        .await,
         1
     );
     let issuer: Option<String> =
@@ -737,7 +775,12 @@ async fn delete_app_refuses_until_the_licence_count_is_confirmed() {
         1
     );
     assert_eq!(
-        count(&db, "SELECT count(*) FROM license WHERE id = $1", LIC_DELETE_A).await,
+        count(
+            &db,
+            "SELECT count(*) FROM license WHERE id = $1",
+            LIC_DELETE_A
+        )
+        .await,
         1
     );
 }

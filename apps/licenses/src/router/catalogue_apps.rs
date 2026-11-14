@@ -182,7 +182,11 @@ fn query_error(field: &str, kind: &str, message: &str, input: Value) -> Refusal 
     )
 }
 
-fn required_string(object: &Map<String, Value>, field: &str, whole: &Value) -> Result<String, Refusal> {
+fn required_string(
+    object: &Map<String, Value>,
+    field: &str,
+    whole: &Value,
+) -> Result<String, Refusal> {
     match object.get(field) {
         None => Err(body_error(json!({
             "type": "missing",
@@ -361,11 +365,7 @@ fn plan_response(row: PlanRow) -> PlanResponse {
     }
 }
 
-fn app_json(
-    status: StatusCode,
-    row: AppRow,
-    message: &'static str,
-) -> Result<Response, Refusal> {
+fn app_json(status: StatusCode, row: AppRow, message: &'static str) -> Result<Response, Refusal> {
     let key = row.key.clone();
     let Some(body) = app_response(row) else {
         // Pydantic refuses a value outside the audience Literal; the reference's
@@ -476,9 +476,7 @@ pub async fn create_app(
     }
 
     let caller_owner = issuance::require_known_owner(&user)?;
-    let issuers = app
-        .issuers
-        .unwrap_or_else(|| vec![caller_owner.clone()]);
+    let issuers = app.issuers.unwrap_or_else(|| vec![caller_owner.clone()]);
 
     // Issuer squatting: naming ANOTHER owner as issuer would let any license-admin client
     // hand that owner (or deny it) an app it never registered. Only the caller's own owner
@@ -558,7 +556,9 @@ pub async fn create_app(
         // existing-row, not 409: the docstring promises idempotence and the caller cannot
         // tell whether it lost the race or arrived second. Re-raise when the re-read finds
         // nothing, because then the violated constraint was NOT the key race.
-        Err(sqlx::Error::Database(database)) if database.code().is_some_and(|code| code.starts_with("23")) => {
+        Err(sqlx::Error::Database(database))
+            if database.code().is_some_and(|code| code.starts_with("23")) =>
+        {
             match catalogue_apps::get_app_by_key(pool, &app.key).await {
                 Ok(Some(row)) => {
                     tracing::info!(app = %row.id, key = %row.key, "App already exists; returning it");
@@ -714,10 +714,7 @@ pub async fn list_app_licenses(
         None
     } else {
         let tenant = get_tenant_id(&state, &user).await?;
-        Some(
-            Uuid::try_parse(&tenant)
-                .map_err(|_| internal_error("Failed to list app licenses"))?,
-        )
+        Some(Uuid::try_parse(&tenant).map_err(|_| internal_error("Failed to list app licenses"))?)
     };
     let rows = catalogue_apps::list_app_licences(pool, app.id, tenant_id)
         .await
