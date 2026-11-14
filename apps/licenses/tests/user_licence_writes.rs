@@ -16,7 +16,7 @@ use std::time::{Duration, Instant};
 use axum::body::Body;
 use axum::extract::State as AxumState;
 use axum::http::{HeaderMap, Request, StatusCode};
-use axum::routing::{get, post, Router};
+use axum::routing::{Router, get, post};
 use axum::{Extension, Json};
 use conveyor_auth::oauth::ClientCredentials;
 use conveyor_licenses::auth::{JwtVerifier, UnavailableJwks, User};
@@ -237,19 +237,11 @@ async fn push(
     StatusCode::from_u16(*stub.status.lock().expect("stub lock")).expect("status")
 }
 
-async fn budget_push(
-    stub: AxumState<Stub>,
-    headers: HeaderMap,
-    body: Json<Value>,
-) -> StatusCode {
+async fn budget_push(stub: AxumState<Stub>, headers: HeaderMap, body: Json<Value>) -> StatusCode {
     push(stub, headers, body, "/api/budget").await
 }
 
-async fn quota_push(
-    stub: AxumState<Stub>,
-    headers: HeaderMap,
-    body: Json<Value>,
-) -> StatusCode {
+async fn quota_push(stub: AxumState<Stub>, headers: HeaderMap, body: Json<Value>) -> StatusCode {
     push(stub, headers, body, "/api/quota/config").await
 }
 
@@ -335,13 +327,12 @@ async fn a_create_returns_the_captured_shape_and_meters_the_licence() {
     assert_eq!(body["plan"]["token_budget_monthly"], 1000);
 
     // The licence row, and the subject it created.
-    let row: (Uuid, Uuid, Option<Value>) = sqlx::query_as(
-        "SELECT subject_id, tenant_id, metadata FROM license WHERE id::text = $1",
-    )
-    .bind(&license_id)
-    .fetch_one(&db.pool)
-    .await
-    .expect("licence row");
+    let row: (Uuid, Uuid, Option<Value>) =
+        sqlx::query_as("SELECT subject_id, tenant_id, metadata FROM license WHERE id::text = $1")
+            .bind(&license_id)
+            .fetch_one(&db.pool)
+            .await
+            .expect("licence row");
     assert_eq!(row.1, TENANT);
     assert_eq!(row.2, Some(json!({"source": "portal"})));
     let (keycloak_sub, subject_tenant): (String, Option<Uuid>) =
@@ -358,13 +349,15 @@ async fn a_create_returns_the_captured_shape_and_meters_the_licence() {
     let expected_id = license_id.clone();
     wait_for(
         || {
-            stub.calls().iter().filter(|call| {
-                call.body
-                    .as_ref()
-                    .and_then(|body| body["license_id"].as_str())
-                    == Some(expected_id.as_str())
-            })
-            .count()
+            stub.calls()
+                .iter()
+                .filter(|call| {
+                    call.body
+                        .as_ref()
+                        .and_then(|body| body["license_id"].as_str())
+                        == Some(expected_id.as_str())
+                })
+                .count()
                 >= 2
         },
         "both metering pushes",
@@ -400,13 +393,19 @@ async fn a_create_returns_the_captured_shape_and_meters_the_licence() {
         .find(|call| call.path == "/api/budget")
         .expect("budget call");
     assert_eq!(budget.body.as_ref().expect("body")["budget_tokens"], 1000);
-    assert_eq!(budget.body.as_ref().expect("body")["source"], "license_sync");
+    assert_eq!(
+        budget.body.as_ref().expect("body")["source"],
+        "license_sync"
+    );
     let quota = calls
         .iter()
         .find(|call| call.path == "/api/quota/config")
         .expect("quota call");
     assert_eq!(quota.body.as_ref().expect("body")["quota_monthly"], 100);
-    assert_eq!(quota.body.as_ref().expect("body")["app_id"], APP.to_string());
+    assert_eq!(
+        quota.body.as_ref().expect("body")["app_id"],
+        APP.to_string()
+    );
 
     // The stamp is written only after every owed push was accepted.
     let license_id = Uuid::parse_str(&license_id).expect("uuid");
@@ -431,7 +430,12 @@ async fn a_second_post_returns_the_existing_active_licence() {
     let db = seeded().await;
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-admin"], "operator-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "operator-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
 
     let (status, first) = send(
@@ -475,7 +479,12 @@ async fn a_self_tenant_mint_is_admitted() {
     let tenant_ref = TENANT.to_string();
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-admin"], "operator-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "operator-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
     let (status, body) = send(
         app,
@@ -512,7 +521,12 @@ async fn a_registered_tenant_id_as_subject_is_a_409() {
     .expect("other tenant");
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-admin"], "operator-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "operator-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
     let (status, body) = send(
         app,
@@ -538,7 +552,12 @@ async fn issuance_refusals_use_the_captured_error_keys() {
         .expect("drop issuer");
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-admin"], "operator-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "operator-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
     let (status, body) = send(
         app,
@@ -570,7 +589,12 @@ async fn issuance_refusals_use_the_captured_error_keys() {
         .expect("re-owner");
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-admin"], "operator-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "operator-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
     let (status, body) = send(
         app,
@@ -608,7 +632,12 @@ async fn invalid_bodies_are_fastapi_422s() {
     let db = seeded().await;
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-admin"], "operator-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "operator-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
 
     let (status, body) = send(
@@ -685,7 +714,12 @@ async fn metering_down_does_not_change_the_response() {
     let base = start_stub(stub.clone()).await;
     let app = route(
         state(db.pool.clone(), Some(Arc::new(provisioner(&base)))),
-        user(&["license-admin"], "operator-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "operator-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
     let (status, body) = send(
         app,
@@ -730,7 +764,12 @@ async fn delete_soft_requires_confirmation_then_stamps_and_revokes() {
     insert_subject_and_licence(&db.pool).await;
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-admin"], "admin-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "admin-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
     let path = format!("/licenses/user/{SUB}?reason=cleanup");
 
@@ -786,22 +825,15 @@ async fn delete_soft_requires_confirmation_then_stamps_and_revokes() {
     assert_eq!(row.delete_reason.as_deref(), Some("cleanup"));
     assert_eq!(row.deleted_from_status.as_deref(), Some("active"));
     assert!(row.revoked_at.is_some(), "revoked_at stamped");
-    let token_revoked: bool =
-        sqlx::query_scalar("SELECT revoked FROM token WHERE license_id = $1")
-            .bind(LICENSE)
-            .fetch_one(&db.pool)
-            .await
-            .expect("token");
+    let token_revoked: bool = sqlx::query_scalar("SELECT revoked FROM token WHERE license_id = $1")
+        .bind(LICENSE)
+        .fetch_one(&db.pool)
+        .await
+        .expect("token");
     assert!(token_revoked);
 
     // A repeat skips the already-stamped row (first deletion stays the first).
-    let (status, body) = send(
-        app,
-        "DELETE",
-        &format!("{path}&confirm_licenses=1"),
-        None,
-    )
-    .await;
+    let (status, body) = send(app, "DELETE", &format!("{path}&confirm_licenses=1"), None).await;
     assert_eq!(status, StatusCode::OK, "{body}");
     assert_eq!(body["deleted"], 0);
 }
@@ -814,7 +846,12 @@ async fn delete_needs_the_admin_role_and_an_authorized_app() {
     // The role guard is realm-only and precedes any subject lookup.
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-reader"], "reader-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-reader"],
+            "reader-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
     let (status, body) = send(app, "DELETE", &format!("/licenses/user/{SUB}"), None).await;
     assert_eq!(status, StatusCode::FORBIDDEN, "{body}");
@@ -823,7 +860,12 @@ async fn delete_needs_the_admin_role_and_an_authorized_app() {
     // An unknown subject is a 404.
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-admin"], "admin-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "admin-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
     let (status, body) = send(app, "DELETE", "/licenses/user/nope", None).await;
     assert_eq!(status, StatusCode::NOT_FOUND, "{body}");
@@ -837,7 +879,12 @@ async fn delete_needs_the_admin_role_and_an_authorized_app() {
         .expect("drop issuer");
     let app = route(
         state(db.pool.clone(), None),
-        user(&["license-admin"], "admin-sub", Some(TENANT), Some("owner-a")),
+        user(
+            &["license-admin"],
+            "admin-sub",
+            Some(TENANT),
+            Some("owner-a"),
+        ),
     );
     let (status, body) = send(app, "DELETE", &format!("/licenses/user/{SUB}"), None).await;
     assert_eq!(status, StatusCode::FORBIDDEN, "{body}");

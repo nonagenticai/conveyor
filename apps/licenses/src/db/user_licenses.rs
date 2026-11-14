@@ -229,11 +229,16 @@ pub async fn find_active_license(
 }
 
 /// One licence by row id, with the app and plan joined — what the POST returns as its 201 body.
-pub async fn license_by_id(pool: &PgPool, license_id: Uuid) -> Result<Option<LicenseRow>, sqlx::Error> {
-    sqlx::query_as(sqlx::AssertSqlSafe(format!("{LICENSE_COLUMNS} WHERE l.id = $1")))
-        .bind(license_id)
-        .fetch_optional(pool)
-        .await
+pub async fn license_by_id(
+    pool: &PgPool,
+    license_id: Uuid,
+) -> Result<Option<LicenseRow>, sqlx::Error> {
+    sqlx::query_as(sqlx::AssertSqlSafe(format!(
+        "{LICENSE_COLUMNS} WHERE l.id = $1"
+    )))
+    .bind(license_id)
+    .fetch_optional(pool)
+    .await
 }
 
 /// The columns `create_license` (:6956) writes for a user-licence mint.
@@ -518,10 +523,8 @@ pub async fn soft_delete_licenses_for_subject(
 
 /// SQLSTATE `23505` on the active-licence partial unique index.
 fn is_active_licence_race(error: &sqlx::Error) -> bool {
-    error
-        .as_database_error()
-        .is_some_and(|database| {
-            database.is_unique_violation()
-                && database.constraint() == Some(UQ_ACTIVE_TENANT_APP_SUBJECT)
-        })
+    error.as_database_error().is_some_and(|database| {
+        database.is_unique_violation()
+            && database.constraint() == Some(UQ_ACTIVE_TENANT_APP_SUBJECT)
+    })
 }

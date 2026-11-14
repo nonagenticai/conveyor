@@ -456,8 +456,9 @@ fn required_uuid(
             "msg": "Field required",
             "input": body,
         }))),
-        Some(Value::String(text)) => Uuid::try_parse(text)
-            .map_err(|_| uuid_field_error(field, &Value::String(text.clone()))),
+        Some(Value::String(text)) => {
+            Uuid::try_parse(text).map_err(|_| uuid_field_error(field, &Value::String(text.clone())))
+        }
         Some(other) => Err(uuid_field_error(field, other)),
     }
 }
@@ -744,15 +745,10 @@ pub async fn create_user_license(
     .await?;
 
     // ⛔ A stated non-human realm is honoured only for its exact subs.
-    if let Some(problem) = stated_non_human_subject_problem(
-        parsed.subject_realm.as_deref(),
-        &subject_id,
-        &tenant,
-    ) {
-        return Err(Refusal::detail(
-            StatusCode::UNPROCESSABLE_ENTITY,
-            problem,
-        ));
+    if let Some(problem) =
+        stated_non_human_subject_problem(parsed.subject_realm.as_deref(), &subject_id, &tenant)
+    {
+        return Err(Refusal::detail(StatusCode::UNPROCESSABLE_ENTITY, problem));
     }
     let keycloak_realm = parsed
         .subject_realm
@@ -903,7 +899,8 @@ pub async fn create_user_license(
         // Lost a race to a concurrent provision (unique index) — return the active licence that
         // won instead of 500ing.
         Err(user_licenses::CreateLicenceError::LostRace) => {
-            let Some(existing) = find_active(pool, tenant_id, parsed.app_id, subject_id_row).await?
+            let Some(existing) =
+                find_active(pool, tenant_id, parsed.app_id, subject_id_row).await?
             else {
                 tracing::error!("lost the active-licence race but no winner is readable");
                 return Err(internal_error_created("Failed to create license"));
@@ -1051,8 +1048,8 @@ pub async fn delete_user_licenses(
             "Role 'license-admin' required",
         ));
     }
-    let tenant_id =
-        Uuid::try_parse(&tenant).map_err(|_| internal_error_deleted("Failed to delete licenses"))?;
+    let tenant_id = Uuid::try_parse(&tenant)
+        .map_err(|_| internal_error_deleted("Failed to delete licenses"))?;
     if let Some(value) = query.confirm_licenses
         && value < 0
     {
