@@ -104,6 +104,22 @@ tokens"*. Do not depend on the assignee field. The claim is: `status:claimed` + 
 branch + a claim comment naming the branch and HEAD. The branch is the lock; the label and
 comment are the readable signal.
 
+⭐ **The labels are checked, hourly, by `scripts/ci/board.py`** (`.github/workflows/board.yml`).
+The label is written by hand after the branch is pushed, so it is the step that gets skipped —
+measured 2026-11-15, four issues carried `status:ready` while their work was live (#137/#140, then
+#149/#151 created ready and claimed without the label moving), and two stayed `status:blocked` on a
+blocker that had closed. `reap-stale-claims.sh` cannot see any of it: a claim is a *remote branch*.
+
+- **Automatic, one direction only.** An issue carrying `status:ready` while a branch `issue/<n>-*`
+  or an open PR names it is relabelled `status:claimed`, with one comment naming the evidence. The
+  check never moves an issue back to `ready`: a check that could return a live claim to the pool is
+  worse than the drift it repairs.
+- **Reported, never applied.** `status:blocked` with no line *starting* `Blocker: #N` naming an open
+  issue, and `status:claimed` with no branch, no PR and no update in 48 h. Releasing a claim is a
+  human decision — the same reason the reaper defaults to report mode.
+- **By hand:** `python3 scripts/ci/board.py --repo <owner/name> --dry-run` (exit 1 when a fix is
+  pending). The fixtures run in the `checks` job; the job summary is the record.
+
 ## Claim — four checks, then push
 
 From any checkout, before creating a branch:
