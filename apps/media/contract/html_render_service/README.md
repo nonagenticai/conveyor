@@ -4,7 +4,7 @@ Captured 2026-11-15 from the **running** reference image, not from a rebuild:
 
 | | |
 |---|---|
-| image | `registry.internal:5000/html_render_service:latest@sha256:19ae2c9fe2ee2bf32e0f06794337f1557708029f867aaab02cdb1963a50c2fd4` |
+| image | `html_render_service:latest@sha256:19ae2c9fe2ee2bf32e0f06794337f1557708029f867aaab02cdb1963a50c2fd4` (the registry host is private; the digest is the pin) |
 | operations | 37 over 33 paths |
 | lock | `openapi.lock.json` (sorted, taken from `/openapi.json`) |
 | operation list | `operations.txt` |
@@ -42,7 +42,7 @@ port 18201 → container port 6319.
    is why no redesign job can be executed in the rig (see the drop table) — it is a capability gap,
    not a rig defect.
 5. **Storage was pointed at local disk.** Production sets `STORAGE_BACKEND=minio` +
-   `STORAGE_MINIO_ENDPOINT=minio.internal:8389`; the rig has no object store, so the capture passes
+   `STORAGE_MINIO_ENDPOINT=<object-store host>`; the rig has no object store, so the capture passes
    `STORAGE_BACKEND=local STORAGE_LOCAL_PATH=/tmp/storage`. `/health/ready` therefore reports only
    `database` — parity is the shape, not a store name.
 6. **The licence gate was left at its code default (off).** Production arms

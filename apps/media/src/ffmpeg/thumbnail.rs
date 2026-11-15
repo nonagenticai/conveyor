@@ -513,7 +513,7 @@ mod tests {
         let root = scratch("remote");
         let config = test_config(&root);
         let error = thumbnail(
-            &json!({"video_url": "https://minio.internal/hero.mp4"}),
+            &json!({"video_url": "https://example.invalid/hero.mp4"}),
             &config,
         )
         .await

@@ -41,7 +41,7 @@ fn instruction(kind: &str, wall_secs: i64) -> Instruction {
 fn dispatch() -> Dispatch {
     Dispatch {
         namespace: "conveyor-jobs".to_string(),
-        image: "registry.internal:5000/conveyor-media-browser@sha256:00".to_string(),
+        image: "conveyor-media-browser@sha256:00".to_string(),
         pull_secret: conveyor_runner::DEFAULT_PULL_SECRET.to_string(),
         node_selector: None,
         toleration: None,

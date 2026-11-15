@@ -673,7 +673,7 @@ mod tests {
         let root = scratch("remote");
         let config = test_config(&root);
         let error = concat_audio(
-            &json!({"clips": [{"id": "clip-0", "audio_url": "https://minio.internal/clip.wav"}]}),
+            &json!({"clips": [{"id": "clip-0", "audio_url": "https://example.invalid/clip.wav"}]}),
             &config,
         )
         .await
