@@ -11,6 +11,12 @@
 //! `project.meta` is merged, not replaced: a later PM job may write keys the seed does not own,
 //! and a seed run must not erase them. The seed owns the keys it names (`plan`, `track`,
 //! `issues`, `depends_on`, `plan_status`, `status_source`) and leaves every other key alone.
+//!
+//! **Every non-archived project also gets a board.** A project is addressed through its board —
+//! the console's workspace, its cards, the start card `projects.create` files — and no action
+//! creates a board for an existing project (`boards.create` does not exist), so a project the
+//! seed inserts without one could never acquire it. Measured 2026-11-15: P0, the programme's own
+//! definition project, was the one of 48 with no board.
 
 use conveyor_domain::{Code, TenantId};
 use serde::Deserialize;
