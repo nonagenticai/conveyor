@@ -9,7 +9,10 @@ WHY THIS FILE EXISTS
     claimed status:claimed  branch pushed + claim comment, work in progress
     blocked status:blocked  the body carries a plain `Blocker: #N` naming an OPEN issue
 
-Every one of those clauses is machine-checkable, and until now none of them was checked.
+Three of those clauses are checkable without reading a sentence of prose -- the branch, the
+open PR, and the blocker line -- and until now none of them was checked. The `## Claim` block is
+deliberately NOT read: a released claim usually leaves a stale body cell behind, and re-claiming
+on that would be a worse failure than missing it.
 The label is written by hand after the branch is pushed, so it is the step that gets
 skipped, and a stale `status:ready` is a licence to start a second branch on work that
 already exists. Measured on 2026-11-15: #137 and #140 carried `ready` with live branches
@@ -68,9 +71,15 @@ NEEDS_HUMAN = "status:needs-human"
 # `03-DELIVERY.md`: "A `status:blocked` issue carries a plain line STARTING `Blocker: #N`;
 # a `Blocker:` mention inside prose or a checklist is not a blocker line." So the line must
 # begin with the token -- that is what excludes the `- [x] ... `Blocker: #N` present.`
-# checklists and mid-sentence prose -- and it may continue with a reason, and it may name
-# more than one issue.
-BLOCKER_LINE_RE = re.compile(r"^[ \t]*Blocker:[ \t]*(.+)$", re.MULTILINE)
+# checklists and mid-sentence prose.
+#
+# Only the RUN of issue references immediately after the colon are blockers. A reason follows
+# them and routinely cites other issues as evidence ("the crate is on main (#45 merged), the
+# publish mechanism is live (#98)"); counting those would keep a block alive on a number that
+# was never a blocker, or report a stale block on one that only appeared in prose.
+BLOCKER_LINE_RE = re.compile(
+    r"^[ \t]*Blocker:[ \t]*((?:#\d+(?:[ \t]*[,/][ \t]*)?[ \t]*)+)", re.MULTILINE
+)
 ISSUE_REF_RE = re.compile(r"#(\d+)")
 
 STALE_CLAIM_HOURS = 48
@@ -81,18 +90,20 @@ LIMIT = "500"
 
 
 def blockers_of(body: str) -> list[int]:
-    """Issue numbers named by the FIRST line that starts with `Blocker:`.
+    """Issue numbers named by every line that starts with `Blocker:`.
+
+    Union, not first-line-only: a body that carries two blocker lines has been edited, and
+    whichever line is newer is the one a reader would believe -- so keeping the block alive
+    while ANY named blocker is open is the direction that cannot invent a stale block.
 
     Empty list means the issue carries no conforming blocker line at all.
     """
-    match = BLOCKER_LINE_RE.search(body)
-    if match is None:
-        return []
     seen: list[int] = []
-    for number in ISSUE_REF_RE.findall(match.group(1)):
-        value = int(number)
-        if value not in seen:
-            seen.append(value)
+    for match in BLOCKER_LINE_RE.finditer(body):
+        for number in ISSUE_REF_RE.findall(match.group(1)):
+            value = int(number)
+            if value not in seen:
+                seen.append(value)
     return seen
 
 
@@ -162,9 +173,9 @@ def plan(issues, prs, branches, blocker_state, now):
                 )
                 continue
             states = {blocker: blocker_state(blocker) for blocker in blockers}
-            # A block is real while ANY named blocker is open; it is stale only when every
-            # one of them has closed (or never existed).
-            if not any(state == "open" for state in states.values()):
+            # A block is real while ANY named blocker is open, and while any lookup could not be
+            # completed. It is stale only when every named blocker is positively closed or missing.
+            if all(state in ("closed", "missing") for state in states.values()):
                 named = ", ".join(f"#{b} {s}" for b, s in states.items())
                 reports.append(
                     {
@@ -280,7 +291,10 @@ def blocker_states(repo: str):
                 capture_output=True,
                 text=True,
             )
-            cache[number] = proc.stdout.strip().lower() if proc.returncode == 0 else "missing"
+            # "unknown" is not "missing": a lookup that failed is not evidence that the blocker
+            # closed, and reporting a stale block on a failed lookup would be a lie that costs
+            # a human a trip to the issue. Rule B only reports on closed or missing.
+            cache[number] = proc.stdout.strip().lower() if proc.returncode == 0 else "unknown"
         return cache[number]
 
     return state
@@ -352,7 +366,8 @@ def self_test() -> int:
             "body": body,
         }
 
-    states = {120: "closed", 151: "open"}
+    # 777 is a lookup that could not be completed; anything absent never existed.
+    states = {120: "closed", 151: "open", 777: "unknown"}
 
     def blocker_state(number):
         return states.get(number, "missing")
@@ -426,6 +441,22 @@ def self_test() -> int:
             "blocked, blocker only in a checklist -> report",
             [issue(30, [BLOCKED], "- [x] Dependencies typed; `Blocker: #151` present.\n")],
             [], [], [], ["B:30"],
+        ),
+        (
+            "blocker's reason cites other issues -> only the leading run counts",
+            # #120 is closed; #999 is cited in the reason as open. The block is #120 only.
+            [issue(95, [BLOCKED], "Blocker: #120 — superseded by #999, see #151 too.\n")],
+            [], [], [], ["B:95"],
+        ),
+        (
+            "two blocker lines -> union, one open keeps the block",
+            [issue(72, [BLOCKED], "Blocker: #120\nBlocker: #151 — corrected.\n")],
+            [], [], [], [],
+        ),
+        (
+            "blocker lookup failed -> no stale report",
+            [issue(13, [BLOCKED], "Blocker: #777\n")],
+            [], [], [], [],
         ),
         (
             "claimed, no branch, stale -> report",

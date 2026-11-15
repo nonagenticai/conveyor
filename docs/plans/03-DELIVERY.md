@@ -89,8 +89,8 @@ prose or a checklist is not a blocker line. The number is an issue, never a PR.
 | state | label | meaning |
 |---|---|---|
 | ready | `status:ready` | open, no `## Claim` block, no live branch for it, no linked PR — safe to claim |
-| claimed | `status:claimed` | branch pushed + claim comment; work in progress, no PR yet |
-| in review | (native) | one non-draft PR open with `Closes #n` |
+| claimed | `status:claimed` | branch pushed + claim comment; work in progress — with or without an open PR |
+| in review | (native) | one non-draft PR open with `Closes #n`; the claim label stays on the issue until it merges |
 | blocked | `status:blocked` | body carries a plain `Blocker: #N` line naming an open issue; do not claim |
 | needs human | `status:needs-human` | a decision/credential/permission the session cannot supply |
 | done | closed | PR merged; `Closes #n` closed it; branch deleted |
