@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>04 — The tool estate: what remains, and the deliverable vocabulary · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="04--the-tool-estate-what-remains-and-the-deliverable-vocabulary">04 — The tool estate: what remains, and the deliverable vocabulary</h1>
+<p><strong>Status:</strong> recording document · 2026-11-15 · unit #138 <strong>Authority above this file:</strong> <code>docs/decisions/0006-tool-absorption-grouping.md</code> (the grouping), <code>docs/decisions/0005-absorption-sequence-and-repo-scope.md</code> (who performs a rewrite).</p>
+<p>This file is not a new plan and opens no new direction. ADR 0006 decided the grouping and the sequence. What was missing was three facts in one place: where each group actually stands, that the eighteen stage directories are a <strong>deliverable vocabulary rather than services</strong>, and that the estate has <strong>one capability gap no spec covers</strong> — host control.</p>
+<hr />
+<h2 id="1-where-each-adr-0006-group-stands">1. Where each ADR 0006 group stands</h2>
+<p>A group is one deployable with one image, one database and one role; the toolkits it publishes stay separate catalogue entries (<code>§11.2</code> identities), so the broker never learns the topology.</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Absorbs, by role</th>
+<th>State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apps/scientific</code></td>
+<td>the scientific research service; the evidence-review service</td>
+<td><strong>absorbed, not deployed</strong> (#105 merged). The live deployment is still the Python image and sits at zero replicas</td>
+</tr>
+<tr>
+<td><code>apps/research</code></td>
+<td>the web-scraper service; the media-discovery service</td>
+<td><strong>in flight</strong> — #117 merged into <code>apps/research</code>, #118 in flight; ADR 0007 keeps it here</td>
+</tr>
+<tr>
+<td><code>apps/media</code></td>
+<td>the browser-rendered producers; the ffmpeg producers; the thin speech fan-out and video-publish operations</td>
+<td><strong>decided, unclaimed</strong> (#139); ADR 0007 keeps it in this workspace as two executor images, with <code>analyse.*</code> as a library</td>
+</tr>
+<tr>
+<td><code>apps/lean4-prover</code></td>
+<td>the Lean 4 prover</td>
+<td><strong>absorbed, not deployed</strong> (#116 merged). The live deployment is still the pre-absorption image; the deployable stays separate for its toolchain state and node pin</td>
+</tr>
+<tr>
+<td><code>apps/coding</code></td>
+<td>the <code>coding-*</code> fleet</td>
+<td><strong>join the existing Rust repository, never a second rewrite</strong> (ADR 0006). The Python fleet is still deployed and is not the current implementation</td>
+</tr>
+<tr>
+<td>external — <code>strata_ingest</code>, <code>strata_rag</code></td>
+<td>shared ingest and retrieval</td>
+<td>done (ADR 0005 §2); they are tool-estate members but not repository scope</td>
+</tr>
+<tr>
+<td>external — the model servers</td>
+<td>speech, transcription, image generation, vision</td>
+<td><strong>stay remote HTTP hosts bound as toolkits</strong> (ADR 0006 §Consequences)</td>
+</tr>
+</tbody>
+</table>
+<p>Two lessons this table makes visible, both recorded rather than fixed here:</p>
+<ul>
+<li><strong>"Merged" and "live" are different claims.</strong> Two groups are fully absorbed in code and still serve the legacy image. Any statement that the estate is Rust must be read as "the rewrite exists", not "the old service is off".</li>
+<li><strong><code>apps/media</code> is the one decided group with no issue.</strong> ADR 0006 §Consequences says "one issue per app"; #139 supplies the missing one.</li>
+</ul>
+<h3 id="11-archived-and-needing-no-decision">1.1 Archived and needing no decision</h3>
+<p>Five stage blueprints were archived before this document was written. They are not migration targets and must not be reopened as work.</p>
+<hr />
+<h2 id="2-the-eighteen-stage-directories-are-a-vocabulary-not-services">2. The eighteen stage directories are a vocabulary, not services</h2>
+<p>ADR 0006 records the correction: the "w2v stages" are not services — they live inside the orchestrator, which is out of scope. That correction is load-bearing and easy to lose, so it is restated here with the content that gives it meaning.</p>
+<p>Of the eighteen directories, <strong>two are libraries</strong> (<code>primitives</code>, <code>shared</code>). The other <strong>sixteen are deliverable blueprints</strong> — each names a kind of output the system can produce and the sequence of steps that produces it. They are the conveyor's <strong>project-type vocabulary</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Blueprint</th>
+<th>Deliverable</th>
+<th>Phases</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>generic</code></td>
+<td>any short media piece</td>
+<td>brief → source ingest → script → storyboard → asset search → site capture → stills → generated video → motion graphics → narration → render</td>
+</tr>
+<tr>
+<td><code>lesson</code></td>
+<td>one narrated lesson</td>
+<td>script → slides → stills → narration → record → compile</td>
+</tr>
+<tr>
+<td><code>course</code></td>
+<td>a multi-lesson course</td>
+<td>outline → per-lesson compilation → stitch → thumbnail</td>
+</tr>
+<tr>
+<td><code>audiobook</code></td>
+<td>a narrated long-form reading</td>
+<td>script → narration → compile</td>
+</tr>
+<tr>
+<td><code>promo</code></td>
+<td>a promotional clip</td>
+<td>brief → script → assets → render</td>
+</tr>
+<tr>
+<td><code>demo_video</code></td>
+<td>a product demonstration</td>
+<td>brief → screen capture → narration → render</td>
+</tr>
+<tr>
+<td><code>action_reel</code></td>
+<td>a montage</td>
+<td>brief → assets → render</td>
+</tr>
+<tr>
+<td><code>app_review</code></td>
+<td>an application assessment</td>
+<td>capture → inspect → analyse → report</td>
+</tr>
+<tr>
+<td><code>audit_video</code></td>
+<td>a video quality audit</td>
+<td>extract frames → OCR → vision verification → report</td>
+</tr>
+<tr>
+<td><code>website_review</code></td>
+<td>a site assessment</td>
+<td>capture → analyse → report</td>
+</tr>
+<tr>
+<td><code>web_design</code></td>
+<td>a redesigned site</td>
+<td>capture → redesign → screenshot → deliver</td>
+</tr>
+<tr>
+<td><code>web_design_v2</code></td>
+<td>the redesign, second generation</td>
+<td>as above with the current planner</td>
+</tr>
+<tr>
+<td><code>seo_audit</code></td>
+<td>a search audit</td>
+<td>crawl → analyse → report</td>
+</tr>
+<tr>
+<td><code>cro_audit</code></td>
+<td>a conversion audit</td>
+<td>crawl → analyse → report</td>
+</tr>
+<tr>
+<td><code>marketing_scorecard</code></td>
+<td>a scored campaign read</td>
+<td>gather → score → report</td>
+</tr>
+<tr>
+<td><code>growth_bundle</code></td>
+<td>a combined growth pack</td>
+<td>the audit set, composed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Consequence — the point of this section.</strong> These sixteen map to <strong>project types and procedure templates</strong>, never to services. A project type is a template, not code (<code>SPEC_V2</code> §5.2): its phases are WBS node kinds, its gates are approval rows, its artefacts are governed assets. So "produce a video course" is a <strong>project</strong> with a baseline, gates and evidence — not a DAG a person re-invokes, and not a service to port.</p>
+<p>They divide on exactly the line the owner drew:</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Blueprints</th>
+<th>What the output is for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>analysis</strong></td>
+<td><code>app_review</code>, <code>audit_video</code>, <code>website_review</code>, <code>web_design</code>, <code>web_design_v2</code>, <code>seo_audit</code>, <code>cro_audit</code>, <code>marketing_scorecard</code>, <code>growth_bundle</code></td>
+<td><strong>evidence</strong> — a gate or QC input</td>
+</tr>
+<tr>
+<td><strong>production</strong></td>
+<td><code>generic</code>, <code>lesson</code>, <code>course</code>, <code>audiobook</code>, <code>promo</code>, <code>demo_video</code>, <code>action_reel</code></td>
+<td><strong>an artefact</strong> — a published deliverable</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-the-two-capability-families">3. The two capability families</h2>
+<p>Declared in <code>SPEC_V2</code> §10.4. One note on the boundary, because it is the defect a later reader would otherwise introduce:</p>
+<ul>
+<li><code>analyse.*</code> concerns <strong>artefacts and external properties</strong> — a site, an application, a video, brand presence. Its outputs are evidence.</li>
+<li><code>metrics.*</code> and the eval slices (S17–S20) concern <strong>this system's own process quality</strong> — flow, quality, cost, governance, and scored evaluations.</li>
+</ul>
+<p>A capability that scores <em>our</em> work is <code>metrics</code>/evals. A capability that scores <em>the thing we were asked to look at</em> is <code>analyse.*</code>. Building the second inside the first is the double-build this note exists to prevent.</p>
+<p><code>produce.*</code> is the production side of the same table, and it is deliberately one family: the sixteen blueprints differ in ordering and in which capabilities they call, not in kind.</p>
+<hr />
+<h2 id="4-the-gap-host-control">4. The gap: host control</h2>
+<p><code>SPEC_V2</code> §10.4 declares the operations family with <code>ops.k8s_*</code> and <code>ops.git_*</code>. There is <strong>no family that reaches a bare-metal host</strong> — no service restart, no unit status, no log tail on a machine that is not a cluster node. Several estate hosts are exactly that, and the model servers bound as toolkits live on them.</p>
+<p>The reason this is a design gap and not a missing implementation detail: the conveyor runs in the cluster. Reaching a host means a credential that can restart anything on it, held by a web-facing service. That is a different <strong>class</strong> of credential from a namespaced service account, and it deserves its own decision rather than appearing as a function of <code>ops.k8s_restart</code>.</p>
+<p>The shape proposed for consideration (§10.4 declares the family; the mechanism is T7's to settle):</p>
+<ol type="1">
+<li>A <strong>host registry</strong> — a row naming an addressable host and its role, so a job never supplies one.</li>
+<li>A <strong>per-host agent</strong> on each host, and no host credential inside the conveyor pod. The agent is the credential boundary, mirroring the rule the broker already applies to tool destinations.</li>
+<li>A <strong>forced-command</strong> key: the agent answers a fixed verb set, so a compromised conveyor cannot ask for an arbitrary command.</li>
+<li>The <strong>destructive effect class</strong> already applies — approval, dry run, dual control.</li>
+</ol>
+<p>Until that is decided, host control does not exist, and a procedure must not pretend to do it.</p>
+<hr />
+<h2 id="5-destination-count">5. Destination count</h2>
+<p>Measured by role, without naming hosts or repositories:</p>
+<ul>
+<li><strong>~30 tool-adjacent services are deployed today</strong> across the legacy systems and the estate.</li>
+<li>The grouping above reduces that to <strong>~15 destinations</strong>: <strong>9 inside this workspace</strong> (<code>server</code>, <code>web</code>, <code>inference-router</code>, <code>licenses</code>, <code>scientific</code>, <code>lean4-prover</code>, <code>research</code>, <code>media</code>, <code>analysis</code>) and the <code>coding</code> repository, with the rest bound toolkits: the two shared Rust stores and the model servers. ADR 0007 makes this workspace as self-contained as possible; only <code>coding</code> keeps its own repository.</li>
+</ul>
+<p>The reduction is not the goal. ADR 0006 §2 is: <strong>combine on runtime shape, not on file count.</strong> The browser and the ffmpeg producers do not share a runtime, so they do not become one image; the thin operations share the server's runtime, so they do not become a deployable at all.</p>
+<hr />
+<h2 id="6-what-stays-outside-deliberately">6. What stays outside, deliberately</h2>
+<ul>
+<li><strong>The model servers.</strong> They are model servers, not tool code (ADR 0006 §Consequences).</li>
+<li><strong>Product applications</strong> are clients of this system, never job tools (<code>§11.2</code>).</li>
+<li><strong>The agent platform and its gateway.</strong> Two control planes, permanently (D59).</li>
+<li><strong>The orchestrator.</strong> Out of scope; its role becomes procedures, not a second scheduler.</li>
+</ul>
+<hr />
+<h2 id="7-open-items-this-document-raises">7. Open items this document raises</h2>
+<ol type="1">
+<li><code>apps/media</code>'s device-inspection member needs an Appium driver and a device farm, and it never worked in the live estate. Owner ruling 2026-11-15: deferred outright — not ported, not measured for demand, deployment retired at cutover. Appium being WebDriver over HTTP is recorded only so the deferral is not later read as a technical impossibility.</li>
+<li>Two fleet functions are claimed by neither the Rust service nor a measured consumer. Neither port nor drop is justified until the consumer is measured (ADR 0006 §row <code>apps/coding</code>).</li>
+<li>Two groups are merged but not deployed. A deployment unit each — not part of this document.</li>
+<li>Host control is a family without a mechanism. §4 above is a proposal for T7, not a decision.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

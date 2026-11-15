@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "0b3ae52ca47039c41e4c65a9950711fb061f3bf91a914548cfc89948ecc00831",
-      "bytes": 140426,
+      "sha256": "357fc4e3f6211807119ecb8965565c207af1132e5b604ea4851aef31118385f4",
+      "bytes": 144348,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -99,6 +99,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "adc8b99c210be970b1d8931dee11aa9f71b3a6b024c59bfdf628dff6539736cd",
       "bytes": 6657,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0006-tool-absorption-grouping.md"
+    },
+    {
+      "title": "0007 — The tool estate is conveyor plus coding",
+      "path": "docs/decisions/0007-tool-estate-conveyor-and-coding.html",
+      "source": "docs/decisions/0007-tool-estate-conveyor-and-coding.md",
+      "section": "Decisions",
+      "sha256": "ce47d2ab95b25eed4d73a29b0040e2f16e78a834d78f3d34bc03998bd2148217",
+      "bytes": 7520,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0007-tool-estate-conveyor-and-coding.md"
     },
     {
       "title": "Web UI design",
@@ -303,8 +312,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "80fa0a35b7c9e3d26a156c0cfe13ea32a82d8dd492245fafbf0bece0dce329b0",
-      "bytes": 7532,
+      "sha256": "4aff627ecf20ad80b2bb36ceb8f50d85576b057f1a7c369b72fb2ff1d8fe9db7",
+      "bytes": 7714,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -387,6 +396,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "bc2965a26e87934c22511c4d03282d3e77c383315ae2abea816ef1a3e81ee4eb",
       "bytes": 21408,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
+    },
+    {
+      "title": "04 — The tool estate: what remains, and the deliverable vocabulary",
+      "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
+      "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
+      "section": "Plans",
+      "sha256": "6c6e5245a5a3fc5a59962dc767552a67d09a1be4dfdd98629c1c9134aad88cab",
+      "bytes": 10272,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
     },
     {
       "title": "P0 — Programme definition",

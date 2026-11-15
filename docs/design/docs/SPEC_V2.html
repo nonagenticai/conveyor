@@ -527,9 +527,24 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>intake → asset design → review → publish → validate (§5.7, T17)</td>
 <td>per-asset review; publish gate</td>
 </tr>
+<tr>
+<td><strong>media</strong></td>
+<td>brief → script → asset → render → QC → publish → close (§5.2.1)</td>
+<td>script, asset, QC, publish</td>
+</tr>
 </tbody>
 </table>
 <p>The project type is a <strong>template</strong>, not code: its phases are WBS node kinds, its gates are <code>approval</code> rows with the gate name and evidence refs, and its artefacts are <code>governed_asset</code> rows (V1's one lifecycle for requirements, principles and ADRs, extended to charter/contract/closure/postmortem).</p>
+<h4 id="521-the-media-type--a-proven-vocabulary-not-a-new-invention">5.2.1 The <code>media</code> type — a proven vocabulary, not a new invention</h4>
+<p>Sixteen deliverable blueprints already exist in the live estate: a generic short media piece, a single lesson, a multi-lesson course, a narrated audiobook, a promo, a product demo, a montage, plus the review and audit set (<code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code> §2). They are <strong>phase templates</strong>, and they are what this type generalises. The type is new to the conveyor; the sequence it encodes is not new, and it was not invented for this spec.</p>
+<ul>
+<li><strong>Phases are the blueprints' steps</strong>, so <code>media</code> differs from project to project by <em>which</em> capabilities a phase calls and in what order — not by a different state machine. <code>lesson</code> and <code>course</code> differ in that <code>course</code> adds an outline phase and a per-lesson compilation phase above <code>lesson</code>'s own steps.</li>
+<li><strong>The output is an artefact</strong> in tenant-prefixed object storage with a content hash, referenced from the WBS node that accepted it (§11.10). A phase is accepted when its artefact meets its criteria, not when its checkbox is ticked (§5.3).</li>
+<li><strong>QC is a phase, not a review habit.</strong> A production project's acceptance is a scored check against the artefact, recorded as evidence, so "the video is fine" is a row rather than an opinion.</li>
+<li><strong>Publish is gated</strong> because it is outward-facing and often a <code>spend</code> effect (§11.4).</li>
+<li>⚠️ <strong>Not a second scheduler.</strong> The sequencing that exists in the live estate today becomes a <strong>procedure</strong> (§6.3 of the V1 spec, S11), never a ported orchestrator. A <code>media</code> project is a plan over cards and runs.</li>
+</ul>
+<p>The analysis family needs no type of its own: its blueprints are <code>delivery</code> projects whose phase evidence is an <code>analyse.*</code> result, which is why they appear in §10.4 as a capability family rather than a template.</p>
 <h3 id="53-plan-state-and-execution-are-different-things">5.3 Plan, state and execution are different things</h3>
 <p>Three separations are load-bearing and are the V1 fixes carried forward:</p>
 <ol type="1">
@@ -1618,7 +1633,15 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>operations</td>
-<td><code>ops.incident|triage|mitigate|resolve|postmortem</code>, <code>ops.k8s_*</code>, <code>ops.git_*</code></td>
+<td><code>ops.incident|triage|mitigate|resolve|postmortem</code>, <code>ops.k8s_*</code>, <code>ops.git_*</code>, <code>ops.host_*</code> (§10.4.1)</td>
+</tr>
+<tr>
+<td>analysis</td>
+<td><code>analyse.site</code>, <code>analyse.app</code>, <code>analyse.video</code>, <code>analyse.brand</code>, <code>analyse.content</code>, <code>analyse.report</code></td>
+</tr>
+<tr>
+<td>production</td>
+<td><code>produce.brief</code>, <code>produce.script</code>, <code>produce.asset</code>, <code>produce.speech</code>, <code>produce.render</code>, <code>produce.still</code>, <code>produce.deck</code>, <code>produce.qc</code>, <code>produce.publish_youtube</code></td>
 </tr>
 <tr>
 <td>tools</td>
@@ -1635,6 +1658,16 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tbody>
 </table>
 <p>Every action is an <code>ActionSpec</code> (V1 §5.5): one declaration → HTTP + MCP + OpenAPI + generated client.</p>
+<h4 id="1041-two-boundaries-this-table-must-not-blur">10.4.1 Two boundaries this table must not blur</h4>
+<p><strong><code>analyse.*</code> is not <code>metrics.*</code>.</strong> <code>analyse</code> measures <strong>the thing we were asked to look at</strong> — a site, an application, a video, a brand's presence, a piece of content — and its result is <strong>evidence</strong> for a gate or a QC phase (§5.2.1). <code>metrics</code> and the eval slices (S17–S20) measure <strong>this system's own process quality</strong>: flow, quality, cost, governance, and scored evaluations of our runs. A capability that scores our work belongs to <code>metrics</code>/evals; a capability that scores the subject of the project belongs to <code>analyse</code>. Building the second inside the first is the double-build this paragraph exists to prevent.</p>
+<p><strong><code>ops.host_*</code> is a different credential class from <code>ops.k8s_*</code>.</strong> The cluster operations reach a namespaced API server under a service account. A host operation reaches a bare-metal machine and can restart anything on it. The family is declared here so a procedure can name the intent; the mechanism is T7's, and it is fixed to these constraints rather than left open:</p>
+<ol type="1">
+<li>a <strong>host registry</strong> row names an addressable host and its role — a job never supplies a destination;</li>
+<li>a <strong>per-host agent</strong> holds the host credential; the conveyor pod holds none, mirroring the broker's rule for tool destinations (§11.3);</li>
+<li>the agent answers a <strong>forced-command</strong> verb set, so a compromised conveyor cannot ask for an arbitrary command;</li>
+<li><code>destructive</code> effect applies in full — approval, dry run and dual control (§11.4).</li>
+</ol>
+<p>Until T7 lands that mechanism, <code>ops.host_*</code> operations do not exist and a procedure must not claim them.</p>
 <h3 id="105-ui-additions">10.5 UI additions</h3>
 <p>V1's nine destinations stand (Today, Board, Runs, Build, Design, Measure, Evals, Govern, Channels). V2 adds:</p>
 <table>
@@ -1787,13 +1820,13 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><code>w2v-orchestrator</code> :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on mini1)</td>
 <td>deliverable runs and stage capabilities; rendered artifacts</td>
-<td>live; <strong>migration target — the stage fleet moves into the conveyor and is rewritten in Rust (D54)</strong></td>
+<td>live; <strong>migration target — rewritten in Rust in this workspace: <code>apps/media</code> executor images and the <code>analysis</code> library (ADR 0007, D54)</strong></td>
 <td>media production</td>
 </tr>
 <tr>
 <td><code>video-compiler</code> :8200</td>
 <td>ffmpeg render/compile jobs (slide/footage → video), durable <code>compile_jobs</code>, MinIO outputs</td>
-<td>live; migration candidate — joins the conveyor workspace when rewritten in Rust (D58)</td>
+<td>live; migration candidate — joins <code>apps/media</code>'s ffmpeg executor image when rewritten in Rust (ADR 0007, D58)</td>
 <td>media production</td>
 </tr>
 <tr>

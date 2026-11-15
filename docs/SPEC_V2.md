@@ -372,10 +372,34 @@ and the project dependency graph.
 | **development (self)** | design → branch → implement → CI → review → merge → deploy → verify (§9.1) | design (structural), merge, deploy |
 | **operations** | detect → triage → mitigate → resolve → postmortem (§9.2) | destructive-action gate only |
 | **setup (authoring)** | intake → asset design → review → publish → validate (§5.7, T17) | per-asset review; publish gate |
+| **media** | brief → script → asset → render → QC → publish → close (§5.2.1) | script, asset, QC, publish |
 
 The project type is a **template**, not code: its phases are WBS node kinds, its gates are `approval` rows with the
 gate name and evidence refs, and its artefacts are `governed_asset` rows (V1's one lifecycle for requirements,
 principles and ADRs, extended to charter/contract/closure/postmortem).
+
+#### 5.2.1 The `media` type — a proven vocabulary, not a new invention
+
+Sixteen deliverable blueprints already exist in the live estate: a generic short media piece, a single
+lesson, a multi-lesson course, a narrated audiobook, a promo, a product demo, a montage, plus the review
+and audit set (`docs/plans/04-TOOL-ESTATE-INVENTORY.md` §2). They are **phase templates**, and they are
+what this type generalises. The type is new to the conveyor; the sequence it encodes is not new, and it
+was not invented for this spec.
+
+- **Phases are the blueprints' steps**, so `media` differs from project to project by *which* capabilities a
+  phase calls and in what order — not by a different state machine. `lesson` and `course` differ in that
+  `course` adds an outline phase and a per-lesson compilation phase above `lesson`'s own steps.
+- **The output is an artefact** in tenant-prefixed object storage with a content hash, referenced from the
+  WBS node that accepted it (§11.10). A phase is accepted when its artefact meets its criteria, not when
+  its checkbox is ticked (§5.3).
+- **QC is a phase, not a review habit.** A production project's acceptance is a scored check against the
+  artefact, recorded as evidence, so "the video is fine" is a row rather than an opinion.
+- **Publish is gated** because it is outward-facing and often a `spend` effect (§11.4).
+- ⚠️ **Not a second scheduler.** The sequencing that exists in the live estate today becomes a **procedure**
+  (§6.3 of the V1 spec, S11), never a ported orchestrator. A `media` project is a plan over cards and runs.
+
+The analysis family needs no type of its own: its blueprints are `delivery` projects whose phase evidence is
+an `analyse.*` result, which is why they appear in §10.4 as a capability family rather than a template.
 
 ### 5.3 Plan, state and execution are different things
 
@@ -1004,12 +1028,37 @@ in §11.8.
 | coach | `coach.interrupt`, `coach.triage`, `coach.remedy`, `coach.escalate` |
 | kata | `kata.open\|observe\|analyse\|propose\|measure\|adopt\|propagate\|close` |
 | development | `dev.open\|implement\|verify\|merge\|release\|rollback` (composes coding/git/CI actions) |
-| operations | `ops.incident\|triage\|mitigate\|resolve\|postmortem`, `ops.k8s_*`, `ops.git_*` |
+| operations | `ops.incident\|triage\|mitigate\|resolve\|postmortem`, `ops.k8s_*`, `ops.git_*`, `ops.host_*` (§10.4.1) |
+| analysis | `analyse.site`, `analyse.app`, `analyse.video`, `analyse.brand`, `analyse.content`, `analyse.report` |
+| production | `produce.brief`, `produce.script`, `produce.asset`, `produce.speech`, `produce.render`, `produce.still`, `produce.deck`, `produce.qc`, `produce.publish_youtube` |
 | tools | `tools.list\|get\|probe\|call\|publish\|retire`, `toolkits.import_openapi\|publish\|list`, `tool_bindings.create\|update\|retire`, `tool_calls.list`, `tool_authoring.draft\|validate\|test\|review` (§11.8) |
 | memory | `lessons.propose\|review\|promote` |
 | metrics | `metrics.flow`, `metrics.job`, `metrics.programme`, `metrics.maturity` |
 
 Every action is an `ActionSpec` (V1 §5.5): one declaration → HTTP + MCP + OpenAPI + generated client.
+
+#### 10.4.1 Two boundaries this table must not blur
+
+**`analyse.*` is not `metrics.*`.** `analyse` measures **the thing we were asked to look at** — a site, an
+application, a video, a brand's presence, a piece of content — and its result is **evidence** for a gate or a
+QC phase (§5.2.1). `metrics` and the eval slices (S17–S20) measure **this system's own process quality**: flow,
+quality, cost, governance, and scored evaluations of our runs. A capability that scores our work belongs to
+`metrics`/evals; a capability that scores the subject of the project belongs to `analyse`. Building the second
+inside the first is the double-build this paragraph exists to prevent.
+
+**`ops.host_*` is a different credential class from `ops.k8s_*`.** The cluster operations reach a namespaced
+API server under a service account. A host operation reaches a bare-metal machine and can restart anything on
+it. The family is declared here so a procedure can name the intent; the mechanism is T7's, and it is fixed to
+these constraints rather than left open:
+
+1. a **host registry** row names an addressable host and its role — a job never supplies a destination;
+2. a **per-host agent** holds the host credential; the conveyor pod holds none, mirroring the broker's rule
+   for tool destinations (§11.3);
+3. the agent answers a **forced-command** verb set, so a compromised conveyor cannot ask for an arbitrary
+   command;
+4. `destructive` effect applies in full — approval, dry run and dual control (§11.4).
+
+Until T7 lands that mechanism, `ops.host_*` operations do not exist and a procedure must not claim them.
 
 ### 10.5 UI additions
 
@@ -1081,8 +1130,8 @@ carries tool content, and the binding never widens the grant.
 | `scientific_processor` :8808 | meta-analysis, survival fitting, verification/trust scoring, sandboxed analysis | deployed; scaled to 0 today (measured 2026-11-11) — a binding needs a scale-up and a green probe | AHTAPol evidence |
 | `lean4_prover` :8812 (mini1 host) | Lean 4 typecheck/elaborate/prove over REST | live | verification, SOP formal checks |
 | `evidence_review` :8810 | protocol-locked PRISMA screening, blinded review, adjudication, inclusion export | built; not deployed | AHTAPol screening |
-| `w2v-orchestrator` :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on mini1) | deliverable runs and stage capabilities; rendered artifacts | live; **migration target — the stage fleet moves into the conveyor and is rewritten in Rust (D54)** | media production |
-| `video-compiler` :8200 | ffmpeg render/compile jobs (slide/footage → video), durable `compile_jobs`, MinIO outputs | live; migration candidate — joins the conveyor workspace when rewritten in Rust (D58) | media production |
+| `w2v-orchestrator` :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on mini1) | deliverable runs and stage capabilities; rendered artifacts | live; **migration target — rewritten in Rust in this workspace: `apps/media` executor images and the `analysis` library (ADR 0007, D54)** | media production |
+| `video-compiler` :8200 | ffmpeg render/compile jobs (slide/footage → video), durable `compile_jobs`, MinIO outputs | live; migration candidate — joins `apps/media`'s ffmpeg executor image when rewritten in Rust (ADR 0007, D58) | media production |
 | ops — Kubernetes API, GitHub API, Flux, Prometheus/Loki/Grafana | read verbs (pods, deployments, events, logs, metrics, CI); write verbs gated | live (read) / gated (write) | operations |
 | `billing_service`, `licenses` :8544 | usage and entitlement facts | live | project office, governance |
 | AHTAPol `discovery` :8807 | source discovery, harvest and surveillance over guideline, literature and HTA sources | planned (spec); catalogue `draft` — binds when its slice deploys it (D56) | AHTAPol evidence |
