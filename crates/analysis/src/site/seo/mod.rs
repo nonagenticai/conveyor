@@ -6,9 +6,12 @@
 //! score differently from the service it replaces, which is the one thing a port must not do.
 
 pub mod content_utils;
+pub mod keyword;
 pub mod mobile;
 pub mod on_page;
 pub mod readability;
+pub mod signals;
+pub mod snippet;
 pub mod social;
 pub mod structural;
 pub mod technical;
@@ -143,6 +146,8 @@ pub fn scan_audit(document: &Document, _as_of: &chrono::DateTime<chrono::Utc>) -
     let url = document.url.as_str();
     let mut findings = scan_parsed(&html, url);
     findings.extend(readability::check_readability(&html, url));
+    findings.extend(keyword::check_keyword(&html, url));
+    findings.extend(snippet::check_snippet(&html, url));
     findings
 }
 

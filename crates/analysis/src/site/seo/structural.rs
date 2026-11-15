@@ -30,7 +30,10 @@ pub fn check_canonical(html: &Html, url: &str) -> Vec<Finding> {
 
 /// The JSON-LD blocks on the page, parsed. A block that does not parse yields `Err(())` exactly
 /// once — the source reported one "invalid JSON-LD" finding per bad block, not per item.
-fn json_ld_blocks(html: &Html) -> Vec<Result<Value, ()>> {
+///
+/// Shared with the audit groups' signal reader, so the crate has one JSON-LD parser rather than
+/// two that can disagree about what counts as a block.
+pub(crate) fn json_ld_blocks(html: &Html) -> Vec<Result<Value, ()>> {
     let mut blocks = Vec::new();
     for script in all(html, "script") {
         if attr(&script, "type") != Some("application/ld+json") {

@@ -111,6 +111,25 @@ fn collapse(text: &str) -> String {
     whitespace_re().replace_all(text, " ").trim().to_owned()
 }
 
+/// An element's text with each text node trimmed, empties dropped, joined by a space.
+///
+/// This is BeautifulSoup's `get_text(" ", strip=True)` — the source's accessor for titles, H1s,
+/// anchor labels and headings. It is *not* [`main_text`] (which collapses runs) and not
+/// [`super::text`] (which concatenates): `<a>click <b>here</b></a>` is `"click here"` here and
+/// `"click here"`-as-one-token nowhere else.
+pub fn spaced_text(element: &ElementRef<'_>) -> String {
+    let mut parts: Vec<&str> = Vec::new();
+    for node in element.descendants() {
+        if let Node::Text(text) = node.value() {
+            let trimmed = text.trim();
+            if !trimmed.is_empty() {
+                parts.push(trimmed);
+            }
+        }
+    }
+    parts.join(" ")
+}
+
 /// Lowercased alphabetic word tokens from a text blob.
 pub fn words(text: &str) -> Vec<String> {
     word_re()
