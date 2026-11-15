@@ -1,0 +1,6 @@
+POST
+/license/introspect
+-H
+Content-Type: application/json
+--data-raw
+{"token":"golden-synthetic-unknown-token-0000000000000000"}

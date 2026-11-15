@@ -1,0 +1,4 @@
+{
+  "note": "A tolerance is a claim about ONE captured case: it names a pointer removed from BOTH sides and the reason the difference is not a property of the implementation. The list is empty today because the authenticated golden set has not been captured yet (it lands in the parity close-out slice); an empty list passes verify.sh/shadow.sh's reason check by construction, not by excusing anything. Four differences are already known and must be attached to their cases, with a reason, when the corpus lands: (1) the reference's NullPool connection-retry seam has no Rust counterpart; (2) FastAPI's 422 validation body versus axum's — the Rust schemas were aligned to HTTPValidationError.detail, so this may no longer be needed, and it must be re-measured before it is ever recorded; (3) a malformed resource_access claim; (4) the reference's fixed 60 s last_used_at throttle. Each is a row here with its case and reason, or it is not a tolerance.",
+  "tolerances": []
+}

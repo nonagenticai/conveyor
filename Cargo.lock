@@ -871,6 +871,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-licenses"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "base64 0.23.1",
+ "chrono",
+ "clap",
+ "conveyor-auth",
+ "conveyor-domain",
+ "conveyor-platform",
+ "getrandom 0.3.4",
+ "jsonwebtoken",
+ "metrics-exporter-prometheus",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "sqlx",
+ "thiserror",
+ "tokio",
+ "tower",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
 name = "conveyor-platform"
 version = "0.1.0"
 dependencies = [
