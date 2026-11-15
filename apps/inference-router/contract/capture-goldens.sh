@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Capture the golden set from a running inference-router.
 #
-#   capture-goldens.sh --live http://HOST:PORT --out DIR
+#   capture-goldens.sh --live http://HOST:PORT --out DIR [--image-digest sha256:...]
 #
 # Run it against the PINNED OLD IMAGE (see contract/manifest.json). The output is the oracle:
 # every later slice is measured against it, and `verify.sh` replays the same cases against a
 # candidate. This script never talks to the Rust rewrite — a golden set regenerated from the
-# implementation under test proves nothing.
+# implementation under test proves nothing. `--image-digest` is the pin the caller pulled
+# (`oracle.sh` passes the manifest digest); it is recorded in `capture.json` beside the cases.
 #
 # Determinism: responses are normalised before they are written (see normalize below). The
 # normaliser only ever REMOVES information that cannot be stable across runs — a clock, a
@@ -17,15 +18,17 @@ set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 live=""
 out="$here/golden"
+digest=""
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --live) live="${2:-}"; shift 2 ;;
         --out) out="${2:-}"; shift 2 ;;
-        *) echo "usage: $0 --live URL [--out DIR]" >&2; exit 2 ;;
+        --image-digest) digest="${2:-}"; shift 2 ;;
+        *) echo "usage: $0 --live URL [--out DIR] [--image-digest sha256:...]" >&2; exit 2 ;;
     esac
 done
-[ -n "$live" ] || { echo "usage: $0 --live URL [--out DIR]" >&2; exit 2; }
+[ -n "$live" ] || { echo "usage: $0 --live URL [--out DIR] [--image-digest sha256:...]" >&2; exit 2; }
 live="${live%/}"
 command -v jq >/dev/null || { echo "missing jq" >&2; exit 2; }
 command -v curl >/dev/null || { echo "missing curl" >&2; exit 2; }
@@ -191,4 +194,28 @@ request replay_list   GET '/api/replay/invocation-log?limit=1'
 request canary_get    GET /api/canary/prompt/golden-worker
 request admin_catalog GET /api/admin/catalog
 
-echo "wrote $(ls -1 "$out"/*.status 2>/dev/null | wc -l | tr -d ' ') cases to $out"
+cases="$(ls -1 "$out"/*.status 2>/dev/null | wc -l | tr -d ' ')"
+echo "wrote $cases cases to $out"
+
+# Provenance, written by the capture itself rather than asserted in prose: the image digest the
+# ORACLE was pulled by (`oracle.sh` passes the manifest pin), whether the ledger was reset before
+# the run, and a hash over the case files so this record cannot be decoupled from the bytes it
+# describes. The whole contract rests on the goldens coming from the reference, so the evidence of
+# which image produced them travels WITH them.
+if command -v sha256sum >/dev/null 2>&1; then sha() { sha256sum; }; else sha() { shasum -a 256; }; fi
+golden_sha="$(
+    cd "$out" && LC_ALL=C ls -1 *.body *.content-type *.request *.status 2>/dev/null | LC_ALL=C sort |
+        while IFS= read -r file; do printf '%s\n' "$file"; cat "$file"; done | sha | cut -d' ' -f1
+)"
+ledger_reset="false"
+[ -n "${IR_PSQL:-}" ] && ledger_reset="true"
+jq -n \
+    --arg digest "$digest" \
+    --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    --argjson cases "$cases" \
+    --argjson ledger_reset "$ledger_reset" \
+    --arg golden_sha "$golden_sha" \
+    '{service:"inference-router-goldens", image_digest:$digest, captured_at:$at,
+      cases:$cases, ledger_reset:$ledger_reset, golden_sha256:$golden_sha}' \
+    > "$out/capture.json"
+echo "wrote $out/capture.json (image ${digest:-unpinned}, ledger_reset $ledger_reset, sha $golden_sha)"
