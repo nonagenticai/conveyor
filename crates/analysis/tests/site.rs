@@ -160,3 +160,73 @@ fn duplicate_findings_are_collapsed_before_scoring() {
     ids.dedup();
     assert_eq!(ids.len(), total, "no check id appears twice");
 }
+
+/// A page built to fail every audit group at once: 250 repeated words, no question heading, no
+/// author, no contact or privacy link, no citations, no date, no structured data, no internal
+/// links, and a title that does not carry the dominant term.
+fn fails_every_audit_group() -> String {
+    format!(
+        "<html><head><title>Ordinary heading</title></head><body><main><h1>Ordinary heading</h1>\
+         <p>{}</p></main></body></html>",
+        std::iter::repeat_n("padding", 250)
+            .collect::<Vec<_>>()
+            .join(" ")
+    )
+}
+
+#[test]
+fn audit_groups_all_run_in_one_pass() {
+    let html = fails_every_audit_group();
+    let report = at_fixed_instant(&Document::new("https://example.test/", &html));
+    let ids: Vec<&str> = report.findings.iter().map(|f| f.check_id()).collect();
+    for expected in [
+        "seo-content-thin",
+        "seo-keyword-missing-in-title",
+        "seo-snippet-no-question-heading",
+        "seo-eeat-no-privacy-link",
+        "seo-schema-no-organization",
+        "seo-linking-no-internal",
+        "seo-geo-no-author-entity",
+    ] {
+        assert!(ids.contains(&expected), "{expected} missing from {ids:?}");
+    }
+}
+
+#[test]
+fn audit_schema_flags_missing_organization_and_lowers_the_group() {
+    let report = at_fixed_instant(&Document::new("https://example.test/", BARE));
+    let ids: Vec<&str> = report.findings.iter().map(|f| f.check_id()).collect();
+    assert!(ids.contains(&"seo-schema-no-organization"), "got {ids:?}");
+    let schema = report.scorecard.buckets["schema"];
+    assert!(schema < 100.0, "the schema group score is {schema}");
+}
+
+#[test]
+fn an_empty_group_scores_one_hundred_and_stays_in_the_breakdown() {
+    // The bare page is far too short for the snippet group to assess, so it has no findings there.
+    let report = at_fixed_instant(&Document::new("https://example.test/", BARE));
+    let ids: Vec<&str> = report.findings.iter().map(|f| f.check_id()).collect();
+    assert!(
+        !ids.iter().any(|id| id.starts_with("seo-snippet-")),
+        "got {ids:?}"
+    );
+    assert_eq!(report.scorecard.buckets.get("snippet"), Some(&100.0));
+}
+
+#[test]
+fn audit_geo_measures_age_against_the_supplied_instant() {
+    let html = format!(
+        "<html><head><title>Ordinary</title></head><body><main><p>{}</p>\
+         <script type=\"application/ld+json\">{{\"@type\": \"Person\", \"name\": \"A\", \
+         \"datePublished\": \"2021-01-01\"}}</script></main></body></html>",
+        std::iter::repeat_n("padding", 210)
+            .collect::<Vec<_>>()
+            .join(" ")
+    );
+    let report = at_fixed_instant(&Document::new("https://example.test/", &html));
+    let ids: Vec<&str> = report.findings.iter().map(|f| f.check_id()).collect();
+    assert!(
+        ids.contains(&"seo-geo-stale-content"),
+        "a 2021 date is stale at the fixed 2026 instant: {ids:?}"
+    );
+}

@@ -1,4 +1,5 @@
-//! The SEO scan: nineteen base checks, their audit groups, and the group scorecard.
+//! The SEO scan: the nineteen base checks, the seven deterministic audit groups, and the group
+//! scorecard.
 //!
 //! The check list and its order are the source scanner's (`SEOScanner.scan`), because the order
 //! is what a caller sees in `findings` and dedupe keeps first-seen order. The group weights and
@@ -7,6 +8,7 @@
 
 pub mod content_utils;
 pub mod eeat;
+pub mod geo;
 pub mod internal_linking;
 pub mod keyword;
 pub mod mobile;
@@ -144,7 +146,7 @@ pub fn scan(document: &Document) -> Vec<Finding> {
 /// (`seo-geo-ai-crawler-blocked`, `seo-geo-no-llms-txt`) needs a fetch, and fetching belongs to
 /// `apps/research`/`apps/media`. The LLM annotations (`seo-keyword-intent`, `seo-eeat-depth`)
 /// need a model; they are deferred, not forgotten.
-pub fn scan_audit(document: &Document, _as_of: &chrono::DateTime<chrono::Utc>) -> Vec<Finding> {
+pub fn scan_audit(document: &Document, as_of: &chrono::DateTime<chrono::Utc>) -> Vec<Finding> {
     let html = Html::parse_document(&document.html);
     let url = document.url.as_str();
     let mut findings = scan_parsed(&html, url);
@@ -154,6 +156,7 @@ pub fn scan_audit(document: &Document, _as_of: &chrono::DateTime<chrono::Utc>) -
     findings.extend(eeat::check_eeat(&html, url));
     findings.extend(schema_coverage::check_schema_coverage(&html, url));
     findings.extend(internal_linking::check_internal_linking(&html, url));
+    findings.extend(geo::check_geo(&html, url, *as_of));
     findings
 }
 
