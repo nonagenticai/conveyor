@@ -277,6 +277,9 @@ async fn a_failover_bills_each_attempt_with_its_own_tokens() {
         .expect("router answers");
     assert_eq!(response.status(), axum::http::StatusCode::OK);
 
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["served_provider"], "stub-openai");
+
     let events = recorder.0.lock().expect("recorder");
     assert_eq!(events.len(), 2, "one event per provider attempt");
     // The failed first attempt spent nothing billable, and must not inherit the served usage.
@@ -289,9 +292,6 @@ async fn a_failover_bills_each_attempt_with_its_own_tokens() {
     assert_eq!(events[1].input_tokens, 7);
     assert_eq!(events[1].output_tokens, 3);
     assert!(events[1].fallback_used);
-
-    let row = one_row(&db.pool).await;
-    assert_eq!(row["served_provider"], "stub-openai");
 }
 
 #[tokio::test]
