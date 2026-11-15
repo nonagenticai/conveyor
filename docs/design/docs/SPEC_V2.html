@@ -1820,13 +1820,13 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><code>w2v-orchestrator</code> :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on mini1)</td>
 <td>deliverable runs and stage capabilities; rendered artifacts</td>
-<td>live; <strong>migration target — the stage fleet moves into the conveyor and is rewritten in Rust (D54)</strong></td>
+<td>live; <strong>migration target — rewritten in Rust into the public <code>media</code> executor images and the <code>analysis</code> library (ADR 0007, D54)</strong>, bound through the same job and artefact contracts</td>
 <td>media production</td>
 </tr>
 <tr>
 <td><code>video-compiler</code> :8200</td>
 <td>ffmpeg render/compile jobs (slide/footage → video), durable <code>compile_jobs</code>, MinIO outputs</td>
-<td>live; migration candidate — joins the conveyor workspace when rewritten in Rust (D58)</td>
+<td>live; migration candidate — joins the <code>media</code> executor images when rewritten in Rust (ADR 0007, D58)</td>
 <td>media production</td>
 </tr>
 <tr>
