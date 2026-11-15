@@ -308,6 +308,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
     },
     {
+      "title": "frontendtestrunnerservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-frontend_test_runner_service.html",
+      "source": "docs/evidence/media-frontend_test_runner_service.md",
+      "section": "Evidence",
+      "sha256": "1fa8ef82bd83ac39536f58a7bfe61b1624fb8149e8f3cb2f794100efdbfdb405",
+      "bytes": 3241,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-frontend_test_runner_service.md"
+    },
+    {
       "title": "htmlrenderservice absorption — evidence (2026-11-15)",
       "path": "docs/evidence/media-html_render_service.html",
       "source": "docs/evidence/media-html_render_service.md",
