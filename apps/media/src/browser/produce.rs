@@ -1676,30 +1676,39 @@ impl Chrome {
         width: u32,
         height: u32,
     ) -> Result<(), CapabilityError> {
-        let finished = self
-            .run(vec![
-                format!("--window-size={width},{height}"),
-                format!("--screenshot={}", output.display()),
-                format!("file://{}", page.display()),
-            ])
-            .await?;
-        if !finished.ok() {
-            return Err(CapabilityError::Failed(format!(
-                "the browser failed to screenshot {page:?}: {}",
-                finished.tail()
-            )));
+        // One retry, and the reason is measured rather than defensive: the lock above is
+        // per-process, so two test binaries (nextest runs each test in its own process) still
+        // launch Chromium at the same moment, and under that contention the browser's own
+        // teardown watchdog fires (`Teardown watchdog expired; recording dump and terminating`)
+        // and the frame is never written. A fresh launch with a fresh profile succeeds; a real
+        // page error fails twice and is reported.
+        let mut last = String::new();
+        for _ in 0..2 {
+            let finished = self
+                .run(vec![
+                    format!("--window-size={width},{height}"),
+                    format!("--screenshot={}", output.display()),
+                    format!("file://{}", page.display()),
+                ])
+                .await?;
+            if !finished.ok() {
+                last = finished.tail();
+                continue;
+            }
+            let bytes = std::fs::read(output).map_err(|error| {
+                CapabilityError::Failed(format!(
+                    "the browser reported success but wrote no screenshot at {output:?}: {error}"
+                ))
+            })?;
+            if bytes.is_empty() {
+                last = "the browser wrote an empty screenshot".to_string();
+                continue;
+            }
+            return Ok(());
         }
-        let bytes = std::fs::read(output).map_err(|error| {
-            CapabilityError::Failed(format!(
-                "the browser reported success but wrote no screenshot at {output:?}: {error}"
-            ))
-        })?;
-        if bytes.is_empty() {
-            return Err(CapabilityError::Failed(format!(
-                "the browser wrote an empty screenshot at {output:?}"
-            )));
-        }
-        Ok(())
+        Err(CapabilityError::Failed(format!(
+            "the browser failed to screenshot {page:?} twice: {last}"
+        )))
     }
 
     async fn dump_dom(&self, page: &Path) -> Result<String, CapabilityError> {
