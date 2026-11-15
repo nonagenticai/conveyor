@@ -15,11 +15,11 @@ pub mod export;
 pub mod memory_consolidate;
 pub mod prompt_audit_run;
 pub mod publish;
-pub mod publish_outputs;
+// The pack builders live in `conveyor-pack` so the API can serve the same bytes the CLI writes.
+pub use conveyor_pack::{outputs as publish_outputs, snapshot};
 pub mod sandbox;
 pub mod seed;
 pub mod shutdown;
-pub mod snapshot;
 pub mod telemetry;
 pub mod worker;
 

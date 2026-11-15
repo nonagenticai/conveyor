@@ -314,3 +314,121 @@ async fn organisation_is_populated_for_a_seeded_tenant() {
 
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+/// The live window and the CLI write the same bytes from the same rows.
+///
+/// This is the parity gate that lets the API serve `snapshot.js`/`outputs.js`/pages from
+/// Postgres instead of the generated files: one library, one renderer, two consumers.
+#[tokio::test]
+async fn the_live_view_and_the_cli_write_the_same_bytes() {
+    let db = common::TestDb::fresh().await;
+
+    let tenant_uuid: Uuid = sqlx::query_scalar(
+        "INSERT INTO tenant (slug, name) VALUES ('snap-live', 'Live snapshot') RETURNING id",
+    )
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("tenant");
+    let tenant = conveyor_domain::TenantId::from_uuid(tenant_uuid).expect("tenant id");
+    let programme: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'live programme') RETURNING id",
+    )
+    .bind(tenant_uuid)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("programme");
+    let project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name, programme_id)
+         VALUES ($1, 'LIVE', 'Live project', $2) RETURNING id",
+    )
+    .bind(tenant_uuid)
+    .bind(programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("project");
+
+    let body = "# Live output\n\nOne row, two consumers.\n";
+    let document_id = Uuid::now_v7();
+    let mut tx = conveyor_store::begin_scoped(&db.owner, tenant)
+        .await
+        .expect("scoped write");
+    conveyor_store::document::create_document_tx(
+        &mut *tx,
+        tenant,
+        &conveyor_store::document::NewDocument {
+            id: document_id,
+            project_id: Some(project),
+            kind: "document".to_owned(),
+            title: "Live output".to_owned(),
+            status: "active".to_owned(),
+            object_key: None,
+            content_hash: Some(sha256_hex(body.as_bytes())),
+            card_id: None,
+            body: Some(body.to_owned()),
+            external_ref: None,
+            meta: json!({"category": "evidence"}),
+            publishable: true,
+        },
+    )
+    .await
+    .expect("compose the live output");
+    tx.commit().await.expect("commit");
+
+    let dir = std::env::temp_dir().join(format!("conveyor-live-parity-{}", Uuid::now_v7()));
+    std::fs::create_dir_all(&dir).expect("snapshot dir");
+    let issues_path = dir.join("issues.json");
+    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
+    let issues: Value = serde_json::from_str(r#"{"issues": []}"#).expect("issues json");
+    let feedback = "https://example.test/feedback";
+    let git_sha = "0123456789abcdef0123456789abcdef01234567";
+
+    let view = conveyor_pack::live::site_view(
+        &db.runtime,
+        conveyor_pack::live::SiteArgs {
+            tenant,
+            tenant_slug: "snap-live",
+            issues,
+            feedback_url: feedback,
+            git_sha,
+        },
+    )
+    .await
+    .expect("the live view");
+
+    conveyor_server::snapshot::run_with_pool(
+        &db.runtime,
+        SnapshotArgs {
+            tenant: "snap-live".to_owned(),
+            out: dir.clone(),
+            outputs_dir: Some(dir.join("docs")),
+            generated_at: Some(view.generated_at.clone()),
+            issues: issues_path,
+            feedback_url: feedback.to_owned(),
+            database_url: None,
+            git_sha: Some(git_sha.to_owned()),
+        },
+    )
+    .await
+    .expect("the CLI snapshot");
+
+    assert_eq!(
+        std::fs::read(dir.join("snapshot.js")).expect("snapshot.js"),
+        view.snapshot_js.as_bytes(),
+        "the CLI and the live route write one snapshot"
+    );
+    assert_eq!(
+        std::fs::read(dir.join("docs/outputs.js")).expect("outputs.js"),
+        view.outputs_js.as_bytes(),
+        "the CLI and the live route write one output index"
+    );
+    assert_eq!(
+        std::fs::read(dir.join(format!("docs/output-{document_id}.html"))).expect("output page"),
+        view.pages
+            .get(&document_id)
+            .expect("the live page")
+            .as_bytes(),
+        "the CLI and the live route render one page"
+    );
+
+    let _ = std::fs::remove_dir_all(&dir);
+}

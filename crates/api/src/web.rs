@@ -82,12 +82,18 @@ pub(crate) fn site_config(state: &AppState) -> SiteConfig {
     }
 }
 
-/// The router fallback: the static UI when this build carries one, otherwise the API's 404.
+/// The router fallback: the live design window, then the static UI, then the API's 404.
 pub(crate) async fn not_found_or_web(
     State(state): State<AppState>,
     method: Method,
     uri: Uri,
+    headers: HeaderMap,
 ) -> Response {
+    // The live window answers first: these paths must come from Postgres, never from a stale
+    // file baked into the image.
+    if let Some(response) = crate::design::serve(&state, &method, &uri, &headers).await {
+        return response;
+    }
     let root = web_root();
     if let Some(response) = serve(&site_config(&state), root.as_deref(), &method, &uri).await {
         return response;
@@ -157,7 +163,7 @@ async fn serve(
 }
 
 /// The site root: `CONVEYOR_WEB_ROOT` when set, else `/srv/site` when the image carries one.
-fn web_root() -> Option<PathBuf> {
+pub(crate) fn web_root() -> Option<PathBuf> {
     if let Ok(raw) = std::env::var("CONVEYOR_WEB_ROOT") {
         let raw = raw.trim();
         if !raw.is_empty() {

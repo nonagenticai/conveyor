@@ -27,6 +27,8 @@ conveyor-auth = { path = "../../crates/auth" }
 # S13: the relay publishes to the care-bus and the worker consumes it (CONTRACT §7).
 conveyor-bus = { path = "../../crates/bus" }
 conveyor-domain = { path = "../../crates/domain" }
+# The public design pack: the snapshot and output builders the CLI and the live routes share.
+conveyor-pack = { path = "../../crates/pack" }
 conveyor-store = { path = "../../crates/store" }
 # The S17 sandbox talks to the Kubernetes API directly (no `kube`: five REST calls), and the
 # SSE gate reads a stream chunk by chunk from a real socket.
@@ -36,8 +38,6 @@ serde_json = { workspace = true }
 regex = { workspace = true }
 # The eval audit writes its control scores as `NUMERIC`; the conversion stays in Rust.
 rust_decimal = { workspace = true }
-# Platform outputs: the publish-time Markdown -> HTML renderer.
-pulldown-cmark = { workspace = true }
 # The sandbox Job name's truncation hash.
 sha2 = { workspace = true }
 thiserror = { workspace = true }

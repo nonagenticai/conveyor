@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const path = require("node:path");
 const os = require("node:os");
 const { pathToFileURL } = require("node:url");
-const base = pathToFileURL(path.resolve(__dirname, "../studio.html")).href;
+const base = pathToFileURL(path.resolve(__dirname, "../studio.html")).href + "?design=1";
 
 (async () => {
   const browser = await chromium.launch({
