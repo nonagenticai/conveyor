@@ -1,0 +1,1 @@
+{"name":"standard","description":"Standard 1080p compilation","target_width":1920,"target_height":1080,"crf":20,"fps":30,"transition_type":"smart","crossfade_duration":0.5}

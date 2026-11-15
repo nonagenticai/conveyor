@@ -1,0 +1,1 @@
+{"status":"healthy","components":{"database":"healthy","redis":"healthy","storage":"healthy","api":"healthy"},"concurrency":{"active":0,"queued":0,"max_concurrent":6,"per_pod_max":3,"queue_wait_timeout_seconds":300.0,"available_slots":6}}
