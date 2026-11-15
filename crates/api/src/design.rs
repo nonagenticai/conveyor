@@ -115,12 +115,7 @@ pub async fn serve(
     Some(answer(state, live, head, headers).await)
 }
 
-async fn answer(
-    state: &AppState,
-    live: LivePath,
-    head: bool,
-    headers: &HeaderMap,
-) -> Response {
+async fn answer(state: &AppState, live: LivePath, head: bool, headers: &HeaderMap) -> Response {
     let Some(slug) = state.config.public_tenant.as_deref() else {
         return miss(StatusCode::NOT_FOUND, "no public tenant is configured");
     };
@@ -142,8 +137,14 @@ async fn answer(
     };
 
     let (bytes, content_type) = match &live {
-        LivePath::Snapshot => (view.snapshot_js.as_bytes(), "application/javascript; charset=utf-8"),
-        LivePath::Outputs => (view.outputs_js.as_bytes(), "application/javascript; charset=utf-8"),
+        LivePath::Snapshot => (
+            view.snapshot_js.as_bytes(),
+            "application/javascript; charset=utf-8",
+        ),
+        LivePath::Outputs => (
+            view.outputs_js.as_bytes(),
+            "application/javascript; charset=utf-8",
+        ),
         LivePath::Page(id) => match view.pages.get(id) {
             Some(page) => (page.as_bytes(), "text/html; charset=utf-8"),
             None => return miss(StatusCode::NOT_FOUND, "no such output"),
@@ -165,10 +166,7 @@ enum Reason {
 }
 
 /// Serve the cached view when fresh, otherwise rebuild it under a single-flight lock.
-async fn build_or_cached(
-    state: &AppState,
-    slug: &str,
-) -> Result<(Arc<SiteView>, bool), Reason> {
+async fn build_or_cached(state: &AppState, slug: &str) -> Result<(Arc<SiteView>, bool), Reason> {
     let mut guard = state.design.inner.lock().await;
 
     if let Some(cached) = guard.as_ref()

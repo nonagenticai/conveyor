@@ -287,7 +287,7 @@ jobs:
           persist-credentials: false
 
       - name: build
-        run: docker build --file Dockerfile --tag "$IMG" .
+        run: docker build --file Dockerfile --build-arg GIT_SHA="$GITHUB_SHA" --tag "$IMG" .
 
       # The default smoke would start the server, which exits on the missing DATABASE_URL /
       # BIND_ADDR / OIDC issuer before proving anything; instead check that the binary runs and

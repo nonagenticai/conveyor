@@ -17,8 +17,8 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use conveyor_domain::TenantId;
 use conveyor_domain::Project;
+use conveyor_domain::TenantId;
 use conveyor_store as store;
 use conveyor_store::document::DocumentRecord;
 use pulldown_cmark::{CowStr, Event, Options, Parser, Tag, html};

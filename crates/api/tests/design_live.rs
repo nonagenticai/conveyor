@@ -89,7 +89,10 @@ async fn the_live_window_serves_published_rows_and_hides_the_rest() {
         .expect("an ETag")
         .to_owned();
     let snapshot = response.text().await.expect("snapshot");
-    assert!(snapshot.starts_with("window.CONVEYOR_SNAPSHOT = {"), "{snapshot}");
+    assert!(
+        snapshot.starts_with("window.CONVEYOR_SNAPSHOT = {"),
+        "{snapshot}"
+    );
     assert!(snapshot.contains("\"tenant\":\"public\""), "{snapshot}");
     assert!(snapshot.contains("0123456789abcdef"), "{snapshot}");
 
@@ -129,15 +132,14 @@ async fn the_live_window_serves_published_rows_and_hides_the_rest() {
     assert!(!index.contains(&foreign), "{index}");
 
     // One rendered page carries the Markdown as HTML.
-    let page = get(
-        &running,
-        &format!("/design/docs/output-{published}.html"),
-    )
-    .await;
+    let page = get(&running, &format!("/design/docs/output-{published}.html")).await;
     assert_eq!(page.status(), 200);
     let page = page.text().await.expect("page");
     assert!(page.contains("<h1>Programme note</h1>"), "{page}");
-    assert!(page.contains("A decision recorded from the console."), "{page}");
+    assert!(
+        page.contains("A decision recorded from the console."),
+        "{page}"
+    );
 
     // A private row, a foreign row and a malformed id are live 404s that are never cached.
     for path in [
