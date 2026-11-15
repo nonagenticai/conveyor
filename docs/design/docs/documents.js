@@ -150,8 +150,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-13-inference-router-absorption.html",
       "source": "docs/evidence/2026-11-13-inference-router-absorption.md",
       "section": "Evidence",
-      "sha256": "b86c0d474d47e5ccf8ade98c3555728e44d6f35901694e9de7016b7218fc28bb",
-      "bytes": 6631,
+      "sha256": "dc005f38374c32cb622e0a627c97330f4a9df0917f32b58aba7d3113ef1040d0",
+      "bytes": 8155,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-13-inference-router-absorption.md"
     },
     {

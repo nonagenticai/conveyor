@@ -105,11 +105,22 @@ pub const OUTCOME_EMPTY_RESULT: &str = "empty_result";
 /// The attempt failed; `ProviderAttempt::failure` says how.
 pub const OUTCOME_ERROR: &str = "error";
 
+/// The `path` label: how this attempt was reached. Fixed at dispatch and never derived from
+/// traffic, so the four values partition every attempt exactly once — the reference's
+/// `_PATH_ROUTED` / `_PATH_ROUTED_STREAM` / `_PATH_PINNED` / `_PATH_PINNED_STREAM`.
+pub const PATH_ROUTED: &str = "routed";
+pub const PATH_ROUTED_STREAM: &str = "routed_stream";
+pub const PATH_PINNED: &str = "pinned";
+pub const PATH_PINNED_STREAM: &str = "pinned_stream";
+
 /// One dispatch attempt, in the order it happened. This is the unit the cost bus is billed on:
 /// a request that fails over spends money on every attempt, not only on the one that served it.
 #[derive(Debug, Clone)]
 pub struct ProviderAttempt {
     pub provider: String,
+    /// How the attempt was reached (policy/global chain vs the caller's `X-Provider` pin). Rides
+    /// the attempt so the metric write path cannot disagree with how the request was dispatched.
+    pub path: &'static str,
     /// The upstream model id this attempt was sent with (`None` = the provider's default).
     pub model_override: Option<String>,
     /// Measured around the provider call, so it includes the concurrency-slot wait — what the
@@ -293,6 +304,7 @@ impl RouterService {
         let result = open_stream(provider, name, model_override, request).await;
         attempts.push(attempt_of_stream(
             name,
+            PATH_PINNED_STREAM,
             model_override,
             started,
             result.as_ref().err(),
@@ -350,6 +362,7 @@ impl RouterService {
             let result = open_stream(provider, name, model_override, request).await;
             attempts.push(attempt_of_stream(
                 name,
+                PATH_ROUTED_STREAM,
                 model_override,
                 started,
                 result.as_ref().err(),
@@ -389,6 +402,7 @@ impl RouterService {
                 open_stream(provider, &hop.hop.target.provider, model_override, request).await;
             attempts.push(attempt_of_stream(
                 &hop.hop.target.provider,
+                PATH_ROUTED_STREAM,
                 model_override,
                 started,
                 result.as_ref().err(),
@@ -515,7 +529,13 @@ impl RouterService {
         loop {
             let started = Instant::now();
             let result = provider.complete(request, model_override).await;
-            attempts.push(attempt_of(name, model_override, started, &result));
+            attempts.push(attempt_of(
+                name,
+                PATH_PINNED,
+                model_override,
+                started,
+                &result,
+            ));
             match result {
                 Ok(upstream) => {
                     let mut response = upstream.response;
@@ -601,7 +621,13 @@ impl RouterService {
                 .map(String::as_str);
             let started = Instant::now();
             let result = provider.complete(request, model_override).await;
-            attempts.push(attempt_of(name, model_override, started, &result));
+            attempts.push(attempt_of(
+                name,
+                PATH_ROUTED,
+                model_override,
+                started,
+                &result,
+            ));
             match result {
                 Ok(upstream) => {
                     let mut response = upstream.response;
@@ -692,7 +718,13 @@ impl RouterService {
             let model_override = Some(hop.hop.model.as_str());
             let started = Instant::now();
             let result = provider.complete(request, model_override).await;
-            attempts.push(attempt_of(provider_name, model_override, started, &result));
+            attempts.push(attempt_of(
+                provider_name,
+                PATH_ROUTED,
+                model_override,
+                started,
+                &result,
+            ));
             match result {
                 Ok(upstream) => {
                     let mut response = upstream.response;
@@ -777,6 +809,7 @@ fn key_owner(kind: &str) -> &'static str {
 /// Snapshot one attempt before its result is consumed: the chain keeps the last error.
 fn attempt_of(
     provider: &str,
+    path: &'static str,
     model_override: Option<&str>,
     started: Instant,
     result: &Result<provider::UpstreamResponse, UpstreamError>,
@@ -797,6 +830,7 @@ fn attempt_of(
     };
     ProviderAttempt {
         provider: provider.to_owned(),
+        path,
         model_override: model_override.map(str::to_owned),
         latency: started.elapsed(),
         outcome,
@@ -838,12 +872,14 @@ async fn open_stream(
 /// hashes the request fingerprint instead of upstream text.
 fn attempt_of_stream(
     provider: &str,
+    path: &'static str,
     model_override: Option<&str>,
     started: Instant,
     failure: Option<&UpstreamError>,
 ) -> ProviderAttempt {
     ProviderAttempt {
         provider: provider.to_owned(),
+        path,
         model_override: model_override.map(str::to_owned),
         latency: started.elapsed(),
         outcome: if failure.is_some() {

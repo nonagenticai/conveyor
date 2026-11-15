@@ -17,6 +17,7 @@ pub mod whoami;
 use axum::Router;
 use axum::routing::{get, patch, post};
 
+use crate::metrics;
 use crate::state::AppState;
 
 /// `(METHOD, path)` for every operation this service registers.
@@ -140,6 +141,21 @@ pub fn openapi() -> utoipa::openapi::OpenApi {
 
 /// The HTTP application the binary serves.
 pub fn router(state: AppState) -> Router {
+    // Both completion paths, wrapped in one admission counter. The reference's middleware counts a
+    // POST on exactly these two routes, before the body is parsed — so its 422 is counted and the
+    // handler's own 401 is not. `/v1/chat/completions` is the OpenAI-SDK alias, deliberately NOT in
+    // `ROUTES`/utoipa for the same reason as `/v1/models`: the reference registers it
+    // `include_in_schema=False`, and `--check-lock` compares against the captured 27.
+    let completions: Router<AppState> = Router::new()
+        .route(
+            "/api/chat/completions",
+            post(completions::create_chat_completion),
+        )
+        .route(
+            "/v1/chat/completions",
+            post(completions::create_chat_completion),
+        )
+        .route_layer(axum::middleware::from_fn(metrics::count_completion_request));
     Router::new()
         .route("/", get(health::root))
         .route("/health", get(health::health))
@@ -156,10 +172,7 @@ pub fn router(state: AppState) -> Router {
             get(providers::list_provider_models),
         )
         .route("/api/whoami", get(whoami::whoami))
-        .route(
-            "/api/chat/completions",
-            post(completions::create_chat_completion),
-        )
+        .merge(completions)
         .route(
             "/api/internal/inference-calls",
             get(ledger::list_inference_calls),
