@@ -72,6 +72,8 @@ pub mod prompt;
 pub mod prompt_audit;
 pub mod quality;
 mod run;
+// ADR 0007 §Decision 4: the runner/v1 contract between the conveyor and a stateless executor.
+pub mod runner;
 pub mod template;
 pub mod validate;
 
@@ -96,6 +98,10 @@ pub use governance::{
 };
 pub use ids::{Id, IdError, TenantId, Version};
 pub use run::{Run, RunError, RunStatus};
+pub use runner::{
+    Artefact, ContractError, ErrorClass, ErrorInfo, Input, Instruction, Limits, Output, RunResult,
+    Status,
+};
 
 pub use chrono::{DateTime, Utc};
 pub use uuid::Uuid;

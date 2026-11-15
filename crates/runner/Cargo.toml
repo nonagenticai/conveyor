@@ -1,0 +1,17 @@
+[package]
+name = "conveyor-runner"
+description = "Job dispatch to stateless executors: the batch/v1 client and the runner/v1 Job spec (ADR 0007)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+conveyor-domain = { path = "../domain" }
+# The same choice recorded in `apps/server/src/sandbox.rs`: five REST calls, not `kube`.
+reqwest = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
