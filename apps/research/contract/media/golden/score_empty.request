@@ -1,0 +1,2 @@
+POST /api/score
+{"item_ids":[]}

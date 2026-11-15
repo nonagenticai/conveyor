@@ -1,0 +1,2 @@
+POST /api/score/batch
+{"item_ids":[]}

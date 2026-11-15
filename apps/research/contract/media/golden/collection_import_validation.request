@@ -1,0 +1,2 @@
+POST /api/collections/import
+{"source_url":"not-a-url","name":"golden"}

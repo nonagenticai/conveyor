@@ -953,6 +953,7 @@ name = "conveyor-research"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "chrono",
  "clap",
  "http-body-util",
  "regex",
@@ -960,12 +961,14 @@ dependencies = [
  "scraper",
  "serde",
  "serde_json",
+ "sqlx",
  "thiserror",
  "tokio",
  "tower",
  "tracing",
  "tracing-subscriber",
  "url",
+ "uuid",
 ]
 
 [[package]]

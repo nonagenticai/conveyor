@@ -4,7 +4,7 @@
 #   bash scripts/ci/gate.sh
 #
 # Requires: the toolchain from rust-toolchain.toml, cargo-nextest, and Docker with a running
-# daemon. cargo-audit and gitleaks are optional and reported as skipped when absent.
+# daemon. cargo-audit and betterleaks are optional and reported as skipped when absent.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
@@ -73,9 +73,18 @@ if command -v betterleaks >/dev/null 2>&1; then
   # The SAME scanner, config and ignore file as `ci-public.yml`'s secret-scan job. gitleaks was
   # retired: it is a different scanner with different defaults, so a green gitleaks run said
   # nothing about the gate that actually blocks a merge.
-  betterleaks dir --redact --exit-code 1 --no-banner \
-    --config=.betterleaks.toml \
-    --gitleaks-ignore-path .betterleaksignore .
+  #
+  # ⛔ --config IS REQUIRED. betterleaks only auto-loads a target's own config under
+  # --unsafe-auto-load-config, so a bare `betterleaks dir` scans with the BUILT-IN defaults — which
+  # are not gitleaks' defaults: measured on this tree, 605 findings (600 generic-credential-uri on
+  # local dev DSNs, 5 generic-password on compose placeholders), none of them real.
+  #
+  # ⛔ TRACKED FILES ONLY. CI scans a clean checkout, so it only ever sees what git tracks.
+  # Scanning `.` here also walks `target/` — 1.57 GB of build output, 12 findings measured
+  # 2026-11-15, every one a binary that happened to match a rule. A local gate that disagrees with
+  # CI is worse than no gate: it trains you to ignore the step.
+  git ls-files -z | xargs -0 -r betterleaks dir --redact --exit-code 1 --no-banner \
+    --config=.betterleaks.toml --gitleaks-ignore-path .betterleaksignore --
 else
   echo "    skip: betterleaks not installed (https://github.com/betterleaks/betterleaks)"
 fi

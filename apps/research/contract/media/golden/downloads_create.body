@@ -1,0 +1,1 @@
+{"error":{"code":"HTTP_501","message":"Download execution is not implemented: no worker consumes download jobs, so a created job would never leave the 'pending' state. No job was created. Track this endpoint's status before relying on it.","status":501,"request_id":"01a1debc-eec2-7020-bdd0-551df7b5f3db","timestamp":"2026-11-15T10:24:46Z"}}
