@@ -129,7 +129,7 @@ const CREDENTIAL_SCHEMES: [&str; 8] = [
 
 /// True for the nil-UUID sentinel in any spelling (dashed, undashed, braced, `urn:uuid:`,
 /// any case). Honouring one would make a real tenant's compute unbillable.
-fn is_unattributable(value: &str) -> bool {
+pub(crate) fn is_unattributable(value: &str) -> bool {
     let mut normalised = value.trim().to_ascii_lowercase();
     if let Some(rest) = normalised.strip_prefix("urn:uuid:") {
         normalised = rest.to_owned();
@@ -162,7 +162,7 @@ fn is_own_tenant(asserted: &str, caller_tenant: &str) -> bool {
 }
 
 /// The lower-cased auth scheme when the value is `Authorization`-shaped, else `None`.
-fn credential_scheme(value: &str) -> Option<&'static str> {
+pub(crate) fn credential_scheme(value: &str) -> Option<&'static str> {
     let trimmed = value.trim();
     let (scheme, rest) = trimmed.split_once(' ')?;
     if rest.trim().is_empty() {

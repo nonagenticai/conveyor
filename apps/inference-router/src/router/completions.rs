@@ -23,7 +23,9 @@ use crate::contract::schemas::{
     ChatCompletionRequest, ChatCompletionResponse, HTTPValidationError, Usage,
 };
 use crate::ledger::{self, CallContext, LedgerRow, StreamRow};
-use crate::metering::{CostEvent, ZERO_COST_USD, licence_is_absent};
+use crate::metering::{
+    CostEvent, ZERO_COST_USD, licence_is_absent, tenant_id_rejection_reason, tenant_is_unattributed,
+};
 use crate::policy::{self, ResolvedHop};
 use crate::provider::ChunkStream;
 use crate::routing::{
@@ -487,14 +489,29 @@ fn unlicensed_trio(event: &CostEvent) -> Option<(String, String, f64, i64)> {
     Some((caller, worker, cost_usd, tokens))
 }
 
-/// Book one cost event: the unlicensed trio FIRST, then the XADD, then the token totals ONLY when
-/// the sink confirms delivery.
+/// Book one cost event: refuse an unattributable tenant FIRST, then the unlicensed trio, then the
+/// XADD, then the token totals ONLY when the sink confirms delivery.
 ///
-/// The order is the reference's own (`metering.py` :797-835, then :1011-1035): the trio records
-/// what was spent without a licence whether or not the stream write succeeds (the spend happened
-/// either way), while `tokens_total` is booked after a successful XADD, so a dropped event cannot
-/// inflate the token families. Every emit site goes through this one helper so none can drift.
+/// The order is the reference's own (`metering.py` :574, :679, :797-835, then :1011-1035). Billing
+/// dead-letters an event with no usable tenant, so the reference never emits one — it counts the
+/// refusal on its own alert-keyed family and returns before the trio, the XADD and the tokens. The
+/// trio then records what was spent without a licence whether or not the stream write succeeds
+/// (the spend happened either way), while `tokens_total` is booked after a successful XADD, so a
+/// dropped event cannot inflate the token families. Every emit site goes through this one helper
+/// so none can drift.
 async fn emit_cost(state: &AppState, event: &CostEvent) {
+    if tenant_is_unattributed(&event.tenant_id) {
+        crate::metrics::record_cost_unattributed(&event.service_key, &event.provider);
+        return;
+    }
+    if let Some(reason) = event
+        .tenant_id
+        .as_deref()
+        .and_then(tenant_id_rejection_reason)
+    {
+        crate::metrics::record_cost_malformed_tenant(&event.service_key, &event.provider, reason);
+        return;
+    }
     if let Some((caller, worker, cost_usd, tokens)) = unlicensed_trio(event) {
         crate::metrics::record_cost_unlicensed(
             &event.service_key,

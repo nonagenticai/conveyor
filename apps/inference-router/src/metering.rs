@@ -211,9 +211,68 @@ pub fn licence_is_absent(license_id: &Option<String>) -> bool {
     }
 }
 
+/// The reference's `CREDENTIAL_TENANT_ID` (`metering.py:135`): the value a credential-shaped
+/// tenant is replaced with at admission. It is never a tenant, so an event carrying it must be
+/// refused and counted rather than billed.
+const CREDENTIAL_TENANT_ID: &str = "__credential_redacted__";
+
+/// The literal renderings that are not identifiers (`metering.py:239-255`), matched
+/// case-insensitively after trimming. A closed set, deliberately not a length rule: the shortest
+/// real legacy tenant label is only six characters today.
+const NOT_AN_IDENTIFIER_LITERALS: [&str; 11] = [
+    "t",
+    "f",
+    "true",
+    "false",
+    "0",
+    "1",
+    "null",
+    "none",
+    "nil",
+    "undefined",
+    "nan",
+];
+
+/// The reference's `_MAX_TENANT_ID_LEN` (`metering.py:90`). **Not** a UUID check: billing accepts
+/// a UUID OR a registered legacy tenant NAME (longest 33 characters), so a UUID-only rule would
+/// refuse billable events.
+const MAX_TENANT_ID_LEN: usize = 64;
+
+/// The reference's refusal at `metering.py:574`: no tenant, a blank one, or the nil-UUID sentinel
+/// in any spelling means the event cannot be attributed, so billing would dead-letter it.
+pub fn tenant_is_unattributed(tenant: &Option<String>) -> bool {
+    match tenant {
+        None => true,
+        Some(value) => value.trim().is_empty() || crate::auth::is_unattributable(value),
+    }
+}
+
+/// Why `value` cannot be a tenant identifier (`metering.py:269-298`), or `None` when it can be.
+///
+/// Returns a member of the reference's CLOSED set and never caller text — the caller puts the
+/// result on a Prometheus label, so caller-controlled cardinality must not reach it. The order is
+/// the reference's own: a credential is reported as `credential_shaped`, never merely as
+/// `contains_whitespace`, because the credential class is the security event.
+pub fn tenant_id_rejection_reason(value: &str) -> Option<&'static str> {
+    if value == CREDENTIAL_TENANT_ID || crate::auth::credential_scheme(value).is_some() {
+        return Some("credential_shaped");
+    }
+    let literal = value.trim().to_ascii_lowercase();
+    if NOT_AN_IDENTIFIER_LITERALS.contains(&literal.as_str()) {
+        return Some("not_an_identifier_literal");
+    }
+    if value.chars().count() > MAX_TENANT_ID_LEN {
+        return Some("too_long");
+    }
+    if value.chars().any(char::is_whitespace) {
+        return Some("contains_whitespace");
+    }
+    None
+}
+
 #[cfg(test)]
 mod tests {
-    use super::licence_is_absent;
+    use super::{licence_is_absent, tenant_id_rejection_reason, tenant_is_unattributed};
 
     #[test]
     fn licence_is_absent_covers_the_reference_three_ways() {
@@ -232,5 +291,54 @@ mod tests {
             !licence_is_absent(&Some("lic-0123456789abcdef".to_owned())),
             "a real licence is present"
         );
+    }
+
+    #[test]
+    fn tenant_id_rejection_reason_mirrors_the_reference_closed_set() {
+        for credential in ["Bearer x", "__credential_redacted__"] {
+            assert_eq!(
+                tenant_id_rejection_reason(credential),
+                Some("credential_shaped"),
+                "a credential sent as a tenant is reported as one, never as whitespace: {credential}"
+            );
+        }
+        for literal in ["null", "TRUE", "0"] {
+            assert_eq!(
+                tenant_id_rejection_reason(literal),
+                Some("not_an_identifier_literal"),
+                "a rendered literal is not an identifier: {literal}"
+            );
+        }
+        let too_long = "a".repeat(65);
+        assert_eq!(tenant_id_rejection_reason(&too_long), Some("too_long"));
+        assert_eq!(
+            tenant_id_rejection_reason("a b"),
+            Some("contains_whitespace")
+        );
+        assert_eq!(
+            tenant_id_rejection_reason("tenant-1"),
+            None,
+            "a registered legacy tenant NAME is billable"
+        );
+        assert_eq!(
+            tenant_id_rejection_reason("7d9c2b6e-0f3a-4a57-9c1e-2b6a1f0e4d55"),
+            None,
+            "a uuid is billable"
+        );
+    }
+
+    #[test]
+    fn tenant_is_unattributed_covers_none_blank_and_the_nil_sentinel() {
+        assert!(tenant_is_unattributed(&None), "no tenant at all");
+        assert!(tenant_is_unattributed(&Some(String::new())), "empty tenant");
+        assert!(
+            tenant_is_unattributed(&Some("   ".to_owned())),
+            "blank tenant"
+        );
+        assert!(
+            tenant_is_unattributed(&Some("00000000-0000-0000-0000-000000000000".to_owned())),
+            "the nil sentinel is never a real tenant"
+        );
+        assert!(!tenant_is_unattributed(&Some("tenant-1".to_owned())));
     }
 }

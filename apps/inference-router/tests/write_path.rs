@@ -1086,6 +1086,9 @@ async fn a_stream_writes_one_completed_row_and_one_cost_event() {
         .oneshot(
             Request::post("/api/chat/completions")
                 .header("content-type", "application/json")
+                // The cost event is refused without an attributable tenant (the reference's
+                // `metering.py:574` gate); these tests assert the streamed event is emitted.
+                .header("x-tenant-id", "7d9c2b6e-0f3a-4a57-9c1e-2b6a1f0e4d55")
                 .body(stream_request())
                 .expect("request"),
         )
@@ -1138,6 +1141,9 @@ async fn an_aborted_stream_is_booked_as_a_client_disconnect() {
         .oneshot(
             Request::post("/api/chat/completions")
                 .header("content-type", "application/json")
+                // The cost event is refused without an attributable tenant (the reference's
+                // `metering.py:574` gate); these tests assert the streamed event is emitted.
+                .header("x-tenant-id", "7d9c2b6e-0f3a-4a57-9c1e-2b6a1f0e4d55")
                 .body(stream_request())
                 .expect("request"),
         )
@@ -1178,6 +1184,9 @@ async fn a_stream_that_never_opens_is_one_row_with_its_http_code() {
         .oneshot(
             Request::post("/api/chat/completions")
                 .header("content-type", "application/json")
+                // The cost event is refused without an attributable tenant (the reference's
+                // `metering.py:574` gate); these tests assert the streamed event is emitted.
+                .header("x-tenant-id", "7d9c2b6e-0f3a-4a57-9c1e-2b6a1f0e4d55")
                 .body(stream_request())
                 .expect("request"),
         )

@@ -679,17 +679,26 @@ fn configured_with_cost(
     api_router(state)
 }
 
-async fn serve_one(router: Router) -> StatusCode {
+/// The attributable tenant the Card A requests now assert. Without one the cost event is
+/// correctly REFUSED (`metering.py:574`), and the token and unlicensed families never move.
+const ATTRIBUTABLE_TENANT: &str = "7d9c2b6e-0f3a-4a57-9c1e-2b6a1f0e4d55";
+
+/// One completion carrying an asserted tenant; `None` sends no `X-Tenant-Id` at all.
+async fn serve_one_as(router: Router, tenant: Option<&'static str>) -> StatusCode {
+    let mut request =
+        Request::post("/api/chat/completions").header("content-type", "application/json");
+    if let Some(tenant) = tenant {
+        request = request.header("x-tenant-id", tenant);
+    }
     router
-        .oneshot(
-            Request::post("/api/chat/completions")
-                .header("content-type", "application/json")
-                .body(completion())
-                .expect("request"),
-        )
+        .oneshot(request.body(completion()).expect("request"))
         .await
         .expect("router answers")
         .status()
+}
+
+async fn serve_one(router: Router) -> StatusCode {
+    serve_one_as(router, Some(ATTRIBUTABLE_TENANT)).await
 }
 
 // ── the ledger write-failure family ────────────────────────────────────────────────────────
@@ -854,6 +863,109 @@ async fn a_delivered_cost_event_books_the_attempt_tokens() {
             ),
             Some(expected),
             "a delivered event books its {kind} tokens after the XADD returns"
+        );
+    }
+}
+
+#[tokio::test]
+async fn a_completion_with_no_tenant_is_counted_unattributed_and_books_no_tokens() {
+    let provider = "stub-metrics-unattributed";
+    let address = stub_provider("unattributed").await;
+    let router = configured_with_cost(
+        provider,
+        address,
+        Arc::new(ScriptedSink { delivered: true }),
+    );
+
+    let before = series_value(
+        &scrape().await,
+        "inference_router_cost_events_unattributed_total",
+        &[("service_key", "inference-router"), ("provider", provider)],
+    )
+    .expect("the family is pre-seeded for every provider");
+
+    assert_eq!(serve_one_as(router, None).await, StatusCode::OK);
+
+    let body = scrape().await;
+    let after = series_value(
+        &body,
+        "inference_router_cost_events_unattributed_total",
+        &[("service_key", "inference-router"), ("provider", provider)],
+    )
+    .expect("the family is pre-seeded for every provider");
+    assert!(
+        after > before,
+        "a completion with no tenant must be counted unattributed: {before} -> {after}"
+    );
+    for kind in ["prompt", "completion"] {
+        assert_eq!(
+            series_value(
+                &body,
+                "inference_router_tokens_total",
+                &[
+                    ("service_key", "inference-router"),
+                    ("provider", provider),
+                    ("kind", kind),
+                ],
+            ),
+            Some(0.0),
+            "a refused event must book no {kind} tokens"
+        );
+    }
+}
+
+#[tokio::test]
+async fn a_malformed_tenant_is_counted_with_its_reason_and_books_no_tokens() {
+    let provider = "stub-metrics-malformed";
+    let address = stub_provider("malformed tenant").await;
+    let router = configured_with_cost(
+        provider,
+        address,
+        Arc::new(ScriptedSink { delivered: true }),
+    );
+
+    let series = [
+        ("service_key", "inference-router"),
+        ("provider", provider),
+        ("reason", "not_an_identifier_literal"),
+    ];
+    let before = series_value(
+        &scrape().await,
+        "inference_router_cost_events_malformed_tenant_total",
+        &series,
+    )
+    .expect("the family is pre-seeded with its measured reason");
+
+    assert_eq!(
+        serve_one_as(router, Some("null")).await,
+        StatusCode::OK,
+        "a malformed tenant is meter-and-allow, never a refusal"
+    );
+
+    let body = scrape().await;
+    let after = series_value(
+        &body,
+        "inference_router_cost_events_malformed_tenant_total",
+        &series,
+    )
+    .expect("the family is pre-seeded with its measured reason");
+    assert!(
+        after > before,
+        "X-Tenant-Id: null must count not_an_identifier_literal: {before} -> {after}"
+    );
+    for kind in ["prompt", "completion"] {
+        assert_eq!(
+            series_value(
+                &body,
+                "inference_router_tokens_total",
+                &[
+                    ("service_key", "inference-router"),
+                    ("provider", provider),
+                    ("kind", kind),
+                ],
+            ),
+            Some(0.0),
+            "a refused event must book no {kind} tokens"
         );
     }
 }

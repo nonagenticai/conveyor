@@ -230,6 +230,38 @@ pub fn record_cost_unlicensed(
     .increment(tokens.max(0) as u64);
 }
 
+/// Count one cost event the producer refused because it had no usable tenant
+/// (`metering.py:574`).
+///
+/// The refusal is the whole point: billing would dead-letter an event it cannot attribute, so the
+/// producer never writes it and counts it here instead. Booked BEFORE the unlicensed trio and the
+/// XADD, because a refused event books neither.
+pub fn record_cost_unattributed(service_key: &str, provider: &str) {
+    counter!(
+        "inference_router_cost_events_unattributed_total",
+        "service_key" => service_key.to_owned(),
+        "provider" => provider.to_owned()
+    )
+    .increment(1);
+}
+
+/// Count one cost event the producer refused because its tenant is not an identifier
+/// (`metering.py:679`).
+///
+/// `reason` is [`crate::metering::tenant_id_rejection_reason`]'s closed set — `credential_shaped`
+/// | `not_an_identifier_literal` | `too_long` | `contains_whitespace` — never caller text, so the
+/// label's cardinality is bounded by construction. Like the unattributed family, a refused event
+/// books no unlicensed trio and no token totals.
+pub fn record_cost_malformed_tenant(service_key: &str, provider: &str, reason: &str) {
+    counter!(
+        "inference_router_cost_events_malformed_tenant_total",
+        "service_key" => service_key.to_owned(),
+        "provider" => provider.to_owned(),
+        "reason" => reason.to_owned()
+    )
+    .increment(1);
+}
+
 /// Count one request that reached a completion route.
 ///
 /// Booked by [`count_completion_request`], which wraps the matched route rather than the body
