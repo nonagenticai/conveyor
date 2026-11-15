@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0007 — The tool estate is conveyor plus coding · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0007-tool-estate-conveyor-and-coding.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0007--the-tool-estate-is-conveyor-plus-coding">0007 — The tool estate is conveyor plus coding</h1>
+<p>Status: Accepted · Date: 2026-11-15 · Issue: #138 · Amends: ADR 0006 §Decision (destination for the research and media groups confirmed; the coding row stands), ADR 0005 §2–3 unchanged</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>Destination.</strong> The tool estate completes inside this workspace. <code>conveyor</code> absorbs the three capability families; one repository stays outside it:</p>
+<table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Shape</th>
+<th>Owns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apps/research</code> (exists)</td>
+<td>workspace app, stateless HTTP</td>
+<td>the web-scraper and media-discovery contracts: fetch, link scoring, declarative extraction, media search</td>
+</tr>
+<tr>
+<td><code>apps/media</code> (new)</td>
+<td>workspace app, two executor images</td>
+<td>Chromium capture/record, ffmpeg/ffprobe, tesseract OCR, native Gherkin runner</td>
+</tr>
+<tr>
+<td><code>crates/analysis</code> (new)</td>
+<td>workspace library, no service</td>
+<td><code>analyse.*</code> rubrics/scoring/synthesis, seven generation providers, crawl, LLM/vision client</td>
+</tr>
+<tr>
+<td>the <code>coding</code> repository (exists)</td>
+<td>separate public Rust repo</td>
+<td>repository provisioning, dependency graph, verified writes, CI and security checks</td>
+</tr>
+<tr>
+<td><code>apps/server</code>, <code>apps/web</code> and the existing apps</td>
+<td>—</td>
+<td>actions, procedures, job ledger, artefacts, deck/PPTX, thin operations, UI</td>
+</tr>
+</tbody>
+</table>
+<p>This is the owner's ruling of 2026-11-15: <strong>conveyor is as self-contained as possible</strong>, and the coding service keeps its own repository and release cadence (ADR 0006's coding row is unchanged). The model servers (<code>asr</code>, <code>tts</code>, <code>vlm</code>, image generation) stay external HTTP hosts — they are model servers, not tool code.</p></li>
+<li><p><strong>One stateful plane.</strong> Conveyor holds the database, job queue and object store. The research app answers request/response and keeps nothing; the media executors keep nothing; the analysis library keeps nothing. A second queue, database or store credential anywhere in the estate is an architecture violation, not an implementation detail.</p></li>
+<li><p><strong>Media work runs as per-job Kubernetes Jobs, not a second worker protocol.</strong> Dispatch is built by conveyor, generalising the mechanism that already exists in <code>apps/server/src/sandbox.rs</code> (ConfigMap payload, <strong>no service-account token</strong>, CPU/memory/ephemeral caps, create/get/delete). The module is <code>crates/runner</code> — deliberately not "executor", because <code>crates/domain/src/executor.rs</code> already owns that word for the T0 run-executor seam. The two images (<code>media-browser</code>, <code>media-ffmpeg</code>) are built from workspace packages by the same per-package image mechanism the other apps use.</p></li>
+<li><p><strong>The runner contract is the only interface a media job has.</strong> A versioned <code>runner/v1</code> instruction and result generated from <code>crates/domain/src/runner.rs</code>; the schemas are checked in and drift-failing. The instruction travels in the Job's ConfigMap, a short-lived <strong>job token</strong> in a Secret. All bytes cross conveyor's own routes (<code>/api/jobs/{id}/inputs|outputs|result|progress</code>), authorized by the token <em>and</em> the job row (status, live lease, attempt, tenant) — because this repository <strong>forbids presigned URLs</strong> (<code>crates/actions/src/integrations/objects.rs</code>, <code>crates/api/src/documents.rs</code>). No store credential ever reaches a pod.</p></li>
+<li><p><strong>Analysis is a library, not a service.</strong> Its inherited surfaces are sub-second LLM orchestration. As per-job pods they pay cold start per call; as a service they duplicate conveyor's job, retry and artefact handling. One conveyor job owns a whole provider lifecycle (submit → poll → fetch).</p></li>
+<li><p><strong>The mobile app-inspector is deferred outright.</strong> It never worked in the live estate and no consumer depends on it. It is not ported, not measured for demand, and not bound as a tool; its deployment is retired in the cutover unit. Appium being WebDriver over HTTP is recorded only so a future reader does not mistake the deferral for a technical impossibility.</p></li>
+<li><p><strong>PPTX is written in Rust.</strong> The old slide service produced decks with <code>python-pptx</code> and rendered them with LibreOffice. The conveyor writes OOXML itself (<code>crates/deck</code>) from one deck model that also emits PDF/PNG through <code>crates/render</code>. Accepted deviation: LibreOffice-only layout fidelity is not reproduced, and the v1 template set is fixed (title, bullets, image, notes) so "PPTX support" cannot silently become unlimited work.</p></li>
+<li><p><strong>All seven generation providers are ported</strong> — Kling, Runway, Veo, WAN, Seedance, Sora, OpenAI — with provider calls tested only against recorded fixtures and the <code>(job_id, attempt)</code> idempotency key carried to the provider, so a retried attempt cannot double-spend.</p></li>
+<li><p><strong>Public treatment.</strong> This repository is already public. The <code>coding</code> repository and each absorbed Python repository are flipped public <strong>after their own High code-scanning set is clear and <code>gitleaks</code> is clean</strong>, and the Python repositories are archived once parity has landed. The flip and the archive belong to the cutover unit, not to the rewrite. No new repository is created by this ADR.</p></li>
+</ol>
+<h2 id="context--what-was-measured-2026-11-15">Context — what was measured (2026-11-15)</h2>
+<ul>
+<li>The w2v directory holds 26 git repositories; 19 are live. Six are MLX model servers that stay external and are not ports; the rest are ~340k lines of production Python across sixteen workloads.</li>
+<li><code>apps/research</code> already exists on <code>main</code>: the web-scraper contract landed (#117, merged as #132) and the media-discovery contract is in flight (#118). Absorbing rather than extracting is zero-churn and matches the owner's self-containment ruling.</li>
+<li><strong>There is no usage inventory for the w2v services.</strong> <code>parity/</code> covers fr, rm and planka only. The contract for the conversion is therefore the sixteen deliverable blueprints (§5.2.1), not endpoint parity; a Loki sample of the old surfaces precedes the port and records its drops, exactly as <code>parity/</code> did.</li>
+<li>The dispatch target already exists: <code>crates/store</code> leases jobs, <code>apps/server/src/worker.rs</code> renews leases, <code>apps/server/src/sandbox.rs</code> creates Jobs. What is new is the generalised runner, the contract, and the job-token byte routes.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li><strong>ADR 0006 stands, amended in wording only.</strong> Its <code>apps/scientific</code>, <code>apps/lean4-prover</code> and coding rows are unchanged; its research and media rows are confirmed as workspace apps. ADR 0005 §2–3 are untouched: this repository is where a rewrite lands, and the two strata services remain external.</li>
+<li><strong>Issue #139</strong> (the <code>apps/media</code> unit) keeps its acceptance content and its destination.</li>
+<li><strong>Issue #144</strong> (the runner substrate) is the enabler for both media images and is unaffected by the destination question; only its dependency wording changes.</li>
+<li><strong>No cross-repository coupling remains</strong>: no vendored schema pin, no git dependency, no new CI surface. The media executor binary is compiled from this workspace and its contract types are the same <code>conveyor-domain</code> types the server uses.</li>
+<li><strong>Sequence:</strong> docs (this ADR) → runner substrate (#144) → <code>apps/media</code> images → <code>crates/analysis</code> → capability families, project type, deck, thin operations and frontend. #118 completes <code>apps/research</code> independently. Deployment, cutover, public flips and archive are a later unit.</li>
+<li><strong>Review gates this ADR creates</strong>, each with the test that enforces it: no presigned URL (token route tests), no second queue/DB/credential (review + CI env assertion), no Node in any image (the Gherkin runner is native), no schema drift (<code>docs/contracts/runner/v1</code> check), no dead-endpoint port (usage sample recorded before the port).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0007-tool-estate-conveyor-and-coding.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

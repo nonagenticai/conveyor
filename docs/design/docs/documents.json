@@ -101,13 +101,13 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0006-tool-absorption-grouping.md"
     },
     {
-      "title": "0007 — The w2v conversion: three public repositories, one stateful plane",
-      "path": "docs/decisions/0007-w2v-conversion-three-public-repositories.html",
-      "source": "docs/decisions/0007-w2v-conversion-three-public-repositories.md",
+      "title": "0007 — The tool estate is conveyor plus coding",
+      "path": "docs/decisions/0007-tool-estate-conveyor-and-coding.html",
+      "source": "docs/decisions/0007-tool-estate-conveyor-and-coding.md",
       "section": "Decisions",
-      "sha256": "762eeb97c2b08d90fdbd82eed418e066708ac8fc04021665e288736ca6271e45",
-      "bytes": 7337,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0007-w2v-conversion-three-public-repositories.md"
+      "sha256": "ce47d2ab95b25eed4d73a29b0040e2f16e78a834d78f3d34bc03998bd2148217",
+      "bytes": 7520,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0007-tool-estate-conveyor-and-coding.md"
     },
     {
       "title": "Web UI design",
@@ -402,8 +402,8 @@
       "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
       "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
       "section": "Plans",
-      "sha256": "9306d7786b9a499d354967a2d44ec6f12f711e2f5c8cbf02f9114c717aeff0b7",
-      "bytes": 10250,
+      "sha256": "6c6e5245a5a3fc5a59962dc767552a67d09a1be4dfdd98629c1c9134aad88cab",
+      "bytes": 10272,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
     },
     {
