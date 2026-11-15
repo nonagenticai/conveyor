@@ -475,6 +475,7 @@ window.ArchitecturePack = (function () {
     ["Programme control", "overview", "Portfolio read model · programme cadence", "§5.1, §8.2", "R"],
     ["Portfolio", "portfolio", "Computed portfolio · programme shared config · dependencies · WSJF · metering", "§5.1, §5.5, §8.2, D49", "P"],
     ["Projects", "projects", "Project · WBS node · work package (card)", "§5.1–§5.5", "R"],
+    ["Outputs", "outputs", "Output register · unit · category · publish flag · public page", "§10.5, docs/design", "R"],
     ["Contribute", "contribute", "GitHub issue registry · ready units · claim protocol · feedback", "§10.5, 03-DELIVERY", "R"],
     ["Plan & WBS", "plan", "wbs_node · project_baseline · register · change control", "§5.3–§5.5", "P"],
     ["Validation", "validation", "Measured coverage · tranche · units · gap list · the gate", "§12, coverage.json", "R"],
@@ -1009,7 +1010,7 @@ window.ArchitecturePack = (function () {
       ${panel("Architecture → studio destinations", "§10.5, STUDIO-SPEC destination map", figure("ui-map"))}
       ${panel(
         "Every sidebar destination",
-        "35 destinations · R = V1 implemented · P = V2 proposed · L = legacy study",
+        "36 destinations · R = V1 implemented · P = V2 proposed · L = legacy study",
         `${uiTable(UI_ROWS)}<p class="arch-prose">The row for a destination names the aggregates and rows it views; a V2 preview never claims a write path. The <span class="mono">architecture</span> row is this page itself.</p>`,
       )}
       ${panel(

@@ -1640,6 +1640,7 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
       "overview",
       "projects",
       "project",
+      "outputs",
       "types",
       "capabilities",
       "processes",
