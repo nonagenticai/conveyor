@@ -53,6 +53,21 @@ pub enum PublishOutputsError {
     Json(#[from] serde_json::Error),
 }
 
+/// One published attachment on an output page and in `outputs.js`.
+#[derive(Clone, Debug, Serialize)]
+pub struct AttachmentEntry {
+    /// The attachment document id.
+    pub id: String,
+    /// The display file name (the attachment's title).
+    pub filename: String,
+    /// The validated MIME type.
+    pub content_type: String,
+    /// The byte length.
+    pub size_bytes: i64,
+    /// The live route path, relative to the pack root.
+    pub path: String,
+}
+
 /// One entry of `outputs.js`.
 #[derive(Clone, Debug, Serialize)]
 pub struct OutputEntry {
@@ -66,6 +81,14 @@ pub struct OutputEntry {
     pub project_key: Option<String>,
     /// The project name, for display.
     pub project_name: Option<String>,
+    /// The output-standard slot, when recorded.
+    pub category: Option<String>,
+    /// The programme unit, when recorded.
+    pub unit: Option<String>,
+    /// The author's display name, when recorded; never an email.
+    pub author: Option<String>,
+    /// The published attachments, in upload order.
+    pub attachments: Vec<AttachmentEntry>,
     /// The page path, relative to the pack root (`docs/output-<id>.html`).
     pub path: String,
     /// When the output last changed.
@@ -85,9 +108,11 @@ pub async fn write_outputs(
     let mut tx = store::begin_scoped_read_only(pool, tenant).await?;
     let records = store::document::list_published_outputs_tx(&mut tx, tenant).await?;
     let projects = store::project::list_projects_tx(&mut tx, tenant, None, 1000).await?;
+    let attachments = store::document::list_published_attachments_tx(&mut tx, tenant).await?;
+    let names = author_names(&mut tx, &records).await?;
     tx.rollback().await?;
 
-    let (index, pages) = render_outputs(&records, &projects, generated_at)?;
+    let (index, pages) = render_outputs(&records, &projects, &attachments, &names, generated_at)?;
 
     std::fs::create_dir_all(out)?;
     for (id, page) in &pages {
@@ -105,12 +130,20 @@ pub async fn write_outputs(
 pub fn render_outputs(
     records: &[DocumentRecord],
     projects: &[Project],
+    attachments: &[DocumentRecord],
+    names: &HashMap<Uuid, String>,
     generated_at: &str,
 ) -> Result<(String, HashMap<Uuid, String>), PublishOutputsError> {
     let projects: HashMap<Uuid, (String, String)> = projects
         .iter()
         .map(|project| (project.id, (project.key.clone(), project.name.clone())))
         .collect();
+    let mut by_parent: HashMap<Uuid, Vec<&DocumentRecord>> = HashMap::new();
+    for attachment in attachments {
+        if let Some(parent) = attachment.parent_document_id {
+            by_parent.entry(parent).or_default().push(attachment);
+        }
+    }
 
     let mut entries = Vec::with_capacity(records.len());
     let mut pages = HashMap::with_capacity(records.len());
@@ -121,11 +154,37 @@ pub fn render_outputs(
             .and_then(|id| projects.get(&id).cloned())
             .map_or((None, None), |(key, name)| (Some(key), Some(name)));
         let project_label = project_name.as_deref().or(project_key.as_deref());
+        let author = record.created_by.and_then(|id| names.get(&id).cloned());
+        let attachment_entries: Vec<AttachmentEntry> = by_parent
+            .get(&record.id)
+            .map(|rows| {
+                rows.iter()
+                    .map(|row| AttachmentEntry {
+                        id: row.id.to_string(),
+                        filename: row.title.clone(),
+                        content_type: row
+                            .meta
+                            .get("content_type")
+                            .and_then(serde_json::Value::as_str)
+                            .unwrap_or("application/octet-stream")
+                            .to_owned(),
+                        size_bytes: row
+                            .meta
+                            .get("size_bytes")
+                            .and_then(serde_json::Value::as_i64)
+                            .unwrap_or(0),
+                        path: format!("docs/attachment-{}", row.id),
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
         let page = output_page(
             &record.title,
             &render_markdown(body),
             generated_at,
             project_label,
+            author.as_deref(),
+            &attachment_entries,
         );
         pages.insert(record.id, page);
         entries.push(OutputEntry {
@@ -134,11 +193,26 @@ pub fn render_outputs(
             project_id: record.project_id.map(|id| id.to_string()),
             project_key,
             project_name,
+            category: record.category.clone(),
+            unit: record.unit.clone(),
+            author,
+            attachments: attachment_entries,
             path: format!("docs/output-{}.html", record.id),
             updated_at: record.updated_at.to_rfc3339(),
         });
     }
     Ok((outputs_js(&entries, generated_at)?, pages))
+}
+
+/// The author display names for the records' `created_by` ids, in one read.
+pub(crate) async fn author_names(
+    conn: &mut sqlx::PgConnection,
+    records: &[DocumentRecord],
+) -> Result<HashMap<Uuid, String>, sqlx::Error> {
+    let mut ids: Vec<Uuid> = records.iter().filter_map(|record| record.created_by).collect();
+    ids.sort_unstable();
+    ids.dedup();
+    store::document::author_names_tx(conn, &ids).await
 }
 
 /// The `outputs.js` assignment the Documents page reads synchronously.
@@ -223,11 +297,17 @@ pub fn output_page(
     body_html: &str,
     generated_at: &str,
     project: Option<&str>,
+    author: Option<&str>,
+    attachments: &[AttachmentEntry],
 ) -> String {
-    let source = match project {
+    let mut source = match project {
         Some(project) => format!("{project} · conveyor output · published {generated_at}"),
         None => format!("conveyor output · published {generated_at}"),
     };
+    if let Some(author) = author.filter(|author| !author.is_empty()) {
+        source.push_str(&format!(" · {author}"));
+    }
+    let body_html = format!("{body_html}{}", attachments_html(attachments));
     // Body last: a body that happens to contain a placeholder string must not be rewritten.
     TEMPLATE
         .replace("$root$", "../")
@@ -243,7 +323,27 @@ pub fn output_page(
             "A conveyor platform output, rendered at publish time.",
         )
         .replace("at build time.</span>", "at publish time.</span>")
-        .replace("$body$", body_html)
+        .replace("$body$", &body_html)
+}
+
+/// The attachments block appended to a rendered body. Names are escaped and every link is a
+/// same-origin live route; the bytes are served by `/design/docs/attachment-<id>` with a
+/// non-inline disposition for anything but a PNG or JPEG.
+fn attachments_html(attachments: &[AttachmentEntry]) -> String {
+    if attachments.is_empty() {
+        return String::new();
+    }
+    let mut out = String::from("<h2>Attachments</h2><ul class=\"attachments\">");
+    for attachment in attachments {
+        out.push_str(&format!(
+            "<li><a href=\"{}\" rel=\"noopener\">{}</a> <span class=\"muted\">{}</span></li>",
+            escape_html(&attachment.path),
+            escape_html(&attachment.filename),
+            escape_html(&attachment.content_type),
+        ));
+    }
+    out.push_str("</ul>");
+    out
 }
 
 /// Escape a value for HTML text or an attribute.
@@ -296,7 +396,7 @@ mod tests {
 
     #[test]
     fn the_page_uses_the_pack_assets_and_escapes_the_title() {
-        let page = output_page("<T>", "<p>x</p>", "2026-11-13T00:00:00Z", Some("S02"));
+        let page = output_page("<T>", "<p>x</p>", "2026-11-13T00:00:00Z", Some("S02"), None, &[]);
         assert!(
             page.contains("../docs.css"),
             "the page must share the pack CSS"
@@ -317,6 +417,10 @@ mod tests {
             project_id: Some("p-1".to_owned()),
             project_key: Some("S02".to_owned()),
             project_name: Some("Skeleton".to_owned()),
+            category: Some("evidence".to_owned()),
+            unit: Some("S02".to_owned()),
+            author: Some("A Person".to_owned()),
+            attachments: Vec::new(),
             path: "docs/output-id-1.html".to_owned(),
             updated_at: "2026-11-13T00:00:00Z".to_owned(),
         }];

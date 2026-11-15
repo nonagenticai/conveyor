@@ -180,6 +180,7 @@ async fn eval_runs_export(
             object_key: Some(key.clone()),
             content_hash: Some(content_hash.clone()),
             card_id: None,
+            parent_document_id: None,
             body: None,
             external_ref: None,
             meta: json!({
@@ -190,6 +191,10 @@ async fn eval_runs_export(
                 "variant": run.variant.as_str(),
             }),
             publishable: false,
+            category: None,
+            unit: None,
+            created_by: None,
+            updated_by: None,
         },
     )
     .await

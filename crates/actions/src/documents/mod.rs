@@ -25,6 +25,7 @@ use crate::spec::FieldError;
 
 pub mod actions;
 pub mod ingest;
+pub mod revisions;
 pub mod repositories;
 pub mod secrets;
 
@@ -55,6 +56,12 @@ pub const DOCUMENT_UPDATED: &str = "document.updated";
 pub const DOCUMENT_DELETED: &str = "document.deleted";
 /// Emitted by `documents.ingest` — the upstream job id has been recorded on the row.
 pub const DOCUMENT_INGESTED: &str = "document.ingested";
+/// Emitted by `documents.publish` when an output enters the public window.
+pub const DOCUMENT_PUBLISHED: &str = "document.published";
+/// Emitted by `documents.publish` when an output leaves it.
+pub const DOCUMENT_UNPUBLISHED: &str = "document.unpublished";
+/// Emitted by `documents.request_publish` — an author's signal to an admin.
+pub const DOCUMENT_PUBLISH_REQUESTED: &str = "document.publish_requested";
 /// The job kind that removes a tombstoned document's object.
 pub const DOCUMENT_PURGE_KIND: &str = "document.purge";
 
