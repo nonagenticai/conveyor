@@ -5,9 +5,14 @@
 //! is reclaimable but only an ack clears it, the delivery ceiling really puts the original envelope
 //! and its reason on `bus:dead`, and a large job document survives the trip intact.
 //!
-//! Each test takes its own tenant, so `stream_for` gives it a stream no sibling test touches and
-//! the four may run concurrently in one binary against one Redis. `support::redis` starts that
-//! Redis (or uses `TEST_REDIS_URL` / `REDIS_URL`).
+//! Each test takes its own tenant, so `stream_for` gives it a stream no sibling test touches.
+//! That is enough for isolation but **not** for concurrency: the replay test below deliberately
+//! calls `FLUSHALL`, which wipes the whole keyspace — every sibling's stream too. A tenant cannot
+//! protect against a global wipe, so the binary is held to one test at a time by the
+//! `serial-redis-loss` test group in `.config/nextest.toml`. Do not remove that override: without
+//! it, the replay test fails its siblings with `NOGROUP` whenever it overlaps them (measured
+//! 2026-11-15, run 43696201698). `support::redis` starts that Redis (or uses `TEST_REDIS_URL` /
+//! `REDIS_URL`).
 
 mod support;
 
