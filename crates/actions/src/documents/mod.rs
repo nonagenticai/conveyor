@@ -25,8 +25,8 @@ use crate::spec::FieldError;
 
 pub mod actions;
 pub mod ingest;
-pub mod revisions;
 pub mod repositories;
+pub mod revisions;
 pub mod secrets;
 
 /// The upload cap, in bytes: 10 MiB exactly (S09 §5.2).

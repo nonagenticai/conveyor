@@ -20,7 +20,7 @@ use uuid::Uuid;
 
 use super::actions::{DocumentIdIn, DocumentOut, can_publish, document_out_with_names, etag};
 use super::{
-    DOCUMENT_PUBLISHED, DOCUMENT_PUBLISH_REQUESTED, DOCUMENT_UNPUBLISHED, DOCUMENT_UPDATED,
+    DOCUMENT_PUBLISH_REQUESTED, DOCUMENT_PUBLISHED, DOCUMENT_UNPUBLISHED, DOCUMENT_UPDATED,
     document_error, emit_document_event, invalid,
 };
 use crate::invoke::{ActionError, HandlerCtx};
@@ -99,8 +99,10 @@ async fn documents_publish(
     )
     .await?;
     let etag = etag(updated.version.get());
-    Ok(HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
-        .with_etag(etag))
+    Ok(
+        HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
+            .with_etag(etag),
+    )
 }
 
 // ── documents.request_publish ────────────────────────────────────────────────────────────
@@ -153,8 +155,10 @@ async fn documents_request_publish(
     )
     .await?;
     let etag = etag(updated.version.get());
-    Ok(HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
-        .with_etag(etag))
+    Ok(
+        HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
+            .with_etag(etag),
+    )
 }
 
 // ── documents.revision_list / .get ────────────────────────────────────────────────────────
@@ -432,8 +436,10 @@ async fn documents_revisions_restore(
     )
     .await?;
     let etag = etag(updated.version.get());
-    Ok(HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
-        .with_etag(etag))
+    Ok(
+        HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
+            .with_etag(etag),
+    )
 }
 
 async fn author_names(
@@ -441,7 +447,10 @@ async fn author_names(
     records: &[store::document::DocumentRevisionRecord],
     action: &'static str,
 ) -> Result<HashMap<Uuid, String>, ActionError> {
-    let mut ids: Vec<Uuid> = records.iter().filter_map(|record| record.author_id).collect();
+    let mut ids: Vec<Uuid> = records
+        .iter()
+        .filter_map(|record| record.author_id)
+        .collect();
     ids.sort_unstable();
     ids.dedup();
     store::document::author_names_tx(conn, &ids)

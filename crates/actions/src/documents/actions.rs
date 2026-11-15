@@ -202,13 +202,7 @@ async fn names_for(
 ) -> Result<HashMap<Uuid, String>, ActionError> {
     let mut ids: Vec<Uuid> = records
         .iter()
-        .flat_map(|record| {
-            [
-                record.created_by,
-                record.updated_by,
-                record.published_by,
-            ]
-        })
+        .flat_map(|record| [record.created_by, record.updated_by, record.published_by])
         .flatten()
         .collect();
     ids.sort_unstable();
@@ -388,8 +382,10 @@ async fn documents_create(
     )
     .await?;
     let etag = etag(created.version.get());
-    Ok(HandlerOutput::created(document_out_with_names(&mut *tx, created, action).await?)
-        .with_etag(etag))
+    Ok(
+        HandlerOutput::created(document_out_with_names(&mut *tx, created, action).await?)
+            .with_etag(etag),
+    )
 }
 
 // ── documents.compose ─────────────────────────────────────────────────────────────────────
@@ -548,8 +544,10 @@ async fn documents_compose(
     )
     .await?;
     let etag = etag(created.version.get());
-    Ok(HandlerOutput::created(document_out_with_names(&mut *tx, created, action).await?)
-        .with_etag(etag))
+    Ok(
+        HandlerOutput::created(document_out_with_names(&mut *tx, created, action).await?)
+            .with_etag(etag),
+    )
 }
 
 // ── documents.get ─────────────────────────────────────────────────────────────────────────
@@ -583,8 +581,10 @@ async fn documents_get(
         .map_err(|error| document_error(error, "documents.get"))?
         .ok_or_else(|| ActionError::resource_not_found("such document"))?;
     let etag = etag(record.version.get());
-    Ok(HandlerOutput::ok(document_out_with_names(&mut *tx, record, "documents.get").await?)
-        .with_etag(etag))
+    Ok(
+        HandlerOutput::ok(document_out_with_names(&mut *tx, record, "documents.get").await?)
+            .with_etag(etag),
+    )
 }
 
 // ── documents.list ────────────────────────────────────────────────────────────────────────
@@ -598,6 +598,9 @@ pub struct DocumentListIn {
     /// Only this card's documents.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub card_id: Option<Uuid>,
+    /// Only this output's attachments.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_document_id: Option<Uuid>,
     /// Only this kind (`document | report | export`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kind: Option<String>,
@@ -651,6 +654,7 @@ async fn documents_list(
     let filter = DocumentFilter {
         project_id: input.project_id,
         card_id: input.card_id,
+        parent_document_id: input.parent_document_id,
         kind: input.kind,
         publishable: input.publishable,
         category: input
@@ -936,11 +940,7 @@ async fn documents_update(
                 }
             }
         }
-        if meta_changed
-            || body.is_some()
-            || input.category.is_some()
-            || input.unit.is_some()
-        {
+        if meta_changed || body.is_some() || input.category.is_some() || input.unit.is_some() {
             Some(merged)
         } else {
             None
@@ -977,8 +977,10 @@ async fn documents_update(
     )
     .await?;
     let etag = etag(updated.version.get());
-    Ok(HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
-        .with_etag(etag))
+    Ok(
+        HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
+            .with_etag(etag),
+    )
 }
 
 // ── documents.delete ──────────────────────────────────────────────────────────────────────

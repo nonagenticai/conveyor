@@ -209,7 +209,10 @@ pub(crate) async fn author_names(
     conn: &mut sqlx::PgConnection,
     records: &[DocumentRecord],
 ) -> Result<HashMap<Uuid, String>, sqlx::Error> {
-    let mut ids: Vec<Uuid> = records.iter().filter_map(|record| record.created_by).collect();
+    let mut ids: Vec<Uuid> = records
+        .iter()
+        .filter_map(|record| record.created_by)
+        .collect();
     ids.sort_unstable();
     ids.dedup();
     store::document::author_names_tx(conn, &ids).await
@@ -396,7 +399,14 @@ mod tests {
 
     #[test]
     fn the_page_uses_the_pack_assets_and_escapes_the_title() {
-        let page = output_page("<T>", "<p>x</p>", "2026-11-13T00:00:00Z", Some("S02"), None, &[]);
+        let page = output_page(
+            "<T>",
+            "<p>x</p>",
+            "2026-11-13T00:00:00Z",
+            Some("S02"),
+            None,
+            &[],
+        );
         assert!(
             page.contains("../docs.css"),
             "the page must share the pack CSS"

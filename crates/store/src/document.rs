@@ -16,7 +16,7 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::{RevisionStatus, TenantId, Version};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use sqlx::PgConnection;
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -144,6 +144,8 @@ pub struct DocumentFilter {
     pub project_id: Option<Uuid>,
     /// Only this card's documents.
     pub card_id: Option<Uuid>,
+    /// Only this output's attachments.
+    pub parent_document_id: Option<Uuid>,
     /// Only this kind.
     pub kind: Option<String>,
     /// Only publishable rows, or only unpublishable ones.
@@ -355,14 +357,15 @@ pub async fn list_documents_tx(
           WHERE tenant_id = $1
             AND ($2::uuid IS NULL OR project_id = $2)
             AND ($3::uuid IS NULL OR card_id = $3)
-            AND ($4::text IS NULL OR kind = $4)
-            AND ($5::boolean IS NULL OR publishable = $5)
-            AND ($6::text IS NULL OR category = $6)
-            AND ($7::text IS NULL OR unit = $7)
-            AND ($8::boolean IS NULL OR (publish_requested_at IS NOT NULL) = $8)
-            AND ($9::timestamptz IS NULL OR (updated_at, id) < ($9::timestamptz, $10::uuid))
+            AND ($4::uuid IS NULL OR parent_document_id = $4)
+            AND ($5::text IS NULL OR kind = $5)
+            AND ($6::boolean IS NULL OR publishable = $6)
+            AND ($7::text IS NULL OR category = $7)
+            AND ($8::text IS NULL OR unit = $8)
+            AND ($9::boolean IS NULL OR (publish_requested_at IS NOT NULL) = $9)
+            AND ($10::timestamptz IS NULL OR (updated_at, id) < ($10::timestamptz, $11::uuid))
           ORDER BY updated_at DESC, id DESC
-          LIMIT $11"
+          LIMIT $12"
     );
     let (cursor_at, cursor_id) = match &cursor {
         Some((key, id)) => {
@@ -377,6 +380,7 @@ pub async fn list_documents_tx(
         .bind(tenant.as_uuid())
         .bind(filter.project_id)
         .bind(filter.card_id)
+        .bind(filter.parent_document_id)
         .bind(filter.kind.as_deref())
         .bind(filter.publishable)
         .bind(filter.category.as_deref())
@@ -462,8 +466,14 @@ pub async fn update_document_revisioned_tx(
         write_document_revision_tx(&mut *conn, tenant, &current, "pre-image", None).await?;
     }
     let updated = apply_patch_tx(&mut *conn, tenant, &current, patch).await?;
-    write_document_revision_tx(&mut *conn, tenant, &updated, revision_label, revision_author)
-        .await?;
+    write_document_revision_tx(
+        &mut *conn,
+        tenant,
+        &updated,
+        revision_label,
+        revision_author,
+    )
+    .await?;
     Ok(updated)
 }
 
@@ -987,6 +997,29 @@ pub async fn revision_exists_tx(
     .fetch_one(&mut *conn)
     .await
     .map_err(DocumentStoreError::Database)
+}
+
+/// Remove a purged document's history.
+///
+/// The tombstone keeps the row until the purge; from then on the content is gone, and the
+/// revisions hold the same content. Leaving them behind would make delete a request that never
+/// removes what the author wrote.
+pub async fn delete_revisions_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    document_id: Uuid,
+) -> Result<u64, DocumentStoreError> {
+    let affected = sqlx::query(
+        "DELETE FROM revision
+          WHERE tenant_id = $1 AND entity_type = $2 AND entity_id = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(DOCUMENT_ENTITY_TYPE)
+    .bind(document_id)
+    .execute(&mut *conn)
+    .await?
+    .rows_affected();
+    Ok(affected)
 }
 
 /// One document's history, newest version first.

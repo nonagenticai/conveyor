@@ -580,12 +580,24 @@ async fn dispatch(
                         .map_err(|error| {
                             JobFailure::retryable(format!("clear the document content: {error}"))
                         })?;
+                    // The revisions hold the same content; a purge removes them with the body.
+                    let revisions =
+                        store::document::delete_revisions_tx(&mut tx, tenant, document_id)
+                            .await
+                            .map_err(|error| {
+                                JobFailure::retryable(format!(
+                                    "remove the document history: {error}"
+                                ))
+                            })?;
                     let mut changed = Vec::new();
                     if had_object {
                         changed.push("object_key");
                     }
                     if had_body {
                         changed.push("body");
+                    }
+                    if revisions > 0 {
+                        changed.push("revisions");
                     }
                     let event = store::NewEvent {
                         topic: format!("document:{document_id}"),

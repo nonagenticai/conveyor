@@ -121,7 +121,7 @@ window.installV2 = function (api, enterprise) {
     lastError: null,
     outputs: {},
     outputsLoading: null,
-    register: { items: [], loaded: false, loading: false, error: null },
+    register: { items: [], loaded: false, loading: false, error: null, next_cursor: null },
     programme: null,
     runs: [],
     runsLoaded: false,
@@ -553,15 +553,23 @@ window.installV2 = function (api, enterprise) {
     }
   }
 
-  // The cross-project register. One `documents.list` with no project filter: the operator sees
-  // every output in the tenant, and the project workspace reads the same rows through its own
-  // per-project cache.
-  async function consoleLoadRegister() {
-    if (!consoleOn() || cs.register.loading || cs.register.loaded) return;
+  // The cross-project register. One `documents.list` page at a time: the operator sees the
+  // tenant's outputs, and "Load more" follows the cursor instead of silently stopping at a cap.
+  async function consoleLoadRegister(more = false) {
+    if (!consoleOn() || cs.register.loading) return;
+    if (cs.register.loaded && !more) return;
     cs.register.loading = true;
     try {
-      const page = await C.action("documents.list", { page: { limit: 200 } });
-      cs.register.items = list(page.items);
+      const page = await C.action("documents.list", {
+        kind: "document",
+        page: {
+          limit: 50,
+          ...(more && cs.register.next_cursor ? { cursor: cs.register.next_cursor } : {}),
+        },
+      });
+      const items = list(page.items);
+      cs.register.items = more ? [...cs.register.items, ...items] : items;
+      cs.register.next_cursor = page.next_cursor || null;
       cs.register.error = null;
       cs.register.loaded = true;
     } catch (error) {
@@ -577,6 +585,7 @@ window.installV2 = function (api, enterprise) {
   function consoleRefreshOutputs(projectId) {
     cs.register.loaded = false;
     cs.register.items = [];
+    cs.register.next_cursor = null;
     if (projectId) delete cs.outputs[projectId];
     if (!consoleOn()) return;
     if (projectId) consoleLoadOutputs(projectId);
@@ -783,10 +792,24 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------- outputs */
-  const outputCategoryOf = (doc) => String(((doc.meta || {}).category) || "");
-  const outputUnitOf = (doc) => String(((doc.meta || {}).unit) || "");
-  const INCEPTION_CATEGORIES = ["analysis", "architecture"];
+  // The promoted columns are authoritative; the `meta` keys are the pre-0042 read and stay as a
+  // fallback for the rows composed before the migration.
+  const outputCategoryOf = (doc) => String(doc.category || ((doc.meta || {}).category) || "");
+  const outputUnitOf = (doc) => String(doc.unit || ((doc.meta || {}).unit) || "");
+  const outputAuthorOf = (doc) => String(doc.created_by_name || "");
+  const outputStateOf = (doc) =>
+    doc.publishable ? "public" : doc.publish_requested_at ? "review requested" : "draft";
+  const isAdmin = () => !!(C && C.role && C.role() === "admin");
+  const INCEPTION_CATEGORIES = ["inception-analysis", "architecture-design"];
+  // The standard's slots. One vocabulary until Lane 2 makes it a shared JSON file; the seed, this
+  // list and the action layer must agree.
   const OUTPUT_CATEGORIES = [
+    "project-brief",
+    "inception-analysis",
+    "architecture-design",
+    "decision",
+    "evidence",
+    "closure-review",
     "vision",
     "blueprint",
     "business-case",
@@ -794,17 +817,12 @@ window.installV2 = function (api, enterprise) {
     "governance",
     "reuse-map",
     "brief",
-    "project-brief",
     "brief-template",
     "architecture-analysis",
     "analysis",
     "architecture",
     "plan",
     "spec",
-    "decision",
-    "evidence",
-    "handoff",
-    "report",
   ];
 
   function outputsPage() {
@@ -818,17 +836,16 @@ window.installV2 = function (api, enterprise) {
       ? cs.register.items
       : list(pack.outputs).map((row) => ({ ...row, publishable: true }));
     const projectFilter = v.outputsProject || "";
-    const unitFilter = v.outputsUnit || "";
-    const visibility = v.outputsVisibility || "";
+    const stateFilter = v.outputsState || "";
     const categoryFilter = v.outputsCategory || "";
+    const unitFilter = v.outputsUnit || "";
     const categories = [...new Set(all.map(outputCategoryOf).filter(Boolean))].sort();
     const units = [...new Set(all.map(outputUnitOf).filter(Boolean))].sort();
     const rows = all.filter((doc) => {
       if (projectFilter && doc.project_id !== projectFilter) return false;
-      if (unitFilter && outputUnitOf(doc) !== unitFilter) return false;
-      if (visibility === "public" && !doc.publishable) return false;
-      if (visibility === "private" && doc.publishable) return false;
+      if (stateFilter && outputStateOf(doc) !== stateFilter) return false;
       if (categoryFilter && outputCategoryOf(doc) !== categoryFilter) return false;
+      if (unitFilter && outputUnitOf(doc) !== unitFilter) return false;
       return true;
     });
     const projectName = (doc) => {
@@ -842,22 +859,28 @@ window.installV2 = function (api, enterprise) {
         ? ` <a class="e-project-link" href="docs/output-${E(doc.id)}.html" target="_blank" rel="noopener">public ↗</a>`
         : "";
     const filters = signed
-      ? `<div class="toolbar"><label class="e-select">Project <select data-v2-input="outputs-filter" data-key="outputsProject"><option value="">Every project</option>${consoleProjects()
-          .map(
-            (p) =>
-              `<option value="${E(p.id)}" ${projectFilter === p.id ? "selected" : ""}>${E(p.key)} · ${E(p.name)}</option>`,
-          )
-          .join("")}</select></label><label class="e-select">Unit <select data-v2-input="outputs-filter" data-key="outputsUnit"><option value="">Any</option>${units
-          .map(
-            (u) =>
-              `<option value="${E(u)}" ${unitFilter === u ? "selected" : ""}>${E(u)}</option>`,
-          )
-          .join("")}</select></label><label class="e-select">Visibility <select data-v2-input="outputs-filter" data-key="outputsVisibility"><option value="">Any</option><option value="public" ${visibility === "public" ? "selected" : ""}>Published</option><option value="private" ${visibility === "private" ? "selected" : ""}>Private</option></select></label><label class="e-select">Category <select data-v2-input="outputs-filter" data-key="outputsCategory"><option value="">Any</option>${categories
-          .map(
-            (c) =>
-              `<option value="${E(c)}" ${categoryFilter === c ? "selected" : ""}>${E(c)}</option>`,
-          )
-          .join("")}</select></label><span class="mono muted">${rows.length} / ${all.length} outputs</span></div>`
+      ? `<div class="toolbar">
+          <label class="e-select">Project <select data-v2-input="outputs-filter" data-key="outputsProject"><option value="">Every project</option>${consoleProjects()
+            .map(
+              (p) =>
+                `<option value="${E(p.id)}" ${projectFilter === p.id ? "selected" : ""}>${E(p.key)} · ${E(p.name)}</option>`,
+            )
+            .join("")}</select></label>
+          <label class="e-select">State <select data-v2-input="outputs-filter" data-key="outputsState"><option value="">Any</option><option value="public" ${stateFilter === "public" ? "selected" : ""}>Published</option><option value="review requested" ${stateFilter === "review requested" ? "selected" : ""}>Review requested</option><option value="draft" ${stateFilter === "draft" ? "selected" : ""}>Draft</option></select></label>
+          <label class="e-select">Category <select data-v2-input="outputs-filter" data-key="outputsCategory"><option value="">Any</option>${categories
+            .map(
+              (c) =>
+                `<option value="${E(c)}" ${categoryFilter === c ? "selected" : ""}>${E(c)}</option>`,
+            )
+            .join("")}</select></label>
+          <label class="e-select">Unit <select data-v2-input="outputs-filter" data-key="outputsUnit"><option value="">Any</option>${units
+            .map(
+              (u) =>
+                `<option value="${E(u)}" ${unitFilter === u ? "selected" : ""}>${E(u)}</option>`,
+            )
+            .join("")}</select></label>
+          <span class="mono muted">${rows.length} of ${all.length} loaded</span>
+        </div>`
       : "";
     const signedRows = rows.map((doc) => {
       const actions = [
@@ -867,7 +890,28 @@ window.installV2 = function (api, enterprise) {
         C.can("documents.update")
           ? button("Edit", "output-edit", `data-id="${E(doc.id)}"`, "small", "edit")
           : "",
-        C.can("documents.update")
+        C.can("documents.revision_list")
+          ? button(
+              "History",
+              "output-history",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "file",
+            )
+          : "",
+        C.can("documents.create")
+          ? button("Attach", "output-attach", `data-id="${E(doc.id)}"`, "small", "plus")
+          : "",
+        !doc.publishable && C.can("documents.request_publish") && !doc.publish_requested_at
+          ? button(
+              "Request publish",
+              "output-request-publish",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "shield",
+            )
+          : "",
+        isAdmin() && C.can("documents.publish")
           ? button(
               doc.publishable ? "Unpublish" : "Publish",
               "output-publish",
@@ -889,15 +933,23 @@ window.installV2 = function (api, enterprise) {
             )
           : "",
       ].join("");
-      return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)}</small></td><td>${E(projectName(doc))}</td><td>${E(outputUnitOf(doc) || "—")}</td><td>${E(outputCategoryOf(doc) || "—")}</td><td>${B(doc.publishable ? "public" : "private", doc.publishable ? "green" : "")}${pageLink(doc)}</td><td><div class="console-actions">${actions}</div></td></tr>`;
+      const state = outputStateOf(doc);
+      return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)}</small></td><td>${E(projectName(doc))}</td><td>${E(outputUnitOf(doc) || "—")}</td><td>${E(outputCategoryOf(doc) || "—")}</td><td>${E(outputAuthorOf(doc) || "—")}</td><td>${B(state, doc.publishable ? "green" : "")}${pageLink(doc)}</td><td><div class="console-actions">${actions}</div></td></tr>`;
     });
     const publicRows = rows.map(
       (doc) =>
         `<tr><td><a class="e-project-link" href="${E(doc.path || `docs/output-${doc.id}.html`)}" target="_blank" rel="noopener"><strong>${E(doc.title)}</strong></a></td><td>${E(doc.project_key || doc.project_name || "—")}</td><td><small>${E(short(doc.updated_at, 16))}</small></td></tr>`,
     );
     const body = signed
-      ? table(["Output", "Project", "Unit", "Category", "Visibility", "Operate"], signedRows)
+      ? table(
+          ["Output", "Project", "Unit", "Category", "Author", "State", "Operate"],
+          signedRows,
+        )
       : table(["Output", "Project", "Updated"], publicRows);
+    const more =
+      signed && cs.register.next_cursor
+        ? `<div class="row" style="margin-top:10px">${button("Load more", "outputs-more", "", "small", "arrow")}</div>`
+        : "";
     const compose = signed && C.can("documents.compose")
       ? button("Compose output", "output-new-register", "", "small", "plus")
       : "";
@@ -918,7 +970,7 @@ window.installV2 = function (api, enterprise) {
     }${panel(
       "Outputs",
       (signed ? signedRows : publicRows).length
-        ? body
+        ? `${body}${more}`
         : `<p class="muted">${
             signed
               ? "No output matches these filters. Compose one, or clear a filter."
@@ -1164,7 +1216,7 @@ window.installV2 = function (api, enterprise) {
       groups.get(key).push(doc);
     });
     const rows = [...groups.entries()].flatMap(([key, docs]) => [
-      `<tr class="console-group"><td colspan="4"><strong>${E(key)}</strong></td></tr>`,
+      `<tr class="console-group"><td colspan="5"><strong>${E(key)}</strong></td></tr>`,
       ...docs.map((doc) => {
         const actions = [
           C.can("documents.get")
@@ -1173,7 +1225,28 @@ window.installV2 = function (api, enterprise) {
           C.can("documents.update")
             ? button("Edit", "output-edit", `data-id="${E(doc.id)}"`, "small", "edit")
             : "",
-          C.can("documents.update")
+          C.can("documents.revision_list")
+            ? button(
+                "History",
+                "output-history",
+                `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+                "small",
+                "file",
+              )
+            : "",
+          C.can("documents.create")
+            ? button("Attach", "output-attach", `data-id="${E(doc.id)}"`, "small", "plus")
+            : "",
+          !doc.publishable && C.can("documents.request_publish") && !doc.publish_requested_at
+            ? button(
+                "Request publish",
+                "output-request-publish",
+                `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+                "small",
+                "shield",
+              )
+            : "",
+          isAdmin() && C.can("documents.publish")
             ? button(
                 doc.publishable ? "Unpublish" : "Publish",
                 "output-publish",
@@ -1183,16 +1256,13 @@ window.installV2 = function (api, enterprise) {
               )
             : "",
         ].join("");
-        return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)} · ${E(doc.content_type || "text/markdown")}</small></td><td>${B(
-          doc.publishable ? "public" : "private",
-          doc.publishable ? "green" : "",
-        )}</td><td><small>${E(short(doc.updated_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
+        return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)} · ${E(doc.content_type || "text/markdown")}</small></td><td>${E(outputAuthorOf(doc) || "—")}</td><td>${B(outputStateOf(doc), doc.publishable ? "green" : "")}</td><td><small>${E(short(doc.updated_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
       }),
     ]);
     return panel(
       `${project.key} · Outputs`,
       rows.length
-        ? table(["Output", "Visibility", "Updated", "Operate"], rows)
+        ? table(["Output", "Author", "State", "Updated", "Operate"], rows)
         : `<p class="muted">No output yet. An output is a design note, evidence record or decision bound to this project and, optionally, a card.</p>`,
       C.can("documents.compose")
         ? button("Compose output", "output-new", `data-project="${E(project.id)}"`, "small", "plus")
@@ -1414,7 +1484,7 @@ window.installV2 = function (api, enterprise) {
       (c) =>
         `<option value="${E(c)}" ${nextCategory === c ? "selected" : ""}>${E(c)}</option>`,
     ).join("");
-    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}${projectSelect}<label class="field full"><span>Title</span><input id="output-title" value="${E(template.title || "")}" placeholder="What this output records"></label><label class="field full"><span>Unit (project key or issue number)</span><input id="output-unit" value="${E(unitValue)}" placeholder="${E((project || {}).key || "121")}" spellcheck="false"></label><label class="field full"><span>Category</span><select id="output-category"><option value="">—</option>${options}</select></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why.">${E(template.body || "")}</textarea></label><label class="check"><input id="output-publishable" type="checkbox"> Publish this output on the public design site</label><p class="muted">The body is capped at 256 KiB. It starts private unless you tick the box.</p></div>`;
+    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}${projectSelect}<label class="field full"><span>Title</span><input id="output-title" value="${E(template.title || "")}" placeholder="What this output records"></label><label class="field full"><span>Unit (project key or issue number)</span><input id="output-unit" value="${E(unitValue)}" placeholder="${E((project || {}).key || "121")}" spellcheck="false"></label><label class="field full"><span>Category</span><select id="output-category"><option value="">—</option>${options}</select></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why.">${E(template.body || "")}</textarea></label><p class="muted">The body is capped at 256 KiB. Saving keeps it a draft; an admin publishes it after review.</p></div>`;
     openDialog(
       nextCategory ? `Compose ${nextCategory}` : "Compose output",
       body,
@@ -1426,7 +1496,6 @@ window.installV2 = function (api, enterprise) {
   async function consoleOutputSave(projectId) {
     const title = (document.getElementById("output-title") || {}).value || "";
     const body = (document.getElementById("output-body") || {}).value || "";
-    const publishable = !!(document.getElementById("output-publishable") || {}).checked;
     const chosen =
       (document.getElementById("output-project") || {}).value || projectId || "";
     const unit = ((document.getElementById("output-unit") || {}).value || "").trim();
@@ -1439,21 +1508,18 @@ window.installV2 = function (api, enterprise) {
       toast("Choose a project for this output");
       return;
     }
-    const meta = {};
-    if (unit) meta.unit = unit;
-    if (category) meta.category = category;
     try {
       await C.action("documents.compose", {
         project_id: chosen,
         card_id: v.outputCard || undefined,
         title: title.trim(),
         body,
-        publishable,
-        meta: Object.keys(meta).length ? meta : undefined,
+        category: category || undefined,
+        unit: unit || undefined,
       });
       v.outputCard = null;
       closeWorkspaceDialog();
-      toast(publishable ? "Output saved and marked public" : "Output saved (private)");
+      toast("Output saved as a draft");
       consoleRefreshOutputs(chosen);
     } catch (error) {
       cs.lastError = error;
@@ -1470,19 +1536,39 @@ window.installV2 = function (api, enterprise) {
       toast("Read refused · " + consoleError(error));
       return;
     }
-    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Title</span><input id="output-title" value="${E(doc.title)}"></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10">${E(doc.body || "")}</textarea></label><label class="check"><input id="output-publishable" type="checkbox" ${doc.publishable ? "checked" : ""}> Publish this output on the public design site</label><p class="muted">Version ${E(doc.version)} · content hash <span class="mono">${E(short(doc.content_hash, 12))}</span></p></div>`;
-    openDialog(
-      `Edit · ${doc.title}`,
-      body,
-      `${button("Save changes", "output-update", `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`, "primary", "shield")}${btn("Cancel", "close-dialog")}`,
-      true,
-    );
+    const locked = doc.publishable && !isAdmin();
+    const options = OUTPUT_CATEGORIES.map(
+      (c) =>
+        `<option value="${E(c)}" ${outputCategoryOf(doc) === c ? "selected" : ""}>${E(c)}</option>`,
+    ).join("");
+    const body = `<div class="dialog-body console-dialog-body">${
+      doc.publishable
+        ? note(
+            locked
+              ? "<strong>Published</strong> · this output is public; only an admin can edit it. Ask an admin to unpublish it first."
+              : "<strong>Published</strong> · an edit is versioned and stays public until an admin unpublishes it.",
+          )
+        : ""
+    }<label class="field full"><span>Title</span><input id="output-title" value="${E(doc.title)}" ${locked ? "disabled" : ""}></label><label class="field full"><span>Category</span><select id="output-category" ${locked ? "disabled" : ""}><option value="">—</option>${options}</select></label><label class="field full"><span>Unit (project key or issue)</span><input id="output-unit" value="${E(outputUnitOf(doc))}" spellcheck="false" ${locked ? "disabled" : ""}></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" ${locked ? "disabled" : ""}>${E(doc.body || "")}</textarea></label><p class="muted">Version ${E(doc.version)} · content hash <span class="mono">${E(short(doc.content_hash, 12))}</span>. Every save keeps the previous version in the history.</p></div>`;
+    const actions = `${
+      locked
+        ? ""
+        : button(
+            "Save changes",
+            "output-update",
+            `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+            "primary",
+            "shield",
+          )
+    }${button("History", "output-history", `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`, "", "file")}${btn("Cancel", "close-dialog")}`;
+    openDialog(`Edit · ${doc.title}`, body, actions, true);
   }
 
   async function consoleOutputUpdate(id, version) {
     const title = (document.getElementById("output-title") || {}).value || "";
     const body = (document.getElementById("output-body") || {}).value || "";
-    const publishable = !!(document.getElementById("output-publishable") || {}).checked;
+    const category = (document.getElementById("output-category") || {}).value || "";
+    const unit = ((document.getElementById("output-unit") || {}).value || "").trim();
     if (!title.trim() || !body.trim()) {
       toast("An output needs a title and a body");
       return;
@@ -1490,7 +1576,7 @@ window.installV2 = function (api, enterprise) {
     try {
       const updated = await C.action(
         "documents.update",
-        { id, title: title.trim(), body, publishable },
+        { id, title: title.trim(), body, category, unit },
         { etag: Number(version) },
       );
       closeWorkspaceDialog();
@@ -1506,16 +1592,217 @@ window.installV2 = function (api, enterprise) {
   async function consoleOutputPublish(id, publishable, version) {
     try {
       const updated = await C.action(
-        "documents.update",
-        { id, publishable },
+        "documents.publish",
+        { id, publish: publishable },
         { etag: Number(version) },
       );
-      toast(publishable ? "Output marked public" : "Output unpublished");
+      toast(publishable ? "Output published" : "Output unpublished");
       consoleRefreshOutputs(updated.project_id);
     } catch (error) {
       cs.lastError = error;
-      toast("Publish flag refused · " + consoleError(error));
+      toast("Publish refused · " + consoleError(error));
       render();
+    }
+  }
+
+  async function consoleOutputRequestPublish(id, version) {
+    try {
+      const updated = await C.action(
+        "documents.request_publish",
+        { id },
+        { etag: Number(version) },
+      );
+      toast("Publish requested");
+      consoleRefreshOutputs(updated.project_id);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Request refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  async function consoleOutputHistory(id, version) {
+    try {
+      const revisions = list(await C.action("documents.revision_list", { id, limit: 50 }));
+      const rows = revisions.map((rev) => {
+        const actions = [
+          button(
+            "View",
+            "revision-view",
+            `data-id="${E(id)}" data-seq="${E(rev.seq)}"`,
+            "small",
+            "file",
+          ),
+          C.can("documents.revision_restore")
+            ? button(
+                "Restore",
+                "revision-restore",
+                `data-id="${E(id)}" data-seq="${E(rev.seq)}" data-version="${E(version)}"`,
+                "small",
+                "replay",
+              )
+            : "",
+        ].join("");
+        return `<tr><td class="mono">v${E(rev.seq)}</td><td>${E(rev.label)}</td><td>${E(rev.author || "—")}</td><td><small>${E(short(rev.created_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
+      });
+      openDialog(
+        "History",
+        `<div class="dialog-body console-dialog-body">${
+          rows.length
+            ? table(["Version", "Change", "Author", "When", "Operate"], rows)
+            : "<p class='muted'>No revision recorded yet.</p>"
+        }<p class="muted">Restore copies the chosen text forward as a new draft; it never rewrites history and never republishes.</p></div>`,
+        btn("Close", "close-dialog"),
+        true,
+      );
+    } catch (error) {
+      toast("History refused · " + consoleError(error));
+    }
+  }
+
+  async function consoleRevisionView(id, seq) {
+    try {
+      const rev = await C.action("documents.revision_get", { id, seq: Number(seq) });
+      const content = rev.content || {};
+      const body = `<div class="dialog-body console-dialog-body">${kv([
+        ["Version", `<span class="mono">v${E(rev.seq)}</span>`],
+        ["Change", E(rev.label)],
+        ["Author", E(rev.author || "—")],
+      ])}<pre class="console-output-body">${E(content.body || "(no body)")}</pre></div>`;
+      openDialog(`Version ${seq}`, body, btn("Close", "close-dialog"), true);
+    } catch (error) {
+      toast("Version refused · " + consoleError(error));
+    }
+  }
+
+  function consoleRevisionRestore(id, seq, version) {
+    openDialog(
+      "Restore version",
+      `<div class="dialog-body console-dialog-body"><p>Restore <span class="mono">v${E(seq)}</span> as a new draft? The current version stays in the history, and the restored text is not public until an admin publishes it.</p></div>`,
+      `${button("Restore", "revision-restore-confirm", `data-id="${E(id)}" data-seq="${E(seq)}" data-version="${E(version)}"`, "primary", "replay")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleRevisionRestoreConfirm(id, seq, version) {
+    try {
+      const updated = await C.action(
+        "documents.revision_restore",
+        { id, seq: Number(seq) },
+        { etag: Number(version) },
+      );
+      closeWorkspaceDialog();
+      toast("Version restored as a draft");
+      consoleRefreshOutputs(updated.project_id);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Restore refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  /* ---------------------------------------------------------- attachments */
+  const fileBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
+      reader.onerror = () => reject(reader.error || new Error("the file could not be read"));
+      reader.readAsDataURL(file);
+    });
+
+  const contentTypeOf = (name) => {
+    const extension = String(name || "").toLowerCase().split(".").pop();
+    return (
+      {
+        png: "image/png",
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        pdf: "application/pdf",
+        svg: "image/svg+xml",
+        json: "application/json",
+        csv: "text/csv",
+        md: "text/markdown",
+        txt: "text/plain",
+      }[extension] || "text/plain"
+    );
+  };
+
+  async function consoleOutputAttach(id) {
+    openDialog(
+      "Attachments",
+      `<div class="dialog-body console-dialog-body"><div id="output-attachments">Loading attachments…</div><label class="field full"><span>Add a file (10 MiB cap)</span><input type="file" data-v2-input="output-attachment" data-id="${E(id)}" accept=".png,.jpg,.jpeg,.pdf,.svg,.json,.csv,.md,.txt"></label><p class="muted">PNG and JPEG are shown inline on the public page; every other type is served as a download. An attachment is public only while its output is.</p></div>`,
+      btn("Close", "close-dialog"),
+      true,
+    );
+    consoleLoadAttachments(id);
+  }
+
+  async function consoleLoadAttachments(id) {
+    const host = document.getElementById("output-attachments");
+    if (!host) return;
+    try {
+      const page = await C.action("documents.list", {
+        parent_document_id: id,
+        kind: "attachment",
+        page: { limit: 50 },
+      });
+      const rows = list(page.items);
+      host.innerHTML = rows.length
+        ? `<ul class="console-attachments">${rows
+            .map(
+              (row) =>
+                `<li><strong>${E(row.title)}</strong> <small class="mono">${E(row.content_type || "")}${
+                  row.size_bytes ? ` · ${E(row.size_bytes)} B` : ""
+                }</small> ${C.can("documents.download") ? button("Download", "attachment-download", `data-id="${E(row.id)}" data-type="${E(row.content_type || "")}" data-name="${E(row.title)}"`, "small", "download") : ""}</li>`,
+            )
+            .join("")}</ul>`
+        : `<p class="muted">No attachment yet.</p>`;
+    } catch (error) {
+      host.innerHTML = `<p class="muted">Attachments could not be read: ${E(consoleError(error))}</p>`;
+    }
+  }
+
+  async function consoleOutputAttachFile(input) {
+    const file = input.files && input.files[0];
+    const id = input.dataset.id;
+    if (!file || !id) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast("The file is larger than 10 MiB");
+      input.value = "";
+      return;
+    }
+    try {
+      const content_base64 = await fileBase64(file);
+      await C.action("documents.create", {
+        title: file.name,
+        content_type: file.type || contentTypeOf(file.name),
+        content_base64,
+        parent_document_id: id,
+      });
+      toast("Attachment uploaded");
+      input.value = "";
+      consoleLoadAttachments(id);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Attachment refused · " + consoleError(error));
+    }
+  }
+
+  async function consoleAttachmentDownload(id, contentType, filename) {
+    try {
+      const dl = await C.action("documents.download", { id });
+      const bytes = Uint8Array.from(atob(dl.content_base64 || ""), (c) => c.charCodeAt(0));
+      const blob = new Blob([bytes], {
+        type: dl.content_type || contentType || "application/octet-stream",
+      });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename || "attachment";
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      toast("Download refused · " + consoleError(error));
     }
   }
 
@@ -1574,13 +1861,13 @@ window.installV2 = function (api, enterprise) {
     const label = category.replace(/-/g, " ");
     const heading = label.charAt(0).toUpperCase() + label.slice(1);
     const templates = {
-      analysis: {
-        category: "analysis",
-        title: `Analysis — ${project.key} ${project.name}`,
-        body: `# Analysis — ${project.key}\n\n## Current state\n\nWhat exists today, inside the conveyor repo and in the wider estate.\n\n## Reuse sources\n\nInside the conveyor repo, the wider estate, upstream crates. Name the capability and the boundary; no private host or path.\n\n## Build vs reuse\n\n## Risks\n\n`,
+      "inception-analysis": {
+        category: "inception-analysis",
+        title: `Inception analysis — ${project.key} ${project.name}`,
+        body: `# Inception analysis — ${project.key}\n\n## Current state\n\nWhat exists today, inside the conveyor repo and in the wider estate.\n\n## Reuse sources\n\nInside the conveyor repo, the wider estate, upstream crates. Name the capability and the boundary; no private host or path.\n\n## Build vs reuse\n\n## Risks\n\n`,
       },
-      architecture: {
-        category: "architecture",
+      "architecture-design": {
+        category: "architecture-design",
         title: `Architecture — ${project.key} ${project.name}`,
         body: `# Architecture — ${project.key}\n\n## Context and boundary\n\n## Aggregates, tables, actions\n\n## Decisions\n\nA deviation from the blueprint is a decision record, not a silent fork.\n\n## Acceptance\n\n`,
       },
@@ -3802,6 +4089,11 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
       render();
       return;
     }
+    const attachment = event.target.closest('[data-v2-input="output-attachment"]');
+    if (attachment) {
+      consoleOutputAttachFile(attachment);
+      return;
+    }
     const el = event.target.closest('[data-v2-input="pko-search"]');
     if (!el) return;
     v.pkoQuery = el.value.trim().toLowerCase();
@@ -3933,6 +4225,30 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         break;
       case "output-delete-confirm":
         consoleOutputDeleteConfirm(d.id, d.version);
+        break;
+      case "output-request-publish":
+        consoleOutputRequestPublish(d.id, d.version);
+        break;
+      case "output-history":
+        consoleOutputHistory(d.id, d.version);
+        break;
+      case "output-attach":
+        consoleOutputAttach(d.id);
+        break;
+      case "revision-view":
+        consoleRevisionView(d.id, d.seq);
+        break;
+      case "revision-restore":
+        consoleRevisionRestore(d.id, d.seq, d.version);
+        break;
+      case "revision-restore-confirm":
+        consoleRevisionRestoreConfirm(d.id, d.seq, d.version);
+        break;
+      case "attachment-download":
+        consoleAttachmentDownload(d.id, d.type, d.name);
+        break;
+      case "outputs-more":
+        consoleLoadRegister(true);
         break;
       case "output-new-register":
         consoleOutputNew();
