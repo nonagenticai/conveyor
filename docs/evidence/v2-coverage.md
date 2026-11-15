@@ -7,7 +7,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 |---|---|---|
 | `exists` | implemented in code and backed by real rows | 11 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
-| `new` | absent | 23 |
+| `new` | absent | 25 |
 
 ## Rows
 
@@ -44,6 +44,8 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:kata` | §10.4 | actions | kata | `new` | actions: kata.* absent<br>*V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5.* |
 | `actions:development` | §10.4 | actions | development | `new` | actions: dev.* absent |
 | `actions:operations` | §10.4 | actions | operations | `new` | actions: ops.* absent |
+| `actions:analysis` | §10.4 | actions | analysis | `new` | actions: analyse.* absent |
+| `actions:production` | §10.4 | actions | production | `new` | actions: produce.* absent |
 | `actions:tools` | §10.4 | actions | tools | `new` | actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* absent<br>actions: tools.* absent |
 | `actions:memory` | §10.4 | actions | memory | `new` | actions: lessons.* absent |
 | `actions:metrics` | §10.4 | actions | metrics | `new` | actions: metrics.* absent |
