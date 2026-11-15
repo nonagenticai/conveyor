@@ -441,7 +441,9 @@ def self_test() -> int:
     ]
 
     failures = 0
+    total = 0
     for name, issues, prs, branches, want_fixes, want_reports in cases:
+        total += 1
         fixes, reports = plan(issues, prs, branches, blocker_state, now)
         got_fixes = [fix["number"] for fix in fixes]
         got_reports = [f"{report['rule']}:{report['number']}" for report in reports]
@@ -459,13 +461,14 @@ def self_test() -> int:
            "evidence": ["branch `issue/149-work-store`", "open PR #150"]}
     body = comment_for(fix)
     for needle in ("status:claimed", "#150", "issue/149-work-store", "not free to claim"):
+        total += 1
         if needle in body:
             print(f"ok: comment names {needle!r}")
         else:
             failures += 1
             print(f"FAIL: comment omits {needle!r}")
 
-    print(f"\n{len(cases) + 1 - failures} passing, {failures} failing")
+    print(f"\n{total - failures} passing, {failures} failing")
     return 1 if failures else 0
 
 
