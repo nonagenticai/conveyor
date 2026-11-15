@@ -1,0 +1,70 @@
+name: board
+
+# The label contract in `docs/plans/03-DELIVERY.md` § "Labels and states" is written by hand,
+# and that hand step is the one that gets skipped. Measured 2026-11-15: #137 and #140 carried
+# `status:ready` with live branches; they were repaired by hand at 15:47Z, and then #149 and
+# #151 were created ready at 15:56Z/16:35Z and claimed without the label moving; #121 and #122
+# stayed `status:blocked` on a blocker that closed at 00:37:54Z.
+#
+# Nothing local can catch this. A claim is a REMOTE BRANCH (`reap-stale-claims.sh`), so the
+# reaper reads branches and never labels, and a session only notices a stale label when it is
+# already looking for work. This runs server-side, so it holds for every session on every
+# machine, including the ones that never read this file.
+#
+# Rule A (ready + a live branch or an open PR -> claimed) is the only automatic action, and it
+# moves in ONE direction only: a check that could also return an issue to `ready` could steal a
+# claim, which is worse than the drift it repairs. Rules B (blocked with no open blocker) and C
+# (claimed with no branch and no update in 48 h) are reported in the job summary and never
+# applied -- releasing a claim stays a human decision.
+#
+# Disable with: gh workflow disable board.yml
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print the plan and write nothing (the job fails if a rule-A fix is pending)"
+        type: boolean
+        default: false
+
+# Read by default; the one write is scoped to the job that needs it, so nothing else in this
+# file can inherit it. zizmor's excessive-permissions audit fails a workflow-level `issues: write`.
+permissions:
+  contents: read
+
+concurrency:
+  group: board
+  cancel-in-progress: true
+
+jobs:
+  board:
+    name: Check the label contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Check
+        # Inputs and context go through env, never interpolated into the script: the dispatch
+        # input is caller-supplied, and `${{ }}` inside `run:` is the template-injection shape.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          args=(--repo "$REPO")
+          # `:-` because a scheduled run has no inputs, and `set -u` must not depend on whether
+          # Actions exports an empty value or omits the variable.
+          if [ "${DRY_RUN:-}" = "true" ]; then
+            args+=(--dry-run)
+          fi
+          python3 scripts/ci/board.py "${args[@]}"

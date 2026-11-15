@@ -323,8 +323,19 @@
     {
       "day": "DATE",
       "licensed_share": 1.0,
-      "n": 5,
-      "n_licence_recorded": 5,
+      "n": 1,
+      "n_licence_recorded": 1,
+      "requested_model": "stub-model",
+      "seed_share": 0.0,
+      "served_model_root": null,
+      "served_provider": null,
+      "t0_share": 0.0
+    },
+    {
+      "day": "DATE",
+      "licensed_share": 1.0,
+      "n": 6,
+      "n_licence_recorded": 6,
       "requested_model": "stub-model",
       "seed_share": 0.0,
       "served_model_root": null,

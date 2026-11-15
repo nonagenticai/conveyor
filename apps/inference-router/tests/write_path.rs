@@ -59,6 +59,28 @@ async fn stub_provider() -> std::net::SocketAddr {
     address
 }
 
+/// A provider that answers 200 with a usable payload but no content at all: a `Blank` attempt that
+/// still reports usage. The live catalog marks this provider ground truth, so P3's pinned retry
+/// does not fire and the caller still receives the blank answer.
+async fn blank_stub_provider() -> std::net::SocketAddr {
+    async fn handler(axum::Json(_body): axum::Json<Value>) -> axum::Json<Value> {
+        axum::Json(json!({
+            "id": "chatcmpl-blank",
+            "model": "stub-model",
+            "served_model": "stub-model",
+            "choices": [{"index": 0, "message": {"role": "assistant", "content": "   "}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
+        }))
+    }
+    let app = Router::new().route("/v1/chat/completions", post(handler));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind stub");
+    let address = listener.local_addr().expect("address");
+    tokio::spawn(async move { axum::serve(listener, app).await.expect("stub serves") });
+    address
+}
+
 /// The `completion_attributed` request, byte for byte: model, content and max_tokens all feed the
 /// request fingerprint, so changing any of them changes the hash this test pins.
 fn attributed_request() -> Body {
@@ -206,6 +228,183 @@ async fn a_served_request_writes_its_row_and_one_cost_event() {
             "cost_source"
         ]
     );
+}
+
+#[tokio::test]
+async fn a_failover_bills_each_attempt_with_its_own_tokens() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+
+    let failing = failing_stub_provider().await;
+    let serving = stub_provider().await;
+    // No alias for the requested model, so the route is the whole chain and a failure fails over.
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: stub-fail\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{failing}/v1\n    model: stub-model\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{serving}/v1\n    model: stub-model\ndefault_chain: [stub-fail, stub-openai]\n"
+    ))
+    .expect("catalog");
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let recorder = Arc::new(Recorder::default());
+    let state = AppState::with_deps(
+        Config::from_lookup(|_| None).expect("defaults"),
+        router,
+        AppDeps {
+            ledger: Some(db.pool.clone()),
+            budget: Arc::new(AllowAllGate),
+            cost: recorder.clone(),
+            ..AppDeps::default()
+        },
+    );
+
+    let body = Body::from(
+        json!({
+            "model": "unaliased-model",
+            "messages": [{"role": "user", "content": "failover"}],
+            "max_tokens": 8
+        })
+        .to_string(),
+    );
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-tenant-id", TENANT)
+                .body(body)
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["served_provider"], "stub-openai");
+
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 2, "one event per provider attempt");
+    // The failed first attempt spent nothing billable, and must not inherit the served usage.
+    assert_eq!(events[0].provider, "stub-fail");
+    assert_eq!(events[0].input_tokens, 0);
+    assert_eq!(events[0].output_tokens, 0);
+    assert!(!events[0].fallback_used);
+    // The attempt that served carries its own usage.
+    assert_eq!(events[1].provider, "stub-openai");
+    assert_eq!(events[1].input_tokens, 7);
+    assert_eq!(events[1].output_tokens, 3);
+    assert!(events[1].fallback_used);
+}
+
+#[tokio::test]
+async fn a_blank_attempt_is_recorded_as_served_and_still_bills_its_usage() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+
+    let address = blank_stub_provider().await;
+    // Ground truth: the reference does not retry this provider's blank answer, it serves it.
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: stub-model\n    is_ground_truth: true\n    model_aliases:\n      stub-model: stub-model\ndefault_chain: [stub-openai]\n"
+    ))
+    .expect("catalog");
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let recorder = Arc::new(Recorder::default());
+    let state = AppState::with_deps(
+        Config::from_lookup(|_| None).expect("defaults"),
+        router,
+        AppDeps {
+            ledger: Some(db.pool.clone()),
+            budget: Arc::new(AllowAllGate),
+            cost: recorder.clone(),
+            ..AppDeps::default()
+        },
+    );
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-tenant-id", TENANT)
+                .body(attributed_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    // A ground-truth provider's blank is not retried: the caller receives it, so it served.
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+
+    let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM inference_call")
+        .fetch_one(&db.pool)
+        .await
+        .expect("count");
+    assert_eq!(
+        rows, 1,
+        "the blank answer was returned, so it is the served row"
+    );
+
+    // It is still an attempt that spent tokens, so it is still billed its own usage.
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 1);
+    assert_eq!(events[0].input_tokens, 7);
+    assert_eq!(events[0].output_tokens, 3);
+}
+
+#[tokio::test]
+async fn a_second_blank_writes_the_refusal_row_the_reference_records() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+
+    let address = blank_stub_provider().await;
+    // NOT ground truth: the pinned path retries the blank once and refuses the second.
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: stub-model\n    model_aliases:\n      stub-model: stub-model\ndefault_chain: [stub-openai]\n"
+    ))
+    .expect("catalog");
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let recorder = Arc::new(Recorder::default());
+    let state = AppState::with_deps(
+        Config::from_lookup(|_| None).expect("defaults"),
+        router,
+        AppDeps {
+            ledger: Some(db.pool.clone()),
+            budget: Arc::new(AllowAllGate),
+            cost: recorder.clone(),
+            ..AppDeps::default()
+        },
+    );
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-tenant-id", TENANT)
+                .body(attributed_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::BAD_GATEWAY);
+
+    // The reference records the call it paid for: one row with the refusal's status and none of
+    // the response columns — captured from the oracle's second-blank case on 2026-11-15.
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["status"], "502");
+    assert_eq!(row["streamed"], false);
+    assert_eq!(row["served_provider"], Value::Null);
+    assert_eq!(row["served_model"], Value::Null);
+    assert_eq!(row["finish_reason"], Value::Null);
+    assert!(row["request_sha256"].is_string());
+    assert_eq!(row["response_sha256"], Value::Null);
+    assert_eq!(row["response_json_valid"], Value::Null);
+    assert_eq!(row["request_text_sha256"], Value::Null);
+
+    // Both attempts spent their own tokens, so both are billed.
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 2, "every attempt is a cost event");
+    assert_eq!(events[0].input_tokens, 7);
+    assert!(events[1].fallback_used);
 }
 
 #[tokio::test]

@@ -320,6 +320,10 @@ jobs:
       - name: disk headroom
         run: df -h /
 
+      # Fixtures only: no network, no git, no clock. The live board check is board.yml, hourly.
+      - name: board contract fixtures
+        run: bash scripts/ci/tests/board.sh
+
       - name: cargo fmt
         run: cargo fmt --all -- --check
 
