@@ -55,7 +55,10 @@ fn nested_objects(depth: usize) -> Value {
 
 #[test]
 fn a_null_content_is_blank() {
-    assert_eq!(completion_reason(&response(Value::Null)), Some(EmptyReason::Blank));
+    assert_eq!(
+        completion_reason(&response(Value::Null)),
+        Some(EmptyReason::Blank)
+    );
 }
 
 #[test]
@@ -98,7 +101,12 @@ fn empty_json_shapes_are_empty_results() {
 #[test]
 fn a_scalar_value_is_a_real_answer() {
     // 0 / false are answers: {"n": 0} answers "how many". Not vacuous, so not an empty result.
-    for text in [r#"{"a": 0}"#, r#"{"a": false}"#, r#"{"n": 3}"#, r#"{"score": 0.0}"#] {
+    for text in [
+        r#"{"a": 0}"#,
+        r#"{"a": false}"#,
+        r#"{"n": 3}"#,
+        r#"{"score": 0.0}"#,
+    ] {
         assert_eq!(completion_reason(&response(json!(text))), None, "{text}");
         assert!(!is_vacuous_json(text), "{text}");
     }
@@ -115,7 +123,14 @@ fn a_non_empty_list_of_hollow_objects_is_not_vacuous() {
 
 #[test]
 fn prose_and_top_level_scalars_are_not_vacuous() {
-    for text in ["ok", "Sure, here is the answer.", "3", "\"done\"", "true", "null"] {
+    for text in [
+        "ok",
+        "Sure, here is the answer.",
+        "3",
+        "\"done\"",
+        "true",
+        "null",
+    ] {
         assert!(!is_vacuous_json(text), "{text}");
         assert_eq!(completion_reason(&response(json!(text))), None, "{text}");
     }

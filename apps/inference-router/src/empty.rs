@@ -68,9 +68,10 @@ pub fn completion_reason(response: &ChatCompletionResponse) -> Option<EmptyReaso
 ///
 /// Vacuously true for an empty `choices` list, matching the reference's loop.
 pub fn every_choice_blank(response: &ChatCompletionResponse) -> bool {
-    response.choices.iter().all(|choice| {
-        !has_tool_calls(&choice.message) && content_is_blank(&choice.message.content)
-    })
+    response
+        .choices
+        .iter()
+        .all(|choice| !has_tool_calls(&choice.message) && content_is_blank(&choice.message.content))
 }
 
 /// Is `text` valid JSON whose payload carries no result at all?
@@ -171,7 +172,10 @@ mod tests {
 
     #[test]
     fn a_fence_with_a_language_tag_yields_its_body() {
-        assert_eq!(strip_markdown_fences("```json\n{\"a\": []}\n```"), "{\"a\": []}");
+        assert_eq!(
+            strip_markdown_fences("```json\n{\"a\": []}\n```"),
+            "{\"a\": []}"
+        );
         assert_eq!(strip_markdown_fences("```\n{}\n```"), "{}");
         assert_eq!(strip_markdown_fences("```json {}```"), "{}");
         assert_eq!(strip_markdown_fences("answer: ```json\n[]\n``` done"), "[]");
