@@ -60,6 +60,7 @@ fn new_run(job_id: Uuid, attempt: i32) -> NewRun<'static> {
         image: "registry.internal:5000/conveyor-media-ffmpeg:test",
         namespace: "conveyor-runners",
         job_name: "run-test",
+        instruction: json!({ "schema": "runner/v1", "job_id": job_id, "attempt": attempt }),
     }
 }
 
