@@ -46,17 +46,35 @@ pub fn completion_reason(response: &ChatCompletionResponse) -> Option<EmptyReaso
     }
     match &choice.message.content {
         Value::Null => Some(EmptyReason::Blank),
-        Value::String(text) => {
-            if text.trim().is_empty() {
-                Some(EmptyReason::Blank)
-            } else if is_vacuous_json(text) {
-                Some(EmptyReason::EmptyResult)
-            } else {
-                None
-            }
-        }
+        Value::String(text) => classify_text(text),
         // An array of content parts: a shape we did not expect, so a usable answer.
         _ => None,
+    }
+}
+
+/// Classify the assistant text the relay accumulated, for the streaming path.
+///
+/// The relay has the concatenated content and the tool-call flag, not a
+/// `ChatCompletionResponse`; both paths must agree on what "empty" means, so the text arm is
+/// shared with [`completion_reason`] rather than restated beside it.
+pub fn text_reason(text: Option<&str>, has_tool_calls: bool) -> Option<EmptyReason> {
+    if has_tool_calls {
+        return None;
+    }
+    match text {
+        // No content fragment arrived at all: the reference classifies the empty string.
+        None => Some(EmptyReason::Blank),
+        Some(text) => classify_text(text),
+    }
+}
+
+fn classify_text(text: &str) -> Option<EmptyReason> {
+    if text.trim().is_empty() {
+        Some(EmptyReason::Blank)
+    } else if is_vacuous_json(text) {
+        Some(EmptyReason::EmptyResult)
+    } else {
+        None
     }
 }
 

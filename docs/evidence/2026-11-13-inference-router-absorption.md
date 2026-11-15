@@ -96,6 +96,28 @@ The success path is not in the golden set: the captured `internal_capture` case 
 and the oracle harness cannot arm its allowlist yet. The behaviour is pinned by the tests against
 the reference's source, and the limitation is stated rather than hidden.
 
+## Observability — the metrics listener (#137, 2026-11-15)
+
+`GET /metrics` is served on a **dedicated listener** (`INFERENCE_ROUTER_METRICS_PORT`; the candidate
+runs `:9150`). The API port `:8150` serves no `/metrics` route: its OpenAPI document is the captured
+contract, and the estate deliberately moved scrapes off the inference API.
+
+The listener exports the 15 families the alert rules read — the provider attempt trio, requests
+received, tokens, the unlicensed trio plus the unattributed/malformed-tenant pair, effective tenant,
+project id, the two licence-introspection families and the ledger write-failure family. Names,
+label names and label allow-lists are copied from the reference's `src/observability/metrics.py`,
+and every family is pre-seeded at boot so an absent series and a zero series cannot be confused.
+`tests/metrics_families.rs` pins the set and drives every family from a real request.
+
+Two reference mechanisms have no counterpart in this port, and are documented rather than
+simulated: `provider_attempt_seconds_total` and `cost_usd_unlicensed_total` are exposed as monotonic
+gauges (the `metrics` crate's counter is integer-only; the rules read them through `increase()`),
+and the `backpressure`/`stream_capture` write-failure reasons cannot occur because ledger writes are
+awaited inline instead of queued or finalised through a swallowed callback.
+
+The cutover's scrape restoration (`up == 1` for the namespace and a live
+`inference_router_requests_received_total`) is verified in #71 P4.
+
 ## What each #44 scenario shows
 
 | Scenario | Result | Where |
