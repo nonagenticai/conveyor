@@ -54,6 +54,16 @@ pub async fn render(params: &Value, config: &Config) -> Result<Value, Capability
         ));
     }
 
+    // The pod has no egress (ADR 0007 §3: a media job reaches nothing but conveyor's own routes).
+    // A caller naming a URL is refused by name rather than left to fail at Chromium with a DNS
+    // error that reads like a transient fault.
+    if params.get("url").is_some() {
+        return Err(CapabilityError::refused(
+            "url_not_supported",
+            "a media job has no network egress; pass the document as html or as an input file",
+        ));
+    }
+
     let width = params.get("width").and_then(Value::as_u64).unwrap_or(1280);
     let height = params.get("height").and_then(Value::as_u64).unwrap_or(720);
     let wait_ms = params.get("wait_ms").and_then(Value::as_u64).unwrap_or(0);
@@ -73,6 +83,14 @@ pub async fn render(params: &Value, config: &Config) -> Result<Value, Capability
         params.get("input").and_then(Value::as_str),
     ) {
         (Some(html), None) => {
+            // The captured reference refuses a document of zero characters (`html: String should
+            // have at least 1 characters`, 422). An empty file renders a blank page, which would
+            // turn that refusal into a silent success and a PDF nobody asked for.
+            if html.is_empty() {
+                return Err(CapabilityError::Invalid(
+                    "html must have at least 1 character".to_string(),
+                ));
+            }
             let path = config.work_dir.join(format!("{name}.html"));
             std::fs::create_dir_all(&config.work_dir).map_err(|error| {
                 CapabilityError::Failed(format!("cannot create {:?}: {error}", config.work_dir))
@@ -154,10 +172,12 @@ pub async fn render(params: &Value, config: &Config) -> Result<Value, Capability
 
 fn hex(bytes: &[u8]) -> String {
     use std::fmt::Write;
-    bytes.iter().fold(String::with_capacity(bytes.len() * 2), |mut out, byte| {
-        let _ = write!(out, "{byte:02x}");
-        out
-    })
+    bytes
+        .iter()
+        .fold(String::with_capacity(bytes.len() * 2), |mut out, byte| {
+            let _ = write!(out, "{byte:02x}");
+            out
+        })
 }
 
 #[cfg(test)]
@@ -173,7 +193,27 @@ mod tests {
             out_dir: std::env::temp_dir(),
         };
         let error = render(&params, &config).await.unwrap_err();
-        assert!(error.to_string().contains("wait_until_not_supported"), "{error}");
+        assert!(
+            error.to_string().contains("wait_until_not_supported"),
+            "{error}"
+        );
+    }
+
+    #[tokio::test]
+    async fn an_empty_document_is_refused_like_the_captured_reference() {
+        // The capture pins `html: String should have at least 1 characters` (422). A blank page
+        // rendered successfully would be the silent-success version of the same request.
+        let params = json!({"html": ""});
+        let config = Config {
+            service: "test".into(),
+            work_dir: std::env::temp_dir(),
+            out_dir: std::env::temp_dir(),
+        };
+        let error = render(&params, &config).await.unwrap_err();
+        assert!(
+            error.to_string().contains("at least 1 character"),
+            "{error}"
+        );
     }
 
     #[tokio::test]

@@ -105,8 +105,16 @@ pub fn check(captures: &[Capture], kinds: &[&str]) -> Result<Summary, LockError>
         return Err(LockError::Drifted {
             missing: missing.len(),
             extra: extra.len(),
-            missing_list: missing.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(", "),
-            extra_list: extra.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(", "),
+            missing_list: missing
+                .iter()
+                .map(|s| s.as_str())
+                .collect::<Vec<_>>()
+                .join(", "),
+            extra_list: extra
+                .iter()
+                .map(|s| s.as_str())
+                .collect::<Vec<_>>()
+                .join(", "),
         });
     }
     Ok(Summary {
@@ -145,7 +153,10 @@ mod tests {
             &["media.render_html", "media.compile_video", "media.invented"],
         )
         .unwrap_err();
-        assert!(err.to_string().contains("1 kind(s) are implemented"), "{err}");
+        assert!(
+            err.to_string().contains("1 kind(s) are implemented"),
+            "{err}"
+        );
     }
 
     #[test]

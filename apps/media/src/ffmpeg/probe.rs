@@ -10,8 +10,8 @@ use std::path::Path;
 
 use serde_json::{Value, json};
 
-use crate::common::{CapabilityError, Config};
 use crate::common::process;
+use crate::common::{CapabilityError, Config};
 
 /// The kind slug this module implements.
 pub const KIND: &str = "media.probe_video";
@@ -40,8 +40,9 @@ pub async fn probe(params: &Value, config: &Config) -> Result<Value, CapabilityE
             finished.tail()
         )));
     }
-    let document: Value = serde_json::from_slice(&finished.stdout)
-        .map_err(|error| CapabilityError::Failed(format!("ffprobe emitted unreadable JSON: {error}")))?;
+    let document: Value = serde_json::from_slice(&finished.stdout).map_err(|error| {
+        CapabilityError::Failed(format!("ffprobe emitted unreadable JSON: {error}"))
+    })?;
     Ok(summarise(&document))
 }
 

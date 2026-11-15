@@ -83,7 +83,7 @@ service = "video_analyzer_service"
 operation = "POST /api/analyze/audio"
 disposition = "kind"
 kind = "media.analyze_audio"
-note = "the reference's synchronous route; the golden body is a real beat grid over the synthetic file"
+note = "the reference's synchronous route. DECLARED GAP: the golden body is a real librosa beat grid (bpm, bpm_confidence, beats, onsets, downbeats, grid_source); this crate links no audio DSP, so a caller asking for the grid is refused by name (requires_librosa) and only duration_s plus stream metadata are served"
 
 [[operation]]
 service = "video_analyzer_service"

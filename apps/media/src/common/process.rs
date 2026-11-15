@@ -63,7 +63,9 @@ pub async fn run(tool: &str, args: &[String]) -> Result<Finished, CapabilityErro
     let output = match tokio::time::timeout(TOOL_TIMEOUT, child.wait_with_output()).await {
         Ok(Ok(output)) => output,
         Ok(Err(error)) => {
-            return Err(CapabilityError::Failed(format!("{tool} could not be waited on: {error}")));
+            return Err(CapabilityError::Failed(format!(
+                "{tool} could not be waited on: {error}"
+            )));
         }
         Err(_) => {
             return Err(CapabilityError::Failed(format!(

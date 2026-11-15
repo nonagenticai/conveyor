@@ -909,6 +909,7 @@ dependencies = [
  "chrono",
  "clap",
  "conveyor-domain",
+ "conveyor-runner",
  "futures-util",
  "http-body-util",
  "object_store",

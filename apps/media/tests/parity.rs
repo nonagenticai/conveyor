@@ -103,7 +103,10 @@ fn no_row_names_an_operation_no_capture_has() {
         .filter(|row| !captured.contains(&(row.service.clone(), row.operation.clone())))
         .map(|row| format!("{} {}", row.service, row.operation))
         .collect();
-    assert!(orphans.is_empty(), "rows naming nothing captured: {orphans:#?}");
+    assert!(
+        orphans.is_empty(),
+        "rows naming nothing captured: {orphans:#?}"
+    );
 }
 
 #[test]
@@ -112,9 +115,12 @@ fn a_served_row_names_an_implemented_kind_and_a_drop_says_why() {
     for row in table().operation {
         match row.disposition.as_str() {
             "kind" => {
-                let kind = row
-                    .kind
-                    .unwrap_or_else(|| panic!("{} {} is a kind row with no kind", row.service, row.operation));
+                let kind = row.kind.unwrap_or_else(|| {
+                    panic!(
+                        "{} {} is a kind row with no kind",
+                        row.service, row.operation
+                    )
+                });
                 assert!(
                     implemented.contains(kind.as_str()),
                     "{} {} names {kind}, which no image implements",
@@ -123,9 +129,12 @@ fn a_served_row_names_an_implemented_kind_and_a_drop_says_why() {
                 );
             }
             "drop" => {
-                let reason = row
-                    .reason
-                    .unwrap_or_else(|| panic!("{} {} is dropped with no reason", row.service, row.operation));
+                let reason = row.reason.unwrap_or_else(|| {
+                    panic!(
+                        "{} {} is dropped with no reason",
+                        row.service, row.operation
+                    )
+                });
                 assert!(
                     !reason.trim().is_empty(),
                     "{} {} is dropped with an empty reason",
@@ -133,7 +142,10 @@ fn a_served_row_names_an_implemented_kind_and_a_drop_says_why() {
                     row.operation
                 );
             }
-            other => panic!("{} {} has an unknown disposition {other:?}", row.service, row.operation),
+            other => panic!(
+                "{} {} has an unknown disposition {other:?}",
+                row.service, row.operation
+            ),
         }
     }
 }

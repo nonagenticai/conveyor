@@ -41,6 +41,7 @@ tracing-subscriber = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
+conveyor-runner = { path = "../../crates/runner" }
 http-body-util = "0.1.5"
 toml = { workspace = true }
 tower = { workspace = true }

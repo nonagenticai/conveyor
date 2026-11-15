@@ -112,10 +112,7 @@ pub fn available() -> bool {
 
 fn which_tesseract() -> bool {
     std::env::var_os("PATH")
-        .map(|paths| {
-            std::env::split_paths(&paths)
-                .any(|dir| dir.join("tesseract").is_file())
-        })
+        .map(|paths| std::env::split_paths(&paths).any(|dir| dir.join("tesseract").is_file()))
         .unwrap_or(false)
 }
 
@@ -203,7 +200,10 @@ mod tests {
         let document = ocr(&json!({"input": "text.png"}), &config)
             .await
             .expect("a readable image must be read");
-        let text = document["text"].as_str().unwrap_or_default().to_ascii_uppercase();
+        let text = document["text"]
+            .as_str()
+            .unwrap_or_default()
+            .to_ascii_uppercase();
         assert!(
             text.contains("CONVEYOR") || text.contains("OCR"),
             "tesseract read {text:?}"
