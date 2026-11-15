@@ -62,7 +62,9 @@ jobs:
         run: |
           set -euo pipefail
           args=(--repo "$REPO")
-          if [ "$DRY_RUN" = "true" ]; then
+          # `:-` because a scheduled run has no inputs, and `set -u` must not depend on whether
+          # Actions exports an empty value or omits the variable.
+          if [ "${DRY_RUN:-}" = "true" ]; then
             args+=(--dry-run)
           fi
           python3 scripts/ci/board.py "${args[@]}"
