@@ -123,12 +123,12 @@
       },
       "name": "Publish the SPEC_V2 studio design pack, live",
       "parallel_with": [
+        "P0",
         "PLATFORM",
         "S00",
         "S01",
         "SPEC-V2",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/design/STUDIO-SPEC.md",
       "status": "built",
@@ -136,7 +136,7 @@
       "tranche": 0,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           32,
           33,
@@ -146,8 +146,55 @@
           97,
           103
         ],
+        "open": 1,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
+        "docs/plans/P0-programme-definition.md"
+      ],
+      "gap": "the definition set (#121) and the reuse/architecture pack (#122) are not yet authored",
+      "key": "P0",
+      "measured": {
+        "actions": [
+          0,
+          0
+        ],
+        "modules": [
+          0,
+          0
+        ],
+        "tables": [
+          0,
+          0
+        ]
+      },
+      "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",
+      "parallel_with": [
+        "DESIGN-PUBLISH",
+        "PLATFORM",
+        "S00",
+        "S01",
+        "SPEC-V2",
+        "T0"
+      ],
+      "plan": "docs/plans/P0-programme-definition.md",
+      "status": "planned",
+      "track": "programme",
+      "tranche": 0,
+      "units": {
+        "blocked": 2,
+        "claimed": 1,
+        "numbers": [
+          120,
+          121,
+          122
+        ],
         "open": 3,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -176,19 +223,19 @@
       "name": "CI, runners and platform",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "S00",
         "S01",
         "SPEC-V2",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/plans/development-process-speed.md",
       "status": "standing",
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 3,
-        "claimed": 2,
+        "blocked": 4,
+        "claimed": 1,
         "numbers": [
           17,
           22,
@@ -201,10 +248,13 @@
           71,
           93,
           95,
-          102
+          102,
+          117,
+          118,
+          127
         ],
-        "open": 8,
-        "ready": 3,
+        "open": 9,
+        "ready": 4,
         "unknown": 0
       }
     },
@@ -233,11 +283,11 @@
       "name": "Usage inventory \u2192 parity/parity.yaml",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "PLATFORM",
         "S01",
         "SPEC-V2",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/plans/slices/S00-usage-inventory.md",
       "status": "built",
@@ -276,11 +326,11 @@
       "name": "UI spike \u2014 Leptos CSR vs Leptos SSR",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "PLATFORM",
         "S00",
         "SPEC-V2",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/plans/slices/S01-ui-spike.md",
       "status": "built",
@@ -320,7 +370,8 @@
       },
       "name": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE",
       "parallel_with": [
-        "T1"
+        "T1",
+        "T11"
       ],
       "plan": "docs/plans/slices/S02-skeleton.md",
       "status": "built",
@@ -1337,11 +1388,11 @@
       "name": "SPEC V2 \u2014 the organisational operating model",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "PLATFORM",
         "S00",
         "S01",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/SPEC_V2.md",
       "status": "built",
@@ -1361,56 +1412,59 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/domain/src/executor.rs",
+        "crates/domain/src/organisation.rs",
+        "crates/store/src/organisation.rs",
+        "migrations/0040_organisation.sql"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": null,
       "key": "T0",
       "measured": {
         "actions": [
-          0,
-          0
+          15,
+          15
         ],
         "modules": [
-          0,
-          0
+          3,
+          3
         ],
         "tables": [
-          0,
-          0
+          9,
+          9
         ]
       },
       "name": "Model and contracts",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "PLATFORM",
         "S00",
         "S01",
-        "SPEC-V2",
-        "T11"
+        "SPEC-V2"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 0,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           34
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
     },
     {
       "blocked_by": [
-        "T0"
+        "P0"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "table wbs_node, table project_baseline, table project_register_item, table project_dependency, table programme_cadence",
       "key": "T1",
       "measured": {
         "actions": [
@@ -1423,12 +1477,13 @@
         ],
         "tables": [
           0,
-          0
+          5
         ]
       },
       "name": "Plan spine",
       "parallel_with": [
-        "S02"
+        "S02",
+        "T11"
       ],
       "plan": "docs/SPEC_V2.md#12",
       "status": "proposed",
@@ -1447,13 +1502,14 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T1",
         "T3"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no backlog materialisation, PI planning, demo or inspect-and-adapt cadence",
       "key": "T10",
       "measured": {
         "actions": [
@@ -1495,11 +1551,13 @@
       }
     },
     {
-      "blocked_by": [],
+      "blocked_by": [
+        "P0"
+      ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no metrics roll-ups, metering drill-down or billing reconciliation (continuous)",
       "key": "T11",
       "measured": {
         "actions": [
@@ -1517,17 +1575,13 @@
       },
       "name": "Metrics, metering and maturity",
       "parallel_with": [
-        "DESIGN-PUBLISH",
-        "PLATFORM",
-        "S00",
-        "S01",
-        "SPEC-V2",
-        "T0"
+        "S02",
+        "T1"
       ],
       "plan": "docs/SPEC_V2.md#12",
       "status": "proposed",
       "track": "v2",
-      "tranche": 0,
+      "tranche": 1,
       "units": {
         "blocked": 1,
         "claimed": 0,
@@ -1541,7 +1595,7 @@
     },
     {
       "blocked_by": [
-        "T0",
+        "P0",
         "T1",
         "T10",
         "T11",
@@ -1562,7 +1616,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "the one-organisation acceptance loop is not built",
       "key": "T12",
       "measured": {
         "actions": [
@@ -1597,12 +1651,13 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T2"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "table tool, table toolkit, table tool_binding, table tool_call",
       "key": "T13",
       "measured": {
         "actions": [
@@ -1615,7 +1670,7 @@
         ],
         "tables": [
           0,
-          0
+          4
         ]
       },
       "name": "Tool platform",
@@ -1640,12 +1695,13 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no estate toolkit published with a probe and a live call",
       "key": "T14",
       "measured": {
         "actions": [
@@ -1688,13 +1744,14 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13",
         "T6"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no tool authoring, OpenAPI draft import or BYO tool binding",
       "key": "T15",
       "measured": {
         "actions": [
@@ -1729,13 +1786,14 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13",
         "T2"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "table pko_release, table pko_entity, table pko_relation",
       "key": "T16",
       "measured": {
         "actions": [
@@ -1748,7 +1806,7 @@
         ],
         "tables": [
           0,
-          0
+          3
         ]
       },
       "name": "SOP, RDF/OWL and process-document ingestion",
@@ -1778,13 +1836,14 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T16",
         "T3"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no tenant asset authoring intake or review queue",
       "key": "T17",
       "measured": {
         "actions": [
@@ -1824,12 +1883,13 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T1"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "the decision tables exist as T0 schema; no decision-ladder evaluation, laya client or generation split (T2 behaviour)",
       "key": "T2",
       "measured": {
         "actions": [
@@ -1866,12 +1926,13 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T2"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no PM job: no charter, WBS, baseline, staffing, gate routing or closure run",
       "key": "T3",
       "measured": {
         "actions": [
@@ -1909,12 +1970,13 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T3"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no interruption taxonomy, closed remedy set or coach card",
       "key": "T4",
       "measured": {
         "actions": [
@@ -1957,12 +2019,13 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T2"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no kata.* action family and no measured procedure-change loop",
       "key": "T5",
       "measured": {
         "actions": [
@@ -1999,13 +2062,14 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13",
         "T5"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no development-project path over conveyor and a dependency repo",
       "key": "T6",
       "measured": {
         "actions": [
@@ -2043,6 +2107,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13",
         "T2",
         "T4"
@@ -2050,7 +2115,7 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no incident, runbook or postmortem rows and no operations tool call set",
       "key": "T7",
       "measured": {
         "actions": [
@@ -2090,12 +2155,13 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T5"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "table lesson",
       "key": "T8",
       "measured": {
         "actions": [
@@ -2108,7 +2174,7 @@
         ],
         "tables": [
           0,
-          0
+          1
         ]
       },
       "name": "Organisational memory",
@@ -2133,13 +2199,14 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T1",
         "T3"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "V2 slice unbuilt; its unit is the plan",
+      "gap": "no architecture project type and no TOGAF phase contracts",
       "key": "T9",
       "measured": {
         "actions": [
@@ -2395,16 +2462,16 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 25,
+        "built": 26,
         "partial": 2,
-        "planned": 0,
-        "proposed": 18,
+        "planned": 1,
+        "proposed": 17,
         "standing": 1
       },
-      "total": 47,
+      "total": 48,
       "uncovered": [],
       "with_open_units": 33,
-      "without_open_units": 14
+      "without_open_units": 15
     },
     "screens": {
       "actions_invoked": 22,

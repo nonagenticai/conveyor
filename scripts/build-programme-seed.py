@@ -37,6 +37,14 @@ REPO_URL = "https://github.com/nonagenticai/conveyor"
 # The cross-cutting units that are not a `S##`/`T##` plan. Their issues are assigned by
 # number — these are the public repository's numbers after the 2026-11-12 recreation.
 CROSS_CUTTING = {
+    "P0": {
+        "name": "Programme definition — vision, blueprint, plan and project briefs",
+        "plan": "docs/plans/P0-programme-definition.md",
+        "track": "programme",
+        # #120 is the seed/plan/gate unit; #121 the definition set; #122 the reuse map,
+        # architecture/analysis pack and the per-project inception standard.
+        "issues": [120, 121, 122],
+    },
     "SPEC-V2": {
         "name": "SPEC V2 — the organisational operating model",
         "plan": "docs/SPEC_V2.md",
@@ -66,25 +74,29 @@ CROSS_CUTTING = {
 # "T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 and T13;
 #  T7 after T2/T4 and T13; T9/T10 after T1/T3; T8 after T5; T11 continuous; T12 after all;
 #  T13 after T2; T14 after T13; T15 after T13 and T6; T16 after T2 and T13; T17 after T16 and T3."
+#
+# P0 (the programme definition) gates every delivery slice T1–T17: the programme plan and the
+# project briefs are what a delivery project is held to. T0 is the already-merged organisation
+# spine — history, not a P0 dependency.
 T_DEPENDS_ON = {
     "T0": [],
-    "T1": ["T0"],
-    "T2": ["T1"],
-    "T3": ["T2"],
-    "T4": ["T3"],
-    "T5": ["T2", "S16", "S17", "S18", "S19", "S20"],
-    "T6": ["T5", "T13"],
-    "T7": ["T2", "T4", "T13"],
-    "T8": ["T5"],
-    "T9": ["T1", "T3"],
-    "T10": ["T1", "T3"],
-    "T11": [],
-    "T12": [f"T{n}" for n in range(18) if n != 12],
-    "T13": ["T2"],
-    "T14": ["T13"],
-    "T15": ["T13", "T6"],
-    "T16": ["T2", "T13"],
-    "T17": ["T16", "T3"],
+    "T1": ["T0", "P0"],
+    "T2": ["T1", "P0"],
+    "T3": ["T2", "P0"],
+    "T4": ["T3", "P0"],
+    "T5": ["T2", "S16", "S17", "S18", "S19", "S20", "P0"],
+    "T6": ["T5", "T13", "P0"],
+    "T7": ["T2", "T4", "T13", "P0"],
+    "T8": ["T5", "P0"],
+    "T9": ["T1", "T3", "P0"],
+    "T10": ["T1", "T3", "P0"],
+    "T11": ["P0"],
+    "T12": [f"T{n}" for n in range(18) if n != 12] + ["P0"],
+    "T13": ["T2", "P0"],
+    "T14": ["T13", "P0"],
+    "T15": ["T13", "T6", "P0"],
+    "T16": ["T2", "T13", "P0"],
+    "T17": ["T16", "T3", "P0"],
 }
 
 # SPEC_V2 §12, kept here until `docs/SPEC_V2.md` is on main (issue #24). The parser below

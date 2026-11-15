@@ -103,22 +103,6 @@ async fn board_and_lane(running: &support::Running) -> (String, String) {
     (board, lane)
 }
 
-/// One active project with no dependencies: a blocker in the dependency-gate tests.
-async fn create_project(running: &support::Running) -> (String, String) {
-    let (status, created) = running
-        .invoke(
-            "projects.create",
-            TOKEN,
-            json!({"title": format!("Dependency {}", Uuid::now_v7().simple())}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "{created}");
-    (text(output(&created), "id"), text(output(&created), "key"))
-}
-
 /// Merge `patch` into the project's meta through the tenant-scoped transaction.
 async fn merge_meta(
     pg: &support::Pg,
@@ -752,18 +736,34 @@ async fn seeded_tenant(pg: &support::Pg) -> Uuid {
 
 /// The programme's order is enforced at the card start: a card on a project whose
 /// `meta.depends_on` names an open project is refused `409 blocked_by`, and closing the
-/// dependency lets the same start through.
+/// dependency lets the same start through. The dependency is named **P0** — the programme's
+/// first project and the gate every delivery slice T1–T17 depends on — so the test proves the
+/// exact edge the programme seed carries.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn start_refuses_a_card_on_a_blocked_project() {
     let (pg, running, seeded) = fixture().await;
     let sop = support::publish_sop(&running, "process-start-blocked-sop").await;
-    let (dependency_id, dependency_key) = create_project(&running).await;
+    let (status, created) = running
+        .invoke(
+            "projects.create",
+            TOKEN,
+            json!({
+                "title": format!("Programme definition {}", Uuid::now_v7().simple()),
+                "key": "P0",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let dependency_id = text(output(&created), "id");
     let (project_id, _project_key, board, lane) = board_lane_project(&running).await;
     merge_meta(
         &pg,
         seeded.tenant,
         &project_id,
-        json!({"depends_on": [&dependency_key]}),
+        json!({"depends_on": ["P0"]}),
     )
     .await;
     let card = create_card(&running, &board, &lane, "feature").await;
@@ -786,10 +786,7 @@ async fn start_refuses_a_card_on_a_blocked_project() {
     assert_eq!(status, 409, "{body}");
     assert_eq!(slug(&body), "blocked_by", "{body}");
     assert!(
-        body["detail"]
-            .as_str()
-            .unwrap_or_default()
-            .contains(&dependency_key),
+        body["detail"].as_str().unwrap_or_default().contains("P0"),
         "{body}"
     );
 

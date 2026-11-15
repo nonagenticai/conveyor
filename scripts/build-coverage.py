@@ -7,7 +7,8 @@ Every status is measured from a committed artefact, never guessed:
   (rename-aware: `procedure` -> `process`, `procedure_step` -> `process_step`), `adds_actions`
   against the compiled registry dump `docs/design/data/actions.json`, `adds_modules` against
   the tree (with an explicit, evidenced alias table for a module absorbed under another name);
-* a V2 slice (`T##`) is `proposed`: no code exists, its unit is the evidence;
+* a V2 slice (`T##`) from `scripts/v2-slice-artefacts.json` — the same table/action/module
+  measurement as V1, with an explicit curated row for a slice whose deliverable is behaviour;
 * a screen from `docs/design/v2.js` — the page map, the render body's `ribbon`/`wrapLegacy`,
   and every `C.action(...)` call;
 * a tranche from `seed/programme.json` `meta.depends_on` (longest path), with `blocked_by`
@@ -44,6 +45,13 @@ MODULE_ALIASES = {
 # A slice with no `adds_*` declarations: its deliverable is a named artefact, so presence is
 # measured directly and the evidence path is checked. No status here is inferred from prose.
 SLICE_EVIDENCE = {
+    # P0 is the programme-definition project: its plan declares no tables/actions/modules, so
+    # its status is the plan's existence plus the definition set's publication (#121/#122).
+    "P0": {
+        "status": "planned",
+        "evidence": ["docs/plans/P0-programme-definition.md"],
+        "gap": "the definition set (#121) and the reuse/architecture pack (#122) are not yet authored",
+    },
     "S00": {
         "status": "built",
         "evidence": ["parity/parity.yaml", "parity/SUMMARY.md"],
@@ -197,6 +205,17 @@ def module_path(root: pathlib.Path, name: str) -> str | None:
     `interaction` is store, `board` is actions), so the search walks every `src` tree rather
     than guessing one crate. The path it returns is the evidence the gate checks.
     """
+    # An exact repo-relative path is itself the evidence (V2 slice declarations name files),
+    # but only inside a crate or app's `src` tree: `README.md` is not a module.
+    exact = root / name
+    parts = pathlib.PurePosixPath(name).parts
+    if (
+        len(parts) >= 3
+        and parts[0] in ("crates", "apps")
+        and parts[2] == "src"
+        and (exact.is_file() or exact.is_dir())
+    ):
+        return exact.relative_to(root).as_posix()
     # A crate or app whose NAME is the module (`domain`, `store`): the crate root is the
     # evidence, not a directory under some other crate's `src`.
     for parent in (root / "crates", root / "apps"):
@@ -348,19 +367,66 @@ def units(project: dict, registry: dict[int, dict]) -> dict:
     return counts
 
 
-def measure_slice(
+def v2_artefacts(root: pathlib.Path) -> dict[str, dict]:
+    """The declared deliverable of every V2 slice, from `scripts/v2-slice-artefacts.json`."""
+    path = root / "scripts" / "v2-slice-artefacts.json"
+    document = json.loads(read(path))
+    slices = document.get("slices")
+    if not isinstance(slices, dict) or not slices:
+        raise SystemExit("coverage: scripts/v2-slice-artefacts.json has no `slices` object")
+    return slices
+
+
+def v1_credited(projects: list[dict], root: pathlib.Path) -> dict[str, str]:
+    """Every artefact a V1 slice declares, mapped to the slice that first delivers it."""
+    credited: dict[str, str] = {}
+    for project in projects:
+        if project.get("meta", {}).get("track") != "v1":
+            continue
+        plan = project.get("meta", {}).get("plan", "")
+        plan_path = root / plan if plan else None
+        fields = parse_frontmatter(read(plan_path)) if plan_path and plan_path.exists() else {}
+        for kind, names in (
+            ("table", field_list(fields, "adds_tables")),
+            ("action", field_list(fields, "adds_actions")),
+            ("module", field_list(fields, "adds_modules")),
+        ):
+            for name in names:
+                credited.setdefault(f"{kind}:{name}", project["key"])
+    return credited
+
+
+def refuse_cross_track_credits(
+    v2: dict[str, dict], projects: list[dict], root: pathlib.Path
+) -> None:
+    """A V2 slice may not credit an artefact a V1 slice already declared as its own."""
+    owned = v1_credited(projects, root)
+    for key in sorted(v2):
+        declaration = v2[key]
+        for kind, names in (
+            ("table", declaration.get("tables", []) or []),
+            ("action", declaration.get("actions", []) or []),
+            ("module", declaration.get("modules", []) or []),
+        ):
+            for name in names:
+                artefact = f"{kind}:{name}"
+                if artefact in owned:
+                    raise SystemExit(
+                        f"coverage: {key} credits {artefact}, already delivered by V1 "
+                        f"{owned[artefact]}; credit only what the slice first delivers"
+                    )
+
+
+def measure_declared(
     root: pathlib.Path,
-    project: dict,
     tables: dict[str, str],
     actions: set[str],
+    declared_tables: list[str],
+    declared_actions: list[str],
+    declared_modules: list[str],
+    empty_status: str,
 ) -> dict:
-    key = project["key"]
-    plan = project.get("meta", {}).get("plan", "")
-    plan_path = root / plan if plan else None
-    fields = parse_frontmatter(read(plan_path)) if plan_path and plan_path.exists() else {}
-    declared_tables = field_list(fields, "adds_tables")
-    declared_actions = field_list(fields, "adds_actions")
-    declared_modules = field_list(fields, "adds_modules")
+    """Measure declared tables/actions/modules. `empty_status` is V1's `absent`, V2's `proposed`."""
     total = len(declared_tables) + len(declared_actions) + len(declared_modules)
     evidence: list[str] = []
     missing: list[str] = []
@@ -383,7 +449,44 @@ def measure_slice(
             evidence.append(found)
         else:
             missing.append(f"module {module}")
-    if total == 0:
+    status = "built" if present == total else ("partial" if present else empty_status)
+    return {
+        "total": total,
+        "present": present,
+        "status": status,
+        "measured": {
+            "tables": [sum(1 for t in declared_tables if t in tables), len(declared_tables)],
+            "actions": [sum(1 for a in declared_actions if a in actions), len(declared_actions)],
+            "modules": [
+                sum(1 for m in declared_modules if module_path(root, m) is not None),
+                len(declared_modules),
+            ],
+        },
+        "evidence": sorted(set(evidence))[:6],
+        "missing": missing,
+    }
+
+
+def measure_slice(
+    root: pathlib.Path,
+    project: dict,
+    tables: dict[str, str],
+    actions: set[str],
+) -> dict:
+    key = project["key"]
+    plan = project.get("meta", {}).get("plan", "")
+    plan_path = root / plan if plan else None
+    fields = parse_frontmatter(read(plan_path)) if plan_path and plan_path.exists() else {}
+    result = measure_declared(
+        root,
+        tables,
+        actions,
+        field_list(fields, "adds_tables"),
+        field_list(fields, "adds_actions"),
+        field_list(fields, "adds_modules"),
+        empty_status="absent",
+    )
+    if result["total"] == 0:
         override = SLICE_EVIDENCE.get(key)
         if override is None:
             return {
@@ -398,19 +501,42 @@ def measure_slice(
             "evidence": list(override["evidence"]),
             "gap": override["gap"],
         }
-    status = "built" if present == total else ("partial" if present else "absent")
     return {
-        "status": status,
-        "measured": {
-            "tables": [sum(1 for t in declared_tables if t in tables), len(declared_tables)],
-            "actions": [sum(1 for a in declared_actions if a in actions), len(declared_actions)],
-            "modules": [
-                sum(1 for m in declared_modules if module_path(root, m) is not None),
-                len(declared_modules),
-            ],
-        },
-        "evidence": sorted(set(evidence))[:6],
-        "gap": ", ".join(missing[:6]) if missing else None,
+        "status": result["status"],
+        "measured": result["measured"],
+        "evidence": result["evidence"],
+        "gap": ", ".join(result["missing"][:6]) if result["missing"] else None,
+    }
+
+
+def measure_v2(
+    root: pathlib.Path,
+    declaration: dict,
+    tables: dict[str, str],
+    actions: set[str],
+) -> dict:
+    """Measure one V2 slice's declared deliverable; a behavioural slice stays a curated row."""
+    result = measure_declared(
+        root,
+        tables,
+        actions,
+        list(declaration.get("tables", []) or []),
+        list(declaration.get("actions", []) or []),
+        list(declaration.get("modules", []) or []),
+        empty_status="proposed",
+    )
+    if result["total"] == 0:
+        return {
+            "status": declaration.get("status", "proposed"),
+            "measured": {"tables": [0, 0], "actions": [0, 0], "modules": [0, 0]},
+            "evidence": list(declaration.get("evidence", []) or ["docs/SPEC_V2.md"]),
+            "gap": declaration.get("gap") or "no declared artefacts and no evidence row; add one",
+        }
+    return {
+        "status": result["status"],
+        "measured": result["measured"],
+        "evidence": result["evidence"] or ["docs/SPEC_V2.md"],
+        "gap": ", ".join(result["missing"][:6]) if result["missing"] else None,
     }
 
 
@@ -458,6 +584,8 @@ def build(root: pathlib.Path) -> dict:
     actions = set(json.loads(read(actions_path))["actions"])
     tables = table_index(root)
     projects = seed["projects"]
+    v2 = v2_artefacts(root)
+    refuse_cross_track_credits(v2, projects, root)
     levels, cycles = tranches(projects)
 
     rows: list[dict] = []
@@ -468,12 +596,13 @@ def build(root: pathlib.Path) -> dict:
         if track == "v1" and re.match(r"^S\d{2}[a-z]?$", key):
             measured = measure_slice(root, project, tables, actions)
         elif track == "v2":
-            measured = {
-                "status": "proposed",
-                "measured": {"tables": [0, 0], "actions": [0, 0], "modules": [0, 0]},
-                "evidence": ["docs/SPEC_V2.md"],
-                "gap": "V2 slice unbuilt; its unit is the plan",
-            }
+            declaration = v2.get(key)
+            if declaration is None:
+                raise SystemExit(
+                    f"coverage: V2 slice {key} has no declaration in "
+                    "scripts/v2-slice-artefacts.json"
+                )
+            measured = measure_v2(root, declaration, tables, actions)
         elif key == "SPEC-V2":
             measured = {
                 "status": "built",
@@ -494,6 +623,16 @@ def build(root: pathlib.Path) -> dict:
                 "measured": {"tables": [0, 0], "actions": [0, 0], "modules": [0, 0]},
                 "evidence": [".github/workflows/ci-public.yml", "Dockerfile"],
                 "gap": "standing project; CI and platform work continues",
+            }
+        elif key in SLICE_EVIDENCE:
+            # A cross-cutting project whose deliverable is a named artefact and whose plan
+            # declares no tables/actions/modules (P0 today).
+            override = SLICE_EVIDENCE[key]
+            measured = {
+                "status": override["status"],
+                "measured": {"tables": [0, 0], "actions": [0, 0], "modules": [0, 0]},
+                "evidence": list(override["evidence"]),
+                "gap": override["gap"],
             }
         else:
             measured = {

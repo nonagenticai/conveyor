@@ -146,6 +146,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-13-inference-router-absorption.md"
     },
     {
+      "title": "licenses absorption — evidence (2026-11-14)",
+      "path": "docs/evidence/2026-11-14-licenses-absorption.html",
+      "source": "docs/evidence/2026-11-14-licenses-absorption.md",
+      "section": "Evidence",
+      "sha256": "7845610b509f02858589c5bd1cc0a801246bb01b829b8ba24567fccd2bce2aab",
+      "bytes": 24364,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-14-licenses-absorption.md"
+    },
+    {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
       "path": "docs/evidence/D23-EVAL-CALLER.html",
       "source": "docs/evidence/D23-EVAL-CALLER.md",
@@ -294,8 +303,8 @@
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "c1fca2d9c6cf447a8381dee0bcba2e9600853e362e801ae58c4cc8aa6ff6ac46",
-      "bytes": 7423,
+      "sha256": "80fa0a35b7c9e3d26a156c0cfe13ea32a82d8dd492245fafbf0bece0dce329b0",
+      "bytes": 7532,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -303,8 +312,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "8a62a18c5f0adb70847481a66387f5fbc846c3f88a1db007d0f2227afffd3d68",
-      "bytes": 248838,
+      "sha256": "8ce6f46cb69a3c63bc1053991ce4f9d426f6374014054e9e502aaed0fa799275",
+      "bytes": 248991,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -378,6 +387,15 @@
       "sha256": "7b6c06b72ef3cb4554451e42827a05e6813f58c46c347d0c092f23ee2b6ff917",
       "bytes": 19851,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
+    },
+    {
+      "title": "P0 — Programme definition",
+      "path": "docs/plans/P0-programme-definition.html",
+      "source": "docs/plans/P0-programme-definition.md",
+      "section": "Plans",
+      "sha256": "11781114924d791ebfa317a6411367da7b538315ac52f9c997ebae16d3ee6cb0",
+      "bytes": 5045,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
     },
     {
       "title": "Rust development process: audit and improvement plan",
