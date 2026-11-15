@@ -1,0 +1,10 @@
+# The new-issue chooser. Blank issues are disabled so every report carries a privacy checkbox;
+# the unit form stays the maintainer-shaped contract and is not offered to first-time reporters.
+blank_issues_enabled: false
+contact_links:
+  - name: Design discussion
+    url: https://github.com/nonagenticai/conveyor/discussions
+    about: Ask a question or discuss the design before it becomes a unit.
+  - name: Report a vulnerability
+    url: https://github.com/nonagenticai/conveyor/security/advisories/new
+    about: Do not open a public issue for a security report; see SECURITY.md.

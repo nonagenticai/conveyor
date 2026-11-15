@@ -1,14 +1,16 @@
 name: Design feedback
-description: Report what a screen of nonagentic.ai/design showed, and what you expected.
+description: Report what a screen of conveyor.nonagentic.ai/design showed, and what you expected.
 title: "Design feedback: <page>"
 labels: ["feedback"]
 body:
   - type: markdown
     attributes:
       value: |
-        This is the public development surface of the conveyor. The site is a design study:
-        pages marked `LIVE` render the platform's own rows from a published snapshot; pages
-        marked `V2 · PROPOSED` are still fixtures. Say which one you were looking at.
+        This is the public surface of the conveyor programme. The public site carries the
+        programme: Portfolio, Projects, Plan, Validation, Execution, Documents, Contribute and the
+        system architecture. Pages marked `LIVE` read the platform's own rows from Postgres; a
+        page marked `V2 · PROPOSED` is the design study (signed-in operators and `?design=1`).
+        Say which one you were looking at.
   - type: input
     id: page
     attributes:
@@ -33,7 +35,7 @@ body:
     id: url
     attributes:
       label: URL
-      placeholder: https://nonagentic.ai/design/#portfolio
+      placeholder: https://conveyor.nonagentic.ai/design/#portfolio
   - type: textarea
     id: saw
     attributes:

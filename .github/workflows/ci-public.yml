@@ -33,6 +33,88 @@ permissions:
   contents: read
 
 jobs:
+  # Code/doc classifier. A docs-only PR must still CREATE the required contexts (`checks`,
+  # `image`, `service-image`) and SKIP their work; `paths-ignore` would leave those contexts
+  # missing and the PR unmergeable. An empty or unreadable diff is not a docs-only licence —
+  # it runs the full suite. The merge run is always full (EVENT_NAME != pull_request).
+  classify:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      docs_only: ${{ steps.classify.outputs.docs_only }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: classify
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" != "pull_request" ]; then
+            echo "docs_only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
+          if [ -z "$changed" ]; then
+            echo "docs_only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          non_docs=0
+          while IFS= read -r path; do
+            if [ -z "$path" ]; then
+              continue
+            fi
+            case "$path" in
+              docs/*|.claude/*|*.md) ;;
+              *) non_docs=1 ;;
+            esac
+          done <<< "$changed"
+          if [ "$non_docs" -eq 0 ]; then
+            echo "docs_only=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # DCO 1.1. Every contributor commit in the PR carries a `Signed-off-by:` trailer; GitHub's own
+  # merge commit is not a contributor commit (`--no-merges`). A failure names each offending sha.
+  dco:
+    if: ${{ !github.event.repository.private && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: every commit is signed off
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          missing=""
+          count=0
+          while IFS= read -r commit; do
+            if [ -z "$commit" ]; then
+              continue
+            fi
+            count=$((count + 1))
+            if ! git log -1 --format=%B "$commit" | grep -qE '^Signed-off-by: .+ <[^<>@ ]+@[^<> ]+>$'; then
+              missing="$missing $commit"
+            fi
+          done < <(git rev-list --no-merges "$BASE_SHA..$HEAD_SHA")
+          if [ -n "$missing" ]; then
+            echo "::error::DCO: these commits have no Signed-off-by trailer:$missing"
+            echo "Fix with: git rebase --signoff origin/main (or git commit -s and re-push)"
+            exit 1
+          fi
+          echo "DCO: $count commit(s) signed off"
+
   # Secret scan. Dir-mode fingerprints are what `.betterleaksignore` holds (see its header), and a
   # full-tree scan is the honest one for a repo whose whole point is being public.
   secret-scan:
@@ -161,7 +243,8 @@ jobs:
   # `docker run` on those variables. max_connections=300: nextest is process-per-test and the
   # image default of 100 times out pools.
   checks:
-    if: ${{ !github.event.repository.private }}
+    needs: classify
+    if: ${{ !github.event.repository.private && needs.classify.outputs.docs_only != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
@@ -267,7 +350,8 @@ jobs:
   # The cluster consumes `latest` through Flux (gitops-production ImagePolicy `conveyor`), which is
   # how the archetype's promote step behaved; `sha-*` tags are the immutable record for rollback.
   image:
-    if: ${{ !github.event.repository.private }}
+    needs: classify
+    if: ${{ !github.event.repository.private && needs.classify.outputs.docs_only != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -325,7 +409,8 @@ jobs:
   # through the template every absorbed service will ship with. The probe needs no database, so
   # the smoke is "build, start, answer /health".
   service-image:
-    if: ${{ !github.event.repository.private }}
+    needs: classify
+    if: ${{ !github.event.repository.private && needs.classify.outputs.docs_only != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:

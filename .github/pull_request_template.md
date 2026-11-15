@@ -22,6 +22,7 @@ sha=<head>
 | P1.1 | `<command>` | pass | `<sha>` |
 
 - [ ] Every scenario in the issue has a row above, at this SHA
+- [ ] Every commit carries the DCO sign-off (`git commit -s`); the `dco` check is green
 - [ ] The issue's acceptance gate is green at this SHA
 - [ ] Tests named per part exist and ran; none skipped
 - [ ] The issue's Definition-of-done checklist is satisfied
