@@ -351,7 +351,7 @@ async fn record(
     // The served row is the answer the caller actually received: the LAST attempt, whatever its
     // outcome. A blank 200 (a ground-truth provider, or before the retry lands) is still a call the
     // caller saw; the attempt's `outcome` feeds the metric and the retry decision, not this
-    // selection. A refusal has no `served` response and therefore no row.
+    // selection.
     let served_attempt = served.and(outcome.attempts.last());
 
     if let (Some(pool), Some(response), Some(attempt)) =
@@ -366,6 +366,29 @@ async fn record(
         );
         if let Err(error) = ledger::insert(pool, &row).await {
             tracing::warn!(%error, "inference ledger write failed");
+        }
+    } else if let (Some(pool), Err(refusal)) = (state.deps().ledger.as_ref(), &outcome.response)
+    {
+        // A request that reached a provider is a call the estate paid for, even when the answer is
+        // refused — the reference records it (measured 2026-11-15 from the contract oracle: the
+        // second-blank refusal lands a row with status '502' and no response columns). A refusal
+        // taken BEFORE dispatch — policy, budget, auth, validation — has no attempt and writes
+        // none, so the row is gated on the attempts rather than on the outcome alone.
+        if !outcome.attempts.is_empty() {
+            let latency_ms: i64 = outcome
+                .attempts
+                .iter()
+                .map(|attempt| attempt.latency.as_millis() as i64)
+                .sum();
+            let row = LedgerRow::refused(
+                &context,
+                request,
+                &refusal.status.as_u16().to_string(),
+                latency_ms,
+            );
+            if let Err(error) = ledger::insert(pool, &row).await {
+                tracing::warn!(%error, "inference ledger write failed");
+            }
         }
     }
 

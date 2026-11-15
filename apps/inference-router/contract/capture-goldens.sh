@@ -151,6 +151,19 @@ request completion_unauthenticated POST /api/chat/completions "${json[@]}" \
 request completion_validation POST /api/chat/completions "${json[@]}" "${auth[@]}" \
   -d '{"model":"stub-model"}'
 
+# --- the two empty-completion classes ------------------------------------------------------
+# The stub answers `""` to the first sentinel (blank) and `{}` to the second (vacuous), so the
+# ORACLE classifies them, never this script: the reference retries a blank once against the same
+# provider and refuses a second blank with 502 `upstream_empty_completion`; a vacuous `{}` is an
+# `empty_result`, served as a 200 and never retried. Both cases sit here, before the internal
+# reads, because the replay (`verify.sh`) runs in name order and the aggregates must see the same
+# ledger rows the capture did.
+request completion_blank POST /api/chat/completions "${json[@]}" "${auth[@]}" \
+  -d '{"model":"stub-model","messages":[{"role":"user","content":"__stub_blank__"}],"max_tokens":8}'
+
+request completion_empty_result POST /api/chat/completions "${json[@]}" "${auth[@]}" \
+  -d '{"model":"stub-model","messages":[{"role":"user","content":"__stub_empty_result__"}],"max_tokens":8}'
+
 request completion_over_budget POST /api/chat/completions "${json[@]}" \
   -H "authorization: Bearer $OVER_TOKEN" \
   -d '{"model":"stub-model","messages":[{"role":"user","content":"hi"}],"max_tokens":8}'

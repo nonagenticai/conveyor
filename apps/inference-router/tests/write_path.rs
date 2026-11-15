@@ -350,6 +350,64 @@ async fn a_blank_attempt_is_recorded_as_served_and_still_bills_its_usage() {
 }
 
 #[tokio::test]
+async fn a_second_blank_writes_the_refusal_row_the_reference_records() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("migrations");
+
+    let address = blank_stub_provider().await;
+    // NOT ground truth: the pinned path retries the blank once and refuses the second.
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: stub-model\n    model_aliases:\n      stub-model: stub-model\ndefault_chain: [stub-openai]\n"
+    ))
+    .expect("catalog");
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let recorder = Arc::new(Recorder::default());
+    let state = AppState::with_deps(
+        Config::from_lookup(|_| None).expect("defaults"),
+        router,
+        AppDeps {
+            ledger: Some(db.pool.clone()),
+            budget: Arc::new(AllowAllGate),
+            cost: recorder.clone(),
+            ..AppDeps::default()
+        },
+    );
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-tenant-id", TENANT)
+                .body(attributed_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::BAD_GATEWAY);
+
+    // The reference records the call it paid for: one row with the refusal's status and none of
+    // the response columns — captured from the oracle's second-blank case on 2026-11-15.
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["status"], "502");
+    assert_eq!(row["streamed"], false);
+    assert_eq!(row["served_provider"], Value::Null);
+    assert_eq!(row["served_model"], Value::Null);
+    assert_eq!(row["finish_reason"], Value::Null);
+    assert!(row["request_sha256"].is_string());
+    assert_eq!(row["response_sha256"], Value::Null);
+    assert_eq!(row["response_json_valid"], Value::Null);
+    assert_eq!(row["request_text_sha256"], Value::Null);
+
+    // Both attempts spent their own tokens, so both are billed.
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 2, "every attempt is a cost event");
+    assert_eq!(events[0].input_tokens, 7);
+    assert!(events[1].fallback_used);
+}
+
+#[tokio::test]
 async fn a_database_failure_never_fails_the_customers_request() {
     // The pool points at a database that does not have the ledger table: the insert fails, and the
     // response must still be the provider's 200.
