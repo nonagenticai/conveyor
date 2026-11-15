@@ -116,6 +116,9 @@ pub struct Config {
     /// `CONVEYOR_RUNNER_IMAGES` — `kind=image[,kind=image]`. The dispatch resolves a job's kind
     /// here; a kind that is absent has no image and is refused, never defaulted.
     pub runner_images: Vec<(String, String)>,
+    /// `CONVEYOR_RUNNER_BASE_URL` — the in-cluster address a dispatched pod calls back on. Unset is
+    /// fail-closed: an instruction without a callable base URL is never dispatched.
+    pub runner_base_url: Option<String>,
 }
 
 impl Config {
@@ -188,6 +191,7 @@ impl Config {
                 }
             },
             runner_images: parse_runner_images(get("CONVEYOR_RUNNER_IMAGES"))?,
+            runner_base_url: get("CONVEYOR_RUNNER_BASE_URL"),
         })
     }
 
