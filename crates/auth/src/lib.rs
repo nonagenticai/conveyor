@@ -20,6 +20,7 @@ pub mod oauth;
 pub mod principal;
 pub mod provisioning;
 pub mod service;
+pub mod url;
 
 pub use authn::{IdentitySession, authenticate, bearer, identity_session};
 pub use billing::BillingClient;

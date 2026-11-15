@@ -32,6 +32,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_REPORT = Path.home() / ".claude" / "plans" / "conveyor-public-audit.md"
@@ -99,14 +100,38 @@ def git(*args: str) -> str:
     return subprocess.check_output(["git", "-C", str(ROOT), *args], text=True, errors="replace")
 
 
-def allow_email(match: re.Match[str]) -> bool:
-    domain = match.group(1).lower()
+# Documented synthetic mail domains: the domain itself or any subdomain of it is a fixture.
+ALLOWED_EMAIL_DOMAINS = (
+    "example.com",
+    "example.org",
+    "example.net",
+    "users.noreply.github.com",
+)
+ALLOWED_EMAIL_HOSTS = ("example.invalid",)
+
+
+def email_host(domain: str) -> str:
+    """The hostname of an email domain, PARSED rather than matched as a substring."""
+    host = urlsplit(f"//{domain}").hostname or ""
+    return host.lower().rstrip(".")
+
+
+def host_under(host: str, domain: str) -> bool:
+    """True when `host` is `domain` or a subdomain of it, compared label by label."""
+    host_labels = host.split(".")
+    domain_labels = domain.split(".")
     return (
-        domain.endswith("example.com")
-        or domain.endswith("example.org")
-        or domain.endswith("example.net")
-        or domain.endswith("users.noreply.github.com")
-        or domain == "example.invalid"
+        len(host_labels) >= len(domain_labels)
+        and host_labels[-len(domain_labels):] == domain_labels
+    )
+
+
+def allow_email(match: re.Match[str]) -> bool:
+    host = email_host(match.group(1))
+    if not host:
+        return False
+    return host in ALLOWED_EMAIL_HOSTS or any(
+        host_under(host, domain) for domain in ALLOWED_EMAIL_DOMAINS
     )
 
 
