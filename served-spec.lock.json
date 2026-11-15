@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "9711f755a86315d8b342182e438a4f675a3ad754a628053875a3b03557ee25d1",
+    "GET /api/actions": "46718a551ca84de32704e61c82788ab1b23fd63437ec815f5205c490562ee7b5",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -93,6 +93,7 @@
     "POST /api/actions/decisions.list/invocations": "cb036c454320c687bf4164ed3c87a71ca41cf1dca93a9296079c858fa8135cff",
     "POST /api/actions/decisions.transition/invocations": "7524ac3eefa3ea02dcaae5dcfd4e3f71643b240220234ba1783b09c34f7f1098",
     "POST /api/actions/decisions.update/invocations": "32c999fe0dca38fda125b3535fd9412c9d1355217cee2c872543ef99ddcfb282",
+    "POST /api/actions/decks.render/invocations": "88a4cd8b5fc1794f06f656a9b3333415480a72bcfe7caa66af311c74856c490e",
     "POST /api/actions/departments.create/invocations": "b9c76b4eabd2f83813526698dd2ca566c533f5ea1d5395848d18d2613c8a2287",
     "POST /api/actions/departments.list/invocations": "0f40f82a6d6153238bc49b956b05cc32acd824978d4de1143911f200c5364b01",
     "POST /api/actions/documents.compose/invocations": "4e0d89f4c294b665abba95fda44751fc999bf53830b409e81700a2bb9a4948ee",
