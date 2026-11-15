@@ -41,6 +41,8 @@ pub struct TestDb {
     pub pool: PgPool,
     pub url: String,
     pub name: String,
+    /// The shared server's admin URL, so `Drop` can remove the database it created.
+    pub server_base: String,
 }
 
 async fn server() -> &'static Server {
@@ -200,5 +202,39 @@ pub async fn fresh() -> TestDb {
         .connect(&url)
         .await
         .expect("connect the test database");
-    TestDb { pool, url, name }
+    TestDb {
+        pool,
+        url,
+        name,
+        server_base: server.base.clone(),
+    }
+}
+
+/// Drop the database this test created — the same defect as `apps/server/tests/common/mod.rs`:
+/// with `TEST_DATABASE_URL` set every binary shares one server, and before this nothing dropped
+/// what it created, so the gate's Postgres filled up mid-run.
+impl Drop for TestDb {
+    fn drop(&mut self) {
+        let base = self.server_base.clone();
+        let name = self.name.clone();
+        let _ = std::thread::spawn(move || {
+            let Ok(rt) = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+            else {
+                return;
+            };
+            rt.block_on(async move {
+                if let Ok(admin) = PgPool::connect(&base).await {
+                    let _ = sqlx::query(AssertSqlSafe(format!(
+                        "DROP DATABASE IF EXISTS \"{name}\" WITH (FORCE)"
+                    )))
+                    .execute(&admin)
+                    .await;
+                    admin.close().await;
+                }
+            });
+        })
+        .join();
+    }
 }

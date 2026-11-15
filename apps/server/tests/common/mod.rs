@@ -209,6 +209,8 @@ pub struct TestDb {
     pub runtime_url: String,
     /// The test database's name.
     pub name: String,
+    /// The shared server's admin URL, so `Drop` can remove the database it created.
+    pub server_base: String,
 }
 
 impl TestDb {
@@ -265,7 +267,46 @@ impl TestDb {
             runtime,
             runtime_url,
             name,
+            server_base: server.base.clone(),
         }
+    }
+}
+
+/// Drop the database the test created.
+///
+/// The harness's original assumption was one throwaway container per test binary, which dies with
+/// its databases. Under `TEST_DATABASE_URL` — which `scripts/ci/gate.sh` sets — every binary shares
+/// one server instead, so the databases accumulated: measured 2026-11-15, `-p conveyor-api` alone
+/// left **137 databases / 2.1 GB**, and the full suite overran the gate's Postgres and produced
+/// `53100 could not extend file` failures in tests that had nothing to do with the change.
+///
+/// `WITH (FORCE)` (PostgreSQL 13+) terminates the pools' backends, which are still open at this
+/// point: `Drop::drop` runs before the struct's fields are dropped, so closing them first is not
+/// possible from here. The thread is joined — a detached drop would race the process exiting, which
+/// is the leak this exists to stop.
+impl Drop for TestDb {
+    fn drop(&mut self) {
+        let base = self.server_base.clone();
+        let name = self.name.clone();
+        let _ = std::thread::spawn(move || {
+            let Ok(rt) = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+            else {
+                return;
+            };
+            rt.block_on(async move {
+                if let Ok(admin) = PgPool::connect(&base).await {
+                    let _ = sqlx::query(AssertSqlSafe(format!(
+                        "DROP DATABASE IF EXISTS \"{name}\" WITH (FORCE)"
+                    )))
+                    .execute(&admin)
+                    .await;
+                    admin.close().await;
+                }
+            });
+        })
+        .join();
     }
 }
 

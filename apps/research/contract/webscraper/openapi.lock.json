@@ -1,0 +1,1626 @@
+{
+  "components": {
+    "parameters": {
+      "TenantIdHeader": {
+        "description": "Tenant identifier (defaults to configured DEFAULT_TENANT_ID).",
+        "example": "n8n-dev",
+        "in": "header",
+        "name": "X-Tenant-Id",
+        "required": false,
+        "schema": {
+          "default": "n8n-dev",
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "AuthConfig": {
+        "description": "Reference to a stored credential plus flow hints for the scraper.\n\nThe actual username/password/token lives in the secrets service and is\nfetched at scrape time using the caller's license token — it is NEVER\npassed inline in a scrape request.",
+        "properties": {
+          "credential_id": {
+            "description": "ID of the credential stored in the secrets service",
+            "maxLength": 256,
+            "minLength": 1,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Credential Id",
+            "type": "string"
+          },
+          "login_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Explicit login URL. If omitted, the scraper will attempt the login flow on whatever page the target URL redirects to.",
+            "title": "Login Url"
+          },
+          "password_selector": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CSS selector for the password input (optional, defaults to common patterns)",
+            "title": "Password Selector"
+          },
+          "submit_selector": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CSS selector for the submit button (optional, defaults to common patterns)",
+            "title": "Submit Selector"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AuthType",
+            "default": "form",
+            "description": "Authentication flow to apply"
+          },
+          "username_selector": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CSS selector for the username/email input (optional, defaults to common patterns)",
+            "title": "Username Selector"
+          },
+          "wait_for_selector": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CSS selector to wait for after submit (alternative to wait_for_url)",
+            "title": "Wait For Selector"
+          },
+          "wait_for_url": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL regex/glob to wait for after submit (confirms login succeeded)",
+            "title": "Wait For Url"
+          },
+          "wait_timeout_ms": {
+            "default": 15000,
+            "description": "Max milliseconds to wait for post-login state",
+            "maximum": 120000.0,
+            "minimum": 1000.0,
+            "title": "Wait Timeout Ms",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "credential_id"
+        ],
+        "title": "AuthConfig",
+        "type": "object"
+      },
+      "AuthType": {
+        "description": "Authentication flow selector for a scrape request.\n\nAttributes:\n    FORM: Fill a login form with username/password from the credential.\n    STORAGE_STATE: Inject a previously captured Playwright storageState.\n    BEARER: Set ``Authorization: Bearer <token>`` from the credential.\n    BASIC: Set HTTP Basic auth on the browser context.",
+        "enum": [
+          "form",
+          "storage_state",
+          "bearer",
+          "basic"
+        ],
+        "title": "AuthType",
+        "type": "string"
+      },
+      "BulkScrapeRequest": {
+        "description": "Request model for scraping multiple URLs.\n\nAttributes:\n    urls: List of URLs to scrape.\n    scraper_type: Backend scraper to use for all URLs.\n    javascript_enabled: Force Playwright in AUTO mode (ignored otherwise).\n    timeout: Request timeout in seconds per URL.\n    follow_links: Whether to follow links on scraped pages.\n    max_depth: Maximum crawl depth when following links.\n    allowed_domains: Domains allowed when following links.\n    link_query: Optional topic used to score links and order the crawl frontier.\n    sort_links_by_score: Whether to return links ranked by score.",
+        "example": {
+          "follow_links": false,
+          "scraper_type": "scrapy",
+          "timeout": 30.0,
+          "urls": [
+            "https://example.com",
+            "https://example.org"
+          ]
+        },
+        "properties": {
+          "allowed_domains": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Restrict link following to these domains (subdomains included). Applied to every followed link; the seed URLs themselves are always scraped. Omit to follow any same-site link the page declares. Entries are bare hostnames — 'example.com', not a URL or a wildcard.",
+            "title": "Allowed Domains"
+          },
+          "auth_config": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthConfig"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional authentication configuration referencing a stored credential. Login is performed once and the session is reused across all URLs."
+          },
+          "delay": {
+            "default": 0.0,
+            "description": "Post-load delay in seconds before content extraction",
+            "maximum": 30.0,
+            "minimum": 0.0,
+            "title": "Delay",
+            "type": "number"
+          },
+          "download_images": {
+            "default": false,
+            "description": "Download image content and include base64-encoded bytes in response",
+            "title": "Download Images",
+            "type": "boolean"
+          },
+          "extraction_schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtractionSchema"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional declarative CSS schema applied to every scraped page, producing extracted_data per result."
+          },
+          "follow_links": {
+            "default": false,
+            "description": "Follow links on scraped pages",
+            "title": "Follow Links",
+            "type": "boolean"
+          },
+          "javascript_enabled": {
+            "default": false,
+            "description": "Force a JS-rendering backend (Playwright) when scraper_type is 'auto'. Ignored when scraper_type names an explicit backend.",
+            "title": "Javascript Enabled",
+            "type": "boolean"
+          },
+          "link_query": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional topic (e.g. 'pricing plans') used to score discovered links. With follow_links it also orders the Scrapy crawl frontier best-first, so a depth-limited crawl spends its budget on relevant pages.",
+            "title": "Link Query"
+          },
+          "max_depth": {
+            "default": 1,
+            "description": "Maximum crawl depth",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Max Depth",
+            "type": "integer"
+          },
+          "scraper_type": {
+            "$ref": "#/components/schemas/ScraperType",
+            "default": "auto",
+            "description": "Type of scraper to use"
+          },
+          "screenshot": {
+            "default": false,
+            "description": "Capture screenshot of each page",
+            "title": "Screenshot",
+            "type": "boolean"
+          },
+          "sort_links_by_score": {
+            "default": false,
+            "description": "Return links[] ranked by score (descending) instead of document order",
+            "title": "Sort Links By Score",
+            "type": "boolean"
+          },
+          "stealth": {
+            "default": false,
+            "description": "Apply browser-level stealth patches to each page. Requires a browser backend; not combinable with follow_links.",
+            "title": "Stealth",
+            "type": "boolean"
+          },
+          "timeout": {
+            "default": 30.0,
+            "description": "Request timeout in seconds",
+            "maximum": 300.0,
+            "minimum": 1.0,
+            "title": "Timeout",
+            "type": "number"
+          },
+          "urls": {
+            "description": "List of URLs to scrape",
+            "items": {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Urls",
+            "type": "array"
+          },
+          "virtual_scroll": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VirtualScrollConfig"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Scroll each page (or a container) before extracting. Forces the Playwright backend; not combinable with follow_links, which crawls via Scrapy."
+          },
+          "wait_for_selector": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CSS selector to wait for before scraping (Playwright only)",
+            "title": "Wait For Selector"
+          },
+          "wait_until": {
+            "default": "load",
+            "description": "Page-load wait condition: 'load' (default), 'domcontentloaded', 'networkidle', or 'commit'. 'networkidle' is an explicit opt-in only — on live SPAs with analytics/websockets/polling the network never goes 500ms-quiet, so it blocks the whole timeout and returns empty content on a good page. An invalid value is rejected with 422 (rather than reaching page.goto and returning a FAILED result).",
+            "enum": [
+              "load",
+              "domcontentloaded",
+              "networkidle",
+              "commit"
+            ],
+            "title": "Wait Until",
+            "type": "string"
+          }
+        },
+        "required": [
+          "urls"
+        ],
+        "title": "BulkScrapeRequest",
+        "type": "object"
+      },
+      "BulkScrapeResponse": {
+        "description": "Response model for bulk scrape operations.\n\nAttributes:\n    total_urls: Number of URLs in the request.\n    completed: Number of successfully scraped URLs.\n    failed: Number of URLs that failed to scrape.\n    results: Individual scrape results for each URL.\n    processing_time_seconds: Total time for all URLs.",
+        "example": {
+          "completed": 2,
+          "failed": 0,
+          "processing_time_seconds": 5.0,
+          "results": [],
+          "total_urls": 2
+        },
+        "properties": {
+          "completed": {
+            "description": "Successfully scraped URLs",
+            "title": "Completed",
+            "type": "integer"
+          },
+          "failed": {
+            "description": "Failed URLs",
+            "title": "Failed",
+            "type": "integer"
+          },
+          "processing_time_seconds": {
+            "description": "Total processing time",
+            "title": "Processing Time Seconds",
+            "type": "number"
+          },
+          "results": {
+            "description": "Individual scrape results",
+            "items": {
+              "$ref": "#/components/schemas/ScrapeResponse"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "total_urls": {
+            "description": "Total URLs requested",
+            "title": "Total Urls",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_urls",
+          "completed",
+          "failed",
+          "results",
+          "processing_time_seconds"
+        ],
+        "title": "BulkScrapeResponse",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "description": "Inner error payload.",
+        "properties": {
+          "code": {
+            "description": "Stable machine-readable error code",
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional debug detail; only populated when LEAK_EXCEPTION_DETAILS=true",
+            "title": "Details"
+          },
+          "message": {
+            "description": "Human-readable error description",
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Request UUID7 for log correlation",
+            "title": "Request Id"
+          },
+          "status": {
+            "description": "HTTP status code",
+            "title": "Status",
+            "type": "integer"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ISO-8601 UTC timestamp the error was emitted",
+            "title": "Timestamp"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "status"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "description": "Standard error response envelope.",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "ExtractionField": {
+        "description": "One field in a declarative extraction schema.\n\nAttributes:\n    name: Output key for this field in each extracted record.\n    selector: CSS selector, relative to the enclosing element. Omit to read\n        the enclosing element itself.\n    type: How to pull the value (see ExtractionFieldType).\n    attribute: Attribute name to read when ``type`` is ``attribute``.\n    transform: Optional string transform applied to scalar values.\n    default: Value used when the selector matches nothing.\n    fields: Child fields, required for nested/list/nested_list.",
+        "properties": {
+          "attribute": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Attribute to read when type is 'attribute'",
+            "title": "Attribute"
+          },
+          "default": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Value used when the selector matches nothing",
+            "title": "Default"
+          },
+          "fields": {
+            "description": "Child fields for nested/list/nested_list",
+            "items": {
+              "$ref": "#/components/schemas/ExtractionField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "name": {
+            "description": "Output key",
+            "maxLength": 256,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Name",
+            "type": "string"
+          },
+          "selector": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CSS selector relative to the enclosing element",
+            "title": "Selector"
+          },
+          "transform": {
+            "anyOf": [
+              {
+                "enum": [
+                  "lowercase",
+                  "uppercase",
+                  "strip"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional transform for scalar values",
+            "title": "Transform"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ExtractionFieldType",
+            "default": "text",
+            "description": "How to extract the value"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ExtractionField",
+        "type": "object"
+      },
+      "ExtractionFieldType": {
+        "description": "How a schema field pulls its value out of the matched element.\n\n``computed`` and ``regex`` from the upstream crawl4ai dialect are\ndeliberately absent — see services.extraction_schema for why.",
+        "enum": [
+          "text",
+          "attribute",
+          "html",
+          "nested",
+          "list",
+          "nested_list"
+        ],
+        "title": "ExtractionFieldType",
+        "type": "string"
+      },
+      "ExtractionSchema": {
+        "description": "Declarative CSS schema describing repeated records on a page.\n\nWire-compatible with crawl4ai's ``JsonCssExtractionStrategy`` dialect:\n``baseSelector`` is accepted as an alias for ``base_selector``, so an\nexisting crawl4ai schema can be sent verbatim.\n\nAttributes:\n    name: Human label for the schema (echoed nowhere; aids debugging).\n    base_selector: Selector matching one element per record.\n    fields: Fields to extract from each matched record.",
+        "properties": {
+          "baseSelector": {
+            "description": "CSS selector matching one element per record",
+            "maxLength": 500,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Baseselector",
+            "type": "string"
+          },
+          "fields": {
+            "description": "Fields to extract from each matched record",
+            "items": {
+              "$ref": "#/components/schemas/ExtractionField"
+            },
+            "minItems": 1,
+            "title": "Fields",
+            "type": "array"
+          },
+          "name": {
+            "default": "extraction",
+            "description": "Human label for this schema",
+            "maxLength": 256,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "baseSelector",
+          "fields"
+        ],
+        "title": "ExtractionSchema",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "description": "Health check response model for the /health endpoint.\n\nAttributes:\n    status: Service health status ('healthy' or 'unhealthy').\n    timestamp: ISO8601 formatted timestamp of the check.\n    service: Name of the service.\n    version: Semantic version of the service.\n    playwright_available: Whether Playwright library is installed.\n    browser_ready: Whether browser instance is initialized.",
+        "example": {
+          "browser_ready": true,
+          "playwright_available": true,
+          "service": "webscraper-service",
+          "status": "healthy",
+          "timestamp": "2024-01-01T00:00:00Z",
+          "version": "1.0.0"
+        },
+        "properties": {
+          "browser_ready": {
+            "default": false,
+            "description": "Browser initialized and ready",
+            "title": "Browser Ready",
+            "type": "boolean"
+          },
+          "playwright_available": {
+            "default": false,
+            "description": "Playwright browser available",
+            "title": "Playwright Available",
+            "type": "boolean"
+          },
+          "service": {
+            "default": "webscraper-service",
+            "description": "Service name",
+            "title": "Service",
+            "type": "string"
+          },
+          "status": {
+            "description": "Service health status",
+            "title": "Status",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "ISO8601 timestamp",
+            "title": "Timestamp",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "description": "Service version",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "timestamp"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "ImageInfo": {
+        "description": "Information about a discovered image.\n\nAttributes:\n    src: The image source URL.\n    alt: The image alt text.\n    title: The image title attribute.\n    width: Natural width in pixels.\n    height: Natural height in pixels.\n    content_base64: Base64-encoded image bytes (when download_images=true).\n    mime_type: Detected MIME type of downloaded image.\n    byte_size: Size of downloaded image in bytes.",
+        "properties": {
+          "alt": {
+            "default": "",
+            "description": "Alt text",
+            "maxLength": 10000,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Alt",
+            "type": "string"
+          },
+          "byte_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Size of image in bytes",
+            "title": "Byte Size"
+          },
+          "content_base64": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Base64-encoded image content",
+            "title": "Content Base64"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Natural height",
+            "title": "Height"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "MIME type of the image",
+            "title": "Mime Type"
+          },
+          "src": {
+            "description": "Image source URL",
+            "maxLength": 10000,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Src",
+            "type": "string"
+          },
+          "srcset": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "srcset attribute for responsive images",
+            "title": "Srcset"
+          },
+          "title": {
+            "default": "",
+            "description": "Title attribute",
+            "maxLength": 1000,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Title",
+            "type": "string"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Natural width",
+            "title": "Width"
+          }
+        },
+        "required": [
+          "src"
+        ],
+        "title": "ImageInfo",
+        "type": "object"
+      },
+      "LinkInfo": {
+        "description": "Information about a discovered hyperlink.\n\nAttributes:\n    text: The link's anchor text.\n    url: The link's target URL.\n    rel: The link's rel attribute value.\n    type: Classification as 'internal' or 'external'.\n    score: Relevance score in [0, 1] (see services.link_scoring). Present\n        on every link; higher is more relevant. When the request carries a\n        ``link_query`` the score blends intrinsic link quality with how well\n        the anchor text and URL slug match that query. ``type == \"internal\"``\n        remains the same-domain signal — it is not duplicated here.",
+        "properties": {
+          "rel": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Link rel attribute",
+            "title": "Rel"
+          },
+          "score": {
+            "default": 0.0,
+            "description": "Relevance score in [0, 1]; higher is more relevant",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "type": "number"
+          },
+          "text": {
+            "description": "Link text",
+            "maxLength": 10000,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Text",
+            "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "internal or external",
+            "title": "Type"
+          },
+          "url": {
+            "description": "Link URL",
+            "maxLength": 10000,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "url"
+        ],
+        "title": "LinkInfo",
+        "type": "object"
+      },
+      "ScrapeRequest": {
+        "description": "Request model for scraping a single URL.\n\nAttributes:\n    url: The URL to scrape.\n    scraper_type: Backend scraper to use.\n    javascript_enabled: Force Playwright in AUTO mode (ignored otherwise).\n    timeout: Request timeout in seconds.\n    wait_for_selector: CSS selector to wait for before scraping.\n    wait_until: Page load wait condition.\n    screenshot: Whether to capture a screenshot.\n    viewport_width: Browser viewport width in pixels.\n    viewport_height: Browser viewport height in pixels.\n    user_agent: Custom User-Agent header.\n    headers: Custom HTTP headers.\n    cookies: Custom cookies to send.\n    link_query: Optional topic used to score discovered links.\n    sort_links_by_score: Whether to return links ranked by score.",
+        "example": {
+          "scraper_type": "auto",
+          "screenshot": false,
+          "timeout": 30.0,
+          "url": "https://example.com",
+          "viewport_height": 1080,
+          "viewport_width": 1920
+        },
+        "properties": {
+          "auth_config": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthConfig"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional authentication configuration referencing a stored credential. When present, forces the Playwright scraper for form/storage_state types."
+          },
+          "cookies": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custom cookies",
+            "title": "Cookies"
+          },
+          "delay": {
+            "default": 0.0,
+            "description": "Post-load delay in seconds before content extraction",
+            "maximum": 30.0,
+            "minimum": 0.0,
+            "title": "Delay",
+            "type": "number"
+          },
+          "download_images": {
+            "default": false,
+            "description": "Download image content and include base64-encoded bytes in response",
+            "title": "Download Images",
+            "type": "boolean"
+          },
+          "extraction_schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtractionSchema"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional declarative CSS schema for pulling repeated records (listings, tables, team pages) into extracted_data. Runs against the page HTML, so it works with every backend. Wire-compatible with crawl4ai's JsonCssExtractionStrategy dialect."
+          },
+          "headers": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custom HTTP headers",
+            "title": "Headers"
+          },
+          "javascript_enabled": {
+            "default": false,
+            "description": "Force a JS-rendering backend (Playwright) when scraper_type is 'auto'. Ignored when scraper_type names an explicit backend.",
+            "title": "Javascript Enabled",
+            "type": "boolean"
+          },
+          "link_query": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional topic (e.g. 'pricing plans') used to score discovered links. Every link always carries a score; supplying a query blends topical relevance into it. Does not filter or reorder unless sort_links_by_score is set.",
+            "title": "Link Query"
+          },
+          "no_cache": {
+            "default": false,
+            "description": "Bypass the result cache for this request (always fetch fresh and do not store). The cache only ever holds anonymous COMPLETED scrapes.",
+            "title": "No Cache",
+            "type": "boolean"
+          },
+          "scraper_type": {
+            "$ref": "#/components/schemas/ScraperType",
+            "default": "auto",
+            "description": "Type of scraper to use (playwright for JS-heavy sites, scrapy for bulk)"
+          },
+          "screenshot": {
+            "default": false,
+            "description": "Capture screenshot of page",
+            "title": "Screenshot",
+            "type": "boolean"
+          },
+          "sort_links_by_score": {
+            "default": false,
+            "description": "Return links[] ranked by score (descending) instead of document order. Off by default because document order is the existing contract.",
+            "title": "Sort Links By Score",
+            "type": "boolean"
+          },
+          "stealth": {
+            "default": false,
+            "description": "Apply browser-level stealth patches (navigator.webdriver and friends) to the Playwright context. Applied automatically when AUTO escalates to Playwright after curl_cffi was already blocked; set explicitly to force it. Requires a browser backend: rejected with a 422 alongside an explicit non-browser scraper_type.",
+            "title": "Stealth",
+            "type": "boolean"
+          },
+          "timeout": {
+            "default": 30.0,
+            "description": "Request timeout in seconds",
+            "maximum": 300.0,
+            "minimum": 1.0,
+            "title": "Timeout",
+            "type": "number"
+          },
+          "url": {
+            "description": "URL to scrape",
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Url",
+            "type": "string"
+          },
+          "user_agent": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custom user agent string",
+            "title": "User Agent"
+          },
+          "viewport_height": {
+            "default": 1080,
+            "description": "Viewport height",
+            "maximum": 2160.0,
+            "minimum": 240.0,
+            "title": "Viewport Height",
+            "type": "integer"
+          },
+          "viewport_width": {
+            "default": 1920,
+            "description": "Viewport width",
+            "maximum": 3840.0,
+            "minimum": 320.0,
+            "title": "Viewport Width",
+            "type": "integer"
+          },
+          "virtual_scroll": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VirtualScrollConfig"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Scroll the page (or a container) before extracting, so infinite feeds yield more than the first viewport. Forces the Playwright backend, since the other backends do not run JavaScript."
+          },
+          "wait_for_selector": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CSS selector to wait for before scraping (Playwright only)",
+            "title": "Wait For Selector"
+          },
+          "wait_until": {
+            "default": "load",
+            "description": "Page-load wait condition: 'load' (default), 'domcontentloaded', 'networkidle', or 'commit'. 'networkidle' is an explicit opt-in only — on live SPAs with analytics/websockets/polling the network never goes 500ms-quiet, so it blocks the whole timeout and returns empty content on a good page. An invalid value is rejected with 422 (rather than reaching page.goto and returning a FAILED result).",
+            "enum": [
+              "load",
+              "domcontentloaded",
+              "networkidle",
+              "commit"
+            ],
+            "title": "Wait Until",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "ScrapeRequest",
+        "type": "object"
+      },
+      "ScrapeResponse": {
+        "description": "Response model for a completed scrape operation.\n\nAttributes:\n    url: The original requested URL.\n    final_url: The final URL after redirects.\n    html_content: Raw HTML content of the page.\n    text_content: Extracted visible text content.\n    markdown_content: Extracted main content as Markdown (LLM/RAG-ready).\n    title: Page title.\n    metadata: Extracted metadata (Open Graph, meta tags, etc.).\n    structured_data: Embedded structured data (JSON-LD, microdata, OpenGraph, microformats).\n    links: List of discovered hyperlinks.\n    images: List of discovered images.\n    screenshot_base64: Base64-encoded screenshot PNG.\n    status: Operation status.\n    error: Error message if status is FAILED.\n    scraper_used: Name of the scraper that processed the request.\n    processing_time_seconds: Time taken to complete the scrape.",
+        "example": {
+          "final_url": "https://example.com/",
+          "processing_time_seconds": 2.5,
+          "scraper_used": "PlaywrightScraper",
+          "status": "completed",
+          "text_content": "Example Domain\nThis domain is for use in examples...",
+          "title": "Example Domain",
+          "url": "https://example.com"
+        },
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Error message if failed",
+            "title": "Error"
+          },
+          "extracted_data": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Records pulled by the request's extraction_schema, one dict per matched element. None when no schema was supplied; an empty list means a schema ran and matched nothing.",
+            "title": "Extracted Data"
+          },
+          "final_url": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Final URL after redirects",
+            "title": "Final Url"
+          },
+          "html_content": {
+            "anyOf": [
+              {
+                "maxLength": 10000000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Raw HTML content",
+            "title": "Html Content"
+          },
+          "images": {
+            "description": "Discovered images",
+            "items": {
+              "$ref": "#/components/schemas/ImageInfo"
+            },
+            "title": "Images",
+            "type": "array"
+          },
+          "links": {
+            "description": "Discovered links",
+            "items": {
+              "$ref": "#/components/schemas/LinkInfo"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "markdown_content": {
+            "anyOf": [
+              {
+                "maxLength": 10000000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Extracted main content as Markdown (LLM/RAG-ready)",
+            "title": "Markdown Content"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "description": "Page metadata",
+            "title": "Metadata",
+            "type": "object"
+          },
+          "processing_time_seconds": {
+            "description": "Time taken to scrape",
+            "title": "Processing Time Seconds",
+            "type": "number"
+          },
+          "scraper_used": {
+            "description": "Name of scraper that processed this",
+            "maxLength": 256,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Scraper Used",
+            "type": "string"
+          },
+          "screenshot_base64": {
+            "anyOf": [
+              {
+                "maxLength": 50000000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Base64 encoded screenshot",
+            "title": "Screenshot Base64"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ScrapeStatus",
+            "description": "Scrape operation status"
+          },
+          "storage_state": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Playwright storageState captured after successful auth. Cache and reuse via auth_config.type='storage_state' to avoid re-logging-in.",
+            "title": "Storage State"
+          },
+          "structured_data": {
+            "additionalProperties": true,
+            "description": "Embedded structured data (JSON-LD, microdata, OpenGraph, microformats)",
+            "title": "Structured Data",
+            "type": "object"
+          },
+          "text_content": {
+            "anyOf": [
+              {
+                "maxLength": 10000000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Extracted text content",
+            "title": "Text Content"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Page title",
+            "title": "Title"
+          },
+          "url": {
+            "description": "Scraped URL",
+            "maxLength": 10000,
+            "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "status",
+          "scraper_used",
+          "processing_time_seconds"
+        ],
+        "title": "ScrapeResponse",
+        "type": "object"
+      },
+      "ScrapeStatus": {
+        "description": "Status of a scrape operation.\n\nAttributes:\n    QUEUED: Operation is waiting to be processed.\n    RUNNING: Operation is currently in progress.\n    COMPLETED: Operation finished successfully.\n    FAILED: Operation encountered an error.",
+        "enum": [
+          "queued",
+          "running",
+          "completed",
+          "failed"
+        ],
+        "title": "ScrapeStatus",
+        "type": "string"
+      },
+      "ScraperType": {
+        "description": "Available scraper backend types.\n\nAttributes:\n    PLAYWRIGHT: Use Playwright for JavaScript rendering.\n    SCRAPY: Use Scrapy for efficient bulk crawling.\n    HTTPX: Use httpx + BeautifulSoup for fast static page scraping.\n    CURL_CFFI: Use curl_cffi (Chrome TLS/JA3 impersonation) for static pages\n        behind network-layer anti-bot blocks; no JavaScript.\n    AUTO: Automatically select the best scraper.",
+        "enum": [
+          "playwright",
+          "scrapy",
+          "httpx",
+          "curl_cffi",
+          "auto"
+        ],
+        "title": "ScraperType",
+        "type": "string"
+      },
+      "VirtualScrollConfig": {
+        "description": "How to scroll a page to materialize lazily-loaded content.\n\nPlaywright-only: the other backends do not execute JavaScript, so supplying\nthis forces the Playwright backend in AUTO mode.\n\nAttributes:\n    container_selector: Element to scroll. Omit to scroll the window.\n        Required to recover *virtualized* lists that recycle DOM nodes —\n        without a container there is nothing to accumulate children from.\n    scroll_count: Maximum scroll steps. Bounded because each step costs a\n        real wait against the caller's timeout.\n    scroll_by: Pixels per step; 0 means one viewport/container height.\n    wait_ms: Pause after each step, for content to load.",
+        "properties": {
+          "container_selector": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "pattern": "^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Element to scroll; omit to scroll the window",
+            "title": "Container Selector"
+          },
+          "scroll_by": {
+            "default": 0,
+            "description": "Pixels to scroll per step; 0 means one viewport height",
+            "maximum": 20000.0,
+            "minimum": 0.0,
+            "title": "Scroll By",
+            "type": "integer"
+          },
+          "scroll_count": {
+            "default": 10,
+            "description": "Maximum number of scroll steps",
+            "maximum": 30.0,
+            "minimum": 1.0,
+            "title": "Scroll Count",
+            "type": "integer"
+          },
+          "wait_ms": {
+            "default": 500,
+            "description": "Pause after each step, in milliseconds",
+            "maximum": 5000.0,
+            "minimum": 50.0,
+            "title": "Wait Ms",
+            "type": "integer"
+          }
+        },
+        "title": "VirtualScrollConfig",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "bearerFormat": "License",
+        "description": "License token. Transport: `X-Tenant-Id: Bearer <token>` (not the Authorization header — that is reserved for caller-side auth).",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Web scraping microservice with multiple backends: Playwright (JS-rendered pages), Scrapy (bulk crawling), and httpx+BeautifulSoup (fast static pages). Auto mode selects the best backend per URL. Auth: license token via `X-Tenant-Id: Bearer <token>`, validated against LICENSE_INTROSPECT_URL. Trusted-network clients (RFC 1918) bypass token requirement.",
+    "title": "WebScraper Service",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Provide service information at the root endpoint (public).",
+        "operationId": "service_root",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Service Root",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Service banner",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/scrape/bulk": {
+      "post": {
+        "description": "Scrape multiple URLs in a single request.\n\nProcesses URLs sequentially to avoid overwhelming target servers.\nEach URL is scraped independently and failures don't affect other URLs.\n\nArgs:\n    request: Bulk scrape request containing list of URLs and options.\n    token: JWT token payload for authentication.\n\nReturns:\n    BulkScrapeResponse with individual results for each URL and summary stats.\n\nRaises:\n    HTTPException: 500 error if bulk scraping fails catastrophically.",
+        "operationId": "scrape_bulk",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkScrapeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkScrapeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request format"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication required"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Scraping failed"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Upstream secrets service unavailable"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Scrape multiple URLs in one request",
+        "tags": [
+          "Scrape"
+        ]
+      }
+    },
+    "/api/scrape/url": {
+      "post": {
+        "description": "Scrape a single URL and extract content.\n\nUses Playwright for JavaScript-heavy sites or simple HTTP for static pages.\nSupports screenshot capture, custom headers, cookies, and viewport settings.\n\nArgs:\n    request: Scrape request containing URL and configuration options.\n    token: JWT token payload for authentication.\n\nReturns:\n    ScrapeResponse containing extracted content, metadata, links, and images.\n\nRaises:\n    HTTPException: 500 error if scraping fails due to network or parsing errors.",
+        "operationId": "scrape_url",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request format"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication required"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Scraping failed"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Upstream secrets service unavailable"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Scrape a single URL",
+        "tags": [
+          "Scrape"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "General health check endpoint with detailed service status.\n\nProvides comprehensive health information including service version,\nPlaywright availability, and browser initialization status.",
+        "operationId": "health_check",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Service health summary",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Kubernetes liveness probe endpoint.\n\nReturns 200 if the service process is running and responding. Used by\nKubernetes to determine if the container should be restarted.",
+        "operationId": "health_live",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Live",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Kubernetes readiness probe endpoint.\n\nVerifies that the service can handle incoming requests by checking\nPlaywright availability and browser initialization status. Returns 200 if\nready to serve traffic, 503 if not ready.",
+        "operationId": "health_ready",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service not ready"
+          }
+        },
+        "summary": "Readiness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Liveness, readiness, and root probes.",
+      "name": "Health"
+    },
+    {
+      "description": "Web scraping operations: single URL fetch, bulk crawl, multi-backend (Playwright / Scrapy / httpx) selection.",
+      "name": "Scrape"
+    }
+  ]
+}

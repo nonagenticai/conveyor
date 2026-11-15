@@ -1,0 +1,20 @@
+# Capture cases: name|METHOD|path|body   ({BASE} is replaced by --fixtures)
+health|GET|/health|
+health_live|GET|/health/live|
+health_ready|GET|/health/ready|
+root|GET|/|
+scrape_article|POST|/api/scrape/url|{"url":"{BASE}/article.html","no_cache":true}
+scrape_article2|POST|/api/scrape/url|{"url":"{BASE}/article2.html","no_cache":true}
+scrape_directory|POST|/api/scrape/url|{"url":"{BASE}/directory.html","no_cache":true}
+scrape_list|POST|/api/scrape/url|{"url":"{BASE}/list.html","no_cache":true}
+scrape_spa|POST|/api/scrape/url|{"url":"{BASE}/spa.html","no_cache":true}
+scrape_login|POST|/api/scrape/url|{"url":"{BASE}/login.html","no_cache":true}
+scrape_images|POST|/api/scrape/url|{"url":"{BASE}/images.html","no_cache":true}
+scrape_minimal|POST|/api/scrape/url|{"url":"{BASE}/minimal.html","no_cache":true}
+scrape_long|POST|/api/scrape/url|{"url":"{BASE}/long.html","no_cache":true}
+scrape_malformed|POST|/api/scrape/url|{"url":"{BASE}/malformed.html","no_cache":true}
+scrape_empty|POST|/api/scrape/url|{"url":"{BASE}/empty.html","no_cache":true}
+scrape_noindex|POST|/api/scrape/url|{"url":"{BASE}/noindex.html","no_cache":true}
+extraction_schema|POST|/api/scrape/url|{"url":"{BASE}/list.html","no_cache":true,"extraction_schema":{"name":"cards","baseSelector":".card","fields":[{"name":"name","selector":".name"},{"name":"price","selector":".price"}]}}
+bulk_two|POST|/api/scrape/bulk|{"urls":["{BASE}/minimal.html","{BASE}/article2.html"]}
+blocked_address|POST|/api/scrape/url|{"url":"http://169.254.169.254/latest/meta-data/"}
