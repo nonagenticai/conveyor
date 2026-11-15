@@ -164,6 +164,12 @@ impl ClusterConfig {
         self.ca_pem = ca_pem;
         self
     }
+
+    /// Override the per-call HTTP timeout.
+    pub fn with_timeout(mut self, timeout: Duration) -> Self {
+        self.timeout = timeout;
+        self
+    }
 }
 
 /// The observed state of a dispatched Job.

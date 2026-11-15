@@ -19,7 +19,6 @@
 use std::time::Duration;
 
 use conveyor_domain::benchmark::{APPLY_PATCH_FAIL, APPLY_PATCH_PASS, EVAL_MARKER, TIMEOUT_MARKER};
-use reqwest::{Client, StatusCode};
 use serde_json::{Map, Value, json};
 use sha2::{Digest, Sha256};
 use uuid::Uuid;
@@ -72,24 +71,25 @@ pub enum SandboxError {
     NoPod(String),
 }
 
-/// An optional node selector (`SANDBOX_NODE_SELECTOR=key=value`).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct NodeSelector {
-    /// The label key.
-    pub key: String,
-    /// The label value.
-    pub value: String,
-}
+/// The selector and toleration types are the runner crate's: one definition, two dispatchers.
+pub use conveyor_runner::{NodeSelector, Toleration};
 
-/// An optional toleration (`SANDBOX_TOLERATION=key=value:Effect`).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Toleration {
-    /// The taint key.
-    pub key: String,
-    /// The taint value.
-    pub value: String,
-    /// `NoSchedule | PreferNoSchedule | NoExecute`.
-    pub effect: String,
+impl From<conveyor_runner::RunnerError> for SandboxError {
+    fn from(err: conveyor_runner::RunnerError) -> Self {
+        use conveyor_runner::RunnerError as Runner;
+        match err {
+            Runner::NotConfigured => Self::NotConfigured,
+            Runner::Credential(detail) => Self::Credential(detail),
+            Runner::Transport(detail) => Self::Transport(detail),
+            Runner::Api { status, body } => Self::Api {
+                status,
+                body: capped(body),
+            },
+            Runner::NotFound { what, name } => Self::NotFound { what, name },
+            Runner::Manifest { detail } => Self::Manifest { detail },
+            Runner::ConfigMapTooLarge { size, .. } => Self::ConfigMapTooLarge { size },
+        }
+    }
 }
 
 /// The sandbox client's configuration. Built from env in a pod; built from a lookup in tests.
@@ -240,22 +240,21 @@ pub enum JobState {
 #[derive(Clone, Debug)]
 pub struct Sandbox {
     config: SandboxConfig,
-    client: Client,
+    cluster: conveyor_runner::Cluster,
 }
 
 impl Sandbox {
     /// Build a client from an explicit configuration.
     pub fn new(config: SandboxConfig) -> Result<Self, SandboxError> {
-        let mut builder = Client::builder().timeout(config.timeout);
-        if let Some(pem) = config.ca_pem.as_deref() {
-            let certificate = reqwest::Certificate::from_pem(pem)
-                .map_err(|err| SandboxError::Credential(format!("CA PEM: {err}")))?;
-            builder = builder.add_root_certificate(certificate);
-        }
-        let client = builder
-            .build()
-            .map_err(|err| SandboxError::Transport(err.to_string()))?;
-        Ok(Self { config, client })
+        let cluster_config = conveyor_runner::ClusterConfig::from_parts(
+            config.namespace.clone(),
+            config.api_url.clone(),
+            config.token.clone(),
+        )
+        .with_ca(config.ca_pem.clone())
+        .with_timeout(config.timeout);
+        let cluster = conveyor_runner::Cluster::new(cluster_config)?;
+        Ok(Self { config, cluster })
     }
 
     /// Build from the process environment; [`SandboxError::NotConfigured`] is the fail-closed
@@ -495,54 +494,12 @@ impl Sandbox {
             .ok_or_else(|| SandboxError::NoPod(job.to_owned()))
     }
 
-    fn url(&self, path: &str) -> String {
-        format!("{}{}", self.config.api_url.trim_end_matches('/'), path)
-    }
-
     async fn create(&self, path: &str, body: &Value) -> Result<(), SandboxError> {
-        let response = self
-            .client
-            .post(self.url(path))
-            .bearer_auth(&self.config.token)
-            .json(body)
-            .send()
-            .await
-            .map_err(|err| SandboxError::Transport(err.to_string()))?;
-        let status = response.status();
-        if status.is_success() || status == StatusCode::CONFLICT {
-            return Ok(());
-        }
-        Err(SandboxError::Api {
-            status: status.as_u16(),
-            body: capped(response.text().await.unwrap_or_default()),
-        })
+        self.cluster.create(path, body).await.map_err(Into::into)
     }
 
     async fn get(&self, path: &str, what: &'static str, name: &str) -> Result<Value, SandboxError> {
-        let response = self
-            .client
-            .get(self.url(path))
-            .bearer_auth(&self.config.token)
-            .send()
-            .await
-            .map_err(|err| SandboxError::Transport(err.to_string()))?;
-        let status = response.status();
-        if status == StatusCode::NOT_FOUND {
-            return Err(SandboxError::NotFound {
-                what,
-                name: name.to_owned(),
-            });
-        }
-        if !status.is_success() {
-            return Err(SandboxError::Api {
-                status: status.as_u16(),
-                body: capped(response.text().await.unwrap_or_default()),
-            });
-        }
-        response
-            .json()
-            .await
-            .map_err(|err| SandboxError::Transport(err.to_string()))
+        self.cluster.get(path, what, name).await.map_err(Into::into)
     }
 
     async fn get_text(
@@ -551,48 +508,18 @@ impl Sandbox {
         what: &'static str,
         name: &str,
     ) -> Result<String, SandboxError> {
-        let response = self
-            .client
-            .get(self.url(path))
-            .bearer_auth(&self.config.token)
-            .send()
+        self.cluster
+            .get_text(path, what, name)
             .await
-            .map_err(|err| SandboxError::Transport(err.to_string()))?;
-        let status = response.status();
-        if status == StatusCode::NOT_FOUND {
-            return Err(SandboxError::NotFound {
-                what,
-                name: name.to_owned(),
-            });
-        }
-        if !status.is_success() {
-            return Err(SandboxError::Api {
-                status: status.as_u16(),
-                body: capped(response.text().await.unwrap_or_default()),
-            });
-        }
-        response
-            .text()
-            .await
-            .map_err(|err| SandboxError::Transport(err.to_string()))
+            .map_err(Into::into)
     }
 
+    /// A `404` is success here: the reaper may run after the Job's TTL cleanup.
     async fn delete_path(&self, path: &str) -> Result<(), SandboxError> {
-        let response = self
-            .client
-            .delete(self.url(path))
-            .bearer_auth(&self.config.token)
-            .send()
-            .await
-            .map_err(|err| SandboxError::Transport(err.to_string()))?;
-        let status = response.status();
-        if status.is_success() || status == StatusCode::NOT_FOUND {
-            return Ok(());
+        match self.cluster.delete(path, "object", path).await {
+            Ok(()) | Err(conveyor_runner::RunnerError::NotFound { .. }) => Ok(()),
+            Err(err) => Err(err.into()),
         }
-        Err(SandboxError::Api {
-            status: status.as_u16(),
-            body: capped(response.text().await.unwrap_or_default()),
-        })
     }
 }
 
