@@ -159,7 +159,10 @@ pub async fn claim_with(
             SET status = 'running',
                 lease_token = uuidv7(),
                 lease_until = now() + make_interval(secs => $1),
-                attempts = j.attempts + 1,
+                -- A continuation of an attempt already counted (see `defer`) does not count
+                -- again: `runner_run.attempt` is the pod's idempotency key and must not move.
+                attempts = CASE WHEN j.continuation THEN j.attempts ELSE j.attempts + 1 END,
+                continuation = false,
                 updated_at = now()
            FROM due
           WHERE j.id = due.job_id
@@ -168,6 +171,23 @@ pub async fn claim_with(
     let job: Option<Job> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(lease_secs as f64)
         .bind(&kinds)
+        .fetch_optional(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok(job)
+}
+
+/// One job by id, in the caller's tenant scope. `None` is "no such job here" — a job belonging to
+/// another tenant is indistinguishable from a missing one, which is what the byte routes need.
+pub async fn get(
+    pool: &PgPool,
+    tenant: TenantId,
+    job_id: Uuid,
+) -> Result<Option<Job>, sqlx::Error> {
+    let mut tx = begin_scoped(pool, tenant).await?;
+    let sql = format!("SELECT {COLUMNS} FROM job WHERE id = $1");
+    let job: Option<Job> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(job_id)
         .fetch_optional(&mut *tx)
         .await?;
     tx.commit().await?;
@@ -332,6 +352,77 @@ pub async fn fail(
             status: None,
         },
     })
+}
+
+/// Return a running job to `pending` because the handler has more to do on the same attempt.
+///
+/// This is **not** [`fail`]: a dispatch that created a Kubernetes Job and must come back to poll
+/// it has not failed and has not spent a retry. `continuation` records that, and the claim
+/// statement reads it to skip the `attempts` increment — otherwise the attempt number would grow
+/// on every poll tick and the pod's idempotency key (`(job_id, attempt)`, ADR 0007 §Decision 4)
+/// would change under it.
+///
+/// The exhaustion rule stays the database's: a continuation that never returns is bounded by the
+/// job's own deadline and by the reaper, not by `max_attempts`.
+pub async fn defer(
+    pool: &PgPool,
+    tenant: TenantId,
+    job_id: Uuid,
+    lease_token: Uuid,
+    retry_after: Duration,
+) -> Result<bool, sqlx::Error> {
+    let mut tx = begin_scoped(pool, tenant).await?;
+    let rows = sqlx::query(
+        "UPDATE job
+            SET status = 'pending',
+                run_after = now() + make_interval(secs => $3),
+                continuation = true,
+                lease_until = NULL,
+                lease_token = NULL,
+                updated_at = now()
+          WHERE id = $1 AND status = 'running' AND lease_token = $2",
+    )
+    .bind(job_id)
+    .bind(lease_token)
+    .bind(retry_after.as_secs_f64())
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
+    tx.commit().await?;
+    Ok(rows == 1)
+}
+
+/// Cancel a live job: `dead`, with the caller's reason recorded.
+///
+/// Cancellation is deliberately NOT a fifth status. The `job` CHECK has no `cancelled` value, and
+/// every finish path, the expiry reaper and the job-token routes fence on `status = 'running'` —
+/// a cancelled row that read as anything still running would keep a pod's token valid. `dead` is
+/// what "this will not run again" already means in this ledger.
+pub async fn cancel(
+    pool: &PgPool,
+    tenant: TenantId,
+    job_id: Uuid,
+    reason: &str,
+) -> Result<bool, sqlx::Error> {
+    let error = truncate(reason);
+    let mut tx = begin_scoped(pool, tenant).await?;
+    let rows = sqlx::query(
+        "UPDATE job
+            SET status = 'dead',
+                last_error = $2,
+                continuation = false,
+                lease_until = NULL,
+                lease_token = NULL,
+                updated_at = now()
+          WHERE id = $1 AND status IN ('pending', 'running')",
+    )
+    .bind(job_id)
+    .bind(error)
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
+    tx.commit().await?;
+    Ok(rows == 1)
 }
 
 /// Enqueue a job, deduped on `(tenant, kind, dedupe_key)` while one is pending or running.

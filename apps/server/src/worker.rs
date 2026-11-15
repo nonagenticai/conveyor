@@ -78,6 +78,10 @@ pub const RETRY_AFTER: Duration = Duration::from_secs(30);
 /// The only kinds a worker may claim while the tenant's andon cord is pulled (S06 §5.5,
 /// open question 1). Everything that *starts* work stays pending; delivery and the interaction
 /// sweeps keep running so a pulled cord can still be reported and released.
+///
+/// Runner-backed kinds (#144) are deliberately absent: they start Kubernetes Jobs and spend
+/// compute, which is exactly what pulling the cord is meant to stop. `runner.reap` is absent too —
+/// it deletes objects rather than starting work, but it is not a delivery path.
 pub const ANDON_ALLOWED_KINDS: [&str; 4] = [
     "delivery.send",
     "approval.closed.emit",
@@ -129,6 +133,11 @@ pub struct JobFailure {
     pub message: String,
     /// True when retrying cannot help (a bug, an unknown kind, an unconfigured client).
     pub permanent: bool,
+    /// True when the handler has more to do on the SAME attempt and the row should come back
+    /// without spending a retry (`store::jobs::defer`). A runner dispatch that created a
+    /// Kubernetes Job and must return to poll it is the case this exists for: the pod's
+    /// idempotency key is `(job_id, attempt)`, so the attempt number must not move (#144).
+    pub deferred: bool,
     /// The delay before the retry, when not permanent.
     pub retry_after: Duration,
 }
@@ -139,6 +148,7 @@ impl JobFailure {
         Self {
             message: message.into(),
             permanent: false,
+            deferred: false,
             retry_after: RETRY_AFTER,
         }
     }
@@ -148,7 +158,18 @@ impl JobFailure {
         Self {
             message: message.into(),
             permanent: true,
+            deferred: false,
             retry_after: RETRY_AFTER,
+        }
+    }
+
+    /// Come back after `delay` on the SAME attempt — a continuation, not a retry.
+    pub fn deferred(message: impl Into<String>, delay: Duration) -> Self {
+        Self {
+            message: message.into(),
+            permanent: false,
+            deferred: true,
+            retry_after: delay,
         }
     }
 }
@@ -345,15 +366,22 @@ impl Worker {
         // it, and its eventual finish writes nothing.
         let renewal = self.spawn_renewal(tenant, job.id, token);
 
-        let outcome = run_kind(
-            &self.pool,
-            &self.config,
-            self.licence.as_ref(),
-            tenant,
-            &job.kind,
-            &job.payload,
-        )
-        .await;
+        // A runner-backed kind takes the pod path: dispatch once, then poll the attempt it created.
+        // It is decided from the deployment's image map, not from a name pattern, so a kind is
+        // runner-backed exactly when an image exists for it.
+        let outcome = if crate::runner_dispatch::handles(&self.config, &job.kind) {
+            crate::runner_dispatch::step(&self.pool, &self.config, tenant, job).await
+        } else {
+            run_kind(
+                &self.pool,
+                &self.config,
+                self.licence.as_ref(),
+                tenant,
+                &job.kind,
+                &job.payload,
+            )
+            .await
+        };
         renewal.abort();
 
         match outcome {
@@ -374,7 +402,11 @@ impl Worker {
                     %failure,
                     "job failed"
                 );
-                let outcome = if failure.permanent {
+                let outcome = if failure.deferred {
+                    store::jobs::defer(&self.pool, tenant, job.id, token, failure.retry_after)
+                        .await
+                        .map(|changed| changed.then_some("pending".to_owned()))
+                } else if failure.permanent {
                     store::finish_dead(&self.pool, tenant, job.id, token, &failure.message)
                         .await
                         .map(|changed| changed.then_some("dead".to_owned()))
@@ -800,6 +832,10 @@ pub async fn run_kind(
         // S17 — one bounded benchmark driver tick, and the reaper that fails a stalled one.
         "benchmark.run.poll" => crate::benchmark_worker::poll(pool, tenant, payload).await?,
         "benchmark.reap" => crate::benchmark_worker::reap(pool, tenant).await?,
+        // #144 — the runner's housekeeping. Dispatching and polling are not string kinds: a job
+        // whose kind has an image in `CONVEYOR_RUNNER_IMAGES` is handled by `runner_dispatch`
+        // BEFORE this match (see `tick`), because the step needs the job row and its lease.
+        "runner.reap" => crate::runner_dispatch::reap(pool, config, tenant).await?,
         // S18 — the conveyor arm's producer (one case per job) and the improvement loop's verdict.
         "benchmark.case.produce" => {
             crate::benchmark_producer::produce(pool, tenant, &config.app_key, payload).await?
@@ -1669,6 +1705,7 @@ async fn fail_delivery_send(
     Err(JobFailure {
         message: error,
         permanent: false,
+        deferred: false,
         retry_after,
     })
 }

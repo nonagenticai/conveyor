@@ -32,7 +32,7 @@ use crate::tenants;
 /// `licence.sync` every 5 minutes keeps `app_licence.checked_at` inside the one-hour
 /// staleness window (`crates/auth`'s `LICENCE_MAX_AGE_SECS`) with twelve missed runs to
 /// spare — the licence extractor refuses a row older than that.
-pub const DEFAULT_SCHEDULES: [(&str, &str); 21] = [
+pub const DEFAULT_SCHEDULES: [(&str, &str); 22] = [
     ("event.prune", "15 3 * * *"),
     ("job.prune", "45 3 * * *"),
     // The three rules §6 stated and nothing produced until 0012: the invocation trace (30 d), terminal
@@ -73,6 +73,9 @@ pub const DEFAULT_SCHEDULES: [(&str, &str); 21] = [
     // S17's benchmark reaper: a run whose driver has not polled for five minutes is failed and
     // its orphaned sandbox Jobs are deleted. The driver itself is a per-tick job, not a cron.
     ("benchmark.reap", "*/5 * * * *"),
+    // #144's runner reaper: deletes the Kubernetes objects a long-abandoned attempt left behind
+    // and marks its row `lost`. Polling is NOT a cron — it rides the job's own deferred row.
+    ("runner.reap", "*/15 * * * *"),
 ];
 
 /// The furthest ahead the next-run search looks. A cron with no occurrence inside a year

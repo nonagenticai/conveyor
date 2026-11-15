@@ -12,6 +12,7 @@ pub mod billing;
 pub mod config;
 pub mod dev;
 pub mod error;
+pub mod job_token;
 pub mod jwks;
 pub mod keycloak_admin;
 pub mod licence;
