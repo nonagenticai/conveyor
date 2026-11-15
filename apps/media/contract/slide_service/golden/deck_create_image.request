@@ -1,0 +1,3 @@
+POST /api/decks
+{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}
+{"title":"Synthetic image deck","template_ids":["00000000-0000-0000-0000-0000000000d2"],"slides":[{"template_id":"00000000-0000-0000-0000-0000000000d2","role":"image","content":{"title":"Image capture","description":"Synthetic PNG fixture","image_url":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGUlEQVR42mNQSFjwnxLMMGrAqAGjBgwXAwDOEx8fgOoCtAAAAABJRU5ErkJggg==","bullets":["One","Two"]}}],"content_shaper":{"enabled":false}}

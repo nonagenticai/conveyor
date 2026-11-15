@@ -1,0 +1,1 @@
+{"name":"Slide Service","version":"0.1.0","description":"Presentation deck generation microservice","endpoints":{"health":"/health","docs":"/docs","templates":"/api/templates","decks":"/api/decks"},"status":"running","environment":"development"}

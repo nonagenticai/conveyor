@@ -70,6 +70,7 @@
     "decisions.list",
     "decisions.transition",
     "decisions.update",
+    "decks.render",
     "departments.create",
     "departments.list",
     "documents.compose",

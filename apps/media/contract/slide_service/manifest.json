@@ -1,0 +1,28 @@
+{
+  "service": "slide_service",
+  "image_digest": "sha256:2ea3aacd271cbd53191e39b6a741c7272ecceaaac8f70edb50b41b8b2e66d8e0",
+  "source_commit": "unknown",
+  "taken": "2026-11-15T21:14:48Z",
+  "operations": 18,
+  "paths": 15,
+  "op_list": [
+    "DELETE /api/templates/{template_id}",
+    "GET /",
+    "GET /api/decks/{job_id}",
+    "GET /api/decks/{job_id}/manifest",
+    "GET /api/decks/{job_id}/pdf",
+    "GET /api/decks/{job_id}/pptx",
+    "GET /api/decks/{job_id}/slides/{slide_index}.png",
+    "GET /api/templates",
+    "GET /api/templates/{template_id}",
+    "GET /api/templates/{template_id}/versions",
+    "GET /health",
+    "GET /health/live",
+    "GET /health/ready",
+    "GET /healthz",
+    "GET /readyz",
+    "POST /api/decks",
+    "POST /api/templates",
+    "PUT /api/templates/{template_id}"
+  ]
+}
