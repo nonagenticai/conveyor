@@ -450,6 +450,7 @@ async fn record(
             attempt,
             index > 0,
             reservation_id,
+            state.router().catalog().provider(&attempt.provider),
         );
         emit_cost(state, &event).await;
     }
@@ -556,6 +557,25 @@ fn stream_outcome(status: &'static str, capture: &StreamCapture) -> &'static str
     }
 }
 
+/// The reference's `calculate_cost`: tokens × the per-million catalog price ÷ 10^6, rendered at
+/// the fixed 8 decimals the cost event carries (`metering.py:411-429`). A provider the catalog
+/// does not know prices at zero, and negative token counts never price negative — the reference's
+/// `max(0.0, …)` clamp.
+fn cost_usd(
+    input_tokens: i64,
+    output_tokens: i64,
+    entry: Option<&crate::catalog::ProviderEntry>,
+) -> String {
+    let Some(entry) = entry else {
+        return ZERO_COST_USD.to_owned();
+    };
+    let input_tokens = input_tokens.max(0) as f64;
+    let output_tokens = output_tokens.max(0) as f64;
+    let usd = (input_tokens * entry.cost_input_per_1m + output_tokens * entry.cost_output_per_1m)
+        / 1_000_000.0;
+    format!("{:.8}", usd.max(0.0))
+}
+
 fn cost_event(
     context: &CallContext,
     request: &ChatCompletionRequest,
@@ -563,10 +583,13 @@ fn cost_event(
     attempt: &ProviderAttempt,
     fallback_used: bool,
     reservation_id: Option<&str>,
+    catalog_entry: Option<&crate::catalog::ProviderEntry>,
 ) -> CostEvent {
     // Tokens are per ATTEMPT, never the served response's: every attempt spends its own tokens,
     // and a failed attempt (no usage) must bill zero rather than inherit the served usage.
     let usage = attempt.usage.as_ref();
+    let input_tokens = usage.map_or(0, |usage| usage.prompt_tokens);
+    let output_tokens = usage.map_or(0, |usage| usage.completion_tokens);
     CostEvent {
         tenant_id: context.tenant_id.clone(),
         license_id: context.license_id.clone(),
@@ -581,11 +604,11 @@ fn cost_event(
             .clone()
             .unwrap_or_else(|| request.model.clone()),
         served_model: served.and_then(|response| response.served_model.clone()),
-        input_tokens: usage.map_or(0, |usage| usage.prompt_tokens),
-        output_tokens: usage.map_or(0, |usage| usage.completion_tokens),
+        input_tokens,
+        output_tokens,
         cache_creation_input_tokens: usage.map_or(0, |usage| usage.cache_creation_input_tokens),
         cache_read_input_tokens: usage.map_or(0, |usage| usage.cache_read_input_tokens),
-        cost_usd: ZERO_COST_USD.to_owned(),
+        cost_usd: cost_usd(input_tokens, output_tokens, catalog_entry),
         latency_ms: attempt.latency.as_millis() as i64,
         schema_id: Some("default".to_owned()),
         fallback_used,
@@ -883,6 +906,7 @@ async fn finalise_stream(
             } else {
                 None
             },
+            state.router().catalog().provider(&attempt.provider),
         );
         emit_cost(&state, &event).await;
     }
@@ -934,6 +958,7 @@ async fn record_unopened_stream(
             None,
             None,
             None,
+            state.router().catalog().provider(&attempt.provider),
         );
         emit_cost(state, &event).await;
     }
@@ -951,7 +976,10 @@ fn stream_cost_event(
     usage: Option<&Usage>,
     served_model: Option<&str>,
     provider_request_id: Option<&str>,
+    catalog_entry: Option<&crate::catalog::ProviderEntry>,
 ) -> CostEvent {
+    let input_tokens = usage.map_or(0, |usage| usage.prompt_tokens);
+    let output_tokens = usage.map_or(0, |usage| usage.completion_tokens);
     CostEvent {
         tenant_id: context.tenant_id.clone(),
         license_id: context.license_id.clone(),
@@ -966,11 +994,11 @@ fn stream_cost_event(
             .clone()
             .unwrap_or_else(|| request.model.clone()),
         served_model: served_model.map(str::to_owned),
-        input_tokens: usage.map_or(0, |usage| usage.prompt_tokens),
-        output_tokens: usage.map_or(0, |usage| usage.completion_tokens),
+        input_tokens,
+        output_tokens,
         cache_creation_input_tokens: usage.map_or(0, |usage| usage.cache_creation_input_tokens),
         cache_read_input_tokens: usage.map_or(0, |usage| usage.cache_read_input_tokens),
-        cost_usd: ZERO_COST_USD.to_owned(),
+        cost_usd: cost_usd(input_tokens, output_tokens, catalog_entry),
         latency_ms: attempt.latency.as_millis() as i64,
         schema_id: Some("default".to_owned()),
         fallback_used,

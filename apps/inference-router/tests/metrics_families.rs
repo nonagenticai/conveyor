@@ -701,6 +701,64 @@ async fn serve_one(router: Router) -> StatusCode {
     serve_one_as(router, Some(ATTRIBUTABLE_TENANT)).await
 }
 
+/// The alert-keyed USD family must actually carry the catalog price, not the fixed zero the first
+/// port wired in: 7 prompt + 3 completion tokens at 1,000,000 per million is 10 USD. The provider
+/// is priced, so it cannot be `customer_eligible` (a boot refusal), and its name is unique to this
+/// test because the recorder is process-wide.
+#[tokio::test]
+async fn the_unlicensed_usd_family_carries_the_catalog_price() {
+    let provider = "stub-metrics-priced";
+    let address = stub_provider("priced").await;
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: {provider}\n    enabled: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: metric-model\n    cost_input_per_1m: 1000000\n    cost_output_per_1m: 1000000\ndefault_chain: [{provider}]\n"
+    ))
+    .expect("catalog");
+    // The trio is booked before the XADD, so the default (delivering-nothing) deps still record it.
+    preseed(&[]);
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let state = AppState::with_deps(
+        Config::from_lookup(|_| None).expect("defaults"),
+        router,
+        AppDeps::default(),
+    );
+    assert_eq!(
+        serve_one_as(api_router(state), Some(ATTRIBUTABLE_TENANT)).await,
+        StatusCode::OK
+    );
+
+    let body = scrape().await;
+    assert_eq!(
+        series_value(
+            &body,
+            "inference_router_cost_usd_unlicensed_total",
+            &[
+                ("service_key", "inference-router"),
+                ("provider", provider),
+                ("caller", "unknown"),
+                ("worker", "unknown"),
+            ],
+        ),
+        Some(10.0),
+        "7 prompt + 3 completion at 1,000,000 per million is 10 USD, not the fixed zero"
+    );
+}
+
+/// P1.1: the alert families live on their own listener. The API router must answer 404 for
+/// `/metrics`, so a scrape can never be served by the unauthenticated API surface.
+#[tokio::test]
+async fn the_api_router_does_not_serve_metrics() {
+    let address = stub_provider("never dialled").await;
+    let response = configured("stub-metrics-no-metrics-route", address)
+        .oneshot(
+            Request::get("/metrics")
+                .body(Body::empty())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
 // ── the ledger write-failure family ────────────────────────────────────────────────────────
 //
 // The reference books this family for a dropped ledger row. This port awaits every write inline,

@@ -95,6 +95,47 @@ fn attributed_request() -> Body {
     )
 }
 
+/// A catalog price is what the event bills, at the reference's fixed 8 decimals: 7 prompt + 3
+/// completion tokens at 1,000,000 per million is 10 USD. The provider is priced, so it cannot be
+/// `customer_eligible` (the catalog refuses a priced customer-eligible provider at boot).
+#[tokio::test]
+async fn a_priced_provider_is_billed_at_its_catalog_rate() {
+    let address = stub_provider().await;
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: stub-priced\n    enabled: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: stub-model\n    cost_input_per_1m: 1000000\n    cost_output_per_1m: 1000000\ndefault_chain: [stub-priced]\n"
+    ))
+    .expect("catalog");
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let recorder = Arc::new(Recorder::default());
+    let state = AppState::with_deps(
+        Config::from_lookup(|_| None).expect("defaults"),
+        router,
+        AppDeps {
+            cost: recorder.clone(),
+            ..AppDeps::default()
+        },
+    );
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-tenant-id", "00000000-0000-4000-8000-0000000000a1")
+                .body(attributed_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+
+    let events = recorder.0.lock().expect("recorder");
+    assert_eq!(events.len(), 1, "one event per provider attempt");
+    assert_eq!(events[0].provider, "stub-priced");
+    assert_eq!(events[0].input_tokens, 7);
+    assert_eq!(events[0].output_tokens, 3);
+    assert_eq!(events[0].cost_usd, "10.00000000");
+}
+
 #[tokio::test]
 async fn a_served_request_writes_its_row_and_one_cost_event() {
     let db = common::fresh().await;
@@ -199,6 +240,8 @@ async fn a_served_request_writes_its_row_and_one_cost_event() {
     assert_eq!(event.cost_source, "inference-router");
     assert_eq!(event.input_tokens, 7);
     assert_eq!(event.output_tokens, 3);
+    // This provider declares no rates, so the fixed-width zero must survive.
+    assert_eq!(event.cost_usd, "0.00000000");
     assert_eq!(event.schema_id.as_deref(), Some("default"));
     assert!(!event.fallback_used);
     assert_eq!(
