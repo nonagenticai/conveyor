@@ -1,0 +1,27 @@
+[package]
+name = "conveyor-analysis"
+description = "The analyse.* library: rubrics, scoring and the deterministic site scan (ADR 0007 §5)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "conveyor_analysis"
+path = "src/lib.rs"
+
+[dependencies]
+# ADR 0007 §5: a library, not a service. No `reqwest`, no `sqlx`, no `axum`, no clock. Every
+# operation is a pure function of its inputs, so a report is reproducible and a test needs no
+# server — and `crates/api/tests/externals_declared.rs` forbids the transport this crate must
+# not have anyway.
+scraper = "0.25"
+regex = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+url = "2"
+
+[dev-dependencies]
+serde_json = { workspace = true }

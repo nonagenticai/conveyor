@@ -744,6 +744,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-analysis"
+version = "0.1.0"
+dependencies = [
+ "regex",
+ "scraper",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "url",
+]
+
+[[package]]
 name = "conveyor-api"
 version = "0.1.0"
 dependencies = [
