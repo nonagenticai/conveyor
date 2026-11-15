@@ -166,6 +166,29 @@ found a claim, not a stale label.
   PR's owner keeps the work; never push to that branch. `conveyor#38` (PR #36) is the worked
   example.
 
+### Fork claim — no write access
+
+A contributor without write access cannot push `issue/N-<slug>` to this repository or apply a
+label. The claim is still the same four checks; a maintainer performs the writes:
+
+1. The contributor comments on the unit issue with their plan and states they will take it.
+2. A maintainer runs the four checks, applies `status:claimed`, and replies with the claim time and
+   the comment link (the claim record is the comment, not a branch in this repository).
+3. The contributor creates `issue/N-<slug>` in their fork and opens a PR from
+   `<owner>:issue/N-<slug>` to `nonagenticai/conveyor:main` with `Closes #N`.
+4. Every check is performable from the fork:
+
+```bash
+gh issue view N --repo nonagenticai/conveyor --json state,labels,comments,closedByPullRequestsReferences
+gh pr list --repo nonagenticai/conveyor --state all --search "#N"
+git ls-remote --heads origin "issue/N-*"                         # origin = your fork
+git ls-remote --heads https://github.com/nonagenticai/conveyor "issue/N-*"
+git log upstream/main --grep "#N" --oneline
+```
+
+Never force-push a branch you do not own. The 2-PR cap counts maintainer PRs in this repository;
+a fork PR does not count against it (record the count on the day with the command above).
+
 ## Abandonment and adoption
 
 A claim is **abandoned** when 48 hours have passed since both the last push to its branch and the
@@ -264,18 +287,21 @@ gh pr create --base main --head issue/N-<slug> \
 - **2 pipeline runs per issue**: the PR run and the merge run. Every run is a verdict, never a
   probe.
 - **A docs-only PR skips the checks and the build.** When every changed path is documentation
-  (`docs/**`, any `*.md`, `.claude/**`), the archetype's classifier marks the change as non-code
-  and both `rust-checks` and `Build, push, smoke` are skipped (gitops-production#5166). Budget
-  such an issue as one short run, not a full suite — **this applies to the PR run only; the merge
-  run is still a full suite until #32.** One code path — a `Cargo.toml`, a migration,
-  `.gitignore`, a workflow file — puts the whole suite back.
+  (`docs/**`, any `*.md`, `.claude/**`), the public CI's `classify` job marks the change as
+  non-code and `checks`, `image` and `service-image` are **created and skipped** — a job-level
+  `if`, never `paths-ignore`, which would leave the required contexts missing. (The private
+  archetype has its own classifier, gitops-production#5166.) Budget such an issue as one short
+  run, not a full suite — **this applies to the PR run only; the merge run is still a full suite
+  until #32.** One code path — a `Cargo.toml`, a migration, `.gitignore`, a workflow file — puts
+  the whole suite back.
 - **At most 2 open unit PRs at a time** (the workspace suite runs on `arc-large`, whose measured
   pool max is 2). More only queues and makes sessions wait on CI. Count open PRs whose head
-  matches `issue/*` — PRs do not inherit issue labels:
+  matches `issue/*` **in this repository**; a fork PR is not a maintainer PR and does not count:
 
 ```bash
-gh pr list --state open --json number,headRefName \
-  --jq '[.[] | select(.headRefName | startswith("issue/"))] | length'
+gh pr list --state open --json number,headRefName,headRepositoryOwner \
+  --jq '[.[] | select(.headRefName | startswith("issue/"))
+             | select(.headRepositoryOwner.login == "nonagenticai")] | length'
 ```
 
 - `issue-deliver` checks this cap and refuses the PR when it is full. **Claims (branches) are

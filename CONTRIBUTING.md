@@ -6,19 +6,24 @@ agreement is required.
 
 ## Before you write code
 
-- **Open an issue first.** The issue is the unit of work: it carries the definition of ready, the
-  acceptance criteria and the definition of done. Use the `Unit of work` template.
-- **Claim it.** Run the `issue-pickup` skill in this repository, or perform the four checks it
-  names; the pushed branch is the lock.
+- **Open an issue first.** A bug or a feature idea starts as a report (Bug report, Feature request
+  or Design feedback). A maintainer triages an accepted report into a `unit` issue — the full
+  contract, with the definition of ready, acceptance criteria and definition of done. The report is
+  linked from the unit and never rewritten in place.
+- **Claim it.** With write access, push `issue/<n>-<slug>`; the pushed branch is the lock. Without
+  write access, comment your plan on the unit issue, a maintainer applies `status:claimed`, and the
+  branch lives in your fork as `<you>:issue/<n>-<slug>`.
 - One issue = one branch `issue/<n>-<slug>` = one pull request with `Closes #<n>`.
 
 ## Workflow
 
-1. Fork the repository and branch from `main` as `issue/<n>-<slug>`.
+1. Fork the repository and branch from upstream `main` as `issue/<n>-<slug>`.
 2. Sign off every commit with `git commit -s`, certifying the Developer Certificate of Origin 1.1
-   (DCO, <https://developercertificate.org/>).
+   (DCO, <https://developercertificate.org/>). The `dco` check fails a pull request whose commits
+   carry no `Signed-off-by:` trailer and names the offending commit.
 3. Run the local gate before opening the pull request.
-4. Open the pull request against `main`. Required checks and a maintainer review gate the merge.
+4. Open the pull request against `main`; the head is `issue/<n>-<slug>` (from a fork,
+   `<you>:issue/<n>-<slug>`). Required checks and a maintainer review gate the merge.
 
 ## The local gate
 
@@ -50,7 +55,10 @@ For the design pack, run `node docs/design/scripts/check-docs.cjs` and the other
 
 - A maintainer reviews every pull request, and required checks must be green.
 - A merge is a human decision. A green run alone does not merge anything.
-- The design and roadmap are published at <https://nonagentic.ai/design/>.
+- A change to `.github/workflows/**`, `.github/CODEOWNERS`, `SECURITY.md` or `scripts/ci/**` is a
+  sensitive path: it needs a code-owner review in addition to the required checks once the
+  `@nonagenticai/maintainers` team exists (tracked on issue #93).
+- The programme is published at <https://conveyor.nonagentic.ai/design/>.
 
 ## Reporting a vulnerability
 

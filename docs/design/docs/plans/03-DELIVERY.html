@@ -157,6 +157,20 @@ gh issue comment N --body &#39;Claimed. Branch `issue/N-&lt;slug&gt;` at `&lt;sh
 <li>If an in-flight branch predates its issue (<code>lane/*</code>, <code>slice/*</code>), record the branch in the issue body and adopt it. ⚠️ <code>block-duplicate-pr.py</code> refuses a PR from <code>slice/*</code>, so at ship time push the adopted HEAD to a new <code>issue/N-&lt;slug&gt;</code> ref and open the PR from that.</li>
 <li>If a PR already exists without an issue, create the issue for it (the full contract), record the branch and PR in the body, comment on the PR with the link, and add <code>Closes #N</code> to its body. The PR's owner keeps the work; never push to that branch. <code>conveyor#38</code> (PR #36) is the worked example.</li>
 </ul>
+<h3 id="fork-claim--no-write-access">Fork claim — no write access</h3>
+<p>A contributor without write access cannot push <code>issue/N-&lt;slug&gt;</code> to this repository or apply a label. The claim is still the same four checks; a maintainer performs the writes:</p>
+<ol type="1">
+<li>The contributor comments on the unit issue with their plan and states they will take it.</li>
+<li>A maintainer runs the four checks, applies <code>status:claimed</code>, and replies with the claim time and the comment link (the claim record is the comment, not a branch in this repository).</li>
+<li>The contributor creates <code>issue/N-&lt;slug&gt;</code> in their fork and opens a PR from <code>&lt;owner&gt;:issue/N-&lt;slug&gt;</code> to <code>nonagenticai/conveyor:main</code> with <code>Closes #N</code>.</li>
+<li>Every check is performable from the fork:</li>
+</ol>
+<pre class="bash"><code>gh issue view N --repo nonagenticai/conveyor --json state,labels,comments,closedByPullRequestsReferences
+gh pr list --repo nonagenticai/conveyor --state all --search &quot;#N&quot;
+git ls-remote --heads origin &quot;issue/N-*&quot;                         # origin = your fork
+git ls-remote --heads https://github.com/nonagenticai/conveyor &quot;issue/N-*&quot;
+git log upstream/main --grep &quot;#N&quot; --oneline</code></pre>
+<p>Never force-push a branch you do not own. The 2-PR cap counts maintainer PRs in this repository; a fork PR does not count against it (record the count on the day with the command above).</p>
 <h2 id="abandonment-and-adoption">Abandonment and adoption</h2>
 <p>A claim is <strong>abandoned</strong> when 48 hours have passed since both the last push to its branch and the last comment on its issue. A claim that is merely idle is not abandoned — a status comment holds it, and waiting on CI or on a blocker is normal.</p>
 <p>Any session may adopt an abandoned claim after the four checks, without the original session's permission. Adoption is:</p>
@@ -226,11 +240,12 @@ gh issue comment N --body &#39;Claimed. Branch `issue/N-&lt;slug&gt;` at `&lt;sh
 <h2 id="ci-budget-and-wip-cap">CI budget and WIP cap</h2>
 <ul>
 <li><strong>2 pipeline runs per issue</strong>: the PR run and the merge run. Every run is a verdict, never a probe.</li>
-<li><strong>A docs-only PR skips the checks and the build.</strong> When every changed path is documentation (<code>docs/**</code>, any <code>*.md</code>, <code>.claude/**</code>), the archetype's classifier marks the change as non-code and both <code>rust-checks</code> and <code>Build, push, smoke</code> are skipped (gitops-production#5166). Budget such an issue as one short run, not a full suite — <strong>this applies to the PR run only; the merge run is still a full suite until #32.</strong> One code path — a <code>Cargo.toml</code>, a migration, <code>.gitignore</code>, a workflow file — puts the whole suite back.</li>
-<li><strong>At most 2 open unit PRs at a time</strong> (the workspace suite runs on <code>arc-large</code>, whose measured pool max is 2). More only queues and makes sessions wait on CI. Count open PRs whose head matches <code>issue/*</code> — PRs do not inherit issue labels:</li>
+<li><strong>A docs-only PR skips the checks and the build.</strong> When every changed path is documentation (<code>docs/**</code>, any <code>*.md</code>, <code>.claude/**</code>), the public CI's <code>classify</code> job marks the change as non-code and <code>checks</code>, <code>image</code> and <code>service-image</code> are <strong>created and skipped</strong> — a job-level <code>if</code>, never <code>paths-ignore</code>, which would leave the required contexts missing. (The private archetype has its own classifier, gitops-production#5166.) Budget such an issue as one short run, not a full suite — <strong>this applies to the PR run only; the merge run is still a full suite until #32.</strong> One code path — a <code>Cargo.toml</code>, a migration, <code>.gitignore</code>, a workflow file — puts the whole suite back.</li>
+<li><strong>At most 2 open unit PRs at a time</strong> (the workspace suite runs on <code>arc-large</code>, whose measured pool max is 2). More only queues and makes sessions wait on CI. Count open PRs whose head matches <code>issue/*</code> <strong>in this repository</strong>; a fork PR is not a maintainer PR and does not count:</li>
 </ul>
-<pre class="bash"><code>gh pr list --state open --json number,headRefName \
-  --jq &#39;[.[] | select(.headRefName | startswith(&quot;issue/&quot;))] | length&#39;</code></pre>
+<pre class="bash"><code>gh pr list --state open --json number,headRefName,headRepositoryOwner \
+  --jq &#39;[.[] | select(.headRefName | startswith(&quot;issue/&quot;))
+             | select(.headRepositoryOwner.login == &quot;nonagenticai&quot;)] | length&#39;</code></pre>
 <ul>
 <li><code>issue-deliver</code> checks this cap and refuses the PR when it is full. <strong>Claims (branches) are unlimited; PRs are not</strong> — <code>issue-pickup</code> never refuses a claim on this basis.</li>
 </ul>
