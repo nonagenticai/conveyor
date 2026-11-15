@@ -46,12 +46,12 @@
 <tr>
 <td><code>apps/research</code></td>
 <td>the web-scraper service; the media-discovery service</td>
-<td><strong>in flight</strong> (#117 claimed, #118 blocked)</td>
+<td><strong>in flight</strong> — #117 merged into <code>apps/research</code>, #118 in flight; ADR 0007 keeps it here</td>
 </tr>
 <tr>
 <td><code>apps/media</code></td>
 <td>the browser-rendered producers; the ffmpeg producers; the thin speech fan-out and video-publish operations</td>
-<td><strong>destination superseded by ADR 0007</strong> — the group becomes the public <code>media</code> repository (browser and ffmpeg images) and the <code>analysis</code> library; #139 keeps its acceptance content and loses its destination</td>
+<td><strong>decided, unclaimed</strong> (#139); ADR 0007 keeps it in this workspace as two executor images, with <code>analyse.*</code> as a library</td>
 </tr>
 <tr>
 <td><code>apps/lean4-prover</code></td>
@@ -226,7 +226,7 @@
 <p>Measured by role, without naming hosts or repositories:</p>
 <ul>
 <li><strong>~30 tool-adjacent services are deployed today</strong> across the legacy systems and the estate.</li>
-<li>The grouping above reduces that to <strong>~15 destinations</strong>: <strong>9 are this workspace's own applications</strong> (<code>server</code>, <code>web</code>, <code>inference-router</code>, <code>licenses</code>, <code>scientific</code>, <code>lean4-prover</code>, <code>coding</code>) plus the two public repositories ADR 0007 creates (<code>media</code> executor images and the <code>analysis</code> library), and the rest are bound toolkits: the two shared Rust stores, the model servers, and the research group.</li>
+<li>The grouping above reduces that to <strong>~15 destinations</strong>: <strong>9 inside this workspace</strong> (<code>server</code>, <code>web</code>, <code>inference-router</code>, <code>licenses</code>, <code>scientific</code>, <code>lean4-prover</code>, <code>research</code>, <code>media</code>, <code>analysis</code>) and the <code>coding</code> repository, with the rest bound toolkits: the two shared Rust stores and the model servers. ADR 0007 makes this workspace as self-contained as possible; only <code>coding</code> keeps its own repository.</li>
 </ul>
 <p>The reduction is not the goal. ADR 0006 §2 is: <strong>combine on runtime shape, not on file count.</strong> The browser and the ffmpeg producers do not share a runtime, so they do not become one image; the thin operations share the server's runtime, so they do not become a deployable at all.</p>
 <hr />
@@ -240,7 +240,7 @@
 <hr />
 <h2 id="7-open-items-this-document-raises">7. Open items this document raises</h2>
 <ol type="1">
-<li><code>apps/media</code>'s device-inspection member needs an Appium driver and a device farm, which no other member of the group does. ADR 0007 keeps it a bound Python tool and out of v1: Appium is itself WebDriver over HTTP, so a Rust client is possible, but no consumer has been measured. Recorded, not built.</li>
+<li><code>apps/media</code>'s device-inspection member needs an Appium driver and a device farm, and it never worked in the live estate. Owner ruling 2026-11-15: deferred outright — not ported, not measured for demand, deployment retired at cutover. Appium being WebDriver over HTTP is recorded only so the deferral is not later read as a technical impossibility.</li>
 <li>Two fleet functions are claimed by neither the Rust service nor a measured consumer. Neither port nor drop is justified until the consumer is measured (ADR 0006 §row <code>apps/coding</code>).</li>
 <li>Two groups are merged but not deployed. A deployment unit each — not part of this document.</li>
 <li>Host control is a family without a mechanism. §4 above is a proposal for T7, not a decision.</li>

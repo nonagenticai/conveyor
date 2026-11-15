@@ -19,8 +19,8 @@ separate catalogue entries (`§11.2` identities), so the broker never learns the
 | Group | Absorbs, by role | State |
 |---|---|---|
 | `apps/scientific` | the scientific research service; the evidence-review service | **absorbed, not deployed** (#105 merged). The live deployment is still the Python image and sits at zero replicas |
-| `apps/research` | the web-scraper service; the media-discovery service | **in flight** (#117 claimed, #118 blocked) |
-| `apps/media` | the browser-rendered producers; the ffmpeg producers; the thin speech fan-out and video-publish operations | **destination superseded by ADR 0007** — the group becomes the public `media` repository (browser and ffmpeg images) and the `analysis` library; #139 keeps its acceptance content and loses its destination |
+| `apps/research` | the web-scraper service; the media-discovery service | **in flight** — #117 merged into `apps/research`, #118 in flight; ADR 0007 keeps it here |
+| `apps/media` | the browser-rendered producers; the ffmpeg producers; the thin speech fan-out and video-publish operations | **decided, unclaimed** (#139); ADR 0007 keeps it in this workspace as two executor images, with `analyse.*` as a library |
 | `apps/lean4-prover` | the Lean 4 prover | **absorbed, not deployed** (#116 merged). The live deployment is still the pre-absorption image; the deployable stays separate for its toolchain state and node pin |
 | `apps/coding` | the `coding-*` fleet | **join the existing Rust repository, never a second rewrite** (ADR 0006). The Python fleet is still deployed and is not the current implementation |
 | external — `strata_ingest`, `strata_rag` | shared ingest and retrieval | done (ADR 0005 §2); they are tool-estate members but not repository scope |
@@ -134,11 +134,11 @@ Until that is decided, host control does not exist, and a procedure must not pre
 Measured by role, without naming hosts or repositories:
 
 - **~30 tool-adjacent services are deployed today** across the legacy systems and the estate.
-- The grouping above reduces that to **~15 destinations**: **9 are this workspace's own
-  applications** (`server`, `web`, `inference-router`, `licenses`, `scientific`, `lean4-prover`,
-  `coding`) plus the two public repositories ADR 0007 creates (`media` executor images and the
-  `analysis` library), and the rest are bound toolkits: the two shared Rust stores, the model
-  servers, and the research group.
+- The grouping above reduces that to **~15 destinations**: **9 inside this workspace**
+  (`server`, `web`, `inference-router`, `licenses`, `scientific`, `lean4-prover`, `research`,
+  `media`, `analysis`) and the `coding` repository, with the rest bound toolkits: the two shared
+  Rust stores and the model servers. ADR 0007 makes this workspace as self-contained as possible;
+  only `coding` keeps its own repository.
 
 The reduction is not the goal. ADR 0006 §2 is: **combine on runtime shape, not on file count.** The
 browser and the ffmpeg producers do not share a runtime, so they do not become one image; the thin
@@ -157,10 +157,10 @@ operations share the server's runtime, so they do not become a deployable at all
 
 ## 7. Open items this document raises
 
-1. `apps/media`'s device-inspection member needs an Appium driver and a device farm, which no other
-   member of the group does. ADR 0007 keeps it a bound Python tool and out of v1: Appium is itself
-   WebDriver over HTTP, so a Rust client is possible, but no consumer has been measured. Recorded,
-   not built.
+1. `apps/media`'s device-inspection member needs an Appium driver and a device farm, and it never
+   worked in the live estate. Owner ruling 2026-11-15: deferred outright — not ported, not measured
+   for demand, deployment retired at cutover. Appium being WebDriver over HTTP is recorded only so
+   the deferral is not later read as a technical impossibility.
 2. Two fleet functions are claimed by neither the Rust service nor a measured consumer. Neither
    port nor drop is justified until the consumer is measured (ADR 0006 §row `apps/coding`).
 3. Two groups are merged but not deployed. A deployment unit each — not part of this document.
