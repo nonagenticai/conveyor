@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use chrono::{Duration as ChronoDuration, Utc};
 use conveyor_auth::job_token::{
-    self, JobClaims, JobTokenError, JobTokenKey, JOB_TOKEN_ENV, MAX_TTL,
+    self, JOB_TOKEN_ENV, JobClaims, JobTokenError, JobTokenKey, MAX_TTL,
 };
 use conveyor_domain::TenantId;
 use uuid::Uuid;

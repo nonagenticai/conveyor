@@ -179,16 +179,12 @@ impl Config {
             git_sha: get("CONVEYOR_GIT_SHA"),
             job_token_key: match get("CONVEYOR_JOB_TOKEN_KEY") {
                 None => None,
-                Some(raw) => {
-                    Some(
-                        conveyor_auth::job_token::JobTokenKey::parse(&raw).map_err(|error| {
-                            ConfigError::Invalid {
-                                name: "CONVEYOR_JOB_TOKEN_KEY",
-                                reason: error.to_string(),
-                            }
-                        })?,
-                    )
-                }
+                Some(raw) => Some(conveyor_auth::job_token::JobTokenKey::parse(&raw).map_err(
+                    |error| ConfigError::Invalid {
+                        name: "CONVEYOR_JOB_TOKEN_KEY",
+                        reason: error.to_string(),
+                    },
+                )?),
             },
             runner_images: parse_runner_images(get("CONVEYOR_RUNNER_IMAGES"))?,
             runner_base_url: get("CONVEYOR_RUNNER_BASE_URL"),
@@ -280,9 +276,7 @@ impl Config {
 /// `kind=image[,kind=image]`. An empty value is "no runner configured", not an error; a malformed
 /// entry is, because silently dropping a kind would turn a dispatch into a confusing permanent
 /// failure much later.
-fn parse_runner_images(
-    raw: Option<String>,
-) -> Result<Vec<(String, String)>, ConfigError> {
+fn parse_runner_images(raw: Option<String>) -> Result<Vec<(String, String)>, ConfigError> {
     let Some(raw) = raw else {
         return Ok(Vec::new());
     };
@@ -305,7 +299,10 @@ fn parse_runner_images(
                 reason: format!("{entry:?} has an empty kind or image"),
             });
         }
-        if images.iter().any(|(configured, _): &(String, String)| configured == kind) {
+        if images
+            .iter()
+            .any(|(configured, _): &(String, String)| configured == kind)
+        {
             return Err(ConfigError::Invalid {
                 name: "CONVEYOR_RUNNER_IMAGES",
                 reason: format!("{kind:?} is configured twice"),

@@ -100,8 +100,10 @@ async fn fence(state: &AppState, headers: &HeaderMap, job_id: Uuid) -> Result<Fe
         return Err(refused());
     }
 
-    let instruction: Instruction = serde_json::from_value(run.instruction.clone())
-        .map_err(|error| ApiError::internal(format!("the stored instruction is not readable: {error}")))?;
+    let instruction: Instruction =
+        serde_json::from_value(run.instruction.clone()).map_err(|error| {
+            ApiError::internal(format!("the stored instruction is not readable: {error}"))
+        })?;
 
     Ok(Fenced {
         claims,
@@ -137,7 +139,9 @@ pub async fn job_input(
         .inputs
         .iter()
         .find(|input| input.name == name)
-        .ok_or_else(|| ApiError::not_found(format!("the instruction declares no input {name:?}")))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("the instruction declares no input {name:?}"))
+        })?;
 
     let mut tx = store::begin_scoped(&state.pool, fenced.claims.tenant).await?;
     let loaded = conveyor_actions::documents::actions::fetch_bytes(
@@ -201,7 +205,9 @@ pub async fn job_progress(
     let progress: Value = serde_json::from_slice(&body)
         .map_err(|error| ApiError::unprocessable(format!("the progress is not JSON: {error}")))?;
     if !progress.is_object() {
-        return Err(ApiError::unprocessable("the progress must be a JSON object"));
+        return Err(ApiError::unprocessable(
+            "the progress must be a JSON object",
+        ));
     }
 
     let accepted = store::runner::record_progress(
@@ -275,9 +281,10 @@ pub async fn job_output(
         ));
     }
 
-    let objects = conveyor_actions::integrations::objects::Objects::from_env().ok_or_else(|| {
-        ApiError::service_unavailable("object storage is not configured (CONVEYOR_S3_*)")
-    })?;
+    let objects =
+        conveyor_actions::integrations::objects::Objects::from_env().ok_or_else(|| {
+            ApiError::service_unavailable("object storage is not configured (CONVEYOR_S3_*)")
+        })?;
     let tenant = fenced.claims.tenant;
     let sha256 = hex(&Sha256::digest(&body));
     let key = format!(
@@ -337,8 +344,9 @@ pub async fn job_result(
     body: Bytes,
 ) -> Result<Response, ApiError> {
     let fenced = fence(&state, &headers, id).await?;
-    let result: RunResult = serde_json::from_slice(&body)
-        .map_err(|error| ApiError::unprocessable(format!("the result is not runner/v1: {error}")))?;
+    let result: RunResult = serde_json::from_slice(&body).map_err(|error| {
+        ApiError::unprocessable(format!("the result is not runner/v1: {error}"))
+    })?;
     result
         .validate(&fenced.instruction)
         .map_err(|error| ApiError::unprocessable(error.to_string()))?;

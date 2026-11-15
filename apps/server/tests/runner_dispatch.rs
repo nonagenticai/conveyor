@@ -69,7 +69,10 @@ async fn created(State(stub): State<Stub>, body: Json<Value>) -> impl IntoRespon
     (axum::http::StatusCode::CREATED, Json(body))
 }
 
-async fn job_state(State(stub): State<Stub>, Path((_ns, name)): Path<(String, String)>) -> impl IntoResponse {
+async fn job_state(
+    State(stub): State<Stub>,
+    Path((_ns, name)): Path<(String, String)>,
+) -> impl IntoResponse {
     let status = stub
         .status
         .lock()
@@ -83,7 +86,10 @@ async fn job_state(State(stub): State<Stub>, Path((_ns, name)): Path<(String, St
     )
 }
 
-async fn removed(State(stub): State<Stub>, Path((_ns, name)): Path<(String, String)>) -> impl IntoResponse {
+async fn removed(
+    State(stub): State<Stub>,
+    Path((_ns, name)): Path<(String, String)>,
+) -> impl IntoResponse {
     stub.deleted.lock().expect("deleted").push(name);
     axum::http::StatusCode::OK
 }
@@ -180,7 +186,10 @@ async fn dispatch_then_poll_finishes_the_job() {
     let job = a_claimed_job(&db.runtime, tenant).await;
     let first = runner_dispatch::step_with(&db.runtime, &config, tenant, &job, &cluster).await;
     let failure = first.expect_err("a dispatch defers, it does not finish");
-    assert!(failure.deferred, "the dispatch must come back on the SAME attempt");
+    assert!(
+        failure.deferred,
+        "the dispatch must come back on the SAME attempt"
+    );
     assert_eq!(stub.job_names().len(), 1, "one Job was created");
 
     let run = store::runner::attempt(&db.runtime, tenant, job.id, 1)
@@ -198,7 +207,10 @@ async fn dispatch_then_poll_finishes_the_job() {
     use sha2::{Digest, Sha256};
     let artefact = conveyor_domain::runner::Artefact {
         name: "report.txt".to_owned(),
-        sha256: Sha256::digest(&bytes).iter().map(|b| format!("{b:02x}")).collect(),
+        sha256: Sha256::digest(&bytes)
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect(),
         bytes: bytes.len() as i64,
         content_type: "text/plain".to_owned(),
     };

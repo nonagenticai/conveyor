@@ -75,18 +75,21 @@ fn instruction_for(
 ) -> Result<Instruction, JobFailure> {
     let payload = &job.payload;
     let limits: Limits = match payload.get("limits") {
-        Some(value) => serde_json::from_value(value.clone())
-            .map_err(|error| JobFailure::permanent(format!("the job's limits are unusable: {error}")))?,
+        Some(value) => serde_json::from_value(value.clone()).map_err(|error| {
+            JobFailure::permanent(format!("the job's limits are unusable: {error}"))
+        })?,
         None => default_limits(),
     };
     let inputs: Vec<Input> = match payload.get("inputs") {
-        Some(value) => serde_json::from_value(value.clone())
-            .map_err(|error| JobFailure::permanent(format!("the job's inputs are unusable: {error}")))?,
+        Some(value) => serde_json::from_value(value.clone()).map_err(|error| {
+            JobFailure::permanent(format!("the job's inputs are unusable: {error}"))
+        })?,
         None => Vec::new(),
     };
     let outputs: Vec<Output> = match payload.get("outputs") {
-        Some(value) => serde_json::from_value(value.clone())
-            .map_err(|error| JobFailure::permanent(format!("the job's outputs are unusable: {error}")))?,
+        Some(value) => serde_json::from_value(value.clone()).map_err(|error| {
+            JobFailure::permanent(format!("the job's outputs are unusable: {error}"))
+        })?,
         None => Vec::new(),
     };
     let correlation_id = payload
@@ -109,9 +112,9 @@ fn instruction_for(
         conveyor_base_url: base_url.trim_end_matches('/').to_owned(),
         trace_id: job.id.to_string(),
     };
-    instruction
-        .validate()
-        .map_err(|error| JobFailure::permanent(format!("the instruction is not runner/v1: {error}")))?;
+    instruction.validate().map_err(|error| {
+        JobFailure::permanent(format!("the instruction is not runner/v1: {error}"))
+    })?;
     Ok(instruction)
 }
 
@@ -140,10 +143,14 @@ pub async fn step_with(
         .runner_image(&job.kind)
         .ok_or_else(|| JobFailure::permanent(format!("no image is configured for {}", job.kind)))?;
     let base_url = config.runner_base_url.as_deref().ok_or_else(|| {
-        JobFailure::permanent("CONVEYOR_RUNNER_BASE_URL is not configured, so a pod cannot call back")
+        JobFailure::permanent(
+            "CONVEYOR_RUNNER_BASE_URL is not configured, so a pod cannot call back",
+        )
     })?;
     let key = config.job_token_key.as_ref().ok_or_else(|| {
-        JobFailure::permanent("CONVEYOR_JOB_TOKEN_KEY is not configured, so no pod token can be minted")
+        JobFailure::permanent(
+            "CONVEYOR_JOB_TOKEN_KEY is not configured, so no pod token can be minted",
+        )
     })?;
 
     let run = store::runner::attempt(pool, tenant, job.id, job.attempts)
@@ -210,8 +217,9 @@ async fn dispatch(
         .await
         .map_err(cluster_failure)?;
 
-    let instruction = serde_json::to_value(&instruction)
-        .map_err(|error| JobFailure::permanent(format!("the instruction does not serialise: {error}")))?;
+    let instruction = serde_json::to_value(&instruction).map_err(|error| {
+        JobFailure::permanent(format!("the instruction does not serialise: {error}"))
+    })?;
     store::runner::begin(
         pool,
         tenant,
@@ -237,8 +245,10 @@ async fn poll(
     cluster: &Cluster,
 ) -> Result<(), JobFailure> {
     let run_id = run.id;
-    let instruction: Instruction = serde_json::from_value(run.instruction.clone())
-        .map_err(|error| JobFailure::permanent(format!("the stored instruction is unreadable: {error}")))?;
+    let instruction: Instruction =
+        serde_json::from_value(run.instruction.clone()).map_err(|error| {
+            JobFailure::permanent(format!("the stored instruction is unreadable: {error}"))
+        })?;
 
     if run.status == "reported" {
         return finish_from_result(pool, tenant, job, run_id, &instruction).await;
@@ -307,8 +317,9 @@ async fn finish_from_result(
         .map_err(db)?
         .and_then(|run| run.result)
         .ok_or_else(|| JobFailure::permanent("the attempt reports a result it does not hold"))?;
-    let result: RunResult = serde_json::from_value(value)
-        .map_err(|error| JobFailure::permanent(format!("the stored result is unreadable: {error}")))?;
+    let result: RunResult = serde_json::from_value(value).map_err(|error| {
+        JobFailure::permanent(format!("the stored result is unreadable: {error}"))
+    })?;
     if let Err(error) = result.validate(instruction) {
         store::runner::finish(pool, tenant, run_id, "failed")
             .await
@@ -390,15 +401,17 @@ pub async fn cancel_with(
     job_id: uuid::Uuid,
     cluster: Option<&Cluster>,
 ) -> Result<bool, JobFailure> {
-    if let Some(run) = store::runner::latest(pool, tenant, job_id).await.map_err(db)? {
-        if !run.is_terminal() {
-            if let Some(cluster) = cluster {
-                abandon(cluster, &run.job_name).await;
-            }
-            store::runner::finish(pool, tenant, run.id, "lost")
-                .await
-                .map_err(db)?;
+    if let Some(run) = store::runner::latest(pool, tenant, job_id)
+        .await
+        .map_err(db)?
+        && !run.is_terminal()
+    {
+        if let Some(cluster) = cluster {
+            abandon(cluster, &run.job_name).await;
         }
+        store::runner::finish(pool, tenant, run.id, "lost")
+            .await
+            .map_err(db)?;
     }
     store::jobs::cancel(pool, tenant, job_id, "cancelled")
         .await
@@ -450,7 +463,8 @@ fn cluster_failure(error: conveyor_runner::RunnerError) -> JobFailure {
     // A refused create is retryable: the API server may be restarting. A credential or
     // configuration fault is not, and `RunnerError` says which.
     match error {
-        conveyor_runner::RunnerError::NotConfigured | conveyor_runner::RunnerError::Credential(_) => {
+        conveyor_runner::RunnerError::NotConfigured
+        | conveyor_runner::RunnerError::Credential(_) => {
             JobFailure::permanent(format!("the runner is not configured: {error}"))
         }
         other => JobFailure::retryable(format!("the Kubernetes API refused the dispatch: {other}")),

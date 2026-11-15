@@ -370,7 +370,7 @@ impl Worker {
         // It is decided from the deployment's image map, not from a name pattern, so a kind is
         // runner-backed exactly when an image exists for it.
         let outcome = if crate::runner_dispatch::handles(&self.config, &job.kind) {
-            crate::runner_dispatch::step(&self.pool, &self.config, tenant, &job).await
+            crate::runner_dispatch::step(&self.pool, &self.config, tenant, job).await
         } else {
             run_kind(
                 &self.pool,

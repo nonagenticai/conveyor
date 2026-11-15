@@ -120,12 +120,12 @@ impl JobTokenKey {
                 return Ok(Self(decoded.try_into().expect("length checked")));
             }
         }
-        if let Some(bytes) = decode_hex(raw) {
-            if bytes.len() == KEY_BYTES {
-                return Ok(Self(bytes.try_into().expect("length checked")));
-            }
+        if let Some(bytes) = decode_hex(raw)
+            && bytes.len() == KEY_BYTES
+        {
+            return Ok(Self(bytes.try_into().expect("length checked")));
         }
-        if raw.as_bytes().len() == KEY_BYTES {
+        if raw.len() == KEY_BYTES {
             return Ok(Self(raw.as_bytes().try_into().expect("length checked")));
         }
         Err(JobTokenError::KeyMalformed)
@@ -181,7 +181,10 @@ pub fn mint(key: &JobTokenKey, claims: &JobClaims) -> String {
     let payload = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(wire);
     let signed = format!("{JOB_TOKEN_VERSION}.{payload}");
     let mac = key.mac(&signed).finalize().into_bytes();
-    format!("{signed}.{}", base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(mac))
+    format!(
+        "{signed}.{}",
+        base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(mac)
+    )
 }
 
 /// The expiry a dispatch should stamp: `now + ttl`, clamped to [`MAX_TTL`].
@@ -190,14 +193,16 @@ pub fn mint(key: &JobTokenKey, claims: &JobClaims) -> String {
 pub fn expires_at(now: DateTime<Utc>, ttl: Duration) -> DateTime<Utc> {
     let ttl = ttl.min(MAX_TTL);
     let at = now + chrono::Duration::from_std(ttl).unwrap_or_else(|_| chrono::Duration::hours(1));
-    Utc.timestamp_opt(at.timestamp(), 0)
-        .single()
-        .unwrap_or(at)
+    Utc.timestamp_opt(at.timestamp(), 0).single().unwrap_or(at)
 }
 
 /// Verify `token` at `now`. Every failure — bad shape, bad MAC, unsupported version, expired —
 /// collapses to one error variant per cause; the caller must not tell them apart.
-pub fn verify(key: &JobTokenKey, token: &str, now: DateTime<Utc>) -> Result<JobClaims, JobTokenError> {
+pub fn verify(
+    key: &JobTokenKey,
+    token: &str,
+    now: DateTime<Utc>,
+) -> Result<JobClaims, JobTokenError> {
     let token = token.trim();
     let mut parts = token.split('.');
     let (Some(version), Some(payload), Some(mac), None) =
@@ -228,7 +233,7 @@ pub fn verify(key: &JobTokenKey, token: &str, now: DateTime<Utc>) -> Result<JobC
 }
 
 fn decode_hex(raw: &str) -> Option<Vec<u8>> {
-    if raw.len() % 2 != 0 || !raw.bytes().all(|b| b.is_ascii_hexdigit()) {
+    if !raw.len().is_multiple_of(2) || !raw.bytes().all(|b| b.is_ascii_hexdigit()) {
         return None;
     }
     let mut out = Vec::with_capacity(raw.len() / 2);
