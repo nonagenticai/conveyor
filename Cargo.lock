@@ -785,6 +785,7 @@ dependencies = [
  "chrono",
  "conveyor-domain",
  "conveyor-store",
+ "hmac",
  "jsonwebtoken",
  "reqwest",
  "serde",
