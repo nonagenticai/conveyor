@@ -335,3 +335,200 @@ async fn a_failed_attempt_books_its_classification() {
         "the error series carries the attempt's own classification"
     );
 }
+
+// ── P2c: the two admission counters ─────────────────────────────────────────────────────────
+//
+// `requests_received_total` is label-free and the recorder is process-wide, and this binary runs
+// its tests in parallel, so a test can prove that its own request MOVED the counter but never that
+// it moved it by exactly one. The project-id family carries a caller label, so each test below
+// takes its own caller and its series are asserted exactly.
+
+fn requests_received(body: &str) -> f64 {
+    series_value(body, "inference_router_requests_received_total", &[])
+        .expect("the requests family is pre-seeded at zero")
+}
+
+fn project_series(body: &str, outcome: &str, caller: &str) -> Option<f64> {
+    series_value(
+        body,
+        "inference_router_project_id_header_total",
+        &[("outcome", outcome), ("caller", caller)],
+    )
+}
+
+/// The same one-provider router as [`configured`], with the licence gate in `enforce`: a caller
+/// carrying no verifiable token is refused before the handler's admission counter can run.
+fn enforcing(provider: &str, address: std::net::SocketAddr) -> Router {
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: {provider}\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: metric-model\ndefault_chain: [{provider}]\n"
+    ))
+    .expect("catalog");
+    preseed(&[]);
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let config = Config::from_lookup(|key| {
+        (key == "INFERENCE_ROUTER_INTROSPECT_MODE").then(|| "enforce".to_owned())
+    })
+    .expect("config");
+    api_router(AppState::new(config, router))
+}
+
+#[tokio::test]
+async fn an_unparseable_body_is_counted_before_it_is_rejected() {
+    let address = stub_provider("never dialled").await;
+    let router = configured("stub-metrics-422", address);
+    let before = requests_received(&scrape().await);
+
+    let response = router
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .body(Body::from(r#"{"model":"metric-model""#))
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+
+    let after = requests_received(&scrape().await);
+    assert!(
+        after > before,
+        "a 422 is counted by the route layer, before the body is parsed: {before} -> {after}"
+    );
+}
+
+#[tokio::test]
+async fn a_licence_refusal_is_counted_but_its_project_id_is_not() {
+    let address = stub_provider("never dialled").await;
+    let router = enforcing("stub-metrics-401", address);
+    let before = requests_received(&scrape().await);
+
+    let response = router
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-app-id", "care-bus")
+                .header("x-project-id", "7d9c2b6e-0f3a-4a57-9c1e-2b6a1f0e4d55")
+                .body(completion())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+    let body = scrape().await;
+    let after = requests_received(&body);
+    assert!(
+        after > before,
+        "a licence-refused request reached the completion route: {before} -> {after}"
+    );
+    for outcome in ["absent", "valid", "malformed"] {
+        assert_eq!(
+            project_series(&body, outcome, "care-bus"),
+            Some(0.0),
+            "the reference resolves X-Project-Id after its auth dependency, so a 401 is never \
+             counted ({outcome})"
+        );
+    }
+}
+
+#[tokio::test]
+async fn the_project_id_header_is_classified_absent_valid_or_malformed() {
+    let address = stub_provider("project id").await;
+    let router = configured("stub-metrics-project", address);
+
+    async fn post(
+        router: Router,
+        caller: &'static str,
+        project: Option<&'static str>,
+    ) -> StatusCode {
+        let mut request = Request::post("/api/chat/completions")
+            .header("content-type", "application/json")
+            .header("x-app-id", caller);
+        if let Some(project) = project {
+            request = request.header("x-project-id", project);
+        }
+        router
+            .oneshot(request.body(completion()).expect("request"))
+            .await
+            .expect("router answers")
+            .status()
+    }
+
+    assert_eq!(post(router.clone(), "karma", None).await, StatusCode::OK);
+    assert_eq!(
+        post(
+            router.clone(),
+            "canary",
+            Some("7d9c2b6e-0f3a-4a57-9c1e-2b6a1f0e4d55")
+        )
+        .await,
+        StatusCode::OK
+    );
+    assert_eq!(
+        post(router, "replay", Some("not-a-uuid")).await,
+        StatusCode::OK
+    );
+
+    let body = scrape().await;
+    assert_eq!(
+        project_series(&body, "absent", "karma"),
+        Some(1.0),
+        "a caller that sent no X-Project-Id is counted absent"
+    );
+    assert_eq!(
+        project_series(&body, "valid", "canary"),
+        Some(1.0),
+        "a UUID is counted valid and stored on the row"
+    );
+    assert_eq!(
+        project_series(&body, "malformed", "replay"),
+        Some(1.0),
+        "a present non-UUID is counted malformed"
+    );
+    assert_eq!(
+        project_series(&body, "absent", "replay"),
+        Some(0.0),
+        "a malformed header must NOT be counted absent"
+    );
+    assert_eq!(project_series(&body, "valid", "replay"), Some(0.0));
+}
+
+#[tokio::test]
+async fn the_v1_alias_is_served_and_counted_like_the_api_path() {
+    let address = stub_provider("alias completion").await;
+    let router = configured("stub-metrics-alias", address);
+    let before = requests_received(&scrape().await);
+
+    let response = router
+        .oneshot(
+            Request::post("/v1/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-app-id", "agent")
+                .body(completion())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = scrape().await;
+    let after = requests_received(&body);
+    assert!(
+        after > before,
+        "the /v1 alias sits on the same counting sub-router as the api path: {before} -> {after}"
+    );
+    assert_eq!(
+        series_value(
+            &body,
+            "inference_router_provider_attempts_total",
+            &[
+                ("provider", "stub-metrics-alias"),
+                ("path", "routed"),
+                ("outcome", "ok"),
+                ("caller", "agent"),
+            ],
+        ),
+        Some(1.0),
+        "the alias dispatches through the same handler"
+    );
+}

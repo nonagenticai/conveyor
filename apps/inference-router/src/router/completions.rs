@@ -130,6 +130,19 @@ pub async fn create_chat_completion(
         Ok(caller) => caller,
         Err(refusal) => return refusal.into_response(),
     };
+    // The admission counter, booked here for the same reason the reference books it inside the
+    // handler: the licence gate above already ran, so a refused caller is NEVER counted, while both
+    // the streaming and the non-streaming paths below are. Only a real UUID reaches the ledger;
+    // the metric is what tells absent, valid and malformed apart.
+    let project_outcome = match project_id(&headers) {
+        Some(_) => "valid",
+        None if attribution(&headers, "x-project-id").is_some() => "malformed",
+        None => "absent",
+    };
+    let x_app_id = headers
+        .get("x-app-id")
+        .and_then(|value| value.to_str().ok());
+    crate::metrics::record_project_id(project_outcome, &crate::metrics::caller_label(x_app_id));
     if request.stream {
         return stream_completion(state, headers, request, identity, effective).await;
     }
@@ -286,6 +299,15 @@ fn attribution(headers: &HeaderMap, name: &str) -> Option<String> {
         .map(str::to_owned)
 }
 
+/// The caller's `X-Project-Id`, when it is a UUID. Absent, non-UTF-8 and blank all mean "the caller
+/// sent none", and a present value that is not a UUID means the same thing — a bad header never
+/// fails a request. The admission metric records which of the three happened; the ledger stores
+/// only a real identifier.
+fn project_id(headers: &HeaderMap) -> Option<String> {
+    let value = attribution(headers, "x-project-id")?;
+    uuid::Uuid::parse_str(&value).ok().map(|_| value)
+}
+
 /// Add the attribution headers and the policy hop to a call context. Shared by the
 /// non-streaming and the streaming write paths so the two rows cannot drift.
 fn attributed(
@@ -301,7 +323,7 @@ fn attributed(
         stage: attribution(headers, "x-stage"),
         trace_id: attribution(headers, "x-aa-trace-id"),
         card_id: attribution(headers, "x-aa-card-id"),
-        project_id: attribution(headers, "x-project-id"),
+        project_id: project_id(headers),
         parent_execution_id: attribution(headers, "x-aa-parent-exec"),
         // Only a policy-routed request carries these; a global-routed one leaves them null.
         policy_version: decision.map(|decision| decision.version),

@@ -172,6 +172,45 @@ pub fn record_attempt(
     }
 }
 
+/// Count one request that reached a completion route.
+///
+/// Booked by [`count_completion_request`], which wraps the matched route rather than the body
+/// parse: the reference's middleware counts a POST on either completion path whatever the outcome,
+/// so a malformed-body 422 and a licence-refused 401 are both counted here. (The project-id family
+/// below is the one that skips a refused caller — it is booked after the licence gate.)
+pub fn record_request_received() {
+    counter!("inference_router_requests_received_total").increment(1);
+}
+
+/// Book the caller's `X-Project-Id` onto the admission family.
+///
+/// `outcome` is one of `absent` | `valid` | `malformed` and `caller` is already normalised through
+/// [`caller_label`]; both are closed sets, so a caller-supplied header never reaches a series raw.
+pub fn record_project_id(outcome: &str, caller: &str) {
+    counter!(
+        "inference_router_project_id_header_total",
+        "outcome" => outcome.to_owned(),
+        "caller" => caller.to_owned()
+    )
+    .increment(1);
+}
+
+/// The route layer over both completion paths: count a matched POST, then pass the request through
+/// untouched.
+///
+/// The matched route set IS the scope — there is no path matching here — so the count can never
+/// drift from what the router serves. A non-POST never reaches a completion handler, and is not
+/// counted, exactly as in the reference.
+pub async fn count_completion_request(
+    request: axum::extract::Request,
+    next: axum::middleware::Next,
+) -> Response {
+    if request.method() == axum::http::Method::POST {
+        record_request_received();
+    }
+    next.run(request).await
+}
+
 /// Pre-seed every one of the 15 families at zero, so a scrape never has to distinguish "nothing
 /// happened" from "this build never registered the instrument".
 ///
