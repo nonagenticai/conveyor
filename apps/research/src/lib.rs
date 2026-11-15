@@ -5,6 +5,7 @@ pub mod contract;
 pub mod extract;
 pub mod fetch;
 pub mod links;
+pub mod media;
 pub mod models;
 pub mod router;
 pub mod schema_extract;

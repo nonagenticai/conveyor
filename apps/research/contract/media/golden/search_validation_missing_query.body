@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"Request validation failed","status":422,"request_id":"01a1debc-ecf3-71f1-833e-a182e202a41b","timestamp":"2026-11-15T10:24:45Z","details":"[{'type': 'missing', 'loc': ('body', 'query'), 'msg': 'Field required', 'input': {}}]"}}

@@ -1,0 +1,2 @@
+POST /api/search
+{"query":"golden","media_types":["hologram"]}

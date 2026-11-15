@@ -1,0 +1,2 @@
+POST /api/collections
+{"name":"golden-one","description":"a golden collection","collection_type":"manual"}

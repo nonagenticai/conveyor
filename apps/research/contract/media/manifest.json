@@ -1,0 +1,13 @@
+{
+  "service": "media-discovery",
+  "captured_at": "2026-11-15T10:24:46Z",
+  "source_commit": "9505a50",
+  "image_digest": "sha256:376c127aafa1eb7c1ec49489c4751ad66543096c9d51b150752513d88e3b7449",
+  "lock_sha256": "cddfeb1e3aa56cb8d011d0ff6e61e4d43629c4779f0a3a37ff26285b85995ddf",
+  "openapi": "3.1.0",
+  "paths": 20,
+  "schemas": 19,
+  "operations": 23,
+  "golden_cases": 36,
+  "dropped": []
+}

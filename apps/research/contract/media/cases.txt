@@ -1,0 +1,69 @@
+# Golden cases for media-discovery, one per line:
+#
+#   name|METHOD|path|body
+#
+# The reference is booted by ../run-local.sh with every network adapter disabled and no licence
+# token, against a scratch database holding `seed.sql` — so every happy-path answer below comes
+# from the reference's own code and its own rows, and every miss answers from its own 404 branch.
+#
+# Two substitutions are made by capture-goldens.sh as it walks this file in order:
+#   {ITEM_ID}       — the id of the first row in seed.sql
+#   {COLLECTION_ID} — the id in the body of `collection_create`, captured earlier in this file
+#
+# Order is load-bearing. The collection cases run create → add → get → remove → delete on ONE
+# collection, so each answer is captured against the state the previous case left.
+#
+# Volatile fields (ids, timestamps, request_id, search_time_ms, quality freshness) are declared in
+# §"Tolerance" of ../README.md and normalised by the parity test, never asserted away silently.
+
+# Public surface
+health|GET|/health|
+health_ready|GET|/health/ready|
+health_live|GET|/health/live|
+status|GET|/status|
+search_sources|GET|/api/search/sources|
+
+# Search — validation is pydantic's, and an unknown media type is not an error
+search_validation_missing_query|POST|/api/search|{}
+search_validation_bad_media_type|POST|/api/search|{"query":"golden","media_types":["hologram"]}
+search_no_sources|POST|/api/search|{"query":"golden","limit":5}
+
+# Items — the four misses, then the seeded row
+items_not_found|GET|/api/items/00000000-0000-7000-8000-000000000000|
+items_related_not_found|GET|/api/items/00000000-0000-7000-8000-000000000000/related|
+items_transcript_not_found|GET|/api/items/00000000-0000-7000-8000-000000000000/transcript|
+items_score_not_found|GET|/api/items/00000000-0000-7000-8000-000000000000/score|
+items_score_post_not_found|POST|/api/items/00000000-0000-7000-8000-000000000000/score|
+# The GET runs before the POST: the POST persists a score, and the GET must be captured on a row
+# that has never been scored (it computes in memory and writes nothing).
+items_get|GET|/api/items/{ITEM_ID}|
+items_related|GET|/api/items/{ITEM_ID}/related|
+items_transcript|GET|/api/items/{ITEM_ID}/transcript|
+items_get_score|GET|/api/items/{ITEM_ID}/score|
+items_score|POST|/api/items/{ITEM_ID}/score|
+
+# Collections — nothing is seeded, so the listing is genuinely empty
+collections_empty|GET|/api/collections|
+collection_create|POST|/api/collections|{"name":"golden-one","description":"a golden collection","collection_type":"manual"}
+# An empty name is accepted, and collection_type defaults to playlist
+collection_create_validation|POST|/api/collections|{"name":""}
+collection_add_items_ok|POST|/api/collections/{COLLECTION_ID}/items|{"item_ids":["10000000-0000-7000-8000-000000000001"]}
+collection_get|GET|/api/collections/{COLLECTION_ID}|
+collection_remove_item|DELETE|/api/collections/{COLLECTION_ID}/items/10000000-0000-7000-8000-000000000001|
+# A well-formed item id that exists in no tenant is not "no valid items"
+collection_add_items|POST|/api/collections/{COLLECTION_ID}/items|{"item_ids":["00000000-0000-7000-8000-000000000000"]}
+collection_get_missing|GET|/api/collections/00000000-0000-7000-8000-000000000000|
+collection_import_validation|POST|/api/collections/import|{"source_url":"not-a-url","name":"golden"}
+collection_delete|DELETE|/api/collections/{COLLECTION_ID}|
+
+# Downloads — the reference executes no job (501), and answers 404 for an unknown one
+downloads_create|POST|/api/downloads|{"item_ids":["00000000-0000-7000-8000-000000000000"],"download_type":"audio"}
+downloads_get_missing|GET|/api/downloads/00000000-0000-7000-8000-000000000000|
+
+# Scoring
+score_empty|POST|/api/score|{"item_ids":[]}
+score_batch_empty|POST|/api/score/batch|{"item_ids":[]}
+score_happy|POST|/api/score|{"item_ids":["10000000-0000-7000-8000-000000000001"]}
+score_batch_happy|POST|/api/score/batch|{"item_ids":["10000000-0000-7000-8000-000000000001","10000000-0000-7000-8000-000000000002"]}
+score_report|GET|/api/score/report/20000000-0000-7000-8000-000000000001|
+score_report_missing|GET|/api/score/report/00000000-0000-7000-8000-000000000000|
