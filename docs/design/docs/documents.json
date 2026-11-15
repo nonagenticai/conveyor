@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "0b3ae52ca47039c41e4c65a9950711fb061f3bf91a914548cfc89948ecc00831",
-      "bytes": 140426,
+      "sha256": "ab49e4970d090fc25ebd1f6e2272b77328eb56c50fc3139c8eb8e99a483d8632",
+      "bytes": 144286,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -387,6 +387,15 @@
       "sha256": "bc2965a26e87934c22511c4d03282d3e77c383315ae2abea816ef1a3e81ee4eb",
       "bytes": 21408,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
+    },
+    {
+      "title": "04 — The tool estate: what remains, and the deliverable vocabulary",
+      "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
+      "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
+      "section": "Plans",
+      "sha256": "f4826b0bad8e21dea9147c1145f5ca067f9dfff210319c9a8d1ab3bf400dad21",
+      "bytes": 9871,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
     },
     {
       "title": "P0 — Programme definition",
