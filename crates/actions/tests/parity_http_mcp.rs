@@ -4125,6 +4125,71 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample.input = Box::new(|ctx: &Ctx| json!({"agent_id": ctx.capability_agent_id}));
             sample
         },
+        // ── #139 P3.1: the media toolkit ──────────────────────────────────────────────────
+        // Each kind enqueues one job and answers `{job_id, kind}`. The dedupe key is the payload
+        // hash, so round B joins round A's still-live job and the two bodies compare; there is no
+        // worker in this harness, so nothing executes the capability itself.
+        expecting(
+            plain("media.render_html", json!({"html": "<p>parity</p>"}), None),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.compile_video",
+                json!({"shots": [{"id": "shot-1", "seconds": 1.0}]}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.thumbnail",
+                json!({"video_url": "inputs/source.mp4"}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.concat_audio",
+                json!({"clips": [{"id": "clip-1", "audio_url": "inputs/clip.wav"}]}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.probe_video",
+                json!({"input": "inputs/source.mp4"}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.analyze_video",
+                json!({"input": "inputs/source.mp4"}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.analyze_audio",
+                json!({"input": "inputs/source.wav"}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain("media.ocr", json!({"input": "inputs/page.png"}), None),
+            200,
+        ),
+        {
+            let mut sample = plain("media.capabilities", json!({}), None);
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
     ];
 
     for sample in &mut out {

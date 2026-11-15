@@ -10,7 +10,9 @@
 //! check were late (or absent), the answer would be a database error instead. The one case that is
 //! *allowed* through demonstrates exactly that contrast.
 
-use conveyor_actions::invoke::{ActionError, Authority, InvokeRequest, binding_ceiling, invoke_bound};
+use conveyor_actions::invoke::{
+    ActionError, Authority, InvokeRequest, binding_ceiling, invoke_bound,
+};
 use conveyor_actions::{Registry, registry};
 use conveyor_auth::{Role, ScopePolicy};
 use conveyor_domain::TenantId;
@@ -71,7 +73,10 @@ async fn effect_ceiling_is_never_raised() {
     .expect_err("a read ceiling must refuse a write action");
     assert_eq!(error.status, 403, "{error:?}");
     assert_eq!(error.code, "effect_ceiling", "{error:?}");
-    assert!(error.detail.contains("write") && error.detail.contains("read"), "{error:?}");
+    assert!(
+        error.detail.contains("write") && error.detail.contains("read"),
+        "{error:?}"
+    );
 }
 
 #[tokio::test]
@@ -117,8 +122,14 @@ fn an_unknown_ceiling_is_a_refusal_never_unlimited() {
 
 #[test]
 fn a_binding_without_a_ceiling_is_governed_by_the_actions_own_effect() {
-    assert_eq!(binding_ceiling(&json!({"limits": {}})).expect("absent is not an error"), None);
-    assert_eq!(binding_ceiling(&json!({})).expect("absent is not an error"), None);
+    assert_eq!(
+        binding_ceiling(&json!({"limits": {}})).expect("absent is not an error"),
+        None
+    );
+    assert_eq!(
+        binding_ceiling(&json!({})).expect("absent is not an error"),
+        None
+    );
 }
 
 /// The scale itself, so a future effect cannot be added without answering where it sits.

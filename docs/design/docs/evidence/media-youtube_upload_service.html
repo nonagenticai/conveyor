@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>youtubeuploadservice capture — evidence (2026-11-15) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-youtube_upload_service.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="youtube_upload_service-capture--evidence-2026-11-15">youtube_upload_service capture — evidence (2026-11-15)</h1>
+<p>Issue #139 · <strong>captured here, implemented in the thin-operations unit.</strong> ADR 0007 §1 hosts thin operations in <code>apps/server</code>; this file records the contract that unit will be held to. The reference is pinned by digest; no private hostname, slug, address or customer payload appears here.</p>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capture</td>
+<td><code>apps/media/contract/youtube_upload_service/</code> — taken 2026-11-15T16:04:37Z</td>
+</tr>
+<tr>
+<td>Pinned image</td>
+<td><code>sha256:e5f44636ccb5e4e78e375b99f28e744477fa2f9e26a2181cd3d8270c66ae798e</code></td>
+</tr>
+<tr>
+<td>Operations captured</td>
+<td>22 (20 paths)</td>
+</tr>
+<tr>
+<td>Golden cases</td>
+<td>26</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-the-capture-pins">What the capture pins</h2>
+<ul>
+<li>OAuth connect/status/callback/disconnect, and the per-tenant OAuth client settings.</li>
+<li>Upload jobs: submit, list, read, privacy change, retract.</li>
+<li>The platform-channel administration surface.</li>
+<li>Health (<code>/health</code>, <code>/health/live</code>, <code>/health/ready</code>, <code>/healthz</code>, <code>/readyz</code>).</li>
+</ul>
+<p>Synthetic fixtures only: a fake OAuth token and a two-second mp4. One value is <strong>redacted in the golden</strong>: OAuth <code>state</code> (43 base64url characters shape-match a licence token to a secret scanner). The field is volatile, so no evidence is lost.</p>
+<h2 id="why-it-is-not-in-this-unit">Why it is not in this unit</h2>
+<p>Uploading is a thin HTTP call to an external provider plus a credential store — no browser, no ffmpeg, no local media work. Its home is <code>apps/server</code>, beside the job ledger that already owns the job rows, and ADR 0007's sequence puts thin operations after the media images.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/media-youtube_upload_service.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
