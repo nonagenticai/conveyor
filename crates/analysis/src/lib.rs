@@ -8,7 +8,7 @@
 //!
 //! # The determinism contract
 //!
-//! `(document, rubric) ⇒ byte-identical [`Report`]`, on any machine, in any process order.
+//! `(document, options) ⇒ byte-identical [`Report`]`, on any machine, in any process order.
 //! Three things make that true, and each is structural rather than a convention:
 //!
 //! 1. **No identity is minted here.** The source stamped a `uuid7` on every finding; this crate
@@ -20,6 +20,10 @@
 //!    half-to-even like Python's `round(x, 1)`; `f64::round` is half-away-from-zero and would
 //!    move every golden that lands on a boundary.
 //!
+//! The one time-dependent check — content staleness — does not read a clock either:
+//! [`site::AnalyseOptions`] carries the instant the analysis is treated as running, so the caller
+//! owns "now" exactly as it owns the bytes.
+//!
 //! # What is deliberately absent
 //!
 //! Fetching is not analysis. `apps/research` owns the fetch contract and `apps/media` owns the
@@ -29,6 +33,7 @@
 //! the report critic) arrive as a caller-supplied trait when they are ported; nothing in this
 //! crate holds a client today, and `Cargo.toml` has no transport dependency to hold one in.
 
+pub mod industry;
 pub mod model;
 pub mod rubric;
 pub mod site;

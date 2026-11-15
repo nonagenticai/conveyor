@@ -12,6 +12,7 @@ pub mod keyword;
 pub mod mobile;
 pub mod on_page;
 pub mod readability;
+pub mod schema_coverage;
 pub mod signals;
 pub mod snippet;
 pub mod social;
@@ -151,6 +152,7 @@ pub fn scan_audit(document: &Document, _as_of: &chrono::DateTime<chrono::Utc>) -
     findings.extend(keyword::check_keyword(&html, url));
     findings.extend(snippet::check_snippet(&html, url));
     findings.extend(eeat::check_eeat(&html, url));
+    findings.extend(schema_coverage::check_schema_coverage(&html, url));
     findings.extend(internal_linking::check_internal_linking(&html, url));
     findings
 }

@@ -141,7 +141,7 @@ fn is_author_type(value: Option<&Value>) -> bool {
 }
 
 /// A JSON value's truthiness, as Python's `if author:` means it.
-fn is_truthy(value: &Value) -> bool {
+pub(crate) fn is_truthy(value: &Value) -> bool {
     match value {
         Value::Null => false,
         Value::Bool(flag) => *flag,
