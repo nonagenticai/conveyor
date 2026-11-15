@@ -109,6 +109,13 @@ pub struct Config {
     pub public_tenant: Option<String>,
     /// `CONVEYOR_GIT_SHA` — the commit the image was built from, carried by the live snapshot.
     pub git_sha: Option<String>,
+    /// `CONVEYOR_JOB_TOKEN_KEY` — the runner's HMAC key (32 bytes). Unset is fail-closed: no token
+    /// can be minted or verified, so every job byte route answers 503 and a dispatch is a
+    /// permanent failure rather than a guess at a default key (#144, ADR 0007 §Decision 4).
+    pub job_token_key: Option<conveyor_auth::job_token::JobTokenKey>,
+    /// `CONVEYOR_RUNNER_IMAGES` — `kind=image[,kind=image]`. The dispatch resolves a job's kind
+    /// here; a kind that is absent has no image and is refused, never defaulted.
+    pub runner_images: Vec<(String, String)>,
 }
 
 impl Config {
@@ -167,7 +174,29 @@ impl Config {
             job_lease_secs,
             public_tenant: get("CONVEYOR_PUBLIC_TENANT"),
             git_sha: get("CONVEYOR_GIT_SHA"),
+            job_token_key: match get("CONVEYOR_JOB_TOKEN_KEY") {
+                None => None,
+                Some(raw) => {
+                    Some(
+                        conveyor_auth::job_token::JobTokenKey::parse(&raw).map_err(|error| {
+                            ConfigError::Invalid {
+                                name: "CONVEYOR_JOB_TOKEN_KEY",
+                                reason: error.to_string(),
+                            }
+                        })?,
+                    )
+                }
+            },
+            runner_images: parse_runner_images(get("CONVEYOR_RUNNER_IMAGES"))?,
         })
+    }
+
+    /// The image a job of `kind` runs in, when the deployment configured one.
+    pub fn runner_image(&self, kind: &str) -> Option<&str> {
+        self.runner_images
+            .iter()
+            .find(|(configured, _)| configured == kind)
+            .map(|(_, image)| image.as_str())
     }
 
     /// The secure-apps credential (`conveyor-backend`). `Err` names the missing setting —
@@ -242,6 +271,45 @@ impl Config {
     pub fn is_production(&self) -> bool {
         !conveyor_auth::is_development_env(&self.app_env)
     }
+}
+
+/// `kind=image[,kind=image]`. An empty value is "no runner configured", not an error; a malformed
+/// entry is, because silently dropping a kind would turn a dispatch into a confusing permanent
+/// failure much later.
+fn parse_runner_images(
+    raw: Option<String>,
+) -> Result<Vec<(String, String)>, ConfigError> {
+    let Some(raw) = raw else {
+        return Ok(Vec::new());
+    };
+    let mut images = Vec::new();
+    for entry in raw.split(',') {
+        let entry = entry.trim();
+        if entry.is_empty() {
+            continue;
+        }
+        let Some((kind, image)) = entry.split_once('=') else {
+            return Err(ConfigError::Invalid {
+                name: "CONVEYOR_RUNNER_IMAGES",
+                reason: format!("{entry:?} is not kind=image"),
+            });
+        };
+        let (kind, image) = (kind.trim(), image.trim());
+        if kind.is_empty() || image.is_empty() {
+            return Err(ConfigError::Invalid {
+                name: "CONVEYOR_RUNNER_IMAGES",
+                reason: format!("{entry:?} has an empty kind or image"),
+            });
+        }
+        if images.iter().any(|(configured, _): &(String, String)| configured == kind) {
+            return Err(ConfigError::Invalid {
+                name: "CONVEYOR_RUNNER_IMAGES",
+                reason: format!("{kind:?} is configured twice"),
+            });
+        }
+        images.push((kind.to_owned(), image.to_owned()));
+    }
+    Ok(images)
 }
 
 #[cfg(test)]

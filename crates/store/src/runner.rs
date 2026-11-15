@@ -33,6 +33,8 @@ pub struct Run {
     pub image: String,
     pub namespace: String,
     pub job_name: String,
+    /// The `runner/v1` instruction this attempt was dispatched with.
+    pub instruction: Value,
     pub status: String,
     pub progress: Value,
     pub result: Option<Value>,
@@ -56,6 +58,8 @@ pub struct NewRun<'a> {
     pub image: &'a str,
     pub namespace: &'a str,
     pub job_name: &'a str,
+    /// The instruction the pod is dispatched with, kept for the routes' validation.
+    pub instruction: Value,
 }
 
 /// One `runner_artefact` row.
@@ -88,8 +92,8 @@ pub async fn begin(
 ) -> Result<Option<Run>, sqlx::Error> {
     let mut tx = begin_scoped(pool, tenant).await?;
     let run: Option<Run> = sqlx::query_as(
-        "INSERT INTO runner_run (tenant_id, job_id, attempt, image, namespace, job_name)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        "INSERT INTO runner_run (tenant_id, job_id, attempt, image, namespace, job_name, instruction)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
          ON CONFLICT (job_id, attempt) DO NOTHING
          RETURNING *",
     )
@@ -99,6 +103,7 @@ pub async fn begin(
     .bind(new.image)
     .bind(new.namespace)
     .bind(new.job_name)
+    .bind(&new.instruction)
     .fetch_optional(&mut *tx)
     .await?;
     tx.commit().await?;

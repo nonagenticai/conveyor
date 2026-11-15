@@ -26,6 +26,10 @@ CREATE TABLE runner_run (
     image       text NOT NULL,
     namespace   text NOT NULL,
     job_name    text NOT NULL,
+    -- The exact `runner/v1` instruction this attempt was dispatched with. The routes validate a
+    -- pod's result against it and serve its declared inputs, so it is kept with the attempt and
+    -- not re-derived from a job payload that may since have moved on.
+    instruction jsonb NOT NULL,
     -- dispatched: the Kubernetes Job exists. running: the pod was observed running.
     -- reported: the pod POSTed a result; poll has not consumed it yet. succeeded/failed: poll's
     -- terminal verdict. lost: the pod died without a result and the attempt is spent.
@@ -42,6 +46,7 @@ CREATE TABLE runner_run (
     CONSTRAINT runner_run_attempt_positive CHECK (attempt > 0),
     CONSTRAINT runner_run_image_not_blank CHECK (btrim(image) <> ''),
     CONSTRAINT runner_run_names_not_blank CHECK (btrim(namespace) <> '' AND btrim(job_name) <> ''),
+    CONSTRAINT runner_run_instruction_is_object CHECK (jsonb_typeof(instruction) = 'object'),
     CONSTRAINT runner_run_progress_is_object CHECK (jsonb_typeof(progress) = 'object'),
     CONSTRAINT runner_run_result_is_object CHECK (result IS NULL OR jsonb_typeof(result) = 'object'),
     CONSTRAINT runner_run_finish_after_start CHECK (

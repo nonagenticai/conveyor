@@ -11,6 +11,7 @@
     "GET /api/copilot/conversations/{id}/turns": "24f9db6613af94313f5c3a2dbca2ea7de5d47b25a8d143cc2176e90cd288628e",
     "GET /api/documents/{id}/content": "d7396a539aba4f28694cf6536781a7ced6fd01ab3110d43a4b777dfc74c70739",
     "GET /api/events": "da07bafeabd8dc2a2eb115979454277a61ee158f4e1d7af6c2254f1587e5db02",
+    "GET /api/jobs/{id}/inputs/{name}": "7d509bb91b328ea66fd2201e5bcfa8edddaea361a812fdbf970e926a471332c0",
     "GET /api/me": "81a8dba47cf6ce2bf26dfdb2fef202f565b196aafe3ecd2f4be8ffb047626cd3",
     "GET /api/models/{id}/render": "4601dfcb14427aae9c00c587b27bdac99fe3dfc0beb00c17063d6f99290bcec2",
     "GET /api/models/{id}/xmi": "c4a15583c1652bf75a2b6cdd8788dadd68ef06e673a08578d0c23ade6f90b7fe",
@@ -345,8 +346,11 @@
     "POST /api/channels/{binding_id}/inbound": "211a31e7c092475e47549d463463c639e4ceccee33a4882b0876721443c870a8",
     "POST /api/copilot/conversations": "728ebe4c0239a88a3f0a458b47dec7352cace25be69fd0ea7623b8712142fe0f",
     "POST /api/copilot/conversations/{id}/turns": "8c1364d9169f958377e348e145cb260854f224f8ba1d6cd6df214e23965ff7d3",
+    "POST /api/jobs/{id}/outputs/{name}": "94d9eb11b75b1e068a023b1d85f4582619a66d1e47218b93f7c265a1225e5ca2",
+    "POST /api/jobs/{id}/result": "0334710c526bb9c206b8d68a3fd7029d6fe3f8d4ee1147fc9ed34e910b1ccccb",
     "POST /api/platform/tenants": "18731e256c2679e488ad2989eac8cfa787a6f4315b6b83db582fa87e59672332",
     "POST /api/platform/tenants/{id}/invite-admin": "d722f2e296dfbb95531e19eed4472628ad488b089411566e1f7ba1f216804fc2",
-    "POST /api/platform/tenants/{id}/retry": "39317864781274be4d60330235e40dd1a6cc53576654b43b256e7d505a5979e0"
+    "POST /api/platform/tenants/{id}/retry": "39317864781274be4d60330235e40dd1a6cc53576654b43b256e7d505a5979e0",
+    "PUT /api/jobs/{id}/progress": "3936b109f5de4963c7caf4f783ceb0a8953a483637e096b44b84c22089747776"
   }
 }

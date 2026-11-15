@@ -20,6 +20,7 @@ pub mod design;
 pub mod documents;
 pub mod error;
 pub mod extract;
+pub mod job_routes;
 pub mod metrics;
 pub mod models;
 pub mod request_id;
@@ -64,7 +65,8 @@ pub use state::{AppState, Authenticator};
         (name = "channels", description = "Inbound channel callbacks (Telegram)"),
         (name = "copilot", description = "Conversations, turns and proposals"),
         (name = "platform", description = "Super-admin tenant provisioning and recovery"),
-        (name = "billing", description = "A tenant's cost and usage, read from billing_service")
+        (name = "billing", description = "A tenant's cost and usage, read from billing_service"),
+        (name = "jobs", description = "The runner's pod-side byte routes, fenced by a job token")
     )
 )]
 struct ApiDoc;
@@ -96,6 +98,12 @@ fn api_router() -> OpenApiRouter<AppState> {
         // One `routes!` per handler — combining GET handlers builds one MethodRouter and the
         // router panics at startup.
         .routes(routes!(documents::document_content))
+        // #144 — the runner's pod-side routes. They carry a job token, never a session: a pod has
+        // no Caller and no licence, and the fence is the job row itself (ADR 0007 §Decision 4).
+        .routes(routes!(job_routes::job_input))
+        .routes(routes!(job_routes::job_progress))
+        .routes(routes!(job_routes::job_output))
+        .routes(routes!(job_routes::job_result))
         .routes(routes!(models::render_model))
         .routes(routes!(models::export_model_xmi))
         // S10 — the copilot. The chat transport is a route, not an action: streaming does not fit

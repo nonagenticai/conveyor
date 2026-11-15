@@ -177,6 +177,23 @@ pub async fn claim_with(
     Ok(job)
 }
 
+/// One job by id, in the caller's tenant scope. `None` is "no such job here" — a job belonging to
+/// another tenant is indistinguishable from a missing one, which is what the byte routes need.
+pub async fn get(
+    pool: &PgPool,
+    tenant: TenantId,
+    job_id: Uuid,
+) -> Result<Option<Job>, sqlx::Error> {
+    let mut tx = begin_scoped(pool, tenant).await?;
+    let sql = format!("SELECT {COLUMNS} FROM job WHERE id = $1");
+    let job: Option<Job> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(job_id)
+        .fetch_optional(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok(job)
+}
+
 /// Every job of one `(kind, dedupe_key)`, newest first.
 ///
 /// The dedupe key is unique only among **live** rows (`pending`/`running`), so a key with a
