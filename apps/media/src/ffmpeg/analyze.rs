@@ -783,16 +783,9 @@ fn round6(value: f64) -> f64 {
 mod tests {
     use super::*;
     use std::path::PathBuf;
-    use std::process::{Command, Stdio};
 
-    fn available(tool: &str) -> bool {
-        Command::new(tool)
-            .arg("-version")
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .status()
-            .map(|status| status.success())
-            .unwrap_or(false)
+    fn arguments(values: &[&str]) -> Vec<String> {
+        values.iter().map(|value| (*value).to_string()).collect()
     }
 
     struct Fixture {
@@ -820,54 +813,52 @@ mod tests {
 
         /// A 1-second 320x240 @ 10 fps mp4 with a 440 Hz sine track, built by the image's own
         /// ffmpeg (the same synthetic shape the capture used).
-        fn video(&self) -> bool {
-            Command::new("ffmpeg")
-                .args([
-                    "-hide_banner",
-                    "-loglevel",
-                    "error",
-                    "-f",
-                    "lavfi",
-                    "-i",
-                    "testsrc=size=320x240:rate=10:duration=1",
-                    "-f",
-                    "lavfi",
-                    "-i",
-                    "sine=frequency=440:duration=1",
-                    "-c:v",
-                    "mpeg4",
-                    "-pix_fmt",
-                    "yuv420p",
-                    "-c:a",
-                    "aac",
-                    "-shortest",
-                    "-y",
-                ])
-                .arg(self.dir.join("cap.mp4"))
-                .status()
-                .map(|status| status.success())
-                .unwrap_or(false)
+        async fn video(&self) -> bool {
+            let mut arguments = arguments(&[
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc=size=320x240:rate=10:duration=1",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=440:duration=1",
+                "-c:v",
+                "mpeg4",
+                "-pix_fmt",
+                "yuv420p",
+                "-c:a",
+                "aac",
+                "-shortest",
+                "-y",
+            ]);
+            arguments.push(self.dir.join("cap.mp4").display().to_string());
+            process::run("ffmpeg", &arguments)
+                .await
+                .is_ok_and(|finished| finished.ok())
         }
 
         /// A 1-second 440 Hz sine WAV.
-        fn tone(&self) -> bool {
-            Command::new("ffmpeg")
-                .args([
-                    "-hide_banner",
-                    "-loglevel",
-                    "error",
-                    "-f",
-                    "lavfi",
-                    "-i",
-                    "sine=frequency=440:duration=1",
-                    "-c:a",
-                    "pcm_s16le",
-                    "-y",
-                ])
-                .arg(self.dir.join("tone.wav"))
-                .status()
-                .map(|status| status.success())
-                .unwrap_or(false)
+        async fn tone(&self) -> bool {
+            let mut arguments = arguments(&[
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=440:duration=1",
+                "-c:a",
+                "pcm_s16le",
+                "-y",
+            ]);
+            arguments.push(self.dir.join("tone.wav").display().to_string());
+            process::run("ffmpeg", &arguments)
+                .await
+                .is_ok_and(|finished| finished.ok())
         }
     }
 
@@ -879,12 +870,12 @@ mod tests {
 
     #[tokio::test]
     async fn a_generated_video_is_measured_end_to_end() {
-        if !(available("ffmpeg") && available("ffprobe")) {
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
             eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
             return;
         }
         let fixture = Fixture::new("video");
-        assert!(fixture.video(), "could not build the synthetic clip");
+        assert!(fixture.video().await, "could not build the synthetic clip");
 
         let document = analyze_video(&json!({"input": "cap.mp4"}), &fixture.config())
             .await
@@ -922,12 +913,12 @@ mod tests {
 
     #[tokio::test]
     async fn a_generated_sine_is_measured_end_to_end() {
-        if !(available("ffmpeg") && available("ffprobe")) {
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
             eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
             return;
         }
         let fixture = Fixture::new("audio");
-        assert!(fixture.tone(), "could not build the synthetic tone");
+        assert!(fixture.tone().await, "could not build the synthetic tone");
 
         let document = analyze_audio(&json!({"input": "tone.wav"}), &fixture.config())
             .await

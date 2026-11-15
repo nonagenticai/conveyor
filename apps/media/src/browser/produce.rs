@@ -2197,6 +2197,10 @@ mod tests {
 
     #[tokio::test]
     async fn two_shots_produce_one_encoded_video() {
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
+            eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
+            return;
+        }
         let config = scratch("two-shots");
         colour_clip(&config.work_dir, "red.mp4", "red").await;
         colour_clip(&config.work_dir, "blue.mp4", "blue").await;
@@ -2249,6 +2253,10 @@ mod tests {
         if ensure_chrome().is_none() {
             return;
         }
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
+            eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
+            return;
+        }
         let config = scratch("animation");
         // The captured animation fixture: a self-contained page with RENDER_DURATION_MS and
         // render(t). 320x240 @ 10 fps for 1 s is the measured reference request.
@@ -2294,6 +2302,10 @@ mod tests {
         if ensure_chrome().is_none() {
             return;
         }
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
+            eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
+            return;
+        }
         let config = scratch("title-card");
         let params = json!({
             "title": "Capture Title Card",
@@ -2324,6 +2336,10 @@ mod tests {
     #[tokio::test]
     async fn an_animation_duration_may_come_from_the_page() {
         if ensure_chrome().is_none() {
+            return;
+        }
+        if !process::available("ffmpeg") {
+            eprintln!("ffmpeg not installed; skipping the end-to-end case");
             return;
         }
         let config = scratch("animation-page-duration");

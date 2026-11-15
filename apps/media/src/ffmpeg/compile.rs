@@ -1181,6 +1181,10 @@ mod tests {
 
     #[tokio::test]
     async fn two_shots_compile_into_one_encoded_video() {
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
+            eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
+            return;
+        }
         let config = scratch("two-shots");
         colour_clip(&config.work_dir, "red.mp4", "red").await;
         colour_clip(&config.work_dir, "blue.mp4", "blue").await;
@@ -1219,6 +1223,10 @@ mod tests {
 
     #[tokio::test]
     async fn a_footage_clip_keeps_its_audio_and_retimes_it() {
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
+            eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
+            return;
+        }
         let config = scratch("footage-audio");
         clip_with_audio(&config.work_dir, "talk.mp4").await;
         let params = json!({
@@ -1255,6 +1263,10 @@ mod tests {
 
     #[tokio::test]
     async fn a_speed_retime_shortens_a_silent_segment() {
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
+            eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
+            return;
+        }
         let config = scratch("speed");
         colour_clip(&config.work_dir, "slow.mp4", "green").await;
         let params = json!({
@@ -1272,6 +1284,10 @@ mod tests {
 
     #[tokio::test]
     async fn the_captured_submit_request_compiles_without_optional_fields() {
+        if !process::available("ffmpeg") {
+            eprintln!("ffmpeg not installed; skipping the end-to-end case");
+            return;
+        }
         // Exactly the captured request's shots, plus only the executor's own output name.
         let config = scratch("golden-request");
         let params = json!({

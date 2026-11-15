@@ -10,8 +10,6 @@
 //! that tesseract cannot honour (diagram structure, bounding boxes per word with confidence) is
 //! refused by name rather than approximated.
 
-use std::path::Path;
-
 use serde_json::{Value, json};
 
 use crate::common::{CapabilityError, Config, process};
@@ -107,13 +105,7 @@ pub fn summarise(text: &str) -> Value {
 
 /// Whether the image carries tesseract at all — the probe behind a `tool_missing` refusal.
 pub fn available() -> bool {
-    Path::new("/usr/bin/tesseract").exists() || which_tesseract()
-}
-
-fn which_tesseract() -> bool {
-    std::env::var_os("PATH")
-        .map(|paths| std::env::split_paths(&paths).any(|dir| dir.join("tesseract").is_file()))
-        .unwrap_or(false)
+    process::available("tesseract")
 }
 
 #[cfg(test)]
@@ -171,24 +163,26 @@ mod tests {
         // A white image with black text, rendered by ImageMagick if present; otherwise ffmpeg's
         // drawtext filter, which is the same tesseract input shape.
         let image = dir.join("text.png");
-        let built = std::process::Command::new("ffmpeg")
-            .args([
-                "-hide_banner",
-                "-loglevel",
-                "error",
-                "-f",
-                "lavfi",
-                "-i",
-                "color=c=white:s=640x200:d=1",
-                "-vf",
-                "drawtext=text='CONVEYOR OCR':fontsize=48:fontcolor=black:x=20:y=80",
-                "-frames:v",
-                "1",
-                "-y",
-            ])
-            .arg(&image)
-            .status();
-        if !matches!(built, Ok(status) if status.success()) {
+        let mut arguments: Vec<String> = [
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=white:s=640x200:d=1",
+            "-vf",
+            "drawtext=text='CONVEYOR OCR':fontsize=48:fontcolor=black:x=20:y=80",
+            "-frames:v",
+            "1",
+            "-y",
+        ]
+        .into_iter()
+        .map(str::to_string)
+        .collect();
+        arguments.push(image.display().to_string());
+        let built = process::run("ffmpeg", &arguments).await;
+        if !matches!(built, Ok(finished) if finished.ok()) {
             eprintln!("ffmpeg could not build the fixture; skipping the end-to-end case");
             return;
         }

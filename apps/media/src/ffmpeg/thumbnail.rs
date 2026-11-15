@@ -405,6 +405,10 @@ mod tests {
 
     #[tokio::test]
     async fn extracts_a_frame_from_a_generated_clip() {
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
+            eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
+            return;
+        }
         let root = scratch("extract");
         generate_video(&root).await;
         let config = test_config(&root);

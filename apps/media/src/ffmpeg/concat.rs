@@ -558,6 +558,10 @@ mod tests {
 
     #[tokio::test]
     async fn concatenates_two_generated_clips_in_order() {
+        if !(process::available("ffmpeg") && process::available("ffprobe")) {
+            eprintln!("ffmpeg/ffprobe not installed; skipping the end-to-end case");
+            return;
+        }
         let root = scratch("stitch");
         generate_tone(&root, "clip-0.wav", 440).await;
         generate_tone(&root, "clip-1.wav", 660).await;

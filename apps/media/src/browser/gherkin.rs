@@ -924,14 +924,17 @@ impl Browser {
 }
 
 /// The browser this process drives: `CHROME_BIN`, then the image's Chromium, then a developer
-/// box's stock Chrome. `None` is the "no browser is installed" refusal.
+/// box's stock Chrome. A configured path that does not exist is not a browser; it falls through
+/// to the candidates rather than failing the launch. `None` is the "no browser is installed"
+/// refusal.
 fn chrome_binary() -> Option<PathBuf> {
-    if let Some(configured) = std::env::var_os(CHROME_ENV) {
-        return Some(PathBuf::from(configured));
-    }
-    [CHROME_DEFAULT, CHROME_DEVELOPER]
-        .into_iter()
+    std::env::var_os(CHROME_ENV)
         .map(PathBuf::from)
+        .into_iter()
+        .chain([
+            PathBuf::from(CHROME_DEFAULT),
+            PathBuf::from(CHROME_DEVELOPER),
+        ])
         .find(|candidate| candidate.is_file())
 }
 
