@@ -97,6 +97,9 @@ pub enum SeedError {
     /// The embedded programme document is not valid JSON (also a build-time constant).
     #[error("the embedded programme seed is not valid JSON: {0}")]
     ProgrammeDocument(String),
+    /// The board ensure refused a seeded project's board.
+    #[error(transparent)]
+    Board(#[from] crate::board::BoardStoreError),
     /// The embedded organisation document is not valid JSON (also a build-time constant).
     #[error("the embedded organisation seed is not valid JSON: {0}")]
     OrganisationDocument(String),
@@ -1550,6 +1553,19 @@ pub async fn seed_catalogue(
         .execute(&mut *tx)
         .await?;
         tx.commit().await?;
+        // SPEC D27: every seeded tenant gets the built-in prompt catalogue.
+        //
+        // This is not decoration. A process agent pins `prompt_ref = agent@1`, and
+        // `process_runs.start` refuses the whole run with `409 capability_not_ready`
+        // (`PromptMissing`) when that pin is not an active prompt — before the run row, so a
+        // tenant whose catalogue was installed without prompts has ZERO runnable processes and
+        // `projects.create` rolls back with it. Measured on the live tenant 2026-11-15: 123
+        // agents pinning `agent@1`, 333 published processes, 0 `prompt` rows. The dev seed
+        // (`catalogue()` below) has always seeded them, which is why only production was
+        // affected; installing them here covers `--seed` and `--process-catalogue` alike (the
+        // latter calls this function first). Additive and idempotent: an existing
+        // `(key, version)` is never rewritten.
+        prompts_for_tenant(pool, tenant_id).await?;
         results.push((
             slug,
             ImportCounts {
