@@ -238,3 +238,21 @@ async fn a_closed_pool_is_a_503_not_a_placeholder() {
         Some("no-store")
     );
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn an_unknown_public_tenant_is_a_closed_window() {
+    let pg = support::Pg::fresh().await;
+    support::seed(&pg, "public", "alice", "Alice").await;
+    let running =
+        support::Running::start_with_config(config_with_public_tenant(&pg, "no-such-tenant")).await;
+
+    let response = get(&running, "/design/data/snapshot.js").await;
+    assert_eq!(response.status(), 404);
+    assert_eq!(
+        response
+            .headers()
+            .get("cache-control")
+            .and_then(|value| value.to_str().ok()),
+        Some("no-store")
+    );
+}

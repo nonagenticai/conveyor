@@ -353,7 +353,7 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
         .await
         .expect("scoped write");
     conveyor_store::document::create_document_tx(
-        &mut *tx,
+        &mut tx,
         tenant,
         &conveyor_store::document::NewDocument {
             id: document_id,
