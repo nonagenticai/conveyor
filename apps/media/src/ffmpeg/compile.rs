@@ -511,58 +511,79 @@ impl Shot {
                 })?,
         };
 
-        let fit = match map.get("fit").and_then(Value::as_str).unwrap_or("contain") {
-            "contain" => Fit::Contain,
-            "cover" => Fit::Cover,
-            "scroll" => {
-                return Err(refuse(
-                    code::FIT_SCROLL,
-                    format!("shots.{index}.fit=scroll is not implemented"),
-                ));
-            }
-            other => {
-                return Err(CapabilityError::Invalid(format!(
-                    "shots.{index}.fit: {other:?} is not one of contain, cover, scroll"
-                )));
-            }
+        let fit = match map.get("fit").filter(|value| !value.is_null()) {
+            None => Fit::Contain,
+            Some(value) => match value.as_str() {
+                Some("contain") => Fit::Contain,
+                Some("cover") => Fit::Cover,
+                Some("scroll") => {
+                    return Err(refuse(
+                        code::FIT_SCROLL,
+                        format!("shots.{index}.fit=scroll is not implemented"),
+                    ));
+                }
+                Some(other) => {
+                    return Err(CapabilityError::Invalid(format!(
+                        "shots.{index}.fit: {other:?} is not one of contain, cover, scroll"
+                    )));
+                }
+                None => {
+                    return Err(CapabilityError::Invalid(format!(
+                        "shots.{index}.fit: must be a string"
+                    )));
+                }
+            },
         };
 
         match map
             .get("clip_anchor")
-            .and_then(Value::as_str)
-            .unwrap_or("start")
-        {
-            "start" => {}
-            "end" => {
+            .filter(|value| !value.is_null())
+            .map(|value| {
+                value.as_str().ok_or_else(|| {
+                    CapabilityError::Invalid(format!("shots.{index}.clip_anchor: must be a string"))
+                })
+            }) {
+            None => {}
+            Some(Ok("start")) => {}
+            Some(Ok("end")) => {
                 return Err(refuse(
                     code::CLIP_ANCHOR_END,
                     format!("shots.{index}.clip_anchor=end is not implemented"),
                 ));
             }
-            other => {
+            Some(Ok(other)) => {
                 return Err(CapabilityError::Invalid(format!(
                     "shots.{index}.clip_anchor: {other:?} is not one of start, end"
                 )));
             }
+            Some(Err(error)) => return Err(error),
         }
 
         // The captured field says an unset/unknown `retime` falls back to the service-wide clean
         // drop/dup path, which is exactly the `fps` filter below. Only the two re-timers this port
         // cannot run are refused.
-        match map.get("retime").and_then(Value::as_str) {
-            Some("motion") => {
-                return Err(refuse(
-                    code::RETIME_MOTION,
-                    format!("shots.{index}.retime=motion is not implemented"),
-                ));
-            }
-            Some("budget") => {
-                return Err(refuse(
-                    code::RETIME_BUDGET,
-                    format!("shots.{index}.retime=budget is not implemented"),
-                ));
-            }
-            _ => {}
+        match map.get("retime").filter(|value| !value.is_null()) {
+            None => {}
+            Some(value) => match value.as_str() {
+                Some("motion") => {
+                    return Err(refuse(
+                        code::RETIME_MOTION,
+                        format!("shots.{index}.retime=motion is not implemented"),
+                    ));
+                }
+                Some("budget") => {
+                    return Err(refuse(
+                        code::RETIME_BUDGET,
+                        format!("shots.{index}.retime=budget is not implemented"),
+                    ));
+                }
+                Some(_) => {}
+                None => {
+                    return Err(CapabilityError::Invalid(format!(
+                        "shots.{index}.retime: must be a string"
+                    )));
+                }
+            },
         }
 
         let clip_lead = match map

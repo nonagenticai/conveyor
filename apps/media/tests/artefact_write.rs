@@ -27,9 +27,12 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
+/// One recorded upload: the route path, the declared content type and the bytes.
+type Upload = (String, String, Vec<u8>);
+
 #[derive(Default, Clone)]
 struct Stub {
-    uploads: Arc<Mutex<Vec<(String, String, Vec<u8>)>>>,
+    uploads: Arc<Mutex<Vec<Upload>>>,
 }
 
 async fn upload(
