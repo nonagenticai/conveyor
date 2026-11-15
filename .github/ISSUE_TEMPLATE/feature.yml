@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose a capability or a change to how the conveyor works.
+title: "feature: <one line>"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A feature request is design input. A maintainer decides whether it becomes a `unit` issue
+        with the full contract; that decision is linked here.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What is hard or impossible today, and for whom.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: The proposal
+      description: What should be true after the change. A sketch is enough.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What you tried instead, or why the obvious alternative is worse.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: This request contains no credential, personal data or private infrastructure detail.
+          required: true

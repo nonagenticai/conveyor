@@ -68,11 +68,16 @@ cargo test --doc --locked
 echo "==> no private references"
 bash scripts/ci/no-private-refs.sh
 
-echo "==> gitleaks"
-if command -v gitleaks >/dev/null 2>&1; then
-  gitleaks dir --redact --exit-code 1 --no-banner --gitleaks-ignore-path .gitleaksignore .
+echo "==> betterleaks"
+if command -v betterleaks >/dev/null 2>&1; then
+  # The SAME scanner, config and ignore file as `ci-public.yml`'s secret-scan job. gitleaks was
+  # retired: it is a different scanner with different defaults, so a green gitleaks run said
+  # nothing about the gate that actually blocks a merge.
+  betterleaks dir --redact --exit-code 1 --no-banner \
+    --config=.betterleaks.toml \
+    --gitleaks-ignore-path .betterleaksignore .
 else
-  echo "    skip: gitleaks not installed (https://github.com/gitleaks/gitleaks)"
+  echo "    skip: betterleaks not installed (https://github.com/betterleaks/betterleaks)"
 fi
 
 echo "gate: OK"
