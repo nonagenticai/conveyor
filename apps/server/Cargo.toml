@@ -29,6 +29,7 @@ conveyor-bus = { path = "../../crates/bus" }
 conveyor-domain = { path = "../../crates/domain" }
 # The public design pack: the snapshot and output builders the CLI and the live routes share.
 conveyor-pack = { path = "../../crates/pack" }
+conveyor-runner = { path = "../../crates/runner" }
 conveyor-store = { path = "../../crates/store" }
 # The S17 sandbox talks to the Kubernetes API directly (no `kube`: five REST calls), and the
 # SSE gate reads a stream chunk by chunk from a real socket.
