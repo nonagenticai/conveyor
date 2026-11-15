@@ -31,3 +31,6 @@ url = "2"
 
 [dev-dependencies]
 serde_json = { workspace = true }
+# `tests/parity.rs` pins the served contract by digest: the capture is only evidence if the bytes it
+# describes are the bytes that were served. A dev-dependency, so the library tree stays transport-free.
+sha2 = { workspace = true }
