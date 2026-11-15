@@ -32,6 +32,9 @@ pub struct CallContext {
     pub delegated_by: Option<String>,
     pub correlation_id: Option<String>,
     pub worker_name: Option<String>,
+    /// The caller-asserted `X-App-Id`. Used for the bounded `caller` metric label through
+    /// `metrics::caller_label`; never placed on a series raw.
+    pub app_id: Option<String>,
     /// The caller's stage label (`X-Stage`). Carried by the cost event; the ledger has no column.
     pub stage: Option<String>,
     pub trace_id: Option<String>,

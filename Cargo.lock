@@ -850,6 +850,8 @@ dependencies = [
  "conveyor-platform",
  "futures-util",
  "jsonwebtoken",
+ "metrics",
+ "metrics-exporter-prometheus",
  "redis",
  "reqwest",
  "serde",
