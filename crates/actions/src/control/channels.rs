@@ -701,6 +701,19 @@ pub async fn send_telegram_message(
     message_thread_id: Option<i64>,
     text: &str,
 ) -> TelegramSendOutcome {
+    // The bot token is a PATH segment here, so the base must be an encrypted channel: an
+    // `http` base would put the credential itself on the wire. Refuse before building the
+    // URL rather than concatenate a scheme we cannot verify.
+    if !conveyor_auth::url::is_secure_service_url(api_base) {
+        return TelegramSendOutcome {
+            ok: false,
+            status_code: None,
+            error: Some(
+                "the telegram api base is not https; refusing to send a bot token in cleartext"
+                    .to_owned(),
+            ),
+        };
+    }
     let url = format!("{}/bot{token}/sendMessage", api_base.trim_end_matches('/'));
     let mut body = serde_json::Map::new();
     body.insert("chat_id".to_owned(), json!(chat_id));
@@ -796,5 +809,25 @@ mod tests {
     fn the_inbound_path_names_the_binding() {
         let id = Uuid::now_v7();
         assert_eq!(inbound_url(id), format!("/api/channels/{id}/inbound"));
+    }
+
+    #[tokio::test]
+    async fn a_cleartext_telegram_base_is_refused_before_the_token_is_placed_in_a_url() {
+        let outcome = send_telegram_message(
+            "http://telegram.example.com",
+            "bot-token",
+            "42",
+            None,
+            "hello",
+        )
+        .await;
+        assert!(!outcome.ok);
+        assert_eq!(outcome.status_code, None, "no request was sent");
+        let error = outcome.error.expect("a refusal reason");
+        assert!(error.contains("not https"), "{error}");
+        assert!(
+            !error.contains("bot-token"),
+            "the refusal must not echo the token"
+        );
     }
 }
