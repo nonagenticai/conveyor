@@ -1,0 +1,16 @@
+# name | METHOD | path | headers | body
+# The tenant is supplied by header on every authenticated case: the reference refuses a request
+# that carries none (401), and a sentinel default would prove nothing about the rewrite.
+health|GET|/health||
+health_live|GET|/livez||
+health_ready|GET|/readyz||
+batches_submit|POST|/api/tts/batches|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"batch_id":"capture-batch-0001","chunks":[{"ref":"c1","text":"Synthetic capture sentence one."},{"ref":"c2","text":"Synthetic capture sentence two.","speed":1.25}]}
+batches_submit_validation|POST|/api/tts/batches|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+batches_get|GET|/api/tts/batches/capture-batch-0001|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+batches_get_missing|GET|/api/tts/batches/capture-batch-absent|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+batches_get_no_tenant|GET|/api/tts/batches/capture-batch-0001|| 
+claim_no_work|POST|/api/tts/claim|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"worker_id":"capture-worker"}
+heartbeat_missing|POST|/api/tts/jobs/00000000-0000-0000-0000-0000000000ff/heartbeat|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+release_missing|POST|/api/tts/jobs/00000000-0000-0000-0000-0000000000ff/release|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+result_missing|POST|/api/tts/jobs/00000000-0000-0000-0000-0000000000ff/result|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+fail_missing|POST|/api/tts/jobs/00000000-0000-0000-0000-0000000000ff/fail|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
