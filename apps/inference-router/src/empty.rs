@@ -88,7 +88,7 @@ pub fn is_vacuous_json(text: &str) -> bool {
     };
     match parsed {
         Value::Array(items) => items.is_empty(),
-        Value::Object(map) => map.values().all(|value| is_empty_value(value)),
+        Value::Object(map) => map.values().all(is_empty_value),
         // A top-level scalar: a bare literal is not confident evidence of "nothing".
         _ => false,
     }
