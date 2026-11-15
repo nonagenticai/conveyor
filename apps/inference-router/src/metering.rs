@@ -61,16 +61,24 @@ pub struct CostEvent {
 ///
 /// `emit` is fire-and-forget by contract: the reference never fails a request because metering
 /// failed, and neither may this port. Implementations log and count; they do not return errors.
+///
+/// The returned `bool` is delivery evidence, not control flow: `true` iff the event reached the
+/// stream. Callers book per-attempt token totals only on `true`, exactly as the reference does
+/// after its XADD returns (`metering.py:1011-1035`), so a dropped event cannot inflate the token
+/// families. An implementation never fails a request either way.
 pub trait CostSink: Send + Sync {
-    fn emit<'a>(&'a self, event: &'a CostEvent) -> BoxFuture<'a, ()>;
+    fn emit<'a>(&'a self, event: &'a CostEvent) -> BoxFuture<'a, bool>;
 }
 
 /// Metering is off: no URL configured, or a test that does not assert the bus.
+///
+/// Nothing is delivered, so `emit` answers `false` — the honest delivery verdict, which keeps the
+/// token families from moving on an event that went nowhere.
 pub struct NoopCostSink;
 
 impl CostSink for NoopCostSink {
-    fn emit<'a>(&'a self, _event: &'a CostEvent) -> BoxFuture<'a, ()> {
-        Box::pin(async {})
+    fn emit<'a>(&'a self, _event: &'a CostEvent) -> BoxFuture<'a, bool> {
+        Box::pin(async { false })
     }
 }
 
@@ -160,7 +168,7 @@ impl RedisCostSink {
 }
 
 impl CostSink for RedisCostSink {
-    fn emit<'a>(&'a self, event: &'a CostEvent) -> BoxFuture<'a, ()> {
+    fn emit<'a>(&'a self, event: &'a CostEvent) -> BoxFuture<'a, bool> {
         Box::pin(async move {
             // Raw command, not `xadd_maxlen`: the argument order is the reference's and does not
             // move when the client crate changes its helper signature.
@@ -177,9 +185,52 @@ impl CostSink for RedisCostSink {
             let mut connection = self.connection.clone();
             let result: Result<String, redis::RedisError> =
                 command.query_async(&mut connection).await;
-            if let Err(error) = result {
-                tracing::warn!(%error, stream = %self.stream, "cost event was not written");
+            match result {
+                Ok(_) => true,
+                Err(error) => {
+                    tracing::warn!(%error, stream = %self.stream, "cost event was not written");
+                    false
+                }
             }
         })
+    }
+}
+
+/// The reference's `licence_is_absent` (`metering.py:332`): no licence, a blank one, or the
+/// literal `unknown` (case-insensitively) all mean "nobody paid for this attempt".
+///
+/// The literal is a real value the licence server emits when it could not resolve one, so it must
+/// be folded into the unlicensed bucket rather than treated as an identifier.
+pub fn licence_is_absent(license_id: &Option<String>) -> bool {
+    match license_id {
+        None => true,
+        Some(value) => {
+            let value = value.trim();
+            value.is_empty() || value.eq_ignore_ascii_case("unknown")
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::licence_is_absent;
+
+    #[test]
+    fn licence_is_absent_covers_the_reference_three_ways() {
+        assert!(licence_is_absent(&None), "no licence at all");
+        assert!(licence_is_absent(&Some(String::new())), "empty licence");
+        assert!(licence_is_absent(&Some("   ".to_owned())), "blank licence");
+        assert!(
+            licence_is_absent(&Some("unknown".to_owned())),
+            "the licence server's unresolved literal"
+        );
+        assert!(
+            licence_is_absent(&Some("UnKnOwN".to_owned())),
+            "the literal is matched case-insensitively"
+        );
+        assert!(
+            !licence_is_absent(&Some("lic-0123456789abcdef".to_owned())),
+            "a real licence is present"
+        );
     }
 }

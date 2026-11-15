@@ -33,9 +33,10 @@ const GOLDEN_REQUEST_SHA256: &str =
 struct Recorder(Mutex<Vec<CostEvent>>);
 
 impl CostSink for Recorder {
-    fn emit<'a>(&'a self, event: &'a CostEvent) -> BoxFuture<'a, ()> {
+    fn emit<'a>(&'a self, event: &'a CostEvent) -> BoxFuture<'a, bool> {
         Box::pin(async move {
             self.0.lock().expect("recorder").push(event.clone());
+            true
         })
     }
 }

@@ -23,7 +23,7 @@ use crate::contract::schemas::{
     ChatCompletionRequest, ChatCompletionResponse, HTTPValidationError, Usage,
 };
 use crate::ledger::{self, CallContext, LedgerRow, StreamRow};
-use crate::metering::{CostEvent, ZERO_COST_USD};
+use crate::metering::{CostEvent, ZERO_COST_USD, licence_is_absent};
 use crate::policy::{self, ResolvedHop};
 use crate::provider::ChunkStream;
 use crate::routing::{
@@ -435,7 +435,7 @@ async fn record(
             index > 0,
             reservation_id,
         );
-        state.deps().cost.emit(&event).await;
+        emit_cost(state, &event).await;
     }
 }
 
@@ -452,6 +452,58 @@ fn attempt_reason(outcome: &str, attempt: &ProviderAttempt) -> Option<&'static s
             .as_ref()
             .map(|failure| failure.classification),
         _ => None,
+    }
+}
+
+/// The unlicensed trio's inputs for one event, or `None` when the event carries a licence.
+///
+/// Split out of [`emit_cost`] so the classification is unit-testable without a live recorder. The
+/// reference decides "unlicensed" on the licence identifier alone ([`licence_is_absent`] — none,
+/// blank, or the literal `unknown`); the caller and worker labels go through the same bounded
+/// normalisers as every other family, so a raw header can never reach a series.
+fn unlicensed_trio(event: &CostEvent) -> Option<(String, String, f64, i64)> {
+    if !licence_is_absent(&event.license_id) {
+        return None;
+    }
+    let caller = crate::metrics::caller_label(event.app_id.as_deref());
+    let worker = crate::metrics::worker_label(event.worker_name.as_deref());
+    // A malformed decimal books zero dollars; it never fails the request.
+    let cost_usd = event.cost_usd.parse::<f64>().unwrap_or(0.0);
+    let tokens = event.input_tokens.max(0) + event.output_tokens.max(0);
+    Some((caller, worker, cost_usd, tokens))
+}
+
+/// Book one cost event: the unlicensed trio FIRST, then the XADD, then the token totals ONLY when
+/// the sink confirms delivery.
+///
+/// The order is the reference's own (`metering.py` :797-835, then :1011-1035): the trio records
+/// what was spent without a licence whether or not the stream write succeeds (the spend happened
+/// either way), while `tokens_total` is booked after a successful XADD, so a dropped event cannot
+/// inflate the token families. Every emit site goes through this one helper so none can drift.
+async fn emit_cost(state: &AppState, event: &CostEvent) {
+    if let Some((caller, worker, cost_usd, tokens)) = unlicensed_trio(event) {
+        crate::metrics::record_cost_unlicensed(
+            &event.service_key,
+            &event.provider,
+            &caller,
+            &worker,
+            cost_usd,
+            tokens,
+        );
+    }
+    if state.deps().cost.emit(event).await {
+        crate::metrics::record_tokens(
+            &event.service_key,
+            &event.provider,
+            "prompt",
+            event.input_tokens,
+        );
+        crate::metrics::record_tokens(
+            &event.service_key,
+            &event.provider,
+            "completion",
+            event.output_tokens,
+        );
     }
 }
 
@@ -805,7 +857,7 @@ async fn finalise_stream(
                 None
             },
         );
-        state.deps().cost.emit(&event).await;
+        emit_cost(&state, &event).await;
     }
 }
 
@@ -860,7 +912,7 @@ async fn record_unopened_stream(
             None,
             None,
         );
-        state.deps().cost.emit(&event).await;
+        emit_cost(state, &event).await;
     }
 }
 
@@ -1067,6 +1119,47 @@ mod tests {
         assert!(text.contains("\"served_provider\":\"pgx-local\""));
         assert!(text.contains("\"served_model\":\"stub-model\""));
         assert!(text.contains("\"provider_request_id\":\"chatcmpl-stub\""));
+    }
+
+    #[test]
+    fn the_unlicensed_trio_is_classified_on_the_licence_alone() {
+        let mut event = crate::metering::CostEvent {
+            service_key: "inference-router".to_owned(),
+            provider: "trio-provider".to_owned(),
+            // Negative input is clamped: the trio books max(0,input) + max(0,output).
+            input_tokens: -4,
+            output_tokens: 3,
+            cost_usd: "0.25000000".to_owned(),
+            app_id: Some("w2v".to_owned()),
+            worker_name: Some("core-app".to_owned()),
+            ..crate::metering::CostEvent::default()
+        };
+        assert_eq!(
+            super::unlicensed_trio(&event),
+            Some(("w2v".to_owned(), "core-app".to_owned(), 0.25, 3)),
+            "no licence at all: the trio moves, labelled through the bounded normalisers"
+        );
+
+        event.license_id = Some("unknown".to_owned());
+        assert!(
+            super::unlicensed_trio(&event).is_some(),
+            "the licence server's unresolved literal is unlicensed"
+        );
+
+        event.license_id = Some("lic-0123456789abcdef".to_owned());
+        assert_eq!(
+            super::unlicensed_trio(&event),
+            None,
+            "a licence present means no unlicensed cost"
+        );
+
+        event.license_id = None;
+        event.cost_usd = "not-a-decimal".to_owned();
+        assert_eq!(
+            super::unlicensed_trio(&event).map(|trio| trio.2),
+            Some(0.0),
+            "a malformed decimal books zero dollars rather than failing"
+        );
     }
 
     #[tokio::test]

@@ -5,6 +5,7 @@
 //! sidecar would scrape — the attempt trio is the alert surface, so a family that is merely
 //! *present* is not evidence that it *moves*.
 
+use std::sync::Arc;
 use std::time::Duration;
 
 use axum::Router;
@@ -13,7 +14,9 @@ use axum::http::{Request, StatusCode};
 use axum::routing::post;
 use conveyor_inference_router::catalog::Catalog;
 use conveyor_inference_router::config::Config;
+use conveyor_inference_router::metering::{CostEvent, CostSink};
 use conveyor_inference_router::metrics::{FAMILIES, caller_label, preseed, router, worker_label};
+use conveyor_inference_router::provider::BoxFuture;
 use conveyor_inference_router::router::router as api_router;
 use conveyor_inference_router::routing::RouterService;
 use conveyor_inference_router::state::{AppDeps, AppState};
@@ -491,6 +494,143 @@ async fn the_project_id_header_is_classified_absent_valid_or_malformed() {
         "a malformed header must NOT be counted absent"
     );
     assert_eq!(project_series(&body, "valid", "replay"), Some(0.0));
+}
+
+// ── P2d: the cost-write token gate ──────────────────────────────────────────────────────────
+//
+// `tokens_total` is booked only after the XADD reports success, while the unlicensed-cost trio is
+// booked BEFORE it. A scripted sink stands in for Redis so both sides of the gate are provable,
+// and each test takes its own provider name because the recorder is process-wide.
+
+/// A cost sink with a fixed delivery verdict, standing in for the Redis XADD.
+struct ScriptedSink {
+    delivered: bool,
+}
+
+impl CostSink for ScriptedSink {
+    fn emit<'a>(&'a self, _event: &'a CostEvent) -> BoxFuture<'a, bool> {
+        Box::pin(async move { self.delivered })
+    }
+}
+
+/// The same one-provider router as [`configured`], with the cost sink injected and the provider
+/// pre-seeded so its token series exists at zero before any traffic reaches it.
+fn configured_with_cost(
+    provider: &str,
+    address: std::net::SocketAddr,
+    cost: Arc<dyn CostSink>,
+) -> Router {
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: {provider}\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: metric-model\ndefault_chain: [{provider}]\n"
+    ))
+    .expect("catalog");
+    preseed(&[provider.to_owned()]);
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let state = AppState::with_deps(
+        Config::from_lookup(|_| None).expect("defaults"),
+        router,
+        AppDeps {
+            cost,
+            ..AppDeps::default()
+        },
+    );
+    api_router(state)
+}
+
+async fn serve_one(router: Router) -> StatusCode {
+    router
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .body(completion())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers")
+        .status()
+}
+
+#[tokio::test]
+async fn an_undelivered_cost_event_leaves_the_token_families_at_zero() {
+    let address = stub_provider("undelivered").await;
+    let router = configured_with_cost(
+        "stub-metrics-undelivered",
+        address,
+        Arc::new(ScriptedSink { delivered: false }),
+    );
+    assert_eq!(serve_one(router).await, StatusCode::OK);
+
+    let body = scrape().await;
+    let labels = [
+        ("service_key", "inference-router"),
+        ("provider", "stub-metrics-undelivered"),
+    ];
+    for kind in ["prompt", "completion"] {
+        let mut series = labels.to_vec();
+        series.push(("kind", kind));
+        assert_eq!(
+            series_value(&body, "inference_router_tokens_total", &series),
+            Some(0.0),
+            "the sink refused delivery, so {kind} tokens must not be booked"
+        );
+    }
+    // The trio is booked BEFORE the XADD: the spend happened whether or not the write landed.
+    assert_eq!(
+        series_value(
+            &body,
+            "inference_router_cost_events_unlicensed_total",
+            &[
+                ("service_key", "inference-router"),
+                ("provider", "stub-metrics-undelivered"),
+                ("caller", "unknown"),
+                ("worker", "unknown"),
+            ],
+        ),
+        Some(1.0),
+        "an unlicensed attempt is counted even when the stream write fails"
+    );
+    assert_eq!(
+        series_value(
+            &body,
+            "inference_router_cost_tokens_unlicensed_total",
+            &[
+                ("service_key", "inference-router"),
+                ("provider", "stub-metrics-undelivered"),
+                ("caller", "unknown"),
+                ("worker", "unknown"),
+            ],
+        ),
+        Some(10.0),
+        "the unlicensed token total is 7 prompt + 3 completion"
+    );
+}
+
+#[tokio::test]
+async fn a_delivered_cost_event_books_the_attempt_tokens() {
+    let address = stub_provider("delivered").await;
+    let router = configured_with_cost(
+        "stub-metrics-delivered",
+        address,
+        Arc::new(ScriptedSink { delivered: true }),
+    );
+    assert_eq!(serve_one(router).await, StatusCode::OK);
+
+    let body = scrape().await;
+    for (kind, expected) in [("prompt", 7.0), ("completion", 3.0)] {
+        assert_eq!(
+            series_value(
+                &body,
+                "inference_router_tokens_total",
+                &[
+                    ("service_key", "inference-router"),
+                    ("provider", "stub-metrics-delivered"),
+                    ("kind", kind),
+                ],
+            ),
+            Some(expected),
+            "a delivered event books its {kind} tokens after the XADD returns"
+        );
+    }
 }
 
 #[tokio::test]

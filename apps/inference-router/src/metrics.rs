@@ -172,6 +172,64 @@ pub fn record_attempt(
     }
 }
 
+/// Book one attempt's tokens onto `tokens_total{service_key,provider,kind}`.
+///
+/// Called ONLY after the cost sink confirms the event was delivered (`CostSink::emit` returned
+/// `true`) — the reference increments this family after its XADD returns. `kind` is `prompt` or
+/// `completion`; a negative count is clamped to zero rather than subtracting from an alert signal.
+pub fn record_tokens(service_key: &str, provider: &str, kind: &str, count: i64) {
+    counter!(
+        "inference_router_tokens_total",
+        "service_key" => service_key.to_owned(),
+        "provider" => provider.to_owned(),
+        "kind" => kind.to_owned()
+    )
+    .increment(count.max(0) as u64);
+}
+
+/// Book one attempt that carried no licence onto the unlicensed-cost trio.
+///
+/// Called BEFORE the XADD, exactly as the reference does: the trio measures the spend and tokens
+/// this service ATTEMPTED without a licence, so it must count even when delivery later fails.
+/// Negatives are clamped to zero (the reference's `max(0.0, …)` / `max(0, …)`).
+///
+/// The USD family is a GAUGE for the same reason as `provider_attempt_seconds_total`: the `metrics`
+/// crate's `Counter` is integer-only, while this series must carry fractional dollars. `preseed`
+/// registers the same kind, so one metric name never carries two `# TYPE` lines.
+pub fn record_cost_unlicensed(
+    service_key: &str,
+    provider: &str,
+    caller: &str,
+    worker: &str,
+    cost_usd: f64,
+    tokens: i64,
+) {
+    counter!(
+        "inference_router_cost_events_unlicensed_total",
+        "service_key" => service_key.to_owned(),
+        "provider" => provider.to_owned(),
+        "caller" => caller.to_owned(),
+        "worker" => worker.to_owned()
+    )
+    .increment(1);
+    gauge!(
+        "inference_router_cost_usd_unlicensed_total",
+        "service_key" => service_key.to_owned(),
+        "provider" => provider.to_owned(),
+        "caller" => caller.to_owned(),
+        "worker" => worker.to_owned()
+    )
+    .increment(cost_usd.max(0.0));
+    counter!(
+        "inference_router_cost_tokens_unlicensed_total",
+        "service_key" => service_key.to_owned(),
+        "provider" => provider.to_owned(),
+        "caller" => caller.to_owned(),
+        "worker" => worker.to_owned()
+    )
+    .increment(tokens.max(0) as u64);
+}
+
 /// Count one request that reached a completion route.
 ///
 /// Booked by [`count_completion_request`], which wraps the matched route rather than the body
@@ -263,7 +321,6 @@ pub fn preseed(providers: &[String]) {
         }
         for family in [
             "inference_router_cost_events_unlicensed_total",
-            "inference_router_cost_usd_unlicensed_total",
             "inference_router_cost_tokens_unlicensed_total",
         ] {
             counter!(
@@ -275,6 +332,16 @@ pub fn preseed(providers: &[String]) {
             )
             .increment(0);
         }
+        // Same reason as `record_cost_unlicensed`: fractional dollars need the gauge kind, and
+        // registering it here with the same kind keeps one `# TYPE` per metric name.
+        gauge!(
+            "inference_router_cost_usd_unlicensed_total",
+            "service_key" => SERVICE_KEY,
+            "provider" => provider.to_string(),
+            "caller" => LABEL_UNKNOWN,
+            "worker" => LABEL_UNKNOWN
+        )
+        .increment(0.0);
         counter!(
             "inference_router_cost_events_unattributed_total",
             "service_key" => SERVICE_KEY,
