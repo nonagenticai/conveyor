@@ -68,6 +68,21 @@ impl Refusal {
     }
 }
 
+/// The refusal the pinned path returns when the SAME provider answers blank twice.
+///
+/// The reference retries a blank pinned completion exactly once and then refuses; a ground-truth
+/// provider is exempt and its blank answer is served. Byte-for-byte the reference's envelope.
+pub fn empty_completion_refusal() -> Refusal {
+    Refusal {
+        status: StatusCode::BAD_GATEWAY,
+        body: serde_json::json!({"error": {
+            "message": "upstream returned an empty completion",
+            "type": "upstream_empty_completion",
+        }}),
+        headers: vec![(CLASSIFICATION_HEADER, "upstream_empty_response".to_owned())],
+    }
+}
+
 impl axum::response::IntoResponse for Refusal {
     fn into_response(self) -> axum::response::Response {
         let mut response = (self.status, axum::Json(self.body)).into_response();
@@ -492,44 +507,73 @@ impl RouterService {
                 served_hop: None,
             };
         };
-        let started = Instant::now();
-        let result = provider.complete(request, model_override).await;
-        attempts.push(attempt_of(name, model_override, started, &result));
-        let response = match result {
-            Ok(upstream) => {
-                let mut response = upstream.response;
-                response.served_provider = Some(name.to_owned());
-                Ok(response)
-            }
-            Err(error) => {
-                if let UpstreamError::BadRequest { message, .. } = &error {
-                    // A 400 is the REQUEST's fault: pass the upstream's own reason through.
+        let ground_truth = self
+            .catalog
+            .provider(name)
+            .is_some_and(|entry| entry.ground_truth);
+        let mut blank_retried = false;
+        loop {
+            let started = Instant::now();
+            let result = provider.complete(request, model_override).await;
+            attempts.push(attempt_of(name, model_override, started, &result));
+            match result {
+                Ok(upstream) => {
+                    let mut response = upstream.response;
+                    // The reference retries a blank pinned completion once against the SAME
+                    // provider, refuses a second blank, and never retries ground truth.
+                    let blank = !ground_truth
+                        && matches!(
+                            crate::empty::completion_reason(&response),
+                            Some(crate::empty::EmptyReason::Blank)
+                        )
+                        && crate::empty::every_choice_blank(&response);
+                    if blank {
+                        if blank_retried {
+                            return CompletionOutcome {
+                                response: Err(empty_completion_refusal()),
+                                attempts,
+                                served_hop: None,
+                            };
+                        }
+                        blank_retried = true;
+                        continue;
+                    }
+                    response.served_provider = Some(name.to_owned());
                     return CompletionOutcome {
-                        response: Err(Refusal::openai(
-                            StatusCode::BAD_REQUEST,
-                            message.clone(),
-                            "invalid_request_error",
+                        response: Ok(response),
+                        attempts,
+                        served_hop: None,
+                    };
+                }
+                Err(error) => {
+                    if let UpstreamError::BadRequest { message, .. } = &error {
+                        // A 400 is the REQUEST's fault: pass the upstream's own reason through.
+                        return CompletionOutcome {
+                            response: Err(Refusal::openai(
+                                StatusCode::BAD_REQUEST,
+                                message.clone(),
+                                "invalid_request_error",
+                            )),
+                            attempts,
+                            served_hop: None,
+                        };
+                    }
+                    let status = if matches!(error, UpstreamError::QueueRejected { .. }) {
+                        StatusCode::SERVICE_UNAVAILABLE
+                    } else {
+                        StatusCode::BAD_GATEWAY
+                    };
+                    return CompletionOutcome {
+                        response: Err(Refusal::detail(
+                            status,
+                            format!("Pinned provider '{name}' failed: {}", error.describe()),
+                            error.classification(),
                         )),
                         attempts,
                         served_hop: None,
                     };
                 }
-                let status = if matches!(error, UpstreamError::QueueRejected { .. }) {
-                    StatusCode::SERVICE_UNAVAILABLE
-                } else {
-                    StatusCode::BAD_GATEWAY
-                };
-                Err(Refusal::detail(
-                    status,
-                    format!("Pinned provider '{name}' failed: {}", error.describe()),
-                    error.classification(),
-                ))
             }
-        };
-        CompletionOutcome {
-            response,
-            attempts,
-            served_hop: None,
         }
     }
 
@@ -786,7 +830,7 @@ mod tests {
 
     use super::*;
     use crate::catalog::Catalog;
-    use crate::contract::schemas::{ChatCompletionResponse, ChatMessage, Role, Usage};
+    use crate::contract::schemas::{ChatCompletionResponse, ChatMessage, Choice, Role, Usage};
 
     /// A provider that answers with a fixed response or a fixed error.
     struct Fake {
@@ -806,24 +850,7 @@ mod tests {
         ) -> provider::BoxFuture<'a, Result<provider::UpstreamResponse, UpstreamError>> {
             Box::pin(async move {
                 match &self.answer {
-                    Ok(()) => Ok(provider::UpstreamResponse {
-                        response: ChatCompletionResponse {
-                            choices: vec![],
-                            created: 0,
-                            id: "id".to_owned(),
-                            model: "m".to_owned(),
-                            object: "chat.completion".to_owned(),
-                            provider_request_id: None,
-                            served_model: Some("m".to_owned()),
-                            served_model_root: None,
-                            served_provider: None,
-                            usage: Usage::default(),
-                        },
-                        bodies: provider::UpstreamBodies {
-                            request_text: String::new(),
-                            response_text: String::new(),
-                        },
-                    }),
+                    Ok(()) => Ok(usable_response("the answer")),
                     Err((kind, message)) => match *kind {
                         "status" => Err(UpstreamError::Status {
                             provider: self.name.clone(),
@@ -856,6 +883,38 @@ mod tests {
                     provider: self.name.clone(),
                 })
             })
+        }
+    }
+
+    /// A 200 with one usable choice whose content is `content`.
+    fn usable_response(content: &str) -> provider::UpstreamResponse {
+        provider::UpstreamResponse {
+            response: ChatCompletionResponse {
+                choices: vec![Choice {
+                    finish_reason: "stop".to_owned(),
+                    index: 0,
+                    message: ChatMessage {
+                        content: serde_json::json!(content),
+                        reasoning_content: None,
+                        role: Role::Assistant,
+                        tool_call_id: None,
+                        tool_calls: None,
+                    },
+                }],
+                created: 0,
+                id: "id".to_owned(),
+                model: "m".to_owned(),
+                object: "chat.completion".to_owned(),
+                provider_request_id: None,
+                served_model: Some("m".to_owned()),
+                served_model_root: None,
+                served_provider: None,
+                usage: Usage::default(),
+            },
+            bodies: provider::UpstreamBodies {
+                request_text: String::new(),
+                response_text: String::new(),
+            },
         }
     }
 
@@ -1071,5 +1130,142 @@ default_chain: [pgx-local]
         assert_eq!(outcome.attempts.len(), 1);
         assert!(outcome.attempts[0].failure.is_none());
         assert_eq!(outcome.attempts[0].provider, "pgx-local");
+    }
+
+    /// One scripted upstream answer, in the order the harness consumes it.
+    enum Reply {
+        /// A 200 with whitespace-only content: `EmptyReason::Blank`.
+        Blank,
+        /// A 200 with a real answer.
+        Usable,
+        /// A 200 whose content is `{}`: `EmptyReason::EmptyResult`, not a blank.
+        Vacuous,
+    }
+
+    /// A provider that answers from a script, so a retry sees a different answer than attempt one.
+    struct Scripted {
+        name: String,
+        replies: std::sync::Mutex<std::collections::VecDeque<Reply>>,
+    }
+
+    impl Provider for Scripted {
+        fn name(&self) -> &str {
+            &self.name
+        }
+
+        fn complete<'a>(
+            &'a self,
+            _request: &'a ChatCompletionRequest,
+            _model_override: Option<&'a str>,
+        ) -> provider::BoxFuture<'a, Result<provider::UpstreamResponse, UpstreamError>> {
+            Box::pin(async move {
+                let reply = self
+                    .replies
+                    .lock()
+                    .expect("replies")
+                    .pop_front()
+                    .expect("the script ran out of replies");
+                Ok(match reply {
+                    Reply::Blank => usable_response("   "),
+                    Reply::Usable => usable_response("the answer"),
+                    Reply::Vacuous => usable_response("{}"),
+                })
+            })
+        }
+
+        fn stream<'a>(
+            &'a self,
+            _request: &'a ChatCompletionRequest,
+            _model_override: Option<&'a str>,
+        ) -> provider::BoxFuture<'a, Result<provider::ChunkStream, UpstreamError>> {
+            Box::pin(async move {
+                Err(UpstreamError::Unsupported {
+                    provider: self.name.clone(),
+                })
+            })
+        }
+    }
+
+    fn scripted_service(replies: Vec<Reply>, ground_truth: bool) -> RouterService {
+        let yaml = format!(
+            r#"
+providers:
+  - name: pgx-local
+    enabled: true
+    customer_eligible: true
+    protocol: openai
+    endpoint: http://127.0.0.1:1/v1
+    model: local-llm
+    is_ground_truth: {ground_truth}
+default_chain: [pgx-local]
+"#
+        );
+        let catalog = Catalog::from_yaml(&yaml).expect("catalog");
+        let mut providers: BTreeMap<String, Arc<dyn Provider>> = BTreeMap::new();
+        providers.insert(
+            "pgx-local".to_owned(),
+            Arc::new(Scripted {
+                name: "pgx-local".to_owned(),
+                replies: std::sync::Mutex::new(std::collections::VecDeque::from(replies)),
+            }),
+        );
+        RouterService {
+            catalog,
+            providers,
+            slot_wait: Duration::from_secs(1),
+        }
+    }
+
+    #[tokio::test]
+    async fn a_blank_pinned_completion_is_retried_once_and_the_retry_serves() {
+        let outcome = scripted_service(vec![Reply::Blank, Reply::Usable], false)
+            .complete(&request("local-llm"), Some("pgx-local"), None)
+            .await;
+        let response = outcome.response.expect("the retry served");
+        assert_eq!(response.served_provider.as_deref(), Some("pgx-local"));
+        assert_eq!(outcome.attempts.len(), 2);
+    }
+
+    #[tokio::test]
+    async fn a_second_blank_pinned_completion_is_the_reference_502() {
+        let outcome = scripted_service(vec![Reply::Blank, Reply::Blank], false)
+            .complete(&request("local-llm"), Some("pgx-local"), None)
+            .await;
+        assert_eq!(outcome.attempts.len(), 2, "exactly one retry");
+        let error = outcome.response.expect_err("a second blank is refused");
+        assert_eq!(error.status, StatusCode::BAD_GATEWAY);
+        assert_eq!(
+            error.body,
+            serde_json::json!({"error": {
+                "message": "upstream returned an empty completion",
+                "type": "upstream_empty_completion",
+            }})
+        );
+        assert_eq!(error.headers.len(), 1);
+        assert_eq!(error.headers[0].0, CLASSIFICATION_HEADER);
+        assert_eq!(error.headers[0].1, "upstream_empty_response");
+    }
+
+    #[tokio::test]
+    async fn an_empty_result_is_not_retried() {
+        // The queue's `Usable` reply is never reached: a vacuous `{}` is a 200 answer, not a blank.
+        let outcome = scripted_service(vec![Reply::Vacuous, Reply::Usable], false)
+            .complete(&request("local-llm"), Some("pgx-local"), None)
+            .await;
+        assert!(outcome.response.is_ok());
+        assert_eq!(outcome.attempts.len(), 1);
+        assert_eq!(outcome.attempts[0].outcome, OUTCOME_EMPTY_RESULT);
+    }
+
+    #[tokio::test]
+    async fn a_ground_truth_blank_is_served_not_retried() {
+        let outcome = scripted_service(vec![Reply::Blank, Reply::Usable], true)
+            .complete(&request("local-llm"), Some("pgx-local"), None)
+            .await;
+        let response = outcome
+            .response
+            .expect("a ground-truth blank is the answer");
+        assert_eq!(response.served_provider.as_deref(), Some("pgx-local"));
+        assert_eq!(outcome.attempts.len(), 1, "the flag suppresses the retry");
     }
 }

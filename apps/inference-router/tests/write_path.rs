@@ -60,7 +60,8 @@ async fn stub_provider() -> std::net::SocketAddr {
 }
 
 /// A provider that answers 200 with a usable payload but no content at all: a `Blank` attempt that
-/// still reports usage. The caller gets this answer (P2 has no retry/refusal yet).
+/// still reports usage. The live catalog marks this provider ground truth, so P3's pinned retry
+/// does not fire and the caller still receives the blank answer.
 async fn blank_stub_provider() -> std::net::SocketAddr {
     async fn handler(axum::Json(_body): axum::Json<Value>) -> axum::Json<Value> {
         axum::Json(json!({
@@ -301,8 +302,9 @@ async fn a_blank_attempt_is_recorded_as_served_and_still_bills_its_usage() {
         .expect("migrations");
 
     let address = blank_stub_provider().await;
+    // Ground truth: the reference does not retry this provider's blank answer, it serves it.
     let catalog = Catalog::from_yaml(&format!(
-        "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: stub-model\n    model_aliases:\n      stub-model: stub-model\ndefault_chain: [stub-openai]\n"
+        "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: stub-model\n    is_ground_truth: true\n    model_aliases:\n      stub-model: stub-model\ndefault_chain: [stub-openai]\n"
     ))
     .expect("catalog");
     let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
@@ -328,14 +330,17 @@ async fn a_blank_attempt_is_recorded_as_served_and_still_bills_its_usage() {
         )
         .await
         .expect("router answers");
-    // P2 parses and bills only: the caller still receives the blank answer.
+    // A ground-truth provider's blank is not retried: the caller receives it, so it served.
     assert_eq!(response.status(), axum::http::StatusCode::OK);
 
     let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM inference_call")
         .fetch_one(&db.pool)
         .await
         .expect("count");
-    assert_eq!(rows, 1, "the blank answer was returned, so it is the served row");
+    assert_eq!(
+        rows, 1,
+        "the blank answer was returned, so it is the served row"
+    );
 
     // It is still an attempt that spent tokens, so it is still billed its own usage.
     let events = recorder.0.lock().expect("recorder");
