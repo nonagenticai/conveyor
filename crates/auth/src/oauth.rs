@@ -117,9 +117,9 @@ impl ClientCredentials {
         if client_secret.trim().is_empty() {
             return Err(TokenError::Unconfigured("SERVICE_CLIENT_SECRET"));
         }
-        if !(token_url.starts_with("http://") || token_url.starts_with("https://")) {
+        if !crate::url::is_secure_service_url(token_url) {
             return Err(TokenError::Unconfigured(
-                "SERVICE_TOKEN_URL (not an http(s) URL)",
+                "SERVICE_TOKEN_URL (not an https URL)",
             ));
         }
         let http = reqwest::Client::builder()
@@ -270,14 +270,14 @@ mod tests {
         let error = ClientCredentials::new("x/token", "id", "secret").unwrap_err();
         assert_eq!(
             error,
-            TokenError::Unconfigured("SERVICE_TOKEN_URL (not an http(s) URL)")
+            TokenError::Unconfigured("SERVICE_TOKEN_URL (not an https URL)")
         );
     }
 
     #[test]
     fn debug_never_prints_the_secret() {
         let client =
-            ClientCredentials::new("http://x/token", "id", "super-secret-value").expect("client");
+            ClientCredentials::new("https://x/token", "id", "super-secret-value").expect("client");
         let rendered = format!("{client:?}");
         assert!(!rendered.contains("super-secret-value"));
         assert!(rendered.contains("<redacted>"));

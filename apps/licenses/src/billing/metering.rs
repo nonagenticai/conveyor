@@ -138,10 +138,10 @@ impl MeteringProvisioner {
         if base.is_empty() {
             return Err(ServiceError::Unconfigured("METERING_SERVICE_URL"));
         }
-        if !(base.starts_with("http://") || base.starts_with("https://")) {
+        if !conveyor_auth::url::is_secure_service_url(base) {
             return Err(ServiceError::Body {
                 service: "billing",
-                error: format!("base URL {base:?} is not http(s)"),
+                error: format!("base URL {base:?} is not https (loopback http is test-only)"),
             });
         }
         let http = reqwest::Client::builder()
