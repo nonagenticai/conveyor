@@ -584,13 +584,19 @@ impl RouterService {
     ) -> CompletionOutcome {
         let mut attempts = Vec::new();
         let mut last: Option<UpstreamError> = None;
-        for name in chain {
+        // A blank completion is retried once at the REQUEST level: the retry is the next hop when
+        // the chain has one, else the same provider again. A second blank is refused.
+        let mut blank_retried = false;
+        let mut index = 0;
+        while index < chain.len() {
+            let name = &chain[index];
             let Some(provider) = self.providers.get(name) else {
+                index += 1;
                 continue;
             };
-            let model_override = self
-                .catalog
-                .provider(name)
+            let entry = self.catalog.provider(name);
+            let ground_truth = entry.is_some_and(|entry| entry.ground_truth);
+            let model_override = entry
                 .and_then(|entry| entry.model_aliases.get(&request.model))
                 .map(String::as_str);
             let started = Instant::now();
@@ -599,6 +605,27 @@ impl RouterService {
             match result {
                 Ok(upstream) => {
                     let mut response = upstream.response;
+                    let blank = !ground_truth
+                        && matches!(
+                            crate::empty::completion_reason(&response),
+                            Some(crate::empty::EmptyReason::Blank)
+                        )
+                        && crate::empty::every_choice_blank(&response);
+                    if blank {
+                        if blank_retried {
+                            return CompletionOutcome {
+                                response: Err(empty_completion_refusal()),
+                                attempts,
+                                served_hop: None,
+                            };
+                        }
+                        blank_retried = true;
+                        // Advance only when a next hop is reachable; otherwise retry this one.
+                        if index + 1 < chain.len() {
+                            index += 1;
+                        }
+                        continue;
+                    }
                     response.served_provider = Some(name.clone());
                     return CompletionOutcome {
                         response: Ok(response),
@@ -608,6 +635,7 @@ impl RouterService {
                 }
                 Err(error) => {
                     last = Some(error);
+                    index += 1;
                 }
             }
         }
@@ -636,7 +664,9 @@ impl RouterService {
     /// Dispatch a policy-routed request through the resolved hops, in order.
     ///
     /// A hop that fails is followed only when the policy says `failover_on_error`; otherwise the
-    /// chain stops there and the caller sees the 503. Every attempt is recorded either way.
+    /// chain stops there and the caller sees the 503. A blank completion is retried once — on the
+    /// next hop when it fails over and one exists, else on the same hop — and a second blank is
+    /// the reference 502. Every attempt is recorded either way.
     async fn complete_policy(
         &self,
         hops: &[ResolvedHop],
@@ -644,22 +674,48 @@ impl RouterService {
     ) -> CompletionOutcome {
         let mut attempts = Vec::new();
         let mut last: Option<UpstreamError> = None;
-        for hop in hops {
-            let Some(provider) = self.providers.get(&hop.hop.target.provider) else {
+        // A blank completion is retried once at the REQUEST level: the next hop when the policy
+        // fails over and another hop exists, else the SAME hop again. A second blank is refused.
+        let mut blank_retried = false;
+        let mut index = 0;
+        while index < hops.len() {
+            let hop = &hops[index];
+            let provider_name = &hop.hop.target.provider;
+            let Some(provider) = self.providers.get(provider_name) else {
+                index += 1;
                 continue;
             };
+            let ground_truth = self
+                .catalog
+                .provider(provider_name)
+                .is_some_and(|entry| entry.ground_truth);
             let model_override = Some(hop.hop.model.as_str());
             let started = Instant::now();
             let result = provider.complete(request, model_override).await;
-            attempts.push(attempt_of(
-                &hop.hop.target.provider,
-                model_override,
-                started,
-                &result,
-            ));
+            attempts.push(attempt_of(provider_name, model_override, started, &result));
             match result {
                 Ok(upstream) => {
                     let mut response = upstream.response;
+                    let blank = !ground_truth
+                        && matches!(
+                            crate::empty::completion_reason(&response),
+                            Some(crate::empty::EmptyReason::Blank)
+                        )
+                        && crate::empty::every_choice_blank(&response);
+                    if blank {
+                        if blank_retried {
+                            return CompletionOutcome {
+                                response: Err(empty_completion_refusal()),
+                                attempts,
+                                served_hop: None,
+                            };
+                        }
+                        blank_retried = true;
+                        if hop.hop.failover_on_error && index + 1 < hops.len() {
+                            index += 1;
+                        }
+                        continue;
+                    }
                     response.served_provider = Some(hop.hop.target.provider.clone());
                     return CompletionOutcome {
                         response: Ok(response),
@@ -681,6 +737,7 @@ impl RouterService {
                     if !failover {
                         break;
                     }
+                    index += 1;
                 }
             }
         }
@@ -1267,5 +1324,182 @@ default_chain: [pgx-local]
             .expect("a ground-truth blank is the answer");
         assert_eq!(response.served_provider.as_deref(), Some("pgx-local"));
         assert_eq!(outcome.attempts.len(), 1, "the flag suppresses the retry");
+    }
+
+    /// A service whose default chain is `providers` in order, each answering from its own script.
+    /// `ground_truth` names the one provider flagged ground truth, if any.
+    fn scripted_chain_service(
+        providers: Vec<(&str, Vec<Reply>)>,
+        ground_truth: Option<&str>,
+    ) -> RouterService {
+        let entries: String = providers
+            .iter()
+            .map(|(name, _)| {
+                let flag = if ground_truth == Some(*name) {
+                    "    is_ground_truth: true\n"
+                } else {
+                    ""
+                };
+                format!(
+                    "  - name: {name}\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://127.0.0.1:1/v1\n    model: {name}-model\n{flag}"
+                )
+            })
+            .collect();
+        let chain = providers
+            .iter()
+            .map(|(name, _)| *name)
+            .collect::<Vec<_>>()
+            .join(", ");
+        let catalog =
+            Catalog::from_yaml(&format!("providers:\n{entries}default_chain: [{chain}]\n"))
+                .expect("catalog");
+        let mut map: BTreeMap<String, Arc<dyn Provider>> = BTreeMap::new();
+        for (name, replies) in providers {
+            map.insert(
+                name.to_owned(),
+                Arc::new(Scripted {
+                    name: name.to_owned(),
+                    replies: std::sync::Mutex::new(std::collections::VecDeque::from(replies)),
+                }),
+            );
+        }
+        RouterService {
+            catalog,
+            providers: map,
+            slot_wait: Duration::from_secs(1),
+        }
+    }
+
+    fn resolved_hop(
+        index: i16,
+        provider: &str,
+        failover_on_error: bool,
+    ) -> crate::policy::ResolvedHop {
+        crate::policy::ResolvedHop {
+            index,
+            hop: crate::policy::Hop {
+                target: crate::policy::Target {
+                    kind: "platform".to_owned(),
+                    provider: provider.to_owned(),
+                },
+                model: "local-llm".to_owned(),
+                failover_on_error,
+                failover_on_validation: false,
+            },
+        }
+    }
+
+    #[tokio::test]
+    async fn a_blank_chain_completion_is_retried_once_on_the_next_hop() {
+        let outcome = scripted_chain_service(
+            vec![("alpha", vec![Reply::Blank]), ("beta", vec![Reply::Usable])],
+            None,
+        )
+        .complete(&request("some-worker-name"), None, None)
+        .await;
+        let response = outcome.response.expect("the next hop served");
+        assert_eq!(response.served_provider.as_deref(), Some("beta"));
+        assert_eq!(outcome.attempts.len(), 2);
+    }
+
+    #[tokio::test]
+    async fn a_second_blank_chain_completion_is_the_reference_502() {
+        // One provider: the retry lands on the same provider, and a second blank ends it.
+        let outcome =
+            scripted_chain_service(vec![("alpha", vec![Reply::Blank, Reply::Blank])], None)
+                .complete(&request("some-worker-name"), None, None)
+                .await;
+        assert_eq!(outcome.attempts.len(), 2, "exactly one retry");
+        let error = outcome.response.expect_err("a second blank is refused");
+        assert_eq!(error.status, StatusCode::BAD_GATEWAY);
+        assert_eq!(
+            error.body,
+            serde_json::json!({"error": {
+                "message": "upstream returned an empty completion",
+                "type": "upstream_empty_completion",
+            }})
+        );
+        assert_eq!(error.headers[0].1, "upstream_empty_response");
+    }
+
+    #[tokio::test]
+    async fn the_blank_retry_is_request_level_across_chain_hops() {
+        // alpha blanks and beta blanks: blank_retried is request-level, so gamma is never reached.
+        let outcome = scripted_chain_service(
+            vec![
+                ("alpha", vec![Reply::Blank]),
+                ("beta", vec![Reply::Blank]),
+                ("gamma", vec![Reply::Usable]),
+            ],
+            None,
+        )
+        .complete(&request("some-worker-name"), None, None)
+        .await;
+        assert_eq!(outcome.attempts.len(), 2);
+        let error = outcome.response.expect_err("the second blank is refused");
+        assert_eq!(error.status, StatusCode::BAD_GATEWAY);
+    }
+
+    #[tokio::test]
+    async fn a_ground_truth_chain_blank_is_served_not_retried() {
+        let outcome = scripted_chain_service(
+            vec![("alpha", vec![Reply::Blank]), ("beta", vec![Reply::Usable])],
+            Some("alpha"),
+        )
+        .complete(&request("some-worker-name"), None, None)
+        .await;
+        let response = outcome
+            .response
+            .expect("a ground-truth blank is the answer");
+        assert_eq!(response.served_provider.as_deref(), Some("alpha"));
+        assert_eq!(outcome.attempts.len(), 1, "the flag suppresses the retry");
+    }
+
+    #[tokio::test]
+    async fn a_blank_policy_hop_fails_over_to_the_next_hop() {
+        let service = scripted_chain_service(
+            vec![("alpha", vec![Reply::Blank]), ("beta", vec![Reply::Usable])],
+            None,
+        );
+        let hops = vec![
+            resolved_hop(0, "alpha", true),
+            resolved_hop(1, "beta", true),
+        ];
+        let outcome = service
+            .complete_policy(&hops, &request("some-worker-name"))
+            .await;
+        let response = outcome.response.expect("the next hop served");
+        assert_eq!(response.served_provider.as_deref(), Some("beta"));
+        assert_eq!(outcome.attempts.len(), 2);
+        let served = outcome.served_hop.expect("a served hop");
+        assert_eq!(served.index, 1);
+        assert_eq!(served.reason, "failover_error");
+    }
+
+    #[tokio::test]
+    async fn a_blank_policy_hop_without_failover_is_retried_itself() {
+        let service =
+            scripted_chain_service(vec![("alpha", vec![Reply::Blank, Reply::Usable])], None);
+        let hops = vec![resolved_hop(0, "alpha", false)];
+        let outcome = service
+            .complete_policy(&hops, &request("some-worker-name"))
+            .await;
+        let response = outcome.response.expect("the retry served");
+        assert_eq!(response.served_provider.as_deref(), Some("alpha"));
+        assert_eq!(outcome.attempts.len(), 2);
+        let served = outcome.served_hop.expect("a served hop");
+        assert_eq!(served.index, 0);
+        assert_eq!(served.reason, "first");
+
+        // A second blank on that retry is the reference 502, not a third attempt.
+        let service =
+            scripted_chain_service(vec![("alpha", vec![Reply::Blank, Reply::Blank])], None);
+        let hops = vec![resolved_hop(0, "alpha", false)];
+        let outcome = service
+            .complete_policy(&hops, &request("some-worker-name"))
+            .await;
+        assert_eq!(outcome.attempts.len(), 2);
+        let error = outcome.response.expect_err("a second blank is refused");
+        assert_eq!(error.status, StatusCode::BAD_GATEWAY);
     }
 }
