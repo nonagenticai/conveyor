@@ -184,7 +184,7 @@ async fn public_bytes_are_redacted_and_inert() {
     assert!(page.contains("&lt;img"), "{page}");
     assert!(!page.to_ascii_lowercase().contains("javascript:"), "{page}");
     assert!(!page.contains("alice@example.com"), "{page}");
-    assert!(!page.contains(token), "{page}");
+    assert!(!page.contains(&token), "{page}");
     assert!(page.contains("[redacted-token]"), "{page}");
 
     let index = get(&running, "/design/docs/outputs.js")
@@ -192,7 +192,7 @@ async fn public_bytes_are_redacted_and_inert() {
         .text()
         .await
         .expect("index");
-    assert!(!index.contains(token), "{index}");
+    assert!(!index.contains(&token), "{index}");
     assert!(index.contains("[redacted-token]"), "{index}");
 }
 
