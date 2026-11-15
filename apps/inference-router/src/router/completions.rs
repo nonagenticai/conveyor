@@ -355,10 +355,30 @@ fn capture_allowed(headers: &HeaderMap, allowlist: &[String]) -> bool {
     !app_id.is_empty() && allowlist.iter().any(|caller| caller.trim() == app_id)
 }
 
+/// Write one ledger row, booking a refused write onto the write-failure family.
+///
+/// `db_error` is the reference's insert/commit failure (`inference_ledger.py:717`);
+/// `db_not_initialised` is its missing-session-factory outcome (`:619`), which in this port is the
+/// absent pool only unit and health builds have. The reference's other two reasons are NOT
+/// simulated, because their mechanisms do not exist here: `backpressure` needs its bounded
+/// in-flight task set, and `stream_capture` needs its swallowed `on_finish` finaliser. Both writes
+/// in this port are awaited inline in the request path, so neither can fail independently; the two
+/// pre-seeded series stay, so "always zero" is distinguishable from "never registered".
+async fn write_ledger(state: &AppState, row: &LedgerRow) {
+    let Some(pool) = state.deps().ledger.as_ref() else {
+        crate::metrics::record_write_failed("db_not_initialised");
+        return;
+    };
+    if let Err(error) = ledger::insert(pool, row).await {
+        crate::metrics::record_write_failed("db_error");
+        tracing::warn!(%error, "inference ledger write failed");
+    }
+}
+
 /// One ledger row for the served attempt, and one cost event per attempt.
 ///
-/// Both failures are logged and dropped: the reference never turns a write-path problem into a
-/// failed inference, and neither does this port.
+/// Both failures are booked, logged and dropped: the reference never turns a write-path problem
+/// into a failed inference, and neither does this port.
 async fn record(
     state: &AppState,
     context: CallContext,
@@ -380,9 +400,7 @@ async fn record(
     // selection.
     let served_attempt = served.and(outcome.attempts.last());
 
-    if let (Some(pool), Some(response), Some(attempt)) =
-        (state.deps().ledger.as_ref(), served, served_attempt)
-    {
+    if let (Some(response), Some(attempt)) = (served, served_attempt) {
         let row = LedgerRow::served(
             &context,
             request,
@@ -390,10 +408,8 @@ async fn record(
             attempt.bodies.as_ref(),
             attempt.latency.as_millis() as i64,
         );
-        if let Err(error) = ledger::insert(pool, &row).await {
-            tracing::warn!(%error, "inference ledger write failed");
-        }
-    } else if let (Some(pool), Err(refusal)) = (state.deps().ledger.as_ref(), &outcome.response) {
+        write_ledger(state, &row).await;
+    } else if let Err(refusal) = &outcome.response {
         // A request that reached a provider is a call the estate paid for, even when the answer is
         // refused — the reference records it (measured 2026-11-15 from the contract oracle: the
         // second-blank refusal lands a row with status '502' and no response columns). A refusal
@@ -411,9 +427,7 @@ async fn record(
                 &refusal.status.as_u16().to_string(),
                 latency_ms,
             );
-            if let Err(error) = ledger::insert(pool, &row).await {
-                tracing::warn!(%error, "inference ledger write failed");
-            }
+            write_ledger(state, &row).await;
         }
     }
 
@@ -795,31 +809,27 @@ async fn finalise_stream(
     status: &'static str,
 ) {
     let latency = started.elapsed().as_millis() as i64;
-    if let Some(pool) = state.deps().ledger.as_ref() {
-        let response_sha256 = capture.response_sha256();
-        let row = LedgerRow::streamed(
-            &context,
-            &request,
-            StreamRow {
-                served_provider: capture.served_provider.as_deref(),
-                served_model: capture.served_model.as_deref(),
-                finish_reason: capture.finish_reason(),
-                response_sha256: response_sha256.as_deref(),
-                response_json_valid: capture.response_json_valid(),
-                status: if status == STREAM_COMPLETED {
-                    "ok"
-                } else {
-                    "error"
-                }
-                .to_owned(),
-                stream_status: Some(status),
-            },
-            latency,
-        );
-        if let Err(error) = ledger::insert(pool, &row).await {
-            tracing::warn!(%error, "inference ledger write failed");
-        }
-    }
+    let response_sha256 = capture.response_sha256();
+    let row = LedgerRow::streamed(
+        &context,
+        &request,
+        StreamRow {
+            served_provider: capture.served_provider.as_deref(),
+            served_model: capture.served_model.as_deref(),
+            finish_reason: capture.finish_reason(),
+            response_sha256: response_sha256.as_deref(),
+            response_json_valid: capture.response_json_valid(),
+            status: if status == STREAM_COMPLETED {
+                "ok"
+            } else {
+                "error"
+            }
+            .to_owned(),
+            stream_status: Some(status),
+        },
+        latency,
+    );
+    write_ledger(&state, &row).await;
     let served_attempt = attempts
         .iter()
         .rposition(|attempt| attempt.failure.is_none());
@@ -873,25 +883,21 @@ async fn record_unopened_stream(
     started: Instant,
 ) {
     let latency = started.elapsed().as_millis() as i64;
-    if let Some(pool) = state.deps().ledger.as_ref() {
-        let row = LedgerRow::streamed(
-            &context,
-            request,
-            StreamRow {
-                served_provider: None,
-                served_model: None,
-                finish_reason: None,
-                response_sha256: None,
-                response_json_valid: None,
-                status: status.as_u16().to_string(),
-                stream_status: None,
-            },
-            latency,
-        );
-        if let Err(error) = ledger::insert(pool, &row).await {
-            tracing::warn!(%error, "inference ledger write failed");
-        }
-    }
+    let row = LedgerRow::streamed(
+        &context,
+        request,
+        StreamRow {
+            served_provider: None,
+            served_model: None,
+            finish_reason: None,
+            response_sha256: None,
+            response_json_valid: None,
+            status: status.as_u16().to_string(),
+            stream_status: None,
+        },
+        latency,
+    );
+    write_ledger(state, &row).await;
     let caller = crate::metrics::caller_label(context.app_id.as_deref());
     for (index, attempt) in attempts.iter().enumerate() {
         crate::metrics::record_attempt(

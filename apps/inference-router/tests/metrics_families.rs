@@ -692,6 +692,89 @@ async fn serve_one(router: Router) -> StatusCode {
         .status()
 }
 
+// ── the ledger write-failure family ────────────────────────────────────────────────────────
+//
+// The reference books this family for a dropped ledger row. This port awaits every write inline,
+// so only the two reachable reasons move: `db_error` (the insert failed) and `db_not_initialised`
+// (no pool, which unit and health deps have). `backpressure` and `stream_capture` have no
+// mechanism here; their pre-seeded series stay at zero. The recorder is process-wide and these
+// tests run in parallel, so every assertion is movement (`after > before`), never an absolute
+// value.
+
+const WRITE_FAILED: &str = "inference_router_inference_call_write_failed_total";
+
+fn write_failed_series(body: &str, reason: &str) -> Option<f64> {
+    series_value(body, WRITE_FAILED, &[("reason", reason)])
+}
+
+/// [`configured`] with a ledger pool injected. The pool must be lazy: the test never wants a
+/// database, only an insert that fails.
+fn configured_with_ledger(
+    provider: &str,
+    address: std::net::SocketAddr,
+    ledger: sqlx::PgPool,
+) -> Router {
+    let catalog = Catalog::from_yaml(&format!(
+        "providers:\n  - name: {provider}\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: metric-model\ndefault_chain: [{provider}]\n"
+    ))
+    .expect("catalog");
+    preseed(&[]);
+    let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
+    let state = AppState::with_deps(
+        Config::from_lookup(|_| None).expect("defaults"),
+        router,
+        AppDeps {
+            ledger: Some(ledger),
+            ..AppDeps::default()
+        },
+    );
+    api_router(state)
+}
+
+#[tokio::test]
+async fn an_absent_ledger_pool_books_db_not_initialised() {
+    let address = stub_provider("write-failed-uninitialised").await;
+    let router = configured("stub-metrics-uninitialised", address);
+
+    let before = write_failed_series(&scrape().await, "db_not_initialised")
+        .expect("the family is pre-seeded");
+    assert_eq!(serve_one(router).await, StatusCode::OK);
+    let after = write_failed_series(&scrape().await, "db_not_initialised")
+        .expect("the family is pre-seeded");
+
+    assert!(
+        after > before,
+        "a served completion with no ledger pool must book db_not_initialised: {before} -> {after}"
+    );
+}
+
+#[tokio::test]
+async fn a_failing_ledger_insert_books_db_error() {
+    // A lazily connected pool aimed at a port nothing listens on: the insert fails without a
+    // database, and the acquire timeout bounds the wait if the connect is ever slow.
+    let port = {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind");
+        listener.local_addr().expect("address").port()
+    };
+    let pool = sqlx::postgres::PgPoolOptions::new()
+        .acquire_timeout(Duration::from_millis(500))
+        .connect_lazy(&format!("postgres://unused:unused@127.0.0.1:{port}/unused"))
+        .expect("lazy pool");
+
+    let address = stub_provider("write-failed-db-error").await;
+    let router = configured_with_ledger("stub-metrics-db-error", address, pool);
+
+    let before =
+        write_failed_series(&scrape().await, "db_error").expect("the family is pre-seeded");
+    assert_eq!(serve_one(router).await, StatusCode::OK);
+    let after = write_failed_series(&scrape().await, "db_error").expect("the family is pre-seeded");
+
+    assert!(
+        after > before,
+        "a refused ledger insert must book db_error: {before} -> {after}"
+    );
+}
+
 #[tokio::test]
 async fn an_undelivered_cost_event_leaves_the_token_families_at_zero() {
     let address = stub_provider("undelivered").await;

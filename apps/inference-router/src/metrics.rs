@@ -292,6 +292,22 @@ pub fn record_license_introspection(outcome: &str, enforced: bool, caller: &str,
     .increment(1);
 }
 
+/// Book ONE dropped ledger row onto the alert-keyed write-failure family.
+///
+/// `reason` is the reference's closed set — `db_error` | `db_not_initialised` | `backpressure` |
+/// `stream_capture`, pre-seeded below. Only the first two are reachable in this port: every ledger
+/// write is awaited inline in the request path, so the reference's bounded in-flight task set (its
+/// `backpressure`) and its swallowed `on_finish` finaliser (its `stream_capture`) have no
+/// counterpart here. Their series stay pre-seeded, so a scrape can tell "always zero" from "this
+/// build never registered the instrument".
+pub fn record_write_failed(reason: &str) {
+    counter!(
+        "inference_router_inference_call_write_failed_total",
+        "reason" => reason.to_owned()
+    )
+    .increment(1);
+}
+
 /// The route layer over both completion paths: count a matched POST, then pass the request through
 /// untouched.
 ///
