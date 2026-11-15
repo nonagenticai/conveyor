@@ -185,7 +185,10 @@ mod tests {
                 // T0: the organisation spine — industry and the department placement, job
                 // catalogue, immutable release, binding, the card/run pins, and the
                 // decision-ladder tables (0040_organisation.sql, SPEC_V2 §4, §10.3, §12 T0).
-                (40, "organisation".to_owned())
+                (40, "organisation".to_owned()),
+                // #144 (ADR 0007 §Decision 3–4): `runner_run` — one row per dispatched attempt —
+                // and `runner_artefact`, the manifest a polled result is checked against.
+                (41, "runner".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
