@@ -144,7 +144,13 @@ async fn seeded() -> sqlx::PgPool {
         .await
         .expect("migrations");
     seed(&db.pool).await;
-    db.pool.clone()
+    let pool = db.pool.clone();
+    // The database must outlive this helper — every test here keeps using the pool after it
+    // returns, and `TestDb::drop` would remove the database under the running test. This is the one
+    // deliberate exception to the drop-on-end rule in this crate's harness; it costs one database
+    // per test in this file, and the container removes it at process exit.
+    std::mem::forget(db);
+    pool
 }
 
 #[tokio::test]

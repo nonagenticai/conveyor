@@ -1,0 +1,12 @@
+{
+  "service": "webscraper",
+  "captured_at": "2026-11-14T21:00:45Z",
+  "source_commit": "d5221b8",
+  "image_digest": "",
+  "lock_sha256": "8d0470a97f316a7191099663f7790f1b9421feca0cd625354c8035bdd259d7f4",
+  "openapi": "3.1.0",
+  "paths": 6,
+  "schemas": 17,
+  "operations": 6,
+  "dropped": []
+}

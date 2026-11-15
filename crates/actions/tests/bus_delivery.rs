@@ -253,9 +253,16 @@ async fn a_flushall_replays_from_postgres_without_a_double_outcome() {
     conveyor_store::seed::catalogue(&pg.owner)
         .await
         .expect("the catalogue seed");
-    let running = support::Running::start(&pg).await;
-    let bus = support::redis::bus().await;
-    bus.flush_all().await.expect("flush the shared test Redis");
+    // This test's own Redis: `flush_all` is server-wide, and on the shared one it deleted every
+    // sibling test's consumer groups mid-run (measured 2026-11-15, `NOGROUP` in
+    // `a_large_job_round_trips_intact`, in CI as well as locally).
+    let redis_url = support::redis::private_url().await;
+    let running =
+        support::Running::start_with_config(support::config_with_redis(&pg, &redis_url)).await;
+    let bus = conveyor_bus::Bus::connect(&redis_url)
+        .await
+        .expect("connect to this test's Redis");
+    bus.flush_all().await.expect("flush this test's Redis");
 
     // A project, a card, and a two-step process run: starting it writes the first
     // `run_step.requested` event and its `process.step` job.

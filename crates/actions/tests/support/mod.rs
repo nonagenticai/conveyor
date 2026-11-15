@@ -187,6 +187,8 @@ pub struct Pg {
     pub runtime_url: String,
     pub owner_url: String,
     pub name: String,
+    /// The shared server's admin URL, so `Drop` can remove the database it created.
+    pub server_base: String,
 }
 
 impl Pg {
@@ -242,7 +244,38 @@ impl Pg {
             runtime_url,
             owner_url,
             name,
+            server_base: server.base.clone(),
         }
+    }
+}
+
+/// Drop the database the test created — see the same impl in `apps/server/tests/common/mod.rs`
+/// for the measurement that made this necessary: with `TEST_DATABASE_URL` set (which
+/// `scripts/ci/gate.sh` does) every binary shares one server and nothing dropped its databases, so
+/// the gate's Postgres filled up mid-run.
+impl Drop for Pg {
+    fn drop(&mut self) {
+        let base = self.server_base.clone();
+        let name = self.name.clone();
+        let _ = std::thread::spawn(move || {
+            let Ok(rt) = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+            else {
+                return;
+            };
+            rt.block_on(async move {
+                if let Ok(admin) = PgPool::connect(&base).await {
+                    let _ = sqlx::query(AssertSqlSafe(format!(
+                        "DROP DATABASE IF EXISTS \"{name}\" WITH (FORCE)"
+                    )))
+                    .execute(&admin)
+                    .await;
+                    admin.close().await;
+                }
+            });
+        })
+        .join();
     }
 }
 
@@ -367,6 +400,26 @@ pub fn config(pg: &Pg) -> Config {
         "CONVEYOR_DEV_AUTH" => Some("1".into()),
         "BIND_ADDR" => Some("127.0.0.1:0".into()),
         "APP_KEY" => Some("conveyor".into()),
+        _ => None,
+    })
+    .expect("test config")
+}
+
+/// [`config`] with the app pointed at a caller-supplied Redis.
+///
+/// The flush test needs this: `FLUSHALL` is server-wide, so a test that wipes Redis must own the
+/// server the app under test is using, or it wipes every sibling test's streams mid-run.
+pub fn config_with_redis(pg: &Pg, redis_url: &str) -> Config {
+    let runtime_url = pg.runtime_url.clone();
+    let owner_url = pg.owner_url.clone();
+    let redis_url = redis_url.to_owned();
+    Config::from_lookup(move |key| match key {
+        "DATABASE_URL" | "DATABASE_LISTEN_URL" => Some(runtime_url.clone()),
+        "DATABASE_MIGRATE_URL" => Some(owner_url.clone()),
+        "CONVEYOR_DEV_AUTH" => Some("1".into()),
+        "BIND_ADDR" => Some("127.0.0.1:0".into()),
+        "APP_KEY" => Some("conveyor".into()),
+        "REDIS_URL" => Some(redis_url.clone()),
         _ => None,
     })
     .expect("test config")
