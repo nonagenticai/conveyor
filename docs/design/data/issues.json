@@ -1,11 +1,28 @@
 {
   "issues": [
     {
+      "number": 127,
+      "title": "design: version the pack's asset URLs so a publish is visible immediately",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/127",
+      "updatedAt": "2026-11-14T23:58:03Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
       "number": 123,
       "title": "programme: the measured truth measures V2 slices (T0 built, not proposed)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/123",
-      "updatedAt": "2026-11-14T22:36:40Z",
+      "updatedAt": "2026-11-14T23:58:10Z",
       "labels": [
         {
           "name": "unit",
@@ -56,7 +73,7 @@
       "title": "P0 \u2014 the programme definition project and its gate",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/120",
-      "updatedAt": "2026-11-14T22:15:48Z",
+      "updatedAt": "2026-11-14T23:30:23Z",
       "labels": [
         {
           "name": "unit",
@@ -284,7 +301,7 @@
       "title": "estate: deploy and cut over the absorbed licenses (P4 + the live shadow window)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/95",
-      "updatedAt": "2026-11-14T11:14:49Z",
+      "updatedAt": "2026-11-15T00:02:33Z",
       "labels": [
         {
           "name": "unit",
@@ -845,24 +862,24 @@
       "title": "estate: absorb billing-service \u2014 contract, Rust rewrite, parity, metering reconciliation, cutover",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/46",
-      "updatedAt": "2026-11-14T07:34:23Z",
+      "updatedAt": "2026-11-15T00:02:26Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
     {
       "number": 45,
       "title": "estate: absorb licenses \u2014 contract, Rust rewrite, parity",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/45",
-      "updatedAt": "2026-11-14T21:29:16Z",
+      "updatedAt": "2026-11-15T00:01:56Z",
       "labels": [
         {
           "name": "unit",
@@ -1332,7 +1349,7 @@
       "title": "CI/ARC \u2014 the archetype rebuild (owned by its own session; do not touch)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/17",
-      "updatedAt": "2026-11-13T19:11:37Z",
+      "updatedAt": "2026-11-15T00:02:34Z",
       "labels": [
         {
           "name": "unit",

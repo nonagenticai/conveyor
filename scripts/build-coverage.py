@@ -45,6 +45,13 @@ MODULE_ALIASES = {
 # A slice with no `adds_*` declarations: its deliverable is a named artefact, so presence is
 # measured directly and the evidence path is checked. No status here is inferred from prose.
 SLICE_EVIDENCE = {
+    # P0 is the programme-definition project: its plan declares no tables/actions/modules, so
+    # its status is the plan's existence plus the definition set's publication (#121/#122).
+    "P0": {
+        "status": "planned",
+        "evidence": ["docs/plans/P0-programme-definition.md"],
+        "gap": "the definition set (#121) and the reuse/architecture pack (#122) are not yet authored",
+    },
     "S00": {
         "status": "built",
         "evidence": ["parity/parity.yaml", "parity/SUMMARY.md"],
@@ -616,6 +623,16 @@ def build(root: pathlib.Path) -> dict:
                 "measured": {"tables": [0, 0], "actions": [0, 0], "modules": [0, 0]},
                 "evidence": [".github/workflows/ci-public.yml", "Dockerfile"],
                 "gap": "standing project; CI and platform work continues",
+            }
+        elif key in SLICE_EVIDENCE:
+            # A cross-cutting project whose deliverable is a named artefact and whose plan
+            # declares no tables/actions/modules (P0 today).
+            override = SLICE_EVIDENCE[key]
+            measured = {
+                "status": override["status"],
+                "measured": {"tables": [0, 0], "actions": [0, 0], "modules": [0, 0]},
+                "evidence": list(override["evidence"]),
+                "gap": override["gap"],
             }
         else:
             measured = {

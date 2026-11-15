@@ -32,6 +32,7 @@
 <ul>
 <li><code>S00</code>–<code>S21</code> — the V1 slice plans in <code>slices/</code> (including the <code>S06a</code>–<code>S06d</code> variants);</li>
 <li><code>T0</code>–<code>T17</code> — the SPEC_V2 slices (<code>docs/SPEC_V2.md</code> §12);</li>
+<li><code>P0</code> — the programme definition (<code>docs/plans/P0-programme-definition.md</code>), the first project and the gate T1–T17 depend on (issues #120–#122);</li>
 <li><code>SPEC-V2</code>, <code>DESIGN-PUBLISH</code>, <code>PLATFORM</code> — the cross-cutting units.</li>
 </ul>
 <p>Each project carries <code>meta.plan</code>, <code>meta.track</code> and <code>meta.issues</code>; each slice plan carries a one-line <code>Programme project:</code> header. <code>migrate --seed</code> installs the programme and its projects idempotently (<code>crates/store/src/seed_programme.rs</code>), and <code>conveyor snapshot</code> publishes the same rows to the public design site.</p>

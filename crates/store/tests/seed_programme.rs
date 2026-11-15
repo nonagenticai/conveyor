@@ -22,7 +22,7 @@ async fn seed_programme_is_idempotent() {
     assert_eq!(first.len(), 1, "one tenant targeted");
     let (slug, counts) = &first[0];
     assert_eq!(slug, "prog");
-    assert_eq!(counts.created, 48, "the programme and its 47 projects");
+    assert_eq!(counts.created, 49, "the programme and its 48 projects");
     assert_eq!(counts.updated, 0);
     assert_eq!(counts.skipped, 0);
 
@@ -32,7 +32,7 @@ async fn seed_programme_is_idempotent() {
     let counts = second[0].1;
     assert_eq!(counts.created, 0, "a second run creates nothing");
     assert_eq!(counts.updated, 0, "a second run updates nothing");
-    assert_eq!(counts.skipped, 48);
+    assert_eq!(counts.skipped, 49);
 
     let programmes: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM programme WHERE tenant_id = $1 AND name = 'conveyor buildout'",
@@ -51,7 +51,7 @@ async fn seed_programme_is_idempotent() {
     .fetch_one(&db.super_pool)
     .await
     .expect("count projects");
-    assert_eq!(projects, 47);
+    assert_eq!(projects, 48);
 
     let versions: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM project
@@ -132,7 +132,7 @@ async fn seed_programme_preserves_meta_the_seed_does_not_own() {
         second[0].1.updated, 0,
         "the seed does not rewrite its own rows"
     );
-    assert_eq!(second[0].1.skipped, 48);
+    assert_eq!(second[0].1.skipped, 49);
 
     let (plan, note): (Option<String>, Option<String>) = sqlx::query_as(
         "SELECT meta ->> 'plan', meta ->> 'owner_note'

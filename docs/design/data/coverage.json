@@ -123,12 +123,12 @@
       },
       "name": "Publish the SPEC_V2 studio design pack, live",
       "parallel_with": [
+        "P0",
         "PLATFORM",
         "S00",
         "S01",
         "SPEC-V2",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/design/STUDIO-SPEC.md",
       "status": "built",
@@ -147,6 +147,53 @@
           103
         ],
         "open": 1,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
+        "docs/plans/P0-programme-definition.md"
+      ],
+      "gap": "the definition set (#121) and the reuse/architecture pack (#122) are not yet authored",
+      "key": "P0",
+      "measured": {
+        "actions": [
+          0,
+          0
+        ],
+        "modules": [
+          0,
+          0
+        ],
+        "tables": [
+          0,
+          0
+        ]
+      },
+      "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",
+      "parallel_with": [
+        "DESIGN-PUBLISH",
+        "PLATFORM",
+        "S00",
+        "S01",
+        "SPEC-V2",
+        "T0"
+      ],
+      "plan": "docs/plans/P0-programme-definition.md",
+      "status": "planned",
+      "track": "programme",
+      "tranche": 0,
+      "units": {
+        "blocked": 2,
+        "claimed": 1,
+        "numbers": [
+          120,
+          121,
+          122
+        ],
+        "open": 3,
         "ready": 0,
         "unknown": 0
       }
@@ -176,19 +223,19 @@
       "name": "CI, runners and platform",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "S00",
         "S01",
         "SPEC-V2",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/plans/development-process-speed.md",
       "status": "standing",
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 7,
-        "claimed": 4,
+        "blocked": 4,
+        "claimed": 1,
         "numbers": [
           17,
           22,
@@ -204,13 +251,10 @@
           102,
           117,
           118,
-          120,
-          121,
-          122,
-          123
+          127
         ],
-        "open": 13,
-        "ready": 2,
+        "open": 9,
+        "ready": 4,
         "unknown": 0
       }
     },
@@ -239,11 +283,11 @@
       "name": "Usage inventory \u2192 parity/parity.yaml",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "PLATFORM",
         "S01",
         "SPEC-V2",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/plans/slices/S00-usage-inventory.md",
       "status": "built",
@@ -282,11 +326,11 @@
       "name": "UI spike \u2014 Leptos CSR vs Leptos SSR",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "PLATFORM",
         "S00",
         "SPEC-V2",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/plans/slices/S01-ui-spike.md",
       "status": "built",
@@ -326,7 +370,8 @@
       },
       "name": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE",
       "parallel_with": [
-        "T1"
+        "T1",
+        "T11"
       ],
       "plan": "docs/plans/slices/S02-skeleton.md",
       "status": "built",
@@ -1343,11 +1388,11 @@
       "name": "SPEC V2 \u2014 the organisational operating model",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "PLATFORM",
         "S00",
         "S01",
-        "T0",
-        "T11"
+        "T0"
       ],
       "plan": "docs/SPEC_V2.md",
       "status": "built",
@@ -1391,11 +1436,11 @@
       "name": "Model and contracts",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "P0",
         "PLATFORM",
         "S00",
         "S01",
-        "SPEC-V2",
-        "T11"
+        "SPEC-V2"
       ],
       "plan": "docs/SPEC_V2.md#12",
       "status": "built",
@@ -1413,7 +1458,9 @@
       }
     },
     {
-      "blocked_by": [],
+      "blocked_by": [
+        "P0"
+      ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -1435,7 +1482,8 @@
       },
       "name": "Plan spine",
       "parallel_with": [
-        "S02"
+        "S02",
+        "T11"
       ],
       "plan": "docs/SPEC_V2.md#12",
       "status": "proposed",
@@ -1454,6 +1502,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T1",
         "T3"
       ],
@@ -1502,7 +1551,9 @@
       }
     },
     {
-      "blocked_by": [],
+      "blocked_by": [
+        "P0"
+      ],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -1524,17 +1575,13 @@
       },
       "name": "Metrics, metering and maturity",
       "parallel_with": [
-        "DESIGN-PUBLISH",
-        "PLATFORM",
-        "S00",
-        "S01",
-        "SPEC-V2",
-        "T0"
+        "S02",
+        "T1"
       ],
       "plan": "docs/SPEC_V2.md#12",
       "status": "proposed",
       "track": "v2",
-      "tranche": 0,
+      "tranche": 1,
       "units": {
         "blocked": 1,
         "claimed": 0,
@@ -1548,6 +1595,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T1",
         "T10",
         "T11",
@@ -1603,6 +1651,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T2"
       ],
       "evidence": [
@@ -1646,6 +1695,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13"
       ],
       "evidence": [
@@ -1694,6 +1744,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13",
         "T6"
       ],
@@ -1735,6 +1786,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13",
         "T2"
       ],
@@ -1784,6 +1836,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T16",
         "T3"
       ],
@@ -1830,6 +1883,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T1"
       ],
       "evidence": [
@@ -1872,6 +1926,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T2"
       ],
       "evidence": [
@@ -1915,6 +1970,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T3"
       ],
       "evidence": [
@@ -1963,6 +2019,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T2"
       ],
       "evidence": [
@@ -2005,6 +2062,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13",
         "T5"
       ],
@@ -2049,6 +2107,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T13",
         "T2",
         "T4"
@@ -2096,6 +2155,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T5"
       ],
       "evidence": [
@@ -2139,6 +2199,7 @@
     },
     {
       "blocked_by": [
+        "P0",
         "T1",
         "T3"
       ],
@@ -2403,13 +2464,13 @@
         "archived": 1,
         "built": 26,
         "partial": 2,
-        "planned": 0,
+        "planned": 1,
         "proposed": 17,
         "standing": 1
       },
-      "total": 47,
+      "total": 48,
       "uncovered": [],
-      "with_open_units": 32,
+      "with_open_units": 33,
       "without_open_units": 15
     },
     "screens": {

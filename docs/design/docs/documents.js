@@ -312,8 +312,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "8a62a18c5f0adb70847481a66387f5fbc846c3f88a1db007d0f2227afffd3d68",
-      "bytes": 248838,
+      "sha256": "8ce6f46cb69a3c63bc1053991ce4f9d426f6374014054e9e502aaed0fa799275",
+      "bytes": 248991,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -387,6 +387,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "7b6c06b72ef3cb4554451e42827a05e6813f58c46c347d0c092f23ee2b6ff917",
       "bytes": 19851,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
+    },
+    {
+      "title": "P0 — Programme definition",
+      "path": "docs/plans/P0-programme-definition.html",
+      "source": "docs/plans/P0-programme-definition.md",
+      "section": "Plans",
+      "sha256": "11781114924d791ebfa317a6411367da7b538315ac52f9c997ebae16d3ee6cb0",
+      "bytes": 5045,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
     },
     {
       "title": "Rust development process: audit and improvement plan",
