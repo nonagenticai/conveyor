@@ -23,6 +23,8 @@ pub struct AppState {
     pub auth: Arc<Authenticator>,
     /// The Platform/billing clients. `None` per service when unconfigured.
     pub services: crate::services::Services,
+    /// The live public design view, built from Postgres and held for a few seconds.
+    pub design: std::sync::Arc<crate::design::DesignCache>,
     pub metrics: Metrics,
 }
 
@@ -49,6 +51,7 @@ impl AppState {
             config: Arc::new(config),
             auth: Arc::new(auth),
             services,
+            design: std::sync::Arc::new(crate::design::DesignCache::new()),
             metrics: Metrics::install(),
         })
     }

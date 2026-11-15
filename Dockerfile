@@ -93,6 +93,10 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-web \
     && cp docs/design/studio.html /out/site/design/index.html
 
 FROM ${BASE_IMAGE} AS runtime
+# The commit this image was built from; the live design snapshot carries it. The public CI
+# passes GITHUB_SHA; a local `docker build` gets "unknown" and the snapshot says so.
+ARG GIT_SHA=unknown
+ENV CONVEYOR_GIT_SHA=${GIT_SHA}
 # ca-certificates: outbound https (rustls platform roots, OIDC JWKS). curl: the HEALTHCHECK.
 # hadolint ignore=DL3008
 RUN apt-get update \

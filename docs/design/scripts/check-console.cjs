@@ -767,8 +767,16 @@ function readBody(req, done) {
       await page.waitForSelector(".page");
       await page.waitForTimeout(300);
       assert.equal(await page.locator("#console-chip").count(), 0, "no chip without a config");
-      assert.match(await page.locator("#main").innerText(), /Work breakdown/, "file:// keeps the WBS default");
-      await page.click('[data-v2="tab"][data-key="plan"][data-value="Boards"]');
+      assert.match(
+        await page.locator("#main").innerText(),
+        /Boards/,
+        "the public plan opens on Boards",
+      );
+      assert.equal(
+        await page.locator('[data-v2="tab"][data-key="plan"][data-value="WBS"]').count(),
+        0,
+        "the WBS study tab is not public",
+      );
       await page.waitForSelector("text=No published snapshot is loaded");
       assert.equal(await page.locator('[data-v2="console-signin"]').count(), 0, "no sign-in without a config");
       assert.equal(
@@ -837,7 +845,11 @@ function readBody(req, done) {
     /* 1c — the public pack with a snapshot: real rows, zero API, contribute units. */
     {
       const page = await browser.newPage();
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(String(error)));
       await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#portfolio`);
+      await page.waitForTimeout(600);
+      assert.deepEqual(errors, [], "no page error on the public live portfolio");
       await page.waitForSelector(".page");
       await page.waitForTimeout(300);
       const portfolioText = await page.locator("#main").innerText();

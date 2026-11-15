@@ -55,6 +55,17 @@ window.installV2 = function (api, enterprise) {
   // fixtures they cover, and the pages with no live source keep the DESIGN ribbon.
   const S = window.CONVEYOR_SNAPSHOT;
   const live = S && S.schema === "design-snapshot/v1" ? S : null;
+  // The V2 product-design study is not part of the public programme site. It stays available
+  // to signed-in operators, and to a reviewer who asks for it explicitly with `?design=1`
+  // (the mode `check-v2.cjs` exercises). Without either, a design destination is a sign-in gate.
+  const designStudy = (() => {
+    try {
+      return new URLSearchParams(window.location.search).has("design");
+    } catch {
+      return false;
+    }
+  })();
+  const studyOn = () => consoleOn() || designStudy;
   const list = (value) => (Array.isArray(value) ? value : []);
   const short = (value, n = 12) => String(value == null ? "" : value).slice(0, n);
   const count = {
@@ -2458,7 +2469,9 @@ window.installV2 = function (api, enterprise) {
   // Signed in, or published with a snapshot, the room is real; offline it stays the design
   // study, clearly labelled PROPOSED.
   function executionPage() {
-    return consoleOn() || live ? consoleExecutionPage() : executionStudy();
+    if (consoleOn() || live) return consoleExecutionPage();
+    if (studyOn()) return executionStudy();
+    return `<div class="page enterprise">${heading("Execution room", "Every run the programme has started: its steps, tools, gates and outputs.", "", "PORTFOLIO & PLAN")}${note("No published snapshot is loaded. The execution room is live-only; sign in at the app origin to read the tenant's runs.")}</div>`;
   }
 
   const projects = () => db.projects.filter((p) => p.programme);
@@ -2472,7 +2485,27 @@ window.installV2 = function (api, enterprise) {
     ((b.value + b.criticality + b.risk) / b.size).toFixed(1);
 
   /* ------------------------------------------------------------------ sidebar */
+  // The public site carries the programme. The V2 design destinations are the operator
+  // console's; they are not announced signed-out and a direct hash gets a sign-in gate.
+  const PUBLIC_PAGES = new Set([
+    "portfolio",
+    "projects",
+    "plan",
+    "validation",
+    "execution",
+    "documents",
+    "contribute",
+    "architecture",
+  ]);
+
+  function publicSidebar() {
+    const projectCount = live ? snapshotProjects().length : 0;
+    return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Public programme<small>conveyor.nonagentic.ai/design</small></span></div><nav>
+      <div class="nav-group"><div class="nav-label">PROGRAMME</div>${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", projectCount)}${N("plan", "Plan &amp; WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("documents", "Documents", "file")}${N("contribute", "Contribute", "grid")}${N("architecture", "System architecture", "model")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>${live ? "LIVE programme" : "No snapshot loaded"}</div></div>`;
+  }
+
   function sidebar() {
+    if (!studyOn()) return publicSidebar();
     const projectCount =
       consoleOn() && cs.projects.length
         ? cs.projects.length
@@ -2623,25 +2656,50 @@ window.installV2 = function (api, enterprise) {
 
   function portfolio() {
     if (consoleOn()) return consolePortfolio();
-    const tab = v.tab.portfolio || "In flight";
-    const scoped = projects().filter((p) => p.programme === v.programme);
-    const rows = scoped.map(
-      (p) =>
-        `<tr><td><strong>${E(p.name)}</strong><small>${E(p.key)} · ${E(p.stream || p.type)}</small></td><td>${E(p.enterprisePhase || p.status)}</td><td><div class="v2-bar"><i style="width:${Math.round(((p.completed || 0) / (p.total || 1)) * 100)}%"></i></div><small>${p.completed || 0} / ${p.total || 0}${p.issues ? ` issues · ${p.cards || 0} cards` : ""}</small></td><td>${B(p.blocks ? p.blocks + " open" : "Clear", p.blocks ? "amber" : "green")}</td><td>${p.live || 0}</td><td>${money(p.spent || 0)}</td></tr>`,
+    if (live) return publicPortfolio();
+    return `<div class="page enterprise">${heading("Portfolio", "The programme's real projects, tranches and linked units, read from Postgres.", "", "PORTFOLIO & PLAN")}${note("No published snapshot is loaded. The public site serves the programme from the database; sign in at the app origin to read it.", "bad")}</div>`;
+  }
+
+  // Signed out, the portfolio is the snapshot's real programme — never the design fixture.
+  function publicPortfolio() {
+    const rows = snapshotProjects();
+    const programme = list((live.programme || {}).programme)[0] || {};
+    const body = rows.map((p) => {
+      const meta = p.meta || {};
+      return `<tr><td><strong>${E(p.name)}</strong><small>${E(p.key)}${p.repo_url ? ` · ${E(p.repo_url)}` : ""}</small></td><td>${E(meta.tranche ?? "—")}</td><td>${B(p.status || "—", p.status === "active" ? "green" : p.status === "closed" ? "" : "amber")}</td><td>${E(meta.measured_status || p.phase_code || "—")}</td><td><small>${E(projectIssues(p).length)} linked</small></td></tr>`;
+    });
+    const dependencies = rows.flatMap((p) =>
+      list((p.meta || {}).depends_on).map((dep) => ({ from: p.key, to: dep })),
     );
-    const content =
-      tab === "In flight"
-        ? `${panel("In-flight portfolio", `<p class="muted">Every project and programme in flight for the tenant — a computed read model over <span class="mono">programme</span> and <span class="mono">project</span>; no portfolio row exists.</p>${table(["Project", "Lifecycle", "Delivery", "Blockers", "Live", "Spend"], rows)}`, B(rows.length + " projects", "green"))}${note("Portfolio membership is derived from the tenant's configured in-flight statuses (default active + paused). Closed and archived work is history and is not listed.", "ok")}`
-        : tab === "Programmes"
-          ? `${panel("Programmes", `${table(["Programme", "Cadence", "Budget", "Health"], F.programmes.map((p) => `<tr><td><strong>${E(p.name)}</strong><small>${E(p.key)} · ${E(p.note)}</small></td><td>${E(p.cadence)}</td><td>${E(p.budget)}</td><td>${B(p.tone === "green" ? "On track" : "Attention", p.tone)}</td></tr>`))}${note("A programme carries <span class='mono'>shared_config</span> (knowledge pins, job families, approval defaults, budget, cadence) inherited by its projects. A project may override a key only when the programme does not lock it.")}`, route("Open programme control", "overview", "small", "grid"))}`
-          : tab === "Shared config & dependencies"
-            ? `<div class="v2-split"><div>${panel("Shared configuration", `${table(["Key", "Value", "Lock", "Inherited by"], [["knowledge_pin", "capability@17", "locked", "3 projects"], ["job_families", "delivery · verification · operations", "locked", "3 projects"], ["approval_policy", "human · dual for phase gates", "tenant policy", "3 projects"], ["budget", "€48.6m", "locked", "3 projects"], ["cadence", "PI-2026.4 · demo D-14", "locked", "3 projects"]].map((r) => `<tr><td class="mono">${E(r[0])}</td><td>${E(r[1])}</td><td>${B(r[2], r[2] === "locked" ? "amber" : "")}</td><td>${E(r[3])}</td></tr>`))}`)}</div><div>${panel("Project dependency graph", `${F.projectDeps.map((d) => `<div class="v2-step"><span class="n">${E(d.kind)}</span><span class="grow"><strong>${E(d.from)} → ${E(d.to)}</strong><small>${E(d.note)} · ${E(d.status)}</small></span></div>`).join("")}${button("Add dependency", "cycle", "", "small", "plus")}${v.cycle ? note("<strong>422 project_dependency_cycle</strong> · identity → portal → billing → identity is a cycle. The edge was refused at creation.", "bad") : ""}${note("Edges are typed rows: <span class='mono'>blocks | needs | supersedes | informs</span>. A cycle is refused at creation, not repaired later.")}`, B("3 edges"))}</div></div>`
-            : tab === "Backlog & WSJF"
-              ? `${panel("Programme backlog", `<p class="muted">WSJF is arithmetic, not opinion: <span class="mono">(business_value + time_criticality + risk_reduction) / job_size</span>. All four inputs are typed integers; the score is computed, never stored.</p>${table(["ID", "Backlog item", "Value", "Criticality", "Risk", "Size", "WSJF", "Status"], F.backlog.map((b) => `<tr><td class="mono">${E(b.id)}</td><td>${E(b.item)}</td><td>${b.value}</td><td>${b.criticality}</td><td>${b.risk}</td><td>${b.size}</td><td><strong>${wsjf(b)}</strong></td><td>${B(b.status, b.status === "Stale" ? "amber" : "green")}</td></tr>`))}`, button("Re-score backlog", "wsjf", "", "small", "replay"))}${note("Backlog refinement is a scheduled job that re-scores WSJF and flags stale items. The plan is materialised for the next cadence; a person approves it.")}`
-              : tab === "Cadence & capacity"
-                ? `<div class="v2-split"><div>${panel("PI-2026.4 cadence", `${flow([["PI planning", "draft cards from backlog by WSJF within WIP"], ["System demo", "each deliverable exhibits evidence; no demo, no credit"], ["Inspect & adapt", "retro produces lessons and kata candidates"]])}${note("A programme_cadence row materialises the next cadence's draft cards. Cards are ordered by WSJF and bounded by the tenant's WIP limits; a person approves the plan.")}`)}</div><div>${panel("Capacity", `${table(["Team", "Members", "WIP", "Used"], [["Delivery", "7", "14", "11"], ["Verification", "3", "6", "5"], ["Operations", "3", "6", "2"], ["Project office", "3", "6", "4"]].map((r) => `<tr><td>${E(r[0])}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`))}${note("WIP is a pressure valve, not a report: a breach is a coach card and a laya remedy.")}`)}</div></div>`
-                : `${panel("Metering · " + programme().name, `${table(["Level", "Tokens", "Cost", "Tool spend", "Budget"], [["Programme", "9.6M", "$214.20", "$21.40", "54%"], ["Project: Identity & access", "3.1M", "$68.40", "$7.20", "41%"], ["Project: Citizen services", "4.2M", "$101.10", "$9.80", "57%"], ["Project: Core services", "2.3M", "$44.70", "$4.40", "48%"]].map((r) => `<tr><td>${E(r[0])}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`))}${note("Cost is derived at read time from <span class='mono'>inference_call</span> and <span class='mono'>tool_call</span>; tokens are stored, money is not. The same derivation feeds the API.")}`, route("Open metering", "metering", "small", "chart"))}`;
-    return `<div class="page enterprise">${heading("Portfolio", "Every project and programme in flight for the tenant, its shared configuration, dependency graph, WSJF backlog and measured spend.", `${route("Plan & WBS", "plan", "", "board")}${route("Organisation", "organisation", "", "layers")}`, "PORTFOLIO & PLAN")}${ribbon("Portfolio is a computed read model (D49); programme shared config, cadence and metering are proposed V2 aggregates.", count.programmes > 0)}<div class="e-programmes">${F.programmes.map((p) => `<button class="e-programme ${p.id === v.programme ? "selected" : ""}" data-v2="programme" data-id="${p.id}" aria-pressed="${p.id === v.programme}"><span class="e-programme-top"><span class="mono">${p.key}</span>${B(p.tone === "green" ? "On track" : "Attention", p.tone)}</span><strong>${E(p.name)}</strong><small>${projects().filter((x) => x.programme === p.id).length} projects · ${E(p.cadence)}</small></button>`).join("")}</div><div class="e-scopebar"><div>${I("layers")}<strong>${E(programme().name)}</strong>${B("V2 portfolio", "green")}<span class="muted">${E(programme().note)}</span></div><div><span class="mono muted">${E(programme().cadence)} · ${E(programme().budget)}</span></div></div>${tabs(["In flight", "Programmes", "Shared config & dependencies", "Backlog & WSJF", "Cadence & capacity", "Metering"], tab, "portfolio")}${content}${dataPanel()}</div>`;
+    const depRows = dependencies
+      .slice(0, 60)
+      .map((d) => `<tr><td class="mono">${E(d.from)}</td><td class="mono">${E(d.to)}</td></tr>`);
+    return `<div class="page enterprise">${heading(
+      "Portfolio",
+      "The conveyor programme's real projects, tranches and linked units, read from Postgres.",
+      `${route("Plan & WBS", "plan", "", "board")}${route("Projects", "projects", "", "projects")}`,
+      "PORTFOLIO & PLAN",
+    )}${consoleRibbon(
+      `The published programme snapshot${programme.name ? ` · ${E(programme.name)}` : ""}: ${rows.length} projects and their dependency edges.`,
+      rows.length > 0,
+    )}${panel(
+      "Projects",
+      `<p class="muted">Every row is a programme project in the published snapshot, with the GitHub units linked on it.</p>${table(
+        ["Project", "Tranche", "Status", "Measured", "Units"],
+        rows.length
+          ? body
+          : [`<tr><td colspan="5">No project is published yet.</td></tr>`],
+      )}`,
+      B(`${rows.length} projects`, rows.length ? "green" : ""),
+    )}${panel(
+      "Dependency edges",
+      `${table(
+        ["From", "To"],
+        depRows.length
+          ? depRows
+          : [`<tr><td colspan="2">No dependency edges are published.</td></tr>`],
+      )}`,
+    )}</div>`;
   }
 
   /* -------------------------------------------------------------- Validation */
@@ -2742,8 +2800,10 @@ window.installV2 = function (api, enterprise) {
     // On an origin that can sign in, Boards is the first surface even before signing in: that
     // is where the sign-in prompt is. file:// and the snapshot-less homepage keep WBS.
     const consoleCapable = !!(C && C.config());
-    const tab =
-      v.tab.plan || (liveBoards || consoleOn() || consoleCapable ? "Boards" : "WBS");
+    const signed = consoleOn();
+    const tab = signed
+      ? v.tab.plan || (liveBoards || consoleCapable ? "Boards" : "WBS")
+      : "Boards";
     const change = F.changes[0];
     const content =
       tab === "Boards"
@@ -2761,7 +2821,7 @@ window.installV2 = function (api, enterprise) {
           ? `<div class="v2-ribbon live" role="note"><strong>LIVE</strong><span>Operator console · the platform's own projects, boards and cards, joined to the GitHub issue registry. Signed in as ${E(C.status().name)} · tenant ${E(C.status().tenant)}.</span><span class="v2-src">API · no snapshot</span></div>`
           : ribbon("LIVE · GitHub issues are read at publish and joined to the conveyor's own cards and runs. A unit with no real card is shown as not intaken; nothing is seeded.", liveBoards)
         : ribbon("V2 plan spine: wbs_node, project_baseline, project_register_item (six kinds), project_dependency and change control. Proposed in T1.");
-    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: the programme's GitHub issues joined to its real cards and runs, then the WBS, a frozen baseline against a computed forecast, one six-kind register and controlled change.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(["Boards", "WBS", "Baseline vs forecast", "Registers", "Change control"], tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}</div></div>`;
+    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: the programme's GitHub issues joined to its real cards and runs, then the WBS, a frozen baseline against a computed forecast, one six-kind register and controlled change.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${signed ? tabs(["Boards", "WBS", "Baseline vs forecast", "Registers", "Change control"], tab, "plan") : tabs(["Boards"], "Boards", "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${signed ? `${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}` : ""}<span class="muted">The WBS, baseline, registers and change control are the V2 plan spine, proposed in T1; the public site carries the programme's boards.</span></div></div>`;
   }
 
   /* The plan is a join, not a seed: the project's GitHub issues (the registry fetched at
@@ -3504,6 +3564,16 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     documents: "Documents",
   };
 
+  // Signed out, a design-study destination is not part of the public site — even by direct
+  // hash. The public pages are the programme; the rest is the operator console's after sign-in.
+  const signInGate = (title) =>
+    `<div class="page enterprise">${heading(title, "This destination is part of the conveyor design study and is available after sign-in.", "", "DESIGN STUDY")}${note("The public site carries the programme: Portfolio, Projects, Plan, Validation, Execution, Documents, Contribute and the system architecture. Sign in at the top of the page to open the operator console's design destinations.")}</div>`;
+  for (const key of Object.keys(pages)) {
+    if (PUBLIC_PAGES.has(key)) continue;
+    const inner = pages[key];
+    pages[key] = () => (studyOn() ? inner() : signInGate(titles[key] || key));
+  }
+
   /* ------------------------------------------------------------------ events */
   document.addEventListener("change", (event) => {
     const projectPage = event.target.closest('[data-v2-input="project-page"]');
@@ -4007,5 +4077,14 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     }
   });
 
-  return { sidebar, titles, pages };
+  return {
+    sidebar,
+    titles,
+    pages,
+    // The public/design boundary, exported so `studio.js` can gate the legacy pages it
+    // merges into the same table (they predate this pack and are not in `pages`).
+    publicPages: PUBLIC_PAGES,
+    studyOn,
+    gate: signInGate,
+  };
 };

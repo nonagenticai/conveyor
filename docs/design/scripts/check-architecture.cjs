@@ -7,7 +7,7 @@ const path = require("node:path");
 const os = require("node:os");
 const { pathToFileURL } = require("node:url");
 const dir = path.resolve(__dirname, "..");
-const base = pathToFileURL(path.join(dir, "studio.html")).href;
+const base = pathToFileURL(path.join(dir, "studio.html")).href + "?design=1";
 const shot = (name) =>
   path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), name);
 

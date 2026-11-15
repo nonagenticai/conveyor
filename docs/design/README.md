@@ -9,22 +9,30 @@ The Plan **Boards** tab is a join, not a seed: it renders each project's GitHub 
 issue registry fetched at publish, joined to the conveyor's own cards and runs. A unit with no real
 card is shown as **not intaken**. V1 surfaces implemented in the Rust app are unlabelled.
 
-**Two surfaces, one pack.** Published at **https://nonagentic.ai/design/** the pack is the
-read-only public snapshot: no accounts, no backend call, the privacy contract unchanged. Served by
-the app itself at **https://conveyor.nonagentic.ai/design/** the same pack is the **operator
-console**: `console.js` finds the same-origin `/config.json`, signs in against the realm the server
-already trusts (auth-code + PKCE S256, token in memory), and the Plan **Boards** tab reads and
-writes the platform's own rows — intake an issue as a card, move it, comment, claim and release.
-Signed out, or on the homepage, nothing changes: no API request and no write control.
+**Two surfaces, one pack.** Served by the app at **https://conveyor.nonagentic.ai/design/** the pack
+is the **operating site**: the unauthenticated routes `/design/data/snapshot.js`,
+`/design/docs/outputs.js` and `/design/docs/output-<id>.html` are read from Postgres for the tenant
+named by `CONVEYOR_PUBLIC_TENANT`, so the public reads the real programme and every output marked
+publishable. `console.js` finds the same-origin `/config.json`, signs in against the realm the server
+already trusts (auth-code + PKCE S256, token in memory), and turns the same pack into the operator
+console — intake an issue as a card, move it, comment, claim and release, compose and publish an
+output. Signed out there is no API request and no write control; a missing asset is served
+`no-store`, never cached as a 404.
+
+The public sidebar carries the programme only: **Portfolio, Projects, Plan, Validation, Execution,
+Documents, Contribute, System architecture**. The V2 product-design study (Organisation, Jobs,
+Procedures, Authoring, Improve, Operations, Tools, Metering and the V1 surfaces) is the operator
+console's; a signed-out direct hash is a sign-in gate, and a reviewer can open it explicitly with
+`?design=1`. The pack still loads the fixture scripts, but no public page renders them.
 
 The **Projects** destination is the programme workspace: the tenant's projects, a project's board,
 plan link and linked issues, its cards with their process binding and the card type's expected
 outputs, its text **outputs** (compose, edit, publish flag) and the public feedback inbox. Intake
 binds the card type's READY process (`meta.process_key`), so a card can **Start run**
 (`process_runs.start`) and open in the Execution room. Signed in it can edit a project
-(`projects.update`, If-Match), compose an output and **Publish** — which enqueues a job that builds
-the pack and opens a pull request on the homepage repository; it never merges. On the homepage the
-same page is read-only from the snapshot.
+(`projects.update`, If-Match) and compose an output. Publishing is the output's `publishable` flag:
+the live route serves it immediately. The homepage mirror at `nonagentic.ai/design` is the old
+read-only copy and is retired by the one-URL unit.
 
 The **Execution room** lists the tenant's runs (`runs.list`), renders one run's steps, tool calls,
 gates and outputs (`runs.get`), cancels a live run (`runs.cancel`) and decides a pending gate
@@ -111,12 +119,12 @@ local stylesheet, no fetch — so they work from `file://` and from the publishe
 - The Documents destination in `studio.html` reads `docs/documents.js`. Without that file (a clean
   checkout before generation) the destination says so instead of rendering a broken list.
 
-**Platform outputs** are the second document source: a publishable text output is rendered at
-publish time to `docs/output-<id>.html` and indexed by `docs/outputs.js`
-(`window.CONVEYOR_OUTPUTS = {schema:"design-outputs/v1", …}`); the Documents destination adds a
-**Platform outputs** group. A clean checkout carries the null placeholder and shows no group; a
-body is rendered with raw HTML neutralised, so the public page has no executable markup from an
-author.
+**Platform outputs** are the second document source: a publishable text output is served live at
+`/design/docs/output-<id>.html` and indexed by `/design/docs/outputs.js`, both read from Postgres
+for the public tenant. The committed `data/outputs.js` placeholder is only the clean-checkout
+fallback; the live route shadows it. `conveyor snapshot --outputs-dir` writes the same bytes for
+an offline pack, and a parity test holds the two to one renderer. A body is rendered with raw HTML
+neutralised, so the public page has no executable markup from an author.
 
 ## Feedback
 

@@ -917,7 +917,7 @@
       .slice(0, 2)
       .join("");
   const state = {
-    page: "overview",
+    page: "portfolio",
     project: "portal",
     projectTab: "Workbench",
     mode: "Canvas",
@@ -3419,9 +3419,19 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
   // tools and metering destinations. It composes the existing editors instead of forking them.
   const v2Pack = window.installV2 ? window.installV2(studioApi, enterprise) : null;
   if (v2Pack) {
+    const legacyPages = Object.keys(enterprise.pages);
     Object.assign(enterprise.pages, v2Pack.pages);
     Object.assign(enterprise.titles, v2Pack.titles);
     enterprise.sidebar = v2Pack.sidebar;
+    // The legacy study pages (overview, jobtypes, improvement, tools, constraints, knowledge,
+    // agents, learning) predate the V2 pack and are not in its `pages` table. The public site
+    // carries the programme, so an unsigned direct hash gets the same sign-in gate.
+    for (const key of legacyPages) {
+      if (v2Pack.publicPages.has(key)) continue;
+      const inner = enterprise.pages[key];
+      enterprise.pages[key] = () =>
+        v2Pack.studyOn() ? inner() : v2Pack.gate(enterprise.titles[key] || key);
+    }
   }
   // Keep in-flight project definitions immutable while the tenant edits its next version.
   db.projects.forEach((p) => {
@@ -3462,5 +3472,18 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
     ].includes(initial)
   )
     state.page = initial;
+  // The status bar says what the reader is looking at: the live programme or an empty pack.
+  {
+    const snapshot = window.CONVEYOR_SNAPSHOT;
+    const liveSite = snapshot && snapshot.schema === "design-snapshot/v1";
+    const status = document.getElementById("site-status");
+    if (status) {
+      status.innerHTML = liveSite
+        ? `<i class="dot green"></i> LIVE · programme from Postgres <span class="footer-extra">· ${esc(
+            snapshot.tenant || "tenant",
+          )} · ${esc(String(snapshot.generated_at || "").slice(0, 19))}</span>`
+        : `<i class="dot orange"></i> No snapshot <span class="footer-extra">· sign in at the app origin</span>`;
+    }
+  }
   render();
 })();

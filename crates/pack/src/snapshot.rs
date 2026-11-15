@@ -117,7 +117,7 @@ pub enum SnapshotError {
     Json(#[from] serde_json::Error),
     /// A publishable output page or index could not be written.
     #[error(transparent)]
-    PublishOutputs(#[from] crate::publish_outputs::PublishOutputsError),
+    PublishOutputs(#[from] crate::outputs::PublishOutputsError),
 }
 
 /// Read one tenant and write every snapshot file.
@@ -249,7 +249,7 @@ pub async fn run_with_pool(
     // documents (`docs/design/docs`), not in the data directory, and the pack mirrors both.
     let mut outputs = 0usize;
     if let Some(dir) = args.outputs_dir.as_deref() {
-        outputs = crate::publish_outputs::write_outputs(pool, tenant, &generated_at, dir).await?;
+        outputs = crate::outputs::write_outputs(pool, tenant, &generated_at, dir).await?;
         tracing::info!(outputs, dir = %dir.display(), "platform outputs written");
     }
 
@@ -292,7 +292,7 @@ fn with_header(mut value: Value, schema: &str, generated_at: &str) -> Value {
     value
 }
 
-fn snapshot_js(
+pub(crate) fn snapshot_js(
     data: &store::snapshot::SnapshotData,
     tenant: &str,
     feedback_url: &str,
@@ -416,7 +416,7 @@ static HOME_PATH_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLoc
 /// The structural queries already exclude every free-text field that is likely to carry
 /// private material (card descriptions, comments, run payloads, notes). This pass is the
 /// safety net for the fields that remain public (titles, charters, configuration text).
-fn redact(value: &mut Value) {
+pub(crate) fn redact(value: &mut Value) {
     match value {
         Value::String(text) => {
             let masked = DATABASE_URL_PATTERN.replace_all(text, "$1[redacted]");
@@ -436,6 +436,16 @@ fn redact(value: &mut Value) {
     }
 }
 
+/// Redact one free-text value (the same safety net the snapshot applies to its JSON).
+pub(crate) fn redact_text(text: &str) -> String {
+    let mut value = Value::String(text.to_owned());
+    redact(&mut value);
+    match value {
+        Value::String(redacted) => redacted,
+        _ => String::new(),
+    }
+}
+
 /// The issue registry written by `scripts/fetch-issues.sh`. Absent is not fatal: the app does
 /// not call GitHub at runtime, and a snapshot without the registry still renders every row.
 fn read_issues(path: &Path) -> Result<Value, SnapshotError> {
@@ -452,7 +462,7 @@ fn read_issues(path: &Path) -> Result<Value, SnapshotError> {
     })
 }
 
-fn feedback_issues(issues: &Value) -> Vec<Value> {
+pub(crate) fn feedback_issues(issues: &Value) -> Vec<Value> {
     issues
         .get("issues")
         .and_then(Value::as_array)

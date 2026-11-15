@@ -754,6 +754,7 @@ dependencies = [
  "conveyor-auth",
  "conveyor-bus",
  "conveyor-domain",
+ "conveyor-pack",
  "conveyor-render",
  "conveyor-store",
  "metrics",
@@ -898,6 +899,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-pack"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "conveyor-domain",
+ "conveyor-store",
+ "pulldown-cmark",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "sqlx",
+ "thiserror",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "conveyor-platform"
 version = "0.1.0"
 dependencies = [
@@ -985,8 +1004,8 @@ dependencies = [
  "conveyor-auth",
  "conveyor-bus",
  "conveyor-domain",
+ "conveyor-pack",
  "conveyor-store",
- "pulldown-cmark",
  "regex",
  "reqwest",
  "rust_decimal",

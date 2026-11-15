@@ -16,6 +16,7 @@ pub mod actions;
 pub mod board;
 pub mod config;
 pub mod copilot;
+pub mod design;
 pub mod documents;
 pub mod error;
 pub mod extract;

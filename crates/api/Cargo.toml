@@ -15,6 +15,8 @@ chrono = { workspace = true }
 conveyor-actions = { path = "../actions" }
 conveyor-auth = { path = "../auth" }
 conveyor-domain = { path = "../domain" }
+# The live design window builds the same bytes as `conveyor snapshot` (one read-only tx).
+conveyor-pack = { path = "../pack" }
 # The byte routes and the actions render through the same pure crate (CONTRACT §1).
 conveyor-render = { path = "../render" }
 conveyor-store = { path = "../store" }
@@ -22,6 +24,8 @@ metrics = { workspace = true }
 metrics-exporter-prometheus = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+# The live design routes' content ETag is the sha256 of the exact response bytes.
+sha2 = { workspace = true }
 sqlx = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
@@ -36,8 +40,6 @@ uuid = { workspace = true }
 # The API tests include `../../actions/tests/support/mod.rs` by path, whose `redis` module starts
 # an ephemeral bus for the S13 delivery tests — so this crate needs the bus crate too.
 conveyor-bus = { path = "../bus" }
-# `documents_roundtrip` hashes the bytes it uploads and compares them with the row's `content_hash`.
-sha2 = { workspace = true }
 tower = { workspace = true }
 # The S05 gate's API tests drive the REAL server over HTTP (the actions test harness is
 # included by path), so they need the same client the server is tested with.

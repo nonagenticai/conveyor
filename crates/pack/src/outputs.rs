@@ -17,8 +17,10 @@
 use std::collections::HashMap;
 use std::path::Path;
 
+use conveyor_domain::Project;
 use conveyor_domain::TenantId;
 use conveyor_store as store;
+use conveyor_store::document::DocumentRecord;
 use pulldown_cmark::{CowStr, Event, Options, Parser, Tag, html};
 use serde::Serialize;
 use sqlx::PgPool;
@@ -85,14 +87,34 @@ pub async fn write_outputs(
     let projects = store::project::list_projects_tx(&mut tx, tenant, None, 1000).await?;
     tx.rollback().await?;
 
-    let projects: HashMap<Uuid, (String, String)> = projects
-        .into_iter()
-        .map(|project| (project.id, (project.key, project.name)))
-        .collect();
+    let (index, pages) = render_outputs(&records, &projects, generated_at)?;
 
     std::fs::create_dir_all(out)?;
+    for (id, page) in &pages {
+        std::fs::write(out.join(format!("output-{id}.html")), page)?;
+    }
+    std::fs::write(out.join("outputs.js"), index)?;
+    Ok(pages.len())
+}
+
+/// Render the published set from rows the caller already read.
+///
+/// The caller owns the transaction: [`write_outputs`] opens one for the CLI, and
+/// [`crate::live::site_view`] reads the same rows inside the transaction it already holds. One
+/// renderer keeps the two byte-identical.
+pub fn render_outputs(
+    records: &[DocumentRecord],
+    projects: &[Project],
+    generated_at: &str,
+) -> Result<(String, HashMap<Uuid, String>), PublishOutputsError> {
+    let projects: HashMap<Uuid, (String, String)> = projects
+        .iter()
+        .map(|project| (project.id, (project.key.clone(), project.name.clone())))
+        .collect();
+
     let mut entries = Vec::with_capacity(records.len());
-    for record in &records {
+    let mut pages = HashMap::with_capacity(records.len());
+    for record in records {
         let body = record.body.as_deref().unwrap_or_default();
         let (project_key, project_name) = record
             .project_id
@@ -105,7 +127,7 @@ pub async fn write_outputs(
             generated_at,
             project_label,
         );
-        std::fs::write(out.join(format!("output-{}.html", record.id)), page)?;
+        pages.insert(record.id, page);
         entries.push(OutputEntry {
             id: record.id.to_string(),
             title: record.title.clone(),
@@ -116,8 +138,7 @@ pub async fn write_outputs(
             updated_at: record.updated_at.to_rfc3339(),
         });
     }
-    std::fs::write(out.join("outputs.js"), outputs_js(&entries, generated_at)?)?;
-    Ok(entries.len())
+    Ok((outputs_js(&entries, generated_at)?, pages))
 }
 
 /// The `outputs.js` assignment the Documents page reads synchronously.

@@ -104,6 +104,11 @@ pub struct Config {
     pub keycloak_admin_client_secret: Option<Secret>,
     /// `JOB_LEASE_SECS`.
     pub job_lease_secs: u64,
+    /// `CONVEYOR_PUBLIC_TENANT` — the slug whose published rows the unauthenticated design
+    /// site serves. Unset means the live window is closed: every live route answers 404.
+    pub public_tenant: Option<String>,
+    /// `CONVEYOR_GIT_SHA` — the commit the image was built from, carried by the live snapshot.
+    pub git_sha: Option<String>,
 }
 
 impl Config {
@@ -160,6 +165,8 @@ impl Config {
             keycloak_admin_client_id: get("KEYCLOAK_ADMIN_CLIENT_ID"),
             keycloak_admin_client_secret: get("KEYCLOAK_ADMIN_CLIENT_SECRET").map(Secret),
             job_lease_secs,
+            public_tenant: get("CONVEYOR_PUBLIC_TENANT"),
+            git_sha: get("CONVEYOR_GIT_SHA"),
         })
     }
 

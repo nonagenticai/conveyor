@@ -259,6 +259,7 @@ async fn dev_state(db: &common::TestDb) -> AppState {
         config: Arc::new(config),
         auth: Arc::new(Authenticator::new(AuthConfig::development()).expect("dev authenticator")),
         services,
+        design: Default::default(),
         metrics: Metrics::install(),
     }
 }
