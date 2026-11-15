@@ -810,6 +810,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-deck"
+version = "0.1.0"
+dependencies = [
+ "conveyor-render",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "conveyor-domain"
 version = "0.1.0"
 dependencies = [
@@ -964,6 +975,7 @@ version = "0.1.0"
 dependencies = [
  "conveyor-domain",
  "fontdb 0.24.0",
+ "pdf-writer",
  "quick-xml 0.42.0",
  "resvg",
  "serde",

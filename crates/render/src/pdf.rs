@@ -34,6 +34,97 @@ pub(crate) fn render(svg: &[u8]) -> Result<Vec<u8>, RenderError> {
         .map_err(|error| RenderError::Invalid(format!("pdf: {error}")))
 }
 
+/// Convert several SVG documents into **one** PDF, one page per document.
+///
+/// The deck authoring path (`crates/deck`) needs one file for a whole deck, and it must be the
+/// same layout pass the PNGs came from. Each page's size comes from its own SVG, so a deck's pages
+/// are 16:9 while a document's single page stays A4 landscape; nothing here re-lays-out a page.
+///
+/// Determinism holds for the same reason the single-page path holds it: the page order is the
+/// caller's slice order, the object numbering is derived from it, and `svg2pdf` writes no date and
+/// no file id.
+///
+/// **Text is outlines here, not an embedded subset.** Measured: with `embed_text: true` two runs of
+/// the same two-page deck differed — each page gets its own `svg2pdf` context, and a context writes
+/// its font objects in a hash-map order, so the subset order inside a page is not stable across
+/// processes. Outlines remove the font objects, and the same deck is then byte-identical. The
+/// single-page document path keeps its embedded text; a deck's pages are pictures of themselves.
+pub(crate) fn render_pages(pages: &[&[u8]]) -> Result<Vec<u8>, RenderError> {
+    use std::collections::HashMap;
+
+    use pdf_writer::{Content, Finish, Name, Pdf, Rect, Ref};
+
+    if pages.is_empty() {
+        return Err(RenderError::Invalid(
+            "a pdf needs at least one page".to_string(),
+        ));
+    }
+    let conversion = svg2pdf::ConversionOptions {
+        embed_text: false,
+        ..svg2pdf::ConversionOptions::default()
+    };
+    // Each page's graphic is addressed by the same resource name; the name lives in the page's own
+    // resource dictionary, so pages cannot collide.
+    let svg_name = Name(b"S1");
+
+    let mut alloc = Ref::new(1);
+    let catalog_id = alloc.bump();
+    let page_tree_id = alloc.bump();
+    let page_ids: Vec<Ref> = pages.iter().map(|_| alloc.bump()).collect();
+
+    let mut pdf = Pdf::new();
+    pdf.catalog(catalog_id).pages(page_tree_id);
+    pdf.pages(page_tree_id)
+        .kids(page_ids.iter().copied())
+        .count(pages.len() as i32);
+
+    for (index, svg) in pages.iter().enumerate() {
+        let text =
+            std::str::from_utf8(svg).map_err(|error| RenderError::Invalid(error.to_string()))?;
+        let tree = usvg::Tree::from_str(text, font::options())?;
+        let size = tree.size();
+        let width_pt = f64::from(size.width()) * 72.0 / f64::from(DPI);
+        let height_pt = f64::from(size.height()) * 72.0 / f64::from(DPI);
+
+        // The SVG becomes an independent chunk, renumbered into this document's object space.
+        let (chunk, svg_id) = svg2pdf::to_chunk(&tree, conversion.clone())
+            .map_err(|error| RenderError::Invalid(format!("pdf: {error}")))?;
+        let mut map = HashMap::new();
+        let chunk = chunk.renumber(|old| *map.entry(old).or_insert_with(|| alloc.bump()));
+        let svg_id = *map
+            .get(&svg_id)
+            .ok_or_else(|| RenderError::Invalid(format!("pdf: page {index} lost its graphic")))?;
+
+        let content_id = alloc.bump();
+        {
+            let mut page = pdf.page(page_ids[index]);
+            page.media_box(Rect::new(0.0, 0.0, width_pt as f32, height_pt as f32));
+            page.parent(page_tree_id);
+            page.contents(content_id);
+            page.resources().x_objects().pair(svg_name, svg_id);
+            page.finish();
+        }
+
+        // The graphic's own coordinate space is one point square, so the page transform is its
+        // page size in points.
+        let mut content = Content::new();
+        content
+            .transform([
+                width_pt as f32,
+                0.0,
+                0.0,
+                height_pt as f32,
+                0.0,
+                0.0,
+            ])
+            .x_object(svg_name);
+        pdf.stream(content_id, &content.finish());
+        pdf.extend(&chunk);
+    }
+
+    Ok(pdf.finish())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
