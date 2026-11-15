@@ -69,6 +69,7 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
     for (const id of [
       "portfolio",
       "projects",
+      "outputs",
       "plan",
       "validation",
       "execution",
@@ -105,6 +106,7 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
     for (const [id, title] of [
       ["portfolio", "Portfolio"],
       ["projects", "Projects"],
+      ["outputs", "Outputs"],
       ["plan", "Plan & WBS"],
       ["validation", "Validation"],
       ["execution", "Execution room"],
@@ -173,11 +175,17 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       (await content()).includes("No ready unit is published right now"),
       "the public contribute page is honest without a registry",
     );
+    await nav("outputs");
+    check(
+      (await content()).includes("No output is published yet"),
+      "the public outputs page is honest without a published row",
+    );
 
     // 6. No fictional enterprise programme text renders on any public page.
     for (const id of [
       "portfolio",
       "projects",
+      "outputs",
       "plan",
       "validation",
       "execution",
@@ -231,11 +239,22 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       (await page.locator('a[href="docs/output-o-1.html"]').count()) === 1,
       "the published output links its standalone page",
     );
+    await page.locator('#sidebar [data-page="outputs"]').first().click();
+    await page.waitForTimeout(200);
+    check(
+      (await content()).includes("Published note"),
+      "the public Outputs page lists the published index",
+    );
+    check(
+      (await page.locator('a[href="docs/output-o-1.html"]').count()) === 1,
+      "the public Outputs page links the output's page",
+    );
 
     // 8. Responsive: every public destination at 1440, 1024 and 390.
     const destinations = [
       "portfolio",
       "projects",
+      "outputs",
       "plan",
       "validation",
       "execution",

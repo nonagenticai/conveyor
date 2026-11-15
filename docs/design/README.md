@@ -19,11 +19,20 @@ console — intake an issue as a card, move it, comment, claim and release, comp
 output. Signed out there is no API request and no write control; a missing asset is served
 `no-store`, never cached as a 404.
 
-The public sidebar carries the programme only: **Portfolio, Projects, Plan, Validation, Execution,
-Documents, Contribute, System architecture**. The V2 product-design study (Organisation, Jobs,
-Procedures, Authoring, Improve, Operations, Tools, Metering and the V1 surfaces) is the operator
-console's; a signed-out direct hash is a sign-in gate, and a reviewer can open it explicitly with
-`?design=1`. The pack still loads the fixture scripts, but no public page renders them.
+The public sidebar carries the programme only: **Portfolio, Projects, Outputs, Plan, Validation,
+Execution, Documents, Contribute, System architecture**. The V2 product-design study (Organisation,
+Jobs, Procedures, Authoring, Improve, Operations, Tools, Metering and the V1 surfaces) is the
+operator console's; a signed-out direct hash is a sign-in gate, and a reviewer can open it
+explicitly with `?design=1`. The pack still loads the fixture scripts, but no public page renders
+them.
+
+**Outputs** is the programme register: every output across all projects with its project, unit,
+category, visibility and public URL. Signed in it composes, edits with `If-Match`, publishes and
+unpublishes (the row's own `publishable` flag), downloads and deletes; signed out it lists the
+published index only. A project's workspace adds its tranche, `blocked_by`, measured status and
+evidence from `data/coverage.json`, groups its outputs by unit and category, and shows an
+**inception checklist** — an analysis and an architecture, each present and published — with a
+compose template for each. A missing inception output is a visible gap; it is not a backend gate.
 
 The **Projects** destination is the programme workspace: the tenant's projects, a project's board,
 plan link and linked issues, its cards with their process binding and the card type's expected

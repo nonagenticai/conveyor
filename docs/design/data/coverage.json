@@ -1,99 +1,115 @@
 {
   "actions_invoked": [
     {
-      "line": 725,
+      "line": 757,
       "name": "approvals.decide"
     },
     {
-      "line": 195,
+      "line": 197,
       "name": "card_types.list"
     },
     {
-      "line": 374,
+      "line": 376,
       "name": "cards.claim"
     },
     {
-      "line": 358,
+      "line": 360,
       "name": "cards.comment"
     },
     {
-      "line": 306,
+      "line": 308,
       "name": "cards.create"
     },
     {
-      "line": 335,
+      "line": 337,
       "name": "cards.move"
     },
     {
-      "line": 389,
+      "line": 391,
       "name": "cards.release"
     },
     {
-      "line": 1277,
+      "line": 1573,
       "name": "documents.compose"
     },
     {
-      "line": 1299,
+      "line": 1687,
+      "name": "documents.delete"
+    },
+    {
+      "line": 1666,
+      "name": "documents.download"
+    },
+    {
+      "line": 1595,
       "name": "documents.get"
     },
     {
-      "line": 1363,
+      "line": 1651,
       "name": "documents.get"
     },
     {
-      "line": 552,
+      "line": 554,
       "name": "documents.list"
     },
     {
-      "line": 748,
+      "line": 574,
+      "name": "documents.list"
+    },
+    {
+      "line": 780,
       "name": "process_runs.start"
     },
     {
-      "line": 186,
+      "line": 188,
       "name": "programmes.list"
     },
     {
-      "line": 1243,
+      "line": 1519,
       "name": "projects.close"
     },
     {
-      "line": 1153,
+      "line": 1420,
       "name": "projects.create"
     },
     {
-      "line": 633,
+      "line": 1429,
+      "name": "projects.update"
+    },
+    {
+      "line": 665,
       "name": "publish.start"
     },
     {
-      "line": 610,
+      "line": 642,
       "name": "publish.status"
     },
     {
-      "line": 1404,
+      "line": 1746,
       "name": "repositories.create"
     },
     {
-      "line": 568,
+      "line": 600,
       "name": "repositories.list"
     },
     {
-      "line": 698,
+      "line": 730,
       "name": "runs.cancel"
     },
     {
-      "line": 676,
+      "line": 708,
       "name": "runs.get"
     },
     {
-      "line": 653,
+      "line": 685,
       "name": "runs.list"
     },
     {
-      "line": 1400,
+      "line": 1742,
       "name": "secrets.create"
     },
     {
-      "line": 1434,
+      "line": 1776,
       "name": "secrets.create"
     }
   ],
@@ -2388,6 +2404,15 @@
       "evidence": [
         "docs/design/v2.js"
       ],
+      "gap": null,
+      "key": "outputs",
+      "status": "live",
+      "title": "Outputs"
+    },
+    {
+      "evidence": [
+        "docs/design/v2.js"
+      ],
       "gap": "V1 surface retained behind a banner",
       "key": "overview",
       "status": "legacy",
@@ -2474,14 +2499,14 @@
       "without_open_units": 15
     },
     "screens": {
-      "actions_invoked": 22,
+      "actions_invoked": 25,
       "by_status": {
         "legacy": 7,
-        "live": 6,
+        "live": 7,
         "mixed": 3,
         "proposed": 7
       },
-      "total": 23
+      "total": 24
     }
   },
   "version": 1

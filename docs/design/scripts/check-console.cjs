@@ -115,6 +115,8 @@ function freshState() {
       },
     ],
     requests: [],
+    listBodies: [],
+    planPatches: [],
     failProjects: 0,
     failMove: 0,
     failDocument: 0,
@@ -283,6 +285,10 @@ function startServer({ config, state, snapshot }) {
           "documents.get",
           "documents.list",
           "documents.update",
+          "documents.download",
+          "documents.delete",
+          "projects.create",
+          "projects.close",
           "projects.update",
           "publish.start",
           "publish.status",
@@ -522,11 +528,39 @@ function startServer({ config, state, snapshot }) {
           json(res, 200, run);
         });
       }
+      if (pathname === "/api/actions/projects.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.ok(input.title, "projects.create sends a title");
+          const project = {
+            id: "p-new",
+            key: "NEW",
+            name: input.title,
+            description: input.description || "",
+            status: "active",
+            programme_id: input.programme_id || null,
+            project_type_code: null,
+            phase_code: null,
+            owner_user_id: null,
+            repo_url: null,
+            meta: {},
+            version: 1,
+          };
+          json(res, 201, { project });
+        });
+        return;
+      }
       if (pathname === "/api/actions/projects.update/invocations") {
         return readBody(req, (body) => {
           try {
             const input = body.input || {};
-            assert.equal(input.id, "p-s02", "projects.update names the project");
+            if (input.id !== "p-s02") {
+              // The create-time plan patch: `projects.create` has no meta, so the console
+              // follows it with a plan update. No If-Match — the row was just created.
+              assert.equal(req.headers["if-match"], undefined, "the create-time plan patch has no If-Match");
+              state.planPatches.push(input.meta && input.meta.plan);
+              return json(res, 200, { project: { id: input.id, version: 2 } });
+            }
             assert.equal(req.headers["if-match"], `"${state.project.version}"`, "projects.update carries If-Match");
             for (const key of ["name", "description", "status", "repo_url"]) {
               if (input[key] !== undefined) state.project[key] = input[key];
@@ -546,7 +580,12 @@ function startServer({ config, state, snapshot }) {
       }
       if (pathname === "/api/actions/documents.list/invocations") {
         return readBody(req, (body) => {
-          assert.equal(body.input.project_id, "p-s02", "documents.list is scoped to the project");
+          const scoped = body.input.project_id;
+          assert.ok(
+            scoped === undefined || scoped === "p-s02",
+            "documents.list is project-scoped or the cross-project register",
+          );
+          state.listBodies.push(scoped === undefined ? "register" : scoped);
           const items = state.documents.map((doc) => {
             const summary = Object.assign({}, doc);
             delete summary.body;
@@ -573,7 +612,7 @@ function startServer({ config, state, snapshot }) {
             content_hash: "a".repeat(64),
             body: input.body,
             external_ref: null,
-            meta: {},
+            meta: input.meta || {},
             publishable: !!input.publishable,
             version: 1,
             created_at: "2026-11-13T00:00:00Z",
@@ -613,6 +652,33 @@ function startServer({ config, state, snapshot }) {
           json(res, 200, doc);
         });
         return;
+      }
+      if (pathname === "/api/actions/documents.download/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          if (!doc) return json(res, 404, { title: "Not Found", detail: "no such document" });
+          const bytes = Buffer.from(doc.body || "", "utf8");
+          json(res, 200, {
+            id: doc.id,
+            content_type: "text/markdown",
+            content_base64: bytes.toString("base64"),
+            content_hash: "a".repeat(64),
+            byte_len: bytes.length,
+          });
+        });
+      }
+      if (pathname === "/api/actions/documents.delete/invocations") {
+        return readBody(req, (body) => {
+          const index = state.documents.findIndex((row) => row.id === body.input.id);
+          assert.ok(index >= 0, "documents.delete names a real document");
+          assert.equal(
+            req.headers["if-match"],
+            `"${state.documents[index].version}"`,
+            "documents.delete carries If-Match",
+          );
+          state.documents.splice(index, 1);
+          json(res, 200, { deleted: true });
+        });
       }
       if (pathname === "/api/actions/repositories.list/invocations") {
         return readBody(req, () => json(res, 200, { items: state.repositories }));
@@ -964,6 +1030,8 @@ function readBody(req, done) {
       await page.waitForSelector("#output-title");
       await page.fill("#output-title", "S02 design note");
       await page.fill("#output-body", "# Design note\n\nA decision recorded from the console.");
+      await page.fill("#output-unit", "7");
+      await page.selectOption("#output-category", "analysis");
       await page.check("#output-publishable");
       await page.click('[data-v2="output-save"][data-project="p-s02"]');
       await page.waitForSelector("text=Output saved and marked public");
@@ -973,6 +1041,26 @@ function readBody(req, done) {
       );
       await page.waitForSelector('[data-v2="output-read"][data-id="d-1"]');
       assert.match(await page.locator("#main").innerText(), /S02 design note/, "the output is listed");
+      // The workspace shows the measured programme and groups the output by unit + category.
+      const workspaceText = await page.locator("#main").innerText();
+      assert.match(workspaceText, /Programme truth/, "the coverage panel renders");
+      assert.match(workspaceText, /T1/, "the coverage row's tranche renders");
+      assert.match(workspaceText, /7 · analysis/, "the output is grouped by unit and category");
+      assert.match(workspaceText, /1\/2 published/, "one inception output is published");
+      await page.click('[data-v2="output-new-template"][data-category="analysis"]');
+      await page.waitForSelector("#output-category");
+      assert.equal(
+        await page.locator("#output-category").inputValue(),
+        "analysis",
+        "the inception template pre-sets its category",
+      );
+      assert.match(
+        await page.locator("#output-body").inputValue(),
+        /Reuse sources/,
+        "the analysis template carries the reuse prompt",
+      );
+      await page.click('#dialog [data-action="close-dialog"]');
+      await page.waitForFunction(() => !document.getElementById("dialog").open);
 
       await page.click('[data-v2="output-publish"][data-id="d-1"]');
       await page.waitForSelector("text=Output unpublished");
@@ -981,6 +1069,57 @@ function readBody(req, done) {
         "documents.update was sent",
       );
       assert.equal(consoleState.documents[0].publishable, false, "the publish flag crossed the wire");
+      await page.waitForSelector("text=0/2 published");
+
+      // ── the cross-project register: unfiltered list, publish, download, delete ───────
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#outputs`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForSelector('[data-v2="output-publish"][data-id="d-1"]');
+      assert.ok(
+        consoleState.listBodies.includes("register"),
+        "the register calls documents.list with no project filter",
+      );
+      const registerText = await page.locator("#main").innerText();
+      assert.match(registerText, /S02 design note/, "the register lists the output");
+      assert.match(registerText, /S02 · Skeleton/, "the register names the project");
+      assert.match(registerText, /7/, "the register shows the unit");
+      assert.match(registerText, /analysis/, "the register shows the category");
+      await page.click('[data-v2="output-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Output marked public");
+      await page.waitForSelector('a[href="docs/output-d-1.html"]');
+      assert.equal(
+        consoleState.documents[0].publishable,
+        true,
+        "the register publishes through documents.update",
+      );
+      const [downloadEvent] = await Promise.all([
+        page.waitForEvent("download"),
+        page.click('[data-v2="output-download"][data-id="d-1"]'),
+      ]);
+      assert.ok(
+        downloadEvent.suggestedFilename().startsWith("output-"),
+        "the download names the output",
+      );
+      await page.click('[data-v2="output-delete"][data-id="d-1"]');
+      await page.waitForSelector('[data-v2="output-delete-confirm"]');
+      await page.click('[data-v2="output-delete-confirm"]');
+      await page.waitForSelector("text=Output deleted");
+      assert.equal(consoleState.documents.length, 0, "the delete crossed the wire");
+
+      // ── a new project's plan reaches projects.update (create has no meta) ───────────
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#projects`);
+      await page.waitForSelector('[data-v2="project-new"]');
+      await page.click('[data-v2="project-new"]');
+      await page.waitForSelector("#project-name");
+      await page.fill("#project-name", "A new part of the conveyor");
+      await page.fill("#project-plan", "docs/plans/slices/S00-usage-inventory.md");
+      await page.click('[data-v2="project-create"]');
+      await page.waitForSelector("text=Project created with its plan");
+      assert.deepEqual(
+        consoleState.planPatches,
+        ["docs/plans/slices/S00-usage-inventory.md"],
+        "the plan reaches projects.update",
+      );
 
       await page.click('[data-v2="feedback-intake"][data-issue="9"]');
       await page.waitForSelector("text=Issue #9 intaken as a card");
@@ -989,32 +1128,12 @@ function readBody(req, done) {
         "the feedback issue became a card",
       );
 
-      assert.ok(
-        (await page.locator('button[disabled]:has-text("Publish the design site")').count()) >= 1,
-        "publish is disabled without a target",
-      );
-      await page.click("summary:has-text('Connect a homepage repository')");
-      await page.fill("#publish-token", "ghp_test_token");
-      await page.click('[data-v2="publish-connect"]');
-      await page.waitForSelector("text=Publish target connected");
-      assert.ok(
-        consoleState.requests.some((row) => row.path === "/api/actions/repositories.create/invocations"),
-        "repositories.create was sent",
-      );
-      await page.waitForSelector('[data-v2="publish-start"]');
-      await page.click('[data-v2="publish-start"]');
-      await page.waitForSelector("text=Publish enqueued");
-      await page.waitForSelector(
-        'a[href="https://github.com/nonagenticai/nonagentic_homepage/pull/7"]',
-      );
-      assert.ok(
-        consoleState.requests.some((row) => row.path === "/api/actions/publish.start/invocations"),
-        "publish.start was sent",
-      );
+      // The pack-PR publish path is gone from the programme workspace: publishing is the
+      // output's own `publishable` flag (the toggle asserted above).
       assert.equal(
-        consoleState.publish.pr_url,
-        "https://github.com/nonagenticai/nonagentic_homepage/pull/7",
-        "the stub reports the PR",
+        await page.locator('[data-v2="publish-start"]').count(),
+        0,
+        "the console no longer offers the pack-PR publish path",
       );
 
       // ── the execution room: start a run from a card, read its trace, decide a gate ──
