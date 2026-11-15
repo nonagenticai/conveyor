@@ -80,13 +80,22 @@ pub async fn run(kind: &str, cli: &Cli, config: &Config, dispatch: Dispatch) -> 
             return ExitCode::FAILURE;
         }
     };
-    match dispatch(kind.to_string(), params, config.clone()).await {
+    let mut config = config.clone();
+    if let Some(out) = &cli.out {
+        config.out_dir = out.clone();
+    }
+    if let Err(error) = std::fs::create_dir_all(&config.out_dir) {
+        eprintln!("{}: cannot create {:?}: {error}", config.service, config.out_dir);
+        return ExitCode::FAILURE;
+    }
+    let service = config.service.clone();
+    match dispatch(kind.to_string(), params, config).await {
         Ok(result) => {
             println!("{}", serde_json::to_string_pretty(&result).unwrap_or_default());
             ExitCode::SUCCESS
         }
         Err(error) => {
-            eprintln!("{}: {error}", config.service);
+            eprintln!("{service}: {error}");
             ExitCode::FAILURE
         }
     }

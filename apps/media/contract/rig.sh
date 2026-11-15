@@ -14,11 +14,14 @@
 # reach are on localhost (scratch Postgres, scratch Redis, and whatever a card starts itself).
 #
 # `DATABASE_URL` and `REDIS_URL` are supplied for the card; anything else the service needs at boot
-# is passed as an `ENV=VAL` argument.
+# is passed as an `ENV=VAL` argument. Every container joins one docker network and addresses the
+# scratch Postgres and Redis **by container name** — no host-gateway alias, so nothing in this file
+# names an internal hostname that `scripts/ci/no-private-refs.sh` would refuse to publish.
 set -euo pipefail
 
 PG_PORT="${PG_PORT:-55433}"
 REDIS_PORT="${REDIS_PORT:-56379}"
+NETWORK="${NETWORK:-conveyor-capture}"
 PG_CONTAINER="${PG_CONTAINER:-conveyor-media-pg}"
 REDIS_CONTAINER="${REDIS_CONTAINER:-conveyor-media-redis}"
 DB_USER="${DB_USER:-cap}"
@@ -29,13 +32,16 @@ shift || true
 
 case "$cmd" in
 up)
+    docker network inspect "$NETWORK" >/dev/null 2>&1 || docker network create "$NETWORK" >/dev/null
     docker inspect "$PG_CONTAINER" >/dev/null 2>&1 || \
-        docker run -d --name "$PG_CONTAINER" \
+        docker run -d --name "$PG_CONTAINER" --network "$NETWORK" \
             -e POSTGRES_PASSWORD="$DB_PASS" -e POSTGRES_USER="$DB_USER" \
             -p "127.0.0.1:$PG_PORT:5432" postgres:18 >/dev/null
     docker inspect "$REDIS_CONTAINER" >/dev/null 2>&1 || \
-        docker run -d --name "$REDIS_CONTAINER" \
+        docker run -d --name "$REDIS_CONTAINER" --network "$NETWORK" \
             -p "127.0.0.1:$REDIS_PORT:6379" library/redis:8.10.1-alpine >/dev/null
+    docker network connect "$NETWORK" "$PG_CONTAINER" >/dev/null 2>&1 || true
+    docker network connect "$NETWORK" "$REDIS_CONTAINER" >/dev/null 2>&1 || true
     docker start "$PG_CONTAINER" >/dev/null 2>&1 || true
     docker start "$REDIS_CONTAINER" >/dev/null 2>&1 || true
     for _ in $(seq 1 30); do
@@ -56,9 +62,9 @@ run)
     name="${1:?usage: rig.sh run NAME IMAGE HOSTPORT CONTAINERPORT DB [ENV=VAL ...]}"
     image="${2:?}"; hostport="${3:?}"; cport="${4:?}"; db="${5:?}"; shift 5
     docker rm -f "cap-$name" >/dev/null 2>&1 || true
-    args=(-d --name "cap-$name" -p "127.0.0.1:$hostport:$cport"
-          -e "DATABASE_URL=postgresql+psycopg://$DB_USER:$DB_PASS@host.docker.internal:$PG_PORT/$db"
-          -e "REDIS_URL=redis://host.docker.internal:$REDIS_PORT/0"
+    args=(-d --name "cap-$name" --network "$NETWORK" -p "127.0.0.1:$hostport:$cport"
+          -e "DATABASE_URL=postgresql+psycopg://$DB_USER:$DB_PASS@$PG_CONTAINER:5432/$db"
+          -e "REDIS_URL=redis://$REDIS_CONTAINER:6379/0"
           -e "API_PORT=$cport"
           -e "ENVIRONMENT=development"
           # w2v_common's auth has no bypass flag that works: `AUTH_ENABLED=false` is ignored by the

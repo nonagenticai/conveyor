@@ -9,6 +9,8 @@
 //! `slide_service` is **not** here: ADR 0007 §7 moves deck authoring to `crates/deck`, which emits
 //! OOXML and renders PDF/PNG through `crates/render`.
 
+pub mod render;
+
 use futures_util::future::BoxFuture;
 use serde_json::Value;
 
@@ -19,7 +21,7 @@ use crate::contract::Capture;
 pub const SERVICE: &str = "conveyor-media-browser";
 
 /// The capability kinds this image implements. Must equal the union of [`CAPTURES`]' kinds.
-pub const KINDS: &[&str] = &[];
+pub const KINDS: &[&str] = &[render::KIND];
 
 /// The captured contracts whose kinds this image owns.
 pub const CAPTURES: &[Capture] = &[];
@@ -27,8 +29,13 @@ pub const CAPTURES: &[Capture] = &[];
 /// Execute one capability.
 pub fn dispatch(
     kind: String,
-    _params: Value,
-    _config: Config,
+    params: Value,
+    config: Config,
 ) -> BoxFuture<'static, Result<Value, CapabilityError>> {
-    Box::pin(async move { Err(CapabilityError::UnknownKind(kind)) })
+    Box::pin(async move {
+        match kind.as_str() {
+            render::KIND => render::render(&params, &config).await,
+            other => Err(CapabilityError::UnknownKind(other.to_string())),
+        }
+    })
 }

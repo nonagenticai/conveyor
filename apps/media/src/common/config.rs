@@ -13,6 +13,8 @@ pub struct Config {
     /// Scratch space. The pod's `emptyDir`; never a mounted store, because no store credential
     /// reaches a media pod (ADR 0007 §4).
     pub work_dir: PathBuf,
+    /// Where a capability writes its outputs. Defaults to `<work_dir>/out`.
+    pub out_dir: PathBuf,
 }
 
 impl Config {
@@ -20,9 +22,13 @@ impl Config {
         let work_dir = std::env::var("MEDIA_WORK_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|_| std::env::temp_dir().join("conveyor-media"));
+        let out_dir = std::env::var("MEDIA_OUT_DIR")
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| work_dir.join("out"));
         Self {
             service: service.to_string(),
             work_dir,
+            out_dir,
         }
     }
 }

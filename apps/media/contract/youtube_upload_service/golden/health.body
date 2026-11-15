@@ -1,0 +1,1 @@
+{"status":"healthy","components":{"database":"healthy","redis":"healthy","api":"healthy"}}

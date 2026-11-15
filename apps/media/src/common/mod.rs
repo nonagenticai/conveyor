@@ -3,6 +3,7 @@
 pub mod config;
 pub mod entry;
 pub mod error;
+pub mod process;
 
 pub use config::Config;
 pub use error::CapabilityError;

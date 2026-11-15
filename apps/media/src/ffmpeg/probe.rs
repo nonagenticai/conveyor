@@ -11,7 +11,7 @@ use std::path::Path;
 use serde_json::{Value, json};
 
 use crate::common::{CapabilityError, Config};
-use crate::ffmpeg::process;
+use crate::common::process;
 
 /// The kind slug this module implements.
 pub const KIND: &str = "media.probe_video";

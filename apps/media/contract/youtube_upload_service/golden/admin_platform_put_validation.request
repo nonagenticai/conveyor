@@ -1,0 +1,3 @@
+PUT /api/admin/platform-channel
+{"X-Tenant-Id":"Bearer capture-licence-token-0001"}
+{"client_id":"capture-synthetic-client-id","channel_id":"UCcapture0000000000000","channel_title":"Capture Channel","default_for_tenants":false}

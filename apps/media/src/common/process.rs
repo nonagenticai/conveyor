@@ -1,6 +1,6 @@
-//! Running `ffmpeg`/`ffprobe` as a bounded child process.
+//! Running an external tool (`ffmpeg`, `ffprobe`, a headless browser) as a bounded child process.
 //!
-//! The image shells out; it does not link a decoder. What matters here is everything the shell-out
+//! Both media images shell out rather than link a decoder or a browser engine. What matters here is everything the shell-out
 //! can get wrong: an argument list built from caller data must never reach a shell, a hung encode
 //! must be killed rather than hold the job's deadline, and a failure must carry the tool's own last
 //! words instead of a bare exit code.
@@ -45,7 +45,7 @@ impl Finished {
 }
 
 /// Run `tool` with `args`, no shell, stdin closed, output captured, bounded by [`TOOL_TIMEOUT`].
-pub async fn run(tool: &'static str, args: &[String]) -> Result<Finished, CapabilityError> {
+pub async fn run(tool: &str, args: &[String]) -> Result<Finished, CapabilityError> {
     let mut command = Command::new(tool);
     command
         .args(args)
@@ -54,7 +54,12 @@ pub async fn run(tool: &'static str, args: &[String]) -> Result<Finished, Capabi
         .stderr(Stdio::piped())
         .kill_on_drop(true);
 
-    let child = command.spawn().map_err(|source| CapabilityError::ToolMissing { tool, source })?;
+    let child = command
+        .spawn()
+        .map_err(|source| CapabilityError::ToolMissing {
+            tool: tool.to_string(),
+            source,
+        })?;
     let output = match tokio::time::timeout(TOOL_TIMEOUT, child.wait_with_output()).await {
         Ok(Ok(output)) => output,
         Ok(Err(error)) => {

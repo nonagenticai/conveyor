@@ -25,7 +25,7 @@ pub enum CapabilityError {
     /// A tool the image needs is missing (chromium, ffmpeg, tesseract).
     #[error("{tool} is not available: {source}")]
     ToolMissing {
-        tool: &'static str,
+        tool: String,
         #[source]
         source: std::io::Error,
     },

@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"AnalysisRequest requires 'video_url' (or use POST /api/analyze/upload)","status":422,"request_id":"01a1dffc-4eee-7562-969d-2f3c9b2eb8c0","timestamp":"2026-11-15T16:13:36Z","details":[{"loc":["body"],"msg":"AnalysisRequest requires 'video_url' (or use POST /api/analyze/upload)","type":"value_error"}]}}

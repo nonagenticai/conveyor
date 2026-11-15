@@ -9,7 +9,6 @@
 //! hosts thin operations in `apps/server` beside the job ledger they already use.
 
 pub mod probe;
-pub mod process;
 
 use futures_util::future::BoxFuture;
 use serde_json::Value;
@@ -24,7 +23,18 @@ pub const SERVICE: &str = "conveyor-media-ffmpeg";
 pub const KINDS: &[&str] = &[probe::KIND];
 
 /// The captured contracts whose kinds this image owns.
-pub const CAPTURES: &[Capture] = &[];
+pub const CAPTURES: &[Capture] = &[
+    Capture {
+        service: "video_compiler_service",
+        lock_json: include_str!("../../contract/video_compiler_service/openapi.lock.json"),
+        capabilities: include_str!("../../contract/video_compiler_service/capabilities.txt"),
+    },
+    Capture {
+        service: "video_analyzer_service",
+        lock_json: include_str!("../../contract/video_analyzer_service/openapi.lock.json"),
+        capabilities: include_str!("../../contract/video_analyzer_service/capabilities.txt"),
+    },
+];
 
 /// Execute one capability.
 pub fn dispatch(
