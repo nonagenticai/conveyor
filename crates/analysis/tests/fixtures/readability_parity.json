@@ -1,0 +1,171 @@
+{
+  "cases": [
+    {
+      "text": "",
+      "words": 0,
+      "content_words": 0,
+      "sentences": 0,
+      "syllables": 0,
+      "flesch_reading_ease": 100.0,
+      "gunning_fog": 0.0
+    },
+    {
+      "text": "One.",
+      "words": 1,
+      "content_words": 1,
+      "sentences": 1,
+      "syllables": 1,
+      "flesch_reading_ease": 121.22,
+      "gunning_fog": 0.4
+    },
+    {
+      "text": "cat",
+      "words": 1,
+      "content_words": 1,
+      "sentences": 1,
+      "syllables": 1,
+      "flesch_reading_ease": 121.22,
+      "gunning_fog": 0.4
+    },
+    {
+      "text": "cat cat cat.",
+      "words": 3,
+      "content_words": 3,
+      "sentences": 1,
+      "syllables": 3,
+      "flesch_reading_ease": 119.19,
+      "gunning_fog": 1.2
+    },
+    {
+      "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word.",
+      "words": 149,
+      "content_words": 149,
+      "sentences": 1,
+      "syllables": 149,
+      "flesch_reading_ease": -29.0,
+      "gunning_fog": 59.6
+    },
+    {
+      "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word.",
+      "words": 150,
+      "content_words": 150,
+      "sentences": 1,
+      "syllables": 150,
+      "flesch_reading_ease": -30.01,
+      "gunning_fog": 60.0
+    },
+    {
+      "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word.",
+      "words": 299,
+      "content_words": 299,
+      "sentences": 1,
+      "syllables": 299,
+      "flesch_reading_ease": -181.25,
+      "gunning_fog": 119.6
+    },
+    {
+      "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word.",
+      "words": 300,
+      "content_words": 300,
+      "sentences": 1,
+      "syllables": 300,
+      "flesch_reading_ease": -182.26,
+      "gunning_fog": 120.0
+    },
+    {
+      "text": "cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat. cat cat cat cat cat cat cat cat cat cat.",
+      "words": 400,
+      "content_words": 400,
+      "sentences": 40,
+      "syllables": 400,
+      "flesch_reading_ease": 112.09,
+      "gunning_fog": 4.0
+    },
+    {
+      "text": "water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water. water water water water water water water water water water.",
+      "words": 400,
+      "content_words": 400,
+      "sentences": 40,
+      "syllables": 800,
+      "flesch_reading_ease": 27.49,
+      "gunning_fog": 4.0
+    },
+    {
+      "text": "The aforementioned notwithstanding, the municipality's comprehensive redevelopment initiative necessitates substantial interdepartmental coordination; consequently, stakeholders should reconsider their prioritisation methodology prior to implementation.",
+      "words": 22,
+      "content_words": 17,
+      "sentences": 1,
+      "syllables": 80,
+      "flesch_reading_ease": -123.13,
+      "gunning_fog": 37.89
+    },
+    {
+      "text": "Don't stop using state-of-the-art tools, because they're easier to use and people love them. We can't go back now.",
+      "words": 19,
+      "content_words": 13,
+      "sentences": 2,
+      "syllables": 26,
+      "flesch_reading_ease": 81.42,
+      "gunning_fog": 5.91
+    },
+    {
+      "text": "123 456 !!! ...",
+      "words": 0,
+      "content_words": 0,
+      "sentences": 1,
+      "syllables": 0,
+      "flesch_reading_ease": 100.0,
+      "gunning_fog": 0.0
+    },
+    {
+      "text": "Coffee tastes best when the beans are ground right before brewing. Fresh grounds keep their oils and aromas. Pre ground coffee goes flat quickly. A burr grinder gives an even grind. Even a cheap one beats a blade grinder.",
+      "words": 39,
+      "content_words": 29,
+      "sentences": 5,
+      "syllables": 50,
+      "flesch_reading_ease": 90.46,
+      "gunning_fog": 4.15
+    },
+    {
+      "text": "scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability scalability",
+      "words": 120,
+      "content_words": 120,
+      "sentences": 1,
+      "syllables": 600,
+      "flesch_reading_ease": -337.96,
+      "gunning_fog": 88.0
+    }
+  ],
+  "phrases": [
+    {
+      "phrase": "art",
+      "text": "smart marketing",
+      "expected": false
+    },
+    {
+      "phrase": "art",
+      "text": "modern art gallery",
+      "expected": true
+    },
+    {
+      "phrase": "cloud backup",
+      "text": "best cloud backup tools",
+      "expected": true
+    },
+    {
+      "phrase": "cloud backup",
+      "text": "backup in the cloud",
+      "expected": false
+    },
+    {
+      "phrase": "",
+      "text": "anything",
+      "expected": false
+    },
+    {
+      "phrase": "a b c",
+      "text": "a b",
+      "expected": false
+    }
+  ]
+}

@@ -5,8 +5,10 @@
 //! the legacy `check_id` → group map are the source's too: a report that re-derived them would
 //! score differently from the service it replaces, which is the one thing a port must not do.
 
+pub mod content_utils;
 pub mod mobile;
 pub mod on_page;
+pub mod readability;
 pub mod social;
 pub mod structural;
 pub mod technical;
@@ -121,27 +123,51 @@ pub fn scorecard(findings: &[Finding]) -> Scorecard {
 /// reports sees the same sequence the old service produced.
 pub fn scan(document: &Document) -> Vec<Finding> {
     let html = Html::parse_document(&document.html);
+    scan_parsed(&html, &document.url)
+}
+
+/// The full audit scan: the base checks **plus** the seven deterministic audit groups.
+///
+/// The source had two surfaces — `scan` for critique consumers whose scores must not move, and
+/// `scan_audit` for the audit endpoint — and so does this crate. The audit groups run in the
+/// source's order after the base checks (`readability`, `keyword`, `snippet`, `eeat`,
+/// `schema_coverage`, `internal_linking`, `geo`), because dedupe keeps first-seen order.
+///
+/// The network-dependent checks are deliberately absent: cross-page link analysis
+/// (`seo-linking-broken`/`-orphan`/`-hub`) needs a crawl and robots/llms discovery
+/// (`seo-geo-ai-crawler-blocked`, `seo-geo-no-llms-txt`) needs a fetch, and fetching belongs to
+/// `apps/research`/`apps/media`. The LLM annotations (`seo-keyword-intent`, `seo-eeat-depth`)
+/// need a model; they are deferred, not forgotten.
+pub fn scan_audit(document: &Document, _as_of: &chrono::DateTime<chrono::Utc>) -> Vec<Finding> {
+    let html = Html::parse_document(&document.html);
     let url = document.url.as_str();
+    let mut findings = scan_parsed(&html, url);
+    findings.extend(readability::check_readability(&html, url));
+    findings
+}
+
+/// The base checks over an already-parsed document — one parse for both scan surfaces.
+fn scan_parsed(html: &Html, url: &str) -> Vec<Finding> {
     let mut findings = Vec::new();
-    findings.extend(on_page::check_title(&html, url));
-    findings.extend(on_page::check_meta_description(&html, url));
-    findings.extend(social::check_og_tags(&html, url));
-    findings.extend(on_page::check_heading_hierarchy(&html, url));
-    findings.extend(structural::check_canonical(&html, url));
-    findings.extend(on_page::check_image_alt(&html, url));
-    findings.extend(structural::check_structured_data(&html, url));
-    findings.extend(social::check_twitter_cards(&html, url));
-    findings.extend(technical::check_hreflang(&html, url));
+    findings.extend(on_page::check_title(html, url));
+    findings.extend(on_page::check_meta_description(html, url));
+    findings.extend(social::check_og_tags(html, url));
+    findings.extend(on_page::check_heading_hierarchy(html, url));
+    findings.extend(structural::check_canonical(html, url));
+    findings.extend(on_page::check_image_alt(html, url));
+    findings.extend(structural::check_structured_data(html, url));
+    findings.extend(social::check_twitter_cards(html, url));
+    findings.extend(technical::check_hreflang(html, url));
     findings.extend(structural::check_url_structure(url));
-    findings.extend(technical::check_meta_robots(&html, url));
-    findings.extend(technical::check_favicon(&html, url));
-    findings.extend(mobile::check_viewport(&html, url));
-    findings.extend(structural::check_internal_nofollow(&html, url));
-    findings.extend(on_page::check_keyword_alignment(&html, url));
-    findings.extend(structural::check_breadcrumb_schema(&html, url));
-    findings.extend(structural::check_canonical_mismatch(&html, url));
-    findings.extend(on_page::check_duplicate_meta(&html, url));
-    findings.extend(mobile::check_mobile_font_sizes(&html, url));
+    findings.extend(technical::check_meta_robots(html, url));
+    findings.extend(technical::check_favicon(html, url));
+    findings.extend(mobile::check_viewport(html, url));
+    findings.extend(structural::check_internal_nofollow(html, url));
+    findings.extend(on_page::check_keyword_alignment(html, url));
+    findings.extend(structural::check_breadcrumb_schema(html, url));
+    findings.extend(structural::check_canonical_mismatch(html, url));
+    findings.extend(on_page::check_duplicate_meta(html, url));
+    findings.extend(mobile::check_mobile_font_sizes(html, url));
     findings
 }
 

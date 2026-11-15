@@ -1,7 +1,8 @@
 //! `analyse.site` — the deterministic SEO report for one stored document.
 
+use chrono::Utc;
 use conveyor_analysis::model::{Document, Report};
-use conveyor_analysis::site::analyse;
+use conveyor_analysis::site::{AnalyseOptions, analyse};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgConnection;
@@ -32,7 +33,8 @@ pub struct AnalyseSiteIn {
 /// Analyse a stored page.
 ///
 /// A read, not a write: no row is created, no event is emitted, and the report is a pure function
-/// of the document's bytes plus the URL. Two calls with the same bytes return the same report.
+/// of the document's bytes, the URL and the instant the analysis ran (the content-staleness check
+/// measures age). Two calls on the same day return the same report.
 #[crate::action(
     name = "analyse.site",
     version = 1,
@@ -60,7 +62,10 @@ async fn analyse_site(
 /// always what their headers claim.
 fn analyse_bytes(bytes: &[u8], url: &str) -> Report {
     let html = String::from_utf8_lossy(bytes);
-    analyse(&Document::new(url.to_owned(), html.into_owned()))
+    analyse(
+        &Document::new(url.to_owned(), html.into_owned()),
+        &AnalyseOptions::at(Utc::now()),
+    )
 }
 
 #[cfg(test)]

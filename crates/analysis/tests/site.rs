@@ -1,7 +1,17 @@
 //! `analyse.site` end to end: what a caller gets for one document.
 
-use conveyor_analysis::model::{Document, Severity};
-use conveyor_analysis::site::analyse;
+use chrono::{TimeZone, Utc};
+use conveyor_analysis::model::{Document, Report, Severity};
+use conveyor_analysis::site::{AnalyseOptions, analyse};
+
+/// The instant every test analyses at: fixed, so a report is reproducible in a test.
+fn at_fixed_instant(document: &Document) -> Report {
+    let as_of = Utc
+        .with_ymd_and_hms(2026, 11, 15, 12, 0, 0)
+        .single()
+        .expect("a valid instant");
+    analyse(document, &AnalyseOptions::at(as_of))
+}
 
 const BARE: &str = "<html><head></head><body><p>nothing</p></body></html>";
 
@@ -36,7 +46,7 @@ const REASONABLE: &str = r#"<!doctype html>
 
 #[test]
 fn a_page_missing_title_and_description_reports_both() {
-    let report = analyse(&Document::new("https://example.test/", BARE));
+    let report = at_fixed_instant(&Document::new("https://example.test/", BARE));
     let ids: Vec<&str> = report.findings.iter().map(|f| f.check_id()).collect();
     assert!(ids.contains(&"seo-missing-title"), "got {ids:?}");
     assert!(ids.contains(&"seo-meta-description-missing"), "got {ids:?}");
@@ -55,8 +65,8 @@ fn a_page_missing_title_and_description_reports_both() {
 #[test]
 fn the_same_document_twice_is_the_same_bytes() {
     let document = Document::new("https://example.test/", REASONABLE);
-    let first = serde_json::to_string(&analyse(&document)).expect("serialises");
-    let second = serde_json::to_string(&analyse(&document)).expect("serialises");
+    let first = serde_json::to_string(&at_fixed_instant(&document)).expect("serialises");
+    let second = serde_json::to_string(&at_fixed_instant(&document)).expect("serialises");
     assert_eq!(
         first, second,
         "the scan must be a pure function of its input"
@@ -65,7 +75,7 @@ fn the_same_document_twice_is_the_same_bytes() {
 
 #[test]
 fn the_breakdown_always_carries_every_weighted_group() {
-    let report = analyse(&Document::new("https://example.test/", BARE));
+    let report = at_fixed_instant(&Document::new("https://example.test/", BARE));
     let mut groups: Vec<&str> = report
         .scorecard
         .buckets
@@ -90,8 +100,8 @@ fn the_breakdown_always_carries_every_weighted_group() {
 
 #[test]
 fn a_bare_page_scores_lower_than_a_complete_one() {
-    let bare = analyse(&Document::new("https://example.test/", BARE));
-    let good = analyse(&Document::new("https://example.test/", REASONABLE));
+    let bare = at_fixed_instant(&Document::new("https://example.test/", BARE));
+    let good = at_fixed_instant(&Document::new("https://example.test/", REASONABLE));
     assert!(
         bare.scorecard.overall_score < good.scorecard.overall_score,
         "bare {}, good {}",
@@ -103,7 +113,7 @@ fn a_bare_page_scores_lower_than_a_complete_one() {
 
 #[test]
 fn a_complete_page_does_not_trip_the_presence_checks() {
-    let report = analyse(&Document::new("https://example.test/", REASONABLE));
+    let report = at_fixed_instant(&Document::new("https://example.test/", REASONABLE));
     let ids: Vec<&str> = report.findings.iter().map(|f| f.check_id()).collect();
     for absent in [
         "seo-missing-title",
@@ -129,7 +139,7 @@ fn a_complete_page_does_not_trip_the_presence_checks() {
 #[test]
 fn a_page_with_no_url_still_analyses() {
     // The URL-dependent checks stand down rather than inventing findings from an empty string.
-    let report = analyse(&Document::new("", REASONABLE));
+    let report = at_fixed_instant(&Document::new("", REASONABLE));
     let ids: Vec<&str> = report.findings.iter().map(|f| f.check_id()).collect();
     assert!(!ids.contains(&"seo-internal-nofollow"));
     assert!(!ids.contains(&"seo-canonical-protocol-mismatch"));
@@ -143,7 +153,7 @@ fn duplicate_findings_are_collapsed_before_scoring() {
     let html = "<title>Emergency plumber in Leeds today</title>\
                 <h1>Emergency plumber in Leeds</h1>\
                 <img src=a><img src=b>";
-    let report = analyse(&Document::new("https://example.test/", html));
+    let report = at_fixed_instant(&Document::new("https://example.test/", html));
     let mut ids: Vec<&str> = report.findings.iter().map(|f| f.check_id()).collect();
     let total = ids.len();
     ids.sort_unstable();
