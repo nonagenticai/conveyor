@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "ab49e4970d090fc25ebd1f6e2272b77328eb56c50fc3139c8eb8e99a483d8632",
-      "bytes": 144286,
+      "sha256": "eafb6b46c41dd18cedfeeebf1a541df3d3d394f1704157e4fd952e4206184a19",
+      "bytes": 144382,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -99,6 +99,15 @@
       "sha256": "adc8b99c210be970b1d8931dee11aa9f71b3a6b024c59bfdf628dff6539736cd",
       "bytes": 6657,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0006-tool-absorption-grouping.md"
+    },
+    {
+      "title": "0007 — The w2v conversion: three public repositories, one stateful plane",
+      "path": "docs/decisions/0007-w2v-conversion-three-public-repositories.html",
+      "source": "docs/decisions/0007-w2v-conversion-three-public-repositories.md",
+      "section": "Decisions",
+      "sha256": "762eeb97c2b08d90fdbd82eed418e066708ac8fc04021665e288736ca6271e45",
+      "bytes": 7337,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0007-w2v-conversion-three-public-repositories.md"
     },
     {
       "title": "Web UI design",
@@ -393,8 +402,8 @@
       "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
       "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
       "section": "Plans",
-      "sha256": "f4826b0bad8e21dea9147c1145f5ca067f9dfff210319c9a8d1ab3bf400dad21",
-      "bytes": 9871,
+      "sha256": "9306d7786b9a499d354967a2d44ec6f12f711e2f5c8cbf02f9114c717aeff0b7",
+      "bytes": 10250,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
     },
     {
