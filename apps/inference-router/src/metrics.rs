@@ -9,8 +9,9 @@
 //! (`inference_router/src/observability/metrics.py`) so the two services scrape identically.
 
 use std::sync::OnceLock;
+use std::time::Duration;
 
-use ::metrics::counter;
+use ::metrics::{counter, gauge};
 use axum::Router;
 use axum::http::{HeaderValue, StatusCode, header};
 use axum::response::{IntoResponse, Response};
@@ -116,6 +117,61 @@ fn bounded_label(raw: Option<&str>, allowed: &[&str]) -> String {
     }
 }
 
+/// Book ONE provider attempt into the three alert-keyed attempt families.
+///
+/// Counts and seconds are incremented **together**, from one call, so no site can record an
+/// attempt and forget its wall clock — a mean latency that silently dropped the failures is how
+/// "6% of calls are empty" turns into "14.6% of the spend is empty". `reason` is supplied only
+/// for a failed attempt (its classification) and for a blank completion; `empty_result` is an
+/// observation, not an error, and books no reason.
+///
+/// Every label value here is bounded: the provider comes from the enabled catalog, the path and
+/// outcome from the closed sets this crate defines, and the caller through [`caller_label`] — a
+/// caller-supplied header never reaches a series raw.
+pub fn record_attempt(
+    provider: &str,
+    path: &str,
+    outcome: &str,
+    caller: &str,
+    latency: Duration,
+    reason: Option<&str>,
+) {
+    let provider = provider.to_owned();
+    let path = path.to_owned();
+    let outcome = outcome.to_owned();
+    let caller = caller.to_owned();
+    counter!(
+        "inference_router_provider_attempts_total",
+        "provider" => provider.clone(),
+        "path" => path.clone(),
+        "outcome" => outcome.clone(),
+        "caller" => caller.clone()
+    )
+    .increment(1);
+    // ⚠️ A GAUGE, and only because the `metrics` crate's `Counter` is integer-only while this
+    // series must carry fractional seconds. The reference increments a float counter; the
+    // estate's rules only ever `increase()` this family over a range, and `increase()` on a
+    // monotonic, never-reset series is the same number for a gauge as for a counter. Series name
+    // and labels are the reference's own — only the exposed `# TYPE` differs.
+    gauge!(
+        "inference_router_provider_attempt_seconds_total",
+        "provider" => provider.clone(),
+        "path" => path.clone(),
+        "outcome" => outcome,
+        "caller" => caller
+    )
+    .increment(latency.as_secs_f64());
+    if let Some(reason) = reason {
+        counter!(
+            "inference_router_provider_errors_total",
+            "provider" => provider,
+            "path" => path,
+            "reason" => reason.to_owned()
+        )
+        .increment(1);
+    }
+}
+
 /// Pre-seed every one of the 15 families at zero, so a scrape never has to distinguish "nothing
 /// happened" from "this build never registered the instrument".
 ///
@@ -141,14 +197,15 @@ pub fn preseed(providers: &[String]) {
             "caller" => LABEL_UNKNOWN
         )
         .increment(0);
-        counter!(
+        // Same reason as `record_attempt`: the seconds family is a monotonic gauge.
+        gauge!(
             "inference_router_provider_attempt_seconds_total",
             "provider" => provider.to_string(),
             "path" => "routed",
             "outcome" => "ok",
             "caller" => LABEL_UNKNOWN
         )
-        .increment(0);
+        .increment(0.0);
         counter!(
             "inference_router_provider_errors_total",
             "provider" => provider.to_string(),

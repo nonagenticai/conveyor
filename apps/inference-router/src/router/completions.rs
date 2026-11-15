@@ -26,7 +26,10 @@ use crate::ledger::{self, CallContext, LedgerRow, StreamRow};
 use crate::metering::{CostEvent, ZERO_COST_USD};
 use crate::policy::{self, ResolvedHop};
 use crate::provider::ChunkStream;
-use crate::routing::{CompletionOutcome, ProviderAttempt, Refusal, ServedHop, ServedStream};
+use crate::routing::{
+    CompletionOutcome, OUTCOME_EMPTY, OUTCOME_EMPTY_RESULT, OUTCOME_ERROR, OUTCOME_OK,
+    ProviderAttempt, Refusal, ServedHop, ServedStream,
+};
 use crate::state::AppState;
 use crate::stream::{
     STREAM_CLIENT_DISCONNECT, STREAM_COMPLETED, STREAM_UPSTREAM_ERROR, StreamCapture,
@@ -294,6 +297,7 @@ fn attributed(
     CallContext {
         correlation_id: attribution(headers, "x-correlation-id"),
         worker_name: attribution(headers, "x-worker-name"),
+        app_id: attribution(headers, "x-app-id"),
         stage: attribution(headers, "x-stage"),
         trace_id: attribution(headers, "x-aa-trace-id"),
         card_id: attribution(headers, "x-aa-card-id"),
@@ -391,7 +395,16 @@ async fn record(
         }
     }
 
+    let caller = crate::metrics::caller_label(context.app_id.as_deref());
     for (index, attempt) in outcome.attempts.iter().enumerate() {
+        crate::metrics::record_attempt(
+            &attempt.provider,
+            attempt.path,
+            attempt.outcome,
+            &caller,
+            attempt.latency,
+            attempt_reason(attempt.outcome, attempt),
+        );
         let event = cost_event(
             &context,
             request,
@@ -401,6 +414,40 @@ async fn record(
             reservation_id,
         );
         state.deps().cost.emit(&event).await;
+    }
+}
+
+/// The `provider_errors_total` reason for one attempt.
+///
+/// Only two populations carry one: a failed attempt (its classification) and a completed-but-blank
+/// one (`upstream_empty_response`). `empty_result` is an observation, not an error — it deliberately
+/// books nothing, so it cannot be paged on as a failure.
+fn attempt_reason(outcome: &str, attempt: &ProviderAttempt) -> Option<&'static str> {
+    match outcome {
+        OUTCOME_EMPTY => Some("upstream_empty_response"),
+        OUTCOME_ERROR => attempt
+            .failure
+            .as_ref()
+            .map(|failure| failure.classification),
+        _ => None,
+    }
+}
+
+/// The terminal outcome of a streamed attempt, as the reference's `_record_stream_attempt`
+/// computes it.
+///
+/// A stream that never reached `[DONE]` — client disconnect or an upstream error mid-stream — is
+/// `aborted`: we do not know what it would have produced, so counting it `empty` would let a
+/// flaky caller manufacture the signal the empty-completion alert exists to detect. Only a
+/// completed stream is classified, and a tool-call reply is a complete answer with no text.
+fn stream_outcome(status: &'static str, capture: &StreamCapture) -> &'static str {
+    if status != STREAM_COMPLETED {
+        return "aborted";
+    }
+    match crate::empty::text_reason(capture.content(), capture.saw_tool_call()) {
+        Some(crate::empty::EmptyReason::EmptyResult) => OUTCOME_EMPTY_RESULT,
+        Some(crate::empty::EmptyReason::Blank) => OUTCOME_EMPTY,
+        None => OUTCOME_OK,
     }
 }
 
@@ -702,8 +749,22 @@ async fn finalise_stream(
     let served_attempt = attempts
         .iter()
         .rposition(|attempt| attempt.failure.is_none());
+    let caller = crate::metrics::caller_label(context.app_id.as_deref());
     for (index, attempt) in attempts.iter().enumerate() {
         let served = Some(index) == served_attempt;
+        let outcome = if served {
+            stream_outcome(status, &capture)
+        } else {
+            attempt.outcome
+        };
+        crate::metrics::record_attempt(
+            &attempt.provider,
+            attempt.path,
+            outcome,
+            &caller,
+            attempt.latency,
+            attempt_reason(outcome, attempt),
+        );
         let event = stream_cost_event(
             &context,
             &request,
@@ -757,7 +818,16 @@ async fn record_unopened_stream(
             tracing::warn!(%error, "inference ledger write failed");
         }
     }
+    let caller = crate::metrics::caller_label(context.app_id.as_deref());
     for (index, attempt) in attempts.iter().enumerate() {
+        crate::metrics::record_attempt(
+            &attempt.provider,
+            attempt.path,
+            attempt.outcome,
+            &caller,
+            attempt.latency,
+            attempt_reason(attempt.outcome, attempt),
+        );
         let event = stream_cost_event(
             &context,
             request,
