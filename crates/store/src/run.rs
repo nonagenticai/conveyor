@@ -766,6 +766,31 @@ pub async fn live_run_for_card_tx(
     row.map(Run::try_from).transpose()
 }
 
+/// How many ROOT runs of `process_id` the card has ever had.
+///
+/// The coach's recursion cap counts history, not liveness: a *terminal* coach run is exactly
+/// what makes the next failure a repeat, and [`live_run_for_card_tx`] cannot see it. Root-only,
+/// like every card-wide query since 0033.
+pub async fn count_root_runs_for_card_process_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+    process_id: Uuid,
+) -> Result<i64, RunStoreError> {
+    let count: i64 = sqlx::query_scalar(
+        "SELECT count(*)
+           FROM run
+          WHERE tenant_id = $1 AND card_id = $2 AND process_id = $3
+            AND parent_run_id IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .bind(process_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    Ok(count)
+}
+
 /// The project's live card-less execution run, if one exists.
 ///
 /// `card_id IS NULL` is the discriminator: a card-scoped run and a project execution can both
