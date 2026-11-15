@@ -392,6 +392,39 @@ pub async fn defer(
     Ok(rows == 1)
 }
 
+/// Cancel a live job: `dead`, with the caller's reason recorded.
+///
+/// Cancellation is deliberately NOT a fifth status. The `job` CHECK has no `cancelled` value, and
+/// every finish path, the expiry reaper and the job-token routes fence on `status = 'running'` —
+/// a cancelled row that read as anything still running would keep a pod's token valid. `dead` is
+/// what "this will not run again" already means in this ledger.
+pub async fn cancel(
+    pool: &PgPool,
+    tenant: TenantId,
+    job_id: Uuid,
+    reason: &str,
+) -> Result<bool, sqlx::Error> {
+    let error = truncate(reason);
+    let mut tx = begin_scoped(pool, tenant).await?;
+    let rows = sqlx::query(
+        "UPDATE job
+            SET status = 'dead',
+                last_error = $2,
+                continuation = false,
+                lease_until = NULL,
+                lease_token = NULL,
+                updated_at = now()
+          WHERE id = $1 AND status IN ('pending', 'running')",
+    )
+    .bind(job_id)
+    .bind(error)
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
+    tx.commit().await?;
+    Ok(rows == 1)
+}
+
 /// Enqueue a job, deduped on `(tenant, kind, dedupe_key)` while one is pending or running.
 ///
 /// Returns the new id, or `None` when a live job with the same key already exists — the

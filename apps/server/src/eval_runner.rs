@@ -851,6 +851,7 @@ async fn fail(
     Err(JobFailure {
         message: format!("{}: {message}", class.as_str()),
         permanent: !class.is_retryable() || exhausted,
+        deferred: false,
         retry_after,
     })
 }
@@ -1057,6 +1058,7 @@ fn permanent(message: String) -> JobFailure {
     JobFailure {
         message,
         permanent: true,
+        deferred: false,
         retry_after: Duration::ZERO,
     }
 }
