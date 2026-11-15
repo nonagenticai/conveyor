@@ -321,7 +321,8 @@ async fn board_lanes(
 ) -> Result<Option<Vec<String>>, SeedError> {
     let code = Code::parse(DEFAULT_TEMPLATE_CODE)
         .map_err(|error| SeedError::ProgrammeDocument(error.to_string()))?;
-    Ok(template_lanes_tx(&mut *conn, tenant, &code).await?)
+    let lanes = template_lanes_tx(&mut *conn, tenant, &code).await?;
+    Ok(lanes)
 }
 
 /// Give a seeded project the board `projects.create` would have given it.
