@@ -25,6 +25,7 @@ path = "src/ffmpeg/main.rs"
 axum = { workspace = true }
 bytes = { workspace = true }
 chrono = { workspace = true }
+conveyor-domain = { path = "../../crates/domain" }
 clap = { workspace = true }
 futures-util = { workspace = true }
 object_store = { workspace = true }
