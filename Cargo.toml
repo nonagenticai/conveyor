@@ -152,6 +152,9 @@ quick-xml = "0.42.0"
 # HKDF-SHA256(KEK, salt = tenant_id). Both are RustCrypto, audited, and add no OS crypto dependency.
 chacha20poly1305 = { version = "0.10.1", features = ["std"] }
 hkdf = "0.13.0"
+# The runner's job token is HMAC-SHA256 over its claims (#144, ADR 0007 §Decision 4). Already in
+# the lock through hkdf, so this is a direct dependency and not a second digest family.
+hmac = "0.13.0"
 # MinIO speaks S3. `object_store`'s aws backend is the client (S09 §5.2) — deliberately NOT a
 # hand-rolled SigV4: signing is the part nobody tests until it fails in production, and
 # `artifacts`/`s3` crates would drag in the AWS SDK for one bucket.
