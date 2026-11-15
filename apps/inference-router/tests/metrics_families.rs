@@ -362,17 +362,159 @@ fn project_series(body: &str, outcome: &str, caller: &str) -> Option<f64> {
 /// The same one-provider router as [`configured`], with the licence gate in `enforce`: a caller
 /// carrying no verifiable token is refused before the handler's admission counter can run.
 fn enforcing(provider: &str, address: std::net::SocketAddr) -> Router {
+    gated(provider, address, "enforce")
+}
+
+fn gated(provider: &str, address: std::net::SocketAddr, mode: &str) -> Router {
     let catalog = Catalog::from_yaml(&format!(
         "providers:\n  - name: {provider}\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: metric-model\ndefault_chain: [{provider}]\n"
     ))
     .expect("catalog");
     preseed(&[]);
     let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
-    let config = Config::from_lookup(|key| {
-        (key == "INFERENCE_ROUTER_INTROSPECT_MODE").then(|| "enforce".to_owned())
+    let mode = mode.to_owned();
+    let config = Config::from_lookup(move |key| {
+        (key == "INFERENCE_ROUTER_INTROSPECT_MODE").then(|| mode.clone())
     })
     .expect("config");
     api_router(AppState::new(config, router))
+}
+
+// ── P2e: the licence-introspection families, driven end to end ──────────────────────────────
+//
+// The recorder is process-wide and this binary runs its tests in parallel, so every test takes
+// its own `X-App-Id` + `X-Worker-Name` pair and asserts `after > before`, never a count. The
+// callers below avoid `karma`/`canary`/`replay`: the project-id test asserts those three at exact
+// counts, and an observe-mode request (which reaches the handler) would move them.
+
+fn introspection_series(body: &str, outcome: &str, enforced: &str) -> Option<f64> {
+    series_value(
+        body,
+        "inference_router_license_introspection_total",
+        &[("outcome", outcome), ("enforced", enforced)],
+    )
+}
+
+fn by_caller_series(body: &str, outcome: &str, caller: &str, worker: &str) -> Option<f64> {
+    series_value(
+        body,
+        "inference_router_license_introspection_by_caller_total",
+        &[("outcome", outcome), ("caller", caller), ("worker", worker)],
+    )
+}
+
+#[tokio::test]
+async fn an_absent_token_moves_the_families_in_enforce_mode() {
+    let address = stub_provider("licence-absent-enforce").await;
+    let before = scrape().await;
+    let before_total = introspection_series(&before, "absent", "true");
+    let before_caller = by_caller_series(&before, "absent", "karma", "principle_consistency");
+
+    let response = gated("stub-licence-absent", address, "enforce")
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-app-id", "karma")
+                .header("x-worker-name", "principle_consistency")
+                .body(completion())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+    let after = scrape().await;
+    assert!(
+        introspection_series(&after, "absent", "true").unwrap_or(0.0) > before_total.unwrap_or(0.0),
+        "an absent token in enforce mode books the total family"
+    );
+    assert!(
+        by_caller_series(&after, "absent", "karma", "principle_consistency").unwrap_or(0.0)
+            > before_caller.unwrap_or(0.0),
+        "…and the per-caller family, with the bounded caller and worker labels"
+    );
+}
+
+#[tokio::test]
+async fn an_absent_token_moves_the_families_in_observe_mode() {
+    let address = stub_provider("licence-absent-observe").await;
+    let before = scrape().await;
+    let before_total = introspection_series(&before, "absent", "false");
+    let before_caller = by_caller_series(&before, "absent", "core-app", "decision_quality");
+
+    let response = gated("stub-licence-observe", address, "observe")
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-app-id", "core-app")
+                .header("x-worker-name", "decision_quality")
+                .body(completion())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "observe counts the same resolution the armed gate would refuse"
+    );
+
+    let after = scrape().await;
+    assert!(
+        introspection_series(&after, "absent", "false").unwrap_or(0.0)
+            > before_total.unwrap_or(0.0),
+        "the same absent token is counted under enforced=false in observe mode"
+    );
+    assert!(
+        by_caller_series(&after, "absent", "core-app", "decision_quality").unwrap_or(0.0)
+            > before_caller.unwrap_or(0.0),
+        "both families move in observe mode too"
+    );
+}
+
+#[tokio::test]
+async fn an_ignored_authorization_jwt_moves_the_families() {
+    let address = stub_provider("licence-jwt-ignored").await;
+    let before = scrape().await;
+    let before_total = introspection_series(&before, "authorization_jwt_ignored", "true");
+    let before_caller = by_caller_series(
+        &before,
+        "authorization_jwt_ignored",
+        "aa-authoring",
+        "reply_polish",
+    );
+
+    let response = gated("stub-licence-jwt", address, "enforce")
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("authorization", "Bearer a.b.c")
+                .header("x-app-id", "aa-authoring")
+                .header("x-worker-name", "reply_polish")
+                .body(completion())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+    let after = scrape().await;
+    assert!(
+        introspection_series(&after, "authorization_jwt_ignored", "true").unwrap_or(0.0)
+            > before_total.unwrap_or(0.0),
+        "a JWT is an absent-class outcome, never sent to licences"
+    );
+    assert!(
+        by_caller_series(
+            &after,
+            "authorization_jwt_ignored",
+            "aa-authoring",
+            "reply_polish"
+        )
+        .unwrap_or(0.0)
+            > before_caller.unwrap_or(0.0),
+        "the per-caller family names the absent class too"
+    );
 }
 
 #[tokio::test]

@@ -71,6 +71,23 @@ pub enum Verdict {
     Unavailable,
 }
 
+/// A verdict plus the closed-set outcome that explains how it was reached.
+///
+/// `Verdict` is what the gate acts on; `outcome` is what the metrics record. Keeping them apart is
+/// what makes a positive cache hit (`cached`) distinguishable from a fresh success (`resolved`) —
+/// the gate must behave identically, the operator must be able to tell them apart.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Resolution {
+    pub verdict: Verdict,
+    pub outcome: &'static str,
+}
+
+impl Resolution {
+    fn new(verdict: Verdict, outcome: &'static str) -> Self {
+        Self { verdict, outcome }
+    }
+}
+
 /// The caller as the service can prove it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CallerIdentity {
@@ -326,16 +343,19 @@ struct Cache {
 const MAX_CACHE_ENTRIES: usize = 4096;
 
 impl Cache {
-    fn get(&mut self, token: &str, now: Instant) -> Option<Verdict> {
+    fn get(&mut self, token: &str, now: Instant) -> Option<Resolution> {
         if let Some((licence, stored)) = self.positive.get(token) {
             if now.duration_since(*stored) < self.positive_ttl {
-                return Some(Verdict::Resolved(licence.clone()));
+                return Some(Resolution::new(
+                    Verdict::Resolved(licence.clone()),
+                    "cached",
+                ));
             }
             self.positive.remove(token);
         }
         if let Some(stored) = self.negative.get(token) {
             if now.duration_since(*stored) < self.negative_ttl {
-                return Some(Verdict::Denied);
+                return Some(Resolution::new(Verdict::Denied, "inactive"));
             }
             self.negative.remove(token);
         }
@@ -403,30 +423,31 @@ impl Introspector {
         }
     }
 
-    /// Resolve a token, through the cache.
-    pub async fn resolve(&self, token: &str) -> Verdict {
+    /// Resolve a token, through the cache. `asserted_tenant` is the caller's plain-uuid
+    /// `X-Tenant-Id`, if it had one: it is compared only to COUNT a mismatch, never to decide.
+    pub async fn resolve(&self, token: &str, asserted_tenant: Option<&str>) -> Resolution {
         let now = Instant::now();
         if let Some(cached) = self.cache.lock().expect("cache lock").get(token, now) {
-            return judge(cached);
+            return judge(cached, asserted_tenant);
         }
-        let verdict = self.introspect(token).await;
+        let resolution = self.introspect(token).await;
         self.cache
             .lock()
             .expect("cache lock")
-            .store(token, &verdict, now);
-        judge(verdict)
+            .store(token, &resolution.verdict, now);
+        judge(resolution, asserted_tenant)
     }
 
     /// Resolve a token WITHOUT the cache and WITHOUT the app check — `/api/whoami` reports what
     /// the licence server says about the token itself, so a revoked token reads 401 at once and
     /// a wrong app is reported rather than judged.
-    pub async fn resolve_fresh(&self, token: &str) -> Verdict {
+    pub async fn resolve_fresh(&self, token: &str) -> Resolution {
         self.introspect(token).await
     }
 
-    async fn introspect(&self, token: &str) -> Verdict {
+    async fn introspect(&self, token: &str) -> Resolution {
         if self.url.trim().is_empty() {
-            return Verdict::Unavailable;
+            return Resolution::new(Verdict::Unavailable, "unconfigured");
         }
         let response = self
             .client
@@ -435,46 +456,61 @@ impl Introspector {
             .timeout(self.timeout)
             .send()
             .await;
-        let Ok(response) = response else {
-            return Verdict::Unavailable;
+        let response = match response {
+            Ok(response) => response,
+            Err(error) if error.is_timeout() => {
+                return Resolution::new(Verdict::Unavailable, "timeout");
+            }
+            Err(_) => return Resolution::new(Verdict::Unavailable, "transport"),
         };
         if !response.status().is_success() {
             // Including 4xx: licences answers an inactive token with 200 {"active": false}. A
             // non-200 is a contract drift or an outage — never a statement about this caller.
-            return Verdict::Unavailable;
+            return Resolution::new(Verdict::Unavailable, "bad_status");
         }
         let Ok(payload) = response.json::<Payload>().await else {
-            return Verdict::Unavailable;
+            return Resolution::new(Verdict::Unavailable, "bad_body");
         };
         if !payload.active {
-            return Verdict::Denied;
+            return Resolution::new(Verdict::Denied, "inactive");
         }
         let (Some(tenant_id), Some(license_id)) = (payload.tenant_id, payload.license_id) else {
             // Active but without the two fields the gate exists to establish — never substituted
             // from the caller's headers.
-            return Verdict::Denied;
+            return Resolution::new(Verdict::Denied, "incomplete");
         };
-        Verdict::Resolved(Licence {
-            tenant_id,
-            license_id,
-            app: payload.app.and_then(|app| app.key),
-            expires_at: payload.expires_at,
-            subject_id: payload.subject_id,
-        })
+        Resolution::new(
+            Verdict::Resolved(Licence {
+                tenant_id,
+                license_id,
+                app: payload.app.and_then(|app| app.key),
+                expires_at: payload.expires_at,
+                subject_id: payload.subject_id,
+            }),
+            "resolved",
+        )
     }
 }
 
-/// The app check re-runs on every cache hit, so the cache cannot launder a wrong-app licence.
-fn judge(verdict: Verdict) -> Verdict {
-    match verdict {
+/// The post-introspection checks, re-run on every cache hit so the cache cannot launder a
+/// wrong-app licence: app first (a refusal), then the asserted tenant (a count, not a refusal —
+/// the identity is the token's, exactly as in the reference).
+fn judge(resolution: Resolution, asserted_tenant: Option<&str>) -> Resolution {
+    match resolution.verdict {
         Verdict::Resolved(licence) => {
             if licence.app.as_deref() != Some(EXPECTED_APP) {
-                Verdict::Denied
-            } else {
-                Verdict::Resolved(licence)
+                return Resolution::new(Verdict::Denied, "wrong_app");
             }
+            let asserted = asserted_tenant.map(str::trim).unwrap_or("");
+            if !asserted.is_empty() && !asserted.eq_ignore_ascii_case(licence.tenant_id.trim()) {
+                return Resolution::new(Verdict::Resolved(licence), "tenant_mismatch");
+            }
+            Resolution::new(Verdict::Resolved(licence), resolution.outcome)
         }
-        other => other,
+        verdict => Resolution {
+            verdict,
+            outcome: resolution.outcome,
+        },
     }
 }
 
@@ -485,10 +521,10 @@ pub async fn authorize(
     fail_open: bool,
     headers: &HeaderMap,
 ) -> Result<CallerIdentity, Refusal> {
+    let header = |name: &str| headers.get(name).and_then(|value| value.to_str().ok());
+    let raw_tenant = header("x-tenant-id");
     let asserted = CallerIdentity {
-        tenant_id: headers
-            .get("x-tenant-id")
-            .and_then(|value| value.to_str().ok())
+        tenant_id: raw_tenant
             .map(str::trim)
             .filter(|value| !value.is_empty())
             .map(str::to_owned),
@@ -497,18 +533,35 @@ pub async fn authorize(
         subject_id: None,
     };
     if mode == Mode::Off {
-        // The inert path: no header is read, no request is made.
+        // The inert path: no header is read, no request is made, nothing is counted.
         return Ok(asserted);
     }
+    let caller = crate::metrics::caller_label(header("x-app-id"));
+    let worker = crate::metrics::worker_label(header("x-worker-name"));
+    let enforced = mode == Mode::Enforce;
     let presentation = read_license_token(headers);
     let Some(token) = presentation.token else {
-        return if mode == Mode::Enforce {
+        crate::metrics::record_license_introspection(
+            presentation.absent_outcome,
+            enforced,
+            &caller,
+            &worker,
+        );
+        return if enforced {
             Err(denied("unlicensed"))
         } else {
             Ok(asserted)
         };
     };
-    match introspector.resolve(&token).await {
+    // The caller's asserted tenant, only when it is a plain uuid: a credential-shaped
+    // `X-Tenant-Id` is the licence token itself, never a tenant to compare against.
+    let asserted_tenant = raw_tenant
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .filter(|value| credential_scheme(value).is_none() && is_uuid(value));
+    let resolution = introspector.resolve(&token, asserted_tenant).await;
+    crate::metrics::record_license_introspection(resolution.outcome, enforced, &caller, &worker);
+    match resolution.verdict {
         Verdict::Resolved(licence) => Ok(CallerIdentity {
             tenant_id: Some(licence.tenant_id.clone()),
             license_id: Some(licence.license_id.clone()),
@@ -516,14 +569,14 @@ pub async fn authorize(
             subject_id: licence.subject_id.clone(),
         }),
         Verdict::Denied => {
-            if mode == Mode::Enforce {
+            if enforced {
                 Err(denied("licence_not_active"))
             } else {
                 Ok(asserted)
             }
         }
         Verdict::Unavailable => {
-            if mode == Mode::Enforce && !fail_open {
+            if enforced && !fail_open {
                 Err(Refusal::detail(
                     StatusCode::SERVICE_UNAVAILABLE,
                     "Licence introspection unavailable",
@@ -647,12 +700,17 @@ mod tests {
     #[tokio::test]
     async fn an_active_licence_resolves_and_is_cached() {
         let (seen, introspector) = introspector(active_payload(), 200).await;
-        let verdict = introspector.resolve(TOKEN).await;
+        let first = introspector.resolve(TOKEN, None).await;
         assert!(
-            matches!(verdict, Verdict::Resolved(ref licence) if licence.tenant_id == "0195f48b-d000-7000-8000-000000000001")
+            matches!(first.verdict, Verdict::Resolved(ref licence) if licence.tenant_id == "0195f48b-d000-7000-8000-000000000001")
         );
-        // The second call is served from the cache: one POST, not two.
-        let _ = introspector.resolve(TOKEN).await;
+        assert_eq!(
+            first.outcome, "resolved",
+            "a fresh success is distinguishable from a cache hit"
+        );
+        // The second call is served from the cache: one POST, not two — and it says so.
+        let second = introspector.resolve(TOKEN, None).await;
+        assert_eq!(second.outcome, "cached");
         assert_eq!(seen.lock().await.len(), 1);
         assert_eq!(seen.lock().await[0]["token"], TOKEN);
     }
@@ -660,7 +718,14 @@ mod tests {
     #[tokio::test]
     async fn an_inactive_licence_is_denied() {
         let (_seen, introspector) = introspector(json!({"active": false}), 200).await;
-        assert_eq!(introspector.resolve(TOKEN).await, Verdict::Denied);
+        let first = introspector.resolve(TOKEN, None).await;
+        assert_eq!(first.verdict, Verdict::Denied);
+        assert_eq!(first.outcome, "inactive");
+        let second = introspector.resolve(TOKEN, None).await;
+        assert_eq!(
+            second.outcome, "inactive",
+            "the negative cache reports the same class, not a network outcome"
+        );
     }
 
     #[tokio::test]
@@ -670,7 +735,9 @@ mod tests {
             200,
         )
         .await;
-        assert_eq!(introspector.resolve(TOKEN).await, Verdict::Denied);
+        let resolution = introspector.resolve(TOKEN, None).await;
+        assert_eq!(resolution.verdict, Verdict::Denied);
+        assert_eq!(resolution.outcome, "wrong_app");
     }
 
     #[tokio::test]
@@ -679,7 +746,45 @@ mod tests {
             "http://127.0.0.1:1/x".to_owned(),
             Duration::from_millis(200),
         );
-        assert_eq!(introspector.resolve(TOKEN).await, Verdict::Unavailable);
+        let resolution = introspector.resolve(TOKEN, None).await;
+        assert_eq!(resolution.verdict, Verdict::Unavailable);
+        assert_eq!(
+            resolution.outcome, "transport",
+            "a refused connection is not a timeout"
+        );
+    }
+
+    #[tokio::test]
+    async fn the_network_failures_are_classified_not_flattened() {
+        let unconfigured = Introspector::new(String::new(), Duration::from_millis(100));
+        assert_eq!(
+            unconfigured.resolve(TOKEN, None).await.outcome,
+            "unconfigured"
+        );
+
+        let (_seen, bad_status) = introspector(active_payload(), 500).await;
+        let resolution = bad_status.resolve(TOKEN, None).await;
+        assert_eq!(resolution.verdict, Verdict::Unavailable);
+        assert_eq!(resolution.outcome, "bad_status");
+
+        let (_seen, bad_body) = introspector(json!("not an object"), 200).await;
+        assert_eq!(bad_body.resolve(TOKEN, None).await.outcome, "bad_body");
+    }
+
+    #[tokio::test]
+    async fn an_asserted_tenant_that_differs_is_counted_not_refused() {
+        let (_seen, introspector) = introspector(active_payload(), 200).await;
+        let resolution = introspector
+            .resolve(TOKEN, Some(&format!("  {}  ", OTHER.to_uppercase())))
+            .await;
+        assert_eq!(
+            resolution.outcome, "tenant_mismatch",
+            "trimmed and case-insensitive, like the reference"
+        );
+        assert!(
+            matches!(resolution.verdict, Verdict::Resolved(_)),
+            "the identity is the token's: a mismatch is a count, never a refusal"
+        );
     }
 
     #[tokio::test]

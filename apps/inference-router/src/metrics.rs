@@ -266,6 +266,32 @@ pub fn record_effective_tenant(outcome: &str) {
     .increment(1);
 }
 
+/// Book ONE request's licence-introspection outcome onto BOTH alert-keyed families.
+///
+/// `outcome` is the reference's closed set: the absent class (`absent` | `sentinel` |
+/// `authorization_jwt_ignored` | `not_licence_shaped`) plus `resolved` | `cached` | `inactive` |
+/// `incomplete` | `unconfigured` | `timeout` | `transport` | `bad_status` | `bad_body` |
+/// `wrong_app` | `tenant_mismatch`. `enforced` is the GATE MODE, not the behaviour: observe and
+/// enforce count the same resolutions. `caller` / `worker` are already normalised through
+/// [`caller_label`] / [`worker_label`], so no caller-supplied value ever reaches a series raw.
+/// Both families move together, exactly once per request, as in the reference's `_Recorder`.
+pub fn record_license_introspection(outcome: &str, enforced: bool, caller: &str, worker: &str) {
+    let enforced = if enforced { "true" } else { "false" };
+    counter!(
+        "inference_router_license_introspection_total",
+        "outcome" => outcome.to_owned(),
+        "enforced" => enforced
+    )
+    .increment(1);
+    counter!(
+        "inference_router_license_introspection_by_caller_total",
+        "outcome" => outcome.to_owned(),
+        "caller" => caller.to_owned(),
+        "worker" => worker.to_owned()
+    )
+    .increment(1);
+}
+
 /// The route layer over both completion paths: count a matched POST, then pass the request through
 /// untouched.
 ///
