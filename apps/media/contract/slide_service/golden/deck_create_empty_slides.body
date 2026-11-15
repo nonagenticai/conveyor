@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"slides: Should have at least 1 items","status":422,"request_id":"01a1e10f-de7b-740d-b933-715b2333c73e","timestamp":"2026-11-15T21:14:36Z","details":[{"loc":["body","slides"],"msg":"Should have at least 1 items","type":"too_short"}]}}

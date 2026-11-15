@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"default_timing_hint_seconds: Input should be greater than 0.0","status":422,"request_id":"01a1e10f-de1b-7202-808d-e3d35d665152","timestamp":"2026-11-15T21:14:35Z","details":[{"loc":["body","default_timing_hint_seconds"],"msg":"Input should be greater than 0.0","type":"greater_than"}]}}

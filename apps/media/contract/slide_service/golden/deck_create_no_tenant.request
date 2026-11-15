@@ -1,0 +1,2 @@
+POST /api/decks
+{"title":"No tenant","slides":[{"template_id":"00000000-0000-0000-0000-0000000000d1"}]}

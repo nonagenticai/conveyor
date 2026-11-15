@@ -1,0 +1,3 @@
+PUT /api/templates/00000000-0000-0000-0000-0000000000d1
+{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}
+{"display_name":"Capture Title Updated"}
