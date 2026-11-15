@@ -48,13 +48,12 @@ async fn the_catalogue_seed_installs_the_built_in_prompt_catalogue() {
 
     // SPEC D27's built-in catalogue: the copilot's system prompt, the prompt-audit instruction
     // and the capability agent's `agent@1` pin.
-    let prompts: Vec<(String, i32, String)> = sqlx::query_as(
-        "SELECT key, version, status FROM prompt WHERE tenant_id = $1 ORDER BY key",
-    )
-    .bind(tenant)
-    .fetch_all(&db.super_pool)
-    .await
-    .expect("read the prompt catalogue");
+    let prompts: Vec<(String, i32, String)> =
+        sqlx::query_as("SELECT key, version, status FROM prompt WHERE tenant_id = $1 ORDER BY key")
+            .bind(tenant)
+            .fetch_all(&db.super_pool)
+            .await
+            .expect("read the prompt catalogue");
     assert_eq!(
         prompts,
         vec![
@@ -126,7 +125,11 @@ async fn the_programme_seed_gives_every_active_project_a_board() {
     .fetch_all(&db.super_pool)
     .await
     .expect("count board-less projects");
-    assert_eq!(boardless, vec!["S06a".to_owned()], "only the archived project");
+    assert_eq!(
+        boardless,
+        vec!["S06a".to_owned()],
+        "only the archived project"
+    );
 
     // The board is the one `projects.create` makes: the five template lanes, in order.
     let lanes: Vec<String> = sqlx::query_scalar(
@@ -140,7 +143,10 @@ async fn the_programme_seed_gives_every_active_project_a_board() {
     .fetch_all(&db.super_pool)
     .await
     .expect("read P0's lanes");
-    assert_eq!(lanes, vec!["intake", "active", "waiting", "done", "archive"]);
+    assert_eq!(
+        lanes,
+        vec!["intake", "active", "waiting", "done", "archive"]
+    );
 
     // Idempotent: the second run creates no board and touches no project.
     let second = seed_programme(&db.super_pool, Some("run-prog"))
