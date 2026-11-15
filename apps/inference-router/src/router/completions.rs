@@ -367,8 +367,7 @@ async fn record(
         if let Err(error) = ledger::insert(pool, &row).await {
             tracing::warn!(%error, "inference ledger write failed");
         }
-    } else if let (Some(pool), Err(refusal)) = (state.deps().ledger.as_ref(), &outcome.response)
-    {
+    } else if let (Some(pool), Err(refusal)) = (state.deps().ledger.as_ref(), &outcome.response) {
         // A request that reached a provider is a call the estate paid for, even when the answer is
         // refused — the reference records it (measured 2026-11-15 from the contract oracle: the
         // second-blank refusal lands a row with status '502' and no response columns). A refusal
