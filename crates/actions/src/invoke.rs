@@ -31,11 +31,17 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::registry::Registry;
-use crate::spec::{ActionKind, Effect, FieldError, HandlerRef, validate_input};
+use crate::spec::{ActionKind, Effect, FieldError, HandlerRef, Tenancy, validate_input};
 use crate::views::InvocationResponse;
 
 /// The invocation depth at which a call chain is refused (S04 trap 6).
 pub const MAX_DEPTH: u32 = 8;
+
+/// The caller's tenant on the wire to an external service that declares `Tenancy::Tenant`.
+///
+/// The coding service resolves a job by this header; without it every job lands in the service's
+/// default tenant instead of the caller's.
+pub const TENANT_HEADER: &str = "X-Tenant-Id";
 
 /// The circuit breaker's failure count inside its window.
 pub const BREAKER_THRESHOLD: usize = 5;
@@ -1052,6 +1058,11 @@ async fn invoke_external(
     };
     if let Some(correlation) = &correlation {
         builder = builder.header("X-Correlation-Id", correlation);
+    }
+    // The caller's tenant, for the external actions that scope themselves to it (every current
+    // one). `ctx` is Copy and is not consumed until the failure recorder below.
+    if spec.tenancy == Tenancy::Tenant {
+        builder = builder.header(TENANT_HEADER, ctx.tenant.to_string());
     }
     if let Some(token) = &bearer {
         builder = builder.bearer_auth(token);
