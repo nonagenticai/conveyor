@@ -1,0 +1,25 @@
+# nextest configuration — the one thing the default profile cannot know.
+#
+# ⛔ `bus_delivery` shares ONE Redis across all of its tests, and exactly one of them rehearses a
+# Redis loss with `FLUSHALL` — which wipes every sibling's stream, not just its own tenant's.
+# nextest runs each test in its own PROCESS, so no in-process lock can serialise them; a test
+# group can, and does: `max-threads = 1` holds the binary to one test at a time.
+#
+# MEASURED 2026-11-15 (run 43696201698, job `checks`): `bus_delivery::a_large_job_round_trips_intact`
+# died with `XREADGROUP … NOGROUP: No such key 'bus:<tenant>:process'` at 08:56:54.819, inside the
+# 2.036 s window of `bus_delivery::a_flushall_replays_from_postgres_without_a_double_outcome`
+# (finished 08:56:55.281). A positive failure, not a timing guess. The same test failed the #116
+# main run on 2026-11-14.
+#
+# The scope is the binary, not the test: a sibling added later inherits the protection, and the
+# cost is seconds on one small binary (the suite's other binaries are unaffected).
+[test-groups.serial-redis-loss]
+max-threads = 1
+
+# ⚠️ `overrides` (plural). `override` is silently accepted as an unknown key and the file still
+# loads — measured 2026-11-15: nextest printed `ignoring unknown configuration key:
+# profile.default.override` and ran the binary concurrently. Always confirm the group with
+# `cargo nextest list --message-format json` before believing a green run.
+[[profile.default.overrides]]
+filter = 'binary(bus_delivery)'
+test-group = 'serial-redis-loss'

@@ -6,7 +6,10 @@
 //! test — nothing here skips, because a bus test that skips proves nothing about the bus.
 //!
 //! One Redis serves every test in a binary. The bus tests take their own tenant, so `stream_for`
-//! gives them disjoint streams and they may run concurrently.
+//! gives them disjoint streams — but a tenant does not survive `FLUSHALL`, which the replay test
+//! issues on purpose. `crates/actions/tests/bus_delivery.rs` is therefore serialised by the
+//! `serial-redis-loss` test group in `.config/nextest.toml`; any binary that shares this Redis and
+//! wipes it needs the same treatment.
 
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
