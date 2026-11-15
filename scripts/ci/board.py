@@ -156,6 +156,10 @@ def plan(issues, prs, branches, blocker_state, now):
                     "branch": branch,
                     "pr": pr["number"] if pr else None,
                     "evidence": evidence,
+                    # `status:blocked` is not claimable. When an issue somehow carries both, the
+                    # dangerous label is `ready`: remove it, and leave the block exactly as it is
+                    # rather than producing an issue with two state labels.
+                    "blocked": BLOCKED in labels,
                 }
             )
             continue
@@ -206,8 +210,15 @@ def plan(issues, prs, branches, blocker_state, now):
 
 def comment_for(fix) -> str:
     """One comment per fix: what moved, on what evidence, and why it is not a mistake."""
+    if fix.get("blocked"):
+        head = (
+            "Board contract check: the `status:ready` label is removed; the issue keeps "
+            "`status:blocked`."
+        )
+    else:
+        head = "Board contract check: `status:ready` -> `status:claimed`."
     return (
-        "Board contract check: `status:ready` -> `status:claimed`.\n"
+        f"{head}\n"
         "\n"
         f"This issue was labelled `{READY}` while {' and '.join(fix['evidence'])} "
         "proved the work is live. `docs/plans/03-DELIVERY.md` § \"Labels and states\" "
@@ -337,13 +348,17 @@ def apply(fixes, repo: str):
     applied, failed = [], []
     for fix in fixes:
         try:
-            gh(
+            edit = [
                 "issue", "edit", str(fix["number"]), "--repo", repo,
-                "--add-label", CLAIMED, "--remove-label", READY,
-            )
+                "--remove-label", READY,
+            ]
+            if not fix.get("blocked"):
+                edit += ["--add-label", CLAIMED]
+            gh(*edit)
             gh("issue", "comment", str(fix["number"]), "--repo", repo, "--body", comment_for(fix))
             applied.append(fix)
-            print(f"fixed #{fix['number']}: ready -> claimed")
+            outcome = "ready removed, block kept" if fix.get("blocked") else "ready -> claimed"
+            print(f"fixed #{fix['number']}: {outcome}")
         except RuntimeError as error:
             failed.append((fix, str(error)))
             print(f"FAILED #{fix['number']}: {error}", file=sys.stderr)
@@ -399,6 +414,13 @@ def self_test() -> int:
             [],
         ),
         ("ready + nothing -> no action", [issue(6, [READY])], [], [], [], []),
+        (
+            # Two state labels is already invalid; resolve it without creating a third shape.
+            "ready AND blocked + branch -> fix that keeps the block",
+            [issue(72, [READY, BLOCKED], "Blocker: #151\n")],
+            [], ["issue/72-plan-spine"],
+            [72], [],
+        ),
         (
             "claimed + branch -> no action",
             [issue(137, [CLAIMED])],
@@ -498,6 +520,19 @@ def self_test() -> int:
         else:
             failures += 1
             print(f"FAIL: comment omits {needle!r}")
+
+    # A ready+blocked issue must lose `ready` without being claimed: `blocked` is not claimable,
+    # and a fix that added `claimed` would leave two state labels on the issue.
+    total += 1
+    conflict, _ = plan(
+        [issue(72, [READY, BLOCKED], "Blocker: #151\n")],
+        [], ["issue/72-plan-spine"], blocker_state, now,
+    )
+    if conflict and conflict[0]["blocked"] and "keeps `status:blocked`" in comment_for(conflict[0]):
+        print("ok: ready+blocked keeps the block instead of claiming it")
+    else:
+        failures += 1
+        print("FAIL: ready+blocked would claim an issue that is still blocked")
 
     print(f"\n{total - failures} passing, {failures} failing")
     return 1 if failures else 0
