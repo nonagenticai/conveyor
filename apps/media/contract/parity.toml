@@ -390,3 +390,317 @@ service = "html_render_service"
 operation = "GET /readyz"
 disposition = "drop"
 reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+
+# video_production_service — one row per captured operation.
+
+[[operation]]
+service = "video_production_service"
+operation = "DELETE /api/compile/jobs/{job_id}"
+disposition = "drop"
+reason = "cancel is a ledger transition"
+
+[[operation]]
+service = "video_production_service"
+operation = "DELETE /api/compile/presets/custom/{preset_id}"
+disposition = "drop"
+reason = "per-tenant CRUD"
+
+[[operation]]
+service = "video_production_service"
+operation = "DELETE /api/compile/templates/{template_id}"
+disposition = "drop"
+reason = "per-tenant CRUD"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /"
+disposition = "drop"
+reason = "endpoint index advertising routes the executor will not serve"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/analytics/usage"
+disposition = "drop"
+reason = "usage aggregation is billing/metering, ledger-owned"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/analytics/usage/daily"
+disposition = "drop"
+reason = "daily usage aggregation"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/batch/{batch_id}"
+disposition = "drop"
+reason = "batch status"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs"
+disposition = "drop"
+reason = "job list/polling is the conveyor ledger's; the executor surfaces intake only"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}"
+disposition = "drop"
+reason = "status polling"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/report"
+disposition = "drop"
+reason = "per-job stage report"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/result"
+disposition = "drop"
+reason = "result metadata"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/thumbnail"
+disposition = "drop"
+reason = "artifact read of a ledger-owned job"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/video"
+disposition = "drop"
+reason = "artifact download"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/video-url"
+disposition = "drop"
+reason = "artifact URL minting"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/presets"
+disposition = "drop"
+reason = "static config data; the executor receives explicit config in the job request"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/presets/custom"
+disposition = "drop"
+reason = "per-tenant CRUD rows belong to the config/ledger store"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/presets/{name}"
+disposition = "drop"
+reason = "static config lookup"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/templates"
+disposition = "drop"
+reason = "template catalogue (seeded per boot)"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/themes"
+disposition = "drop"
+reason = "static theme catalogue"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/themes/{name}"
+disposition = "drop"
+reason = "static theme lookup"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/batch/{batch_id}"
+disposition = "drop"
+reason = "batch status"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/jobs"
+disposition = "drop"
+reason = "recording job list/polling"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/jobs/{job_id}"
+disposition = "drop"
+reason = "recording status"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/jobs/{job_id}/result"
+disposition = "drop"
+reason = "recording result metadata"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/jobs/{job_id}/video"
+disposition = "drop"
+reason = "artifact download"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /events/{tenant_id}"
+disposition = "drop"
+reason = "SSE job-progress stream; ledger-owned and not a request/response pair"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /health"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /health/live"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /health/ready"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /healthz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /metrics"
+disposition = "drop"
+reason = "Prometheus exposition scaffolding; operational, not a business operation"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /readyz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile"
+disposition = "kind"
+kind = "media.produce_video"
+note = "shot list + supplied recordings → assembled deliverable; pinned at intake (completion blocked by the `fps` defect)"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/admin/cleanup"
+disposition = "drop"
+reason = "retention/maintenance; ledger-owned"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/audio-export"
+disposition = "drop"
+reason = "extracts audio from a ledger-owned job's output by `job_id`"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/batch"
+disposition = "drop"
+reason = "fan-out of several compiles is ledger orchestration"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/edit-plan"
+disposition = "drop"
+reason = "LLM edit planning; the ledger/orchestrator owns planning, and the response is a plan, not media"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/findings-video"
+disposition = "drop"
+reason = "findings → shot-list shaping is presentation policy; the caller/ledger supplies the shot list to `media.produce_video`"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/jobs/{job_id}/thumbnail"
+disposition = "drop"
+reason = "artifact write against a ledger-owned job"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/presets/custom"
+disposition = "drop"
+reason = "per-tenant CRUD"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/preview"
+disposition = "drop"
+reason = "derived preview of a ledger-owned job output; not a capability"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/templates"
+disposition = "drop"
+reason = "per-tenant CRUD"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/title-card"
+disposition = "kind"
+kind = "media.produce_video"
+note = "single title-card shot render (Pillow → mp4); happy path captured"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/animation"
+disposition = "drop"
+reason = "320×240 @ 10 fps, 1.0 s → 10 PNG frames → H.264 1.000 s + silent AAC, 3 628 B, 3.7 s wall clock (capture raster 640×480, scale 2) | **no**"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/batch"
+disposition = "drop"
+reason = "recording fan-out"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/batch_from_artifacts"
+disposition = "drop"
+reason = "fan-out plus artifact retrieval; ledger orchestration"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/capture/screens"
+disposition = "kind"
+kind = "media.record_browser"
+note = "one screenshot per demo step → zip; pinned at the SSRF/validation branch (needs a public URL)"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/content"
+disposition = "drop"
+reason = "inline one-page HTML → 320×240, 1.8 s @ 25 fps, H.264 + AAC, 26 807 B, ~3.8 s wall clock | **yes**"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/jobs/{job_id}/cancel"
+disposition = "drop"
+reason = "cancel is a ledger transition"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/part"
+disposition = "kind"
+kind = "media.record_browser"
+note = "scripted browser part; pinned at validation (needs a scripts directory)"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/url"
+disposition = "kind"
+kind = "media.record_browser"
+note = "live URL → continuous browser recording; the rig pins the SSRF/validation branches (happy path needs an external public URL)"

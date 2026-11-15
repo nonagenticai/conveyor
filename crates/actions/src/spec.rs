@@ -66,6 +66,29 @@ impl Effect {
             Self::Destructive => "destructive",
         }
     }
+
+    /// How far up the scale this effect sits: `read < write < destructive`.
+    ///
+    /// The order is the whole point of a binding's ceiling — a job bound to `read` may not reach a
+    /// `write`, and comparisons are made on this rank, never on the string.
+    pub fn rank(self) -> u8 {
+        match self {
+            Self::Read => 0,
+            Self::Write => 1,
+            Self::Destructive => 2,
+        }
+    }
+
+    /// Parse the manifest/OpenAPI spelling. `None` for anything else, so an unknown ceiling is
+    /// refused rather than silently treated as unlimited.
+    pub fn parse(text: &str) -> Option<Self> {
+        match text {
+            "read" => Some(Self::Read),
+            "write" => Some(Self::Write),
+            "destructive" => Some(Self::Destructive),
+            _ => None,
+        }
+    }
 }
 
 /// How a channel asks the human before executing.
