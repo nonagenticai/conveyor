@@ -16,7 +16,7 @@ corrected here and in `04` itself.
 
 | Group | Plan 04's state word | Measured state | Evidence |
 |---|---|---|---|
-| the executor group (`apps/media`) | decided, unclaimed | **absorbed** (#139 merged 2026-11-15) | `apps/media/src/{browser,ffmpeg}/`; twelve `media.*` actions in `crates/actions/src/media.rs` |
+| the executor group (`apps/media`) | decided, unclaimed | **absorbed** (#139 merged 2026-11-15) | `apps/media/src/{browser,ffmpeg}/`; twelve `media.*` actions in `crates/actions/src/media.rs` — eleven executor kinds and the capabilities probe |
 | the analysis library (`crates/analysis`) | absorbed, not deployed | **in flight** (#154) | absent on main; P1–P4 on `issue/154-analysis` |
 | deck authoring (`crates/deck`) | not listed | **in flight** (#161) | absent on main; `issue/161-deck` |
 | the production family (`produce.*`) | "one family" (§3) | **not started** | zero `produce.*` actions registered |
