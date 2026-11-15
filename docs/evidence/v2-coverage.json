@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 11,
+    "exists": 12,
     "extend": 8,
-    "new": 25
+    "new": 24
   },
   "rows": [
     {
@@ -352,9 +352,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "analysis",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: analyse.* absent"
+        "actions: analyse.* found (analyse.site)"
       ]
     },
     {
