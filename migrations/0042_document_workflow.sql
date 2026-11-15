@@ -41,10 +41,18 @@ ALTER TABLE document ADD CONSTRAINT document_kind_check
     CHECK (kind IN ('document', 'report', 'export', 'attachment'));
 
 -- Backfill the two promoted keys. An empty string is not a category.
+--
+-- ⚠️ `document` is FORCE ROW LEVEL SECURITY and a migration has no tenant context, so a bare
+-- UPDATE here would match ZERO rows: `tenant_id = app_current_tenant()` is NULL. The force is
+-- lifted for the statement and restored immediately; the ALTER takes an ACCESS EXCLUSIVE lock,
+-- so no application read or write can observe the window. sqlx runs a migration in one
+-- transaction, so a failure rolls the restore back with the statement.
+ALTER TABLE document NO FORCE ROW LEVEL SECURITY;
 UPDATE document
    SET category = NULLIF(btrim(meta->>'category'), ''),
        unit = NULLIF(btrim(meta->>'unit'), '')
  WHERE meta ? 'category' OR meta ? 'unit';
+ALTER TABLE document FORCE ROW LEVEL SECURITY;
 
 -- The project workspace asks "which of the expected slots does this project have?"; the register
 -- filters by unit; the attachment list reads by parent; the admin queue reads requested rows.

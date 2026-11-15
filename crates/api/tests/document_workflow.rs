@@ -299,6 +299,74 @@ async fn the_first_edit_of_a_legacy_row_writes_its_pre_image() {
 }
 
 #[tokio::test(flavor = "multi_thread")]
+async fn the_category_backfill_crosses_tenants_under_force_rls() {
+    let pg = support::Pg::fresh().await;
+    let first = support::seed(&pg, "backfill-a", "alice", "Alice").await;
+    let second = support::seed(&pg, "backfill-b", "bob", "Bob").await;
+    for (tenant, title) in [(first.tenant, "one"), (second.tenant, "two")] {
+        let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
+            .await
+            .expect("scoped tx");
+        sqlx::query(
+            "INSERT INTO document (id, tenant_id, kind, title, status, body, content_hash,
+                                   meta, publishable)
+             VALUES ($1, $2, 'document', $3, 'active', '# x', $4,
+                     '{\"category\":\"evidence\",\"unit\":\"S02\"}'::jsonb, false)",
+        )
+        .bind(Uuid::now_v7())
+        .bind(tenant.as_uuid())
+        .bind(title)
+        .bind("a".repeat(64))
+        .execute(&mut *tx)
+        .await
+        .expect("insert a legacy row");
+        tx.commit().await.expect("commit the legacy row");
+    }
+
+    // The 0042 statement, with the force lifted exactly as the migration does: without this,
+    // FORCE RLS makes the backfill match nothing because a migration has no tenant context.
+    let mut admin = pg.owner.begin().await.expect("admin tx");
+    sqlx::query("ALTER TABLE document NO FORCE ROW LEVEL SECURITY")
+        .execute(&mut *admin)
+        .await
+        .expect("lift the force");
+    let affected = sqlx::query(
+        "UPDATE document
+            SET category = NULLIF(btrim(meta->>'category'), ''),
+                unit = NULLIF(btrim(meta->>'unit'), '')
+          WHERE meta ? 'category' OR meta ? 'unit'",
+    )
+    .execute(&mut *admin)
+    .await
+    .expect("backfill")
+    .rows_affected();
+    sqlx::query("ALTER TABLE document FORCE ROW LEVEL SECURITY")
+        .execute(&mut *admin)
+        .await
+        .expect("restore the force");
+    admin.commit().await.expect("commit the backfill");
+    assert_eq!(affected, 2, "both tenants' rows were backfilled");
+
+    for (tenant, title) in [(first.tenant, "one"), (second.tenant, "two")] {
+        let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
+            .await
+            .expect("scoped read");
+        let row: Option<(Option<String>, Option<String>)> =
+            sqlx::query_as("SELECT category, unit FROM document WHERE title = $1")
+                .bind(title)
+                .fetch_optional(&mut *tx)
+                .await
+                .expect("read the backfilled row");
+        assert_eq!(
+            row,
+            Some((Some("evidence".to_owned()), Some("S02".to_owned()))),
+            "the promoted columns carry the meta values"
+        );
+        tx.rollback().await.expect("close the read");
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
 async fn an_attachment_is_a_child_document_with_its_parents_scope() {
     let pg = support::Pg::fresh().await;
     support::seed(&pg, "attach", "alice", "Alice").await;

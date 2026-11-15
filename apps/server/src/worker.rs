@@ -523,7 +523,15 @@ async fn dispatch(
             )
             .await
             .map_err(db)?;
-            tracing::info!(tenant = %tenant, deleted, "model.prune");
+            let documents = store::prune::document_revision_prune(
+                pool,
+                tenant,
+                store::prune::DOCUMENT_REVISION_KEEP,
+                store::prune::PRUNE_BATCH,
+            )
+            .await
+            .map_err(db)?;
+            tracing::info!(tenant = %tenant, deleted, documents, "model.prune");
         }
         "validation.prune" => {
             let deleted = store::prune::validation_run_prune(

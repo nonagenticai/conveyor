@@ -338,9 +338,11 @@ fn attachments_html(attachments: &[AttachmentEntry]) -> String {
     }
     let mut out = String::from("<h2>Attachments</h2><ul class=\"attachments\">");
     for attachment in attachments {
+        // The page lives at /design/docs/output-<id>.html, so a sibling attachment is
+        // `attachment-<id>`; the `path` in `outputs.js` is relative to /design/ instead.
         out.push_str(&format!(
-            "<li><a href=\"{}\" rel=\"noopener\">{}</a> <span class=\"muted\">{}</span></li>",
-            escape_html(&attachment.path),
+            "<li><a href=\"attachment-{}\" rel=\"noopener\">{}</a> <span class=\"muted\">{}</span></li>",
+            escape_html(&attachment.id),
             escape_html(&attachment.filename),
             escape_html(&attachment.content_type),
         ));
@@ -399,14 +401,30 @@ mod tests {
 
     #[test]
     fn the_page_uses_the_pack_assets_and_escapes_the_title() {
+        let attachments = [AttachmentEntry {
+            id: "a-1".to_owned(),
+            filename: "evidence.png".to_owned(),
+            content_type: "image/png".to_owned(),
+            size_bytes: 8,
+            path: "docs/attachment-a-1".to_owned(),
+        }];
         let page = output_page(
             "<T>",
             "<p>x</p>",
             "2026-11-13T00:00:00Z",
             Some("S02"),
-            None,
-            &[],
+            Some("A Person"),
+            &attachments,
         );
+        assert!(
+            page.contains("href=\"attachment-a-1\""),
+            "an attachment is a sibling of the output page"
+        );
+        assert!(
+            !page.contains("href=\"docs/attachment-a-1\""),
+            "the outputs.js path is not the page link"
+        );
+        assert!(page.contains("A Person"), "the author is credited");
         assert!(
             page.contains("../docs.css"),
             "the page must share the pack CSS"
