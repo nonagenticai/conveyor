@@ -8,7 +8,8 @@ use clap::Parser;
 use conveyor_media::browser;
 use conveyor_media::common::{Config, entry};
 
-fn main() -> std::process::ExitCode {
+#[tokio::main]
+async fn main() -> std::process::ExitCode {
     let cli = entry::Cli::parse();
     if cli.check_lock {
         return entry::check(browser::CAPTURES, browser::KINDS);
@@ -19,7 +20,7 @@ fn main() -> std::process::ExitCode {
     }
     let config = Config::from_env(browser::SERVICE);
     match cli.run.clone() {
-        Some(kind) => entry::run(&kind, &cli, &config, &browser::dispatch),
+        Some(kind) => entry::run(&kind, &cli, &config, browser::dispatch).await,
         None => {
             eprintln!("{}: pass --run <kind>, --list or --check-lock", browser::SERVICE);
             std::process::ExitCode::FAILURE

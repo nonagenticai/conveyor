@@ -40,7 +40,12 @@ pub struct Cli {
 }
 
 /// A capability implementation: `(kind, params, config) -> result document`.
-pub type Dispatch<'a> = &'a dyn Fn(&str, &Value, &Config) -> Result<Value, CapabilityError>;
+///
+/// Boxed rather than an `async fn` pointer: the two images dispatch from a table, and a trait
+/// object of `async fn` is not stable. The future owns its inputs so the table stays trivially
+/// callable from both the CLI and, later, the runner loop.
+pub type Dispatch =
+    fn(String, Value, Config) -> futures_util::future::BoxFuture<'static, Result<Value, CapabilityError>>;
 
 /// `--check-lock`: every captured kind implemented, and nothing implemented that no capture names.
 pub fn check(captures: &[Capture], kinds: &[&str]) -> ExitCode {
@@ -67,7 +72,7 @@ pub fn list(kinds: &[&str]) {
 }
 
 /// `--run`: read the parameters, dispatch, print the result document.
-pub fn run(kind: &str, cli: &Cli, config: &Config, dispatch: Dispatch<'_>) -> ExitCode {
+pub async fn run(kind: &str, cli: &Cli, config: &Config, dispatch: Dispatch) -> ExitCode {
     let params = match read_params(cli.params.as_deref()) {
         Ok(params) => params,
         Err(error) => {
@@ -75,7 +80,7 @@ pub fn run(kind: &str, cli: &Cli, config: &Config, dispatch: Dispatch<'_>) -> Ex
             return ExitCode::FAILURE;
         }
     };
-    match dispatch(kind, &params, config) {
+    match dispatch(kind.to_string(), params, config.clone()).await {
         Ok(result) => {
             println!("{}", serde_json::to_string_pretty(&result).unwrap_or_default());
             ExitCode::SUCCESS

@@ -8,7 +8,8 @@ use clap::Parser;
 use conveyor_media::common::{Config, entry};
 use conveyor_media::ffmpeg;
 
-fn main() -> std::process::ExitCode {
+#[tokio::main]
+async fn main() -> std::process::ExitCode {
     let cli = entry::Cli::parse();
     if cli.check_lock {
         return entry::check(ffmpeg::CAPTURES, ffmpeg::KINDS);
@@ -19,7 +20,7 @@ fn main() -> std::process::ExitCode {
     }
     let config = Config::from_env(ffmpeg::SERVICE);
     match cli.run.clone() {
-        Some(kind) => entry::run(&kind, &cli, &config, &ffmpeg::dispatch),
+        Some(kind) => entry::run(&kind, &cli, &config, ffmpeg::dispatch).await,
         None => {
             eprintln!("{}: pass --run <kind>, --list or --check-lock", ffmpeg::SERVICE);
             std::process::ExitCode::FAILURE

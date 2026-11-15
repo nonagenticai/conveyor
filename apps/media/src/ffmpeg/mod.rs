@@ -8,6 +8,10 @@
 //! `tts_gateway` and `youtube_upload_service` are **not** here: they are thin, and ADR 0007 §1
 //! hosts thin operations in `apps/server` beside the job ledger they already use.
 
+pub mod probe;
+pub mod process;
+
+use futures_util::future::BoxFuture;
 use serde_json::Value;
 
 use crate::common::{CapabilityError, Config};
@@ -17,16 +21,21 @@ use crate::contract::Capture;
 pub const SERVICE: &str = "conveyor-media-ffmpeg";
 
 /// The capability kinds this image implements. Must equal the union of [`CAPTURES`]' kinds.
-pub const KINDS: &[&str] = &[];
+pub const KINDS: &[&str] = &[probe::KIND];
 
 /// The captured contracts whose kinds this image owns.
 pub const CAPTURES: &[Capture] = &[];
 
 /// Execute one capability.
 pub fn dispatch(
-    kind: &str,
-    _params: &Value,
-    _config: &Config,
-) -> Result<Value, CapabilityError> {
-    Err(CapabilityError::UnknownKind(kind.to_string()))
+    kind: String,
+    params: Value,
+    config: Config,
+) -> BoxFuture<'static, Result<Value, CapabilityError>> {
+    Box::pin(async move {
+        match kind.as_str() {
+            probe::KIND => probe::probe(&params, &config).await,
+            other => Err(CapabilityError::UnknownKind(other.to_string())),
+        }
+    })
 }

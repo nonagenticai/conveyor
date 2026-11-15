@@ -9,6 +9,7 @@
 //! `slide_service` is **not** here: ADR 0007 §7 moves deck authoring to `crates/deck`, which emits
 //! OOXML and renders PDF/PNG through `crates/render`.
 
+use futures_util::future::BoxFuture;
 use serde_json::Value;
 
 use crate::common::{CapabilityError, Config};
@@ -25,9 +26,9 @@ pub const CAPTURES: &[Capture] = &[];
 
 /// Execute one capability.
 pub fn dispatch(
-    kind: &str,
-    _params: &Value,
-    _config: &Config,
-) -> Result<Value, CapabilityError> {
-    Err(CapabilityError::UnknownKind(kind.to_string()))
+    kind: String,
+    _params: Value,
+    _config: Config,
+) -> BoxFuture<'static, Result<Value, CapabilityError>> {
+    Box::pin(async move { Err(CapabilityError::UnknownKind(kind)) })
 }
