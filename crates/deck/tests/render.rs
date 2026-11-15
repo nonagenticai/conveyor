@@ -8,7 +8,7 @@
 
 use std::path::Path;
 
-use conveyor_deck::{to_pdf, to_pngs, Deck, Slide};
+use conveyor_deck::{Deck, Slide, to_pdf, to_pngs};
 
 fn deck() -> Deck {
     Deck {
@@ -40,11 +40,17 @@ fn one_deck_renders_to_pdf_and_png_with_the_same_text() {
     let pngs = to_pngs(&deck, Path::new(".")).expect("the deck renders to PNGs");
 
     assert!(pdf.starts_with(b"%PDF-"), "the PDF header");
-    assert!(pdf.ends_with(b"%%EOF\n") || pdf.ends_with(b"%%EOF"), "the PDF trailer");
+    assert!(
+        pdf.ends_with(b"%%EOF\n") || pdf.ends_with(b"%%EOF"),
+        "the PDF trailer"
+    );
     assert_eq!(page_count(&pdf), deck.slides.len(), "one page per slide");
     assert_eq!(pngs.len(), deck.slides.len(), "one PNG per slide");
     for (index, png) in pngs.iter().enumerate() {
-        assert!(png.starts_with(&[0x89, b'P', b'N', b'G']), "slide {index} is a PNG");
+        assert!(
+            png.starts_with(&[0x89, b'P', b'N', b'G']),
+            "slide {index} is a PNG"
+        );
         // 960x540 at the renderer's 2x scale rule.
         let width = u32::from_be_bytes([png[16], png[17], png[18], png[19]]);
         let height = u32::from_be_bytes([png[20], png[21], png[22], png[23]]);

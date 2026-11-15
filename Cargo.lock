@@ -707,6 +707,7 @@ dependencies = [
  "conveyor-api",
  "conveyor-auth",
  "conveyor-bus",
+ "conveyor-deck",
  "conveyor-domain",
  "conveyor-render",
  "conveyor-store",

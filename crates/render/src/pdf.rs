@@ -87,7 +87,7 @@ pub(crate) fn render_pages(pages: &[&[u8]]) -> Result<Vec<u8>, RenderError> {
         let height_pt = f64::from(size.height()) * 72.0 / f64::from(DPI);
 
         // The SVG becomes an independent chunk, renumbered into this document's object space.
-        let (chunk, svg_id) = svg2pdf::to_chunk(&tree, conversion.clone())
+        let (chunk, svg_id) = svg2pdf::to_chunk(&tree, conversion)
             .map_err(|error| RenderError::Invalid(format!("pdf: {error}")))?;
         let mut map = HashMap::new();
         let chunk = chunk.renumber(|old| *map.entry(old).or_insert_with(|| alloc.bump()));
@@ -109,14 +109,7 @@ pub(crate) fn render_pages(pages: &[&[u8]]) -> Result<Vec<u8>, RenderError> {
         // page size in points.
         let mut content = Content::new();
         content
-            .transform([
-                width_pt as f32,
-                0.0,
-                0.0,
-                height_pt as f32,
-                0.0,
-                0.0,
-            ])
+            .transform([width_pt as f32, 0.0, 0.0, height_pt as f32, 0.0, 0.0])
             .x_object(svg_name);
         pdf.stream(content_id, &content.finish());
         pdf.extend(&chunk);

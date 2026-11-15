@@ -261,6 +261,15 @@ pub fn to_pngs(deck: &Deck, base: &Path) -> Result<Vec<Vec<u8>>, DeckError> {
         .collect()
 }
 
+/// Write `parts` — names and stored bytes, in the given order — as one deterministic ZIP.
+///
+/// This is the same stored-ZIP writer [`to_pptx_in`] emits, exposed so a caller that has several
+/// artefacts of one deck (the PNG-per-slide form) packages them without a second writer and
+/// without a second determinism contract. A part that does not fit ZIP32 is refused by name.
+pub fn zip_parts(parts: &[(&str, &[u8])]) -> Result<Vec<u8>, DeckError> {
+    zip::archive(parts).map_err(|part| DeckError::PackageTooLarge { part })
+}
+
 /// The prepared images as `(media type, bytes)` — the shape the SVG layout embeds as a data URI.
 fn media(prepared: &[Option<PreparedImage>]) -> Vec<Option<(String, Vec<u8>)>> {
     prepared

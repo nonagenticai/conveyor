@@ -63,7 +63,8 @@ use serde_json::{Value, json};
 /// `job_bindings.*` (4) — the organisation spine (SPEC_V2 §4, §10.4). 305 → **320**.
 /// **#139 P3.1 adds 9 internal**: the eight media capability kinds and the `media.capabilities`
 /// probe. 320 → **332** (the three video kinds joined after the first measurement).
-const EXPECTED: [&str; 332] = [
+/// **#161 P3 adds 1 internal**: `decks.render`, the deck toolkit. 332 → **333**.
+const EXPECTED: [&str; 333] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -134,6 +135,7 @@ const EXPECTED: [&str; 332] = [
     "decisions.list",
     "decisions.transition",
     "decisions.update",
+    "decks.render",
     "departments.create",
     "departments.list",
     "documents.compose",
@@ -425,8 +427,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // reads existed and the domain validator was unreachable through the API.
     // The external count moves exactly once, at step 8 — every other addition is internal.
     // #92 adds `card_types.list` (internal, read): 289 → 290; T0 adds 15 internal actions
-    // (the organisation spine): 290 → 305; #139 P3.1 adds the twelve media actions: 305 → 317.
-    assert_eq!((internal, external), (317, 15));
+    // (the organisation spine): 290 → 305; #139 P3.1 adds the twelve media actions: 305 → 317;
+    // #161 P3 adds `decks.render` (internal, write): 317 → 318.
+    assert_eq!((internal, external), (318, 15));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

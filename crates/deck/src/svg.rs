@@ -25,9 +25,9 @@ pub fn slides(deck: &Deck, images: &[Option<(String, Vec<u8>)>]) -> Vec<String> 
             match slide {
                 Slide::Title { title, subtitle } => title_svg(title, subtitle.as_deref()),
                 Slide::Bullets { title, bullets } => bullets_svg(title.as_deref(), bullets),
-                Slide::Image {
-                    title, caption, ..
-                } => image_svg(title.as_deref(), caption.as_deref(), image),
+                Slide::Image { title, caption, .. } => {
+                    image_svg(title.as_deref(), caption.as_deref(), image)
+                }
                 Slide::Notes { title, notes } => notes_svg(title, notes),
             }
         })
