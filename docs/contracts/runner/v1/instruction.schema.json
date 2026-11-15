@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Instruction",
+  "description": "One unit of work for a stateless executor.",
+  "type": "object",
+  "properties": {
+    "attempt": {
+      "description": "1 for the first dispatch; a retry after an infrastructure failure increments it.",
+      "type": "integer",
+      "format": "int32"
+    },
+    "conveyor_base_url": {
+      "description": "In-cluster address of the conveyor API the executor calls.",
+      "type": "string"
+    },
+    "correlation_id": {
+      "description": "Groups the attempts of one logical request for tracing.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "deadline_unix_ms": {
+      "description": "Wall-clock deadline as Unix milliseconds. The pod's `activeDeadlineSeconds` is derived from\nit; the token expires with it.",
+      "type": "integer",
+      "format": "int64"
+    },
+    "inputs": {
+      "description": "Inputs the executor may fetch through `GET /api/jobs/{id}/inputs/{name}`.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Input"
+      }
+    },
+    "job_id": {
+      "description": "The conveyor job this attempt executes.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "kind": {
+      "description": "The capability slug, e.g. `media.render_html`.",
+      "type": "string"
+    },
+    "limits": {
+      "description": "Resource and size caps. The Job spec is built from these, not from a per-kind default.",
+      "$ref": "#/$defs/Limits"
+    },
+    "outputs": {
+      "description": "The **closed** set of artefacts the executor may produce.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Output"
+      }
+    },
+    "params": {
+      "description": "Kind-versioned parameters. The executor validates its own shape; this contract does not\npretend to know every kind's vocabulary."
+    },
+    "schema": {
+      "description": "Always [`CONTRACT`]; a different tag is refused rather than version-negotiated.",
+      "type": "string"
+    },
+    "tenant": {
+      "description": "The tenant the job belongs to. Every byte route re-checks it against the job row.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "trace_id": {
+      "description": "Trace identifier for logs and events.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "job_id",
+    "tenant",
+    "kind",
+    "attempt",
+    "correlation_id",
+    "deadline_unix_ms",
+    "params",
+    "inputs",
+    "outputs",
+    "limits",
+    "conveyor_base_url",
+    "trace_id"
+  ],
+  "$defs": {
+    "Input": {
+      "description": "One input document the executor may fetch.",
+      "type": "object",
+      "properties": {
+        "bytes": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "content_type": {
+          "type": "string"
+        },
+        "document_id": {
+          "description": "The document row the bytes belong to; the route resolves it and re-checks the tenant.",
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "description": "Route segment: `GET /api/jobs/{job_id}/inputs/{name}`.",
+          "type": "string"
+        },
+        "sha256": {
+          "description": "SHA-256 of the bytes, hex. The executor may refuse early when a download does not match.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "document_id",
+        "sha256",
+        "content_type",
+        "bytes"
+      ]
+    },
+    "Limits": {
+      "description": "Caps carried into the Job spec.",
+      "type": "object",
+      "properties": {
+        "cpu_millis": {
+          "description": "CPU request/limit in millicores.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "max_output_bytes": {
+          "description": "The sum of every declared output's size is checked against this.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "memory_bytes": {
+          "description": "Memory limit in bytes.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "wall_secs": {
+          "description": "Wall-clock cap in seconds. `activeDeadlineSeconds` on the Job.",
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "cpu_millis",
+        "memory_bytes",
+        "wall_secs",
+        "max_output_bytes"
+      ]
+    },
+    "Output": {
+      "description": "One artefact the executor may produce.",
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "description": "The executor must echo this exact type; a different one is refused by the route.",
+          "type": "string"
+        },
+        "max_bytes": {
+          "description": "The largest acceptable body for this artefact.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "description": "Route segment: `POST /api/jobs/{job_id}/outputs/{name}`.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "content_type",
+        "max_bytes"
+      ]
+    }
+  }
+}
