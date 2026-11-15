@@ -21,6 +21,9 @@ pub const DEFAULT_PROVIDERS_CONFIG: &str = "/config/providers.yaml";
 pub struct Config {
     /// The listener address (`BIND_ADDR`, else `0.0.0.0:$INFERENCE_ROUTER_PORT`).
     pub bind: SocketAddr,
+    /// `INFERENCE_ROUTER_METRICS_PORT` — the dedicated Prometheus scrape port. Absent or `0`
+    /// disables the listener; the API port never serves `/metrics`.
+    pub metrics_port: u16,
     /// The service's own database. Required to serve; `--print-openapi` never reads it.
     pub database_url: Option<String>,
     /// The provider catalog YAML (the live ConfigMap's mount path by default).
@@ -139,6 +142,8 @@ pub enum ConfigError {
     InvalidBind(String),
     #[error("INFERENCE_ROUTER_PORT is not a port number: {0}")]
     InvalidPort(String),
+    #[error("INFERENCE_ROUTER_METRICS_PORT is not a port number: {0}")]
+    InvalidMetricsPort(String),
     #[error("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT is not a positive number of seconds: {0}")]
     InvalidSlotWait(String),
     #[error("INFERENCE_ROUTER_INTROSPECT_MODE is not one of off/observe/enforce: {0}")]
@@ -187,6 +192,13 @@ impl Config {
                 };
                 SocketAddr::from((Ipv4Addr::UNSPECIFIED, port))
             }
+        };
+        // The scrape listener's port. Absent or `0` is "off"; it is never the API port.
+        let metrics_port: u16 = match non_empty(lookup("INFERENCE_ROUTER_METRICS_PORT")) {
+            Some(raw) => raw
+                .parse()
+                .map_err(|_| ConfigError::InvalidMetricsPort(raw.clone()))?,
+            None => 0,
         };
 
         // The live Secret supplies `INFERENCE_ROUTER_DATABASE_URL`; `DATABASE_URL` is the
@@ -349,6 +361,7 @@ impl Config {
 
         Ok(Self {
             bind,
+            metrics_port,
             database_url,
             providers_config_path,
             environment,

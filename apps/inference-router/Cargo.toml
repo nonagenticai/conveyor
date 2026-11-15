@@ -23,6 +23,7 @@ conveyor-auth = { path = "../../crates/auth" }
 conveyor-platform = { path = "../../crates/platform" }
 futures-util = { workspace = true }
 jsonwebtoken = { workspace = true }
+metrics-exporter-prometheus = { workspace = true }
 redis = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
@@ -38,4 +39,5 @@ uuid = { workspace = true }
 
 [dev-dependencies]
 base64 = { workspace = true }
+metrics = { workspace = true }
 tower = { workspace = true }
