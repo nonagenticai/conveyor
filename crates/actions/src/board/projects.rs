@@ -26,12 +26,9 @@ use crate::spec::HandlerOutput;
 
 use super::{ProjectCloseIn, ProjectCreateIn, ProjectExecuteIn, ProjectUpdateIn, views::IdIn};
 
-/// The board every new project gets. One board per project today, but the FK is the
-/// contract, not a 1:1 assumption (data-arch §2.3).
-const DEFAULT_BOARD_NAME: &str = "Board";
-
-/// The template code `projects.create` reads.
-const DEFAULT_TEMPLATE_CODE: &str = "standard";
+/// The board every new project gets, and the template it reads its lanes from. Both live in
+/// `store` so the seeds give a project exactly the board this action gives it.
+pub use conveyor_store::board::{DEFAULT_BOARD_NAME, DEFAULT_TEMPLATE_CODE};
 
 /// The card type of the start card every fresh project is born with (S13 §5.8).
 const START_CARD_TYPE_CODE: &str = "project_start_request_analysis";

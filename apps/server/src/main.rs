@@ -639,6 +639,7 @@ async fn migrate(
                 created = counts.created,
                 updated = counts.updated,
                 skipped = counts.skipped,
+                boards_created = counts.boards_created,
                 "programme seeded"
             );
         }
