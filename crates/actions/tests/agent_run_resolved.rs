@@ -37,6 +37,16 @@ async fn fixture() -> (support::Pg, support::Seeded, support::Running) {
 
 /// One active capability and its one active executor, as S15's actions would create them.
 async fn seed_executor(pg: &support::Pg, seeded: &support::Seeded) -> (Uuid, Uuid) {
+    seed_executor_with(pg, seeded, &["workflows.list"]).await
+}
+
+/// The same executor with the tool surface the test names — `&[]` for an agent with NO tools,
+/// which is what every seeded process agent has.
+async fn seed_executor_with(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    allowed_actions: &[&str],
+) -> (Uuid, Uuid) {
     let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
         .await
         .expect("scope");
@@ -48,18 +58,22 @@ async fn seed_executor(pg: &support::Pg, seeded: &support::Seeded) -> (Uuid, Uui
     .fetch_one(&mut *tx)
     .await
     .expect("insert capability");
+    let allowed: Vec<String> = allowed_actions
+        .iter()
+        .map(|name| (*name).to_owned())
+        .collect();
     let (agent_id,): (Uuid,) = sqlx::query_as(
         // A `process_agent` must name the process it runs (0035's CHECK); this fixture is a
         // generic executor, so it declares the tool-agent role.
         "INSERT INTO capability_agent
              (tenant_id, capability_id, key, role, status, model_ref, allowed_actions,
               max_iterations, timeout_secs)
-         VALUES ($1, $2, 'agent', 'tool_agent', 'active', 'resolved-model',
-                 ARRAY['workflows.list'], 3, 60)
+         VALUES ($1, $2, 'agent', 'tool_agent', 'active', 'resolved-model', $3, 3, 60)
          RETURNING id",
     )
     .bind(seeded.tenant.as_uuid())
     .bind(capability_id)
+    .bind(&allowed)
     .fetch_one(&mut *tx)
     .await
     .expect("insert executor");
@@ -67,18 +81,22 @@ async fn seed_executor(pg: &support::Pg, seeded: &support::Seeded) -> (Uuid, Uui
     (capability_id, agent_id)
 }
 
-/// A stub that answers text immediately and records the `model` each request asked for.
-async fn stub_router() -> (String, Arc<Mutex<Vec<String>>>) {
+/// A stub that answers text immediately and records each request's `model` and whole body.
+async fn stub_router() -> (String, Arc<Mutex<Vec<String>>>, Arc<Mutex<Vec<Value>>>) {
     let models: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+    let bodies: Arc<Mutex<Vec<Value>>> = Arc::new(Mutex::new(Vec::new()));
     let state = models.clone();
+    let captured = bodies.clone();
     let app = axum::Router::new().route(
         "/api/chat/completions",
         axum::routing::post(move |axum::Json(body): axum::Json<Value>| {
             let state = state.clone();
+            let captured = captured.clone();
             async move {
                 if let Some(model) = body.get("model").and_then(Value::as_str) {
                     state.lock().expect("models").push(model.to_owned());
                 }
+                captured.lock().expect("bodies").push(body);
                 axum::Json(json!({
                     "id": "chatcmpl-resolved",
                     "choices": [{
@@ -98,7 +116,7 @@ async fn stub_router() -> (String, Arc<Mutex<Vec<String>>>) {
     tokio::spawn(async move {
         let _ = axum::serve(listener, app).await;
     });
-    (base, models)
+    (base, models, bodies)
 }
 
 /// A published one-node workflow whose input carries only the user message: the executor resolves
@@ -163,7 +181,7 @@ async fn the_run_declares_its_executor_and_the_step_resolves_the_config() {
     // The inference URL is process-global: hold the lock from before binding it to this stub
     // until the recorded models are asserted, or a concurrent test overwrites it.
     let _router = ROUTER.lock().await;
-    let (base, models) = stub_router().await;
+    let (base, models, bodies) = stub_router().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
     let (_capability_id, agent_id) = seed_executor(&pg, &seeded).await;
     let workflow_id = published_agent_workflow(&running).await;
@@ -254,6 +272,40 @@ async fn the_run_declares_its_executor_and_the_step_resolves_the_config() {
         models.lock().expect("models").as_slice(),
         ["resolved-model"],
         "the model came from the row, not the node input"
+    );
+    let bodies = bodies.lock().expect("bodies");
+    assert_eq!(bodies.len(), 1, "one model call");
+    assert_eq!(
+        bodies[0]["tools"][0]["function"]["name"], "workflows.list",
+        "a tool-bearing executor sends its tool surface unchanged: {}",
+        bodies[0]
+    );
+}
+
+/// An agent whose `allowed_actions` is empty — every seeded process agent — must send NO `tools`
+/// field. An empty array is not a harmless spelling of "none": vLLM answers 400
+/// `tools must not be an empty array` before it dials the model, which made every agent step fail
+/// live on 2026-11-15.
+#[tokio::test]
+async fn an_executor_with_no_tools_omits_the_field_from_the_model_request() {
+    let (pg, seeded, running) = fixture().await;
+    let _router = ROUTER.lock().await;
+    let (base, _models, bodies) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let (_capability, agent) = seed_executor_with(&pg, &seeded, &[]).await;
+    let workflow = published_agent_workflow(&running).await;
+    let project = project(&running).await;
+    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+
+    drive(&pg, &seeded, &run).await;
+    assert_eq!(run_status(&pg, &seeded, &run).await, "succeeded");
+
+    let bodies = bodies.lock().expect("bodies");
+    assert_eq!(bodies.len(), 1, "one model call");
+    assert!(
+        bodies[0].get("tools").is_none(),
+        "an agent with no tool surface must OMIT `tools`; an empty array is rejected upstream: {}",
+        bodies[0]
     );
 }
 
@@ -405,7 +457,7 @@ async fn a_bound_run_may_lower_a_cap() {
     // The inference URL is process-global: hold the lock from before binding it to this stub
     // until the recorded models are asserted, or a concurrent test overwrites it.
     let _router = ROUTER.lock().await;
-    let (base, models) = stub_router().await;
+    let (base, models, _bodies) = stub_router().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
     let (_capability, agent) = seed_executor(&pg, &seeded).await;
     let workflow = published_agent_workflow_with(
