@@ -24,7 +24,11 @@ pub const SERVICE: &str = "conveyor-media-browser";
 pub const KINDS: &[&str] = &[render::KIND];
 
 /// The captured contracts whose kinds this image owns.
-pub const CAPTURES: &[Capture] = &[];
+pub const CAPTURES: &[Capture] = &[Capture {
+    service: "html_render_service",
+    lock_json: include_str!("../../contract/html_render_service/openapi.lock.json"),
+    capabilities: include_str!("../../contract/html_render_service/capabilities.txt"),
+}];
 
 /// Execute one capability.
 pub fn dispatch(

@@ -919,6 +919,7 @@ dependencies = [
  "sqlx",
  "thiserror",
  "tokio",
+ "toml",
  "tower",
  "tracing",
  "tracing-subscriber",

@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"Field required","status":422,"request_id":"01a1e01c-2fb1-730a-976f-fb25eef56e5c","timestamp":"2026-11-15T16:48:26Z","details":[{"loc":["body"],"msg":"Field required","type":"missing"}]}}
