@@ -31,6 +31,10 @@ pub struct ProviderEntry {
     /// Customer tenants may be routed here (free, owner-hosted).
     #[serde(default)]
     pub customer_eligible: bool,
+    /// Owner-designated ground truth: a blank completion from this provider is the answer, so the
+    /// pinned path serves it instead of retrying it once and refusing a second blank.
+    #[serde(default, rename = "is_ground_truth")]
+    pub ground_truth: bool,
     pub protocol: Protocol,
     #[serde(default)]
     pub endpoint: Option<String>,

@@ -14,6 +14,7 @@ pub mod catalog;
 pub mod config;
 pub mod contract;
 pub mod db;
+pub mod empty;
 pub mod internal;
 pub mod ledger;
 pub mod metering;

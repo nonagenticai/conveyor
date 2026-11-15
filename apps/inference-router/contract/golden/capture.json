@@ -1,0 +1,8 @@
+{
+  "service": "inference-router-goldens",
+  "image_digest": "sha256:723671a96af98111f16430ef4934370900962c04b1b6793f178d7a65ff70c58f",
+  "captured_at": "2026-11-15T16:47:06Z",
+  "cases": 32,
+  "ledger_reset": true,
+  "golden_sha256": "e05d7fdefe9e1b0f283d7f8caed12e0b080c2efb715aa6d9278b7306e6d9eada"
+}

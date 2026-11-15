@@ -330,6 +330,62 @@ impl LedgerRow {
         }
     }
 
+    /// Build the row for a request that REACHED a provider and was then refused.
+    ///
+    /// The reference records the call it paid for. Measured from the contract oracle
+    /// (2026-11-15): the second-blank refusal lands a row with `status = '502'`, the request's
+    /// own facts, and NO response columns — no hash, no body, no `response_json_valid`. A
+    /// refusal taken BEFORE dispatch (policy, budget, auth, validation) has no attempt and writes
+    /// no row at all, which is why the caller gates this on a non-empty attempt list.
+    pub fn refused(
+        context: &CallContext,
+        request: &ChatCompletionRequest,
+        status: &str,
+        latency_ms: i64,
+    ) -> Self {
+        Self {
+            tenant_id: uuid_of(context.tenant_id.as_deref()),
+            correlation_id: context.correlation_id.clone(),
+            caller_worker: context.worker_name.clone(),
+            requested_model: request.model.clone(),
+            served_provider: None,
+            served_model: None,
+            served_model_root: None,
+            temperature: request.temperature,
+            seed: request.seed,
+            max_tokens: request.max_tokens.map(|value| value as i32),
+            repetition_penalty: request.repetition_penalty,
+            frequency_penalty: request.frequency_penalty,
+            finish_reason: None,
+            licence_id: context.license_id.clone(),
+            licence_source: context.license_id.as_ref().map(|_| "header"),
+            request_sha256: request_sha256(request),
+            response_sha256: None,
+            latency_ms,
+            status: status.to_owned(),
+            // The reference writes neither the body hash nor the text on a refused row, even
+            // when the attempts carried the upstream bytes (measured: the blank capture's row).
+            request_text_sha256: None,
+            request_json: None,
+            response_json: None,
+            request_text: None,
+            response_text: None,
+            traffic_source: "live",
+            trace_id: uuid_of(context.trace_id.as_deref()),
+            card_id: context.card_id.clone(),
+            project_id: uuid_of(context.project_id.as_deref()),
+            parent_execution_id: context.parent_execution_id.clone(),
+            streamed: false,
+            stream_status: None,
+            response_json_valid: None,
+            policy_version: context.policy_version,
+            llm_setup: context.llm_setup,
+            hop_index: context.hop_index,
+            hop_reason: context.hop_reason.clone(),
+            key_owner: context.key_owner.clone(),
+        }
+    }
+
     /// Build the row for a STREAMED request from what the in-memory capture accumulated.
     ///
     /// A streamed row never stores text, whatever the caller asked for: the reference forces
@@ -585,6 +641,18 @@ mod tests {
             row.request_text_sha256.is_some(),
             "the hash is always written"
         );
+    }
+
+    #[test]
+    fn a_refused_row_keeps_the_request_facts_and_no_response() {
+        let row = LedgerRow::refused(&CallContext::default(), &request(), "502", 9);
+        assert_eq!(row.status, "502");
+        assert_eq!(row.requested_model, "stub-model");
+        assert!(row.response_sha256.is_none());
+        assert!(row.response_json_valid.is_none());
+        assert!(row.finish_reason.is_none());
+        assert!(row.request_text_sha256.is_none());
+        assert_eq!(row.request_sha256, request_sha256(&request()));
     }
 
     #[test]
