@@ -15,7 +15,7 @@
   "counts": {
     "exists": 11,
     "extend": 8,
-    "new": 23
+    "new": 25
   },
   "rows": [
     {
@@ -345,6 +345,26 @@
       "verdict": "new",
       "evidence": [
         "actions: ops.* absent"
+      ]
+    },
+    {
+      "id": "actions:analysis",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "analysis",
+      "verdict": "new",
+      "evidence": [
+        "actions: analyse.* absent"
+      ]
+    },
+    {
+      "id": "actions:production",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "production",
+      "verdict": "new",
+      "evidence": [
+        "actions: produce.* absent"
       ]
     },
     {
