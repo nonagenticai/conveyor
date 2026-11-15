@@ -178,11 +178,7 @@ fn token_for(harness: &Harness, tenant: TenantId, ttl: ChronoDuration) -> String
     )
 }
 
-async fn get(
-    harness: &Harness,
-    path: &str,
-    token: &str,
-) -> (u16, Option<String>, Vec<u8>) {
+async fn get(harness: &Harness, path: &str, token: &str) -> (u16, Option<String>, Vec<u8>) {
     let response = reqwest::Client::new()
         .get(format!("{}{path}", harness.running.base()))
         .header("authorization", format!("Bearer {token}"))
@@ -195,7 +191,11 @@ async fn get(
         .get("content-type")
         .and_then(|value| value.to_str().ok())
         .map(str::to_owned);
-    (status, content_type, response.bytes().await.unwrap_or_default().to_vec())
+    (
+        status,
+        content_type,
+        response.bytes().await.unwrap_or_default().to_vec(),
+    )
 }
 
 async fn post_bytes(harness: &Harness, path: &str, token: &str, body: Vec<u8>) -> (u16, Value) {
@@ -312,10 +312,7 @@ async fn undeclared_output_key_is_refused() {
         b"not declared".to_vec(),
     )
     .await;
-    assert_eq!(
-        status, 422,
-        "the declared output set is closed: {body}"
-    );
+    assert_eq!(status, 422, "the declared output set is closed: {body}");
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -339,25 +336,19 @@ async fn an_output_is_stored_under_its_computed_hash() {
     let (status, _) = post_bytes(&harness, &path, &token, b"different".to_vec()).await;
     assert_eq!(status, 409, "a name may not silently change its bytes");
 
-    let runs = store::runner::latest(
-        &harness.running.state.pool,
-        harness.tenant,
-        harness.job_id,
-    )
-    .await
-    .expect("read the attempt")
-    .expect("the attempt exists");
-    let artefacts = store::runner::artefacts(
-        &harness.running.state.pool,
-        harness.tenant,
-        runs.id,
-    )
-    .await
-    .expect("list artefacts");
+    let runs = store::runner::latest(&harness.running.state.pool, harness.tenant, harness.job_id)
+        .await
+        .expect("read the attempt")
+        .expect("the attempt exists");
+    let artefacts = store::runner::artefacts(&harness.running.state.pool, harness.tenant, runs.id)
+        .await
+        .expect("list artefacts");
     assert_eq!(artefacts.len(), 1);
     assert_eq!(artefacts[0].sha256, hex(&body));
     assert!(
-        artefacts[0].object_key.starts_with(&format!("t/{}/jobs/", harness.tenant.as_uuid())),
+        artefacts[0]
+            .object_key
+            .starts_with(&format!("t/{}/jobs/", harness.tenant.as_uuid())),
         "the key is tenant-prefixed: {}",
         artefacts[0].object_key
     );
@@ -420,14 +411,10 @@ async fn a_result_is_recorded_without_finishing_the_job() {
         job.status, "running",
         "the pod recorded a verdict; it did not finish the job"
     );
-    let run = store::runner::latest(
-        &harness.running.state.pool,
-        harness.tenant,
-        harness.job_id,
-    )
-    .await
-    .expect("read the attempt")
-    .expect("the attempt exists");
+    let run = store::runner::latest(&harness.running.state.pool, harness.tenant, harness.job_id)
+        .await
+        .expect("read the attempt")
+        .expect("the attempt exists");
     assert_eq!(run.status, "reported");
     assert!(run.result.is_some());
 }

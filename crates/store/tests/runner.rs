@@ -31,10 +31,7 @@ async fn a_tenant(db: &common::TestDb) -> TenantId {
 }
 
 /// Enqueue and claim one runner job; returns the job id and the claimed row.
-async fn a_claimed_job(
-    pool: &PgPool,
-    tenant: TenantId,
-) -> conveyor_store::jobs::Job {
+async fn a_claimed_job(pool: &PgPool, tenant: TenantId) -> conveyor_store::jobs::Job {
     jobs::enqueue(
         pool,
         tenant,
@@ -57,7 +54,7 @@ fn new_run(job_id: Uuid, attempt: i32) -> NewRun<'static> {
     NewRun {
         job_id,
         attempt,
-        image: "registry.internal:5000/conveyor-media-ffmpeg:test",
+        image: "registry.invalid/conveyor-media-ffmpeg:test",
         namespace: "conveyor-runners",
         job_name: "run-test",
         instruction: json!({ "schema": "runner/v1", "job_id": job_id, "attempt": attempt }),
@@ -114,9 +111,10 @@ async fn stale_attempt_result_is_rejected() {
         .expect("attempt 2 is a new key");
 
     // Attempt 1's pod finally posts. It is stale, so it must write nothing.
-    let accepted = runner::record_result(pool, tenant, job.id, 1, &json!({ "status": "succeeded" }))
-        .await
-        .expect("the stale write runs");
+    let accepted =
+        runner::record_result(pool, tenant, job.id, 1, &json!({ "status": "succeeded" }))
+            .await
+            .expect("the stale write runs");
     assert!(!accepted, "a superseded attempt's result is refused");
 
     let (status, attempts) = job_state(pool, tenant, job.id).await;
@@ -248,11 +246,12 @@ async fn artefacts_cascade_with_the_run() {
         .fetch_one(&db.super_pool)
         .await
         .expect("count runs");
-    let artefacts: i64 = sqlx::query_scalar("SELECT count(*) FROM runner_artefact WHERE run_id = $1")
-        .bind(run.id)
-        .fetch_one(&db.super_pool)
-        .await
-        .expect("count artefacts");
+    let artefacts: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM runner_artefact WHERE run_id = $1")
+            .bind(run.id)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("count artefacts");
     println!("after the job delete: runs={runs} artefacts={artefacts}");
     assert_eq!(runs, 0, "the attempt row cascades");
     assert_eq!(artefacts, 0, "the artefacts cascade through the run");
