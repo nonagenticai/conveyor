@@ -43,7 +43,13 @@ async fn fresh() -> PgPool {
     conveyor_licenses::db::migrate(&db.pool)
         .await
         .expect("migrate");
-    db.pool
+    let pool = db.pool.clone();
+    // The database must outlive this helper — every test here keeps using the pool after it
+    // returns, and `TestDb::drop` would remove the database under the running test. This is the one
+    // deliberate exception to the drop-on-end rule in the harness; it costs one database per test in
+    // this file, and the container removes it at process exit.
+    std::mem::forget(db);
+    pool
 }
 
 /// The tenant, its owner and one subject: the rows every licence needs.
