@@ -348,7 +348,11 @@ async fn record(
         capture_allowed(headers, &state.config().inference_capture_allowed_callers);
 
     let served = outcome.response.as_ref().ok();
-    let served_attempt = outcome.attempts.iter().rev().find(|a| a.failure.is_none());
+    // The served row is the answer the caller actually received: the LAST attempt, whatever its
+    // outcome. A blank 200 (a ground-truth provider, or before the retry lands) is still a call the
+    // caller saw; the attempt's `outcome` feeds the metric and the retry decision, not this
+    // selection. A refusal has no `served` response and therefore no row.
+    let served_attempt = served.and(outcome.attempts.last());
 
     if let (Some(pool), Some(response), Some(attempt)) =
         (state.deps().ledger.as_ref(), served, served_attempt)
@@ -386,7 +390,9 @@ fn cost_event(
     fallback_used: bool,
     reservation_id: Option<&str>,
 ) -> CostEvent {
-    let usage = served.map(|response| &response.usage);
+    // Tokens are per ATTEMPT, never the served response's: every attempt spends its own tokens,
+    // and a failed attempt (no usage) must bill zero rather than inherit the served usage.
+    let usage = attempt.usage.as_ref();
     CostEvent {
         tenant_id: context.tenant_id.clone(),
         license_id: context.license_id.clone(),

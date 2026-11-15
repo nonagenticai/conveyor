@@ -80,6 +80,16 @@ impl axum::response::IntoResponse for Refusal {
     }
 }
 
+/// The attempt produced the answer the caller received.
+pub const OUTCOME_OK: &str = "ok";
+/// The attempt answered, but with no bytes at all (`crate::empty::EmptyReason::Blank`).
+pub const OUTCOME_EMPTY: &str = "empty";
+/// The attempt answered with a vacuous payload and no result
+/// (`crate::empty::EmptyReason::EmptyResult`).
+pub const OUTCOME_EMPTY_RESULT: &str = "empty_result";
+/// The attempt failed; `ProviderAttempt::failure` says how.
+pub const OUTCOME_ERROR: &str = "error";
+
 /// One dispatch attempt, in the order it happened. This is the unit the cost bus is billed on:
 /// a request that fails over spends money on every attempt, not only on the one that served it.
 #[derive(Debug, Clone)]
@@ -90,6 +100,12 @@ pub struct ProviderAttempt {
     /// Measured around the provider call, so it includes the concurrency-slot wait — what the
     /// caller actually waited for.
     pub latency: Duration,
+    /// How this attempt ended. Only `OUTCOME_OK` may be recorded as the row the caller was served:
+    /// a blank upstream answer still returns 200, but it is not the served row.
+    pub outcome: &'static str,
+    /// The provider's usage for THIS attempt, when it reported one. Every attempt is billed with
+    /// its own tokens — a failed attempt bills zero even when a later attempt served.
+    pub usage: Option<crate::contract::schemas::Usage>,
     /// `None` when the attempt succeeded.
     pub failure: Option<AttemptFailure>,
     /// The exact bytes that went upstream and came back, when the attempt produced a response.
@@ -664,10 +680,26 @@ fn attempt_of(
     started: Instant,
     result: &Result<provider::UpstreamResponse, UpstreamError>,
 ) -> ProviderAttempt {
+    let usage = result
+        .as_ref()
+        .ok()
+        .map(|upstream| upstream.response.usage.clone());
+    // A provider that answers 200 with no usable content did not serve this request; the reason
+    // rides on the attempt so the write path can refuse to record it as the served row.
+    let outcome = match result {
+        Ok(upstream) => match crate::empty::completion_reason(&upstream.response) {
+            Some(crate::empty::EmptyReason::EmptyResult) => OUTCOME_EMPTY_RESULT,
+            Some(crate::empty::EmptyReason::Blank) => OUTCOME_EMPTY,
+            None => OUTCOME_OK,
+        },
+        Err(_) => OUTCOME_ERROR,
+    };
     ProviderAttempt {
         provider: provider.to_owned(),
         model_override: model_override.map(str::to_owned),
         latency: started.elapsed(),
+        outcome,
+        usage,
         failure: result.as_ref().err().map(|error| AttemptFailure {
             classification: error.classification(),
             describe: error.describe(),
@@ -713,6 +745,13 @@ fn attempt_of_stream(
         provider: provider.to_owned(),
         model_override: model_override.map(str::to_owned),
         latency: started.elapsed(),
+        outcome: if failure.is_some() {
+            OUTCOME_ERROR
+        } else {
+            OUTCOME_OK
+        },
+        // The stream cost path is unchanged: it meters from the usage chunk, not the attempt.
+        usage: None,
         failure: failure.map(|error| AttemptFailure {
             classification: error.classification(),
             describe: error.describe(),
