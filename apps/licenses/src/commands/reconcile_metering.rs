@@ -69,6 +69,19 @@ use crate::billing::metering::{
 const EVENT: &str = "metering_reconcile";
 /// The script's `DEFAULT_ACTOR`.
 const DEFAULT_ACTOR: &str = "cronjob:reconcile-metering";
+
+/// A non-identifying label for the audit actor, for the human-readable log line.
+///
+/// The actor is a Keycloak `preferred_username` (or `sub`) when the route runs the sweep, so
+/// the account name belongs in the JSON payload — the audit record — and not in a log line.
+fn actor_label(actor: &str) -> &'static str {
+    if actor == DEFAULT_ACTOR {
+        "the scheduled job"
+    } else {
+        "an operator"
+    }
+}
+
 /// The script's `EXIT_CONVERGED` / `EXIT_NOT_CONVERGED` / `EXIT_TRANSPORT`.
 const EXIT_CONVERGED: i32 = 0;
 const EXIT_NOT_CONVERGED: i32 = 1;
@@ -489,7 +502,7 @@ pub(crate) async fn run_metering_reconcile(
             "reconcile-metering: examining {} live licence(s) whose billing coverage has not \
              been verified (requested by {}, dry_run={}, revalidate={}, force_plan_quota={})",
             gaps.len(),
-            actor,
+            actor_label(actor),
             dry_run,
             revalidate,
             force_plan_quota
