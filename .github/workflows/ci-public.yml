@@ -369,7 +369,12 @@ jobs:
   # ⛔ A MATRIX ROW MAY ONLY NAME A PACKAGE THAT IS ON `main`. Every absorbed service is merged
   # before it is deployed, so its row lands with (or after) its absorption, never before — a row
   # for a branch-only crate turns every main push red in a job whose failure is unrelated to the
-  # push. `conveyor-licenses` is the next row, added when its absorption merges.
+  # push.
+  #
+  # ⛔ `conveyor-licenses` publishes to its OWN package. `image:` must stay `conveyor-licenses` and
+  # never `licenses`: the `licenses` package's `latest` is Flux-tracked by the Python service's
+  # Deployment and its four CronJobs, so pushing this binary there would auto-deploy the rewrite on
+  # the next reconcile (measured constraint, #95).
   publish-service-images:
     if: ${{ !github.event.repository.private && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
@@ -385,6 +390,9 @@ jobs:
           - package: conveyor-inference-router
             bin: conveyor-inference-router
             image: conveyor-inference-router
+          - package: conveyor-licenses
+            bin: conveyor-licenses
+            image: conveyor-licenses
     env:
       IMG: conveyor-service:ci
       GH_ACTOR: ${{ github.actor }}
