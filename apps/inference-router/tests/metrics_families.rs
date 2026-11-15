@@ -672,3 +672,82 @@ async fn the_v1_alias_is_served_and_counted_like_the_api_path() {
         "the alias dispatches through the same handler"
     );
 }
+
+// ── P2e: the effective-tenant family ────────────────────────────────────────────────────────
+//
+// The family is booked inside the resolver, once per request, and its `outcome` label is the
+// reference's closed set. The recorder is process-wide and this binary runs in parallel, so this
+// test proves its own requests MOVED a series, never an exact count. The other three outcomes are
+// classified by `effective_tenant`'s unit tests in `src/auth.rs`.
+
+#[tokio::test]
+async fn the_effective_tenant_family_moves_for_absent_and_self() {
+    let address = stub_provider("effective tenant").await;
+    let router = configured("stub-metrics-tenant", address);
+
+    let before = scrape().await;
+    let absent_before = series_value(
+        &before,
+        "inference_router_effective_tenant_total",
+        &[("outcome", "absent")],
+    )
+    .expect("the family is pre-seeded at zero");
+    let self_before = series_value(
+        &before,
+        "inference_router_effective_tenant_total",
+        &[("outcome", "self")],
+    )
+    .expect("the family is pre-seeded at zero");
+
+    // No X-Tenant-Id: there is no caller tenant to resolve from.
+    let response = router
+        .clone()
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .body(completion())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // X-Tenant-Id names the caller's own tenant; the asserted tenant is that same tenant.
+    let response = router
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-tenant-id", "0195f48b-d000-7000-8000-000000000001")
+                .header(
+                    "x-effective-tenant-id",
+                    "0195f48b-d000-7000-8000-000000000001",
+                )
+                .body(completion())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = scrape().await;
+    let absent_after = series_value(
+        &body,
+        "inference_router_effective_tenant_total",
+        &[("outcome", "absent")],
+    )
+    .expect("the family is pre-seeded at zero");
+    let self_after = series_value(
+        &body,
+        "inference_router_effective_tenant_total",
+        &[("outcome", "self")],
+    )
+    .expect("the family is pre-seeded at zero");
+    assert!(
+        absent_after > absent_before,
+        "a request with no X-Tenant-Id books absent: {absent_before} -> {absent_after}"
+    );
+    assert!(
+        self_after > self_before,
+        "a request asserting its own tenant books self: {self_before} -> {self_after}"
+    );
+}

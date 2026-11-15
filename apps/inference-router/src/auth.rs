@@ -205,15 +205,18 @@ pub fn effective_tenant(
         delegated_by: None,
     };
     let Some(caller) = caller_tenant.filter(|value| !value.trim().is_empty()) else {
+        crate::metrics::record_effective_tenant("absent");
         return own(None);
     };
     let Some(asserted) = header_value
         .map(str::trim)
         .filter(|value| !value.is_empty())
     else {
+        crate::metrics::record_effective_tenant("self");
         return own(Some(caller));
     };
     if is_own_tenant(asserted, caller) {
+        crate::metrics::record_effective_tenant("self");
         return own(Some(caller));
     }
     let subject = vouched_subject
@@ -225,13 +228,16 @@ pub fn effective_tenant(
             .any(|allowed| allowed.trim().eq_ignore_ascii_case(subject))
     });
     if !allowlisted {
+        crate::metrics::record_effective_tenant("unvouched");
         return own(Some(caller));
     }
     // The asserted tenant is caller-supplied and is never logged before these checks: a
     // delegating caller that fat-fingered its own licence token here must not leak it.
     if credential_scheme(asserted).is_some() || is_unattributable(asserted) || !is_uuid(asserted) {
+        crate::metrics::record_effective_tenant("invalid");
         return own(Some(caller));
     }
+    crate::metrics::record_effective_tenant("honoured");
     EffectiveTenant {
         tenant_id: Some(asserted.to_owned()),
         delegated_by: subject,

@@ -253,6 +253,19 @@ pub fn record_project_id(outcome: &str, caller: &str) {
     .increment(1);
 }
 
+/// Book one request's effective-tenant resolution onto the alert-keyed family.
+///
+/// `outcome` is one of `absent` | `self` | `honoured` | `unvouched` | `invalid`, the reference's
+/// closed set (pre-seeded below), so no caller-supplied value ever reaches a series raw. Booked
+/// inside the resolver, exactly once per request, as in the reference.
+pub fn record_effective_tenant(outcome: &str) {
+    counter!(
+        "inference_router_effective_tenant_total",
+        "outcome" => outcome.to_owned()
+    )
+    .increment(1);
+}
+
 /// The route layer over both completion paths: count a matched POST, then pass the request through
 /// untouched.
 ///
