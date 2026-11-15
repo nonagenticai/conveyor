@@ -1,0 +1,26 @@
+# name | METHOD | path | headers | body
+# The tenant is supplied by header on every authenticated case; the reference refuses a
+# request that carries none (401), which `templates_list_no_tenant` pins.
+# The template id 00000000-0000-0000-0000-0000000000d1 is seeded by seed.sql (fixed uuid,
+# synthetic) so `deck_create` actually renders one slide through Chromium on every replay.
+root|GET|/||
+health|GET|/health||
+health_live|GET|/health/live||
+health_ready|GET|/health/ready||
+healthz|GET|/healthz||
+readyz|GET|/readyz||
+templates_list|GET|/api/templates?category=capture|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+templates_list_no_tenant|GET|/api/templates||
+template_get|GET|/api/templates/00000000-0000-0000-0000-0000000000d1|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+template_versions|GET|/api/templates/00000000-0000-0000-0000-0000000000d1/versions|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+template_update|PUT|/api/templates/00000000-0000-0000-0000-0000000000d1|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"display_name":"Capture Title Updated"}
+template_create|POST|/api/templates|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"name":"capture_created","display_name":"Capture Created","category":"capture","layout_type":"title","slot_definitions":{"title":{"type":"text","max_length":80,"required":true}},"styling_rules":{"title_font_size":40},"default_timing_hint_seconds":6.0}
+template_create_validation|POST|/api/templates|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+deck_create|POST|/api/decks|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"title":"Synthetic capture deck","template_ids":["00000000-0000-0000-0000-0000000000d1"],"slides":[{"template_id":"00000000-0000-0000-0000-0000000000d1","role":"title","content":{"eyebrow":"Capture","title":"Synthetic capture deck","subtitle":"One slide rendered by Chromium."}}],"content_shaper":{"enabled":false}}
+deck_status_missing|GET|/api/decks/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+deck_pptx_missing|GET|/api/decks/00000000-0000-0000-0000-0000000000ff/pptx|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+deck_pdf_missing|GET|/api/decks/00000000-0000-0000-0000-0000000000ff/pdf|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+deck_slide_missing|GET|/api/decks/00000000-0000-0000-0000-0000000000ff/slides/0.png|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+deck_manifest_missing|GET|/api/decks/00000000-0000-0000-0000-0000000000ff/manifest|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+template_get_missing|GET|/api/templates/00000000-0000-0000-0000-0000000000fe|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+template_delete|DELETE|/api/templates/00000000-0000-0000-0000-0000000000d1|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|

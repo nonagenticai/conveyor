@@ -1,0 +1,32 @@
+{
+  "service": "youtube_upload_service",
+  "image_digest": "sha256:e5f44636ccb5e4e78e375b99f28e744477fa2f9e26a2181cd3d8270c66ae798e",
+  "source_commit": "",
+  "taken": "2026-11-15T16:04:37Z",
+  "operations": 22,
+  "paths": 20,
+  "op_list": [
+    "DELETE /api/auth/disconnect",
+    "DELETE /api/settings/oauth-client",
+    "GET /",
+    "GET /api/admin/platform-channel",
+    "GET /api/admin/tenant-settings",
+    "GET /api/auth/callback",
+    "GET /api/auth/status",
+    "GET /api/settings",
+    "GET /api/upload/jobs",
+    "GET /api/upload/jobs/{job_id}",
+    "GET /health",
+    "GET /health/live",
+    "GET /health/ready",
+    "GET /healthz",
+    "GET /readyz",
+    "POST /api/auth/connect",
+    "POST /api/upload",
+    "POST /api/upload/jobs/{job_id}/privacy",
+    "POST /api/upload/jobs/{job_id}/retract",
+    "PUT /api/admin/platform-channel",
+    "PUT /api/admin/tenants/{tenant_id}/platform-channel",
+    "PUT /api/settings/oauth-client"
+  ]
+}

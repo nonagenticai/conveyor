@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"html: String should have at least 1 characters","status":422,"request_id":"01a1e01c-2f97-715c-9931-7f8b4faa7d87","timestamp":"2026-11-15T16:48:26Z","details":[{"loc":["body","html"],"msg":"String should have at least 1 characters","type":"string_too_short"}]}}

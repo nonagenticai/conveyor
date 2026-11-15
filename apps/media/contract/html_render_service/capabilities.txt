@@ -1,0 +1,8 @@
+# The capability kinds this service owns after its drop table (see README.md).
+# One kind. The browser image already implements it (src/browser/render.rs), so the captured set
+# must equal it exactly — contract.rs::check fails on a captured kind the image does not dispatch.
+# The reference's job CRUD, batch, job-artefact retrieval, style administration and style preview
+# are dropped: the conveyor owns the job ledger (ADR 0007 §2) and styles are tenant admin, not a
+# capability. The redesign pipeline behind the job routes needs inference-router and object storage
+# and is not absorbable from this capture.
+media.render_html

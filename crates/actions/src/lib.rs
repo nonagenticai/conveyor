@@ -40,6 +40,8 @@ pub mod invoke;
 pub mod knowledge;
 pub mod lock;
 pub mod mcp;
+// #139 P3.1: the media group's toolkit — one action per capability kind, plus the probe.
+pub mod media;
 // S15: work-package memory — remember (the only writing action) and recall.
 pub mod memory;
 pub mod model;

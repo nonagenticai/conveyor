@@ -1,0 +1,2 @@
+POST /api/compile
+{"shot_list":{"parts":[{"id":"intro","title":"Capture Intro","subtitle":"Synthetic","part_type":"title_card","estimated_duration_seconds":1.0},{"id":"body","title":"Body","part_type":"browser_recording","estimated_duration_seconds":2.0}]},"recordings":[{"part_id":"body","video_path":"/tmp/fixtures/clip.mp4","duration_seconds":2.0,"file_size_bytes":10890,"width":320,"height":240,"has_audio":false,"success":true}],"target_width":320,"target_height":240,"preset":"quick-preview"}

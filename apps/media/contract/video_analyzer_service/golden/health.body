@@ -1,0 +1,1 @@
+{"status":"healthy","components":{"database":"healthy","api":"healthy","beat_detector":"healthy","pipeline_runner":"healthy","stranded_sweeper":"healthy"}}

@@ -1,0 +1,10 @@
+GET /api/tts/batches/{batch_id}
+GET /health
+GET /livez
+GET /readyz
+POST /api/tts/batches
+POST /api/tts/claim
+POST /api/tts/jobs/{job_id}/fail
+POST /api/tts/jobs/{job_id}/heartbeat
+POST /api/tts/jobs/{job_id}/release
+POST /api/tts/jobs/{job_id}/result

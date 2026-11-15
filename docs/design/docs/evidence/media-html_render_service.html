@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>htmlrenderservice absorption — evidence (2026-11-15) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-html_render_service.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="html_render_service-absorption--evidence-2026-11-15">html_render_service absorption — evidence (2026-11-15)</h1>
+<p>Issue #139 · the browser executor image (<code>conveyor-media-browser</code>). The reference is pinned by digest; no private hostname, slug, address or customer payload appears in this file.</p>
+<h2 id="the-contract">The contract</h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capture</td>
+<td><code>apps/media/contract/html_render_service/</code> — taken 2026-11-15</td>
+</tr>
+<tr>
+<td>Pinned image</td>
+<td><code>sha256:19ae2c9fe2ee2bf32e0f06794337f1557708029f867aaab02cdb1963a50c2fd4</code></td>
+</tr>
+<tr>
+<td>Operations captured</td>
+<td>37 (33 paths)</td>
+</tr>
+<tr>
+<td>Golden cases</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Capability kinds after the drop table</td>
+<td>1 — <code>media.render_html</code></td>
+</tr>
+</tbody>
+</table>
+<p>Captured from the running image (amd64 under emulation) against a scratch <code>postgres:18</code> and redis, with one hand-written, self-contained HTML fixture: no external stylesheet, font, script or image, so the render needs no network.</p>
+<h2 id="parity-accounting">Parity accounting</h2>
+<p><code>apps/media/contract/parity.toml</code> has one row per captured operation; <code>apps/media/tests/parity.rs</code> fails on a missing, duplicated or orphan row.</p>
+<ul>
+<li><strong>1 served as a kind</strong>: <code>POST /api/designs/render/pdf</code> → <code>media.render_html</code>. PDF and PNG are the same browser path (print vs. a sized screenshot); the captured case is the PDF, and the executor's own tests carry the PNG.</li>
+<li><strong>36 dropped with a reason</strong>, in four groups: the job ledger and every job-scoped artefact or history route (17 — conveyor's ledger, result route and artefact store, ADR 0007 §2–4), batch orchestration (6 — a batch is a plan over runs, not a capability), the tenant style catalogue (6 — administration, not a capability), design authoring and the refine pipeline (3 — the redesign model behind inference-router is licence-gated and writes to object storage, so it is not absorbable from this capture), the root banner (1) and the five health aliases (an executor is a batch pod; its liveness is the Job's <code>activeDeadlineSeconds</code>).</li>
+</ul>
+<h2 id="traps-worth-keeping">Traps worth keeping</h2>
+<ul>
+<li>This service reads <strong><code>API_PORT</code></strong>, not <code>PORT</code>; the rig exports the latter.</li>
+<li>A non-UUID <code>X-Tenant-Id</code> is refused exactly like a missing one (<code>TENANT_REQUIRED</code>), so a capture case that "tests a bad tenant" is really testing the same 401.</li>
+<li>PDF bytes are <strong>nondeterministic</strong> (<code>/CreationDate</code>, <code>/ID</code> inside the document), so the golden is compared by invariants (page count, text extraction, size band), not byte equality.</li>
+</ul>
+<h2 id="what-the-rewrite-does">What the rewrite does</h2>
+<p>One capability: an HTML document in, a PDF or PNG out, driven by the image's own Chromium. The Playwright <code>wait_until</code> vocabulary has no headless equivalent and is refused by name (<code>wait_until_not_supported</code>) with <code>wait_ms</code> as the substitute — a declared gap, not a silent one.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/media-html_render_service.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"part_ids: Field required (and 1 more)","status":422,"request_id":"01a1e021-ccf0-7744-b49a-ede870079378","timestamp":"2026-11-15T16:54:33Z","details":[{"loc":["body","part_ids"],"msg":"Field required","type":"missing"},{"loc":["body","scripts_dir"],"msg":"Field required","type":"missing"}]}}

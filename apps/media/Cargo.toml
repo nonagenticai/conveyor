@@ -1,0 +1,47 @@
+[package]
+name = "conveyor-media"
+description = "The captured media-group contract: browser rendering, ffmpeg composition and the thin fan-out services."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "conveyor_media"
+path = "src/lib.rs"
+
+# One binary per runtime shape (ADR 0006 §2). A reference service maps to exactly one binary — the
+# one whose heaviest runtime it needs — so no captured route set is split across deployables.
+[[bin]]
+name = "conveyor-media-browser"
+path = "src/browser/main.rs"
+
+[[bin]]
+name = "conveyor-media-ffmpeg"
+path = "src/ffmpeg/main.rs"
+
+[dependencies]
+axum = { workspace = true }
+bytes = { workspace = true }
+chrono = { workspace = true }
+conveyor-domain = { path = "../../crates/domain" }
+clap = { workspace = true }
+futures-util = { workspace = true }
+object_store = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+sqlx = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+conveyor-runner = { path = "../../crates/runner" }
+http-body-util = "0.1.5"
+toml = { workspace = true }
+tower = { workspace = true }

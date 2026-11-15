@@ -1,0 +1,16 @@
+# The capability kinds this service owns after the drop table (see README.md).
+# Captured from the live digest
+# `frontend_test_runner_service:latest@sha256:db276ca39dd5021f06ee634aadcf90ba584f894e3d87b061ab15211f2350d6a3`
+# (the registry host is private; the digest is the pin), 12 operations over 12 paths.
+#
+# One kind. The reference's `POST /api/test-runner/execute` takes a Playwright **suite** — a ZIP
+# `package_url` or a `bdd_job_id` pointing at the retired bdd-playwright-service — plus suite knobs
+# (`browsers`, `workers`, `grep_pattern`, `expect_recording`). ADR 0007 §1 gives the browser image a
+# native Gherkin runner, so the kind takes the feature document itself (`feature` + `target_url`)
+# and keeps only `timeout_per_test_ms` and `retries`. The suite and recording fields are refused by
+# name; `screenshot_on_failure`, which the reference accepted and ignored, is implemented here.
+#
+# The five health operations are scaffolding in the reference, not a kind: an executor is a batch
+# pod whose liveness is the Job's `activeDeadlineSeconds` (ADR 0007 §3). The job feed, the report,
+# the artefact path and the per-scenario clip are the ledger's, the store's or another product's.
+media.run_gherkin

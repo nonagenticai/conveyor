@@ -1,0 +1,12 @@
+GET /
+GET /api/test-runner/{job_id}
+GET /api/test-runner/{job_id}/artifacts/{artifact_path}
+GET /api/test-runner/{job_id}/clips/{clip_key}/video
+GET /api/test-runner/{job_id}/report
+GET /api/test-runner/{job_id}/result
+GET /health
+GET /health/live
+GET /health/ready
+GET /healthz
+GET /readyz
+POST /api/test-runner/execute
