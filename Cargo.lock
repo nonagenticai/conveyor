@@ -704,6 +704,7 @@ dependencies = [
  "bytes",
  "chrono",
  "conveyor-actions-derive",
+ "conveyor-analysis",
  "conveyor-api",
  "conveyor-auth",
  "conveyor-bus",
@@ -748,6 +749,7 @@ name = "conveyor-analysis"
 version = "0.1.0"
 dependencies = [
  "regex",
+ "schemars",
  "scraper",
  "serde",
  "serde_json",

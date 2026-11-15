@@ -18,6 +18,10 @@ path = "src/lib.rs"
 # not have anyway.
 scraper = "0.25"
 regex = { workspace = true }
+# The report shape is published as a schema: `analyse.site`'s action spec derives its output type
+# from these structs, so the manifest documents what a caller receives without a second copy of
+# the shape living in `crates/actions`.
+schemars = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

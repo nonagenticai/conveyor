@@ -7,7 +7,7 @@
 use scraper::Html;
 
 use crate::model::{Finding, Severity};
-use crate::site::seo::{all, attr, rel_tokens};
+use crate::site::seo::{all, attr};
 
 /// `^x-default$` or a two-letter language code with an optional region subtag.
 fn hreflang_re() -> &'static regex::Regex {
@@ -104,8 +104,9 @@ pub fn check_hreflang(html: &Html, url: &str) -> Vec<Finding> {
     let tags: Vec<_> = all(html, "link")
         .into_iter()
         .filter(|element| {
-            rel_tokens(element).iter().any(|token| token == "alternate")
-                && attr(element, "hreflang").is_some()
+            // The source matched `rel` exactly ("alternate" and nothing else), so
+            // `rel="alternate canonical"` is not an hreflang tag there and is not one here.
+            crate::site::seo::rel_is(element, "alternate") && attr(element, "hreflang").is_some()
         })
         .collect();
     let mut findings = Vec::new();

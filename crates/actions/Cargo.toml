@@ -12,6 +12,9 @@ conveyor-actions-derive = { path = "../actions-derive" }
 conveyor-auth = { path = "../auth" }
 conveyor-domain = { path = "../domain" }
 conveyor-workflow = { path = "../workflow" }
+# `analyse.site` calls the analysis library (ADR 0007 §5). The edge is one-way and the library
+# is pure, so this adds no transport, no connection and no clock to the action surface.
+conveyor-analysis = { path = "../analysis" }
 # The three exchange actions (S08 B2) call the pure renderer; CONTRACT §1 records the edge.
 conveyor-render = { path = "../render" }
 conveyor-store = { path = "../store" }

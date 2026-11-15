@@ -18,6 +18,8 @@ pub use serde_json;
 pub use sqlx;
 
 pub mod agent_surface;
+// ADR 0007 §5: the `analyse.*` family — the analysis library's invocable surface.
+pub mod analysis;
 // S17: the benchmark harness — suites, runs, cases.
 pub mod benchmark;
 pub mod board;

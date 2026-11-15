@@ -9,6 +9,7 @@
 
 use std::collections::BTreeMap;
 
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 /// The document an analysis runs over: a URL and the bytes that were fetched for it.
@@ -39,7 +40,9 @@ impl Document {
 /// The numeric rank is the source's `_SEVERITY_RANK`: `critical 0 … info 4`. Dedupe keeps the
 /// finding with the **lowest** rank, which is the reason the ordering is descending by severity
 /// rather than alphabetically.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum Severity {
     Critical,
@@ -51,18 +54,9 @@ pub enum Severity {
 }
 
 impl Severity {
-    /// Penalty this severity contributes to a bucket, before decay.
-    pub fn default_weight(self) -> i32 {
-        match self {
-            Severity::Critical => 30,
-            Severity::High => 15,
-            Severity::Medium => 7,
-            Severity::Low => 3,
-            Severity::Info => 0,
-        }
-    }
-
-    /// The source's rank: lower is more severe.
+    /// The source's rank: lower is more severe. The penalty a rank is worth lives in
+    /// [`crate::rubric::SeverityWeights`] — one table, so an overridden weight cannot disagree
+    /// with a dedupe decision.
     pub fn rank(self) -> u8 {
         match self {
             Severity::Critical => 0,
@@ -86,7 +80,9 @@ impl Severity {
 
 /// The category a finding belongs to. A scorecard is computed per category, exactly as the
 /// source's `compute_category_score(findings, category)` did.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum Category {
     #[default]
@@ -121,7 +117,7 @@ impl Category {
 
 /// One finding. Construct with [`Finding::seo`] and the `with_` setters, or build the struct
 /// directly with `..Finding::default()`.
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 pub struct Finding {
     /// Stable identifier of the *check*, not of this occurrence (`seo-missing-title`). The rubric
     /// groups findings by the prefix of this value, so it is load-bearing, not decorative.
@@ -204,7 +200,7 @@ impl Finding {
 }
 
 /// A letter grade, mapped from the score by [`rubric::grade`].
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub enum Grade {
     #[serde(rename = "A+")]
     APlus,
@@ -237,7 +233,7 @@ impl Grade {
 ///
 /// `buckets` is a `BTreeMap` so serialisation order is stable — a `HashMap` here would make two
 /// identical reports differ byte for byte.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct Scorecard {
     pub overall_score: f64,
     pub grade: Grade,
@@ -245,7 +241,7 @@ pub struct Scorecard {
 }
 
 /// The result of one `analyse.*` operation.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct Report {
     pub url: String,
     pub findings: Vec<Finding>,

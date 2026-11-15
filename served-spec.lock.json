@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "2014c94682fd83461d52a285b1c34c52e4f54ba0eb8b3785cc6cdce3dae1f25c",
+    "GET /api/actions": "54d67a2742691523a67f5167b4ee92fc7c3f849faf614bbec1b53b685f14a79d",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -26,6 +26,7 @@
     "POST /api/actions/actions.describe/invocations": "2b42cd8f4ff618ee7bf82d6dc93107a80587623839940ad15bcd31eac8d72916",
     "POST /api/actions/actions.list/invocations": "fbbce32255a060978118c04d258962fbc65d3b0e1d76f222f16d6ce563ca8f41",
     "POST /api/actions/agent.run/invocations": "a505de68a58d336a60d758cf32c13eda8b7f0590535bef3f738d7fdd26feaed5",
+    "POST /api/actions/analyse.site/invocations": "53dab915150feeff076281b0c92093e0ae39b2d325f40a5886bea3f8897e1c47",
     "POST /api/actions/andon.engage/invocations": "ff487e6c1af676fe03962408a99589d1a9ba1e6f30cbc80b5425fb589f6e550a",
     "POST /api/actions/andon.release/invocations": "669a570fc1a07ae3a5d2e52a203191a7353126d4eaf46edd7992308787f27537",
     "POST /api/actions/approvals.decide/invocations": "c219c07364e45524561d5487c0a8f10d967136c33bfcaefb12f7d25fe6524efa",
