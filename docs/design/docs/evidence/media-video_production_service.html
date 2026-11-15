@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>videoproductionservice absorption — evidence (2026-11-15) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-video_production_service.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="video_production_service-absorption--evidence-2026-11-15">video_production_service absorption — evidence (2026-11-15)</h1>
+<p>Issue #139 · the browser executor image (<code>conveyor-media-browser</code>). The reference is pinned by digest; no private hostname, slug, address or customer payload appears in this file.</p>
+<h2 id="the-contract">The contract</h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capture</td>
+<td><code>apps/media/contract/video_production_service/</code> — taken 2026-11-15T16:47:33Z</td>
+</tr>
+<tr>
+<td>Pinned image</td>
+<td><code>sha256:016a2db10e4984813e138f280c07bf5e9fb6cd7053089b78fa7c315b12e72cd6</code></td>
+</tr>
+<tr>
+<td>Operations captured</td>
+<td>51 (47 paths)</td>
+</tr>
+<tr>
+<td>Golden cases</td>
+<td>51</td>
+</tr>
+<tr>
+<td>Capability kinds after the drop table</td>
+<td>2 — <code>media.produce_video</code>, <code>media.record_browser</code></td>
+</tr>
+</tbody>
+</table>
+<p>Captured from the running image against a scratch <code>postgres:18</code> and redis, with synthetic fixtures (a one-page HTML document and a generated short mp4). One capture run was invalidated by a full Docker VM and every case was re-taken; the goldens in the tree are from the second run.</p>
+<h2 id="a-measured-defect-in-the-live-reference">A measured defect in the live reference</h2>
+<p><strong><code>POST /api/compile</code> cannot complete in the running digest.</strong> Every submission dies in <code>_initialize</code> with <code>AttributeError: 'CompilationJob' object has no attribute 'fps'</code> — the image's ORM lacks the column — so the job stays <code>processing</code> forever. Production runs this exact digest. What is pinned is therefore the <strong>intake contract</strong> (the 200 <code>AsyncJobResponse</code>), never a completed compile. The port does not claim a render parity the reference cannot produce; its own <code>media.produce_video</code> tests carry the render evidence.</p>
+<h2 id="parity-accounting">Parity accounting</h2>
+<p><code>apps/media/contract/parity.toml</code> has one row per captured operation; <code>apps/media/tests/parity.rs</code> fails on a missing, duplicated or orphan row.</p>
+<ul>
+<li><strong>7 served as kinds</strong>: <code>POST /api/compile</code>, <code>POST /api/compile/title-card</code>, <code>POST /api/record/animation</code> → <code>media.produce_video</code>; <code>POST /api/record/content</code>, <code>POST /api/record/url</code>, <code>POST /api/record/part</code>, <code>POST /api/record/capture/screens</code> → <code>media.record_browser</code>.</li>
+<li><strong>44 dropped with a reason</strong>, grouped: the job ledger (poll/status/cancel/result/report/download/ thumbnail/url, batches, SSE events), catalogue CRUD (presets/themes/templates), metering and analytics, admin cleanup, preview, the findings adapter, edit planning, the root banner, metrics, and the five health aliases (an executor is a batch pod; its liveness is the Job's <code>activeDeadlineSeconds</code>).</li>
+</ul>
+<h2 id="declared-deviations">Declared deviations</h2>
+<ol type="1">
+<li><strong>Recording is virtual-time sampling, not a wall-clock screencast.</strong> The reference records a live Playwright context for the session's duration. The port renders the page at successive <code>--virtual-time-budget</code> values and encodes the frames with ffmpeg: deterministic, reproducible, and no new dependency. A page whose content depends on real network or real wall-clock time will differ from the reference; a deterministic page matches frame for frame.</li>
+<li><strong><code>url</code> recording is opt-in.</strong> A remote URL is refused by name (<code>egress_denied</code>) unless the request carries <code>allow_network: true</code>. P2.2 keeps egress denied by default; a deployment that wants URL recording grants it per kind (#83).</li>
+</ol>
+<h2 id="boot-traps-worth-keeping">Boot traps worth keeping</h2>
+<p>Migrations are <code>initContainer</code>-only (head <code>012</code>); the service reads <strong><code>API_PORT</code></strong>, not <code>PORT</code>; <code>AUTH_ENABLED=false</code> is ignored and the trusted lane still refuses a tenantless request; the licence gate's default is off; local storage plus <code>COMPILATION_ALLOW_LOCAL_FILE_INPUTS=true</code> is what makes a capture possible without an object store; the VP9-alpha probe passes at boot and Chromium starts lazily per job, not at boot.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/media-video_production_service.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

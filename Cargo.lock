@@ -901,6 +901,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-media"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "bytes",
+ "chrono",
+ "clap",
+ "conveyor-domain",
+ "conveyor-runner",
+ "futures-util",
+ "http-body-util",
+ "object_store",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "sqlx",
+ "thiserror",
+ "tokio",
+ "toml",
+ "tower",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
 name = "conveyor-pack"
 version = "0.1.0"
 dependencies = [

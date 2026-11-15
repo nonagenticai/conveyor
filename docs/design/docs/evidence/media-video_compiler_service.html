@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>videocompilerservice absorption — evidence (2026-11-15) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-video_compiler_service.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="video_compiler_service-absorption--evidence-2026-11-15">video_compiler_service absorption — evidence (2026-11-15)</h1>
+<p>Issue #139 · the ffmpeg executor image (<code>conveyor-media-ffmpeg</code>). The reference is pinned by digest; no private hostname, slug, address or customer payload appears in this file.</p>
+<h2 id="the-contract">The contract</h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capture</td>
+<td><code>apps/media/contract/video_compiler_service/</code> — taken 2026-11-15T16:06:38Z</td>
+</tr>
+<tr>
+<td>Pinned image</td>
+<td><code>sha256:9895faae83d370047f3aba4f67533e6df8f4ee9c80dd53d58faccbb3c4bd9322</code></td>
+</tr>
+<tr>
+<td>Operations captured</td>
+<td>10 (10 paths)</td>
+</tr>
+<tr>
+<td>Golden cases</td>
+<td>14</td>
+</tr>
+<tr>
+<td>Capability kinds after the drop table</td>
+<td>3 — <code>media.compile_video</code>, <code>media.thumbnail</code>, <code>media.concat_audio</code></td>
+</tr>
+</tbody>
+</table>
+<p>Captured from the <strong>running image</strong>, not a rebuild: the rig (<code>apps/media/contract/rig.sh</code>) pulled the digest above and booted it against a scratch <code>postgres:18</code> and redis on one Docker network. Fixtures are synthetic — a generated 2-second mp4 and a generated WAV. No live customer payload was used, and none could be: the rig has no route to an estate host.</p>
+<h2 id="parity-accounting">Parity accounting</h2>
+<p><code>apps/media/contract/parity.toml</code> has one row per captured operation, and <code>apps/media/tests/parity.rs</code> fails if a row is missing, duplicated, or names an operation no lock carries.</p>
+<ul>
+<li><strong>3 served as kinds</strong>: <code>POST /api/compile</code> → <code>media.compile_video</code>; <code>POST /api/thumbnails</code> → <code>media.thumbnail</code>; <code>POST /api/concat-audio</code> → <code>media.concat_audio</code>.</li>
+<li><strong>7 dropped with a reason</strong>: the four health endpoints and <code>/readyz</code> (an executor is a batch pod, not a service; its liveness is the Job's <code>activeDeadlineSeconds</code>), <code>/api/jobs/{job_id}</code> and <code>/api/jobs/cancel</code> (job status and cancellation are conveyor's ledger, ADR 0007 §2–4).</li>
+</ul>
+<p>The goldens pin the <strong>submit and validation</strong> branches. The render branch uploaded its master to an object store, which the rig deliberately does not supply, so the executor's own tests carry that evidence instead: a real compile, a real thumbnail and a real concat against local <code>ffmpeg</code>.</p>
+<h2 id="tolerances">Tolerances</h2>
+<p>The captured error envelopes carry <code>request_id</code> (ULID) and <code>timestamp</code>, and <code>compile_submit</code> carries a minted <code>job_id</code> and <code>poll_url</code>. Those are the only fields that cannot replay; the parity table names each, and everything else in a golden is compared exactly.</p>
+<h2 id="what-the-rewrite-does">What the rewrite does</h2>
+<p>The reference answered 202 and rendered asynchronously behind a lease and a reaper. The executor does the work <strong>inside one job</strong>: inputs arrive as files in the work directory, the encoded master leaves as a declared output through conveyor's own upload route. Anything the reference offered that this port does not (grading, caption burn-in, ambient audio bed, cursor/focus tracks) is refused by name with a stable code — never accepted and ignored.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/media-video_compiler_service.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

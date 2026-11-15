@@ -1,0 +1,1 @@
+{"error":{"code":"HTTP_422","message":"The platform channel is not configured yet: client_secret and refresh_token are both required to create it.","status":422,"request_id":"01a1dff4-8316-77af-9310-7f0af50e305a","timestamp":"2026-11-15T16:05:05Z"}}

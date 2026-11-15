@@ -1,0 +1,67 @@
+# name | METHOD | path | headers | body
+# Captured from the LIVE reference image; see README "How it was captured".
+# Every authenticated case names its tenant header explicitly: the reference refuses a
+# tenantless request (401 TENANT_REQUIRED), which record_animation_no_tenant
+# and compile_submit_no_tenant pin. The tenant is a fixed synthetic UUID.
+#
+# Absorbed operations (media.produce_video / media.record_browser) are pinned here:
+# compile submit, title-card, animation render, HTML-content recording, and the
+# admission branches of the URL/part/screens recording routes (their happy paths need
+# an external public URL or a scripts directory, which the rig deliberately lacks).
+# Dropped routes are pinned at their reachable not-found/validation/branch shapes so the
+# rewrite can be compared even where the conveyor ledger owns the route.
+#
+# POST /api/compile returns a 200 AsyncJobResponse in this image (not 202) and the job
+# then dies in the background on a reference defect documented in README.md — the pair
+# pinned here is the HTTP contract at submission, not a completed render.
+health|GET|/health||
+healthz|GET|/healthz||
+health_live|GET|/health/live||
+health_ready|GET|/health/ready||
+readyz|GET|/readyz||
+root|GET|/||
+compile_submit|POST|/api/compile|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"shot_list":{"parts":[{"id":"intro","title":"Capture Intro","subtitle":"Synthetic","part_type":"title_card","estimated_duration_seconds":1.0},{"id":"body","title":"Body","part_type":"browser_recording","estimated_duration_seconds":2.0}]},"recordings":[{"part_id":"body","video_path":"/tmp/fixtures/clip.mp4","duration_seconds":2.0,"file_size_bytes":10890,"width":320,"height":240,"has_audio":false,"success":true}],"target_width":320,"target_height":240,"preset":"quick-preview"}
+compile_submit_no_tenant|POST|/api/compile||{"shot_list":{"parts":[{"id":"intro","title":"Capture Intro","subtitle":"Synthetic","part_type":"title_card","estimated_duration_seconds":1.0},{"id":"body","title":"Body","part_type":"browser_recording","estimated_duration_seconds":2.0}]},"recordings":[{"part_id":"body","video_path":"/tmp/fixtures/clip.mp4","duration_seconds":2.0,"file_size_bytes":10890,"width":320,"height":240,"has_audio":false,"success":true}],"target_width":320,"target_height":240,"preset":"quick-preview"}
+compile_validation|POST|/api/compile|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+compile_title_card|POST|/api/compile/title-card|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"title":"Capture Title Card","subtitle":"Synthetic","width":320,"height":240,"duration":1.0}
+compile_title_card_validation|POST|/api/compile/title-card|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+compile_edit_plan|POST|/api/compile/edit-plan|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"recordings":[{"part_id":"body","video_path":"/tmp/fixtures/clip.mp4","duration_seconds":2.0}],"shot_list":{"parts":[{"id":"body","title":"Body","estimated_duration_seconds":2.0}]},"target_duration_minutes":1}
+compile_findings_video|POST|/api/compile/findings-video|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"title":"Capture Findings","findings":[{"title":"Finding one","description":"Synthetic finding"}]}
+compile_findings_video_validation|POST|/api/compile/findings-video|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+compile_preview_missing|POST|/api/compile/preview|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"job_id":"00000000-0000-0000-0000-0000000000ff","width":320,"height":240}
+compile_preview_empty|POST|/api/compile/preview|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+compile_audio_export_missing|POST|/api/compile/audio-export|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"job_id":"00000000-0000-0000-0000-0000000000ff","format":"mp3"}
+compile_job_missing|GET|/api/compile/jobs/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_result_missing|GET|/api/compile/jobs/00000000-0000-0000-0000-0000000000ff/result|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_video_missing|GET|/api/compile/jobs/00000000-0000-0000-0000-0000000000ff/video|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_video_url_missing|GET|/api/compile/jobs/00000000-0000-0000-0000-0000000000ff/video-url|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_report_missing|GET|/api/compile/jobs/00000000-0000-0000-0000-0000000000ff/report|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_thumbnail_missing|GET|/api/compile/jobs/00000000-0000-0000-0000-0000000000ff/thumbnail|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_cancel_missing|DELETE|/api/compile/jobs/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_batch_missing|GET|/api/compile/batch/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_presets|GET|/api/compile/presets|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_preset|GET|/api/compile/presets/standard|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_preset_missing|GET|/api/compile/presets/not-a-preset|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_themes|GET|/api/compile/themes|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_theme|GET|/api/compile/themes/default|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_templates|GET|/api/compile/templates|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+compile_custom_presets|GET|/api/compile/presets/custom|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+record_animation|POST|/api/record/animation|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"html":"<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Capture motion template</title>\n<style>\n  html, body { margin: 0; height: 100%; background: #101c2c; }\n  #stage { position: relative; width: 100%; height: 100%; overflow: hidden; }\n  #bar { position: absolute; top: 45%; left: 0; height: 10%; width: 12%; background: #4fd1c5; }\n</style>\n</head>\n<body>\n<div id=\"stage\"><div id=\"bar\"></div></div>\n<script>\n  window.RENDER_DURATION_MS = 1000;\n  window.render = function (t) {\n    var p = Math.max(0, Math.min(1, t / window.RENDER_DURATION_MS));\n    document.getElementById('bar').style.left = (p * 88) + '%';\n    document.body.style.background = p > 0.5 ? '#132a3c' : '#101c2c';\n  };\n</script>\n</body>\n</html>\n","part_id":"anim001","fps":10,"width":320,"height":240,"duration_ms":1000}
+record_animation_no_tenant|POST|/api/record/animation||{"html":"<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Capture motion template</title>\n<style>\n  html, body { margin: 0; height: 100%; background: #101c2c; }\n  #stage { position: relative; width: 100%; height: 100%; overflow: hidden; }\n  #bar { position: absolute; top: 45%; left: 0; height: 10%; width: 12%; background: #4fd1c5; }\n</style>\n</head>\n<body>\n<div id=\"stage\"><div id=\"bar\"></div></div>\n<script>\n  window.RENDER_DURATION_MS = 1000;\n  window.render = function (t) {\n    var p = Math.max(0, Math.min(1, t / window.RENDER_DURATION_MS));\n    document.getElementById('bar').style.left = (p * 88) + '%';\n    document.body.style.background = p > 0.5 ? '#132a3c' : '#101c2c';\n  };\n</script>\n</body>\n</html>\n","part_id":"anim001","fps":10,"width":320,"height":240,"duration_ms":1000}
+record_animation_validation|POST|/api/record/animation|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+record_content|POST|/api/record/content|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"html_content":"<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Capture sample page</title>\n<style>\n  html, body { margin: 0; font-family: sans-serif; background: #f7f7f2; color: #1b1b1b; }\n  header { padding: 24px 32px; background: #24506b; color: #fff; }\n  main { padding: 32px; }\n  .card { margin: 16px 0; padding: 24px; background: #fff; border: 1px solid #d8d8d8; border-radius: 8px; }\n  .swatch { display: inline-block; width: 48px; height: 48px; margin-right: 8px; border-radius: 6px; }\n</style>\n</head>\n<body>\n<header><h1>Contract capture sample</h1><p>One local page, no external resources.</p></header>\n<main>\n  <div class=\"card\"><h2>Section one</h2><p>Synthetic content for a deterministic screen recording.</p></div>\n  <div class=\"card\"><h2>Section two</h2>\n    <span class=\"swatch\" style=\"background:#24506b\"></span>\n    <span class=\"swatch\" style=\"background:#4fd1c5\"></span>\n    <span class=\"swatch\" style=\"background:#e0a800\"></span>\n  </div>\n  <div class=\"card\"><h2>Section three</h2><p>End of the one-page fixture.</p></div>\n</main>\n</body>\n</html>\n","part_id":"page001","recording_config":{"viewport_width":320,"viewport_height":240,"output_format":"mp4","timeout_ms":60000},"scroll_config":{"enabled":true,"speed_px_per_second":5000,"start_delay_seconds":0,"end_delay_seconds":0}}
+record_content_validation|POST|/api/record/content|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+record_url_ssrf|POST|/api/record/url|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"url":"http://127.0.0.1:18202/","part_id":"shot001"}
+record_url_invalid|POST|/api/record/url|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"url":"not-a-url","part_id":"shot001"}
+record_part_validation|POST|/api/record/part|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+record_screens_ssrf|POST|/api/record/capture/screens|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"url":"http://127.0.0.1:18202/","part_id":"shot001","steps":[{"name":"home"}]}
+record_batch_validation|POST|/api/record/batch|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+record_batch_from_artifacts_validation|POST|/api/record/batch_from_artifacts|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"project_id":"proj-1","parts":[]}
+record_job_missing|GET|/api/record/jobs/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+record_result_missing|GET|/api/record/jobs/00000000-0000-0000-0000-0000000000ff/result|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+record_video_missing|GET|/api/record/jobs/00000000-0000-0000-0000-0000000000ff/video|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+record_cancel_missing|POST|/api/record/jobs/00000000-0000-0000-0000-0000000000ff/cancel|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+record_batch_missing|GET|/api/record/batch/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+analytics_usage|GET|/api/analytics/usage|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+analytics_daily|GET|/api/analytics/usage/daily|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+events_no_tenant|GET|/events/00000000-0000-0000-0000-0000000000c1||

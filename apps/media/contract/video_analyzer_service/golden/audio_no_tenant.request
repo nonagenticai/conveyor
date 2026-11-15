@@ -1,0 +1,2 @@
+POST /api/analyze/audio
+{"audio_url":"http://cap-media:8001/cap-2s-audio.mp4","meter":4}

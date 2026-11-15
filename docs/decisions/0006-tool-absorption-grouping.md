@@ -87,3 +87,28 @@ active construction.
   servers, not tool code, and the already-converted ones are not touched again.
 - A group's image is built by `docker/Dockerfile.service` and published by the per-service CI row,
   which lands only after the package is on `main` (#99's rule).
+
+## Amendment — 2026-11-15 (#139): the device-inspection decision
+
+#139's P4 asks for one explicit answer, and this is it.
+
+**`app_inspector_service` is not absorbed.** It stays a binding to an external tool, for two
+reasons that are independent:
+
+1. **No runtime in common.** ADR 0006 §2 keeps services apart when one needs a heavy runtime the
+   others do not. Device inspection needs a Selenium/Appium driver in front of a *device farm* — a
+   fleet of physical or emulated devices. No such farm exists in this estate, and Chromium (which
+   `apps/media`'s browser binary does carry) is not a substitute for one: the capability is
+   "drive a phone", not "render a page".
+2. **No conveyor consumer.** Its only caller is the w2v orchestrator, which is out of scope by the
+   §Decision above. Decision 4's rule applies unchanged: a capability with no live consumer is
+   retired, not rewritten, and if it is ever wanted back it is a new capability with a live
+   upstream.
+
+Two further browser services are named here so the record is complete rather than silent:
+`bdd_playwright_service` and `redesign_service` are browser services the `apps/media` group row
+does not list. Neither is absorbed by #139. If the conveyor ever calls either as a tool, that is a
+new capability and its own issue — not a widening of this group by inference.
+
+What remains true of the group is unchanged: the eight services the row names, three binaries by
+runtime shape, one issue and one PR.

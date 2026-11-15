@@ -1,0 +1,3 @@
+POST /api/designs/render/pdf
+{"X-Tenant-Id":"not-a-uuid"}
+{"html":"<p>synthetic</p>"}

@@ -96,8 +96,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/decisions/0006-tool-absorption-grouping.html",
       "source": "docs/decisions/0006-tool-absorption-grouping.md",
       "section": "Decisions",
-      "sha256": "adc8b99c210be970b1d8931dee11aa9f71b3a6b024c59bfdf628dff6539736cd",
-      "bytes": 6657,
+      "sha256": "ca641a316c68edef63cc3fed5b9c7d00f19ace9246ad3a91b52576cad3fb349b",
+      "bytes": 8138,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0006-tool-absorption-grouping.md"
     },
     {
@@ -306,6 +306,69 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "bb9b5e1c319d68155857b6a1ecff9c0e6027f723177070a819cc5045bfa46a09",
       "bytes": 9280,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
+    },
+    {
+      "title": "frontendtestrunnerservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-frontend_test_runner_service.html",
+      "source": "docs/evidence/media-frontend_test_runner_service.md",
+      "section": "Evidence",
+      "sha256": "1fa8ef82bd83ac39536f58a7bfe61b1624fb8149e8f3cb2f794100efdbfdb405",
+      "bytes": 3241,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-frontend_test_runner_service.md"
+    },
+    {
+      "title": "htmlrenderservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-html_render_service.html",
+      "source": "docs/evidence/media-html_render_service.md",
+      "section": "Evidence",
+      "sha256": "ab92b97ede2a3144d03db3ad066f34f2cd0502ec9aed082b12daa30a2fee14fe",
+      "bytes": 2634,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-html_render_service.md"
+    },
+    {
+      "title": "ttsgateway capture — evidence (2026-11-15)",
+      "path": "docs/evidence/media-tts_gateway.html",
+      "source": "docs/evidence/media-tts_gateway.md",
+      "section": "Evidence",
+      "sha256": "d8694ea57fe760beb365e5a288bf04cfab78250b9df711feff206009bcfa3865",
+      "bytes": 1626,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-tts_gateway.md"
+    },
+    {
+      "title": "videoanalyzerservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-video_analyzer_service.html",
+      "source": "docs/evidence/media-video_analyzer_service.md",
+      "section": "Evidence",
+      "sha256": "70ebcd571d865d8d22d3e523cbfd0322334eacd3ddb7e946ec499a46f9e2195d",
+      "bytes": 2998,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-video_analyzer_service.md"
+    },
+    {
+      "title": "videocompilerservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-video_compiler_service.html",
+      "source": "docs/evidence/media-video_compiler_service.md",
+      "section": "Evidence",
+      "sha256": "a25a873737821bef07958e290acf2267df376d059021221d5c695d9678e8b394",
+      "bytes": 2720,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-video_compiler_service.md"
+    },
+    {
+      "title": "videoproductionservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-video_production_service.html",
+      "source": "docs/evidence/media-video_production_service.md",
+      "section": "Evidence",
+      "sha256": "5862ba2f4bd2587b6bacd61da05e5210f82c1c9b3949bc27003b049b43a83b2b",
+      "bytes": 3536,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-video_production_service.md"
+    },
+    {
+      "title": "youtubeuploadservice capture — evidence (2026-11-15)",
+      "path": "docs/evidence/media-youtube_upload_service.html",
+      "source": "docs/evidence/media-youtube_upload_service.md",
+      "section": "Evidence",
+      "sha256": "4cb5ee8e83a8a17b152990abedc1061c9aba76badbb3dbdfa8fa8a790cf3cdd4",
+      "bytes": 1473,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-youtube_upload_service.md"
     },
     {
       "title": "V1 → SPECV2 coverage",

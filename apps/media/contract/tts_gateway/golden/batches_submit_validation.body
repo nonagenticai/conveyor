@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"batch_id: Field required (and 1 more)","status":422,"request_id":"01a1dfee-d4e2-72a0-b627-aef2c78e962a","timestamp":"2026-11-15T15:58:53Z","details":[{"loc":["body","batch_id"],"msg":"Field required","type":"missing"},{"loc":["body","chunks"],"msg":"Field required","type":"missing"}]}}

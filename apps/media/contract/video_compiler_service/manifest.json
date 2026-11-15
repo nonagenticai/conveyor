@@ -1,0 +1,20 @@
+{
+  "service": "video_compiler_service",
+  "image_digest": "sha256:9895faae83d370047f3aba4f67533e6df8f4ee9c80dd53d58faccbb3c4bd9322",
+  "source_commit": "",
+  "taken": "2026-11-15T16:06:38Z",
+  "operations": 10,
+  "paths": 10,
+  "op_list": [
+    "GET /api/jobs/{job_id}",
+    "GET /health",
+    "GET /health/live",
+    "GET /health/ready",
+    "GET /healthz",
+    "GET /readyz",
+    "POST /api/compile",
+    "POST /api/concat-audio",
+    "POST /api/jobs/cancel",
+    "POST /api/thumbnails"
+  ]
+}

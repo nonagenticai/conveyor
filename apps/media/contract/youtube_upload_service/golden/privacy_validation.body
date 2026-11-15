@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"privacy_status: Input should be 'unlisted' or 'public'","status":422,"request_id":"01a1dff4-828f-721c-b28d-64b373225b91","timestamp":"2026-11-15T16:05:05Z","details":[{"loc":["body","privacy_status"],"msg":"Input should be 'unlisted' or 'public'","type":"literal_error"}]}}

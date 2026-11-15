@@ -1,0 +1,14 @@
+DELETE /api/analyze/{job_id}
+GET /
+GET /api/analyze/{job_id}
+GET /api/analyze/{job_id}/artifact/{name}
+GET /api/analyze/{job_id}/result
+GET /api/analyze/{job_id}/verification
+GET /health
+GET /health/live
+GET /health/ready
+GET /healthz
+GET /readyz
+POST /api/analyze
+POST /api/analyze/audio
+POST /api/analyze/upload

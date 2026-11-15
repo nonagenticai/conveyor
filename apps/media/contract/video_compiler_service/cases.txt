@@ -1,0 +1,21 @@
+# name | METHOD | path | headers | body
+# The tenant is supplied by header on every authenticated case: the reference refuses a request
+# carrying none (401 TENANT_REQUIRED), and a sentinel default would prove nothing about the rewrite.
+# The happy path of the three job operations is the SUBMIT itself: POST /api/compile answers 202
+# from durable job state and does the render asynchronously, so it needs no object store. The
+# render side (thumbnails, concat-audio) uploads to an object store and is captured on its
+# validation branch only — see the README drop table.
+health|GET|/health||
+health_live|GET|/health/live||
+health_ready|GET|/health/ready||
+healthz|GET|/healthz||
+readyz|GET|/readyz||
+compile_submit|POST|/api/compile|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"shots":[{"id":"s1","seconds":1},{"id":"s2","seconds":1}]}
+compile_submit_validation|POST|/api/compile|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+compile_submit_no_tenant|POST|/api/compile||{"shots":[{"id":"s1","seconds":1}]}
+job_get_missing|GET|/api/jobs/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+job_get_no_tenant|GET|/api/jobs/00000000-0000-0000-0000-0000000000ff||
+cancel_by_prefix|POST|/api/jobs/cancel|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"idempotency_key_prefix":"capture-"}
+cancel_validation|POST|/api/jobs/cancel|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+thumbnails_validation|POST|/api/thumbnails|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+concat_audio_validation|POST|/api/concat-audio|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
