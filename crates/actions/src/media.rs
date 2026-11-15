@@ -64,9 +64,11 @@ pub const OCR: &str = "media.ocr";
 pub const PRODUCE_VIDEO: &str = "media.produce_video";
 /// A browser page stepped through virtual time and encoded into a video.
 pub const RECORD_BROWSER: &str = "media.record_browser";
+/// A native Gherkin feature executed against one page.
+pub const RUN_GHERKIN: &str = "media.run_gherkin";
 
 /// Every kind this module publishes, in the order the group's evidence names them.
-pub const KINDS: [&str; 10] = [
+pub const KINDS: [&str; 11] = [
     RENDER_HTML,
     COMPILE_VIDEO,
     THUMBNAIL,
@@ -77,16 +79,18 @@ pub const KINDS: [&str; 10] = [
     OCR,
     PRODUCE_VIDEO,
     RECORD_BROWSER,
+    RUN_GHERKIN,
 ];
 
 /// The kinds that produce an artefact. The other four only measure.
-pub const WRITE_KINDS: [&str; 6] = [
+pub const WRITE_KINDS: [&str; 7] = [
     RENDER_HTML,
     COMPILE_VIDEO,
     THUMBNAIL,
     CONCAT_AUDIO,
     PRODUCE_VIDEO,
     RECORD_BROWSER,
+    RUN_GHERKIN,
 ];
 
 /// One dispatch plus the single infrastructure retry the runner ledger allows.
@@ -851,6 +855,53 @@ impl RecordBrowserIn {
     }
 }
 
+// ── media.run_gherkin ───────────────────────────────────────────────────────────────────
+
+/// `media.run_gherkin` input — a Gherkin document and the page it runs against.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct RunGherkinIn {
+    /// The Gherkin feature document.
+    pub feature: String,
+    /// The page under test: a `file://` document, or an `http(s)` URL with `allow_network`.
+    pub target_url: String,
+    /// Per-scenario ceiling in milliseconds (1000–600000); absent means the executor's default.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timeout_per_test_ms: Option<u64>,
+    /// How many times a failed scenario is re-run (0–10).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub retries: Option<u32>,
+    /// Write a screenshot into the job's output directory when a scenario fails.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub screenshot_on_failure: Option<bool>,
+    /// The deployment's explicit permission to reach an `http(s)` URL.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allow_network: Option<bool>,
+}
+
+impl RunGherkinIn {
+    fn params(self) -> Result<Value, ActionError> {
+        if self.feature.trim().is_empty() {
+            return Err(invalid("feature", "must contain at least one scenario"));
+        }
+        let remote =
+            self.target_url.starts_with("http://") || self.target_url.starts_with("https://");
+        if !remote && !self.target_url.starts_with("file://") {
+            return Err(invalid(
+                "target_url",
+                "must be a file:// document or an http(s) URL",
+            ));
+        }
+        if remote && self.allow_network != Some(true) {
+            return Err(invalid(
+                "target_url",
+                "a network URL requires allow_network: true; the deployment grants it per kind",
+            ));
+        }
+        serde_json::to_value(self).map_err(|_| ActionError::internal())
+    }
+}
+
 // ── actions ──────────────────────────────────────────────────────────────────────────────
 
 /// The probe the broker calls before binding: every media kind and its effect class.
@@ -1076,6 +1127,26 @@ async fn media_record_browser(
     input: RecordBrowserIn,
 ) -> Result<MediaJobOut, ActionError> {
     enqueue_job(tx, &ctx, RECORD_BROWSER, input.params()?).await
+}
+
+/// Run a Gherkin feature against one page.
+#[crate::action(
+    name = "media.run_gherkin",
+    version = 1,
+    kind = "internal",
+    scopes = ["capabilities:write"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn media_run_gherkin(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: RunGherkinIn,
+) -> Result<MediaJobOut, ActionError> {
+    enqueue_job(tx, &ctx, RUN_GHERKIN, input.params()?).await
 }
 
 #[cfg(test)]

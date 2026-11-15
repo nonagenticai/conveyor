@@ -704,3 +704,78 @@ operation = "POST /api/record/url"
 disposition = "kind"
 kind = "media.record_browser"
 note = "live URL → continuous browser recording; the rig pins the SSRF/validation branches (happy path needs an external public URL)"
+
+# frontend_test_runner_service — one row per captured operation.
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /"
+disposition = "drop"
+reason = "a service banner describes an HTTP surface the executor does not have"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "POST /api/test-runner/execute"
+disposition = "kind"
+kind = "media.run_gherkin"
+note = "the capability survives as the native Gherkin kind, but the request source changes: the reference accepts a Playwright ZIP package_url or a bdd_job_id, the kind takes the feature document itself"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}"
+disposition = "drop"
+reason = "job state, results and reports are conveyor's ledger and artefact store (ADR 0007 §2-4); the executor answers one synchronous verdict"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}/artifacts/{artifact_path}"
+disposition = "drop"
+reason = "job state, results and reports are conveyor's ledger and artefact store (ADR 0007 §2-4); the executor answers one synchronous verdict"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}/clips/{clip_key}/video"
+disposition = "drop"
+reason = "per-scenario clip capture is w2v's demo-video pipeline, not a media executor"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}/report"
+disposition = "drop"
+reason = "job state, results and reports are conveyor's ledger and artefact store (ADR 0007 §2-4); the executor answers one synchronous verdict"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}/result"
+disposition = "drop"
+reason = "job state, results and reports are conveyor's ledger and artefact store (ADR 0007 §2-4); the executor answers one synchronous verdict"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /health"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /health/live"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /health/ready"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /healthz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /readyz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"

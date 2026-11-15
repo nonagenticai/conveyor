@@ -1,0 +1,22 @@
+{
+  "service": "frontend_test_runner_service",
+  "image_digest": "sha256:db276ca39dd5021f06ee634aadcf90ba584f894e3d87b061ab15211f2350d6a3",
+  "source_commit": "",
+  "taken": "2026-11-15T19:13:16Z",
+  "operations": 12,
+  "paths": 12,
+  "op_list": [
+    "GET /",
+    "GET /api/test-runner/{job_id}",
+    "GET /api/test-runner/{job_id}/artifacts/{artifact_path}",
+    "GET /api/test-runner/{job_id}/clips/{clip_key}/video",
+    "GET /api/test-runner/{job_id}/report",
+    "GET /api/test-runner/{job_id}/result",
+    "GET /health",
+    "GET /health/live",
+    "GET /health/ready",
+    "GET /healthz",
+    "GET /readyz",
+    "POST /api/test-runner/execute"
+  ]
+}

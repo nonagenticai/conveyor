@@ -9,6 +9,7 @@
 //! `slide_service` is **not** here: ADR 0007 §7 moves deck authoring to `crates/deck`, which emits
 //! OOXML and renders PDF/PNG through `crates/render`.
 
+pub mod gherkin;
 pub mod produce;
 pub mod record;
 pub mod render;
@@ -23,7 +24,7 @@ use crate::contract::Capture;
 pub const SERVICE: &str = "conveyor-media-browser";
 
 /// The capability kinds this image implements. Must equal the union of [`CAPTURES`]' kinds.
-pub const KINDS: &[&str] = &[produce::KIND, record::KIND, render::KIND];
+pub const KINDS: &[&str] = &[gherkin::KIND, produce::KIND, record::KIND, render::KIND];
 
 /// The captured contracts whose kinds this image owns.
 pub const CAPTURES: &[Capture] = &[
@@ -37,6 +38,11 @@ pub const CAPTURES: &[Capture] = &[
         lock_json: include_str!("../../contract/video_production_service/openapi.lock.json"),
         capabilities: include_str!("../../contract/video_production_service/capabilities.txt"),
     },
+    Capture {
+        service: "frontend_test_runner_service",
+        lock_json: include_str!("../../contract/frontend_test_runner_service/openapi.lock.json"),
+        capabilities: include_str!("../../contract/frontend_test_runner_service/capabilities.txt"),
+    },
 ];
 
 /// Execute one capability.
@@ -47,6 +53,7 @@ pub fn dispatch(
 ) -> BoxFuture<'static, Result<Value, CapabilityError>> {
     Box::pin(async move {
         match kind.as_str() {
+            gherkin::KIND => gherkin::run(&params, &config).await,
             produce::KIND => produce::produce(&params, &config).await,
             record::KIND => record::record(&params, &config).await,
             render::KIND => render::render(&params, &config).await,

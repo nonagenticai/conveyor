@@ -4185,6 +4185,38 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             plain("media.ocr", json!({"input": "inputs/page.png"}), None),
             200,
         ),
+        expecting(
+            plain(
+                "media.produce_video",
+                json!({"title": "parity card", "duration": 1.0}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.record_browser",
+                json!({
+                    "html": "<p>parity</p>",
+                    "duration_ms": 500,
+                    "width": 640,
+                    "height": 360
+                }),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.run_gherkin",
+                json!({
+                    "feature": "Feature: parity\n  Scenario: loads\n    Then I expect the title to be \"parity\"",
+                    "target_url": "file:///tmp/parity.html"
+                }),
+                None,
+            ),
+            200,
+        ),
         {
             let mut sample = plain("media.capabilities", json!({}), None);
             sample.deterministic = true;

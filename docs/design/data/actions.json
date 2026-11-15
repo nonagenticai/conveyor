@@ -172,6 +172,7 @@
     "media.produce_video",
     "media.record_browser",
     "media.render_html",
+    "media.run_gherkin",
     "media.thumbnail",
     "members.list",
     "members.remove",
