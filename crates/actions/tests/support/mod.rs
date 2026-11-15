@@ -405,6 +405,26 @@ pub fn config(pg: &Pg) -> Config {
     .expect("test config")
 }
 
+/// [`config`] with the app pointed at a caller-supplied Redis.
+///
+/// The flush test needs this: `FLUSHALL` is server-wide, so a test that wipes Redis must own the
+/// server the app under test is using, or it wipes every sibling test's streams mid-run.
+pub fn config_with_redis(pg: &Pg, redis_url: &str) -> Config {
+    let runtime_url = pg.runtime_url.clone();
+    let owner_url = pg.owner_url.clone();
+    let redis_url = redis_url.to_owned();
+    Config::from_lookup(move |key| match key {
+        "DATABASE_URL" | "DATABASE_LISTEN_URL" => Some(runtime_url.clone()),
+        "DATABASE_MIGRATE_URL" => Some(owner_url.clone()),
+        "CONVEYOR_DEV_AUTH" => Some("1".into()),
+        "BIND_ADDR" => Some("127.0.0.1:0".into()),
+        "APP_KEY" => Some("conveyor".into()),
+        "REDIS_URL" => Some(redis_url.clone()),
+        _ => None,
+    })
+    .expect("test config")
+}
+
 /// [`config`] with development auth OFF and a licences service configured, so a request is
 /// authenticated by licence introspection (S06b) rather than by a `dev:` bearer.
 ///

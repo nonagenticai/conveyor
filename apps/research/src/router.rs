@@ -237,7 +237,11 @@ async fn scrape_bulk(
 
     let started = Instant::now();
     let options = ScrapeOptions::from_bulk(&request);
-    let mut results = Vec::with_capacity(request.urls.len());
+    // No capacity taken from the request: `urls.len()` is caller-controlled, and sizing an
+    // allocation from it is a CodeQL alert on the PR (the same defect #105 fixed in
+    // `apps/scientific`). The vector grows as results are pushed, which is bounded by the work
+    // actually done.
+    let mut results = Vec::new();
     let mut completed = 0usize;
     let mut failed = 0usize;
 

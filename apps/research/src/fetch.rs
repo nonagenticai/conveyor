@@ -45,7 +45,7 @@ pub struct FetchOptions<'a> {
 }
 
 pub async fn fetch_page(url: &str, options: &FetchOptions<'_>) -> Result<FetchedPage, FetchError> {
-    assert_allowed_url(url, options.allowed_hosts).await?;
+    let validated = assert_allowed_url(url, options.allowed_hosts).await?;
 
     // The contract bounds `timeout` to 1..=300 seconds. Clamp here as well:
     // `Duration::from_secs_f64` panics on NaN/infinity/absurd values, and this
@@ -62,7 +62,7 @@ pub async fn fetch_page(url: &str, options: &FetchOptions<'_>) -> Result<Fetched
         .build()
         .map_err(|error| FetchError::Transport(error.to_string()))?;
 
-    let mut request = client.get(url);
+    let mut request = client.get(validated);
     if let Some(user_agent) = options.user_agent {
         request = request.header(USER_AGENT, user_agent);
     }
@@ -117,7 +117,13 @@ pub async fn fetch_page(url: &str, options: &FetchOptions<'_>) -> Result<Fetched
 /// The chokepoint. `allowed_hosts` entries are exact hostnames (case-insensitive,
 /// trailing root dot ignored) and bypass the range checks, exactly as the
 /// reference's `SSRF_ALLOWED_HOSTS` does.
-pub async fn assert_allowed_url(url: &str, allowed_hosts: &[String]) -> Result<(), FetchError> {
+/// Validate `url` and return **the parsed value that was checked**.
+///
+/// Returning the `Url` (rather than `()`) is the point: the caller's sink takes exactly the value
+/// this function inspected, so the request cannot be issued against a string that was validated as
+/// one thing and parsed as another — and the data flow from the request body to `reqwest` passes
+/// through the checks instead of around them.
+pub async fn assert_allowed_url(url: &str, allowed_hosts: &[String]) -> Result<Url, FetchError> {
     let parsed = Url::parse(url)
         .map_err(|error| FetchError::Blocked(format!("URL not allowed: unparseable ({error})")))?;
 
@@ -154,7 +160,7 @@ pub async fn assert_allowed_url(url: &str, allowed_hosts: &[String]) -> Result<(
             .trim_end_matches('.')
             .eq_ignore_ascii_case(&host_text)
     }) {
-        return Ok(());
+        return Ok(parsed);
     }
 
     match host {
@@ -178,7 +184,7 @@ pub async fn assert_allowed_url(url: &str, allowed_hosts: &[String]) -> Result<(
                     )));
                 }
             }
-            Ok(())
+            Ok(parsed)
         }
         Host::Ipv4(address) => {
             if ip_is_blocked(IpAddr::V4(address)) {
@@ -186,7 +192,7 @@ pub async fn assert_allowed_url(url: &str, allowed_hosts: &[String]) -> Result<(
                     "URL not allowed: blocked address {host_text}"
                 )));
             }
-            Ok(())
+            Ok(parsed)
         }
         Host::Ipv6(address) => {
             if ip_is_blocked(IpAddr::V6(address)) {
@@ -194,7 +200,7 @@ pub async fn assert_allowed_url(url: &str, allowed_hosts: &[String]) -> Result<(
                     "URL not allowed: blocked address {host_text}"
                 )));
             }
-            Ok(())
+            Ok(parsed)
         }
     }
 }

@@ -46,6 +46,17 @@ pub async fn bus() -> Bus {
         .expect("connect to the test Redis")
 }
 
+/// A Redis URL nobody else is using — for the one scenario that wipes the server.
+///
+/// `flush_all` is `FLUSHALL`: server-wide, not database-scoped. On the shared test Redis it deletes
+/// every sibling test's streams and consumer groups mid-run; measured 2026-11-15, that is what
+/// failed CI with `NOGROUP` inside `a_large_job_round_trips_intact` while the flush test itself
+/// passed. This deliberately never consults `TEST_REDIS_URL`/`REDIS_URL`: a caller-provided URL is
+/// exactly the shared server the flush test must not touch.
+pub async fn private_url() -> String {
+    start_container().await
+}
+
 fn image() -> String {
     match std::env::var("TEST_REDIS_IMAGE") {
         Ok(image) if !image.trim().is_empty() => image.trim().to_owned(),
