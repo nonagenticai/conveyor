@@ -308,6 +308,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
     },
     {
+      "title": "The analysis service — capture and drop table (2026-11-15)",
+      "path": "docs/evidence/analysis-capture-2026-11-15.html",
+      "source": "docs/evidence/analysis-capture-2026-11-15.md",
+      "section": "Evidence",
+      "sha256": "a892d3f17c947b0e134d15d36d9083352e728c0913a1c00a7bbc96e45ed8026a",
+      "bytes": 28890,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-capture-2026-11-15.md"
+    },
+    {
       "title": "V1 → SPECV2 coverage",
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
@@ -402,8 +411,8 @@
       "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
       "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
       "section": "Plans",
-      "sha256": "6c6e5245a5a3fc5a59962dc767552a67d09a1be4dfdd98629c1c9134aad88cab",
-      "bytes": 10272,
+      "sha256": "f4bf3870efe8dae259ba3e0e1fe97cb56c37faa60ac73452f835d15f6fdbdc48",
+      "bytes": 10733,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
     },
     {
