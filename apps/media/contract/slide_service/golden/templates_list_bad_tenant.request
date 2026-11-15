@@ -1,0 +1,2 @@
+GET /api/templates
+{"X-Tenant-Id":"not-a-uuid"}

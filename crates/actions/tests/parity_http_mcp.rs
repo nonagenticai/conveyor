@@ -4222,6 +4222,26 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample.deterministic = true;
             expecting(sample, 200)
         },
+        // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────
+        // The response is a pure function of the input — the deck writer has no clock, no
+        // random id and no hash-map order — so a replay and an execution agree byte for byte.
+        expecting(
+            plain(
+                "decks.render",
+                json!({
+                    "format": "pptx",
+                    "deck": {
+                        "title": "Parity",
+                        "slides": [
+                            {"layout": "title", "title": "Opening", "subtitle": "Synthetic"},
+                            {"layout": "bullets", "title": "Findings", "bullets": ["one", "two"]}
+                        ]
+                    }
+                }),
+                None,
+            ),
+            200,
+        ),
     ];
 
     for sample in &mut out {

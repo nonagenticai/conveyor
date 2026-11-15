@@ -1,0 +1,18 @@
+[package]
+name = "conveyor-deck"
+description = "One deck model -> deterministic OOXML (.pptx), fixed v1 layouts (ADR 0007 §7)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# `JsonSchema` is a derive from schemars; the rest are the model's serde shape and its typed
+# refusals. Deliberately no zip crate: `src/zip.rs` writes the stored archive itself so the
+# determinism contract is a property of this code, not a feature flag of a dependency.
+conveyor-render = { path = "../render" }
+schemars = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
