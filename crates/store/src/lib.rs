@@ -119,6 +119,7 @@ pub mod revision;
 // `organisation` snapshot section.
 pub mod organisation;
 pub mod run;
+pub mod runner;
 pub mod schedule;
 pub mod scope;
 pub mod search;
