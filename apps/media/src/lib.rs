@@ -11,4 +11,3 @@ pub mod contract;
 
 pub mod browser;
 pub mod ffmpeg;
-pub mod thin;

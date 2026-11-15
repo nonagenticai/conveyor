@@ -1,42 +1,54 @@
-//! What the three binaries do identically: parse the flags, check the lock, print the document, or
-//! serve. Only the router, the locks and the service name differ.
+//! The command line both images share.
+//!
+//! A media image is **not an HTTP service**: it executes one capability and exits. This binary is
+//! therefore the local, testable form of what the runner contract will invoke —
+//! `conveyor_domain::runner::Instruction` (issue #144) carries the same four things: a `kind`, its
+//! `params`, named `inputs` and a closed set of `outputs`. Binding the real instruction is a
+//! one-function change once that contract lands; nothing here assumes a route.
 
+use std::path::PathBuf;
 use std::process::ExitCode;
 
-use axum::Router;
 use clap::Parser;
-use serde_json::{Value, json};
+use serde_json::Value;
 
-use crate::common::Config;
-use crate::contract::{self, Lock};
+use crate::common::{CapabilityError, Config};
+use crate::contract::{self, Capture};
 
-/// The flags every `conveyor-media-*` binary accepts.
+/// The flags a media image accepts.
 #[derive(Parser, Debug, Clone)]
 pub struct Cli {
-    /// Bind address (default 0.0.0.0).
-    #[arg(long)]
-    pub host: Option<String>,
-
-    /// Bind port.
-    #[arg(long)]
-    pub port: Option<u16>,
-
-    /// Compare the routed operations with the captured contracts and exit.
+    /// Compare the kinds this image implements with the captured contracts and exit.
     #[arg(long)]
     pub check_lock: bool,
 
-    /// Print the served OpenAPI document and exit.
+    /// Print the capability kinds this image implements and exit.
     #[arg(long)]
-    pub print_openapi: bool,
+    pub list: bool,
+
+    /// Execute one capability kind.
+    #[arg(long)]
+    pub run: Option<String>,
+
+    /// The capability's parameters, as a JSON file (or `-` for stdin).
+    #[arg(long)]
+    pub params: Option<String>,
+
+    /// Directory the capability writes its outputs into.
+    #[arg(long)]
+    pub out: Option<PathBuf>,
 }
 
-/// `--check-lock`: every captured operation routed, and no route the capture does not name.
-pub fn check(locks: &[Lock], served: &[(&str, &str)]) -> ExitCode {
-    match contract::check(locks, served) {
+/// A capability implementation: `(kind, params, config) -> result document`.
+pub type Dispatch<'a> = &'a dyn Fn(&str, &Value, &Config) -> Result<Value, CapabilityError>;
+
+/// `--check-lock`: every captured kind implemented, and nothing implemented that no capture names.
+pub fn check(captures: &[Capture], kinds: &[&str]) -> ExitCode {
+    match contract::check(captures, kinds) {
         Ok(summary) => {
             println!(
-                "lock: OK ({} operations served across {} captured services)",
-                summary.operations, summary.services
+                "lock: OK ({} capability kind(s) covered across {} captured services)",
+                summary.kinds, summary.services
             );
             ExitCode::SUCCESS
         }
@@ -47,40 +59,27 @@ pub fn check(locks: &[Lock], served: &[(&str, &str)]) -> ExitCode {
     }
 }
 
-/// A minimal OpenAPI document describing exactly what this binary serves.
-///
-/// It is deliberately generated from `served`, not copied from a capture: this document answers
-/// "what does the binary answer", and the capture answers "what must it answer".
-pub fn openapi(service: &str, served: &[(&str, &str)]) -> Value {
-    let mut paths = serde_json::Map::new();
-    for (method, path) in served {
-        let entry = paths
-            .entry((*path).to_string())
-            .or_insert_with(|| Value::Object(serde_json::Map::new()));
-        if let Some(map) = entry.as_object_mut() {
-            map.insert(method.to_ascii_lowercase(), json!({"responses": {"200": {"description": "OK"}}}));
-        }
+/// `--list`, one kind per line.
+pub fn list(kinds: &[&str]) {
+    for kind in kinds {
+        println!("{kind}");
     }
-    json!({
-        "openapi": "3.1.0",
-        "info": {"title": service, "version": env!("CARGO_PKG_VERSION")},
-        "paths": Value::Object(paths),
-    })
 }
 
-/// Serve `router` on the configured address until the process is stopped.
-pub async fn serve(config: &Config, router: Router) -> ExitCode {
-    let address = format!("{}:{}", config.bind_host, config.bind_port);
-    let listener = match tokio::net::TcpListener::bind(&address).await {
-        Ok(listener) => listener,
+/// `--run`: read the parameters, dispatch, print the result document.
+pub fn run(kind: &str, cli: &Cli, config: &Config, dispatch: Dispatch<'_>) -> ExitCode {
+    let params = match read_params(cli.params.as_deref()) {
+        Ok(params) => params,
         Err(error) => {
-            eprintln!("{}: cannot bind {address}: {error}", config.service);
+            eprintln!("{}: {error}", config.service);
             return ExitCode::FAILURE;
         }
     };
-    eprintln!("{} listening on {address}", config.service);
-    match axum::serve(listener, router).await {
-        Ok(()) => ExitCode::SUCCESS,
+    match dispatch(kind, &params, config) {
+        Ok(result) => {
+            println!("{}", serde_json::to_string_pretty(&result).unwrap_or_default());
+            ExitCode::SUCCESS
+        }
         Err(error) => {
             eprintln!("{}: {error}", config.service);
             ExitCode::FAILURE
@@ -88,12 +87,20 @@ pub async fn serve(config: &Config, router: Router) -> ExitCode {
     }
 }
 
-/// Apply the `--host`/`--port` overrides to a config.
-pub fn apply(config: &mut Config, cli: &Cli) {
-    if let Some(host) = &cli.host {
-        config.bind_host = host.clone();
-    }
-    if let Some(port) = cli.port {
-        config.bind_port = port;
+fn read_params(path: Option<&str>) -> Result<Value, CapabilityError> {
+    match path {
+        None | Some("-") => {
+            let mut raw = String::new();
+            std::io::Read::read_to_string(&mut std::io::stdin(), &mut raw)
+                .map_err(|e| CapabilityError::Invalid(format!("cannot read stdin: {e}")))?;
+            serde_json::from_str(&raw)
+                .map_err(|e| CapabilityError::Invalid(format!("params are not JSON: {e}")))
+        }
+        Some(path) => {
+            let raw = std::fs::read_to_string(path)
+                .map_err(|e| CapabilityError::Invalid(format!("cannot read {path}: {e}")))?;
+            serde_json::from_str(&raw)
+                .map_err(|e| CapabilityError::Invalid(format!("{path} is not JSON: {e}")))
+        }
     }
 }

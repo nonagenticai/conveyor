@@ -1,30 +1,32 @@
-//! The ffmpeg binary: `video_compiler_service`, `video_analyzer_service`.
+//! The ffmpeg image: composition/compile, probe/analysis and OCR.
 //!
-//! `ffmpeg` is invoked as a child process — there is no Rust decoder in this workspace and there is
-//! no reason for one: the reference shells out to the same binary, and its own arguments are what
-//! the capture pins.
+//! The group's ffmpeg capabilities after the drop table: `video_compiler_service`,
+//! `video_analyzer_service` (ffprobe metrics and tesseract OCR). `ffmpeg` and `ffprobe` are invoked
+//! as child processes — there is no Rust decoder in this workspace and no reason for one; the
+//! reference shells out to the same binaries, and its own arguments are what the capture pins.
+//!
+//! `tts_gateway` and `youtube_upload_service` are **not** here: they are thin, and ADR 0007 §1
+//! hosts thin operations in `apps/server` beside the job ledger they already use.
 
-use axum::Router;
+use serde_json::Value;
 
-use crate::common::health;
-use crate::contract::Lock;
+use crate::common::{CapabilityError, Config};
+use crate::contract::Capture;
 
-/// The name this binary reports on `/health`.
+/// The image name reported by `--list` and in logs.
 pub const SERVICE: &str = "conveyor-media-ffmpeg";
 
-pub const DEFAULT_PORT: u16 = 8812;
+/// The capability kinds this image implements. Must equal the union of [`CAPTURES`]' kinds.
+pub const KINDS: &[&str] = &[];
 
-/// The captured contracts this binary must serve; `--check-lock` refuses a green while it is empty.
-pub const LOCKS: &[Lock] = &[];
+/// The captured contracts whose kinds this image owns.
+pub const CAPTURES: &[Capture] = &[];
 
-/// The operations this binary actually serves, in `METHOD path` spelling.
-pub const SERVED: &[(&str, &str)] = &[
-    ("GET", "/health"),
-    ("GET", "/livez"),
-    ("GET", "/readyz"),
-];
-
-/// The HTTP surface.
-pub fn router() -> Router {
-    health::router(SERVICE)
+/// Execute one capability.
+pub fn dispatch(
+    kind: &str,
+    _params: &Value,
+    _config: &Config,
+) -> Result<Value, CapabilityError> {
+    Err(CapabilityError::UnknownKind(kind.to_string()))
 }

@@ -1,10 +1,8 @@
-//! What the three binaries share: the error envelope, the health surface, config and the tenant.
+//! What both images share: configuration, the capability error, and the command line.
 
 pub mod config;
 pub mod entry;
 pub mod error;
-pub mod health;
-pub mod tenant;
 
 pub use config::Config;
-pub use error::ApiError;
+pub use error::CapabilityError;

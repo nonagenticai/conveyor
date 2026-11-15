@@ -1,38 +1,33 @@
-//! The Chromium binary: `html_render_service`, `slide_service`, `frontend_test_runner_service`,
-//! `video_production_service`.
+//! The Chromium image: page capture and recording, HTML→PDF/PNG, and the native Gherkin runner.
 //!
-//! These four are grouped because they all need a browser, which is the heavy runtime ADR 0006 §2
-//! says must not be folded into a service that does not. Rendering is driven over CDP; the
-//! Playwright-runner-specific behaviour of `frontend_test_runner_service` is refused by name rather
-//! than imitated (see that service's contract README).
+//! These are the group's browser capabilities after the drop table: `html_render_service`,
+//! `video_production_service`'s recording paths and `frontend_test_runner_service`. Each is a job
+//! kind, not a route — the executor takes one `kind`, its `params`, and writes named outputs
+//! (ADR 0007 §3–4). Chromium is driven over CDP; Playwright-runner-specific behaviour is refused
+//! by name rather than imitated.
+//!
+//! `slide_service` is **not** here: ADR 0007 §7 moves deck authoring to `crates/deck`, which emits
+//! OOXML and renders PDF/PNG through `crates/render`.
 
-use axum::Router;
+use serde_json::Value;
 
-use crate::common::health;
-use crate::contract::Lock;
+use crate::common::{CapabilityError, Config};
+use crate::contract::Capture;
 
-/// The name this binary reports on `/health`.
+/// The image name reported by `--list` and in logs.
 pub const SERVICE: &str = "conveyor-media-browser";
 
-/// Chrome's default in the estate's other deployables is the reference's own port; this one is the
-/// group's, chosen to be free everywhere (8000 is out of bounds on this estate).
-pub const DEFAULT_PORT: u16 = 8811;
+/// The capability kinds this image implements. Must equal the union of [`CAPTURES`]' kinds.
+pub const KINDS: &[&str] = &[];
 
-/// The captured contracts this binary must serve. One per reference service; filled as each
-/// capture lands, and `--check-lock` refuses to report green while it is empty.
-pub const LOCKS: &[Lock] = &[];
+/// The captured contracts whose kinds this image owns.
+pub const CAPTURES: &[Capture] = &[];
 
-/// The operations this binary actually serves, in `METHOD path` spelling.
-///
-/// It must never name a route the router does not answer: an operation added here without a
-/// handler is a claim, not a port.
-pub const SERVED: &[(&str, &str)] = &[
-    ("GET", "/health"),
-    ("GET", "/livez"),
-    ("GET", "/readyz"),
-];
-
-/// The HTTP surface.
-pub fn router() -> Router {
-    health::router(SERVICE)
+/// Execute one capability.
+pub fn dispatch(
+    kind: &str,
+    _params: &Value,
+    _config: &Config,
+) -> Result<Value, CapabilityError> {
+    Err(CapabilityError::UnknownKind(kind.to_string()))
 }

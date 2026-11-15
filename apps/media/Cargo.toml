@@ -21,10 +21,6 @@ path = "src/browser/main.rs"
 name = "conveyor-media-ffmpeg"
 path = "src/ffmpeg/main.rs"
 
-[[bin]]
-name = "conveyor-media-thin"
-path = "src/thin/main.rs"
-
 [dependencies]
 axum = { workspace = true }
 bytes = { workspace = true }
