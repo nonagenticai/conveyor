@@ -5866,7 +5866,7 @@
     },
     "/api/compile/jobs/{job_id}/video-url": {
       "get": {
-        "description": "Return the stream-through download URL for the compiled video.\n\nurl is always None — browsers cannot reach MinIO's internal endpoint\n(minio.internal:8389), so consumers must follow fallback_download_url,\nwhich streams the bytes through this service.",
+        "description": "Return the stream-through download URL for the compiled video.\n\nurl is always None — browsers cannot reach MinIO's internal endpoint\n(<object-store>:8389), so consumers must follow fallback_download_url,\nwhich streams the bytes through this service.",
         "operationId": "get_compiled_video_url",
         "parameters": [
           {
@@ -7021,7 +7021,7 @@
     },
     "/api/record/jobs/{job_id}/video": {
       "get": {
-        "description": "Download the recorded video file.\n\nFor local storage, returns a streaming FileResponse with range-request support.\nFor MinIO storage, streams the bytes through this service (no presigned-URL\nredirect — browsers can't reach `minio.internal:8389` directly, and the org\npattern is stream-through, matching artifact_service:download_artifact).\n\nArgs:\n    job_id: UUID of the recording job.\n    request: FastAPI request.\n    jm: JobManager instance (injected).\n\nReturns:\n    Video file response (FileResponse for local, Response with bytes for MinIO).\n\nRaises:\n    HTTPException: 404 if job/video not found, 410 if video expired.",
+        "description": "Download the recorded video file.\n\nFor local storage, returns a streaming FileResponse with range-request support.\nFor MinIO storage, streams the bytes through this service (no presigned-URL\nredirect — browsers can't reach `<object-store>:8389` directly, and the org\npattern is stream-through, matching artifact_service:download_artifact).\n\nArgs:\n    job_id: UUID of the recording job.\n    request: FastAPI request.\n    jm: JobManager instance (injected).\n\nReturns:\n    Video file response (FileResponse for local, Response with bytes for MinIO).\n\nRaises:\n    HTTPException: 404 if job/video not found, 410 if video expired.",
         "operationId": "download_recording_video",
         "parameters": [
           {

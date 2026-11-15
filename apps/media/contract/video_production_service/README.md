@@ -25,6 +25,13 @@ The largest member of the media group and the only one with two distinct executi
 
 That split is the whole kind decomposition (`capabilities.txt`).
 
+## One sanitised line in the lock
+
+The captured OpenAPI is verbatim except for one thing: two route descriptions quote the
+service's own source, and that source names the private object-store endpoint. The two
+occurrences are replaced with `<object-store>:8389`; no path, schema, field or status code
+changes. This repository is public and `scripts/ci/no-private-refs.sh` refuses the hostname.
+
 ## How it was captured
 
 `apps/media/contract/rig.sh` — one scratch `postgres:18` and one `redis` on localhost, and the
