@@ -6,6 +6,8 @@
 //! score differently from the service it replaces, which is the one thing a port must not do.
 
 pub mod content_utils;
+pub mod eeat;
+pub mod internal_linking;
 pub mod keyword;
 pub mod mobile;
 pub mod on_page;
@@ -148,6 +150,8 @@ pub fn scan_audit(document: &Document, _as_of: &chrono::DateTime<chrono::Utc>) -
     findings.extend(readability::check_readability(&html, url));
     findings.extend(keyword::check_keyword(&html, url));
     findings.extend(snippet::check_snippet(&html, url));
+    findings.extend(eeat::check_eeat(&html, url));
+    findings.extend(internal_linking::check_internal_linking(&html, url));
     findings
 }
 
