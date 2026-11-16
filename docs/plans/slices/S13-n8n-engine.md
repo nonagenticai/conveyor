@@ -192,8 +192,9 @@ a dind Redis from the archetype's `redis_image`.
 
 `projects.create` creates project + board + start card in one transaction and emits `card.created`; the start
 card is `project_start_request_analysis` (intake). It starts a root run **only when the tenant has published a
-start process** — there is no universal seed, because a tenant may run accounting, marketing or human project
-management (owner ruling 2026-11-10). The move
+start process and its capability is ready** — there is no universal seed, because a tenant may run accounting,
+marketing or human project management (owner ruling 2026-11-10), and an unready capability leaves a start card
+a person starts later (`#231`). The move
 step is `cards.move`. `wip.pull` reacts to `card.moved` and keeps `may_move` as the guard. `err.card` runs on
 `run.failed`, moves the card to BLOCKED and comments; it starts the coach root run unless the failed run is
 itself the coach, the card's project is closed or archived, or the card already holds three coach root runs of
