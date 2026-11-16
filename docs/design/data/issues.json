@@ -1,6 +1,112 @@
 {
   "issues": [
     {
+      "number": 221,
+      "title": "programme: the rigour output categories and the architecture/tranche seed rows",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/221",
+      "updatedAt": "2026-11-16T19:12:05Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 219,
+      "title": "docs: make contribution easy to start, credited, and accepted by the maintainer",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/219",
+      "updatedAt": "2026-11-16T19:11:05Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 216,
+      "title": "programme: the MSP and TOGAF rigour layer (V2 + P0 + T9 plan + design study)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/216",
+      "updatedAt": "2026-11-16T19:01:42Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 214,
+      "title": "deploy: bind media.generate_image to the image host \u2014 the URL env and the egress rule",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/214",
+      "updatedAt": "2026-11-16T18:24:48Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 213,
+      "title": "estate: retire the dead w2v namespace surface (17 zero-replica Deployments, their Services, and the dead routes)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/213",
+      "updatedAt": "2026-11-16T16:34:36Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 212,
+      "title": "estate: deploy and cut over the absorbed scientific service",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/212",
+      "updatedAt": "2026-11-16T18:36:37Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
       "number": 206,
       "title": "projects.update cannot set project_type_code \u2014 a typeless project refuses every card move",
       "state": "CLOSED",
@@ -22,24 +128,28 @@
       "title": "estate: deploy and cut over the absorbed research (webscraper + media-discovery)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/205",
-      "updatedAt": "2026-11-16T09:36:48Z",
+      "updatedAt": "2026-11-16T18:12:16Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
     {
       "number": 203,
       "title": "estate: publish the two research service images (webscraper + media-discovery)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/203",
-      "updatedAt": "2026-11-16T09:37:01Z",
+      "updatedAt": "2026-11-16T17:17:38Z",
       "labels": [
         {
           "name": "unit",
@@ -104,17 +214,17 @@
     {
       "number": 194,
       "title": "engine: a pulled andon cord makes its own release path unreachable \u2014 licence.sync is blocked and the release action needs a fresh licence",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/194",
-      "updatedAt": "2026-11-16T07:23:12Z",
+      "updatedAt": "2026-11-16T16:40:23Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -146,9 +256,9 @@
     {
       "number": 185,
       "title": "estate: deploy the media executor images and prove one live job per image",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/185",
-      "updatedAt": "2026-11-16T05:26:12Z",
+      "updatedAt": "2026-11-16T13:48:22Z",
       "labels": [
         {
           "name": "unit",
@@ -173,7 +283,7 @@
       "title": "programme: one output standard, completeness and the next-output queue",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/183",
-      "updatedAt": "2026-11-16T10:14:34Z",
+      "updatedAt": "2026-11-16T17:09:47Z",
       "labels": [
         {
           "name": "unit",
@@ -284,9 +394,9 @@
     {
       "number": 174,
       "title": "estate: image generation \u2014 media.generate_image over the MOSS-Image host",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/174",
-      "updatedAt": "2026-11-16T08:15:09Z",
+      "updatedAt": "2026-11-16T10:52:42Z",
       "labels": [
         {
           "name": "unit",
@@ -305,17 +415,17 @@
     {
       "number": 173,
       "title": "estate: speech and transcription \u2014 produce.speech and media.transcribe",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/173",
-      "updatedAt": "2026-11-15T21:42:56Z",
+      "updatedAt": "2026-11-16T18:47:16Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -378,15 +488,15 @@
       "title": "ops: the Kubernetes read family \u2014 a conveyor client and the ops.* reads",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/170",
-      "updatedAt": "2026-11-15T21:42:27Z",
+      "updatedAt": "2026-11-16T18:38:44Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -458,15 +568,15 @@
       "title": "estate: absorb the content service \u2014 produce.script and the blueprint layer",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/163",
-      "updatedAt": "2026-11-15T20:57:27Z",
+      "updatedAt": "2026-11-16T18:26:26Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -477,9 +587,9 @@
     {
       "number": 162,
       "title": "docs: the w2v absorption record \u2014 what shipped, the produce layer, and the corrected estate table",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/162",
-      "updatedAt": "2026-11-15T20:59:59Z",
+      "updatedAt": "2026-11-16T19:01:47Z",
       "labels": [
         {
           "name": "unit",
@@ -517,11 +627,15 @@
       "title": "executor: the inference endpoint is TENANT configuration \u2014 a tenant-admin registers it in the console, not a platform env var",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/160",
-      "updatedAt": "2026-11-15T20:30:09Z",
+      "updatedAt": "2026-11-16T18:46:58Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "status:ready",
@@ -589,7 +703,7 @@
       "title": "estate: absorb the analysis service into crates/analysis \u2014 the analyse.* library",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/154",
-      "updatedAt": "2026-11-15T20:22:35Z",
+      "updatedAt": "2026-11-16T18:26:32Z",
       "labels": [
         {
           "name": "unit",
@@ -864,15 +978,15 @@
       "title": "P0 \u2014 the reuse map, the architecture/analysis pack and the per-project inception standard",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/122",
-      "updatedAt": "2026-11-15T19:05:13Z",
+      "updatedAt": "2026-11-16T19:03:47Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
@@ -881,15 +995,15 @@
       "title": "P0 \u2014 author the programme definition set",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/121",
-      "updatedAt": "2026-11-15T19:05:11Z",
+      "updatedAt": "2026-11-16T19:03:45Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
@@ -1126,7 +1240,7 @@
       "title": "estate: deploy and cut over the absorbed licenses (P4 + the live shadow window)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/95",
-      "updatedAt": "2026-11-15T21:17:51Z",
+      "updatedAt": "2026-11-16T18:34:01Z",
       "labels": [
         {
           "name": "unit",
@@ -1194,7 +1308,7 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-13T22:53:23Z",
+      "updatedAt": "2026-11-16T19:11:35Z",
       "labels": [
         {
           "name": "unit",
@@ -1317,10 +1431,10 @@
     },
     {
       "number": 82,
-      "title": "T10 \u2014 SAFe cadence",
+      "title": "T10 \u2014 SAFe cadence and MSP tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/82",
-      "updatedAt": "2026-11-13T22:53:51Z",
+      "updatedAt": "2026-11-16T19:02:51Z",
       "labels": [
         {
           "name": "unit",
@@ -1338,10 +1452,10 @@
     },
     {
       "number": 81,
-      "title": "T9 \u2014 TOGAF profile",
+      "title": "T9 \u2014 the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/81",
-      "updatedAt": "2026-11-13T22:53:49Z",
+      "updatedAt": "2026-11-16T19:11:57Z",
       "labels": [
         {
           "name": "unit",
@@ -1488,7 +1602,7 @@
       "title": "T3 \u2014 PM job",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/74",
-      "updatedAt": "2026-11-13T22:53:33Z",
+      "updatedAt": "2026-11-16T19:03:12Z",
       "labels": [
         {
           "name": "unit",
@@ -1530,7 +1644,7 @@
       "title": "T1 \u2014 Plan spine",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/72",
-      "updatedAt": "2026-11-13T22:53:29Z",
+      "updatedAt": "2026-11-16T19:11:33Z",
       "labels": [
         {
           "name": "unit",
@@ -1549,9 +1663,9 @@
     {
       "number": 71,
       "title": "estate: deploy and cut over the absorbed inference-router (P4 + the live shadow window)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/71",
-      "updatedAt": "2026-11-15T09:50:43Z",
+      "updatedAt": "2026-11-16T18:46:20Z",
       "labels": [
         {
           "name": "unit",
@@ -1687,15 +1801,15 @@
       "title": "estate: absorb billing-service \u2014 contract, Rust rewrite, parity, metering reconciliation, cutover",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/46",
-      "updatedAt": "2026-11-15T21:17:49Z",
+      "updatedAt": "2026-11-16T18:46:34Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
