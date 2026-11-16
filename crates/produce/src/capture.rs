@@ -15,7 +15,9 @@ use sha2::{Digest, Sha256};
 pub const DOCUMENT_JSON: &str =
     include_str!("../../../docs/evidence/produce-openapi-2026-11-16.json");
 
-const HTTP_METHODS: &[&str] = &["get", "post", "put", "patch", "delete", "options", "head", "trace"];
+const HTTP_METHODS: &[&str] = &[
+    "get", "post", "put", "patch", "delete", "options", "head", "trace",
+];
 
 /// The parsed document. Parsing once is enough: the input is a constant.
 pub fn document() -> &'static Value {

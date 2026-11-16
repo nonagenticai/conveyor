@@ -74,7 +74,9 @@ pub enum BudgetError {
         offending: Vec<String>,
     },
     /// The shots fall short of the target.
-    #[error("the shot list runs {actual_ms}ms against a {target_ms}ms budget; it is {short_by_ms}ms short")]
+    #[error(
+        "the shot list runs {actual_ms}ms against a {target_ms}ms budget; it is {short_by_ms}ms short"
+    )]
     Under {
         target_ms: u32,
         actual_ms: u32,
@@ -189,7 +191,12 @@ pub fn validate(script: &Script) -> Result<(), BudgetError> {
 /// `storyline` and `descriptions` are the model's output; a description is matched to a shot by
 /// id. A shot the model did not answer for keeps its empty description rather than borrowing its
 /// neighbour's — a wrong description is worse than an absent one, and the caller can see the gap.
-pub fn assemble(brief: &str, target_duration_ms: u32, storyline: &str, descriptions: &[(String, String)]) -> Script {
+pub fn assemble(
+    brief: &str,
+    target_duration_ms: u32,
+    storyline: &str,
+    descriptions: &[(String, String)],
+) -> Script {
     let by_id: std::collections::BTreeMap<&str, &str> = descriptions
         .iter()
         .map(|(id, text)| (id.as_str(), text.as_str()))

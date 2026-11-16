@@ -709,6 +709,7 @@ dependencies = [
  "conveyor-bus",
  "conveyor-deck",
  "conveyor-domain",
+ "conveyor-produce",
  "conveyor-render",
  "conveyor-store",
  "conveyor-workflow",

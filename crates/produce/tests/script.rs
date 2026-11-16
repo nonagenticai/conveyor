@@ -19,7 +19,10 @@ fn deterministic_ids() {
     let second = script::skeleton(BRIEF, 10_000);
     let ids_first: Vec<&str> = first.iter().map(|shot| shot.id.as_str()).collect();
     let ids_second: Vec<&str> = second.iter().map(|shot| shot.id.as_str()).collect();
-    assert_eq!(ids_first, ids_second, "the same brief must yield the same shot ids");
+    assert_eq!(
+        ids_first, ids_second,
+        "the same brief must yield the same shot ids"
+    );
 
     // Ten seconds is ten one-second shots, and the split sums to the target exactly.
     assert_eq!(first.len(), 10);
@@ -38,11 +41,17 @@ fn deterministic_ids() {
     assert!(first[0].id.chars().all(|c| c.is_ascii_hexdigit()));
 
     // A populated script keeps the skeleton's ids: binding model text never re-identifies a shot.
-    let descriptions = vec![(first[2].id.clone(), "the camera holds on the empty grid".to_string())];
+    let descriptions = vec![(
+        first[2].id.clone(),
+        "the camera holds on the empty grid".to_string(),
+    )];
     let script = script::assemble(BRIEF, 10_000, "a through-line", &descriptions);
     let ids_after: Vec<&str> = script.shots.iter().map(|shot| shot.id.as_str()).collect();
     assert_eq!(ids_first, ids_after);
-    assert_eq!(script.shots[2].description, "the camera holds on the empty grid");
+    assert_eq!(
+        script.shots[2].description,
+        "the camera holds on the empty grid"
+    );
     // A shot the model did not answer for keeps an empty description rather than borrowing one.
     assert_eq!(script.shots[1].description, "");
 }
@@ -66,14 +75,23 @@ fn duration_budget_reports_shots() {
         shot.duration_ms = 0;
     }
     let error = script::validate(&script).expect_err("15s cannot pass a 10s budget");
-    let BudgetError::Over { target_ms, actual_ms, offending, .. } = error else {
+    let BudgetError::Over {
+        target_ms,
+        actual_ms,
+        offending,
+        ..
+    } = error
+    else {
         panic!("expected an over-budget refusal, got {error:?}");
     };
     assert_eq!(target_ms, 10_000);
     assert_eq!(actual_ms, 15_000);
     // Shots 1-3 total 9s (under 11s); shot 4 brings the total to 12s, so shot 4 and everything
     // after it is named. Cutting that suffix is sufficient.
-    let expected: Vec<String> = script.shots[3..].iter().map(|shot| shot.id.clone()).collect();
+    let expected: Vec<String> = script.shots[3..]
+        .iter()
+        .map(|shot| shot.id.clone())
+        .collect();
     assert_eq!(offending, expected);
 
     // Under budget is refused too, and names no shots: there is nothing to cut.

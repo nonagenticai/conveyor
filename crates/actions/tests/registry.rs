@@ -70,7 +70,7 @@ use serde_json::{Value, json};
 /// **#156 adds 5 internal**: the work-store publish/request/revision actions. 341 → **346**.
 /// **#174 adds 1 external**: `media.generate_image`, the MOSS-Image host over the engine's own
 /// declared-external path (it is the first action to declare an `Artefact`). 346 → **347**.
-const EXPECTED: [&str; 349] = [
+const EXPECTED: [&str; 350] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -317,6 +317,7 @@ const EXPECTED: [&str; 349] = [
     "processes.publish",
     "processes.retire",
     "processes.update",
+    "produce.script",
     "programmes.create",
     "programmes.get",
     "programmes.list",
@@ -459,7 +460,7 @@ fn the_registry_is_exactly_the_declared_set() {
     // #173 adds `produce.speech` and `media.transcribe` (both external): 331 → 333, external 16 → 18.
     // They are the first actions whose request carries a DOCUMENT's bytes (multipart) and the first
     // whose artefact is UTF-8 text rather than base64 — both mechanisms live in the engine.
-    assert_eq!((internal, external), (331, 18));
+    assert_eq!((internal, external), (332, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

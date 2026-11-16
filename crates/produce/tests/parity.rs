@@ -17,7 +17,8 @@ const EVIDENCE_MD: &str = concat!(
 
 /// P1.2 — the digest of the exact captured bytes, and of the image they came from.
 const DOCUMENT_SHA256: &str = "28de38166d3c3dc4068e54471ec0f6fd0bd4fab5c033fe73e40c824fb3d5027d";
-const IMAGE_DIGEST: &str = "sha256:71a79a0fd5392e36b8920f696f398c6dc8906933276735d9dfab88ae24e9e743";
+const IMAGE_DIGEST: &str =
+    "sha256:71a79a0fd5392e36b8920f696f398c6dc8906933276735d9dfab88ae24e9e743";
 
 const OPERATIONS: usize = 25;
 const PORTED: usize = 6;
@@ -79,7 +80,9 @@ fn capture() {
     let mut rows: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
     for line in md.lines() {
         if let Some((operation, disposition, reason)) = row(line) {
-            rows.entry(operation).or_default().push((disposition, reason));
+            rows.entry(operation)
+                .or_default()
+                .push((disposition, reason));
         }
     }
 

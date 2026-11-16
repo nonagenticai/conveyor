@@ -654,7 +654,38 @@ impl Stub {
 ///
 /// A JSON object naming the path: an external action passes a service's document through unchanged, so the stub
 /// answers the shape the conveyor expects (an object) and lets a test assert which route was called.
-async fn external_answer(uri: axum::http::Uri) -> axum::Json<serde_json::Value> {
+///
+/// `produce.script` (#163) is the one caller that is not a passthrough: it reads `choices[0].message.content`,
+/// parses it as its own document and binds it to shot ids it derived. A catch-all answer would send it down its
+/// 502 path, which proves nothing, so the stub recognises the ask in the request and answers a valid — empty —
+/// shot list. Empty on purpose: the ids belong to the caller, and a stub that invented them would be testing
+/// the stub.
+async fn external_answer(
+    uri: axum::http::Uri,
+    body: Option<axum::Json<Value>>,
+) -> axum::Json<serde_json::Value> {
+    let asks_for_a_shot_list = body
+        .as_ref()
+        .and_then(|axum::Json(body)| body.get("messages"))
+        .and_then(Value::as_array)
+        .is_some_and(|messages| {
+            messages.iter().any(|message| {
+                message
+                    .get("content")
+                    .and_then(Value::as_str)
+                    .is_some_and(|content| content.contains("shot list"))
+            })
+        });
+    if asks_for_a_shot_list {
+        return axum::Json(serde_json::json!({
+            "choices": [{
+                "message": {
+                    "role": "assistant",
+                    "content": "{\"storyline\":\"the stub's through-line\",\"shots\":[]}"
+                }
+            }]
+        }));
+    }
     axum::Json(serde_json::json!({
         "stub": true,
         "path": uri.path(),

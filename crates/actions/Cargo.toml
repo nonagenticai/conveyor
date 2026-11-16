@@ -13,6 +13,9 @@ conveyor-auth = { path = "../auth" }
 # #161 P3: `decks.render` renders the deck model; the action layer holds no OOXML writer.
 conveyor-deck = { path = "../deck" }
 conveyor-domain = { path = "../domain" }
+# #163 P3: `produce.script` binds the model's prose to shot ids the library derives; the id and
+# budget rules live there, free of transport, and are tested without a model.
+conveyor-produce = { path = "../produce" }
 conveyor-workflow = { path = "../workflow" }
 # The three exchange actions (S08 B2) call the pure renderer; CONTRACT §1 records the edge.
 conveyor-render = { path = "../render" }

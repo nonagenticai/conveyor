@@ -85,7 +85,10 @@ fn all_sixteen_load() {
         .iter()
         .filter(|blueprint| blueprint.family == Family::Production)
         .count();
-    assert_eq!(production, 7, "plan 04 §2 names seven production blueprints");
+    assert_eq!(
+        production, 7,
+        "plan 04 §2 names seven production blueprints"
+    );
     assert_eq!(
         loaded.blueprints.len() - production,
         9,
