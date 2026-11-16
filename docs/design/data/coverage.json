@@ -1,116 +1,92 @@
 {
   "actions_invoked": [
     {
-      "line": 757,
+      "line": 666,
       "name": "approvals.decide"
     },
     {
-      "line": 197,
+      "line": 186,
       "name": "card_types.list"
     },
     {
-      "line": 376,
+      "line": 365,
       "name": "cards.claim"
     },
     {
-      "line": 360,
+      "line": 349,
       "name": "cards.comment"
     },
     {
-      "line": 308,
+      "line": 297,
       "name": "cards.create"
     },
     {
-      "line": 337,
+      "line": 326,
       "name": "cards.move"
     },
     {
-      "line": 391,
+      "line": 380,
       "name": "cards.release"
     },
     {
-      "line": 1573,
+      "line": 1446,
       "name": "documents.compose"
     },
     {
-      "line": 1687,
+      "line": 1560,
       "name": "documents.delete"
     },
     {
-      "line": 1666,
+      "line": 1539,
       "name": "documents.download"
     },
     {
-      "line": 1595,
+      "line": 1468,
       "name": "documents.get"
     },
     {
-      "line": 1651,
+      "line": 1524,
       "name": "documents.get"
     },
     {
-      "line": 554,
+      "line": 543,
       "name": "documents.list"
     },
     {
-      "line": 574,
+      "line": 563,
       "name": "documents.list"
     },
     {
-      "line": 780,
+      "line": 689,
       "name": "process_runs.start"
     },
     {
-      "line": 188,
+      "line": 177,
       "name": "programmes.list"
     },
     {
-      "line": 1519,
+      "line": 1377,
       "name": "projects.close"
     },
     {
-      "line": 1420,
+      "line": 1278,
       "name": "projects.create"
     },
     {
-      "line": 1429,
+      "line": 1287,
       "name": "projects.update"
     },
     {
-      "line": 665,
-      "name": "publish.start"
-    },
-    {
-      "line": 642,
-      "name": "publish.status"
-    },
-    {
-      "line": 1746,
-      "name": "repositories.create"
-    },
-    {
-      "line": 600,
-      "name": "repositories.list"
-    },
-    {
-      "line": 730,
+      "line": 639,
       "name": "runs.cancel"
     },
     {
-      "line": 708,
+      "line": 617,
       "name": "runs.get"
     },
     {
-      "line": 685,
+      "line": 594,
       "name": "runs.list"
-    },
-    {
-      "line": 1742,
-      "name": "secrets.create"
-    },
-    {
-      "line": 1776,
-      "name": "secrets.create"
     }
   ],
   "cycles": [],
@@ -160,10 +136,11 @@
           37,
           89,
           97,
-          103
+          103,
+          149
         ],
-        "open": 1,
-        "ready": 0,
+        "open": 2,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -203,13 +180,13 @@
       "tranche": 0,
       "units": {
         "blocked": 2,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           120,
           121,
           122
         ],
-        "open": 3,
+        "open": 2,
         "ready": 0,
         "unknown": 0
       }
@@ -250,8 +227,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 4,
-        "claimed": 1,
+        "blocked": 2,
+        "claimed": 7,
         "numbers": [
           17,
           22,
@@ -265,12 +242,13 @@
           93,
           95,
           102,
-          117,
-          118,
-          127
+          137,
+          139,
+          140,
+          144
         ],
         "open": 9,
-        "ready": 4,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -986,7 +964,7 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           6,
           26,
@@ -994,7 +972,7 @@
           28
         ],
         "open": 4,
-        "ready": 3,
+        "ready": 4,
         "unknown": 0
       }
     },
@@ -1032,7 +1010,8 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          7
+          7,
+          136
         ],
         "open": 1,
         "ready": 1,
@@ -2499,7 +2478,7 @@
       "without_open_units": 15
     },
     "screens": {
-      "actions_invoked": 25,
+      "actions_invoked": 20,
       "by_status": {
         "legacy": 7,
         "live": 7,
