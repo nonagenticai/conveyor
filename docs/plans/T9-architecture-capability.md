@@ -254,7 +254,7 @@ categories. The seed is generated (`scripts/build-programme-seed.py`), never han
 | blocked-by | #74 | same; the phase contract gates run on the PM's gate routing and closure |
 | related | #121, #122 | P0's definition set and its architecture capability baseline |
 | related | #216 | the MSP layer this capability sits beside; the design study's programme destination |
-| related | the rigour-categories unit | the output-standard categories and the seed's architecture rows |
+| related | #221 | the output-standard categories and the seed's architecture rows |
 | blocks | #88 | `seed/programme.json` T12 `meta.depends_on` includes `T9` |
 
 ## 10. Acceptance and definition of done

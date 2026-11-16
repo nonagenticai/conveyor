@@ -123,8 +123,8 @@
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "84477d36bee0c98d2330fb9aa6e54b9fa9509cd5e9568d0a569bbbdd4dad8a61",
-      "bytes": 75637,
+      "sha256": "1f546834d0f436525019d309f72e69dd61dee57c2ab6b764ed89444e5c45ac41",
+      "bytes": 75944,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -483,8 +483,8 @@
       "path": "docs/plans/T9-architecture-capability.html",
       "source": "docs/plans/T9-architecture-capability.md",
       "section": "Plans",
-      "sha256": "18ce3eb202ad58902e791c8bd4bbf20eee74a644736f7b1b05ef652974f14287",
-      "bytes": 17061,
+      "sha256": "040562c0ad23f4528916a3e111f36ae76275f581bbc4ae525d3ae00d89d22968",
+      "bytes": 17039,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {

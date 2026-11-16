@@ -845,7 +845,11 @@ gold/empty controls and refuses unavailable subject arms.
 `job_catalogue`, `job_release`, `job_binding`); the plan spine (`wbs_node`, `project_baseline`,
 `project_register_item`, `project_dependency`, programme shared config and cadence); the MSP
 programme layer (`programme_tranche`, `benefit_profile`, `benefit_link`, `benefit_transition`,
-`stakeholder_profile`, and the extended `governed_asset` kinds); the decision
+`stakeholder_profile`, and the extended `governed_asset` kinds); the architecture capability
+(`architecture_artifact`, `architecture_artifact_entry`, `architecture_artifact_link`,
+`artifact_type`, `adm_profile`, `architecture_contract`, `architecture_compliance_review`,
+`architecture_waiver`, `governance_body`, `architecture_maturity`,
+`architecture_skill_assessment`); the decision
 tables and laya client; PM/coach/kata/development/operations jobs; lessons; PKO and SOP/RDF/BPMN
 ingestion; tenant asset authoring; the tool estate (`tool`, `toolkit`, `tool_binding`, `tool_call`,
 the broker, BYO and authoring); metering roll-ups; the MinIO storage adapter; and the knowledge and
