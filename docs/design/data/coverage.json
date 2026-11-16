@@ -1,136 +1,112 @@
 {
   "actions_invoked": [
     {
-      "line": 766,
+      "line": 675,
       "name": "approvals.decide"
     },
     {
-      "line": 197,
+      "line": 186,
       "name": "card_types.list"
     },
     {
-      "line": 376,
+      "line": 365,
       "name": "cards.claim"
     },
     {
-      "line": 360,
+      "line": 349,
       "name": "cards.comment"
     },
     {
-      "line": 308,
+      "line": 297,
       "name": "cards.create"
     },
     {
-      "line": 337,
+      "line": 326,
       "name": "cards.move"
     },
     {
-      "line": 391,
+      "line": 380,
       "name": "cards.release"
     },
     {
-      "line": 1647,
+      "line": 1512,
       "name": "documents.compose"
     },
     {
-      "line": 1911,
+      "line": 1776,
       "name": "documents.create"
     },
     {
-      "line": 1982,
+      "line": 1847,
       "name": "documents.delete"
     },
     {
-      "line": 1928,
+      "line": 1793,
       "name": "documents.download"
     },
     {
-      "line": 1961,
+      "line": 1826,
       "name": "documents.download"
     },
     {
-      "line": 1669,
+      "line": 1534,
       "name": "documents.get"
     },
     {
-      "line": 1946,
+      "line": 1811,
       "name": "documents.get"
     },
     {
-      "line": 554,
+      "line": 543,
       "name": "documents.list"
     },
     {
-      "line": 574,
+      "line": 563,
       "name": "documents.list"
     },
     {
-      "line": 1879,
+      "line": 1744,
       "name": "documents.list"
     },
     {
-      "line": 1800,
+      "line": 1665,
       "name": "documents.revision_get"
     },
     {
-      "line": 1761,
+      "line": 1626,
       "name": "documents.revision_list"
     },
     {
-      "line": 789,
+      "line": 698,
       "name": "process_runs.start"
     },
     {
-      "line": 188,
+      "line": 177,
       "name": "programmes.list"
     },
     {
-      "line": 1596,
+      "line": 1447,
       "name": "projects.close"
     },
     {
-      "line": 1497,
+      "line": 1348,
       "name": "projects.create"
     },
     {
-      "line": 1506,
+      "line": 1357,
       "name": "projects.update"
     },
     {
-      "line": 674,
-      "name": "publish.start"
-    },
-    {
-      "line": 651,
-      "name": "publish.status"
-    },
-    {
-      "line": 2041,
-      "name": "repositories.create"
-    },
-    {
-      "line": 609,
-      "name": "repositories.list"
-    },
-    {
-      "line": 739,
+      "line": 648,
       "name": "runs.cancel"
     },
     {
-      "line": 717,
+      "line": 626,
       "name": "runs.get"
     },
     {
-      "line": 694,
+      "line": 603,
       "name": "runs.list"
-    },
-    {
-      "line": 2037,
-      "name": "secrets.create"
-    },
-    {
-      "line": 2071,
-      "name": "secrets.create"
     }
   ],
   "cycles": [],
@@ -180,10 +156,11 @@
           37,
           89,
           97,
-          103
+          103,
+          149
         ],
-        "open": 1,
-        "ready": 0,
+        "open": 2,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -223,13 +200,13 @@
       "tranche": 0,
       "units": {
         "blocked": 2,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           120,
           121,
           122
         ],
-        "open": 3,
+        "open": 2,
         "ready": 0,
         "unknown": 0
       }
@@ -270,8 +247,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 4,
-        "claimed": 1,
+        "blocked": 2,
+        "claimed": 7,
         "numbers": [
           17,
           22,
@@ -285,12 +262,13 @@
           93,
           95,
           102,
-          117,
-          118,
-          127
+          137,
+          139,
+          140,
+          144
         ],
         "open": 9,
-        "ready": 4,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1006,7 +984,7 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           6,
           26,
@@ -1014,7 +992,7 @@
           28
         ],
         "open": 4,
-        "ready": 3,
+        "ready": 4,
         "unknown": 0
       }
     },
@@ -1052,7 +1030,8 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          7
+          7,
+          136
         ],
         "open": 1,
         "ready": 1,
@@ -2519,7 +2498,7 @@
       "without_open_units": 15
     },
     "screens": {
-      "actions_invoked": 28,
+      "actions_invoked": 23,
       "by_status": {
         "legacy": 7,
         "live": 7,

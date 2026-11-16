@@ -1860,16 +1860,28 @@ window.installV2 = function (api, enterprise) {
     if (!project) return;
     const label = category.replace(/-/g, " ");
     const heading = label.charAt(0).toUpperCase() + label.slice(1);
+    const inceptionBody = `# Inception analysis — ${project.key}\n\n## Current state\n\nWhat exists today, inside the conveyor repo and in the wider estate.\n\n## Reuse sources\n\nInside the conveyor repo, the wider estate, upstream crates. Name the capability and the boundary; no private host or path.\n\n## Build vs reuse\n\n## Risks\n\n`;
+    const architectureBody = `# Architecture — ${project.key}\n\n## Context and boundary\n\n## Aggregates, tables, actions\n\n## Decisions\n\nA deviation from the blueprint is a decision record, not a silent fork.\n\n## Acceptance\n\n`;
     const templates = {
       "inception-analysis": {
         category: "inception-analysis",
         title: `Inception analysis — ${project.key} ${project.name}`,
-        body: `# Inception analysis — ${project.key}\n\n## Current state\n\nWhat exists today, inside the conveyor repo and in the wider estate.\n\n## Reuse sources\n\nInside the conveyor repo, the wider estate, upstream crates. Name the capability and the boundary; no private host or path.\n\n## Build vs reuse\n\n## Risks\n\n`,
+        body: inceptionBody,
+      },
+      analysis: {
+        category: "analysis",
+        title: `Inception analysis — ${project.key} ${project.name}`,
+        body: inceptionBody,
       },
       "architecture-design": {
         category: "architecture-design",
         title: `Architecture — ${project.key} ${project.name}`,
-        body: `# Architecture — ${project.key}\n\n## Context and boundary\n\n## Aggregates, tables, actions\n\n## Decisions\n\nA deviation from the blueprint is a decision record, not a silent fork.\n\n## Acceptance\n\n`,
+        body: architectureBody,
+      },
+      architecture: {
+        category: "architecture",
+        title: `Architecture — ${project.key} ${project.name}`,
+        body: architectureBody,
       },
       "project-brief": {
         category: "project-brief",
