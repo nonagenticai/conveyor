@@ -7,9 +7,11 @@
 //!
 //! **The attempt number is the job's, not a counter of our own.** A dispatch reads
 //! `job.attempts` at claim time and writes it here; every pod-side write is fenced on
-//! `job.attempts = runner_run.attempt AND job.status = 'running'`. An attempt whose pod arrives
-//! after the row was reclaimed therefore updates zero rows and its result is refused — the
-//! stale-attempt test in `crates/store/tests/runner.rs` is the acceptance for that fence.
+//! `job.attempts = runner_run.attempt` plus a live attempt — `LIVE_ATTEMPT` below, which accepts
+//! the worker's claim (`running`, lease live) and the deferred gap between two polls (`pending`,
+//! `continuation`). An attempt whose pod arrives after the row was reclaimed bumps `job.attempts`
+//! and therefore updates zero rows — the stale-attempt test in `crates/store/tests/runner.rs` is
+//! the acceptance for that fence.
 //!
 //! Bytes never live here. An artefact row names an object conveyor wrote itself from the bytes it
 //! received; no presigned URL and no store credential exists anywhere in this path (ADR 0007
@@ -145,6 +147,19 @@ pub async fn latest(
     Ok(row)
 }
 
+/// The attempt is live when the worker holds the claim, OR when it is between two polls.
+///
+/// A dispatched pod outlives the worker's claim: `store::jobs::defer` leaves the row `pending`
+/// with the lease cleared so the next poll can re-claim it without spending an attempt. Fencing a
+/// pod-side write on `status = 'running'` therefore refuses almost every one — measured live
+/// 2026-11-16, on the first real dispatch: `POST /result` answered 403, and once the API-side
+/// fence was corrected the same write answered 409 because these statements had not moved with
+/// it. `conveyor_api::job_routes::fence` states the same rule; the two must agree.
+const LIVE_ATTEMPT: &str = "EXISTS (SELECT 1 FROM job j
+                         WHERE j.id = r.job_id AND j.attempts = r.attempt
+                           AND ((j.status = 'running' AND j.lease_until > now())
+                             OR (j.status = 'pending' AND j.continuation)))";
+
 /// Mark the pod as observed running. Fenced like every pod-side write.
 pub async fn mark_running(
     pool: &PgPool,
@@ -153,19 +168,18 @@ pub async fn mark_running(
     attempt: i32,
 ) -> Result<bool, sqlx::Error> {
     let mut tx = begin_scoped(pool, tenant).await?;
-    let rows = sqlx::query(
+    let sql = format!(
         "UPDATE runner_run r
             SET status = 'running', started_at = coalesce(r.started_at, now())
           WHERE r.job_id = $1 AND r.attempt = $2 AND r.status = 'dispatched'
-            AND EXISTS (SELECT 1 FROM job j
-                         WHERE j.id = r.job_id AND j.attempts = r.attempt
-                           AND j.status = 'running')",
-    )
-    .bind(job_id)
-    .bind(attempt)
-    .execute(&mut *tx)
-    .await?
-    .rows_affected();
+            AND {LIVE_ATTEMPT}"
+    );
+    let rows = sqlx::query(sqlx::AssertSqlSafe(sql))
+        .bind(job_id)
+        .bind(attempt)
+        .execute(&mut *tx)
+        .await?
+        .rows_affected();
     tx.commit().await?;
     Ok(rows == 1)
 }
@@ -180,21 +194,20 @@ pub async fn record_progress(
     progress: &Value,
 ) -> Result<bool, sqlx::Error> {
     let mut tx = begin_scoped(pool, tenant).await?;
-    let rows = sqlx::query(
+    let sql = format!(
         "UPDATE runner_run r
             SET progress = $3
           WHERE r.job_id = $1 AND r.attempt = $2
             AND r.status IN ('dispatched', 'running')
-            AND EXISTS (SELECT 1 FROM job j
-                         WHERE j.id = r.job_id AND j.attempts = r.attempt
-                           AND j.status = 'running')",
-    )
-    .bind(job_id)
-    .bind(attempt)
-    .bind(progress)
-    .execute(&mut *tx)
-    .await?
-    .rows_affected();
+            AND {LIVE_ATTEMPT}"
+    );
+    let rows = sqlx::query(sqlx::AssertSqlSafe(sql))
+        .bind(job_id)
+        .bind(attempt)
+        .bind(progress)
+        .execute(&mut *tx)
+        .await?
+        .rows_affected();
     tx.commit().await?;
     Ok(rows == 1)
 }
@@ -210,21 +223,20 @@ pub async fn record_result(
     result: &Value,
 ) -> Result<bool, sqlx::Error> {
     let mut tx = begin_scoped(pool, tenant).await?;
-    let rows = sqlx::query(
+    let sql = format!(
         "UPDATE runner_run r
             SET status = 'reported', result = $3
           WHERE r.job_id = $1 AND r.attempt = $2
             AND r.status IN ('dispatched', 'running')
-            AND EXISTS (SELECT 1 FROM job j
-                         WHERE j.id = r.job_id AND j.attempts = r.attempt
-                           AND j.status = 'running')",
-    )
-    .bind(job_id)
-    .bind(attempt)
-    .bind(result)
-    .execute(&mut *tx)
-    .await?
-    .rows_affected();
+            AND {LIVE_ATTEMPT}"
+    );
+    let rows = sqlx::query(sqlx::AssertSqlSafe(sql))
+        .bind(job_id)
+        .bind(attempt)
+        .bind(result)
+        .execute(&mut *tx)
+        .await?
+        .rows_affected();
     tx.commit().await?;
     Ok(rows == 1)
 }
