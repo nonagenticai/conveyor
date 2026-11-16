@@ -1,11 +1,19 @@
 {
   "issues": [
     {
+      "number": 235,
+      "title": "Rust telemetry parity: cost-event attribution + licence-expiry metrics",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/235",
+      "updatedAt": "2026-11-16T21:17:00Z",
+      "labels": []
+    },
+    {
       "number": 231,
       "title": "console: the programme store is operable \u2014 workspace, project class, review requests and public feedback",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/231",
-      "updatedAt": "2026-11-16T21:05:24Z",
+      "updatedAt": "2026-11-16T21:22:12Z",
       "labels": [
         {
           "name": "unit",
@@ -754,7 +762,7 @@
       "title": "executor: the inference endpoint is TENANT configuration \u2014 a tenant-admin registers it in the console, not a platform env var",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/160",
-      "updatedAt": "2026-11-16T20:43:52Z",
+      "updatedAt": "2026-11-16T21:15:50Z",
       "labels": [
         {
           "name": "unit",
