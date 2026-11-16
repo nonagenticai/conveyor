@@ -36,6 +36,20 @@ async fn seed_gate(
     required_decisions: u16,
     expires_at: Option<DateTime<Utc>>,
 ) -> (Uuid, Uuid) {
+    // T1 P1.3: the requester cannot decide, so the ordinary fixture uses a dedicated
+    // requester and leaves alice/carol free to approve.
+    let requester = seed_principal(pg, seeded, "requester", "human").await;
+    seed_gate_for(pg, seeded, Some(requester), required_decisions, expires_at).await
+}
+
+/// The same gate, with an explicit requester (`None` is a system-opened gate).
+async fn seed_gate_for(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    requested_by: Option<Uuid>,
+    required_decisions: u16,
+    expires_at: Option<DateTime<Utc>>,
+) -> (Uuid, Uuid) {
     let tenant = seeded.tenant;
     let mut tx = store::begin_scoped(&pg.runtime, tenant)
         .await
@@ -64,7 +78,7 @@ async fn seed_gate(
         "gate",
         required_decisions,
         expires_at,
-        Some(seeded.user_id),
+        requested_by,
     )
     .await
     .expect("open the gate");
@@ -487,4 +501,35 @@ async fn a_gate_cannot_require_more_decisions_than_the_bound() {
     assert_eq!(status, 200, "255 is the bound and must be accepted: {body}");
 
     running.shutdown().await;
+}
+
+/// T1 P1.3 (SPEC_V2 §5.4) — the requester cannot decide the gate that judges their own work.
+///
+/// The gate is requested by alice; her decision is refused before any `approval_decision` row is
+/// written and the gate stays pending. A distinct human then decides it, so the refusal is the
+/// rule and not a broken gate.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_requester_cannot_decide_their_own_gate() {
+    let (pg, running, seeded) = fixture().await;
+    let (approval, _run) = seed_gate_for(&pg, &seeded, Some(seeded.user_id), 1, None).await;
+
+    let (status, body) = decide(&running, "dev:alice", approval, "approve").await;
+    assert_eq!(status, 409, "{body}");
+    assert!(
+        body.to_string().contains("requester cannot decide"),
+        "{body}"
+    );
+    assert!(
+        decision_rows(&pg, seeded.tenant_id, approval)
+            .await
+            .is_empty(),
+        "the refused decision wrote a row"
+    );
+
+    let carol = seed_principal(&pg, &seeded, "carol", "human").await;
+    let (status, body) = decide(&running, "dev:carol", approval, "approve").await;
+    assert_eq!(status, 200, "{body}");
+    let rows = decision_rows(&pg, seeded.tenant_id, approval).await;
+    assert_eq!(rows.len(), 1, "a distinct approver was refused");
+    assert_eq!(rows[0].0, carol);
 }

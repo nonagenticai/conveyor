@@ -37,7 +37,7 @@
 <tr>
 <td><code>exists</code></td>
 <td>implemented in code and backed by real rows</td>
-<td>11</td>
+<td>23</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
@@ -47,7 +47,7 @@
 <tr>
 <td><code>new</code></td>
 <td>absent</td>
-<td>44</td>
+<td>32</td>
 </tr>
 </tbody>
 </table>
@@ -117,80 +117,80 @@
 <td>§10.3</td>
 <td>table</td>
 <td>wbs_node</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE wbs_node</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE wbs_node</td>
 </tr>
 <tr>
 <td><code>table:project_baseline</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>project_baseline</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE project_baseline</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE project_baseline</td>
 </tr>
 <tr>
 <td><code>table:programme_cadence</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>programme_cadence</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE programme_cadence</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE programme_cadence</td>
 </tr>
 <tr>
 <td><code>table:programme_tranche</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>programme_tranche</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE programme_tranche</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE programme_tranche</td>
 </tr>
 <tr>
 <td><code>table:programme_baseline</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>programme_baseline</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE programme_baseline</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE programme_baseline</td>
 </tr>
 <tr>
 <td><code>table:project_register_item</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>project_register_item</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE project_register_item</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE project_register_item</td>
 </tr>
 <tr>
 <td><code>table:benefit_profile</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>benefit_profile</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE benefit_profile</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE benefit_profile</td>
 </tr>
 <tr>
 <td><code>table:benefit_link</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>benefit_link</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE benefit_link</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE benefit_link</td>
 </tr>
 <tr>
 <td><code>table:benefit_transition</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>benefit_transition</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE benefit_transition</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE benefit_transition</td>
 </tr>
 <tr>
 <td><code>table:stakeholder_profile</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>stakeholder_profile</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE stakeholder_profile</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE stakeholder_profile</td>
 </tr>
 <tr>
 <td><code>table:architecture_artifact</code></td>
@@ -317,8 +317,8 @@
 <td>§10.3</td>
 <td>table</td>
 <td>project_dependency</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE project_dependency</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE project_dependency</td>
 </tr>
 <tr>
 <td><code>table:decision_policy_refinement</code></td>
@@ -366,15 +366,15 @@
 <td>actions</td>
 <td>programme/plan</td>
 <td><code>extend</code></td>
-<td>actions: baselines.* absent<br>actions: cadences.* absent<br>actions: governed_assets.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* absent<br>actions: registers.* absent<br>actions: tranches.* absent<br>actions: wbs.* absent</td>
+<td>actions: baselines.* found (baselines.get, baselines.list, baselines.take)<br>actions: cadences.* absent<br>actions: governed_assets.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)<br>actions: registers.* found (registers.create, registers.get, registers.list…)<br>actions: tranches.* found (tranches.create, tranches.list, tranches.review)<br>actions: wbs.* found (wbs.create, wbs.get, wbs.list…)</td>
 </tr>
 <tr>
 <td><code>actions:benefits</code></td>
 <td>§10.4</td>
 <td>actions</td>
 <td>benefits</td>
-<td><code>new</code></td>
-<td>actions: benefits.* absent</td>
+<td><code>exists</code></td>
+<td>actions: benefits.* found (benefits.create, benefits.get, benefits.link…)</td>
 </tr>
 <tr>
 <td><code>actions:architecture</code></td>
