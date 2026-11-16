@@ -2449,6 +2449,15 @@
         "docs/design/v2.js"
       ],
       "gap": null,
+      "key": "programme",
+      "status": "live",
+      "title": "Programme definition"
+    },
+    {
+      "evidence": [
+        "docs/design/v2.js"
+      ],
+      "gap": null,
       "key": "projects",
       "status": "live",
       "title": "Projects"
@@ -2501,11 +2510,11 @@
       "actions_invoked": 23,
       "by_status": {
         "legacy": 7,
-        "live": 7,
+        "live": 8,
         "mixed": 3,
         "proposed": 7
       },
-      "total": 24
+      "total": 25
     }
   },
   "version": 1

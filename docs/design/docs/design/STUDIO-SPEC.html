@@ -346,16 +346,55 @@
 <p><strong>Probes and retirement:</strong> every published tool has a read-only <code>tools.probe</code>; a probe failure unbinds new runs while in-flight runs finish. A tool with zero calls over one programme cycle is flagged and retired. A schema-drift signature opens a kata.</p>
 <p><strong>Storage (D57):</strong> the conveyor writes and reads its own bytes directly to the shared platform MinIO with a mandatory tenant prefix, server-side encryption, a content hash per object, a size cap and sealed credential profiles. <code>artifact_service</code> and <code>storage-api</code> are not conveyor dependencies; a job never sees an S3 key.</p>
 <p><strong>Relationship to <code>nonagenticai_mcp_server</code> (D44, D59):</strong> concepts borrowed, dependency refused. The conveyor implements its own registry, broker, credential injection and call ledger. The agent platform keeps its own gateway; there is no planned convergence and the conveyor broker is not exposed to the agent.</p>
-<h2 id="executable-rigour--togaf-safe-pmp">Executable rigour — TOGAF, SAFe, PMP</h2>
+<h2 id="executable-rigour--togaf-safe-pmp-msp">Executable rigour — TOGAF, SAFe, PMP, MSP</h2>
 <p>The rigour is rows and gates, not a document library.</p>
 <ul>
 <li><strong>TOGAF ADM as an architecture project type:</strong> phases A–H as WBS nodes, each with required artefacts and a contract gate; requirements management is continuous, linked by <code>trace_link</code>.</li>
 <li><strong>SAFe as the programme cadence:</strong> portfolio (computed), programme/ART with shared config and a dependency graph, PI planning, backlog refinement, system demo (no demo, no credit), inspect &amp; adapt, lean governance at value boundaries.</li>
+<li><strong>MSP as the programme definition and benefit track:</strong> mandate, programme brief, blueprint, business case, benefit profiles and benefits map, projects dossier, tranche reviews, stakeholder profiles, transition and measured realization. A benefit is a measurable improvement with a baseline, a target, a method and an owner; a capability is not a benefit.</li>
 <li><strong>PMP artefacts as typed rows:</strong> charter (<code>governed_asset</code>), WBS (<code>wbs_node</code>), baseline (<code>project_baseline</code>), the one six-kind register, change control with impact analysis, closure.</li>
-<li><strong>The trace chain:</strong> requirement/principle/ADR → architecture contract → charter → WBS deliverable → work package → run → step → artefact/evidence → acceptance → closure. The governance screen answers one question end to end: which requirement does this run prove, and where is the evidence?</li>
-<li><strong>What is not claimed:</strong> no TOGAF certification, no SAFe compliance badge, no PMP certification, no full ADM conformance, no portfolio optimiser, no schedule solver. The claim is that the artefacts and gates the organisation uses are rows, the process runs, and the evidence is traceable.</li>
+<li><strong>The trace chain:</strong> requirement/principle/ADR → architecture contract → charter → WBS deliverable → work package → run → step → artefact/evidence → acceptance → closure, and its programme end: capability → operational outcome → benefit → strategic objective.</li>
+<li><strong>What is not claimed:</strong> no TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP certification, no full ADM conformance, no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is that the artefacts and gates the organisation uses are rows, the process runs, and the evidence is traceable.</li>
 </ul>
-<p>The earlier <strong>TOC study</strong> remains in the studio as an optional constraint-reasoning view. It is not part of SPEC_V2's method: V2's method is SAFe/PMP/TOGAF plus the coach's closed triage and remedy sets. The TOC bars, float and buffer figures are illustrative; no scheduling solver runs.</p>
+<p>The earlier <strong>TOC study</strong> remains in the studio as an optional constraint-reasoning view. It is not part of SPEC_V2's method: V2's method is SAFe/PMP/TOGAF/MSP plus the coach's closed triage and remedy sets. The TOC bars, float and buffer figures are illustrative; no scheduling solver runs.</p>
+<h2 id="programme-definition-and-benefits-realization--the-msp-layer">Programme definition and benefits realization — the MSP layer</h2>
+<p>New destination: <strong>Programme definition</strong> (<code>programme</code>), a design-study page with four tabs. It is sign-in gated on the public site like every other V2 destination; the public programme pages keep showing the real programme, never this fixture.</p>
+<table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>Surfaces</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Definition</strong></td>
+<td>mandate, programme brief, blueprint, business case, refined vision and the governance strategy/plan set; each artefact names its producer, reviewer, approver, version and gate. The mandate approval and the first-tranche authorisation are the two decisions rendered.</td>
+</tr>
+<tr>
+<td><strong>Benefits map &amp; profiles</strong></td>
+<td>the map lane output → capability → operational outcome → benefit/disbenefit → strategic objective, and the benefit profiles with baseline, target, current, measurement method, cost, conditions, dependencies and the BCM owner.</td>
+</tr>
+<tr>
+<td><strong>Tranches &amp; reviews</strong></td>
+<td>the tranche list with entry/exit criteria, baseline, review date and state; the end-of-tranche review with its evidence and the continue / pause / stop decision.</td>
+</tr>
+<tr>
+<td><strong>Benefits realization</strong></td>
+<td>one row per benefit: baseline measured, readiness, transition date, post-transition measurement, legacy retirement, post-closure owner; the transition record and the baseline-versus-realized bar.</td>
+</tr>
+</tbody>
+</table>
+<p>The mock demonstrates the distinctions the model depends on:</p>
+<ul>
+<li><strong>Capability ≠ use ≠ improvement.</strong> A delivered capability gives a team an option; the profile's baseline and target measure whether performance actually moved. The note on the tab says so.</li>
+<li><strong>A tranche ≠ a PI.</strong> The PI cadence is the delivery rhythm inside a tranche; the tranche review is a programme decision by the sponsoring group, with baselines, benefit status and the risk register as evidence.</li>
+<li><strong>A benefit is not a register row.</strong> The six-kind register indexes the benefit; the profile carries the measurement fields; the map carries the path to the objective.</li>
+<li><strong>The review can refuse.</strong> A review with no evidence is refused, and a transition whose baseline was never measured cannot report a realized benefit. The mock's buttons produce those two states.</li>
+</ul>
+<p>All values are local fixtures. No V2 table or action is called; the page is a labelled preview.</p>
+<h3 id="roles-in-the-mock">Roles in the mock</h3>
+<p>The programme roles are ordinary jobs, consistent with the organisation model: the sponsoring group, SRO, programme board, programme office, programme manager, programme architect, BCM, PMO lead and quality manager. The definition and benefit tabs name the producer, reviewer and approver by role, never by person; the person appears only in the approval record.</p>
 <h2 id="knowledge-and-memory-workbench">Knowledge and memory workbench</h2>
 <p>Knowledge management is not a document library and memory is not a transcript. The workbench lets a tenant <strong>inspect → explain → test → revise → review → release</strong>, and answers four questions for every job, work package and run:</p>
 <ul>
@@ -687,6 +726,12 @@
 <td><strong>P</strong></td>
 </tr>
 <tr>
+<td><strong>Programme definition</strong></td>
+<td><code>programme</code></td>
+<td>Definition, benefits map &amp; profiles, tranches &amp; reviews, benefits realization</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
 <td>Projects</td>
 <td><code>projects</code></td>
 <td>live/snapshot programme workspace: project list, board, plan, linked issues, text outputs, public feedback, publish</td>
@@ -840,7 +885,7 @@
 </table>
 <h2 id="existing-implementation-versus-proposed-ui">Existing implementation versus proposed UI</h2>
 <p><strong>Implemented in V1 (the Rust app, live at <code>conveyor.nonagentic.ai</code>):</strong> the one binary with projects, boards, lists, cards, runs, approvals, procedures, capabilities, capability agents, knowledge/memory bindings, the inference ledger, the native SWE-bench harness, evals, the eval hillclimb and the compiled-prompt pipeline; secrets, channels, webhooks, schedules, notifications, <code>licences.get</code>, billing, members, roles, audit and the admin surfaces. The last whole-tree checkpoint measured 83 tables and 243 actions; later S19–S21 lanes moved the served-spec past 290 ops, so those are floors, not live figures. The eval screen already exposes cases/runs/report/ sign-offs/climb and marks authoring, audit and interop as planned; the benchmark screen permits gold/empty controls and refuses unavailable subject arms.</p>
-<p><strong>Proposed in V2 (T0–T17, no V2 code written):</strong> the organisation spine (<code>industry</code>, <code>department</code>, <code>job_catalogue</code>, <code>job_release</code>, <code>job_binding</code>); the plan spine (<code>wbs_node</code>, <code>project_baseline</code>, <code>project_register_item</code>, <code>project_dependency</code>, programme shared config and cadence); the decision tables and laya client; PM/coach/kata/development/operations jobs; lessons; PKO and SOP/RDF/BPMN ingestion; tenant asset authoring; the tool estate (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>, the broker, BYO and authoring); metering roll-ups; the MinIO storage adapter; and the knowledge and memory workbench (effective job-release configuration, the seven-state source transformation, memory record lifecycle and derivation views, the review/release queue, the explain-context manifest and per-object evaluation). The studio renders these as labelled previews.</p>
+<p><strong>Proposed in V2 (T0–T17, no V2 code written):</strong> the organisation spine (<code>industry</code>, <code>department</code>, <code>job_catalogue</code>, <code>job_release</code>, <code>job_binding</code>); the plan spine (<code>wbs_node</code>, <code>project_baseline</code>, <code>project_register_item</code>, <code>project_dependency</code>, programme shared config and cadence); the MSP programme layer (<code>programme_tranche</code>, <code>benefit_profile</code>, <code>benefit_link</code>, <code>benefit_transition</code>, <code>stakeholder_profile</code>, and the extended <code>governed_asset</code> kinds); the decision tables and laya client; PM/coach/kata/development/operations jobs; lessons; PKO and SOP/RDF/BPMN ingestion; tenant asset authoring; the tool estate (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>, the broker, BYO and authoring); metering roll-ups; the MinIO storage adapter; and the knowledge and memory workbench (effective job-release configuration, the seven-state source transformation, memory record lifecycle and derivation views, the review/release queue, the explain-context manifest and per-object evaluation). The studio renders these as labelled previews.</p>
 <p>The V1 retention is concrete: capability packs, <code>strata_ingest</code>/<code>strata_rag</code> retrieval, hot work-package rows and cold digests, lesson promotion, the compiled-prompt pipeline and the S17–S21 instruments exist in the Rust app. The workbench's organisation inheritance, source/passage inspector, record taxonomy and actions, PKO term workspace, explain-context manifest and object evaluation are design previews; no table or action was added by this pack.</p>
 <h2 id="files-and-boundaries">Files and boundaries</h2>
 <p><code>studio.html</code> is the entry point. <code>studio.js</code> / <code>studio.css</code> retain the S12 editors and workbenches; <code>enterprise.js</code> / <code>enterprise.css</code> supply the programme surfaces and the sources &amp; retrieval workbench; <code>learning.js</code> / <code>learning.css</code> add knowledge design, the effective configuration and review surfaces, scoped memory and measurement; <code>v2.js</code> / <code>v2.css</code> add the SPEC_V2 destinations (portfolio, plan, organisation, jobs, procedures, authoring, improve, operations, tools, metering), the PKO term workspace, the explain-context panel and the V2 sidebar and banners; <code>architecture.js</code> / <code>architecture.css</code> add the System architecture page, its ArchiMate model and the UI map; <code>architecture/diagrams/</code> holds the Mermaid <code>.mmd</code> sources and their pre-rendered light/dark SVG pairs; <code>job-catalogue.js</code> and <code>coding-catalogue.js</code> are local source snapshots. Local IBM Plex fonts and code-native SVG are used. The architecture page adds only the committed SVG diagram pairs beyond the existing stylesheets.</p>
@@ -857,12 +902,12 @@
 <pre class="sh"><code>python3 docs/design/scripts/build-job-catalogue.py</code></pre>
 <p>The script reads sibling repositories, writes only <code>job-catalogue.js</code> and records the RM source SHA-256. It is a display extractor, not an executable migration or a parser of live n8n prompts.</p>
 <h2 id="verification">Verification</h2>
-<p>Five headless Chrome passes run against <code>studio.html</code> using <code>playwright-core</code> and local Chrome; set <code>NODE_PATH</code> if Playwright is installed outside this repo, <code>CHROME_BIN</code> for a non-default browser, and <code>CONVEYOR_QA_OUTPUT</code> to change the screenshot directory (defaults to the system temporary directory). Run from any working directory:</p>
-<pre class="sh"><code>node docs/design/scripts/check-studio.cjs       # 234 checks
+<p>Six headless Chrome passes run against <code>studio.html</code> using <code>playwright-core</code> and local Chrome; set <code>NODE_PATH</code> if Playwright is installed outside this repo, <code>CHROME_BIN</code> for a non-default browser, and <code>CONVEYOR_QA_OUTPUT</code> to change the screenshot directory (defaults to the system temporary directory). Run from any working directory (counts measured 2026-11-16):</p>
+<pre class="sh"><code>node docs/design/scripts/check-studio.cjs       # 233 checks
 node docs/design/scripts/check-learning.cjs     # 139 checks
-node docs/design/scripts/check-v2.cjs           # 158 checks
+node docs/design/scripts/check-v2.cjs           # 180 checks
 node docs/design/scripts/check-workbench.cjs    # 119 checks
-node docs/design/scripts/check-architecture.cjs # 141 checks
+node docs/design/scripts/check-architecture.cjs # 146 checks
 node docs/design/scripts/check-data.cjs         # snapshot gate (DESIGN: no-op)</code></pre>
 <p><code>check-data.cjs</code> is the generated-data gate: when <code>data/snapshot.js</code> carries a payload it verifies the manifest schema, every file's SHA-256 and byte length, the <code>window.CONVEYOR_SNAPSHOT</code> assignment, the secret-metadata-only rule, the absence of emails and credential-shaped strings, and that <code>studio.html</code> loads the snapshot before <code>v2.js</code>. With the placeholder it reports DESIGN mode and exits 0.</p>
 <ul>

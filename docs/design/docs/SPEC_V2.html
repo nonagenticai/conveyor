@@ -1163,7 +1163,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <h3 id="77-compiled-prompts">7.7 Compiled prompts</h3>
 <p>V1 D27/S21 stands: a prompt is compiled at run time from the run's sources — instruction, procedure, capability/role, knowledge and project/card sections in trust order — with character budgets, a measured refusal over budget, and a recorded <code>prompt_sha256</code>. The compiled text is never stored. Missing required source → <code>409 capability_not_ready</code> naming the pin and section, <strong>before</strong> a model call. An identical recipe + facts compiles byte-identically. For an <code>internal_agent</code> step the four sources of §4.5 — knowledge, episodic memory, the PDDL request and the curated tool list — are compiled into the same envelope; there is no other prompt compiler in the system.</p>
 <hr />
-<h2 id="8-executable-rigour--togaf-safe-pmp">8. Executable rigour — TOGAF, SAFe, PMP</h2>
+<h2 id="8-executable-rigour--togaf-safe-pmp-msp">8. Executable rigour — TOGAF, SAFe, PMP, MSP</h2>
 <p>The point of this section is that the rigour is <strong>not a document library</strong>. Every artefact below is a row with a lifecycle; every gate is an approval; every claim links to evidence.</p>
 <h3 id="81-togaf-adm-as-an-architecture-project-type">8.1 TOGAF ADM as an architecture project type</h3>
 <p>An <code>architecture</code> project walks the ADM phases as WBS nodes, each with its required artefacts and a contract gate:</p>
@@ -1265,7 +1265,164 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tbody>
 </table>
 <p><strong>WSJF is arithmetic, not opinion:</strong> <code>(business_value + time_criticality + risk_reduction) / job_size</code>, all four typed integer fields on the backlog/WBS row. The computed score is never stored; the inputs are. An LLM may draft the narrative, never the numbers.</p>
-<h3 id="83-pmp-artefacts-as-typed-rows">8.3 PMP artefacts as typed rows</h3>
+<h3 id="83-msp-as-the-programme-definition-and-benefits-realization">8.3 MSP as the programme definition and benefits realization</h3>
+<p>SAFe gives the programme its cadence; MSP gives it its <strong>definition and its benefit track</strong>. A programme is not a large project: it is a temporary organisation that exists to deliver benefits through projects, and it is judged on the improvement operations realizes after those projects close. V2 implements that lifecycle as rows and gates, not as a document library.</p>
+<p><strong>Capability is not use, and use is not improvement.</strong> A delivered capability gives a team a new option. Whether the team uses it, and whether use improves performance, are separate questions. A benefit is a <strong>measurable improvement</strong> resulting from an outcome, valued by at least one stakeholder, that contributes to an organisational objective. A <code>project_register_item(kind='benefit')</code> with no baseline, target, measurement method and owner is not a benefit; it is a wish.</p>
+<table>
+<thead>
+<tr>
+<th>MSP artefact</th>
+<th>V2 row</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mandate — strategic fit, current position, drivers, deliverables/boundaries, delivery and assurance, success and constraints</td>
+<td><code>governed_asset(kind='mandate')</code> on the programme-definition project</td>
+<td>the sponsoring group authorises the mandate</td>
+</tr>
+<tr>
+<td>Programme brief — outline vision, benefit categories, cost/timescale/effort, risks and support, delivery options including doing nothing, candidate projects and timing, current operations</td>
+<td><code>governed_asset(kind='programme_brief')</code></td>
+<td>the sponsoring group approves the brief and authorises definition</td>
+</tr>
+<tr>
+<td>Blueprint — processes/business models, organisation and skills, technology and data, current/intermediate/target states</td>
+<td><code>governed_asset(kind='blueprint')</code> + the §8.1 architecture content</td>
+<td>blueprint contract</td>
+</tr>
+<tr>
+<td>Business case — strategic objectives and realistic benefits, options including doing nothing, investment appraisal, cash flow, and how the investment delivers the capabilities the benefits depend on</td>
+<td><code>governed_asset(kind='business_case')</code></td>
+<td>investment decision; an unacceptable case returns to the future state or the project solutions</td>
+</tr>
+<tr>
+<td>Benefit profile</td>
+<td><code>benefit_profile</code> (six field groups, below), indexed by <code>project_register_item(kind='benefit')</code></td>
+<td>the BCM and SRO approve; the baseline is measured before the transition</td>
+</tr>
+<tr>
+<td>Benefits map</td>
+<td><code>benefit_link</code> edges: output → capability → operational outcome → benefit/disbenefit → strategic objective</td>
+<td>the map is accepted with the profiles</td>
+</tr>
+<tr>
+<td>Projects dossier</td>
+<td><code>project</code> rows + programme membership, each with outputs, resources, timescales, dependencies, requirements, budget, contribution and risks</td>
+<td>first-tranche authorisation</td>
+</tr>
+<tr>
+<td>Programme plan and tranches</td>
+<td><code>programme_tranche</code> + the T1 plan spine</td>
+<td>end-of-tranche review: continue / pause / stop</td>
+</tr>
+<tr>
+<td>Refined vision</td>
+<td><code>governed_asset(kind='refined_vision')</code></td>
+<td>programme board</td>
+</tr>
+<tr>
+<td>Management, governance and boundary baselines</td>
+<td><code>programme_baseline(kind='management' | 'governance' | 'boundary')</code></td>
+<td>the baseline that the next tranche is managed against</td>
+</tr>
+<tr>
+<td>Benefits management strategy and benefits realization plan</td>
+<td><code>governed_asset(kind='benefits_strategy' | 'benefits_realization_plan')</code></td>
+<td>transition readiness</td>
+</tr>
+<tr>
+<td>Stakeholder profiles</td>
+<td><code>stakeholder_profile</code> rows</td>
+<td>engagement plan accepted with the profiles</td>
+</tr>
+<tr>
+<td>Information, risk, issue, monitoring, communications, quality and resource strategies and plans</td>
+<td><code>governed_asset</code> kinds + the existing risk/issue registers (§8.4)</td>
+<td>the programme board's governance baseline</td>
+</tr>
+<tr>
+<td>Transition and realization</td>
+<td><code>benefit_transition</code> per benefit: baseline measured, readiness, enact, post-transition measurement, legacy retirement</td>
+<td>the benefit review</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The benefit profile is the measurement record.</strong> Its six field groups are mandatory:</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identification and purpose</td>
+<td>reference, description, category, objectives, observable outcome</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>affected KPIs, baseline, target, measurement method, financial value where expressible</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>the cost of realizing the benefit, including the associated business change</td>
+</tr>
+<tr>
+<td>Conditions</td>
+<td>capabilities required, outcomes that must already exist, changes to operating practice</td>
+</tr>
+<tr>
+<td>Uncertainty and dependencies</td>
+<td>related risks and issues, and dependencies outside the programme</td>
+</tr>
+<tr>
+<td>Responsibility and attribution</td>
+<td>who realizes it, the benefit owner (BCM), and the operational area to which the improvement is attributed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A tranche is not a PI.</strong> A PI is the delivery rhythm; a tranche is the unit the programme manages and reviews together. <code>programme_tranche(number, state, entry_criteria, exit_criteria, baseline_ref, review_at)</code> holds the unit; the review is an approval (<code>gate='tranche_review'</code>) with the sponsoring group as approver and the baselines, the benefit status and the risk register as its evidence. A project does not start before the first tranche is authorised; a review continues, pauses or stops, and a re-baseline goes through change control, never through the review itself. The preparation plan for definition is P0's own plan, not a separate artefact: it names the resources, boundaries, controls and cost of producing the definition set.</p>
+<table>
+<thead>
+<tr>
+<th>Tranche activity</th>
+<th>V2 mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Establish</td>
+<td>programme board, office and working environment are positions and rows; the tranche's cards are materialised</td>
+</tr>
+<tr>
+<td>Direct the work</td>
+<td>the PM job appoints delivery, runs risk workshops, handles project exceptions and manages the teams through cards</td>
+</tr>
+<tr>
+<td>Exercise control</td>
+<td>gates, the risk/issue registers, communications, audits and assurance reviews</td>
+</tr>
+<tr>
+<td>Maintain alignment</td>
+<td>blueprint against current strategy; a deviation is a change request or a kata, never a silent fork</td>
+</tr>
+<tr>
+<td>Manage resources</td>
+<td>the resource plan, procurement and contracts as governed assets, and metering</td>
+</tr>
+<tr>
+<td>Review and close</td>
+<td>the end-of-tranche review gate, the transition to operations and the next tranche's preparation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Benefits realization is a procedure after delivery.</strong> For each benefit the BCM: measures the baseline while the old practice is still observable; monitors against the profile; plans the transition; communicates the change; assesses readiness; enacts it; measures the post-transition performance; retires the superseded practice and system; and keeps measuring until the realization plan names who continues after programme closure. The comparison with the baseline is the evidence the sponsor uses to judge the change. A benefit whose baseline was never measured cannot claim an improvement.</p>
+<p><strong>Roles are positions, not code paths.</strong> The sponsoring group, SRO, programme board, programme office, programme manager, programme architect, BCM, PMO lead and quality manager are <code>job_key</code>s with authority rows (D50). The SRO is accountable for the coherent capability and the benefits; the BCM owns each benefit and the transition; the PM owns project delivery; the programme board is the SRO's decision forum. The conveyor's own buildout runs under these roles: PM, BCM, SRO and architect are jobs using the same card, run, approval and event primitives.</p>
+<p><strong>Rules.</strong> A benefit without baseline, target, method and owner is refused. Every benefit names the capability it depends on and the operational area that must change. A dependency slip names the benefits put at risk through the benefit-map edges. A tranche review with no evidence is refused. A gate that never refused a tranche or a benefit in a full cycle is flagged as broken, not healthy. The programme closes only with a realization plan that names post-closure measurement. These rules satisfy P10: the named procedures are programme definition, tranche review and benefits realization; the metrics are benefits realised versus planned, tranche gate outcomes and benefit-at-risk count, all computed from rows.</p>
+<h3 id="84-pmp-artefacts-as-typed-rows">8.4 PMP artefacts as typed rows</h3>
 <table>
 <thead>
 <tr>
@@ -1300,16 +1457,16 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 </tbody>
 </table>
-<p>The registers are deliberately one table, not five: the v4 design had separate PM tables and V1 measured RM's <code>pm_*</code> at zero usage. One generic register with a <code>kind</code> CHECK is leaner and still queryable.</p>
-<h3 id="84-the-trace-chain">8.4 The trace chain</h3>
+<p>The registers are deliberately one table, not five: the v4 design had separate PM tables and V1 measured RM's <code>pm_*</code> at zero usage. One generic register with a <code>kind</code> CHECK is leaner and still queryable. The benefit profile is the one exception: a register row indexes the benefit, and the profile holds the measurement fields that a generic register must not carry.</p>
+<h3 id="85-the-trace-chain">8.5 The trace chain</h3>
 <pre><code>requirement / principle / ADR (approved)
    → architecture contract (approved)
    → project charter (approved)
    → WBS deliverable → work package (card) → run → step → artefact / evidence
    → acceptance (approval) → closure</code></pre>
 <p><code>trace_link</code> is V1's existing edge; V2 requires the link at creation time for architecture-governed work. The governance screen answers one question end to end: <em>which requirement does this run prove, and where is the evidence?</em></p>
-<h3 id="85-what-is-not-claimed">8.5 What is not claimed</h3>
-<p>No TOGAF certification, no SAFe compliance badge, no PMP certification. No full ADM conformance, no portfolio optimiser, no schedule solver. The claim is narrower and testable: <strong>the artefacts and gates the organisation uses are rows, the process runs, and the evidence is traceable.</strong></p>
+<h3 id="86-what-is-not-claimed">8.6 What is not claimed</h3>
+<p>No TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP certification or conformance badge. No full ADM conformance, no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is narrower and testable: <strong>the artefacts and gates the organisation uses are rows, the process runs, the benefit is measured against a baseline, and the evidence is traceable.</strong></p>
 <hr />
 <h2 id="9-self-development-and-operations">9. Self-development and operations</h2>
 <h3 id="91-development-projects--the-conveyor-builds-itself">9.1 Development projects — the conveyor builds itself</h3>
@@ -1530,9 +1687,39 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>state machine; materialises cards</td>
 </tr>
 <tr>
+<td><code>programme_tranche</code></td>
+<td>the unit the programme manages and reviews together</td>
+<td>number, state, entry/exit criteria, baseline ref, review date; the review is an approval</td>
+</tr>
+<tr>
+<td><code>programme_baseline</code></td>
+<td>the management, governance and boundary baselines</td>
+<td><code>kind</code> CHECK; immutable; a tranche is managed against a version</td>
+</tr>
+<tr>
 <td><code>project_register_item</code></td>
 <td>risk/issue/assumption/dependency/benefit/change</td>
-<td>one generic register, six kinds</td>
+<td>one generic register, six kinds; a benefit row indexes its profile</td>
+</tr>
+<tr>
+<td><code>benefit_profile</code></td>
+<td>the measurable improvement behind a benefit row</td>
+<td>six field groups (§8.3): purpose, performance, cost, conditions, uncertainty, responsibility; baseline, target and method are mandatory</td>
+</tr>
+<tr>
+<td><code>benefit_link</code></td>
+<td>the benefits-map edges</td>
+<td><code>output → capability → operational outcome → benefit/disbenefit → strategic objective</code>; also the dependency that puts a benefit at risk</td>
+</tr>
+<tr>
+<td><code>benefit_transition</code></td>
+<td>the realization record per benefit</td>
+<td>baseline measured, readiness, enact, post-transition measurement, legacy retirement, post-closure owner</td>
+</tr>
+<tr>
+<td><code>stakeholder_profile</code></td>
+<td>stakeholder concerns, influence, interest, exposure, support and engagement target</td>
+<td>programme- or project-scoped; trends over time</td>
 </tr>
 <tr>
 <td><code>decision</code></td>
@@ -1581,7 +1768,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 </tbody>
 </table>
-<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | architecture_contract | closure | postmortem | sop_source</code>), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and a PKO pin. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
+<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | architecture_contract | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case | refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier</code>; a programme-level asset is attached to the programme-definition project), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and a PKO pin. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
 <h3 id="104-action-families">10.4 Action families</h3>
 <table>
 <thead>
@@ -1593,7 +1780,11 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tbody>
 <tr>
 <td>programme/plan</td>
-<td><code>programmes.*</code>, <code>programme_config.*</code>, <code>project_dependencies.*</code>, <code>cadences.*</code>, <code>wbs.*</code>, <code>baselines.*</code>, <code>registers.*</code></td>
+<td><code>programmes.*</code>, <code>programme_config.*</code>, <code>governed_assets.compose|submit|approve</code> (the MSP artefacts), <code>tranches.*</code>, <code>tranches.review</code>, <code>project_dependencies.*</code>, <code>cadences.*</code>, <code>wbs.*</code>, <code>baselines.*</code>, <code>registers.*</code></td>
+</tr>
+<tr>
+<td>benefits</td>
+<td><code>benefits.list|get|create|update</code>, <code>benefits.link|unlink</code>, <code>benefits.baseline|transition|measure|close</code></td>
 </tr>
 <tr>
 <td>organisation</td>
@@ -1693,6 +1884,10 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><strong>Portfolio</strong></td>
 <td>portfolio view (in-flight projects + programmes), programme shared config + dependency graph, backlog + WSJF, cadence (PI planning, demo, retro), capacity, metering per project</td>
+</tr>
+<tr>
+<td><strong>Programme</strong></td>
+<td>mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realized benefits</td>
 </tr>
 <tr>
 <td><strong>Plan</strong></td>
@@ -2001,8 +2196,8 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>T1</strong></td>
-<td><strong>Plan spine</strong> — <code>wbs_node</code>, <code>project_baseline</code>, <code>project_register_item</code>, <code>project_dependency</code>, programme <code>shared_config</code> and cadence; project types; DoD</td>
-<td>one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused</td>
+<td><strong>Plan spine</strong> — <code>wbs_node</code>, <code>project_baseline</code>, <code>project_register_item</code>, <code>project_dependency</code>, programme <code>shared_config</code> and cadence; <code>programme_tranche</code>, <code>benefit_profile</code>, <code>benefit_link</code> and the programme-definition kinds; project types; DoD</td>
+<td>one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused; a benefit profile without baseline, target, method or owner is refused; a benefit-map edge names its five levels</td>
 </tr>
 <tr>
 <td><strong>T2</strong></td>
@@ -2046,8 +2241,8 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>T10</strong></td>
-<td><strong>SAFe cadence</strong> — backlog, WSJF, PI planning, demo, inspect &amp; adapt</td>
-<td>PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons</td>
+<td><strong>SAFe cadence and MSP tranches</strong> — backlog, WSJF, PI planning, demo, inspect &amp; adapt; tranche review, benefits strategy and realization plan</td>
+<td>PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized</td>
 </tr>
 <tr>
 <td><strong>T11</strong></td>
@@ -2057,7 +2252,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><strong>T12</strong></td>
 <td><strong>One organisation loop</strong> — the acceptance of V2</td>
-<td>one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget</td>
+<td>one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area</td>
 </tr>
 <tr>
 <td><strong>T13</strong></td>
@@ -2467,6 +2662,11 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><strong>D61</strong></td>
 <td><strong>Executor seam; external runtime deferred</strong></td>
 <td>The conveyor keeps <strong>one runtime</strong>: <code>procedure</code> and <code>internal_agent</code> are two implementations of one internal <code>Executor</code> contract, and <code>executor_kind</code> is an extensible enum rather than a branch through the run path. <strong>An external runtime is an explicit non-goal</strong> until four conditions hold: a generic work-packet ingress returning per-step evidence the conveyor can verify (not outcome-level); governance at the boundary (a produce-only runtime, the conveyor ships); separate owners and roadmaps; and it beats the internal agent on the conveyor's own benchmark. D33/D44 stand — the agent platform is a front end, not a runtime — and D46's two live kinds stand. The product boundary is <code>/mcp</code>; only stateless infrastructure is shared (inference-router, strata, MinIO, tool backends). The seam preserves the option at near-zero cost (proposed 2026-11-11, from the independent runtime review)</td>
+</tr>
+<tr>
+<td><strong>D62</strong></td>
+<td><strong>Programme definition and benefits realization (MSP)</strong></td>
+<td>V2 adopts MSP's programme lifecycle as rows and gates. The <strong>mandate, programme brief, blueprint, business case, refined vision and governance strategies</strong> are <code>governed_asset</code> kinds on the programme-definition project. <code>benefit_profile</code> is the mandatory measurement record behind <code>project_register_item(kind='benefit')</code>; <code>benefit_link</code> carries the benefits map (output → capability → operational outcome → benefit → objective); <code>programme_tranche</code> carries the management/review unit, and its review is an approval with the baselines, benefit status and risk register as evidence; <code>benefit_transition</code> carries the baseline measurement, transition, post-transition measurement and legacy retirement. A benefit without baseline, target, method and owner is refused; a project does not start before the first tranche is authorised; the programme closes only with a realization plan naming post-closure measurement. The SRO, BCM, sponsoring group and programme board are positions with authority rows, not code paths (proposed 2026-11-16, from the programme-architecture and benefits-realization review)</td>
 </tr>
 </tbody>
 </table>

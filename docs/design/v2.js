@@ -2171,6 +2171,9 @@ window.installV2 = function (api, enterprise) {
     cycle: false,
     effectCeiling: "write",
     review: null,
+    benefit: "BEN-01",
+    tranche: 0,
+    programmeGate: null,
   };
 
   /* ------------------------------------------------------------------ fixtures */
@@ -2384,6 +2387,63 @@ window.installV2 = function (api, enterprise) {
       { id: "ASM-04", kind: "assumption", title: "Tenant identity stays within programme scope", owner: "pm", status: "Accepted", severity: "Low", note: "review at gate C" },
       { id: "DEP-09", kind: "dependency", title: "Strata pack v17 availability", owner: "architect", status: "Open", severity: "Medium", note: "required knowledge pin" },
       { id: "BEN-02", kind: "benefit", title: "Fulfilment time −40%", owner: "pm", status: "Tracking", severity: "—", note: "planned vs realised at closure" },
+    ],
+    /* The MSP layer: programme definition, benefit profiles, the benefits map, tranches and
+       realization. Local fixtures — no V2 table or action exists yet (SPEC_V2 §8.3, D62). */
+    programmeDefinition: {
+      key: "PGM-CB",
+      name: "conveyor buildout",
+      sponsors: "sponsoring group · N. de Vries (chair) · G. Dekker (SRO) · R. Slot",
+      mandate: { state: "Draft", approved: "—", version: "v3" },
+      fields: [
+        ["Strategic fit", "One operating model for every conveyor work stream; the programme contributes to the mission of a self-operating organisation."],
+        ["Current position", "V1 is live; T0's organisation spine is merged; 48 projects are in flight. The programme's definition set is at tranche 0."],
+        ["Drivers", "One-off tooling cost, duplicated project machinery and unmeasured outcomes across the estate."],
+        ["Deliverables and boundaries", "The organisation spine, the plan spine, the decision ladder, the tool estate and benefits realization. Out of scope: customer-facing applications."],
+        ["Delivery and assurance", "Iterative delivery inside tranches; each tranche review decides continue, pause or stop on evidence."],
+        ["Success and constraints", "Benefits realized against their profiles; no project starts before the first tranche is authorised; public/opt-in licensing frame."],
+      ],
+      artefacts: [
+        { id: "PD-01", kind: "Mandate", title: "Programme mandate", producer: "programme manager", reviewer: "BCM", approver: "sponsoring group", version: "v3", state: "Draft", gate: "authorise the programme" },
+        { id: "PD-02", kind: "Brief", title: "Programme brief", producer: "SRO", reviewer: "programme board", approver: "sponsoring group", version: "v2", state: "Approved", gate: "authorise definition" },
+        { id: "PD-03", kind: "Blueprint", title: "Blueprint — target architecture and operating model", producer: "programme architect", reviewer: "BCM", approver: "SRO", version: "v4", state: "Approved", gate: "blueprint contract" },
+        { id: "PD-04", kind: "Business case", title: "Business case — options, appraisal and cash flow", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v3", state: "In review", gate: "investment decision" },
+        { id: "PD-05", kind: "Benefits map", title: "Benefits map and profiles", producer: "BCM", reviewer: "programme manager", approver: "SRO", version: "v2", state: "Draft", gate: "profiles accepted" },
+        { id: "PD-06", kind: "Projects dossier", title: "Projects dossier — outputs, resources, dependencies", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v5", state: "Draft", gate: "first-tranche authorisation" },
+        { id: "PD-07", kind: "Programme plan", title: "Programme plan and tranches", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v6", state: "Approved", gate: "first-tranche authorisation" },
+        { id: "PD-08", kind: "Governance", title: "Governance, roles and the strategy set", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v2", state: "Approved", gate: "governance baseline" },
+        { id: "PD-09", kind: "Stakeholders", title: "Stakeholder profiles", producer: "BCM", reviewer: "programme manager", approver: "SRO", version: "v2", state: "Draft", gate: "engagement plan" },
+        { id: "PD-10", kind: "Realization", title: "Benefits management strategy and realization plan", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v1", state: "Draft", gate: "transition readiness" },
+      ],
+      options: [
+        ["Do nothing", "No programme; the estate keeps its duplicated machinery — rejected: the cost and the evidence gap continue."],
+        ["Programme, all four tranches", "Recommended: definition first, then the spine, knowledge/tools, operations."],
+        ["Projects only, no programme", "Cheaper to start — rejected: no shared configuration, no tranche review, no benefit owner."],
+      ],
+    },
+    benefits: [
+      { id: "BEN-01", title: "Delivery lead time", category: "efficiency", objective: "faster IT delivery", outcome: "a card reaches acceptance with less queue time", kpi: "median cycle time (days)", baseline: 14, target: 8, current: 12.1, method: "card and run timestamps, weekly", value: "€0.4m/yr avoided contractor capacity", cost: "€0.12m", owner: "BCM · delivery", area: "delivery", conditions: "jobs bound; coach enabled; WIP limits configured", deps: "T1, T4", state: "Tracking" },
+      { id: "BEN-02", title: "Evidence at every gate", category: "governance", objective: "faster IT delivery; data as an asset", outcome: "a gate decision names its evidence", kpi: "gates with an evidence reference (%)", baseline: 41, target: 95, current: 78, method: "approval × evidence join, daily", value: "non-cash", cost: "€0.05m", owner: "BCM · project office", area: "project office", conditions: "approval policies configured; evidence captured at the action", deps: "T1", state: "Tracking" },
+      { id: "BEN-03", title: "Zero-use tools retired", category: "cost", objective: "manageability; lower cost", outcome: "the estate carries only tools a job calls", kpi: "toolkits retired after a zero-call cycle", baseline: 0, target: 12, current: 4, method: "tool_call roll-up per programme cycle", value: "€0.2m/yr", cost: "€0.08m", owner: "BCM · operations", area: "operations", conditions: "tool ledger live; a probe per toolkit", deps: "T13, T14", state: "At risk" },
+      { id: "BEN-04", title: "Review latency", category: "disbenefit", objective: "sustainable delivery", outcome: "dual control added no more than 8 h to a decision", kpi: "median gate decision latency (h)", baseline: 0, target: 8, current: 5.4, method: "approval opened → decided", value: "—", cost: "—", owner: "BCM · delivery", area: "delivery", conditions: "approver on call; a gate names its expiry", deps: "T1", state: "Monitoring", disbenefit: true },
+    ],
+    benefitLinks: [
+      { output: "T1 plan spine", capability: "WBS, baseline and register rows", outcome: "the plan is managed and evidenced", benefit: "BEN-02", objective: "faster IT delivery" },
+      { output: "T3 PM job", capability: "charter, baseline and change control", outcome: "fewer unplanned changes", benefit: "BEN-01", objective: "faster IT delivery" },
+      { output: "T13 tool platform", capability: "tool call ledger + probes", outcome: "zero-use tools are visible", benefit: "BEN-03", objective: "manageability" },
+      { output: "T4 kanban coach", capability: "WIP limits + one coach card", outcome: "flow is protected", benefit: "BEN-04", objective: "sustainable delivery" },
+    ],
+    tranches: [
+      { no: 0, name: "Definition", projects: "P0, SPEC-V2, DESIGN-PUBLISH", entry: "mandate approved", exit: "definition set accepted; benefits baselined", baseline: "B0", review: "2026-12-04", state: "In review", decision: "Pending" },
+      { no: 1, name: "Organisation spine", projects: "T1, T2, T3", entry: "definition accepted", exit: "PM runs a request end to end", baseline: "B1", review: "2027-01-15", state: "Planned", decision: "—" },
+      { no: 2, name: "Knowledge and tools", projects: "T8, T13, T14", entry: "T1 accepted", exit: "a toolkit is probed and called; a lesson is promoted", baseline: "B2", review: "2027-02-26", state: "Planned", decision: "—" },
+      { no: 3, name: "Operations", projects: "T4, T5, T7, T10", entry: "T2 accepted", exit: "one incident postmortemed; one benefit transitioned and measured", baseline: "B3", review: "2027-04-09", state: "Planned", decision: "—" },
+    ],
+    realization: [
+      { benefit: "BEN-01", baselineMeasured: "— (planned 2026-12-08, 14 days)", readiness: "Amber · coach not yet bound", transition: "2027-01-12", post: "4 weekly measures", legacy: "manual cycle-time spreadsheet", owner: "BCM · delivery", state: "Planned" },
+      { benefit: "BEN-02", baselineMeasured: "2026-12-01 · 41%", readiness: "Green", transition: "2026-12-15", post: "daily join, monthly review", legacy: "gate audit export", owner: "BCM · project office", state: "In transition" },
+      { benefit: "BEN-03", baselineMeasured: "— · not measured", readiness: "Red · tool ledger not live", transition: "—", post: "—", legacy: "—", owner: "BCM · operations", state: "Blocked · baseline missing" },
+      { benefit: "BEN-04", baselineMeasured: "2026-11-20 · 0 h (no dual control)", readiness: "Green", transition: "2026-12-01", post: "weekly", legacy: "single-reviewer approvals", owner: "BCM · delivery", state: "Monitoring" },
     ],
     changes: [
       { id: "CR-018", title: "Add delegated identity scope", baseline: "B3", impact: "scope +2 deliverables · schedule +9 d · cost +€0.8m · risk medium", rationale: "", state: "Draft" },
@@ -3004,7 +3064,7 @@ window.installV2 = function (api, enterprise) {
           ? snapshotProjects().length
           : db.projects.length;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Non-Agentic AI<small>Organisation workspace</small></span><span>⌄</span></div><nav>
-      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
+      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("programme", "Programme definition", "shield")}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
       <div class="nav-group"><div class="nav-label">ORGANISATION</div>${N("organisation", "Organisation", "layers")}${N("jobs", "Jobs", "board", F.jobs.length)}${N("agents", "Agents", "agent")}${N("toolkits", "Tools", "tools")}${N("types", "Project types", "grid")}</div>
       <div class="nav-group"><div class="nav-label">PROCEDURES &amp; AUTHORING</div>${N("procedures", "Procedures", "flow")}${N("capabilities", "Capabilities", "layers")}${N("authoring", "Authoring", "book")}</div>
       <div class="nav-group"><div class="nav-label">GOVERN &amp; DESIGN</div>${N("assurance", "Assurance &amp; baselines", "shield")}${N("constraints", "Flow &amp; constraints", "branch")}${N("requirements", "Requirements", "file")}${N("principles", "Principles", "book")}${N("models", "Architecture &amp; UML", "model")}${N("architecture", "System architecture", "model")}${N("documents", "Documents", "file")}</div>
@@ -3191,6 +3251,131 @@ window.installV2 = function (api, enterprise) {
           : [`<tr><td colspan="2">No dependency edges are published.</td></tr>`],
       )}`,
     )}</div>`;
+  }
+
+  /* ------------------------------------------------ Programme definition (MSP) */
+  // SPEC_V2 §8.3 / D62: the definition set, benefit profiles and the benefits map, tranches and
+  // their reviews, and benefits realization. Local fixtures only — no V2 table or action exists.
+  // The pages map gates every non-public destination, so the public site never renders this page.
+  function programmeDefinitionPage() {
+    const tab = v.tab.programme || "Definition";
+    const def = F.programmeDefinition;
+    const benefit = F.benefits.find((b) => b.id === v.benefit) || F.benefits[0];
+    const tranche = F.tranches.find((t) => t.no === v.tranche) || F.tranches[0];
+    const row = F.realization.find((r) => r.benefit === benefit.id) || F.realization[0];
+    const gate = v.programmeGate;
+    const span = Math.max(benefit.baseline, benefit.target, benefit.current, 1);
+    const pct = (n) => Math.min(100, Math.round((n / span) * 100));
+    const bar = `<div class="v2-bar" style="position:relative"><i style="width:${pct(benefit.current)}%"></i></div><div class="row" style="justify-content:space-between;margin-top:4px"><small class="muted">baseline ${E(benefit.baseline)}</small><small class="muted">current ${E(benefit.current)}</small><small class="muted">target ${E(benefit.target)}</small></div>`;
+    const reviewEvidence =
+      tranche.no === 0
+        ? [
+            ["Baselines frozen and approved", "B0 · B1"],
+            ["Benefits against their profiles", "BEN-02 78% · BEN-03 at risk"],
+            ["Risk and issue register", "2 open · 1 high"],
+            ["Blueprint alignment", "no deviation"],
+            ["Tranche exit criteria", "3 of 4 met"],
+          ]
+        : [["First review is due on " + tranche.review, "not started"]];
+
+    const definition =
+      `${panel("Mandate · " + def.name, `${table(
+        ["Field", "Entry"],
+        def.fields.map(([field, entry]) => `<tr><td><strong>${E(field)}</strong></td><td>${E(entry)}</td></tr>`),
+      )}${kv([
+        ["Producer", "programme manager"],
+        ["Reviewer", "BCM"],
+        ["Approver", "sponsoring group"],
+        ["Version", E(def.mandate.version)],
+        ["State", B(gate === "mandate-ok" ? "Approved" : def.mandate.state, gate === "mandate-ok" ? "green" : "amber")],
+        ["Sponsors", E(def.sponsors)],
+      ])}${gate === "mandate-ok" ? note("<strong>Approved</strong> · the sponsoring group authorised the mandate. The programme may enter definition; the brief is the next gate.", "ok") : gate === "mandate-return" ? note("<strong>Returned</strong> · the sponsoring group returned the mandate. No definition work starts and no delivery project is opened.", "bad") : note("The mandate is a decision, not a document: the sponsoring group approves the six fields, then the brief, then the first tranche. The programme cannot skip a gate.")}`, `${button("Approve the mandate", "programme-mandate", "", "small", "shield")}${button("Return for revision", "programme-mandate-return", "", "small", "replay")}`)}` +
+      `${panel("Definition set", `${table(
+        ["ID", "Artefact", "Producer", "Reviewer", "Approver", "Version", "State", "Gate"],
+        def.artefacts.map((a) => `<tr><td class="mono">${E(a.id)}</td><td><strong>${E(a.title)}</strong><small>${E(a.kind)}</small></td><td><small>${E(a.producer)}</small></td><td><small>${E(a.reviewer)}</small></td><td><small>${E(a.approver)}</small></td><td>${E(a.version)}</td><td>${B(a.state, a.state === "Approved" ? "green" : a.state === "In review" ? "amber" : "")}</td><td><small>${E(a.gate)}</small></td></tr>`),
+      )}${note("Every artefact names its producer, reviewer and approver. The set is the programme's, not a document library: a missing approval is a missing gate.")}`, B(`${def.artefacts.length} artefacts`))}` +
+      `${panel("Delivery options", `${table(
+        ["Option", "Assessment"],
+        def.options.map(([option, assessment]) => `<tr><td><strong>${E(option)}</strong></td><td>${E(assessment)}</td></tr>`),
+      )}${note("Doing nothing is always an option and is assessed as one. The business case has two return paths: redesign the future state, or rework the project solutions.")}`)}`;
+
+    const benefits =
+      `<div class="v2-split"><div>${panel("Benefit profiles", `${table(
+        ["ID", "Benefit", "Owner", "State"],
+        F.benefits.map((b) => `<tr data-v2="benefit" data-id="${b.id}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="benefit" data-id="${b.id}">${E(b.id)}</button></td><td><strong>${E(b.title)}</strong><small>${E(b.kpi)}</small></td><td><small>${E(b.owner)}</small></td><td>${B(b.state, b.state === "Tracking" ? "green" : b.state === "At risk" ? "amber" : "")}</td></tr>`),
+      )}`, B(`${F.benefits.length} profiles`))}</div><div>${panel(
+        "Profile · " + benefit.id,
+        `${kv([
+          ["Benefit", E(benefit.title)],
+          ["Category", E(benefit.category)],
+          ["Objective", E(benefit.objective)],
+          ["Observable outcome", E(benefit.outcome)],
+          ["KPI", E(benefit.kpi)],
+          ["Measurement method", E(benefit.method)],
+          ["Financial value", E(benefit.value)],
+          ["Cost to realize", E(benefit.cost)],
+          ["Conditions", E(benefit.conditions)],
+          ["Dependencies", E(benefit.deps)],
+          ["Owner", E(benefit.owner)],
+          ["Operational area", E(benefit.area)],
+        ])}${bar}${note("A capability gives a team a new option; whether it uses the option, and whether use improves performance, are separate questions. The baseline is measured while the old practice is still observable.")}`,
+        B(benefit.state, benefit.state === "Tracking" ? "green" : "amber"),
+      )}</div></div>${panel("Benefits map", `${table(
+        ["Output", "Capability", "Operational outcome", "Benefit", "Strategic objective"],
+        F.benefitLinks.map((l) => `<tr><td><strong>${E(l.output)}</strong></td><td>${E(l.capability)}</td><td>${E(l.outcome)}</td><td class="mono">${E(l.benefit)}</td><td>${E(l.objective)}</td></tr>`),
+      )}${note("Read left to right. A dependency slip names the benefits put at risk through these edges. A disbenefit is tracked with the same profile discipline.")}`)}`;
+
+    const tranches =
+      `<div class="v2-split"><div>${panel("Tranches", `${table(
+        ["#", "Tranche", "Projects", "Baseline", "Review", "State"],
+        F.tranches.map((t) => `<tr data-v2="tranche-review" data-id="${t.no}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="tranche-review" data-id="${t.no}">${t.no}</button></td><td><strong>${E(t.name)}</strong></td><td><small>${E(t.projects)}</small></td><td>${E(t.baseline)}</td><td>${E(t.review)}</td><td>${B(t.state, t.state === "In review" ? "amber" : "")}</td></tr>`),
+      )}`, B(`${F.tranches.length} tranches`))}</div><div>${panel(
+        "Review · tranche " + tranche.no,
+        `${kv([
+          ["Tranche", E(tranche.name)],
+          ["Projects", E(tranche.projects)],
+          ["Entry criteria", E(tranche.entry)],
+          ["Exit criteria", E(tranche.exit)],
+          ["Management baseline", E(tranche.baseline)],
+          ["Review", E(tranche.review)],
+          ["Decision", E(tranche.decision)],
+        ])}${table(
+          ["Evidence", "State"],
+          reviewEvidence.map((r) => `<tr><td>${E(r[0])}</td><td>${E(r[1])}</td></tr>`),
+        )}${gate === "tranche-continue" ? note("<strong>Decision recorded · continue</strong> · tranche 0 closes and B1 becomes the management baseline for tranche 1. The next tranche is authorised on this evidence.", "ok") : gate === "tranche-hold" ? note("<strong>Decision recorded · pause</strong> · tranche 1 does not start; the definition set returns to the board with the named gaps.", "bad") : note("A review with no evidence is refused. A re-baseline goes through change control; the review never rewrites the baseline.")}`,
+        `${button("Continue to tranche 1", "tranche-continue", "", "small", "shield")}${button("Hold the tranche", "tranche-hold", "", "small", "replay")}`,
+      )}</div></div>${note("A tranche is not a PI: the PI cadence is the delivery rhythm inside it; the review is the sponsoring group's decision to continue, pause or stop on evidence.")}`;
+
+    const realization =
+      `${panel("Transition and measurement", `${table(
+        ["Benefit", "Baseline measured", "Readiness", "Transition", "Post-transition", "Legacy retired", "Owner", "State"],
+        F.realization.map((r) => `<tr data-v2="transition-select" data-id="${r.benefit}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="transition-select" data-id="${r.benefit}">${E(r.benefit)}</button></td><td><small>${E(r.baselineMeasured)}</small></td><td><small>${E(r.readiness)}</small></td><td>${E(r.transition)}</td><td><small>${E(r.post)}</small></td><td><small>${E(r.legacy)}</small></td><td><small>${E(r.owner)}</small></td><td>${B(r.state, r.state.startsWith("Blocked") ? "amber" : r.state === "Monitoring" ? "green" : "")}</td></tr>`),
+      )}${note("The BCM measures the baseline before the transition, plans it, assesses readiness, enacts it, measures post-transition and retires the legacy practice. A benefit whose baseline was never measured cannot claim an improvement.")}`)}` +
+      `${panel("Selected benefit · " + benefit.id, `${kv([
+        ["Benefit", E(benefit.title)],
+        ["Baseline", E(row.baselineMeasured)],
+        ["Readiness", E(row.readiness)],
+        ["Transition", E(row.transition)],
+        ["Post-transition measurement", E(row.post)],
+        ["Legacy retirement", E(row.legacy)],
+        ["Post-closure owner", E(row.owner)],
+      ])}${gate === "transition-ok" ? note("<strong>Transition recorded</strong> · the post-transition measurement opens on the planned date; the legacy practice is retired after the first post measure. The comparison with the baseline is the sponsor's evidence.", "ok") : gate === "transition-blocked" ? note("<strong>422 benefit_baseline_missing</strong> · this benefit has no measured baseline. Measure the baseline first; the tool ledger is not live.", "bad") : note("The transition is the BCM's procedure. It is not a status change on the project, and the programme does not close until the realization plan names who keeps measuring.")}`, button("Record the transition", "transition-record", "", "small", "run"))}`;
+
+    const content =
+      tab === "Definition"
+        ? definition
+        : tab === "Benefits map & profiles"
+          ? benefits
+          : tab === "Tranches & reviews"
+            ? tranches
+            : realization;
+
+    return `<div class="page enterprise">${heading(
+      "Programme definition",
+      "The programme's mandate, brief, blueprint, business case, benefits, tranches and realized outcomes — the MSP layer of SPEC_V2.",
+      `${route("Portfolio", "portfolio", "", "layers")}${route("Plan & WBS", "plan", "", "board")}`,
+      "PORTFOLIO & PLAN",
+    )}${ribbon("MSP programme definition and benefits realization: programme_tranche, benefit_profile, benefit_link, benefit_transition and the extended governed_asset kinds. Proposed in T1/T10; D62.")}${tabs(["Definition", "Benefits map & profiles", "Tranches & reviews", "Benefits realization"], tab, "programme")}${content}</div>`;
   }
 
   /* -------------------------------------------------------------- Validation */
@@ -3989,6 +4174,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
 
   const pages = {
     portfolio,
+    programme: programmeDefinitionPage,
     plan,
     validation,
     projects: projectsPage,
@@ -4040,6 +4226,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
   };
   const titles = {
     portfolio: "Portfolio",
+    programme: "Programme definition",
     plan: "Plan & WBS",
     validation: "Validation",
     projects: "Projects",
@@ -4279,6 +4466,51 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         v.programme = d.id;
         render();
         break;
+      case "programme-mandate":
+        v.programmeGate = "mandate-ok";
+        render();
+        toast("Mandate approved · the sponsoring group authorised the programme");
+        break;
+      case "programme-mandate-return":
+        v.programmeGate = "mandate-return";
+        render();
+        toast("Mandate returned · no definition work starts");
+        break;
+      case "benefit":
+      case "transition-select":
+        v.benefit = d.id;
+        v.programmeGate = null;
+        render();
+        break;
+      case "tranche-review":
+        v.tranche = Number(d.id);
+        v.programmeGate = null;
+        render();
+        break;
+      case "tranche-continue":
+        v.programmeGate = "tranche-continue";
+        render();
+        toast("Tranche review recorded · continue");
+        break;
+      case "tranche-hold":
+        v.programmeGate = "tranche-hold";
+        render();
+        toast("Tranche review recorded · pause");
+        break;
+      case "transition-record": {
+        const record = F.realization.find((r) => r.benefit === v.benefit);
+        v.programmeGate =
+          record && !String(record.baselineMeasured).includes("not measured")
+            ? "transition-ok"
+            : "transition-blocked";
+        render();
+        toast(
+          v.programmeGate === "transition-ok"
+            ? "Transition recorded · post-transition measurement opens"
+            : "422 benefit_baseline_missing · measure the baseline first",
+        );
+        break;
+      }
       case "job":
         v.job = d.id;
         render();

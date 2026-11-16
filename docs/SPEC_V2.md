@@ -780,7 +780,7 @@ list — are compiled into the same envelope; there is no other prompt compiler 
 
 ---
 
-## 8. Executable rigour — TOGAF, SAFe, PMP
+## 8. Executable rigour — TOGAF, SAFe, PMP, MSP
 
 The point of this section is that the rigour is **not a document library**. Every artefact below is a row with a
 lifecycle; every gate is an approval; every claim links to evidence.
@@ -824,7 +824,86 @@ conformance. The phases, artefacts and gates are the ones the organisation will 
 integer fields on the backlog/WBS row. The computed score is never stored; the inputs are. An LLM may draft the
 narrative, never the numbers.
 
-### 8.3 PMP artefacts as typed rows
+### 8.3 MSP as the programme definition and benefits realization
+
+SAFe gives the programme its cadence; MSP gives it its **definition and its benefit track**. A programme is not a
+large project: it is a temporary organisation that exists to deliver benefits through projects, and it is judged on
+the improvement operations realizes after those projects close. V2 implements that lifecycle as rows and gates, not
+as a document library.
+
+**Capability is not use, and use is not improvement.** A delivered capability gives a team a new option. Whether the
+team uses it, and whether use improves performance, are separate questions. A benefit is a **measurable improvement**
+resulting from an outcome, valued by at least one stakeholder, that contributes to an organisational objective. A
+`project_register_item(kind='benefit')` with no baseline, target, measurement method and owner is not a benefit; it
+is a wish.
+
+| MSP artefact | V2 row | Gate |
+|---|---|---|
+| Mandate — strategic fit, current position, drivers, deliverables/boundaries, delivery and assurance, success and constraints | `governed_asset(kind='mandate')` on the programme-definition project | the sponsoring group authorises the mandate |
+| Programme brief — outline vision, benefit categories, cost/timescale/effort, risks and support, delivery options including doing nothing, candidate projects and timing, current operations | `governed_asset(kind='programme_brief')` | the sponsoring group approves the brief and authorises definition |
+| Blueprint — processes/business models, organisation and skills, technology and data, current/intermediate/target states | `governed_asset(kind='blueprint')` + the §8.1 architecture content | blueprint contract |
+| Business case — strategic objectives and realistic benefits, options including doing nothing, investment appraisal, cash flow, and how the investment delivers the capabilities the benefits depend on | `governed_asset(kind='business_case')` | investment decision; an unacceptable case returns to the future state or the project solutions |
+| Benefit profile | `benefit_profile` (six field groups, below), indexed by `project_register_item(kind='benefit')` | the BCM and SRO approve; the baseline is measured before the transition |
+| Benefits map | `benefit_link` edges: output → capability → operational outcome → benefit/disbenefit → strategic objective | the map is accepted with the profiles |
+| Projects dossier | `project` rows + programme membership, each with outputs, resources, timescales, dependencies, requirements, budget, contribution and risks | first-tranche authorisation |
+| Programme plan and tranches | `programme_tranche` + the T1 plan spine | end-of-tranche review: continue / pause / stop |
+| Refined vision | `governed_asset(kind='refined_vision')` | programme board |
+| Management, governance and boundary baselines | `programme_baseline(kind='management' \| 'governance' \| 'boundary')` | the baseline that the next tranche is managed against |
+| Benefits management strategy and benefits realization plan | `governed_asset(kind='benefits_strategy' \| 'benefits_realization_plan')` | transition readiness |
+| Stakeholder profiles | `stakeholder_profile` rows | engagement plan accepted with the profiles |
+| Information, risk, issue, monitoring, communications, quality and resource strategies and plans | `governed_asset` kinds + the existing risk/issue registers (§8.4) | the programme board's governance baseline |
+| Transition and realization | `benefit_transition` per benefit: baseline measured, readiness, enact, post-transition measurement, legacy retirement | the benefit review |
+
+**The benefit profile is the measurement record.** Its six field groups are mandatory:
+
+| Group | Fields |
+|---|---|
+| Identification and purpose | reference, description, category, objectives, observable outcome |
+| Performance | affected KPIs, baseline, target, measurement method, financial value where expressible |
+| Cost | the cost of realizing the benefit, including the associated business change |
+| Conditions | capabilities required, outcomes that must already exist, changes to operating practice |
+| Uncertainty and dependencies | related risks and issues, and dependencies outside the programme |
+| Responsibility and attribution | who realizes it, the benefit owner (BCM), and the operational area to which the improvement is attributed |
+
+**A tranche is not a PI.** A PI is the delivery rhythm; a tranche is the unit the programme manages and reviews
+together. `programme_tranche(number, state, entry_criteria, exit_criteria, baseline_ref, review_at)` holds the unit;
+the review is an approval (`gate='tranche_review'`) with the sponsoring group as approver and the baselines, the
+benefit status and the risk register as its evidence. A project does not start before the first tranche is
+authorised; a review continues, pauses or stops, and a re-baseline goes through change control, never through the
+review itself. The preparation plan for definition is P0's own plan, not a separate artefact: it names the
+resources, boundaries, controls and cost of producing the definition set.
+
+| Tranche activity | V2 mechanism |
+|---|---|
+| Establish | programme board, office and working environment are positions and rows; the tranche's cards are materialised |
+| Direct the work | the PM job appoints delivery, runs risk workshops, handles project exceptions and manages the teams through cards |
+| Exercise control | gates, the risk/issue registers, communications, audits and assurance reviews |
+| Maintain alignment | blueprint against current strategy; a deviation is a change request or a kata, never a silent fork |
+| Manage resources | the resource plan, procurement and contracts as governed assets, and metering |
+| Review and close | the end-of-tranche review gate, the transition to operations and the next tranche's preparation |
+
+**Benefits realization is a procedure after delivery.** For each benefit the BCM: measures the baseline while the old
+practice is still observable; monitors against the profile; plans the transition; communicates the change; assesses
+readiness; enacts it; measures the post-transition performance; retires the superseded practice and system; and keeps
+measuring until the realization plan names who continues after programme closure. The comparison with the baseline is
+the evidence the sponsor uses to judge the change. A benefit whose baseline was never measured cannot claim an
+improvement.
+
+**Roles are positions, not code paths.** The sponsoring group, SRO, programme board, programme office, programme
+manager, programme architect, BCM, PMO lead and quality manager are `job_key`s with authority rows (D50). The SRO is
+accountable for the coherent capability and the benefits; the BCM owns each benefit and the transition; the PM owns
+project delivery; the programme board is the SRO's decision forum. The conveyor's own buildout runs under these
+roles: PM, BCM, SRO and architect are jobs using the same card, run, approval and event primitives.
+
+**Rules.** A benefit without baseline, target, method and owner is refused. Every benefit names the capability it
+depends on and the operational area that must change. A dependency slip names the benefits put at risk through the
+benefit-map edges. A tranche review with no evidence is refused. A gate that never refused a tranche or a benefit in
+a full cycle is flagged as broken, not healthy. The programme closes only with a realization plan that names
+post-closure measurement. These rules satisfy P10: the named procedures are programme definition, tranche review and
+benefits realization; the metrics are benefits realised versus planned, tranche gate outcomes and benefit-at-risk
+count, all computed from rows.
+
+### 8.4 PMP artefacts as typed rows
 
 | PMP artefact | V2 row |
 |---|---|
@@ -836,9 +915,11 @@ narrative, never the numbers.
 | Acceptance/closure | `governed_asset(kind='closure')` + DoD evidence |
 
 The registers are deliberately one table, not five: the v4 design had separate PM tables and V1 measured RM's `pm_*`
-at zero usage. One generic register with a `kind` CHECK is leaner and still queryable.
+at zero usage. One generic register with a `kind` CHECK is leaner and still queryable. The benefit profile is the one
+exception: a register row indexes the benefit, and the profile holds the measurement fields that a generic register
+must not carry.
 
-### 8.4 The trace chain
+### 8.5 The trace chain
 
 ```
 requirement / principle / ADR (approved)
@@ -851,11 +932,12 @@ requirement / principle / ADR (approved)
 `trace_link` is V1's existing edge; V2 requires the link at creation time for architecture-governed work. The governance
 screen answers one question end to end: *which requirement does this run prove, and where is the evidence?*
 
-### 8.5 What is not claimed
+### 8.6 What is not claimed
 
-No TOGAF certification, no SAFe compliance badge, no PMP certification. No full ADM conformance, no portfolio
-optimiser, no schedule solver. The claim is narrower and testable: **the artefacts and gates the organisation uses are
-rows, the process runs, and the evidence is traceable.**
+No TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP certification or conformance badge. No
+full ADM conformance, no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is narrower
+and testable: **the artefacts and gates the organisation uses are rows, the process runs, the benefit is measured
+against a baseline, and the evidence is traceable.**
 
 ---
 
@@ -996,7 +1078,13 @@ the conversation, records only its own turns.
 | `wbs_node` | phase/deliverable/work package/milestone tree | `card_id` nullable; WSJF inputs; acceptance |
 | `project_baseline` | frozen, approved scope/schedule/cost | immutable; change requests reference it |
 | `programme_cadence` | PI/sprint/demo/retro/refinement | state machine; materialises cards |
-| `project_register_item` | risk/issue/assumption/dependency/benefit/change | one generic register, six kinds |
+| `programme_tranche` | the unit the programme manages and reviews together | number, state, entry/exit criteria, baseline ref, review date; the review is an approval |
+| `programme_baseline` | the management, governance and boundary baselines | `kind` CHECK; immutable; a tranche is managed against a version |
+| `project_register_item` | risk/issue/assumption/dependency/benefit/change | one generic register, six kinds; a benefit row indexes its profile |
+| `benefit_profile` | the measurable improvement behind a benefit row | six field groups (§8.3): purpose, performance, cost, conditions, uncertainty, responsibility; baseline, target and method are mandatory |
+| `benefit_link` | the benefits-map edges | `output → capability → operational outcome → benefit/disbenefit → strategic objective`; also the dependency that puts a benefit at risk |
+| `benefit_transition` | the realization record per benefit | baseline measured, readiness, enact, post-transition measurement, legacy retirement, post-closure owner |
+| `stakeholder_profile` | stakeholder concerns, influence, interest, exposure, support and engagement target | programme- or project-scoped; trends over time |
 | `decision` | one L1 decision | probabilities, confidence, policy, latency, input hash |
 | `decision_option` | options for a choice/score question | authored, versioned |
 | `decision_policy` | thresholds, fail policy, action | per decision kind/gate |
@@ -1008,7 +1096,9 @@ the conversation, records only its own turns.
 | `pko_entity` / `pko_relation` | PKO terms and edges | kind, attributes, synonyms; subject/predicate/object/cardinality |
 
 Reused, not created: `programme` (extended with `shared_config`), `project`, `card`, `run`, `approval`, `governed_asset` (extend `kind` to
-`charter | architecture_contract | closure | postmortem | sop_source`), `trace_link`, `event`, `job`, `audit_event`,
+`charter | architecture_contract | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case |
+refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier`; a programme-level asset is attached to the
+programme-definition project), `trace_link`, `event`, `job`, `audit_event`,
 `inference_call`, `eval*`, `benchmark*`; `procedure`/`procedure_step` extend with PDDL action text and a PKO pin. New
 columns only where unavoidable: `card.job_binding_id`, `card.wbs_node_id`, `run.job_binding_id`/`release_hash`,
 `project.project_type_code` (exists). The tool tables (`tool`, `toolkit`, `tool_binding`, `tool_call`) are specified
@@ -1018,7 +1108,8 @@ in §11.8.
 
 | Family | Examples |
 |---|---|
-| programme/plan | `programmes.*`, `programme_config.*`, `project_dependencies.*`, `cadences.*`, `wbs.*`, `baselines.*`, `registers.*` |
+| programme/plan | `programmes.*`, `programme_config.*`, `governed_assets.compose\|submit\|approve` (the MSP artefacts), `tranches.*`, `tranches.review`, `project_dependencies.*`, `cadences.*`, `wbs.*`, `baselines.*`, `registers.*` |
+| benefits | `benefits.list\|get\|create\|update`, `benefits.link\|unlink`, `benefits.baseline\|transition\|measure\|close` |
 | organisation | `industries.*`, `departments.*`, `jobs.create\|update\|release\|retire`, `job_releases.publish\|retire`, `job_bindings.create\|retire\|list` |
 | procedures | `procedures.ingest_sop\|ingest_process\|ingest_rdf\|draft\|validate\|publish`, `capabilities.design\|publish`, `pko.import_rdf\|edit\|publish\|pin` |
 | authoring | `authoring.intake\|draft\|review\|publish`, `authoring.assets` |
@@ -1070,6 +1161,7 @@ V1's nine destinations stand (Today, Board, Runs, Build, Design, Measure, Evals,
 | **Procedures** | capability/procedure workspace, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, PDDL step editor, PKO editor (tenant-editable), knowledge-pack pairing, publish |
 | **Authoring** | intake queue (chat + documents), asset draft catalogue, review/publish, asset dependency status |
 | **Portfolio** | portfolio view (in-flight projects + programmes), programme shared config + dependency graph, backlog + WSJF, cadence (PI planning, demo, retro), capacity, metering per project |
+| **Programme** | mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realized benefits |
 | **Plan** | WBS, baseline vs forecast, registers, change control |
 | **Improve** | kata queue, six-Gets workspace, lesson review, adoption |
 | **Operations** | incidents, on-call, runbooks, postmortems, andon |
@@ -1334,7 +1426,7 @@ slice integrates and when the repo merges. V2 slices build on V1's S-slices and 
 | # | Slice | Gate |
 |---|---|---|
 | **T0** | **Model and contracts** — approve V2; the ownership matrix; `industry`/`department`/`job_catalogue`/`job_release`/`job_binding`; the decision-ladder types; the internal `Executor` contract (two live kinds, extensible `executor_kind`) | a job is created in the conveyor, a release is published, a binding pins its hash, and a run on a retired binding refuses `409 job_binding_stale`; no concept has two stores; a test-only third executor kind registers without editing the run path |
-| **T1** | **Plan spine** — `wbs_node`, `project_baseline`, `project_register_item`, `project_dependency`, programme `shared_config` and cadence; project types; DoD | one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused |
+| **T1** | **Plan spine** — `wbs_node`, `project_baseline`, `project_register_item`, `project_dependency`, programme `shared_config` and cadence; `programme_tranche`, `benefit_profile`, `benefit_link` and the programme-definition kinds; project types; DoD | one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused; a benefit profile without baseline, target, method or owner is refused; a benefit-map edge names its five levels |
 | **T2** | **Decision ladder** — `decision`/`decision_option`/`decision_policy`/`decision_policy_refinement`, `laya_inference_config`; laya client; policy evaluation; the generation split | a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card |
 | **T3** | **PM job** — charter, WBS, baseline, staffing, gate routing, closure | PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request |
 | **T4** | **Kanban coach** — interruption taxonomy, closed remedy set, per-signature uniqueness, depth cap | an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata |
@@ -1343,9 +1435,9 @@ slice integrates and when the repo merges. V2 slices build on V1's S-slices and 
 | **T7** | **Operations** — incidents, runbooks, k8s read actions, the full gated write set, postmortem | an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable |
 | **T8** | **Organisational memory** — lessons, evidence refs, review, promotion to a knowledge source | a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine |
 | **T9** | **TOGAF profile** — architecture project type, phases A–H, contracts, delivery-project compliance | an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata |
-| **T10** | **SAFe cadence** — backlog, WSJF, PI planning, demo, inspect & adapt | PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons |
+| **T10** | **SAFe cadence and MSP tranches** — backlog, WSJF, PI planning, demo, inspect & adapt; tranche review, benefits strategy and realization plan | PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized |
 | **T11** | **Metrics, metering and maturity** — flow, quality, cost, governance, C0–C5 (thresholds calibrated from real run/approval data and stored as configuration); metering roll-ups (tenant, department, programme, project, job) and drill-down (run, step, call); billing reconciliation | every metric and every metering level recomputes from rows; the reconciliation with `billing_service` is exact or opens an incident; a C0–C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged |
-| **T12** | **One organisation loop** — the acceptance of V2 | one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget |
+| **T12** | **One organisation loop** — the acceptance of V2 | one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area |
 | **T13** | **Tool platform** — `tool`/`toolkit`/`tool_binding`/`tool_call`; the broker; effect classes; credential profiles; the MinIO storage adapter; the coding toolkit and one kag-era toolkit; V1's external actions migrated | a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt |
 | **T14** | **Estate toolkits** — import wave over the live services: coding fleet, strata, billing and licence reads, webscraper, media_discovery, scientific_processor, lean4_prover, video-compiler, w2v orchestrator, ops read tools; `evidence_review`, `discovery` :8807 and the planned AHTAPol services enter as `draft` | each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish |
 | **T15** | **Tool authoring and BYO** — OpenAPI draft import, service-scaffold registration, remote-MCP binding, tenant binding, promotion path | a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling |
@@ -1465,6 +1557,7 @@ and is proposed for acceptance with the rest.
 | **D59** | **Two tool paths, permanently** | The agent platform keeps its own gateway (`nonagenticai_mcp_server`) for its own backends; the conveyor broker serves conveyor jobs only. There is **no planned convergence** and the broker is not exposed to the agent. One ledger covers conveyor calls; the agent's calls are its product (owner, 2026-11-11) |
 | **D60** | **AHTAPol and w2v scope** | The conveyor **covers the AHTAPol implementation and the w2v product** (owner, 2026-11-11 — "the conveyor will also cover the AHTAPol implementation"; every tool AHTAPol and w2v use is in the estate): their projects run as conveyor work and their services are estate toolkits. **AHTAPol is its own tenant, industry `health-technology-assessment`; w2v is its own tenant, industry `media`** — neither sits under `nonagentic`. The first engineering tenant remains `nonagentic`/software (owner, 2026-11-11) |
 | **D61** | **Executor seam; external runtime deferred** | The conveyor keeps **one runtime**: `procedure` and `internal_agent` are two implementations of one internal `Executor` contract, and `executor_kind` is an extensible enum rather than a branch through the run path. **An external runtime is an explicit non-goal** until four conditions hold: a generic work-packet ingress returning per-step evidence the conveyor can verify (not outcome-level); governance at the boundary (a produce-only runtime, the conveyor ships); separate owners and roadmaps; and it beats the internal agent on the conveyor's own benchmark. D33/D44 stand — the agent platform is a front end, not a runtime — and D46's two live kinds stand. The product boundary is `/mcp`; only stateless infrastructure is shared (inference-router, strata, MinIO, tool backends). The seam preserves the option at near-zero cost (proposed 2026-11-11, from the independent runtime review) |
+| **D62** | **Programme definition and benefits realization (MSP)** | V2 adopts MSP's programme lifecycle as rows and gates. The **mandate, programme brief, blueprint, business case, refined vision and governance strategies** are `governed_asset` kinds on the programme-definition project. `benefit_profile` is the mandatory measurement record behind `project_register_item(kind='benefit')`; `benefit_link` carries the benefits map (output → capability → operational outcome → benefit → objective); `programme_tranche` carries the management/review unit, and its review is an approval with the baselines, benefit status and risk register as evidence; `benefit_transition` carries the baseline measurement, transition, post-transition measurement and legacy retirement. A benefit without baseline, target, method and owner is refused; a project does not start before the first tranche is authorised; the programme closes only with a realization plan naming post-closure measurement. The SRO, BCM, sponsoring group and programme board are positions with authority rows, not code paths (proposed 2026-11-16, from the programme-architecture and benefits-realization review) |
 
 ### 15.2 Open questions at review
 

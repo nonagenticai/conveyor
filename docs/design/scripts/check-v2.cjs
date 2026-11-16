@@ -96,6 +96,7 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       "jobtypes",
       "tools",
       "constraints",
+      "programme",
     ])
       check(
         (await page.locator(`#sidebar [data-page="${id}"]`).count()) === 0,
@@ -130,7 +131,15 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       (await content()).includes("part of the conveyor design study"),
       "a legacy study page is a sign-in gate publicly",
     );
-    for (const id of ["organisation", "jobs", "operations", "toolkits", "metering", "jobtypes"]) {
+    for (const id of [
+      "organisation",
+      "jobs",
+      "operations",
+      "toolkits",
+      "metering",
+      "jobtypes",
+      "programme",
+    ]) {
       await nav(id, "?design=1");
       check(
         (await page.locator("h1").count()) === 1,
@@ -141,6 +150,53 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
         `the reviewer mode is not the gate for ${id}`,
       );
     }
+
+    // 4a. The programme-definition destination carries the MSP layer end to end.
+    await nav("programme", "?design=1");
+    check((await content()).includes("Definition set"), "the programme definition set renders");
+    await page
+      .locator('[data-v2="tab"][data-value="Benefits map & profiles"]')
+      .first()
+      .click();
+    check((await content()).includes("Benefits map"), "the benefits map renders");
+    await page
+      .locator('[data-v2="tab"][data-value="Tranches & reviews"]')
+      .first()
+      .click();
+    check((await content()).includes("Review · tranche 0"), "the tranche review renders");
+    await page
+      .locator('[data-v2="tab"][data-value="Benefits map & profiles"]')
+      .first()
+      .click();
+    await page.locator('[data-v2="benefit"][data-id="BEN-03"]').first().click();
+    await page
+      .locator('[data-v2="tab"][data-value="Benefits realization"]')
+      .first()
+      .click();
+    check(
+      (await content()).includes("not measured"),
+      "a benefit without a measured baseline is visible",
+    );
+    await page.locator('[data-v2="transition-record"]').first().click();
+    check(
+      (await content()).includes("benefit_baseline_missing"),
+      "a transition without a baseline is refused",
+    );
+    for (const width of [1440, 1024, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await nav("programme", "?design=1");
+      check(
+        (await page.locator("h1").count()) === 1,
+        `programme definition renders at ${width}`,
+      );
+      check(!(await overflow()), `programme definition has no page overflow at ${width}`);
+    }
+    await page.setViewportSize({ width: 1440, height: 1060 });
+    await nav("programme");
+    check(
+      (await content()).includes("part of the conveyor design study"),
+      "the programme destination is a sign-in gate publicly",
+    );
 
     // 5. Without a snapshot every public page is honest; the coverage pack is still real.
     await nav("portfolio");
