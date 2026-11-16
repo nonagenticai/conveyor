@@ -238,7 +238,8 @@ async fn without_a_tenant_start_process_the_project_and_card_exist_with_no_run()
 /// readiness subject. The shipped type file carries its own agent; this test needs the binding to
 /// be the only executor, exactly the shape `capability_readiness.rs` proves.
 async fn install_start_process(running: &support::Running) -> String {
-    let sop = support::publish_sop(running, &format!("start-{}-sop", Uuid::now_v7().simple())).await;
+    let sop =
+        support::publish_sop(running, &format!("start-{}-sop", Uuid::now_v7().simple())).await;
     let steps = json!([
         {"action": "cards.claim", "procedure_id": sop,
          "input_template": {"id": "{{card.id}}", "_version": "{{card.version}}"}},
