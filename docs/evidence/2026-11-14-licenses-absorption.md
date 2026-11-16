@@ -202,3 +202,36 @@ difference in a field a golden case would compare or an arm with no case yet.
    input for `verify.sh`'s `unexplained=0` leg. Neither is claimed here.
 6. **Retirement.** `nonagenticai/licenses` is not archived until every consumer in the table
    above is off it. `license-authz` is not a consumer to switch; it stays external.
+
+## Cutover execution (2026-11-16, #95)
+
+Environment at the cutover: the Python Deployment `licenses` ran 2/2 on `sha256:6eee5af0…`; the
+Rust Deployment ran on `sha256:3d5a6d6c…`, the digest #203's main push published. Every consumer
+already called `http://licenses.licenses.svc.cluster.local:8544` (`LICENCES_BASE_URL` in the
+conveyor Deployment, `LICENSE_INTROSPECT_URL` in license-authz and the dependent manifests), so
+**no consumer environment changed**.
+
+| Scenario | Result | Where |
+|---|---|---|
+| P3.1 probe window | `record-corpus.sh` recorded the 6-case golden request set from the live Python service; `shadow.sh --corpus … --candidate <rust>` → `cases=6 equal=6 unexplained=0`. A wider exploratory set (tokenless `byo-mode`, unknown app, unknown app plans, `/regions`, two unauthenticated admin/internal reads) was also 6/6 equal. | `contract/shadow-report.json` (counts and hashed case ids only) |
+| P3.2 organic window | **NOT MEASURABLE**, exactly as the reference states: the service captures no request bodies. No zero-traffic claim is made; the probe window above is the recorded substitute. | `shadow.sh --live` exits 3 |
+| P2.1 four CronJobs | Switched to `/usr/local/bin/service expire-stale\|reconcile-metering\|reap-expired\|revoke-expired-tokens` with schedules, env values, `Forbid`, `backoffLimit` and `restartPolicy` unchanged. Each ran live in an **ownerRef-free** Job (a `--from=cronjob` copy would have forged `lastSuccessfulTime`): exit 0 and one JSON line each — expire-stale converged (0 selected), metering-reconcile scanned 516 and converged, reap-expired converged (0 reapable), revoke-expired-tokens acted 5 and converged. The CronJob status fields were unchanged afterwards. | gitops `2c3702c94f` |
+| P2.2 live commands + introspection | The four scheduled commands ran live (row above). Introspection is exercised live by license-authz on every gated request (40 responses in the 5 minutes after the flip, all 200). A production **mint** was not performed — no production writes by policy; the mint/get legs are proven same-seed in `contract/cron-parity.md` and the #45 HTTP parity. | this row |
+| P4.1 flip | `conveyor-licenses` (2/2 Ready, `app: licenses`, same digest) took the Service, then the Python Deployment was parked at 0. Live after: the Service's endpoints are exactly the two Rust pod IPs; `licenses-pdb` ALLOWED DISRUPTIONS 1; `/health`, `/health/ready`, `/health/live` 200; unauthenticated `/licenses/active` 401; golden replay through the Service `cases=6 unexplained=0`. | gitops `b064a3a410`, `7dbc434e94` |
+| Observation window | 45 minutes after the flip: 377 license-authz responses, all 200; two organic `licence.sync` successes against the Rust Service (19:20:13Z and 19:35:02Z, conveyor worker); both Rust pods 0 restarts; the scheduled `:37` CronJob run fired and converged. | conveyor worker logs; authz logs |
+| P4.2 rollback | **Executed**, four steps in the router order: (1) Python returns to 2/2 and the four CronJobs revert to the Python image (#5296) — four endpoints, no gap; (2) `conveyor-licenses` scales to 0, Python alone serves, replay through the Service `cases=6 unexplained=0` (#5300); (3) `conveyor-licenses` returns to 2/2 beside Python (#5301); (4) a revert of step 1 parks Python and returns the CronJobs to Rust (#5302). Final state re-verified: two Rust endpoints, replay 6/6, CronJobs on the Rust binary. | gitops #5296, #5300, #5301, #5302 |
+
+### Recorded deviations at cutover
+
+- **`CORS_ALLOWED_ORIGINS`, `ENABLE_DOCS`, `DEFAULT_TENANT_ID` are not implemented in the Rust
+  binary.** `DEFAULT_TENANT_ID` is a documented no-op in the reference (`licenses/main.py:361-364`);
+  every consumer in the table above is server-side, so CORS is unexercised; `/openapi.json` is
+  served by both (the capture and `--check-lock` depend on it).
+- **`/metrics` families are not ported.** The binary serves the endpoint
+  (`apps/licenses/src/router/observability.rs`) but emits none of the licence-expiry families the
+  Python collector (`services/expiry_metrics.py`) provided. The Deployment therefore does **not**
+  carry the Python pod's `prometheus.io/*` annotations — a target with none of those series reads
+  as covered while nothing is measured — and keeps an explicit
+  `alerting.nonagentic.ai/coverage: "none"` with that reason. Porting the families is a follow-up.
+- **No live production mint.** The one-mint leg of P2.2 is not executed against production data;
+  its evidence is the same-seed parity artifact, not a live write.
