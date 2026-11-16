@@ -156,7 +156,7 @@
 </ul>
 <h3 id="w14-prove-the-real-measurementimprovement-loop">W14. Prove the real measurement/improvement loop</h3>
 <p><strong>Outstanding evidence, not missing pure logic.</strong> Existing receipts cover banked parser/verdict parity and stub sandbox lifecycle, not the actual configured Job, cleanup/resource policy, live gold/empty controls or repaired producer → grader → compare → keep/revert path (<code>docs/evidence/S17-CORE.md:169</code>, <code>docs/evidence/S18-B.md:57</code>).</p>
-<p>Use the recorded grading-node decision (<code>hp1</code>, index); verify config rather than reopening it. Prove one live sandbox lifecycle, then controls and producer/improvement. Compare an authenticated real router response with its ledger row and retain repeatable audit evidence. Keep benchmark gold/empty and eval oracle/null/judge-negative controls distinct.</p>
+<p>Use the recorded grading-node decision (the grading node, index); verify config rather than reopening it. Prove one live sandbox lifecycle, then controls and producer/improvement. Compare an authenticated real router response with its ledger row and retain repeatable audit evidence. Keep benchmark gold/empty and eval oracle/null/judge-negative controls distinct.</p>
 <h3 id="w15-finish-deferred-recipememory-authoring">W15. Finish deferred recipe/memory authoring</h3>
 <p>Tenant recipe CRUD/version activation/retirement with audit, and automatic memory selection → processing → <code>prompt.memory</code>, remain explicitly deferred (<code>docs/plans/slices/S21-message-construction.md:237</code>). Knowledge prompt sections currently render pack identities, not automatically selected retrieved content (<code>crates/domain/src/prompt.rs:414</code>). Design/implement selection without duplicating working <code>knowledge.query</code>.</p>
 <p>Native memory accepts structured metadata on write but omits it from reads (<code>crates/store/src/memory.rs:47</code>, <code>crates/actions/src/memory/mod.rs:22</code>). Restore readback if native consumers require structured provenance. This is a native API concern, <strong>not</strong> an old-ledger migration/readback gate.</p>
@@ -234,7 +234,7 @@
 <td>Reconcile one authorization contract before expanding access, preserving human signoff/held-out restrictions. Necessary for claimed agent-driven improvement; not a wholesale auth rebuild.</td>
 </tr>
 <tr>
-<td>R12 says no grading node chosen; index records hp1.</td>
+<td>R12 says no grading node chosen; index records the grading node.</td>
 <td>Carry recorded decision into current config/proof.</td>
 </tr>
 <tr>

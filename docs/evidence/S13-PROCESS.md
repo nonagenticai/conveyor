@@ -150,7 +150,7 @@ A second pass over the same lane, driven by the 2026-11-10 plan audit. Measured,
   Session 2 adds **no** action.
 
 **Not run locally: the bus limb.** `bus_delivery` needs a real Redis; the build host has no docker
-and no Redis and cannot reach mini3, so it fails closed (by design) rather than skipping. Its venue
+and no Redis and cannot reach the dev box, so it fails closed (by design) rather than skipping. Its venue
 is CI (dind Redis). Everything else above was executed.
 
 ## Outstanding (stated plainly — do not claim these)
@@ -222,7 +222,7 @@ only one side:
 ### Still not true (stated, not hidden)
 
 - **The bus limb has not run on the build host.** `bus_delivery` needs a real Redis; the build host
-  is m1, which has no docker and no Redis and cannot reach mini3 (measured: `m1->mini3:22` and the
+  is the build host, which has no docker and no Redis and cannot reach the dev box (measured: `build-host->dev-box:22` and the
   LAN both fail). The code and all five tests — including the new `FLUSHALL` replay test — are
   complete; the limb is unexecuted until CI or a host with Redis.
 - **No live `laya.judge` / `inference.chat` call.** Owner ruling for this unit: code completion, no

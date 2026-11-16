@@ -966,7 +966,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </table>
 <p><strong>The hard rule:</strong> L2 has no path to a state transition. A generated output is stored as a draft artefact (<code>governed_asset</code>, <code>document</code>, or a code patch); applying it is an <strong>action</strong>, and the action's gate is L1/L3. The Rust type system enforces this: the generation result type is not accepted by any transition function.</p>
 <h3 id="72-the-laya-contract">7.2 The laya contract</h3>
-<p><code>POST /v1/systemone {model, state, questions}</code> — <code>state</code> is the task text and <code>questions</code> is keyed by qid; each question is <code>{type: noul|choice|score, instructions, criteria}</code> and the response carries <code>answers.&lt;qid&gt;</code>. <code>noul</code> is a scalar answer, <code>choice</code> picks one of 2–255 labelled options, <code>score</code> is a 2–10 ordered scale; probabilities are carried for the types that provide them. The estate's laya is live on pgx behind a Jev-compatible bridge (<code>:9210</code>), ~17–21 ms per request (measured 2026-10-10).</p>
+<p><code>POST /v1/systemone {model, state, questions}</code> — <code>state</code> is the task text and <code>questions</code> is keyed by qid; each question is <code>{type: noul|choice|score, instructions, criteria}</code> and the response carries <code>answers.&lt;qid&gt;</code>. <code>noul</code> is a scalar answer, <code>choice</code> picks one of 2–255 labelled options, <code>score</code> is a 2–10 ordered scale; probabilities are carried for the types that provide them. The estate's laya is live on the DGX host behind a Jev-compatible bridge (<code>:9210</code>), ~17–21 ms per request (measured 2026-10-10).</p>
 <p>V2 rules:</p>
 <ul>
 <li><strong>Options are rows</strong> (<code>decision_option</code>), authored and versioned, never free text from a prompt.</li>
@@ -1399,7 +1399,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>Models/inference</td>
-<td><code>inference-router</code> for text; <code>mlx-api</code>/<code>modality-gateway</code> for media; laya on pgx</td>
+<td><code>inference-router</code> for text; <code>mlx-api</code>/<code>modality-gateway</code> for media; laya on the DGX host</td>
 <td>conveyor</td>
 </tr>
 <tr>
@@ -1806,7 +1806,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>AHTAPol evidence</td>
 </tr>
 <tr>
-<td><code>lean4_prover</code> :8812 (mini1 host)</td>
+<td><code>lean4_prover</code> :8812 (the media host)</td>
 <td>Lean 4 typecheck/elaborate/prove over REST</td>
 <td>live</td>
 <td>verification, SOP formal checks</td>
@@ -1818,7 +1818,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>AHTAPol screening</td>
 </tr>
 <tr>
-<td><code>w2v-orchestrator</code> :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on mini1)</td>
+<td><code>w2v-orchestrator</code> :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on the media host)</td>
 <td>deliverable runs and stage capabilities; rendered artifacts</td>
 <td>live; <strong>migration target — rewritten in Rust in this workspace: <code>apps/media</code> executor images and the <code>analysis</code> library (ADR 0007, D54)</strong></td>
 <td>media production</td>
@@ -1873,7 +1873,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <li><strong>Legacy kag is archived and not a tool.</strong> Every kag repo — <code>kag</code>, <code>kag_orchestrator</code>, <code>kag_graph_service</code>, <code>kag_common</code>, <code>kag_clients</code>, <code>kag-frontend</code>, <code>hirag_service</code>, <code>karma_service</code>, <code>neo4j</code>, <code>n8n-nodes-kag</code> — is archived on GitHub (measured 2026-11-11), and no kag, hirag, karma or neo4j deployment exists in the cluster. The direction is a <strong>Rust rewrite</strong>, with the home decided per capability in <code>docs/SPEC_LEGACY_KAG.md</code>, the separate spec this V2 creates; neo4j, hirag and karma are explicitly undecided there. <code>strata_ingest</code> and <code>strata_rag</code> are the live, shared ingest/retrieval services both platforms use, and the conveyor binds them at least to the extent the agent platform already does (D54).</li>
 <li><strong>External sources stay behind services.</strong> PubMed, Europe PMC, ClinicalTrials.gov, NICE, GIN/INAHTA, EMA/FDA, ICD-11, SNOMED CT, ATC/DDD, RxNorm and the rest are called by the services that own their licences and rate limits, not by conveyor jobs directly (D42). Migration is expected, not exceptional: where a Python source must change to fit the conveyor's contracts it is re-architected rather than line-ported (owner, 2026-11-11).</li>
 <li><strong>Planned tools enter as <code>draft</code>.</strong> An AHTAPol service that is specified but not live gets a catalogue entry and no binding; it cannot be called until its slice deploys it and its probe passes (P8).</li>
-<li><strong><code>8812</code> is two distinct services.</strong> <code>lean4_prover</code> is a launchd process on the mini1 host reached by a ServiceEntry; the AHTAPol R stats sidecar is a separate planned container reached only by 8808 and 8813 over internal HTTP. Same port number, different hosts and networks — never the same toolkit, and a port is not an identity.</li>
+<li><strong><code>8812</code> is two distinct services.</strong> <code>lean4_prover</code> is a launchd process on the media host reached by a ServiceEntry; the AHTAPol R stats sidecar is a separate planned container reached only by 8808 and 8813 over internal HTTP. Same port number, different hosts and networks — never the same toolkit, and a port is not an identity.</li>
 <li><strong>AHTAPol's own documents overstate deployment.</strong> They describe <code>evidence_review</code> :8810 and research output :8811 as "existing live"; the cluster has no deployment of either (measured 2026-11-11). The catalogue follows the cluster, not the document: both are <code>draft</code> until a slice deploys them and a probe passes.</li>
 <li><strong>AHTAPol's plan assumes archived kag components.</strong> Its service documents call the kag gateway, <code>karma_service</code> :8801, <code>hirag_service</code> and <code>kag_orchestrator</code> :8806; every one is archived and none is deployed. Their functions are re-homed per <code>docs/SPEC_LEGACY_KAG.md</code> before the AHTAPol slice that needs them, and none may be bound as a tool (R19).</li>
 </ul>

@@ -290,7 +290,7 @@ is the claim.
     process-side trace, and the old recordings drive the workflow-side diff.
 
 ⚠️ The **bus test is CI-only in this environment**: it needs a Redis reachable from the build host,
-which has neither docker nor a Redis and cannot reach mini3. It fails closed; it never skips.
+which has neither docker nor a Redis and cannot reach the dev box. It fails closed; it never skips.
 
 ⛔ **No longer an item:** migration `0034`'s drop of `workflow`, and the deletion of `crates/workflow`,
 `workflows.*`/`workflow_runs.*` and `fixtures/named/**`. **The workflow engine is retained as the tool-sequence

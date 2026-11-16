@@ -388,13 +388,13 @@ above exactly.
 
 ## 16. Toolchain and local environment (measured 2026-11-07; **build host changed 2026-11-09**)
 
-- ⛔ **Rust builds and tests run on the build host `m1`, never on this machine (2026-11-09).** `~/.local/bin/cargo`
+- ⛔ **Rust builds and tests run on the build host the build host, never on this machine (2026-11-09).** `~/.local/bin/cargo`
   and `~/.local/bin/rustc` are **shims that refuse inside any Cargo project** — the refusal is deliberate (the
   workspace's `target/` reached 84 GiB on a 228 GiB volume). Do not work around it, and do not add a
   machine-level `~/.cargo/config.toml`: cargo gives `config.toml` precedence over the repo's `Cargo.toml`.
   Use **`rbuild -- <cargo args>`** (e.g. `rbuild -- test --locked`), **`rbuild --gate`** for the LANE gate
   (`fmt --all -- --check && clippy && test --locked`), and `--detach` + `--status` / `--logs` for long runs.
-  A one-off may override with `ALLOW_LOCAL_RUST=1`. Full detail: memory `remote-rust-builds-on-m1.md`.
+  A one-off may override with `ALLOW_LOCAL_RUST=1`. Full detail: memory `remote-rust-builds-on-the build host.md`.
 - ⛔ **Therefore every gate block in this set is wrong as written, and a slice that copies one blindly runs
   nothing.** Two mechanical translations: (a) a line that invokes `cargo` becomes `rbuild -- <args>`, and the
   opening `source ~/.cargo/env` is removed (the shim is what must be reached, not bypassed); (b) `rbuild` never
