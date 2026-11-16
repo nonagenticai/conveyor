@@ -285,6 +285,7 @@ fn laya_judge() -> ActionSpec {
             path: LAYA_PATH,
             auth: Some(LAYA_TOKEN_SECRET),
             auth_optional: false,
+            upload: None,
         },
     }
 }

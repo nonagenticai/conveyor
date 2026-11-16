@@ -921,6 +921,7 @@ async fn invoke_external(
         path,
         auth,
         auth_optional,
+        upload,
     } = spec.handler
     else {
         return Err(ActionError::internal());
@@ -1050,12 +1051,52 @@ async fn invoke_external(
         .usage
         .as_ref()
         .and_then(|usage| usage.correlation_id.clone());
-    let mut builder = match method {
-        "POST" => client.post(&url).json(&input),
-        "PUT" => client.put(&url).json(&input),
-        "PATCH" => client.patch(&url).json(&input),
-        "DELETE" => client.delete(&url).json(&input),
-        _ => client.get(&url),
+    let mut builder = match upload {
+        Some(upload) => {
+            // One document's bytes, fetched under the caller's tenant and hash-verified by the
+            // same `fetch_bytes` a documents byte route uses. The document id never reaches the
+            // service and no store credential leaves this process.
+            let loaded = {
+                let member = input
+                    .get(upload.input)
+                    .and_then(Value::as_str)
+                    .ok_or_else(|| {
+                        ActionError::invalid_input(vec![FieldError {
+                            field: upload.input.to_owned(),
+                            code: "required".to_owned(),
+                            detail: "the document to upload is required".to_owned(),
+                        }])
+                    })?;
+                let id: Uuid = member.parse().map_err(|_| {
+                    ActionError::invalid_input(vec![FieldError {
+                        field: upload.input.to_owned(),
+                        code: "invalid_value".to_owned(),
+                        detail: "the document to upload must be a document id".to_owned(),
+                    }])
+                })?;
+                let mut tx = store::begin_scoped(pool, ctx.tenant)
+                    .await
+                    .map_err(|_| ActionError::internal())?;
+                let loaded =
+                    crate::documents::actions::fetch_bytes(&mut tx, ctx.tenant, id, spec.name)
+                        .await?;
+                let _ = tx.rollback().await;
+                loaded
+            };
+            let part = reqwest::multipart::Part::bytes(loaded.bytes)
+                .file_name("upload")
+                .mime_str(&loaded.content_type)
+                .map_err(|_| ActionError::internal())?;
+            let form = reqwest::multipart::Form::new().part(upload.field.to_owned(), part);
+            client.post(&url).multipart(form)
+        }
+        None => match method {
+            "POST" => client.post(&url).json(&input),
+            "PUT" => client.put(&url).json(&input),
+            "PATCH" => client.patch(&url).json(&input),
+            "DELETE" => client.delete(&url).json(&input),
+            _ => client.get(&url),
+        },
     };
     if let Some(correlation) = &correlation {
         builder = builder.header("X-Correlation-Id", correlation);
@@ -1067,6 +1108,12 @@ async fn invoke_external(
     }
     if let Some(token) = &bearer {
         builder = builder.bearer_auth(token);
+    }
+    // A declared artefact carries its payload inside the JSON response (CONTRACT §6), so ask for
+    // JSON explicitly instead of relying on the service's default. It matters: the narration
+    // contract answers raw `audio/wav` unless `Accept` names JSON.
+    if spec.artefact.is_some() {
+        builder = builder.header(reqwest::header::ACCEPT, "application/json");
     }
 
     let result = tokio::time::timeout(
@@ -1252,15 +1299,18 @@ async fn materialise_artefact(
                 format!("the response carried no {} member", artefact.field),
             )
         })?;
-    let bytes = base64::engine::general_purpose::STANDARD
-        .decode(encoded.trim())
-        .map_err(|_| {
-            ActionError::new(
-                502,
-                "artefact_invalid",
-                format!("the {} member is not base64", artefact.field),
-            )
-        })?;
+    let bytes = match artefact.encoding {
+        crate::spec::ArtefactEncoding::Base64 => base64::engine::general_purpose::STANDARD
+            .decode(encoded.trim())
+            .map_err(|_| {
+                ActionError::new(
+                    502,
+                    "artefact_invalid",
+                    format!("the {} member is not base64", artefact.field),
+                )
+            })?,
+        crate::spec::ArtefactEncoding::Utf8 => encoded.as_bytes().to_vec(),
+    };
 
     let mut tx = store::begin_scoped(pool, ctx.tenant)
         .await

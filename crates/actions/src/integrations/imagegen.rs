@@ -27,8 +27,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::registry::ActionRegistration;
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, AgentTier, Artefact, Confirm, Effect, HandlerRef, Schema,
-    Scope, Tenancy,
+    ActionKind, ActionSpec, AgentHints, AgentTier, Artefact, ArtefactEncoding, Confirm, Effect,
+    HandlerRef, Schema, Scope, Tenancy,
 };
 
 /// The service key: `CONVEYOR_EXTERNAL_IMAGE_GEN_URL`. Underscores, not hyphens: the engine's env
@@ -176,6 +176,7 @@ fn generate_image() -> ActionSpec {
         captures_usage: true,
         artefact: Some(Artefact {
             field: ARTEFACT_FIELD,
+            encoding: ArtefactEncoding::Base64,
             content_type: "image/png",
             title: "Generated image",
         }),
@@ -185,6 +186,7 @@ fn generate_image() -> ActionSpec {
             path: "/v1/images/generations",
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }
