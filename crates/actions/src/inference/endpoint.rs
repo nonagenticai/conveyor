@@ -199,41 +199,51 @@ async fn emit_endpoint_event(
 }
 
 /// Validate the destination the engine will append a path to.
+///
+/// `http::Uri` rather than a request client: this is shape validation, and a parser that builds a
+/// request would be exactly the second transport the externals rule forbids.
 fn destination_input(raw: &str) -> Result<String, ActionError> {
     let text = raw.trim();
-    let url = reqwest::Url::parse(text).map_err(|_| {
+    if text.is_empty() || text.chars().any(char::is_whitespace) {
+        return Err(invalid(
+            "destination_url",
+            "invalid_url",
+            "must be an absolute http(s) URL with no whitespace",
+        ));
+    }
+    let uri: http::Uri = text.parse().map_err(|_| {
         invalid(
             "destination_url",
             "invalid_url",
             "must be an absolute http(s) URL",
         )
     })?;
-    if !matches!(url.scheme(), "http" | "https") {
+    if !matches!(uri.scheme_str(), Some("http" | "https")) {
         return Err(invalid(
             "destination_url",
             "invalid_url",
             "must use http or https",
         ));
     }
-    if url.host_str().is_none() {
+    let Some(authority) = uri.authority() else {
         return Err(invalid(
             "destination_url",
             "invalid_url",
             "must name a host",
         ));
-    }
-    if !url.username().is_empty() || url.password().is_some() {
+    };
+    if authority.as_str().contains('@') {
         return Err(invalid(
             "destination_url",
             "credential_in_url",
             "must not embed a credential; use the credential field",
         ));
     }
-    if url.query().is_some() || url.fragment().is_some() {
+    if uri.path_and_query().and_then(|part| part.query()).is_some() {
         return Err(invalid(
             "destination_url",
             "invalid_url",
-            "must not carry a query or a fragment",
+            "must not carry a query",
         ));
     }
     Ok(text.to_owned())
