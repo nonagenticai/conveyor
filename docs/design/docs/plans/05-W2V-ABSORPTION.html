@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>05 — The w2v absorption: disposition and the production layer · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/05-W2V-ABSORPTION.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="05--the-w2v-absorption-disposition-and-the-production-layer">05 — The w2v absorption: disposition and the production layer</h1>
+<p>This plan complements <code>04-TOOL-ESTATE-INVENTORY.md</code>; it does not replace it. Plan 04 holds the grouping decision, the sixteen-blueprint vocabulary and the destination count. This document holds what has <strong>actually shipped</strong>, one disposition per absorbed component, and the measurement that fixes the shape of the one family nobody has started.</p>
+<p>Convention, inherited from plan 04 §5: components are named by <strong>public role</strong>. No private repository name, host name or address appears here — the repository is public and <code>scripts/ci/no-private-refs.sh</code> is a merge gate.</p>
+<h2 id="1-what-has-shipped-measured-2026-11-15">1. What has shipped, measured 2026-11-15</h2>
+<p>Plan 04 §1 states <code>apps/media</code> as "decided, unclaimed (#139)". That is no longer true. The row is corrected here and in <code>04</code> itself.</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Plan 04's state word</th>
+<th>Measured state</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the executor group (<code>apps/media</code>)</td>
+<td>decided, unclaimed</td>
+<td><strong>absorbed</strong> (#139 merged 2026-11-15)</td>
+<td><code>apps/media/src/{browser,ffmpeg}/</code>; twelve <code>media.*</code> actions in <code>crates/actions/src/media.rs</code> — eleven executor kinds and the capabilities probe</td>
+</tr>
+<tr>
+<td>the analysis library (<code>crates/analysis</code>)</td>
+<td>absorbed, not deployed</td>
+<td><strong>in flight</strong> (#154)</td>
+<td>absent on main; P1–P4 on <code>issue/154-analysis</code></td>
+</tr>
+<tr>
+<td>deck authoring (<code>crates/deck</code>)</td>
+<td>not listed</td>
+<td><strong>in flight</strong> (#161)</td>
+<td>absent on main; <code>issue/161-deck</code></td>
+</tr>
+<tr>
+<td>the production family (<code>produce.*</code>)</td>
+<td>"one family" (§3)</td>
+<td><strong>not started</strong></td>
+<td>zero <code>produce.*</code> actions registered</td>
+</tr>
+<tr>
+<td>the model-server boundary</td>
+<td>external HTTP</td>
+<td><strong>holds</strong>, and is already Rust (§5)</td>
+<td>both serving hosts run Rust binaries</td>
+</tr>
+</tbody>
+</table>
+<p>The distinction plan 04 §1 draws — "merged" is not "live" — still applies to the two groups that are absorbed but not deployed. It does <strong>not</strong> apply to the executor group's <em>code</em>: the rewrite and the captured contract are on main and tested.</p>
+<h2 id="2-disposition-one-row-per-component">2. Disposition, one row per component</h2>
+<p>Each row is a component of the legacy media estate, named by role, with where it went.</p>
+<table>
+<thead>
+<tr>
+<th>Component, by role</th>
+<th>Disposition</th>
+<th>Destination</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the site-analysis service (critique, review, brand, SEO, CRO, marketing scorecards)</td>
+<td>absorbed in flight</td>
+<td><code>crates/analysis</code>, <code>analyse.*</code> (#154)</td>
+</tr>
+<tr>
+<td>the browser-rendered producers (HTML to image, recording, Gherkin)</td>
+<td>absorbed</td>
+<td><code>apps/media</code>, browser executor: <code>media.render_html</code>, <code>media.record_browser</code>, <code>media.run_gherkin</code></td>
+</tr>
+<tr>
+<td>the ffmpeg producers (compile, concat, thumbnail, probe)</td>
+<td>absorbed</td>
+<td><code>apps/media</code>, ffmpeg executor: <code>media.compile_video</code>, <code>media.concat_audio</code>, <code>media.thumbnail</code>, <code>media.probe_video</code></td>
+</tr>
+<tr>
+<td>the video measurement service (frame extraction, OCR, audio measurement)</td>
+<td>absorbed</td>
+<td><code>apps/media</code>: <code>media.analyze_video</code>, <code>media.analyze_audio</code>, <code>media.ocr</code></td>
+</tr>
+<tr>
+<td>the video assembly producer</td>
+<td>absorbed</td>
+<td><code>apps/media</code>: <code>media.produce_video</code></td>
+</tr>
+<tr>
+<td>the slide/deck service</td>
+<td>in flight</td>
+<td><code>crates/deck</code> (#161), <code>produce.deck</code></td>
+</tr>
+<tr>
+<td>the content service (storyline, shot list, narration text, script generation)</td>
+<td><strong>not started</strong></td>
+<td><code>produce.script</code> (#163)</td>
+</tr>
+<tr>
+<td>the course assembler</td>
+<td>not started</td>
+<td>a blueprint over <code>produce.*</code>, not a service (#163)</td>
+</tr>
+<tr>
+<td>the video-publish operation</td>
+<td>out</td>
+<td>no measured consumer; ADR 0006 defers it</td>
+</tr>
+<tr>
+<td>the thin speech fan-out</td>
+<td>out</td>
+<td>model-server boundary (§5)</td>
+</tr>
+<tr>
+<td>the app-inspection service</td>
+<td>out</td>
+<td>owner ruling 2026-11-15 (plan 04 §7.1): deferred outright, never worked live</td>
+</tr>
+<tr>
+<td>the website-redesign service</td>
+<td>out</td>
+<td>subsumed by the site-analysis family's redesign output</td>
+</tr>
+<tr>
+<td>the image/video generation fan-out</td>
+<td>out</td>
+<td>model-server boundary, and no measured consumer</td>
+</tr>
+<tr>
+<td>the shared Python library</td>
+<td>dissolved</td>
+<td>its functions land in existing crates; no destination of its own</td>
+</tr>
+<tr>
+<td>the orchestrator</td>
+<td>out</td>
+<td>plan 04 §6: its role becomes procedures and project types, not a second scheduler</td>
+</tr>
+<tr>
+<td>the SPA</td>
+<td>out of this programme</td>
+<td>absorbed by the product's own web surface (Leptos), on its own schedule</td>
+</tr>
+<tr>
+<td>the six predecessor microservices (analyzer, brand, critique, review, narrative, script)</td>
+<td>archived</td>
+<td>subsumed by the site-analysis and content services before this programme started</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-why-the-production-family-is-data-not-services">3. Why the production family is data, not services</h2>
+<p>Plan 04 §2 tabulates the sixteen blueprints. What it does not record is the measurement that makes the production family's shape non-negotiable.</p>
+<p>Across the sixteen blueprint directories, the same stage primitives are re-implemented per blueprint:</p>
+<table>
+<thead>
+<tr>
+<th>Primitive</th>
+<th>Copies</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>narrate.py</code></td>
+<td><strong>9</strong></td>
+<td>narration text to per-shot audio, via the speech model server</td>
+</tr>
+<tr>
+<td><code>compile.py</code></td>
+<td><strong>8</strong></td>
+<td>shots to one encoded video, via ffmpeg</td>
+</tr>
+<tr>
+<td><code>slides.py</code></td>
+<td><strong>7</strong></td>
+<td>a slide spec to rendered stills</td>
+</tr>
+<tr>
+<td><code>script.py</code></td>
+<td><strong>7</strong></td>
+<td>the deliverable's narration script</td>
+</tr>
+<tr>
+<td><code>record.py</code></td>
+<td><strong>7</strong></td>
+<td>a browser stepped through virtual time into a video</td>
+</tr>
+<tr>
+<td><code>scan.py</code></td>
+<td><strong>3</strong></td>
+<td>a crawl/fetch pass feeding an audit</td>
+</tr>
+<tr>
+<td><code>critique.py</code></td>
+<td><strong>2</strong></td>
+<td>the scored read over a scan</td>
+</tr>
+<tr>
+<td><code>stitch.py</code></td>
+<td><strong>2</strong></td>
+<td>segments joined into one artefact</td>
+</tr>
+<tr>
+<td><code>thumbnail.py</code></td>
+<td><strong>1</strong></td>
+<td>a poster frame</td>
+</tr>
+</tbody>
+</table>
+<p><strong>46 stage files are 9 distinct operations.</strong> Every blueprint's real content is the <em>ordering</em> and the <em>parameters</em>, not the stage logic. Two consequences:</p>
+<ol type="1">
+<li>The production family needs <strong>one action per primitive</strong>, not one service per blueprint or per legacy service. <code>produce.script</code>, <code>produce.speech</code>, <code>produce.still</code>, <code>produce.deck</code>, <code>produce.render</code>, <code>produce.qc</code> cover all nine primitives (<code>SPEC_V2</code> §10.4 already declares this set).</li>
+<li>A blueprint is <strong>data</strong>: an ordered phase list whose phases name registered actions. It is not a deployable, and porting 46 files as 46 modules would reproduce the sprawl inside one repository.</li>
+</ol>
+<p>The two families divide exactly as plan 04 §2 says: nine blueprints produce <strong>evidence</strong> (the <code>analyse.*</code> side, mostly landed), seven produce <strong>an artefact</strong> (the <code>produce.*</code> side, not started).</p>
+<h2 id="4-the-production-layer--the-only-unstarted-family">4. The production layer — the only unstarted family</h2>
+<p>This is the gap that remains after the executor group merged and the analysis and deck lanes finish.</p>
+<table>
+<thead>
+<tr>
+<th>What exists after #154 and #161</th>
+<th>What does not</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12 executor actions (<code>media.*</code>)</td>
+<td>any <code>produce.*</code> action</td>
+</tr>
+<tr>
+<td>the <code>analyse.*</code> library and its action</td>
+<td>the blueprint manifest type</td>
+</tr>
+<tr>
+<td>the runner substrate and job ledger</td>
+<td>the sixteen blueprints as data</td>
+</tr>
+<tr>
+<td><code>crates/deck</code> for deck assembly</td>
+<td>the script/storyline/storyboard capability</td>
+</tr>
+</tbody>
+</table>
+<p>Issue #163 carries the plan: capture the content service's contract, build the manifest type, ship <code>produce.script</code>, then express the sixteen blueprints over the actions that exist and declare the phases that have no action yet rather than silently omitting them.</p>
+<h2 id="5-the-model-server-boundary-verified">5. The model-server boundary, verified</h2>
+<p>ADR 0007 keeps the model servers outside the repository as remote HTTP hosts bound as toolkits. That is no longer only a decision — it is the estate's actual condition, measured 2026-11-15:</p>
+<ul>
+<li>The speech, transcription and vision servers on both serving hosts run <strong>Rust</strong> binaries (Mach-O arm64, Tokio symbols), alongside a vendored embedding/rerank server.</li>
+<li>The one remaining Python model server is the image-generation host. It has no Rust equivalent and is explicitly outside this programme.</li>
+<li>The legacy speech backend, the voice generator and the speech router have <strong>no running process and no service definition</strong> on either host.</li>
+</ul>
+<p>So the boundary costs nothing to maintain: the Python the conversion would have had to remove is already gone, and what remains is one service with no rewrite path.</p>
+<h2 id="6-how-to-re-measure">6. How to re-measure</h2>
+<p>Every number above is reproducible without cluster access:</p>
+<ul>
+<li><strong>Action families</strong>: <code>git grep -hoE 'name = "[a-z0-9_.]+"' origin/main -- crates/actions/src</code>, then count by namespace prefix. <code>media.*</code> must be 12 and <code>produce.*</code> must be 0 while this document's §1 is current.</li>
+<li><strong>Blueprint duplication</strong>: count <code>basename</code> matches under the orchestrator's stage directory, excluding its two library directories. 16 blueprint directories, 9 primitives, 46 files.</li>
+<li><strong>Group state</strong>: <code>gh issue view &lt;n&gt; --json state</code> for the executor, analysis and deck units.</li>
+</ul>
+<p>If a count disagrees with this document, the document is stale — correct it in the same PR that changes the count, not later.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/05-W2V-ABSORPTION.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

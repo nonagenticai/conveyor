@@ -465,9 +465,18 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
       "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
       "section": "Plans",
-      "sha256": "6c6e5245a5a3fc5a59962dc767552a67d09a1be4dfdd98629c1c9134aad88cab",
-      "bytes": 10272,
+      "sha256": "2b019753c7bf963b15679f46b85688a960fda162716b309fd80c37de35fa553d",
+      "bytes": 10450,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
+    },
+    {
+      "title": "05 — The w2v absorption: disposition and the production layer",
+      "path": "docs/plans/05-W2V-ABSORPTION.html",
+      "source": "docs/plans/05-W2V-ABSORPTION.md",
+      "section": "Plans",
+      "sha256": "3bcca544f04f89a22022d4da65180fbe377ef31dedbf4b8addc31e92e41f51be",
+      "bytes": 8235,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/05-W2V-ABSORPTION.md"
     },
     {
       "title": "P0 — Programme definition",
