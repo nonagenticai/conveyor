@@ -273,7 +273,10 @@ pub(crate) async fn create_from_bytes(
 
     let content_hash = hex(&Sha256::digest(&bytes));
     let objects = Objects::from_env().ok_or_else(|| {
-        crate::documents::object_error(crate::integrations::objects::ObjectError::Unavailable, action)
+        crate::documents::object_error(
+            crate::integrations::objects::ObjectError::Unavailable,
+            action,
+        )
     })?;
     let id = Uuid::now_v7();
     let key = key_for(ctx.tenant.as_uuid(), id, &content_hash);
