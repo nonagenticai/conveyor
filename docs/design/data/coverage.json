@@ -876,7 +876,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 2,
+        "claimed": 1,
         "numbers": [
           156,
           168,
@@ -884,7 +884,7 @@
           195,
           231
         ],
-        "open": 2,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -1563,7 +1563,7 @@
           0
         ]
       },
-      "name": "SAFe cadence",
+      "name": "SAFe cadence and MSP tranches",
       "parallel_with": [
         "S05",
         "S07",
@@ -2263,7 +2263,7 @@
           0
         ]
       },
-      "name": "TOGAF profile",
+      "name": "TOGAF ADM capability",
       "parallel_with": [
         "S05",
         "S07",
@@ -2290,6 +2290,15 @@
     }
   ],
   "screens": [
+    {
+      "evidence": [
+        "docs/design/v2.js"
+      ],
+      "gap": "design study; the ADM rows and actions are T9",
+      "key": "adm",
+      "status": "proposed",
+      "title": "Architecture capability"
+    },
     {
       "evidence": [
         "docs/design/v2.js"
@@ -2474,6 +2483,15 @@
       "evidence": [
         "docs/design/v2.js"
       ],
+      "gap": "design study; the MSP rows and actions are T1/T10",
+      "key": "programme",
+      "status": "proposed",
+      "title": "Programme definition"
+    },
+    {
+      "evidence": [
+        "docs/design/v2.js"
+      ],
       "gap": null,
       "key": "projects",
       "status": "live",
@@ -2529,9 +2547,9 @@
         "legacy": 7,
         "live": 7,
         "mixed": 3,
-        "proposed": 7
+        "proposed": 9
       },
-      "total": 24
+      "total": 26
     }
   },
   "version": 1

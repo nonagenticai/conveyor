@@ -7,7 +7,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 |---|---|---|
 | `exists` | implemented in code and backed by real rows | 11 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
-| `new` | absent | 25 |
+| `new` | absent | 44 |
 
 ## Rows
 
@@ -22,7 +22,24 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:wbs_node` | §10.3 | table | wbs_node | `new` | migrations: no CREATE/ALTER TABLE wbs_node |
 | `table:project_baseline` | §10.3 | table | project_baseline | `new` | migrations: no CREATE/ALTER TABLE project_baseline |
 | `table:programme_cadence` | §10.3 | table | programme_cadence | `new` | migrations: no CREATE/ALTER TABLE programme_cadence |
+| `table:programme_tranche` | §10.3 | table | programme_tranche | `new` | migrations: no CREATE/ALTER TABLE programme_tranche |
+| `table:programme_baseline` | §10.3 | table | programme_baseline | `new` | migrations: no CREATE/ALTER TABLE programme_baseline |
 | `table:project_register_item` | §10.3 | table | project_register_item | `new` | migrations: no CREATE/ALTER TABLE project_register_item |
+| `table:benefit_profile` | §10.3 | table | benefit_profile | `new` | migrations: no CREATE/ALTER TABLE benefit_profile |
+| `table:benefit_link` | §10.3 | table | benefit_link | `new` | migrations: no CREATE/ALTER TABLE benefit_link |
+| `table:benefit_transition` | §10.3 | table | benefit_transition | `new` | migrations: no CREATE/ALTER TABLE benefit_transition |
+| `table:stakeholder_profile` | §10.3 | table | stakeholder_profile | `new` | migrations: no CREATE/ALTER TABLE stakeholder_profile |
+| `table:architecture_artifact` | §10.3 | table | architecture_artifact | `new` | migrations: no CREATE/ALTER TABLE architecture_artifact |
+| `table:architecture_artifact_entry` | §10.3 | table | architecture_artifact_entry | `new` | migrations: no CREATE/ALTER TABLE architecture_artifact_entry |
+| `table:architecture_artifact_link` | §10.3 | table | architecture_artifact_link | `new` | migrations: no CREATE/ALTER TABLE architecture_artifact_link |
+| `table:artifact_type` | §10.3 | table | artifact_type | `new` | migrations: no CREATE/ALTER TABLE artifact_type |
+| `table:adm_profile` | §10.3 | table | adm_profile | `new` | migrations: no CREATE/ALTER TABLE adm_profile |
+| `table:architecture_contract` | §10.3 | table | architecture_contract | `new` | migrations: no CREATE/ALTER TABLE architecture_contract |
+| `table:architecture_compliance_review` | §10.3 | table | architecture_compliance_review | `new` | migrations: no CREATE/ALTER TABLE architecture_compliance_review |
+| `table:architecture_waiver` | §10.3 | table | architecture_waiver | `new` | migrations: no CREATE/ALTER TABLE architecture_waiver |
+| `table:governance_body` | §10.3 | table | governance_body | `new` | migrations: no CREATE/ALTER TABLE governance_body |
+| `table:architecture_maturity` | §10.3 | table | architecture_maturity | `new` | migrations: no CREATE/ALTER TABLE architecture_maturity |
+| `table:architecture_skill_assessment` | §10.3 | table | architecture_skill_assessment | `new` | migrations: no CREATE/ALTER TABLE architecture_skill_assessment |
 | `table:decision` | §10.3 | table | decision | `exists` | migrations: CREATE TABLE decision |
 | `table:decision_option` | §10.3 | table | decision_option | `exists` | migrations: CREATE TABLE decision_option |
 | `table:decision_policy` | §10.3 | table | decision_policy | `exists` | migrations: CREATE TABLE decision_policy |
@@ -33,7 +50,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:pko_release` | §10.3 | table | pko_release | `new` | migrations: no CREATE/ALTER TABLE pko_release |
 | `table:pko_entity` | §10.3 | table | pko_entity | `new` | migrations: no CREATE/ALTER TABLE pko_entity |
 | `table:pko_relation` | §10.3 | table | pko_relation | `new` | migrations: no CREATE/ALTER TABLE pko_relation |
-| `actions:programme/plan` | §10.4 | actions | programme/plan | `extend` | actions: baselines.* absent<br>actions: cadences.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* absent<br>actions: registers.* absent<br>actions: wbs.* absent |
+| `actions:programme/plan` | §10.4 | actions | programme/plan | `extend` | actions: baselines.* absent<br>actions: cadences.* absent<br>actions: governed_assets.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* absent<br>actions: registers.* absent<br>actions: tranches.* absent<br>actions: wbs.* absent |
+| `actions:benefits` | §10.4 | actions | benefits | `new` | actions: benefits.* absent |
+| `actions:architecture` | §10.4 | actions | architecture | `new` | actions: architecture.* absent |
 | `actions:organisation` | §10.4 | actions | organisation | `exists` | actions: departments.* found (departments.create, departments.list)<br>actions: industries.* found (industries.create, industries.get, industries.list)<br>actions: job_bindings.* found (job_bindings.create, job_bindings.get, job_bindings.list…)<br>actions: job_releases.* found (job_releases.list, job_releases.publish, job_releases.retire)<br>actions: jobs.* found (jobs.list, jobs.retry) |
 | `actions:procedures` | §10.4 | actions | procedures | `extend` | actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: pko.* absent<br>actions: procedures.* found (procedures.create, procedures.get, procedures.list…) |
 | `actions:authoring` | §10.4 | actions | authoring | `new` | actions: authoring.* absent |

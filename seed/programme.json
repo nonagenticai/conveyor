@@ -792,7 +792,7 @@
           "evidence",
           "closure-review"
         ],
-        "gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused"
+        "gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused; a benefit profile without baseline, target, method or owner is refused; a benefit-map edge names its five levels"
       }
     },
     {
@@ -1032,7 +1032,7 @@
     },
     {
       "key": "T9",
-      "name": "TOGAF profile",
+      "name": "TOGAF ADM capability",
       "description": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)",
       "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
@@ -1060,12 +1060,12 @@
           "evidence",
           "closure-review"
         ],
-        "gate": "an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata"
+        "gate": "an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata"
       }
     },
     {
       "key": "T10",
-      "name": "SAFe cadence",
+      "name": "SAFe cadence and MSP tranches",
       "description": "SPEC_V2 slice T10 (docs/SPEC_V2.md §12)",
       "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
@@ -1093,7 +1093,7 @@
           "evidence",
           "closure-review"
         ],
-        "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons"
+        "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized"
       }
     },
     {
@@ -1172,7 +1172,7 @@
           "evidence",
           "closure-review"
         ],
-        "gate": "one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget"
+        "gate": "one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area"
       }
     },
     {
