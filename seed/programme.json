@@ -768,7 +768,7 @@
       "key": "T1",
       "name": "Plan spine",
       "description": "SPEC_V2 slice T1 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1053,7 +1053,16 @@
         "expected_outputs": [
           "project-brief",
           "inception-analysis",
-          "architecture-design"
+          "architecture-design",
+          "architecture-principles",
+          "adm-profile",
+          "artifact-standard",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "compliance-review",
+          "waiver",
+          "maturity-assessment",
+          "skills-assessment"
         ],
         "closure_outputs": [
           "evidence",
@@ -1397,7 +1406,20 @@
           "governance",
           "reuse-map",
           "brief-template",
-          "architecture-analysis"
+          "architecture-analysis",
+          "benefit-profile",
+          "benefits-map",
+          "projects-dossier",
+          "tranche-plan",
+          "tranche-review",
+          "benefits-strategy",
+          "realization-plan",
+          "stakeholder-profiles",
+          "architecture-principles",
+          "adm-profile",
+          "artifact-standard",
+          "maturity-assessment",
+          "skills-assessment"
         ],
         "closure_outputs": []
       }
@@ -1436,7 +1458,10 @@
           223,
           224,
           225,
-          226
+          226,
+          256,
+          258,
+          259
         ],
         "depends_on": [],
         "plan_status": "active",
