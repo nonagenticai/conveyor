@@ -6,8 +6,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/README.html",
       "source": "README.md",
       "section": "Root",
-      "sha256": "28449d8dc2fdfff28ebace1650a6eafe9a305174db4991936e7752dc34552cec",
-      "bytes": 2257,
+      "sha256": "f8cf36be9644011eedb00ce8a9c52a2c4b27f3b597afc7fc0a9571cd5c710752",
+      "bytes": 2654,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/README.md"
     },
     {
@@ -114,8 +114,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "1df04253f36c037e83efa7996b46042c516a114fed1a864b1880d7ab04b80884",
-      "bytes": 14090,
+      "sha256": "ffb5c3916ccc9148f60a9c3e894261fcf2fdd9778d1084e947bc0083a2d5b0b4",
+      "bytes": 14208,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {

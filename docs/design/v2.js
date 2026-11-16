@@ -4491,7 +4491,7 @@ window.installV2 = function (api, enterprise) {
       );
     const summary = `<div class="metrics">${[
       [openRows.length, "Open units", `${claimed.length} claimed · ${blocked.length} blocked`, "green"],
-      [ready.length, "Ready to claim", "no branch, no PR, no claim comment", "purple"],
+      [ready.length, "Marked ready", "published issue snapshot; verify on GitHub", "purple"],
       [
         blocked.length,
         "Blocked",
@@ -4506,9 +4506,23 @@ window.installV2 = function (api, enterprise) {
           )}</div><div class="metric-number">${E(value)}</div><small>${E(sub)}</small></div>`,
       )
       .join("")}</div>`;
+    const startHere = panel(
+      "Choose a first contribution",
+      `${table(
+        ["Time", "Path", "Start here"],
+        [
+          ["5 min", "Report design friction", "Name the page, what you expected and what happened. A screenshot is optional."],
+          ["15–30 min", "Review the proposal", "Find one unclear term, a missing decision or an assumption that fails in practice."],
+          ["30+ min", "Improve docs or code", "Take a maintainer-triaged unit with acceptance criteria. A typo, a broken link or a docs clarification can go straight to a pull request."],
+        ].map((row) => `<tr><td><strong>${E(row[0])}</strong></td><td>${E(row[1])}</td><td>${E(row[2])}</td></tr>`),
+      )}${note(
+        `V1 is the live build record; <a href="https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md" target="_blank" rel="noopener">SPEC_V2 defines V2 ↗</a> and this site marks what is live and what is still proposed. AI coding assistants are welcome: you review the diff, run the checks and sign off your own commits. Every merged contribution is credited in <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTORS.md" target="_blank" rel="noopener">CONTRIBUTORS.md ↗</a> unless the contributor opts out. See the <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">contribution workflow ↗</a>.`,
+      )}<div class="toolbar"><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send design feedback ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md" target="_blank" rel="noopener">Review the V2 proposal ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/issues?q=is%3Aissue+is%3Aopen+label%3Aunit" target="_blank" rel="noopener">Browse unit issues ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contribution workflow ↗</a></div>`,
+      B("START HERE", "purple"),
+    );
     const protocol = panel(
       "How a unit is claimed",
-      `<p class="muted">The claim is four empty checks, a pushed branch and a comment. Until all four are empty the unit is someone else's; join it, never start a parallel branch.</p><pre class="v2-code">gh issue view N --json state,labels,comments,closedByPullRequestsReferences
+      `<p class="muted">A change that does not alter behaviour — a typo, a broken link, a docs clarification — can go straight to a pull request; no claim is needed.</p><p class="muted">For a unit, the claim is four empty checks, a pushed branch and a comment. Until all four are empty the unit is someone else's; join it, never start a parallel branch.</p><pre class="v2-code">gh issue view N --json state,labels,comments,closedByPullRequestsReferences
 gh pr list --state all --search "#N"
 git ls-remote --heads origin "issue/N-*"
 git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mono">issue/N-&lt;slug&gt;</span>, add <span class="mono">status:claimed</span> and a comment naming the branch and HEAD. One issue is one branch and exactly one PR with <span class="mono">Closes #N</span>. A contributor without write access comments with the plan; a maintainer applies the claim.</p><div class="toolbar"><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=unit.md" target="_blank" rel="noopener">Propose a unit ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=feedback.yml" target="_blank" rel="noopener">Report design feedback ↗</a><a class="btn" href="${E(
@@ -4518,13 +4532,13 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     );
     return `<div class="page enterprise">${heading(
       "Contribute",
-      "The programme is public. Take a ready unit, send a design report, or discuss the design; claims and code live on GitHub.",
+      "Start with design feedback, review the proposal, or take an accepted unit of work; a small fix can go straight to a pull request. Claims and code live on GitHub.",
       `${route("Projects", "projects", "", "projects")}`,
       "PORTFOLIO & PLAN",
     )}${consoleRibbon(
-      "Ready units are read from the GitHub issue registry at publish; this page writes nothing.",
+      "Issue status is a published snapshot, not a live claim lock. Verify the issue, branch and PR on GitHub before starting; this page writes nothing.",
       registry.length > 0,
-    )}${summary}${
+    )}${summary}${startHere}${
       panels.join("") ||
       note(
         "No ready unit is published right now. A unit becomes <span class='mono'>status:ready</span> when its dependencies are met.",

@@ -1069,7 +1069,8 @@ function readBody(req, done) {
       await page.waitForSelector(".page");
       await page.waitForTimeout(200);
       const contributeText = await page.locator("#main").innerText();
-      assert.match(contributeText, /Ready to claim/, "contribute renders the ready summary");
+      assert.match(contributeText, /Marked ready/, "contribute renders the ready summary");
+      assert.match(contributeText, /verify on GitHub/, "the ready count is labelled a snapshot");
       assert.match(contributeText, /#2/, "a ready unit links its issue");
       assert.match(contributeText, /Unassigned/, "an unlinked ready unit is grouped honestly");
       assert.match(contributeText, /How a unit is claimed/, "the claim protocol renders");
