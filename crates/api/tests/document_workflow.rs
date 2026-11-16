@@ -444,3 +444,50 @@ async fn an_attachment_is_a_child_document_with_its_parents_scope() {
         .await;
     assert_eq!(status, 404, "{refused}");
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_category_alias_is_canonicalised_and_an_unknown_one_is_refused() {
+    let pg = support::Pg::fresh().await;
+    let _seeded = support::seed(&pg, "category", "alice", "Alice").await;
+    let running = support::Running::start(&pg).await;
+
+    // `analysis` is the pre-standard alias for `inception-analysis`.
+    let (status, created) = running
+        .invoke(
+            "documents.compose",
+            "dev:alice",
+            json!({
+                "title": "T1 analysis",
+                "body": "# T1 analysis\n\nCurrent state and reuse.",
+                "category": "analysis",
+                "unit": "T1",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    assert_eq!(output(&created)["category"], "inception-analysis");
+
+    // Anything the standard does not know is refused, not stored as free text.
+    let (status, refused) = running
+        .invoke(
+            "documents.compose",
+            "dev:alice",
+            json!({
+                "title": "Unknown category",
+                "body": "# Unknown",
+                "category": "not-a-category",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert!(
+        refused.to_string().contains("unknown_category"),
+        "the refusal names the category: {refused}"
+    );
+}

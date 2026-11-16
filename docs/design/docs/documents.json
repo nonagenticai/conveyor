@@ -6,8 +6,8 @@
       "path": "docs/README.html",
       "source": "README.md",
       "section": "Root",
-      "sha256": "f8cf36be9644011eedb00ce8a9c52a2c4b27f3b597afc7fc0a9571cd5c710752",
-      "bytes": 2654,
+      "sha256": "28449d8dc2fdfff28ebace1650a6eafe9a305174db4991936e7752dc34552cec",
+      "bytes": 2257,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/README.md"
     },
     {
@@ -105,8 +105,8 @@
       "path": "docs/decisions/0007-tool-estate-conveyor-and-coding.html",
       "source": "docs/decisions/0007-tool-estate-conveyor-and-coding.md",
       "section": "Decisions",
-      "sha256": "fe7224b056433270bf6b367692cf4b700b1e119fd82c3ed5eadd4f03e14f03c4",
-      "bytes": 7854,
+      "sha256": "ce47d2ab95b25eed4d73a29b0040e2f16e78a834d78f3d34bc03998bd2148217",
+      "bytes": 7520,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0007-tool-estate-conveyor-and-coding.md"
     },
     {
@@ -114,8 +114,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "e879d79b41affbcda636335acf535104ae1be5f21c61b644d99db65086051acf",
-      "bytes": 12900,
+      "sha256": "318bb6b76ccdc3d97f1e4242ea918b183d864320c5ef1a44fb32f95d8ab37135",
+      "bytes": 13667,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -465,18 +465,9 @@
       "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
       "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
       "section": "Plans",
-      "sha256": "2b019753c7bf963b15679f46b85688a960fda162716b309fd80c37de35fa553d",
-      "bytes": 10450,
+      "sha256": "6c6e5245a5a3fc5a59962dc767552a67d09a1be4dfdd98629c1c9134aad88cab",
+      "bytes": 10272,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
-    },
-    {
-      "title": "05 — The w2v absorption: disposition and the production layer",
-      "path": "docs/plans/05-W2V-ABSORPTION.html",
-      "source": "docs/plans/05-W2V-ABSORPTION.md",
-      "section": "Plans",
-      "sha256": "3bcca544f04f89a22022d4da65180fbe377ef31dedbf4b8addc31e92e41f51be",
-      "bytes": 8235,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/05-W2V-ABSORPTION.md"
     },
     {
       "title": "P0 — Programme definition",
