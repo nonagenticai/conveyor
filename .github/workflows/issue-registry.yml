@@ -12,6 +12,12 @@ name: issue-registry
 # "Allow GitHub Actions to create and approve pull requests" (can_approve_pull_request_reviews).
 # No repository secret is added.
 #
+# ⛔ A PR created with `GITHUB_TOKEN` does not trigger `pull_request` workflows (GitHub's recursion
+# guard), so its required contexts would never be created and it could never merge. The dispatch
+# below is the exempt event: `gh workflow run ci-public.yml --ref automation/issue-registry`
+# attaches the same contexts to the same head commit, and the generated PR merges through the
+# normal gate. Do not remove the dispatch.
+#
 # Disable with: gh workflow disable issue-registry.yml
 
 on:
@@ -24,7 +30,9 @@ permissions:
 
 concurrency:
   group: issue-registry
-  cancel-in-progress: true
+  # Never cancel mid-run: a cancel after the push but before the PR create leaves a branch with
+  # no PR. The job is a few minutes; the next run updates whatever is left.
+  cancel-in-progress: false
 
 jobs:
   refresh:
@@ -34,6 +42,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      actions: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -117,9 +126,14 @@ jobs:
             "HEAD:refs/heads/automation/issue-registry"
           open="$(gh pr list --repo "$REPO" --head automation/issue-registry --state open --json number --jq '.[].number')"
           if [ -n "$open" ]; then
+            gh pr edit "$open" --repo "$REPO" --body-file "$RUNNER_TEMP/pr-body.md"
             echo "Updated the open generated PR #$open." >> "$GITHUB_STEP_SUMMARY"
           else
             gh pr create --repo "$REPO" --base main --head automation/issue-registry \
               --title "docs: refresh the public issue registry (automated)" \
               --body-file "$RUNNER_TEMP/pr-body.md"
           fi
+          # Recursion-guard exemption: `pull_request` workflows do not run for a PR created with
+          # `GITHUB_TOKEN`, so nothing would create the required contexts. `workflow_dispatch` is
+          # exempt; this run attaches them to the same head commit.
+          gh workflow run ci-public.yml --repo "$REPO" --ref automation/issue-registry
