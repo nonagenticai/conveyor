@@ -145,6 +145,7 @@ const fn spec(target: Target) -> ActionSpec {
         },
         task_capable: false,
         captures_usage: false,
+        artefact: None,
         handler: HandlerRef::External {
             service,
             method,

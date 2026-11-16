@@ -53,6 +53,10 @@ pub enum Effect {
     Read,
     /// Creates or updates.
     Write,
+    /// Costs the tenant money without deleting anything: a model call, a render, a metered render
+    /// seconds. Ranked above `write` because an approval ceiling that permits writes must not
+    /// silently permit spending, and below `destructive` because nothing is removed (§11.4).
+    Spend,
     /// Deletes or irreversibly transitions.
     Destructive,
 }
@@ -63,11 +67,12 @@ impl Effect {
         match self {
             Self::Read => "read",
             Self::Write => "write",
+            Self::Spend => "spend",
             Self::Destructive => "destructive",
         }
     }
 
-    /// How far up the scale this effect sits: `read < write < destructive`.
+    /// How far up the scale this effect sits: `read < write < spend < destructive`.
     ///
     /// The order is the whole point of a binding's ceiling — a job bound to `read` may not reach a
     /// `write`, and comparisons are made on this rank, never on the string.
@@ -75,7 +80,8 @@ impl Effect {
         match self {
             Self::Read => 0,
             Self::Write => 1,
-            Self::Destructive => 2,
+            Self::Spend => 2,
+            Self::Destructive => 3,
         }
     }
 
@@ -85,6 +91,7 @@ impl Effect {
         match text {
             "read" => Some(Self::Read),
             "write" => Some(Self::Write),
+            "spend" => Some(Self::Spend),
             "destructive" => Some(Self::Destructive),
             _ => None,
         }
@@ -670,6 +677,28 @@ pub struct AgentHints {
     pub proposal_required: bool,
 }
 
+/// One external action's response, materialised as a tenant document (S09 §5.2, §11.4).
+///
+/// The engine owns the external call, so it also owns the artefact that call produced: a handler-side
+/// writer would be a second path for the same fact, exactly as with the `inference_call` row. The
+/// bytes travel as base64 inside the service's JSON response (CONTRACT §6), and the engine writes
+/// them to the object store, inserts the document row and adds a `document` member to the response the
+/// caller receives.
+///
+/// Deliberately **not** part of [`ActionSpec::canonical`]: it describes what the engine does with a
+/// response, not the wire contract of the operation itself — the same reasoning as
+/// [`ActionSpec::captures_usage`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Artefact {
+    /// The dotted path into the response JSON holding a base64 payload, e.g. `"data.0.b64_json"`.
+    pub field: &'static str,
+    /// The MIME type declared on the document. It must be on `documents`' allowlist and must match
+    /// the decoded bytes.
+    pub content_type: &'static str,
+    /// The document title.
+    pub title: &'static str,
+}
+
 /// One invocable operation. Exactly §5.1's fields.
 #[derive(Clone, Debug)]
 pub struct ActionSpec {
@@ -707,6 +736,10 @@ pub struct ActionSpec {
     /// [`ActionSpec::task_capable`], it is **not** part of [`ActionSpec::canonical`], so declaring
     /// it does not move an operation's hash.
     pub captures_usage: bool,
+    /// The response member the engine materialises as a tenant document, when the action produces
+    /// one. Defaulted by the derive to `None`; like [`ActionSpec::captures_usage`], it is **not**
+    /// part of [`ActionSpec::canonical`].
+    pub artefact: Option<Artefact>,
     /// Where the work happens.
     pub handler: HandlerRef,
 }

@@ -163,9 +163,12 @@ fn every_external_action_declares_its_services_path_prefix() {
     //   laya                 /v1      the Jev System-1 bridge: /v1/systemone (care-bus' measured client)
     //   fixtures             ""       tests/fixtures/external/openapi.json: /echo, /fail, /slow, /timeout
     //   worker_management    ""       the Python services mount bare: /workers, /providers, /graphs
-    const PREFIXES: [(&str, &str); 8] = [
+    //   image_gen            ""       mlx_inference mounts its OpenAI-compatible routes bare:
+    //                                 http/capabilities.rs:57-70 (`/v1/images/generations`)
+    const PREFIXES: [(&str, &str); 9] = [
         ("worker_management", ""),
         ("fixtures", ""),
+        ("image_gen", ""),
         ("artifacts", "/api"),
         ("billing_service", "/api"),
         ("coding", "/api"),

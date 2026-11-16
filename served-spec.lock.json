@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "703c53a3aa8a4a173264d521a4dee8761609f48028c84b817c77c2a51ef4e7fa",
+    "GET /api/actions": "05479bb60e81ea16bd90b03372769faaea6754b212d332ef16c26d57e708abd3",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -196,6 +196,7 @@
     "POST /api/actions/media.capabilities/invocations": "7c6ce2afb2353fe47bbe93aaf7e692a333782cf0b1f7d955b89170ce47761be0",
     "POST /api/actions/media.compile_video/invocations": "0d588fb313f1d4010696d1f4aa5b4ada5abd8159b7f18e6ce135a3efa7b15c73",
     "POST /api/actions/media.concat_audio/invocations": "17d664fffabbc5eef369f1d88c1edc57f613f8a7d51090f664eedc1b693726e9",
+    "POST /api/actions/media.generate_image/invocations": "1b6293b8b623de5ce1ccba428072b76bebca0bd94cb0f9c771f2c0d49db4bed4",
     "POST /api/actions/media.ocr/invocations": "35fa3d5bff67e488549a7528054cf1bf5e4e39b590d77d51ca780c39ba855d2b",
     "POST /api/actions/media.probe_video/invocations": "c8a436646c5f8b675a9a7e09cc1a1a03a8b23d0a5f9f5a3a01baf217e757e973",
     "POST /api/actions/media.produce_video/invocations": "95885ad01210b25c3f0504ee976ac1ac98d5b0009668240e58c7da2078f19307",

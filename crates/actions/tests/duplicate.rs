@@ -35,6 +35,7 @@ fn spec(name: &'static str) -> ActionSpec {
         },
         task_capable: false,
         captures_usage: false,
+        artefact: None,
         handler: HandlerRef::Workflow,
     }
 }

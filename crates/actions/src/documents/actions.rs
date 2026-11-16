@@ -194,6 +194,173 @@ pub(super) async fn documents_out_with_names(
         .collect())
 }
 
+/// The metadata half of a byte upload: everything but the bytes themselves.
+///
+/// `documents.create` fills it from its input (after resolving an attachment's parent); the engine
+/// fills it for an external action's declared artefact. See [`create_from_bytes`].
+pub(crate) struct NewBytesDocument<'a> {
+    /// The action storing them, for the error surface only (`documents.create`, `media.generate_image`).
+    pub action: &'static str,
+    /// The display title.
+    pub title: &'a str,
+    /// The declared MIME type; it must be on the allowlist and match the bytes.
+    pub content_type: &'a str,
+    /// `document`, `report`, `export` or `attachment`.
+    pub kind: &'a str,
+    /// The owning project, when the document belongs to one.
+    pub project_id: Option<Uuid>,
+    /// The output an attachment hangs off, when this is one.
+    pub parent_document_id: Option<Uuid>,
+    /// The promoted category slot (0042).
+    pub category: Option<String>,
+    /// The promoted unit slot (0042).
+    pub unit: Option<String>,
+    /// Free metadata merged into the row's `meta` beside the server-owned facts.
+    pub meta: Option<Value>,
+}
+
+/// Store `bytes` as a tenant document: validate → store the object → insert the row (§5.2's order).
+///
+/// The one writer for an uploaded document. `documents.create` calls it with bytes a caller sent; the
+/// engine calls it with bytes an external action's response carried (`ActionSpec::artefact`). A second
+/// implementation would be a second rule about ordering, hashing, the 415/413 caps and — since the
+/// work store — the `created` revision row every document needs.
+///
+/// The row and its revision are inserted in the caller's transaction; the object is deleted again
+/// (best effort) when that insert fails.
+pub(crate) async fn create_from_bytes(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    document: NewBytesDocument<'_>,
+    bytes: Vec<u8>,
+) -> Result<(DocumentOut, u64), ActionError> {
+    let NewBytesDocument {
+        action,
+        title,
+        content_type,
+        kind,
+        project_id,
+        parent_document_id,
+        category,
+        unit,
+        meta,
+    } = document;
+    let content_type = content_type.trim().to_ascii_lowercase();
+    if !ALLOWED_CONTENT_TYPES.contains(&content_type.as_str()) {
+        return Err(ActionError::new(
+            415,
+            "unsupported_media_type",
+            format!("{content_type:?} is not an accepted content type"),
+        ));
+    }
+    if bytes.len() > MAX_UPLOAD_BYTES {
+        return Err(ActionError::new(
+            413,
+            "payload_too_large",
+            format!(
+                "the document is {} bytes; the cap is {MAX_UPLOAD_BYTES}",
+                bytes.len()
+            ),
+        ));
+    }
+    if !bytes_match_type(&content_type, &bytes) {
+        return Err(ActionError::new(
+            415,
+            "unsupported_media_type",
+            format!("the bytes are not a valid {content_type} file"),
+        ));
+    }
+
+    let content_hash = hex(&Sha256::digest(&bytes));
+    let objects = Objects::from_env().ok_or_else(|| {
+        crate::documents::object_error(
+            crate::integrations::objects::ObjectError::Unavailable,
+            action,
+        )
+    })?;
+    let id = Uuid::now_v7();
+    let key = key_for(ctx.tenant.as_uuid(), id, &content_hash);
+    objects
+        .put(&key, bytes.clone().into())
+        .await
+        .map_err(|error| crate::documents::object_error(error, action))?;
+
+    let mut meta = meta.unwrap_or_else(|| json!({}));
+    if !meta.is_object() {
+        return Err(invalid("meta", "invalid_value", "must be an object"));
+    }
+    if let Value::Object(map) = &mut meta {
+        map.insert("content_type".to_owned(), json!(content_type));
+        map.insert("size_bytes".to_owned(), json!(bytes.len() as i64));
+        // The promoted columns are authoritative; the meta copy is for readers that predate 0042.
+        if let Some(category) = &category {
+            map.insert("category".to_owned(), json!(category));
+        }
+        if let Some(unit) = &unit {
+            map.insert("unit".to_owned(), json!(unit));
+        }
+    }
+
+    let created = store::document::create_document_tx(
+        &mut *tx,
+        ctx.tenant,
+        &NewDocument {
+            id,
+            project_id,
+            kind: kind.to_owned(),
+            title: title.to_owned(),
+            status: "active".to_owned(),
+            object_key: Some(key.clone()),
+            content_hash: Some(content_hash),
+            card_id: None,
+            parent_document_id,
+            body: None,
+            external_ref: None,
+            meta,
+            publishable: false,
+            category,
+            unit,
+            created_by: Some(ctx.actor_id),
+            updated_by: Some(ctx.actor_id),
+        },
+    )
+    .await
+    .map_err(|error| {
+        // The row did not land, so the object must not either. Nothing can be done about a failed delete
+        // here and the failure is already loud; the purge job is not involved because there is no row.
+        let objects = objects.clone();
+        tokio::spawn(async move {
+            if let Err(error) = objects.delete(&key).await {
+                tracing::error!(%error, "remove the object of a document whose row failed to insert");
+            }
+        });
+        document_error(error, action)
+    })?;
+    store::document::write_document_revision_tx(
+        &mut *tx,
+        ctx.tenant,
+        &created,
+        "created",
+        Some(ctx.actor_id),
+    )
+    .await
+    .map_err(|error| document_error(error, action))?;
+
+    let version = created.version.get();
+    emit_document_event(
+        &mut *tx,
+        ctx,
+        DOCUMENT_CREATED,
+        created.id,
+        json!({"id": created.id, "version": version}),
+    )
+    .await?;
+    Ok((
+        document_out_with_names(&mut *tx, created, action).await?,
+        version,
+    ))
+}
+
 /// The three actor ids of every row, deduplicated, in one `app_user` read.
 async fn names_for(
     conn: &mut PgConnection,
@@ -266,7 +433,6 @@ async fn documents_create(
         ));
     }
 
-    let content_hash = hex(&Sha256::digest(&bytes));
     // An attachment is a document row whose parent is an output. One aggregate: the object key,
     // hash, ETag and purge path are already right for a file. The parent must be this tenant's,
     // active, and not itself an attachment; a mismatched project is a caller error, not something
@@ -299,93 +465,24 @@ async fn documents_create(
             store::document::normalize_slot(input.unit.clone(), None),
         ),
     };
-    let objects = Objects::from_env().ok_or_else(|| {
-        crate::documents::object_error(
-            crate::integrations::objects::ObjectError::Unavailable,
-            action,
-        )
-    })?;
-    let id = Uuid::now_v7();
-    let key = key_for(ctx.tenant.as_uuid(), id, &content_hash);
-    objects
-        .put(&key, bytes.clone().into())
-        .await
-        .map_err(|error| crate::documents::object_error(error, action))?;
-
-    let mut meta = input.meta.unwrap_or_else(|| json!({}));
-    if !meta.is_object() {
-        return Err(invalid("meta", "invalid_value", "must be an object"));
-    }
-    if let Value::Object(map) = &mut meta {
-        map.insert("content_type".to_owned(), json!(content_type));
-        map.insert("size_bytes".to_owned(), json!(bytes.len() as i64));
-        // The promoted columns are authoritative; the meta copy is for readers that predate 0042.
-        if let Some(category) = &category {
-            map.insert("category".to_owned(), json!(category));
-        }
-        if let Some(unit) = &unit {
-            map.insert("unit".to_owned(), json!(unit));
-        }
-    }
-
-    let created = store::document::create_document_tx(
-        &mut *tx,
-        ctx.tenant,
-        &NewDocument {
-            id,
-            project_id,
-            kind: kind.to_owned(),
-            title: title.to_owned(),
-            status: "active".to_owned(),
-            object_key: Some(key.clone()),
-            content_hash: Some(content_hash),
-            card_id: None,
-            parent_document_id,
-            body: None,
-            external_ref: None,
-            meta,
-            publishable: false,
-            category,
-            unit,
-            created_by: Some(ctx.actor_id),
-            updated_by: Some(ctx.actor_id),
-        },
-    )
-    .await
-    .map_err(|error| {
-        // The row did not land, so the object must not either. Nothing can be done about a failed delete
-        // here and the failure is already loud; the purge job is not involved because there is no row.
-        let objects = objects.clone();
-        tokio::spawn(async move {
-            if let Err(error) = objects.delete(&key).await {
-                tracing::error!(%error, "remove the object of a document whose row failed to insert");
-            }
-        });
-        document_error(error, action)
-    })?;
-    store::document::write_document_revision_tx(
-        &mut *tx,
-        ctx.tenant,
-        &created,
-        "created",
-        Some(ctx.actor_id),
-    )
-    .await
-    .map_err(|error| document_error(error, action))?;
-
-    emit_document_event(
+    let (created, version) = create_from_bytes(
         &mut *tx,
         &ctx,
-        DOCUMENT_CREATED,
-        created.id,
-        json!({"id": created.id, "version": created.version.get()}),
+        NewBytesDocument {
+            action,
+            title,
+            content_type: &input.content_type,
+            kind,
+            project_id,
+            parent_document_id,
+            category,
+            unit,
+            meta: input.meta,
+        },
+        bytes,
     )
     .await?;
-    let etag = etag(created.version.get());
-    Ok(
-        HandlerOutput::created(document_out_with_names(&mut *tx, created, action).await?)
-            .with_etag(etag),
-    )
+    Ok(HandlerOutput::created(created).with_etag(etag(version)))
 }
 
 // ── documents.compose ─────────────────────────────────────────────────────────────────────
