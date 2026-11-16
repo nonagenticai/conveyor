@@ -1,6 +1,23 @@
 {
   "issues": [
     {
+      "number": 248,
+      "title": "ci: the registry refresh must regenerate the derived design-pack data",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/248",
+      "updatedAt": "2026-11-16T23:48:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 245,
       "title": "console: the authoring standard \u2014 templates, a blocked publish, and the coach's rework/kata triage",
       "state": "OPEN",
@@ -45,9 +62,9 @@
     {
       "number": 241,
       "title": "docs: point CODEOWNERS at the maintainers team and make the contribution guide true",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/241",
-      "updatedAt": "2026-11-16T22:36:14Z",
+      "updatedAt": "2026-11-16T23:46:06Z",
       "labels": [
         {
           "name": "unit",
