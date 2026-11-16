@@ -3,7 +3,7 @@ name = "seed-benchmark"
 description = "One-time generator for seed/benchmark/<slug>.json (S17). Not part of the product workspace."
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.99.0"
+rust-version = "1.100.0"
 license = "LicenseRef-Proprietary"
 publish = false
 
