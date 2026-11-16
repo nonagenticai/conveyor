@@ -93,7 +93,11 @@ pub const KINDS: [&str; 11] = [
 pub const GENERATE_IMAGE: &str = "media.generate_image";
 
 /// The capability kinds [`KINDS`] does not cover: declared here so the probe's test can name them.
-pub const DIRECT_KINDS: [&str; 1] = [GENERATE_IMAGE];
+///
+/// `media.transcribe` joins `media.generate_image`: both are served directly by an external model
+/// host rather than by an executor job, and both spend the tenant's money instead of writing the
+/// store alone (#173).
+pub const DIRECT_KINDS: [&str; 2] = [GENERATE_IMAGE, "media.transcribe"];
 
 /// The kinds that produce an artefact. The other four only measure.
 pub const WRITE_KINDS: [&str; 7] = [

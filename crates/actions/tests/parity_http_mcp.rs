@@ -4264,6 +4264,26 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             503,
         ),
+        // ── #173: the two audio capabilities ────────────────────────────────────────────────
+        // The same property as the image action: no `CONVEYOR_EXTERNAL_TTS_URL`/
+        // `ASR_URL` in the parity environment, so both transports must answer the SAME typed
+        // refusal. A sample that reached a host would store a document and could not be compared.
+        expecting(
+            plain(
+                "produce.speech",
+                json!({"text": "parity", "speed": 1.0}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain(
+                "media.transcribe",
+                json!({"document": "0192f5b0-0000-7000-8000-000000000000"}),
+                None,
+            ),
+            503,
+        ),
         // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────
         // The response is a pure function of the input — the deck writer has no clock, no
         // random id and no hash-map order — so a replay and an execution agree byte for byte.
