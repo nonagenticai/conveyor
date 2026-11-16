@@ -1,6 +1,6 @@
 # S15 steps 6–13 — knowledge, memory, wiring, readiness — evidence
 
-Measured 2026-11-09 on mini3; every Rust command through `rbuild` on m1 (CONTRACT §16).
+Measured 2026-11-09 on the dev box; every Rust command through `rbuild` on the build host (CONTRACT §16).
 
 ## Harness — real `strata_rag` (not a stub)
 
@@ -44,7 +44,7 @@ query returns 1. ⚠️ A prune whose `except_run` carries **no** document is re
 | `rbuild -- test -p conveyor-api --test portfolio_roundtrip` | 2 passed / 0 failed (scope count 63) |
 | `rbuild -- run -p conveyor-server -- --print-openapi --check-lock` | **exit 0 at 264 ops**, sha256 `9d1150b19c164aee…` |
 
-⚠️ `--write-lock` writes on **m1**; the file must be copied back explicitly (`rsync m1:<slot>/src/served-spec.lock.json`). `rbuild --copy-back <file>` appends `/` and expects a directory — it failed for a single file.
+⚠️ `--write-lock` writes on **the build host**; the file must be copied back explicitly (`rsync <build-host>:<slot>/src/served-spec.lock.json`). `rbuild --copy-back <file>` appends `/` and expects a directory — it failed for a single file.
 ⚠️ Workspace-wide `fmt`/`clippy` remained red on peer files during this pass (`apps/server/tests/common/mod.rs`, `eval_*`, `store/src/seed.rs`, `crates/store/tests/capability.rs`, `apps/server/src/eval_runner.rs`) and, at one point, `crates/auth/src/authn.rs` (web-ui RBAC mid-edit). None is in this lane.
 
 
