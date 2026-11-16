@@ -1287,3 +1287,258 @@ pub async fn insert_benefit_link_tx(
         .await?;
     Ok(row)
 }
+
+// ── programme_cadence ───────────────────────────────────────────────────────────────────
+// T1 stores the cadence row; T10 materialises its cards. No scheduler is built here.
+
+/// A cadence row.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct CadenceRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The programme.
+    pub programme_id: Uuid,
+    /// `pi | sprint | demo | retro | refinement`.
+    pub kind: String,
+    /// The period label.
+    pub period: String,
+    /// The state.
+    pub state: String,
+    /// Free-form metadata.
+    pub meta: Value,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+const CADENCE_COLUMNS: &str = "id, programme_id, kind, period, state, meta, version";
+
+/// Insert a cadence row.
+pub async fn insert_cadence_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+    kind: &str,
+    period: &str,
+    meta: &Value,
+) -> Result<CadenceRecord, PlanStoreError> {
+    ensure_parent_tx(&mut *conn, tenant, Parent::Programme, programme_id)
+        .await
+        .map_err(PlanStoreError::Parent)?;
+    let sql = format!(
+        "INSERT INTO programme_cadence (tenant_id, programme_id, kind, period, meta)
+         VALUES ($1, $2, $3, $4, $5) RETURNING {CADENCE_COLUMNS}"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .bind(kind)
+        .bind(period)
+        .bind(meta)
+        .fetch_one(&mut *conn)
+        .await?)
+}
+
+/// List a programme's cadence rows.
+pub async fn list_cadences_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<CadenceRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {CADENCE_COLUMNS} FROM programme_cadence
+          WHERE tenant_id = $1 AND programme_id = $2 ORDER BY created_at, id"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+// ── stakeholder_profile ─────────────────────────────────────────────────────────────────
+// The MSP profile: concerns, influence, exposure, support and engagement. Distinct from
+// `project_stakeholder` (0008), which records who is involved, not what they care about.
+
+/// A stakeholder profile.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct StakeholderRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The programme.
+    pub programme_id: Uuid,
+    /// The project, if the profile is project-scoped.
+    pub project_id: Option<Uuid>,
+    /// The name.
+    pub name: String,
+    /// Concerns.
+    pub concerns: String,
+    /// Sensitivities.
+    pub sensitivities: String,
+    /// Importance.
+    pub importance: String,
+    /// Influence.
+    pub influence: String,
+    /// Interest.
+    pub interest: String,
+    /// Exposure.
+    pub exposure: String,
+    /// Support level.
+    pub support_level: String,
+    /// Support trend.
+    pub support_trend: String,
+    /// Engagement target.
+    pub engagement_target: String,
+    /// Benefits distributed to the group.
+    pub benefits: Value,
+    /// Disbenefits distributed to the group.
+    pub disbenefits: Value,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+const STAKEHOLDER_COLUMNS: &str = "id, programme_id, project_id, name, concerns, sensitivities, \
+    importance, influence, interest, exposure, support_level, support_trend, engagement_target, \
+    benefits, disbenefits, version";
+
+/// A new stakeholder profile.
+#[derive(Clone, Debug, Default)]
+pub struct NewStakeholderProfile {
+    /// The programme.
+    pub programme_id: Uuid,
+    /// The project, if project-scoped.
+    pub project_id: Option<Uuid>,
+    /// The name.
+    pub name: String,
+    /// Concerns.
+    pub concerns: String,
+    /// Sensitivities.
+    pub sensitivities: String,
+    /// Importance.
+    pub importance: String,
+    /// Influence.
+    pub influence: String,
+    /// Interest.
+    pub interest: String,
+    /// Exposure.
+    pub exposure: String,
+    /// Support level.
+    pub support_level: String,
+    /// Support trend.
+    pub support_trend: String,
+    /// Engagement target.
+    pub engagement_target: String,
+    /// Benefits distributed to the group.
+    pub benefits: Value,
+    /// Disbenefits distributed to the group.
+    pub disbenefits: Value,
+}
+
+/// Insert a stakeholder profile.
+pub async fn insert_stakeholder_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewStakeholderProfile,
+) -> Result<StakeholderRecord, PlanStoreError> {
+    ensure_parent_tx(&mut *conn, tenant, Parent::Programme, new.programme_id)
+        .await
+        .map_err(PlanStoreError::Parent)?;
+    ensure_optional_parent_tx(&mut *conn, tenant, Parent::Project, new.project_id)
+        .await
+        .map_err(PlanStoreError::Parent)?;
+    let sql = format!(
+        "INSERT INTO stakeholder_profile
+            (tenant_id, programme_id, project_id, name, concerns, sensitivities, importance,
+             influence, interest, exposure, support_level, support_trend, engagement_target,
+             benefits, disbenefits)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+         RETURNING {STAKEHOLDER_COLUMNS}"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.programme_id)
+        .bind(new.project_id)
+        .bind(&new.name)
+        .bind(&new.concerns)
+        .bind(&new.sensitivities)
+        .bind(&new.importance)
+        .bind(&new.influence)
+        .bind(&new.interest)
+        .bind(&new.exposure)
+        .bind(&new.support_level)
+        .bind(&new.support_trend)
+        .bind(&new.engagement_target)
+        .bind(&new.benefits)
+        .bind(&new.disbenefits)
+        .fetch_one(&mut *conn)
+        .await?)
+}
+
+/// Read one stakeholder profile inside the caller's tenant.
+pub async fn get_stakeholder_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<StakeholderRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {STAKEHOLDER_COLUMNS} FROM stakeholder_profile WHERE tenant_id = $1 AND id = $2"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Edit a stakeholder profile under `If-Match`.
+#[allow(clippy::too_many_arguments)]
+pub async fn update_stakeholder_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    support_level: Option<&str>,
+    support_trend: Option<&str>,
+    engagement_target: Option<&str>,
+    concerns: Option<&str>,
+) -> Result<StakeholderRecord, PlanStoreError> {
+    let sql = format!(
+        "UPDATE stakeholder_profile SET
+            support_level = coalesce($4, support_level),
+            support_trend = coalesce($5, support_trend),
+            engagement_target = coalesce($6, engagement_target),
+            concerns = coalesce($7, concerns),
+            version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3
+          RETURNING {STAKEHOLDER_COLUMNS}"
+    );
+    let row: Option<StakeholderRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(support_level)
+        .bind(support_trend)
+        .bind(engagement_target)
+        .bind(concerns)
+        .fetch_optional(&mut *conn)
+        .await?;
+    row.ok_or(PlanStoreError::Stale {
+        what: "stakeholder profile",
+    })
+}
+
+/// List a programme's stakeholder profiles.
+pub async fn list_stakeholders_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<StakeholderRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {STAKEHOLDER_COLUMNS} FROM stakeholder_profile
+          WHERE tenant_id = $1 AND programme_id = $2 ORDER BY created_at, id"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}

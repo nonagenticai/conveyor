@@ -32,9 +32,10 @@ use crate::views::{Page, PageIn};
 
 pub use crate::board::views::IdIn;
 pub use store::spine::{
-    BaselineRecord, BenefitLinkRecord, BenefitRecord, DependencyRecord, InFlightRecord,
-    NewBenefitLink, NewBenefitProfile, NewRegisterItem, NewWbsNode, PlanStoreError, RegisterRecord,
-    TrancheRecord, WbsPatch, WbsRecord,
+    BaselineRecord, BenefitLinkRecord, BenefitRecord, CadenceRecord, DependencyRecord,
+    InFlightRecord, NewBenefitLink, NewBenefitProfile, NewRegisterItem, NewStakeholderProfile,
+    NewWbsNode, PlanStoreError, RegisterRecord, StakeholderRecord, TrancheRecord, WbsPatch,
+    WbsRecord,
 };
 
 /// The one event every spine mutation emits.
@@ -1598,4 +1599,361 @@ async fn benefits_link(
         version: record.version,
     })
     .with_etag(etag_of(record.version)))
+}
+
+// ── cadence and stakeholder views ───────────────────────────────────────────────────────
+
+/// A cadence row as `cadences.*` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CadenceOut {
+    /// The row id.
+    pub id: String,
+    /// The programme.
+    pub programme_id: String,
+    /// `pi | sprint | demo | retro | refinement`.
+    pub kind: String,
+    /// The period label.
+    pub period: String,
+    /// The state.
+    pub state: String,
+    /// Free-form metadata.
+    pub meta: Value,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+fn cadence_out(record: &CadenceRecord) -> CadenceOut {
+    CadenceOut {
+        id: record.id.to_string(),
+        programme_id: record.programme_id.to_string(),
+        kind: record.kind.clone(),
+        period: record.period.clone(),
+        state: record.state.clone(),
+        meta: record.meta.clone(),
+        version: record.version,
+    }
+}
+
+/// `cadences.create`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CadenceCreateIn {
+    /// The programme.
+    pub programme_id: Uuid,
+    /// `pi | sprint | demo | retro | refinement`.
+    pub kind: String,
+    /// The period label (e.g. `PI-2027.1`).
+    pub period: String,
+    /// Free-form metadata.
+    pub meta: Option<Value>,
+}
+
+/// `cadences.list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CadenceListIn {
+    /// The programme whose cadence rows are read.
+    pub programme_id: Uuid,
+}
+
+/// A stakeholder profile as `stakeholders.*` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct StakeholderOut {
+    /// The row id.
+    pub id: String,
+    /// The programme.
+    pub programme_id: String,
+    /// The project, if project-scoped.
+    pub project_id: Option<String>,
+    /// The name.
+    pub name: String,
+    /// Concerns.
+    pub concerns: String,
+    /// Sensitivities.
+    pub sensitivities: String,
+    /// Importance.
+    pub importance: String,
+    /// Influence.
+    pub influence: String,
+    /// Interest.
+    pub interest: String,
+    /// Exposure.
+    pub exposure: String,
+    /// Support level.
+    pub support_level: String,
+    /// Support trend.
+    pub support_trend: String,
+    /// Engagement target.
+    pub engagement_target: String,
+    /// Benefits distributed to the group.
+    pub benefits: Value,
+    /// Disbenefits distributed to the group.
+    pub disbenefits: Value,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+fn stakeholder_out(record: &StakeholderRecord) -> StakeholderOut {
+    StakeholderOut {
+        id: record.id.to_string(),
+        programme_id: record.programme_id.to_string(),
+        project_id: record.project_id.map(|id| id.to_string()),
+        name: record.name.clone(),
+        concerns: record.concerns.clone(),
+        sensitivities: record.sensitivities.clone(),
+        importance: record.importance.clone(),
+        influence: record.influence.clone(),
+        interest: record.interest.clone(),
+        exposure: record.exposure.clone(),
+        support_level: record.support_level.clone(),
+        support_trend: record.support_trend.clone(),
+        engagement_target: record.engagement_target.clone(),
+        benefits: record.benefits.clone(),
+        disbenefits: record.disbenefits.clone(),
+        version: record.version,
+    }
+}
+
+/// `stakeholders.profile_create`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct StakeholderCreateIn {
+    /// The programme.
+    pub programme_id: Uuid,
+    /// The project, if project-scoped.
+    pub project_id: Option<Uuid>,
+    /// The name.
+    pub name: String,
+    /// Concerns.
+    pub concerns: Option<String>,
+    /// Sensitivities.
+    pub sensitivities: Option<String>,
+    /// Importance.
+    pub importance: Option<String>,
+    /// Influence.
+    pub influence: Option<String>,
+    /// Interest.
+    pub interest: Option<String>,
+    /// Exposure.
+    pub exposure: Option<String>,
+    /// Support level.
+    pub support_level: Option<String>,
+    /// Support trend.
+    pub support_trend: Option<String>,
+    /// Engagement target.
+    pub engagement_target: Option<String>,
+    /// Benefits distributed to the group.
+    pub benefits: Option<Value>,
+    /// Disbenefits distributed to the group.
+    pub disbenefits: Option<Value>,
+}
+
+/// `stakeholders.profile_update`; `If-Match` is required.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct StakeholderUpdateIn {
+    /// The profile to edit.
+    pub id: Uuid,
+    /// The new support level.
+    pub support_level: Option<String>,
+    /// The new support trend.
+    pub support_trend: Option<String>,
+    /// The new engagement target.
+    pub engagement_target: Option<String>,
+    /// The new concerns.
+    pub concerns: Option<String>,
+}
+
+/// `stakeholders.profile_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct StakeholderListIn {
+    /// The programme whose profiles are read.
+    pub programme_id: Uuid,
+}
+
+/// Create a cadence row.
+#[crate::action(
+    name = "cadences.create",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_create(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CadenceCreateIn,
+) -> Result<HandlerOutput<CadenceOut>, ActionError> {
+    let kind = input.kind.trim().to_owned();
+    if !matches!(
+        kind.as_str(),
+        "pi" | "sprint" | "demo" | "retro" | "refinement"
+    ) {
+        return Err(invalid(
+            "kind",
+            "unknown_kind",
+            "kind must be pi, sprint, demo, retro or refinement",
+        ));
+    }
+    let period = input.period.trim().to_owned();
+    if period.is_empty() {
+        return Err(invalid("period", "required", "a period label is required"));
+    }
+    let record = store::spine::insert_cadence_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.programme_id,
+        &kind,
+        &period,
+        &input.meta.unwrap_or_else(|| serde_json::json!({})),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "programme_cadence", record.id, "created").await?;
+    Ok(HandlerOutput::created(cadence_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// List a programme's cadence rows.
+#[crate::action(
+    name = "cadences.list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CadenceListIn,
+) -> Result<Page<CadenceOut>, ActionError> {
+    let records = store::spine::list_cadences_tx(&mut *tx, ctx.tenant, input.programme_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(cadence_out).collect(),
+        next_cursor: None,
+    })
+}
+
+/// Create a stakeholder profile.
+#[crate::action(
+    name = "stakeholders.profile_create",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn stakeholders_profile_create(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: StakeholderCreateIn,
+) -> Result<HandlerOutput<StakeholderOut>, ActionError> {
+    let name = input.name.trim().to_owned();
+    if name.is_empty() {
+        return Err(invalid(
+            "name",
+            "required",
+            "a stakeholder name is required",
+        ));
+    }
+    let record = store::spine::insert_stakeholder_tx(
+        &mut *tx,
+        ctx.tenant,
+        &NewStakeholderProfile {
+            programme_id: input.programme_id,
+            project_id: input.project_id,
+            name,
+            concerns: input.concerns.unwrap_or_default(),
+            sensitivities: input.sensitivities.unwrap_or_default(),
+            importance: input.importance.unwrap_or_default(),
+            influence: input.influence.unwrap_or_default(),
+            interest: input.interest.unwrap_or_default(),
+            exposure: input.exposure.unwrap_or_default(),
+            support_level: input.support_level.unwrap_or_default(),
+            support_trend: input.support_trend.unwrap_or_default(),
+            engagement_target: input.engagement_target.unwrap_or_default(),
+            benefits: input.benefits.unwrap_or_else(|| serde_json::json!([])),
+            disbenefits: input.disbenefits.unwrap_or_else(|| serde_json::json!([])),
+        },
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "stakeholder_profile", record.id, "created").await?;
+    Ok(HandlerOutput::created(stakeholder_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// Edit a stakeholder profile; `If-Match` is required.
+#[crate::action(
+    name = "stakeholders.profile_update",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn stakeholders_profile_update(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: StakeholderUpdateIn,
+) -> Result<HandlerOutput<StakeholderOut>, ActionError> {
+    let current = store::spine::get_stakeholder_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such stakeholder profile"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    let record = store::spine::update_stakeholder_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+        input.support_level.as_deref(),
+        input.support_trend.as_deref(),
+        input.engagement_target.as_deref(),
+        input.concerns.as_deref(),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "stakeholder_profile", record.id, "updated").await?;
+    Ok(HandlerOutput::ok(stakeholder_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// List a programme's stakeholder profiles.
+#[crate::action(
+    name = "stakeholders.profile_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn stakeholders_profile_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: StakeholderListIn,
+) -> Result<Page<StakeholderOut>, ActionError> {
+    let records = store::spine::list_stakeholders_tx(&mut *tx, ctx.tenant, input.programme_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(stakeholder_out).collect(),
+        next_cursor: None,
+    })
 }

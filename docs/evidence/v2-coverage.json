@@ -397,7 +397,7 @@
       "verdict": "extend",
       "evidence": [
         "actions: baselines.* found (baselines.get, baselines.list, baselines.take)",
-        "actions: cadences.* absent",
+        "actions: cadences.* found (cadences.create, cadences.list)",
         "actions: governed_assets.* absent",
         "actions: programme_config.* absent",
         "actions: programmes.* found (programmes.create, programmes.get, programmes.list…)",

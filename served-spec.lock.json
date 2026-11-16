@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "72106617da08a873dd4b95dea88e1d1661c82c69df36c96937bce9f1a975dfc9",
+    "GET /api/actions": "7cb6e03907c16edf7cbdfb5a0ea2a34502dc493df92348d31da889fc870c9367",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -52,6 +52,8 @@
     "POST /api/actions/billing.summary/invocations": "d1c353db2c945789fcb0dd6d3e9585bacae19d233a1c80e34a710bc338ac0421",
     "POST /api/actions/boards.get/invocations": "1e036af70e8a186779f49b6c44d3357e228d00f7623d0f8e5d63b198beb6d54c",
     "POST /api/actions/boards.set_member/invocations": "07ecc461ab9909db7058e2e3779d8450191b4844363a08d720d124fb7c525b35",
+    "POST /api/actions/cadences.create/invocations": "9d54d8d41edbdd2c7ff366596d79f97a89a3d88eb80f561a671c8a54f7b52ef1",
+    "POST /api/actions/cadences.list/invocations": "0f4418eb757448407b8b5c8aae150da422809f506871429a9e758ca0d5f15502",
     "POST /api/actions/capabilities.bind_knowledge/invocations": "cc6dc3414dbf20376def006df311fce534f419d1b1354c58da33f0c62071d880",
     "POST /api/actions/capabilities.get/invocations": "0da5c9cf821b0420bab1d95478af6c439cd06e87fbe821dbcd8ee74b3e6ffc54",
     "POST /api/actions/capabilities.list/invocations": "05b84f5181c45f7be20f5269faa95a21711554819789598c726f9c4d91ac4bea",
@@ -347,6 +349,9 @@
     "POST /api/actions/stakeholders.delete/invocations": "dbc2439a9e88b630734c1c17f028844c511b147a8e98c418077af6ab84b1d132",
     "POST /api/actions/stakeholders.get/invocations": "f90a62a0b34ee798b9313ca8839457c4180bf90abfd93ef4832500f94f6a6957",
     "POST /api/actions/stakeholders.list/invocations": "e6eca119390023f079fcd615f73443259c88dd2cac59d99cc4f1cea96a3ca3e4",
+    "POST /api/actions/stakeholders.profile_create/invocations": "5d6a8f06ef7334a0cfa53a03108c8f3566bde5b3aa4777bd7057c870b29e5125",
+    "POST /api/actions/stakeholders.profile_list/invocations": "0c4f1f27c64d00982bf4f9dc2d0ddc9a1e5e441b699d99128097e226d714c553",
+    "POST /api/actions/stakeholders.profile_update/invocations": "55cc5a92562f73550b826dc7e81942ffb73420169fbace2f377c8d81da840ae4",
     "POST /api/actions/stakeholders.update/invocations": "f504e3e98b283cd9b668d9a8a7dcc57c63ed3c9cb09ca1a82ac3500cb03161be",
     "POST /api/actions/task_lists.create/invocations": "8454d09770bd52c3946bca7bb35c05c3fef8ceb208c33fa739c03c0ca3238c0d",
     "POST /api/actions/task_lists.delete/invocations": "f78b4dda959bc731cd2f80fb4a630529aaf1ebeaca9c475cfa727faa53bfcb60",

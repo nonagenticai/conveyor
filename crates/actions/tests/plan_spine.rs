@@ -579,3 +579,74 @@ async fn a_tranche_review_without_evidence_is_refused() {
     assert_eq!(status, 200, "{reviewed}");
     assert_eq!(output(&reviewed)["state"], "closed");
 }
+
+/// The cadence row and the stakeholder profile are T1's MSP rows; their actions are ordinary
+/// CRUD over the same tenant-scoped envelope. This is a smoke test, not one of the ten
+/// acceptance scenarios (which are the parts of #72).
+#[tokio::test(flavor = "multi_thread")]
+async fn cadences_and_stakeholder_profiles_are_rows() {
+    let (_pg, running, _seeded) = fixture().await;
+    let programme = create_programme(&running, "Cadence programme").await;
+
+    let (status, cadence) = running
+        .invoke(
+            "cadences.create",
+            "dev:alice",
+            json!({"programme_id": programme, "kind": "pi", "period": "PI-2027.1"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{cadence}");
+    let (status, listed) = running
+        .invoke(
+            "cadences.list",
+            "dev:alice",
+            json!({"programme_id": programme}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{listed}");
+    assert_eq!(
+        output(&listed)["items"].as_array().map(|items| items.len()),
+        Some(1)
+    );
+
+    let (status, headers, profile) = running
+        .invoke_full(
+            "stakeholders.profile_create",
+            "dev:alice",
+            json!({
+                "programme_id": programme,
+                "name": "Sponsoring group",
+                "influence": "high",
+                "interest": "high",
+                "support_level": "medium"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{profile}");
+    let etag = headers
+        .get("etag")
+        .cloned()
+        .expect("the profile carries an ETag");
+    let id = id_of(output(&profile), "id");
+    let (status, updated) = running
+        .invoke(
+            "stakeholders.profile_update",
+            "dev:alice",
+            json!({"id": id, "support_level": "high"}),
+            Some(etag.as_str()),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{updated}");
+    assert_eq!(output(&updated)["support_level"], "high");
+}
