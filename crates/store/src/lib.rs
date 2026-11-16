@@ -130,6 +130,9 @@ pub mod seed_organisation;
 pub mod seed_programme;
 pub mod snapshot;
 pub mod task;
+// #160: the tenant's registered inference destination — one row per tenant, read by the executor
+// before it falls back to the platform environment.
+pub mod tenant_inference;
 pub mod tenants;
 pub mod trace_link;
 pub mod validation;

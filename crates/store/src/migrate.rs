@@ -192,7 +192,10 @@ mod tests {
                 // #156: the work store — provenance, the publish request, promoted
                 // `category`/`unit`, and the attachment kind on `document`
                 // (0042_document_workflow.sql).
-                (42, "document workflow".to_owned())
+                (42, "document workflow".to_owned()),
+                // #160: the tenant's registered inference destination
+                // (0043_tenant_inference_endpoint.sql).
+                (43, "tenant inference endpoint".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

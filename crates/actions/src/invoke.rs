@@ -579,6 +579,35 @@ pub fn service_url(service: &str) -> Option<String> {
         .filter(|value| !value.trim().is_empty())
 }
 
+/// The destination a tenant registered for `service`, or `None` when it registered none.
+///
+/// The tenant's own row wins over the platform environment: the credential was already
+/// per-tenant while the destination was process-global, and #160 removes that asymmetry. Only the
+/// inference service has tenant-scoped destinations today; every other external action keeps the
+/// environment-only resolution. A store error is logged and treated as "not registered", so a
+/// config-read failure cannot take the platform default away with it.
+async fn tenant_service_url(pool: &PgPool, tenant: TenantId, service: &str) -> Option<String> {
+    if service != crate::integrations::inference::SERVICE {
+        return None;
+    }
+    let mut tx = match store::begin_scoped(pool, tenant).await {
+        Ok(tx) => tx,
+        Err(error) => {
+            tracing::warn!(%error, service, "scope the tenant inference endpoint read");
+            return None;
+        }
+    };
+    let registered = store::tenant_inference::destination(&mut tx, tenant).await;
+    let _ = tx.rollback().await;
+    match registered {
+        Ok(value) => value,
+        Err(error) => {
+            tracing::warn!(%error, service, "read the tenant inference endpoint");
+            None
+        }
+    }
+}
+
 /// The bearer a sealed secret carries.
 ///
 /// A tenant's BYO credential is stored raw; a token written from the licences API is the JSON
@@ -987,7 +1016,11 @@ async fn invoke_external(
         return Err(ActionError::circuit_open(spec.name));
     }
 
-    let Some(base) = service_url(service) else {
+    let base = match tenant_service_url(pool, ctx.tenant, service).await {
+        Some(url) => Some(url),
+        None => service_url(service),
+    };
+    let Some(base) = base else {
         let elapsed = started.elapsed().as_millis() as i32;
         record_failure(
             pool,
