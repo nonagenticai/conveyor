@@ -65,6 +65,10 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
         .await
         .map_err(PublishOutputsError::from)?;
     let projects = store::project::list_projects_tx(&mut tx, args.tenant, None, 1000).await?;
+    let attachments = store::document::list_published_attachments_tx(&mut tx, args.tenant)
+        .await
+        .map_err(PublishOutputsError::from)?;
+    let names = crate::outputs::author_names(&mut tx, &records).await?;
     tx.rollback().await?;
 
     let generated_at = generated_at(&records);
@@ -93,7 +97,18 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
             record.body = Some(redact_text(body));
         }
     }
-    let (outputs_js, pages) = render_outputs(&redacted, &projects, &generated_at)?;
+    // An attachment's title is the file name the public page shows; it is free text too.
+    let mut redacted_attachments = attachments;
+    for attachment in &mut redacted_attachments {
+        attachment.title = redact_text(&attachment.title);
+    }
+    let (outputs_js, pages) = render_outputs(
+        &redacted,
+        &projects,
+        &redacted_attachments,
+        &names,
+        &generated_at,
+    )?;
 
     Ok(SiteView {
         snapshot_js,

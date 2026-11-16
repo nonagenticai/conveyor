@@ -200,7 +200,9 @@ async fn documents_ingest(
     )
     .await?;
 
-    Ok(HandlerOutput::ok(DocumentOut::from(updated)))
+    Ok(HandlerOutput::ok(
+        super::actions::document_out_with_names(&mut *tx, updated, "documents.ingest").await?,
+    ))
 }
 
 /// The file name the upstream records: the document's title, with anything a path would choke on removed.
