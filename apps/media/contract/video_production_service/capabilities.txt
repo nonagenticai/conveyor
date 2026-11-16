@@ -1,0 +1,23 @@
+# The capability kinds this service owns after its drop table (see README.md).
+#
+# Two kinds, split on what the executor actually has to own, not on route grouping:
+#
+#   media.produce_video   Deterministic production of a video deliverable from explicit
+#                         shot definitions and supplied assets. The measured reference
+#                         path is already per-shot PNG render + ffmpeg encode: the
+#                         animation recorder seeks a page per frame, screenshots PNGs,
+#                         then encodes them. Compilation composes supplied clips and
+#                         generated title cards with ffmpeg. No continuous capture.
+#
+#   media.record_browser  A live browser session captured in real time. Playwright
+#                         records the context (`record_video_dir`), so the output
+#                         timeline is wall-clock and cannot be reproduced as a per-shot
+#                         PNG + ffmpeg job; it needs a running Chromium for the duration
+#                         of the recording. Covers HTML content, remote URLs, scripted
+#                         parts and screenshot capture.
+#
+# Everything else the reference serves (job polling/status/cancel/result/download,
+# batches, catalogue CRUD, analytics, SSE events, health/metrics, admin cleanup) is
+# dropped with a reason in the README drop table — never decomposed into a kind.
+media.produce_video
+media.record_browser

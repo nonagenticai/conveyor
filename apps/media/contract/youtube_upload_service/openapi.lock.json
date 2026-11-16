@@ -1,0 +1,1859 @@
+{
+  "components": {
+    "parameters": {
+      "TenantIdHeader": {
+        "description": "License token transport: `Bearer <token>`.",
+        "in": "header",
+        "name": "X-Tenant-Id",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "AuthConnectResponse": {
+        "description": "Response for POST /api/auth/connect.",
+        "properties": {
+          "authorization_url": {
+            "description": "Google consent URL to redirect the user to",
+            "title": "Authorization Url",
+            "type": "string"
+          },
+          "state": {
+            "description": "Opaque state token for CSRF protection",
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "authorization_url",
+          "state"
+        ],
+        "title": "AuthConnectResponse",
+        "type": "object"
+      },
+      "AuthDisconnectResponse": {
+        "description": "Response for DELETE /api/auth/disconnect.",
+        "properties": {
+          "disconnected": {
+            "title": "Disconnected",
+            "type": "boolean"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "disconnected",
+          "tenant_id"
+        ],
+        "title": "AuthDisconnectResponse",
+        "type": "object"
+      },
+      "AuthStatusResponse": {
+        "description": "Response for GET /api/auth/status.\n\n``connected`` is true ONLY for the tenant's own live grant. A tenant served by\nthe platform channel is ``status=\"platform_default\"`` with ``connected=false``\n(``can_publish=true``); a tenant whose grant Google refused is\n``status=\"reconnect_required\"`` (``can_publish=false``).",
+        "properties": {
+          "can_publish": {
+            "description": "Whether an upload for this tenant would be attempted (own grant, or the operator-enabled platform channel)",
+            "title": "Can Publish",
+            "type": "boolean"
+          },
+          "channel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Id"
+          },
+          "channel_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Title"
+          },
+          "connected": {
+            "description": "True only when the tenant's OWN grant is live",
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "connected_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connected At"
+          },
+          "mode": {
+            "description": "Which resolution branch an upload takes: the tenant's own grant, the platform channel, or none (uploads fail with 'connect YouTube')",
+            "enum": [
+              "tenant",
+              "platform",
+              "none"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "needs_reconnect": {
+            "default": false,
+            "description": "mode=tenant only: the grant is unusable (refused by Google, or issued by an OAuth client the tenant no longer has); uploads fail until reconnect",
+            "title": "Needs Reconnect",
+            "type": "boolean"
+          },
+          "reconnect_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reconnect Reason"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Scopes",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "connected",
+              "reconnect_required",
+              "platform_default",
+              "not_connected"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "token_expiry": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Expiry"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "connected",
+          "status",
+          "mode",
+          "can_publish",
+          "tenant_id"
+        ],
+        "title": "AuthStatusResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "OAuthClientRequest": {
+        "description": "``PUT /api/settings/oauth-client`` — both fields required.",
+        "properties": {
+          "client_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Client Id",
+            "type": "string"
+          },
+          "client_secret": {
+            "format": "password",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Client Secret",
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "client_id",
+          "client_secret"
+        ],
+        "title": "OAuthClientRequest",
+        "type": "object"
+      },
+      "PlatformChannelRequest": {
+        "description": "``PUT /api/admin/platform-channel``. Omitted secrets keep the stored ones.",
+        "properties": {
+          "channel_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Channel Id",
+            "type": "string"
+          },
+          "channel_title": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Channel Title",
+            "type": "string"
+          },
+          "client_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Client Id",
+            "type": "string"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "format": "password",
+                "maxLength": 512,
+                "type": "string",
+                "writeOnly": true
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Secret"
+          },
+          "default_for_tenants": {
+            "title": "Default For Tenants",
+            "type": "boolean"
+          },
+          "refresh_token": {
+            "anyOf": [
+              {
+                "format": "password",
+                "maxLength": 2048,
+                "type": "string",
+                "writeOnly": true
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh Token"
+          }
+        },
+        "required": [
+          "client_id",
+          "channel_id",
+          "channel_title",
+          "default_for_tenants"
+        ],
+        "title": "PlatformChannelRequest",
+        "type": "object"
+      },
+      "PlatformChannelResponse": {
+        "description": "Operator view; secrets as ``has_*`` only.",
+        "properties": {
+          "channel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Id"
+          },
+          "channel_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Title"
+          },
+          "client_id": {
+            "title": "Client Id",
+            "type": "string"
+          },
+          "default_for_tenants": {
+            "title": "Default For Tenants",
+            "type": "boolean"
+          },
+          "has_client_secret": {
+            "title": "Has Client Secret",
+            "type": "boolean"
+          },
+          "has_refresh_token": {
+            "title": "Has Refresh Token",
+            "type": "boolean"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          }
+        },
+        "required": [
+          "client_id",
+          "has_client_secret",
+          "has_refresh_token",
+          "default_for_tenants"
+        ],
+        "title": "PlatformChannelResponse",
+        "type": "object"
+      },
+      "PlatformChannelSummary": {
+        "properties": {
+          "channel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Id"
+          },
+          "channel_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Title"
+          }
+        },
+        "title": "PlatformChannelSummary",
+        "type": "object"
+      },
+      "SetPrivacyRequest": {
+        "description": "Body of ``POST /api/upload/jobs/{job_id}/privacy`` — the governed release target.",
+        "properties": {
+          "privacy_status": {
+            "description": "Visibility to raise the uploaded video to (``private`` is /retract's job).",
+            "enum": [
+              "unlisted",
+              "public"
+            ],
+            "title": "Privacy Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "privacy_status"
+        ],
+        "title": "SetPrivacyRequest",
+        "type": "object"
+      },
+      "TenantPlatformChannelRequest": {
+        "description": "``PUT /api/admin/tenants/{tenant_id}/platform-channel`` — ``allowed`` must be sent.",
+        "properties": {
+          "allowed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "true/false, or null = follow the platform default",
+            "title": "Allowed"
+          }
+        },
+        "required": [
+          "allowed"
+        ],
+        "title": "TenantPlatformChannelRequest",
+        "type": "object"
+      },
+      "TenantPlatformChannelResponse": {
+        "properties": {
+          "effective_platform_channel_allowed": {
+            "title": "Effective Platform Channel Allowed",
+            "type": "boolean"
+          },
+          "platform_channel_allowed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform Channel Allowed"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "effective_platform_channel_allowed"
+        ],
+        "title": "TenantPlatformChannelResponse",
+        "type": "object"
+      },
+      "TenantSettingsListItem": {
+        "properties": {
+          "has_grant": {
+            "title": "Has Grant",
+            "type": "boolean"
+          },
+          "has_oauth_client": {
+            "title": "Has Oauth Client",
+            "type": "boolean"
+          },
+          "platform_channel_allowed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform Channel Allowed"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "has_grant",
+          "has_oauth_client"
+        ],
+        "title": "TenantSettingsListItem",
+        "type": "object"
+      },
+      "TenantSettingsResponse": {
+        "description": "``GET /api/settings`` — also the body of oauth-client PUT/DELETE.",
+        "properties": {
+          "effective_platform_channel_allowed": {
+            "title": "Effective Platform Channel Allowed",
+            "type": "boolean"
+          },
+          "has_oauth_client_secret": {
+            "title": "Has Oauth Client Secret",
+            "type": "boolean"
+          },
+          "oauth_client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oauth Client Id"
+          },
+          "platform_channel": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlatformChannelSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "platform_channel_allowed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The tenant's own setting; null = follow the platform default",
+            "title": "Platform Channel Allowed"
+          },
+          "redirect_uri": {
+            "description": "Register this as an Authorized redirect URI",
+            "title": "Redirect Uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "has_oauth_client_secret",
+          "redirect_uri",
+          "effective_platform_channel_allowed"
+        ],
+        "title": "TenantSettingsResponse",
+        "type": "object"
+      },
+      "UploadJobListResponse": {
+        "description": "Response for GET /api/upload/jobs.",
+        "properties": {
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/UploadJobResponse"
+            },
+            "title": "Jobs",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "jobs",
+          "total"
+        ],
+        "title": "UploadJobListResponse",
+        "type": "object"
+      },
+      "UploadJobResponse": {
+        "description": "Response for upload job status.",
+        "properties": {
+          "caption_applied": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption Applied"
+          },
+          "caption_requested": {
+            "default": false,
+            "title": "Caption Requested",
+            "type": "boolean"
+          },
+          "category_id": {
+            "title": "Category Id",
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "file_source": {
+            "title": "File Source",
+            "type": "string"
+          },
+          "file_source_type": {
+            "title": "File Source Type",
+            "type": "string"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "privacy_status": {
+            "title": "Privacy Status",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "thumbnail_applied": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail Applied"
+          },
+          "thumbnail_requested": {
+            "default": false,
+            "title": "Thumbnail Requested",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "youtube_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Youtube Url"
+          },
+          "youtube_video_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Youtube Video Id"
+          }
+        },
+        "required": [
+          "job_id",
+          "tenant_id",
+          "status",
+          "file_source",
+          "file_source_type",
+          "title",
+          "category_id",
+          "privacy_status"
+        ],
+        "title": "UploadJobResponse",
+        "type": "object"
+      },
+      "UploadRequest": {
+        "description": "Request body for POST /api/upload.",
+        "properties": {
+          "caption_language": {
+            "default": "en",
+            "description": "ISO 639-1 language code for the caption track (only used when caption_source set)",
+            "maxLength": 10,
+            "title": "Caption Language",
+            "type": "string"
+          },
+          "caption_source": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional soft closed-caption track (SRT/VTT URL). Attached best-effort post-upload via captions().insert.",
+            "title": "Caption Source"
+          },
+          "caption_source_type": {
+            "const": "url",
+            "default": "url",
+            "description": "Caption source type — 'url' is the only supported value",
+            "title": "Caption Source Type",
+            "type": "string"
+          },
+          "category_id": {
+            "default": "22",
+            "description": "YouTube category ID (22 = People & Blogs)",
+            "pattern": "^\\d{1,3}$",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "YouTube video description (YouTube's API cap is 5000 chars)",
+            "title": "Description"
+          },
+          "file_source": {
+            "description": "URL to the video",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "File Source",
+            "type": "string"
+          },
+          "file_source_type": {
+            "const": "url",
+            "default": "url",
+            "description": "Source type — 'url' is the only supported value",
+            "title": "File Source Type",
+            "type": "string"
+          },
+          "privacy_status": {
+            "default": "private",
+            "description": "Video privacy status",
+            "pattern": "^(public|unlisted|private)$",
+            "title": "Privacy Status",
+            "type": "string"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 500,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Video tags. YouTube's total tag byte cap is ~500 chars; we bound the list to 500 items as a DoS ceiling and each tag to 100 chars.",
+            "title": "Tags"
+          },
+          "thumbnail_source": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional custom thumbnail URL. Applied best-effort post-upload.",
+            "title": "Thumbnail Source"
+          },
+          "thumbnail_source_type": {
+            "const": "url",
+            "default": "url",
+            "description": "Thumbnail source type — 'url' is the only supported value",
+            "title": "Thumbnail Source Type",
+            "type": "string"
+          },
+          "title": {
+            "description": "YouTube video title",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_source",
+          "title"
+        ],
+        "title": "UploadRequest",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "bearerFormat": "License",
+        "description": "License token. Transport: `X-Tenant-Id: Bearer <token>` (not the Authorization header — that is reserved for caller-side auth).",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "YouTube upload microservice: OAuth2 authorization and async video upload",
+    "title": "YouTube Upload Service",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Return service info and available endpoint listing.",
+        "operationId": "service_root",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Service Root",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Service banner + endpoint index",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/admin/platform-channel": {
+      "get": {
+        "operationId": "get_youtube_platform_channel",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/PlatformChannelResponse"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Get Youtube Platform Channel"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "The platform YouTube channel (null when unconfigured; no secrets)",
+        "tags": [
+          "admin"
+        ]
+      },
+      "put": {
+        "operationId": "put_youtube_platform_channel",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformChannelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformChannelResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create/update the platform YouTube channel (omitted secrets are kept)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/admin/tenant-settings": {
+      "get": {
+        "operationId": "list_youtube_tenant_settings",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TenantSettingsListItem"
+                  },
+                  "title": "Response List Youtube Tenant Settings",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Every tenant with YouTube settings or a grant (no secrets)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/admin/tenants/{tenant_id}/platform-channel": {
+      "put": {
+        "operationId": "put_tenant_youtube_platform_channel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "title": "Tenant Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantPlatformChannelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantPlatformChannelResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Allow/deny a tenant the platform channel (null = follow the default)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/auth/callback": {
+      "get": {
+        "description": "Handle Google's OAuth2 redirect. Exchanges code for tokens and stores them.",
+        "operationId": "handle_youtube_auth_callback",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Code"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "in": "query",
+            "name": "error",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Error"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "OAuth2 redirect endpoint — exchanges code for tokens (PUBLIC)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/connect": {
+      "post": {
+        "description": "Start the OAuth2 flow. Returns a Google consent URL for the tenant.\n\nThe one-time ``state`` is bound to ``tenant_id`` — the OWNER tenant — so the\npublic callback stores the grant under the tenant whose uploads will use it —\nand to the OAuth client that starts the flow (the tenant's own client when\nconfigured, else the platform client), so the callback exchanges the code\nwith that same client and records it on the grant.",
+        "operationId": "connect_youtube_auth",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthConnectResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Start the OAuth2 flow — returns a Google consent URL",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/disconnect": {
+      "delete": {
+        "description": "Remove the tenant's stored YouTube OAuth2 tokens.",
+        "operationId": "disconnect_youtube_auth",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthDisconnectResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Remove the tenant's stored YouTube OAuth2 tokens",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/status": {
+      "get": {
+        "description": "Report the tenant's YouTube connection truthfully.\n\n``connected`` only for the tenant's own live grant; ``platform_default`` and\n``reconnect_required`` are distinct states, never folded into ``connected``.\nReadable by any member (it only reports), unlike connect/disconnect.",
+        "operationId": "get_youtube_auth_status",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Check whether the tenant has a connected YouTube account",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/settings": {
+      "get": {
+        "operationId": "get_youtube_settings",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantSettingsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "The owner tenant's YouTube settings (no secrets)",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/oauth-client": {
+      "delete": {
+        "description": "A grant the removed client issued is marked ``needs_reconnect``.",
+        "operationId": "delete_youtube_oauth_client",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantSettingsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Remove the tenant's own Google OAuth client",
+        "tags": [
+          "settings"
+        ]
+      },
+      "put": {
+        "description": "A grant issued by a different client is marked ``needs_reconnect``.",
+        "operationId": "put_youtube_oauth_client",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthClientRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantSettingsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Store the tenant's own Google OAuth client (secret is write-only)",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/upload": {
+      "post": {
+        "description": "Create an upload job and return immediately with a job_id for polling.\n\nA render that is already on YouTube for this tenant is a **409**, not a\nsecond upload. This route is the only entry point to the upload path (there\nis no automatic retry anywhere in the service), so a repeat request is a\nhuman re-submitting — usually after reading a job the reaper marked\n``failed``, which is not evidence that nothing was published. The 409 names\nthe existing video so the operator can check the channel.",
+        "operationId": "start_youtube_upload",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create a YouTube upload job — returns immediately with a job_id",
+        "tags": [
+          "upload"
+        ]
+      }
+    },
+    "/api/upload/jobs": {
+      "get": {
+        "description": "List upload jobs for the calling tenant (scoped to the real owner).",
+        "operationId": "list_youtube_upload_jobs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadJobListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "List YouTube upload jobs for the authenticated tenant",
+        "tags": [
+          "upload"
+        ]
+      }
+    },
+    "/api/upload/jobs/{job_id}": {
+      "get": {
+        "description": "Poll the status of a specific upload job (scoped to the calling tenant).",
+        "operationId": "get_youtube_upload_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Poll the status of a specific YouTube upload job",
+        "tags": [
+          "upload"
+        ]
+      }
+    },
+    "/api/upload/jobs/{job_id}/privacy": {
+      "post": {
+        "description": "Raise the job's YouTube video to ``unlisted``/``public``. Never deletes, never lowers.\n\nCalled by the governed ``marketing.publish_video`` release of a video uploaded private.\n404: no such job for this owner. 409: the job never published a video.\n503: no channel credentials. 502: YouTube refused or no longer has the video.",
+        "operationId": "set_youtube_upload_privacy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPrivacyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Release a private upload: set its YouTube video to unlisted or public",
+        "tags": [
+          "upload"
+        ]
+      }
+    },
+    "/api/upload/jobs/{job_id}/retract": {
+      "post": {
+        "description": "Set the job's YouTube video to ``private``. Only ever reduces visibility.\n\n404: no such job for this owner. 409: the job never published a video.\n503: no channel credentials. 502: YouTube refused or no longer has the video.",
+        "operationId": "retract_youtube_upload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Retract a published upload: set its YouTube video to private (reversible)",
+        "tags": [
+          "upload"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Combined health check for all components.",
+        "operationId": "health_check",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Combined health probe — database + redis + api status",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Kubernetes liveness probe.",
+        "operationId": "health_live",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness probe — 200 if the process is up",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Kubernetes readiness probe -- checks database connectivity.\n\nReturns 503 (never 500) when the engine is missing or unreachable; see the\n``_DB_ENGINE_MISSING`` note above.",
+        "operationId": "health_ready",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readiness probe — 200 once the database is reachable, 503 otherwise",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "description": "Modern K8s liveness probe path (alias of /health/live).",
+        "operationId": "health.live",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health.Live",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Healthz",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/readyz": {
+      "get": {
+        "description": "Modern K8s readiness probe path (alias of /health/ready).",
+        "operationId": "health.ready",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readyz",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Liveness, readiness, and basic service-status probes.",
+      "name": "health"
+    },
+    {
+      "description": "OAuth2 authorization for the YouTube Data API — connect, callback, status, disconnect.",
+      "name": "auth"
+    },
+    {
+      "description": "Async YouTube video upload jobs — create, poll, list.",
+      "name": "upload"
+    },
+    {
+      "description": "Per-tenant YouTube settings (own OAuth client; no secrets returned).",
+      "name": "settings"
+    },
+    {
+      "description": "Operator: platform YouTube channel and per-tenant permission.",
+      "name": "admin"
+    }
+  ]
+}

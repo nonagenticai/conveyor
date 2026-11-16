@@ -44,6 +44,17 @@ impl NewBoard {
     }
 }
 
+/// The board every project gets. One board per project today, but the FK is the contract, not a
+/// 1:1 assumption (data-arch §2.3).
+///
+/// One definition for the action (`projects.create`, `project_requests.promote`) and the seeds:
+/// a board the programme seed gives a project must be the board the action would have given it,
+/// or the console shows two shapes of board for the same kind of project.
+pub const DEFAULT_BOARD_NAME: &str = "Board";
+
+/// The `board_template` code a new project's board reads its lanes from.
+pub const DEFAULT_TEMPLATE_CODE: &str = "standard";
+
 /// A card type to create.
 #[derive(Clone, Debug)]
 pub struct NewCardType {

@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html><head><title>YouTube Connected</title></head>
+<body style="font-family:sans-serif;text-align:center;padding:60px">
+<h1>Session Expired</h1><p>State token is invalid or expired. Please try again.</p>
+<p style="color:#666">You can close this window.</p>
+</body></html>

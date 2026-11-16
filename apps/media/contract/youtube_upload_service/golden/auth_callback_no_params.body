@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html><head><title>YouTube Connected</title></head>
+<body style="font-family:sans-serif;text-align:center;padding:60px">
+<h1>Invalid Request</h1><p>Missing code or state parameter</p>
+<p style="color:#666">You can close this window.</p>
+</body></html>

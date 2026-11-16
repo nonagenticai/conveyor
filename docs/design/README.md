@@ -27,12 +27,16 @@ explicitly with `?design=1`. The pack still loads the fixture scripts, but no pu
 them.
 
 **Outputs** is the programme register: every output across all projects with its project, unit,
-category, visibility and public URL. Signed in it composes, edits with `If-Match`, publishes and
-unpublishes (the row's own `publishable` flag), downloads and deletes; signed out it lists the
-published index only. A project's workspace adds its tranche, `blocked_by`, measured status and
-evidence from `data/coverage.json`, groups its outputs by unit and category, and shows an
-**inception checklist** — an analysis and an architecture, each present and published — with a
-compose template for each. A missing inception output is a visible gap; it is not a backend gate.
+category, visibility and public URL, filtered by project, unit, category and visibility. Signed in
+it composes, edits with `If-Match`, publishes and unpublishes (the row's own `publishable` flag),
+downloads and deletes; signed out it lists the published index only. A project's workspace adds its
+tranche, `blocked_by`, measured status and evidence from `data/coverage.json`, groups its outputs
+by unit and category, and shows **Expected outputs** — the project's own checklist from
+`meta.expected_outputs`: P0's eight definition artefacts, or a delivery project's brief and, for V2,
+its analysis and architecture. Each row is absent, present-private or published; the first missing
+row is marked **next** and carries its compose template. P0's brief artefact is a computed
+`project briefs N/47` coverage row across the delivery projects. A missing output is a visible gap;
+it is not a backend gate.
 
 The **Projects** destination is the programme workspace: the tenant's projects, a project's board,
 plan link and linked issues, its cards with their process binding and the card type's expected

@@ -5,10 +5,15 @@
 //! frame, so the doorbell (`pg_notify`), the tenant-scoped replay query and the topic
 //! resolution are all exercised end to end — nothing here calls the producer directly.
 //!
-//! Timing: the live assertion measures the interval between the mover's `200` and the frame.
-//! The bound is the gate's own **200 ms** (S05 §7 property (e)): delivery is DOORBELL-driven,
-//! so the frame is enqueued by `pg_notify` in the mutation's transaction and must reach the
-//! subscriber almost immediately. A polling loop would miss this bound by construction.
+//! Timing: the live assertion measures **the delivery path**, from the instant the event row was
+//! written (`created_at`, carried in the frame) to the instant the client parsed it. The bound is
+//! the gate's own **200 ms** (S05 §7 property (e)): delivery is DOORBELL-driven, so the frame is
+//! enqueued by `pg_notify` in the mutation's transaction and must reach the subscriber almost
+//! immediately. A polling loop would miss this bound by construction.
+//!
+//! It deliberately does **not** time the mover's request. Measured 2026-11-15 on a loaded box: the
+//! write alone took 300-370 ms and the property failed while delivery was tens of milliseconds, so
+//! the clock started in the wrong place. The write's own budget is a different property.
 
 #[path = "../../actions/tests/support/mod.rs"]
 mod support;
@@ -249,13 +254,12 @@ async fn a_second_client_on_the_board_sees_card_moved_live_and_on_replay() {
     )
     .await;
 
-    let started = Instant::now();
     move_card(&running, &card_id, &waiting, "\"1\"").await;
     let frame = stream
         .next(Duration::from_secs(2))
         .await
         .expect("the mover's 200 must be followed by a frame");
-    let elapsed = started.elapsed();
+    let delivered = chrono::Utc::now();
 
     assert_eq!(frame.event, "card.moved");
     assert_eq!(frame.data["type"], "card.moved");
@@ -270,10 +274,27 @@ async fn a_second_client_on_the_board_sees_card_moved_live_and_on_replay() {
         "the payload names the lane being left"
     );
     assert!(frame.id.unwrap_or(0) > before, "the SSE id is event.seq");
-    println!("card.moved delivered in {} ms", elapsed.as_millis());
+
+    // The delivery path's own latency: the frame carries the instant its row was written, so the
+    // interval excludes the mover's write and the HTTP round-trip to the API.
+    let published = chrono::DateTime::parse_from_rfc3339(
+        frame.data["created_at"]
+            .as_str()
+            .expect("every frame carries created_at"),
+    )
+    .expect("created_at is RFC 3339")
+    .with_timezone(&chrono::Utc);
+    let delivery = delivered
+        .signed_duration_since(published)
+        .to_std()
+        .unwrap_or_default();
+    println!(
+        "card.moved delivered {} ms after its event row was written",
+        delivery.as_millis()
+    );
     assert!(
-        elapsed < Duration::from_millis(200),
-        "property (e): board:{{id}} delivery must be under 200 ms, was {elapsed:?}"
+        delivery < Duration::from_millis(200),
+        "property (e): board:{{id}} delivery took {delivery:?} from the event's created_at ({published}) to the parsed frame ({delivered})"
     );
 
     // ── replay: a cursor just below the move re-delivers it ──────────────────────────

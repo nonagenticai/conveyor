@@ -40,8 +40,8 @@
 <h3 id="step-16--retention-and-registration">Step 16 — retention and registration</h3>
 <p><code>store::prune::eval_trace_prune</code> (90 days, batched, tenant-scoped) + the <code>eval.prune</code> worker arm + its <code>DEFAULT_SCHEDULES</code> row (18 → 19). SSE: the audit rides the existing <code>eval:{id}</code> topic, so no new topic. Registration: the seven actions above; <code>AGENT_TOOLS</code> <strong>34 → 37</strong> (<code>eval_runs.report</code>, <code>eval_audits.get</code>, <code>eval_findings.list</code>); <code>EXPECTED</code> <strong>247 → 254</strong> with the reachable set <strong>7 → 9</strong>; api count <strong>254</strong>; seven parity samples.</p>
 <h3 id="step-17--the-served-surface">Step 17 — the served surface</h3>
-<p><code>--print-openapi --write-lock</code> on this branch; <code>served-spec.lock.json</code> written and copied back from m1. <strong><code>--check-lock</code> exit 0.</strong></p>
-<h2 id="measured-gate-rbuild-on-m1-the-pinned-1990-toolchain">Measured gate (rbuild on m1, the pinned 1.99.0 toolchain)</h2>
+<p><code>--print-openapi --write-lock</code> on this branch; <code>served-spec.lock.json</code> written and copied back from the build host. <strong><code>--check-lock</code> exit 0.</strong></p>
+<h2 id="measured-gate-rbuild-on-the-build-host-the-pinned-1990-toolchain">Measured gate (rbuild on the build host, the pinned 1.99.0 toolchain)</h2>
 <table>
 <thead>
 <tr>
@@ -149,7 +149,7 @@
 <li><code>fmt --all</code> on the files the train left unformatted (S20's precedent), and one <code>#[allow(clippy::type_complexity)]</code> on the train's <code>named_flows</code> row read — the last workspace clippy error after the merge.</li>
 </ul>
 <p><strong>Measured on the merged tree:</strong> <code>registry</code> 8/8 at <strong>276</strong> · api lib <strong>30/30</strong> · <code>eval_report</code> 5/5 · <code>eval_audits</code> 2/2 · <code>eval_roundtrip</code> 1/1 · <code>parity_http_mcp</code> 4/4 · <code>eval_audit</code> 4/4 · <code>eval_controls</code> 3/3 · <code>conveyor-server</code> <strong>all binaries green</strong> · <strong><code>workflow_runs</code> 4/4 green</strong> (the train's S13 fix) · the two <code>0028</code> ledger assertions green (the train's migration) · workspace <code>clippy --all-targets -D warnings</code> <strong>exit 0</strong> · <code>fmt --all --check</code> <strong>exit 0</strong> · <code>--check-lock</code> <strong>exit 0</strong> (304 ops). The PR is #3, stacked on the train.</p>
-<h2 id="the-final-workspace-gate-m1-the-pinned-1990-toolchain-on-de3865d">The final workspace gate (m1, the pinned 1.99.0 toolchain, on <code>de3865d</code>)</h2>
+<h2 id="the-final-workspace-gate-the-build-host-the-pinned-1990-toolchain-on-de3865d">The final workspace gate (the build host, the pinned 1.99.0 toolchain, on <code>de3865d</code>)</h2>
 <p>After the train's <code>a2e6b7c</code> (docs + the role-script serialisation + its own strata allowlist) was merged (<code>4faded6</code>) and the train's allowlist was rustfmt'd (<code>de3865d</code>), the whole workspace was run again on the exact pushed tree:</p>
 <table>
 <thead>
@@ -180,7 +180,7 @@
 <p>The same full-workspace run was also <strong>201 binaries, 0 failed</strong> on the immediately preceding tree (<code>c3cf84d</code>), so the result is not a single lucky pass.</p>
 <h2 id="environment-note-transient-corrected">Environment note (transient, corrected)</h2>
 <ul>
-<li><strong>The first full-workspace run on m1 hit a transient <code>ENOSPC</code></strong> (the first failure is <code>could not write to file "pg_wal/xlogtemp.NNNN": No space left on device</code>, and the DB-backed tests behind it fail with <code>PoolTimedOut</code> — the test Postgres died, not the code). <strong>The host was healthy again immediately afterwards (72 GiB free, 84 % used) and the suite was re-run on it</strong>; the re-run's result is the one recorded in "The final workspace gate" above.</li>
+<li><strong>The first full-workspace run on the build host hit a transient <code>ENOSPC</code></strong> (the first failure is <code>could not write to file "pg_wal/xlogtemp.NNNN": No space left on device</code>, and the DB-backed tests behind it fail with <code>PoolTimedOut</code> — the test Postgres died, not the code). <strong>The host was healthy again immediately afterwards (72 GiB free, 84 % used) and the suite was re-run on it</strong>; the re-run's result is the one recorded in "The final workspace gate" above.</li>
 <li><strong>CI's build job failed pulling its own smoke image</strong> from <code>registry.example.com:5000</code> after six attempts (connection refused on port 5000 for ~5 minutes) — the estate registry, not this change. The code gate is the <code>rust-checks</code> job (fmt, clippy, test).</li>
 </ul>
 </main>

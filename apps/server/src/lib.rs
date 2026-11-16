@@ -23,6 +23,8 @@ pub mod seed;
 pub mod shutdown;
 pub mod telemetry;
 pub mod worker;
+// #182 slice B: the `youtube.upload` job — one document to the tenant's own YouTube channel.
+pub mod youtube_upload;
 
 pub use conveyor_api::state::AppStateError;
 pub use conveyor_api::{ApiError, AppState, Config, ConfigError, Metrics, app, openapi};

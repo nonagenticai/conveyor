@@ -1,0 +1,1753 @@
+{
+  "components": {
+    "parameters": {
+      "TenantIdHeader": {
+        "description": "License token transport: `Bearer <token>`.",
+        "in": "header",
+        "name": "X-Tenant-Id",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "AssetPlacement": {
+        "description": "Presentation hints for rendering a slide image slot.",
+        "properties": {
+          "fit": {
+            "default": "cover",
+            "description": "Crop to cover the slot or contain the full image inside the slot",
+            "enum": [
+              "cover",
+              "contain"
+            ],
+            "title": "Fit",
+            "type": "string"
+          },
+          "mode": {
+            "default": "framed",
+            "description": "Render inside the template frame or as a full-bleed background",
+            "enum": [
+              "framed",
+              "full_bleed"
+            ],
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "title": "AssetPlacement",
+        "type": "object"
+      },
+      "BrandConfig": {
+        "description": "Brand configuration for deck generation.",
+        "properties": {
+          "font_family": {
+            "default": "Arial",
+            "description": "Primary font family",
+            "title": "Font Family",
+            "type": "string"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to brand logo",
+            "title": "Logo Url"
+          },
+          "primary_color": {
+            "default": "#1a73e8",
+            "description": "Primary brand color (hex)",
+            "title": "Primary Color",
+            "type": "string"
+          },
+          "secondary_color": {
+            "default": "#34a853",
+            "description": "Secondary brand color (hex)",
+            "title": "Secondary Color",
+            "type": "string"
+          },
+          "theme": {
+            "default": "modern",
+            "description": "Theme name",
+            "title": "Theme",
+            "type": "string"
+          }
+        },
+        "title": "BrandConfig",
+        "type": "object"
+      },
+      "ContentShaperConfig": {
+        "description": "Configuration for LLM content shaping.",
+        "properties": {
+          "enabled": {
+            "default": false,
+            "description": "Enable LLM content shaping",
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "generate_speaker_notes": {
+            "default": true,
+            "description": "Generate speaker notes",
+            "title": "Generate Speaker Notes",
+            "type": "boolean"
+          },
+          "generate_transitions": {
+            "default": false,
+            "description": "Generate transition text",
+            "title": "Generate Transitions",
+            "type": "boolean"
+          },
+          "summarize": {
+            "default": true,
+            "description": "Summarize verbose content",
+            "title": "Summarize",
+            "type": "boolean"
+          },
+          "tone": {
+            "default": "professional",
+            "description": "Content tone",
+            "title": "Tone",
+            "type": "string"
+          }
+        },
+        "title": "ContentShaperConfig",
+        "type": "object"
+      },
+      "DeckAssetInput": {
+        "description": "Optional image/document asset included with the deck request.",
+        "properties": {
+          "asset_id": {
+            "description": "Stable asset identifier",
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "image_url": {
+            "description": "Image reference or data URL",
+            "title": "Image Url",
+            "type": "string"
+          },
+          "kind": {
+            "default": "image",
+            "description": "Asset kind: current, redesign, app, doc, image",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "default": "",
+            "description": "Human-friendly label",
+            "title": "Label",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "description": "Additional asset metadata",
+            "title": "Metadata",
+            "type": "object"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional semantic role",
+            "title": "Role"
+          }
+        },
+        "required": [
+          "asset_id",
+          "image_url"
+        ],
+        "title": "DeckAssetInput",
+        "type": "object"
+      },
+      "DeckCreateRequest": {
+        "description": "Request to create a deck generation job.",
+        "properties": {
+          "aspect_ratio": {
+            "default": "16:9",
+            "description": "Slide aspect ratio",
+            "title": "Aspect Ratio",
+            "type": "string"
+          },
+          "brand": {
+            "$ref": "#/components/schemas/BrandConfig"
+          },
+          "content_shaper": {
+            "$ref": "#/components/schemas/ContentShaperConfig"
+          },
+          "image_assets": {
+            "description": "Optional image assets referenced by the deck",
+            "items": {
+              "$ref": "#/components/schemas/DeckAssetInput"
+            },
+            "title": "Image Assets",
+            "type": "array"
+          },
+          "render_scale": {
+            "anyOf": [
+              {
+                "maximum": 4.0,
+                "minimum": 1.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Chromium device pixel ratio for slide PNG capture. None = the service default (RENDER_DEVICE_SCALE_FACTOR). 1.333 -> 2K, 2.0 -> 4K. Keeps the 1920x1080 layout; only raises output resolution/sharpness.",
+            "title": "Render Scale"
+          },
+          "slides": {
+            "description": "Slide content list. At least one slide is required: an empty list produced an empty PPTX/PDF and a zero-asset manifest that still reported the job 'completed'.",
+            "items": {
+              "$ref": "#/components/schemas/SlideContent"
+            },
+            "minItems": 1,
+            "title": "Slides",
+            "type": "array"
+          },
+          "template_ids": {
+            "description": "Template IDs used in this deck",
+            "items": {
+              "type": "string"
+            },
+            "title": "Template Ids",
+            "type": "array"
+          },
+          "timing": {
+            "$ref": "#/components/schemas/TimingConfig"
+          },
+          "title": {
+            "description": "Deck title",
+            "title": "Title",
+            "type": "string"
+          },
+          "tokens": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional design-system tokens (e.g. surface, surface_2, on_surface, on_surface_muted, accent_2, accent_soft, type_display, type_h1, type_body, grid_gutter, grid_margin). Each entry is emitted as a CSS custom property (`on_surface` -> `--on-surface`) on the rendered slide and overrides the template's built-in value. Presence is opt-in: omitting it (or null) renders exactly as before.",
+            "title": "Tokens"
+          }
+        },
+        "required": [
+          "title",
+          "slides"
+        ],
+        "title": "DeckCreateRequest",
+        "type": "object"
+      },
+      "DeckJobResponse": {
+        "description": "Response after creating a deck job (202).",
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "status"
+        ],
+        "title": "DeckJobResponse",
+        "type": "object"
+      },
+      "DeckManifestResponse": {
+        "description": "Manifest JSON response.",
+        "properties": {
+          "aspect_ratio": {
+            "default": "16:9",
+            "title": "Aspect Ratio",
+            "type": "string"
+          },
+          "assets": {
+            "additionalProperties": true,
+            "title": "Assets",
+            "type": "object"
+          },
+          "brand": {
+            "additionalProperties": true,
+            "title": "Brand",
+            "type": "object"
+          },
+          "content_entries_dropped": {
+            "default": 0,
+            "description": "Offered entries that were unrenderable (non-dict metric, non-list slot, entry that normalised to empty text) and so are absent from the slides. Non-zero means a PNG the video pipeline composites is thinner than the payload asked for; each affected slide also carries a visible degraded marker. 0 with a non-zero offered count is a healthy deck, and 0/0 is a deliberately text-only one.",
+            "title": "Content Entries Dropped",
+            "type": "integer"
+          },
+          "content_entries_offered": {
+            "default": 0,
+            "description": "List entries (metrics, bullets, items, timeline beats, column bullets) this deck's payload offered across all slides.",
+            "title": "Content Entries Offered",
+            "type": "integer"
+          },
+          "deck_id": {
+            "title": "Deck Id",
+            "type": "string"
+          },
+          "image_slots_failed": {
+            "default": 0,
+            "description": "Image slots that were requested but produced no bytes (expired/403 presigned URL, SSRF rejection, timeout). Non-zero means the deck is missing imagery it asked for; the deck build hard-fails when ALL of them failed.",
+            "title": "Image Slots Failed",
+            "type": "integer"
+          },
+          "image_slots_requested": {
+            "default": 0,
+            "description": "Image slots this deck asked for across all slides. 0 means the deck was deliberately text-only.",
+            "title": "Image Slots Requested",
+            "type": "integer"
+          },
+          "image_slots_unclassified": {
+            "default": 0,
+            "description": "Slots whose key NAME looks like an image but whose value is neither a reference nor a registered layout hint (image_fit/image_placement/...). Counted separately on purpose: they are not satisfied slots and not failed ones, so neither counter may absorb them. Non-zero means a key needs registering in image_layout.IMAGE_LAYOUT_HINT_KEYS or a real ref.",
+            "title": "Image Slots Unclassified",
+            "type": "integer"
+          },
+          "image_slots_undrawn": {
+            "default": 0,
+            "description": "Slots that carried a real image reference which no renderer in their layout family draws (e.g. a logo attached to a title slide). Counted apart from image_slots_failed on purpose: nothing was fetched, so this is NOT evidence the image is dead — it is a TEMPLATE defect. Non-zero means a slot is declared where nothing can render it; it never fails the deck.",
+            "title": "Image Slots Undrawn",
+            "type": "integer"
+          },
+          "manifest_version": {
+            "default": "1.0",
+            "title": "Manifest Version",
+            "type": "string"
+          },
+          "shaping_degraded_code": {
+            "default": "",
+            "description": "Stable machine-readable degradation code. Empty string means shaping was healthy OR was never requested. The only non-empty value is 'shaping_failed', which means the shaper was asked for and did not fully deliver: the deck ships partly or wholly unshaped while the worker_management call was still billed. Branch on this instead of grepping the service's ERROR log.",
+            "title": "Shaping Degraded Code",
+            "type": "string"
+          },
+          "shaping_degraded_reason": {
+            "default": "",
+            "description": "Where shaping broke, when shaping_degraded_code is set: 'prompt_render_failed' (the prompt template would not render, a code defect, no WM call was made), 'wm_call_failed' (WM 4xx/5xx, timeout or connection failure), 'no_usable_output' (WM answered with a shape carrying no slides), 'partial_merge' (the model answered for only some slides, or every value it returned for a slide was the wrong type). Empty when the code is empty.",
+            "title": "Shaping Degraded Reason",
+            "type": "string"
+          },
+          "shaping_slides_requested": {
+            "default": 0,
+            "description": "Slides submitted to the LLM content shaper. 0 means shaping was not enabled for this deck, which is a legitimate, non-degraded outcome.",
+            "title": "Shaping Slides Requested",
+            "type": "integer"
+          },
+          "shaping_slides_shaped": {
+            "default": 0,
+            "description": "Submitted slides that actually took at least one shaped value (summarised content, speaker notes, or transition text).",
+            "title": "Shaping Slides Shaped",
+            "type": "integer"
+          },
+          "shaping_slides_unshaped": {
+            "default": 0,
+            "description": "Submitted slides that came back untouched and therefore ship RAW — unsummarised, with no generated speaker notes. This is the count of affected slides; the shaper fails open on purpose, so the deck is still delivered and the job still reports success.",
+            "title": "Shaping Slides Unshaped",
+            "type": "integer"
+          },
+          "slide_count": {
+            "default": 0,
+            "title": "Slide Count",
+            "type": "integer"
+          },
+          "slides": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Slides",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "total_estimated_duration_seconds": {
+            "default": 0.0,
+            "title": "Total Estimated Duration Seconds",
+            "type": "number"
+          }
+        },
+        "required": [
+          "deck_id",
+          "title"
+        ],
+        "title": "DeckManifestResponse",
+        "type": "object"
+      },
+      "DeckStatusResponse": {
+        "description": "Response when polling deck job status.",
+        "properties": {
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "slide_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slide Count"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "status"
+        ],
+        "title": "DeckStatusResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "SlideContent": {
+        "description": "Content for a single slide in a deck request.",
+        "properties": {
+          "asset_placements": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AssetPlacement"
+            },
+            "description": "Per-slot image placement hints keyed by content slot name",
+            "title": "Asset Placements",
+            "type": "object"
+          },
+          "asset_urls": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Optional named asset URLs or asset references keyed by content slot name",
+            "title": "Asset Urls",
+            "type": "object"
+          },
+          "content": {
+            "additionalProperties": true,
+            "description": "Slot content key-value pairs",
+            "title": "Content",
+            "type": "object"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Semantic role for downstream mapping",
+            "title": "Role"
+          },
+          "template_id": {
+            "description": "UUID of the template to use",
+            "title": "Template Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_id"
+        ],
+        "title": "SlideContent",
+        "type": "object"
+      },
+      "TemplateCreateRequest": {
+        "description": "Request to create a custom template.",
+        "properties": {
+          "category": {
+            "description": "Grouping category",
+            "maxLength": 50,
+            "title": "Category",
+            "type": "string"
+          },
+          "default_timing_hint_seconds": {
+            "default": 10.0,
+            "description": "Suggested slide duration (seconds, must be > 0)",
+            "exclusiveMinimum": 0.0,
+            "title": "Default Timing Hint Seconds",
+            "type": "number"
+          },
+          "default_transition": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Default transition config",
+            "title": "Default Transition"
+          },
+          "display_name": {
+            "description": "Human label",
+            "maxLength": 200,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "layout_type": {
+            "description": "Layout identifier",
+            "maxLength": 50,
+            "title": "Layout Type",
+            "type": "string"
+          },
+          "name": {
+            "description": "Machine name",
+            "maxLength": 100,
+            "title": "Name",
+            "type": "string"
+          },
+          "slot_definitions": {
+            "additionalProperties": true,
+            "description": "Typed slot schema",
+            "title": "Slot Definitions",
+            "type": "object"
+          },
+          "styling_rules": {
+            "additionalProperties": true,
+            "description": "Visual configuration",
+            "title": "Styling Rules",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "display_name",
+          "category",
+          "layout_type",
+          "slot_definitions"
+        ],
+        "title": "TemplateCreateRequest",
+        "type": "object"
+      },
+      "TemplateListResponse": {
+        "description": "Paginated template list response.",
+        "properties": {
+          "page": {
+            "default": 1,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "default": 50,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "templates": {
+            "items": {
+              "$ref": "#/components/schemas/TemplateResponse"
+            },
+            "title": "Templates",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "templates",
+          "total"
+        ],
+        "title": "TemplateListResponse",
+        "type": "object"
+      },
+      "TemplateResponse": {
+        "description": "Response for a single template.",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "default_timing_hint_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Timing Hint Seconds"
+          },
+          "default_transition": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Transition"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "default": true,
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "is_system": {
+            "default": false,
+            "title": "Is System",
+            "type": "boolean"
+          },
+          "layout_type": {
+            "title": "Layout Type",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slot_definitions": {
+            "additionalProperties": true,
+            "title": "Slot Definitions",
+            "type": "object"
+          },
+          "styling_rules": {
+            "additionalProperties": true,
+            "title": "Styling Rules",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "display_name",
+          "category",
+          "layout_type",
+          "slot_definitions",
+          "styling_rules"
+        ],
+        "title": "TemplateResponse",
+        "type": "object"
+      },
+      "TemplateUpdateRequest": {
+        "description": "Request to update a template.",
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "maxLength": 50,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "default_timing_hint_seconds": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Timing Hint Seconds"
+          },
+          "default_transition": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Transition"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "slot_definitions": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slot Definitions"
+          },
+          "styling_rules": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Styling Rules"
+          }
+        },
+        "title": "TemplateUpdateRequest",
+        "type": "object"
+      },
+      "TemplateVersionResponse": {
+        "description": "Response for a template version.",
+        "properties": {
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "default_timing_hint_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Timing Hint Seconds"
+          },
+          "default_transition": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Transition"
+          },
+          "slot_definitions": {
+            "additionalProperties": true,
+            "title": "Slot Definitions",
+            "type": "object"
+          },
+          "snapshot_hash": {
+            "title": "Snapshot Hash",
+            "type": "string"
+          },
+          "styling_rules": {
+            "additionalProperties": true,
+            "title": "Styling Rules",
+            "type": "object"
+          },
+          "template_id": {
+            "title": "Template Id",
+            "type": "string"
+          },
+          "version_id": {
+            "title": "Version Id",
+            "type": "string"
+          },
+          "version_number": {
+            "title": "Version Number",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version_id",
+          "template_id",
+          "version_number",
+          "snapshot_hash",
+          "slot_definitions",
+          "styling_rules"
+        ],
+        "title": "TemplateVersionResponse",
+        "type": "object"
+      },
+      "TimingConfig": {
+        "description": "Timing configuration for deck generation.",
+        "properties": {
+          "default_slide_duration_seconds": {
+            "default": 15.0,
+            "description": "Default per-slide duration",
+            "title": "Default Slide Duration Seconds",
+            "type": "number"
+          },
+          "target_duration_seconds": {
+            "default": 120.0,
+            "description": "Target total deck duration",
+            "title": "Target Duration Seconds",
+            "type": "number"
+          }
+        },
+        "title": "TimingConfig",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "bearerFormat": "License",
+        "description": "License token. Transport: `X-Tenant-Id: Bearer <token>` (not the Authorization header — that is reserved for caller-side auth).",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Presentation deck generation microservice for branded PowerPoint decks",
+    "title": "Slide Service",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Return service info and available endpoint listing.",
+        "operationId": "service_root",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Service Root",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Service banner + endpoint index",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/decks": {
+      "post": {
+        "description": "Start deck generation job (returns 202).",
+        "operationId": "start_deck_generation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeckCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Deck",
+        "tags": [
+          "slides"
+        ]
+      }
+    },
+    "/api/decks/{job_id}": {
+      "get": {
+        "description": "Poll deck job status.",
+        "operationId": "get_deck_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Deck Status",
+        "tags": [
+          "slides"
+        ]
+      }
+    },
+    "/api/decks/{job_id}/manifest": {
+      "get": {
+        "description": "Download manifest JSON.",
+        "operationId": "get_deck_manifest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckManifestResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or manifest not found"
+          },
+          "409": {
+            "description": "Job still processing"
+          },
+          "422": {
+            "description": "Deck generation failed"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Manifest",
+        "tags": [
+          "slides"
+        ]
+      }
+    },
+    "/api/decks/{job_id}/pdf": {
+      "get": {
+        "description": "Download generated PDF file.",
+        "operationId": "download_deck_pdf",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or PDF file not found"
+          },
+          "409": {
+            "description": "Job still processing"
+          },
+          "422": {
+            "description": "Deck generation failed"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Pdf",
+        "tags": [
+          "slides"
+        ]
+      }
+    },
+    "/api/decks/{job_id}/pptx": {
+      "get": {
+        "description": "Download generated .pptx file.",
+        "operationId": "download_deck_pptx",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or PPTX file not found"
+          },
+          "409": {
+            "description": "Job still processing"
+          },
+          "422": {
+            "description": "Deck generation failed"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Pptx",
+        "tags": [
+          "slides"
+        ]
+      }
+    },
+    "/api/decks/{job_id}/slides/{slide_index}.png": {
+      "get": {
+        "description": "Download a generated slide preview PNG.",
+        "operationId": "download_deck_slide_preview",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "slide_index",
+            "required": true,
+            "schema": {
+              "title": "Slide Index",
+              "type": "integer"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or slide preview not found"
+          },
+          "409": {
+            "description": "Job still processing"
+          },
+          "422": {
+            "description": "Deck generation failed"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Slide Preview",
+        "tags": [
+          "slides"
+        ]
+      }
+    },
+    "/api/templates": {
+      "get": {
+        "description": "List active templates with optional filtering.\n\nReturns templates owned by the caller's tenant plus platform templates\n(``is_system``). Other tenants' templates are hidden. Platform visibility is\nthe ``is_system`` flag — the ``tenant_id = 'system'`` sentinel is retired.",
+        "operationId": "list_slide_templates",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "layout_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Layout Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "List Templates",
+        "tags": [
+          "slides"
+        ]
+      },
+      "post": {
+        "description": "Create a custom template.",
+        "operationId": "create_slide_template",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Template",
+        "tags": [
+          "slides"
+        ]
+      }
+    },
+    "/api/templates/{template_id}": {
+      "delete": {
+        "description": "Soft-delete a template (sets is_active=false).\n\nOnly the owning tenant can delete a template. Other tenants get 404.",
+        "operationId": "delete_slide_template",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Delete Slide Template",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "description": "Cannot delete system templates"
+          },
+          "404": {
+            "description": "Template not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Delete Template",
+        "tags": [
+          "slides"
+        ]
+      },
+      "get": {
+        "description": "Get a single template by ID.\n\nVisible to the caller's tenant or to all tenants (system templates).\nReturns 404 for templates owned by other tenants to avoid disclosing\ntheir existence.",
+        "operationId": "get_slide_template",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Template not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Template",
+        "tags": [
+          "slides"
+        ]
+      },
+      "put": {
+        "description": "Update a template. Auto-versions if the template has been used by any deck.\n\nOnly the owning tenant can mutate a template. Templates owned by other\ntenants (or system templates) return 404 to avoid existence disclosure.",
+        "operationId": "update_slide_template",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "description": "Cannot modify system templates"
+          },
+          "404": {
+            "description": "Template not found"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Update Template",
+        "tags": [
+          "slides"
+        ]
+      }
+    },
+    "/api/templates/{template_id}/versions": {
+      "get": {
+        "description": "List frozen versions of a template.\n\nThe TemplateVersion table has no ``tenant_id`` of its own, so we first\nverify the parent ``SlideTemplate`` belongs to the caller's tenant (or\nis a system template). If not, return 404 to avoid existence disclosure.",
+        "operationId": "list_slide_template_versions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateVersionResponse"
+                  },
+                  "title": "Response List Slide Template Versions",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "List Template Versions",
+        "tags": [
+          "slides"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Combined health check for all components.\n\nReports the three components that actually do the work — the Chromium pool\nthat renders slides, the system-template seed that supplies what it renders,\nand the reaper loop that unwedges dead deck jobs — alongside the DB/Redis\ndependencies. None is wired into readiness; see :func:`health_ready` for why.",
+        "operationId": "health_check",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Check",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Kubernetes liveness probe.",
+        "operationId": "health_live",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Live",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Kubernetes readiness probe -- checks database connectivity.\n\nThe browser pool is deliberately NOT checked here, and that is a decision,\nnot an omission. Unlike the queue-driven siblings, slide rendering IS driven\nby the HTTP request — so gating readiness on the pool looks right, and is a\ntrap:\n\n* **The pool self-heals on the next render.** ``get_browser_pool`` is\n  start-on-demand, so a pod whose eager startup launch failed transiently\n  recovers the first time a render arrives. Failing readiness removes exactly\n  the traffic that would trigger that recovery, converting a transient\n  startup failure into a permanent one — the pod can never become ready\n  again, because nothing will ever ask it to render.\n* **A non-transient cause is shared.** A bad image or a node without the\n  Chromium deps takes out every replica identically, so readiness would evict\n  the whole Deployment at once and remove the template/CRUD/status routes as\n  well, on top of a render outage.\n\nThe system-template seed is kept off readiness for the second reason above,\nwhich applies to it exactly: a failed seed is a SHARED cause (same DB, same\npolicies), so gating readiness on it 503s every replica at once and takes out\ntenant-owned templates, deck CRUD, job-status polling and the reaper — none\nof which need a system template — to signal a fault that degrades only the\nsubset of decks that request one. It lands on ``/health`` as ``unhealthy``\ninstead: loud to an operator and to alerting, inert to the scheduler.\n\nSo the signal lands on ``/health`` as ``status: unhealthy`` — loud to an\noperator and to alerting, inert to the scheduler. The reaper is only ever\n``degraded``: it is advisory-lock gated so exactly one replica acts per tick,\nand a sibling holding that lock keeps decks unwedged regardless of this pod.",
+        "operationId": "health_ready",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "description": "Modern K8s liveness probe path (alias of /health/live).",
+        "operationId": "health.live",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Healthz",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/readyz": {
+      "get": {
+        "description": "Modern K8s readiness probe path (alias of /health/ready).",
+        "operationId": "health.ready",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readyz",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Liveness, readiness, dependency probes.",
+      "name": "health"
+    },
+    {
+      "description": "Slide-template CRUD/versioning and async deck generation jobs (PPTX/PDF/preview/manifest artifacts).",
+      "name": "slides"
+    }
+  ]
+}

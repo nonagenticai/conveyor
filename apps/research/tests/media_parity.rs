@@ -64,6 +64,25 @@ fn normalise(value: &mut Value, volatile: &BTreeSet<String>) {
                 normalise(item, volatile);
             }
         }
+        // A score is a float average, and its last digit is not portable: measured on CI
+        // 2026-11-16, `avg_score` came out 0.7333 on Linux against the capture's 0.7332 for the
+        // same inputs — the same accumulation rounded on a different IEEE boundary. Snapping to
+        // three decimals keeps the comparison honest at the precision the capture actually pins
+        // (a thousandth of a score) without pretending a float is exact.
+        Value::Number(number) => {
+            // Only fractions: an integer must stay an integer, or `2` would become `2.0` and the
+            // comparison would fail on a value that never drifted.
+            if let Some(float) = number.as_f64()
+                && float.fract() != 0.0
+            {
+                let snapped = (float * 1000.0).round() / 1000.0;
+                if snapped != float
+                    && let Some(snapped) = serde_json::Number::from_f64(snapped)
+                {
+                    *value = Value::Number(snapped);
+                }
+            }
+        }
         _ => {}
     }
 }

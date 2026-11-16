@@ -195,7 +195,9 @@ card is `project_start_request_analysis` (intake). It starts a root run **only w
 start process** — there is no universal seed, because a tenant may run accounting, marketing or human project
 management (owner ruling 2026-11-10). The move
 step is `cards.move`. `wip.pull` reacts to `card.moved` and keeps `may_move` as the guard. `err.card` runs on
-`run.failed`, moves the card to BLOCKED, comments and starts the coach root run. Approval routing is the gate
+`run.failed`, moves the card to BLOCKED and comments; it starts the coach root run unless the failed run is
+itself the coach, the card's project is closed or archived, or the card already holds three coach root runs of
+the key family (#179; SPEC_V2 §1.4 and T4's recursion cap). Approval routing is the gate
 resume. The hook route and `CONVEYOR_HOOK_SECRET` are deleted.
 
 ### 5.9 The dispositions ledger
@@ -288,7 +290,7 @@ is the claim.
     process-side trace, and the old recordings drive the workflow-side diff.
 
 ⚠️ The **bus test is CI-only in this environment**: it needs a Redis reachable from the build host,
-which has neither docker nor a Redis and cannot reach mini3. It fails closed; it never skips.
+which has neither docker nor a Redis and cannot reach the dev box. It fails closed; it never skips.
 
 ⛔ **No longer an item:** migration `0034`'s drop of `workflow`, and the deletion of `crates/workflow`,
 `workflows.*`/`workflow_runs.*` and `fixtures/named/**`. **The workflow engine is retained as the tool-sequence

@@ -1,0 +1,1 @@
+{"id":"01a1e10f-db40-75ca-9a2e-66ce97342dd7","name":"capture_created","display_name":"Capture Created","category":"capture","layout_type":"title","slot_definitions":{"title":{"type":"text","max_length":80,"required":true}},"styling_rules":{"title_font_size":40},"default_transition":null,"default_timing_hint_seconds":6.0,"is_system":false,"is_active":true}

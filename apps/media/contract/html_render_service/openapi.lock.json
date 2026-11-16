@@ -1,0 +1,5032 @@
+{
+  "components": {
+    "parameters": {
+      "TenantIdHeader": {
+        "description": "License token transport: `Bearer <token>`.",
+        "in": "header",
+        "name": "X-Tenant-Id",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "AccessibilityCategoryResponse": {
+        "description": "Score for an accessibility category.",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "findings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AccessibilityFindingResponse"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "category"
+        ],
+        "title": "AccessibilityCategoryResponse",
+        "type": "object"
+      },
+      "AccessibilityFindingResponse": {
+        "description": "A single accessibility finding.",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "element": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Element"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation"
+          },
+          "severity": {
+            "title": "Severity",
+            "type": "string"
+          },
+          "wcag_criterion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wcag Criterion"
+          }
+        },
+        "required": [
+          "category",
+          "severity",
+          "description"
+        ],
+        "title": "AccessibilityFindingResponse",
+        "type": "object"
+      },
+      "AccessibilityScoreResponse": {
+        "description": "Accessibility assessment results.",
+        "properties": {
+          "auto_theme": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auto Theme"
+          },
+          "categories": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AccessibilityCategoryResponse"
+            },
+            "title": "Categories",
+            "type": "array"
+          },
+          "critique_adapter_validation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Critique Adapter Validation"
+          },
+          "findings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AccessibilityFindingResponse"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "html_was_fixed": {
+            "default": false,
+            "title": "Html Was Fixed",
+            "type": "boolean"
+          },
+          "overall_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overall Score"
+          },
+          "unscored_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unscored Reason"
+          }
+        },
+        "title": "AccessibilityScoreResponse",
+        "type": "object"
+      },
+      "AsyncJobResponse": {
+        "description": "Response when a redesign job is created.",
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "poll_url": {
+            "title": "Poll Url",
+            "type": "string"
+          },
+          "status": {
+            "default": "pending",
+            "title": "Status",
+            "type": "string"
+          },
+          "webhook_configured": {
+            "default": false,
+            "title": "Webhook Configured",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "job_id",
+          "poll_url"
+        ],
+        "title": "AsyncJobResponse",
+        "type": "object"
+      },
+      "BatchJobResponse": {
+        "description": "Response when a batch job is created.",
+        "properties": {
+          "batch_id": {
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "page_jobs": {
+            "items": {
+              "$ref": "#/components/schemas/BatchPageJobInfo"
+            },
+            "title": "Page Jobs",
+            "type": "array"
+          },
+          "poll_url": {
+            "title": "Poll Url",
+            "type": "string"
+          },
+          "status": {
+            "default": "pending",
+            "title": "Status",
+            "type": "string"
+          },
+          "total_pages": {
+            "title": "Total Pages",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "batch_id",
+          "total_pages",
+          "page_jobs",
+          "poll_url"
+        ],
+        "title": "BatchJobResponse",
+        "type": "object"
+      },
+      "BatchListItem": {
+        "description": "Summary of a batch in a listing.",
+        "properties": {
+          "batch_id": {
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "completed_pages": {
+            "title": "Completed Pages",
+            "type": "integer"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "failed_pages": {
+            "title": "Failed Pages",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_pages": {
+            "title": "Total Pages",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "batch_id",
+          "status",
+          "total_pages",
+          "completed_pages",
+          "failed_pages"
+        ],
+        "title": "BatchListItem",
+        "type": "object"
+      },
+      "BatchListResponse": {
+        "description": "List of batches for a tenant.",
+        "properties": {
+          "batches": {
+            "items": {
+              "$ref": "#/components/schemas/BatchListItem"
+            },
+            "title": "Batches",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "batches",
+          "total"
+        ],
+        "title": "BatchListResponse",
+        "type": "object"
+      },
+      "BatchPageErrorInfo": {
+        "description": "Error info for a failed page in a batch.",
+        "properties": {
+          "error": {
+            "title": "Error",
+            "type": "string"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "url",
+          "error"
+        ],
+        "title": "BatchPageErrorInfo",
+        "type": "object"
+      },
+      "BatchPageInput": {
+        "description": "A single page in a batch redesign request.",
+        "properties": {
+          "html_content": {
+            "anyOf": [
+              {
+                "maxLength": 100000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Html Content"
+          },
+          "page_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Page type",
+            "title": "Page Type"
+          },
+          "url": {
+            "description": "Page URL",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "BatchPageInput",
+        "type": "object"
+      },
+      "BatchPageJobInfo": {
+        "description": "Info about a single page job within a batch.",
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "page_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Type"
+          },
+          "priority_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority Score"
+          },
+          "status": {
+            "default": "pending",
+            "title": "Status",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "url"
+        ],
+        "title": "BatchPageJobInfo",
+        "type": "object"
+      },
+      "BatchPageStatusInfo": {
+        "description": "Status of a single page within a batch.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "url",
+          "status"
+        ],
+        "title": "BatchPageStatusInfo",
+        "type": "object"
+      },
+      "BatchRedesignRequest": {
+        "description": "Request for batch multi-page redesign.",
+        "properties": {
+          "brand": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BrandInfoInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "critique_findings": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CritiqueFindingInput"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Critique Findings"
+          },
+          "generate_concept_images": {
+            "default": false,
+            "title": "Generate Concept Images",
+            "type": "boolean"
+          },
+          "generate_screenshots": {
+            "default": true,
+            "title": "Generate Screenshots",
+            "type": "boolean"
+          },
+          "pages": {
+            "description": "Pages to redesign",
+            "items": {
+              "$ref": "#/components/schemas/BatchPageInput"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Pages",
+            "type": "array"
+          },
+          "scope": {
+            "default": "full_page",
+            "pattern": "^(full_page|sections)$",
+            "title": "Scope",
+            "type": "string"
+          },
+          "site_analysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SiteAnalysisInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "style": {
+            "default": "modern",
+            "maxLength": 100,
+            "title": "Style",
+            "type": "string"
+          },
+          "user_context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserContextInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "webhook_secret": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Webhook Secret"
+          },
+          "webhook_url": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Webhook Url"
+          }
+        },
+        "required": [
+          "pages"
+        ],
+        "title": "BatchRedesignRequest",
+        "type": "object"
+      },
+      "BatchResultsResponse": {
+        "description": "Results of a completed batch job.",
+        "properties": {
+          "batch_id": {
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "completed_pages": {
+            "title": "Completed Pages",
+            "type": "integer"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/BatchPageErrorInfo"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "failed_pages": {
+            "title": "Failed Pages",
+            "type": "integer"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/RedesignResultResponse"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_pages": {
+            "title": "Total Pages",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "batch_id",
+          "status",
+          "total_pages",
+          "completed_pages",
+          "failed_pages",
+          "results",
+          "errors"
+        ],
+        "title": "BatchResultsResponse",
+        "type": "object"
+      },
+      "BatchRetryResponse": {
+        "description": "Response when retrying failed batch pages.",
+        "properties": {
+          "batch_id": {
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "retried_jobs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Retried Jobs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "batch_id",
+          "retried_jobs",
+          "count"
+        ],
+        "title": "BatchRetryResponse",
+        "type": "object"
+      },
+      "BatchStatusResponse": {
+        "description": "Status of a batch redesign job.",
+        "properties": {
+          "batch_id": {
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "completed_pages": {
+            "title": "Completed Pages",
+            "type": "integer"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "failed_pages": {
+            "title": "Failed Pages",
+            "type": "integer"
+          },
+          "page_statuses": {
+            "items": {
+              "$ref": "#/components/schemas/BatchPageStatusInfo"
+            },
+            "title": "Page Statuses",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_pages": {
+            "title": "Total Pages",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "batch_id",
+          "status",
+          "total_pages",
+          "completed_pages",
+          "failed_pages",
+          "page_statuses"
+        ],
+        "title": "BatchStatusResponse",
+        "type": "object"
+      },
+      "BrandInfoInput": {
+        "description": "Brand identity data for consistent redesign.",
+        "properties": {
+          "body_font": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Body text font family",
+            "title": "Body Font"
+          },
+          "display_font": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Heading/display font family",
+            "title": "Display Font"
+          },
+          "font_family": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Brand font family (display fallback)",
+            "title": "Font Family"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to brand logo",
+            "title": "Logo Url"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Brand/site name",
+            "title": "Name"
+          },
+          "primary_color": {
+            "default": "#2563EB",
+            "description": "Primary brand color (hex)",
+            "title": "Primary Color",
+            "type": "string"
+          },
+          "secondary_color": {
+            "default": "#1E40AF",
+            "description": "Secondary brand color (hex)",
+            "title": "Secondary Color",
+            "type": "string"
+          }
+        },
+        "title": "BrandInfoInput",
+        "type": "object"
+      },
+      "CancelJobResponse": {
+        "description": "Response when a job is cancelled.",
+        "properties": {
+          "cancelled_at": {
+            "title": "Cancelled At",
+            "type": "string"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "status": {
+            "default": "cancelled",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "cancelled_at"
+        ],
+        "title": "CancelJobResponse",
+        "type": "object"
+      },
+      "ColorPaletteInput": {
+        "description": "Color palette for a custom style.",
+        "properties": {
+          "accent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Accent color hex",
+            "title": "Accent"
+          },
+          "background": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Background color hex",
+            "title": "Background"
+          },
+          "primary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Primary color hex",
+            "title": "Primary"
+          },
+          "secondary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Secondary color hex",
+            "title": "Secondary"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Text color hex",
+            "title": "Text"
+          }
+        },
+        "title": "ColorPaletteInput",
+        "type": "object"
+      },
+      "ComponentTargetInput": {
+        "description": "Target component for component-level redesign.",
+        "properties": {
+          "component_selector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custom CSS selector override",
+            "title": "Component Selector"
+          },
+          "component_type": {
+            "description": "Component type: navbar, hero, footer, cta, pricing, testimonials, features, contact, sidebar",
+            "title": "Component Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "component_type"
+        ],
+        "title": "ComponentTargetInput",
+        "type": "object"
+      },
+      "ConceptImageAssetResponse": {
+        "description": "Resolved concept-image asset metadata from ai_content_generation_service.",
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "download_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download Url"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "file_size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Size Bytes"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "presigned_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presigned Url"
+          },
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "status": {
+            "default": "completed",
+            "title": "Status",
+            "type": "string"
+          },
+          "target_usage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Usage"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "usage_context": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Usage Context"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          }
+        },
+        "required": [
+          "asset_id",
+          "url"
+        ],
+        "title": "ConceptImageAssetResponse",
+        "type": "object"
+      },
+      "CreateCustomStyleRequest": {
+        "description": "Request to create a custom style definition.",
+        "properties": {
+          "color_palette": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ColorPaletteInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Style description",
+            "title": "Description"
+          },
+          "example_references": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Reference site URLs",
+            "title": "Example References"
+          },
+          "layout": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LayoutPreferencesInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "description": "Style name",
+            "maxLength": 100,
+            "title": "Name",
+            "type": "string"
+          },
+          "typography": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TypographyInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateCustomStyleRequest",
+        "type": "object"
+      },
+      "CritiqueFindingInput": {
+        "description": "A critique finding to address in the redesign.",
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Category: seo, security, a11y, performance, ux",
+            "title": "Category"
+          },
+          "description": {
+            "description": "Detailed description of the issue",
+            "title": "Description",
+            "type": "string"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Suggested fix",
+            "title": "Recommendation"
+          },
+          "severity": {
+            "default": "medium",
+            "description": "Finding severity: low, medium, high, critical",
+            "title": "Severity",
+            "type": "string"
+          },
+          "title": {
+            "description": "Short title of the finding",
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "description"
+        ],
+        "title": "CritiqueFindingInput",
+        "type": "object"
+      },
+      "CustomStyleResponse": {
+        "description": "Response for a custom style.",
+        "properties": {
+          "color_palette": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color Palette"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "example_references": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Example References"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "default": true,
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "layout": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layout"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "typography": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Typography"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ],
+        "title": "CustomStyleResponse",
+        "type": "object"
+      },
+      "EmbedSpec": {
+        "description": "An external interactive artifact embedded into an assembled page.\n\nThe three.js input seam: a future three.js service (or any producer) yields a\nfetchable ``artifact_url`` and this spec tells the assembler where and how to\nmount it. Injection is deterministic — a sandboxed ``<iframe>`` placed at the\nnamed mount point — so the LLM never emits the embed markup itself.",
+        "properties": {
+          "artifact_url": {
+            "description": "Fetchable URL of the artifact to embed.",
+            "maxLength": 2048,
+            "title": "Artifact Url",
+            "type": "string"
+          },
+          "aspect_ratio": {
+            "default": "16 / 9",
+            "description": "CSS aspect-ratio for the embed frame.",
+            "maxLength": 16,
+            "title": "Aspect Ratio",
+            "type": "string"
+          },
+          "mount": {
+            "default": "hero",
+            "description": "Named mount point / block slot where the embed is injected.",
+            "maxLength": 64,
+            "title": "Mount",
+            "type": "string"
+          },
+          "sandbox": {
+            "default": true,
+            "description": "Wrap the embed in a sandboxed iframe (strongly recommended).",
+            "title": "Sandbox",
+            "type": "boolean"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Accessible iframe title.",
+            "title": "Title"
+          },
+          "type": {
+            "default": "iframe",
+            "description": "Embed kind (e.g. 'threejs', 'iframe'). Rendered as a sandboxed iframe.",
+            "maxLength": 32,
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_url"
+        ],
+        "title": "EmbedSpec",
+        "type": "object"
+      },
+      "FeaturePriorityInput": {
+        "description": "Priority weighting for a specific feature or improvement area.",
+        "properties": {
+          "feature": {
+            "description": "Feature name (e.g., 'navigation', 'search')",
+            "title": "Feature",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Additional context",
+            "title": "Notes"
+          },
+          "priority": {
+            "default": "medium",
+            "description": "Priority: low, medium, high, critical",
+            "title": "Priority",
+            "type": "string"
+          }
+        },
+        "required": [
+          "feature"
+        ],
+        "title": "FeaturePriorityInput",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "IterationHistoryResponse": {
+        "description": "Full iteration history for a root job.",
+        "properties": {
+          "iterations": {
+            "items": {
+              "$ref": "#/components/schemas/IterationSummary"
+            },
+            "title": "Iterations",
+            "type": "array"
+          },
+          "root_job_id": {
+            "title": "Root Job Id",
+            "type": "string"
+          },
+          "total_iterations": {
+            "title": "Total Iterations",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "root_job_id",
+          "iterations",
+          "total_iterations"
+        ],
+        "title": "IterationHistoryResponse",
+        "type": "object"
+      },
+      "IterationSummary": {
+        "description": "Summary of a single iteration in the refinement chain.",
+        "properties": {
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "iteration_number": {
+            "title": "Iteration Number",
+            "type": "integer"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "iteration_number",
+          "status"
+        ],
+        "title": "IterationSummary",
+        "type": "object"
+      },
+      "JobListItem": {
+        "description": "Summary of a job in a listing.",
+        "properties": {
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "page_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Type"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Style"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "url",
+          "status"
+        ],
+        "title": "JobListItem",
+        "type": "object"
+      },
+      "JobListResponse": {
+        "description": "Paginated list of jobs.",
+        "properties": {
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/JobListItem"
+            },
+            "title": "Jobs",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "jobs",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "JobListResponse",
+        "type": "object"
+      },
+      "JobStatusResponse": {
+        "description": "Response for job status polling.",
+        "properties": {
+          "accessibility_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accessibility Score"
+          },
+          "batch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Id"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "concept_image_degraded": {
+            "default": false,
+            "title": "Concept Image Degraded",
+            "type": "boolean"
+          },
+          "concept_image_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concept Image Error"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "iteration_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iteration Number"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "parent_job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Job Id"
+          },
+          "refine_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refine Url"
+          },
+          "result_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Url"
+          },
+          "root_job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Root Job Id"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Style"
+          },
+          "token_usage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Usage"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "job_id",
+          "status"
+        ],
+        "title": "JobStatusResponse",
+        "type": "object"
+      },
+      "LLMConfigOverride": {
+        "description": "Optional LLM configuration override for per-request model switching.",
+        "properties": {
+          "api_key_env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Key Env"
+          },
+          "base_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Url"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          }
+        },
+        "title": "LLMConfigOverride",
+        "type": "object"
+      },
+      "LayoutPreferencesInput": {
+        "description": "Layout preferences for a custom style.",
+        "properties": {
+          "border_radius": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Border radius: none, small, medium, large, pill",
+            "title": "Border Radius"
+          },
+          "grid_columns": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Grid column count",
+            "title": "Grid Columns"
+          },
+          "max_width": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Max content width (e.g., '1200px')",
+            "title": "Max Width"
+          },
+          "spacing": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Spacing density: tight, normal, generous",
+            "title": "Spacing"
+          }
+        },
+        "title": "LayoutPreferencesInput",
+        "type": "object"
+      },
+      "PdfRenderRequest": {
+        "description": "A self-contained HTML document to render to a PDF.\n\n\"Self-contained\" is enforced at the sink, not here: the render page refuses\nevery http(s) subresource that is not public\n(``screenshot_renderer.block_private_subresources``). Inline/``data:``\nassets and public remote assets both render; an ``<iframe>`` or ``<img>``\naimed at MinIO, a ClusterIP or cloud metadata is aborted before the request\nleaves the pod, so its bytes cannot appear in the returned PDF.",
+        "properties": {
+          "html": {
+            "minLength": 1,
+            "title": "Html",
+            "type": "string"
+          }
+        },
+        "required": [
+          "html"
+        ],
+        "title": "PdfRenderRequest",
+        "type": "object"
+      },
+      "RedesignRequest": {
+        "description": "Request body for a redesign job.",
+        "properties": {
+          "accessibility_first_auto_theme": {
+            "default": false,
+            "description": "Apply accessibility-first auto theme (style/palette tuning from critique findings) and revalidate with critique adapters",
+            "title": "Accessibility First Auto Theme",
+            "type": "boolean"
+          },
+          "accessibility_threshold": {
+            "default": 70.0,
+            "description": "Minimum accessibility score (0-100)",
+            "title": "Accessibility Threshold",
+            "type": "number"
+          },
+          "auto_fix_accessibility": {
+            "default": false,
+            "description": "Auto-fix accessibility issues",
+            "title": "Auto Fix Accessibility",
+            "type": "boolean"
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BrandInfoInput"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Brand identity data"
+          },
+          "capture_original": {
+            "default": true,
+            "description": "Also screenshot the live original URL (for before/after)",
+            "title": "Capture Original",
+            "type": "boolean"
+          },
+          "component_set": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Component library variant for assembly mode (default: settings.catalog).",
+            "title": "Component Set"
+          },
+          "component_target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ComponentTargetInput"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Component target for scope=component"
+          },
+          "critique_findings": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CritiqueFindingInput"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Critique findings to address",
+            "title": "Critique Findings"
+          },
+          "embeds": {
+            "description": "External interactive artifacts (three.js seam) injected as sandboxed iframes.",
+            "items": {
+              "$ref": "#/components/schemas/EmbedSpec"
+            },
+            "title": "Embeds",
+            "type": "array"
+          },
+          "full_page": {
+            "default": true,
+            "description": "Capture full scroll height (True) or just the viewport (False)",
+            "title": "Full Page",
+            "type": "boolean"
+          },
+          "generate_comparison": {
+            "default": true,
+            "description": "Generate before/after comparison + diff images",
+            "title": "Generate Comparison",
+            "type": "boolean"
+          },
+          "generate_concept_images": {
+            "default": false,
+            "description": "Generate AI concept images",
+            "title": "Generate Concept Images",
+            "type": "boolean"
+          },
+          "generate_screenshots": {
+            "default": true,
+            "description": "Render screenshots of the redesign",
+            "title": "Generate Screenshots",
+            "type": "boolean"
+          },
+          "html_content": {
+            "anyOf": [
+              {
+                "maxLength": 100000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Raw HTML content (if not fetching live)",
+            "title": "Html Content"
+          },
+          "interactivity": {
+            "default": "static",
+            "description": "'static' = no client-side runtime. 'interactive' = allow vendored htmx/Alpine + inline JS in assembled output (assembly mode only).",
+            "pattern": "^(static|interactive)$",
+            "title": "Interactivity",
+            "type": "string"
+          },
+          "llm_config": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LLMConfigOverride"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional LLM configuration override"
+          },
+          "mode": {
+            "default": "freeform",
+            "description": "Generation mode. 'freeform' = the legacy LLM-writes-CSS path (default, byte-identical for existing callers). 'assembly' = compose the page from the vetted open-source component catalog (LLM selects blocks + fills content; scaffolding/theming/assets are deterministic).",
+            "pattern": "^(freeform|assembly)$",
+            "title": "Mode",
+            "type": "string"
+          },
+          "page_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Page type: homepage, landing, product, etc.",
+            "title": "Page Type"
+          },
+          "run_accessibility_check": {
+            "default": false,
+            "description": "Run accessibility scoring after generation",
+            "title": "Run Accessibility Check",
+            "type": "boolean"
+          },
+          "scope": {
+            "default": "full_page",
+            "description": "Design scope. full_page/redesign = whole-page (chunked) generation; section(s) = per-section; component = a single component (needs component_target); hero = fast single hero treatment (the promo fast path); landing = from-scratch landing page (url optional).",
+            "pattern": "^(full_page|sections|section|component|hero|landing|redesign)$",
+            "title": "Scope",
+            "type": "string"
+          },
+          "screenshot_viewports": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Override viewports to render (e.g. ['desktop']); None = service default. Must be known viewport names — an unknown one is rejected here rather than silently skipped by the renderer (which yields zero screenshots).",
+            "title": "Screenshot Viewports"
+          },
+          "section_screenshots": {
+            "default": false,
+            "description": "Also capture a discrete still per landmark section of the composite redesign (surfaced as redesign_section:<name> visual assets) so a consumer can sync each section to the narration line that discusses it",
+            "title": "Section Screenshots",
+            "type": "boolean"
+          },
+          "site_analysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SiteAnalysisInput"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Site analysis context"
+          },
+          "style": {
+            "default": "modern",
+            "description": "Design style name or slug",
+            "maxLength": 100,
+            "title": "Style",
+            "type": "string"
+          },
+          "styles": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Multiple styles for A/B variant generation (max 4)",
+            "title": "Styles"
+          },
+          "url": {
+            "default": "",
+            "description": "URL of the page to design/redesign (optional for scope=landing)",
+            "title": "Url",
+            "type": "string"
+          },
+          "user_context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserContextInput"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rich user context"
+          },
+          "webhook_secret": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Webhook HMAC secret",
+            "title": "Webhook Secret"
+          },
+          "webhook_url": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Webhook URL for job notifications",
+            "title": "Webhook Url"
+          }
+        },
+        "title": "RedesignRequest",
+        "type": "object"
+      },
+      "RedesignResultResponse": {
+        "description": "Full result of a completed redesign job.",
+        "properties": {
+          "accessibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AccessibilityScoreResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "comparisons": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comparisons"
+          },
+          "component_html_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Component Html Path"
+          },
+          "concept_image_assets": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ConceptImageAssetResponse"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concept Image Assets"
+          },
+          "concept_image_degraded": {
+            "default": false,
+            "title": "Concept Image Degraded",
+            "type": "boolean"
+          },
+          "concept_image_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concept Image Error"
+          },
+          "diffs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Diffs"
+          },
+          "html_validation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Html Validation"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "original_screenshots": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Screenshots"
+          },
+          "redesigned_html_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redesigned Html Path"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "screenshots": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Screenshots"
+          },
+          "section_html_paths": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section Html Paths"
+          },
+          "section_screenshots": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section Screenshots"
+          },
+          "style": {
+            "title": "Style",
+            "type": "string"
+          },
+          "token_usage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Usage"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "variants": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/VariantResult"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variants"
+          },
+          "verification_report": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Report"
+          },
+          "verification_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Status"
+          },
+          "visual_assets": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/VisualAssetResponse"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visual Assets"
+          }
+        },
+        "required": [
+          "job_id",
+          "url",
+          "scope",
+          "style"
+        ],
+        "title": "RedesignResultResponse",
+        "type": "object"
+      },
+      "RefineRequest": {
+        "description": "Request to refine an existing redesign with feedback.",
+        "properties": {
+          "feedback": {
+            "description": "Textual feedback for refinement",
+            "maxLength": 2000,
+            "title": "Feedback",
+            "type": "string"
+          },
+          "focus_areas": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Structured feedback areas: layout, colors, typography, content, spacing",
+            "title": "Focus Areas"
+          },
+          "generate_concept_images": {
+            "default": false,
+            "title": "Generate Concept Images",
+            "type": "boolean"
+          },
+          "generate_screenshots": {
+            "default": true,
+            "title": "Generate Screenshots",
+            "type": "boolean"
+          },
+          "llm_config": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LLMConfigOverride"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional LLM configuration override"
+          }
+        },
+        "required": [
+          "feedback"
+        ],
+        "title": "RefineRequest",
+        "type": "object"
+      },
+      "SiteAnalysisInput": {
+        "description": "Condensed site analysis context for the redesign.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Site description",
+            "title": "Description"
+          },
+          "target_audience": {
+            "description": "Target audience segments",
+            "items": {
+              "type": "string"
+            },
+            "title": "Target Audience",
+            "type": "array"
+          },
+          "tone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Brand tone: professional, casual, etc.",
+            "title": "Tone"
+          },
+          "visual_identity": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Visual identity attributes",
+            "title": "Visual Identity"
+          }
+        },
+        "title": "SiteAnalysisInput",
+        "type": "object"
+      },
+      "StyleListResponse": {
+        "description": "Response listing custom styles.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "styles": {
+            "items": {
+              "$ref": "#/components/schemas/CustomStyleResponse"
+            },
+            "title": "Styles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "styles",
+          "count"
+        ],
+        "title": "StyleListResponse",
+        "type": "object"
+      },
+      "StylePreviewRequest": {
+        "description": "Request to preview a style's effect.",
+        "properties": {
+          "html_snippet": {
+            "description": "HTML to preview the style on",
+            "maxLength": 5000,
+            "title": "Html Snippet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "html_snippet"
+        ],
+        "title": "StylePreviewRequest",
+        "type": "object"
+      },
+      "StylePreviewResponse": {
+        "description": "Response with styled HTML preview.",
+        "properties": {
+          "style_description": {
+            "title": "Style Description",
+            "type": "string"
+          },
+          "styled_html": {
+            "title": "Styled Html",
+            "type": "string"
+          }
+        },
+        "required": [
+          "styled_html",
+          "style_description"
+        ],
+        "title": "StylePreviewResponse",
+        "type": "object"
+      },
+      "TypographyInput": {
+        "description": "Typography settings for a custom style.",
+        "properties": {
+          "body_font": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Body text font family",
+            "title": "Body Font"
+          },
+          "heading_font": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Heading font family",
+            "title": "Heading Font"
+          },
+          "scale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Type scale: compact, default, spacious",
+            "title": "Scale"
+          }
+        },
+        "title": "TypographyInput",
+        "type": "object"
+      },
+      "UpdateCustomStyleRequest": {
+        "description": "Request to update a custom style definition.",
+        "properties": {
+          "color_palette": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ColorPaletteInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "example_references": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Example References"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          },
+          "layout": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LayoutPreferencesInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "typography": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TypographyInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "UpdateCustomStyleRequest",
+        "type": "object"
+      },
+      "UserContextInput": {
+        "description": "Rich user context for better redesign targeting.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Site/business description",
+            "title": "Description"
+          },
+          "exclude_pages": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URLs to skip in batch",
+            "title": "Exclude Pages"
+          },
+          "feature_priorities": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/FeaturePriorityInput"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Feature priority list",
+            "title": "Feature Priorities"
+          },
+          "focus_pages": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URLs to prioritize in batch",
+            "title": "Focus Pages"
+          },
+          "goals": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Redesign goals (e.g., increase_conversions)",
+            "title": "Goals"
+          },
+          "site_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ecommerce, saas, blog, portfolio, corporate, landing",
+            "title": "Site Type"
+          },
+          "target_audience": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Target audience segments",
+            "title": "Target Audience"
+          },
+          "visual_preferences": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VisualPreferencesInput"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Visual design preferences"
+          }
+        },
+        "title": "UserContextInput",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VariantComparisonResponse": {
+        "description": "Side-by-side comparison of all variants for a job.",
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/VariantResult"
+            },
+            "title": "Variants",
+            "type": "array"
+          }
+        },
+        "required": [
+          "job_id",
+          "variants"
+        ],
+        "title": "VariantComparisonResponse",
+        "type": "object"
+      },
+      "VariantResult": {
+        "description": "Result for a single A/B variant.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "redesigned_html_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redesigned Html Path"
+          },
+          "screenshot_paths": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Screenshot Paths"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "style": {
+            "title": "Style",
+            "type": "string"
+          },
+          "variant_id": {
+            "title": "Variant Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "variant_id",
+          "style",
+          "status"
+        ],
+        "title": "VariantResult",
+        "type": "object"
+      },
+      "VisualAssetResponse": {
+        "description": "Structured visual asset metadata for downstream consumers.",
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          },
+          "page_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Url"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "title",
+          "kind",
+          "role",
+          "url",
+          "source"
+        ],
+        "title": "VisualAssetResponse",
+        "type": "object"
+      },
+      "VisualPreferencesInput": {
+        "description": "Visual design preferences from the user.",
+        "properties": {
+          "animation_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "none, subtle, moderate, dynamic",
+            "title": "Animation Level"
+          },
+          "color_scheme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "light, dark, colorful, monochrome",
+            "title": "Color Scheme"
+          },
+          "image_style": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "photography, illustration, abstract, minimal",
+            "title": "Image Style"
+          },
+          "layout_style": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "card-based, list, grid, magazine",
+            "title": "Layout Style"
+          }
+        },
+        "title": "VisualPreferencesInput",
+        "type": "object"
+      },
+      "WebhookDeliveryStatus": {
+        "description": "Status of a webhook delivery attempt.",
+        "properties": {
+          "attempt_number": {
+            "title": "Attempt Number",
+            "type": "integer"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "event_type": {
+            "title": "Event Type",
+            "type": "string"
+          },
+          "response_status": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response Status"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_number",
+          "event_type",
+          "status"
+        ],
+        "title": "WebhookDeliveryStatus",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "bearerFormat": "License",
+        "description": "License token. Transport: `X-Tenant-Id: Bearer <token>` (not the Authorization header — that is reserved for caller-side auth).",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Web-design microservice: LLM HTML generation + Playwright screenshot rendering",
+    "title": "HTML Render Service",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Return service info and available endpoint listing.",
+        "operationId": "service_root",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Service Root",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Service banner",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/designs": {
+      "post": {
+        "description": "Create a new redesign job (always async).",
+        "operationId": "create_design",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedesignRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Redesign",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/batch": {
+      "get": {
+        "description": "List all batches for the current tenant.",
+        "operationId": "list_redesign_batches",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "List Batches",
+        "tags": [
+          "designs"
+        ]
+      },
+      "post": {
+        "description": "Create a batch redesign job for multiple pages.",
+        "operationId": "create_redesign_batch",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchRedesignRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Batch",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/batch/{batch_id}": {
+      "get": {
+        "description": "Get status of a batch job.",
+        "operationId": "get_redesign_batch_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "title": "Batch Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Batch not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Batch Status",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/batch/{batch_id}/cancel": {
+      "post": {
+        "description": "Cancel a batch and all its pending child jobs.",
+        "operationId": "cancel_redesign_batch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "title": "Batch Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Cancel Redesign Batch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "Batch cannot be cancelled"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Cancel Batch",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/batch/{batch_id}/results": {
+      "get": {
+        "description": "Get results of a completed batch job.",
+        "operationId": "get_redesign_batch_results",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "title": "Batch Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResultsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Batch not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Batch Results",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/batch/{batch_id}/retry-failed": {
+      "post": {
+        "description": "Re-queue failed pages in a batch for retry.",
+        "operationId": "retry_redesign_batch_failed",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "title": "Batch Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRetryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Batch not found"
+          },
+          "409": {
+            "description": "No failed jobs to retry"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Retry Failed Batch Pages",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs": {
+      "get": {
+        "description": "List jobs for the current tenant with optional filters.",
+        "operationId": "list_redesign_jobs",
+        "parameters": [
+          {
+            "description": "Filter by status",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by status",
+              "title": "Status"
+            }
+          },
+          {
+            "description": "Filter by page type",
+            "in": "query",
+            "name": "page_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by page type",
+              "title": "Page Type"
+            }
+          },
+          {
+            "description": "Max results",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "description": "Max results",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Offset for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "description": "Offset for pagination",
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "List Jobs",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}": {
+      "get": {
+        "description": "Get status of a redesign job.",
+        "operationId": "get_redesign_job_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Job Status",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/cancel": {
+      "post": {
+        "description": "Cancel a pending or processing job.",
+        "operationId": "cancel_redesign_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "Job cannot be cancelled"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Cancel Job",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/compare": {
+      "get": {
+        "description": "Compare all style variants for a job.",
+        "operationId": "compare_redesign_variants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariantComparisonResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or variants not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Compare Variants",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/comparison/{viewport}": {
+      "get": {
+        "description": "Download side-by-side comparison for a viewport.",
+        "operationId": "download_redesign_comparison",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "viewport",
+            "required": true,
+            "schema": {
+              "title": "Viewport",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or comparison not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Comparison",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/component-html": {
+      "get": {
+        "description": "Download the redesigned component HTML.",
+        "operationId": "download_redesign_component_html",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or component HTML not found"
+          },
+          "409": {
+            "description": "Job not completed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Component Html",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/diff/{viewport}": {
+      "get": {
+        "description": "Download pixel diff for a viewport.",
+        "operationId": "download_redesign_diff",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "viewport",
+            "required": true,
+            "schema": {
+              "title": "Viewport",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or diff not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Diff",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/history": {
+      "get": {
+        "description": "Get the full iteration history for a job.",
+        "operationId": "list_redesign_iteration_history",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IterationHistoryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Iteration History",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/html": {
+      "get": {
+        "description": "Download the redesigned HTML for a completed job.",
+        "operationId": "download_redesign_html",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or HTML not found"
+          },
+          "409": {
+            "description": "Job not completed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Html",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/original/{viewport}": {
+      "get": {
+        "description": "Download original screenshot for a viewport.",
+        "operationId": "download_redesign_original_screenshot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "viewport",
+            "required": true,
+            "schema": {
+              "title": "Viewport",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or original screenshot not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Original Screenshot",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/pdf": {
+      "get": {
+        "description": "Render the generated HTML to PDF on demand (headless Chromium print).",
+        "operationId": "download_redesign_pdf",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or HTML not found"
+          },
+          "409": {
+            "description": "Job not completed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Pdf",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/refine": {
+      "post": {
+        "description": "Refine an existing redesign with feedback.",
+        "operationId": "refine_redesign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefineRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "description": "Invalid refinement request"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Refine Redesign",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/result": {
+      "get": {
+        "description": "Get the full result of a completed redesign job.\n\nServed from a single builder off the authoritative DB row. A Redis result\ncache used to short-circuit this read, but it was a once-per-job endpoint\nwhose cache was never invalidated and whose hand-maintained snapshot silently\ndiverged from the DB serialization (it dropped the completion-gating\n``verification_status``/``verification_report`` and ``variants``), so it was\nremoved. There is exactly one serialization now — cache and DB cannot drift.",
+        "operationId": "get_redesign_job_result",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedesignResultResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job not found"
+          },
+          "409": {
+            "description": "Job not completed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Job Result",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/screenshots/{viewport}": {
+      "get": {
+        "description": "Download a screenshot for a specific viewport.",
+        "operationId": "download_redesign_screenshot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "viewport",
+            "required": true,
+            "schema": {
+              "title": "Viewport",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or screenshot not found"
+          },
+          "409": {
+            "description": "Job not completed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Screenshot",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/sections/{section_name}": {
+      "get": {
+        "description": "Download a discrete per-section redesign still by section name.",
+        "operationId": "download_redesign_section_screenshot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "section_name",
+            "required": true,
+            "schema": {
+              "title": "Section Name",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Job or section screenshot not found"
+          },
+          "409": {
+            "description": "Job not completed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Section Screenshot",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/variants/{style}/html": {
+      "get": {
+        "description": "Download the HTML for a specific variant.",
+        "operationId": "download_redesign_variant_html",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "style",
+            "required": true,
+            "schema": {
+              "title": "Style",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Variant or HTML not found"
+          },
+          "409": {
+            "description": "Variant not completed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Variant Html",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/jobs/{job_id}/webhooks": {
+      "get": {
+        "description": "Get webhook delivery log for a job.",
+        "operationId": "list_redesign_webhook_deliveries",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WebhookDeliveryStatus"
+                  },
+                  "title": "Response List Redesign Webhook Deliveries",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Webhook Deliveries",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/render/pdf": {
+      "post": {
+        "description": "Render a self-contained HTML string to a PDF (stateless, headless Chromium print).\n\nUnlike ``/jobs/{job_id}/pdf`` this takes the HTML in the request body instead of\nloading a stored redesign job — for callers (e.g. the orchestrator audit-report\nstage) that build the HTML themselves. No persistence; the bytes are streamed back.\n\nStateless does NOT mean anonymous. This was the only route in the module that\nnever resolved a tenant, so it drove unattributable Chromium work — a full\nbrowser engine, on caller-supplied markup, inside the cluster — for anyone who\ncould reach the port. ``_get_tenant_id`` fails closed with a 401, so the work\nis authenticated and attributable like every sibling route even though there is\nno row to scope. The orchestrator already sends ``X-Tenant-Id`` on this call\n(``BaseServiceClient``), so nothing legitimate loses access.",
+        "operationId": "render_pdf_from_html",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfRenderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation error (empty html)"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Render Pdf",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/styles": {
+      "get": {
+        "description": "List all custom styles for the tenant, deactivated ones included.\n\nA MANAGEMENT listing, like ``GET /styles/{id}``: every row carries\n``is_active`` so a client can filter for itself. It must show deactivated\nrows because ``count_styles`` charges quota for them — an active-only list\nwould let a tenant hit \"maximum custom styles reached\" on ``POST`` while\n``GET`` reported ``count: 0``, with no way left to obtain the ``style_id``\nthat ``PUT`` (to reactivate) and ``DELETE`` (to free the slot) both require.\nThat was a permanent, API-inescapable lockout.",
+        "operationId": "list_redesign_styles",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StyleListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "List Styles",
+        "tags": [
+          "designs"
+        ]
+      },
+      "post": {
+        "description": "Create a new custom style.",
+        "operationId": "create_redesign_style",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomStyleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomStyleResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "Maximum custom styles reached"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Style",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/styles/{style_id}": {
+      "delete": {
+        "description": "Delete a custom style.\n\nReads the row first — with ``include_inactive`` so a deactivated style is\nstill deletable — purely to learn its ``slug``: the cache key is\n``(tenant_id, slug)`` and after the DELETE there is nothing left to derive it\nfrom. The DELETE keeps its own tenant predicate (it is not relying on this\nread for scoping); the read only turns a miss into the same 404 as before.",
+        "operationId": "delete_redesign_style",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "style_id",
+            "required": true,
+            "schema": {
+              "title": "Style Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Delete Redesign Style",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Style not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Delete Style",
+        "tags": [
+          "designs"
+        ]
+      },
+      "get": {
+        "description": "Get a custom style by ID.\n\nA MANAGEMENT read: it opts into deactivated styles (``include_inactive``)\nbecause the response body carries ``is_active`` precisely so the owner can\nsee and manage a switched-off style. Hiding it here while ``PUT`` can still\nreactivate it — and while it still occupies a quota slot — would leave the\nrow invisible but chargeable.",
+        "operationId": "get_redesign_style",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "style_id",
+            "required": true,
+            "schema": {
+              "title": "Style Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomStyleResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Style not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Style",
+        "tags": [
+          "designs"
+        ]
+      },
+      "put": {
+        "description": "Update a custom style.\n\nBoth reads opt into deactivated styles: this is the ONLY route that can flip\n``is_active`` back to True, so filtering them out here would strand a\ndeactivated row permanently (404 on its own guard) while it still consumed a\nquota slot.",
+        "operationId": "update_redesign_style",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "style_id",
+            "required": true,
+            "schema": {
+              "title": "Style Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomStyleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomStyleResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Style not found"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Update Style",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/api/designs/styles/{style_id}/preview": {
+      "post": {
+        "description": "Preview a custom style applied to an HTML snippet.\n\nA CONSUMPTION route, not a management one: it renders the style, exactly as\nthe generation path does. So it takes the default active-only ``get_style``\nand now 404s on a deactivated style, matching ``get_style_by_slug`` — which\nevery real redesign/variant/refinement lookup goes through. Previously this\nwas the one place a switched-off style still produced output (and still spent\nan LLM call).",
+        "operationId": "preview_redesign_style",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "style_id",
+            "required": true,
+            "schema": {
+              "title": "Style Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StylePreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StylePreviewResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Style not found"
+          },
+          "422": {
+            "description": "Validation error"
+          },
+          "504": {
+            "description": "Style preview generation timed out"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Preview Style",
+        "tags": [
+          "designs"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Combined health check for all components.\n\nReports the two components that actually do the work — the claim-queue worker\ntasks and the Chromium pool — alongside the DB/Redis dependencies. Neither is\nwired into readiness; see :func:`health_ready` for why.",
+        "operationId": "health_check",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Check",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Kubernetes liveness probe.",
+        "operationId": "health_live",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Live",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Kubernetes readiness probe -- checks database connectivity.\n\nThe worker pool and the browser pool are deliberately NOT checked here, and\nthat is a decision, not an omission:\n\n* **Readiness gates HTTP, but work does not arrive over HTTP.** Jobs are\n  *pulled* off a shared Postgres claim queue, not pushed by the Service. So\n  evicting a pod whose workers died stops none of the damage — it only\n  removes a submit/status/artifact surface that is still perfectly correct.\n* **The realistic causes are shared, not per-pod.** A bad image or config\n  kills the workers on every replica at once. Readiness would then evict all\n  of them simultaneously, so on top of a stalled queue clients could no\n  longer submit jobs or poll the ones already queued. That is strictly worse\n  than the blindness it replaces.\n* **Liveness was considered and rejected** for the same reason: a restart\n  would fix a locally-crashed pool, but a shared cause turns it into a\n  fleet-wide crashloop.\n\nSo the signal lands on ``/health`` as ``status: unhealthy`` — loud to an\noperator and to alerting, inert to the scheduler.",
+        "operationId": "health_ready",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "description": "Modern K8s liveness probe path (alias of /health/live).",
+        "operationId": "health.live",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Healthz",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/readyz": {
+      "get": {
+        "description": "Modern K8s readiness probe path (alias of /health/ready).",
+        "operationId": "health.ready",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readyz",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Liveness, readiness, dependency probes.",
+      "name": "health"
+    },
+    {
+      "description": "Async web-design jobs (HTML generation across scopes + screenshot artifacts). Canonical surface.",
+      "name": "designs"
+    }
+  ]
+}

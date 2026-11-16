@@ -1,0 +1,12 @@
+# html_render_service — synthetic cases, no customer payload.
+# Identity: the trusted-network lane requires a UUID X-Tenant-Id; a non-UUID is refused like a missing one.
+health|GET|/health||
+healthz|GET|/healthz||
+health_live|GET|/health/live||
+health_ready|GET|/health/ready||
+readyz|GET|/readyz||
+render_pdf|POST|/api/designs/render/pdf|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"html":"<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Conveyor capture fixture</title>\n<style>\n  body { font-family: Georgia, serif; margin: 2rem; color: #1b1b1b; }\n  h1 { font-size: 2rem; border-bottom: 2px solid #335; }\n  table { border-collapse: collapse; margin-top: 1rem; }\n  td, th { border: 1px solid #99a; padding: 0.25rem 0.75rem; text-align: left; }\n</style>\n</head>\n<body>\n<h1>Conveyor media capture fixture</h1>\n<p>Synthetic one-page document written for contract capture. It is self-contained: no\nexternal stylesheet, font, script or image is referenced, so the render needs no network.</p>\n<table>\n  <tr><th>field</th><th>value</th></tr>\n  <tr><td>purpose</td><td>media.render_html golden</td></tr>\n  <tr><td>source</td><td>hand-written, not a customer payload</td></tr>\n</table>\n</body>\n</html>\n"}
+render_pdf_empty|POST|/api/designs/render/pdf|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"html":""}
+render_pdf_no_body|POST|/api/designs/render/pdf|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+render_pdf_no_tenant|POST|/api/designs/render/pdf||{"html":"<p>synthetic</p>"}
+render_pdf_bad_tenant|POST|/api/designs/render/pdf|{"X-Tenant-Id":"not-a-uuid"}|{"html":"<p>synthetic</p>"}

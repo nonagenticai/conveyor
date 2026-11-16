@@ -56,8 +56,9 @@ CROSS_CUTTING = {
         "plan": "docs/design/STUDIO-SPEC.md",
         "track": "programme",
         # #89 (the V2 registration in the seed/index), #97 (the console's live engine proof)
-        # and #103 (the measured programme truth) are the pack/console surface.
-        "issues": [32, 33, 36, 37, 89, 97, 103],
+        # and #103 (the measured programme truth) are the pack/console surface. #149 is the
+        # work store: expected outputs and the project checklist on the same console.
+        "issues": [32, 33, 36, 37, 89, 97, 103, 149],
     },
     "PLATFORM": {
         "name": "CI, runners and platform",
@@ -69,6 +70,33 @@ CROSS_CUTTING = {
         "issues": [17, 22, 43, 44, 45, 46, 55, 57, 71, 93, 95, 102],
     },
 }
+
+# The intermediate outputs each project owes, in the order they are worked. The app renders
+# this as the project's checklist and the CLI compares it with the project's documents by
+# `meta.category`; `published briefs / 47` is computed across the delivery projects.
+# P0's eight artefacts are docs/plans/P0-programme-definition.md §3; a delivery project owes
+# its brief, and (V2 only) the two inception units from §5.
+P0_EXPECTED_OUTPUTS = [
+    "vision",
+    "blueprint",
+    "business-case",
+    "programme-plan",
+    "governance",
+    "reuse-map",
+    "brief-template",
+    "architecture-analysis",
+]
+DELIVERY_EXPECTED_OUTPUTS = {
+    "v1": ["project-brief"],
+    "v2": ["project-brief", "analysis", "architecture"],
+}
+
+
+def expected_outputs(project: dict) -> list[str]:
+    """The output categories a project owes. Programme extras owe only their brief."""
+    if project["key"] == "P0":
+        return list(P0_EXPECTED_OUTPUTS)
+    return list(DELIVERY_EXPECTED_OUTPUTS.get(project["track"], ["project-brief"]))
 
 # SPEC_V2 §12 (the dependency sentence, kept as data because prose parsing is not a parser).
 # "T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 and T13;
@@ -412,6 +440,7 @@ def build() -> dict:
                     "status_source": "measured coverage + open GitHub issues + plan frontmatter",
                     "measured_status": measured.get("status", ""),
                     "tranche": measured.get("tranche", 0),
+                    "expected_outputs": expected_outputs(project),
                     **({"gate": project["gate"]} if project.get("gate") else {}),
                 },
             }

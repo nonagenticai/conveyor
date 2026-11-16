@@ -3,7 +3,7 @@
 `slices: [S00, S05, S14]` · **No repository SHA applies to this file.** Every number below is a live reading
 of 2026-11-07 with the command that produced it; re-measure before relying on any of it.
 
-Measured while writing the plan set, from `mini3`. Every number below is a reading with its command — re-measure
+Measured while writing the plan set, from the dev box. Every number below is a reading with its command — re-measure
 before relying on it; none of it is a standing fact.
 
 ## Loki (the S0 access-log source)

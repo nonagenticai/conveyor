@@ -35,7 +35,7 @@
 <li><code>crates/actions/src/procedure/{mod,procedures}.rs</code> — the wire mapping, gate facts from <code>meta.expires_at</code>, the projection call after <code>validate_publish</code>, and <code>422 procedure.plan_invalid</code> with one field error per finding.</li>
 <li>Ledgers — <code>crates/store/src/migrate.rs</code> and <code>crates/store/tests/s07_schema.rs</code> both carry 32.</li>
 </ul>
-<h2 id="measured-gate-rbuild-on-m1-2026-11-09">Measured gate (rbuild on m1, 2026-11-09)</h2>
+<h2 id="measured-gate-rbuild-on-the-build-host-2026-11-09">Measured gate (rbuild on the build host, 2026-11-09)</h2>
 <table>
 <thead>
 <tr>
@@ -132,12 +132,12 @@
 <li>a stale tenancy test — <code>/api/me</code> with no header is the switcher bootstrap (200 + the membership list), not a 400; the test now proves the bootstrap and keeps the 400 on a tenant-scoped action, and CONTRACT §9 states the exception;</li>
 <li><code>crates/api/tests/externals_declared.rs</code> — S15's <code>integrations/strata.rs</code> was missing from the exactly-compared ALLOWED list; added with the same transport rationale as <code>ingest.rs</code>;</li>
 <li><code>scripts/db-roles.sql</code> — its two cluster-wide ALTER ROLE statements raced across parallel test databases (<code>XX000 tuple concurrently updated</code>; measured 27 targets failed in one run); now serialised by a transaction-scoped advisory lock, released at COMMIT;</li>
-<li>the environment — m1 had <strong>7 GiB free</strong> and the first run died <code>StorageFull</code> (the mass panics at <code>common/mod.rs:213</code> were that, not code); three cold conveyor slot caches were pruned, freeing 77 GiB (84 GiB free), slot 0's warm target kept.</li>
+<li>the environment — the build host had <strong>7 GiB free</strong> and the first run died <code>StorageFull</code> (the mass panics at <code>common/mod.rs:213</code> were that, not code); three cold conveyor slot caches were pruned, freeing 77 GiB (84 GiB free), slot 0's warm target kept.</li>
 </ol></li>
 <li><code>fmt --all -- --check</code>: red on four S19/S20 eval files only (<code>apps/server/src/eval_runner.rs</code>, <code>apps/server/tests/eval_runner.rs</code>, <code>eval_runner_properties.rs</code>, <code>eval_support/mod.rs</code>); none of this slice's files. They are the eval lane's to format.</li>
 </ul>
 <h2 id="served-spec-lock">Served-spec lock</h2>
-<p>The declared member changes the <code>procedures.*</code> operation schemas (<code>StepIn</code> on create/update, <code>StepOut</code> on get/list/create/retire), so <code>served-spec.lock.json</code> was regenerated over the <strong>whole tree</strong> — not just this slice — with <code>conveyor-server --print-openapi --write-lock</code> on m1, copied back with <code>rbuild --copy-back</code>. Measured 2026-11-09 19:15 CET:</p>
+<p>The declared member changes the <code>procedures.*</code> operation schemas (<code>StepIn</code> on create/update, <code>StepOut</code> on get/list/create/retire), so <code>served-spec.lock.json</code> was regenerated over the <strong>whole tree</strong> — not just this slice — with <code>conveyor-server --print-openapi --write-lock</code> on the build host, copied back with <code>rbuild --copy-back</code>. Measured 2026-11-09 19:15 CET:</p>
 <ul>
 <li><strong>287 → 297 operations.</strong> Added 10: <code>GET/POST /api/platform/tenants</code>, <code>GET/POST /api/platform/tenants/{id}</code>, <code>POST /api/platform/tenants/{id}/invite-admin</code>, <code>POST /api/platform/tenants/{id}/retry</code>, <code>GET /api/tenants/{id}/billing</code>, <code>POST /api/hooks/{hook}</code>, and the invocation routes for <code>cards.list</code>, <code>runs.get</code> and <code>eval_runs.regrade</code>.</li>
 <li>14 operations changed hash, including all six <code>procedures.*</code> surfaces (this slice), <code>GET /api/actions</code> (the manifest), <code>capabilities.get</code> (S15), <code>eval_climbs.compare</code> (S20), <code>eval_signoffs.*</code> (S19), <code>approvals.*</code> and <code>schedules.upsert</code>.</li>

@@ -1,0 +1,1 @@
+{"name":"Video Analyzer Service","version":"0.1.0","status":"running","endpoints":{"analyze":"/api/analyze","analyze_audio":"/api/analyze/audio","upload":"/api/analyze/upload","job_status":"/api/analyze/{job_id}","job_result":"/api/analyze/{job_id}/result","verification":"/api/analyze/{job_id}/verification","artifact":"/api/analyze/{job_id}/artifact/{name}","health":"/health"}}

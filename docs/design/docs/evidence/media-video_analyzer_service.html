@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>videoanalyzerservice absorption — evidence (2026-11-15) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-video_analyzer_service.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="video_analyzer_service-absorption--evidence-2026-11-15">video_analyzer_service absorption — evidence (2026-11-15)</h1>
+<p>Issue #139 · the ffmpeg executor image (<code>conveyor-media-ffmpeg</code>). The reference is pinned by digest; no private hostname, slug, address or customer payload appears in this file.</p>
+<h2 id="the-contract">The contract</h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capture</td>
+<td><code>apps/media/contract/video_analyzer_service/</code> — taken 2026-11-15T16:11:54Z</td>
+</tr>
+<tr>
+<td>Pinned image</td>
+<td><code>sha256:5836071586adf4035825c1076c84adfec94c2f1d762adc979fffb94d223ca29d</code></td>
+</tr>
+<tr>
+<td>Operations captured</td>
+<td>14 (13 paths)</td>
+</tr>
+<tr>
+<td>Golden cases</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Capability kinds after the drop table</td>
+<td>4 — <code>media.probe_video</code>, <code>media.analyze_video</code>, <code>media.analyze_audio</code>, <code>media.ocr</code></td>
+</tr>
+</tbody>
+</table>
+<p>Captured from the running image against a scratch <code>postgres:18</code> and redis, with synthetic fixtures (a 2-second 320×240 mp4 and a generated audio file). The job was separately driven to <code>completed</code> from the captured submit body before the goldens were taken, so <code>analyze_submit</code> is a real 202 for a real job, and <code>audio_beat_grid</code> is a real beat grid computed from the synthetic file.</p>
+<h2 id="parity-accounting">Parity accounting</h2>
+<p><code>apps/media/contract/parity.toml</code> carries one row per captured operation; <code>apps/media/tests/parity.rs</code> enforces it in both directions.</p>
+<ul>
+<li><strong>3 served as kinds</strong>: <code>POST /api/analyze</code> and <code>POST /api/analyze/upload</code> → <code>media.analyze_video</code>; <code>POST /api/analyze/audio</code> → <code>media.analyze_audio</code>. (<code>upload</code> is served but uncaptured: the capture script sends JSON only, and multipart/form-data cannot be expressed; the executor takes the same bytes as a work-dir input.)</li>
+<li><strong>11 dropped with a reason</strong>: health scaffolding and <code>/</code> (an executor is a batch pod with no HTTP surface), and every job-scoped read/delete route (<code>/api/analyze/{job_id}</code>, <code>/result</code>, <code>/verification</code>, <code>/artifact/{name}</code>, <code>DELETE</code>) because the job ledger, the result route and the artefact store are conveyor's (ADR 0007 §2–4).</li>
+<li><strong>2 kinds are new, not ported</strong>: <code>media.probe_video</code> (the reference exposes probe data inside its analysis document; conveyor publishes it as its own kind so a caller can decide before spending a job) and <code>media.ocr</code> (ADR 0007 §1 puts tesseract in the image; the reference's OCR is a licence-gated vision-provider call, so no reference operation evidences a local one).</li>
+</ul>
+<h2 id="declared-deviation--ocr">Declared deviation — OCR</h2>
+<p>The captured job runs with <code>extract_ocr</code> <strong>off</strong>, because that stage calls the vision provider behind <code>inference-router</code> and the rig has no licence token. The port's <code>media.ocr</code> is therefore a tesseract-based <strong>new</strong> capability, not a parity claim, and its tests assert its own behaviour (a real image, its text) rather than a golden.</p>
+<h2 id="what-the-rewrite-does">What the rewrite does</h2>
+<p>The reference was an asynchronous analysis service with a lease and a reaper. The executor does the analysis inside one job and posts one result document. Measurements derivable from ffprobe/ffmpeg output are reproduced in Rust; any parameter whose reference implementation reads raw pixels through OpenCV is refused by name with a stable code.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/media-video_analyzer_service.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

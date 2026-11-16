@@ -203,7 +203,7 @@ fi
 if [ "$capture" = 1 ]; then
     echo "==> capturing the golden set into $capture_out"
     IR_PSQL="docker exec -i $pg psql -U postgres -d inference_router -v ON_ERROR_STOP=1" \
-        "$here/capture-goldens.sh" --live "$url" --out "$capture_out"
+        "$here/capture-goldens.sh" --live "$url" --out "$capture_out" --image-digest "$digest"
 fi
 
 # One canonical attributed completion, so a ledger/cost dump has exactly one deterministic row to

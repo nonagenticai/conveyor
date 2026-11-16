@@ -1,0 +1,891 @@
+{
+  "components": {
+    "parameters": {
+      "TenantIdHeader": {
+        "description": "License token transport: `Bearer <token>`.",
+        "in": "header",
+        "name": "X-Tenant-Id",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "BatchStatusResponse": {
+        "properties": {
+          "batch_id": {
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/JobStatus"
+            },
+            "title": "Jobs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "batch_id",
+          "jobs"
+        ],
+        "title": "BatchStatusResponse",
+        "type": "object"
+      },
+      "ChunkIn": {
+        "properties": {
+          "ref": {
+            "description": "Caller's opaque id (e.g. orchestrator chunk id)",
+            "title": "Ref",
+            "type": "string"
+          },
+          "speed": {
+            "default": 1.0,
+            "maximum": 2.0,
+            "minimum": 0.5,
+            "title": "Speed",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "voice": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice"
+          }
+        },
+        "required": [
+          "ref",
+          "text"
+        ],
+        "title": "ChunkIn",
+        "type": "object"
+      },
+      "ClaimRequest": {
+        "properties": {
+          "worker_id": {
+            "title": "Worker Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_id"
+        ],
+        "title": "ClaimRequest",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "JobRef": {
+        "properties": {
+          "idempotency_key": {
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref",
+          "job_id",
+          "idempotency_key",
+          "status"
+        ],
+        "title": "JobRef",
+        "type": "object"
+      },
+      "JobStatus": {
+        "description": "One job as the orchestrator reads it while polling a batch.\n\n``duration_seconds`` is ``None`` in TWO different situations, and a consumer that\ncannot tell them apart mis-builds the narration timeline:\n\n* the job has not finished yet — there is no duration to have;\n* the job IS ``done`` and its clip is real, but the synth backend never measured\n  a length (``tts_backend`` emits ``duration_sec = frames / sr if sr else 0.0``).\n\n``duration_unmeasured`` names the second case. It exists because the second case\nused to be published as the number ``0.0``, which is indistinguishable from a\ngenuine measurement: the timeline allocated no time at all for a chunk full of\nspeech, narration drifted against picture for everything after it, and the batch\nand the run both reported success. A consumer must treat ``duration_unmeasured``\nas \"audio of unknown length\" — measure the clip, or degrade loudly — and never as\n\"zero seconds of audio\".",
+        "properties": {
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Seconds"
+          },
+          "duration_unmeasured": {
+            "default": false,
+            "title": "Duration Unmeasured",
+            "type": "boolean"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "idempotency_key": {
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "result_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Url"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "idempotency_key",
+          "status"
+        ],
+        "title": "JobStatus",
+        "type": "object"
+      },
+      "SubmitBatchRequest": {
+        "properties": {
+          "batch_id": {
+            "description": "One book's narrate submission id",
+            "maxLength": 64,
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "chunks": {
+            "items": {
+              "$ref": "#/components/schemas/ChunkIn"
+            },
+            "title": "Chunks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "batch_id",
+          "chunks"
+        ],
+        "title": "SubmitBatchRequest",
+        "type": "object"
+      },
+      "SubmitBatchResponse": {
+        "properties": {
+          "batch_id": {
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/JobRef"
+            },
+            "title": "Jobs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "batch_id",
+          "jobs"
+        ],
+        "title": "SubmitBatchResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "fail": {
+        "properties": {
+          "error": {
+            "title": "Error",
+            "type": "string"
+          },
+          "terminal": {
+            "default": false,
+            "title": "Terminal",
+            "type": "boolean"
+          },
+          "worker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worker Id"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "Body_tts.fail",
+        "type": "object"
+      },
+      "heartbeat": {
+        "properties": {
+          "worker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worker Id"
+          }
+        },
+        "title": "Body_tts.heartbeat",
+        "type": "object"
+      },
+      "release": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "worker_id": {
+            "title": "Worker Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_id"
+        ],
+        "title": "Body_tts.release",
+        "type": "object"
+      },
+      "result": {
+        "properties": {
+          "audio": {
+            "contentMediaType": "application/octet-stream",
+            "title": "Audio",
+            "type": "string"
+          },
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "maximum": 999999.999,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Seconds"
+          },
+          "worker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worker Id"
+          }
+        },
+        "required": [
+          "audio"
+        ],
+        "title": "Body_tts.result",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "bearerFormat": "License",
+        "description": "License token. Transport: `X-Tenant-Id: Bearer <token>` (not the Authorization header — that is reserved for caller-side auth).",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "w2v service — w2v service",
+    "title": "tts-gateway",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/tts/batches": {
+      "post": {
+        "description": "Enqueue a book idempotently, confirming every dedupe HIT still has its clip.\n\nSubmit deduplicates on ``sha256(tenant|voice|speed|preproc|text)`` and that key\nIS the object name, so a ``done`` row can outlive its audio (lifecycle expiry, a\nbucket sweep, a half-failed upload). Returning ``done`` for such a row is a dead\nreference: the poll presigns a URL for nothing and the downstream compile 404s,\nfailing the whole run. So every hit that comes back ``done`` is confirmed\nagainst storage first, and a definitively-absent clip is re-queued rather than\npublished. See ``jm.requeue_jobs_with_missing_clips`` for cost + race handling.",
+        "operationId": "tts.batches.submit",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitBatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitBatchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Submit Batch",
+        "tags": [
+          "batches"
+        ]
+      }
+    },
+    "/api/tts/batches/{batch_id}": {
+      "get": {
+        "operationId": "tts.batches.get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "title": "Batch Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Batch",
+        "tags": [
+          "batches"
+        ]
+      }
+    },
+    "/api/tts/claim": {
+      "post": {
+        "operationId": "tts.claim",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Claim",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/tts/jobs/{job_id}/fail": {
+      "post": {
+        "description": "Report a synth failure.\n\n``worker_id`` is OPTIONAL only for rollout compatibility with the manually-deployed\nMac kokoro workers (see job_manager). When present, the failure is guarded on\n``claimed_by``, so a stale worker's late error cannot requeue — or, at the cap,\nPOISON — the claim another worker is actively working. A guarded miss returns\n``{\"status\": \"unknown\"}``: same shape, same 200, no retry bait.\n\n``terminal=true`` fails the job outright instead of requeueing it — for a failure\nno retry can fix (a 402 customer-config refusal from the synth target). It\nREQUIRES ``worker_id``: an unguarded terminal fail would let any holder of the\nshared legacy subject kill any claimed job outright.",
+        "operationId": "tts.fail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/fail"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Tts.Fail",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Report Failure",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/tts/jobs/{job_id}/heartbeat": {
+      "post": {
+        "operationId": "tts.heartbeat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/heartbeat"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Heartbeat",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/tts/jobs/{job_id}/release": {
+      "post": {
+        "description": "Surrender a claim at graceful shutdown; the consumed attempt is REFUNDED.\n\nCalled by a worker's SIGTERM handler (k8s RollingUpdate, Mac reboot). Without\nit every rollout burns one of a HEALTHY chunk's ``max_attempts`` lives and\nfour interrupted claims poison it permanently.\n\nAlways 200, never an error status: this is a shutdown path, and a worker that\nis already dying must not see something it might retry. A release that no\nlonger owns the claim (completed / reclaimed / already released) is a truthful\n``{\"released\": false}``, not a fault. If the call never lands at all, the\nserver self-heals via lease expiry.",
+        "operationId": "tts.release",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/release"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "boolean"
+                  },
+                  "title": "Response Tts.Release",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Release Claim",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/tts/jobs/{job_id}/result": {
+      "post": {
+        "description": "Store the clip and finish the job.\n\n**Size.** Two gates protect this endpoint. ``BodySizeLimitMiddleware`` refuses an\noversized REQUEST at the ASGI layer — ahead of the multipart parser, so the body\nis never spooled to a temp file and resource exhaustion is genuinely prevented,\nnot merely converted into node disk pressure. The ``read(max + 1)`` below is the\nper-FILE bound behind it, keeping an oversized clip out of the object store.\n\n**Duration bound.** ``duration_seconds`` is persisted as ``Numeric(9, 3)``, whose\nlargest representable value is ``999999.999``. Before this bound existed, a worker\nreporting anything above it -- or ``inf``/``nan``, which ``float()`` accepts from a\nform field -- reached the UPDATE in ``job_manager`` and raised a DB ``DataError``.\nThat surfaced as a 500, the worker's ``raise_for_status()`` fired, the worker POSTed\n``/fail``, and a perfectly good job burned a retry attempt until it died. ``le`` is\nanchored on the exact column ceiling rather than ``lt=1e6`` because Postgres rounds\nto scale BEFORE checking precision, so ``999999.9995`` would round to ``1000000.000``\nand overflow; ``allow_inf_nan=False`` kills the non-finite cases outright instead of\nrelying on NaN comparison semantics, which never reject.\n\nThe bound is deliberately ONE-SIDED: there is no lower bound. A non-positive duration\nis logged below but still accepted -- see that block for why.\n\n``worker_id`` is OPTIONAL only for rollout compatibility with the manually-deployed\nMac kokoro workers (see job_manager). When present, the completion is guarded on\n``claimed_by`` so a worker whose lease already expired cannot finish the claim a\ndifferent worker now holds.\n\n**A missing measurement is not a duration of zero.** ``duration_seconds`` is\nSELF-REPORTED and is republished by ``GET /api/tts/batches/{batch_id}``, from\nwhich the orchestrator builds its narration timeline. ``tts_backend`` emits\n``duration_sec = frames / sr if sr else 0.0``, so real, good audio legitimately\narrives with NO length — a normal production event, not an attack.\n\nIt used to arrive as the number ``0.0`` and be stored as such, which made the\ngap unexpressible: the timeline builder allocated zero seconds to a chunk full\nof speech, every later chunk drifted against the picture, and the batch and the\nrun both reported success. Nothing downstream could tell that fabricated zero\nfrom a measured one.\n\nSo the field is OPTIONAL, and missing / null / non-positive are all normalised\nto ``None`` → persisted as SQL NULL (``tts_jobs.duration_seconds`` is already\nnullable) → surfaced to the consumer as ``duration_unmeasured: true`` on a job\nthat is otherwise plainly ``done``. NULL is a value the timeline builder cannot\nsilently add up, and the flag says which of the two zeroes this is.\n\nThe job is still COMPLETED — the audio is real and losing it is worse than the\ndrift. Rejecting (e.g. a ``gt=0`` bound → 422) is the trap: ``worker.py`` calls\n``raise_for_status()``, converts the 422 into a POST ``/fail``, and the queue\nrequeues a deterministically-failing job until ``max_attempts`` burns out and it\nlands in ``status='failed'`` — and the orchestrator's audiobook narrate stage\nraises ``StagePreconditionError`` on ANY failed job, aborting the whole book for\none chunk that synthesized fine.\n\nThe upper bound stays one-sided and unchanged: it exists only to keep an\nunstorable value out of ``Numeric(9, 3)``.\n\nValidating the value for real would mean decoding the clip, which is\ndeliberately out of scope here.",
+        "operationId": "tts.result",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/result"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Report Result",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Health",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/livez": {
+      "get": {
+        "operationId": "health_livez",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Livez",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/readyz": {
+      "get": {
+        "description": "Return 200 once Postgres answers, 503 while it does not.",
+        "operationId": "health_readyz",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Readyz",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readyz",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}

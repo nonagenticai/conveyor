@@ -171,7 +171,7 @@ yq -r &#39;.[]|select(.status==&quot;used&quot; and (.evidence_class==&quot;B&qu
 # 14 — SUMMARY counts and the signed hash
 yq -r &#39;.[]|.area+&quot;\t&quot;+.status&#39; parity/parity.yaml | sort | uniq -c &gt; parity/evidence/counts.tsv &amp;&amp; shasum -a 256 parity/parity.yaml</code></pre>
 <h2 id="7-gate-executable">7. Gate (executable)</h2>
-<p>From <code>$HOME/Movies/conveyor</code>, under <code>bash</code>; every line is an assertion and exits 0 only when the property holds. <code>check-jsonschema</code> is <strong>not</strong> installed on mini3 (verified 2026-11-07) — install it first.</p>
+<p>From <code>$HOME/Movies/conveyor</code>, under <code>bash</code>; every line is an assertion and exits 0 only when the property holds. <code>check-jsonschema</code> is <strong>not</strong> installed on the dev box (verified 2026-11-07) — install it first.</p>
 <pre class="bash"><code>set -euo pipefail
 uv tool install check-jsonschema            # once; absent 2026-11-07
 test -z &quot;$(yq -r &#39;.[].id&#39; parity/parity.yaml | sort | uniq -d)&quot;                                   # G1 ids unique

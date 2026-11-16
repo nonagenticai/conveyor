@@ -140,6 +140,14 @@ impl StreamCapture {
         self.broken = true;
     }
 
+    /// True when any choice carried a tool-call fragment. A tool-call reply is a complete answer
+    /// even with no text, so the empty classifier must not judge it blank.
+    pub fn saw_tool_call(&self) -> bool {
+        self.choices
+            .values()
+            .any(|parts| !parts.tool_calls.is_empty())
+    }
+
     pub fn finish_reason(&self) -> Option<&str> {
         self.choices
             .get(&0)

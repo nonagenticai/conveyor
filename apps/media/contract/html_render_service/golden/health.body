@@ -1,0 +1,1 @@
+{"status":"healthy","components":{"database":"healthy","redis":"healthy","api":"healthy","job_workers":"healthy: 1/1 worker task(s) alive","browser_pool":"healthy: 2 slot(s), 2 idle, 2 browser(s) live","batch_progress":"healthy"}}

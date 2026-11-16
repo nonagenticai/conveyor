@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="s21-step-1--budgeted-compile--the-role-component--evidence">S21 step 1 — budgeted compile + the role component — evidence</h1>
-<p>Measured 2026-11-09 on mini3; every Rust command through <code>rbuild</code> on m1 (CONTRACT §16). Lane <code>s21-message-construction</code>, joining the D27 seam that <code>s13-agent-inference-nodes</code> built.</p>
+<p>Measured 2026-11-09 on the dev box; every Rust command through <code>rbuild</code> on the build host (CONTRACT §16). Lane <code>s21-message-construction</code>, joining the D27 seam that <code>s13-agent-inference-nodes</code> built.</p>
 <h2 id="built">Built</h2>
 <ul>
 <li><code>migrations/0031_s21_prompt_budget.sql</code> — <code>prompt.budget_chars</code> and <code>prompt_section.budget_chars</code> (nullable = unbounded, <code>&gt; 0</code> by CHECK) and <code>'role'</code> added to <code>prompt_section.source_kind</code>. Grants are re-applied by <code>migrate</code> (0030's rule); no grant block.</li>

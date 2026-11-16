@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>ttsgateway capture — evidence (2026-11-15) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-tts_gateway.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="tts_gateway-capture--evidence-2026-11-15">tts_gateway capture — evidence (2026-11-15)</h1>
+<p>Issue #139 · <strong>captured here, implemented in the thin-operations unit.</strong> ADR 0007 §1 hosts thin operations in <code>apps/server</code> beside the job ledger, and its sequence line puts them after the two media images; this file records the contract the later unit will be held to. The reference is pinned by digest; no private hostname, slug, address or customer payload appears here.</p>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capture</td>
+<td><code>apps/media/contract/tts_gateway/</code> — taken 2026-11-15T15:58:21Z</td>
+</tr>
+<tr>
+<td>Pinned image</td>
+<td><code>sha256:8068472f07537acb42b2e5d26e7ec0b05b3da223a5ab5d9ac9dc25ba96428d99</code></td>
+</tr>
+<tr>
+<td>Operations captured</td>
+<td>10 (10 paths)</td>
+</tr>
+<tr>
+<td>Golden cases</td>
+<td>13</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-the-capture-pins">What the capture pins</h2>
+<ul>
+<li>Synthesis batches (<code>POST /api/tts/batches</code>, <code>GET /api/tts/batches/{batch_id}</code>) and the worker surface (<code>claim</code>, <code>heartbeat</code>, <code>release</code>, <code>result</code>, <code>fail</code>) — the gateway's fan-out to the model hosts, with the degraded shape when a worker is unreachable.</li>
+<li>Health (<code>/health</code>, <code>/livez</code>, <code>/readyz</code>).</li>
+</ul>
+<p>Synthetic fixtures only: a known voice and a two-word text. The three boot traps that cost time are recorded in <code>apps/media/contract/tts_gateway/README.md</code> (initContainer migrations, <code>AUTH_ENABLED=false</code> being ignored, and the worker surface being an allowlist keyed on the subject).</p>
+<h2 id="why-it-is-not-in-this-unit">Why it is not in this unit</h2>
+<p>The gateway keeps no state of its own; it is a thin HTTP fan-out. In conveyor it runs beside the job ledger in <code>apps/server</code>, which already owns the queue, the retries and the artefact routes — the home ADR 0007 §1 gives it. Landing it in the media images would put a scheduler in a pod.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/media-tts_gateway.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

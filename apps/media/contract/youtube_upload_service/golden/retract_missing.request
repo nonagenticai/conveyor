@@ -1,0 +1,2 @@
+POST /api/upload/jobs/00000000-0000-0000-0000-0000000000ff/retract
+{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}

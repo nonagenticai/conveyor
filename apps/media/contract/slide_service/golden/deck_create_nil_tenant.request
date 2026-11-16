@@ -1,0 +1,3 @@
+POST /api/decks
+{"X-Tenant-Id":"00000000-0000-0000-0000-000000000000"}
+{"title":"Nil tenant","slides":[{"template_id":"00000000-0000-0000-0000-0000000000d1"}]}

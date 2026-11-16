@@ -58,8 +58,11 @@ fn no_handler_calls_a_service_directly() {
     //   * `github.rs`   — #70's publish transport behind the `publish.design` worker job. The job owns
     //     the attempt/dead-letter and records the PR result; no action handler calls it, and the token
     //     is opened only inside the job. Added 2026-11-13.
+    //   * `youtube.rs`  — #182's Google OAuth token exchange behind `youtube.connect`. The actions
+    //     depend on the `YouTubeProvider` trait; this file is the one transport, it owns its own
+    //     timeout and it never reads an error body. Added 2026-11-16.
     // A new name here is a decision, not an accident: the list is compared exactly.
-    const ALLOWED: [&str; 7] = [
+    const ALLOWED: [&str; 8] = [
         "invoke.rs",
         "webhooks.rs",
         "channels.rs",
@@ -67,6 +70,7 @@ fn no_handler_calls_a_service_directly() {
         "strata.rs",
         "webhook.rs",
         "github.rs",
+        "youtube.rs",
     ];
 
     let mut offenders = Vec::new();

@@ -1,6 +1,6 @@
 # S21 step 1 — budgeted compile + the role component — evidence
 
-Measured 2026-11-09 on mini3; every Rust command through `rbuild` on m1 (CONTRACT §16).
+Measured 2026-11-09 on the dev box; every Rust command through `rbuild` on the build host (CONTRACT §16).
 Lane `s21-message-construction`, joining the D27 seam that `s13-agent-inference-nodes` built.
 
 ## Built

@@ -122,11 +122,6 @@ window.installV2 = function (api, enterprise) {
     outputs: {},
     outputsLoading: null,
     register: { items: [], loaded: false, loading: false, error: null },
-    repositories: [],
-    repositoriesLoaded: false,
-    publishRepo: null,
-    publishStatus: null,
-    publishTimer: null,
     programme: null,
     runs: [],
     runsLoaded: false,
@@ -156,10 +151,6 @@ window.installV2 = function (api, enterprise) {
     cs.lastError = null;
     cs.outputs = {};
     cs.outputsLoading = null;
-    cs.repositories = [];
-    cs.repositoriesLoaded = false;
-    cs.publishRepo = null;
-    cs.publishStatus = null;
     cs.programme = null;
     cs.runs = [];
     cs.runsLoaded = false;
@@ -167,8 +158,6 @@ window.installV2 = function (api, enterprise) {
     cs.runDetail = {};
     cs.runDetailLoading = null;
     cs.loadingAll = false;
-    if (cs.publishTimer) clearTimeout(cs.publishTimer);
-    cs.publishTimer = null;
   }
 
   async function consoleLoad() {
@@ -594,86 +583,6 @@ window.installV2 = function (api, enterprise) {
     consoleLoadRegister();
   }
 
-  async function consoleLoadRepositories() {
-    if (!consoleOn() || cs.repositoriesLoaded) return;
-    try {
-      const page = await C.action("repositories.list", {});
-      cs.repositories = list(page.items);
-      cs.repositoriesLoaded = true;
-      let stored = "";
-      try {
-        stored = localStorage.getItem("conveyor.publish.repository") || "";
-      } catch (_) {
-        /* a private window may refuse; the selection is then per-render */
-      }
-      const found = cs.repositories.find((row) => row.id === stored);
-      const homepage = cs.repositories.find((row) => /nonagentic_homepage/.test(row.url || ""));
-      cs.publishRepo = found
-        ? found.id
-        : homepage
-          ? homepage.id
-          : (cs.repositories[0] || {}).id || null;
-    } catch (error) {
-      cs.repositories = [];
-      cs.repositoriesLoaded = true;
-      cs.lastError = error;
-    }
-    render();
-  }
-
-  const selectedRepository = () => cs.repositories.find((row) => row.id === cs.publishRepo) || null;
-
-  function consoleSelectRepository(id) {
-    cs.publishRepo = id || null;
-    try {
-      if (id) localStorage.setItem("conveyor.publish.repository", id);
-    } catch (_) {
-      /* per-render selection only */
-    }
-    cs.publishStatus = null;
-    render();
-    if (id) consolePollPublish(id, 0);
-  }
-
-  async function consolePollPublish(repositoryId, attempt) {
-    if (!consoleOn() || !repositoryId) return;
-    if (cs.publishTimer) clearTimeout(cs.publishTimer);
-    try {
-      const status = await C.action("publish.status", { repository_id: repositoryId });
-      cs.publishStatus = status;
-      render();
-      if ((status.state === "pending" || status.state === "running") && attempt < 150) {
-        cs.publishTimer = setTimeout(() => consolePollPublish(repositoryId, attempt + 1), 2000);
-      }
-    } catch (error) {
-      cs.publishStatus = { state: "error", error: consoleError(error) };
-      render();
-    }
-  }
-
-  async function consoleStartPublish() {
-    const repo = selectedRepository();
-    if (!repo) {
-      toast("Select a publish target first");
-      return;
-    }
-    if (!repo.credential_secret_id) {
-      toast("This repository has no token; save one first");
-      return;
-    }
-    try {
-      const started = await C.action("publish.start", { repository_id: repo.id });
-      cs.publishStatus = { state: started.state, job_id: started.job_id };
-      toast(started.already_running ? "A publish is already running" : "Publish enqueued");
-      render();
-      consolePollPublish(repo.id, 0);
-    } catch (error) {
-      cs.lastError = error;
-      toast("Publish refused · " + consoleError(error));
-      render();
-    }
-  }
-
   /* ------------------------------------------------------------- execution room */
   // The runs API already returns everything the room needs: `runs.list` filters by status and
   // card, `runs.get` carries the steps, the gates, the process and the inputs. No control below
@@ -825,7 +734,6 @@ window.installV2 = function (api, enterprise) {
     if (signed) {
       consoleLoadProject(current.id);
       consoleLoadOutputs(current.id);
-      consoleLoadRepositories();
     }
     const select = signed
       ? `<label class="e-select">Project <select data-v2-input="project-page">${rows
@@ -886,6 +794,9 @@ window.installV2 = function (api, enterprise) {
     "governance",
     "reuse-map",
     "brief",
+    "project-brief",
+    "brief-template",
+    "architecture-analysis",
     "analysis",
     "architecture",
     "plan",
@@ -907,11 +818,14 @@ window.installV2 = function (api, enterprise) {
       ? cs.register.items
       : list(pack.outputs).map((row) => ({ ...row, publishable: true }));
     const projectFilter = v.outputsProject || "";
+    const unitFilter = v.outputsUnit || "";
     const visibility = v.outputsVisibility || "";
     const categoryFilter = v.outputsCategory || "";
     const categories = [...new Set(all.map(outputCategoryOf).filter(Boolean))].sort();
+    const units = [...new Set(all.map(outputUnitOf).filter(Boolean))].sort();
     const rows = all.filter((doc) => {
       if (projectFilter && doc.project_id !== projectFilter) return false;
+      if (unitFilter && outputUnitOf(doc) !== unitFilter) return false;
       if (visibility === "public" && !doc.publishable) return false;
       if (visibility === "private" && doc.publishable) return false;
       if (categoryFilter && outputCategoryOf(doc) !== categoryFilter) return false;
@@ -932,6 +846,11 @@ window.installV2 = function (api, enterprise) {
           .map(
             (p) =>
               `<option value="${E(p.id)}" ${projectFilter === p.id ? "selected" : ""}>${E(p.key)} · ${E(p.name)}</option>`,
+          )
+          .join("")}</select></label><label class="e-select">Unit <select data-v2-input="outputs-filter" data-key="outputsUnit"><option value="">Any</option>${units
+          .map(
+            (u) =>
+              `<option value="${E(u)}" ${unitFilter === u ? "selected" : ""}>${E(u)}</option>`,
           )
           .join("")}</select></label><label class="e-select">Visibility <select data-v2-input="outputs-filter" data-key="outputsVisibility"><option value="">Any</option><option value="public" ${visibility === "public" ? "selected" : ""}>Published</option><option value="private" ${visibility === "private" ? "selected" : ""}>Private</option></select></label><label class="e-select">Category <select data-v2-input="outputs-filter" data-key="outputsCategory"><option value="">Any</option>${categories
           .map(
@@ -1087,37 +1006,59 @@ window.installV2 = function (api, enterprise) {
     );
   }
 
-  function inceptionPanel(project) {
+  function expectedOutputPanel(project) {
+    const title = "Expected outputs";
     const state = cs.outputs[project.id];
-    if (!state) return panel("Inception", note("Loading this project's outputs…"));
+    if (!state) return panel(title, note("Loading this project's outputs…"));
     if (state.error) {
       return panel(
-        "Inception",
+        title,
         note(`<strong>Read refused</strong> · ${E(consoleError(state.error))}`, "bad"),
       );
     }
+    const expected = list((project.meta || {}).expected_outputs);
+    const categories = expected.length ? expected : INCEPTION_CATEGORIES;
     let published = 0;
-    const rows = INCEPTION_CATEGORIES.map((category) => {
+    let nextMarked = false;
+    const rows = categories.map((category) => {
       const docs = state.items.filter((doc) => outputCategoryOf(doc) === category);
       const isPublished = docs.some((doc) => doc.publishable);
       if (isPublished) published += 1;
+      // The first category with no published document is the next output to compose.
+      const next = !isPublished && !nextMarked;
+      if (next) nextMarked = true;
       const label = docs.length ? (isPublished ? "published" : "present, private") : "missing";
       const tone = isPublished ? "green" : docs.length ? "amber" : "bad";
       const action = C.can("documents.compose")
         ? button(
             `Compose ${category}`,
             "output-new-template",
-            `data-project="${E(project.id)}" data-category="${E(category)}"`,
+            `data-project="${E(project.id)}" data-category="${E(category)}" data-unit="${E(project.key)}"`,
             "small",
             "plus",
           )
         : "";
-      return `<tr><td><strong>${E(category)}</strong></td><td>${B(label, tone)}</td><td>${docs.length ? E(docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>${action}</td></tr>`;
+      return `<tr><td><strong>${E(category)}</strong>${next ? ` ${B("next", "amber")}` : ""}</td><td>${B(label, tone)}</td><td>${docs.length ? E(docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>${action}</td></tr>`;
     });
+    // P0's artefact #7 is the brief set across every delivery project; it is a computed
+    // coverage row, not a document on P0.
+    if (project.key === "P0") {
+      consoleLoadRegister();
+      const delivery = consoleProjects().filter((row) => row.key !== "P0");
+      const briefed = new Set(
+        list(cs.register.items)
+          .filter((doc) => outputCategoryOf(doc) === "project-brief" && doc.publishable)
+          .map((doc) => doc.project_id),
+      );
+      const covered = delivery.filter((row) => briefed.has(row.id)).length;
+      rows.push(
+        `<tr><td><strong>project briefs</strong></td><td>${B(`${covered}/${delivery.length} published`, covered === delivery.length && delivery.length ? "green" : "amber")}</td><td><small>Across every delivery project</small></td><td></td></tr>`,
+      );
+    }
     return panel(
-      "Inception",
-      `${table(["Output", "State", "Document", "Action"], rows)}${note("A delivery project starts with an analysis and an architecture (P0 §5); both published is the inception standard. A missing one is a visible gap.")}`,
-      B(`${published}/2 published`, published === 2 ? "green" : "amber"),
+      title,
+      `${table(["Output", "State", "Document", "Action"], rows)}${note("The categories are the project's expected outputs — P0's eight artefacts (§3) or a delivery project's brief and, for V2, its analysis and architecture (§5). A missing one is a visible gap; the first missing row is the next output to compose.")}`,
+      B(`${published}/${categories.length} published`, published === categories.length ? "green" : "amber"),
     );
   }
 
@@ -1202,7 +1143,7 @@ window.installV2 = function (api, enterprise) {
     const failure = cs.lastError
       ? note(`<strong>Last refusal</strong> · ${E(consoleError(cs.lastError))}`, "bad")
       : "";
-    return `${failure}${coveragePanel(project)}${board}${cardPanel}${issuePanel}${inceptionPanel(project)}${projectOutputs(project)}${projectFeedback(project)}`;
+    return `${failure}${coveragePanel(project)}${board}${cardPanel}${issuePanel}${expectedOutputPanel(project)}${projectOutputs(project)}${projectFeedback(project)}`;
   }
 
   function projectOutputs(project) {
@@ -1305,89 +1246,6 @@ window.installV2 = function (api, enterprise) {
     );
   }
 
-  function publishingPanel() {
-    if (!consoleOn()) return "";
-    if (!cs.repositoriesLoaded) {
-      consoleLoadRepositories();
-      return panel("Publishing", note("Loading publish targets…"));
-    }
-    const repo = selectedRepository();
-    const status = cs.publishStatus || null;
-    if (repo && !status) consolePollPublish(repo.id, 0);
-    const repoSelect = `<label class="e-select">Publish target <select data-v2-input="publish-repository"><option value="">— choose a repository —</option>${cs.repositories
-      .map(
-        (row) =>
-          `<option value="${E(row.id)}" ${row.id === cs.publishRepo ? "selected" : ""}>${E(row.url)}${
-            row.credential_secret_id ? "" : " · no token"
-          }</option>`,
-      )
-      .join("")}</select></label>`;
-    const connect = !(C.can("secrets.create") && C.can("repositories.create"))
-      ? ""
-      : `<details class="console-details"><summary>Connect a homepage repository</summary><label class="field full"><span>Repository URL</span><input id="publish-url" value="https://github.com/nonagenticai/nonagentic_homepage" spellcheck="false"></label><label class="field full"><span>Default branch</span><input id="publish-branch" value="main" spellcheck="false"></label><label class="field full"><span>Fine-grained token (contents:write, pull_requests:write)</span><input id="publish-token" type="password" autocomplete="off"></label><p class="muted">The token is sealed in the tenant's secret store and never returned.</p>${button(
-      "Save target",
-      "publish-connect",
-      "",
-      "small",
-      "plus",
-    )}</details>`;
-    const rotate = repo && C.can("repositories.update") && C.can("secrets.create")
-      ? `<details class="console-details"><summary>Rotate this target's token</summary><label class="field full"><span>New token</span><input id="publish-rotate-token" type="password" autocomplete="off"></label>${button(
-          "Save token",
-          "publish-rotate",
-          "",
-          "small",
-          "shield",
-        )}</details>`
-      : "";
-    const statusLine = status
-      ? kv([
-          [
-            "State",
-            B(
-              status.state,
-              status.state === "succeeded"
-                ? "green"
-                : status.state === "failed" || status.state === "dead" || status.state === "error"
-                  ? "bad"
-                  : "amber",
-            ),
-          ],
-          [
-            "Pull request",
-            status.pr_url
-              ? `<a class="e-project-link" href="${E(status.pr_url)}" target="_blank" rel="noopener">open ↗</a>`
-              : "—",
-          ],
-          ["Generated", E(status.generated_at || "—")],
-          ["Outputs", status.outputs == null ? "—" : String(status.outputs)],
-          ...(status.error ? [["Error", E(status.error)]] : []),
-        ])
-      : note("Select a target to read its latest publish state.");
-    const reason = !repo
-      ? "Choose or connect a repository first"
-      : !repo.credential_secret_id
-        ? "This repository has no token"
-        : !C.can("publish.start")
-          ? "You are not allowed to publish"
-          : "";
-    const publishControl = reason
-      ? `<button type="button" class="btn primary" disabled title="${E(reason)}">${I("upload")}Publish the design site</button>`
-      : button("Publish the design site", "publish-start", "", "primary", "upload");
-    return panel(
-      "Publishing",
-      `${repoSelect}${statusLine}<div class="console-actions">${publishControl}${button(
-        "Refresh status",
-        "publish-refresh",
-        "",
-        "small",
-        "replay",
-      )}</div>${connect}${rotate}${note(
-        "Publish builds the pack from the platform's rows and every publishable output, then opens a pull request on the homepage repository. A person merges it; the button never merges.",
-      )}`,
-      repo ? `<span class="console-live">GitHub PR</span>` : "",
-    );
-  }
 
   /* ------------------------------------------------------------- workspace actions */
   const closeWorkspaceDialog = () => {
@@ -1532,6 +1390,21 @@ window.installV2 = function (api, enterprise) {
 
   function consoleOutputNew(projectId, cardId, template = {}) {
     v.outputCard = cardId || null;
+    const project = projectId ? projectById(projectId) : null;
+    // Prefill the category with the template's, else the project's first expected output that is
+    // not yet published. The unit is the project key unless the caller named one.
+    const state = project ? cs.outputs[project.id] : null;
+    const expected = list(((project || {}).meta || {}).expected_outputs);
+    const nextCategory =
+      template.category ||
+      expected.find(
+        (category) =>
+          !(state && !state.error ? state.items : []).some(
+            (doc) => doc.publishable && outputCategoryOf(doc) === category,
+          ),
+      ) ||
+      "";
+    const unitValue = template.unit || (project ? project.key : "");
     const projectSelect = projectId
       ? ""
       : `<label class="field full"><span>Project</span><select id="output-project">${consoleProjects()
@@ -1539,11 +1412,11 @@ window.installV2 = function (api, enterprise) {
           .join("")}</select></label>`;
     const options = OUTPUT_CATEGORIES.map(
       (c) =>
-        `<option value="${E(c)}" ${template.category === c ? "selected" : ""}>${E(c)}</option>`,
+        `<option value="${E(c)}" ${nextCategory === c ? "selected" : ""}>${E(c)}</option>`,
     ).join("");
-    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}${projectSelect}<label class="field full"><span>Title</span><input id="output-title" value="${E(template.title || "")}" placeholder="What this output records"></label><label class="field full"><span>Unit (issue number)</span><input id="output-unit" placeholder="121" spellcheck="false"></label><label class="field full"><span>Category</span><select id="output-category"><option value="">—</option>${options}</select></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why.">${E(template.body || "")}</textarea></label><label class="check"><input id="output-publishable" type="checkbox"> Publish this output on the public design site</label><p class="muted">The body is capped at 256 KiB. It starts private unless you tick the box.</p></div>`;
+    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}${projectSelect}<label class="field full"><span>Title</span><input id="output-title" value="${E(template.title || "")}" placeholder="What this output records"></label><label class="field full"><span>Unit (project key or issue number)</span><input id="output-unit" value="${E(unitValue)}" placeholder="${E((project || {}).key || "121")}" spellcheck="false"></label><label class="field full"><span>Category</span><select id="output-category"><option value="">—</option>${options}</select></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why.">${E(template.body || "")}</textarea></label><label class="check"><input id="output-publishable" type="checkbox"> Publish this output on the public design site</label><p class="muted">The body is capped at 256 KiB. It starts private unless you tick the box.</p></div>`;
     openDialog(
-      template.category ? `Compose ${template.category}` : "Compose output",
+      nextCategory ? `Compose ${nextCategory}` : "Compose output",
       body,
       `${button("Save output", "output-save", `data-project="${E(projectId || "")}"`, "primary", "plus")}${btn("Cancel", "close-dialog")}`,
       true,
@@ -1698,6 +1571,8 @@ window.installV2 = function (api, enterprise) {
   function consoleOutputTemplate(projectId, category) {
     const project = projectById(projectId);
     if (!project) return;
+    const label = category.replace(/-/g, " ");
+    const heading = label.charAt(0).toUpperCase() + label.slice(1);
     const templates = {
       analysis: {
         category: "analysis",
@@ -1709,9 +1584,57 @@ window.installV2 = function (api, enterprise) {
         title: `Architecture — ${project.key} ${project.name}`,
         body: `# Architecture — ${project.key}\n\n## Context and boundary\n\n## Aggregates, tables, actions\n\n## Decisions\n\nA deviation from the blueprint is a decision record, not a silent fork.\n\n## Acceptance\n\n`,
       },
+      "project-brief": {
+        category: "project-brief",
+        title: `Project brief — ${project.key} ${project.name}`,
+        body: `# ${project.key} — ${project.name}\n\n**Track:** ${(project.meta || {}).track || ""} · **Tranche:** ${(project.meta || {}).tranche ?? ""} · **Plan:** \`${(project.meta || {}).plan || ""}\`\n\n## Outcome\n\nOne sentence: what is true after this project that is not true now.\n\n## Boundary\n\nIn scope, out of scope, and the surfaces it must not fork.\n\n## Reuse sources\n\n| Source | What to reuse | Analysis question |\n|---|---|---|\n| | | |\n\n## Inception units\n\n1. \`analysis\` — current state, reuse, contract/licence, build-vs-reuse, risks.\n2. \`architecture\` — aggregates, tables, actions, modules, integrations, decision record, acceptance.\n\n## Dependencies\n\n## Acceptance\n\n- Scenario: \n  Verify: \`\`\n\n## Capabilities\n\n## Gaps\n\n`,
+      },
+      "brief-template": {
+        category: "brief-template",
+        title: "Project brief template — the mandatory fields",
+        body: `# Project brief template\n\nEvery delivery project brief carries:\n\n| Field | Content |\n|---|---|\n| Outcome | One sentence: what is true after the project that is not true now |\n| Boundary | Out of scope, and which existing surfaces it must not fork |\n| Reuse sources | Paths inside conveyor; estate services/modules; upstream crates. Each with the analysis question |\n| Inception units | \`analysis\` and \`architecture\`, the project's first two claims |\n| Dependencies | Typed: blocked-by, acceptance-blocked-by, blocks, related |\n| Acceptance | BDD scenario per part with a \`Verify:\` command |\n| Capabilities | The organisation positions/capabilities that own it |\n| Plan | The slice/S## plan path, or the T## SPEC_V2 section |\n`,
+      },
+      "architecture-analysis": {
+        category: "architecture-analysis",
+        title: "Architecture and analysis pack — current state, options, risks",
+        body: `# Architecture and analysis pack\n\n## Current state\n\n## Options considered\n\n## Risks\n\n## Dependency map\n\n`,
+      },
+      vision: {
+        category: "vision",
+        title: "Vision and mandate",
+        body: `# Vision and mandate\n\n## Purpose\n\n## Outcomes\n\n## Boundary\n\n## Who it serves\n\n`,
+      },
+      blueprint: {
+        category: "blueprint",
+        title: "Blueprint — the target architecture and operating model",
+        body: `# Blueprint\n\n## Aggregates and services\n\n## Action registry and data model\n\n## Deployment estate\n\n## The to-be the projects deliver\n\n`,
+      },
+      "business-case": {
+        category: "business-case",
+        title: "Business case",
+        body: `# Business case\n\n## Why now\n\n## Benefit map\n\n## Cost and risk posture\n\n## Licensing frame\n\n`,
+      },
+      "programme-plan": {
+        category: "programme-plan",
+        title: "Programme plan — tranches and projects",
+        body: `# Programme plan\n\n## Tranches\n\n## Projects and sequencing\n\n## Gates\n\n## First three months\n\n`,
+      },
+      governance: {
+        category: "governance",
+        title: "Governance and organisation",
+        body: `# Governance and organisation\n\n## Roles\n\n## Decision ladder\n\n## Assurance\n\n## The unit protocol\n\n`,
+      },
+      "reuse-map": {
+        category: "reuse-map",
+        title: "Reuse map",
+        body: `# Reuse map\n\n| Source | Reuse candidate | Boundary | Licence/contract constraint |\n|---|---|---|---|\n| | | | |\n`,
+      },
     };
-    const template = templates[category];
-    if (!template) return;
+    const template = templates[category] || {
+      category,
+      title: `${heading} — ${project.key} ${project.name}`,
+      body: `# ${heading} — ${project.key}\n\n## Purpose\n\n## Content\n\n## Evidence\n\n`,
+    };
     consoleOutputNew(projectId, null, template);
   }
 
@@ -1729,80 +1652,6 @@ window.installV2 = function (api, enterprise) {
     await consoleIntake(projectId, issueNumber);
   }
 
-  function consolePublishConnect() {
-    const url = (document.getElementById("publish-url") || {}).value || "";
-    const branch = (document.getElementById("publish-branch") || {}).value || "main";
-    const token = (document.getElementById("publish-token") || {}).value || "";
-    if (!url.trim() || !token.trim()) {
-      toast("A repository URL and a token are required");
-      return;
-    }
-    (async () => {
-      try {
-        const secret = await C.action("secrets.create", {
-          name: `publish.github_token.${Date.now()}`,
-          value: token.trim(),
-        });
-        const repo = await C.action("repositories.create", {
-          url: url.trim(),
-          default_branch: branch.trim() || "main",
-          credential_secret_id: secret.id,
-        });
-        cs.repositoriesLoaded = false;
-        await consoleLoadRepositories();
-        consoleSelectRepository(repo.id);
-        toast("Publish target connected");
-      } catch (error) {
-        cs.lastError = error;
-        toast("Connect refused · " + consoleError(error));
-        render();
-      }
-    })();
-  }
-
-  function consolePublishRotate() {
-    const repo = selectedRepository();
-    const token = (document.getElementById("publish-rotate-token") || {}).value || "";
-    if (!repo) {
-      toast("Select a publish target first");
-      return;
-    }
-    if (!token.trim()) {
-      toast("A new token is required");
-      return;
-    }
-    (async () => {
-      try {
-        const secret = await C.action("secrets.create", {
-          name: `publish.github_token.${Date.now()}`,
-          value: token.trim(),
-        });
-        await C.action(
-          "repositories.update",
-          { id: repo.id, credential_secret_id: secret.id },
-          { etag: repo.version },
-        );
-        cs.repositoriesLoaded = false;
-        await consoleLoadRepositories();
-        consoleSelectRepository(repo.id);
-        toast("Publish token rotated");
-      } catch (error) {
-        cs.lastError = error;
-        toast("Rotate refused · " + consoleError(error));
-        render();
-      }
-    })();
-  }
-
-  function consolePublishRefresh() {
-    const repo = selectedRepository();
-    if (!repo) {
-      toast("Select a publish target first");
-      return;
-    }
-    cs.publishStatus = null;
-    consolePollPublish(repo.id, 0);
-  }
 
   /* The Plan · Boards tab on the operator console: the tenant's own projects, its boards,
      its cards and its GitHub registry — read live, written through the action API. */
@@ -3936,11 +3785,6 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
       render();
       return;
     }
-    const publishRepo = event.target.closest('[data-v2-input="publish-repository"]');
-    if (publishRepo) {
-      consoleSelectRepository(publishRepo.value);
-      return;
-    }
     const planProject = event.target.closest('[data-v2-input="plan-project"]');
     if (planProject) {
       v.planProject = planProject.value;
@@ -4098,18 +3942,6 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         break;
       case "feedback-intake":
         consoleFeedbackIntake(d.issue);
-        break;
-      case "publish-start":
-        consoleStartPublish();
-        break;
-      case "publish-refresh":
-        consolePublishRefresh();
-        break;
-      case "publish-connect":
-        consolePublishConnect();
-        break;
-      case "publish-rotate":
-        consolePublishRotate();
         break;
       case "tab":
         v.tab[d.key] = d.value;

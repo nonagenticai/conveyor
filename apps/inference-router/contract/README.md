@@ -31,6 +31,12 @@ export ORACLE_REGISTRY=<private-registry-host:port>   # the pinned image is not 
 ./oracle.sh --down               # remove everything (a non---keep run does this itself)
 ```
 
+`capture-goldens.sh` writes `golden/capture.json` beside the cases: the digest `oracle.sh` pulled
+(from `manifest.json`), whether the ledger was reset first, the case count, and a sha256 over the
+case files. It is written by the capture itself, never by hand, so the record of which image
+produced the goldens travels with the bytes it describes — the contract's whole value rests on
+their coming from the reference rather than from the rewrite.
+
 The image is pulled **by digest** from `manifest.json`, from the registry the caller names
 in `ORACLE_REGISTRY`; no registry host is recorded in this tree. Contributors without
 access to that image can still run the parity harness against a candidate — the committed

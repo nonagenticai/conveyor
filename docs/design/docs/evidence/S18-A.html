@@ -57,7 +57,7 @@
 <li>S17's row claims the gold/empty/<strong>baseline</strong> arms. <code>benchmark_runs.start</code> refuses the <code>baseline</code> arm at <code>crates/actions/src/benchmark/runs.rs</code> — its <code>baseline.py</code> producer has no build step in any slice plan. Source for a port: <code>$HOME/Movies/conveyor-bench</code>.</li>
 </ul>
 <h2 id="gate">Gate</h2>
-<p>Run on m1 through <code>rbuild</code>; every line below was executed, not projected.</p>
+<p>Run on the build host through <code>rbuild</code>; every line below was executed, not projected.</p>
 <table>
 <thead>
 <tr>
@@ -94,7 +94,7 @@
 </tr>
 <tr>
 <td>6</td>
-<td><code>rbuild -- run -p conveyor-server -- --print-openapi --write-lock</code> (on m1) → rsync back</td>
+<td><code>rbuild -- run -p conveyor-server -- --print-openapi --write-lock</code> (on the build host) → rsync back</td>
 <td><strong>304 → 305 ops</strong>, one line changed; <code>benchmark_runs.trend</code> present in the lock</td>
 </tr>
 <tr>

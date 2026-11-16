@@ -1,0 +1,2 @@
+POST /api/designs/render/pdf
+{"html":"<p>synthetic</p>"}

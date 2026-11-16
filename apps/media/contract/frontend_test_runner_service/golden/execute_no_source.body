@@ -1,0 +1,1 @@
+{"error":{"code":"HTTP_422","message":"Either bdd_job_id or package_url must be provided","status":422,"request_id":"01a1e0a1-94e7-71df-bdc9-b2154dc697da","timestamp":"2026-11-15T19:14:08Z"}}

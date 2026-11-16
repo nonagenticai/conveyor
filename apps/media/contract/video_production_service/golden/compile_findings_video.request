@@ -1,0 +1,3 @@
+POST /api/compile/findings-video
+{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}
+{"title":"Capture Findings","findings":[{"title":"Finding one","description":"Synthetic finding"}]}
