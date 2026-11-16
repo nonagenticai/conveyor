@@ -7,6 +7,7 @@
 
 use conveyor_domain::TenantId;
 use sqlx::PgConnection;
+use uuid::Uuid;
 
 /// Why a destination read failed.
 #[derive(Debug, thiserror::Error)]
@@ -31,4 +32,27 @@ pub async fn destination(
     .fetch_optional(conn)
     .await?;
     Ok(destination)
+}
+
+/// Register or replace the tenant's destination; one row per tenant.
+pub async fn set_destination(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    destination_url: &str,
+    updated_by: Uuid,
+) -> Result<(), TenantInferenceStoreError> {
+    sqlx::query(
+        "INSERT INTO tenant_inference_endpoint (tenant_id, destination_url, updated_by)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (tenant_id) DO UPDATE
+            SET destination_url = excluded.destination_url,
+                updated_by = excluded.updated_by,
+                updated_at = now()",
+    )
+    .bind(tenant.as_uuid())
+    .bind(destination_url)
+    .bind(updated_by)
+    .execute(conn)
+    .await?;
+    Ok(())
 }

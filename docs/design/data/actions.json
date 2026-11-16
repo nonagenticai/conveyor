@@ -140,6 +140,8 @@
     "industries.list",
     "inference.chat",
     "inference_calls.list",
+    "inference_endpoint.get",
+    "inference_endpoint.set",
     "inference_usage.report",
     "invites.create",
     "invites.list",

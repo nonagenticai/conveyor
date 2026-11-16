@@ -70,7 +70,10 @@ use serde_json::{Value, json};
 /// **#156 adds 5 internal**: the work-store publish/request/revision actions. 341 → **346**.
 /// **#174 adds 1 external**: `media.generate_image`, the MOSS-Image host over the engine's own
 /// declared-external path (it is the first action to declare an `Artefact`). 346 → **347**.
-const EXPECTED: [&str; 349] = [
+/// **#173 adds 2 internal**: `produce.speech` and `media.transcribe` (the audio hosts). 347 → **349**.
+/// **#160 adds 2 internal**: `inference_endpoint.get|set`, the tenant's registered inference
+/// destination and its sealed credential. 349 → **351**.
+const EXPECTED: [&str; 351] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -211,6 +214,8 @@ const EXPECTED: [&str; 349] = [
     "industries.list",
     "inference.chat",
     "inference_calls.list",
+    "inference_endpoint.get",
+    "inference_endpoint.set",
     "inference_usage.report",
     "invites.create",
     "invites.list",
@@ -459,7 +464,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // #173 adds `produce.speech` and `media.transcribe` (both external): 331 → 333, external 16 → 18.
     // They are the first actions whose request carries a DOCUMENT's bytes (multipart) and the first
     // whose artefact is UTF-8 text rather than base64 — both mechanisms live in the engine.
-    assert_eq!((internal, external), (331, 18));
+    // #160 adds `inference_endpoint.get|set` (both internal): internal 331 → 333; external stays 18.
+    assert_eq!((internal, external), (333, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
