@@ -766,26 +766,51 @@ pub async fn live_run_for_card_tx(
     row.map(Run::try_from).transpose()
 }
 
-/// How many ROOT runs of `process_id` the card has ever had.
+/// The process KEY a run executes, if any.
+///
+/// A guard that identifies a process by its row id breaks the day the key forks: a v2 draft is
+/// a new row, so a failed v1 run would look like some other process and a per-id count would
+/// read zero. The key family is the stable identity.
+pub async fn process_key_of_run_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+) -> Result<Option<String>, RunStoreError> {
+    let key: Option<Option<String>> = sqlx::query_scalar(
+        "SELECT p.key
+           FROM run r
+           JOIN process p ON p.tenant_id = r.tenant_id AND p.id = r.process_id
+          WHERE r.tenant_id = $1 AND r.id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(key.flatten())
+}
+
+/// How many ROOT runs of the process KEY the card has ever had, across every version of the
+/// family.
 ///
 /// The coach's recursion cap counts history, not liveness: a *terminal* coach run is exactly
 /// what makes the next failure a repeat, and [`live_run_for_card_tx`] cannot see it. Root-only,
 /// like every card-wide query since 0033.
-pub async fn count_root_runs_for_card_process_tx(
+pub async fn count_root_runs_for_card_process_key_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     card_id: Uuid,
-    process_id: Uuid,
+    process_key: &str,
 ) -> Result<i64, RunStoreError> {
     let count: i64 = sqlx::query_scalar(
         "SELECT count(*)
-           FROM run
-          WHERE tenant_id = $1 AND card_id = $2 AND process_id = $3
-            AND parent_run_id IS NULL",
+           FROM run r
+           JOIN process p ON p.tenant_id = r.tenant_id AND p.id = r.process_id
+          WHERE r.tenant_id = $1 AND r.card_id = $2 AND p.key = $3
+            AND r.parent_run_id IS NULL",
     )
     .bind(tenant.as_uuid())
     .bind(card_id)
-    .bind(process_id)
+    .bind(process_key)
     .fetch_one(&mut *conn)
     .await?;
     Ok(count)

@@ -283,25 +283,19 @@ pub async fn err_card(
     //   * no coach about a coach — the failed run IS the coach process;
     //   * a closed or archived project produces no work to protect;
     //   * the per-card depth cap.
-    let failed_process = store::run::process_of_run_tx(&mut tx, tenant, run_id)
+    //
+    // Identity is the process KEY family, never a process-row id: a v2 draft forked from a
+    // published coach is a new row, so an id comparison would stop recognising the v1 coach and
+    // an id-keyed count would read zero (PR #188 audit finding F1).
+    let failed_process_key = store::run::process_key_of_run_tx(&mut tx, tenant, run_id)
         .await
         .map_err(|error| match error {
             store::run::RunStoreError::Database(error) => store_error(error, action),
             other => {
-                tracing::error!(error = %other, "err.card: read the failed run's process");
+                tracing::error!(error = %other, "err.card: read the failed run's process key");
                 ActionError::internal()
             }
         })?;
-    let coach_process =
-        store::process::get_process_by_key_tx(&mut tx, tenant, COACH_ERROR_PROCESS, None)
-            .await
-            .map_err(|error| match error {
-                store::process::ProcessStoreError::Database(error) => store_error(error, action),
-                other => {
-                    tracing::error!(error = %other, "err.card: read the coach process");
-                    ActionError::internal()
-                }
-            })?;
     let board = store::board::get_board_tx(&mut tx, tenant, card.board_id)
         .await
         .map_err(|error| store_error(error, action))?
@@ -313,31 +307,31 @@ pub async fn err_card(
         .await
         .map_err(|error| store_error(error, action))?
         .map(|project| project.status);
-    let prior_coaches = match coach_process.as_ref() {
-        Some(process) => {
-            store::run::count_root_runs_for_card_process_tx(&mut tx, tenant, card_id, process.id)
-                .await
-                .map_err(|error| match error {
-                    store::run::RunStoreError::Database(error) => store_error(error, action),
-                    other => {
-                        tracing::error!(error = %other, "err.card: count the card's coach runs");
-                        ActionError::internal()
-                    }
-                })?
+    let prior_coaches = store::run::count_root_runs_for_card_process_key_tx(
+        &mut tx,
+        tenant,
+        card_id,
+        COACH_ERROR_PROCESS,
+    )
+    .await
+    .map_err(|error| match error {
+        store::run::RunStoreError::Database(error) => store_error(error, action),
+        other => {
+            tracing::error!(error = %other, "err.card: count the card's coach runs");
+            ActionError::internal()
         }
-        None => 0,
-    };
-    let coach_refusal = match (failed_process, coach_process.as_ref()) {
-        (_, None) => Some("the coach process is not published"),
-        (Some(failed), Some(coach)) if failed == coach.id => Some("no coach about a coach"),
-        _ if project_status
-            .as_deref()
-            .is_some_and(|status| matches!(status, "closed" | "archived")) =>
-        {
-            Some("the card's project is closed")
-        }
-        _ if prior_coaches >= COACH_CHAIN_MAX => Some("the coach chain reached its cap"),
-        _ => None,
+    })?;
+    let coach_refusal = if failed_process_key.as_deref() == Some(COACH_ERROR_PROCESS) {
+        Some("no coach about a coach")
+    } else if project_status
+        .as_deref()
+        .is_some_and(|status| matches!(status, "closed" | "archived"))
+    {
+        Some("the card's project is closed")
+    } else if prior_coaches >= COACH_CHAIN_MAX {
+        Some("the coach chain reached its cap")
+    } else {
+        None
     };
     tx.commit().await.map_err(|error| {
         tracing::error!(%error, "err.card: close the read transaction");
