@@ -483,14 +483,19 @@ jobs:
             bin: conveyor-licenses
             image: conveyor-licenses
           # The two media executor images (ADR 0007 §1–3): one package, two binaries, one image
-          # each. A media image runs one `runner/v1` instruction and exits, so the entrypoint is
-          # the binary itself — no server wrapper, no port.
+          # each. `tools` installs what the binary shells out to — measured on the push run of
+          # 2026-11-16, a generic runtime built fine and then failed `--version`: an executor has
+          # no version flag, and without `tools` it has no Chromium and no ffmpeg either.
           - package: conveyor-media
             bin: conveyor-media-browser
             image: conveyor-media-browser
+            tools: chromium
+            smoke: --list
           - package: conveyor-media
             bin: conveyor-media-ffmpeg
             image: conveyor-media-ffmpeg
+            tools: ffmpeg
+            smoke: --list
     env:
       IMG: conveyor-service:ci
       GH_ACTOR: ${{ github.actor }}
@@ -505,13 +510,20 @@ jobs:
           docker build --file docker/Dockerfile.service \
             --build-arg PACKAGE=${{ matrix.package }} \
             --build-arg BIN=${{ matrix.bin }} \
+            --build-arg TOOLS=${{ matrix.tools || '' }} \
             --tag "$IMG" .
 
       - name: smoke
         run: |
           set -euo pipefail
-          docker run --rm "$IMG" --version
-          docker run --rm "$IMG" --check-lock
+          # A service answers `--version`; an executor lists the kinds it implements. Both are the
+          # binary's own command, not a wrapper's.
+          if [ -n "${{ matrix.smoke || '' }}" ]; then
+            docker run --rm "$IMG" ${{ matrix.smoke }}
+          else
+            docker run --rm "$IMG" --version
+            docker run --rm "$IMG" --check-lock
+          fi
 
       # Same tag shape as the server image: `sha-*` is the immutable rollback record, `main-*`
       # the run ordinal, `latest` what an ImagePolicy tracks.
