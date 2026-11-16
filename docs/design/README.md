@@ -62,7 +62,10 @@ checklist from `meta.expected_outputs`: P0's eight definition artefacts, or a de
 brief and, for V2, its inception analysis and architecture design. Each row is absent,
 present-private or published; the first missing row is marked **next** and carries its compose
 template. P0's brief artefact is a computed `project briefs N/47` coverage row across the delivery
-projects. A missing output is a visible gap; it is not a backend gate.
+projects. A missing output is a visible gap; it is not a backend gate. An admin's **Review
+requests** panel lists every draft whose author asked for publication
+(`documents.list {publish_requested: true}`) and publishes it in place; publication is the same
+`documents.publish` action as the register's, and there is no separate approve/deny action.
 
 **The output standard** is data: `seed/output-standard.json` owns the vocabulary and the
 per-project-class due-now and at-closure sets. `scripts/build-programme-seed.py` writes
@@ -78,10 +81,17 @@ The **Projects** destination is the programme workspace: the tenant's projects, 
 plan link and linked issues, its cards with their process binding and the card type's expected
 outputs, its text **outputs** (compose, edit, request publish, admin publish, history, attachments)
 and the public feedback inbox. Intake binds the card type's READY process (`meta.process_key`), so a
-card can **Start run** (`process_runs.start`) and open in the Execution room. Signed in it can edit a
-project (`projects.update`, If-Match) and compose an output. An admin's publish sets the output's
-public bit; the live route serves it immediately. The homepage mirror at `nonagentic.ai/design` is
-the old read-only copy and is retired by the one-URL unit.
+card can **Start run** (`process_runs.start`) and open in the Execution room. **The board is
+optional**: a project without one (an archived row, or a row from before the seed's board-ensure)
+still opens its header, checklist and outputs; cards, runs and intake need a board and say so.
+Signed in, the New/Edit project dialogs take a **delivery class** and a **tranche**; the class is
+resolved from `seed/output-standard.json`, and its due-now and at-closure sets are written to
+`meta.expected_outputs`/`meta.closure_outputs` through `projects.update`, so a project created here
+appears in the programme queue. The class picker is generated from the standard, so #221's added
+classes appear without a code change; the seed owns its own 48 rows and a later `migrate --seed`
+restores their class and sets. An admin's publish sets the output's public bit; the live route
+serves it immediately. The homepage mirror at `nonagentic.ai/design` is the old read-only copy and
+is retired by the one-URL unit.
 
 The **Execution room** lists the tenant's runs (`runs.list`), renders one run's steps, tool calls,
 gates and outputs (`runs.get`), cancels a live run (`runs.cancel`) and decides a pending gate
@@ -178,10 +188,14 @@ neutralised, so the public page has no executable markup from an author.
 
 ## Feedback
 
-The public surface is GitHub, not a service. `studio.html` links the repository's **Discussions**
-and opens a prefilled issue with the `feedback` label from every page; the snapshot's
-`manifest.feedback_url` carries the target, and `data/feedback.json` publishes the feedback issues
-that exist. The issue template is `.github/ISSUE_TEMPLATE/feedback.yml`.
+The public surface is GitHub, not a service. Every public programme page renders **Feedback &
+discussion** (the repository's Discussions) and **Report this screen** (a prefilled issue with the
+`feedback` label, carrying the page, snapshot, git SHA and URL) in its live data panel; the
+snapshot's `feedback_url` carries the repository target. The panel names only the files the public
+window serves — `data/snapshot.js`, `docs/outputs.js` and `docs/documents.json` — never the old
+404 data files. A standalone output page carries a **Discuss this output** link. The links are
+anchors: the public page makes no GitHub call and no `/api/` request. The issue template is
+`.github/ISSUE_TEMPLATE/feedback.yml`.
 
 The console lists the `feedback`-labelled issues on the Projects destination and can **intake** one
 into a project's intake lane (`cards.create` carrying `meta.issue`); the issue stays the GitHub

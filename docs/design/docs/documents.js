@@ -114,8 +114,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "e78508a82fb6410c865ac40fda2f93b584f6ddd5c9711d5abf700b8763be94df",
-      "bytes": 15093,
+      "sha256": "f4ce1367a77f2d56dbc52cff5350aa1b65d1d9e92837e00fec1bfbb08aebb48f",
+      "bytes": 16365,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -672,8 +672,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S13-n8n-engine.html",
       "source": "docs/plans/slices/S13-n8n-engine.md",
       "section": "Plans",
-      "sha256": "27257efb5cab78398481160c5dd2d81bee7d6f1858a274ff6d955c249603672c",
-      "bytes": 28142,
+      "sha256": "e43492310c7a938ee9fbfdbcfc775f8e60504e21c7be986790bd7c3980f273eb",
+      "bytes": 28248,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S13-n8n-engine.md"
     },
     {

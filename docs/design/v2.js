@@ -122,6 +122,7 @@ window.installV2 = function (api, enterprise) {
     outputs: {},
     outputsLoading: null,
     register: { items: [], loaded: false, loading: false, error: null, next_cursor: null },
+    requests: { items: [], loaded: false, loading: false, error: null, next_cursor: null },
     programme: null,
     runs: [],
     runsLoaded: false,
@@ -151,6 +152,8 @@ window.installV2 = function (api, enterprise) {
     cs.lastError = null;
     cs.outputs = {};
     cs.outputsLoading = null;
+    cs.register = { items: [], loaded: false, loading: false, error: null, next_cursor: null };
+    cs.requests = { items: [], loaded: false, loading: false, error: null, next_cursor: null };
     cs.programme = null;
     cs.runs = [];
     cs.runsLoaded = false;
@@ -206,7 +209,13 @@ window.installV2 = function (api, enterprise) {
     try {
       const view = await C.get("/api/projects/" + encodeURIComponent(projectId));
       const board = list(view.boards)[0];
-      if (!board) throw new Error("This project has no board.");
+      // A project without a board is a real state, not a read failure: its outputs and
+      // checklist are documents, and the seed leaves archived rows board-less. Cache the
+      // absence so the next render does not re-fetch it and never shows "loading" forever.
+      if (!board) {
+        cs.byProject[projectId] = { board: null, lists: [], cards: [], stale: false };
+        return;
+      }
       const [boardView, cardPage] = await Promise.all([
         C.get("/api/boards/" + encodeURIComponent(board.id)),
         C.get("/api/boards/" + encodeURIComponent(board.id) + "/cards?limit=200"),
@@ -280,6 +289,10 @@ window.installV2 = function (api, enterprise) {
     const issue = cs.issues.find((row) => String(row.number) === String(issueNumber));
     if (!project || !data || data.error) {
       toast("The project's board is not loaded yet");
+      return;
+    }
+    if (!data.board) {
+      toast("This project has no board; intake a card needs one");
       return;
     }
     const lane = list(data.lists).find((row) => row.kind === "intake") || list(data.lists)[0];
@@ -580,12 +593,40 @@ window.installV2 = function (api, enterprise) {
     }
   }
 
+  // The admin's review queue: every draft whose author asked for publication. It is a
+  // tenant-wide query, not the register's loaded page, so its count is honest at any size.
+  async function consoleLoadRequests(more = false) {
+    if (!consoleOn() || !isAdmin() || cs.requests.loading) return;
+    if (cs.requests.loaded && !more) return;
+    cs.requests.loading = true;
+    try {
+      const page = await C.action("documents.list", {
+        publish_requested: true,
+        page: {
+          limit: 50,
+          ...(more && cs.requests.next_cursor ? { cursor: cs.requests.next_cursor } : {}),
+        },
+      });
+      const items = list(page.items);
+      cs.requests.items = more ? [...cs.requests.items, ...items] : items;
+      cs.requests.next_cursor = page.next_cursor || null;
+      cs.requests.error = null;
+      cs.requests.loaded = true;
+    } catch (error) {
+      cs.requests.error = error;
+    } finally {
+      cs.requests.loading = false;
+      render();
+    }
+  }
+
   // After a write the register and the owning project's panel both reload. A single helper keeps
   // the two caches from disagreeing about the row that just changed.
   function consoleRefreshOutputs(projectId) {
     cs.register.loaded = false;
     cs.register.items = [];
     cs.register.next_cursor = null;
+    cs.requests = { items: [], loaded: false, loading: false, error: null, next_cursor: null };
     if (projectId) delete cs.outputs[projectId];
     if (!consoleOn()) return;
     if (projectId) consoleLoadOutputs(projectId);
@@ -809,6 +850,98 @@ window.installV2 = function (api, enterprise) {
   const INCEPTION_CATEGORIES = ["inception-analysis", "architecture-design"];
   const OUTPUT_CATEGORIES = list(OUTPUT_STANDARD.categories);
 
+  // The classes a person may create a project against. The keyed classes (P0, SPEC-V2) are the
+  // programme's own rows, and `archived` is a measurement, not a creation state. #221 adds
+  // classes to the same generated standard; this list follows it without a code change.
+  const OUTPUT_CLASSES = list(OUTPUT_STANDARD.classes).filter(
+    (cls) => !(cls.when || {}).key && cls.name !== "archived",
+  );
+  const classLabel = (cls) =>
+    `${cls.name} · ${list(cls.now).join(", ")}${
+      list(cls.closure).length ? ` · closure ${list(cls.closure).join(", ")}` : ""
+    }`;
+  // Resolve a project's class exactly as the seed builder does: every `when` fact must match,
+  // first match wins, and a project that matches nothing is custom rather than guessed.
+  const classOfProject = (project) => {
+    const meta = project.meta || {};
+    const facts = {
+      key: project.key,
+      track: meta.track,
+      status: project.status,
+      measured_status: meta.measured_status,
+    };
+    return (
+      list(OUTPUT_STANDARD.classes).find((cls) =>
+        Object.entries(cls.when || {}).every(([name, value]) => facts[name] === value),
+      ) || null
+    );
+  };
+  // A class whose `when` omits a fact still needs a representative value, or the first-match
+  // resolver would fall through to the earlier class (`v2-built` is any v2 not `proposed`).
+  const CLASS_STATUS = {
+    "v2-proposed": "proposed",
+    "v2-built": "built",
+    "v1-active": "partial",
+    "v1-built": "built",
+    programme: "planned",
+  };
+  // The meta a class writes: its facts and its due-now / at-closure sets. A class with no
+  // `track`/`measured_status` fact leaves the project's current value alone.
+  const classMeta = (cls, tranche) => {
+    const meta = {
+      expected_outputs: list(cls.now),
+      closure_outputs: list(cls.closure),
+      output_class: cls.name,
+    };
+    if ((cls.when || {}).track) meta.track = cls.when.track;
+    const status = (cls.when || {}).measured_status || CLASS_STATUS[cls.name];
+    if (status) meta.measured_status = status;
+    const number = Number(tranche);
+    if (String(tranche ?? "").trim() !== "" && Number.isFinite(number)) meta.tranche = number;
+    return meta;
+  };
+
+  // The admin's review queue. Publishing is the same action as the register's Publish button;
+  // there is no approve/deny action, so the view surfaces exactly the draft that needs one.
+  function reviewRequestsPanel() {
+    if (!isAdmin()) return "";
+    consoleLoadRequests();
+    const state = cs.requests;
+    if (state.error) {
+      return panel(
+        "Review requests",
+        note(`<strong>Read refused</strong> · ${E(consoleError(state.error))}`, "bad"),
+      );
+    }
+    if (!state.loaded) return panel("Review requests", note("Loading the publish requests…"));
+    if (!state.items.length) {
+      return panel("Review requests", note("No draft is waiting for review."), B("0", ""));
+    }
+    const rows = state.items.map((doc) => {
+      const actions = [
+        C.can("documents.get")
+          ? button("Read", "request-read", `data-id="${E(doc.id)}"`, "small", "file")
+          : "",
+        C.can("documents.publish")
+          ? button(
+              "Publish",
+              "request-publish",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "shield",
+            )
+          : "",
+      ].join("");
+      const project = consoleProjects().find((row) => row.id === doc.project_id);
+      return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)}</small></td><td>${E(doc.project_key || (project || {}).key || "—")}</td><td>${E(outputAuthorOf(doc) || "—")}</td><td><small>${E(short(doc.updated_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
+    });
+    return panel(
+      "Review requests",
+      `${table(["Output", "Project", "Author", "Updated", "Operate"], rows)}${note("A request is a draft whose author asked for publication. Publishing is an admin decision; there is no separate approve action.")}`,
+      B(`${state.items.length} waiting`, "amber"),
+    );
+  }
+
   function outputsPage() {
     const signed = consoleOn();
     if (signed) {
@@ -947,7 +1080,7 @@ window.installV2 = function (api, enterprise) {
         ? "Documents read from the platform's own rows. Publishing is the output's own publishable flag; the public page follows on the next request."
         : "Published outputs only, read from the live outputs.js index.",
       signed ? true : list(pack.outputs).length > 0,
-    )}${filters}${
+    )}${filters}${signed ? reviewRequestsPanel() : ""}${
       signed && cs.register.error
         ? note(`<strong>Read refused</strong> · ${E(consoleError(cs.register.error))}`, "bad")
         : ""
@@ -1241,9 +1374,11 @@ window.installV2 = function (api, enterprise) {
         )
       : panel(
           "Board",
-          data && data.error
-            ? note(`<strong>Read refused</strong> · ${E(consoleError(data.error))}`, "bad")
-            : note("Loading this project's board…"),
+          !data
+            ? note("Loading this project's board…")
+            : data.error
+              ? note(`<strong>Read refused</strong> · ${E(consoleError(data.error))}`, "bad")
+              : note("No board. This project's outputs and checklist work without one; cards and runs need a board."),
         );
     const issueRows = issues.map(
       (issue) =>
@@ -1439,7 +1574,10 @@ window.installV2 = function (api, enterprise) {
 
   function consoleProjectNew() {
     if (!consoleOn()) return;
-    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" placeholder="The part of the conveyor this project delivers"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3"></textarea></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" placeholder="docs/plans/slices/S00-usage-inventory.md" spellcheck="false"></label></div>`;
+    const classes = OUTPUT_CLASSES.map(
+      (cls) => `<option value="${E(cls.name)}">${E(classLabel(cls))}</option>`,
+    ).join("");
+    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" placeholder="The part of the conveyor this project delivers"></label><label class="field full"><span>Key (optional)</span><input id="project-key" placeholder="T18" spellcheck="false"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3"></textarea></label><label class="field full"><span>Delivery class</span><select id="project-class"><option value="">Choose a class…</option>${classes}</select></label><label class="field full"><span>Tranche</span><input id="project-tranche" type="number" min="0" step="1" placeholder="0"></label><label class="field full"><span>Repository URL</span><input id="project-repo" placeholder="https://github.com/nonagenticai/conveyor" spellcheck="false"></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" placeholder="docs/plans/slices/S00-usage-inventory.md" spellcheck="false"></label><p class="muted">The class sets the expected due-now and at-closure outputs from the seeded standard. The seed owns its own 48 rows; a project created here is not in the seed.</p></div>`;
     openDialog(
       "New project",
       body,
@@ -1450,33 +1588,55 @@ window.installV2 = function (api, enterprise) {
 
   async function consoleProjectCreate() {
     const title = (document.getElementById("project-name") || {}).value || "";
+    const key = (document.getElementById("project-key") || {}).value || "";
     const description = (document.getElementById("project-description") || {}).value || "";
     const plan = (document.getElementById("project-plan") || {}).value || "";
+    const repo = (document.getElementById("project-repo") || {}).value || "";
+    const tranche = (document.getElementById("project-tranche") || {}).value || "";
+    const chosenClass = (document.getElementById("project-class") || {}).value || "";
     if (!title.trim()) {
       toast("A project needs a name");
       return;
     }
-    const programme = (cs.projects[0] || {}).programme_id || null;
+    const cls = OUTPUT_CLASSES.find((row) => row.name === chosenClass) || null;
+    // Fail closed: a project without a class would be absent from the programme queue and its
+    // checklist would fall back to a guess. The owner chooses the class, never a default.
+    if (!cls) {
+      toast("Choose a delivery class for the project");
+      return;
+    }
+    const programme =
+      (cs.programme && cs.programme.id) ||
+      (consoleProjects().find((row) => row.programme_id) || {}).programme_id ||
+      null;
+    const payload = {
+      title: title.trim(),
+      description: description.trim(),
+      programme_id: programme,
+    };
+    if (key.trim()) payload.key = key.trim().toUpperCase();
+    if (repo.trim()) payload.repo_url = repo.trim();
+    let projectId = null;
     try {
-      const created = await C.action("projects.create", {
-        title: title.trim(),
-        description: description.trim(),
-        programme_id: programme,
-      });
-      const projectId = created && created.project ? created.project.id : null;
-      // `projects.create` has no meta input: the plan path is a second, explicit patch. It is
-      // merged into the row's existing meta (projects.update preserves absent keys).
-      if (plan.trim() && projectId) {
-        await C.action("projects.update", {
-          id: projectId,
-          meta: { plan: plan.trim() },
-        });
+      const created = await C.action("projects.create", payload);
+      projectId = created && created.project ? created.project.id : null;
+      if (!projectId) throw new Error("projects.create returned no project");
+      // `projects.create` has no meta input: the class and plan are a second, explicit patch.
+      // It is merged into the row's existing meta (projects.update preserves absent keys).
+      const meta = classMeta(cls, tranche);
+      if (plan.trim()) meta.plan = plan.trim();
+      try {
+        await C.action("projects.update", { id: projectId, meta });
+      } catch (error) {
+        // The project exists — say exactly that, never a false "create refused".
+        cs.lastError = error;
+        toast("Project created, class not saved · " + consoleError(error));
       }
       closeWorkspaceDialog();
       cs.loaded = false;
       cs.byProject = {};
       v.projectPage = projectId;
-      toast(plan.trim() ? "Project created with its plan" : "Project created");
+      toast(`Project created · ${cls.name}`);
       render();
       consoleLoad();
     } catch (error) {
@@ -1490,12 +1650,20 @@ window.installV2 = function (api, enterprise) {
     const project = projectById(id);
     if (!project) return;
     const statuses = ["draft", "active", "paused", "closed", "archived"];
+    const currentClass = classOfProject(project);
+    const classes = OUTPUT_CLASSES.map(
+      (cls) =>
+        `<option value="${E(cls.name)}" ${currentClass && currentClass.name === cls.name ? "selected" : ""}>${E(classLabel(cls))}</option>`,
+    ).join("");
+    const keep = currentClass
+      ? ""
+      : `<option value="" selected>Keep the current expected outputs (no matching class)</option>`;
     const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" value="${E(project.name)}"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3">${E(project.description || "")}</textarea></label><label class="field full"><span>Status</span><select id="project-status">${statuses
       .map(
         (status) =>
           `<option value="${status}" ${status === project.status ? "selected" : ""}>${status}</option>`,
       )
-      .join("")}</select></label><label class="field full"><span>Repository URL</span><input id="project-repo" value="${E(project.repo_url || "")}" spellcheck="false"></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" value="${E(((project.meta || {}).plan) || "")}" spellcheck="false"></label><p class="muted">Saving merges the plan into the project's existing meta; other keys are preserved.</p></div>`;
+      .join("")}</select></label><label class="field full"><span>Delivery class</span><select id="project-class">${keep}${classes}</select></label><label class="field full"><span>Tranche</span><input id="project-tranche" type="number" min="0" step="1" value="${E((project.meta || {}).tranche ?? "")}"></label><label class="field full"><span>Repository URL</span><input id="project-repo" value="${E(project.repo_url || "")}" spellcheck="false"></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" value="${E(((project.meta || {}).plan) || "")}" spellcheck="false"></label><p class="muted">Choosing a class recomputes the expected due-now and at-closure outputs; other meta keys are preserved. The seed owns its own 48 rows — a later seed run restores their class and sets.</p></div>`;
     openDialog(
       `${project.key} · edit`,
       body,
@@ -1512,9 +1680,19 @@ window.installV2 = function (api, enterprise) {
     const status = (document.getElementById("project-status") || {}).value || project.status;
     const repoUrl = (document.getElementById("project-repo") || {}).value || "";
     const plan = (document.getElementById("project-plan") || {}).value || "";
+    const tranche = (document.getElementById("project-tranche") || {}).value || "";
+    const chosenClass = (document.getElementById("project-class") || {}).value || "";
     if (!name.trim()) {
       toast("A project needs a name");
       return;
+    }
+    const currentClass = classOfProject(project);
+    const cls = OUTPUT_CLASSES.find((row) => row.name === chosenClass) || null;
+    const meta = { plan: plan.trim() };
+    if (cls && (!currentClass || currentClass.name !== cls.name)) {
+      Object.assign(meta, classMeta(cls, tranche));
+    } else if (String(tranche).trim() !== "" && Number.isFinite(Number(tranche))) {
+      meta.tranche = Number(tranche);
     }
     try {
       await C.action(
@@ -1525,7 +1703,7 @@ window.installV2 = function (api, enterprise) {
           description: description.trim(),
           status,
           repo_url: repoUrl.trim(),
-          meta: { plan: plan.trim() },
+          meta,
         },
         { etag: project.version },
       );
@@ -2081,14 +2259,20 @@ window.installV2 = function (api, enterprise) {
     if (!project) return panel("Boards", note("This tenant holds no projects."));
     const select = consoleProjectSelect(project);
     const data = cs.byProject[project.id];
-    if (!data || !data.board) {
-      consoleLoadProject(project.id);
-      return `${panel("Project", select)}${panel("Boards", note("Loading this project's board…"))}`;
-    }
-    if (data.error) {
+    if (data && data.error) {
       return `${panel("Project", select)}${panel(
         "Boards",
         note(`<strong>Read refused</strong> · ${E(consoleError(data.error))}`, "bad"),
+      )}`;
+    }
+    if (!data) {
+      consoleLoadProject(project.id);
+      return `${panel("Project", select)}${panel("Boards", note("Loading this project's board…"))}`;
+    }
+    if (!data.board) {
+      return `${panel("Project", select)}${panel(
+        "Boards",
+        note("No board. This project's outputs and checklist work without one; the Plan board and card intake need one."),
       )}`;
     }
     const lanes = list(data.lists);
@@ -2222,25 +2406,20 @@ window.installV2 = function (api, enterprise) {
   const dataPanel = () => {
     if (!live) return "";
     const feedback = list((live.programme || {}).feedback);
+    // Only files the public window actually serves. The old list named data/manifest.json,
+    // data/programme.json and friends, which are 404 on the live site.
     const files = [
-      "manifest.json",
-      "programme.json",
-      "organisation.json",
-      "config.json",
-      "work.json",
-      "artefacts.json",
-      "measure.json",
-      "secrets.json",
-      "evidence.json",
-      "feedback.json",
+      ["data/snapshot.js", "the published programme snapshot"],
+      ["docs/outputs.js", "the published outputs index"],
+      ["docs/documents.json", "the generated document index"],
     ];
     return panel(
       "Live data &amp; feedback",
-      `<p class="muted">Rendered from the conveyor's own rows. Snapshot <span class="mono">${E(short(live.payload_sha256))}</span> generated <strong>${E(live.generated_at || "")}</strong> at <span class="mono">${E(short(live.git_sha, 12))}</span>. The raw files are public:</p>${table(
+      `<p class="muted">Rendered from the conveyor's own rows. Snapshot <span class="mono">${E(short(live.payload_sha256))}</span> generated <strong>${E(live.generated_at || "")}</strong> at <span class="mono">${E(short(live.git_sha, 12))}</span>. The public data files:</p>${table(
         ["Data file"],
         files.map(
-          (file) =>
-            `<tr><td><a class="e-project-link" href="data/${file}" target="_blank" rel="noopener"><span class="mono">${file}</span></a></td></tr>`,
+          ([file, label]) =>
+            `<tr><td><a class="e-project-link" href="${E(file)}" target="_blank" rel="noopener"><span class="mono">${E(file)}</span></a> <small>${E(label)}</small></td></tr>`,
         ),
       )}${feedback.length ? table(
         ["Feedback", "State", "Link"],
@@ -4743,6 +4922,13 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     const inner = pages[key];
     pages[key] = () => (studyOn() ? inner() : signInGate(titles[key] || key));
   }
+  // Every public programme page carries the same feedback affordance: Discussions and a
+  // prefilled issue. Signed out only — the operator console has the actions, and the public
+  // page writes nothing and makes no GitHub call (the links are anchors).
+  for (const key of PUBLIC_PAGES) {
+    const inner = pages[key];
+    pages[key] = () => (consoleOn() ? inner() : `${inner()}${dataPanel()}`);
+  }
 
   /* ------------------------------------------------------------------ events */
   document.addEventListener("change", (event) => {
@@ -4917,6 +5103,14 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         break;
       case "output-request-publish":
         consoleOutputRequestPublish(d.id, d.version);
+        break;
+      /* the admin's review queue: the same actions, a distinct control so the register's own
+         buttons stay unambiguous */
+      case "request-read":
+        consoleOutputRead(d.id);
+        break;
+      case "request-publish":
+        consoleOutputPublish(d.id, true, d.version);
         break;
       case "output-history":
         consoleOutputHistory(d.id, d.version);
