@@ -71,6 +71,8 @@ pub mod spec;
 pub mod views;
 // S13: `workflows.*` — the engine's authoring surface (one document, versioned by key).
 pub mod workflow;
+// #182 slice A: the tenant's own YouTube channel — OAuth client, connect, status, disconnect.
+pub mod youtube;
 
 pub use invoke::{
     ActionError, Authority, HandlerCtx, InvokeOutcome, InvokeRequest, MAX_DEPTH, Precondition,
