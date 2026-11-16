@@ -80,6 +80,12 @@ reqwest = { version = "0.13.5", default-features = false, features = [
     # `multipart`: `documents.ingest` pushes the bytes to `strata_ingest`, whose only file route is
     # multipart/form-data (S09 §5.6).
     "multipart",
+    # `form`: #182's Google OAuth token exchange is an `application/x-www-form-urlencoded` POST;
+    # reqwest 0.13 gates `RequestBuilder::form` behind this feature.
+    "form",
+    # `query`: #182's three Data API calls carry small query strings (`part=status`,
+    # `uploadType=resumable`, `id=…`); reqwest 0.13 gates `RequestBuilder::query` likewise.
+    "query",
 ] }
 base64 = "0.23.1"
 # `timestamptz` in Rust (job leases, event timestamps, licence expiry) and the schedule
