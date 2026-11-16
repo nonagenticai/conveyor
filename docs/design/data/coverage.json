@@ -2285,9 +2285,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": null,
+      "gap": "design study; the ADM rows and actions are T9",
       "key": "adm",
-      "status": "live",
+      "status": "proposed",
       "title": "Architecture capability"
     },
     {
@@ -2474,9 +2474,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": null,
+      "gap": "design study; the MSP rows and actions are T1/T10",
       "key": "programme",
-      "status": "live",
+      "status": "proposed",
       "title": "Programme definition"
     },
     {
@@ -2536,9 +2536,9 @@
       "actions_invoked": 23,
       "by_status": {
         "legacy": 7,
-        "live": 9,
+        "live": 7,
         "mixed": 3,
-        "proposed": 7
+        "proposed": 9
       },
       "total": 26
     }
