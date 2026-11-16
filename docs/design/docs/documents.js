@@ -654,8 +654,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S13-n8n-engine.html",
       "source": "docs/plans/slices/S13-n8n-engine.md",
       "section": "Plans",
-      "sha256": "3e9265c16da7dea8cb08d8c89ea4616a32a16d96709a4e9274dd5222a31e8948",
-      "bytes": 27937,
+      "sha256": "716b2e54963224d1b3cf0f19a9d0ac49032c179b983ef5a1a7e33efe5a9a90ca",
+      "bytes": 28136,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S13-n8n-engine.md"
     },
     {
