@@ -51,7 +51,7 @@
 <tr>
 <td><code>apps/media</code></td>
 <td>the browser-rendered producers; the ffmpeg producers; the thin speech fan-out and video-publish operations</td>
-<td><strong>decided, unclaimed</strong> (#139); ADR 0007 keeps it in this workspace as two executor images, with <code>analyse.*</code> as a library</td>
+<td><strong>absorbed</strong> (#139 merged 2026-11-15): two executor images, twelve <code>media.*</code> actions, the captured contract and its drop table; <code>analyse.*</code> stays a library</td>
 </tr>
 <tr>
 <td><code>apps/lean4-prover</code></td>
@@ -78,7 +78,7 @@
 <p>Two lessons this table makes visible, both recorded rather than fixed here:</p>
 <ul>
 <li><strong>"Merged" and "live" are different claims.</strong> Two groups are fully absorbed in code and still serve the legacy image. Any statement that the estate is Rust must be read as "the rewrite exists", not "the old service is off".</li>
-<li><strong><code>apps/media</code> is the one decided group with no issue.</strong> ADR 0006 §Consequences says "one issue per app"; #139 supplies the missing one.</li>
+<li><strong><code>apps/media</code> is no longer the group without an issue.</strong> ADR 0006 §Consequences said "one issue per app"; #139 supplied it and merged. The production family (<code>produce.*</code>) is now the one family with no issue and no code — it is carried by <code>05-W2V-ABSORPTION.md</code> §3 and #163.</li>
 </ul>
 <h3 id="11-archived-and-needing-no-decision">1.1 Archived and needing no decision</h3>
 <p>Five stage blueprints were archived before this document was written. They are not migration targets and must not be reopened as work.</p>
