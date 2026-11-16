@@ -21,6 +21,7 @@ use std::sync::LazyLock;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
+use base64::Engine as _;
 use conveyor_auth::{Role, ScopePolicy};
 use conveyor_domain::{Id, TenantId};
 use conveyor_store as store;
@@ -1140,6 +1141,15 @@ async fn invoke_external(
     };
     breaker_record_success(ctx.tenant, spec.name);
 
+    // S09 §5.2: a declared artefact is written HERE, in the engine, not by a handler — the same rule
+    // the ledger row follows one block below. The external call already happened, so the fact it
+    // produced is committed in its own transaction; a failure is a real failure of the action's
+    // contract (it promised a document) and is recorded as such.
+    let output = match spec.artefact {
+        Some(artefact) => materialise_artefact(pool, spec, &ctx, artefact, output).await?,
+        None => output,
+    };
+
     // S16: one ledger row for a successful model call. The engine owns the response and this
     // transaction; a handler-side writer would be a second path for the same fact.
     let capture = request
@@ -1209,6 +1219,81 @@ async fn invoke_external(
         replayed: false,
         invocation_id: Some(invocation_id),
     })
+}
+
+/// Write an external action's declared artefact as a tenant document (S09 §5.2).
+///
+/// The bytes travel base64 inside the service's JSON response (CONTRACT §6). This decodes the
+/// declared member, stores it through the ONE document writer — the same validation, ordering and
+/// caps `documents.create` uses — and adds a `document` member to the response the caller receives,
+/// so the artefact is addressable without a second lookup.
+///
+/// A response that does not carry the declared member is a `502`: the service answered, but not with
+/// what the action's contract says it produces.
+async fn materialise_artefact(
+    pool: &PgPool,
+    spec: &crate::spec::ActionSpec,
+    ctx: &HandlerCtx,
+    artefact: crate::spec::Artefact,
+    mut output: Value,
+) -> Result<Value, ActionError> {
+    let pointer: String = artefact
+        .field
+        .split('.')
+        .map(|segment| format!("/{segment}"))
+        .collect();
+    let encoded = output
+        .pointer(&pointer)
+        .and_then(Value::as_str)
+        .ok_or_else(|| {
+            ActionError::new(
+                502,
+                "artefact_missing",
+                format!("the response carried no {} member", artefact.field),
+            )
+        })?;
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(encoded.trim())
+        .map_err(|_| {
+            ActionError::new(
+                502,
+                "artefact_invalid",
+                format!("the {} member is not base64", artefact.field),
+            )
+        })?;
+
+    let mut tx = store::begin_scoped(pool, ctx.tenant)
+        .await
+        .map_err(|_| ActionError::internal())?;
+    store::actions::set_statement_timeout(&mut tx, BOOKKEEPING_TIMEOUT_MS)
+        .await
+        .map_err(|_| ActionError::internal())?;
+    let (document, _version) = crate::documents::actions::create_from_bytes(
+        &mut tx,
+        ctx,
+        crate::documents::actions::NewBytesDocument {
+            action: spec.name,
+            title: artefact.title,
+            content_type: artefact.content_type,
+            kind: "document",
+            project_id: None,
+            parent_document_id: None,
+            category: None,
+            unit: None,
+            meta: None,
+        },
+        bytes,
+    )
+    .await?;
+    tx.commit().await.map_err(|_| ActionError::internal())?;
+
+    if let Value::Object(map) = &mut output {
+        map.insert(
+            "document".to_owned(),
+            serde_json::to_value(&document).map_err(ActionError::serialize)?,
+        );
+    }
+    Ok(output)
 }
 
 /// Write `action_invocation`, `audit_event` and the idempotency response in the caller's

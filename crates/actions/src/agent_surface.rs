@@ -41,7 +41,7 @@ pub struct SurfaceEntry {
     pub idempotent: bool,
     /// The caller's deadline.
     pub timeout_ms: u32,
-    /// `read | write | destructive`.
+    /// `read | write | spend | destructive`.
     pub effect: String,
     /// `none | card | card-typed`.
     pub confirm: String,

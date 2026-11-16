@@ -4251,6 +4251,19 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample.deterministic = true;
             expecting(sample, 200)
         },
+        // #174: an external action with no test host. `CONVEYOR_EXTERNAL_IMAGE_GEN_URL` is unset
+        // here, so both transports must produce the SAME typed refusal (`unconfigured`, 503) — which
+        // is the parity property that matters for a declared external action: a missing address is a
+        // visible refusal on every transport, never one transport guessing a default. A sample that
+        // rendered would mint a document id per round and could not be compared body-for-body.
+        expecting(
+            plain(
+                "media.generate_image",
+                json!({"prompt": "parity", "size": "512x512"}),
+                None,
+            ),
+            503,
+        ),
         // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────
         // The response is a pure function of the input — the deck writer has no clock, no
         // random id and no hash-map order — so a replay and an execution agree byte for byte.

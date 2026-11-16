@@ -19,6 +19,7 @@
 
 pub mod external;
 pub mod github;
+pub mod imagegen;
 pub mod inference;
 pub mod ingest;
 pub mod objects;

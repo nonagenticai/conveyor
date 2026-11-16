@@ -83,6 +83,18 @@ pub const KINDS: [&str; 11] = [
     RUN_GHERKIN,
 ];
 
+/// `media.generate_image` — the one capability served by an external model host rather than by the
+/// media executor (#174).
+///
+/// It lives outside [`KINDS`] on purpose: `KINDS` are the job kinds the executor dispatches, and this
+/// one has no executor envelope and no job row — the engine calls mini1's MOSS-Image host directly
+/// and stores the render. It is still a capability this service advertises, so `capabilities()` lists
+/// it (the probe reads the registry, not this list).
+pub const GENERATE_IMAGE: &str = "media.generate_image";
+
+/// The capability kinds [`KINDS`] does not cover: declared here so the probe's test can name them.
+pub const DIRECT_KINDS: [&str; 1] = [GENERATE_IMAGE];
+
 /// The kinds that produce an artefact. The other four only measure.
 pub const WRITE_KINDS: [&str; 7] = [
     RENDER_HTML,
@@ -1442,14 +1454,23 @@ mod tests {
     #[test]
     fn the_probe_lists_all_eight_kinds_with_their_effects() {
         let probe = capabilities();
-        assert_eq!(probe.kinds.len(), KINDS.len(), "{:?}", probe.kinds);
+        assert_eq!(
+            probe.kinds.len(),
+            KINDS.len() + DIRECT_KINDS.len(),
+            "{:?}",
+            probe.kinds
+        );
         let mut kinds: Vec<&str> = probe.kinds.iter().map(|view| view.kind.as_str()).collect();
         kinds.sort_unstable();
-        let mut expected = KINDS.to_vec();
+        let mut expected: Vec<&str> = KINDS.iter().chain(DIRECT_KINDS.iter()).copied().collect();
         expected.sort_unstable();
         assert_eq!(kinds, expected);
         for view in &probe.kinds {
-            let expected = if WRITE_KINDS.contains(&view.kind.as_str()) {
+            // A directly served capability owns its own effect: `media.generate_image` spends the
+            // tenant's money rather than enqueueing an executor job.
+            let expected = if DIRECT_KINDS.contains(&view.kind.as_str()) {
+                "spend"
+            } else if WRITE_KINDS.contains(&view.kind.as_str()) {
                 "write"
             } else {
                 "read"

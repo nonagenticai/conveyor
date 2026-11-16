@@ -323,6 +323,7 @@ mod tests {
             },
             task_capable: false,
             captures_usage: false,
+            artefact: None,
             handler: HandlerRef::Workflow,
         }
     }

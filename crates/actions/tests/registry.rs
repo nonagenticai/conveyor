@@ -68,7 +68,9 @@ use serde_json::{Value, json};
 /// `youtube.client_set|client_get|connect|status|disconnect`. 333 → **338**.
 /// **#182 slice B adds 3 internal**: `youtube.upload|privacy|retract`. 338 → **341**.
 /// **#156 adds 5 internal**: the work-store publish/request/revision actions. 341 → **346**.
-const EXPECTED: [&str; 346] = [
+/// **#174 adds 1 external**: `media.generate_image`, the MOSS-Image host over the engine's own
+/// declared-external path (it is the first action to declare an `Artefact`). 346 → **347**.
+const EXPECTED: [&str; 347] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -242,6 +244,7 @@ const EXPECTED: [&str; 346] = [
     "media.capabilities",
     "media.compile_video",
     "media.concat_audio",
+    "media.generate_image",
     "media.ocr",
     "media.probe_video",
     "media.produce_video",
@@ -449,8 +452,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // `youtube.*` actions (internal): 318 → 323; slice B adds `youtube.upload|privacy|retract`:
     // 323 → 326; the work store (#156) adds five internal actions
     // (`documents.publish`, `documents.request_publish`, the three `documents.revision_*`):
-    // 326 → 331.
-    assert_eq!((internal, external), (331, 15));
+    // 326 → 331. #174 adds `media.generate_image` (external): the external count has moved a second
+    // time, 15 → 16, because it is the first action that calls a service AND stores what it returned.
+    assert_eq!((internal, external), (331, 16));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
