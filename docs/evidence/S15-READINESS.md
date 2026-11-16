@@ -1,6 +1,6 @@
 # S15 step 12 — capability readiness — evidence
 
-Measured 2026-11-09 on mini3; every Rust command through `rbuild` on m1 (CONTRACT §16).
+Measured 2026-11-09 on the dev box; every Rust command through `rbuild` on the build host (CONTRACT §16).
 
 ## Built
 

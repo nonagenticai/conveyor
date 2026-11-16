@@ -25,11 +25,11 @@ only `crates/workflow/**` + this file + the index row/cell. No `spec.rs`, `lib.r
 | `crates/workflow/tests/engine_advance.rs` | 329 | 11 executor tests |
 | `crates/workflow/Cargo.toml` | 14 | adds `serde`, `serde_json`, `thiserror`; still `workflow → domain` only (CONTRACT §1) |
 
-## What was run (real output, `rbuild` on m1 — local `cargo` is disabled by design)
+## What was run (real output, `rbuild` on the build host — local `cargo` is disabled by design)
 
 | # | command | result |
 |---|---|---|
-| 1 | `rbuild --doctor` | ok — m1, toolchain 1.99.0, `initdb` present, slot0 36 GiB / slot1 2 GiB |
+| 1 | `rbuild --doctor` | ok — the build host, toolchain 1.99.0, `initdb` present, slot0 36 GiB / slot1 2 GiB |
 | 2 | `rbuild -- test -p conveyor-workflow` | **25 passed, 0 failed** (14 `definition_validate` + 11 `engine_advance`) |
 | 3 | `rbuild -- fmt -p conveyor-workflow -- --check` | **exit 0** |
 | 4 | `rbuild -- clippy -p conveyor-workflow --all-targets -- -D warnings` | **exit 0.** The first run was blocked by **S16's** in-flight `crates/domain/src/prompt_audit.rs:487` (`unnecessary_map_or`); the peer fixed it on message, and the re-run then reached this crate and caught one real lint of mine — an unused binding in `require_branches` — fixed, re-run green. |
@@ -111,7 +111,7 @@ registry under this session — every count below is the measured final one, not
 | `crates/actions/tests/parity_http_mcp.rs` | 6 `workflows.*` samples + `seed_workflow` + prepare arms |
 | `served-spec.lock.json` | regenerated at **258 ops** (S17 wrote it; this session verified `--check-lock` exit 0) |
 
-## What was run (real output, `rbuild` on m1)
+## What was run (real output, `rbuild` on the build host)
 
 | # | command | result |
 |---|---|---|
@@ -227,8 +227,8 @@ recorded here. The tree is shared and had three live peers (`s15-capability-aggr
 
 ### Corrections and findings while building
 
-- **The lock is written on the build host.** `rbuild` syncs mini3 → m1 before every run, so a written lock is
-  overwritten by the next `rbuild` call. Write, then copy back **immediately** (`scp m1:.../src/served-spec.lock.json`).
+- **The lock is written on the build host.** `rbuild` syncs the dev box → the build host before every run, so a written lock is
+  overwritten by the next `rbuild` call. Write, then copy back **immediately** (`scp <build-host>:.../src/served-spec.lock.json`).
   `rbuild --copy-back <file>` treats the path as a directory and copies nothing.
 - **`parity_http_mcp`: `workflows.get` was marked `deterministic`.** A deterministic sample builds its input twice
   (once per transport) from a one-row prepared queue → `workflows.get was not prepared before its input was built`.
@@ -440,7 +440,7 @@ not prototyped); the `cargo fmt -p conveyor-store` slip is codified and recorded
 
 No new action, no new scope: the registry stays **266** and the lock **287 ops** (sha `47550345…`).
 
-### What was run (real output, `rbuild` on m1)
+### What was run (real output, `rbuild` on the build host)
 
 | # | command | result |
 |---|---|---|
@@ -727,7 +727,7 @@ S14 P1 by design; the count of record is the 348-row dispositions ledger.
 **Step 16.** `docs/decisions/0002-editor.md` records fallback **A**; the slice gate accepts the
 recorded decision in place of the spike (S13 §7).
 
-**Step 17 (gate).** Measured on this tree (`rbuild`, m1; `TEST_DATABASE_URL` on 55432):
+**Step 17 (gate).** Measured on this tree (`rbuild`, the build host; `TEST_DATABASE_URL` on 55432):
 
 - `crates/api/tests/named_flows.rs` **6/6** (conveyor.start create+move and its idempotent
   intake branch, wip.pull's cap and its second no-op run, ask_fr's ask→gate→answer, err.card's

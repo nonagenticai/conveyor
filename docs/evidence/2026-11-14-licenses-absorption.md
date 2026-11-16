@@ -91,7 +91,7 @@ config refusal rather than the argv refusal.
 
 ## Test inventory
 
-Measured on m1 at `4f9b03e` (a throwaway Postgres 18 cluster per run):
+Measured on the build host at `4f9b03e` (a throwaway Postgres 18 cluster per run):
 `rbuild -- test -p conveyor-licenses --locked` → **350 passed, 0 failed** across 36 test
 binaries, exit 0. The per-target counts below are from the complete run:
 

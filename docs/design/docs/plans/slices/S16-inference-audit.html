@@ -150,7 +150,7 @@
 <p>Screens declared for S12: <strong>#11 Inference usage</strong> (<code>inference_usage.report</code>, <code>inference_calls.list</code>; <code>inference-usage.spec.ts</code>) and <strong>#12 Prompt audit</strong> (<code>prompt_audits.*</code>, <code>prompt_findings.*</code>, and the cadence in <code>tenants.update_settings</code>; <code>prompt-audit.spec.ts</code>) — the screen that shows a kata what to fix, and the one place a person sees a finding. Jobs: <code>prompt_audit.run</code>, <code>inference_call.prune</code>, <code>prompt_audit.prune</code>. <strong>There is no <code>prompt_audit.sweep</code> job:</strong> the <em>after N executions</em> trigger is an event at capture time (owner 2026-11-09, answering §10 Q2), so the audit is started by the call that crosses the threshold.</p>
 <h2 id="6-build-order">6. Build order</h2>
 <ol type="1">
-<li>Migration + <code>crates/store/src/migrate.rs</code> touch (the macro embeds at compile time). apply migration 0024 to the dev database (a m1-built binary against the compose DB; CONTRACT §16).</li>
+<li>Migration + <code>crates/store/src/migrate.rs</code> touch (the macro embeds at compile time). apply migration 0024 to the dev database (a the build host-built binary against the compose DB; CONTRACT §16).</li>
 <li><code>domain::inference</code>: <code>Usage</code> parsing, <code>cache_status()</code> with its four-way rule, and the bucket arithmetic. <code>rbuild -- test -p conveyor-domain inference</code>.</li>
 <li><code>store::inference</code>: the insert (called from the engine), the keyset list, the aggregate. <code>rbuild -- test -p conveyor-store inference_</code>.</li>
 <li><code>spec.rs</code> + derive: <code>captures_usage</code>; declare it on <code>completions.create</code>. <code>rbuild -- test -p conveyor-actions registry</code>.</li>
@@ -164,11 +164,11 @@
 <li><strong>The two triggers.</strong> The <em>after N executions</em> policy is an <strong>event at capture time</strong> (owner 2026-11-09): after the engine inserts an <code>inference_call</code>, it counts the tenant's rows since the last <code>prompt_audit.created_at</code> (excluding <code>prompt_ref = 'prompt_audit@1'</code>) and, at the threshold, inserts the queued audit (<code>requested_by IS NULL</code>, <code>ON CONFLICT DO NOTHING</code> against <code>prompt_audit_auto_live_idx</code>) and its <code>prompt_audit.run</code> job in the same transaction. <code>tenant.settings.prompt_audit</code> carries <code>{enabled, after_executions, surfaces, target_model}</code>; an enabled policy without a <code>target_model</code> is not armed. Then <code>prompt_audits.check</code>: deterministic signal scan of ONE draft version, no LLM, synchronous. <code>rbuild -- test -p conveyor-server prompt_audit_triggers</code>.</li>
 <li><strong>The publish seam.</strong> S11's <code>procedures.publish</code> calls <code>prompt_audits.check</code> on the draft it is publishing and refuses with <code>422 procedure_audit_findings</code> when a <code>high</code>-confidence finding remains; the publisher re-sends with <code>acknowledge_findings: true</code> to override, and the override is recorded on the publish's <code>audit_event</code>. <code>rbuild -- test -p conveyor-actions procedure_publish_audit_gate</code>.</li>
 <li>The two pruners on <code>schedule</code> rows. <code>rbuild -- test -p conveyor-server pruners</code>.</li>
-<li>Whole gate below — <code>rbuild --gate</code> (fmt + clippy + <code>test --locked</code>) on m1 (CONTRACT §16).</li>
+<li>Whole gate below — <code>rbuild --gate</code> (fmt + clippy + <code>test --locked</code>) on the build host (CONTRACT §16).</li>
 </ol>
 <h2 id="7-gate">7. Gate</h2>
 <pre class="bash"><code>set -euo pipefail
-# CONTRACT §16: Rust runs on m1 through rbuild; mini3&#39;s cargo refuses inside a Cargo project.
+# CONTRACT §16: Rust runs on the build host through rbuild; the dev box&#39;s cargo refuses inside a Cargo project.
 # 1. the three tables exist with RLS forced (a policy without FORCE reads zero rows and proves nothing)
 test &quot;$(psql &quot;$DATABASE_URL&quot; -tAc &quot;SELECT count(*) FROM pg_class WHERE relname IN
   (&#39;inference_call&#39;,&#39;prompt_audit&#39;,&#39;prompt_audit_finding&#39;) AND relrowsecurity AND relforcerowsecurity&quot;)&quot; -eq 3

@@ -659,7 +659,7 @@ Rust type system enforces this: the generation result type is not accepted by an
 `POST /v1/systemone {model, state, questions}` — `state` is the task text and `questions` is keyed by qid; each
 question is `{type: noul|choice|score, instructions, criteria}` and the response carries `answers.<qid>`. `noul` is a
 scalar answer, `choice` picks one of 2–255 labelled options, `score` is a 2–10 ordered scale; probabilities are
-carried for the types that provide them. The estate's laya is live on pgx behind a Jev-compatible bridge (`:9210`),
+carried for the types that provide them. The estate's laya is live on the DGX host behind a Jev-compatible bridge (`:9210`),
 ~17–21 ms per request (measured 2026-10-10).
 
 V2 rules:
@@ -945,7 +945,7 @@ the coach's escalations are cards; the PM's closure record is evidence; the oper
 | Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings | **`conveyor`** | humans; the agent front end over `/mcp` |
 | Documents/bytes | conveyor `document` + **MinIO**, written by the conveyor's own storage adapter under tenant-separated prefixes (§11.10) | all |
 | Domain knowledge bytes/embeddings | `strata_rag` / `strata_ingest` | conveyor |
-| Models/inference | `inference-router` for text; `mlx-api`/`modality-gateway` for media; laya on pgx | conveyor |
+| Models/inference | `inference-router` for text; `mlx-api`/`modality-gateway` for media; laya on the DGX host | conveyor |
 | Charging and entitlement: cost rollups, plans, licences | `licenses`, `billing_service`; the conveyor's metering read models are computed from its own ledgers | conveyor |
 | Git/CI execution | the `coding-*` fleet, through the conveyor broker's coding toolkit (§11) | development jobs |
 | Kubernetes | the cluster, through the ops toolkit (§11.2) | operations jobs |
@@ -1128,9 +1128,9 @@ carries tool content, and the binding never widens the grant.
 | `webscraper` :9119 | four-backend scraping (Playwright, curl_cffi, Scrapy, httpx) → Markdown/JSON | live | research, SOP ingestion |
 | `media_discovery` :8809 | federated media search, transcripts, quality scoring | live | media production |
 | `scientific_processor` :8808 | meta-analysis, survival fitting, verification/trust scoring, sandboxed analysis | deployed; scaled to 0 today (measured 2026-11-11) — a binding needs a scale-up and a green probe | AHTAPol evidence |
-| `lean4_prover` :8812 (mini1 host) | Lean 4 typecheck/elaborate/prove over REST | live | verification, SOP formal checks |
+| `lean4_prover` :8812 (the media host) | Lean 4 typecheck/elaborate/prove over REST | live | verification, SOP formal checks |
 | `evidence_review` :8810 | protocol-locked PRISMA screening, blinded review, adjudication, inclusion export | built; not deployed | AHTAPol screening |
-| `w2v-orchestrator` :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on mini1) | deliverable runs and stage capabilities; rendered artifacts | live; **migration target — rewritten in Rust in this workspace: `apps/media` executor images and the `analysis` library (ADR 0007, D54)** | media production |
+| `w2v-orchestrator` :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on the media host) | deliverable runs and stage capabilities; rendered artifacts | live; **migration target — rewritten in Rust in this workspace: `apps/media` executor images and the `analysis` library (ADR 0007, D54)** | media production |
 | `video-compiler` :8200 | ffmpeg render/compile jobs (slide/footage → video), durable `compile_jobs`, MinIO outputs | live; migration candidate — joins `apps/media`'s ffmpeg executor image when rewritten in Rust (ADR 0007, D58) | media production |
 | ops — Kubernetes API, GitHub API, Flux, Prometheus/Loki/Grafana | read verbs (pods, deployments, events, logs, metrics, CI); write verbs gated | live (read) / gated (write) | operations |
 | `billing_service`, `licenses` :8544 | usage and entitlement facts | live | project office, governance |
@@ -1159,7 +1159,7 @@ Notes that keep the table honest:
   fit the conveyor's contracts it is re-architected rather than line-ported (owner, 2026-11-11).
 - **Planned tools enter as `draft`.** An AHTAPol service that is specified but not live gets a catalogue entry and no
   binding; it cannot be called until its slice deploys it and its probe passes (P8).
-- **`8812` is two distinct services.** `lean4_prover` is a launchd process on the mini1 host reached by a
+- **`8812` is two distinct services.** `lean4_prover` is a launchd process on the media host reached by a
   ServiceEntry; the AHTAPol R stats sidecar is a separate planned container reached only by 8808 and 8813 over
   internal HTTP. Same port number, different hosts and networks — never the same toolkit, and a port is not an
   identity.

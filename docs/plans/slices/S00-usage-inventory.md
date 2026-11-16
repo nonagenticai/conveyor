@@ -100,7 +100,7 @@ yq -r '.[]|.area+"\t"+.status' parity/parity.yaml | sort | uniq -c > parity/evid
 
 ## 7. Gate (executable)
 
-From `$HOME/Movies/conveyor`, under `bash`; every line is an assertion and exits 0 only when the property holds. `check-jsonschema` is **not** installed on mini3 (verified 2026-11-07) — install it first.
+From `$HOME/Movies/conveyor`, under `bash`; every line is an assertion and exits 0 only when the property holds. `check-jsonschema` is **not** installed on the dev box (verified 2026-11-07) — install it first.
 
 ```bash
 set -euo pipefail

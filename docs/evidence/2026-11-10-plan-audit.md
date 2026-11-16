@@ -152,7 +152,7 @@ Concrete remaining work:
 
 **Outstanding evidence, not missing pure logic.** Existing receipts cover banked parser/verdict parity and stub sandbox lifecycle, not the actual configured Job, cleanup/resource policy, live gold/empty controls or repaired producer → grader → compare → keep/revert path (`docs/evidence/S17-CORE.md:169`, `docs/evidence/S18-B.md:57`).
 
-Use the recorded grading-node decision (`hp1`, index); verify config rather than reopening it. Prove one live sandbox lifecycle, then controls and producer/improvement. Compare an authenticated real router response with its ledger row and retain repeatable audit evidence. Keep benchmark gold/empty and eval oracle/null/judge-negative controls distinct.
+Use the recorded grading-node decision (the grading node, index); verify config rather than reopening it. Prove one live sandbox lifecycle, then controls and producer/improvement. Compare an authenticated real router response with its ledger row and retain repeatable audit evidence. Keep benchmark gold/empty and eval oracle/null/judge-negative controls distinct.
 
 ### W15. Finish deferred recipe/memory authoring
 
@@ -210,7 +210,7 @@ The development-process-speed document is an optimization proposal. Address meas
 | D23 completeness contradicts optional/best-effort capture; prompt identities differ. | W7 coverage/recovery and compiled identity, or explicit contract amendment. |
 | D25 ledger-derived cost contradicts hillclimb prose/code. | One ledger/accounting model (W12). |
 | S20 evidence says retire special `AGENT_TOOLS`; invocation still uses it (`invoke.rs:532`). | Reconcile one authorization contract before expanding access, preserving human signoff/held-out restrictions. Necessary for claimed agent-driven improvement; not a wholesale auth rebuild. |
-| R12 says no grading node chosen; index records hp1. | Carry recorded decision into current config/proof. |
+| R12 says no grading node chosen; index records the grading node. | Carry recorded decision into current config/proof. |
 | Frontmatter/counts/early remaining paragraphs/UI hints lag later build records. | Replace append-only status with current disposition/evidence. Counts are inventory, not backlog. Preserve applied migrations. |
 
 ## Coverage and completed work to preserve
