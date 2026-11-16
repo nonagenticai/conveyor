@@ -2031,6 +2031,14 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_document_bytes(pg, ctx).await;
             ctx.push(sample.name, id);
         }
+        "documents.publish" | "documents.request_publish" => {
+            let id = seed_document_bytes(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        "documents.revision_list" | "documents.revision_get" | "documents.revision_restore" => {
+            let id = seed_document_history(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
         "secrets.create" => {
             sqlx::query("DELETE FROM secret WHERE tenant_id = $1 AND name = 'parity-secret'")
                 .bind(ctx.tenant_id)
@@ -3425,6 +3433,27 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         on_prepared("documents.delete", Some("\"1\"")),
+        {
+            let mut sample = on_prepared("documents.publish", Some("\"1\""));
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"id": ctx.pop("documents.publish"), "publish": true}));
+            expecting(sample, 200)
+        },
+        expecting(on_prepared("documents.request_publish", Some("\"1\"")), 200),
+        expecting(on_prepared("documents.revision_list", None), 200),
+        {
+            let mut sample = on_prepared("documents.revision_get", None);
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"id": ctx.pop("documents.revision_get"), "seq": 1}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = on_prepared("documents.revision_restore", Some("\"1\""));
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("documents.revision_restore"), "seq": 1}),
+            );
+            expecting(sample, 200)
+        },
         {
             // The document is created before the loop, one per round: a push cannot be repeated (the job id is
             // a fact on the row), so the queue is what makes round A and round B both real executions.
@@ -5601,6 +5630,56 @@ async fn seed_document_bytes(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     .execute(&pg.super_pool)
     .await
     .expect("seed a document");
+    id
+}
+
+/// A text output at version 1 plus its `created` revision: the history samples' fixture.
+async fn seed_document_history(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    use sha2::{Digest, Sha256};
+
+    let id = Uuid::now_v7();
+    let body = "# Parity history\n\nA note.";
+    let hash: String = Sha256::digest(body.as_bytes())
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
+    let meta = json!({"content_type": "text/markdown", "size_bytes": body.len() as i64});
+    sqlx::query(
+        "INSERT INTO document (id, tenant_id, kind, title, status, body, content_hash, meta,
+                               version)
+         VALUES ($1, $2, 'document', 'Parity history', 'active', $3, $4, $5, 1)",
+    )
+    .bind(id)
+    .bind(ctx.tenant_id)
+    .bind(body)
+    .bind(&hash)
+    .bind(&meta)
+    .execute(&pg.super_pool)
+    .await
+    .expect("seed a text document");
+    let content = json!({
+        "id": id.to_string(),
+        "title": "Parity history",
+        "body": body,
+        "meta": meta.clone(),
+        "publishable": false,
+        "category": null,
+        "unit": null,
+        "version": 1,
+        "object_key": null,
+        "status": "active",
+    });
+    sqlx::query(
+        "INSERT INTO revision (tenant_id, entity_type, entity_id, seq, label, content,
+                               content_hash, status)
+         VALUES ($1, 'document', $2, 1, 'created', $3, 'h', 'draft')",
+    )
+    .bind(ctx.tenant_id)
+    .bind(id)
+    .bind(content)
+    .execute(&pg.super_pool)
+    .await
+    .expect("seed the document revision");
     id
 }
 

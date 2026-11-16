@@ -364,10 +364,15 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
             object_key: None,
             content_hash: Some(sha256_hex(body.as_bytes())),
             card_id: None,
+            parent_document_id: None,
             body: Some(body.to_owned()),
             external_ref: None,
             meta: json!({"category": "evidence"}),
             publishable: true,
+            category: Some("evidence".to_owned()),
+            unit: None,
+            created_by: None,
+            updated_by: None,
         },
     )
     .await

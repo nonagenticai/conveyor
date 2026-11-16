@@ -188,7 +188,11 @@ mod tests {
                 (40, "organisation".to_owned()),
                 // #144 (ADR 0007 §Decision 3–4): `runner_run` — one row per dispatched attempt —
                 // and `runner_artefact`, the manifest a polled result is checked against.
-                (41, "runner".to_owned())
+                (41, "runner".to_owned()),
+                // #156: the work store — provenance, the publish request, promoted
+                // `category`/`unit`, and the attachment kind on `document`
+                // (0042_document_workflow.sql).
+                (42, "document workflow".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

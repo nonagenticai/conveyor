@@ -415,6 +415,68 @@ async fn model_prune_keeps_the_newest_fifty_and_never_deletes_the_published_revi
 }
 
 #[tokio::test]
+async fn document_revision_prune_keeps_the_newest_50_per_document() {
+    let db = common::TestDb::fresh().await;
+    let (a, b) = tenants(&db).await;
+    let first = Uuid::now_v7();
+    let second = Uuid::now_v7();
+    seed_revisions(&db, a, "document", first, 60).await;
+    seed_revisions(&db, a, "document", second, 10).await;
+    seed_revisions(&db, b, "document", first, 60).await;
+
+    let deleted = conveyor_store::prune::document_revision_prune(
+        &db.runtime,
+        a,
+        conveyor_store::prune::DOCUMENT_REVISION_KEEP,
+        conveyor_store::prune::PRUNE_BATCH,
+    )
+    .await
+    .expect("document.prune");
+    assert_eq!(deleted, 10, "only the older ten of the long history");
+
+    let a_seqs: Vec<i32> = sqlx::query_scalar(
+        "SELECT seq FROM revision
+          WHERE tenant_id = $1 AND entity_type = 'document' AND entity_id = $2
+          ORDER BY seq",
+    )
+    .bind(a.as_uuid())
+    .bind(first)
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("read A document revisions");
+    assert_eq!(a_seqs.len(), 50);
+    assert_eq!(a_seqs.first(), Some(&11));
+    let short: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM revision
+          WHERE tenant_id = $1 AND entity_type = 'document' AND entity_id = $2",
+    )
+    .bind(a.as_uuid())
+    .bind(second)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("count the short history");
+    assert_eq!(short, 10, "a history under the bound is untouched");
+    let other: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM revision WHERE tenant_id = $1 AND entity_type = 'document'",
+    )
+    .bind(b.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("count B");
+    assert_eq!(other, 60, "another tenant is untouched");
+
+    let again = conveyor_store::prune::document_revision_prune(
+        &db.runtime,
+        a,
+        conveyor_store::prune::DOCUMENT_REVISION_KEEP,
+        conveyor_store::prune::PRUNE_BATCH,
+    )
+    .await
+    .expect("second document.prune");
+    assert_eq!(again, 0, "a second run finds nothing past the cut-off");
+}
+
+#[tokio::test]
 async fn validation_run_prune_expires_by_age_and_a_pruned_revision_leaves_a_null_link() {
     let db = common::TestDb::fresh().await;
     let (a, b) = tenants(&db).await;

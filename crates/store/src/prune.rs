@@ -34,6 +34,10 @@ pub const JOB_RETENTION_DAYS: i64 = 30;
 /// governed asset's revisions are never pruned — they are the governance record.
 pub const MODEL_REVISION_KEEP: i64 = 50;
 
+/// A document's history is working state too; the newest 50 versions per output are kept. The
+/// purge of a deleted document removes the whole arm, so this bound is for live rows.
+pub const DOCUMENT_REVISION_KEEP: i64 = 50;
+
 /// `model_validation_run` retention (data-architecture §5.3).
 pub const VALIDATION_RUN_RETENTION_DAYS: i64 = 90;
 
@@ -171,6 +175,49 @@ pub async fn model_revision_prune(
                              SELECT 1 FROM model m
                               WHERE m.tenant_id = r.tenant_id
                                 AND m.published_revision_id = r.id)
+                     ORDER BY r.entity_id, r.seq
+                     LIMIT $3)
+             RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(keep)
+        .bind(batch)
+        .fetch_all(&mut *tx)
+        .await?
+        .len() as u64;
+        tx.commit().await?;
+        total += deleted;
+        if deleted < batch as u64 {
+            return Ok(total);
+        }
+    }
+}
+
+/// Delete this tenant's document revisions past the newest `keep` of each document.
+///
+/// The same per-entity cut-off as [`model_revision_prune`]: `seq` is the document version, so the
+/// newest `keep` versions (including the current one) survive.
+pub async fn document_revision_prune(
+    pool: &PgPool,
+    tenant: TenantId,
+    keep: i64,
+    batch: i64,
+) -> Result<u64, sqlx::Error> {
+    let batch = batch.max(1);
+    let mut total = 0u64;
+    loop {
+        let mut tx = begin_scoped(pool, tenant).await?;
+        let deleted = sqlx::query(
+            "DELETE FROM revision
+              WHERE id IN (
+                    SELECT r.id FROM revision r
+                     WHERE r.tenant_id = $1
+                       AND r.entity_type = 'document'
+                       AND r.seq <= (SELECT max(newest.seq)
+                                       FROM revision newest
+                                      WHERE newest.tenant_id = r.tenant_id
+                                        AND newest.entity_type = 'document'
+                                        AND newest.entity_id = r.entity_id) - $2
                      ORDER BY r.entity_id, r.seq
                      LIMIT $3)
              RETURNING id",

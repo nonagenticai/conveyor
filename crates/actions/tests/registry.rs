@@ -67,9 +67,10 @@ use serde_json::{Value, json};
 /// **#182 slice A adds 5 internal**: the tenant's own YouTube channel —
 /// `youtube.client_set|client_get|connect|status|disconnect`. 333 → **338**.
 /// **#182 slice B adds 3 internal**: `youtube.upload|privacy|retract`. 338 → **341**.
+/// **#156 adds 5 internal**: the work-store publish/request/revision actions. 341 → **346**.
 /// **#174 adds 1 external**: `media.generate_image`, the MOSS-Image host over the engine's own
-/// declared-external path (it is the first action to declare an `Artefact`). 341 → **342**.
-const EXPECTED: [&str; 342] = [
+/// declared-external path (it is the first action to declare an `Artefact`). 346 → **347**.
+const EXPECTED: [&str; 347] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -150,7 +151,12 @@ const EXPECTED: [&str; 342] = [
     "documents.get",
     "documents.ingest",
     "documents.list",
+    "documents.publish",
     "documents.report",
+    "documents.request_publish",
+    "documents.revision_get",
+    "documents.revision_list",
+    "documents.revision_restore",
     "documents.update",
     "eval_audits.get",
     "eval_audits.list",
@@ -444,9 +450,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // (the organisation spine): 290 → 305; #139 P3.1 adds the twelve media actions: 305 → 317;
     // #161 P3 adds `decks.render` (internal, write): 317 → 318; #182 slice A adds the five
     // `youtube.*` actions (internal): 318 → 323; slice B adds `youtube.upload|privacy|retract`:
-    // 323 → 326. #174 adds `media.generate_image` (external): the external count has moved a second
+    // 323 → 326; the work store (#156) adds five internal actions
+    // (`documents.publish`, `documents.request_publish`, the three `documents.revision_*`):
+    // 326 → 331. #174 adds `media.generate_image` (external): the external count has moved a second
     // time, 15 → 16, because it is the first action that calls a service AND stores what it returned.
-    assert_eq!((internal, external), (326, 16));
+    assert_eq!((internal, external), (331, 16));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
