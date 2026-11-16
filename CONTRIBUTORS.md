@@ -1,8 +1,8 @@
 # Contributors
 
 conveyor is developed in public under Apache-2.0. Merged contributions are credited here and in
-the release notes. If you would rather not be listed, say so in your pull request — the work still
-lands.
+the release notes unless the contributor opts out. If you would rather not be listed, say so in
+your pull request — the work still lands.
 
 | Contributor | Contribution | Pull request |
 |---|---|---|
@@ -15,7 +15,8 @@ file is the readable one.
 
 ## Credit policy
 
-- Every merged contribution gets a row here and a line in the release notes.
+- Every merged contribution gets a row here and a line in the release notes, unless the contributor
+  opts out.
 - The merge comment names the contributor and the work.
 - We rebase-merge, so the contributor's commits and sign-offs stay theirs.
 - A contributor may opt out of this list; the work is still credited in the release notes unless
