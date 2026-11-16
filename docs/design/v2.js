@@ -563,7 +563,7 @@ window.installV2 = function (api, enterprise) {
       const page = await C.action("documents.list", {
         kind: "document",
         page: {
-          limit: 50,
+          limit: 200,
           ...(more && cs.register.next_cursor ? { cursor: cs.register.next_cursor } : {}),
         },
       });
@@ -792,38 +792,22 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------- outputs */
-  // The promoted columns are authoritative; the `meta` keys are the pre-0042 read and stay as a
-  // fallback for the rows composed before the migration.
-  const outputCategoryOf = (doc) => String(doc.category || ((doc.meta || {}).category) || "");
+  // `seed/output-standard.json` is the source; the builder writes `data/output-standard.js` for
+  // this file. The promoted columns are authoritative; `meta` is the pre-0042 fallback.
+  const OUTPUT_STANDARD = window.CONVEYOR_OUTPUT_STANDARD || { categories: [], aliases: {} };
+  const canonicalCategory = (value) => {
+    const raw = String(value || "");
+    return (OUTPUT_STANDARD.aliases || {})[raw] || raw;
+  };
+  const outputCategoryOf = (doc) =>
+    canonicalCategory(doc.category || ((doc.meta || {}).category) || "");
   const outputUnitOf = (doc) => String(doc.unit || ((doc.meta || {}).unit) || "");
   const outputAuthorOf = (doc) => String(doc.created_by_name || "");
   const outputStateOf = (doc) =>
     doc.publishable ? "public" : doc.publish_requested_at ? "review requested" : "draft";
   const isAdmin = () => !!(C && C.role && C.role() === "admin");
   const INCEPTION_CATEGORIES = ["inception-analysis", "architecture-design"];
-  // The standard's slots. One vocabulary until Lane 2 makes it a shared JSON file; the seed, this
-  // list and the action layer must agree.
-  const OUTPUT_CATEGORIES = [
-    "project-brief",
-    "inception-analysis",
-    "architecture-design",
-    "decision",
-    "evidence",
-    "closure-review",
-    "vision",
-    "blueprint",
-    "business-case",
-    "programme-plan",
-    "governance",
-    "reuse-map",
-    "brief",
-    "brief-template",
-    "architecture-analysis",
-    "analysis",
-    "architecture",
-    "plan",
-    "spec",
-  ];
+  const OUTPUT_CATEGORIES = list(OUTPUT_STANDARD.categories);
 
   function outputsPage() {
     const signed = consoleOn();
@@ -994,13 +978,13 @@ window.installV2 = function (api, enterprise) {
           }</td></tr>`,
       )
       .join("");
-    return panel(
+    return `${publicExpectedOutputPanel(current)}${panel(
       "All projects",
       `${table(["Project", "Status", "Track", "Plan"], [body])}${note(
         "This is the published snapshot, read-only. Sign in at the app origin to edit a project, compose outputs or publish.",
       )}`,
       B(`${rows.length} projects`, "green"),
-    );
+    )}`;
   }
 
   function coverageOf(key) {
@@ -1058,6 +1042,111 @@ window.installV2 = function (api, enterprise) {
     );
   }
 
+  // The public checklist: published outputs only; a private draft never counts or renders here.
+  function publicExpectedOutputPanel(project) {
+    const title = "Expected outputs";
+    const outputs = list((window.CONVEYOR_OUTPUTS || {}).outputs).filter(
+      (doc) => doc.project_id === project.id,
+    );
+    const expected = list((project.meta || {}).expected_outputs);
+    const closure = list((project.meta || {}).closure_outputs);
+    const categories = expected.length ? expected : INCEPTION_CATEGORIES;
+    const stateOf = (category) => {
+      const docs = outputs.filter((doc) => outputCategoryOf(doc) === category);
+      return {
+        docs,
+        label: docs.length ? "published" : "missing",
+        tone: docs.length ? "green" : "bad",
+      };
+    };
+    let published = 0;
+    let nextMarked = false;
+    const row = (category, markNext) => {
+      const current = stateOf(category);
+      if (current.docs.length) published += 1;
+      const next = markNext && !current.docs.length && !nextMarked;
+      if (next) nextMarked = true;
+      return `<tr><td><strong>${E(category)}</strong>${next ? ` ${B("next", "amber")}` : ""}</td><td>${B(current.label, current.tone)}</td><td>${current.docs.length ? E(current.docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>—</td></tr>`;
+    };
+    const rows = categories.map((category) => row(category, true));
+    if (project.key === "P0") {
+      const delivery = snapshotProjects().filter(
+        (row) => row.key !== "P0" && list((row.meta || {}).expected_outputs).length > 0,
+      );
+      const briefed = new Set(
+        list((window.CONVEYOR_OUTPUTS || {}).outputs)
+          .filter((doc) => outputCategoryOf(doc) === "project-brief")
+          .map((doc) => doc.project_id),
+      );
+      const covered = delivery.filter((row) => briefed.has(row.id)).length;
+      rows.push(
+        `<tr><td><strong>project briefs</strong></td><td>${B(`${covered}/${delivery.length} published`, covered === delivery.length && delivery.length ? "green" : "amber")}</td><td><small>Across every delivery project</small></td><td>—</td></tr>`,
+      );
+    }
+    let closurePublished = 0;
+    const closureRows = closure.map((category) => {
+      const current = stateOf(category);
+      if (current.docs.length) closurePublished += 1;
+      return `<tr><td><strong>${E(category)}</strong></td><td>${B(current.label, current.tone)}</td><td>${current.docs.length ? E(current.docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>—</td></tr>`;
+    });
+    const closureBlock = closure.length
+      ? `<h4>At closure</h4>${table(["Output", "State", "Document", "Action"], closureRows)}`
+      : "";
+    return panel(
+      title,
+      `${table(["Output", "State", "Document", "Action"], rows)}${closureBlock}${note("Published outputs only. A private draft is not part of the public window.")}`,
+      B(
+        `${published}/${categories.length} published${closure.length ? ` · closure ${closurePublished}/${closure.length}` : ""}`,
+        published === categories.length ? "green" : "amber",
+      ),
+    );
+  }
+
+  // The programme work queue: published outputs against the standard's due-now set, ordered by
+  // tranche. The signed-in caller passes every document; the public one passes `outputs.js`.
+  function programmeQueue(projects, docs) {
+    const rows = projects
+      .filter((project) => list((project.meta || {}).expected_outputs).length > 0)
+      .map((project) => {
+        const expected = list((project.meta || {}).expected_outputs);
+        const closure = list((project.meta || {}).closure_outputs);
+        const mine = docs.filter((doc) => doc.project_id === project.id);
+        const isPublished = (category) =>
+          mine.some(
+            (doc) =>
+              outputCategoryOf(doc) === category &&
+              (doc.publishable || doc.publishable === undefined),
+          );
+        return {
+          project,
+          meta: project.meta || {},
+          expected,
+          closure,
+          published: expected.filter(isPublished).length,
+          closurePublished: closure.filter(isPublished).length,
+          next: expected.find((category) => !isPublished(category)) || "",
+        };
+      })
+      .sort(
+        (left, right) =>
+          (left.meta.tranche ?? 99) - (right.meta.tranche ?? 99) ||
+          String(left.project.key).localeCompare(String(right.project.key)),
+      );
+    const body = rows.map(({ project, meta, expected, closure, published, closurePublished, next }) => {
+      const measured = ((coverageOf(project.key) || {}).status) || meta.measured_status || "—";
+      return `<tr><td><strong>${E(project.key)}</strong> <small>${E(project.name)}</small></td><td>${E(meta.tranche ?? "—")}</td><td>${E(measured)}</td><td>${B(`${published}/${expected.length}`, expected.length && published === expected.length ? "green" : "amber")}</td><td>${closure.length ? E(`${closurePublished}/${closure.length}`) : "—"}</td><td>${next ? `<span class="mono">${E(next)}</span>` : "—"}</td></tr>`;
+    });
+    const due = rows.filter((row) => row.next.length > 0).length;
+    return panel(
+      "Programme queue",
+      `${table(
+        ["Project", "Tranche", "Measured", "Outputs", "Closure", "Next output"],
+        body.length ? body : [`<tr><td colspan="6">No projects.</td></tr>`],
+      )}${note("Published outputs against the due-now set; `closure` counts the at-closure set. Ordered by tranche, then project key. The next output is the first due-now category with no published document.")}`,
+      B(`${due} outputs due`, due ? "amber" : "green"),
+    );
+  }
+
   function expectedOutputPanel(project) {
     const title = "Expected outputs";
     const state = cs.outputs[project.id];
@@ -1069,19 +1158,20 @@ window.installV2 = function (api, enterprise) {
       );
     }
     const expected = list((project.meta || {}).expected_outputs);
+    const closure = list((project.meta || {}).closure_outputs);
     const categories = expected.length ? expected : INCEPTION_CATEGORIES;
-    let published = 0;
-    let nextMarked = false;
-    const rows = categories.map((category) => {
+    const stateOf = (category) => {
       const docs = state.items.filter((doc) => outputCategoryOf(doc) === category);
       const isPublished = docs.some((doc) => doc.publishable);
-      if (isPublished) published += 1;
-      // The first category with no published document is the next output to compose.
-      const next = !isPublished && !nextMarked;
-      if (next) nextMarked = true;
-      const label = docs.length ? (isPublished ? "published" : "present, private") : "missing";
-      const tone = isPublished ? "green" : docs.length ? "amber" : "bad";
-      const action = C.can("documents.compose")
+      return {
+        docs,
+        isPublished,
+        label: docs.length ? (isPublished ? "published" : "present, private") : "missing",
+        tone: isPublished ? "green" : docs.length ? "amber" : "bad",
+      };
+    };
+    const compose = (category) =>
+      C.can("documents.compose")
         ? button(
             `Compose ${category}`,
             "output-new-template",
@@ -1090,13 +1180,24 @@ window.installV2 = function (api, enterprise) {
             "plus",
           )
         : "";
-      return `<tr><td><strong>${E(category)}</strong>${next ? ` ${B("next", "amber")}` : ""}</td><td>${B(label, tone)}</td><td>${docs.length ? E(docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>${action}</td></tr>`;
-    });
+    let published = 0;
+    let nextMarked = false;
+    const row = (category, markNext) => {
+      const current = stateOf(category);
+      if (current.isPublished) published += 1;
+      // The first due-now category with no published document is the next output to compose.
+      const next = markNext && !current.isPublished && !nextMarked;
+      if (next) nextMarked = true;
+      return `<tr><td><strong>${E(category)}</strong>${next ? ` ${B("next", "amber")}` : ""}</td><td>${B(current.label, current.tone)}</td><td>${current.docs.length ? E(current.docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>${compose(category)}</td></tr>`;
+    };
+    const rows = categories.map((category) => row(category, true));
     // P0's artefact #7 is the brief set across every delivery project; it is a computed
     // coverage row, not a document on P0.
     if (project.key === "P0") {
       consoleLoadRegister();
-      const delivery = consoleProjects().filter((row) => row.key !== "P0");
+      const delivery = consoleProjects().filter(
+        (row) => row.key !== "P0" && list((row.meta || {}).expected_outputs).length > 0,
+      );
       const briefed = new Set(
         list(cs.register.items)
           .filter((doc) => outputCategoryOf(doc) === "project-brief" && doc.publishable)
@@ -1107,10 +1208,22 @@ window.installV2 = function (api, enterprise) {
         `<tr><td><strong>project briefs</strong></td><td>${B(`${covered}/${delivery.length} published`, covered === delivery.length && delivery.length ? "green" : "amber")}</td><td><small>Across every delivery project</small></td><td></td></tr>`,
       );
     }
+    let closurePublished = 0;
+    const closureRows = closure.map((category) => {
+      const current = stateOf(category);
+      if (current.isPublished) closurePublished += 1;
+      return `<tr><td><strong>${E(category)}</strong></td><td>${B(current.label, current.tone)}</td><td>${current.docs.length ? E(current.docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>${compose(category)}</td></tr>`;
+    });
+    const closureBlock = closure.length
+      ? `<h4>At closure</h4>${table(["Output", "State", "Document", "Action"], closureRows)}`
+      : "";
     return panel(
       title,
-      `${table(["Output", "State", "Document", "Action"], rows)}${note("The categories are the project's expected outputs — P0's eight artefacts (§3) or a delivery project's brief and, for V2, its analysis and architecture (§5). A missing one is a visible gap; the first missing row is the next output to compose.")}`,
-      B(`${published}/${categories.length} published`, published === categories.length ? "green" : "amber"),
+      `${table(["Output", "State", "Document", "Action"], rows)}${closureBlock}${note("The standard's due-now set is required now; the at-closure set is required at closure. The first missing due-now row is the next output to compose. A missing output is a visible gap; publish is an admin decision.")}`,
+      B(
+        `${published}/${categories.length} published${closure.length ? ` · closure ${closurePublished}/${closure.length}` : ""}`,
+        published === categories.length ? "green" : "amber",
+      ),
     );
   }
 
@@ -3019,6 +3132,7 @@ window.installV2 = function (api, enterprise) {
   // design study. The signed-in page never renders a fixture project or a fixture programme.
   function consolePortfolio() {
     if (!cs.loaded && !cs.loading && !cs.error) consoleLoad();
+    consoleLoadRegister();
     const rows = consoleProjects();
     const index = new Map(cs.issues.map((row) => [String(row.number), row]));
     // No programme row is a real answer for a tenant: render the absence. Naming a fixture
@@ -3116,7 +3230,7 @@ window.installV2 = function (api, enterprise) {
         : tab === "Programme"
           ? panel(
               "Programme",
-              `${summary}${note(
+              `${summary}${programmeQueue(rows, list(cs.register.items))}${note(
                 "Shared configuration, WSJF, cadence and metering are V2 aggregates (T1/T10/T11) that do not exist yet. This page shows the rows the platform owns today.",
               )}`,
               B(programme ? programme.status || "active" : "no programme row", programme ? "green" : ""),
@@ -3173,7 +3287,7 @@ window.installV2 = function (api, enterprise) {
     )}${consoleRibbon(
       `The published programme snapshot${programme.name ? ` · ${E(programme.name)}` : ""}: ${rows.length} projects and their dependency edges.`,
       rows.length > 0,
-    )}${panel(
+    )}${programmeQueue(rows, list((window.CONVEYOR_OUTPUTS || {}).outputs))}${panel(
       "Projects",
       `<p class="muted">Every row is a programme project in the published snapshot, with the GitHub units linked on it.</p>${table(
         ["Project", "Tranche", "Status", "Measured", "Units"],
