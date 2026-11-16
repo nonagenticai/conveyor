@@ -418,3 +418,48 @@ async fn a_result_is_recorded_without_finishing_the_job() {
     assert_eq!(run.status, "reported");
     assert!(run.result.is_some());
 }
+
+/// A dispatched pod outlives the worker's claim, and the poll releases the lease between cycles.
+///
+/// `store::jobs::defer` leaves the row `pending` with `continuation = true` and no lease, which is
+/// exactly the state a running pod finds it in most of the time. Requiring `running` there refused
+/// every write that landed between two polls — measured live 2026-11-16 on the first real
+/// dispatch: the executor finished in 10 s and its `POST /result` answered 403, so the job stayed
+/// `pending` for ever. The attempt, not the claim, is what the pod's token authorizes.
+#[tokio::test]
+async fn a_deferred_attempt_can_still_read_its_input() {
+    let harness = harness().await;
+    let job = store::jobs::get(&harness._pg.runtime, harness.tenant, harness.job_id)
+        .await
+        .expect("read the job")
+        .expect("the harness claimed it");
+    let lease = job.lease_token.expect("the claim set a lease token");
+    assert!(
+        store::jobs::defer(
+            &harness._pg.runtime,
+            harness.tenant,
+            harness.job_id,
+            lease,
+            std::time::Duration::from_secs(5),
+        )
+        .await
+        .expect("defer"),
+        "the lease holder may defer"
+    );
+    let deferred = store::jobs::get(&harness._pg.runtime, harness.tenant, harness.job_id)
+        .await
+        .expect("read")
+        .expect("the row is still there");
+    assert_eq!(deferred.status, "pending");
+    assert!(deferred.continuation, "defer is what sets it");
+    assert!(deferred.lease_until.is_none(), "the lease was released");
+
+    let token = token_for(&harness, harness.tenant, ChronoDuration::minutes(5));
+    let path = format!("/api/jobs/{}/inputs/source.txt", harness.job_id);
+    let (status, _, bytes) = get(&harness, &path, &token).await;
+    assert_eq!(
+        status, 200,
+        "a deferred attempt is still the live attempt, so its writes stand"
+    );
+    assert_eq!(bytes, harness.input_bytes);
+}
