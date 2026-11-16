@@ -785,28 +785,98 @@ list — are compiled into the same envelope; there is no other prompt compiler 
 The point of this section is that the rigour is **not a document library**. Every artefact below is a row with a
 lifecycle; every gate is an approval; every claim links to evidence.
 
-### 8.1 TOGAF ADM as an architecture project type
+### 8.1 TOGAF ADM as an architecture capability
 
-An `architecture` project walks the ADM phases as WBS nodes, each with its required artefacts and a contract gate:
+TOGAF's ADM is implemented as a **capability first and a project second**. The Preliminary phase establishes the
+capability; an `architecture` project then walks the phases as WBS nodes; and every artefact a phase produces is a
+typed row with a lifecycle, not a file in a library.
 
-| Phase | Artefacts (governed assets) | Gate |
+**The capability (Preliminary phase).** Six things are established before architecture work starts:
+
+| Capability area | V2 row | Gate |
 |---|---|---|
-| **Preliminary** | architecture principles, tailored ADM profile | principles approved |
-| **A — Vision** | scope, stakeholders, architecture vision, constraints | vision contract |
-| **B — Business** | business architecture, capabilities, value streams | business contract |
-| **C — Information systems** | data + application architecture | IS contract |
-| **D — Technology** | platform, infrastructure, deployment topology | technology contract |
-| **E — Opportunities & solutions** | gap analysis, candidate solutions, work packages | solution contract |
-| **F — Migration planning** | roadmap, increments, dependencies, cost/benefit | migration contract |
-| **G — Implementation governance** | compliance reviews attached to delivery projects | per-delivery compliance |
-| **H — Change management** | monitoring, new requests, lessons | change review → kata/PM |
+| Architecture principles | `architecture_artifact(type='principles_catalog')`; each entry `{uid, statement, rationale, implications}` | the Architecture Board approves the catalogue |
+| Tailored ADM | `adm_profile(phase_set, artifact_requirements, contract_kinds)` — which phases, which artefacts are mandatory per phase and plateau, which contract closes each phase | the board adopts the profile |
+| Repository and artefact standard | `artifact_type` catalogue (the standard's types, phase and plateau) + `architecture_artifact` rows | the repository is seeded and the standard adopted |
+| Architecture Board | `governance_body(kind='architecture_board')` + membership, charter, commissioning authority and decision limits | the charter is approved and the board convened |
+| Governance, contracts and waivers | `architecture_contract` + `architecture_waiver` | the governance baseline is recorded |
+| Maturity and skills | `architecture_maturity(dimension, score 0–5, stage)` + `architecture_skill_assessment(role, skill, proficiency)` | the baseline is assessed and its development plan approved |
 
-**Requirements management is continuous**, not a phase: every requirement/principle/ADR is a `governed_asset` linked
-by `trace_link` to the cards, runs and evidence that realise it. A delivery project cannot pass its design gate
-without the architecture contract that governs it; a contract change is a new version and a new gate.
+**The artefact standard.** `architecture_artifact` is the parent; **catalog**, **matrix** and **diagram** are its three
+types, and each inherits the common metadata: title, status, version, author and date, reviewer and review date, the
+related change initiative or project, the rationale (purpose, stakeholders, scope), and the published document or
+the architecture contract it sits under. Type-specific metadata: a **catalog** names its unique identifier, item name
+and description of use or structure; a **matrix** names its axes (usually two); a **diagram** names its building
+block/metamodel and viewpoint. The entries are rows (`architecture_artifact_entry`: `axis_a`, `axis_b`, `value`), so a
+catalogue is queryable and a matrix is joinable — an artefact is metadata plus entries plus a document, never a blob.
 
-Scope note: this is a **lean ADM profile** for software delivery, not a claim of TOGAF certification or full
-conformance. The phases, artefacts and gates are the ones the organisation will actually use and measure.
+The standard groups artefacts into three **plateaus**: the **Project Start Architecture** (drivers/goals/objectives,
+principles, stakeholders, requirements, actors/roles, application portfolio, solution concept, benefits), the
+**High-Level Design** (business service/function, data entity/component, business interaction, application
+organisation/data, business footprint, functional decomposition, conceptual data, technology standards), and the
+**Solution Design** (process flows, logical data, interfaces, application communication/migration, technology
+portfolio, platform decomposition, processing, project context). A project's tailored profile names which plateau its
+current phase requires. Artefact-to-artefact dependencies are `architecture_artifact_link` edges
+(`derivation | realization | reuse | dependency`), so the repository answers *what this artefact derives from, what it
+realises, and what it reuses*.
+
+**The phases.** Each phase is a WBS node; its mandatory artefact set comes from the standard, filtered by the
+tenant's `adm_profile`; it closes on an approved `architecture_contract`; a phase cannot be skipped.
+
+| Phase | Mandatory artefacts (from the standard) | Contract / gate |
+|---|---|---|
+| **Preliminary** | Principles Catalog; Principle Derivation and Principle Realization diagrams; tailored ADM profile; maturity and skills baseline | principles approved; capability adopted |
+| **A — Vision** | Stakeholder Map and Matrix; Driver/Goal/Objective Catalog; Requirements Catalog; Solution Concept Diagram; **Statement of Architecture Work** | the SAW is approved (vision contract) |
+| **B — Business** | Business Service/Function, Process/Event/Control/Product, Value Stream, Business Capabilities, Value Stream Stages, Contract/Measure catalogs; Business Interaction, Actor/Role, Value Stream/Capability, Strategy/Capability, Capability/Organization matrices; Business Footprint, Business Service/Information, Functional Decomposition, Product Lifecycle, Business Model Canvas, Business Capability Map, Value Stream Map, Goal/Objective/Service, Business Use Case, Process Flow, Event diagrams | business contract |
+| **C — Information systems** | Data Entity/Data Component Catalog; Data Entity/Business Function and Application/Data matrices; Conceptual, Logical and Data Dissemination diagrams; Application Portfolio and Interface catalogs; Application/Organization, Role/Application, Application/Function, Application Interaction matrices; Application Communication, Application Use Case, Process/Application Realization, Application Migration, Software Distribution diagrams | IS contract (data + application) |
+| **D — Technology** | Technology Standards and Technology Portfolio catalogs; Application/Technology and System/Technology matrices; Platform Decomposition, Processing, Environments and Locations diagrams | technology contract |
+| **E — Opportunities & solutions** | gap analysis, candidate solutions, work packages; **Project Context Diagram** (the work package against the affected organisation, functions, services, applications, data and technology); **Benefits Diagram** (goals, outcomes, measurements, sub-benefits, benefits) | solution contract |
+| **F — Migration planning** | roadmap, increments, dependencies, cost/benefit; the migration and delivery contracts | migration contract |
+| **G — Implementation governance** | a per-delivery **compliance review** against the governing contract, its compliance level and its waivers | per-delivery compliance |
+| **H — Change management** | monitoring, new requests, lessons; exactly one typed outcome — a change request with impact, or a kata candidate; a **Request for Architecture Work** when the architecture no longer meets its purpose | change review |
+
+**Requirements management is continuous**, not a phase. The **Requirements Catalog** types every requirement as
+`condition | constraint | assumption | delta`; every requirement, principle and ADR is a governed asset trace-linked
+to the artefacts, contracts, cards, runs and evidence that realise it. The chain the standard defines is the trace
+chain of §8.5: stakeholder and driver → goal → principle → requirement → service → evidence.
+
+**Compliance is a typed review, not a checkbox.** A review records exactly one of the standard's relationships
+between the project and the architecture specification — `irrelevant`, `consistent`, `compliant`, `conformant`,
+`fully_conformant` or `non_conformant` — with its findings. A deviation is rejected, mitigated, or accepted for a
+defined period through a **waiver** naming the accepting asset owner, the reason, the additional cost and risk, and
+the reassessment date. A waiver without an owner and a review date is refused.
+
+**The contracts are the gate objects.** `architecture_contract` carries four kinds across the ADM: the **Statement of
+Architecture Work** (A — assignment, scope, responsibilities, acceptance criteria; distinct from the designs produced
+under it), the **delivery contract** (after F — delivery commitments and the method for assessing compliance), the
+**statement of intent / business usage agreement** (at completion — intended use, ownership, measures of
+effectiveness), and the **Request for Architecture Work** (H — further architecture work, reviewed by the Design
+Board). A contract change is a new version and re-opens its gate; the approved version's body is immutable.
+
+**Maturity and skills are measured, not asserted.** The **architecture maturity** assessment scores nine dimensions
+(architecture process; architecture development; business linkage; senior-management involvement; operating-unit
+participation; architecture communication; IT security; architecture governance; IT investment and acquisition
+strategy) on 0–5 (none, initial, under development, defined, managed, measured), per stage, with a baseline and
+milestones. The **Architecture Skills Framework** assesses seven categories (general; business skills and methods;
+architecture skills; programme/project management; general IT knowledge; technical IT skills; legal environment) at a
+proficiency level per role. Both are dated rows with evidence; the development plan is a set of milestones a tranche
+review can hold the capability to.
+
+**The Architecture Board is a position set with authority rows.** It supports the architecture roadmap, assesses
+proposed changes against it, applies the principles where the roadmap is incomplete, commissions solution
+architectures, and submits them to the delivery Design Board. Its membership (enterprise architects, the CIO,
+business-unit leaders), charter, commissioning authority and decision limits are `governance_body` rows and authority
+rows, not prose.
+
+A delivery project cannot pass its design gate without the contract that governs it; the phase-G review is per
+delivery project, and its compliance level and waivers attach to that delivery's evidence. The conveyor's own
+buildout runs under this capability: P0 is the Preliminary-phase and programme-definition project, and the delivery
+slices T1–T17 each sit under the contract that governs them.
+
+Scope note: this is a **tailored ADM profile** for software delivery, not a claim of TOGAF certification or full
+conformance. The standard's full catalogue is the reference; the tenant's `adm_profile` names the mandatory set per
+phase and plateau, and that set grows with the assessed maturity. The phases, artefacts and gates are the ones the
+organisation will actually use and measure.
 
 ### 8.2 SAFe as the programme cadence
 
@@ -922,7 +992,9 @@ must not carry.
 ### 8.5 The trace chain
 
 ```
-requirement / principle / ADR (approved)
+stakeholder / driver → goal (approved)
+   → principle / requirement / ADR (approved)
+   → architecture artefact (approved: catalog | matrix | diagram)
    → architecture contract (approved)
    → project charter (approved)
    → WBS deliverable → work package (card) → run → step → artefact / evidence
@@ -935,7 +1007,8 @@ screen answers one question end to end: *which requirement does this run prove, 
 ### 8.6 What is not claimed
 
 No TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP certification or conformance badge. No
-full ADM conformance, no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is narrower
+full ADM conformance, no ArchiMate modelling tool (a diagram is a document with typed metadata and a viewpoint, not a
+live metamodel), no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is narrower
 and testable: **the artefacts and gates the organisation uses are rows, the process runs, the benefit is measured
 against a baseline, and the evidence is traceable.**
 
@@ -1024,7 +1097,7 @@ the coach's escalations are cards; the PM's closure record is evidence; the oper
 | Industry, department, job, job release, knowledge layers/kinds, packs, PKO/ontology releases, decision policies and their tenant refinements, laya inference config, model providers, tool grants, channels, conversations/turns | **`conveyor`** | jobs execute on it; humans and the agent front end |
 | Tool estate: tool/toolkit versions, tool bindings, credential profiles, the `tool_call` ledger (§11) | **`conveyor`** | conveyor jobs through the broker; humans |
 | Tool backends: the coding fleet, the kag-era services, the w2v fleet and `video-compiler`, AHTAPol services, k8s/git APIs | each service / the cluster | the conveyor broker only (§11.3) |
-| Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings | **`conveyor`** | humans; the agent front end over `/mcp` |
+| Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, architecture artefacts and contracts, compliance reviews and waivers, maturity and skills assessments, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings | **`conveyor`** | humans; the agent front end over `/mcp` |
 | Documents/bytes | conveyor `document` + **MinIO**, written by the conveyor's own storage adapter under tenant-separated prefixes (§11.10) | all |
 | Domain knowledge bytes/embeddings | `strata_rag` / `strata_ingest` | conveyor |
 | Models/inference | `inference-router` for text; `mlx-api`/`modality-gateway` for media; laya on the DGX host | conveyor |
@@ -1085,6 +1158,17 @@ the conversation, records only its own turns.
 | `benefit_link` | the benefits-map edges | `output → capability → operational outcome → benefit/disbenefit → strategic objective`; also the dependency that puts a benefit at risk |
 | `benefit_transition` | the realization record per benefit | baseline measured, readiness, enact, post-transition measurement, legacy retirement, post-closure owner |
 | `stakeholder_profile` | stakeholder concerns, influence, interest, exposure, support and engagement target | programme- or project-scoped; trends over time |
+| `architecture_artifact` | the typed architecture artefact (§8.1) | common metadata + `type ∈ catalog\|matrix\|diagram`, `phase_code`, `plateau ∈ psa\|hld\|sd`; versioned and superseded, never edited in place once approved |
+| `architecture_artifact_entry` | a catalog item or a matrix cell | `axis_a`, `axis_b`, `value`; a catalog uses one axis, a matrix two |
+| `architecture_artifact_link` | artefact-to-artefact edges | `derivation \| realization \| reuse \| dependency`; the repository's trace |
+| `artifact_type` | the seeded artefact standard | type, phase, plateau, mandatory flag; the tenant's profile filters it |
+| `adm_profile` | the tailored ADM | phase set, mandatory artefact types per phase and plateau, contract kinds |
+| `architecture_contract` | SAW, delivery contract, statement of intent, request for architecture work | `kind`, `phase_code`, version; a change re-opens its gate; the approved body is immutable |
+| `architecture_compliance_review` | one typed verdict per delivery project | the six §8.1 levels, findings and evidence refs |
+| `architecture_waiver` | a time-boxed accepted deviation | accepting owner, reason, cost/risk, reassessment date |
+| `governance_body` | the Architecture Board and other decision forums | membership, charter, commissioning authority, decision limits |
+| `architecture_maturity` | the capability assessment | nine dimensions, score 0–5, stage, date, evidence |
+| `architecture_skill_assessment` | the Skills Framework assessment | seven categories, role/`job_key`, proficiency, date |
 | `decision` | one L1 decision | probabilities, confidence, policy, latency, input hash |
 | `decision_option` | options for a choice/score question | authored, versioned |
 | `decision_policy` | thresholds, fail policy, action | per decision kind/gate |
@@ -1096,9 +1180,10 @@ the conversation, records only its own turns.
 | `pko_entity` / `pko_relation` | PKO terms and edges | kind, attributes, synonyms; subject/predicate/object/cardinality |
 
 Reused, not created: `programme` (extended with `shared_config`), `project`, `card`, `run`, `approval`, `governed_asset` (extend `kind` to
-`charter | architecture_contract | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case |
-refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier`; a programme-level asset is attached to the
-programme-definition project), `trace_link`, `event`, `job`, `audit_event`,
+`charter | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case |
+refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier`; a programme-level asset is attached
+to the programme-definition project; the architecture contract has its own table so a phase gate never depends on a
+generic asset row), `trace_link`, `event`, `job`, `audit_event`,
 `inference_call`, `eval*`, `benchmark*`; `procedure`/`procedure_step` extend with PDDL action text and a PKO pin. New
 columns only where unavoidable: `card.job_binding_id`, `card.wbs_node_id`, `run.job_binding_id`/`release_hash`,
 `project.project_type_code` (exists). The tool tables (`tool`, `toolkit`, `tool_binding`, `tool_call`) are specified
@@ -1110,6 +1195,7 @@ in §11.8.
 |---|---|
 | programme/plan | `programmes.*`, `programme_config.*`, `governed_assets.compose\|submit\|approve` (the MSP artefacts), `tranches.*`, `tranches.review`, `project_dependencies.*`, `cadences.*`, `wbs.*`, `baselines.*`, `registers.*` |
 | benefits | `benefits.list\|get\|create\|update`, `benefits.link\|unlink`, `benefits.baseline\|transition\|measure\|close` |
+| architecture | `architecture.artifacts.list\|get\|create\|update\|approve\|supersede\|link`, `architecture.repository.search` (reuse), `architecture.contracts.request\|approve\|supersede`, `architecture.phases.advance`, `architecture.reviews.record\|waive`, `architecture.board.decide`, `architecture.maturity.assess\|plan`, `architecture.skills.assess`, `architecture.profile.get\|tailor` |
 | organisation | `industries.*`, `departments.*`, `jobs.create\|update\|release\|retire`, `job_releases.publish\|retire`, `job_bindings.create\|retire\|list` |
 | procedures | `procedures.ingest_sop\|ingest_process\|ingest_rdf\|draft\|validate\|publish`, `capabilities.design\|publish`, `pko.import_rdf\|edit\|publish\|pin` |
 | authoring | `authoring.intake\|draft\|review\|publish`, `authoring.assets` |
@@ -1162,6 +1248,7 @@ V1's nine destinations stand (Today, Board, Runs, Build, Design, Measure, Evals,
 | **Authoring** | intake queue (chat + documents), asset draft catalogue, review/publish, asset dependency status |
 | **Portfolio** | portfolio view (in-flight projects + programmes), programme shared config + dependency graph, backlog + WSJF, cadence (PI planning, demo, retro), capacity, metering per project |
 | **Programme** | mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realized benefits |
+| **Architecture** | Preliminary capability (principles, tailored ADM, board charter, maturity and skills); ADM phases A–H with their artefact sets and contracts; the artefact repository (catalog/matrix/diagram, plateau filter, trace and reuse); compliance reviews and waivers; the Statement of Architecture Work and the Request for Architecture Work |
 | **Plan** | WBS, baseline vs forecast, registers, change control |
 | **Improve** | kata queue, six-Gets workspace, lesson review, adoption |
 | **Operations** | incidents, on-call, runbooks, postmortems, andon |
@@ -1434,7 +1521,7 @@ slice integrates and when the repo merges. V2 slices build on V1's S-slices and 
 | **T6** | **Development project** — the self-development path on conveyor + one dependency repo | a real feature lands: lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested |
 | **T7** | **Operations** — incidents, runbooks, k8s read actions, the full gated write set, postmortem | an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable |
 | **T8** | **Organisational memory** — lessons, evidence refs, review, promotion to a knowledge source | a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine |
-| **T9** | **TOGAF profile** — architecture project type, phases A–H, contracts, delivery-project compliance | an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata |
+| **T9** | **TOGAF ADM capability** — Preliminary phase (principles, tailored ADM, the artefact standard and repository, the Architecture Board, governance, maturity and skills), the architecture project type, phases A–H with typed artefacts and contracts, delivery-project compliance and waivers | an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata |
 | **T10** | **SAFe cadence and MSP tranches** — backlog, WSJF, PI planning, demo, inspect & adapt; tranche review, benefits strategy and realization plan | PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized |
 | **T11** | **Metrics, metering and maturity** — flow, quality, cost, governance, C0–C5 (thresholds calibrated from real run/approval data and stored as configuration); metering roll-ups (tenant, department, programme, project, job) and drill-down (run, step, call); billing reconciliation | every metric and every metering level recomputes from rows; the reconciliation with `billing_service` is exact or opens an incident; a C0–C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged |
 | **T12** | **One organisation loop** — the acceptance of V2 | one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area |
@@ -1558,6 +1645,7 @@ and is proposed for acceptance with the rest.
 | **D60** | **AHTAPol and w2v scope** | The conveyor **covers the AHTAPol implementation and the w2v product** (owner, 2026-11-11 — "the conveyor will also cover the AHTAPol implementation"; every tool AHTAPol and w2v use is in the estate): their projects run as conveyor work and their services are estate toolkits. **AHTAPol is its own tenant, industry `health-technology-assessment`; w2v is its own tenant, industry `media`** — neither sits under `nonagentic`. The first engineering tenant remains `nonagentic`/software (owner, 2026-11-11) |
 | **D61** | **Executor seam; external runtime deferred** | The conveyor keeps **one runtime**: `procedure` and `internal_agent` are two implementations of one internal `Executor` contract, and `executor_kind` is an extensible enum rather than a branch through the run path. **An external runtime is an explicit non-goal** until four conditions hold: a generic work-packet ingress returning per-step evidence the conveyor can verify (not outcome-level); governance at the boundary (a produce-only runtime, the conveyor ships); separate owners and roadmaps; and it beats the internal agent on the conveyor's own benchmark. D33/D44 stand — the agent platform is a front end, not a runtime — and D46's two live kinds stand. The product boundary is `/mcp`; only stateless infrastructure is shared (inference-router, strata, MinIO, tool backends). The seam preserves the option at near-zero cost (proposed 2026-11-11, from the independent runtime review) |
 | **D62** | **Programme definition and benefits realization (MSP)** | V2 adopts MSP's programme lifecycle as rows and gates. The **mandate, programme brief, blueprint, business case, refined vision and governance strategies** are `governed_asset` kinds on the programme-definition project. `benefit_profile` is the mandatory measurement record behind `project_register_item(kind='benefit')`; `benefit_link` carries the benefits map (output → capability → operational outcome → benefit → objective); `programme_tranche` carries the management/review unit, and its review is an approval with the baselines, benefit status and risk register as evidence; `benefit_transition` carries the baseline measurement, transition, post-transition measurement and legacy retirement. A benefit without baseline, target, method and owner is refused; a project does not start before the first tranche is authorised; the programme closes only with a realization plan naming post-closure measurement. The SRO, BCM, sponsoring group and programme board are positions with authority rows, not code paths (proposed 2026-11-16, from the programme-architecture and benefits-realization review) |
+| **D63** | **TOGAF ADM as an artefact-typed architecture capability** | The ADM is a capability before it is a project. The **Preliminary phase** establishes the architecture principles, the tailored `adm_profile`, the artefact standard and repository, the Architecture Board (`governance_body` with a charter and decision limits), governance and contracts, and the maturity and skills baseline. An `architecture` project walks phases A–H as WBS nodes; each phase's mandatory artefact set comes from the standard filtered by the profile, and each phase closes on an approved `architecture_contract` (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work). Every artefact is a typed row — **catalog, matrix or diagram**, with the common metadata, a phase and a plateau (PSA / HLD / SD) — whose entries and artefact-to-artefact links are rows, so the repository answers derivation, realization and reuse. The Requirements Catalog is continuous, with requirements typed `condition \| constraint \| assumption \| delta`. A compliance review records exactly one of the six standard levels, and a deviation is rejected, mitigated or waived with a named accepting owner and a reassessment date. A delivery project cannot pass design without the live contract that governs it; a phase-H review produces exactly one change request or kata candidate. Maturity (nine dimensions, 0–5) and skills (seven categories) are dated assessments, not assertions. No ArchiMate tool and no full conformance are claimed (proposed 2026-11-16, from the TOGAF ADM and architecture-artefact standards review) |
 
 ### 15.2 Open questions at review
 

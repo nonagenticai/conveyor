@@ -97,6 +97,7 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       "tools",
       "constraints",
       "programme",
+      "adm",
     ])
       check(
         (await page.locator(`#sidebar [data-page="${id}"]`).count()) === 0,
@@ -139,6 +140,7 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       "metering",
       "jobtypes",
       "programme",
+      "adm",
     ]) {
       await nav(id, "?design=1");
       check(
@@ -196,6 +198,56 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
     check(
       (await content()).includes("part of the conveyor design study"),
       "the programme destination is a sign-in gate publicly",
+    );
+
+    // 4b. The architecture-capability destination carries the TOGAF ADM layer end to end.
+    await nav("adm", "?design=1");
+    check((await content()).includes("Principles catalog"), "the principles catalog renders");
+    check((await content()).includes("Tailored ADM profile"), "the tailored ADM profile renders");
+    await page.locator('[data-v2="tab"][data-value="ADM phases"]').first().click();
+    check((await content()).includes("Phase rail"), "the ADM phase rail renders");
+    check((await content()).includes("Contracts across the ADM"), "the four contract kinds render");
+    await page.locator('[data-v2="adm-advance"]').first().click();
+    check(
+      (await content()).includes("phase_artifacts_missing"),
+      "a phase with a draft mandatory artefact is refused",
+    );
+    await page.locator('[data-v2="tab"][data-value="Artefact repository"]').first().click();
+    await page.locator('[data-v2="adm-artifact"][data-id="ART-005"]').first().click();
+    check((await content()).includes("Requirements catalog"), "a catalog opens with its entries");
+    check((await content()).includes("REQ-011"), "the catalog's entries are rows");
+    await page.locator('[data-v2="adm-artifact"][data-id="ART-003"]').first().click();
+    check((await content()).includes("Stakeholder map"), "a matrix opens with its axes");
+    await page.locator('[data-v2="adm-approve"]').first().click();
+    check(
+      (await content()).includes("a new version supersedes"),
+      "an approval supersedes the version",
+    );
+    await page.locator('[data-v2="tab"][data-value="Board & compliance"]').first().click();
+    check((await content()).includes("Compliance reviews"), "the compliance register renders");
+    await page.locator('[data-v2="adm-waiver"]').first().click();
+    check(
+      (await content()).includes("waiver_owner_required"),
+      "a waiver without an owner and date is refused",
+    );
+    await page.locator('[data-v2="adm-h-change"]').first().click();
+    check((await content()).includes("Change request recorded"), "phase H records a change");
+    await page.locator('[data-v2="adm-h-kata"]').first().click();
+    check(
+      (await content()).includes("phase_h_outcome_exists"),
+      "phase H records exactly one outcome per review",
+    );
+    for (const width of [1440, 1024, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await nav("adm", "?design=1");
+      check((await page.locator("h1").count()) === 1, `architecture capability renders at ${width}`);
+      check(!(await overflow()), `architecture capability has no page overflow at ${width}`);
+    }
+    await page.setViewportSize({ width: 1440, height: 1060 });
+    await nav("adm");
+    check(
+      (await content()).includes("part of the conveyor design study"),
+      "the architecture capability is a sign-in gate publicly",
     );
 
     // 5. Without a snapshot every public page is honest; the coverage pack is still real.

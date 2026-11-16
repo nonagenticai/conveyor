@@ -316,12 +316,17 @@
       "key": "S09",
       "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
       "description": "Plan: docs/plans/slices/S09-documents-integrations.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S09-documents-integrations.md",
         "track": "v1",
-        "issues": [],
+        "issues": [
+          156,
+          168,
+          183,
+          195
+        ],
         "depends_on": [
           "S03",
           "S04"
@@ -436,7 +441,9 @@
         "track": "v1",
         "issues": [
           7,
-          136
+          136,
+          179,
+          198
         ],
         "depends_on": [
           "S03",
@@ -723,7 +730,7 @@
           "analysis",
           "architecture"
         ],
-        "gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused"
+        "gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused; a benefit profile without baseline, target, method or owner is refused; a benefit-map edge names its five levels"
       }
     },
     {
@@ -882,7 +889,10 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          78
+          78,
+          170,
+          171,
+          172
         ],
         "depends_on": [
           "T2",
@@ -932,7 +942,7 @@
     },
     {
       "key": "T9",
-      "name": "TOGAF profile",
+      "name": "TOGAF ADM capability",
       "description": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)",
       "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
@@ -956,12 +966,12 @@
           "analysis",
           "architecture"
         ],
-        "gate": "an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata"
+        "gate": "an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata"
       }
     },
     {
       "key": "T10",
-      "name": "SAFe cadence",
+      "name": "SAFe cadence and MSP tranches",
       "description": "SPEC_V2 slice T10 (docs/SPEC_V2.md §12)",
       "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
@@ -985,7 +995,7 @@
           "analysis",
           "architecture"
         ],
-        "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons"
+        "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized"
       }
     },
     {
@@ -1056,7 +1066,7 @@
           "analysis",
           "architecture"
         ],
-        "gate": "one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget"
+        "gate": "one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area"
       }
     },
     {
@@ -1284,10 +1294,17 @@
           93,
           95,
           102,
-          137,
-          139,
-          140,
-          144
+          154,
+          160,
+          162,
+          163,
+          164,
+          193,
+          205,
+          212,
+          213,
+          216,
+          219
         ],
         "depends_on": [],
         "plan_status": "active",

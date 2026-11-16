@@ -2,6 +2,7 @@ flowchart LR
   subgraph ARCH["SPEC_V2 architecture"]
     ORG["Organisation spine"]:::v2
     PLAN["Portfolio, programme and plan"]:::v2
+    ADM["Architecture capability (TOGAF ADM)"]:::v2
     RUN["Execution, run and gate"]:::v1
     DEC["Decision ladder"]:::v2
     KM["Knowledge and memory"]:::v1
@@ -22,11 +23,14 @@ flowchart LR
     U8["Operations and Assurance"]:::ui
     U9["Metering and Usage and audit"]:::ui
     U10["Requirements, Principles, Models and Types"]:::ui
+    U11["Architecture capability"]:::ui
   end
   ORG --> U4
   ORG --> U10
   PLAN --> U1
   PLAN --> U2
+  ADM --> U11
+  ADM --> U10
   RUN --> U3
   DEC --> U3
   KM --> U5

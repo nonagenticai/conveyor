@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "24c2558a61ac529d1118ee3c63e49b51251dd0ad85d4ec2ef901e1d533b779e9",
-      "bytes": 155925,
+      "sha256": "9157fb2e2ffe6479c032c6cb86f3aa885c5066ff4abe3f46d9d68fc30b59f2e3",
+      "bytes": 168991,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -114,8 +114,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "30371406a4d5a230c896b8e0600636b2b6cd5ae31b3d7212e0f118f697a4bbdf",
-      "bytes": 13328,
+      "sha256": "1df04253f36c037e83efa7996b46042c516a114fed1a864b1880d7ab04b80884",
+      "bytes": 14090,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -123,8 +123,8 @@
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "9ce9bd04c8cb5e173f27a1301446771621d61b7c2adab733762d24279db5a429",
-      "bytes": 72398,
+      "sha256": "84477d36bee0c98d2330fb9aa6e54b9fa9509cd5e9568d0a569bbbdd4dad8a61",
+      "bytes": 75637,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -384,8 +384,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "70a9e9329c13639e1bbeb991cfabefad46f078bda61dd180608cd9cda2f795c8",
-      "bytes": 249164,
+      "sha256": "6d737abe5ea2f541d48a280250a9f455b974857a0f116510f1577217c92542e4",
+      "bytes": 249323,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -474,9 +474,18 @@
       "path": "docs/plans/P0-programme-definition.html",
       "source": "docs/plans/P0-programme-definition.md",
       "section": "Plans",
-      "sha256": "3ea3bf1645443276ac1e121397dfa1e70880b25d03ac74b6e9c927ab62e4f26b",
-      "bytes": 10440,
+      "sha256": "35dbe94ed6fd578b565a766b8a6b26e810de114719c0b1864d45d21a24cc2f16",
+      "bytes": 12762,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
+    },
+    {
+      "title": "T9 — TOGAF ADM capability",
+      "path": "docs/plans/T9-architecture-capability.html",
+      "source": "docs/plans/T9-architecture-capability.md",
+      "section": "Plans",
+      "sha256": "18ce3eb202ad58902e791c8bd4bbf20eee74a644736f7b1b05ef652974f14287",
+      "bytes": 17061,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {
       "title": "Rust development process: audit and improvement plan",

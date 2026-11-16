@@ -2174,6 +2174,10 @@ window.installV2 = function (api, enterprise) {
     benefit: "BEN-01",
     tranche: 0,
     programmeGate: null,
+    adm: "ART-001",
+    admPhase: "B",
+    admType: "all",
+    admGate: null,
   };
 
   /* ------------------------------------------------------------------ fixtures */
@@ -2445,6 +2449,164 @@ window.installV2 = function (api, enterprise) {
       { benefit: "BEN-03", baselineMeasured: "— · not measured", readiness: "Red · tool ledger not live", transition: "—", post: "—", legacy: "—", owner: "BCM · operations", state: "Blocked · baseline missing" },
       { benefit: "BEN-04", baselineMeasured: "2026-11-20 · 0 h (no dual control)", readiness: "Green", transition: "2026-12-01", post: "weekly", legacy: "single-reviewer approvals", owner: "BCM · delivery", state: "Monitoring" },
     ],
+    /* The TOGAF ADM capability: the Preliminary phase (principles, tailored profile, board,
+       maturity, skills), the phase rail with typed artefacts, the contracts and the compliance
+       and waiver register. Local fixtures — no V2 table or action exists (SPEC_V2 §8.1, D63). */
+    architectureCapability: {
+      key: "ARCH-CB",
+      name: "conveyor buildout architecture capability",
+      principles: [
+        { id: "P-01", statement: "One record per fact", rationale: "A second store is a second truth; the systems of record diverge silently", implications: "No derived status is stored; no shadow table; the read model computes" },
+        { id: "P-02", statement: "Rows and gates, not a document library", rationale: "A document with no lifecycle has no gate and no evidence", implications: "Every artefact carries metadata, an owner, a reviewer and a gate" },
+        { id: "P-03", statement: "Tenant configuration over code", rationale: "Policy values differ per tenant and change without a deploy", implications: "Thresholds, approval kinds and maturity sets are versioned tenant rows" },
+        { id: "P-04", statement: "Reuse before build", rationale: "The repository already holds the building block more often than not", implications: "A solution artefact names the enterprise artefact it reuses or declares the deviation" },
+        { id: "P-05", statement: "The executor cannot approve its own gate", rationale: "A gate that cannot refuse is not a gate", implications: "Requester and executor are refused as approvers; dual control defaults on" },
+        { id: "P-06", statement: "A baseline is measured before it moves", rationale: "A benefit or an architecture with no baseline cannot claim an improvement", implications: "A transition or a re-baseline goes through change control, never through a review" },
+      ],
+      profile: {
+        name: "Tailored ADM profile · software delivery",
+        phases: "Preliminary + A–H",
+        psa: "13 artefact types mandatory at inception",
+        hld: "24 artefact types mandatory by phase C",
+        sd: "18 artefact types mandatory by phase E",
+        contracts: "SAW (A) · delivery contract (F) · statement of intent (completion) · request for architecture (H)",
+        adopted: "2026-11-12 · Architecture Board decision BD-01",
+      },
+      board: {
+        name: "Architecture Board",
+        chair: "CIO",
+        members: "enterprise architects · business-unit leaders · the programme architect",
+        charter: "Support the roadmap, assess proposed changes against it, apply the principles where the roadmap is incomplete, commission solution architectures and submit them to the delivery Design Board",
+        authority: "commission architecture work · approve principles and contracts · accept or reject deviations",
+        limits: "cannot approve a delivery gate it requested · cannot waive a deviation it owns · no budget authority",
+      },
+      maturity: [
+        { dimension: "Architecture process", baseline: 2, stage1: 3, stage2: 4 },
+        { dimension: "Architecture development", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Business linkage", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Senior management involvement", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Operating unit participation", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Architecture communication", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "IT security", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Architecture governance", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "IT investment and acquisition", baseline: 1, stage1: 2, stage2: 3 },
+      ],
+      skills: [
+        { category: "General", role: "programme architect", current: 4, target: 4 },
+        { category: "Business skills and methods", role: "programme architect", current: 3, target: 4 },
+        { category: "Architecture skills", role: "programme architect", current: 3, target: 4 },
+        { category: "Programme and project management", role: "programme manager", current: 4, target: 4 },
+        { category: "General IT knowledge", role: "solution architect", current: 4, target: 4 },
+        { category: "Technical IT skills", role: "solution architect", current: 4, target: 5 },
+        { category: "Legal environment", role: "asset owner", current: 2, target: 3 },
+      ],
+      phases: [
+        { code: "Preliminary", name: "Preliminary", plateau: "psa", required: 5, approved: 5, missing: [], contract: "capability adopted (BD-01)", state: "Closed" },
+        { code: "A", name: "Vision", plateau: "psa", required: 6, approved: 6, missing: [], contract: "SAW-01 v2 · approved", state: "Closed" },
+        { code: "B", name: "Business", plateau: "hld", required: 24, approved: 22, missing: ["ART-011 · Business Footprint Diagram", "ART-019 · Process Flow Diagram"], contract: "BC-01 · draft", state: "In progress" },
+        { code: "C", name: "Information systems", plateau: "hld", required: 18, approved: 0, missing: [], contract: "IS-01 · not requested", state: "Planned" },
+        { code: "D", name: "Technology", plateau: "hld", required: 9, approved: 0, missing: [], contract: "TC-01 · not requested", state: "Planned" },
+        { code: "E", name: "Opportunities & solutions", plateau: "sd", required: 6, approved: 0, missing: [], contract: "SC-01 · not requested", state: "Planned" },
+        { code: "F", name: "Migration planning", plateau: "sd", required: 4, approved: 0, missing: [], contract: "DC-01 · not requested", state: "Planned" },
+        { code: "G", name: "Implementation governance", plateau: "sd", required: 1, approved: 0, missing: [], contract: "per-delivery compliance", state: "Planned" },
+        { code: "H", name: "Change management", plateau: "sd", required: 3, approved: 0, missing: [], contract: "RAW-01 · none", state: "Planned" },
+      ],
+      contracts: [
+        { id: "SAW-01", kind: "Statement of Architecture Work", phase: "A", version: "v2", state: "Approved", owner: "programme architect", reviewer: "architecture forum", body: "assignment, scope, responsibilities, acceptance criteria" },
+        { id: "BC-01", kind: "Business contract", phase: "B", version: "v1", state: "Draft", owner: "domain architect", reviewer: "Architecture Board", body: "business architecture delivered, review method" },
+        { id: "DC-01", kind: "Delivery contract", phase: "F", version: "v1", state: "Not requested", owner: "programme manager", reviewer: "asset owner", body: "delivery commitments and compliance method" },
+        { id: "SI-01", kind: "Statement of intent", phase: "completion", version: "—", state: "Not requested", owner: "asset owner", reviewer: "Architecture Board", body: "intended use, ownership, measures of effectiveness" },
+        { id: "RAW-01", kind: "Request for Architecture Work", phase: "H", version: "—", state: "None", owner: "business sponsor", reviewer: "Design Board", body: "further architecture work with a Lean Canvas" },
+      ],
+      artifacts: [
+        { id: "ART-001", title: "Principles catalog", type: "catalog", phase: "Preliminary", plateau: "psa", state: "Approved", version: "v3", owner: "programme architect", reviewer: "Architecture Board", reviewed: "2026-11-12", document: "document · arch-principles-v3", entries: 6 },
+        { id: "ART-002", title: "Principle derivation diagram", type: "diagram", phase: "Preliminary", plateau: "psa", state: "Approved", version: "v2", owner: "programme architect", reviewer: "Architecture Board", reviewed: "2026-11-12", document: "document · arch-principles-v3#derivation", entries: 2, viewpoint: "ArchiMate 3.1 / Motivation" },
+        { id: "ART-003", title: "Stakeholder map and matrix", type: "matrix", phase: "A", plateau: "psa", state: "Approved", version: "v2", owner: "programme architect", reviewer: "SRO", reviewed: "2026-11-13", document: "document · arch-vision-v2", entries: 6 },
+        { id: "ART-004", title: "Driver / goal / objective catalog", type: "catalog", phase: "A", plateau: "psa", state: "Approved", version: "v1", owner: "programme architect", reviewer: "SRO", reviewed: "2026-11-13", document: "document · arch-vision-v2#motivation", entries: 7 },
+        { id: "ART-005", title: "Requirements catalog", type: "catalog", phase: "A", plateau: "psa", state: "Approved", version: "v4", owner: "requirements lead", reviewer: "Architecture Board", reviewed: "2026-11-13", document: "document · arch-requirements-v4", entries: 41 },
+        { id: "ART-006", title: "Solution concept diagram", type: "diagram", phase: "A", plateau: "psa", state: "Approved", version: "v2", owner: "solution architect", reviewer: "Architecture Board", reviewed: "2026-11-13", document: "document · arch-vision-v2#concept", entries: 3, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-007", title: "Benefits diagram", type: "diagram", phase: "E", plateau: "sd", state: "Draft", version: "v1", owner: "BCM", reviewer: "SRO", reviewed: "—", document: "document · arch-benefits-draft", entries: 4, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-008", title: "Business service / function catalog", type: "catalog", phase: "B", plateau: "hld", state: "Approved", version: "v2", owner: "domain architect", reviewer: "SRO", reviewed: "2026-11-15", document: "document · arch-business-v2", entries: 18 },
+        { id: "ART-009", title: "Process / event / control / product catalog", type: "catalog", phase: "B", plateau: "hld", state: "Approved", version: "v1", owner: "domain architect", reviewer: "SRO", reviewed: "2026-11-15", document: "document · arch-business-v2#process", entries: 26 },
+        { id: "ART-010", title: "Actor / role matrix", type: "matrix", phase: "B", plateau: "hld", state: "Approved", version: "v1", owner: "domain architect", reviewer: "SRO", reviewed: "2026-11-15", document: "document · arch-business-v2#actors", entries: 12 },
+        { id: "ART-011", title: "Business footprint diagram", type: "diagram", phase: "B", plateau: "hld", state: "Draft", version: "v1", owner: "domain architect", reviewer: "SRO", reviewed: "—", document: "document · arch-business-draft", entries: 5, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-012", title: "Data entity / data component catalog", type: "catalog", phase: "C", plateau: "hld", state: "Approved", version: "v2", owner: "data architect", reviewer: "Architecture Board", reviewed: "2026-11-15", document: "document · arch-data-v2", entries: 31 },
+        { id: "ART-013", title: "Application portfolio catalog", type: "catalog", phase: "C", plateau: "hld", state: "Approved", version: "v2", owner: "application architect", reviewer: "Architecture Board", reviewed: "2026-11-15", document: "document · arch-application-v2", entries: 24 },
+        { id: "ART-014", title: "Application / data matrix", type: "matrix", phase: "C", plateau: "hld", state: "Draft", version: "v1", owner: "application architect", reviewer: "Architecture Board", reviewed: "—", document: "document · arch-application-draft", entries: 20 },
+        { id: "ART-015", title: "Technology standards catalog", type: "catalog", phase: "D", plateau: "hld", state: "Approved", version: "v2", owner: "platform architect", reviewer: "Architecture Board", reviewed: "2026-11-15", document: "document · arch-technology-v2", entries: 15 },
+        { id: "ART-016", title: "Application communication diagram", type: "diagram", phase: "C", plateau: "sd", state: "Planned", version: "—", owner: "application architect", reviewer: "Architecture Board", reviewed: "—", document: "—", entries: 0, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-017", title: "Project context diagram", type: "diagram", phase: "E", plateau: "sd", state: "Planned", version: "—", owner: "solution architect", reviewer: "Design Board", reviewed: "—", document: "—", entries: 0, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-018", title: "Technology portfolio catalog", type: "catalog", phase: "D", plateau: "sd", state: "Planned", version: "—", owner: "platform architect", reviewer: "Architecture Board", reviewed: "—", document: "—", entries: 0 },
+        { id: "ART-019", title: "Process flow diagram", type: "diagram", phase: "B", plateau: "hld", state: "Draft", version: "v1", owner: "domain architect", reviewer: "SRO", reviewed: "—", document: "document · arch-business-draft#flow", entries: 7, viewpoint: "ArchiMate 3.1 / Process" },
+      ],
+      artifactEntries: {
+        "ART-003": {
+          caption: "Stakeholder map · power × interest",
+          headers: ["Stakeholder", "Power", "Interest", "Engagement"],
+          rows: [
+            ["Executive leadership", "high", "low", "keep satisfied · mandate and funding"],
+            ["Business unit leaders", "high", "high", "manage closely · operating-practice change"],
+            ["Asset owners", "high", "high", "manage closely · waiver acceptance"],
+            ["IT management", "medium", "high", "manage closely · delivery interface"],
+            ["Project managers", "low", "high", "keep informed · phase inputs"],
+            ["Operations / DevOps", "low", "high", "keep informed · run evidence"],
+          ],
+        },
+        "ART-005": {
+          caption: "Requirements catalog · condition / constraint / assumption / delta",
+          headers: ["UID", "Type", "Requirement", "Category", "Priority", "Source", "Owner"],
+          rows: [
+            ["REQ-011", "condition", "A gate decision names its evidence", "governance", "must", "SRO", "programme board"],
+            ["REQ-012", "constraint", "No second store for any fact", "data", "must", "CIO", "architecture board"],
+            ["REQ-013", "assumption", "The buildout runs on one tenant per industry", "scope", "should", "programme manager", "SRO"],
+            ["REQ-014", "delta", "Phase B artefacts replace the V1 rail map", "business", "could", "domain architect", "SRO"],
+          ],
+        },
+        "ART-010": {
+          caption: "Actor / role matrix",
+          headers: ["Actor", "Role", "Responsibility"],
+          rows: [
+            ["programme manager", "accountable", "owns the tranche plan and the gate route"],
+            ["programme architect", "responsible", "authors the artefacts and the contracts"],
+            ["BCM", "consulted", "owns the benefit profiles and the transitions"],
+            ["SRO", "accountable", "decides the tranche and the design gate"],
+          ],
+        },
+      },
+      artifactLinks: [
+        { from: "ART-001", to: "ART-002", kind: "derivation" },
+        { from: "ART-003", to: "ART-002", kind: "derivation" },
+        { from: "ART-004", to: "ART-002", kind: "derivation" },
+        { from: "ART-002", to: "ART-005", kind: "derivation" },
+        { from: "ART-005", to: "ART-006", kind: "realization" },
+        { from: "ART-004", to: "ART-008", kind: "derivation" },
+        { from: "ART-008", to: "ART-011", kind: "derivation" },
+        { from: "ART-012", to: "ART-014", kind: "dependency" },
+        { from: "ART-013", to: "ART-014", kind: "dependency" },
+        { from: "ART-013", to: "ART-016", kind: "derivation" },
+        { from: "ART-013", to: "ART-017", kind: "reuse" },
+        { from: "ART-015", to: "ART-018", kind: "derivation" },
+        { from: "ART-004", to: "ART-007", kind: "derivation" },
+      ],
+      boardDecisions: [
+        { id: "BD-01", decision: "Adopt the tailored ADM profile", evidence: "profile v1 · phased A–H · contract kinds", state: "Approved" },
+        { id: "BD-02", decision: "Approve principles catalog v3", evidence: "P-01…P-06 with rationale and implications", state: "Approved" },
+        { id: "BD-03", decision: "Commission the T9 solution architecture", evidence: "SAW-01 · scope and acceptance", state: "Approved" },
+        { id: "BD-04", decision: "Accept waiver W-01 for T13", evidence: "asset owner acceptance · review 2027-01-15", state: "Approved" },
+      ],
+      compliance: [
+        { project: "T1 plan spine", contract: "DC-01", level: "Consistent", findings: "two SD artefacts deferred; no deviation from the data model", date: "2026-11-14" },
+        { project: "T9 ADM capability", contract: "SAW-01", level: "Compliant", findings: "phase A artefacts approved; the IS contract is not yet requested", date: "2026-11-15" },
+        { project: "T13 tool platform", contract: "DC-02", level: "Non-conformant", findings: "the tool_call row omits the credential alias", date: "2026-11-15" },
+      ],
+      waivers: [
+        { id: "W-01", project: "T13 tool platform", deviation: "credential alias recorded in the broker log, not the tool_call row", owner: "asset owner · operations", mitigation: "broker-log join until T13b", costRisk: "€0.1m · low", review: "2027-01-15", state: "Active" },
+      ],
+      hOutcomes: [
+        { id: "H-01", finding: "two competing identity contracts in the estate", outcome: "Change request CR-019", state: "Routed to the change gate" },
+        { id: "H-02", finding: "a gate never refused in a full cycle", outcome: "Kata candidate K-014", state: "Routed to the kata lane" },
+      ],
+    },
     changes: [
       { id: "CR-018", title: "Add delegated identity scope", baseline: "B3", impact: "scope +2 deliverables · schedule +9 d · cost +€0.8m · risk medium", rationale: "", state: "Draft" },
       { id: "CR-017", title: "Move portal gate to PI-2026.4", baseline: "B2", impact: "schedule −14 d · cost −€0.2m · risk low", rationale: "Programme board rationale recorded", state: "Approved" },
@@ -3067,7 +3229,7 @@ window.installV2 = function (api, enterprise) {
       <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("programme", "Programme definition", "shield")}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
       <div class="nav-group"><div class="nav-label">ORGANISATION</div>${N("organisation", "Organisation", "layers")}${N("jobs", "Jobs", "board", F.jobs.length)}${N("agents", "Agents", "agent")}${N("toolkits", "Tools", "tools")}${N("types", "Project types", "grid")}</div>
       <div class="nav-group"><div class="nav-label">PROCEDURES &amp; AUTHORING</div>${N("procedures", "Procedures", "flow")}${N("capabilities", "Capabilities", "layers")}${N("authoring", "Authoring", "book")}</div>
-      <div class="nav-group"><div class="nav-label">GOVERN &amp; DESIGN</div>${N("assurance", "Assurance &amp; baselines", "shield")}${N("constraints", "Flow &amp; constraints", "branch")}${N("requirements", "Requirements", "file")}${N("principles", "Principles", "book")}${N("models", "Architecture &amp; UML", "model")}${N("architecture", "System architecture", "model")}${N("documents", "Documents", "file")}</div>
+      <div class="nav-group"><div class="nav-label">GOVERN &amp; DESIGN</div>${N("assurance", "Assurance &amp; baselines", "shield")}${N("constraints", "Flow &amp; constraints", "branch")}${N("requirements", "Requirements", "file")}${N("principles", "Principles", "book")}${N("models", "Architecture &amp; UML", "model")}${N("adm", "Architecture capability", "shield")}${N("architecture", "System architecture", "model")}${N("documents", "Documents", "file")}</div>
       <div class="nav-group"><div class="nav-label">KNOWLEDGE &amp; MEMORY</div>${N("knowledge-design", "Knowledge design", "branch")}${N("knowledge", "Sources &amp; retrieval", "book")}${N("memory", "Memory explorer", "layers")}</div>
       <div class="nav-group"><div class="nav-label">MEASURE &amp; IMPROVE</div>${N("improve", "Improve", "chart")}${N("evals", "Evaluation studio", "shield")}${N("hillclimb", "Hillclimb lab", "branch")}${N("benchmarks", "Benchmark harness", "code")}${N("usage", "Inference &amp; prompt audit", "chart")}${N("metering", "Metering", "chart")}</div>
       <div class="nav-group"><div class="nav-label">OPERATIONS</div>${N("operations", "Operations", "run")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>SPEC_V2 design study</div></div>`;
@@ -3376,6 +3538,204 @@ window.installV2 = function (api, enterprise) {
       `${route("Portfolio", "portfolio", "", "layers")}${route("Plan & WBS", "plan", "", "board")}`,
       "PORTFOLIO & PLAN",
     )}${ribbon("MSP programme definition and benefits realization: programme_tranche, benefit_profile, benefit_link, benefit_transition and the extended governed_asset kinds. Proposed in T1/T10; D62.")}${tabs(["Definition", "Benefits map & profiles", "Tranches & reviews", "Benefits realization"], tab, "programme")}${content}</div>`;
+  }
+
+  /* --------------------------------------- Architecture capability (TOGAF ADM) */
+  // SPEC_V2 §8.1 / D63: the Preliminary capability, the ADM phase rail with typed artefacts, the
+  // artefact repository and the board/compliance register. Local fixtures only — no V2 table or
+  // action exists. The pages map gates every non-public destination, so the public site never
+  // renders this page.
+  function architectureCapabilityPage() {
+    const cap = F.architectureCapability;
+    const tab = v.tab.adm || "Capability";
+    const gate = v.admGate;
+    const art = cap.artifacts.find((a) => a.id === v.adm) || cap.artifacts[0];
+    const phase = cap.phases.find((p) => p.code === v.admPhase) || cap.phases[2];
+    const typeFilter = v.admType || "all";
+    const tone = (state) =>
+      state === "Approved" || state === "Closed"
+        ? "green"
+        : state === "Draft" || state === "In progress"
+          ? "amber"
+          : "";
+    const score = (n) => B(String(n), n >= 4 ? "green" : n >= 2 ? "" : "amber");
+    const missing = phase.missing.length
+      ? phase.missing
+      : phase.approved < phase.required
+        ? [`${phase.required - phase.approved} mandatory artefacts are not yet approved`]
+        : [];
+
+    const capability =
+      `<div class="v2-split"><div>${panel(
+        "Principles catalog · ART-001 v3",
+        `${table(
+          ["ID", "Principle", "Rationale", "Implications"],
+          cap.principles.map((p) => `<tr><td class="mono">${E(p.id)}</td><td><strong>${E(p.statement)}</strong></td><td><small>${E(p.rationale)}</small></td><td><small>${E(p.implications)}</small></td></tr>`),
+        )}${note("The principles catalog is an ordinary artefact: entries are rows, the Architecture Board approves the version, and a change supersedes it.")}`,
+        B("approved · v3", "green"),
+      )}</div><div>${panel(
+        "Tailored ADM profile",
+        `${kv([
+          ["Profile", E(cap.profile.name)],
+          ["Phases", E(cap.profile.phases)],
+          ["PSA set", E(cap.profile.psa)],
+          ["HLD set", E(cap.profile.hld)],
+          ["SD set", E(cap.profile.sd)],
+          ["Contracts", E(cap.profile.contracts)],
+          ["Adopted", E(cap.profile.adopted)],
+        ])}${note("The profile is the tenant's tailoring: which phases run, which artefact types are mandatory per phase and plateau, and which contract closes each phase. The mandatory set grows with the assessed maturity.")}`,
+      )}${panel(
+        "Architecture Board",
+        `${kv([
+          ["Body", E(cap.board.name)],
+          ["Chair", E(cap.board.chair)],
+          ["Membership", E(cap.board.members)],
+          ["Charter", E(cap.board.charter)],
+          ["Commissioning authority", E(cap.board.authority)],
+          ["Decision limits", E(cap.board.limits)],
+        ])}${note("The board is a governance body with authority rows, not a meeting. It cannot approve a delivery gate it requested and cannot waive a deviation it owns.")}`,
+        B("charter · BD-01", "green"),
+      )}</div></div>` +
+      `<div class="v2-split"><div>${panel(
+        "Maturity · nine dimensions",
+        `${table(
+          ["Dimension", "Baseline", "Stage 1", "Stage 2"],
+          cap.maturity.map((m) => `<tr><td>${E(m.dimension)}</td><td>${score(m.baseline)}</td><td>${score(m.stage1)}</td><td>${score(m.stage2)}</td></tr>`),
+        )}${note("Scale 0–5: none, initial, under development, defined, managed, measured. Each stage is a milestone a tranche review holds the capability to; the baseline is dated evidence, not an assertion.")}`,
+      )}</div><div>${panel(
+        "Skills · seven categories",
+        `${table(
+          ["Category", "Role", "Current", "Target"],
+          cap.skills.map((s) => `<tr><td>${E(s.category)}</td><td><small>${E(s.role)}</small></td><td>${score(s.current)}</td><td>${score(s.target)}</td></tr>`),
+        )}${note("The Architecture Skills Framework assesses proficiency per role. The development plan is a Preliminary-phase output, aligned with the maturity stages.")}`,
+      )}</div></div>`;
+
+    const advanceNote =
+      gate === "adm-advance-closed"
+        ? note(`<strong>Phase already closed</strong> · ${E(phase.code)} reached its contract and no further advance is recorded.`, "ok")
+        : gate === "adm-advance-refused"
+          ? note(`<strong>422 phase_artifacts_missing</strong> · ${E(missing.join(" · "))}. ${E(phase.contract)} is not live; the phase stays open and no contract row is written.`, "bad")
+          : gate === "adm-advance-ok"
+            ? note(`<strong>Phase closed</strong> · every mandatory artefact is approved and the contract is live. The next phase is open.`, "ok")
+            : note("A phase closes only when every artefact the profile marks mandatory is approved, the required links resolve and its contract is live. The refusal names the missing artefact, never a generic error.");
+
+    const phases =
+      `<div class="v2-split"><div>${panel(
+        "Phase rail",
+        `${table(
+          ["Phase", "Plateau", "Mandatory", "Approved", "Contract", "State"],
+          cap.phases.map((p) => `<tr data-v2="adm-phase" data-id="${E(p.code)}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="adm-phase" data-id="${E(p.code)}">${E(p.code)}</button></td><td>${E(p.plateau)}</td><td>${p.required}</td><td>${p.approved}</td><td><small>${E(p.contract)}</small></td><td>${B(p.state, tone(p.state))}</td></tr>`),
+        )}${note("Each phase is a WBS node. Its mandatory set comes from the standard filtered by the profile; it closes on an approved contract; a phase cannot be skipped.")}`,
+      )}</div><div>${panel(
+        "Phase · " + phase.code + " " + phase.name,
+        `${kv([
+          ["Plateau", E(phase.plateau)],
+          ["Mandatory artefacts", `${phase.approved} approved of ${phase.required}`],
+          ["Contract", E(phase.contract)],
+          ["State", B(phase.state, tone(phase.state))],
+        ])}${missing.length ? `<h4>Missing mandatory set</h4><ul>${missing.map((m) => `<li>${E(m)}</li>`).join("")}</ul>` : ""}${advanceNote}`,
+        button("Advance the phase", "adm-advance", "", "small", "run"),
+      )}${panel(
+        "Contracts across the ADM",
+        `${table(
+          ["ID", "Contract", "Phase", "Version", "State", "Owner", "Reviewer"],
+          cap.contracts.map((c) => `<tr><td class="mono">${E(c.id)}</td><td><strong>${E(c.kind)}</strong><small>${E(c.body)}</small></td><td>${E(c.phase)}</td><td>${E(c.version)}</td><td>${B(c.state, c.state === "Approved" ? "green" : c.state === "Draft" ? "amber" : "")}</td><td><small>${E(c.owner)}</small></td><td><small>${E(c.reviewer)}</small></td></tr>`),
+        )}${note("The Statement of Architecture Work is distinct from the designs produced under it. A contract change is a new version and re-opens its gate; the approved body is immutable.")}`,
+      )}</div></div>`;
+
+    const entries =
+      cap.artifactEntries[art.id] ||
+      (art.id === "ART-001"
+        ? {
+            caption: "Principles catalog entries · statement, rationale, implications",
+            headers: ["ID", "Statement", "Rationale", "Implications"],
+            rows: cap.principles.map((p) => [p.id, p.statement, p.rationale, p.implications]),
+          }
+        : null);
+    const links = cap.artifactLinks.filter((l) => l.from === art.id || l.to === art.id);
+    const entryBlock = entries
+      ? `${table(
+          entries.headers,
+          entries.rows.map((r) => `<tr>${r.map((cell) => `<td>${E(cell)}</td>`).join("")}</tr>`),
+        )}${note(E(entries.caption))}`
+      : art.type === "diagram"
+        ? `${kv([
+            ["Viewpoint", E(art.viewpoint)],
+            ["Metamodel", "ArchiMate 3.1"],
+            ["Document", E(art.document)],
+          ])}${note("A diagram is a document with typed metadata and a viewpoint, not a live metamodel. The row carries the metadata; the pixels live in the document.")}`
+        : note("No entries are recorded on this artefact yet.");
+    const artifacts =
+      `<div class="toolbar"><span class="mono muted">TYPE</span>${["all", "catalog", "matrix", "diagram"].map((t) => `<button class="btn ${typeFilter === t ? "selected" : ""}" data-v2="adm-type" data-id="${t}">${E(t)}</button>`).join("")}</div>` +
+      `<div class="v2-split"><div>${panel(
+        "Artefact repository",
+        `${table(
+          ["ID", "Artefact", "Type", "Phase", "Plateau", "State", "Version", "Owner"],
+          cap.artifacts
+            .filter((a) => typeFilter === "all" || a.type === typeFilter)
+            .map((a) => `<tr data-v2="adm-artifact" data-id="${a.id}" style="cursor:pointer" class="${a.id === art.id ? "selected" : ""}"><td><button type="button" class="btn small" data-v2="adm-artifact" data-id="${a.id}">${E(a.id)}</button></td><td><strong>${E(a.title)}</strong></td><td>${B(a.type, a.type === "catalog" ? "purple" : a.type === "matrix" ? "" : "amber")}</td><td><small>${E(a.phase)}</small></td><td>${E(a.plateau)}</td><td>${B(a.state, tone(a.state))}</td><td>${E(a.version)}</td><td><small>${E(a.owner)}</small></td></tr>`),
+        )}${note("A catalog is queried, a matrix is joined, a diagram is a document with a viewpoint. The repository answers what an artefact derives from, realizes and reuses.")}`,
+        B(`${cap.artifacts.length} artefacts`),
+      )}</div><div>${panel(
+        "Artefact · " + art.id,
+        `${kv([
+          ["Title", E(art.title)],
+          ["Type", B(art.type, art.type === "catalog" ? "purple" : art.type === "matrix" ? "" : "amber")],
+          ["Phase", E(art.phase)],
+          ["Plateau", E(art.plateau)],
+          ["Status", B(art.state, tone(art.state))],
+          ["Version", E(art.version)],
+          ["Author", E(art.owner)],
+          ["Reviewer", E(art.reviewer)],
+          ["Review date", E(art.reviewed)],
+          ["Document", E(art.document)],
+          ["Entries", E(art.entries)],
+        ])}${gate === "adm-artifact-approved" ? note(`<strong>Approved</strong> · a new version supersedes ${E(art.version)}; the approved body is unchanged and the phase gate re-opens.`, "ok") : ""}${entryBlock}`,
+        button("Approve a new version", "adm-approve", "", "small", "shield"),
+      )}${panel(
+        "Links · derivation, realization, reuse, dependency",
+        `${links.length ? table(["Kind", "Direction", "Other artefact"], links.map((l) => `<tr><td class="mono">${E(l.kind)}</td><td>${l.from === art.id ? "out" : "in"}</td><td><strong>${E(l.from === art.id ? l.to : l.from)}</strong></td></tr>`)) : note("No links are recorded on this artefact.")}`,
+      )}</div></div>`;
+
+    const board =
+      `<div class="v2-split"><div>${panel(
+        "Architecture Board decisions",
+        `${table(
+          ["ID", "Decision", "Evidence", "State"],
+          cap.boardDecisions.map((d) => `<tr><td class="mono">${E(d.id)}</td><td><strong>${E(d.decision)}</strong></td><td><small>${E(d.evidence)}</small></td><td>${B(d.state, "green")}</td></tr>`),
+        )}${note("The board supports the roadmap, assesses changes against it, applies the principles and commissions solution architectures. Its decision limits are rows, not convention.")}`,
+      )}${panel(
+        "Phase H outcomes · exactly one per review",
+        `${table(
+          ["Review", "Finding", "Outcome", "State"],
+          cap.hOutcomes.map((h) => `<tr><td class="mono">${E(h.id)}</td><td>${E(h.finding)}</td><td><strong>${E(h.outcome)}</strong></td><td><small>${E(h.state)}</small></td></tr>`),
+        )}${gate === "adm-h-change" ? note("<strong>Change request recorded</strong> · CR-020 with its impact block is routed to the change gate; the project baseline is unchanged until that gate is approved.", "ok") : gate === "adm-h-kata" ? note("<strong>Kata candidate recorded</strong> · K-015 is routed to the kata lane and no change register row is written.", "ok") : gate === "adm-h-refused" ? note("<strong>422 phase_h_outcome_exists</strong> · this review already recorded a change request. A review has exactly one outcome.", "bad") : note("A change review records exactly one outcome: a change request with impact, or a kata candidate. A review with no verdict cannot close phase H. A Request for Architecture Work opens further architecture work.")}`,
+        `${button("Record a change", "adm-h-change", "", "small", "shield")}${button("Record a kata", "adm-h-kata", "", "small", "chart")}`,
+      )}</div><div>${panel(
+        "Compliance reviews · six levels",
+        `${table(
+          ["Project", "Contract", "Level", "Findings", "Date"],
+          cap.compliance.map((c) => `<tr><td><strong>${E(c.project)}</strong></td><td class="mono">${E(c.contract)}</td><td>${B(c.level, c.level === "Non-conformant" ? "bad" : c.level === "Compliant" || c.level === "Fully conformant" ? "green" : "amber")}</td><td><small>${E(c.findings)}</small></td><td>${E(c.date)}</td></tr>`),
+        )}${gate === "adm-review-recorded" ? note("<strong>Review recorded · Consistent</strong> · one level per review; the findings are the evidence the delivery project carries.", "ok") : gate === "adm-review-refused" ? note("<strong>422 compliance_level_exists</strong> · a review records exactly one of the six levels; a second is refused.", "bad") : note("The levels describe different relationships, not a maturity ladder: irrelevant, consistent, compliant, conformant, fully conformant, non-conformant.")}`,
+        `${button("Record a review", "adm-review", "", "small", "check")}${button("Record a second level", "adm-review-second", "", "small", "replay")}`,
+      )}${panel(
+        "Waivers",
+        `${table(
+          ["ID", "Project", "Deviation", "Accepting owner", "Mitigation", "Cost / risk", "Review", "State"],
+          cap.waivers.map((w) => `<tr><td class="mono">${E(w.id)}</td><td>${E(w.project)}</td><td><small>${E(w.deviation)}</small></td><td>${E(w.owner)}</td><td><small>${E(w.mitigation)}</small></td><td>${E(w.costRisk)}</td><td>${E(w.review)}</td><td>${B(w.state, "amber")}</td></tr>`),
+        )}${gate === "adm-waiver-refused" ? note("<strong>422 waiver_owner_required</strong> · a waiver without an accepting asset owner and a reassessment date is refused; the deviation stays non-conformant.", "bad") : gate === "adm-waiver-ok" ? note("<strong>Waiver W-02 recorded</strong> · accepting owner asset owner · operations; reassessment 2027-02-12.", "ok") : note("A deviation is rejected, mitigated, or accepted for a defined period. The asset owner accepts the risk — outages, maintenance and additional cost.")}`,
+        `${button("Record a waiver", "adm-waiver", "", "small", "shield")}${button("Record with owner + date", "adm-waiver-ok", "", "small", "check")}`,
+      )}</div></div>`;
+
+    const content =
+      tab === "Capability" ? capability : tab === "ADM phases" ? phases : tab === "Artefact repository" ? artifacts : board;
+
+    return `<div class="page enterprise">${heading(
+      "Architecture capability",
+      "The TOGAF ADM as a capability and a project: principles, the tailored profile, the typed artefact repository, the phase contracts, the board, compliance and waivers — SPEC_V2 §8.1.",
+      `${route("Programme definition", "programme", "", "shield")}${route("System architecture", "architecture", "", "model")}`,
+      "GOVERN & DESIGN",
+    )}${ribbon("TOGAF ADM capability: architecture_artifact (catalog | matrix | diagram), artifact_type, adm_profile, architecture_contract, architecture_compliance_review, architecture_waiver, governance_body, architecture_maturity, architecture_skill_assessment. Proposed in T9; D63.")}${tabs(["Capability", "ADM phases", "Artefact repository", "Board & compliance"], tab, "adm")}${content}</div>`;
   }
 
   /* -------------------------------------------------------------- Validation */
@@ -4175,6 +4535,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
   const pages = {
     portfolio,
     programme: programmeDefinitionPage,
+    adm: architectureCapabilityPage,
     plan,
     validation,
     projects: projectsPage,
@@ -4227,6 +4588,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
   const titles = {
     portfolio: "Portfolio",
     programme: "Programme definition",
+    adm: "Architecture capability",
     plan: "Plan & WBS",
     validation: "Validation",
     projects: "Projects",
@@ -4461,6 +4823,78 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
       case "tab":
         v.tab[d.key] = d.value;
         render();
+        break;
+      case "adm-type":
+        v.admType = d.id;
+        render();
+        break;
+      case "adm-artifact":
+        v.adm = d.id;
+        v.admGate = null;
+        render();
+        break;
+      case "adm-phase":
+        v.admPhase = d.id;
+        v.admGate = null;
+        render();
+        break;
+      case "adm-advance": {
+        const ph = F.architectureCapability.phases.find((p) => p.code === v.admPhase);
+        const blocked = ph && (ph.missing.length || ph.approved < ph.required);
+        v.admGate = !ph
+          ? null
+          : ph.state === "Closed"
+            ? "adm-advance-closed"
+            : blocked
+              ? "adm-advance-refused"
+              : "adm-advance-ok";
+        render();
+        toast(
+          v.admGate === "adm-advance-refused"
+            ? "422 phase_artifacts_missing · the phase stays open"
+            : v.admGate === "adm-advance-closed"
+              ? "Phase already closed · no further advance"
+              : "Phase closed · the next phase is open",
+        );
+        break;
+      }
+      case "adm-approve":
+        v.admGate = "adm-artifact-approved";
+        render();
+        toast("Artefact approved · a new version supersedes the old; the phase gate re-opens");
+        break;
+      case "adm-review":
+        v.admGate = "adm-review-recorded";
+        render();
+        toast("Compliance review recorded · Consistent");
+        break;
+      case "adm-review-second":
+        v.admGate = "adm-review-refused";
+        render();
+        toast("422 compliance_level_exists · one level per review");
+        break;
+      case "adm-waiver":
+        v.admGate = "adm-waiver-refused";
+        render();
+        toast("422 waiver_owner_required · name the accepting owner and the review date");
+        break;
+      case "adm-waiver-ok":
+        v.admGate = "adm-waiver-ok";
+        render();
+        toast("Waiver W-02 recorded · reassessment 2027-02-12");
+        break;
+      case "adm-h-change":
+      case "adm-h-kata":
+        v.admGate =
+          v.admGate === "adm-h-change" || v.admGate === "adm-h-kata" ? "adm-h-refused" : d.v2;
+        render();
+        toast(
+          v.admGate === "adm-h-refused"
+            ? "422 phase_h_outcome_exists · exactly one outcome per review"
+            : v.admGate === "adm-h-change"
+              ? "Change request recorded · routed to the change gate"
+              : "Kata candidate recorded · routed to the kata lane",
+        );
         break;
       case "programme":
         v.programme = d.id;

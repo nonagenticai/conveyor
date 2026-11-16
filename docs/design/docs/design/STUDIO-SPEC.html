@@ -349,12 +349,12 @@
 <h2 id="executable-rigour--togaf-safe-pmp-msp">Executable rigour — TOGAF, SAFe, PMP, MSP</h2>
 <p>The rigour is rows and gates, not a document library.</p>
 <ul>
-<li><strong>TOGAF ADM as an architecture project type:</strong> phases A–H as WBS nodes, each with required artefacts and a contract gate; requirements management is continuous, linked by <code>trace_link</code>.</li>
+<li><strong>TOGAF ADM as an architecture capability:</strong> the Preliminary phase establishes the principles, the tailored profile, the artefact standard and repository, the Architecture Board, governance and the maturity/skills baseline; phases A–H are WBS nodes, each with its mandatory typed artefacts and a contract gate; requirements management is continuous, linked by <code>trace_link</code>. Artefacts are catalogs, matrices or diagrams with common metadata, entries and derivation/realization/reuse links; a compliance review records one of six levels and a waiver names its accepting owner and review date.</li>
 <li><strong>SAFe as the programme cadence:</strong> portfolio (computed), programme/ART with shared config and a dependency graph, PI planning, backlog refinement, system demo (no demo, no credit), inspect &amp; adapt, lean governance at value boundaries.</li>
 <li><strong>MSP as the programme definition and benefit track:</strong> mandate, programme brief, blueprint, business case, benefit profiles and benefits map, projects dossier, tranche reviews, stakeholder profiles, transition and measured realization. A benefit is a measurable improvement with a baseline, a target, a method and an owner; a capability is not a benefit.</li>
 <li><strong>PMP artefacts as typed rows:</strong> charter (<code>governed_asset</code>), WBS (<code>wbs_node</code>), baseline (<code>project_baseline</code>), the one six-kind register, change control with impact analysis, closure.</li>
-<li><strong>The trace chain:</strong> requirement/principle/ADR → architecture contract → charter → WBS deliverable → work package → run → step → artefact/evidence → acceptance → closure, and its programme end: capability → operational outcome → benefit → strategic objective.</li>
-<li><strong>What is not claimed:</strong> no TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP certification, no full ADM conformance, no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is that the artefacts and gates the organisation uses are rows, the process runs, and the evidence is traceable.</li>
+<li><strong>The trace chain:</strong> stakeholder/driver → goal → principle/requirement/ADR → architecture artefact → architecture contract → charter → WBS deliverable → work package → run → step → artefact/evidence → acceptance → closure, and its programme end: capability → operational outcome → benefit → strategic objective.</li>
+<li><strong>What is not claimed:</strong> no TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP certification, no full ADM conformance, no ArchiMate editor, no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is that the artefacts and gates the organisation uses are rows, the process runs, and the evidence is traceable.</li>
 </ul>
 <p>The earlier <strong>TOC study</strong> remains in the studio as an optional constraint-reasoning view. It is not part of SPEC_V2's method: V2's method is SAFe/PMP/TOGAF/MSP plus the coach's closed triage and remedy sets. The TOC bars, float and buffer figures are illustrative; no scheduling solver runs.</p>
 <h2 id="programme-definition-and-benefits-realization--the-msp-layer">Programme definition and benefits realization — the MSP layer</h2>
@@ -395,6 +395,43 @@
 <p>All values are local fixtures. No V2 table or action is called; the page is a labelled preview.</p>
 <h3 id="roles-in-the-mock">Roles in the mock</h3>
 <p>The programme roles are ordinary jobs, consistent with the organisation model: the sponsoring group, SRO, programme board, programme office, programme manager, programme architect, BCM, PMO lead and quality manager. The definition and benefit tabs name the producer, reviewer and approver by role, never by person; the person appears only in the approval record.</p>
+<h2 id="architecture-capability--the-togaf-adm-layer">Architecture capability — the TOGAF ADM layer</h2>
+<p>New destination: <strong>Architecture capability</strong> (<code>adm</code>), a design-study page with four tabs, also sign-in gated on the public site. It is the surface for SPEC_V2 §8.1: the capability first, the project second.</p>
+<table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>Surfaces</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Capability</strong></td>
+<td>the architecture principles catalog (statement, rationale, implications); the tailored ADM profile (phase set, PSA/HLD/SD mandatory sets, contract kinds); the Architecture Board (chair, membership, charter, commissioning authority, decision limits); the maturity assessment over nine dimensions on 0–5; the Skills Framework assessment over seven categories per role.</td>
+</tr>
+<tr>
+<td><strong>ADM phases</strong></td>
+<td>the phase rail Preliminary and A–H with each phase's mandatory/approved counts, plateau, contract and state; the selected phase's missing mandatory set; the four contract kinds (SAW, delivery contract, statement of intent, Request for Architecture Work) with their producer, reviewer and state.</td>
+</tr>
+<tr>
+<td><strong>Artefact repository</strong></td>
+<td>the typed artefacts (catalog, matrix, diagram) filtered by type; each artefact's common metadata; a catalog's entries as rows, a matrix's axes, a diagram's viewpoint and document; and its derivation/realization/reuse/dependency links.</td>
+</tr>
+<tr>
+<td><strong>Board &amp; compliance</strong></td>
+<td>the board's decisions; the per-delivery compliance reviews with one of the six levels; the waiver register with the accepting owner, mitigation, cost/risk and reassessment date; and the Phase H reviews, each with exactly one outcome — a change request or a kata candidate.</td>
+</tr>
+</tbody>
+</table>
+<p>The mock demonstrates the refusals the model depends on:</p>
+<ul>
+<li><strong>A phase cannot close on a draft.</strong> Advancing phase B while the business footprint and process flow diagrams are still draft returns <code>422 phase_artifacts_missing</code>, names the artefacts and the contract's state, and writes no contract row.</li>
+<li><strong>One compliance level per review.</strong> A second level on the same review is refused; the levels describe different relationships, not a maturity ladder.</li>
+<li><strong>A waiver needs an owner and a date.</strong> Recording a waiver without an accepting asset owner and a reassessment date is refused; the deviation stays non-conformant.</li>
+<li><strong>Phase H records exactly one outcome.</strong> After a change request is recorded, the kata action is refused: a review has one outcome, and a review with none cannot close the phase.</li>
+<li><strong>An approved artefact is immutable.</strong> Approving a new version supersedes the old one and re-opens the phase gate; the approved body does not change.</li>
+</ul>
+<p>All values are local fixtures. No V2 table or action is called; the page is a labelled preview.</p>
 <h2 id="knowledge-and-memory-workbench">Knowledge and memory workbench</h2>
 <p>Knowledge management is not a document library and memory is not a transcript. The workbench lets a tenant <strong>inspect → explain → test → revise → review → release</strong>, and answers four questions for every job, work package and run:</p>
 <ul>
@@ -729,6 +766,12 @@
 <td><strong>Programme definition</strong></td>
 <td><code>programme</code></td>
 <td>Definition, benefits map &amp; profiles, tranches &amp; reviews, benefits realization</td>
+<td><strong>P</strong></td>
+</tr>
+<tr>
+<td><strong>Architecture capability</strong></td>
+<td><code>adm</code></td>
+<td>Capability, ADM phases, artefact repository, board &amp; compliance</td>
 <td><strong>P</strong></td>
 </tr>
 <tr>

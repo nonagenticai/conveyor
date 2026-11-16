@@ -1165,66 +1165,116 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <hr />
 <h2 id="8-executable-rigour--togaf-safe-pmp-msp">8. Executable rigour — TOGAF, SAFe, PMP, MSP</h2>
 <p>The point of this section is that the rigour is <strong>not a document library</strong>. Every artefact below is a row with a lifecycle; every gate is an approval; every claim links to evidence.</p>
-<h3 id="81-togaf-adm-as-an-architecture-project-type">8.1 TOGAF ADM as an architecture project type</h3>
-<p>An <code>architecture</code> project walks the ADM phases as WBS nodes, each with its required artefacts and a contract gate:</p>
+<h3 id="81-togaf-adm-as-an-architecture-capability">8.1 TOGAF ADM as an architecture capability</h3>
+<p>TOGAF's ADM is implemented as a <strong>capability first and a project second</strong>. The Preliminary phase establishes the capability; an <code>architecture</code> project then walks the phases as WBS nodes; and every artefact a phase produces is a typed row with a lifecycle, not a file in a library.</p>
+<p><strong>The capability (Preliminary phase).</strong> Six things are established before architecture work starts:</p>
 <table>
 <thead>
 <tr>
-<th>Phase</th>
-<th>Artefacts (governed assets)</th>
+<th>Capability area</th>
+<th>V2 row</th>
 <th>Gate</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>Architecture principles</td>
+<td><code>architecture_artifact(type='principles_catalog')</code>; each entry <code>{uid, statement, rationale, implications}</code></td>
+<td>the Architecture Board approves the catalogue</td>
+</tr>
+<tr>
+<td>Tailored ADM</td>
+<td><code>adm_profile(phase_set, artifact_requirements, contract_kinds)</code> — which phases, which artefacts are mandatory per phase and plateau, which contract closes each phase</td>
+<td>the board adopts the profile</td>
+</tr>
+<tr>
+<td>Repository and artefact standard</td>
+<td><code>artifact_type</code> catalogue (the standard's types, phase and plateau) + <code>architecture_artifact</code> rows</td>
+<td>the repository is seeded and the standard adopted</td>
+</tr>
+<tr>
+<td>Architecture Board</td>
+<td><code>governance_body(kind='architecture_board')</code> + membership, charter, commissioning authority and decision limits</td>
+<td>the charter is approved and the board convened</td>
+</tr>
+<tr>
+<td>Governance, contracts and waivers</td>
+<td><code>architecture_contract</code> + <code>architecture_waiver</code></td>
+<td>the governance baseline is recorded</td>
+</tr>
+<tr>
+<td>Maturity and skills</td>
+<td><code>architecture_maturity(dimension, score 0–5, stage)</code> + <code>architecture_skill_assessment(role, skill, proficiency)</code></td>
+<td>the baseline is assessed and its development plan approved</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The artefact standard.</strong> <code>architecture_artifact</code> is the parent; <strong>catalog</strong>, <strong>matrix</strong> and <strong>diagram</strong> are its three types, and each inherits the common metadata: title, status, version, author and date, reviewer and review date, the related change initiative or project, the rationale (purpose, stakeholders, scope), and the published document or the architecture contract it sits under. Type-specific metadata: a <strong>catalog</strong> names its unique identifier, item name and description of use or structure; a <strong>matrix</strong> names its axes (usually two); a <strong>diagram</strong> names its building block/metamodel and viewpoint. The entries are rows (<code>architecture_artifact_entry</code>: <code>axis_a</code>, <code>axis_b</code>, <code>value</code>), so a catalogue is queryable and a matrix is joinable — an artefact is metadata plus entries plus a document, never a blob.</p>
+<p>The standard groups artefacts into three <strong>plateaus</strong>: the <strong>Project Start Architecture</strong> (drivers/goals/objectives, principles, stakeholders, requirements, actors/roles, application portfolio, solution concept, benefits), the <strong>High-Level Design</strong> (business service/function, data entity/component, business interaction, application organisation/data, business footprint, functional decomposition, conceptual data, technology standards), and the <strong>Solution Design</strong> (process flows, logical data, interfaces, application communication/migration, technology portfolio, platform decomposition, processing, project context). A project's tailored profile names which plateau its current phase requires. Artefact-to-artefact dependencies are <code>architecture_artifact_link</code> edges (<code>derivation | realization | reuse | dependency</code>), so the repository answers <em>what this artefact derives from, what it realises, and what it reuses</em>.</p>
+<p><strong>The phases.</strong> Each phase is a WBS node; its mandatory artefact set comes from the standard, filtered by the tenant's <code>adm_profile</code>; it closes on an approved <code>architecture_contract</code>; a phase cannot be skipped.</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Mandatory artefacts (from the standard)</th>
+<th>Contract / gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td><strong>Preliminary</strong></td>
-<td>architecture principles, tailored ADM profile</td>
-<td>principles approved</td>
+<td>Principles Catalog; Principle Derivation and Principle Realization diagrams; tailored ADM profile; maturity and skills baseline</td>
+<td>principles approved; capability adopted</td>
 </tr>
 <tr>
 <td><strong>A — Vision</strong></td>
-<td>scope, stakeholders, architecture vision, constraints</td>
-<td>vision contract</td>
+<td>Stakeholder Map and Matrix; Driver/Goal/Objective Catalog; Requirements Catalog; Solution Concept Diagram; <strong>Statement of Architecture Work</strong></td>
+<td>the SAW is approved (vision contract)</td>
 </tr>
 <tr>
 <td><strong>B — Business</strong></td>
-<td>business architecture, capabilities, value streams</td>
+<td>Business Service/Function, Process/Event/Control/Product, Value Stream, Business Capabilities, Value Stream Stages, Contract/Measure catalogs; Business Interaction, Actor/Role, Value Stream/Capability, Strategy/Capability, Capability/Organization matrices; Business Footprint, Business Service/Information, Functional Decomposition, Product Lifecycle, Business Model Canvas, Business Capability Map, Value Stream Map, Goal/Objective/Service, Business Use Case, Process Flow, Event diagrams</td>
 <td>business contract</td>
 </tr>
 <tr>
 <td><strong>C — Information systems</strong></td>
-<td>data + application architecture</td>
-<td>IS contract</td>
+<td>Data Entity/Data Component Catalog; Data Entity/Business Function and Application/Data matrices; Conceptual, Logical and Data Dissemination diagrams; Application Portfolio and Interface catalogs; Application/Organization, Role/Application, Application/Function, Application Interaction matrices; Application Communication, Application Use Case, Process/Application Realization, Application Migration, Software Distribution diagrams</td>
+<td>IS contract (data + application)</td>
 </tr>
 <tr>
 <td><strong>D — Technology</strong></td>
-<td>platform, infrastructure, deployment topology</td>
+<td>Technology Standards and Technology Portfolio catalogs; Application/Technology and System/Technology matrices; Platform Decomposition, Processing, Environments and Locations diagrams</td>
 <td>technology contract</td>
 </tr>
 <tr>
 <td><strong>E — Opportunities &amp; solutions</strong></td>
-<td>gap analysis, candidate solutions, work packages</td>
+<td>gap analysis, candidate solutions, work packages; <strong>Project Context Diagram</strong> (the work package against the affected organisation, functions, services, applications, data and technology); <strong>Benefits Diagram</strong> (goals, outcomes, measurements, sub-benefits, benefits)</td>
 <td>solution contract</td>
 </tr>
 <tr>
 <td><strong>F — Migration planning</strong></td>
-<td>roadmap, increments, dependencies, cost/benefit</td>
+<td>roadmap, increments, dependencies, cost/benefit; the migration and delivery contracts</td>
 <td>migration contract</td>
 </tr>
 <tr>
 <td><strong>G — Implementation governance</strong></td>
-<td>compliance reviews attached to delivery projects</td>
+<td>a per-delivery <strong>compliance review</strong> against the governing contract, its compliance level and its waivers</td>
 <td>per-delivery compliance</td>
 </tr>
 <tr>
 <td><strong>H — Change management</strong></td>
-<td>monitoring, new requests, lessons</td>
-<td>change review → kata/PM</td>
+<td>monitoring, new requests, lessons; exactly one typed outcome — a change request with impact, or a kata candidate; a <strong>Request for Architecture Work</strong> when the architecture no longer meets its purpose</td>
+<td>change review</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Requirements management is continuous</strong>, not a phase: every requirement/principle/ADR is a <code>governed_asset</code> linked by <code>trace_link</code> to the cards, runs and evidence that realise it. A delivery project cannot pass its design gate without the architecture contract that governs it; a contract change is a new version and a new gate.</p>
-<p>Scope note: this is a <strong>lean ADM profile</strong> for software delivery, not a claim of TOGAF certification or full conformance. The phases, artefacts and gates are the ones the organisation will actually use and measure.</p>
+<p><strong>Requirements management is continuous</strong>, not a phase. The <strong>Requirements Catalog</strong> types every requirement as <code>condition | constraint | assumption | delta</code>; every requirement, principle and ADR is a governed asset trace-linked to the artefacts, contracts, cards, runs and evidence that realise it. The chain the standard defines is the trace chain of §8.5: stakeholder and driver → goal → principle → requirement → service → evidence.</p>
+<p><strong>Compliance is a typed review, not a checkbox.</strong> A review records exactly one of the standard's relationships between the project and the architecture specification — <code>irrelevant</code>, <code>consistent</code>, <code>compliant</code>, <code>conformant</code>, <code>fully_conformant</code> or <code>non_conformant</code> — with its findings. A deviation is rejected, mitigated, or accepted for a defined period through a <strong>waiver</strong> naming the accepting asset owner, the reason, the additional cost and risk, and the reassessment date. A waiver without an owner and a review date is refused.</p>
+<p><strong>The contracts are the gate objects.</strong> <code>architecture_contract</code> carries four kinds across the ADM: the <strong>Statement of Architecture Work</strong> (A — assignment, scope, responsibilities, acceptance criteria; distinct from the designs produced under it), the <strong>delivery contract</strong> (after F — delivery commitments and the method for assessing compliance), the <strong>statement of intent / business usage agreement</strong> (at completion — intended use, ownership, measures of effectiveness), and the <strong>Request for Architecture Work</strong> (H — further architecture work, reviewed by the Design Board). A contract change is a new version and re-opens its gate; the approved version's body is immutable.</p>
+<p><strong>Maturity and skills are measured, not asserted.</strong> The <strong>architecture maturity</strong> assessment scores nine dimensions (architecture process; architecture development; business linkage; senior-management involvement; operating-unit participation; architecture communication; IT security; architecture governance; IT investment and acquisition strategy) on 0–5 (none, initial, under development, defined, managed, measured), per stage, with a baseline and milestones. The <strong>Architecture Skills Framework</strong> assesses seven categories (general; business skills and methods; architecture skills; programme/project management; general IT knowledge; technical IT skills; legal environment) at a proficiency level per role. Both are dated rows with evidence; the development plan is a set of milestones a tranche review can hold the capability to.</p>
+<p><strong>The Architecture Board is a position set with authority rows.</strong> It supports the architecture roadmap, assesses proposed changes against it, applies the principles where the roadmap is incomplete, commissions solution architectures, and submits them to the delivery Design Board. Its membership (enterprise architects, the CIO, business-unit leaders), charter, commissioning authority and decision limits are <code>governance_body</code> rows and authority rows, not prose.</p>
+<p>A delivery project cannot pass its design gate without the contract that governs it; the phase-G review is per delivery project, and its compliance level and waivers attach to that delivery's evidence. The conveyor's own buildout runs under this capability: P0 is the Preliminary-phase and programme-definition project, and the delivery slices T1–T17 each sit under the contract that governs them.</p>
+<p>Scope note: this is a <strong>tailored ADM profile</strong> for software delivery, not a claim of TOGAF certification or full conformance. The standard's full catalogue is the reference; the tenant's <code>adm_profile</code> names the mandatory set per phase and plateau, and that set grows with the assessed maturity. The phases, artefacts and gates are the ones the organisation will actually use and measure.</p>
 <h3 id="82-safe-as-the-programme-cadence">8.2 SAFe as the programme cadence</h3>
 <table>
 <thead>
@@ -1459,14 +1509,16 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </table>
 <p>The registers are deliberately one table, not five: the v4 design had separate PM tables and V1 measured RM's <code>pm_*</code> at zero usage. One generic register with a <code>kind</code> CHECK is leaner and still queryable. The benefit profile is the one exception: a register row indexes the benefit, and the profile holds the measurement fields that a generic register must not carry.</p>
 <h3 id="85-the-trace-chain">8.5 The trace chain</h3>
-<pre><code>requirement / principle / ADR (approved)
+<pre><code>stakeholder / driver → goal (approved)
+   → principle / requirement / ADR (approved)
+   → architecture artefact (approved: catalog | matrix | diagram)
    → architecture contract (approved)
    → project charter (approved)
    → WBS deliverable → work package (card) → run → step → artefact / evidence
    → acceptance (approval) → closure</code></pre>
 <p><code>trace_link</code> is V1's existing edge; V2 requires the link at creation time for architecture-governed work. The governance screen answers one question end to end: <em>which requirement does this run prove, and where is the evidence?</em></p>
 <h3 id="86-what-is-not-claimed">8.6 What is not claimed</h3>
-<p>No TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP certification or conformance badge. No full ADM conformance, no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is narrower and testable: <strong>the artefacts and gates the organisation uses are rows, the process runs, the benefit is measured against a baseline, and the evidence is traceable.</strong></p>
+<p>No TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP certification or conformance badge. No full ADM conformance, no ArchiMate modelling tool (a diagram is a document with typed metadata and a viewpoint, not a live metamodel), no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is narrower and testable: <strong>the artefacts and gates the organisation uses are rows, the process runs, the benefit is measured against a baseline, and the evidence is traceable.</strong></p>
 <hr />
 <h2 id="9-self-development-and-operations">9. Self-development and operations</h2>
 <h3 id="91-development-projects--the-conveyor-builds-itself">9.1 Development projects — the conveyor builds itself</h3>
@@ -1540,7 +1592,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>the conveyor broker only (§11.3)</td>
 </tr>
 <tr>
-<td>Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings</td>
+<td>Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, architecture artefacts and contracts, compliance reviews and waivers, maturity and skills assessments, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings</td>
 <td><strong><code>conveyor</code></strong></td>
 <td>humans; the agent front end over <code>/mcp</code></td>
 </tr>
@@ -1722,6 +1774,61 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>programme- or project-scoped; trends over time</td>
 </tr>
 <tr>
+<td><code>architecture_artifact</code></td>
+<td>the typed architecture artefact (§8.1)</td>
+<td>common metadata + <code>type ∈ catalog|matrix|diagram</code>, <code>phase_code</code>, <code>plateau ∈ psa|hld|sd</code>; versioned and superseded, never edited in place once approved</td>
+</tr>
+<tr>
+<td><code>architecture_artifact_entry</code></td>
+<td>a catalog item or a matrix cell</td>
+<td><code>axis_a</code>, <code>axis_b</code>, <code>value</code>; a catalog uses one axis, a matrix two</td>
+</tr>
+<tr>
+<td><code>architecture_artifact_link</code></td>
+<td>artefact-to-artefact edges</td>
+<td><code>derivation | realization | reuse | dependency</code>; the repository's trace</td>
+</tr>
+<tr>
+<td><code>artifact_type</code></td>
+<td>the seeded artefact standard</td>
+<td>type, phase, plateau, mandatory flag; the tenant's profile filters it</td>
+</tr>
+<tr>
+<td><code>adm_profile</code></td>
+<td>the tailored ADM</td>
+<td>phase set, mandatory artefact types per phase and plateau, contract kinds</td>
+</tr>
+<tr>
+<td><code>architecture_contract</code></td>
+<td>SAW, delivery contract, statement of intent, request for architecture work</td>
+<td><code>kind</code>, <code>phase_code</code>, version; a change re-opens its gate; the approved body is immutable</td>
+</tr>
+<tr>
+<td><code>architecture_compliance_review</code></td>
+<td>one typed verdict per delivery project</td>
+<td>the six §8.1 levels, findings and evidence refs</td>
+</tr>
+<tr>
+<td><code>architecture_waiver</code></td>
+<td>a time-boxed accepted deviation</td>
+<td>accepting owner, reason, cost/risk, reassessment date</td>
+</tr>
+<tr>
+<td><code>governance_body</code></td>
+<td>the Architecture Board and other decision forums</td>
+<td>membership, charter, commissioning authority, decision limits</td>
+</tr>
+<tr>
+<td><code>architecture_maturity</code></td>
+<td>the capability assessment</td>
+<td>nine dimensions, score 0–5, stage, date, evidence</td>
+</tr>
+<tr>
+<td><code>architecture_skill_assessment</code></td>
+<td>the Skills Framework assessment</td>
+<td>seven categories, role/<code>job_key</code>, proficiency, date</td>
+</tr>
+<tr>
 <td><code>decision</code></td>
 <td>one L1 decision</td>
 <td>probabilities, confidence, policy, latency, input hash</td>
@@ -1768,7 +1875,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 </tbody>
 </table>
-<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | architecture_contract | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case | refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier</code>; a programme-level asset is attached to the programme-definition project), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and a PKO pin. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
+<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case | refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier</code>; a programme-level asset is attached to the programme-definition project; the architecture contract has its own table so a phase gate never depends on a generic asset row), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and a PKO pin. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
 <h3 id="104-action-families">10.4 Action families</h3>
 <table>
 <thead>
@@ -1785,6 +1892,10 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td>benefits</td>
 <td><code>benefits.list|get|create|update</code>, <code>benefits.link|unlink</code>, <code>benefits.baseline|transition|measure|close</code></td>
+</tr>
+<tr>
+<td>architecture</td>
+<td><code>architecture.artifacts.list|get|create|update|approve|supersede|link</code>, <code>architecture.repository.search</code> (reuse), <code>architecture.contracts.request|approve|supersede</code>, <code>architecture.phases.advance</code>, <code>architecture.reviews.record|waive</code>, <code>architecture.board.decide</code>, <code>architecture.maturity.assess|plan</code>, <code>architecture.skills.assess</code>, <code>architecture.profile.get|tailor</code></td>
 </tr>
 <tr>
 <td>organisation</td>
@@ -1888,6 +1999,10 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><strong>Programme</strong></td>
 <td>mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realized benefits</td>
+</tr>
+<tr>
+<td><strong>Architecture</strong></td>
+<td>Preliminary capability (principles, tailored ADM, board charter, maturity and skills); ADM phases A–H with their artefact sets and contracts; the artefact repository (catalog/matrix/diagram, plateau filter, trace and reuse); compliance reviews and waivers; the Statement of Architecture Work and the Request for Architecture Work</td>
 </tr>
 <tr>
 <td><strong>Plan</strong></td>
@@ -2236,8 +2351,8 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>T9</strong></td>
-<td><strong>TOGAF profile</strong> — architecture project type, phases A–H, contracts, delivery-project compliance</td>
-<td>an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata</td>
+<td><strong>TOGAF ADM capability</strong> — Preliminary phase (principles, tailored ADM, the artefact standard and repository, the Architecture Board, governance, maturity and skills), the architecture project type, phases A–H with typed artefacts and contracts, delivery-project compliance and waivers</td>
+<td>an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata</td>
 </tr>
 <tr>
 <td><strong>T10</strong></td>
@@ -2667,6 +2782,11 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><strong>D62</strong></td>
 <td><strong>Programme definition and benefits realization (MSP)</strong></td>
 <td>V2 adopts MSP's programme lifecycle as rows and gates. The <strong>mandate, programme brief, blueprint, business case, refined vision and governance strategies</strong> are <code>governed_asset</code> kinds on the programme-definition project. <code>benefit_profile</code> is the mandatory measurement record behind <code>project_register_item(kind='benefit')</code>; <code>benefit_link</code> carries the benefits map (output → capability → operational outcome → benefit → objective); <code>programme_tranche</code> carries the management/review unit, and its review is an approval with the baselines, benefit status and risk register as evidence; <code>benefit_transition</code> carries the baseline measurement, transition, post-transition measurement and legacy retirement. A benefit without baseline, target, method and owner is refused; a project does not start before the first tranche is authorised; the programme closes only with a realization plan naming post-closure measurement. The SRO, BCM, sponsoring group and programme board are positions with authority rows, not code paths (proposed 2026-11-16, from the programme-architecture and benefits-realization review)</td>
+</tr>
+<tr>
+<td><strong>D63</strong></td>
+<td><strong>TOGAF ADM as an artefact-typed architecture capability</strong></td>
+<td>The ADM is a capability before it is a project. The <strong>Preliminary phase</strong> establishes the architecture principles, the tailored <code>adm_profile</code>, the artefact standard and repository, the Architecture Board (<code>governance_body</code> with a charter and decision limits), governance and contracts, and the maturity and skills baseline. An <code>architecture</code> project walks phases A–H as WBS nodes; each phase's mandatory artefact set comes from the standard filtered by the profile, and each phase closes on an approved <code>architecture_contract</code> (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work). Every artefact is a typed row — <strong>catalog, matrix or diagram</strong>, with the common metadata, a phase and a plateau (PSA / HLD / SD) — whose entries and artefact-to-artefact links are rows, so the repository answers derivation, realization and reuse. The Requirements Catalog is continuous, with requirements typed <code>condition | constraint | assumption | delta</code>. A compliance review records exactly one of the six standard levels, and a deviation is rejected, mitigated or waived with a named accepting owner and a reassessment date. A delivery project cannot pass design without the live contract that governs it; a phase-H review produces exactly one change request or kata candidate. Maturity (nine dimensions, 0–5) and skills (seven categories) are dated assessments, not assertions. No ArchiMate tool and no full conformance are claimed (proposed 2026-11-16, from the TOGAF ADM and architecture-artefact standards review)</td>
 </tr>
 </tbody>
 </table>

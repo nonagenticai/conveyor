@@ -81,7 +81,18 @@ the claim its transition is measured against.
     crates. For each: reuse candidate, boundary, licence/contract constraint.
 12. **Project briefs** — one per delivery project: outcome, boundaries, dependencies, acceptance,
     capabilities, plan link, reuse sources to analyse, and the two inception units below.
-13. **Architecture / analysis pack** — current-state analysis, options, risks, dependency map.
+13. **Architecture / analysis pack** — current-state analysis, options, risks, dependency map, and
+    the architecture artefacts the blueprint rests on, produced to the architecture artefact
+    standard (SPEC_V2 §8.1).
+14. **Architecture capability baseline (the Preliminary phase)** — the six things an architecture
+    project needs before it starts: the architecture principles catalog (statement, rationale,
+    implications per principle); the tailored ADM profile (which phases run, which artefacts are
+    mandatory per phase and plateau, which contract closes each phase); the artefact standard
+    adopted with its repository and type catalogue; the Architecture Board charter, membership and
+    decision limits; the governance, contract and waiver baseline; and the maturity (nine
+    dimensions, 0–5) and skills (seven categories) baseline with its development milestones. It is
+    the programme's default `adm_profile`; a delivery project's brief says which plateau its own
+    architecture inception must satisfy.
 
 ## 4. The project brief template (mandatory)
 
@@ -105,9 +116,16 @@ already exists (inside the conveyor repo, in the wider estate, and upstream), th
 licence constraints, the build-vs-reuse decision, and the risks. It cites `path:symbol` inside the
 repo; outside, it names the capability, not a private host or URL.
 
-**Architecture** — the project's design: aggregates, tables, actions, modules, integrations, the
-decision record, and acceptance. It must fit the blueprint; a deviation is a decision record, not a
-silent fork.
+**Architecture** — the project's design, produced to the architecture artefact standard (SPEC_V2
+§8.1): the aggregates, tables, actions, modules, integrations, decision record and acceptance, plus
+the artefacts its phase and plateau require — the PSA set at inception (the principles it applies,
+its requirements, stakeholder map, driver/goal/objective and solution concept) and the HLD and SD
+sets as it matures (business services, data entities, application and technology views, process
+and migration diagrams). Every artefact is a typed catalog, matrix or diagram carrying the
+standard's common metadata — owner, reviewer and review date, version, purpose/stakeholders/scope,
+the related project, and its published document or contract — and its links to what it derives
+from, realises or reuses. The project operates under the live `architecture_contract` that governs
+it; it must fit the blueprint, and a deviation is a decision record, not a silent fork.
 
 Both are documents on the project with `meta.category` set. They are published when accepted. A
 project without both published is an inception gap; its build units are not claimed.
@@ -156,13 +174,20 @@ only after the definition set is accepted, and no delivery project starts before
 ## 8. Acceptance
 
 - The definition set is published as documents on P0. The seed's P0 set carries its eight
-  categories today; the benefits, dossier, tranche and realization categories are added by the
-  slice that lands the rows (§12 T1/T10), because an expected output needs a template and a
-  category the document vocabulary accepts.
+  categories today; the benefits, dossier, tranche and realization categories (§12 T1/T10) and the
+  architecture-principles, artefact-standard, ADM-profile and capability-assessment categories
+  (§12 T9) are added by the slice that lands the rows, because an expected output needs a template
+  and a category the document vocabulary accepts.
 - The programme plan lists 48 projects (P0 + 47) with tranches and dependencies.
 - Every benefit has a profile with baseline, target, method and owner, and at least one benefits-map
   path to a strategic objective.
 - Every tranche has entry/exit criteria and a review date; the first tranche is authorised.
-- Every delivery brief carries reuse sources and the two inception units.
+- Every delivery brief carries reuse sources and the two inception units, names the ADM phase and
+  plateau its architecture inception must satisfy, and names the live `architecture_contract` it
+  operates under.
+- The architecture capability baseline (§3.14) is published on P0: principles catalog, tailored ADM
+  profile, artefact-standard adoption, board charter, maturity and skills baseline.
+- Every architecture artefact in the pack carries the standard's common metadata and at least one
+  artefact link; a delivery project whose design gate has no live contract is refused.
 - The Validation page shows P0 at tranche 0 and T1–T17 `blocked_by: [P0]`.
 - `check-coverage` passes; the seed regen is idempotent; this plan is indexed by `build-docs`.

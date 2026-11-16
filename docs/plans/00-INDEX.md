@@ -24,7 +24,9 @@ registered GitHub issues are its units. `seed/programme.json` is the mapping of 
 `scripts/build-programme-seed.py` regenerates it from these plans and `gh issue list`:
 
 - `S00`–`S21` — the V1 slice plans in `slices/` (including the `S06a`–`S06d` variants);
-- `T0`–`T17` — the SPEC_V2 slices (`docs/SPEC_V2.md` §12);
+- `T0`–`T17` — the SPEC_V2 slices (`docs/SPEC_V2.md` §12); the `T9` row's implementation plan is
+  `docs/plans/T9-architecture-capability.md` (the ADM capability, the artefact standard and the
+  phase/contract gates);
 - `P0` — the programme definition (`docs/plans/P0-programme-definition.md`), the first project
   and the gate T1–T17 depend on (issues #120–#122);
 - `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM` — the cross-cutting units.

@@ -331,8 +331,13 @@ exposed to the agent.
 
 The rigour is rows and gates, not a document library.
 
-- **TOGAF ADM as an architecture project type:** phases A–H as WBS nodes, each with required
+- **TOGAF ADM as an architecture capability:** the Preliminary phase establishes the principles,
+  the tailored profile, the artefact standard and repository, the Architecture Board, governance
+  and the maturity/skills baseline; phases A–H are WBS nodes, each with its mandatory typed
   artefacts and a contract gate; requirements management is continuous, linked by `trace_link`.
+  Artefacts are catalogs, matrices or diagrams with common metadata, entries and
+  derivation/realization/reuse links; a compliance review records one of six levels and a waiver
+  names its accepting owner and review date.
 - **SAFe as the programme cadence:** portfolio (computed), programme/ART with shared config and a
   dependency graph, PI planning, backlog refinement, system demo (no demo, no credit), inspect &
   adapt, lean governance at value boundaries.
@@ -342,13 +347,14 @@ The rigour is rows and gates, not a document library.
   baseline, a target, a method and an owner; a capability is not a benefit.
 - **PMP artefacts as typed rows:** charter (`governed_asset`), WBS (`wbs_node`), baseline
   (`project_baseline`), the one six-kind register, change control with impact analysis, closure.
-- **The trace chain:** requirement/principle/ADR → architecture contract → charter → WBS
-  deliverable → work package → run → step → artefact/evidence → acceptance → closure, and its
-  programme end: capability → operational outcome → benefit → strategic objective.
+- **The trace chain:** stakeholder/driver → goal → principle/requirement/ADR → architecture
+  artefact → architecture contract → charter → WBS deliverable → work package → run → step →
+  artefact/evidence → acceptance → closure, and its programme end: capability → operational
+  outcome → benefit → strategic objective.
 - **What is not claimed:** no TOGAF certification, no SAFe compliance badge, no PMP certification,
-  no MSP certification, no full ADM conformance, no portfolio optimiser, no schedule solver, no
-  benefit-forecasting model. The claim is that the artefacts and gates the organisation uses are
-  rows, the process runs, and the evidence is traceable.
+  no MSP certification, no full ADM conformance, no ArchiMate editor, no portfolio optimiser, no
+  schedule solver, no benefit-forecasting model. The claim is that the artefacts and gates the
+  organisation uses are rows, the process runs, and the evidence is traceable.
 
 The earlier **TOC study** remains in the studio as an optional constraint-reasoning view. It is not
 part of SPEC_V2's method: V2's method is SAFe/PMP/TOGAF/MSP plus the coach's closed triage and
@@ -387,6 +393,35 @@ The programme roles are ordinary jobs, consistent with the organisation model: t
 group, SRO, programme board, programme office, programme manager, programme architect, BCM, PMO
 lead and quality manager. The definition and benefit tabs name the producer, reviewer and approver
 by role, never by person; the person appears only in the approval record.
+
+## Architecture capability — the TOGAF ADM layer
+
+New destination: **Architecture capability** (`adm`), a design-study page with four tabs, also
+sign-in gated on the public site. It is the surface for SPEC_V2 §8.1: the capability first, the
+project second.
+
+| Tab | Surfaces |
+|---|---|
+| **Capability** | the architecture principles catalog (statement, rationale, implications); the tailored ADM profile (phase set, PSA/HLD/SD mandatory sets, contract kinds); the Architecture Board (chair, membership, charter, commissioning authority, decision limits); the maturity assessment over nine dimensions on 0–5; the Skills Framework assessment over seven categories per role. |
+| **ADM phases** | the phase rail Preliminary and A–H with each phase's mandatory/approved counts, plateau, contract and state; the selected phase's missing mandatory set; the four contract kinds (SAW, delivery contract, statement of intent, Request for Architecture Work) with their producer, reviewer and state. |
+| **Artefact repository** | the typed artefacts (catalog, matrix, diagram) filtered by type; each artefact's common metadata; a catalog's entries as rows, a matrix's axes, a diagram's viewpoint and document; and its derivation/realization/reuse/dependency links. |
+| **Board & compliance** | the board's decisions; the per-delivery compliance reviews with one of the six levels; the waiver register with the accepting owner, mitigation, cost/risk and reassessment date; and the Phase H reviews, each with exactly one outcome — a change request or a kata candidate. |
+
+The mock demonstrates the refusals the model depends on:
+
+- **A phase cannot close on a draft.** Advancing phase B while the business footprint and process
+  flow diagrams are still draft returns `422 phase_artifacts_missing`, names the artefacts and the
+  contract's state, and writes no contract row.
+- **One compliance level per review.** A second level on the same review is refused; the levels
+  describe different relationships, not a maturity ladder.
+- **A waiver needs an owner and a date.** Recording a waiver without an accepting asset owner and a
+  reassessment date is refused; the deviation stays non-conformant.
+- **Phase H records exactly one outcome.** After a change request is recorded, the kata action is
+  refused: a review has one outcome, and a review with none cannot close the phase.
+- **An approved artefact is immutable.** Approving a new version supersedes the old one and
+  re-opens the phase gate; the approved body does not change.
+
+All values are local fixtures. No V2 table or action is called; the page is a labelled preview.
 
 ## Knowledge and memory workbench
 
@@ -767,6 +802,7 @@ are additive.
 | Today / programme control | `overview` | Delivery map, integrated plan, gate readiness | R |
 | **Portfolio** | `portfolio` | In flight, programmes, shared config & dependencies, backlog & WSJF, cadence & capacity, metering | **P** |
 | **Programme definition** | `programme` | Definition, benefits map & profiles, tranches & reviews, benefits realization | **P** |
+| **Architecture capability** | `adm` | Capability, ADM phases, artefact repository, board & compliance | **P** |
 | Projects | `projects` | live/snapshot programme workspace: project list, board, plan, linked issues, text outputs, public feedback, publish | R (V1 fixture retired; #70 live/snapshot) |
 | **Plan** | `plan` | WBS, baseline vs forecast, registers, change control | **P** |
 | Execution room | `execution` | activity, evidence, context, tools, explain-context manifest | R + P tools / explain context |
