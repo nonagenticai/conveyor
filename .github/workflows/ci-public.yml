@@ -482,6 +482,15 @@ jobs:
           - package: conveyor-licenses
             bin: conveyor-licenses
             image: conveyor-licenses
+          # The two media executor images (ADR 0007 §1–3): one package, two binaries, one image
+          # each. A media image runs one `runner/v1` instruction and exits, so the entrypoint is
+          # the binary itself — no server wrapper, no port.
+          - package: conveyor-media
+            bin: conveyor-media-browser
+            image: conveyor-media-browser
+          - package: conveyor-media
+            bin: conveyor-media-ffmpeg
+            image: conveyor-media-ffmpeg
     env:
       IMG: conveyor-service:ci
       GH_ACTOR: ${{ github.actor }}

@@ -332,7 +332,15 @@
     "workflows.list",
     "workflows.publish",
     "workflows.retire",
-    "workflows.update"
+    "workflows.update",
+    "youtube.client_get",
+    "youtube.client_set",
+    "youtube.connect",
+    "youtube.disconnect",
+    "youtube.privacy",
+    "youtube.retract",
+    "youtube.status",
+    "youtube.upload"
   ],
   "version": 1
 }

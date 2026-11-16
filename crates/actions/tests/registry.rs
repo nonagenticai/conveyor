@@ -64,7 +64,10 @@ use serde_json::{Value, json};
 /// **#139 P3.1 adds 9 internal**: the eight media capability kinds and the `media.capabilities`
 /// probe. 320 → **332** (the three video kinds joined after the first measurement).
 /// **#161 P3 adds 1 internal**: `decks.render`, the deck toolkit. 332 → **333**.
-const EXPECTED: [&str; 333] = [
+/// **#182 slice A adds 5 internal**: the tenant's own YouTube channel —
+/// `youtube.client_set|client_get|connect|status|disconnect`. 333 → **338**.
+/// **#182 slice B adds 3 internal**: `youtube.upload|privacy|retract`. 338 → **341**.
+const EXPECTED: [&str; 341] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -398,6 +401,14 @@ const EXPECTED: [&str; 333] = [
     "workflow_runs.get",
     "workflow_runs.start",
     "workflow_traces.export",
+    "youtube.client_get",
+    "youtube.client_set",
+    "youtube.connect",
+    "youtube.disconnect",
+    "youtube.privacy",
+    "youtube.retract",
+    "youtube.status",
+    "youtube.upload",
 ];
 
 #[test]
@@ -428,8 +439,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // The external count moves exactly once, at step 8 — every other addition is internal.
     // #92 adds `card_types.list` (internal, read): 289 → 290; T0 adds 15 internal actions
     // (the organisation spine): 290 → 305; #139 P3.1 adds the twelve media actions: 305 → 317;
-    // #161 P3 adds `decks.render` (internal, write): 317 → 318.
-    assert_eq!((internal, external), (318, 15));
+    // #161 P3 adds `decks.render` (internal, write): 317 → 318; #182 slice A adds the five
+    // `youtube.*` actions (internal): 318 → 323; slice B adds `youtube.upload|privacy|retract`:
+    // 323 → 326.
+    assert_eq!((internal, external), (326, 15));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

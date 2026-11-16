@@ -23,3 +23,5 @@ pub mod inference;
 pub mod ingest;
 pub mod objects;
 pub mod strata;
+// #182 slice A: Google's OAuth token endpoint, behind `crate::youtube::YouTubeProvider`.
+pub mod youtube;
