@@ -612,7 +612,7 @@ function startServer({ config, state, snapshot }) {
               delete summary.body;
               return summary;
             });
-          json(res, 200, { items, next_cursor: null });
+          json(res, 200, { output: { items, next_cursor: null } });
         });
         return;
       }

@@ -1070,7 +1070,9 @@ window.installV2 = function (api, enterprise) {
     };
     const rows = categories.map((category) => row(category, true));
     if (project.key === "P0") {
-      const delivery = snapshotProjects().filter((row) => row.key !== "P0");
+      const delivery = snapshotProjects().filter(
+        (row) => row.key !== "P0" && list((row.meta || {}).expected_outputs).length > 0,
+      );
       const briefed = new Set(
         list((window.CONVEYOR_OUTPUTS || {}).outputs)
           .filter((doc) => outputCategoryOf(doc) === "project-brief")
@@ -1104,6 +1106,7 @@ window.installV2 = function (api, enterprise) {
   // tranche. The signed-in caller passes every document; the public one passes `outputs.js`.
   function programmeQueue(projects, docs) {
     const rows = projects
+      .filter((project) => list((project.meta || {}).expected_outputs).length > 0)
       .map((project) => {
         const expected = list((project.meta || {}).expected_outputs);
         const closure = list((project.meta || {}).closure_outputs);
@@ -1192,7 +1195,9 @@ window.installV2 = function (api, enterprise) {
     // coverage row, not a document on P0.
     if (project.key === "P0") {
       consoleLoadRegister();
-      const delivery = consoleProjects().filter((row) => row.key !== "P0");
+      const delivery = consoleProjects().filter(
+        (row) => row.key !== "P0" && list((row.meta || {}).expected_outputs).length > 0,
+      );
       const briefed = new Set(
         list(cs.register.items)
           .filter((doc) => outputCategoryOf(doc) === "project-brief" && doc.publishable)

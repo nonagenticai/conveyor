@@ -187,7 +187,10 @@ window.ConveyorConsole = (function () {
       credentials: "same-origin",
       body: JSON.stringify({ input: input == null ? {} : input }),
     });
-    return (await handle(response, path)).json();
+    const body = await (await handle(response, path)).json();
+    // The action route wraps the handler output in `{output}`; the pack's stub returns the bare
+    // output. Unwrap the live envelope and pass a bare body through unchanged.
+    return body && typeof body === "object" && "output" in body ? body.output : body;
   }
 
   async function issues() {
