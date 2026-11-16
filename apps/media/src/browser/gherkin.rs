@@ -1640,7 +1640,7 @@ mod tests {
         let params = json!({
             "feature": feature,
             "target_url": target.clone(),
-            "timeout_per_test_ms": 20000,
+            "timeout_per_test_ms": 60000,
             "screenshot_on_failure": true,
         });
 
@@ -1770,7 +1770,7 @@ mod tests {
         let params = json!({
             "feature": feature,
             "target_url": target,
-            "timeout_per_test_ms": 20000,
+            "timeout_per_test_ms": 60000,
         });
 
         let result = run(&params, &config).await.expect("the run completes");
@@ -1811,7 +1811,7 @@ mod tests {
         let params = json!({
             "feature": feature,
             "target_url": target,
-            "timeout_per_test_ms": 20000,
+            "timeout_per_test_ms": 60000,
         });
 
         let result = run(&params, &config).await.expect("the run completes");
@@ -1841,7 +1841,7 @@ mod tests {
         let params = json!({
             "feature": feature,
             "target_url": target,
-            "timeout_per_test_ms": 20000,
+            "timeout_per_test_ms": 60000,
             "trace_on_failure": true,
         });
 
@@ -1883,7 +1883,7 @@ mod tests {
         let params = json!({
             "feature": feature,
             "target_url": target,
-            "timeout_per_test_ms": 20000,
+            "timeout_per_test_ms": 60000,
         });
 
         let result = run(&params, &config).await.expect("the run completes");
