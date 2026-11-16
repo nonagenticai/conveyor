@@ -18,3 +18,4 @@
 
 pub mod capture;
 pub mod manifest;
+pub mod script;
