@@ -871,7 +871,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 2,
         "numbers": [
           156,
           168,
@@ -879,9 +879,9 @@
           195,
           231
         ],
-        "open": 1,
+        "open": 2,
         "ready": 0,
-        "unknown": 1
+        "unknown": 0
       }
     },
     {
