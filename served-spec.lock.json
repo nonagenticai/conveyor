@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "aa0d55a1f7f5d21e85ede7124d58b0830bd7198bde10f50cf83b6df83d4ba7f7",
+    "GET /api/actions": "74cfe54d2d362fdc7e7b97172e41f49fa4b5589b44876152cc6ec3f8e982bee6",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -163,7 +163,9 @@
     "POST /api/actions/industries.list/invocations": "4f8de95e21e837d0deddd6110da5923df6b52e1c417c7b4521e4363ac4604824",
     "POST /api/actions/inference.chat/invocations": "387748da7c82b351823cbcc31bc52b0e2b70e5656eb809df71b4793d5d4876d9",
     "POST /api/actions/inference_calls.list/invocations": "66b41669ce346d2e2753005b8bb49aa4d7f1379f4081bfae8d902324d343c387",
-    "POST /api/actions/inference_usage.report/invocations": "23301025129479af25b2b2c5f7fcb09cd427441225eee6f5faa14445e4a8b12e",
+    "POST /api/actions/inference_endpoint.get/invocations": "cc77b3117763c2a4cc3f1b3bff2ca02fa4a12ff115f9daf54bd959a4de03e925",
+    "POST /api/actions/inference_endpoint.set/invocations": "33ef7f2012dc6ad95c0885b7d8466de3bb11414748de12d1b2c6359620a418c4",
+    "POST /api/actions/inference_usage.report/invocations": "0cdb705c0410b83be5a6644f49f24ed228ddbe23d46d91e49094e9a64762e2f5",
     "POST /api/actions/invites.create/invocations": "f9d2d501c6b45c56b3dff1d7870c9ea384042f74fb97aee9f178ffac31ed4405",
     "POST /api/actions/invites.list/invocations": "fc1f0ace46fa57310d95bc0976b1dc17828b16936dde0b3e94b109bae31c2a22",
     "POST /api/actions/invites.revoke/invocations": "2239db25e91a24306269dfac3974edfcc3845ec6ddee249bef3544f58a782044",
