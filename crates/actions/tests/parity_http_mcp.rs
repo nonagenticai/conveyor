@@ -4242,6 +4242,76 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             200,
         ),
+        // ── #182 slice A: the tenant's own YouTube channel ────────────────────────────────
+        // `client_set` runs first so both rounds and both transports see a configured client.
+        // No sample can reach Google: `connect` is sampled at the validation boundary, which is
+        // the one input both transports can refuse without a network call, and nothing here has
+        // a stored grant to exchange.
+        expecting(
+            plain(
+                "youtube.client_set",
+                json!({
+                    "client_id": "parity-client.apps.googleusercontent.com",
+                    "client_secret": "parity-client-secret",
+                }),
+                None,
+            ),
+            200,
+        ),
+        {
+            let mut sample = plain("youtube.client_get", json!({}), None);
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
+        // Missing `code` and `redirect_uri`: a schema refusal, never a provider call.
+        expecting(plain("youtube.connect", json!({}), None), 422),
+        {
+            let mut sample = plain("youtube.status", json!({}), None);
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
+        // No grant exists after the refused connect, so both executions answer `{connected:
+        // false}` — which is also the idempotency property, exercised twice in one round.
+        {
+            let mut sample = plain("youtube.disconnect", json!({}), None);
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
+        // ── #182 slice B: publishing ────────────────────────────────────────────────────────
+        // The enqueue is the whole action and it never calls Google. Both rounds name the same
+        // document and metadata, so the second execution joins the live job and answers the SAME
+        // `job_id` as the first — the comparison is over two real executions, not a replay.
+        {
+            let sample = plain(
+                "youtube.upload",
+                json!({
+                    "document_id": "018f3f7c-0000-7000-8000-000000000001",
+                    "title": "a parity upload",
+                    "privacy": "private",
+                }),
+                None,
+            );
+            expecting(sample, 200)
+        },
+        // Both Data API actions are sampled at the validation boundary: the invalid privacy and
+        // the malformed video id are refused before any provider call, so neither transport needs
+        // a network or a stored grant.
+        expecting(
+            plain(
+                "youtube.privacy",
+                json!({"video_id": "dQw4w9WgXcQ", "privacy": "world"}),
+                None,
+            ),
+            422,
+        ),
+        expecting(
+            plain(
+                "youtube.retract",
+                json!({"video_id": "not a video id"}),
+                None,
+            ),
+            422,
+        ),
     ];
 
     for sample in &mut out {
