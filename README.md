@@ -15,7 +15,8 @@ web UI.
 - Decisions: `docs/decisions/`
 
 New here? [`CONTRIBUTING.md`](CONTRIBUTING.md) starts with five-minute paths that do not need Rust,
-and every merged contribution is credited in [`CONTRIBUTORS.md`](CONTRIBUTORS.md).
+and merged contributions are credited in [`CONTRIBUTORS.md`](CONTRIBUTORS.md) unless the contributor
+opts out.
 
 Behaviour changes start from a maintainer-triaged GitHub unit issue. The queue is
 `gh issue list --label unit --state open`; one issue = one branch `issue/<n>-<slug>` = one PR. A
@@ -34,7 +35,7 @@ Report vulnerabilities privately through the repository's Security tab — see
 
 Issues and pull requests are welcome. [`CONTRIBUTING.md`](CONTRIBUTING.md) lists the five-minute
 first steps, the local gate, DCO sign-off, the small-fix path and how maintainers accept a
-contribution; [`CONTRIBUTORS.md`](CONTRIBUTORS.md) records every merged contribution.
+contribution; [`CONTRIBUTORS.md`](CONTRIBUTORS.md) records merged contributions.
 
 ## Licensing
 

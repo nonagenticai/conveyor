@@ -2,8 +2,8 @@
 
 conveyor is licensed under the Apache License 2.0. By submitting a contribution you agree that it
 is licensed under the same terms (Apache-2.0, section 5), so no separate contributor license
-agreement is required. You keep your authorship, and every merged contribution is credited in
-[`CONTRIBUTORS.md`](CONTRIBUTORS.md).
+agreement is required. You keep your authorship, and merged contributions are credited in
+[`CONTRIBUTORS.md`](CONTRIBUTORS.md) unless the contributor opts out.
 
 ## Ways to contribute
 
@@ -34,6 +34,11 @@ a test that asserts behaviour already present — can open a pull request withou
 without a claim. Branch from `main` as `fix/<short-slug>`, describe what and why, and sign off the
 commit.
 
+The small-fix path is for human and external contributors. The repository's own agent sessions keep
+the stricter session contract in [`CLAUDE.md`](CLAUDE.md) — a unit issue and an
+`issue/<n>-<slug>` branch — and their local guard enforces it; that guard is not a requirement for
+your pull request.
+
 Anything that changes behaviour or adds a feature starts from a report or a unit issue. A maintainer
 triages an accepted report into a `unit` issue — the full contract, with the definition of ready,
 acceptance criteria and definition of done — and links the report rather than rewriting it in place.
@@ -42,8 +47,8 @@ acceptance criteria and definition of done — and links the report rather than 
 
 - **Find or open the unit.** The queue is the [good first issues](https://github.com/nonagenticai/conveyor/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
   and [ready units](https://github.com/nonagenticai/conveyor/issues?q=is%3Aissue+is%3Aopen+label%3A%22status%3Aready%22).
-  A unit is ready when it is open, carries `status:ready`, and has no branch, pull request or claim
-  comment. If none fits, open a [unit proposal](https://github.com/nonagenticai/conveyor/issues/new?template=unit.md)
+  A unit is ready when it is open, carries `status:ready`, and its body has no `## Claim` block,
+  live branch, pull request or claim comment. If none fits, open a [unit proposal](https://github.com/nonagenticai/conveyor/issues/new?template=unit.md)
   or a design report and wait for maintainer triage before coding.
 - **Claim it.** With write access, push `issue/<n>-<slug>`; the pushed branch is the lock. Without
   write access, comment your plan on the unit issue; a maintainer applies `status:claimed`, and the
@@ -108,9 +113,9 @@ the report in place.
    `scripts/ci/**`. It runs with your authority.
 3. Check DCO: every commit's `Signed-off-by:` is the author's. Never sign off for someone else and
    never add a sign-off to their commit.
-4. Check that the required checks are green. A docs-only pull request skips the Rust and image
-   jobs; that is expected, not a missing check. The `dco` job is not a required check today — read
-   it.
+4. Check that every check the pull request runs is green, not only the required contexts. A
+   docs-only pull request skips the Rust and image jobs; that is expected. `dco` and `design-pack`
+   are not required contexts, so read them — `design-pack` is what validates a design-pack change.
 5. Merge with `gh pr merge <n> --rebase --delete-branch`. Rebase keeps the contributor's commits
    and authorship; squash only when the contributor asks, and keep their name on the commit. If the
    branch is behind `main`, ask the contributor to update it; never force-push their branch.
