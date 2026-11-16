@@ -62,9 +62,9 @@ Dataset pinned at `SWE-bench/SWE-bench_Verified` @ `78f471bf655a3137b2e8a75af150
 | McNemar pair | `09180535e0cc` (conveyor-oracle-files+failing-test, 24) × `091719199e42` (qwen-oneshot-oracle-files+failing-test, 28) = both 22 · neither 20 · a-only 2 · b-only 6 · discordant 8 · **p = 0.289** |
 | Refusal | `09171352d352` (oracle `files`) × `091719199e42` (`files+test`) = `comparable:false` |
 | Unit vectors | `p = 0.180` (21/20/2/7 ⇒ 9 discordant) and `p = 0.289` (22/20/2/6 ⇒ 8) |
-| Migration | `_sqlx_migrations` row 25 `s17 benchmark` success; the four tables `relrowsecurity AND relforcerowsecurity` = `t` (compose `conveyor_dev`, mini3) |
+| Migration | `_sqlx_migrations` row 25 `s17 benchmark` success; the four tables `relrowsecurity AND relforcerowsecurity` = `t` (compose `conveyor_dev`, the dev box) |
 
-## Gate — run on m1 through `rbuild` (CONTRACT §16; mini3 refuses local cargo)
+## Gate — run on the build host through `rbuild` (CONTRACT §16; the dev box refuses local cargo)
 
 | step | result |
 |---|---|
@@ -73,11 +73,11 @@ Dataset pinned at `SWE-bench/SWE-bench_Verified` @ `78f471bf655a3137b2e8a75af150
 | `rbuild -- test -p conveyor-domain --test benchmark_specgen` | 3/3 (golden 50/50) |
 | `rbuild -- test -p conveyor-actions --test benchmark_parity -- --nocapture` | 2/2 (555/555 rows) |
 | `rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock` | 210 ops, unchanged |
-| seed tool on m1 (clippy, fmt, run + `cmp`) | clean; regenerated artifact byte-identical to the committed one |
+| seed tool on the build host (clippy, fmt, run + `cmp`) | clean; regenerated artifact byte-identical to the committed one |
 | `rbuild -- fmt --all -- --check` | **green (exit 0, no diff)** after improve-01 reformatted `crates/auth/src/jwks.rs` (whitespace-only, its file); `-p conveyor-auth` re-ran green afterwards (37 tests) |
 | RLS + ledger (local psql, compose `conveyor_dev`) | four tables `t`/`t`; migration 25 success |
 
-⚠️ The `psql` probes observe mini3's compose database, **not** the m1 throwaway test cluster the `test`
+⚠️ The `psql` probes observe the dev box's compose database, **not** the the build host throwaway test cluster the `test`
 commands run against; the slice's gate block now says so explicitly. `benchmark_rls` (steps 8–12) will make
 the app-level assertion a Rust test.
 
@@ -100,7 +100,7 @@ Steps 8–12: `store::benchmark`, the eight actions/scopes/registry counts, `app
 
 ## Steps 8–12, session 2 (2026-11-09) — store, sandbox, driver built; action wiring held by peers
 
-Landed and measured (all commands via `rbuild` on m1):
+Landed and measured (all commands via `rbuild` on the build host):
 
 | piece | proof |
 |---|---|
@@ -145,7 +145,7 @@ Landed after the shared-file window opened:
   (`benchmark_fixture`) and a per-round queued run for `benchmark_runs.cancel`. `SANDBOX_NAMESPACE`
   is set in the test so `start` queues rather than answering 503.
 
-Measured (m1/`rbuild`):
+Measured (the build host/`rbuild`):
 
 | check | result |
 |---|---|

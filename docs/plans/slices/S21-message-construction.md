@@ -178,7 +178,7 @@ principal's scopes (an authorisation fact, not context). (3) Memory selection is
 step. (4) Tenant-authored recipes are **not** in this step — they need a CRUD surface (new actions).
 (5) The `plan` projection stays a **later step**, as §6 says.
 
-**Measured (rbuild on m1, 2026-11-09).** `conveyor-domain` prompt **6/6**; `conveyor-store` lib
+**Measured (rbuild on the build host, 2026-11-09).** `conveyor-domain` prompt **6/6**; `conveyor-store` lib
 **37/37** (including `embedded_migrations_are_exactly_the_s0_set`, now through 31) and
 `prompt_catalogue` **4/4**; `conveyor-actions` `prompt_compile` **4/4** and
 `procedure_agent_resolved` **1/1**; `clippy -p conveyor-domain -p conveyor-store -p conveyor-actions
@@ -240,7 +240,7 @@ declaration with the rest of `StepInput`.
 stored. (3) memory selection deferred; its shape is selection → processing → `prompt.memory`.
 (4) tenant-authored recipes remain deferred.
 
-**Measured (rbuild on m1, 2026-11-09).** `conveyor-domain` plan **14/14**; `conveyor-store`
+**Measured (rbuild on the build host, 2026-11-09).** `conveyor-domain` plan **14/14**; `conveyor-store`
 `s11_procedure` **11/11** (including the declared-outputs round-trip) and `s07_schema` **3/3** (the
 ledger through 32); `conveyor-actions` `procedure` **12/12** and `procedure_step` **14/14**
 (including `procedure.plan_invalid`, the declared-output read-back and the expired-gate on_error
@@ -273,7 +273,7 @@ whose index is not a positive integer was silently dropped — now `BadInputRefe
 `FutureInput` also raises the `UnreachableStep` summary; that is the intended shape — every input
 finding carries the step-level summary.
 
-**Measured after the second audit (rbuild on m1, 2026-11-09).** Domain plan **14/14**, actions
+**Measured after the second audit (rbuild on the build host, 2026-11-09).** Domain plan **14/14**, actions
 `procedure` **12/12**.
 
 **Served-spec lock.** Regenerated over the whole tree: **287 → 297 operations**, `--check-lock` exit

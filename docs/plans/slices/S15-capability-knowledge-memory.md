@@ -330,7 +330,7 @@ use it: `capabilities.get` returns `{ready, blocking[]}`, and `procedure_runs.st
 - No new action, scope, event or migration: **266 actions · 40 AGENT_TOOLS** unchanged; the served
   spec's only action drift is `capabilities.get`'s output schema and its 15 s → 30 s budget.
 
-Evidence (measured 2026-11-09, `rbuild` on m1): domain readiness **2/2**; actions `--test capability`
+Evidence (measured 2026-11-09, `rbuild` on the build host): domain readiness **2/2**; actions `--test capability`
 **9/9**, `--test run_capability` **3/3**; api `--test capability_readiness` **3/3** and its live
 missing-pack case (real strata, `--ignored`); `registry` **8/8** at `EXPECTED 266`;
 `parity_http_mcp` **4/4**; clippy clean on every target this lane touches; fmt clean on its files.

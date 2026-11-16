@@ -64,7 +64,7 @@
 </table>
 <p>⚠️ The lock is red because S15's three actions landed without a <code>--write-lock</code>, and <strong>S15 owns that write</strong> (S13 measured 240 actions / 261 ops at their release; expect 243 / 264). This lane adds no route, so it writes no lock — and it must not overwrite S13's regeneration with an older tree, which is why the number here is a measurement and not an edit.</p>
 <p><code>parity_http_mcp</code> is <strong>4/4 green</strong> as re-measured after S13 fixed their two harness bugs (a <code>deterministic</code> sample rebuilding its input from a one-row queue; the andon pair netting to ENGAGED because each prepare set the opposite of its sample). | formatting | clean | <code>cargo fmt -p {actions,server,api} -- --check</code> |</p>
-<h2 id="test-binaries--every-line-run-on-m1-through-rbuild">Test binaries — every line run on m1 through <code>rbuild</code></h2>
+<h2 id="test-binaries--every-line-run-on-the-build-host-through-rbuild">Test binaries — every line run on the build host through <code>rbuild</code></h2>
 <table>
 <thead>
 <tr>
