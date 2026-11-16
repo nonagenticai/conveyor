@@ -474,8 +474,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/P0-programme-definition.html",
       "source": "docs/plans/P0-programme-definition.md",
       "section": "Plans",
-      "sha256": "35dbe94ed6fd578b565a766b8a6b26e810de114719c0b1864d45d21a24cc2f16",
-      "bytes": 12762,
+      "sha256": "c28df1686c1c469dc0ac75b2810b8b1d808a7b12cae1190b83850b4ebaea19fe",
+      "bytes": 12780,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
     },
     {
@@ -483,8 +483,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T9-architecture-capability.html",
       "source": "docs/plans/T9-architecture-capability.md",
       "section": "Plans",
-      "sha256": "040562c0ad23f4528916a3e111f36ae76275f581bbc4ae525d3ae00d89d22968",
-      "bytes": 17039,
+      "sha256": "8fe0b38af1474f11ee0bbc60a059a124ef656b3e04bc60c1369448488b86de2f",
+      "bytes": 17417,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {

@@ -33,7 +33,7 @@ and trace links, so the repository answers what it derives from, realises and re
 buildout itself runs under this capability: P0 is the Preliminary-phase and programme-definition
 project; T1–T17 are the delivery projects the phase-G reviews govern.
 
-## 2. Starting state (measured at `main@5cf3d75`, re-measured at claim)
+## 2. Starting state (measured at `main@48fc44c` on 2026-11-16; re-measured at claim)
 
 | Part | State | Evidence |
 |---|---|---|
@@ -219,9 +219,9 @@ seed's T9 gate and the T9/P0 expected-output categories.
 - Given the console, when the Architecture destination opens, then the four tabs render and each
   interaction changes its recorded state.
   `Verify:` `node docs/design/scripts/check-v2.cjs`
-- Given the seed, when it is regenerated, then T9's gate text is the §12 row's and P0's expected
-  outputs include the architecture categories.
-  `Verify:` `python3 scripts/build-programme-seed.py --check && python3 scripts/check-output-standard.py`
+- Given the seed, when it is regenerated, then T9's gate text is the §12 row's.
+  `Verify:` `python3 scripts/build-programme-seed.py --check`
+  (The architecture expected-output categories are #221's; this unit consumes them once they land.)
 
 ## 6. Data model
 
@@ -252,6 +252,8 @@ categories. The seed is generated (`scripts/build-programme-seed.py`), never han
 |---|---|---|
 | blocked-by | #72 | `seed/programme.json` T9 `meta.depends_on` = `["T1","T3","P0"]`; the phase nodes, the baseline and the register are T1's |
 | blocked-by | #74 | same; the phase contract gates run on the PM's gate routing and closure |
+| blocked-by | #122 | the same `P0` edge at issue level: the architecture capability baseline (P0 §3.14) is the Preliminary input the profile seeds |
+| blocked-by | #121 | the same `P0` edge at issue level: the blueprint (P0 §3.2) is the target architecture the artefacts elaborate. The P0 project and gate (#120) is closed; the definition units are the open blockers |
 | related | #121, #122 | P0's definition set and its architecture capability baseline |
 | related | #216 | the MSP layer this capability sits beside; the design study's programme destination |
 | related | #221 | the output-standard categories and the seed's architecture rows |

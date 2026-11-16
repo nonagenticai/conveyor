@@ -3,7 +3,7 @@ slice: P0
 title: Programme definition — mandate, brief, blueprint, business case, benefits, tranches, governance
 status: planned
 depends_on: []
-spec_sections: ["§1", "§4", "§5", "§8.3", "§12", "MSP"]
+spec_sections: ["§1", "§4", "§5", "§8.1", "§8.3", "§12", "MSP", "TOGAF"]
 adds_tables: []
 adds_actions: []
 adds_events: []
