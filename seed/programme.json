@@ -19,7 +19,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 0
+        "tranche": 0,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -36,7 +39,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 0
+        "tranche": 0,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -57,7 +63,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 1
+        "tranche": 1,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -76,7 +85,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 2
+        "tranche": 2,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -98,7 +110,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 3
+        "tranche": 3,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -118,7 +133,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 4
+        "tranche": 4,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -141,7 +159,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 5
+        "tranche": 5,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -162,7 +183,10 @@
         "plan_status": "superseded",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "archived",
-        "tranche": 6
+        "tranche": 6,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -183,7 +207,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 6
+        "tranche": 6,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -205,7 +232,10 @@
         "plan_status": "built 2026-11-09",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 7
+        "tranche": 7,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -229,7 +259,10 @@
         "plan_status": "built",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 8
+        "tranche": 8,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -249,7 +282,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 4
+        "tranche": 4,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -270,7 +306,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 5
+        "tranche": 5,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -290,7 +329,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 4
+        "tranche": 4,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -312,7 +354,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 6
+        "tranche": 6,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -336,7 +381,10 @@
         "plan_status": "built 2026-11-09 (steps 1–12); amended 2026-11-09 (process/step/SOP split — migration 0033)",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 6
+        "tranche": 6,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -371,7 +419,10 @@
         "plan_status": "built",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 10
+        "tranche": 10,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -384,7 +435,8 @@
         "plan": "docs/plans/slices/S13-n8n-engine.md",
         "track": "v1",
         "issues": [
-          7
+          7,
+          136
         ],
         "depends_on": [
           "S03",
@@ -395,7 +447,10 @@
         "plan_status": "built (2026-11-10; session 2 closed W4/W5/D29, the catalogue E2E and the BYO token path; session 3 closed the step contract, gate/call seed content, the run lifecycle, the judge record, map authoring, the bus replay proof and the install path; the DAG plan is superseded; the engine is retained — owner ruling 2026-11-09)",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 8
+        "tranche": 8,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -420,7 +475,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "partial",
-        "tranche": 11
+        "tranche": 11,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -444,7 +502,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 7
+        "tranche": 7,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -469,7 +530,10 @@
         "plan_status": "built 2026-11-09",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 7
+        "tranche": 7,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -493,7 +557,10 @@
         "plan_status": "built 2026-11-09",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 5
+        "tranche": 5,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -517,7 +584,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 9
+        "tranche": 9,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -546,7 +616,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 8
+        "tranche": 8,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -567,7 +640,10 @@
         "plan_status": "planned",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 9
+        "tranche": 9,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -591,7 +667,10 @@
         "plan_status": "plan written 2026-11-09",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "partial",
-        "tranche": 9
+        "tranche": 9,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -611,6 +690,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
         "tranche": 0,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "a job is created in the conveyor, a release is published, a binding pins its hash, and a run on a retired binding refuses `409 job_binding_stale`; no concept has two stores; a test-only third executor kind registers without editing the run path"
       }
     },
@@ -634,6 +718,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 1,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused"
       }
     },
@@ -657,6 +746,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 2,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card"
       }
     },
@@ -680,6 +774,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 3,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request"
       }
     },
@@ -703,6 +802,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata"
       }
     },
@@ -731,6 +835,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 10,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened"
       }
     },
@@ -755,6 +864,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 11,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "a real feature lands: lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested"
       }
     },
@@ -780,6 +894,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 5,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable"
       }
     },
@@ -803,6 +922,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 11,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine"
       }
     },
@@ -827,6 +951,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata"
       }
     },
@@ -851,6 +980,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons"
       }
     },
@@ -873,6 +1007,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 1,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "every metric and every metering level recomputes from rows; the reconciliation with `billing_service` is exact or opens an incident; a C0–C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged"
       }
     },
@@ -912,6 +1051,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 13,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget"
       }
     },
@@ -935,6 +1079,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 3,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt"
       }
     },
@@ -958,6 +1107,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish"
       }
     },
@@ -982,6 +1136,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 12,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling"
       }
     },
@@ -1006,6 +1165,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a tenant edits a PKO entity and the change is versioned; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds"
       }
     },
@@ -1030,6 +1194,11 @@
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "proposed",
         "tranche": 5,
+        "expected_outputs": [
+          "project-brief",
+          "analysis",
+          "architecture"
+        ],
         "gate": "a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant"
       }
     },
@@ -1049,13 +1218,17 @@
           37,
           89,
           97,
-          103
+          103,
+          149
         ],
         "depends_on": [],
         "plan_status": "active",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 0
+        "tranche": 0,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -1076,7 +1249,17 @@
         "plan_status": "active",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "planned",
-        "tranche": 0
+        "tranche": 0,
+        "expected_outputs": [
+          "vision",
+          "blueprint",
+          "business-case",
+          "programme-plan",
+          "governance",
+          "reuse-map",
+          "brief-template",
+          "architecture-analysis"
+        ]
       }
     },
     {
@@ -1101,15 +1284,19 @@
           93,
           95,
           102,
-          117,
-          118,
-          127
+          137,
+          139,
+          140,
+          144
         ],
         "depends_on": [],
         "plan_status": "active",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "standing",
-        "tranche": 0
+        "tranche": 0,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     },
     {
@@ -1128,7 +1315,10 @@
         "plan_status": "active",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "built",
-        "tranche": 0
+        "tranche": 0,
+        "expected_outputs": [
+          "project-brief"
+        ]
       }
     }
   ]

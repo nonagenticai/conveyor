@@ -46,7 +46,12 @@ const PROJECT = {
   phase_code: null,
   owner_user_id: null,
   repo_url: "https://github.com/nonagenticai/conveyor",
-  meta: { issues: [2, 3], plan: "docs/plans/slices/S02-skeleton.md", track: "v1" },
+  meta: {
+    issues: [2, 3],
+    plan: "docs/plans/slices/S02-skeleton.md",
+    track: "v1",
+    expected_outputs: ["project-brief", "analysis", "architecture"],
+  },
   version: 1,
 };
 
@@ -1028,6 +1033,16 @@ function readBody(req, done) {
       await page.waitForSelector('[data-v2="output-new"][data-project="p-s02"]');
       await page.click('[data-v2="output-new"][data-project="p-s02"]');
       await page.waitForSelector("#output-title");
+      assert.equal(
+        await page.locator("#output-unit").inputValue(),
+        "S02",
+        "compose prefills the project key as the unit",
+      );
+      assert.equal(
+        await page.locator("#output-category").inputValue(),
+        "project-brief",
+        "compose prefills the first expected output that is not yet published",
+      );
       await page.fill("#output-title", "S02 design note");
       await page.fill("#output-body", "# Design note\n\nA decision recorded from the console.");
       await page.fill("#output-unit", "7");
@@ -1046,7 +1061,8 @@ function readBody(req, done) {
       assert.match(workspaceText, /Programme truth/, "the coverage panel renders");
       assert.match(workspaceText, /T1/, "the coverage row's tranche renders");
       assert.match(workspaceText, /7 · analysis/, "the output is grouped by unit and category");
-      assert.match(workspaceText, /1\/2 published/, "one inception output is published");
+      assert.match(workspaceText, /project-brief/, "the project's expected outputs render");
+      assert.match(workspaceText, /1\/3 published/, "one expected output is published");
       await page.click('[data-v2="output-new-template"][data-category="analysis"]');
       await page.waitForSelector("#output-category");
       assert.equal(
@@ -1069,7 +1085,11 @@ function readBody(req, done) {
         "documents.update was sent",
       );
       assert.equal(consoleState.documents[0].publishable, false, "the publish flag crossed the wire");
-      await page.waitForSelector("text=0/2 published");
+      await page.waitForSelector("text=0/3 published");
+      assert.ok(
+        !consoleState.requests.some((row) => /publish\.(start|status)/.test(row.path)),
+        "the console never calls the removed publish.start/publish.status path",
+      );
 
       // ── the cross-project register: unfiltered list, publish, download, delete ───────
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#outputs`);
@@ -1084,6 +1104,15 @@ function readBody(req, done) {
       assert.match(registerText, /S02 · Skeleton/, "the register names the project");
       assert.match(registerText, /7/, "the register shows the unit");
       assert.match(registerText, /analysis/, "the register shows the category");
+      assert.equal(
+        await page.locator('select[data-key="outputsUnit"]').count(),
+        1,
+        "the register has a unit filter",
+      );
+      await page.selectOption('select[data-key="outputsUnit"]', "7");
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("S02 design note"),
+      );
       await page.click('[data-v2="output-publish"][data-id="d-1"]');
       await page.waitForSelector("text=Output marked public");
       await page.waitForSelector('a[href="docs/output-d-1.html"]');
