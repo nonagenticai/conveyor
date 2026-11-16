@@ -62,7 +62,8 @@ gates and outputs (`runs.get`), cancels a live run (`runs.cancel`) and decides a
 (`approvals.decide`). **Portfolio** signed in reads the real programme from the API — projects,
 linked units, loaded boards and `meta.depends_on` edges — never the design fixtures. **Contribute**
 is the public entry point: it lists the `status:ready` units from the issue registry, the four-check
-claim protocol and the feedback/Discussions links; it writes nothing.
+claim protocol, the 5/15–30/30+ first-contribution paths, the small-fix path and the credit links.
+Issue status is a published snapshot to verify on GitHub, and the page writes nothing.
 
 The **Validation** page is the measured programme: every project's status with its evidence, its
 tranche and dependency edges, its units and its gap list; every screen's

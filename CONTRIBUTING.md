@@ -2,16 +2,51 @@
 
 conveyor is licensed under the Apache License 2.0. By submitting a contribution you agree that it
 is licensed under the same terms (Apache-2.0, section 5), so no separate contributor license
-agreement is required.
+agreement is required. You keep your authorship, and every merged contribution is credited in
+[`CONTRIBUTORS.md`](CONTRIBUTORS.md).
+
+## Ways to contribute
+
+You do not need to understand the whole repository, run the programme, or write Rust.
+
+| Time | Contribution | Start here |
+|---|---|---|
+| 5 minutes | Report design friction | Open [Design feedback](https://github.com/nonagenticai/conveyor/issues/new?template=feedback.yml). Name the page, what you expected and what happened; a screenshot is optional. |
+| 15–30 minutes | Review the proposal | Read [`SPEC_V2`](docs/SPEC_V2.md) or the [public design](https://conveyor.nonagentic.ai/design/). Report one unclear term, a missing decision or an assumption that fails in practice. |
+| 30+ minutes | Improve docs or code | Take a [good first issue](https://github.com/nonagenticai/conveyor/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) or a [ready unit](https://github.com/nonagenticai/conveyor/issues?q=is%3Aissue+is%3Aopen+label%3A%22status%3Aready%22); for a small fix, open the pull request directly. |
+
+Feedback is useful even when it disagrees with the design. Explain the scenario you have in mind; a
+maintainer can turn an accepted report into a scoped unit of work.
+
+**AI assistants are welcome.** Use one to read the repository, explain a unit or draft a change.
+You remain the author: review the diff, run the checks and sign off your own commits.
+
+## What is live, and what is proposed?
+
+V1 is the live application and its build record. V2 is specified in [`SPEC_V2`](docs/SPEC_V2.md);
+the public design marks what is live and what is still proposed. Design feedback is most useful
+before implementation starts, while a decision is still cheap.
+
+## Small fixes go straight to a pull request
+
+A change that does not alter behaviour — a typo, a broken link, a comment, a docs clarification, or
+a test that asserts behaviour already present — can open a pull request without a unit issue and
+without a claim. Branch from `main` as `fix/<short-slug>`, describe what and why, and sign off the
+commit.
+
+Anything that changes behaviour or adds a feature starts from a report or a unit issue. A maintainer
+triages an accepted report into a `unit` issue — the full contract, with the definition of ready,
+acceptance criteria and definition of done — and links the report rather than rewriting it in place.
 
 ## Before you write code
 
-- **Open an issue first.** A bug or a feature idea starts as a report (Bug report, Feature request
-  or Design feedback). A maintainer triages an accepted report into a `unit` issue — the full
-  contract, with the definition of ready, acceptance criteria and definition of done. The report is
-  linked from the unit and never rewritten in place.
+- **Find or open the unit.** The queue is the [good first issues](https://github.com/nonagenticai/conveyor/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+  and [ready units](https://github.com/nonagenticai/conveyor/issues?q=is%3Aissue+is%3Aopen+label%3A%22status%3Aready%22).
+  A unit is ready when it is open, carries `status:ready`, and has no branch, pull request or claim
+  comment. If none fits, open a [unit proposal](https://github.com/nonagenticai/conveyor/issues/new?template=unit.md)
+  or a design report and wait for maintainer triage before coding.
 - **Claim it.** With write access, push `issue/<n>-<slug>`; the pushed branch is the lock. Without
-  write access, comment your plan on the unit issue, a maintainer applies `status:claimed`, and the
+  write access, comment your plan on the unit issue; a maintainer applies `status:claimed`, and the
   branch lives in your fork as `<you>:issue/<n>-<slug>`.
 - One issue = one branch `issue/<n>-<slug>` = one pull request with `Closes #<n>`.
 
@@ -40,8 +75,53 @@ cargo audit
 The tests need Postgres 18 and Redis. The `checks` job shows the exact container commands; the
 wrapper `scripts/ci/gate.sh` runs the same commands with an ephemeral Postgres 18 and Redis on
 random local ports, and removes them on exit.
-For the design pack, run `node docs/design/scripts/check-docs.cjs` and the other
-`docs/design/scripts/check-*.cjs` checks.
+
+A docs-only change does not need the Rust suite. CI still runs `secret-scan`, `no-private-refs`,
+`dco`, `lint` and `design-pack`, and creates the Rust and image jobs as skipped. For the design
+pack, run `node docs/design/scripts/check-docs.cjs` and the other `docs/design/scripts/check-*.cjs`
+checks.
+
+## How your work is credited
+
+- A merged contribution gets a row in [`CONTRIBUTORS.md`](CONTRIBUTORS.md): the name and handle you
+  prefer, one line on what landed, and the pull request link. Say so in the pull request if you
+  would rather not be listed; the work still lands.
+- The merge comment names the contributor and the work.
+- Release notes list the pull requests and their authors.
+- We rebase-merge, so the commits you wrote, with your sign-off, stay yours.
+
+## For maintainers: accepting a contribution
+
+You are the merge decision. A green run is necessary, not sufficient. Until the
+`@nonagenticai/maintainers` team exists, the repository owner is the maintainer of record.
+
+**Triage.** Answer a first report; it is the most fragile contribution there is. A change that does
+not alter behaviour is a small fix — no unit, no claim; the pull request is the record. A change
+that alters behaviour needs a unit with acceptance criteria. Label approachable units
+`good first issue`; that label is the newcomer queue. Link the report from the unit; never rewrite
+the report in place.
+
+**Accept.**
+
+1. Read the diff (`gh pr diff <n>`) and confirm it matches its description.
+2. Review a sensitive path yourself: `.github/workflows/**`, `.github/CODEOWNERS`, `SECURITY.md` or
+   `scripts/ci/**`. It runs with your authority.
+3. Check DCO: every commit's `Signed-off-by:` is the author's. Never sign off for someone else and
+   never add a sign-off to their commit.
+4. Check that the required checks are green. A docs-only pull request skips the Rust and image
+   jobs; that is expected, not a missing check. The `dco` job is not a required check today — read
+   it.
+5. Merge with `gh pr merge <n> --rebase --delete-branch`. Rebase keeps the contributor's commits
+   and authorship; squash only when the contributor asks, and keep their name on the commit. If the
+   branch is behind `main`, ask the contributor to update it; never force-push their branch.
+6. Credit the work: add the row to `CONTRIBUTORS.md` and comment on the pull request naming it.
+   When cutting a release, `gh release create <tag> --generate-notes` lists every pull request and
+   author.
+7. Close the record: close the unit issue. A small fix that turned out to change behaviour gets a
+   unit opened after the fact, with the pull request linked.
+
+A first-time fork pull request may wait for your approval before its workflow runs; approve it from
+the pull request's Checks tab.
 
 ## What never lands
 
@@ -55,9 +135,8 @@ For the design pack, run `node docs/design/scripts/check-docs.cjs` and the other
 
 - A maintainer reviews every pull request, and required checks must be green.
 - A merge is a human decision. A green run alone does not merge anything.
-- A change to `.github/workflows/**`, `.github/CODEOWNERS`, `SECURITY.md` or `scripts/ci/**` is a
-  sensitive path: it needs a code-owner review in addition to the required checks once the
-  `@nonagenticai/maintainers` team exists (tracked on issue #93).
+- The sensitive paths above are reviewed by a code owner once the `@nonagenticai/maintainers` team
+  exists; until then the maintainer checklist is the control.
 - The programme is published at <https://conveyor.nonagentic.ai/design/>.
 
 ## Reporting a vulnerability
