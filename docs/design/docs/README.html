@@ -27,19 +27,20 @@
 <p><a href="https://github.com/nonagenticai/conveyor/actions/workflows/ci-public.yml"><img src="https://github.com/nonagenticai/conveyor/actions/workflows/ci-public.yml/badge.svg" alt="CI" /></a> <a href="https://github.com/nonagenticai/conveyor/releases"><img src="https://img.shields.io/github/v/release/nonagenticai/conveyor" alt="Release" /></a> <a href="https://github.com/nonagenticai/conveyor/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License: Apache-2.0" /></a></p>
 <p>The new conveyor: one Rust application (workspace in <code>crates/</code> and <code>apps/</code>), Postgres 18, Leptos web UI.</p>
 <ul>
-<li>Design and roadmap: <a href="https://nonagentic.ai/design/">https://nonagentic.ai/design/</a></li>
+<li>Design and roadmap: <a href="https://conveyor.nonagentic.ai/design/">https://conveyor.nonagentic.ai/design/</a></li>
 <li>Product spec: <code>docs/SPEC.md</code></li>
 <li>Plan index and slice statuses: <code>docs/plans/00-INDEX.md</code></li>
 <li>Delivery protocol: <code>docs/plans/03-DELIVERY.md</code></li>
 <li>Remaining-work audit: <code>docs/evidence/2026-11-10-plan-audit.md</code></li>
 <li>Decisions: <code>docs/decisions/</code></li>
 </ul>
-<p>Work is claimed by a GitHub issue. The queue is <code>gh issue list --label unit --state open</code>; run the <code>issue-pickup</code> skill before creating a branch. One issue = one branch <code>issue/&lt;n&gt;-&lt;slug&gt;</code> = one PR.</p>
+<p>New here? <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a> starts with five-minute paths that do not need Rust, and every merged contribution is credited in <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTORS.md"><code>CONTRIBUTORS.md</code></a>.</p>
+<p>Behaviour changes start from a maintainer-triaged GitHub unit issue. The queue is <code>gh issue list --label unit --state open</code>; one issue = one branch <code>issue/&lt;n&gt;-&lt;slug&gt;</code> = one PR. A change that does not alter behaviour — a typo, a broken link, a docs clarification — can go straight to a pull request; see <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a>.</p>
 <p>Contributing: <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a> · Security: <a href="https://github.com/nonagenticai/conveyor/blob/main/SECURITY.md"><code>SECURITY.md</code></a> · Conduct: <a href="https://github.com/nonagenticai/conveyor/blob/main/CODE_OF_CONDUCT.md"><code>CODE_OF_CONDUCT.md</code></a> · Licence: Apache-2.0 (<a href="https://github.com/nonagenticai/conveyor/blob/main/LICENSE"><code>LICENSE</code></a>).</p>
 <h2 id="security">Security</h2>
 <p>Report vulnerabilities privately through the repository's Security tab — see <a href="https://github.com/nonagenticai/conveyor/blob/main/SECURITY.md"><code>SECURITY.md</code></a>. Do not open a public issue for a security problem.</p>
 <h2 id="contributing">Contributing</h2>
-<p>Issues and pull requests are welcome. See <a href="https://github.com/nonagenticai/.github/blob/main/CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a> for the organisation-wide rules; setup, test and lint commands are in this README. Commits carry DCO sign-off.</p>
+<p>Issues and pull requests are welcome. <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a> lists the five-minute first steps, the local gate, DCO sign-off, the small-fix path and how maintainers accept a contribution; <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTORS.md"><code>CONTRIBUTORS.md</code></a> records every merged contribution.</p>
 <h2 id="licensing">Licensing</h2>
 <p>The code in this repository is Apache-2.0 and needs no licence key to build, test or run. <code>LICENCES_BASE_URL</code> is <strong>optional</strong>: unset, licence sync is unavailable and every other job runs unaffected. With it set, sync failures are retried and never written on a guess.</p>
 <p>The licensing stack is public too — <a href="https://github.com/nonagenticai/licenses"><code>licenses</code></a> (entitlements, plans and tokens) and <a href="https://github.com/nonagenticai/license-authz"><code>license-authz</code></a> (the Envoy <code>ext_authz</code> enforcement point). Neither is required to run this code.</p>
