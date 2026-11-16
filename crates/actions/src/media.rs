@@ -874,6 +874,9 @@ pub struct RunGherkinIn {
     /// Write a screenshot into the job's output directory when a scenario fails.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub screenshot_on_failure: Option<bool>,
+    /// Write the step-by-step trace of a failed scenario into the job's output directory.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trace_on_failure: Option<bool>,
     /// The deployment's explicit permission to reach an `http(s)` URL.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_network: Option<bool>,

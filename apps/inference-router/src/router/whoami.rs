@@ -102,7 +102,7 @@ pub async fn whoami(State(state): State<AppState>, request: Request) -> Response
     let Some(token) = presentation.token else {
         return unauthorized();
     };
-    match state.introspector().resolve_fresh(&token).await {
+    match state.introspector().resolve_fresh(&token).await.verdict {
         Verdict::Resolved(licence) => Json(WhoamiResponse {
             active: true,
             app: licence.app,

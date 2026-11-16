@@ -18,6 +18,7 @@ pub mod empty;
 pub mod internal;
 pub mod ledger;
 pub mod metering;
+pub mod metrics;
 pub mod policy;
 pub mod provider;
 pub mod reads;

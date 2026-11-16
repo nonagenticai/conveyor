@@ -9,6 +9,7 @@
 //! `slide_service` is **not** here: ADR 0007 §7 moves deck authoring to `crates/deck`, which emits
 //! OOXML and renders PDF/PNG through `crates/render`.
 
+pub mod cdp;
 pub mod gherkin;
 pub mod produce;
 pub mod record;
