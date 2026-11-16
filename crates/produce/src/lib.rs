@@ -11,7 +11,10 @@
 //! the pinned image by `contract/capture.sh`. [`capture`] exposes it and its digest; the parity
 //! test refuses an operation that has no disposition.
 //!
-//! The later parts of the issue add the blueprint manifest type and the sixteen blueprints as
-//! data. They are not here yet, and nothing in this module pretends they are.
+//! P2 and P4 add [`manifest`]: the sixteen deliverable blueprints are committed data under
+//! `blueprints/`, each an ordered phase list. Loading validates every phase's action against the
+//! registered action names and reports, by name and never by dropping, the phases whose action
+//! this build does not have yet.
 
 pub mod capture;
+pub mod manifest;

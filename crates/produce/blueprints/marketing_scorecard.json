@@ -1,0 +1,11 @@
+{
+  "key": "marketing_scorecard",
+  "title": "A scored campaign read",
+  "family": "analysis",
+  "phases": [
+    { "id": "gather", "action": "analyse.brand", "params": {} },
+    { "id": "score", "action": "analyse.content", "params": {} },
+    { "id": "report", "action": "analyse.report", "params": {} }
+  ],
+  "unresolved": ["gather", "score", "report"]
+}

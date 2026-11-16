@@ -1,0 +1,12 @@
+{
+  "key": "app_review",
+  "title": "An application assessment",
+  "family": "analysis",
+  "phases": [
+    { "id": "capture", "action": "analyse.app", "params": {} },
+    { "id": "inspect", "action": "analyse.inspect", "params": {} },
+    { "id": "analyse", "action": "analyse.assess", "params": {} },
+    { "id": "report", "action": "analyse.report", "params": {} }
+  ],
+  "unresolved": ["capture", "inspect", "analyse", "report"]
+}

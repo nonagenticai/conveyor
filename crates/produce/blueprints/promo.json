@@ -1,0 +1,12 @@
+{
+  "key": "promo",
+  "title": "A promotional clip",
+  "family": "production",
+  "phases": [
+    { "id": "brief", "action": "produce.brief", "params": {} },
+    { "id": "script", "action": "produce.script", "params": {} },
+    { "id": "assets", "action": "produce.asset", "params": {} },
+    { "id": "render", "action": "media.compile_video", "params": {} }
+  ],
+  "unresolved": ["brief", "script", "assets"]
+}

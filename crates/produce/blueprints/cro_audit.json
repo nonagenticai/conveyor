@@ -1,0 +1,11 @@
+{
+  "key": "cro_audit",
+  "title": "A conversion audit",
+  "family": "analysis",
+  "phases": [
+    { "id": "crawl", "action": "analyse.site", "params": {} },
+    { "id": "analyse", "action": "analyse.assess", "params": {} },
+    { "id": "report", "action": "analyse.report", "params": {} }
+  ],
+  "unresolved": ["crawl", "analyse", "report"]
+}
