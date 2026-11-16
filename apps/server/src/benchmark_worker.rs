@@ -493,10 +493,15 @@ async fn store_log(
             object_key: Some(key),
             content_hash: Some(hash),
             card_id: None,
+            parent_document_id: None,
             body: None,
             external_ref: None,
             meta: json!({ "benchmark_run_id": run_id, "instance_id": instance_id }),
             publishable: false,
+            category: None,
+            unit: None,
+            created_by: None,
+            updated_by: None,
         },
     )
     .await

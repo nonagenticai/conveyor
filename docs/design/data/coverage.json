@@ -1,7 +1,7 @@
 {
   "actions_invoked": [
     {
-      "line": 666,
+      "line": 675,
       "name": "approvals.decide"
     },
     {
@@ -29,23 +29,31 @@
       "name": "cards.release"
     },
     {
-      "line": 1446,
+      "line": 1512,
       "name": "documents.compose"
     },
     {
-      "line": 1560,
+      "line": 1776,
+      "name": "documents.create"
+    },
+    {
+      "line": 1847,
       "name": "documents.delete"
     },
     {
-      "line": 1539,
+      "line": 1793,
       "name": "documents.download"
     },
     {
-      "line": 1468,
+      "line": 1826,
+      "name": "documents.download"
+    },
+    {
+      "line": 1534,
       "name": "documents.get"
     },
     {
-      "line": 1524,
+      "line": 1811,
       "name": "documents.get"
     },
     {
@@ -57,7 +65,19 @@
       "name": "documents.list"
     },
     {
-      "line": 689,
+      "line": 1744,
+      "name": "documents.list"
+    },
+    {
+      "line": 1665,
+      "name": "documents.revision_get"
+    },
+    {
+      "line": 1626,
+      "name": "documents.revision_list"
+    },
+    {
+      "line": 698,
       "name": "process_runs.start"
     },
     {
@@ -65,27 +85,27 @@
       "name": "programmes.list"
     },
     {
-      "line": 1377,
+      "line": 1447,
       "name": "projects.close"
     },
     {
-      "line": 1278,
+      "line": 1348,
       "name": "projects.create"
     },
     {
-      "line": 1287,
+      "line": 1357,
       "name": "projects.update"
     },
     {
-      "line": 639,
+      "line": 648,
       "name": "runs.cancel"
     },
     {
-      "line": 617,
+      "line": 626,
       "name": "runs.get"
     },
     {
-      "line": 594,
+      "line": 603,
       "name": "runs.list"
     }
   ],
@@ -2478,7 +2498,7 @@
       "without_open_units": 15
     },
     "screens": {
-      "actions_invoked": 20,
+      "actions_invoked": 23,
       "by_status": {
         "legacy": 7,
         "live": 7,
