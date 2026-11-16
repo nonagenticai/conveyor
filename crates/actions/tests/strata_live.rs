@@ -6,16 +6,15 @@
 //! rbuild -- test -p conveyor-actions --test strata_live -- --ignored --nocapture
 //! ```
 //!
-//! The service is reached by name (`mini3.local:8092`), because that is the address m1 resolves;
-//! the raw LAN IP times out. The dev token is the one `compose.yaml` sets; it is a local test
-//! credential, not an estate secret.
+//! The service is reached by its compose name (`strata-rag:8092`); the raw LAN IP times out. The
+//! dev token is the one `compose.yaml` sets; it is a local test credential, not an estate secret.
 
 use conveyor_actions::integrations::strata::Strata;
 use conveyor_domain::TenantId;
 use serde_json::json;
 use uuid::Uuid;
 
-const URL: &str = "http://mini3.local:8092";
+const URL: &str = "http://strata-rag:8092";
 const TOKEN: &str = "conveyor-strata-dev";
 const TENANT: Uuid = Uuid::from_u128(0x0197_a0c0_0000_7000_8000_0000_0000_00a1);
 

@@ -32,7 +32,7 @@ Measured 2026-11-09 on mini3; every Rust command through `rbuild` on m1 (CONTRAC
 | `rbuild -- test -p conveyor-actions --test capability` | **9 passed / 0 failed** |
 | `rbuild -- test -p conveyor-actions --test run_capability` | **3 passed / 0 failed** |
 | `rbuild -- test -p conveyor-api --test capability_readiness` | **3 passed / 0 failed** |
-| `rbuild -- test -p conveyor-api --test capability_readiness -- --ignored` | **1 passed / 0 failed** — the live missing-pack case against the real `strata_rag` (`mini3.local:8092`, compose `strata` profile up; the tenant token sealed under the test KEK) |
+| `rbuild -- test -p conveyor-api --test capability_readiness -- --ignored` | **1 passed / 0 failed** — the live missing-pack case against the real `strata_rag` (`strata-rag:8092`, compose `strata` profile up; the tenant token sealed under the test KEK) |
 | `rbuild -- test -p conveyor-actions --test registry` | **8 passed / 0 failed** at `EXPECTED: [&str; 266]` |
 | `rbuild -- test -p conveyor-actions --test parity_http_mcp` | **4 passed / 0 failed** when run before S20 registered `eval_runs.regrade`; the same binary is now red only on that action's missing sample (`missing ["eval_runs.regrade"]`, S20's lane — `capabilities.get`'s sample is present and passed) |
 | `rbuild -- test -p conveyor-actions --lib readiness` | **1 passed / 0 failed** (the pack decision table) |
