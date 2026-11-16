@@ -21,8 +21,10 @@
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -41,8 +43,10 @@
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -65,8 +69,10 @@
         "measured_status": "built",
         "tranche": 1,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -87,8 +93,10 @@
         "measured_status": "built",
         "tranche": 2,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -112,8 +120,10 @@
         "measured_status": "built",
         "tranche": 3,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -135,8 +145,10 @@
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -161,8 +173,10 @@
         "measured_status": "built",
         "tranche": 5,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -186,7 +200,8 @@
         "tranche": 6,
         "expected_outputs": [
           "project-brief"
-        ]
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -209,8 +224,10 @@
         "measured_status": "built",
         "tranche": 6,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -234,8 +251,10 @@
         "measured_status": "built",
         "tranche": 7,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -261,8 +280,10 @@
         "measured_status": "built",
         "tranche": 8,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -284,8 +305,10 @@
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -308,20 +331,27 @@
         "measured_status": "built",
         "tranche": 5,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
       "key": "S09",
       "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
       "description": "Plan: docs/plans/slices/S09-documents-integrations.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S09-documents-integrations.md",
         "track": "v1",
-        "issues": [],
+        "issues": [
+          156,
+          168,
+          183,
+          195
+        ],
         "depends_on": [
           "S03",
           "S04"
@@ -331,8 +361,10 @@
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -356,8 +388,10 @@
         "measured_status": "built",
         "tranche": 6,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -383,8 +417,10 @@
         "measured_status": "built",
         "tranche": 6,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -421,8 +457,10 @@
         "measured_status": "built",
         "tranche": 10,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -436,7 +474,9 @@
         "track": "v1",
         "issues": [
           7,
-          136
+          136,
+          179,
+          198
         ],
         "depends_on": [
           "S03",
@@ -449,8 +489,10 @@
         "measured_status": "built",
         "tranche": 8,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -477,7 +519,11 @@
         "measured_status": "partial",
         "tranche": 11,
         "expected_outputs": [
-          "project-brief"
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": [
+          "closure-review"
         ]
       }
     },
@@ -504,8 +550,10 @@
         "measured_status": "built",
         "tranche": 7,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -532,8 +580,10 @@
         "measured_status": "built",
         "tranche": 7,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -559,8 +609,10 @@
         "measured_status": "built",
         "tranche": 5,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -586,8 +638,10 @@
         "measured_status": "built",
         "tranche": 9,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -618,8 +672,10 @@
         "measured_status": "built",
         "tranche": 8,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -642,8 +698,10 @@
         "measured_status": "built",
         "tranche": 9,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -669,7 +727,11 @@
         "measured_status": "partial",
         "tranche": 9,
         "expected_outputs": [
-          "project-brief"
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": [
+          "closure-review"
         ]
       }
     },
@@ -692,8 +754,10 @@
         "tranche": 0,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "evidence"
+        ],
+        "closure_outputs": [
+          "closure-review"
         ],
         "gate": "a job is created in the conveyor, a release is published, a binding pins its hash, and a run on a retired binding refuses `409 job_binding_stale`; no concept has two stores; a test-only third executor kind registers without editing the run path"
       }
@@ -720,8 +784,12 @@
         "tranche": 1,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused"
       }
@@ -748,8 +816,12 @@
         "tranche": 2,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card"
       }
@@ -776,8 +848,12 @@
         "tranche": 3,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request"
       }
@@ -804,8 +880,12 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata"
       }
@@ -837,8 +917,12 @@
         "tranche": 10,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened"
       }
@@ -866,8 +950,12 @@
         "tranche": 11,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "a real feature lands: lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested"
       }
@@ -882,7 +970,10 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          78
+          78,
+          170,
+          171,
+          172
         ],
         "depends_on": [
           "T2",
@@ -896,8 +987,12 @@
         "tranche": 5,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable"
       }
@@ -924,8 +1019,12 @@
         "tranche": 11,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine"
       }
@@ -953,8 +1052,12 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata"
       }
@@ -982,8 +1085,12 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons"
       }
@@ -1009,8 +1116,12 @@
         "tranche": 1,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "every metric and every metering level recomputes from rows; the reconciliation with `billing_service` is exact or opens an incident; a C0–C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged"
       }
@@ -1053,8 +1164,12 @@
         "tranche": 13,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget"
       }
@@ -1081,8 +1196,12 @@
         "tranche": 3,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt"
       }
@@ -1109,8 +1228,12 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish"
       }
@@ -1138,8 +1261,12 @@
         "tranche": 12,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling"
       }
@@ -1167,8 +1294,12 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a tenant edits a PKO entity and the change is versioned; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds"
       }
@@ -1196,8 +1327,12 @@
         "tranche": 5,
         "expected_outputs": [
           "project-brief",
-          "analysis",
-          "architecture"
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
         ],
         "gate": "a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant"
       }
@@ -1227,7 +1362,11 @@
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
-          "project-brief"
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": [
+          "closure-review"
         ]
       }
     },
@@ -1259,7 +1398,8 @@
           "reuse-map",
           "brief-template",
           "architecture-analysis"
-        ]
+        ],
+        "closure_outputs": []
       }
     },
     {
@@ -1284,10 +1424,21 @@
           93,
           95,
           102,
-          137,
-          139,
-          140,
-          144
+          154,
+          160,
+          163,
+          164,
+          193,
+          205,
+          212,
+          213,
+          216,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226
         ],
         "depends_on": [],
         "plan_status": "active",
@@ -1295,7 +1446,11 @@
         "measured_status": "standing",
         "tranche": 0,
         "expected_outputs": [
-          "project-brief"
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": [
+          "closure-review"
         ]
       }
     },
@@ -1317,8 +1472,9 @@
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
-          "project-brief"
-        ]
+          "spec"
+        ],
+        "closure_outputs": []
       }
     }
   ]

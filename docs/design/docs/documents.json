@@ -6,8 +6,8 @@
       "path": "docs/README.html",
       "source": "README.md",
       "section": "Root",
-      "sha256": "28449d8dc2fdfff28ebace1650a6eafe9a305174db4991936e7752dc34552cec",
-      "bytes": 2257,
+      "sha256": "f8cf36be9644011eedb00ce8a9c52a2c4b27f3b597afc7fc0a9571cd5c710752",
+      "bytes": 2654,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/README.md"
     },
     {
@@ -114,8 +114,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "36139cec9dd02841a6d2ab52173caee36dc1ca34ce9c159578ba47676ca34948",
-      "bytes": 12782,
+      "sha256": "e6acee1e82321b47df4a4d87b157a90cae3f3889f225a8128eab3d4fb58a84e2",
+      "bytes": 13785,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -465,9 +465,18 @@
       "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
       "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
       "section": "Plans",
-      "sha256": "6c6e5245a5a3fc5a59962dc767552a67d09a1be4dfdd98629c1c9134aad88cab",
-      "bytes": 10272,
+      "sha256": "2b019753c7bf963b15679f46b85688a960fda162716b309fd80c37de35fa553d",
+      "bytes": 10450,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
+    },
+    {
+      "title": "05 — The w2v absorption: disposition and the production layer",
+      "path": "docs/plans/05-W2V-ABSORPTION.html",
+      "source": "docs/plans/05-W2V-ABSORPTION.md",
+      "section": "Plans",
+      "sha256": "3bcca544f04f89a22022d4da65180fbe377ef31dedbf4b8addc31e92e41f51be",
+      "bytes": 8235,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/05-W2V-ABSORPTION.md"
     },
     {
       "title": "P0 — Programme definition",

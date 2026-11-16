@@ -50,7 +50,12 @@ const PROJECT = {
     issues: [2, 3],
     plan: "docs/plans/slices/S02-skeleton.md",
     track: "v1",
-    expected_outputs: ["project-brief", "analysis", "architecture"],
+    expected_outputs: [
+      "project-brief",
+      "inception-analysis",
+      "architecture-design",
+    ],
+    closure_outputs: ["evidence", "closure-review"],
   },
   version: 1,
 };
@@ -607,7 +612,7 @@ function startServer({ config, state, snapshot }) {
               delete summary.body;
               return summary;
             });
-          json(res, 200, { items, next_cursor: null });
+          json(res, 200, { output: { items, next_cursor: null } });
         });
         return;
       }
@@ -1060,16 +1065,32 @@ function readBody(req, done) {
       const portfolioText = await page.locator("#main").innerText();
       assert.match(portfolioText, /S02/, "the live portfolio renders the snapshot's project");
       assert.match(portfolioText, /Skeleton/, "the real project name renders");
+      assert.match(portfolioText, /Programme queue/, "the public queue renders");
       assert.doesNotMatch(
         portfolioText,
         /Identity & access|Citizen services/,
         "no fixture project on the live portfolio",
       );
+      await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#projects`);
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      const publicProjectText = await page.locator("#main").innerText();
+      assert.match(
+        publicProjectText,
+        /Expected outputs/,
+        "the public project shows the standard's checklist",
+      );
+      assert.doesNotMatch(
+        publicProjectText,
+        /present, private/,
+        "no private draft is public",
+      );
       await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#contribute`);
       await page.waitForSelector(".page");
       await page.waitForTimeout(200);
       const contributeText = await page.locator("#main").innerText();
-      assert.match(contributeText, /Ready to claim/, "contribute renders the ready summary");
+      assert.match(contributeText, /Marked ready/, "contribute renders the ready summary");
+      assert.match(contributeText, /verify on GitHub/, "the ready count is labelled a snapshot");
       assert.match(contributeText, /#2/, "a ready unit links its issue");
       assert.match(contributeText, /Unassigned/, "an unlinked ready unit is grouped honestly");
       assert.match(contributeText, /How a unit is claimed/, "the claim protocol renders");
@@ -1196,17 +1217,19 @@ function readBody(req, done) {
       assert.match(workspaceText, /7 · project-brief/, "the output is grouped by unit and category");
       assert.match(workspaceText, /project-brief/, "the project's expected outputs render");
       assert.match(workspaceText, /0\/3 published/, "no expected output is published yet");
-      await page.click('[data-v2="output-new-template"][data-category="analysis"]');
+      await page.click(
+        '[data-v2="output-new-template"][data-category="inception-analysis"]',
+      );
       await page.waitForSelector("#output-category");
       assert.equal(
         await page.locator("#output-category").inputValue(),
-        "analysis",
-        "the analysis template pre-sets its category",
+        "inception-analysis",
+        "the inception template pre-sets its category",
       );
       assert.match(
         await page.locator("#output-body").inputValue(),
         /Reuse sources/,
-        "the analysis template carries the reuse prompt",
+        "the inception template carries the reuse prompt",
       );
       await page.click('#dialog [data-action="close-dialog"]');
       await page.waitForFunction(() => !document.getElementById("dialog").open);
@@ -1419,6 +1442,13 @@ function readBody(req, done) {
         /Identity & access|Citizen services/,
         "no fixture project is rendered signed in",
       );
+      await page.click('[data-v2="tab"][data-key="portfolio"][data-value="Programme"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Programme queue"),
+      );
+      const queueText = await page.locator("#main").innerText();
+      assert.match(queueText, /Programme queue/, "the programme queue renders");
+      assert.match(queueText, /outputs due/, "the queue counts the due outputs");
 
       // back to the Plan board for the 412/401 honesty checks
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#plan`);

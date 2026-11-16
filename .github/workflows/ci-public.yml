@@ -219,6 +219,8 @@ jobs:
         run: |
           python3 scripts/build-coverage.py --check
           python3 scripts/build-v2-coverage.py --check
+          python3 scripts/check-output-standard.py --self-test
+          python3 scripts/check-output-standard.py
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs
           node docs/design/scripts/check-docs.cjs
