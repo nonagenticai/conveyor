@@ -3904,6 +3904,22 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             }),
             None,
         ),
+        // ── conveyor#160: the tenant's registered inference endpoint ─────────────────────
+        // The destination is the harness's inference stub, not an invented URL: a tenant row
+        // outranks `CONVEYOR_EXTERNAL_INFERENCE_URL`, so any later model call must still reach
+        // the stub rather than the network.
+        {
+            let mut sample = plain("inference_endpoint.set", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| {
+                json!({
+                    "destination_url": std::env::var("CONVEYOR_EXTERNAL_INFERENCE_URL")
+                        .expect("the parity harness sets the inference stub"),
+                    "credential": "parity-inference-credential",
+                })
+            });
+            expecting(sample, 200)
+        },
+        expecting(plain("inference_endpoint.get", json!({}), None), 200),
         plain("prompt_audits.list", json!({"limit": 10}), None),
         {
             let mut sample = plain("prompt_audits.get", json!({}), None);
@@ -4425,6 +4441,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 | "fixtures.echo"
                 | "inference_calls.list"
                 | "inference_usage.report"
+                | "inference_endpoint.get"
                 | "prompt_audits.check"
                 | "prompt_findings.list"
         ) {

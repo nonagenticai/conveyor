@@ -6,6 +6,7 @@ pub mod cockpit;
 pub mod copilot;
 pub mod evals;
 pub mod improvement;
+pub mod inference;
 pub mod members;
 pub mod models;
 pub mod platform;
