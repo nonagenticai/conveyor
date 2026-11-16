@@ -28,7 +28,8 @@
 //! `memory.consolidate` (one digest per card, on run completion only), S13 §5.8's `err.card` (a
 //! failed run's move → comment → coach), and S19/S20's eval kinds `eval.case.run`,
 //! `eval.regrade`, `eval.grade` (the one-shot per-output grade), `eval.run.tick` and
-//! `eval.reap`.
+//! `eval.reap`. #182 slice B adds `youtube.upload`, the one arm that needs the claimed row's id:
+//! it records the provider's video id there so a retry of the SAME job cannot upload twice.
 //!
 //! The bus consumer executes one notification: a `card.moved` into the ACTIVE lane runs
 //! `wip.pull` for that board (§5.8). Everything else on the stream is either a `process.step`
@@ -372,15 +373,7 @@ impl Worker {
         let outcome = if crate::runner_dispatch::handles(&self.config, &job.kind) {
             crate::runner_dispatch::step(&self.pool, &self.config, tenant, job).await
         } else {
-            run_kind(
-                &self.pool,
-                &self.config,
-                self.licence.as_ref(),
-                tenant,
-                &job.kind,
-                &job.payload,
-            )
-            .await
+            run_job(&self.pool, &self.config, self.licence.as_ref(), tenant, job).await
         };
         renewal.abort();
 
@@ -441,7 +434,6 @@ impl Worker {
     }
 }
 
-/// Run one job kind. Public so tests exercise the exact dispatch the worker uses.
 /// One uuid out of a job payload, or a permanent failure naming what is missing.
 fn payload_uuid(payload: &serde_json::Value, key: &str) -> Result<Uuid, JobFailure> {
     payload
@@ -451,11 +443,50 @@ fn payload_uuid(payload: &serde_json::Value, key: &str) -> Result<Uuid, JobFailu
         .ok_or_else(|| JobFailure::permanent(format!("the job payload has no usable `{key}`")))
 }
 
+/// Run one claimed job, its row id included.
+///
+/// The id is what an arm needs to record a result on the row it is running
+/// (`store::jobs::record_result`). `run_kind` deliberately cannot supply one, so a kind that
+/// requires it refuses there instead of writing to no row — which is why the tests below that
+/// exercise the whole dispatch use this entry point.
+pub async fn run_job(
+    pool: &PgPool,
+    config: &Config,
+    licence: Option<&LicenceSyncClient>,
+    tenant: TenantId,
+    job: &Job,
+) -> Result<(), JobFailure> {
+    dispatch(
+        pool,
+        config,
+        licence,
+        tenant,
+        Some(job.id),
+        &job.kind,
+        &job.payload,
+    )
+    .await
+}
+
+/// Run one job kind **without** a row. Public so tests exercise the exact dispatch the worker
+/// uses; a kind that records a result on its own row needs [`run_job`] and refuses here.
 pub async fn run_kind(
     pool: &PgPool,
     config: &Config,
     licence: Option<&LicenceSyncClient>,
     tenant: TenantId,
+    kind: &str,
+    payload: &serde_json::Value,
+) -> Result<(), JobFailure> {
+    dispatch(pool, config, licence, tenant, None, kind, payload).await
+}
+
+async fn dispatch(
+    pool: &PgPool,
+    config: &Config,
+    licence: Option<&LicenceSyncClient>,
+    tenant: TenantId,
+    job_id: Option<Uuid>,
     kind: &str,
     payload: &serde_json::Value,
 ) -> Result<(), JobFailure> {
@@ -843,6 +874,17 @@ pub async fn run_kind(
         "benchmark.improvement.run" => {
             crate::benchmark_improvement::run(pool, tenant, &config.app_key, payload).await?
         }
+        // #182 slice B: upload one document to the tenant's own YouTube channel. The row id is
+        // required, not optional: the recorded `video_id` lives on this job's own payload and is
+        // the retry's evidence that the upload already happened.
+        "youtube.upload" => {
+            let job_id = job_id.ok_or_else(|| {
+                JobFailure::permanent(
+                    "youtube.upload records its video id on the job row; it cannot run without one",
+                )
+            })?;
+            crate::youtube_upload::run(pool, tenant, job_id, payload).await?
+        }
         other => {
             return Err(JobFailure::permanent(format!(
                 "unknown job kind {other:?}: this build registers event.prune, job.prune, \
@@ -852,7 +894,7 @@ pub async fn run_kind(
                  quality.score, model.validate, copilot.turn.reap, copilot.proposal.sweep, \
                  copilot.proposal.execute, benchmark.run.poll, benchmark.reap, \
                  eval.case.run, eval.regrade, eval.grade, eval.run.tick, eval.reap, \
-                 document.purge, publish.design and memory.consolidate"
+                 document.purge, publish.design, youtube.upload and memory.consolidate"
             )));
         }
     }

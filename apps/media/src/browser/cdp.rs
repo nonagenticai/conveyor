@@ -13,9 +13,9 @@
 //! Every call is bounded by [`process::TOOL_TIMEOUT`], the same ceiling the image gives any other
 //! tool invocation. A wedge therefore fails the step instead of holding the job's deadline.
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Stdio;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use futures_util::{SinkExt, StreamExt};
 use serde_json::{Value, json};
@@ -45,6 +45,66 @@ pub struct Session {
     /// The flattened session id; empty until [`Session::launch`] has attached its target.
     session_id: String,
     next_id: u64,
+    /// Held for the session's life: see [`LaunchLock`].
+    _lock: LaunchLock,
+}
+
+/// A machine-wide "one browser at a time" lock.
+///
+/// The image runs one instruction per pod, so in production this never contends. `nextest` runs
+/// each test in its own process, though, and the per-process guard the screenshot path uses cannot
+/// serialise two of them: measured on CI 2026-11-16, four Gherkin tests launching Chromium at once
+/// each hit their 20 s ceiling at the first step, while the same tests passed in 2 s when they did
+/// not collide. A lock file is the cheapest cross-process answer, and it keeps the tests honest —
+/// they still drive a real browser, just not four at the same instant.
+pub(crate) struct LaunchLock {
+    path: PathBuf,
+}
+
+impl LaunchLock {
+    async fn acquire() -> Result<Self, CapabilityError> {
+        let path = std::env::temp_dir().join("conveyor-cdp-launch.lock");
+        let deadline = Instant::now() + Duration::from_secs(60);
+        loop {
+            match std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&path)
+            {
+                Ok(_) => return Ok(Self { path }),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+                    // A launcher that died must not wedge the machine: a lock older than two
+                    // minutes belongs to nobody.
+                    let stale = std::fs::metadata(&path)
+                        .and_then(|meta| meta.modified())
+                        .ok()
+                        .and_then(|modified| modified.elapsed().ok())
+                        .is_some_and(|age| age > Duration::from_secs(120));
+                    if stale {
+                        let _ = std::fs::remove_file(&path);
+                        continue;
+                    }
+                    if Instant::now() >= deadline {
+                        return Err(CapabilityError::Failed(
+                            "timed out waiting for the browser launch lock".to_string(),
+                        ));
+                    }
+                    tokio::time::sleep(Duration::from_millis(50)).await;
+                }
+                Err(error) => {
+                    return Err(CapabilityError::Failed(format!(
+                        "cannot create the browser launch lock: {error}"
+                    )));
+                }
+            }
+        }
+    }
+}
+
+impl Drop for LaunchLock {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.path);
+    }
 }
 
 impl Session {
@@ -70,6 +130,9 @@ impl Session {
             "--remote-debugging-port=0".to_string(),
         ];
         args.extend(headless_args.iter().cloned());
+        // Serialised across processes: see [`LaunchLock`]. Acquired before the spawn so two
+        // launches never race for the machine's process table, released when the session ends.
+        let lock = LaunchLock::acquire().await?;
         // `--remote-debugging-port` alone starts no page; the positional URL is the page the
         // session attaches to before the scenario navigates it.
         args.push("about:blank".to_string());
@@ -86,7 +149,7 @@ impl Session {
                 source,
             })?;
 
-        match attach(&mut child).await {
+        match attach(&mut child, lock).await {
             Ok(session) => Ok((child, session)),
             Err(error) => {
                 // A browser that printed no endpoint is still running; own its death here.
@@ -460,7 +523,7 @@ impl Session {
 }
 
 /// Read chromium's stderr up to the DevTools endpoint, connect, and attach one flattened page.
-async fn attach(child: &mut Child) -> Result<Session, CapabilityError> {
+async fn attach(child: &mut Child, lock: LaunchLock) -> Result<Session, CapabilityError> {
     let stderr = child
         .stderr
         .take()
@@ -527,6 +590,7 @@ async fn attach(child: &mut Child) -> Result<Session, CapabilityError> {
         socket,
         session_id: String::new(),
         next_id: 1,
+        _lock: lock,
     };
     let created = session
         .call("Target.createTarget", json!({"url": "about:blank"}))
