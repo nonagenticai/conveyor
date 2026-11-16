@@ -282,6 +282,48 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       await page.screenshot({ path: shot(`conveyor-v2-${id}.png`) });
     }
 
+    // 9b. On a live snapshot every public page carries the feedback affordance, and the data
+    // panel names only files the window actually serves. The snapshot is injected before the
+    // page scripts so `live` is true without an HTTP server or a real publish.
+    await page.addInitScript(() => {
+      Object.defineProperty(window, "CONVEYOR_SNAPSHOT", {
+        configurable: true,
+        set() {},
+        get() {
+          return {
+            schema: "design-snapshot/v1",
+            tenant: "nonagentic",
+            generated_at: "2026-11-16T00:00:00Z",
+            git_sha: "a".repeat(40),
+            payload_sha256: "b".repeat(64),
+            programme: { feedback: [], projects: [] },
+            work: { boards: [], lists: [], cards: [] },
+            organisation: {},
+            measure: {},
+          };
+        },
+      });
+    });
+    for (const id of destinations) {
+      await nav(id);
+      const text = await content();
+      check(text.includes("Live data & feedback"), `${id} carries the live data and feedback panel`);
+      check(
+        (await page
+          .locator('#main a[href="https://github.com/nonagenticai/conveyor/discussions"]')
+          .count()) >= 1,
+        `${id} links Discussions`,
+      );
+      check(
+        (await page
+          .locator('#main a[href*="/issues/new?labels=feedback"]')
+          .count()) === 1,
+        `${id} links the prefilled report`,
+      );
+      check(!text.includes("data/manifest.json"), `${id} carries no dead data link`);
+      check(!text.includes("data/programme.json"), `${id} carries no dead programme link`);
+    }
+
     check(errors.length === 0, "no browser runtime errors: " + errors.join(" | "));
     check(failed.length === 0, "no failed assets: " + failed.join(" | "));
     check(external.length === 0, "no external network dependencies: " + external.join(" | "));
