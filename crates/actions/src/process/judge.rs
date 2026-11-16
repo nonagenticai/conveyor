@@ -266,6 +266,7 @@ fn laya_judge() -> ActionSpec {
         agent: AgentHints::default(),
         task_capable: false,
         captures_usage: false,
+        artefact: None,
         handler: HandlerRef::External {
             service: LAYA_SERVICE,
             method: "POST",

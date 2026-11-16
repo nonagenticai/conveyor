@@ -114,32 +114,42 @@ impl From<store::document::DocumentRecord> for DocumentOut {
     }
 }
 
-/// Upload one document.
+/// The metadata half of a byte upload: everything but the bytes themselves.
+pub(crate) struct NewBytesDocument<'a> {
+    /// The action storing them, for the error surface only (`documents.create`, `media.generate_image`).
+    pub action: &'a str,
+    /// The display title.
+    pub title: &'a str,
+    /// The declared MIME type; it must be on the allowlist and match the bytes.
+    pub content_type: &'a str,
+    /// The owning project, when the document belongs to one.
+    pub project_id: Option<Uuid>,
+    /// Free metadata merged into the row's `meta` beside `content_type`/`size_bytes`.
+    pub meta: Option<Value>,
+}
+
+/// Store `bytes` as a tenant document: validate → store the object → insert the row (§5.2's order).
 ///
-/// Over the 10 MiB cap is a `413`, a content type off the allowlist or one the bytes contradict is a `415` —
-/// both before anything is written.
-#[crate::action(
-    name = "documents.create",
-    version = 1,
-    kind = "internal",
-    scopes = ["documents:write"],
-    idempotent = false,
-    timeout_ms = 60000,
-    effect = "write",
-    confirm = "none",
-    tenancy = "tenant"
-)]
-async fn documents_create(
+/// The one writer for an uploaded document. `documents.create` calls it with bytes a caller sent;
+/// the engine calls it with bytes an external action's response carried (`ActionSpec::artefact`).
+/// A second implementation would be a second rule about ordering, hashing and the 415/413 caps.
+///
+/// The row is inserted in the caller's transaction; the object is deleted again (best effort) when
+/// that insert fails.
+pub(crate) async fn create_from_bytes(
     tx: &mut PgConnection,
-    ctx: HandlerCtx,
-    input: DocumentCreateIn,
-) -> Result<HandlerOutput<DocumentOut>, ActionError> {
-    let action = "documents.create";
-    let title = input.title.trim();
-    if title.is_empty() {
-        return Err(invalid("title", "required", "must not be empty"));
-    }
-    let content_type = input.content_type.trim().to_ascii_lowercase();
+    ctx: &HandlerCtx,
+    document: NewBytesDocument<'_>,
+    bytes: Vec<u8>,
+) -> Result<(DocumentOut, u64), ActionError> {
+    let NewBytesDocument {
+        action,
+        title,
+        content_type,
+        project_id,
+        meta,
+    } = document;
+    let content_type = content_type.trim().to_ascii_lowercase();
     if !ALLOWED_CONTENT_TYPES.contains(&content_type.as_str()) {
         return Err(ActionError::new(
             415,
@@ -147,9 +157,6 @@ async fn documents_create(
             format!("{content_type:?} is not an accepted content type"),
         ));
     }
-    let bytes = base64::engine::general_purpose::STANDARD
-        .decode(input.content_base64.trim())
-        .map_err(|_| invalid("content_base64", "invalid_value", "not base64"))?;
     if bytes.len() > MAX_UPLOAD_BYTES {
         return Err(ActionError::new(
             413,
@@ -182,7 +189,7 @@ async fn documents_create(
         .await
         .map_err(|error| crate::documents::object_error(error, action))?;
 
-    let mut meta = input.meta.unwrap_or_else(|| json!({}));
+    let mut meta = meta.unwrap_or_else(|| json!({}));
     if !meta.is_object() {
         return Err(invalid("meta", "invalid_value", "must be an object"));
     }
@@ -196,7 +203,7 @@ async fn documents_create(
         ctx.tenant,
         &NewDocument {
             id,
-            project_id: input.project_id,
+            project_id,
             kind: "document".to_owned(),
             title: title.to_owned(),
             status: "active".to_owned(),
@@ -224,14 +231,59 @@ async fn documents_create(
 
     emit_document_event(
         &mut *tx,
-        &ctx,
+        ctx,
         DOCUMENT_CREATED,
         created.id,
         json!({"id": created.id, "version": created.version.get()}),
     )
     .await?;
-    let etag = etag(created.version.get());
-    Ok(HandlerOutput::created(DocumentOut::from(created)).with_etag(etag))
+    let version = created.version.get();
+    Ok((DocumentOut::from(created), version))
+}
+
+/// Upload one document.
+///
+/// Over the 10 MiB cap is a `413`, a content type off the allowlist or one the bytes contradict is a `415` —
+/// both before anything is written.
+#[crate::action(
+    name = "documents.create",
+    version = 1,
+    kind = "internal",
+    scopes = ["documents:write"],
+    idempotent = false,
+    timeout_ms = 60000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn documents_create(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: DocumentCreateIn,
+) -> Result<HandlerOutput<DocumentOut>, ActionError> {
+    let action = "documents.create";
+    let title = input.title.trim();
+    if title.is_empty() {
+        return Err(invalid("title", "required", "must not be empty"));
+    }
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(input.content_base64.trim())
+        .map_err(|_| invalid("content_base64", "invalid_value", "not base64"))?;
+
+    let (created, version) = create_from_bytes(
+        &mut *tx,
+        &ctx,
+        NewBytesDocument {
+            action,
+            title,
+            content_type: &input.content_type,
+            project_id: input.project_id,
+            meta: input.meta,
+        },
+        bytes,
+    )
+    .await?;
+    Ok(HandlerOutput::created(created).with_etag(etag(version)))
 }
 
 // ── documents.compose ─────────────────────────────────────────────────────────────────────

@@ -153,6 +153,7 @@ fn variant_path(kind: &str, value: &str) -> syn::Result<String> {
         ("kind", "workflow") => "Workflow",
         ("effect", "read") => "Read",
         ("effect", "write") => "Write",
+        ("effect", "spend") => "Spend",
         ("effect", "destructive") => "Destructive",
         ("confirm", "none") => "None",
         ("confirm", "card") => "Card",
@@ -501,6 +502,7 @@ pub fn action(args: TokenStream, item: TokenStream) -> TokenStream {
                 },
                 task_capable: #task_capable,
                 captures_usage: #captures_usage,
+                artefact: None,
                 handler: ::conveyor_actions::HandlerRef::Internal(#handler_ident),
             }
         }
