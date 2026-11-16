@@ -40,6 +40,11 @@ pub struct CallContext {
     pub trace_id: Option<String>,
     pub card_id: Option<String>,
     pub project_id: Option<String>,
+    /// Who acted. The caller's `X-Actor-Id` when it is a UUID, else `SERVICE_ACTOR_ID` — a
+    /// service call has no human behind it, so the acting principal is the calling service
+    /// (the estate convention the billing attribution rule is written against). Absent when
+    /// neither exists, never invented.
+    pub actor_id: Option<String>,
     pub parent_execution_id: Option<String>,
     /// Written by the policy slice; `None` when no policy routed the request.
     pub policy_version: Option<i32>,
