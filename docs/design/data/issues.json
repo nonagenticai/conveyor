@@ -1,6 +1,99 @@
 {
   "issues": [
     {
+      "number": 226,
+      "title": "research-media: the tenant gate is unauthenticated \u2014 a bare X-Tenant-Id is trusted (blocks #205 P4)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/226",
+      "updatedAt": "2026-11-16T19:35:56Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 225,
+      "title": ".github: add a Good first issues link to the new-issue chooser",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/225",
+      "updatedAt": "2026-11-16T19:34:04Z",
+      "labels": [
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 224,
+      "title": "docs: CONTRIBUTING must say how to install Playwright for the design-pack checks",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/224",
+      "updatedAt": "2026-11-16T19:34:02Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 223,
+      "title": "docs: reconcile the issue-first rule in docs/plans/03-DELIVERY.md with the human small-fix path",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/223",
+      "updatedAt": "2026-11-16T19:34:01Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 222,
+      "title": "docs: repair the four broken relative links in docs/design/legacy/UI-SPEC.md",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/222",
+      "updatedAt": "2026-11-16T19:33:59Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
       "number": 221,
       "title": "programme: the rigour output categories and the architecture/tranche seed rows",
       "state": "OPEN",
@@ -20,9 +113,9 @@
     {
       "number": 219,
       "title": "docs: make contribution easy to start, credited, and accepted by the maintainer",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/219",
-      "updatedAt": "2026-11-16T19:11:05Z",
+      "updatedAt": "2026-11-16T19:19:08Z",
       "labels": [
         {
           "name": "unit",
@@ -233,8 +326,21 @@
       "title": "research: media_parity asserts avg_score, a mean of fields the tolerances declare volatile",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/193",
-      "updatedAt": "2026-11-16T07:17:59Z",
-      "labels": []
+      "updatedAt": "2026-11-16T19:34:11Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
     },
     {
       "number": 190,
@@ -283,7 +389,7 @@
       "title": "programme: one output standard, completeness and the next-output queue",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/183",
-      "updatedAt": "2026-11-16T17:09:47Z",
+      "updatedAt": "2026-11-16T19:17:20Z",
       "labels": [
         {
           "name": "unit",
