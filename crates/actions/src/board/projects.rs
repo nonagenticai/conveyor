@@ -502,6 +502,30 @@ async fn projects_update(
             "must be draft, active, paused, closed or archived",
         ));
     }
+    // A type that names no live catalogue row would make every move deny, so it is refused
+    // here exactly as `projects.create` refuses it (#206).
+    if let Some(code) = input.project_type_code.as_deref() {
+        let code = conveyor_domain::Code::parse(code)
+            .map_err(|error| invalid("project_type_code", "invalid_value", error.to_string()))?;
+        let entry = store::catalogue::get_catalogue_entry_tx(
+            &mut *tx,
+            ctx.tenant,
+            conveyor_domain::CatalogueKind::ProjectType,
+            &code,
+        )
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read project type");
+            ActionError::internal()
+        })?;
+        if entry.is_none_or(|entry| !entry.is_active) {
+            return Err(invalid(
+                "project_type_code",
+                "invalid_value",
+                "no active project_type catalogue row has this code in this tenant",
+            ));
+        }
+    }
     let mut changed = Vec::new();
     if input.name.is_some() {
         changed.push("name");
@@ -511,6 +535,9 @@ async fn projects_update(
     }
     if input.status.is_some() {
         changed.push("status");
+    }
+    if input.project_type_code.is_some() {
+        changed.push("project_type_code");
     }
     if input.repo_url.is_some() {
         changed.push("repo_url");
@@ -522,7 +549,8 @@ async fn projects_update(
         return Err(invalid(
             "name",
             "invalid_value",
-            "nothing to update: supply name, description, status, repo_url or meta",
+            "nothing to update: supply name, description, status, project_type_code, repo_url \
+             or meta",
         ));
     }
     // Metadata is merged, not replaced: the seed owns keys this action does not (`issues`,
@@ -542,6 +570,7 @@ async fn projects_update(
         name: input.name.map(|name| name.trim().to_owned()),
         description: input.description,
         status: input.status,
+        project_type_code: input.project_type_code,
         repo_url: input.repo_url,
         meta,
     };

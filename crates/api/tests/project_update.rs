@@ -100,3 +100,78 @@ async fn a_project_is_edited_under_if_match_and_meta_is_merged() {
         .await;
     assert_eq!(status, 412, "{stale}");
 }
+
+/// #206: a project created without a type can acquire one through the API, and a code that
+/// names no active catalogue row is refused. Before this, `projects.update` had no type field
+/// at all, so a typeless project refused every `cards.move` forever.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_project_type_is_settable_and_validated() {
+    let pg = support::Pg::fresh().await;
+    support::seed(&pg, "dev-a", "alice", "Alice").await;
+    conveyor_store::seed::catalogue(&pg.owner)
+        .await
+        .expect("the catalogue seed");
+    conveyor_actions::board::matrix::clear_cache();
+    let running = support::Running::start(&pg).await;
+
+    // No type at creation: the programme seed's shape.
+    let (status, created) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({"title": "Typeless project"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let created_project = output(&created);
+    assert!(
+        created_project["project_type_code"].is_null(),
+        "created without a type: {created_project}"
+    );
+    let id = created_project["id"].as_str().expect("id").to_owned();
+    let version = created_project["version"].as_i64().expect("version");
+    let etag = format!("\"{version}\"");
+
+    // A code that names no active catalogue row is refused, and nothing is written.
+    let (status, refused) = running
+        .invoke(
+            "projects.update",
+            "dev:alice",
+            json!({"id": id, "project_type_code": "nope"}),
+            Some(&etag),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(output(&refused)["errors"][0]["field"], "project_type_code");
+
+    // An active catalogue type is accepted under If-Match and persists.
+    let (status, updated) = running
+        .invoke(
+            "projects.update",
+            "dev:alice",
+            json!({"id": id, "project_type_code": "delivery"}),
+            Some(&etag),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{updated}");
+    assert_eq!(output(&updated)["project"]["project_type_code"], "delivery");
+    let (status, view) = running
+        .invoke(
+            "projects.get",
+            "dev:alice",
+            json!({"id": id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{view}");
+    assert_eq!(output(&view)["project"]["project_type_code"], "delivery");
+}
