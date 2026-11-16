@@ -11,13 +11,23 @@ card is shown as **not intaken**. V1 surfaces implemented in the Rust app are un
 
 **Two surfaces, one pack.** Served by the app at **https://conveyor.nonagentic.ai/design/** the pack
 is the **operating site**: the unauthenticated routes `/design/data/snapshot.js`,
-`/design/docs/outputs.js` and `/design/docs/output-<id>.html` are read from Postgres for the tenant
-named by `CONVEYOR_PUBLIC_TENANT`, so the public reads the real programme and every output marked
+`/design/docs/outputs.js`, `/design/docs/output-<id>.html` and
+`/design/docs/attachment-<id>` are read from Postgres for the tenant named by
+`CONVEYOR_PUBLIC_TENANT`, so the public reads the real programme and every output marked
 publishable. `console.js` finds the same-origin `/config.json`, signs in against the realm the server
 already trusts (auth-code + PKCE S256, token in memory), and turns the same pack into the operator
-console — intake an issue as a card, move it, comment, claim and release, compose and publish an
-output. Signed out there is no API request and no write control; a missing asset is served
-`no-store`, never cached as a 404.
+console — intake an issue as a card, move it, comment, claim and release, compose an output. Signed
+out there is no API request and no write control; a missing asset is served `no-store`, never
+cached as a 404.
+
+**Authors and publishers are different roles.** An invited tenant member (`member`) composes and
+edits outputs and files a publish request (`documents.request_publish`); only an `admin` moves an
+output into or out of the public window (`documents.publish`). A published output is locked to its
+author: an edit to public content is an admin act, so the author asks for an unpublish first. Every
+content mutation appends a revision (`documents.revision_list/get`); `documents.revision_restore`
+copies a text version forward as a new draft and never republishes. A file attached to an output is
+a child `document` (`kind='attachment'`): PNG and JPEG are served inline, every other type is a
+download, and an attachment is public only while its parent is.
 
 The public sidebar carries the programme only: **Portfolio, Projects, Outputs, Plan, Validation,
 Execution, Documents, Contribute, System architecture**. The V2 product-design study (Organisation,
@@ -27,25 +37,25 @@ explicitly with `?design=1`. The pack still loads the fixture scripts, but no pu
 them.
 
 **Outputs** is the programme register: every output across all projects with its project, unit,
-category, visibility and public URL, filtered by project, unit, category and visibility. Signed in
-it composes, edits with `If-Match`, publishes and unpublishes (the row's own `publishable` flag),
-downloads and deletes; signed out it lists the published index only. A project's workspace adds its
-tranche, `blocked_by`, measured status and evidence from `data/coverage.json`, groups its outputs
-by unit and category, and shows **Expected outputs** — the project's own checklist from
-`meta.expected_outputs`: P0's eight definition artefacts, or a delivery project's brief and, for V2,
-its analysis and architecture. Each row is absent, present-private or published; the first missing
-row is marked **next** and carries its compose template. P0's brief artefact is a computed
-`project briefs N/47` coverage row across the delivery projects. A missing output is a visible gap;
-it is not a backend gate.
+category, author, state and public URL, filtered by those fields and paged with `next_cursor`.
+Signed in it composes, edits with `If-Match`, requests or decides publication, reads the history,
+attaches a file, downloads and deletes; signed out it lists the published index only. A project's
+workspace adds its tranche, `blocked_by`, measured status and evidence from `data/coverage.json`,
+groups its outputs by unit and category, and shows **Expected outputs** — the project's own
+checklist from `meta.expected_outputs`: P0's eight definition artefacts, or a delivery project's
+brief and, for V2, its analysis and architecture. Each row is absent, present-private or published;
+the first missing row is marked **next** and carries its compose template. P0's brief artefact is a
+computed `project briefs N/47` coverage row across the delivery projects. A missing output is a
+visible gap; it is not a backend gate.
 
 The **Projects** destination is the programme workspace: the tenant's projects, a project's board,
 plan link and linked issues, its cards with their process binding and the card type's expected
-outputs, its text **outputs** (compose, edit, publish flag) and the public feedback inbox. Intake
-binds the card type's READY process (`meta.process_key`), so a card can **Start run**
-(`process_runs.start`) and open in the Execution room. Signed in it can edit a project
-(`projects.update`, If-Match) and compose an output. Publishing is the output's `publishable` flag:
-the live route serves it immediately. The homepage mirror at `nonagentic.ai/design` is the old
-read-only copy and is retired by the one-URL unit.
+outputs, its text **outputs** (compose, edit, request publish, admin publish, history, attachments)
+and the public feedback inbox. Intake binds the card type's READY process (`meta.process_key`), so a
+card can **Start run** (`process_runs.start`) and open in the Execution room. Signed in it can edit a
+project (`projects.update`, If-Match) and compose an output. An admin's publish sets the output's
+public bit; the live route serves it immediately. The homepage mirror at `nonagentic.ai/design` is
+the old read-only copy and is retired by the one-URL unit.
 
 The **Execution room** lists the tenant's runs (`runs.list`), renders one run's steps, tool calls,
 gates and outputs (`runs.get`), cancels a live run (`runs.cancel`) and decides a pending gate

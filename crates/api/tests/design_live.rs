@@ -10,6 +10,7 @@
 #[path = "../../actions/tests/support/mod.rs"]
 mod support;
 
+use base64::Engine as _;
 use serde_json::json;
 
 /// The support config with one extra setting: the tenant whose published rows are public.
@@ -36,6 +37,163 @@ async fn get(running: &support::Running, path: &str) -> reqwest::Response {
         .send()
         .await
         .expect("http request")
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn published_attachments_are_served_safely_and_leave_with_the_parent() {
+    let pg = support::Pg::fresh().await;
+    support::seed(&pg, "public", "alice", "Alice").await;
+    let running =
+        support::Running::start_with_config(config_with_public_tenant(&pg, "public")).await;
+
+    let parent = compose(&running, "dev:alice", "Evidence", "# Evidence", true).await;
+    let png_bytes = [0x89, b'P', b'N', b'G', 0x0d, 0x0a, 0x1a, 0x0a];
+    let png = base64::engine::general_purpose::STANDARD.encode(png_bytes);
+    let (status, attachment) = running
+        .invoke(
+            "documents.create",
+            "dev:alice",
+            json!({
+                "title": "evidence.png",
+                "content_type": "image/png",
+                "content_base64": png,
+                "parent_document_id": parent,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{attachment}");
+    let attachment = &attachment["output"];
+    let id = attachment["id"].as_str().expect("attachment id").to_owned();
+    let hash = attachment["content_hash"]
+        .as_str()
+        .expect("content hash")
+        .to_owned();
+
+    let response = get(&running, &format!("/design/docs/attachment-{id}")).await;
+    assert_eq!(response.status(), 200);
+    assert_eq!(
+        response
+            .headers()
+            .get("content-type")
+            .and_then(|value| value.to_str().ok()),
+        Some("image/png")
+    );
+    assert!(
+        response
+            .headers()
+            .get("content-disposition")
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or_default()
+            .starts_with("inline"),
+        "a png is inline"
+    );
+    assert_eq!(
+        response
+            .headers()
+            .get("x-content-type-options")
+            .and_then(|value| value.to_str().ok()),
+        Some("nosniff")
+    );
+    assert!(
+        response
+            .headers()
+            .get("content-security-policy")
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or_default()
+            .contains("sandbox"),
+        "every attachment is sandboxed"
+    );
+    let etag = format!("\"{hash}\"");
+    assert_eq!(
+        response
+            .headers()
+            .get("etag")
+            .and_then(|value| value.to_str().ok()),
+        Some(etag.as_str())
+    );
+    assert_eq!(response.bytes().await.expect("bytes").as_ref(), png_bytes);
+
+    // The same ETag revalidates, and HEAD carries no body.
+    let revalidated = reqwest::Client::new()
+        .get(format!("{}/design/docs/attachment-{id}", running.base()))
+        .header("if-none-match", &etag)
+        .send()
+        .await
+        .expect("revalidate");
+    assert_eq!(revalidated.status(), 304);
+    let head = reqwest::Client::new()
+        .head(format!("{}/design/docs/attachment-{id}", running.base()))
+        .send()
+        .await
+        .expect("head");
+    assert_eq!(head.status(), 200);
+    assert!(head.bytes().await.expect("head bytes").is_empty());
+
+    // An SVG is a download, never inline.
+    let svg = b"<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>";
+    let (status, svg_attachment) = running
+        .invoke(
+            "documents.create",
+            "dev:alice",
+            json!({
+                "title": "diagram.svg",
+                "content_type": "image/svg+xml",
+                "content_base64": base64::engine::general_purpose::STANDARD.encode(svg),
+                "parent_document_id": parent,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{svg_attachment}");
+    let svg_id = svg_attachment["output"]["id"]
+        .as_str()
+        .expect("svg id")
+        .to_owned();
+    let response = get(&running, &format!("/design/docs/attachment-{svg_id}")).await;
+    assert_eq!(response.status(), 200);
+    assert!(
+        response
+            .headers()
+            .get("content-disposition")
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or_default()
+            .starts_with("attachment"),
+        "an svg is never inline"
+    );
+
+    // The public index carries both attachments under the published output.
+    let outputs = get(&running, "/design/docs/outputs.js").await;
+    assert_eq!(outputs.status(), 200);
+    let index = outputs.text().await.expect("outputs body");
+    assert!(index.contains(&id), "{index}");
+    assert!(index.contains(&svg_id), "{index}");
+
+    // Unpublishing the parent removes both on the next request.
+    let (status, unpublished) = running
+        .invoke(
+            "documents.publish",
+            "dev:alice",
+            json!({"id": parent, "publish": false}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{unpublished}");
+    let response = get(&running, &format!("/design/docs/attachment-{id}")).await;
+    assert_eq!(response.status(), 404);
+    assert_eq!(
+        response
+            .headers()
+            .get("cache-control")
+            .and_then(|value| value.to_str().ok()),
+        Some("no-store")
+    );
 }
 
 async fn compose(

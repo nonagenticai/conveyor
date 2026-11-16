@@ -292,6 +292,12 @@ function startServer({ config, state, snapshot }) {
           "documents.update",
           "documents.download",
           "documents.delete",
+          "documents.create",
+          "documents.publish",
+          "documents.request_publish",
+          "documents.revision_list",
+          "documents.revision_get",
+          "documents.revision_restore",
           "projects.create",
           "projects.close",
           "projects.update",
@@ -586,16 +592,21 @@ function startServer({ config, state, snapshot }) {
       if (pathname === "/api/actions/documents.list/invocations") {
         return readBody(req, (body) => {
           const scoped = body.input.project_id;
+          const parent = body.input.parent_document_id;
           assert.ok(
             scoped === undefined || scoped === "p-s02",
             "documents.list is project-scoped or the cross-project register",
           );
-          state.listBodies.push(scoped === undefined ? "register" : scoped);
-          const items = state.documents.map((doc) => {
-            const summary = Object.assign({}, doc);
-            delete summary.body;
-            return summary;
-          });
+          if (parent === undefined) {
+            state.listBodies.push(scoped === undefined ? "register" : scoped);
+          }
+          const items = state.documents
+            .filter((doc) => (parent === undefined ? doc.kind !== "attachment" : doc.parent_document_id === parent))
+            .map((doc) => {
+              const summary = Object.assign({}, doc);
+              delete summary.body;
+              return summary;
+            });
           json(res, 200, { items, next_cursor: null });
         });
         return;
@@ -609,6 +620,7 @@ function startServer({ config, state, snapshot }) {
             id: `d-${state.documents.length + 1}`,
             project_id: input.project_id,
             card_id: input.card_id || null,
+            parent_document_id: null,
             kind: "document",
             title: input.title,
             status: "active",
@@ -617,8 +629,18 @@ function startServer({ config, state, snapshot }) {
             content_hash: "a".repeat(64),
             body: input.body,
             external_ref: null,
-            meta: input.meta || {},
-            publishable: !!input.publishable,
+            meta: {},
+            category: input.category || null,
+            unit: input.unit || null,
+            created_by: "u-1",
+            created_by_name: "Test Operator",
+            updated_by: "u-1",
+            updated_by_name: "Test Operator",
+            published_at: null,
+            published_by: null,
+            published_by_name: null,
+            publish_requested_at: null,
+            publishable: false,
             version: 1,
             created_at: "2026-11-13T00:00:00Z",
             updated_at: "2026-11-13T00:00:00Z",
@@ -628,10 +650,121 @@ function startServer({ config, state, snapshot }) {
         });
         return;
       }
+      if (pathname === "/api/actions/documents.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.ok(input.parent_document_id, "an attachment names its parent output");
+          assert.ok(input.content_base64, "an attachment carries its bytes");
+          const attachment = {
+            id: `a-${state.documents.length + 1}`,
+            project_id: "p-s02",
+            card_id: null,
+            parent_document_id: input.parent_document_id,
+            kind: "attachment",
+            title: input.title,
+            status: "active",
+            content_type: input.content_type,
+            size_bytes: 8,
+            content_hash: "b".repeat(64),
+            body: null,
+            external_ref: null,
+            meta: { content_type: input.content_type, size_bytes: 8 },
+            category: null,
+            unit: null,
+            created_by: "u-1",
+            created_by_name: "Test Operator",
+            publishable: false,
+            version: 1,
+            created_at: "2026-11-13T00:00:00Z",
+            updated_at: "2026-11-13T00:00:00Z",
+          };
+          state.documents.push(attachment);
+          json(res, 201, attachment);
+        });
+        return;
+      }
       if (pathname === "/api/actions/documents.get/invocations") {
         return readBody(req, (body) => {
           const doc = state.documents.find((row) => row.id === body.input.id);
           if (!doc) return json(res, 404, { title: "Not Found", detail: "no such document" });
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.publish/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.publish names a real document");
+          assert.equal(req.headers["if-match"], `"${doc.version}"`, "documents.publish carries If-Match");
+          doc.publishable = !!body.input.publish;
+          doc.published_at = doc.publishable ? "2026-11-13T00:00:00Z" : null;
+          doc.published_by = doc.publishable ? "u-1" : null;
+          doc.published_by_name = doc.publishable ? "Test Operator" : null;
+          doc.publish_requested_at = null;
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.request_publish/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.request_publish names a real document");
+          assert.equal(
+            req.headers["if-match"],
+            `"${doc.version}"`,
+            "documents.request_publish carries If-Match",
+          );
+          doc.publish_requested_at = "2026-11-13T00:00:00Z";
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.revision_list/invocations") {
+        return readBody(req, (body) => {
+          assert.ok(body.input.id, "documents.revision_list names its document");
+          json(res, 200, [
+            {
+              id: "r-1",
+              seq: 1,
+              label: "created",
+              content_hash: "c".repeat(64),
+              author_id: "u-1",
+              author: "Test Operator",
+              status: "draft",
+              created_at: "2026-11-13T00:00:00Z",
+            },
+          ]);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.revision_get/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          json(res, 200, {
+            id: "r-1",
+            seq: body.input.seq,
+            label: "created",
+            content_hash: "c".repeat(64),
+            author_id: "u-1",
+            author: "Test Operator",
+            status: "draft",
+            created_at: "2026-11-13T00:00:00Z",
+            content: { body: doc ? doc.body : "", title: doc ? doc.title : "" },
+          });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.revision_restore/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.revision_restore names a real document");
+          assert.equal(
+            req.headers["if-match"],
+            `"${doc.version}"`,
+            "documents.revision_restore carries If-Match",
+          );
+          doc.version += 1;
+          doc.publishable = false;
           json(res, 200, doc);
         });
         return;
@@ -652,7 +785,8 @@ function startServer({ config, state, snapshot }) {
             doc.body = body.input.body;
             doc.size_bytes = body.input.body.length;
           }
-          if (body.input.publishable !== undefined) doc.publishable = body.input.publishable;
+          if (body.input.category !== undefined) doc.category = body.input.category || null;
+          if (body.input.unit !== undefined) doc.unit = body.input.unit || null;
           doc.version += 1;
           json(res, 200, doc);
         });
@@ -1046,10 +1180,9 @@ function readBody(req, done) {
       await page.fill("#output-title", "S02 design note");
       await page.fill("#output-body", "# Design note\n\nA decision recorded from the console.");
       await page.fill("#output-unit", "7");
-      await page.selectOption("#output-category", "analysis");
-      await page.check("#output-publishable");
+      await page.selectOption("#output-category", "project-brief");
       await page.click('[data-v2="output-save"][data-project="p-s02"]');
-      await page.waitForSelector("text=Output saved and marked public");
+      await page.waitForSelector("text=Output saved as a draft");
       assert.ok(
         consoleState.requests.some((row) => row.path === "/api/actions/documents.compose/invocations"),
         "documents.compose was sent",
@@ -1060,15 +1193,15 @@ function readBody(req, done) {
       const workspaceText = await page.locator("#main").innerText();
       assert.match(workspaceText, /Programme truth/, "the coverage panel renders");
       assert.match(workspaceText, /T1/, "the coverage row's tranche renders");
-      assert.match(workspaceText, /7 · analysis/, "the output is grouped by unit and category");
+      assert.match(workspaceText, /7 · project-brief/, "the output is grouped by unit and category");
       assert.match(workspaceText, /project-brief/, "the project's expected outputs render");
-      assert.match(workspaceText, /1\/3 published/, "one expected output is published");
+      assert.match(workspaceText, /0\/3 published/, "no expected output is published yet");
       await page.click('[data-v2="output-new-template"][data-category="analysis"]');
       await page.waitForSelector("#output-category");
       assert.equal(
         await page.locator("#output-category").inputValue(),
         "analysis",
-        "the inception template pre-sets its category",
+        "the analysis template pre-sets its category",
       );
       assert.match(
         await page.locator("#output-body").inputValue(),
@@ -1078,11 +1211,58 @@ function readBody(req, done) {
       await page.click('#dialog [data-action="close-dialog"]');
       await page.waitForFunction(() => !document.getElementById("dialog").open);
 
+      // ── the admin publish decision ──────────────────────────────────────────────────
+      await page.click('[data-v2="output-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Output published");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.publish/invocations",
+        ),
+        "documents.publish was sent",
+      );
+      assert.equal(consoleState.documents[0].publishable, true, "the publish decision crossed the wire");
+
+      // ── attachments: upload through documents.create, parent-bound ──────────────────
+      await page.click('[data-v2="output-attach"][data-id="d-1"]');
+      await page.waitForSelector("#output-attachments");
+      await page.setInputFiles('[data-v2-input="output-attachment"]', {
+        name: "evidence.png",
+        mimeType: "image/png",
+        buffer: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      });
+      await page.waitForSelector("text=Attachment uploaded");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.create/invocations",
+        ),
+        "documents.create was sent for the attachment",
+      );
+      await page.click('#dialog [data-action="close-dialog"]');
+      await page.waitForFunction(() => !document.getElementById("dialog").open);
+
+      // ── history: the revision list is read, not guessed ─────────────────────────────
+      await page.click('[data-v2="output-history"][data-id="d-1"]');
+      await page.waitForSelector("text=v1");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.revision_list/invocations",
+        ),
+        "documents.revision_list was sent",
+      );
+      await page.click('#dialog [data-action="close-dialog"]');
+      await page.waitForFunction(() => !document.getElementById("dialog").open);
+
+      // ── unpublish, then the author's publish request ────────────────────────────────
       await page.click('[data-v2="output-publish"][data-id="d-1"]');
       await page.waitForSelector("text=Output unpublished");
+      await page.waitForSelector('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.click('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Publish requested");
       assert.ok(
-        consoleState.requests.some((row) => row.path === "/api/actions/documents.update/invocations"),
-        "documents.update was sent",
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.request_publish/invocations",
+        ),
+        "documents.request_publish was sent",
       );
       assert.equal(consoleState.documents[0].publishable, false, "the publish flag crossed the wire");
       await page.waitForSelector("text=0/3 published");
@@ -1103,7 +1283,8 @@ function readBody(req, done) {
       assert.match(registerText, /S02 design note/, "the register lists the output");
       assert.match(registerText, /S02 · Skeleton/, "the register names the project");
       assert.match(registerText, /7/, "the register shows the unit");
-      assert.match(registerText, /analysis/, "the register shows the category");
+      assert.match(registerText, /project-brief/, "the register shows the category");
+      assert.match(registerText, /Test Operator/, "the register shows the author");
       assert.equal(
         await page.locator('select[data-key="outputsUnit"]').count(),
         1,
@@ -1114,12 +1295,12 @@ function readBody(req, done) {
         document.querySelector("#main").innerText.includes("S02 design note"),
       );
       await page.click('[data-v2="output-publish"][data-id="d-1"]');
-      await page.waitForSelector("text=Output marked public");
+      await page.waitForSelector("text=Output published");
       await page.waitForSelector('a[href="docs/output-d-1.html"]');
       assert.equal(
         consoleState.documents[0].publishable,
         true,
-        "the register publishes through documents.update",
+        "the register publishes through documents.publish",
       );
       const [downloadEvent] = await Promise.all([
         page.waitForEvent("download"),
@@ -1133,7 +1314,11 @@ function readBody(req, done) {
       await page.waitForSelector('[data-v2="output-delete-confirm"]');
       await page.click('[data-v2="output-delete-confirm"]');
       await page.waitForSelector("text=Output deleted");
-      assert.equal(consoleState.documents.length, 0, "the delete crossed the wire");
+      assert.equal(
+        consoleState.documents.filter((row) => row.kind !== "attachment").length,
+        0,
+        "the delete crossed the wire",
+      );
 
       // ── a new project's plan reaches projects.update (create has no meta) ───────────
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#projects`);
