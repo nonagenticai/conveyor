@@ -326,10 +326,10 @@ async fn the_producer_drives_the_real_loop_and_records_the_patch() {
         "fail_to_pass must never reach the model: {text}"
     );
     assert_eq!(request["model"], json!("test-model"));
-    assert_eq!(
-        request["tools"],
-        json!([]),
-        "the arm is deliberately tool-less"
+    assert!(
+        request.get("tools").is_none(),
+        "the arm is deliberately tool-less: the field is OMITTED, never an empty array — \
+         OpenAI-compatible backends reject `tools: []` (vLLM answers 400 before the model)"
     );
     let messages = request["messages"].as_array().expect("messages");
     assert!(

@@ -567,11 +567,18 @@ pub(crate) async fn drive(
                 tools,
             } => {
                 let turn = u32::from(agent.turns()) + 1;
-                let input = json!({
+                // An agent with NO tool surface sends no `tools` field at all, never
+                // `"tools": []`. `CompletionIn` already omits an empty array
+                // (`skip_serializing_if`), and OpenAI-compatible backends reject the empty one:
+                // vLLM answers 400 "`tools` must not be an empty array" before the model is
+                // dialled, which is how every tool-less executor failed live on 2026-11-15.
+                let mut input = json!({
                     "model": model,
                     "messages": messages.iter().map(wire_message).collect::<Vec<_>>(),
-                    "tools": tools,
                 });
+                if !tools.is_empty() {
+                    input["tools"] = json!(tools);
+                }
                 let outcome = invoke(
                     pool,
                     registry(),
