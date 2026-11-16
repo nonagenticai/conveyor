@@ -87,8 +87,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/decisions/0005-absorption-sequence-and-repo-scope.html",
       "source": "docs/decisions/0005-absorption-sequence-and-repo-scope.md",
       "section": "Decisions",
-      "sha256": "d058956231b4d25f7667edd9a2ac50cf141fa4d030088225a04fefc7b663ce50",
-      "bytes": 2816,
+      "sha256": "497cfc30bfe9f8e98637c6a98fd408e5d24a47688571fb864f908a5589247ee3",
+      "bytes": 4254,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0005-absorption-sequence-and-repo-scope.md"
     },
     {
