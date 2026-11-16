@@ -1191,6 +1191,16 @@ fn bytes_match_type(content_type: &str, bytes: &[u8]) -> bool {
             std::str::from_utf8(bytes).is_ok() && serde_json::from_slice::<Value>(bytes).is_ok()
         }
         "text/csv" | "text/markdown" | "text/plain" => std::str::from_utf8(bytes).is_ok(),
+        // ISO-BMFF: bytes 4..8 are the `ftyp` box type. `video/mp4`, `audio/mp4` and `audio/m4b`
+        // all share it, so the declared type is the caller's claim and the container is the proof.
+        "video/mp4" => bytes.len() >= 12 && &bytes[4..8] == b"ftyp",
+        // RIFF container with a `WAVE` form type.
+        "audio/wav" => bytes.len() >= 12 && &bytes[0..4] == b"RIFF" && &bytes[8..12] == b"WAVE",
+        // MPEG audio: an ID3v2 tag, or a bare frame sync (11 set bits).
+        "audio/mpeg" => {
+            bytes.starts_with(b"ID3")
+                || matches!(bytes.first(), Some(0xff) if bytes.get(1).is_some_and(|b| b & 0xe0 == 0xe0))
+        }
         _ => false,
     }
 }

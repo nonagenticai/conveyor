@@ -37,15 +37,26 @@ pub const MAX_UPLOAD_BYTES: usize = 10 * 1024 * 1024;
 pub const MAX_OUTPUT_BYTES: usize = 256 * 1024;
 
 /// The content types a document may declare. `application/octet-stream` is deliberately absent.
-pub const ALLOWED_CONTENT_TYPES: [&str; 8] = [
+/// Every type the store will hold, each with a magic-byte check in
+/// `actions::bytes_match_type` — the allowlist and the verification are one decision and must
+/// change together.
+///
+/// The three media types are here because a media executor's INPUT is a document: a
+/// `runner/v1` job reads its footage through `GET /api/jobs/{id}/inputs/{name}`, and that route
+/// resolves a document row. Without them a tenant had no way to put a video in a job at all
+/// (#185). A 10 MiB upload cap still applies, so this is for short clips and stills, not masters.
+pub const ALLOWED_CONTENT_TYPES: [&str; 11] = [
     "application/pdf",
     "application/json",
+    "audio/mpeg",
+    "audio/wav",
     "image/jpeg",
     "image/png",
     "image/svg+xml",
     "text/csv",
     "text/markdown",
     "text/plain",
+    "video/mp4",
 ];
 
 /// The event type every document mutation emits.

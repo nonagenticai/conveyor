@@ -26,6 +26,7 @@
 //! row, so a call after the job has finished starts a new job; `idempotent = true` declares exactly
 //! the live-window coalescing that is implemented.
 
+use conveyor_domain::runner::{Input, Output};
 use conveyor_store as store;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -164,9 +165,157 @@ fn require_media_source(field: &str, value: &str) -> Result<(), ActionError> {
     require_input_name(field, value.strip_prefix("file://").unwrap_or(value))
 }
 
-/// The job envelope the runner dispatch reads: the capability's parameters only.
-fn job_payload(params: Value) -> Value {
-    json!({ "params": params })
+/// The largest body this build accepts for one media artefact.
+///
+/// `runner/v1` makes the executor check its own `Output.max_bytes` and the route check the same
+/// number again, so this is the one place a kind's ceiling is chosen. 256 MiB is the ceiling the
+/// compress/record kinds were captured with; a kind that can exceed it must say so here.
+const MAX_ARTEFACT_BYTES: i64 = 256 * 1024 * 1024;
+
+/// The job envelope the runner dispatch reads: the params, the documents, the closed output set.
+///
+/// `Instruction.inputs` and `Instruction.outputs` are the only way bytes cross the pod boundary
+/// (`apps/server/src/runner_dispatch.rs::instruction_for` reads exactly these two keys), and the
+/// executor uploads ONLY a declared name (`apps/media/src/common/runner.rs`). An action that
+/// emitted neither produced a job that could not read a file and could not persist one.
+fn job_payload(params: Value, inputs: Vec<Input>, outputs: Vec<Output>) -> Value {
+    if inputs.is_empty() && outputs.is_empty() {
+        return json!({ "params": params });
+    }
+    json!({ "params": params, "inputs": inputs, "outputs": outputs })
+}
+
+/// Resolve the caller's `documents` map into `runner/v1` inputs.
+///
+/// A document must be `active` and carry bytes — the same three conditions
+/// `crate::documents::actions::fetch_bytes` enforces, because the route the pod then calls applies
+/// them again and a job that starts only to fail `404` on its first download is worse than a 400
+/// here. The hash is the document's own, so the executor can refuse a download that does not
+/// match before it renders anything.
+async fn declared_inputs(
+    tx: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    documents: Option<std::collections::BTreeMap<String, Uuid>>,
+) -> Result<Vec<Input>, ActionError> {
+    let Some(documents) = documents else {
+        return Ok(Vec::new());
+    };
+    let mut inputs = Vec::with_capacity(documents.len());
+    for (name, document_id) in documents {
+        require_input_name("documents", &name)?;
+        let record = store::document::get_document_tx(&mut *tx, tenant, document_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, %document_id, "media: read the input document");
+                ActionError::internal()
+            })?
+            .ok_or_else(|| {
+                invalid(
+                    "documents",
+                    "names a document this tenant does not have, or that has no bytes",
+                )
+            })?;
+        let (hash, content_type) = match (record.status.as_str(), record.object_key.as_deref()) {
+            ("active", Some(_)) => (
+                record
+                    .content_hash
+                    .clone()
+                    .ok_or_else(ActionError::internal)?,
+                record
+                    .meta
+                    .get("content_type")
+                    .and_then(Value::as_str)
+                    .unwrap_or("application/octet-stream")
+                    .to_owned(),
+            ),
+            _ => {
+                return Err(invalid(
+                    "documents",
+                    "names a document that is not active or has no stored bytes",
+                ));
+            }
+        };
+        let bytes = record
+            .meta
+            .get("size_bytes")
+            .and_then(Value::as_i64)
+            .unwrap_or(0);
+        inputs.push(Input {
+            name,
+            document_id,
+            sha256: hash,
+            content_type,
+            bytes,
+        });
+    }
+    Ok(inputs)
+}
+
+/// One artefact a kind writes, as the executor will name it in `out_dir`.
+#[derive(Debug)]
+struct Declared {
+    name: String,
+    content_type: &'static str,
+}
+
+/// What a kind writes, derived from the params the executor will receive.
+///
+/// Every arm mirrors a specific executor line; the name must match byte for byte or the executor
+/// fails `output_missing` after doing the work. A kind that legitimately writes nothing returns
+/// an empty set, and the reason is stated — `outputs: []` is always a decision here.
+fn declared_outputs(kind: &str, params: &Value) -> Vec<Declared> {
+    let text = |field: &str| params.get(field).and_then(Value::as_str);
+    match kind {
+        // browser/render.rs:78 — `format!("{name}.{format}")`, name `render`, format `pdf`.
+        RENDER_HTML => {
+            let name = text("name").unwrap_or("render");
+            let format = text("format").unwrap_or("pdf");
+            let content_type = if format == "png" {
+                "image/png"
+            } else {
+                "application/pdf"
+            };
+            vec![Declared {
+                name: format!("{name}.{format}"),
+                content_type,
+            }]
+        }
+        // ffmpeg/compile.rs:92 — `DEFAULT_NAME = "compile.mp4"`, the param verbatim otherwise.
+        COMPILE_VIDEO => vec![Declared {
+            name: text("name").unwrap_or("compile.mp4").to_owned(),
+            content_type: "video/mp4",
+        }],
+        // browser/produce.rs:1892 reads `params.name`, which ProduceVideoIn never emits, so the
+        // artefact is always its DEFAULT_NAME.
+        PRODUCE_VIDEO => vec![Declared {
+            name: "produce.mp4".to_owned(),
+            content_type: "video/mp4",
+        }],
+        // browser/record.rs:182 — `{base}.mp4`, base = `name` (never emitted by the action) else
+        // `part_id` else `recording`.
+        RECORD_BROWSER => {
+            let base = text("part_id").unwrap_or("recording");
+            let name = if base.to_ascii_lowercase().ends_with(".mp4") {
+                base.to_owned()
+            } else {
+                format!("{base}.mp4")
+            };
+            vec![Declared {
+                name,
+                content_type: "video/mp4",
+            }]
+        }
+        // ⛔ NOT DECLARED, with the reason, because a silent `[]` is how an artefact goes missing:
+        //
+        // `media.thumbnail` and `media.concat_audio` write under `{namespace}/` (thumbnail.rs:88,
+        // concat.rs:173) and `POST /api/jobs/{id}/outputs/{name}` is ONE path segment, so no route
+        // can carry that name. `media.run_gherkin` names its artefacts per scenario
+        // (gherkin.rs:159), which no up-front closed set can enumerate. `media.probe_video`,
+        // `media.analyze_video`, `media.analyze_audio` and `media.ocr` write no artefact at all —
+        // their answer IS the result document. Flattening the first two is a follow-up unit; see
+        // the deviation table in #185.
+        _ => Vec::new(),
+    }
 }
 
 /// Enqueue one job of `kind` and return its id, or the id of the live job this call joined.
@@ -179,8 +328,18 @@ async fn enqueue_job(
     ctx: &HandlerCtx,
     kind: &'static str,
     params: Value,
+    documents: Option<std::collections::BTreeMap<String, Uuid>>,
 ) -> Result<MediaJobOut, ActionError> {
-    let payload = job_payload(params);
+    let inputs = declared_inputs(tx, ctx.tenant, documents).await?;
+    let outputs: Vec<Output> = declared_outputs(kind, &params)
+        .into_iter()
+        .map(|declared| Output {
+            name: declared.name,
+            content_type: declared.content_type.to_owned(),
+            max_bytes: MAX_ARTEFACT_BYTES,
+        })
+        .collect();
+    let payload = job_payload(params, inputs, outputs);
     let encoded = serde_json::to_vec(&payload).map_err(|error| {
         tracing::error!(%error, kind, "media: the job payload does not serialise");
         ActionError::internal()
@@ -288,6 +447,12 @@ pub enum RenderFormat {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct RenderHtmlIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// `pdf` (default) or `png`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub format: Option<RenderFormat>,
@@ -461,6 +626,12 @@ impl CompileShotIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct CompileVideoIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// The shots to join, in timeline order; at least one.
     pub shots: Vec<CompileShotIn>,
     /// The master cadence; snapped to the executor's legal set. Defaults to 30.
@@ -513,6 +684,12 @@ impl CompileVideoIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ThumbnailIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// The video in the job's work directory.
     pub video_url: String,
     /// How many candidates to sample; clamped by the executor to 1–12, default 3.
@@ -559,6 +736,12 @@ pub struct ConcatClipIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ConcatAudioIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// The clips to join, in order; at least one, at most 10 000.
     pub clips: Vec<ConcatClipIn>,
     /// `wav` (default), `mp3` or `m4b`.
@@ -610,6 +793,12 @@ impl ConcatAudioIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ProbeVideoIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// The file in the job's work directory to probe.
     pub input: String,
 }
@@ -627,6 +816,12 @@ impl ProbeVideoIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct AnalyzeVideoIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// The video in the job's work directory.
     pub input: String,
     /// The frame-sampling interval in seconds; a positive number.
@@ -666,6 +861,12 @@ impl AnalyzeVideoIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct AnalyzeAudioIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// The audio file in the job's work directory.
     pub input: String,
 }
@@ -683,6 +884,12 @@ impl AnalyzeAudioIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct OcrIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// The image in the job's work directory.
     pub input: String,
     /// The installed language; this image serves `eng` only.
@@ -730,6 +937,12 @@ impl OcrIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ProduceVideoIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// Shot-list mode: the request's own shot definitions and supplied recordings.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub shot_list: Option<Value>,
@@ -809,6 +1022,12 @@ impl ProduceVideoIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct RecordBrowserIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// The page, as inline HTML. Pass exactly one page source.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub html: Option<String>,
@@ -873,6 +1092,12 @@ impl RecordBrowserIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct RunGherkinIn {
+    /// Stored documents this job's work directory must contain, keyed by the name the params
+    /// reference (`video_url: "clip.mp4"` pairs with `{"clip.mp4": <document id>}`). Read by the
+    /// action, resolved to a hash and content type, and sent to the executor as `runner/v1`
+    /// inputs — never echoed back into `params`.
+    #[serde(default, skip_serializing)]
+    pub documents: Option<std::collections::BTreeMap<String, Uuid>>,
     /// The Gherkin feature document.
     pub feature: String,
     /// The page under test: a `file://` document, or an `http(s)` URL with `allow_network`.
@@ -961,7 +1186,8 @@ async fn media_render_html(
     ctx: HandlerCtx,
     input: RenderHtmlIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, RENDER_HTML, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, RENDER_HTML, input.params()?, documents).await
 }
 
 /// Compile shots into one encoded video.
@@ -981,7 +1207,8 @@ async fn media_compile_video(
     ctx: HandlerCtx,
     input: CompileVideoIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, COMPILE_VIDEO, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, COMPILE_VIDEO, input.params()?, documents).await
 }
 
 /// Extract poster candidates from a video.
@@ -1001,7 +1228,8 @@ async fn media_thumbnail(
     ctx: HandlerCtx,
     input: ThumbnailIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, THUMBNAIL, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, THUMBNAIL, input.params()?, documents).await
 }
 
 /// Join audio clips into one track.
@@ -1021,7 +1249,8 @@ async fn media_concat_audio(
     ctx: HandlerCtx,
     input: ConcatAudioIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, CONCAT_AUDIO, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, CONCAT_AUDIO, input.params()?, documents).await
 }
 
 /// Report what a media file is.
@@ -1041,7 +1270,8 @@ async fn media_probe_video(
     ctx: HandlerCtx,
     input: ProbeVideoIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, PROBE_VIDEO, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, PROBE_VIDEO, input.params()?, documents).await
 }
 
 /// Measure a video: duration, dimensions, frame rate, brightness and scene changes.
@@ -1061,7 +1291,8 @@ async fn media_analyze_video(
     ctx: HandlerCtx,
     input: AnalyzeVideoIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, ANALYZE_VIDEO, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, ANALYZE_VIDEO, input.params()?, documents).await
 }
 
 /// Measure an audio track: its exact decoded duration and stream layout.
@@ -1081,7 +1312,8 @@ async fn media_analyze_audio(
     ctx: HandlerCtx,
     input: AnalyzeAudioIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, ANALYZE_AUDIO, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, ANALYZE_AUDIO, input.params()?, documents).await
 }
 
 /// Read text out of an image.
@@ -1101,7 +1333,8 @@ async fn media_ocr(
     ctx: HandlerCtx,
     input: OcrIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, OCR, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, OCR, input.params()?, documents).await
 }
 
 /// Assemble one deliverable from explicit shot definitions.
@@ -1121,7 +1354,8 @@ async fn media_produce_video(
     ctx: HandlerCtx,
     input: ProduceVideoIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, PRODUCE_VIDEO, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, PRODUCE_VIDEO, input.params()?, documents).await
 }
 
 /// Record a browser page into a video.
@@ -1141,7 +1375,8 @@ async fn media_record_browser(
     ctx: HandlerCtx,
     input: RecordBrowserIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, RECORD_BROWSER, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, RECORD_BROWSER, input.params()?, documents).await
 }
 
 /// Run a Gherkin feature against one page.
@@ -1161,7 +1396,8 @@ async fn media_run_gherkin(
     ctx: HandlerCtx,
     input: RunGherkinIn,
 ) -> Result<MediaJobOut, ActionError> {
-    enqueue_job(tx, &ctx, RUN_GHERKIN, input.params()?).await
+    let documents = input.documents.clone();
+    enqueue_job(tx, &ctx, RUN_GHERKIN, input.params()?, documents).await
 }
 
 #[cfg(test)]
@@ -1262,6 +1498,7 @@ mod tests {
     #[test]
     fn render_html_requires_exactly_one_document() {
         let both = RenderHtmlIn {
+            documents: None,
             format: None,
             width: None,
             height: None,
@@ -1272,6 +1509,7 @@ mod tests {
         };
         assert!(both.params().is_err(), "two documents must be refused");
         let neither = RenderHtmlIn {
+            documents: None,
             format: None,
             width: None,
             height: None,
@@ -1282,6 +1520,7 @@ mod tests {
         };
         assert!(neither.params().is_err(), "no document must be refused");
         let empty = RenderHtmlIn {
+            documents: None,
             format: None,
             width: None,
             height: None,
@@ -1296,6 +1535,7 @@ mod tests {
     #[test]
     fn compile_refuses_an_empty_shot_list() {
         let input = CompileVideoIn {
+            documents: None,
             shots: Vec::new(),
             cadence: None,
             emit_shot_timeline: None,
@@ -1309,6 +1549,7 @@ mod tests {
     #[test]
     fn ocr_refuses_a_language_and_a_mode_the_image_does_not_serve() {
         let language = OcrIn {
+            documents: None,
             input: "inputs/page.png".into(),
             lang: Some("deu".into()),
             psm: None,
@@ -1318,10 +1559,120 @@ mod tests {
             "an uninstalled language is refused"
         );
         let psm = OcrIn {
+            documents: None,
             input: "inputs/page.png".into(),
             lang: None,
             psm: Some(4),
         };
         assert!(psm.params().is_err(), "an unserved psm is refused");
+    }
+}
+
+#[cfg(test)]
+mod declared {
+    use super::*;
+
+    /// The kinds that write exactly one artefact, and the ones that write none.
+    ///
+    /// This table is the decision, so a new kind cannot arrive without someone choosing a side:
+    /// `declared_outputs` returns an empty set for anything unlisted, and an artefact that is
+    /// written but not declared is silently discarded by the executor.
+    const ONE_ARTEFACT: [&str; 4] = [RENDER_HTML, COMPILE_VIDEO, PRODUCE_VIDEO, RECORD_BROWSER];
+
+    #[test]
+    fn every_kind_is_accounted_for() {
+        for kind in KINDS {
+            let outputs = declared_outputs(kind, &json!({}));
+            let expected = usize::from(ONE_ARTEFACT.contains(&kind));
+            assert_eq!(outputs.len(), expected, "{kind} declares {outputs:?}");
+        }
+    }
+
+    #[test]
+    fn render_names_the_file_the_executor_writes() {
+        // browser/render.rs:78 — `format!("{name}.{format}")`.
+        let default = declared_outputs(RENDER_HTML, &json!({}));
+        assert_eq!(default.len(), 1);
+        assert_eq!(default[0].name, "render.pdf");
+        assert_eq!(default[0].content_type, "application/pdf");
+
+        let png = declared_outputs(RENDER_HTML, &json!({"name": "poster", "format": "png"}));
+        assert_eq!(png[0].name, "poster.png");
+        assert_eq!(png[0].content_type, "image/png");
+    }
+
+    #[test]
+    fn compile_names_the_file_the_executor_writes() {
+        // ffmpeg/compile.rs:92 — `DEFAULT_NAME = "compile.mp4"`, the param verbatim otherwise.
+        assert_eq!(
+            declared_outputs(COMPILE_VIDEO, &json!({}))[0].name,
+            "compile.mp4"
+        );
+        assert_eq!(
+            declared_outputs(COMPILE_VIDEO, &json!({"name": "film.mp4"}))[0].name,
+            "film.mp4"
+        );
+    }
+
+    #[test]
+    fn produce_and_record_name_the_files_their_executors_write() {
+        // browser/produce.rs:1892 reads `params.name`, which ProduceVideoIn never emits.
+        assert_eq!(
+            declared_outputs(PRODUCE_VIDEO, &json!({"part_id": "p1"}))[0].name,
+            "produce.mp4"
+        );
+        // browser/record.rs:182 — `{base}.mp4`, base = `part_id` else `recording`.
+        assert_eq!(
+            declared_outputs(RECORD_BROWSER, &json!({}))[0].name,
+            "recording.mp4"
+        );
+        assert_eq!(
+            declared_outputs(RECORD_BROWSER, &json!({"part_id": "anim001"}))[0].name,
+            "anim001.mp4"
+        );
+        assert_eq!(
+            declared_outputs(RECORD_BROWSER, &json!({"part_id": "anim001.mp4"}))[0].name,
+            "anim001.mp4",
+            "an already-suffixed stem is not doubled"
+        );
+    }
+
+    #[test]
+    fn the_kinds_that_write_no_artefact_declare_none() {
+        // Their answer IS the result document, or their name is not expressible as one route
+        // segment (`thumbnail`/`concat_audio` write under `{namespace}/`) — see the comment on
+        // `declared_outputs`. Either way the empty set is deliberate.
+        for kind in [
+            PROBE_VIDEO,
+            ANALYZE_VIDEO,
+            ANALYZE_AUDIO,
+            OCR,
+            THUMBNAIL,
+            CONCAT_AUDIO,
+            RUN_GHERKIN,
+        ] {
+            assert!(
+                declared_outputs(kind, &json!({})).is_empty(),
+                "{kind} must declare no artefact"
+            );
+        }
+    }
+
+    #[test]
+    fn a_document_map_never_leaks_into_params() {
+        // `documents` is read by the action and sent as `runner/v1` inputs; the executor receives
+        // it as a downloaded file, so echoing the ids back into `params` would be a second,
+        // unchecked source of truth.
+        let input: RenderHtmlIn = serde_json::from_value(json!({
+            "html": "<p>x</p>",
+            "documents": {"page.html": Uuid::new_v4()},
+        }))
+        .expect("the map is accepted");
+        assert!(input.documents.is_some());
+        let params = input.params().expect("params");
+        assert!(
+            params.get("documents").is_none(),
+            "params must not carry the document map: {params}"
+        );
     }
 }

@@ -55,6 +55,13 @@ pub struct Job {
     pub max_attempts: i32,
     pub lease_until: Option<DateTime<Utc>>,
     pub lease_token: Option<Uuid>,
+    /// True when the last claim was a CONTINUATION of an attempt already counted (`defer`).
+    ///
+    /// A dispatched pod outlives the worker's claim: the poll defers between cycles, which leaves
+    /// the row `pending` with no lease. This flag is what distinguishes "between two polls of the
+    /// same attempt" from "a fresh job nobody is working", and the job byte routes depend on that
+    /// distinction — see `conveyor_api::job_routes::fence`.
+    pub continuation: bool,
     pub last_error: Option<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -84,7 +91,8 @@ pub struct Finish {
 }
 
 const COLUMNS: &str = "id, tenant_id, kind, dedupe_key, status, payload, run_after, attempts, \
-                       max_attempts, lease_until, lease_token, last_error, created_at, updated_at";
+                       max_attempts, lease_until, lease_token, continuation, last_error, \
+                       created_at, updated_at";
 
 /// Mark every expired-lease row that has no attempt left as `dead`.
 ///
