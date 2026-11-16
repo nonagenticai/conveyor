@@ -8,6 +8,10 @@ snapshot hash and timestamp; an unwired destination or tab keeps the `V2 · PROP
 The Plan **Boards** tab is a join, not a seed: it renders each project's GitHub issues from the
 issue registry fetched at publish, joined to the conveyor's own cards and runs. A unit with no real
 card is shown as **not intaken**. V1 surfaces implemented in the Rust app are unlabelled.
+The registry is refreshed by the `issue-registry` workflow
+(`.github/workflows/issue-registry.yml`), which runs `scripts/fetch-issues.sh` daily and opens one
+generated-data PR when GitHub's issues have moved; merging that PR rebuilds the image the API
+serves the file from.
 
 **Two surfaces, one pack.** Served by the app at **https://conveyor.nonagentic.ai/design/** the pack
 is the **operating site**: the unauthenticated routes `/design/data/snapshot.js`,
