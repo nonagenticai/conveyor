@@ -178,6 +178,7 @@ pub async fn create_chat_completion(
         tenant_id: effective.tenant_id.clone(),
         license_id: identity.license_id.clone(),
         delegated_by: effective.delegated_by.clone(),
+        actor_id: actor_id(&headers, state.config().service_actor_id.as_deref()),
         ..CallContext::default()
     };
     record(
@@ -308,6 +309,29 @@ fn attribution(headers: &HeaderMap, name: &str) -> Option<String> {
 fn project_id(headers: &HeaderMap) -> Option<String> {
     let value = attribution(headers, "x-project-id")?;
     uuid::Uuid::parse_str(&value).ok().map(|_| value)
+}
+
+/// The actor to stamp on a cost event: the caller's `X-Actor-Id` when it is a UUID, else the
+/// service's own subject (`SERVICE_ACTOR_ID`).
+///
+/// A call no human made belongs to the calling service, which is what the billing attribution
+/// rule means by `actor_id` and what its triage instructs (`printenv SERVICE_ACTOR_ID` in the
+/// emitter pod). This is the estate-wide convention; the Python reference instead classified the
+/// introspected licence holder as `tenant`/`member` and never defaulted a person. That
+/// classification is not ported here because the Rust introspection client does not parse the
+/// subject kind — the explicit env value is the port's equivalent and is set on the Deployment.
+///
+/// Absent, blank, non-UTF-8 and non-UUID header values all mean "no actor was sent": a bad header
+/// never fails a request, and an unset service id leaves the field empty rather than invented.
+fn actor_id(headers: &HeaderMap, service_actor: Option<&str>) -> Option<String> {
+    let sent =
+        attribution(headers, "x-actor-id").filter(|value| uuid::Uuid::parse_str(value).is_ok());
+    sent.or_else(|| {
+        service_actor
+            .map(str::trim)
+            .filter(|value| uuid::Uuid::parse_str(value).is_ok())
+            .map(str::to_owned)
+    })
 }
 
 /// Add the attribution headers and the policy hop to a call context. Shared by the
@@ -623,6 +647,7 @@ fn cost_event(
         // settlement draining another caller's hold.
         reservation_id: reservation_id.map(str::to_owned),
         project_id: context.project_id.clone(),
+        actor_id: context.actor_id.clone(),
         card_id: context.card_id.clone(),
         execution_id: context.parent_execution_id.clone(),
         delegated_by: context.delegated_by.clone(),
@@ -667,6 +692,7 @@ async fn stream_completion(
             tenant_id: effective.tenant_id.clone(),
             license_id: identity.license_id.clone(),
             delegated_by: effective.delegated_by.clone(),
+            actor_id: actor_id(&headers, state.config().service_actor_id.as_deref()),
             ..CallContext::default()
         },
         &headers,
@@ -1011,6 +1037,7 @@ fn stream_cost_event(
         ),
         reservation_id: reservation_id.map(str::to_owned),
         project_id: context.project_id.clone(),
+        actor_id: context.actor_id.clone(),
         card_id: context.card_id.clone(),
         execution_id: context.parent_execution_id.clone(),
         delegated_by: context.delegated_by.clone(),
@@ -1237,5 +1264,41 @@ mod tests {
         assert_eq!(body["detail"][0]["loc"], json!(["body", "messages"]));
         assert_eq!(body["detail"][0]["msg"], "Field required");
         assert_eq!(body["detail"][0]["input"], json!({"model": "stub-model"}));
+    }
+
+    #[test]
+    fn the_actor_is_the_sent_header_then_the_service_subject() {
+        use axum::http::{HeaderMap, HeaderValue};
+
+        use super::actor_id;
+
+        let service = "98a72edd-06ee-408f-9f08-f88ce35897a5";
+        let human = "01a1681e-81f2-7487-af71-b888fed32b37";
+        let mut headers = HeaderMap::new();
+        // No header: a call no human made belongs to the calling service.
+        assert_eq!(
+            actor_id(&headers, Some(service)),
+            Some(service.to_owned()),
+            "the service subject is the fallback"
+        );
+        // A valid header wins over the service subject.
+        headers.insert("x-actor-id", HeaderValue::from_static(human));
+        assert_eq!(
+            actor_id(&headers, Some(service)),
+            Some(human.to_owned()),
+            "the caller's own actor wins"
+        );
+        // A malformed or blank header never fails a request and never wins.
+        for sent in ["not-a-uuid", "   "] {
+            headers.insert("x-actor-id", HeaderValue::from_str(sent).expect("header"));
+            assert_eq!(
+                actor_id(&headers, Some(service)),
+                Some(service.to_owned()),
+                "a bad header falls back to the service subject"
+            );
+        }
+        // Neither present, or a malformed fallback: absent, never invented.
+        assert_eq!(actor_id(&HeaderMap::new(), None), None);
+        assert_eq!(actor_id(&HeaderMap::new(), Some("not-a-uuid")), None);
     }
 }
