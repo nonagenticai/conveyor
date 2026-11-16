@@ -112,10 +112,12 @@ jobs:
           print(f"- Closed or reopened: {listing(moved)}")
           print(f"- Removed: {listing(removed)}")
           print()
-          print("This is a docs-only change: `checks`, `image` and `service-image` are created and")
-          print("skipped; `design-pack` validates the file. Merging rebuilds the image, which is how")
-          print("the public design page receives it. This PR is generated and is never auto-merged;")
-          print("a maintainer merges it.")
+          print("The workflow dispatches `ci-public` on this branch so the required contexts exist")
+          print("on this head (a `GITHUB_TOKEN`-created PR triggers no `pull_request` workflow):")
+          print("`checks` runs the suite, `image` builds without pushing, `service-image` builds")
+          print("and smokes, and `design-pack` validates the file. Merging rebuilds the image, which")
+          print("is how the public design page receives it. This PR is generated and is never")
+          print("auto-merged; a maintainer merges it.")
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -129,9 +131,19 @@ jobs:
             gh pr edit "$open" --repo "$REPO" --body-file "$RUNNER_TEMP/pr-body.md"
             echo "Updated the open generated PR #$open." >> "$GITHUB_STEP_SUMMARY"
           else
-            gh pr create --repo "$REPO" --base main --head automation/issue-registry \
-              --title "docs: refresh the public issue registry (automated)" \
-              --body-file "$RUNNER_TEMP/pr-body.md"
+            # A closed-without-merge PR wedges `gh pr create` (422 "already exists" for this
+            # head); reopen it instead of failing every day. Merged PRs are excluded.
+            closed="$(gh pr list --repo "$REPO" --head automation/issue-registry --state closed \
+              --json number,mergedAt --jq '[.[] | select(.mergedAt == null)][0].number')"
+            if [ -n "$closed" ]; then
+              gh pr reopen "$closed" --repo "$REPO"
+              gh pr edit "$closed" --repo "$REPO" --body-file "$RUNNER_TEMP/pr-body.md"
+              echo "Reopened the closed generated PR #$closed." >> "$GITHUB_STEP_SUMMARY"
+            else
+              gh pr create --repo "$REPO" --base main --head automation/issue-registry \
+                --title "docs: refresh the public issue registry (automated)" \
+                --body-file "$RUNNER_TEMP/pr-body.md"
+            fi
           fi
           # Recursion-guard exemption: `pull_request` workflows do not run for a PR created with
           # `GITHUB_TOKEN`, so nothing would create the required contexts. `workflow_dispatch` is
