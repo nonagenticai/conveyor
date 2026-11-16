@@ -1,6 +1,35 @@
 {
   "issues": [
     {
+      "number": 235,
+      "title": "Rust telemetry parity: cost-event attribution + licence-expiry metrics",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/235",
+      "updatedAt": "2026-11-16T21:17:00Z",
+      "labels": []
+    },
+    {
+      "number": 231,
+      "title": "console: the programme store is operable \u2014 workspace, project class, review requests and public feedback",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/231",
+      "updatedAt": "2026-11-16T21:05:24Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S09",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 226,
       "title": "research-media: the tenant gate is unauthenticated \u2014 a bare X-Tenant-Id is trusted (blocks #205 P4)",
       "state": "OPEN",
@@ -132,7 +161,7 @@
       "title": "programme: the MSP and TOGAF rigour layer (V2 + P0 + T9 plan + design study)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/216",
-      "updatedAt": "2026-11-16T19:01:42Z",
+      "updatedAt": "2026-11-16T20:52:40Z",
       "labels": [
         {
           "name": "unit",
@@ -149,7 +178,7 @@
       "title": "deploy: bind media.generate_image to the image host \u2014 the URL env and the egress rule",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/214",
-      "updatedAt": "2026-11-16T18:24:48Z",
+      "updatedAt": "2026-11-16T20:25:17Z",
       "labels": [
         {
           "name": "unit",
@@ -221,7 +250,7 @@
       "title": "estate: deploy and cut over the absorbed research (webscraper + media-discovery)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/205",
-      "updatedAt": "2026-11-16T18:12:16Z",
+      "updatedAt": "2026-11-16T20:32:23Z",
       "labels": [
         {
           "name": "unit",
@@ -387,9 +416,9 @@
     {
       "number": 183,
       "title": "programme: one output standard, completeness and the next-output queue",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/183",
-      "updatedAt": "2026-11-16T19:17:20Z",
+      "updatedAt": "2026-11-16T20:11:19Z",
       "labels": [
         {
           "name": "unit",
@@ -544,7 +573,7 @@
       "title": "ops: host control \u2014 a fixed-verb agent and the systemctl actions",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/172",
-      "updatedAt": "2026-11-15T21:42:44Z",
+      "updatedAt": "2026-11-16T19:59:07Z",
       "labels": [
         {
           "name": "unit",
@@ -731,9 +760,9 @@
     {
       "number": 160,
       "title": "executor: the inference endpoint is TENANT configuration \u2014 a tenant-admin registers it in the console, not a platform env var",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/160",
-      "updatedAt": "2026-11-16T18:46:58Z",
+      "updatedAt": "2026-11-16T21:15:50Z",
       "labels": [
         {
           "name": "unit",
@@ -1344,17 +1373,13 @@
     {
       "number": 95,
       "title": "estate: deploy and cut over the absorbed licenses (P4 + the live shadow window)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/95",
-      "updatedAt": "2026-11-16T18:34:01Z",
+      "updatedAt": "2026-11-16T20:11:05Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
-        },
-        {
-          "name": "status:blocked",
-          "color": "D93F0B"
         }
       ]
     },
@@ -1907,7 +1932,7 @@
       "title": "estate: absorb billing-service \u2014 contract, Rust rewrite, parity, metering reconciliation, cutover",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/46",
-      "updatedAt": "2026-11-16T18:46:34Z",
+      "updatedAt": "2026-11-16T20:47:12Z",
       "labels": [
         {
           "name": "unit",
