@@ -48,6 +48,7 @@ fn echo_spec() -> ActionSpec {
             path: "/echo",
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }
@@ -83,6 +84,7 @@ fn slow_spec() -> ActionSpec {
             path: "/slow",
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }
@@ -117,6 +119,7 @@ fn fail_spec() -> ActionSpec {
             path: "/fail",
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }
@@ -151,6 +154,7 @@ fn timeout_spec() -> ActionSpec {
             path: "/timeout",
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }
