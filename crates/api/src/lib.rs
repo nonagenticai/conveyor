@@ -409,7 +409,7 @@ mod tests {
         let registry = conveyor_actions::registry();
         assert_eq!(
             registry.len(),
-            341,
+            342,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -425,7 +425,7 @@ mod tests {
              organisation actions (320) + #139's eleven media kinds and the media.capabilities probe \
              (332) + #161's decks.render (333) + #182 slice A's five youtube actions \
              (client_set, client_get, connect, status, disconnect) (338) + slice B's three \
-             publishing actions (upload, privacy, retract) (341). \
+             publishing actions (upload, privacy, retract) (341) + #174's media.generate_image (342). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );

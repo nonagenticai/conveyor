@@ -4,14 +4,14 @@
 //! **Declared, not implemented.** The engine's `invoke_external` owns the timeout, the process-local
 //! breaker, the idempotency claim, the audit row, the `inference_call` ledger row and — because this
 //! spec declares an [`Artefact`] — the document the response carries. A `reqwest::` call in this file
-//! would bypass all five and fails `crates/api/tests/externals_declared.rs`.
+//! would bypass all six and fails `crates/api/tests/externals_declared.rs`.
 //!
 //! **The service.** The estate's own image host: the Rust `mlx_inference` server in front of the
 //! vendored `mlxcel` engine running MOSS-Image (`VisualInference/MOSS-Image-SFT-MLX-compact`). It
-//! replaced the Python/mflux FLUX service on 2026-11-15 and keeps the same host, port and DNS the
-//! FLUX service had — none of which belongs in this file: the address is configuration.
-//! The base URL is configuration only: `CONVEYOR_EXTERNAL_IMAGE_GEN_URL`, no default — unset is a
-//! visible `unconfigured` refusal, never a guessable host.
+//! replaced the Python/mflux FLUX service on 2026-11-15 and keeps the same host, port and DNS that
+//! service had — none of which belongs in this file. The address is configuration only:
+//! `CONVEYOR_EXTERNAL_IMAGE_GEN_URL`, no default — unset is a visible `unconfigured` refusal, never a
+//! guessable host.
 //!
 //! **No credential.** The host mounts no licence gate (`AUTH_ENABLED=false`) and is reachable only
 //! from inside the cluster, exactly as its tokenless Python predecessor was. `auth: None` sends no
