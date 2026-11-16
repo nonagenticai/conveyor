@@ -17,7 +17,9 @@ use sqlx::PgPool;
 use tokio::net::TcpListener;
 use uuid::Uuid;
 
-use conveyor_server::{admin, bus_relay, export, seed, shutdown, snapshot, telemetry, worker};
+use conveyor_server::{
+    admin, bus_relay, export, programme_export, seed, shutdown, snapshot, telemetry, worker,
+};
 
 #[derive(Debug, Parser)]
 #[command(
@@ -114,6 +116,31 @@ enum Command {
     Admin {
         #[command(subcommand)]
         command: AdminCommand,
+    },
+    /// Export the published programme outputs as Markdown for the public repository.
+    Programme {
+        #[command(subcommand)]
+        command: ProgrammeCommand,
+    },
+}
+
+/// `conveyor programme …` — the public programme tree.
+#[derive(Debug, Subcommand)]
+enum ProgrammeCommand {
+    /// Render the published set to `programme/` (one-way; never merges).
+    Export {
+        /// The tenant slug whose published rows are exported.
+        #[arg(long)]
+        tenant: String,
+        /// A directory to write, or `-`/`json` for one JSON document on stdout.
+        #[arg(long)]
+        out: Option<String>,
+        /// Compare the tree under this root instead of writing.
+        #[arg(long)]
+        check: Option<PathBuf>,
+        /// The read-only database URL. Defaults to `DATABASE_URL`.
+        #[arg(long)]
+        database_url: Option<String>,
     },
 }
 
@@ -383,6 +410,8 @@ enum RunError {
     Refused(String),
     #[error("export: {0}")]
     Export(#[from] export::ExportError),
+    #[error("programme export: {0}")]
+    ProgrammeExport(#[from] programme_export::ExportError),
     #[error("snapshot: {0}")]
     Snapshot(#[from] snapshot::SnapshotError),
     #[error("json: {0}")]
@@ -491,6 +520,29 @@ async fn run(command: Command) -> Result<(), RunError> {
             Ok(())
         }
         Command::Admin { command } => admin(command).await,
+        Command::Programme { command } => match command {
+            ProgrammeCommand::Export {
+                tenant,
+                out,
+                check,
+                database_url,
+            } => {
+                let report = programme_export::run(programme_export::ExportArgs {
+                    tenant,
+                    out,
+                    check,
+                    database_url,
+                })
+                .await?;
+                tracing::info!(
+                    tenant = %report.tenant,
+                    files = report.files.len(),
+                    generated_at = %report.generated_at,
+                    "programme exported"
+                );
+                Ok(())
+            }
+        },
     }
 }
 
