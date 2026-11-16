@@ -138,11 +138,11 @@ EOF</code></pre>
 </tr>
 <tr>
 <td>Migration</td>
-<td><code>_sqlx_migrations</code> row 25 <code>s17 benchmark</code> success; the four tables <code>relrowsecurity AND relforcerowsecurity</code> = <code>t</code> (compose <code>conveyor_dev</code>, mini3)</td>
+<td><code>_sqlx_migrations</code> row 25 <code>s17 benchmark</code> success; the four tables <code>relrowsecurity AND relforcerowsecurity</code> = <code>t</code> (compose <code>conveyor_dev</code>, the dev box)</td>
 </tr>
 </tbody>
 </table>
-<h2 id="gate--run-on-m1-through-rbuild-contract-16-mini3-refuses-local-cargo">Gate — run on m1 through <code>rbuild</code> (CONTRACT §16; mini3 refuses local cargo)</h2>
+<h2 id="gate--run-on-the-build-host-through-rbuild-contract-16-the-dev-box-refuses-local-cargo">Gate — run on the build host through <code>rbuild</code> (CONTRACT §16; the dev box refuses local cargo)</h2>
 <table>
 <thead>
 <tr>
@@ -172,7 +172,7 @@ EOF</code></pre>
 <td>210 ops, unchanged</td>
 </tr>
 <tr>
-<td>seed tool on m1 (clippy, fmt, run + <code>cmp</code>)</td>
+<td>seed tool on the build host (clippy, fmt, run + <code>cmp</code>)</td>
 <td>clean; regenerated artifact byte-identical to the committed one</td>
 </tr>
 <tr>
@@ -185,7 +185,7 @@ EOF</code></pre>
 </tr>
 </tbody>
 </table>
-<p>⚠️ The <code>psql</code> probes observe mini3's compose database, <strong>not</strong> the m1 throwaway test cluster the <code>test</code> commands run against; the slice's gate block now says so explicitly. <code>benchmark_rls</code> (steps 8–12) will make the app-level assertion a Rust test.</p>
+<p>⚠️ The <code>psql</code> probes observe the dev box's compose database, <strong>not</strong> the the build host throwaway test cluster the <code>test</code> commands run against; the slice's gate block now says so explicitly. <code>benchmark_rls</code> (steps 8–12) will make the app-level assertion a Rust test.</p>
 <h2 id="mutation-checks-a-test-must-be-able-to-fail">Mutation checks (a test must be able to fail)</h2>
 <table>
 <thead>
@@ -227,7 +227,7 @@ EOF</code></pre>
 <h2 id="not-in-this-lane">Not in this lane</h2>
 <p>Steps 8–12: <code>store::benchmark</code>, the eight actions/scopes/registry counts, <code>apps/server/src/sandbox.rs</code>, <code>benchmark.run.poll</code>/<code>benchmark.reap</code>, <code>--write-lock</code>. The <code>conveyor</code> arm and screen 14 are S18; screens are S12.</p>
 <h2 id="steps-812-session-2-2026-11-09--store-sandbox-driver-built-action-wiring-held-by-peers">Steps 8–12, session 2 (2026-11-09) — store, sandbox, driver built; action wiring held by peers</h2>
-<p>Landed and measured (all commands via <code>rbuild</code> on m1):</p>
+<p>Landed and measured (all commands via <code>rbuild</code> on the build host):</p>
 <table>
 <thead>
 <tr>
@@ -272,7 +272,7 @@ EOF</code></pre>
 <li><strong>Two dispatch arms</strong> in <code>worker.rs</code> (<code>benchmark.run.poll</code>, <code>benchmark.reap</code>) and the <code>benchmark.reap</code> schedule row (<code>*/5 * * * *</code>, <code>DEFAULT_SCHEDULES</code> 15 → 16).</li>
 <li><strong>Parity samples</strong>: one per benchmark action, with a fixture suite + two graded runs (<code>benchmark_fixture</code>) and a per-round queued run for <code>benchmark_runs.cancel</code>. <code>SANDBOX_NAMESPACE</code> is set in the test so <code>start</code> queues rather than answering 503.</li>
 </ul>
-<p>Measured (m1/<code>rbuild</code>):</p>
+<p>Measured (the build host/<code>rbuild</code>):</p>
 <table>
 <thead>
 <tr>

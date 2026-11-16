@@ -78,7 +78,7 @@ base-URL contract where it is configured.
 
 ### 5.2 Documents — bytes backend
 
-**`object_store` → MinIO `minio.example.com:8389`** (§5.2), bucket `conveyor-documents`, key `t/<tenant>/<document>/<version>`. Rejected: **`artifacts`** (a second authorizer) and **local disk** (bytes die with the pod; worker3 carries all 24 PVs).
+**`object_store` → MinIO `minio.example.com:8389`** (§5.2), bucket `conveyor-documents`, key `t/<tenant>/<document>/<version>`. Rejected: **`artifacts`** (a second authorizer) and **local disk** (bytes die with the pod; the registry node carries all 24 PVs).
 
 Credentials are service-level: MinIO authorizes nothing; every byte streams through `/api/documents/{id}/content`, authenticated against `tenant_id` + membership. **No presigned URLs** (a time-bombed authorization decision).
 

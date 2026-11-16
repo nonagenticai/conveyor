@@ -25,7 +25,7 @@ then write the lock and land the train.
   with one field error per finding.
 - Ledgers — `crates/store/src/migrate.rs` and `crates/store/tests/s07_schema.rs` both carry 32.
 
-## Measured gate (rbuild on m1, 2026-11-09)
+## Measured gate (rbuild on the build host, 2026-11-09)
 
 | command | result |
 |---|---|
@@ -98,7 +98,7 @@ summary shape.
   4. `scripts/db-roles.sql` — its two cluster-wide ALTER ROLE statements raced across parallel test
      databases (`XX000 tuple concurrently updated`; measured 27 targets failed in one run); now
      serialised by a transaction-scoped advisory lock, released at COMMIT;
-  5. the environment — m1 had **7 GiB free** and the first run died `StorageFull` (the mass panics at
+  5. the environment — the build host had **7 GiB free** and the first run died `StorageFull` (the mass panics at
      `common/mod.rs:213` were that, not code); three cold conveyor slot caches were pruned, freeing
      77 GiB (84 GiB free), slot 0's warm target kept.
 - `fmt --all -- --check`: red on four S19/S20 eval files only (`apps/server/src/eval_runner.rs`,
@@ -109,7 +109,7 @@ summary shape.
 
 The declared member changes the `procedures.*` operation schemas (`StepIn` on create/update,
 `StepOut` on get/list/create/retire), so `served-spec.lock.json` was regenerated over the **whole
-tree** — not just this slice — with `conveyor-server --print-openapi --write-lock` on m1, copied
+tree** — not just this slice — with `conveyor-server --print-openapi --write-lock` on the build host, copied
 back with `rbuild --copy-back`. Measured 2026-11-09 19:15 CET:
 
 - **287 → 297 operations.** Added 10: `GET/POST /api/platform/tenants`, `GET/POST

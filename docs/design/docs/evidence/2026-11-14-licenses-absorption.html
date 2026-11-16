@@ -284,7 +284,7 @@
 </table>
 <p>Tests: <code>tests/command_argv.rs</code> (6 tests) — the refusal payload is asserted byte-for-byte, the extra-word revoke run asserts the sweep actually runs, and the no-argument path asserts the config refusal rather than the argv refusal.</p>
 <h2 id="test-inventory">Test inventory</h2>
-<p>Measured on m1 at <code>4f9b03e</code> (a throwaway Postgres 18 cluster per run): <code>rbuild -- test -p conveyor-licenses --locked</code> → <strong>350 passed, 0 failed</strong> across 36 test binaries, exit 0. The per-target counts below are from the complete run:</p>
+<p>Measured on the build host at <code>4f9b03e</code> (a throwaway Postgres 18 cluster per run): <code>rbuild -- test -p conveyor-licenses --locked</code> → <strong>350 passed, 0 failed</strong> across 36 test binaries, exit 0. The per-target counts below are from the complete run:</p>
 <table>
 <thead>
 <tr>
