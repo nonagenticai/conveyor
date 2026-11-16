@@ -48,6 +48,6 @@ that is why the memory store is a leaf.
 
 - Transport/unit tests: a stub server, under `rbuild` — they prove the client's error mapping, not
   strata's behaviour.
-- Live proofs (`#[ignore]`): `STRATA_LIVE_URL` defaults to `http://mini3.local:8092` with the dev
+- Live proofs (`#[ignore]`): `STRATA_LIVE_URL` defaults to `http://strata-rag:8092` with the dev
   token above; `rbuild` does not forward arbitrary environment variables, which is why the default
   is in the test.

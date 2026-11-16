@@ -355,9 +355,9 @@ async fn a_ready_capability_starts() {
 /// is `pack_not_published`, before any run row. Ignored by default because it needs the compose
 /// `strata` profile on mini3; run with `-- --ignored` while that profile is up.
 #[tokio::test]
-#[ignore = "needs the real strata_rag (compose profile `strata`) at http://mini3.local:8092"]
+#[ignore = "needs the real strata_rag (compose profile `strata`) at http://strata-rag:8092"]
 async fn a_required_pack_with_a_missing_version_is_not_published() {
-    support::set_env("CONVEYOR_STRATA_RAG_URL", "http://mini3.local:8092");
+    support::set_env("CONVEYOR_STRATA_RAG_URL", "http://strata-rag:8092");
     let (pg, running, seeded) = fixture().await;
     let tenant = conveyor_domain::TenantId::from_uuid(seeded.tenant_id).expect("tenant");
     let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
