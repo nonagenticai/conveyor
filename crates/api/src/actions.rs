@@ -7,8 +7,10 @@
 //! path segment the client sent, and the registry lookup is the only authority, so a
 //! literal route and the fallback cannot diverge.
 //!
-//! The licence gate ([`RequireLicence`]) wraps both the manifest and every invocation: a
-//! blocked tenant may still learn who it is (`/api/me` is exempt), but not call anything.
+//! The licence gate ([`RequireLicence`]) wraps the manifest and every invocation **except the
+//! andon cord's own two actions**: a blocked tenant may still learn who it is (`/api/me` is
+//! exempt) and may still stop or restart its own work — a stop control must not depend on the
+//! entitlement it may need to stop. Both andon actions stay authenticated and scope-checked.
 
 use std::time::Instant;
 
@@ -147,7 +149,6 @@ fn problem(error: &ActionError, instance: &str, request_id: &str) -> Response {
 pub async fn invoke_http(
     State(state): State<AppState>,
     caller: Caller,
-    _licence: RequireLicence,
     uri: axum::http::Uri,
     request_id: axum::Extension<RequestId>,
     headers: HeaderMap,
@@ -158,6 +159,17 @@ pub async fn invoke_http(
     // placeholder, and this is what keeps the literal routes and the fallback on ONE
     // handler (the registry lookup is the only authority).
     let name = uri.path().split('/').nth(3).unwrap_or_default().to_owned();
+    // ⛔ A STOP CONTROL MUST NOT DEPEND ON THE ENTITLEMENT IT MAY NEED TO STOP. The cord's own
+    // two actions are exempt from the licence gate: while the cord is pulled `licence.sync` is
+    // the only writer of `app_licence.checked_at`, and if the entitlement has gone stale (or
+    // licences is down) the gate would refuse the very call that releases the cord — measured
+    // 2026-11-16, the only way out was a database edit. Both actions still authenticate the
+    // caller and still check `andon:write`; only this gate is skipped.
+    if !matches!(name.as_str(), "andon.engage" | "andon.release")
+        && let Err(error) = crate::extract::require_licence(&state, caller.tenant).await
+    {
+        return error.into_response();
+    }
     let instance = format!("/api/actions/{name}/invocations");
     let trace_id = headers
         .get("traceparent")

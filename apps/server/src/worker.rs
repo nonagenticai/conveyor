@@ -83,11 +83,19 @@ pub const RETRY_AFTER: Duration = Duration::from_secs(30);
 /// Runner-backed kinds (#144) are deliberately absent: they start Kubernetes Jobs and spend
 /// compute, which is exactly what pulling the cord is meant to stop. `runner.reap` is absent too —
 /// it deletes objects rather than starting work, but it is not a delivery path.
-pub const ANDON_ALLOWED_KINDS: [&str; 4] = [
+///
+/// `licence.sync` is here for the reporting reason and one more: it starts nothing either, and it
+/// is the ONLY writer of the entitlement snapshot (`app_licence.checked_at`) that the action API's
+/// licence gate reads. Withholding it makes the cord its own lock — the snapshot ages past
+/// `STALE_AFTER`, `RequireLicence` refuses every action route including `andon.release`, and only a
+/// database edit can release the cord. Measured 2026-11-16: pulled 00:11:43, stale by 03:46,
+/// released by hand at 03:58:47.
+pub const ANDON_ALLOWED_KINDS: [&str; 5] = [
     "delivery.send",
     "approval.closed.emit",
     "interaction.dispatch",
     "interaction.close",
+    "licence.sync",
 ];
 
 /// One `card.lease_sweep` pass clears at most this many expired leases.

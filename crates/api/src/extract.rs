@@ -89,22 +89,36 @@ impl FromRequestParts<AppState> for RequireLicence {
         state: &AppState,
     ) -> Result<Self, Self::Rejection> {
         let caller = Caller::from_request_parts(parts, state).await?;
-        let row =
-            conveyor_store::licence::get(&state.pool, caller.tenant, &state.config.app_key).await?;
-        match evaluate(row.as_ref(), Utc::now()) {
-            Verdict::Allowed => Ok(Self),
-            Verdict::Refused(reason) => {
-                tracing::warn!(
-                    tenant = %caller.tenant,
-                    reason = reason.code(),
-                    "licence refused"
-                );
-                Err(ApiError::new(
-                    StatusCode::FORBIDDEN,
-                    "licence_required",
-                    reason.detail(),
-                ))
-            }
+        require_licence(state, caller.tenant).await?;
+        Ok(Self)
+    }
+}
+
+/// The licence decision, callable without an extractor.
+///
+/// [`RequireLicence`] is the gate every licensed route takes; the action dispatcher needs the
+/// same decision for every action **except the andon cord's own two** — a stop control must not
+/// depend on the entitlement it may need to stop — so the rule lives here and both call it.
+/// The andon actions remain authenticated and scope-checked; only the entitlement gate is
+/// skipped for them, and only for them.
+pub async fn require_licence(
+    state: &AppState,
+    tenant: conveyor_domain::TenantId,
+) -> Result<(), ApiError> {
+    let row = conveyor_store::licence::get(&state.pool, tenant, &state.config.app_key).await?;
+    match evaluate(row.as_ref(), Utc::now()) {
+        Verdict::Allowed => Ok(()),
+        Verdict::Refused(reason) => {
+            tracing::warn!(
+                tenant = %tenant,
+                reason = reason.code(),
+                "licence refused"
+            );
+            Err(ApiError::new(
+                StatusCode::FORBIDDEN,
+                "licence_required",
+                reason.detail(),
+            ))
         }
     }
 }
