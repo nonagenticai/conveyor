@@ -47,7 +47,7 @@
 <tr>
 <td><code>new</code></td>
 <td>absent</td>
-<td>25</td>
+<td>44</td>
 </tr>
 </tbody>
 </table>
@@ -137,12 +137,148 @@
 <td>migrations: no CREATE/ALTER TABLE programme_cadence</td>
 </tr>
 <tr>
+<td><code>table:programme_tranche</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>programme_tranche</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE programme_tranche</td>
+</tr>
+<tr>
+<td><code>table:programme_baseline</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>programme_baseline</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE programme_baseline</td>
+</tr>
+<tr>
 <td><code>table:project_register_item</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>project_register_item</td>
 <td><code>new</code></td>
 <td>migrations: no CREATE/ALTER TABLE project_register_item</td>
+</tr>
+<tr>
+<td><code>table:benefit_profile</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>benefit_profile</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE benefit_profile</td>
+</tr>
+<tr>
+<td><code>table:benefit_link</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>benefit_link</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE benefit_link</td>
+</tr>
+<tr>
+<td><code>table:benefit_transition</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>benefit_transition</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE benefit_transition</td>
+</tr>
+<tr>
+<td><code>table:stakeholder_profile</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>stakeholder_profile</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE stakeholder_profile</td>
+</tr>
+<tr>
+<td><code>table:architecture_artifact</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>architecture_artifact</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE architecture_artifact</td>
+</tr>
+<tr>
+<td><code>table:architecture_artifact_entry</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>architecture_artifact_entry</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE architecture_artifact_entry</td>
+</tr>
+<tr>
+<td><code>table:architecture_artifact_link</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>architecture_artifact_link</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE architecture_artifact_link</td>
+</tr>
+<tr>
+<td><code>table:artifact_type</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>artifact_type</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE artifact_type</td>
+</tr>
+<tr>
+<td><code>table:adm_profile</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>adm_profile</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE adm_profile</td>
+</tr>
+<tr>
+<td><code>table:architecture_contract</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>architecture_contract</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE architecture_contract</td>
+</tr>
+<tr>
+<td><code>table:architecture_compliance_review</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>architecture_compliance_review</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE architecture_compliance_review</td>
+</tr>
+<tr>
+<td><code>table:architecture_waiver</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>architecture_waiver</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE architecture_waiver</td>
+</tr>
+<tr>
+<td><code>table:governance_body</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>governance_body</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE governance_body</td>
+</tr>
+<tr>
+<td><code>table:architecture_maturity</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>architecture_maturity</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE architecture_maturity</td>
+</tr>
+<tr>
+<td><code>table:architecture_skill_assessment</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>architecture_skill_assessment</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE architecture_skill_assessment</td>
 </tr>
 <tr>
 <td><code>table:decision</code></td>
@@ -230,7 +366,23 @@
 <td>actions</td>
 <td>programme/plan</td>
 <td><code>extend</code></td>
-<td>actions: baselines.* absent<br>actions: cadences.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* absent<br>actions: registers.* absent<br>actions: wbs.* absent</td>
+<td>actions: baselines.* absent<br>actions: cadences.* absent<br>actions: governed_assets.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* absent<br>actions: registers.* absent<br>actions: tranches.* absent<br>actions: wbs.* absent</td>
+</tr>
+<tr>
+<td><code>actions:benefits</code></td>
+<td>§10.4</td>
+<td>actions</td>
+<td>benefits</td>
+<td><code>new</code></td>
+<td>actions: benefits.* absent</td>
+</tr>
+<tr>
+<td><code>actions:architecture</code></td>
+<td>§10.4</td>
+<td>actions</td>
+<td>architecture</td>
+<td><code>new</code></td>
+<td>actions: architecture.* absent</td>
 </tr>
 <tr>
 <td><code>actions:organisation</code></td>

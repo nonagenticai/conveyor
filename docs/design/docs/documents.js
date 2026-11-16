@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "3243e8bf080bd0b4b358ed858ac738c1f459af5ad731db0e0baeac4e597915c1",
-      "bytes": 144379,
+      "sha256": "9157fb2e2ffe6479c032c6cb86f3aa885c5066ff4abe3f46d9d68fc30b59f2e3",
+      "bytes": 168991,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -114,8 +114,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "294d50708b20ddf94e332d4683a5c91790731083aec21ab71432111767c9386a",
-      "bytes": 15057,
+      "sha256": "f4ce1367a77f2d56dbc52cff5350aa1b65d1d9e92837e00fec1bfbb08aebb48f",
+      "bytes": 16365,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -123,8 +123,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "515ba0c7d84e201e1b0221d32ce268c5f0e765b7726ac678dcae764aac7bef67",
-      "bytes": 69023,
+      "sha256": "1f546834d0f436525019d309f72e69dd61dee57c2ab6b764ed89444e5c45ac41",
+      "bytes": 75944,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -375,8 +375,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "4aff627ecf20ad80b2bb36ceb8f50d85576b057f1a7c369b72fb2ff1d8fe9db7",
-      "bytes": 7714,
+      "sha256": "d35d9b1a121728a09ecbdb9fd5dfac4711137a0981a501fe6fe5c52f1b6f54f5",
+      "bytes": 10295,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -384,8 +384,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "70a9e9329c13639e1bbeb991cfabefad46f078bda61dd180608cd9cda2f795c8",
-      "bytes": 249164,
+      "sha256": "6d737abe5ea2f541d48a280250a9f455b974857a0f116510f1577217c92542e4",
+      "bytes": 249323,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -483,9 +483,18 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/P0-programme-definition.html",
       "source": "docs/plans/P0-programme-definition.md",
       "section": "Plans",
-      "sha256": "11781114924d791ebfa317a6411367da7b538315ac52f9c997ebae16d3ee6cb0",
-      "bytes": 5045,
+      "sha256": "c28df1686c1c469dc0ac75b2810b8b1d808a7b12cae1190b83850b4ebaea19fe",
+      "bytes": 12780,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
+    },
+    {
+      "title": "T9 — TOGAF ADM capability",
+      "path": "docs/plans/T9-architecture-capability.html",
+      "source": "docs/plans/T9-architecture-capability.md",
+      "section": "Plans",
+      "sha256": "8fe0b38af1474f11ee0bbc60a059a124ef656b3e04bc60c1369448488b86de2f",
+      "bytes": 17417,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {
       "title": "Rust development process: audit and improvement plan",

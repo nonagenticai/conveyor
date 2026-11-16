@@ -36,6 +36,22 @@ operator console's; a signed-out direct hash is a sign-in gate, and a reviewer c
 explicitly with `?design=1`. The pack still loads the fixture scripts, but no public page renders
 them.
 
+**Programme definition** (`programme`, design study) is the MSP layer proposed in SPEC_V2 §8.3:
+the mandate, brief, blueprint and business case; the benefits map and the benefit profiles; the
+projects dossier; tranches with end-of-tranche reviews; stakeholder profiles; and the transition
+and measured realization of each benefit. The tab demonstrates the two distinctions the model
+depends on — a capability is not a benefit, and a tranche review is a programme decision, not a
+demo — and its controls change only the local fixture state.
+
+**Architecture capability** (`adm`, design study) is the TOGAF ADM layer proposed in SPEC_V2
+§8.1: the Preliminary phase (principles, tailored profile, Architecture Board, maturity and
+skills), the phase rail A–H with its typed artefacts and contracts, the artefact repository
+(catalog, matrix and diagram, with entries and derivation/realization/reuse links), and the
+board/compliance register with the six compliance levels and the waiver discipline. Its controls
+demonstrate the refusals the model depends on — a phase cannot close while a mandatory artefact is
+draft, a review records one compliance level, a waiver needs an accepting owner and a review date,
+and Phase H records exactly one change or kata — and change only the local fixture state.
+
 **Outputs** is the programme register: every output across all projects with its project, unit,
 category, author, state and public URL, filtered by those fields and paged with `next_cursor`.
 Signed in it composes, edits with `If-Match`, requests or decides publication, reads the history,

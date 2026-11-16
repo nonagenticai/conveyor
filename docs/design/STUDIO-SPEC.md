@@ -327,29 +327,101 @@ The conveyor implements its own registry, broker, credential injection and call 
 platform keeps its own gateway; there is no planned convergence and the conveyor broker is not
 exposed to the agent.
 
-## Executable rigour — TOGAF, SAFe, PMP
+## Executable rigour — TOGAF, SAFe, PMP, MSP
 
 The rigour is rows and gates, not a document library.
 
-- **TOGAF ADM as an architecture project type:** phases A–H as WBS nodes, each with required
+- **TOGAF ADM as an architecture capability:** the Preliminary phase establishes the principles,
+  the tailored profile, the artefact standard and repository, the Architecture Board, governance
+  and the maturity/skills baseline; phases A–H are WBS nodes, each with its mandatory typed
   artefacts and a contract gate; requirements management is continuous, linked by `trace_link`.
+  Artefacts are catalogs, matrices or diagrams with common metadata, entries and
+  derivation/realization/reuse links; a compliance review records one of six levels and a waiver
+  names its accepting owner and review date.
 - **SAFe as the programme cadence:** portfolio (computed), programme/ART with shared config and a
   dependency graph, PI planning, backlog refinement, system demo (no demo, no credit), inspect &
   adapt, lean governance at value boundaries.
+- **MSP as the programme definition and benefit track:** mandate, programme brief, blueprint,
+  business case, benefit profiles and benefits map, projects dossier, tranche reviews, stakeholder
+  profiles, transition and measured realization. A benefit is a measurable improvement with a
+  baseline, a target, a method and an owner; a capability is not a benefit.
 - **PMP artefacts as typed rows:** charter (`governed_asset`), WBS (`wbs_node`), baseline
   (`project_baseline`), the one six-kind register, change control with impact analysis, closure.
-- **The trace chain:** requirement/principle/ADR → architecture contract → charter → WBS
-  deliverable → work package → run → step → artefact/evidence → acceptance → closure. The
-  governance screen answers one question end to end: which requirement does this run prove, and
-  where is the evidence?
+- **The trace chain:** stakeholder/driver → goal → principle/requirement/ADR → architecture
+  artefact → architecture contract → charter → WBS deliverable → work package → run → step →
+  artefact/evidence → acceptance → closure, and its programme end: capability → operational
+  outcome → benefit → strategic objective.
 - **What is not claimed:** no TOGAF certification, no SAFe compliance badge, no PMP certification,
-  no full ADM conformance, no portfolio optimiser, no schedule solver. The claim is that the
-  artefacts and gates the organisation uses are rows, the process runs, and the evidence is
-  traceable.
+  no MSP certification, no full ADM conformance, no ArchiMate editor, no portfolio optimiser, no
+  schedule solver, no benefit-forecasting model. The claim is that the artefacts and gates the
+  organisation uses are rows, the process runs, and the evidence is traceable.
 
 The earlier **TOC study** remains in the studio as an optional constraint-reasoning view. It is not
-part of SPEC_V2's method: V2's method is SAFe/PMP/TOGAF plus the coach's closed triage and remedy
-sets. The TOC bars, float and buffer figures are illustrative; no scheduling solver runs.
+part of SPEC_V2's method: V2's method is SAFe/PMP/TOGAF/MSP plus the coach's closed triage and
+remedy sets. The TOC bars, float and buffer figures are illustrative; no scheduling solver runs.
+
+## Programme definition and benefits realization — the MSP layer
+
+New destination: **Programme definition** (`programme`), a design-study page with four tabs. It is
+sign-in gated on the public site like every other V2 destination; the public programme pages keep
+showing the real programme, never this fixture.
+
+| Tab | Surfaces |
+|---|---|
+| **Definition** | mandate, programme brief, blueprint, business case, refined vision and the governance strategy/plan set; each artefact names its producer, reviewer, approver, version and gate. The mandate approval and the first-tranche authorisation are the two decisions rendered. |
+| **Benefits map & profiles** | the map lane output → capability → operational outcome → benefit/disbenefit → strategic objective, and the benefit profiles with baseline, target, current, measurement method, cost, conditions, dependencies and the BCM owner. |
+| **Tranches & reviews** | the tranche list with entry/exit criteria, baseline, review date and state; the end-of-tranche review with its evidence and the continue / pause / stop decision. |
+| **Benefits realization** | one row per benefit: baseline measured, readiness, transition date, post-transition measurement, legacy retirement, post-closure owner; the transition record and the baseline-versus-realized bar. |
+
+The mock demonstrates the distinctions the model depends on:
+
+- **Capability ≠ use ≠ improvement.** A delivered capability gives a team an option; the profile's
+  baseline and target measure whether performance actually moved. The note on the tab says so.
+- **A tranche ≠ a PI.** The PI cadence is the delivery rhythm inside a tranche; the tranche review
+  is a programme decision by the sponsoring group, with baselines, benefit status and the risk
+  register as evidence.
+- **A benefit is not a register row.** The six-kind register indexes the benefit; the profile
+  carries the measurement fields; the map carries the path to the objective.
+- **The review can refuse.** A review with no evidence is refused, and a transition whose baseline
+  was never measured cannot report a realized benefit. The mock's buttons produce those two states.
+
+All values are local fixtures. No V2 table or action is called; the page is a labelled preview.
+
+### Roles in the mock
+
+The programme roles are ordinary jobs, consistent with the organisation model: the sponsoring
+group, SRO, programme board, programme office, programme manager, programme architect, BCM, PMO
+lead and quality manager. The definition and benefit tabs name the producer, reviewer and approver
+by role, never by person; the person appears only in the approval record.
+
+## Architecture capability — the TOGAF ADM layer
+
+New destination: **Architecture capability** (`adm`), a design-study page with four tabs, also
+sign-in gated on the public site. It is the surface for SPEC_V2 §8.1: the capability first, the
+project second.
+
+| Tab | Surfaces |
+|---|---|
+| **Capability** | the architecture principles catalog (statement, rationale, implications); the tailored ADM profile (phase set, PSA/HLD/SD mandatory sets, contract kinds); the Architecture Board (chair, membership, charter, commissioning authority, decision limits); the maturity assessment over nine dimensions on 0–5; the Skills Framework assessment over seven categories per role. |
+| **ADM phases** | the phase rail Preliminary and A–H with each phase's mandatory/approved counts, plateau, contract and state; the selected phase's missing mandatory set; the four contract kinds (SAW, delivery contract, statement of intent, Request for Architecture Work) with their producer, reviewer and state. |
+| **Artefact repository** | the typed artefacts (catalog, matrix, diagram) filtered by type; each artefact's common metadata; a catalog's entries as rows, a matrix's axes, a diagram's viewpoint and document; and its derivation/realization/reuse/dependency links. |
+| **Board & compliance** | the board's decisions; the per-delivery compliance reviews with one of the six levels; the waiver register with the accepting owner, mitigation, cost/risk and reassessment date; and the Phase H reviews, each with exactly one outcome — a change request or a kata candidate. |
+
+The mock demonstrates the refusals the model depends on:
+
+- **A phase cannot close on a draft.** Advancing phase B while the business footprint and process
+  flow diagrams are still draft returns `422 phase_artifacts_missing`, names the artefacts and the
+  contract's state, and writes no contract row.
+- **One compliance level per review.** A second level on the same review is refused; the levels
+  describe different relationships, not a maturity ladder.
+- **A waiver needs an owner and a date.** Recording a waiver without an accepting asset owner and a
+  reassessment date is refused; the deviation stays non-conformant.
+- **Phase H records exactly one outcome.** After a change request is recorded, the kata action is
+  refused: a review has one outcome, and a review with none cannot close the phase.
+- **An approved artefact is immutable.** Approving a new version supersedes the old one and
+  re-opens the phase gate; the approved body does not change.
+
+All values are local fixtures. No V2 table or action is called; the page is a labelled preview.
 
 ## Knowledge and memory workbench
 
@@ -729,6 +801,8 @@ are additive.
 |---|---|---|---|
 | Today / programme control | `overview` | Delivery map, integrated plan, gate readiness | R |
 | **Portfolio** | `portfolio` | In flight, programmes, shared config & dependencies, backlog & WSJF, cadence & capacity, metering | **P** |
+| **Programme definition** | `programme` | Definition, benefits map & profiles, tranches & reviews, benefits realization | **P** |
+| **Architecture capability** | `adm` | Capability, ADM phases, artefact repository, board & compliance | **P** |
 | Projects | `projects` | live/snapshot programme workspace: project list, board, plan, linked issues, text outputs, public feedback, publish | R (V1 fixture retired; #70 live/snapshot) |
 | **Plan** | `plan` | WBS, baseline vs forecast, registers, change control | **P** |
 | Execution room | `execution` | activity, evidence, context, tools, explain-context manifest | R + P tools / explain context |
@@ -769,7 +843,13 @@ gold/empty controls and refuses unavailable subject arms.
 
 **Proposed in V2 (T0–T17, no V2 code written):** the organisation spine (`industry`, `department`,
 `job_catalogue`, `job_release`, `job_binding`); the plan spine (`wbs_node`, `project_baseline`,
-`project_register_item`, `project_dependency`, programme shared config and cadence); the decision
+`project_register_item`, `project_dependency`, programme shared config and cadence); the MSP
+programme layer (`programme_tranche`, `benefit_profile`, `benefit_link`, `benefit_transition`,
+`stakeholder_profile`, and the extended `governed_asset` kinds); the architecture capability
+(`architecture_artifact`, `architecture_artifact_entry`, `architecture_artifact_link`,
+`artifact_type`, `adm_profile`, `architecture_contract`, `architecture_compliance_review`,
+`architecture_waiver`, `governance_body`, `architecture_maturity`,
+`architecture_skill_assessment`); the decision
 tables and laya client; PM/coach/kata/development/operations jobs; lessons; PKO and SOP/RDF/BPMN
 ingestion; tenant asset authoring; the tool estate (`tool`, `toolkit`, `tool_binding`, `tool_call`,
 the broker, BYO and authoring); metering roll-ups; the MinIO storage adapter; and the knowledge and
@@ -861,17 +941,17 @@ SHA-256. It is a display extractor, not an executable migration or a parser of l
 
 ## Verification
 
-Five headless Chrome passes run against `studio.html` using `playwright-core` and local Chrome; set
+Six headless Chrome passes run against `studio.html` using `playwright-core` and local Chrome; set
 `NODE_PATH` if Playwright is installed outside this repo, `CHROME_BIN` for a non-default browser,
 and `CONVEYOR_QA_OUTPUT` to change the screenshot directory (defaults to the system temporary
-directory). Run from any working directory:
+directory). Run from any working directory (counts measured 2026-11-16):
 
 ```sh
-node docs/design/scripts/check-studio.cjs       # 234 checks
+node docs/design/scripts/check-studio.cjs       # 233 checks
 node docs/design/scripts/check-learning.cjs     # 139 checks
-node docs/design/scripts/check-v2.cjs           # 158 checks
+node docs/design/scripts/check-v2.cjs           # 180 checks
 node docs/design/scripts/check-workbench.cjs    # 119 checks
-node docs/design/scripts/check-architecture.cjs # 141 checks
+node docs/design/scripts/check-architecture.cjs # 146 checks
 node docs/design/scripts/check-data.cjs         # snapshot gate (DESIGN: no-op)
 ```
 
