@@ -56,8 +56,23 @@ pub async fn bus() -> Bus {
 /// failed CI with `NOGROUP` inside `a_large_job_round_trips_intact` while the flush test itself
 /// passed. This deliberately never consults `TEST_REDIS_URL`/`REDIS_URL`: a caller-provided URL is
 /// exactly the shared server the flush test must not touch.
+///
+/// A runner may instead provide a **second, private** server through `TEST_REDIS_PRIVATE_URL` (the
+/// coding gate's kata Pod starts one on another port and exports it). That URL wins and no
+/// container is started — the kata Pod has no docker.
 pub async fn private_url() -> String {
+    if let Some(url) = private_url_from(|key| std::env::var(key).ok()) {
+        return url;
+    }
     start_container().await
+}
+
+/// The private URL the environment names, if any. Pure, so a test can prove the decision without
+/// touching the process environment.
+fn private_url_from(get: impl Fn(&str) -> Option<String>) -> Option<String> {
+    get("TEST_REDIS_PRIVATE_URL")
+        .map(|value| value.trim().to_owned())
+        .filter(|value| !value.is_empty())
 }
 
 fn image() -> String {
@@ -154,4 +169,30 @@ fn spawn_watcher(container: &str) {
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::private_url_from;
+
+    #[test]
+    fn a_private_url_from_the_environment_wins() {
+        let named = |value: &'static str| {
+            move |key: &str| (key == "TEST_REDIS_PRIVATE_URL").then(|| value.to_owned())
+        };
+        assert_eq!(
+            private_url_from(named("redis://127.0.0.1:6380/")).as_deref(),
+            Some("redis://127.0.0.1:6380/")
+        );
+        assert_eq!(
+            private_url_from(|_| None),
+            None,
+            "unset falls back to docker"
+        );
+        assert_eq!(
+            private_url_from(|_| Some("  ".to_owned())),
+            None,
+            "blank falls back to docker"
+        );
+    }
 }
