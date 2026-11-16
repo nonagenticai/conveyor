@@ -1,7 +1,8 @@
 # 0007 — The tool estate is conveyor plus coding
 
 Status: Accepted · Date: 2026-11-15 · Issue: #138 · Amends: ADR 0006 §Decision (destination for the
-research and media groups confirmed; the coding row stands), ADR 0005 §2–3 unchanged
+research and media groups confirmed; the coding row stands), ADR 0005 §2–3 unchanged ·
+Amended 2026-11-16 (#203): §1 and §2 record the media half's own database, which landed in #118.
 
 ## Decision
 
@@ -10,7 +11,7 @@ research and media groups confirmed; the coding row stands), ADR 0005 §2–3 un
 
    | Destination | Shape | Owns |
    |---|---|---|
-   | `apps/research` (exists) | workspace app, stateless HTTP | the web-scraper and media-discovery contracts: fetch, link scoring, declarative extraction, media search |
+   | `apps/research` (exists) | workspace app, two binaries | the web-scraper contract (stateless) and the media-discovery contract (its own schema): fetch, link scoring, declarative extraction, media search |
    | `apps/media` (new) | workspace app, two executor images | Chromium capture/record, ffmpeg/ffprobe, tesseract OCR, native Gherkin runner |
    | `crates/analysis` (new) | workspace library, no service | `analyse.*` rubrics/scoring/synthesis, seven generation providers, crawl, LLM/vision client |
    | the `coding` repository (exists) | separate public Rust repo | repository provisioning, dependency graph, verified writes, CI and security checks |
@@ -21,10 +22,12 @@ research and media groups confirmed; the coding row stands), ADR 0005 §2–3 un
    The model servers (`asr`, `tts`, `vlm`, image generation) stay external HTTP hosts — they are
    model servers, not tool code.
 
-2. **One stateful plane.** Conveyor holds the database, job queue and object store. The research app
-   answers request/response and keeps nothing; the media executors keep nothing; the analysis
-   library keeps nothing. A second queue, database or store credential anywhere in the estate is an
-   architecture violation, not an implementation detail.
+2. **One stateful plane.** Conveyor holds its own database, the job queue and the object store. The
+   research app's scraper binary answers request/response and keeps nothing; its media binary keeps
+   the reference's own media schema, one database and one role, never shared with another service;
+   the media executors keep nothing; the analysis library keeps nothing. A second queue, a database
+   shared between services, or a store credential anywhere in the estate is an architecture
+   violation, not an implementation detail.
 
 3. **Media work runs as per-job Kubernetes Jobs, not a second worker protocol.** Dispatch is built by
    conveyor, generalising the mechanism that already exists in `apps/server/src/sandbox.rs`
@@ -74,7 +77,7 @@ research and media groups confirmed; the coding row stands), ADR 0005 §2–3 un
   external and are not ports; the rest are ~340k lines of production Python across sixteen
   workloads.
 - `apps/research` already exists on `main`: the web-scraper contract landed (#117, merged as #132)
-  and the media-discovery contract is in flight (#118). Absorbing rather than extracting is
+  and so did the media-discovery contract (#118, merged as #147). Absorbing rather than extracting is
   zero-churn and matches the owner's self-containment ruling.
 - **There is no usage inventory for the w2v services.** `parity/` covers fr, rm and planka only.
   The contract for the conversion is therefore the sixteen deliverable blueprints (§5.2.1), not

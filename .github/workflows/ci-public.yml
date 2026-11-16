@@ -482,6 +482,16 @@ jobs:
           - package: conveyor-licenses
             bin: conveyor-licenses
             image: conveyor-licenses
+          # The two research services (ADR 0007 §1): one package, two binaries. Both are services,
+          # not executors, so their smoke is the service shape — `--version` and `--check-lock`.
+          # `image:` names stay distinct because they are two Deployments with different lifetimes:
+          # the scraper is stateless, and the media half owns its own schema.
+          - package: conveyor-research
+            bin: conveyor-research
+            image: conveyor-research
+          - package: conveyor-research
+            bin: conveyor-research-media
+            image: conveyor-research-media
           # The two media executor images (ADR 0007 §1–3): one package, two binaries, one image
           # each. `tools` installs what the binary shells out to — measured on the push run of
           # 2026-11-16, a generic runtime built fine and then failed `--version`: an executor has
