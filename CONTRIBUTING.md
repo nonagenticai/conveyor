@@ -97,8 +97,8 @@ checks.
 
 ## For maintainers: accepting a contribution
 
-You are the merge decision. A green run is necessary, not sufficient. Until the
-`@nonagenticai/maintainers` team exists, the repository owner is the maintainer of record.
+You are the merge decision. A green run is necessary, not sufficient. The
+`@nonagenticai/maintainers` team is the maintainer of record.
 
 **Triage.** Answer a first report; it is the most fragile contribution there is. A change that does
 not alter behaviour is a small fix — no unit, no claim; the pull request is the record. A change
@@ -140,8 +140,8 @@ the pull request's Checks tab.
 
 - A maintainer reviews every pull request, and required checks must be green.
 - A merge is a human decision. A green run alone does not merge anything.
-- The sensitive paths above are reviewed by a code owner once the `@nonagenticai/maintainers` team
-  exists; until then the maintainer checklist is the control.
+- The sensitive paths above are owned by `@nonagenticai/maintainers` in `.github/CODEOWNERS`;
+  GitHub requests that team's review on every pull request that touches one.
 - The programme is published at <https://conveyor.nonagentic.ai/design/>.
 
 ## Reporting a vulnerability
