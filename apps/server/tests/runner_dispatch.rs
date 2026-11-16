@@ -279,7 +279,7 @@ async fn dispatch_then_poll_finishes_the_job() {
 
 /// A kind with no image is not a runner kind: the step refuses it permanently and names the gap.
 #[tokio::test]
-async fn unconfigured_image_is_a_permanent_failure() {
+async fn a_kind_without_an_image_is_permanent() {
     let db = common::TestDb::fresh().await;
     let tenant = a_tenant(&db.runtime).await;
     let (_, api_url) = start_stub().await;
