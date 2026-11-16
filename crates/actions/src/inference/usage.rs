@@ -35,11 +35,12 @@ async fn inference_usage_report(
         ));
     }
     let group = UsageGroup::parse(&input.group_by).ok_or_else(|| {
-        invalid(
-            "group_by",
-            "unknown",
-            "one of day, model, caller_kind, cache_status, prompt_sha",
-        )
+        let allowed = UsageGroup::ALL
+            .iter()
+            .map(|group| group.as_str())
+            .collect::<Vec<_>>()
+            .join(", ");
+        invalid("group_by", "unknown", format!("one of {allowed}"))
     })?;
     let rows =
         store::inference::usage_rows_tx(&mut *tx, ctx.tenant, group, input.since, input.until)

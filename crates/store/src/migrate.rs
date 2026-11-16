@@ -195,7 +195,10 @@ mod tests {
                 (42, "document workflow".to_owned()),
                 // #160: the tenant's registered inference destination
                 // (0043_tenant_inference_endpoint.sql).
-                (43, "tenant inference endpoint".to_owned())
+                (43, "tenant inference endpoint".to_owned()),
+                // #46: the commercial-equivalent price per model, the price side of the
+                // read-time cost derivation (0044_commercial_price.sql).
+                (44, "commercial price".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
