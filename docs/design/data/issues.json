@@ -1,6 +1,23 @@
 {
   "issues": [
     {
+      "number": 221,
+      "title": "programme: the rigour output categories and the architecture/tranche seed rows",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/221",
+      "updatedAt": "2026-11-16T19:01:30Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
       "number": 219,
       "title": "docs: make contribution easy to start, credited, and accepted by the maintainer",
       "state": "OPEN",
@@ -19,10 +36,10 @@
     },
     {
       "number": 216,
-      "title": "programme: the MSP definition and benefits-realization layer (V2 + P0 + design study)",
+      "title": "programme: the MSP and TOGAF rigour layer (V2 + P0 + T9 plan + design study)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/216",
-      "updatedAt": "2026-11-16T18:51:13Z",
+      "updatedAt": "2026-11-16T19:01:42Z",
       "labels": [
         {
           "name": "unit",
@@ -570,9 +587,9 @@
     {
       "number": 162,
       "title": "docs: the w2v absorption record \u2014 what shipped, the produce layer, and the corrected estate table",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/162",
-      "updatedAt": "2026-11-16T16:15:32Z",
+      "updatedAt": "2026-11-16T19:01:47Z",
       "labels": [
         {
           "name": "unit",
@@ -961,15 +978,15 @@
       "title": "P0 \u2014 the reuse map, the architecture/analysis pack and the per-project inception standard",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/122",
-      "updatedAt": "2026-11-15T19:05:13Z",
+      "updatedAt": "2026-11-16T19:03:47Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
@@ -978,15 +995,15 @@
       "title": "P0 \u2014 author the programme definition set",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/121",
-      "updatedAt": "2026-11-15T19:05:11Z",
+      "updatedAt": "2026-11-16T19:03:45Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
@@ -1291,7 +1308,7 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-13T22:53:23Z",
+      "updatedAt": "2026-11-16T19:03:13Z",
       "labels": [
         {
           "name": "unit",
@@ -1414,10 +1431,10 @@
     },
     {
       "number": 82,
-      "title": "T10 \u2014 SAFe cadence",
+      "title": "T10 \u2014 SAFe cadence and MSP tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/82",
-      "updatedAt": "2026-11-13T22:53:51Z",
+      "updatedAt": "2026-11-16T19:02:51Z",
       "labels": [
         {
           "name": "unit",
@@ -1435,10 +1452,10 @@
     },
     {
       "number": 81,
-      "title": "T9 \u2014 TOGAF profile",
+      "title": "T9 \u2014 the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/81",
-      "updatedAt": "2026-11-13T22:53:49Z",
+      "updatedAt": "2026-11-16T19:02:08Z",
       "labels": [
         {
           "name": "unit",
@@ -1585,7 +1602,7 @@
       "title": "T3 \u2014 PM job",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/74",
-      "updatedAt": "2026-11-13T22:53:33Z",
+      "updatedAt": "2026-11-16T19:03:12Z",
       "labels": [
         {
           "name": "unit",
@@ -1627,7 +1644,7 @@
       "title": "T1 \u2014 Plan spine",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/72",
-      "updatedAt": "2026-11-13T22:53:29Z",
+      "updatedAt": "2026-11-16T19:02:25Z",
       "labels": [
         {
           "name": "unit",
