@@ -974,6 +974,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-produce"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "sha2 0.11.1",
+]
+
+[[package]]
 name = "conveyor-render"
 version = "0.1.0"
 dependencies = [

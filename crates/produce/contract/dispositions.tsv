@@ -1,0 +1,39 @@
+# The disposition of every operation in the captured document (issue #163 P1).
+#
+# One line per operation: METHOD PATH <TAB> disposition <TAB> reason.
+# Legal dispositions: ported, dropped: transport, dropped: no consumer, dropped: deferred.
+# `capture.sh` refuses to write the evidence if an operation is missing here, or if a line here
+# has no matching operation in the document. Decisions, not observations: a reason that does not
+# name a consumer, a transport shape, or a concrete future need is not a reason.
+#
+# ported — the capability `produce.script` serves, through the inference router, with no service.
+# transport — the operation exists because the reference is an HTTP service with asynchronous
+#             jobs; an action returns its result and the runner owns cancellation and liveness.
+# no consumer — a real capability that nothing in this workspace or the sixteen blueprints asks
+#               for; it is not deferred work, it is simply not wanted.
+# deferred — wanted, but its input model or its blueprint does not exist yet.
+POST /api/storyline	ported	the storyline and its shot list, the first half of P3.1
+POST /api/shotlist	ported	the shot list with stable shot ids, the second half of P3.1
+POST /api/narration	ported	narration text, named in P3
+POST /api/narration/shotlist	ported	narration keyed to a shot list; the form the action takes because the shot list is an input
+POST /api/scripts/generate	ported	script generation, named in P3
+POST /api/scripts/jobs/{job_id}/validate	ported	duration-budget validation with the offending shot ids, P3.2
+POST /api/storyline/plan	dropped: no consumer	the storyline operation returns its plan as part of the result; no caller needs a plan-only projection
+POST /api/scripts/jobs/{job_id}/scaffold	dropped: no consumer	writes a project tree to disk; file delivery is the pack's job and no blueprint names this output
+POST /api/storyline/from-findings	dropped: deferred	needs the analysis family's findings model, which is not in this crate; no blueprint in plan 04 section 2 names it yet
+POST /api/shotlist/enhance	dropped: deferred	no blueprint names shot-list enhancement; port it when a deliverable needs it
+POST /api/shotlist/from-findings	dropped: deferred	same findings model as the storyline conversion; no blueprint names it yet
+POST /api/narrative/extract	dropped: deferred	extracts narrative text from a supplied document; no blueprint in plan 04 section 2 names that input format
+POST /api/scripts/generate/campaign-pack	dropped: deferred	multi-asset campaign generation needs the campaign blueprint, which is not among the sixteen
+POST /api/scripts/generate/batch	dropped: transport	a fan-out over N single calls; the workflow engine supplies concurrency
+GET /api/storyline/{job_id}	dropped: transport	polling shape; the action returns the storyline synchronously
+GET /api/narration/{job_id}	dropped: transport	polling shape; the action returns the narration synchronously
+GET /api/scripts/jobs/{job_id}	dropped: transport	polling shape; the action returns its result
+DELETE /api/scripts/jobs/{job_id}	dropped: transport	cancellation is the runner's; an action invocation has no job to cancel
+GET /api/scripts/batches/{batch_id}	dropped: transport	polling shape for the batch fan-out
+GET /	dropped: transport	the capability is an action, not an HTTP service; there is no root document to serve
+GET /health	dropped: transport	liveness belongs to the runtime shape; an action has no process to health-check
+GET /health/live	dropped: transport	liveness belongs to the runtime shape
+GET /health/ready	dropped: transport	readiness belongs to the runtime shape
+GET /healthz	dropped: transport	duplicate liveness route
+GET /readyz	dropped: transport	duplicate readiness route
