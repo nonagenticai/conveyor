@@ -10,6 +10,8 @@ publish.workspace = true
 [dependencies]
 conveyor-actions-derive = { path = "../actions-derive" }
 conveyor-auth = { path = "../auth" }
+# #161 P3: `decks.render` renders the deck model; the action layer holds no OOXML writer.
+conveyor-deck = { path = "../deck" }
 conveyor-domain = { path = "../domain" }
 conveyor-workflow = { path = "../workflow" }
 # The three exchange actions (S08 B2) call the pure renderer; CONTRACT §1 records the edge.

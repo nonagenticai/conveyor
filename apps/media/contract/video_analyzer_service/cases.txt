@@ -1,0 +1,36 @@
+# name | METHOD | path | headers | body
+# The tenant is supplied by header on every authenticated case: the reference refuses a request
+# that carries none (401 `AUTHENTICATION_REQUIRED`), which `audio_no_tenant` pins.
+#
+# The analysis cases are real, not stubbed identifiers. Two 2-second synthetic files (testsrc,
+# 320x240 @ 10fps; the audio variant adds a 440 Hz sine track) are served by a one-shot static
+# file server container named `cap-media` on the rig network — see README "How it was captured".
+# `analyze_submit` drives the real pipeline with every external-service stage switched off
+# (`extract_frame_descriptions`, `extract_ocr`, `generate_ui_inventory`, `generate_walkthrough`)
+# — the job completes end-to-end on the file (probe, 2 frames, quality metrics, frame index) and
+# calls neither the vision backend nor the transcription client. `vision_provider: "fake"` was
+# measured NOT to avoid the WM backend (the job still failed at `scene_detection` asking for an
+# `inference-router` licence token), so it is not used. `audio_beat_grid` is the reference's
+# SYNCHRONOUS route, so the golden body is an actual beat grid computed from the file.
+#
+# Job-scoped GET/DELETE cases use a fixed absent id: the job id is server-generated, so a
+# static-path replay can only pin the not-found branch. The successful job lifecycle is
+# exercised live by `analyze_submit`, but its ULID cannot be replayed from a cases file.
+# `POST /api/analyze/upload` is multipart and cannot be expressed in this format; it is listed
+# as uncaptured in the README rather than captured with a wrong content type.
+health|GET|/health||
+health_live|GET|/health/live||
+health_ready|GET|/health/ready||
+healthz|GET|/healthz||
+readyz|GET|/readyz||
+root|GET|/||
+analyze_submit|POST|/api/analyze|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"video_url":"http://cap-media:8001/cap-2s.mp4","extract_frame_descriptions":false,"extract_ocr":false,"generate_ui_inventory":false,"generate_walkthrough":false,"frame_interval_seconds":1.0,"max_frames":2}
+analyze_submit_validation|POST|/api/analyze|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+analyze_get_missing|GET|/api/analyze/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+analyze_result_missing|GET|/api/analyze/00000000-0000-0000-0000-0000000000ff/result|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+analyze_verification_missing|GET|/api/analyze/00000000-0000-0000-0000-0000000000ff/verification|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+analyze_artifact_missing|GET|/api/analyze/00000000-0000-0000-0000-0000000000ff/artifact/analysis.json|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+analyze_delete_missing|DELETE|/api/analyze/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+audio_beat_grid|POST|/api/analyze/audio|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"audio_url":"http://cap-media:8001/cap-2s-audio.mp4","meter":4}
+audio_beat_grid_validation|POST|/api/analyze/audio|{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+audio_no_tenant|POST|/api/analyze/audio||{"audio_url":"http://cap-media:8001/cap-2s-audio.mp4","meter":4}

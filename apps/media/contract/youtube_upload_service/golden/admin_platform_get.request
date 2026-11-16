@@ -1,0 +1,2 @@
+GET /api/admin/platform-channel
+{"X-Tenant-Id":"Bearer capture-licence-token-0001"}

@@ -1,0 +1,6 @@
+# The capability kinds this service owns after its drop table (see README.md).
+# Every one is a job kind in the ffmpeg image; the reference's own job CRUD is dropped because the
+# conveyor already owns the job ledger (ADR 0007 §2).
+media.compile_video
+media.thumbnail
+media.concat_audio

@@ -1,0 +1,2 @@
+POST /api/test-runner/execute
+{"target_url":"http://127.0.0.1:18999/","package_url":"http://127.0.0.1:18999/pkg.zip"}

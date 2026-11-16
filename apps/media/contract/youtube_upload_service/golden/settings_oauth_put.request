@@ -1,0 +1,3 @@
+PUT /api/settings/oauth-client
+{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}
+{"client_id":"capture-synthetic-client-id","client_secret":"capture-synthetic-client-secret"}

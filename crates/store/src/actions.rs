@@ -634,17 +634,26 @@ pub async fn job_get(conn: &mut PgConnection, id: Uuid) -> Result<Option<JobRow>
 
 /// Re-queue a `failed`/`dead` job. `None` means the state is not retryable.
 pub async fn job_retry(conn: &mut PgConnection, id: Uuid) -> Result<Option<JobRow>, sqlx::Error> {
-    sqlx::query_as(
+    let row: Option<JobRow> = sqlx::query_as(
         "UPDATE job
             SET status = 'pending', attempts = 0, run_after = now(), last_error = NULL,
-                lease_until = NULL, lease_token = NULL, updated_at = now()
+                continuation = false, lease_until = NULL, lease_token = NULL, updated_at = now()
           WHERE id = $1 AND status IN ('failed', 'dead')
           RETURNING id, kind, dedupe_key, status, payload, run_after, attempts,
                     max_attempts, last_error, created_at, updated_at",
     )
     .bind(id)
-    .fetch_optional(conn)
-    .await
+    .fetch_optional(&mut *conn)
+    .await?;
+    if row.is_some() {
+        // Attempts restart at 1, so a dead attempt's `runner_run` rows would collide with the
+        // fresh ones — and a new run must never inherit a dead one's artefacts.
+        sqlx::query("DELETE FROM runner_run WHERE job_id = $1")
+            .bind(id)
+            .execute(&mut *conn)
+            .await?;
+    }
+    Ok(row)
 }
 
 /// Every schedule of the tenant.

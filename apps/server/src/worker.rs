@@ -28,7 +28,8 @@
 //! `memory.consolidate` (one digest per card, on run completion only), S13 §5.8's `err.card` (a
 //! failed run's move → comment → coach), and S19/S20's eval kinds `eval.case.run`,
 //! `eval.regrade`, `eval.grade` (the one-shot per-output grade), `eval.run.tick` and
-//! `eval.reap`.
+//! `eval.reap`. #182 slice B adds `youtube.upload`, the one arm that needs the claimed row's id:
+//! it records the provider's video id there so a retry of the SAME job cannot upload twice.
 //!
 //! The bus consumer executes one notification: a `card.moved` into the ACTIVE lane runs
 //! `wip.pull` for that board (§5.8). Everything else on the stream is either a `process.step`
@@ -78,6 +79,10 @@ pub const RETRY_AFTER: Duration = Duration::from_secs(30);
 /// The only kinds a worker may claim while the tenant's andon cord is pulled (S06 §5.5,
 /// open question 1). Everything that *starts* work stays pending; delivery and the interaction
 /// sweeps keep running so a pulled cord can still be reported and released.
+///
+/// Runner-backed kinds (#144) are deliberately absent: they start Kubernetes Jobs and spend
+/// compute, which is exactly what pulling the cord is meant to stop. `runner.reap` is absent too —
+/// it deletes objects rather than starting work, but it is not a delivery path.
 pub const ANDON_ALLOWED_KINDS: [&str; 4] = [
     "delivery.send",
     "approval.closed.emit",
@@ -129,6 +134,11 @@ pub struct JobFailure {
     pub message: String,
     /// True when retrying cannot help (a bug, an unknown kind, an unconfigured client).
     pub permanent: bool,
+    /// True when the handler has more to do on the SAME attempt and the row should come back
+    /// without spending a retry (`store::jobs::defer`). A runner dispatch that created a
+    /// Kubernetes Job and must return to poll it is the case this exists for: the pod's
+    /// idempotency key is `(job_id, attempt)`, so the attempt number must not move (#144).
+    pub deferred: bool,
     /// The delay before the retry, when not permanent.
     pub retry_after: Duration,
 }
@@ -139,6 +149,7 @@ impl JobFailure {
         Self {
             message: message.into(),
             permanent: false,
+            deferred: false,
             retry_after: RETRY_AFTER,
         }
     }
@@ -148,7 +159,18 @@ impl JobFailure {
         Self {
             message: message.into(),
             permanent: true,
+            deferred: false,
             retry_after: RETRY_AFTER,
+        }
+    }
+
+    /// Come back after `delay` on the SAME attempt — a continuation, not a retry.
+    pub fn deferred(message: impl Into<String>, delay: Duration) -> Self {
+        Self {
+            message: message.into(),
+            permanent: false,
+            deferred: true,
+            retry_after: delay,
         }
     }
 }
@@ -345,15 +367,14 @@ impl Worker {
         // it, and its eventual finish writes nothing.
         let renewal = self.spawn_renewal(tenant, job.id, token);
 
-        let outcome = run_kind(
-            &self.pool,
-            &self.config,
-            self.licence.as_ref(),
-            tenant,
-            &job.kind,
-            &job.payload,
-        )
-        .await;
+        // A runner-backed kind takes the pod path: dispatch once, then poll the attempt it created.
+        // It is decided from the deployment's image map, not from a name pattern, so a kind is
+        // runner-backed exactly when an image exists for it.
+        let outcome = if crate::runner_dispatch::handles(&self.config, &job.kind) {
+            crate::runner_dispatch::step(&self.pool, &self.config, tenant, job).await
+        } else {
+            run_job(&self.pool, &self.config, self.licence.as_ref(), tenant, job).await
+        };
         renewal.abort();
 
         match outcome {
@@ -374,7 +395,11 @@ impl Worker {
                     %failure,
                     "job failed"
                 );
-                let outcome = if failure.permanent {
+                let outcome = if failure.deferred {
+                    store::jobs::defer(&self.pool, tenant, job.id, token, failure.retry_after)
+                        .await
+                        .map(|changed| changed.then_some("pending".to_owned()))
+                } else if failure.permanent {
                     store::finish_dead(&self.pool, tenant, job.id, token, &failure.message)
                         .await
                         .map(|changed| changed.then_some("dead".to_owned()))
@@ -409,7 +434,6 @@ impl Worker {
     }
 }
 
-/// Run one job kind. Public so tests exercise the exact dispatch the worker uses.
 /// One uuid out of a job payload, or a permanent failure naming what is missing.
 fn payload_uuid(payload: &serde_json::Value, key: &str) -> Result<Uuid, JobFailure> {
     payload
@@ -419,11 +443,50 @@ fn payload_uuid(payload: &serde_json::Value, key: &str) -> Result<Uuid, JobFailu
         .ok_or_else(|| JobFailure::permanent(format!("the job payload has no usable `{key}`")))
 }
 
+/// Run one claimed job, its row id included.
+///
+/// The id is what an arm needs to record a result on the row it is running
+/// (`store::jobs::record_result`). `run_kind` deliberately cannot supply one, so a kind that
+/// requires it refuses there instead of writing to no row — which is why the tests below that
+/// exercise the whole dispatch use this entry point.
+pub async fn run_job(
+    pool: &PgPool,
+    config: &Config,
+    licence: Option<&LicenceSyncClient>,
+    tenant: TenantId,
+    job: &Job,
+) -> Result<(), JobFailure> {
+    dispatch(
+        pool,
+        config,
+        licence,
+        tenant,
+        Some(job.id),
+        &job.kind,
+        &job.payload,
+    )
+    .await
+}
+
+/// Run one job kind **without** a row. Public so tests exercise the exact dispatch the worker
+/// uses; a kind that records a result on its own row needs [`run_job`] and refuses here.
 pub async fn run_kind(
     pool: &PgPool,
     config: &Config,
     licence: Option<&LicenceSyncClient>,
     tenant: TenantId,
+    kind: &str,
+    payload: &serde_json::Value,
+) -> Result<(), JobFailure> {
+    dispatch(pool, config, licence, tenant, None, kind, payload).await
+}
+
+async fn dispatch(
+    pool: &PgPool,
+    config: &Config,
+    licence: Option<&LicenceSyncClient>,
+    tenant: TenantId,
+    job_id: Option<Uuid>,
     kind: &str,
     payload: &serde_json::Value,
 ) -> Result<(), JobFailure> {
@@ -800,12 +863,27 @@ pub async fn run_kind(
         // S17 — one bounded benchmark driver tick, and the reaper that fails a stalled one.
         "benchmark.run.poll" => crate::benchmark_worker::poll(pool, tenant, payload).await?,
         "benchmark.reap" => crate::benchmark_worker::reap(pool, tenant).await?,
+        // #144 — the runner's housekeeping. Dispatching and polling are not string kinds: a job
+        // whose kind has an image in `CONVEYOR_RUNNER_IMAGES` is handled by `runner_dispatch`
+        // BEFORE this match (see `tick`), because the step needs the job row and its lease.
+        "runner.reap" => crate::runner_dispatch::reap(pool, config, tenant).await?,
         // S18 — the conveyor arm's producer (one case per job) and the improvement loop's verdict.
         "benchmark.case.produce" => {
             crate::benchmark_producer::produce(pool, tenant, &config.app_key, payload).await?
         }
         "benchmark.improvement.run" => {
             crate::benchmark_improvement::run(pool, tenant, &config.app_key, payload).await?
+        }
+        // #182 slice B: upload one document to the tenant's own YouTube channel. The row id is
+        // required, not optional: the recorded `video_id` lives on this job's own payload and is
+        // the retry's evidence that the upload already happened.
+        "youtube.upload" => {
+            let job_id = job_id.ok_or_else(|| {
+                JobFailure::permanent(
+                    "youtube.upload records its video id on the job row; it cannot run without one",
+                )
+            })?;
+            crate::youtube_upload::run(pool, tenant, job_id, payload).await?
         }
         other => {
             return Err(JobFailure::permanent(format!(
@@ -816,7 +894,7 @@ pub async fn run_kind(
                  quality.score, model.validate, copilot.turn.reap, copilot.proposal.sweep, \
                  copilot.proposal.execute, benchmark.run.poll, benchmark.reap, \
                  eval.case.run, eval.regrade, eval.grade, eval.run.tick, eval.reap, \
-                 document.purge, publish.design and memory.consolidate"
+                 document.purge, publish.design, youtube.upload and memory.consolidate"
             )));
         }
     }
@@ -1669,6 +1747,7 @@ async fn fail_delivery_send(
     Err(JobFailure {
         message: error,
         permanent: false,
+        deferred: false,
         retry_after,
     })
 }

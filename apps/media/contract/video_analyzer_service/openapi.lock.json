@@ -1,0 +1,1726 @@
+{
+  "components": {
+    "parameters": {
+      "TenantIdHeader": {
+        "description": "License token transport: `Bearer <token>`.",
+        "in": "header",
+        "name": "X-Tenant-Id",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "AnalysisRequest": {
+        "description": "Incoming request for video analysis.",
+        "properties": {
+          "compute_quality_metrics": {
+            "default": true,
+            "title": "Compute Quality Metrics",
+            "type": "boolean"
+          },
+          "extract_frame_descriptions": {
+            "default": true,
+            "title": "Extract Frame Descriptions",
+            "type": "boolean"
+          },
+          "extract_ocr": {
+            "default": true,
+            "title": "Extract Ocr",
+            "type": "boolean"
+          },
+          "frame_interval_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Override default frame interval",
+            "title": "Frame Interval Seconds"
+          },
+          "generate_frame_index": {
+            "default": true,
+            "title": "Generate Frame Index",
+            "type": "boolean"
+          },
+          "generate_ui_inventory": {
+            "default": true,
+            "title": "Generate Ui Inventory",
+            "type": "boolean"
+          },
+          "generate_walkthrough": {
+            "default": true,
+            "title": "Generate Walkthrough",
+            "type": "boolean"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Transcription language hint",
+            "title": "Language"
+          },
+          "max_frames": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Override default max frames",
+            "title": "Max Frames"
+          },
+          "max_vision_cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Hard cap on vision stage spend",
+            "title": "Max Vision Cost Usd"
+          },
+          "verification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VerificationCriteria"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "video_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "HTTP(S) URL or YouTube/Vimeo share link",
+            "title": "Video Url"
+          },
+          "vision_provider": {
+            "anyOf": [
+              {
+                "enum": [
+                  "openai",
+                  "anthropic",
+                  "google",
+                  "fake",
+                  "stub"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vision Provider"
+          }
+        },
+        "title": "AnalysisRequest",
+        "type": "object"
+      },
+      "AnalysisResponse": {
+        "description": "Initial response from POST /api/analyze — returns 202.",
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "progress": {
+            "title": "Progress",
+            "type": "number"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "status",
+          "stage",
+          "progress"
+        ],
+        "title": "AnalysisResponse",
+        "type": "object"
+      },
+      "AudioBeatGrid": {
+        "description": "Beat grid returned by POST /api/analyze/audio. Times are seconds from 0.",
+        "properties": {
+          "beats": {
+            "description": "Beat times in seconds",
+            "items": {
+              "type": "number"
+            },
+            "title": "Beats",
+            "type": "array"
+          },
+          "bpm": {
+            "description": "Estimated tempo in beats per minute",
+            "title": "Bpm",
+            "type": "number"
+          },
+          "bpm_confidence": {
+            "description": "How metronomically the beats fit the reported tempo: mean over inter-beat intervals of max(0, 1 - |interval - 60/bpm|/(60/bpm)/0.25). 1.0 = a click track; 0.7-0.9 = typical live/recorded music; 0.0 = no single tempo fits (or fewer than 3 beats). It does NOT claim the tempo is correct — a half/double-tempo lock scores just as high.",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Bpm Confidence",
+            "type": "number"
+          },
+          "downbeats": {
+            "description": "Inferred bar starts: every ``meter``-th beat, at the phase whose beats carry the most onset energy. Inferred, not DBN-tracked.",
+            "items": {
+              "type": "number"
+            },
+            "title": "Downbeats",
+            "type": "array"
+          },
+          "duration_s": {
+            "description": "Decoded audio duration in seconds",
+            "title": "Duration S",
+            "type": "number"
+          },
+          "grid_source": {
+            "description": "Algorithm that produced this grid",
+            "title": "Grid Source",
+            "type": "string"
+          },
+          "meter": {
+            "description": "Beats per bar used for the downbeat inference",
+            "title": "Meter",
+            "type": "integer"
+          },
+          "onsets": {
+            "description": "Detected onset times in seconds",
+            "items": {
+              "type": "number"
+            },
+            "title": "Onsets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "duration_s",
+          "bpm",
+          "bpm_confidence",
+          "meter",
+          "grid_source"
+        ],
+        "title": "AudioBeatGrid",
+        "type": "object"
+      },
+      "AudioBeatGridRequest": {
+        "description": "Request body for POST /api/analyze/audio.\n\nOnly an ``audio_url`` is accepted, on purpose. This service just REMOVED\nevery caller-supplied filesystem path from its request surface\n(``AnalysisRequest.video_path``, ``ReferenceImage.path`` — see the module\ndocstring), and a new endpoint must not reintroduce the same class of\nunconfined read through a different field name. ``s3://`` is refused for the\nsame reason it is refused elsewhere: the SSRF guard only reasons about\nHTTP(S), so a non-HTTP scheme would reach the fetcher un-judged.\n\nThe *scheme* check lives here so an obviously-wrong body fails validation\n(422) without work. The real judgement — DNS resolution, private/reserved\naddress ranges, internal-suffix blocklist, and the pin that closes the\nrebind window — is ``url_security.validate_public_url``, invoked by\n``VideoDownloader.download`` exactly as it is for ``video_url``. It is NOT\ncalled here: it does blocking DNS, and pydantic validation runs on the event\nloop.",
+        "properties": {
+          "audio_url": {
+            "description": "HTTP(S) URL of the audio (or video) file to analyse",
+            "title": "Audio Url",
+            "type": "string"
+          },
+          "meter": {
+            "default": 4,
+            "description": "Beats per bar used for downbeat phase inference (4 = 4/4)",
+            "maximum": 16.0,
+            "minimum": 1.0,
+            "title": "Meter",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "audio_url"
+        ],
+        "title": "AudioBeatGridRequest",
+        "type": "object"
+      },
+      "Body_upload_video_for_analysis": {
+        "properties": {
+          "config": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config"
+          },
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "description": "Video file to analyze",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_video_for_analysis",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "JobResultResponse": {
+        "description": "Full result returned by GET /api/analyze/{job_id}/result.",
+        "properties": {
+          "artifacts": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifacts"
+          },
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Seconds"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "frame_analyses": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frame Analyses"
+          },
+          "frame_analyses_partial": {
+            "default": false,
+            "description": "True when ``frame_analyses`` holds only the frames scored before the job stopped — i.e. the job is still running, or reached a terminal state other than 'completed' (failure, cost cap, wall-clock deadline). The pipeline checkpoints frame results after every vision batch, so a caller that times out mid-run gets the frames it already paid for rather than null. Use this to tell 'nothing to report' (frame_analyses null/empty, partial False) from 'I was cut off after N frames' (N entries, partial True).",
+            "title": "Frame Analyses Partial",
+            "type": "boolean"
+          },
+          "has_audio": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Audio"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "progress": {
+            "title": "Progress",
+            "type": "number"
+          },
+          "quality_metrics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QualityMetricsResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scene_boundaries": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scene Boundaries"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "transcript_data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcript Data"
+          },
+          "verification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VerificationResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "verification_passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Passed"
+          },
+          "vision_cost_usd": {
+            "default": 0.0,
+            "title": "Vision Cost Usd",
+            "type": "number"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          }
+        },
+        "required": [
+          "job_id",
+          "status",
+          "stage",
+          "progress"
+        ],
+        "title": "JobResultResponse",
+        "type": "object"
+      },
+      "JobStatusResponse": {
+        "description": "Poll response for GET /api/analyze/{job_id}.",
+        "properties": {
+          "artifacts": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifacts"
+          },
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Seconds"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "has_audio": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Audio"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "progress": {
+            "title": "Progress",
+            "type": "number"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "verification_passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Passed"
+          },
+          "vision_cost_usd": {
+            "default": 0.0,
+            "title": "Vision Cost Usd",
+            "type": "number"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          }
+        },
+        "required": [
+          "job_id",
+          "status",
+          "stage",
+          "progress"
+        ],
+        "title": "JobStatusResponse",
+        "type": "object"
+      },
+      "MotionSampleResponse": {
+        "description": "One point on the motion curve: how much changed *arriving at* ``t``.\n\nMirrors the pipeline's ``MotionSample`` dataclass: ``motion`` is the same\n0..1 frame-delta the aggregate ``motion_score`` averages, kept per-sample;\n``t`` is the timestamp of the LATER frame of the pair.",
+        "properties": {
+          "motion": {
+            "description": "0..1 frame-delta at this sample",
+            "title": "Motion",
+            "type": "number"
+          },
+          "t": {
+            "description": "Timestamp (seconds) the change lands at",
+            "title": "T",
+            "type": "number"
+          }
+        },
+        "required": [
+          "t",
+          "motion"
+        ],
+        "title": "MotionSampleResponse",
+        "type": "object"
+      },
+      "QualityMetricsResponse": {
+        "description": "Aggregate visual quality metrics — mirrors the pipeline's ``QualityMetrics``.\n\nStored verbatim (``asdict``) in the job row's JSONB column and read back\nhere, so field names/shape must track the dataclass exactly.",
+        "properties": {
+          "dominant_colors": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dominant Colors",
+            "type": "array"
+          },
+          "frames_analyzed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Frames the aggregates rest on (None on a pre-#122 job)",
+            "title": "Frames Analyzed"
+          },
+          "frames_planned": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Frames the extractor scheduled (None on a pre-#122 job)",
+            "title": "Frames Planned"
+          },
+          "mean_brightness": {
+            "title": "Mean Brightness",
+            "type": "number"
+          },
+          "mean_sharpness": {
+            "title": "Mean Sharpness",
+            "type": "number"
+          },
+          "motion_score": {
+            "title": "Motion Score",
+            "type": "number"
+          },
+          "motion_timeline": {
+            "items": {
+              "$ref": "#/components/schemas/MotionSampleResponse"
+            },
+            "title": "Motion Timeline",
+            "type": "array"
+          },
+          "overall_score": {
+            "title": "Overall Score",
+            "type": "number"
+          },
+          "visual_timeline": {
+            "items": {
+              "$ref": "#/components/schemas/VisualSampleResponse"
+            },
+            "title": "Visual Timeline",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mean_sharpness",
+          "mean_brightness",
+          "motion_score",
+          "dominant_colors",
+          "overall_score"
+        ],
+        "title": "QualityMetricsResponse",
+        "type": "object"
+      },
+      "ReferenceImage": {
+        "description": "A reference image to check against extracted frames.",
+        "properties": {
+          "name": {
+            "description": "Human-readable label",
+            "title": "Name",
+            "type": "string"
+          },
+          "reference_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Reference image key RELATIVE to this tenant's upload root (<upload_dir>/<tenant_id>/). Absolute paths, '..' segments, backslashes and percent-escapes are rejected.",
+            "title": "Reference Key"
+          },
+          "required_at_timestamp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Timestamp in seconds where this image must appear",
+            "title": "Required At Timestamp"
+          },
+          "timestamp_tolerance_seconds": {
+            "default": 2.0,
+            "description": "Allowed ±window around required_at_timestamp",
+            "title": "Timestamp Tolerance Seconds",
+            "type": "number"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Remote reference image URL",
+            "title": "Url"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ReferenceImage",
+        "type": "object"
+      },
+      "ScreenshotMatch": {
+        "description": "pHash match from a reference image to a frame.",
+        "properties": {
+          "distance": {
+            "title": "Distance",
+            "type": "integer"
+          },
+          "matched_frame": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matched Frame"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp"
+          }
+        },
+        "required": [
+          "name",
+          "distance"
+        ],
+        "title": "ScreenshotMatch",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VerificationCriteria": {
+        "description": "Assertions the analyzer checks against extracted data.",
+        "properties": {
+          "expected_resolution": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Resolution"
+          },
+          "expected_transcript": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Transcript"
+          },
+          "fail_on_any": {
+            "default": true,
+            "description": "If True, a single failed criterion fails the whole verification",
+            "title": "Fail On Any",
+            "type": "boolean"
+          },
+          "forbidden_phrases": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Forbidden Phrases",
+            "type": "array"
+          },
+          "max_duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Duration Seconds"
+          },
+          "max_scene_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Scene Count"
+          },
+          "min_duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Duration Seconds"
+          },
+          "min_overall_quality": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Overall Quality"
+          },
+          "min_scene_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Scene Count"
+          },
+          "min_sharpness_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Sharpness Score"
+          },
+          "min_transcript_similarity": {
+            "default": 0.85,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Min Transcript Similarity",
+            "type": "number"
+          },
+          "required_ocr_text": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Required Ocr Text",
+            "type": "array"
+          },
+          "required_phrases": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Required Phrases",
+            "type": "array"
+          },
+          "required_screenshots": {
+            "items": {
+              "$ref": "#/components/schemas/ReferenceImage"
+            },
+            "title": "Required Screenshots",
+            "type": "array"
+          },
+          "screenshot_match_threshold": {
+            "default": 10,
+            "description": "Max pHash Hamming distance (lower = stricter; 10 ≈ same scene)",
+            "minimum": 0.0,
+            "title": "Screenshot Match Threshold",
+            "type": "integer"
+          }
+        },
+        "title": "VerificationCriteria",
+        "type": "object"
+      },
+      "VerificationFailure": {
+        "description": "A single failed verification criterion.",
+        "properties": {
+          "actual": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual"
+          },
+          "criterion": {
+            "title": "Criterion",
+            "type": "string"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "expected": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected"
+          }
+        },
+        "required": [
+          "criterion"
+        ],
+        "title": "VerificationFailure",
+        "type": "object"
+      },
+      "VerificationResult": {
+        "description": "Outcome of running a VerificationCriteria against a job.",
+        "properties": {
+          "criteria_passed": {
+            "title": "Criteria Passed",
+            "type": "integer"
+          },
+          "criteria_total": {
+            "title": "Criteria Total",
+            "type": "integer"
+          },
+          "failures": {
+            "items": {
+              "$ref": "#/components/schemas/VerificationFailure"
+            },
+            "title": "Failures",
+            "type": "array"
+          },
+          "indeterminate": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Indeterminate",
+            "type": "array"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "screenshot_matches": {
+            "items": {
+              "$ref": "#/components/schemas/ScreenshotMatch"
+            },
+            "title": "Screenshot Matches",
+            "type": "array"
+          },
+          "transcript_similarity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcript Similarity"
+          }
+        },
+        "required": [
+          "passed",
+          "criteria_total",
+          "criteria_passed"
+        ],
+        "title": "VerificationResult",
+        "type": "object"
+      },
+      "VisualSampleResponse": {
+        "description": "Per-frame visual metrics — mirrors the pipeline's ``VisualSample``.\n\nThe aggregates on ``QualityMetricsResponse`` are whole-video means, so they\nare identical for every shot; these are the same quantities kept per frame,\nwhich is what makes shot-to-shot continuity and colour drift measurable.",
+        "properties": {
+          "brightness": {
+            "description": "0..1 mean luma at this frame",
+            "title": "Brightness",
+            "type": "number"
+          },
+          "dominant_rgb": {
+            "description": "[r, g, b] 0..255 dominant colour of this frame",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Dominant Rgb",
+            "type": "array"
+          },
+          "index": {
+            "description": "Source ExtractedFrame.index (gaps = undecodable frames)",
+            "title": "Index",
+            "type": "integer"
+          },
+          "sharpness": {
+            "description": "Laplacian variance at this frame",
+            "title": "Sharpness",
+            "type": "number"
+          },
+          "t": {
+            "description": "This frame's timestamp (seconds)",
+            "title": "T",
+            "type": "number"
+          }
+        },
+        "required": [
+          "t",
+          "index",
+          "sharpness",
+          "brightness"
+        ],
+        "title": "VisualSampleResponse",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "bearerFormat": "License",
+        "description": "License token. Transport: `X-Tenant-Id: Bearer <token>` (not the Authorization header — that is reserved for caller-side auth).",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Video analysis and verification microservice",
+    "title": "Video Analyzer Service",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Return service metadata and endpoints.",
+        "operationId": "service_root",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Service Root",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Service banner + endpoint index",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/analyze": {
+      "post": {
+        "description": "Create a new analysis job from a JSON body (video_url).\n\nLocal filesystem inputs are not accepted here — ``video_path`` was removed\n(arbitrary pod-file read); use this endpoint with ``video_url`` or\n``POST /analyze/upload`` for a local file.\n\nThe \"must carry a source\" rule now lives on ``AnalysisRequest`` itself\n(``_require_a_source``) rather than in this handler, so no other caller of\nthe model can build a sourceless request. Consequence: a body with no\n``video_url`` is rejected during body validation and returns **422**, the\nFastAPI-standard code, where this handler used to hand-roll a 400.",
+        "operationId": "start_video_analysis",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Analysis Job",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/api/analyze/audio": {
+      "post": {
+        "description": "Detect a beat grid (bpm, beats, downbeats, onsets) for a music track.\n\nSYNCHRONOUS — and deliberately unlike every sibling route on this router,\nwhich answers 202 with a ``job_id`` and makes the caller poll. The reason is\nthe shape of the work, not consistency for its own sake:\n\n* it is seconds, not minutes. A warm process analyses a full track in\n  ~0.3s (ffmpeg decode) + ~0.04s (librosa). The 202/poll pattern exists for\n  the multi-minute vision+OCR+transcription pipeline; wrapping a sub-second\n  computation in a job row, a queue hop, a poll loop and a DB round-trip\n  would cost more latency than the analysis itself;\n* the caller is a *composer* — the cut-to-beat product needs the grid in\n  hand before it can lay out a single edit, so it blocks either way. Making\n  it poll only moves the blocking into a loop;\n* there is no artifact and nothing to resume. The result is a few hundred\n  floats returned in the response body, so no job row, no object-store\n  write, and nothing to strand if the pod dies mid-request.\n\nThe duration guard is what keeps that choice safe: input longer than\n``beat_detector.MAX_DURATION_S`` is refused (413) off the ffprobe header,\nbefore a single sample is decoded, so no request can pin a CPU indefinitely.",
+        "operationId": "analyze_audio_beat_grid",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AudioBeatGridRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioBeatGrid"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Analyze Audio Beat Grid",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/api/analyze/upload": {
+      "post": {
+        "description": "Accept a multipart upload + optional JSON config and schedule analysis.",
+        "operationId": "upload_video_for_analysis",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_video_for_analysis"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Upload And Analyze",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/api/analyze/{job_id}": {
+      "delete": {
+        "description": "Delete a job, its DB row, and all artifacts (tenant-scoped).\n\nThe repo's tenant-scoped ``delete()`` returns False for a wrong-tenant\nor missing row, which we map to 404 — same shape as a true miss.",
+        "operationId": "delete_analysis_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Delete Analysis Job",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Delete Job",
+        "tags": [
+          "analysis"
+        ]
+      },
+      "get": {
+        "description": "Poll the status/progress of an analysis job (tenant-scoped).\n\nReaps the job first if it has been abandoned. A job whose owning pod died mid-run\nkeeps its non-terminal status forever (no handler runs), so a poller waits on work\nnobody is doing — measured 2026-08-04: 23 such rows, oldest ~11 days. Reaping on the\nPOLL is what makes it visible to the one caller who is actually asking; a background\nsweep would need to read across tenants, which RLS correctly forbids this role.",
+        "operationId": "get_analysis_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Job Status",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/api/analyze/{job_id}/artifact/{name}": {
+      "get": {
+        "description": "Stream a single artifact file by logical name (tenant-scoped).",
+        "operationId": "download_analysis_artifact",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Download Artifact",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/api/analyze/{job_id}/result": {
+      "get": {
+        "description": "Fetch the full result of a completed (or in-progress) job (tenant-scoped).",
+        "operationId": "get_analysis_result",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobResultResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Job Result",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/api/analyze/{job_id}/verification": {
+      "get": {
+        "description": "Return the verification report for a job that ran with criteria (tenant-scoped).",
+        "operationId": "get_analysis_verification",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Verification Result",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Return combined DB + API + executor + sweeper + beat-detector health.",
+        "operationId": "health_check",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Check",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Kubernetes liveness probe.",
+        "operationId": "health_live",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Live",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Kubernetes readiness probe.\n\nThe pipeline runner, the sweeper and the beat detector are deliberately NOT\nchecked here:\n\n* **A missing PipelineRunner is a build-time fault, so it is shared.** It\n  comes from an import that failed against the image — which means it failed\n  identically on every replica. Failing readiness would evict the entire\n  Deployment at once, taking down status polling, results, verification and\n  artifact download for every job already in flight, on top of an executor\n  outage. Blindness is bad; deleting the read surface too is worse.\n* **The sweeper is a background janitor.** It repairs rows; it serves no\n  request. Nothing about a request is wrong when it is dead.\n* **The beat detector is one endpoint of several.** Video analysis (pipeline,\n  OCR, vision) is unaffected by a failed numba warm-up, and that endpoint\n  already answers an honest 503 on its own.\n\nSo all three land on ``/health`` — ``unhealthy`` for the executor, ``degraded``\nfor the other two — loud to an operator and to alerting, inert to the\nscheduler. Readiness stays what it can honestly assert: this pod can reach\nits database and serve HTTP.",
+        "operationId": "health_ready",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "description": "Modern K8s liveness probe path (alias of /health/live).",
+        "operationId": "health.live",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health.Live",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Healthz",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/readyz": {
+      "get": {
+        "description": "Modern K8s readiness probe path (alias of /health/ready).",
+        "operationId": "health.ready",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readyz",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Liveness, readiness, dependency probes.",
+      "name": "health"
+    },
+    {
+      "description": "Video analysis jobs: submission, upload, status, results, verification, and artifact download.",
+      "name": "analysis"
+    }
+  ]
+}

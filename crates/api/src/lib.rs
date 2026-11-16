@@ -20,6 +20,7 @@ pub mod design;
 pub mod documents;
 pub mod error;
 pub mod extract;
+pub mod job_routes;
 pub mod metrics;
 pub mod models;
 pub mod request_id;
@@ -64,7 +65,8 @@ pub use state::{AppState, Authenticator};
         (name = "channels", description = "Inbound channel callbacks (Telegram)"),
         (name = "copilot", description = "Conversations, turns and proposals"),
         (name = "platform", description = "Super-admin tenant provisioning and recovery"),
-        (name = "billing", description = "A tenant's cost and usage, read from billing_service")
+        (name = "billing", description = "A tenant's cost and usage, read from billing_service"),
+        (name = "jobs", description = "The runner's pod-side byte routes, fenced by a job token")
     )
 )]
 struct ApiDoc;
@@ -96,6 +98,12 @@ fn api_router() -> OpenApiRouter<AppState> {
         // One `routes!` per handler — combining GET handlers builds one MethodRouter and the
         // router panics at startup.
         .routes(routes!(documents::document_content))
+        // #144 — the runner's pod-side routes. They carry a job token, never a session: a pod has
+        // no Caller and no licence, and the fence is the job row itself (ADR 0007 §Decision 4).
+        .routes(routes!(job_routes::job_input))
+        .routes(routes!(job_routes::job_progress))
+        .routes(routes!(job_routes::job_output))
+        .routes(routes!(job_routes::job_result))
         .routes(routes!(models::render_model))
         .routes(routes!(models::export_model_xmi))
         // S10 — the copilot. The chat transport is a route, not an action: streaming does not fit
@@ -401,7 +409,7 @@ mod tests {
         let registry = conveyor_actions::registry();
         assert_eq!(
             registry.len(),
-            320,
+            341,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -414,7 +422,10 @@ mod tests {
              S13 session 3's four process_maps writes (292) + S06d's seven channels admin actions (299) + \
              #70's five console actions (documents.compose, projects.update, publish.start, \
              publish.status, repositories.update) (304) + #92's card_types.list (305) + T0's fifteen \
-             organisation actions (320). \
+             organisation actions (320) + #139's eleven media kinds and the media.capabilities probe \
+             (332) + #161's decks.render (333) + #182 slice A's five youtube actions \
+             (client_set, client_get, connect, status, disconnect) (338) + slice B's three \
+             publishing actions (upload, privacy, retract) (341). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );

@@ -1,0 +1,24 @@
+{
+  "service": "video_analyzer_service",
+  "image_digest": "sha256:5836071586adf4035825c1076c84adfec94c2f1d762adc979fffb94d223ca29d",
+  "source_commit": "",
+  "taken": "2026-11-15T16:11:54Z",
+  "operations": 14,
+  "paths": 13,
+  "op_list": [
+    "DELETE /api/analyze/{job_id}",
+    "GET /",
+    "GET /api/analyze/{job_id}",
+    "GET /api/analyze/{job_id}/artifact/{name}",
+    "GET /api/analyze/{job_id}/result",
+    "GET /api/analyze/{job_id}/verification",
+    "GET /health",
+    "GET /health/live",
+    "GET /health/ready",
+    "GET /healthz",
+    "GET /readyz",
+    "POST /api/analyze",
+    "POST /api/analyze/audio",
+    "POST /api/analyze/upload"
+  ]
+}

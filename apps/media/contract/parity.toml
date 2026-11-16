@@ -1,0 +1,781 @@
+# P3.3 — every captured operation, one row each: a served capability kind, or a drop with a reason.
+#
+# The test `apps/media/tests/parity.rs` fails on an operation with no row, a row naming an
+# operation no lock carries, a dropped row with an empty reason, or a kind no image implements.
+#
+# `disposition = "kind"` means the operation's behaviour is that capability, executed as a job.
+# `disposition = "drop"` means the rewrite does not serve it, and `reason` says why.
+# `[[new]]` lists a kind this workspace publishes that no reference operation evidences — the
+# capability exists because an ADR says it does, and the row states that plainly.
+
+[[operation]]
+service = "video_compiler_service"
+operation = "POST /api/compile"
+disposition = "kind"
+kind = "media.compile_video"
+note = "the 202 submit is captured; the render branch uploads to an object store and is not golden-replayable, so the executor's own compile test carries that evidence"
+
+[[operation]]
+service = "video_compiler_service"
+operation = "POST /api/thumbnails"
+disposition = "kind"
+kind = "media.thumbnail"
+note = "the captured branch is validation (422); the happy path fetched a URL and wrote to an object store, so the executor takes a local input file instead"
+
+[[operation]]
+service = "video_compiler_service"
+operation = "POST /api/concat-audio"
+disposition = "kind"
+kind = "media.concat_audio"
+note = "same shape as the thumbnail: validation captured, the fetching happy path replaced by local input files"
+
+[[operation]]
+service = "video_compiler_service"
+operation = "POST /api/jobs/cancel"
+disposition = "drop"
+reason = "cancellation is conveyor's job ledger (ADR 0007 §2-4); an executor has one attempt and no cancel surface"
+
+[[operation]]
+service = "video_compiler_service"
+operation = "GET /api/jobs/{job_id}"
+disposition = "drop"
+reason = "job status is conveyor's ledger; the pod reports through POST /api/jobs/{id}/result"
+
+[[operation]]
+service = "video_compiler_service"
+operation = "GET /health"
+disposition = "drop"
+reason = "an executor is a batch pod, not a service: its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "video_compiler_service"
+operation = "GET /healthz"
+disposition = "drop"
+reason = "same as GET /health: no long-lived process to probe"
+
+[[operation]]
+service = "video_compiler_service"
+operation = "GET /health/live"
+disposition = "drop"
+reason = "same as GET /health: no long-lived process to probe"
+
+[[operation]]
+service = "video_compiler_service"
+operation = "GET /health/ready"
+disposition = "drop"
+reason = "readiness is dispatch: an image with no configured kind is refused before a pod is created"
+
+[[operation]]
+service = "video_compiler_service"
+operation = "GET /readyz"
+disposition = "drop"
+reason = "same as GET /health/ready"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "POST /api/analyze"
+disposition = "kind"
+kind = "media.analyze_video"
+note = "the submit is captured (202); the analysis itself ran to completion locally before the goldens were taken, and the executor's own test carries the measurement evidence"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "POST /api/analyze/audio"
+disposition = "kind"
+kind = "media.analyze_audio"
+note = "the reference's synchronous route. DECLARED GAP: the golden body is a real librosa beat grid (bpm, bpm_confidence, beats, onsets, downbeats, grid_source); this crate links no audio DSP, so a caller asking for the grid is refused by name (requires_librosa) and only duration_s plus stream metadata are served"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "POST /api/analyze/upload"
+disposition = "kind"
+kind = "media.analyze_video"
+note = "served, uncaptured: multipart/form-data cannot be expressed by the capture script; the executor takes the same bytes as a work-dir input"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /api/analyze/{job_id}"
+disposition = "drop"
+reason = "job status is conveyor's ledger"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /api/analyze/{job_id}/result"
+disposition = "drop"
+reason = "the result is the runner/v1 RunResult posted to conveyor's result route"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /api/analyze/{job_id}/verification"
+disposition = "drop"
+reason = "verification is a field of the analysis document, not a second resource; the job ledger owns the document"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /api/analyze/{job_id}/artifact/{name}"
+disposition = "drop"
+reason = "artefacts cross conveyor's own output route and object store (ADR 0007 §4); a pod holds no store credential"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "DELETE /api/analyze/{job_id}"
+disposition = "drop"
+reason = "job deletion is conveyor's ledger"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /"
+disposition = "drop"
+reason = "a root manifest describes an HTTP service; the executor has no HTTP surface"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /health"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's deadline"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /healthz"
+disposition = "drop"
+reason = "same as GET /health"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /health/live"
+disposition = "drop"
+reason = "same as GET /health"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /health/ready"
+disposition = "drop"
+reason = "same as GET /health"
+
+[[operation]]
+service = "video_analyzer_service"
+operation = "GET /readyz"
+disposition = "drop"
+reason = "same as GET /health"
+
+[[new]]
+kind = "media.probe_video"
+reason = "the reference exposes probe data inside its analysis result; conveyor publishes it as its own kind so a caller can decide before spending a job"
+
+[[new]]
+kind = "media.ocr"
+reason = "ADR 0007 §1 puts tesseract in the ffmpeg image; the reference's OCR is a licence-gated vision-provider call, so no reference operation evidences a local one"
+
+# html_render_service — one row per captured operation.
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /"
+disposition = "drop"
+reason = "a root banner describes an HTTP service; an executor has no HTTP surface"
+
+[[operation]]
+service = "html_render_service"
+operation = "POST /api/designs"
+disposition = "drop"
+reason = "design authoring is the redesign pipeline (inference-router plus object store), not a captured capability"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/batch"
+disposition = "drop"
+reason = "batch orchestration is conveyor's job ledger and runs; a batch is a plan over runs, not a capability"
+
+[[operation]]
+service = "html_render_service"
+operation = "POST /api/designs/batch"
+disposition = "drop"
+reason = "batch orchestration is conveyor's job ledger and runs; a batch is a plan over runs, not a capability"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/batch/{batch_id}"
+disposition = "drop"
+reason = "batch orchestration is conveyor's job ledger and runs; a batch is a plan over runs, not a capability"
+
+[[operation]]
+service = "html_render_service"
+operation = "POST /api/designs/batch/{batch_id}/cancel"
+disposition = "drop"
+reason = "batch orchestration is conveyor's job ledger and runs; a batch is a plan over runs, not a capability"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/batch/{batch_id}/results"
+disposition = "drop"
+reason = "batch orchestration is conveyor's job ledger and runs; a batch is a plan over runs, not a capability"
+
+[[operation]]
+service = "html_render_service"
+operation = "POST /api/designs/batch/{batch_id}/retry-failed"
+disposition = "drop"
+reason = "batch orchestration is conveyor's job ledger and runs; a batch is a plan over runs, not a capability"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "POST /api/designs/jobs/{job_id}/cancel"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/compare"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/comparison/{viewport}"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/component-html"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/diff/{viewport}"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/history"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/html"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/original/{viewport}"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/pdf"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "POST /api/designs/jobs/{job_id}/refine"
+disposition = "drop"
+reason = "the refine pipeline calls the redesign model through inference-router (licence-gated) and writes to object storage; not absorbable from this capture"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/result"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/screenshots/{viewport}"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/sections/{section_name}"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/variants/{style}/html"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/jobs/{job_id}/webhooks"
+disposition = "drop"
+reason = "job status, history and every job-scoped artefact are conveyor's ledger, result route and artefact store (ADR 0007 §2-4)"
+
+[[operation]]
+service = "html_render_service"
+operation = "POST /api/designs/render/pdf"
+disposition = "kind"
+kind = "media.render_html"
+note = "the captured happy path is an HTML document to PDF; PNG is the same browser path with a sized viewport, and the executor test carries it"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/styles"
+disposition = "drop"
+reason = "the style catalogue is tenant administration, not a capability; conveyor keeps no second stateful surface (ADR 0007 §2)"
+
+[[operation]]
+service = "html_render_service"
+operation = "POST /api/designs/styles"
+disposition = "drop"
+reason = "the style catalogue is tenant administration, not a capability; conveyor keeps no second stateful surface (ADR 0007 §2)"
+
+[[operation]]
+service = "html_render_service"
+operation = "DELETE /api/designs/styles/{style_id}"
+disposition = "drop"
+reason = "the style catalogue is tenant administration, not a capability; conveyor keeps no second stateful surface (ADR 0007 §2)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /api/designs/styles/{style_id}"
+disposition = "drop"
+reason = "the style catalogue is tenant administration, not a capability; conveyor keeps no second stateful surface (ADR 0007 §2)"
+
+[[operation]]
+service = "html_render_service"
+operation = "PUT /api/designs/styles/{style_id}"
+disposition = "drop"
+reason = "the style catalogue is tenant administration, not a capability; conveyor keeps no second stateful surface (ADR 0007 §2)"
+
+[[operation]]
+service = "html_render_service"
+operation = "POST /api/designs/styles/{style_id}/preview"
+disposition = "drop"
+reason = "the style catalogue is tenant administration, not a capability; conveyor keeps no second stateful surface (ADR 0007 §2)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /health"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /health/live"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /health/ready"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /healthz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "html_render_service"
+operation = "GET /readyz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+
+# video_production_service — one row per captured operation.
+
+[[operation]]
+service = "video_production_service"
+operation = "DELETE /api/compile/jobs/{job_id}"
+disposition = "drop"
+reason = "cancel is a ledger transition"
+
+[[operation]]
+service = "video_production_service"
+operation = "DELETE /api/compile/presets/custom/{preset_id}"
+disposition = "drop"
+reason = "per-tenant CRUD"
+
+[[operation]]
+service = "video_production_service"
+operation = "DELETE /api/compile/templates/{template_id}"
+disposition = "drop"
+reason = "per-tenant CRUD"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /"
+disposition = "drop"
+reason = "endpoint index advertising routes the executor will not serve"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/analytics/usage"
+disposition = "drop"
+reason = "usage aggregation is billing/metering, ledger-owned"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/analytics/usage/daily"
+disposition = "drop"
+reason = "daily usage aggregation"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/batch/{batch_id}"
+disposition = "drop"
+reason = "batch status"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs"
+disposition = "drop"
+reason = "job list/polling is the conveyor ledger's; the executor surfaces intake only"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}"
+disposition = "drop"
+reason = "status polling"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/report"
+disposition = "drop"
+reason = "per-job stage report"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/result"
+disposition = "drop"
+reason = "result metadata"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/thumbnail"
+disposition = "drop"
+reason = "artifact read of a ledger-owned job"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/video"
+disposition = "drop"
+reason = "artifact download"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/jobs/{job_id}/video-url"
+disposition = "drop"
+reason = "artifact URL minting"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/presets"
+disposition = "drop"
+reason = "static config data; the executor receives explicit config in the job request"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/presets/custom"
+disposition = "drop"
+reason = "per-tenant CRUD rows belong to the config/ledger store"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/presets/{name}"
+disposition = "drop"
+reason = "static config lookup"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/templates"
+disposition = "drop"
+reason = "template catalogue (seeded per boot)"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/themes"
+disposition = "drop"
+reason = "static theme catalogue"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/compile/themes/{name}"
+disposition = "drop"
+reason = "static theme lookup"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/batch/{batch_id}"
+disposition = "drop"
+reason = "batch status"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/jobs"
+disposition = "drop"
+reason = "recording job list/polling"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/jobs/{job_id}"
+disposition = "drop"
+reason = "recording status"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/jobs/{job_id}/result"
+disposition = "drop"
+reason = "recording result metadata"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /api/record/jobs/{job_id}/video"
+disposition = "drop"
+reason = "artifact download"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /events/{tenant_id}"
+disposition = "drop"
+reason = "SSE job-progress stream; ledger-owned and not a request/response pair"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /health"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /health/live"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /health/ready"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /healthz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /metrics"
+disposition = "drop"
+reason = "Prometheus exposition scaffolding; operational, not a business operation"
+
+[[operation]]
+service = "video_production_service"
+operation = "GET /readyz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3), not a health route"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile"
+disposition = "kind"
+kind = "media.produce_video"
+note = "shot list + supplied recordings → assembled deliverable; pinned at intake (completion blocked by the `fps` defect)"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/admin/cleanup"
+disposition = "drop"
+reason = "retention/maintenance; ledger-owned"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/audio-export"
+disposition = "drop"
+reason = "extracts audio from a ledger-owned job's output by `job_id`"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/batch"
+disposition = "drop"
+reason = "fan-out of several compiles is ledger orchestration"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/edit-plan"
+disposition = "drop"
+reason = "LLM edit planning; the ledger/orchestrator owns planning, and the response is a plan, not media"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/findings-video"
+disposition = "drop"
+reason = "findings → shot-list shaping is presentation policy; the caller/ledger supplies the shot list to `media.produce_video`"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/jobs/{job_id}/thumbnail"
+disposition = "drop"
+reason = "artifact write against a ledger-owned job"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/presets/custom"
+disposition = "drop"
+reason = "per-tenant CRUD"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/preview"
+disposition = "drop"
+reason = "derived preview of a ledger-owned job output; not a capability"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/templates"
+disposition = "drop"
+reason = "per-tenant CRUD"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/compile/title-card"
+disposition = "kind"
+kind = "media.produce_video"
+note = "single title-card shot render (Pillow → mp4); happy path captured"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/animation"
+disposition = "drop"
+reason = "320×240 @ 10 fps, 1.0 s → 10 PNG frames → H.264 1.000 s + silent AAC, 3 628 B, 3.7 s wall clock (capture raster 640×480, scale 2) | **no**"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/batch"
+disposition = "drop"
+reason = "recording fan-out"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/batch_from_artifacts"
+disposition = "drop"
+reason = "fan-out plus artifact retrieval; ledger orchestration"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/capture/screens"
+disposition = "kind"
+kind = "media.record_browser"
+note = "one screenshot per demo step → zip; pinned at the SSRF/validation branch (needs a public URL)"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/content"
+disposition = "drop"
+reason = "inline one-page HTML → 320×240, 1.8 s @ 25 fps, H.264 + AAC, 26 807 B, ~3.8 s wall clock | **yes**"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/jobs/{job_id}/cancel"
+disposition = "drop"
+reason = "cancel is a ledger transition"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/part"
+disposition = "kind"
+kind = "media.record_browser"
+note = "scripted browser part; pinned at validation (needs a scripts directory)"
+
+[[operation]]
+service = "video_production_service"
+operation = "POST /api/record/url"
+disposition = "kind"
+kind = "media.record_browser"
+note = "live URL → continuous browser recording; the rig pins the SSRF/validation branches (happy path needs an external public URL)"
+
+# frontend_test_runner_service — one row per captured operation.
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /"
+disposition = "drop"
+reason = "a service banner describes an HTTP surface the executor does not have"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "POST /api/test-runner/execute"
+disposition = "kind"
+kind = "media.run_gherkin"
+note = "the capability survives as the native Gherkin kind, but the request source changes: the reference accepts a Playwright ZIP package_url or a bdd_job_id, the kind takes the feature document itself"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}"
+disposition = "drop"
+reason = "job state, results and reports are conveyor's ledger and artefact store (ADR 0007 §2-4); the executor answers one synchronous verdict"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}/artifacts/{artifact_path}"
+disposition = "drop"
+reason = "job state, results and reports are conveyor's ledger and artefact store (ADR 0007 §2-4); the executor answers one synchronous verdict"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}/clips/{clip_key}/video"
+disposition = "drop"
+reason = "per-scenario clip capture is w2v's demo-video pipeline, not a media executor"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}/report"
+disposition = "drop"
+reason = "job state, results and reports are conveyor's ledger and artefact store (ADR 0007 §2-4); the executor answers one synchronous verdict"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /api/test-runner/{job_id}/result"
+disposition = "drop"
+reason = "job state, results and reports are conveyor's ledger and artefact store (ADR 0007 §2-4); the executor answers one synchronous verdict"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /health"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /health/live"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /health/ready"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /healthz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"
+
+[[operation]]
+service = "frontend_test_runner_service"
+operation = "GET /readyz"
+disposition = "drop"
+reason = "an executor is a batch pod; its liveness is the Job's activeDeadlineSeconds (ADR 0007 §3)"

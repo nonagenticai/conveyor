@@ -1,0 +1,6 @@
+{
+  "error": {
+    "message": "upstream returned an empty completion",
+    "type": "upstream_empty_completion"
+  }
+}

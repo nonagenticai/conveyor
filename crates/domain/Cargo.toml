@@ -14,6 +14,8 @@ chrono = { workspace = true }
 rust_decimal = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+# ADR 0007 §Decision 4: the runner/v1 schemas are generated from these types, never hand-written.
+schemars = { workspace = true }
 # S07: `content_hash` is SHA-256 of the JCS-canonical revision snapshot. Pure computation —
 # the crate still performs no IO and sqlx is still not a dependency (CONTRACT §1).
 sha2 = { workspace = true }

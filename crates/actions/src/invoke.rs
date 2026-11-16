@@ -31,11 +31,17 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::registry::Registry;
-use crate::spec::{ActionKind, FieldError, HandlerRef, validate_input};
+use crate::spec::{ActionKind, Effect, FieldError, HandlerRef, Tenancy, validate_input};
 use crate::views::InvocationResponse;
 
 /// The invocation depth at which a call chain is refused (S04 trap 6).
 pub const MAX_DEPTH: u32 = 8;
+
+/// The caller's tenant on the wire to an external service that declares `Tenancy::Tenant`.
+///
+/// The coding service resolves a job by this header; without it every job lands in the service's
+/// default tenant instead of the caller's.
+pub const TENANT_HEADER: &str = "X-Tenant-Id";
 
 /// The circuit breaker's failure count inside its window.
 pub const BREAKER_THRESHOLD: usize = 5;
@@ -601,6 +607,67 @@ fn bearer_from_secret(bytes: Vec<u8>) -> Option<String> {
 
 // ── the engine ──────────────────────────────────────────────────────────────────────────
 
+/// The ceiling a job binding declares for itself, if any.
+///
+/// A binding's `meta` carries `limits.effect_ceiling` (or a top-level `effect_ceiling`). Absent
+/// means "no narrower ceiling than the action's own". An **unrecognised** value is an error, not
+/// an unlimited ceiling: a typo in a binding must never widen what a job can do.
+pub fn binding_ceiling(meta: &Value) -> Result<Option<Effect>, ActionError> {
+    let raw = meta
+        .get("limits")
+        .and_then(|limits| limits.get("effect_ceiling"))
+        .or_else(|| meta.get("effect_ceiling"));
+    let Some(raw) = raw else {
+        return Ok(None);
+    };
+    let Some(text) = raw.as_str() else {
+        return Err(ActionError::new(
+            400,
+            "bad_binding",
+            "a binding's effect_ceiling must be a string",
+        ));
+    };
+    Effect::parse(text).map(Some).ok_or_else(|| {
+        ActionError::new(
+            400,
+            "bad_binding",
+            format!("effect_ceiling {text:?} is not read, write or destructive"),
+        )
+    })
+}
+
+/// Invoke through a job binding: the action's effect may not exceed what the binding allows.
+///
+/// This is the entry a bound caller (a job, a procedure step, the broker) uses. The check runs
+/// before the action's input is validated and before any handler or database work, so a call that
+/// the binding does not permit has no backend effect at all — the error is the only trace.
+pub async fn invoke_bound(
+    pool: &PgPool,
+    registry: &Registry,
+    tenant: TenantId,
+    binding_meta: &Value,
+    request: InvokeRequest,
+) -> Result<InvokeOutcome, ActionError> {
+    let Some(spec) = registry.get(&request.action) else {
+        return Err(ActionError::not_found(&request.action));
+    };
+    if let Some(ceiling) = binding_ceiling(binding_meta)?
+        && spec.effect.rank() > ceiling.rank()
+    {
+        return Err(ActionError::new(
+            403,
+            "effect_ceiling",
+            format!(
+                "{} is a {} action and this binding allows at most {}",
+                spec.name,
+                spec.effect.as_str(),
+                ceiling.as_str()
+            ),
+        ));
+    }
+    invoke(pool, registry, tenant, request).await
+}
+
 /// Invoke one action.
 pub async fn invoke(
     pool: &PgPool,
@@ -991,6 +1058,11 @@ async fn invoke_external(
     };
     if let Some(correlation) = &correlation {
         builder = builder.header("X-Correlation-Id", correlation);
+    }
+    // The caller's tenant, for the external actions that scope themselves to it (every current
+    // one). `ctx` is Copy and is not consumed until the failure recorder below.
+    if spec.tenancy == Tenancy::Tenant {
+        builder = builder.header(TENANT_HEADER, ctx.tenant.to_string());
     }
     if let Some(token) = &bearer {
         builder = builder.bearer_auth(token);

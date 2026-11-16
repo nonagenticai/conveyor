@@ -111,6 +111,12 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
     // The catalog is deployment config and its refusals are part of the contract: an ambiguous
     // alias or a missing owner-hardware credential fails the boot, exactly as it does live.
     let catalog = Catalog::load(&config.providers_config_path)?;
+    // The enabled catalog is the bounded `provider` label set. Collect it before the catalog moves
+    // into the router service: the metrics pre-seed needs it before the scrape listener starts.
+    let provider_names: Vec<String> = catalog
+        .enabled()
+        .map(|provider| provider.name.clone())
+        .collect();
     let slot_wait = std::time::Duration::from_secs_f64(config.provider_slot_wait_seconds);
     let router_service = RouterService::new(catalog, slot_wait)?;
     let pool = db::connect(&database_url, 5).await?;
@@ -169,6 +175,22 @@ async fn serve_inner() -> Result<(), Box<dyn std::error::Error>> {
             std::sync::Arc::new(conveyor_inference_router::metering::NoopCostSink)
         }
     };
+    // The scrape listener is a dedicated port: the API listener's document is the captured
+    // contract, so `/metrics` must never appear there. A bind failure fails the boot.
+    if config.metrics_port != 0 {
+        let address =
+            std::net::SocketAddr::from((std::net::Ipv4Addr::UNSPECIFIED, config.metrics_port));
+        let metrics_listener = tokio::net::TcpListener::bind(address).await?;
+        // Every family exists at zero from the first scrape: absent and zero must never look alike.
+        conveyor_inference_router::metrics::preseed(&provider_names);
+        let metrics_router = conveyor_inference_router::metrics::router();
+        tracing::info!(port = config.metrics_port, "serving /metrics");
+        tokio::spawn(async move {
+            if let Err(error) = axum::serve(metrics_listener, metrics_router).await {
+                tracing::error!(%error, "metrics listener stopped");
+            }
+        });
+    }
     // The budget gate and the cost sink are wired to their real implementations by the slices
     // that add them; until then the defaults are explicit rather than absent.
     let deps = AppDeps {

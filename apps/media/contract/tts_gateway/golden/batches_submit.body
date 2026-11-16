@@ -1,0 +1,1 @@
+{"batch_id":"capture-batch-0001","jobs":[{"ref":"c1","job_id":"01a1dfeed4bd701fad2c7d684ffcc533","idempotency_key":"98189a45f0e8007cbe2996b4e1372b309bbc38aa7fd423e21a5461e34aa00a25","status":"queued"},{"ref":"c2","job_id":"01a1dfeed4bd701fad2c7d699ba587a0","idempotency_key":"b44f3f828a4a799d251d5adfff0a1ec1e42d114b71214fef662bc799e8eb9c66","status":"queued"}]}

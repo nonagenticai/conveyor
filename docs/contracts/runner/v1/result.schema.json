@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RunResult",
+  "description": "What the executor posts to `POST /api/jobs/{id}/result`.",
+  "type": "object",
+  "properties": {
+    "artefacts": {
+      "description": "Every declared output appears exactly once on success; empty is legal on failure.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Artefact"
+      }
+    },
+    "attempt": {
+      "description": "Must equal the instruction's `attempt`.",
+      "type": "integer",
+      "format": "int32"
+    },
+    "error": {
+      "description": "Present iff `status` is [`Status::Failed`].",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ErrorInfo"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "finished_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "job_id": {
+      "description": "Must equal the instruction's `job_id`.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "metrics": {
+      "description": "Free-form measurements (durations, counts). Never used for control flow."
+    },
+    "schema": {
+      "description": "Always [`CONTRACT`].",
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "$ref": "#/$defs/Status"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "job_id",
+    "attempt",
+    "status",
+    "artefacts",
+    "metrics",
+    "started_at",
+    "finished_at"
+  ],
+  "$defs": {
+    "Artefact": {
+      "description": "One produced artefact, as reported by the executor.",
+      "type": "object",
+      "properties": {
+        "bytes": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "content_type": {
+          "description": "Must equal the declared [`Output::content_type`].",
+          "type": "string"
+        },
+        "name": {
+          "description": "Must match a declared [`Output::name`].",
+          "type": "string"
+        },
+        "sha256": {
+          "description": "Hex SHA-256. The route recomputes it while writing; a mismatch refuses the body.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "sha256",
+        "bytes",
+        "content_type"
+      ]
+    },
+    "ErrorClass": {
+      "description": "Why an executor failed, in the vocabulary the dispatcher retries on.",
+      "oneOf": [
+        {
+          "description": "The instruction or its inputs were unusable; retrying cannot help.",
+          "type": "string",
+          "const": "input"
+        },
+        {
+          "description": "An upstream provider refused or failed; the dispatcher decides by `code`.",
+          "type": "string",
+          "const": "provider"
+        },
+        {
+          "description": "A transient condition; the dispatcher may retry once.",
+          "type": "string",
+          "const": "transient"
+        },
+        {
+          "description": "A permanent defect; the job is dead-lettered.",
+          "type": "string",
+          "const": "permanent"
+        }
+      ]
+    },
+    "ErrorInfo": {
+      "description": "The failure detail carried by a `failed` result.",
+      "type": "object",
+      "properties": {
+        "class": {
+          "$ref": "#/$defs/ErrorClass"
+        },
+        "code": {
+          "description": "A stable machine code (`ffmpeg_missing`, `render_timeout`, `provider_5xx`, …).",
+          "type": "string"
+        },
+        "message": {
+          "description": "One human sentence; never a stack trace.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "class",
+        "code",
+        "message"
+      ]
+    },
+    "Status": {
+      "description": "The terminal state an executor reports.",
+      "type": "string",
+      "enum": [
+        "succeeded",
+        "failed"
+      ]
+    }
+  }
+}

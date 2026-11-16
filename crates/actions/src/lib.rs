@@ -26,6 +26,8 @@ pub mod capability;
 // S06d: the connector standard — grants, compiled defaults, the machine floor and adapters.
 pub mod channel;
 pub mod control;
+// #161 P3: the deck toolkit — one action rendering the model to .pptx, PDF or PNG.
+pub mod deck;
 pub mod documents;
 pub mod eval;
 pub mod fixtures;
@@ -40,6 +42,8 @@ pub mod invoke;
 pub mod knowledge;
 pub mod lock;
 pub mod mcp;
+// #139 P3.1: the media group's toolkit — one action per capability kind, plus the probe.
+pub mod media;
 // S15: work-package memory — remember (the only writing action) and recall.
 pub mod memory;
 pub mod model;
@@ -67,6 +71,8 @@ pub mod spec;
 pub mod views;
 // S13: `workflows.*` — the engine's authoring surface (one document, versioned by key).
 pub mod workflow;
+// #182 slice A: the tenant's own YouTube channel — OAuth client, connect, status, disconnect.
+pub mod youtube;
 
 pub use invoke::{
     ActionError, Authority, HandlerCtx, InvokeOutcome, InvokeRequest, MAX_DEPTH, Precondition,

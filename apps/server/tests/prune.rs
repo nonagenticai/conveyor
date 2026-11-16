@@ -798,7 +798,10 @@ fn the_default_schedule_set_is_the_maintenance_kinds() {
             // S10's copilot pair: the streaming-turn reap and the proposal sweep.
             "copilot.turn.reap",
             "copilot.proposal.sweep",
-            "benchmark.reap"
+            "benchmark.reap",
+            // #144: deletes the objects an abandoned runner attempt left behind. Polling a live
+            // one is not a cron — it rides the job's own deferred row.
+            "runner.reap"
         ]
     );
 }

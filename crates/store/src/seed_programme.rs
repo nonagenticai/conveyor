@@ -11,13 +11,23 @@
 //! `project.meta` is merged, not replaced: a later PM job may write keys the seed does not own,
 //! and a seed run must not erase them. The seed owns the keys it names (`plan`, `track`,
 //! `issues`, `depends_on`, `plan_status`, `status_source`) and leaves every other key alone.
+//!
+//! **Every non-archived project also gets a board.** A project is addressed through its board —
+//! the console's workspace, its cards, the start card `projects.create` files — and no action
+//! creates a board for an existing project (`boards.create` does not exist), so a project the
+//! seed inserts without one could never acquire it. Measured 2026-11-15: P0, the programme's own
+//! definition project, was the one of 48 with no board.
 
-use conveyor_domain::TenantId;
+use conveyor_domain::{Code, TenantId};
 use serde::Deserialize;
 use serde_json::Value;
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
+use crate::board::{
+    DEFAULT_BOARD_NAME, DEFAULT_TEMPLATE_CODE, ensure_board_from_template_tx, list_boards_tx,
+    template_lanes_tx,
+};
 use crate::scope::begin_scoped;
 use crate::seed::SeedError;
 use crate::tenants;
@@ -72,6 +82,12 @@ pub struct ProgrammeCounts {
     pub updated: i64,
     /// Rows already at the seeded content.
     pub skipped: i64,
+    /// Boards created for a seeded project that had none.
+    ///
+    /// Separate from `created` because a board is not a project row: a second seed run reports
+    /// `created: 0, boards_created: 0` on an unchanged programme, while the run that first makes
+    /// a board-less project workable reports it here.
+    pub boards_created: i64,
 }
 
 /// Parse the embedded document. A malformed document is a build-time error, never a data error.
@@ -102,10 +118,26 @@ pub async fn seed_programme(
         let tenant = TenantId::from_uuid(tenant_id)?;
         let mut tx = begin_scoped(pool, tenant).await?;
         let mut counts = ProgrammeCounts::default();
+        // Resolved once per tenant, not once per project: the lanes are the same for every board,
+        // and a tenant without the template gets one warning, not 48.
+        let lanes = board_lanes(&mut tx, tenant).await?;
+        if lanes.is_none() {
+            tracing::warn!(
+                tenant = %slug,
+                template = DEFAULT_TEMPLATE_CODE,
+                "programme seed: no active board template for this tenant; the projects keep \
+                 their rows and are left without a board"
+            );
+        }
         let programme_id =
             upsert_programme(&mut tx, tenant_id, &export.programme, &mut counts).await?;
         for project in &export.projects {
-            upsert_project(&mut tx, tenant_id, programme_id, project, &mut counts).await?;
+            let project_id =
+                upsert_project(&mut tx, tenant_id, programme_id, project, &mut counts).await?;
+            if let Some(kinds) = lanes.as_deref() {
+                ensure_project_board(&mut tx, tenant, project_id, project, kinds, &mut counts)
+                    .await?;
+            }
         }
         tx.commit().await?;
         results.push((slug, counts));
@@ -202,13 +234,17 @@ struct ExistingProject {
     meta: Value,
 }
 
+/// Insert or update one project and return its id.
+///
+/// The id is returned on the unchanged path too: the caller's next step (the board) is keyed by
+/// the project, not by whether this run wrote the row.
 async fn upsert_project(
     conn: &mut PgConnection,
     tenant_id: Uuid,
     programme_id: Uuid,
     seed: &ProjectSeed,
     counts: &mut ProgrammeCounts,
-) -> Result<(), SeedError> {
+) -> Result<Uuid, SeedError> {
     let existing: Option<ExistingProject> = sqlx::query_as(
         "SELECT id, name, description, status, programme_id, repo_url, meta
            FROM project
@@ -230,7 +266,7 @@ async fn upsert_project(
                 && row.meta == merged;
             if unchanged {
                 counts.skipped += 1;
-                return Ok(());
+                return Ok(row.id);
             }
             sqlx::query(
                 "UPDATE project
@@ -249,12 +285,14 @@ async fn upsert_project(
             .execute(&mut *conn)
             .await?;
             counts.updated += 1;
+            Ok(row.id)
         }
         None => {
-            sqlx::query(
+            let id: Uuid = sqlx::query_scalar(
                 "INSERT INTO project
                     (tenant_id, key, name, description, status, programme_id, repo_url, meta)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                 RETURNING id",
             )
             .bind(tenant_id)
             .bind(&seed.key)
@@ -264,10 +302,63 @@ async fn upsert_project(
             .bind(programme_id)
             .bind(&seed.repo_url)
             .bind(&seed.meta)
-            .execute(&mut *conn)
+            .fetch_one(&mut *conn)
             .await?;
             counts.created += 1;
+            Ok(id)
         }
+    }
+}
+
+/// The lane kinds this tenant's `standard` board template declares, or `None` when it has none.
+///
+/// A tenant with no active template is not this seed's to invent (S5-D5: an absent template is a
+/// refusal, never an invented lane list), so the caller logs it once and seeds the projects
+/// without boards.
+async fn board_lanes(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+) -> Result<Option<Vec<String>>, SeedError> {
+    let code = Code::parse(DEFAULT_TEMPLATE_CODE)
+        .map_err(|error| SeedError::ProgrammeDocument(error.to_string()))?;
+    let lanes = template_lanes_tx(&mut *conn, tenant, &code).await?;
+    Ok(lanes)
+}
+
+/// Give a seeded project the board `projects.create` would have given it.
+///
+/// A project seeded without a board is a shell: its workspace, its cards and the console's
+/// project page all address a board, and `projects.create` is the only action that makes one — so
+/// a project the seed inserts can never acquire one. The ensure is idempotent by the schema's own
+/// keys (a board is found by `(tenant, project, name)`, a lane by `(board, kind)`), so it repairs
+/// a partially built board and is silent on a project that already has one. An archived project
+/// is history and needs no board.
+async fn ensure_project_board(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+    seed: &ProjectSeed,
+    kinds: &[String],
+    counts: &mut ProgrammeCounts,
+) -> Result<(), SeedError> {
+    if seed.status == "archived" {
+        return Ok(());
+    }
+    let had_board = list_boards_tx(&mut *conn, tenant, project_id)
+        .await?
+        .iter()
+        .any(|board| board.name == DEFAULT_BOARD_NAME);
+    ensure_board_from_template_tx(
+        &mut *conn,
+        tenant,
+        project_id,
+        DEFAULT_BOARD_NAME,
+        kinds,
+        serde_json::json!({}),
+    )
+    .await?;
+    if !had_board {
+        counts.boards_created += 1;
     }
     Ok(())
 }

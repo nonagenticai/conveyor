@@ -138,7 +138,7 @@ Also delivered: `docs/cutover/freeze-log.md`, `docs/cutover/rollback.md`, `docs/
 13. **T0 — freeze, dump, final parity.** Engage andon; scale `fr`, `requirements`, `kanban` deployments to 0; then
     `D=/srv/backups/pg/cutover-<date>; sudo -u postgres mkdir -p "$D"; for db in fr requirements_api kanban; do
     sudo -u postgres pg_dump -Fc -d "$db" -f "$D/$db.dump" && sudo -u postgres pg_restore --list "$D/$db.dump"
-    > /dev/null && sha256sum "$D/$db.dump"; done`, then `rsync "$D/"` to `mf1:/srv/backups/pg/cutover-<date>/`.
+    > /dev/null && sha256sum "$D/$db.dump"; done`, then `rsync "$D/"` to `<backup-host>:/srv/backups/pg/cutover-<date>/`.
     Then the final parity pass (§7) as `R5-parity-final.txt`. The nightly `pg_dumpall` is **not** a substitute.
 14. **T0 — switch the agent's registration.** One change in `agent`: the conveyor external MCP system's `base_url`
     moves to the deployed conveyor and its credential becomes the tenant's conveyor licence. `mcp_server` needs no
@@ -149,7 +149,7 @@ Also delivered: `docs/cutover/freeze-log.md`, `docs/cutover/rollback.md`, `docs/
 15. **T+14 — decommission.** Only if no rollback: probe list (§7) green, dumps restore-tested into a scratch database,
     then `kubectl delete ns fr requirements kanban`; `dropdb fr requirements_api kanban` + `drop role`; remove the
     pgbouncer stanzas, VirtualService, cloudflared host, ImagePolicies; archive the fr / requirements_management repos.
-    **Kept:** the three dumps + sha256 on master and mf1, `docs/cutover/`, the freeze log, the `planka-private` image
+    **Kept:** the three dumps + sha256 on master and the backup host, `docs/cutover/`, the freeze log, the `planka-private` image
     digest (90 days). Evidence `R7-decommission.md`.
 16. **Rollback runbook** (`docs/cutover/rollback.md`, written before T0, exercised in R4): restore = scale the three
     namespaces back to 1, revert the T0 commit (the registration), `rollout status`, run a live agent task. Writes made
@@ -230,7 +230,7 @@ Loki is a **24 h sample**: it can never prove completeness. Only object absence 
 4. **Deleting a DB before its dump.** D7 discards the data; it does not license dropping a database that was never
    dumped and restore-tested.
 5. **`pg_dumpall` runs on master** (02:40 UTC, retain 3) — it is not a cutover dump, and a `dropdb` on master
-   propagates to mf1's streaming standby the moment it commits.
+   propagates to the backup host's streaming standby the moment it commits.
 6. **The freeze is a rule, not a mood.** A "quick fix" to fr/RM/Planka during S14 goes in `freeze-log.md` and is
    absorbed or dropped.
 7. **The ext_authz allowlist is an enumeration** — do not add the conveyor host to `AUTH_REQUIRED_HOSTS`.
