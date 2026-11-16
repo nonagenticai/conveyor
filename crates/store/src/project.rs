@@ -88,6 +88,8 @@ pub struct ProjectPatch {
     pub description: Option<String>,
     /// The status, validated by the action before this call.
     pub status: Option<String>,
+    /// The project type, resolved to an active catalogue row by the action before this call.
+    pub project_type_code: Option<String>,
     /// The source repository.
     pub repo_url: Option<String>,
     /// Metadata merged into the row; keys absent from the patch are preserved.
@@ -274,13 +276,17 @@ pub async fn update_project_tx(
         .clone()
         .unwrap_or(current.description.clone());
     let status = patch.status.clone().unwrap_or(current.status.clone());
+    let project_type_code = patch
+        .project_type_code
+        .clone()
+        .or(current.project_type_code.clone());
     let repo_url = patch.repo_url.clone().or(current.repo_url.clone());
     let meta = patch.meta.clone().unwrap_or(current.meta.clone());
     let expected_raw = i64::try_from(expected.get()).unwrap_or(i64::MAX);
     let row: Option<ProjectRow> = sqlx::query_as(
         "UPDATE project
-            SET name = $3, description = $4, status = $5, repo_url = $6, meta = $7,
-                version = version + 1, updated_at = now()
+            SET name = $3, description = $4, status = $5, project_type_code = $9,
+                repo_url = $6, meta = $7, version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $8
           RETURNING id, key, name, description, status, programme_id, project_type_code,
                     phase_code, owner_user_id, repo_url, meta, version",
@@ -293,6 +299,7 @@ pub async fn update_project_tx(
     .bind(repo_url)
     .bind(meta)
     .bind(expected_raw)
+    .bind(project_type_code)
     .fetch_optional(&mut *conn)
     .await?;
     match row {
