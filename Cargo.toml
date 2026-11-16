@@ -25,6 +25,9 @@ publish = false
 # Exact pins, from the template (0c7396a) and this slice's plan. A floating version is how
 # two services silently diverge; bump deliberately, never by accident.
 tokio = { version = "1.53.3", features = ["full"] }
+# The browser image drives Chromium over CDP: a client-side websocket, no TLS (ws:// on loopback),
+# and `handshake` only. Pinned like every other dependency; nothing else in the workspace uses it.
+tokio-tungstenite = { version = "0.24.0", default-features = false, features = ["handshake"] }
 axum = "0.8.9"
 # Runtime queries only (sqlx::query / query_as with binds). The `macros` feature exists for
 # `sqlx::migrate!`, which embeds migrations/ and needs no database at build time. `uuid`

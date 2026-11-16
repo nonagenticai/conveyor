@@ -6,28 +6,40 @@
 //! table (`contract/frontend_test_runner_service/README.md`) replaces `package_url`/`bdd_job_id`
 //! with the feature text and drops the suite/recording knobs.
 //!
-//! ## The declared gap
+//! ## One session, driven over CDP
 //!
-//! The vocabulary is navigation and assertions only. A step that names an interaction — click,
-//! type, scroll, hover, upload, or anything else outside the table below — is **refused by name**
-//! with [`code::STEP`] (`step_not_supported`), naming the step, rather than imitated or quietly
-//! skipped. A test that passes because its click never ran is worse than one that refuses.
-//! `Background:` is refused with [`code::BACKGROUND`], `trace_on_failure: true` with
-//! [`code::TRACE`] (a Playwright trace needs a CDP session this runner does not open), and every
-//! Gherkin construct outside `Feature:`/`Scenario:`/steps is a malformed feature (`Invalid`, with
-//! the line number).
+//! A scenario launches its own headless Chromium (`--remote-debugging-port=0`, a fresh profile),
+//! attaches one page target and runs **every step of that scenario over that session**: the page
+//! is opened once, interactions are real browser input, and an assertion reads the live DOM after
+//! the steps before it. The client is [`super::cdp::Session`] — no Node, no Playwright, no package
+//! download.
 //!
-//! Text assertions are **substring matches on the dumped DOM** (Chrome's `--dump-dom`), not a
-//! rendered-text extraction: text split across elements, or produced after the dump, is not seen.
-//! Selectors are a simple textual subset (`#id`, `.class`, `tag`, `[attr=value]`) matched by a
-//! small tag/attribute scanner — no CSS engine, no dependency. A compound selector (`div > p`,
-//! `article:has(h1)`, `h1, h2`, `:nth-child(...)`) is refused with [`code::SELECTOR`].
+//! A step whose text is outside the table below is **refused by name** with [`code::STEP`]
+//! (`step_not_supported`), naming the step, rather than imitated or quietly skipped. A test that
+//! passes because its click never ran is worse than one that refuses. A selector that matches no
+//! element fails its step with a typed error naming the step — never a silent no-op.
+//! `Background:` is refused with [`code::BACKGROUND`], and every Gherkin construct outside
+//! `Feature:`/`Scenario:`/steps is a malformed feature (`Invalid`, with the line number).
+//!
+//! Text assertions are **substring matches on the dumped DOM** (`Runtime.evaluate`
+//! `document.documentElement.outerHTML`), not a rendered-text extraction: text split across
+//! elements is not seen, and a word that also appears in the page's own `<script>` source is found
+//! whether or not it is rendered. Selectors are a simple textual subset (`#id`, `.class`, `tag`,
+//! `[attr=value]`) for **both** assertion and interaction steps — assertions match it with a small
+//! tag/attribute scanner, interactions hand it to the page's own CSS engine. A compound selector
+//! (`div > p`, `article:has(h1)`, `h1, h2`, `:nth-child(...)`) is refused with
+//! [`code::SELECTOR`].
 //!
 //! ## Steps
 //!
 //! | step | meaning |
 //! |---|---|
 //! | `I open <url>` / `I visit <url>` | load the page under test |
+//! | `I click "<selector>"` | click the element |
+//! | `I type "<text>" into "<selector>"` | type into the focused element (appends) |
+//! | `I scroll down <pixels>` / `I scroll up <pixels>` | one wheel event on the page |
+//! | `I hover "<selector>"` | move the pointer to the element's centre |
+//! | `I upload "<path>" into "<selector>"` | set a file input's files |
 //! | `I expect to see "<text>"` / `the page contains "<text>"` | the DOM contains the text |
 //! | `I expect not to see "<text>"` | the DOM does not contain the text |
 //! | `I expect the title to be "<title>"` / `the title is "<title>"` | exact `<title>` |
@@ -43,16 +55,19 @@
 //! |---|---|
 //! | `feature` | the Gherkin document |
 //! | `target_url` | the page under test: `file://`, or `http(s)://` with `allow_network: true` |
-//! | `timeout_per_test_ms` | 1000–600000, default 30000; bounds each Chromium run |
+//! | `timeout_per_test_ms` | 1000–600000, default 30000; bounds each scenario attempt |
 //! | `retries` | 0–10, default 0; re-runs a failed scenario |
 //! | `screenshot_on_failure` | write `<scenario>.png` into `out_dir` when a scenario (still) fails |
-//! | `trace_on_failure` | refused when `true`; `false`/absent is the captured default |
+//! | `trace_on_failure` | write `<scenario>.json` — the step list and page URL — when a scenario (still) fails |
 //! | `allow_network` | the deployment's permission to reach `http(s)` URLs |
 //!
-//! A scenario runs its navigation, then **one `--dump-dom` per assertion batch**: the first
-//! assertion after a navigation loads the current page once, and that batch's assertions read the
-//! one dump. A navigation step itself is such a run, so its verdict is whether the page loaded.
-//! The screenshot name is slugified, so a scenario name can never escape `out_dir`.
+//! A scenario runs its steps in order on one session; the first step that needs the page loads
+//! `target_url`, and a navigation step replaces it. Assertions read **one dump per batch**: the
+//! first assertion after a step that changed the page takes the dump, and that batch's assertions
+//! share it. A navigation step is itself such a boundary, so its verdict is whether the page
+//! loaded.
+//!
+//! The screenshot and trace names are slugified, so a scenario name can never escape `out_dir`.
 //!
 //! `target_url` and every navigation URL may be `file://` unconditionally; an `http(s)` URL needs
 //! `allow_network: true`, otherwise [`code::EGRESS_DENIED`] — the `media.record_browser`
@@ -60,16 +75,18 @@
 //!
 //! The result document is `{feature, target_url, scenarios, passed, failed, exit_status}`, where
 //! `feature` is the `Feature:` name, `exit_status` is 0 when every scenario passed and 1 otherwise,
-//! and each scenario is `{name, status, steps, duration_ms}` with each step
-//! `{text, status, detail}` (`status` is `"passed"` or `"failed"`).
+//! and each scenario is `{name, status, steps, duration_ms, trace?}` with each step
+//! `{text, status, detail}` (`status` is `"passed"` or `"failed"`). `trace` is the trace file's
+//! name and is present only when a failed scenario wrote one.
 
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::time::{Duration, Instant};
 
 use serde_json::{Map, Value, json};
-use tokio::process::Command;
+use tokio::process::{Child, Command};
 
+use crate::browser::cdp::Session;
 use crate::common::{CapabilityError, Config, process};
 
 /// The kind slug this module implements.
@@ -82,7 +99,6 @@ pub mod code {
     pub const BACKGROUND: &str = "background_not_supported";
     pub const SELECTOR: &str = "selector_not_supported";
     pub const EGRESS_DENIED: &str = "egress_denied";
-    pub const TRACE: &str = "trace_not_supported";
     pub const BROWSER: &str = "browser_not_available";
 }
 
@@ -137,7 +153,7 @@ pub async fn run(params: &Value, config: &Config) -> Result<Value, CapabilityErr
 
     let mut scenarios = Vec::with_capacity(feature.scenarios.len());
     for scenario in &feature.scenarios {
-        let result =
+        let mut result =
             run_with_retries(scenario, &options.target_url, &browser, options.retries).await;
         if result.status == Status::Failed && options.screenshot_on_failure {
             let output = config.out_dir.join(format!("{}.png", slug(&scenario.name)));
@@ -149,6 +165,20 @@ pub async fn run(params: &Value, config: &Config) -> Result<Value, CapabilityErr
                     path = %output.display(),
                     "screenshot_on_failure could not write the screenshot: {error}"
                 );
+            }
+        }
+        if result.status == Status::Failed && options.trace_on_failure {
+            let name = format!("{}.json", slug(&scenario.name));
+            let output = config.out_dir.join(&name);
+            match write_trace(&output, &result) {
+                Ok(()) => result.trace = Some(name),
+                // Same rule as the screenshot: the verdict stands, and the missing trace is
+                // reported rather than swallowed.
+                Err(error) => tracing::warn!(
+                    scenario = %scenario.name,
+                    path = %output.display(),
+                    "trace_on_failure could not write the trace: {error}"
+                ),
             }
         }
         scenarios.push(result);
@@ -179,6 +209,7 @@ struct Options {
     timeout_ms: u64,
     retries: u64,
     screenshot_on_failure: bool,
+    trace_on_failure: bool,
     allow_network: bool,
 }
 
@@ -207,22 +238,6 @@ impl Options {
             }
         }
 
-        match map.get("trace_on_failure") {
-            None | Some(Value::Null) | Some(Value::Bool(false)) => {}
-            Some(Value::Bool(true)) => {
-                return Err(CapabilityError::refused(
-                    code::TRACE,
-                    "trace_on_failure writes a Playwright trace, which needs a CDP session this \
-                     runner does not open; omit it or pass false",
-                ));
-            }
-            Some(_) => {
-                return Err(CapabilityError::Invalid(
-                    "trace_on_failure must be a boolean".to_string(),
-                ));
-            }
-        }
-
         Ok(Self {
             feature: required_string(map, "feature")?,
             target_url: required_string(map, "target_url")?,
@@ -235,6 +250,7 @@ impl Options {
             )?,
             retries: bounded_integer(map, "retries", 0, 0, RETRIES_MAX)?,
             screenshot_on_failure: optional_bool(map, "screenshot_on_failure")?,
+            trace_on_failure: optional_bool(map, "trace_on_failure")?,
             allow_network: optional_bool(map, "allow_network")?,
         })
     }
@@ -335,6 +351,19 @@ struct Step {
 
 enum Action {
     Open(String),
+    /// A selector already validated against the vocabulary's subset.
+    Click(String),
+    Type {
+        selector: String,
+        text: String,
+    },
+    /// Pixels, positive is down.
+    Scroll(i64),
+    Hover(String),
+    Upload {
+        selector: String,
+        path: String,
+    },
     Assert(Assertion),
 }
 
@@ -486,37 +515,111 @@ fn compile_step(text: &str, line: usize) -> Result<Action, CapabilityError> {
         }
     }
 
-    if let Some(argument) = quoted_argument(text, &lower, "i expect to see ", "") {
-        return text_assertion(line, argument, Assertion::See);
+    if let Some(argument) = quoted_argument(text, &lower, "i click ", "") {
+        return interaction_step(line, argument, Action::Click);
     }
-    if let Some(argument) = quoted_argument(text, &lower, "the page contains ", "") {
-        return text_assertion(line, argument, Assertion::See);
+    if let Some(argument) = quoted_argument(text, &lower, "i hover ", "") {
+        return interaction_step(line, argument, Action::Hover);
     }
-    if let Some(argument) = quoted_argument(text, &lower, "i expect not to see ", "") {
-        return text_assertion(line, argument, Assertion::NotSee);
+    if let Some((typed, selector)) = quoted_pair(text, &lower, "i type ", " into ") {
+        if typed.is_empty() {
+            return Err(malformed(line, "the type step needs text"));
+        }
+        Ok(Action::Type {
+            selector: require_selector(line, selector)?.text(),
+            text: typed.to_string(),
+        })
+    } else if lower.starts_with("i type ") {
+        Err(malformed(
+            line,
+            "the type step is 'I type \"<text>\" into \"<selector>\"'",
+        ))
+    } else if lower.starts_with("i scroll ") {
+        let amount = scroll_amount(&lower).ok_or_else(|| {
+            malformed(
+                line,
+                "the scroll step is 'I scroll down <pixels>' or 'I scroll up <pixels>'",
+            )
+        })?;
+        Ok(Action::Scroll(amount))
+    } else if let Some((path, selector)) = quoted_pair(text, &lower, "i upload ", " into ") {
+        if path.trim().is_empty() {
+            return Err(malformed(line, "the upload step needs a file path"));
+        }
+        Ok(Action::Upload {
+            selector: require_selector(line, selector)?.text(),
+            path: path.to_string(),
+        })
+    } else if lower.starts_with("i upload ") {
+        Err(malformed(
+            line,
+            "the upload step is 'I upload \"<path>\" into \"<selector>\"'",
+        ))
+    } else if let Some(action) = assertion_step(text, &lower, line)? {
+        Ok(action)
+    } else {
+        Err(CapabilityError::refused(
+            code::STEP,
+            format!(
+                "line {line}: the step '{text}' is not supported; the vocabulary is navigation, \
+                 click, type, scroll, hover, upload and the documented assertions"
+            ),
+        ))
     }
-    if let Some(argument) = quoted_argument(text, &lower, "i expect the title to be ", "") {
-        return text_assertion(line, argument, Assertion::Title);
-    }
-    if let Some(argument) = quoted_argument(text, &lower, "the title is ", "") {
-        return text_assertion(line, argument, Assertion::Title);
-    }
-    if let Some(argument) =
-        quoted_argument(text, &lower, "i expect the page to have a ", " element")
-    {
-        return selector_step(line, argument, Assertion::Has);
-    }
-    if let Some(argument) = quoted_argument(text, &lower, "i expect no ", " element") {
-        return selector_step(line, argument, Assertion::HasNot);
-    }
+}
 
-    Err(CapabilityError::refused(
-        code::STEP,
-        format!(
-            "line {line}: the step '{text}' is not supported; this runner executes navigation \
-             and assertions only (no click, type, scroll, hover or upload)"
-        ),
-    ))
+/// The assertion half of the vocabulary, or `None` when the text names no assertion.
+fn assertion_step(text: &str, lower: &str, line: usize) -> Result<Option<Action>, CapabilityError> {
+    if let Some(argument) = quoted_argument(text, lower, "i expect to see ", "") {
+        return text_assertion(line, argument, Assertion::See).map(Some);
+    }
+    if let Some(argument) = quoted_argument(text, lower, "the page contains ", "") {
+        return text_assertion(line, argument, Assertion::See).map(Some);
+    }
+    if let Some(argument) = quoted_argument(text, lower, "i expect not to see ", "") {
+        return text_assertion(line, argument, Assertion::NotSee).map(Some);
+    }
+    if let Some(argument) = quoted_argument(text, lower, "i expect the title to be ", "") {
+        return text_assertion(line, argument, Assertion::Title).map(Some);
+    }
+    if let Some(argument) = quoted_argument(text, lower, "the title is ", "") {
+        return text_assertion(line, argument, Assertion::Title).map(Some);
+    }
+    if let Some(argument) = quoted_argument(text, lower, "i expect the page to have a ", " element")
+    {
+        return selector_step(line, argument, Assertion::Has).map(Some);
+    }
+    if let Some(argument) = quoted_argument(text, lower, "i expect no ", " element") {
+        return selector_step(line, argument, Assertion::HasNot).map(Some);
+    }
+    Ok(None)
+}
+
+/// `I scroll down 200`, `I scroll up 200 px`: pixels, positive down.
+fn scroll_amount(lower: &str) -> Option<i64> {
+    let (sign, rest) = if let Some(rest) = lower.strip_prefix("i scroll down ") {
+        (1i64, rest)
+    } else {
+        (-1i64, lower.strip_prefix("i scroll up ")?)
+    };
+    let rest = rest.trim();
+    let rest = rest
+        .strip_suffix(" pixels")
+        .or_else(|| rest.strip_suffix(" px"))
+        .unwrap_or(rest);
+    let amount: i64 = rest.trim().parse().ok()?;
+    (amount > 0).then_some(sign * amount)
+}
+
+fn interaction_step(
+    line: usize,
+    argument: &str,
+    make: fn(String) -> Action,
+) -> Result<Action, CapabilityError> {
+    if argument.is_empty() {
+        return Err(malformed(line, "the interaction step needs a selector"));
+    }
+    Ok(make(require_selector(line, argument)?.text()))
 }
 
 fn text_assertion(
@@ -535,20 +638,25 @@ fn selector_step(
     argument: &str,
     make: fn(Selector) -> Assertion,
 ) -> Result<Action, CapabilityError> {
+    Ok(Action::Assert(make(require_selector(line, argument)?)))
+}
+
+/// The vocabulary's one selector subset, shared by assertion and interaction steps: `#id`,
+/// `.class`, `tag`, `[attr=value]`. `None` is the by-name refusal.
+fn require_selector(line: usize, argument: &str) -> Result<Selector, CapabilityError> {
     if argument.is_empty() {
         return Err(malformed(line, "the element step needs a selector"));
     }
-    let selector = parse_selector(argument).ok_or_else(|| {
+    parse_selector(argument).ok_or_else(|| {
         CapabilityError::refused(
             code::SELECTOR,
             format!(
                 "line {line}: selector {argument:?} is outside the supported subset (#id, .class, \
-                 tag, [attr=value]); a compound selector needs a CSS engine this runner does not \
-                 have"
+                 tag, [attr=value]); every step uses that one subset, so a compound selector is \
+                 refused rather than resolved by the browser"
             ),
         )
-    })?;
-    Ok(Action::Assert(make(selector)))
+    })
 }
 
 /// The quoted argument of a step, where the step is `prefix` + `"` + argument + `"` + `after`.
@@ -562,6 +670,41 @@ fn quoted_argument<'a>(text: &'a str, lower: &str, prefix: &str, after: &str) ->
     let start = prefix.len() + 1;
     let end = text.len() - after.len() - 1;
     Some(&text[start..end])
+}
+
+/// The two quoted arguments of a step shaped `prefix + "<first>" + separator + "<second>"`.
+/// `lower` is the ASCII-lowercased step text, so matching is case-insensitive while the returned
+/// slices keep the caller's case. A quote inside the first argument is kept: the split is the
+/// first closing quote that is followed by the separator.
+fn quoted_pair<'a>(
+    text: &'a str,
+    lower: &str,
+    prefix: &str,
+    separator: &str,
+) -> Option<(&'a str, &'a str)> {
+    let rest = lower.strip_prefix(prefix)?;
+    rest.strip_prefix('"')?;
+    let body = text[prefix.len()..].strip_prefix('"')?;
+    let mut search = 0;
+    while let Some(found) = body[search..].find('"') {
+        let close = search + found;
+        let after = &body[close + 1..];
+        if after.len() >= separator.len()
+            && after.as_bytes()[..separator.len()].eq_ignore_ascii_case(separator.as_bytes())
+        {
+            let tail = &after[separator.len()..];
+            if let Some(tail) = tail
+                .strip_prefix('"')
+                .and_then(|tail| tail.strip_suffix('"'))
+                && !tail.is_empty()
+                && !tail.contains('"')
+            {
+                return Some((&body[..close], tail));
+            }
+        }
+        search = close + 1;
+    }
+    None
 }
 
 fn unquote(value: &str) -> &str {
@@ -817,11 +960,10 @@ fn page_title(dom: &str) -> Option<String> {
 
 // ── the browser ────────────────────────────────────────────────────────────────────────────
 
-/// The image's own Chromium, one fresh profile per invocation.
+/// The image's own Chromium, one fresh profile per launch.
 struct Browser {
     binary: String,
     timeout: Duration,
-    budget_ms: u64,
     profiles: PathBuf,
 }
 
@@ -839,22 +981,29 @@ impl Browser {
         Ok(Self {
             binary: binary.to_string_lossy().into_owned(),
             timeout: Duration::from_millis(timeout_ms),
-            // `--virtual-time-budget=0` never expires (the trap `render.rs` records), so the
-            // per-test budget is also the page's settling budget, floored at 1 ms.
-            budget_ms: timeout_ms.max(1),
             profiles: config.work_dir.join("gherkin-profiles"),
         })
     }
 
-    async fn dump(&self, url: &str) -> Result<String, CapabilityError> {
-        let finished = self.launch(vec!["--dump-dom".to_string()], url).await?;
-        if !finished.ok() {
-            return Err(CapabilityError::Failed(format!(
-                "the browser failed to load {url:?}: {}",
-                finished.tail()
-            )));
-        }
-        Ok(String::from_utf8_lossy(&finished.stdout).into_owned())
+    /// A profile directory no other launch uses: two scenarios never share browser state.
+    fn next_profile(&self) -> Result<PathBuf, CapabilityError> {
+        static NEXT_PROFILE: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        std::fs::create_dir_all(&self.profiles).map_err(|error| {
+            CapabilityError::Failed(format!("cannot create {:?}: {error}", self.profiles))
+        })?;
+        Ok(self.profiles.join(format!(
+            "{}-{}",
+            std::process::id(),
+            NEXT_PROFILE.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        )))
+    }
+
+    /// The flags the CDP session adds to its fixed headless set: a fixed viewport, so a click's
+    /// viewport coordinates mean the same thing in every run.
+    fn headless_args(&self) -> Vec<String> {
+        vec![format!(
+            "--window-size={SCREENSHOT_WIDTH},{SCREENSHOT_HEIGHT}"
+        )]
     }
 
     async fn screenshot(&self, url: &str, output: &Path) -> Result<(), CapabilityError> {
@@ -891,17 +1040,9 @@ impl Browser {
         extra: Vec<String>,
         url: &str,
     ) -> Result<process::Finished, CapabilityError> {
-        static NEXT_PROFILE: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-        std::fs::create_dir_all(&self.profiles).map_err(|error| {
-            CapabilityError::Failed(format!("cannot create {:?}: {error}", self.profiles))
-        })?;
         // A profile per invocation is what keeps two Chromium launches independent; it also means
         // a scenario never inherits state from the one before it (the `render.rs` measurement).
-        let profile = self.profiles.join(format!(
-            "{}-{}",
-            std::process::id(),
-            NEXT_PROFILE.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-        ));
+        let profile = self.next_profile()?;
         let mut args: Vec<String> = vec![
             "--headless=new".to_string(),
             "--disable-gpu".to_string(),
@@ -911,7 +1052,9 @@ impl Browser {
             "--hide-scrollbars".to_string(),
             "--disable-dev-shm-usage".to_string(),
             format!("--user-data-dir={}", profile.display()),
-            format!("--virtual-time-budget={}", self.budget_ms),
+            // `--virtual-time-budget=0` never expires (the trap `render.rs` records), so the
+            // per-test timeout is also the page's settling budget.
+            format!("--virtual-time-budget={}", self.timeout.as_millis()),
         ];
         args.extend(extra);
         args.push(url.to_string());
@@ -1001,9 +1144,51 @@ struct ScenarioResult {
     status: Status,
     steps: Vec<StepResult>,
     duration_ms: u64,
+    /// The trace file's name in `out_dir`, when a failed scenario wrote one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    trace: Option<String>,
     /// The last URL the scenario loaded, so a failure screenshot shows what the test saw.
     #[serde(skip)]
     last_url: String,
+}
+
+impl ScenarioResult {
+    /// The scenario's own ceiling fired. Every step is reported failed: the browser was killed
+    /// mid-run, so no step's outcome is a verdict.
+    fn timed_out(scenario: &Scenario, target_url: &str, timeout: Duration) -> Self {
+        let detail = format!(
+            "the scenario exceeded its {} ms per-test ceiling",
+            timeout.as_millis()
+        );
+        Self {
+            name: scenario.name.clone(),
+            status: Status::Failed,
+            steps: scenario
+                .steps
+                .iter()
+                .map(|step| StepResult {
+                    text: step.text.clone(),
+                    status: Status::Failed,
+                    detail: detail.clone(),
+                })
+                .collect(),
+            duration_ms: timeout.as_millis() as u64,
+            trace: None,
+            last_url: target_url.to_string(),
+        }
+    }
+}
+
+/// The trace document: the step list with each step's status, and the page the scenario ended on.
+fn write_trace(output: &Path, result: &ScenarioResult) -> Result<(), String> {
+    let document = json!({
+        "scenario": &result.name,
+        "status": result.status,
+        "url": &result.last_url,
+        "steps": &result.steps,
+    });
+    let body = serde_json::to_string_pretty(&document).map_err(|error| error.to_string())?;
+    std::fs::write(output, body).map_err(|error| format!("{}: {error}", output.display()))
 }
 
 /// A failed scenario is re-run `retries` more times; the final attempt is the reported verdict.
@@ -1015,7 +1200,17 @@ async fn run_with_retries(
 ) -> ScenarioResult {
     let mut attempt = 0;
     loop {
-        let result = run_scenario(scenario, target_url, browser).await;
+        // The scenario is the browser run now, so the request's per-test ceiling bounds the whole
+        // attempt. Dropping the future drops the session, which kills the child.
+        let result = match tokio::time::timeout(
+            browser.timeout,
+            run_scenario(scenario, target_url, browser),
+        )
+        .await
+        {
+            Ok(result) => result,
+            Err(_) => ScenarioResult::timed_out(scenario, target_url, browser.timeout),
+        };
         if result.status == Status::Passed || attempt >= retries {
             return result;
         }
@@ -1026,42 +1221,64 @@ async fn run_with_retries(
 async fn run_scenario(scenario: &Scenario, target_url: &str, browser: &Browser) -> ScenarioResult {
     let started = Instant::now();
     let mut steps = Vec::with_capacity(scenario.steps.len());
-    let mut url = target_url.to_string();
-    // The dump for the current URL. `None` means the next assertion must take one; a `Some(Err)`
-    // carries the load failure so one broken batch is not re-run once per assertion.
-    let mut batch: Option<Result<String, CapabilityError>> = None;
+    let mut page = Page::new(target_url);
 
     for step in &scenario.steps {
-        match &step.action {
-            Action::Open(next) => {
-                url.clone_from(next);
-                let outcome = browser.dump(&url).await;
-                let (status, detail) = match &outcome {
-                    Ok(_) => (Status::Passed, format!("loaded {url}")),
-                    Err(error) => (Status::Failed, load_failure(error)),
-                };
-                batch = Some(outcome);
-                steps.push(StepResult {
+        let result = match &step.action {
+            Action::Open(url) => match page.navigate(browser, url).await {
+                Ok(()) => StepResult {
                     text: step.text.clone(),
-                    status,
-                    detail,
-                });
+                    status: Status::Passed,
+                    detail: format!("loaded {url}"),
+                },
+                Err(error) => StepResult {
+                    text: step.text.clone(),
+                    status: Status::Failed,
+                    detail: load_failure(&error),
+                },
+            },
+            Action::Click(selector) => {
+                let outcome = page.click(browser, selector).await;
+                interaction(&step.text, format!("clicked {selector:?}"), outcome)
             }
-            Action::Assert(assertion) => {
-                if batch.is_none() {
-                    batch = Some(browser.dump(&url).await);
-                }
-                let outcome = batch.as_ref().expect("the assertion batch was just filled");
-                steps.push(match outcome {
-                    Ok(dom) => evaluate(&step.text, assertion, dom),
-                    Err(error) => StepResult {
-                        text: step.text.clone(),
-                        status: Status::Failed,
-                        detail: load_failure(error),
-                    },
-                });
+            Action::Type { selector, text } => {
+                let outcome = page.type_text(browser, selector, text).await;
+                // Never echo the typed text: a real feature types passwords through this step.
+                interaction(
+                    &step.text,
+                    format!(
+                        "typed {} characters into {selector:?}",
+                        text.chars().count()
+                    ),
+                    outcome,
+                )
             }
-        }
+            Action::Scroll(dy) => {
+                let outcome = page.scroll(browser, *dy).await;
+                interaction(&step.text, format!("scrolled by {dy} px"), outcome)
+            }
+            Action::Hover(selector) => {
+                let outcome = page.hover(browser, selector).await;
+                interaction(&step.text, format!("hovered {selector:?}"), outcome)
+            }
+            Action::Upload { selector, path } => {
+                let outcome = page.upload(browser, selector, path).await;
+                interaction(
+                    &step.text,
+                    format!("uploaded {path:?} into {selector:?}"),
+                    outcome,
+                )
+            }
+            Action::Assert(assertion) => match page.dom(browser).await {
+                Ok(dom) => evaluate(&step.text, assertion, dom),
+                Err(error) => StepResult {
+                    text: step.text.clone(),
+                    status: Status::Failed,
+                    detail: load_failure(&error),
+                },
+            },
+        };
+        steps.push(result);
     }
 
     let failed = steps.iter().any(|step| step.status == Status::Failed);
@@ -1074,7 +1291,190 @@ async fn run_scenario(scenario: &Scenario, target_url: &str, browser: &Browser) 
         },
         steps,
         duration_ms: started.elapsed().as_millis() as u64,
-        last_url: url,
+        trace: None,
+        last_url: page.target_url,
+    }
+}
+
+fn interaction(text: &str, detail: String, outcome: Result<(), CapabilityError>) -> StepResult {
+    match outcome {
+        Ok(()) => StepResult {
+            text: text.to_string(),
+            status: Status::Passed,
+            detail,
+        },
+        Err(error) => StepResult {
+            text: text.to_string(),
+            status: Status::Failed,
+            detail: error.to_string(),
+        },
+    }
+}
+
+// ── the page under test ────────────────────────────────────────────────────────────────────
+
+/// One scenario's browser session and the page state its assertions read.
+///
+/// The session is launched lazily, on the first step that needs it, and the first such step also
+/// loads `target_url` unless a navigation step already named another page. A launch or load
+/// failure is cached: later steps report it instead of paying for the same failed attempt once
+/// per assertion.
+struct Page {
+    live: Option<Live>,
+    /// Why the browser could not be started; cleared by a new navigation step.
+    unavailable: Option<String>,
+    /// The page the scenario last asked for; `target_url` until a navigation step names another.
+    target_url: String,
+    loaded: bool,
+    /// The reason the current page could not be loaded; cleared by a new navigation step.
+    load_error: Option<String>,
+    /// The dump taken after the last step that changed the page.
+    dom: Option<String>,
+}
+
+impl Page {
+    fn new(target_url: &str) -> Self {
+        Self {
+            live: None,
+            unavailable: None,
+            target_url: target_url.to_string(),
+            loaded: false,
+            load_error: None,
+            dom: None,
+        }
+    }
+
+    async fn live(&mut self, browser: &Browser) -> Result<&mut Live, CapabilityError> {
+        if let Some(reason) = &self.unavailable {
+            return Err(CapabilityError::Failed(reason.clone()));
+        }
+        if self.live.is_none() {
+            match Live::launch(browser).await {
+                Ok(live) => self.live = Some(live),
+                Err(error) => {
+                    self.unavailable = Some(error.to_string());
+                    return Err(error);
+                }
+            }
+        }
+        Ok(self.live.as_mut().expect("the session was just launched"))
+    }
+
+    async fn navigate(&mut self, browser: &Browser, url: &str) -> Result<(), CapabilityError> {
+        self.target_url = url.to_string();
+        self.loaded = true;
+        self.load_error = None;
+        self.dom = None;
+        self.unavailable = None;
+        let outcome = match self.live(browser).await {
+            Ok(live) => live.session.navigate(url).await,
+            Err(error) => Err(error),
+        };
+        self.load_error = outcome.as_ref().err().map(|error| error.to_string());
+        outcome
+    }
+
+    async fn ensure_loaded(&mut self, browser: &Browser) -> Result<(), CapabilityError> {
+        if let Some(reason) = &self.load_error {
+            return Err(CapabilityError::Failed(reason.clone()));
+        }
+        if !self.loaded {
+            let url = self.target_url.clone();
+            self.navigate(browser, &url).await?;
+        }
+        Ok(())
+    }
+
+    /// The live DOM for this batch. A dump is taken once per change; every assertion after the
+    /// same change reads it, which is what makes the outcome independent of how many assertions a
+    /// scenario writes.
+    async fn dom(&mut self, browser: &Browser) -> Result<&str, CapabilityError> {
+        if self.dom.is_none() {
+            self.ensure_loaded(browser).await?;
+            let dump = {
+                let live = self.live(browser).await?;
+                live.session.dump_dom().await?
+            };
+            self.dom = Some(dump);
+        }
+        Ok(self.dom.as_deref().expect("the dump was just taken"))
+    }
+
+    async fn click(&mut self, browser: &Browser, selector: &str) -> Result<(), CapabilityError> {
+        self.ensure_loaded(browser).await?;
+        self.dom = None;
+        self.live(browser).await?.session.click(selector).await
+    }
+
+    async fn type_text(
+        &mut self,
+        browser: &Browser,
+        selector: &str,
+        text: &str,
+    ) -> Result<(), CapabilityError> {
+        self.ensure_loaded(browser).await?;
+        self.dom = None;
+        self.live(browser)
+            .await?
+            .session
+            .type_text(selector, text)
+            .await
+    }
+
+    async fn scroll(&mut self, browser: &Browser, dy: i64) -> Result<(), CapabilityError> {
+        self.ensure_loaded(browser).await?;
+        self.dom = None;
+        self.live(browser).await?.session.scroll(dy).await
+    }
+
+    async fn hover(&mut self, browser: &Browser, selector: &str) -> Result<(), CapabilityError> {
+        self.ensure_loaded(browser).await?;
+        self.dom = None;
+        self.live(browser).await?.session.hover(selector).await
+    }
+
+    async fn upload(
+        &mut self,
+        browser: &Browser,
+        selector: &str,
+        path: &str,
+    ) -> Result<(), CapabilityError> {
+        self.ensure_loaded(browser).await?;
+        self.dom = None;
+        self.live(browser)
+            .await?
+            .session
+            .upload(selector, Path::new(path))
+            .await
+    }
+}
+
+/// One scenario's browser: the child process, its CDP session, and the profile to remove.
+struct Live {
+    child: Child,
+    session: Session,
+    profile: PathBuf,
+}
+
+impl Live {
+    async fn launch(browser: &Browser) -> Result<Self, CapabilityError> {
+        let profile = browser.next_profile()?;
+        let (child, session) =
+            Session::launch(&browser.binary, &profile, &browser.headless_args()).await?;
+        Ok(Self {
+            child,
+            session,
+            profile,
+        })
+    }
+}
+
+impl Drop for Live {
+    fn drop(&mut self) {
+        let _ = self.child.start_kill();
+        // Best effort: a profile that cannot be removed is scratch bytes in the job's emptyDir,
+        // never a reason to fail a run that already produced its verdict.
+        let _ = std::fs::remove_dir_all(&self.profile);
     }
 }
 
@@ -1150,6 +1550,56 @@ mod tests {
 </html>
 "#;
 
+    /// The expected word is built at click time (`['cl', 'icked']`), so a passing assertion can
+    /// only read the live DOM: the page's own source never contains it.
+    const CLICK_PAGE: &str = r#"<!doctype html>
+<html>
+  <head><title>Click fixture</title></head>
+  <body>
+    <button id="go">Go</button>
+    <p id="out">idle</p>
+    <script>
+      document.getElementById('go').addEventListener('click', () => {
+        document.getElementById('out').textContent = ['cl', 'icked'].join('');
+      });
+    </script>
+  </body>
+</html>
+"#;
+
+    /// Every observable word is assembled in the page, never written contiguously in the source.
+    const INTERACTION_PAGE: &str = r#"<!doctype html>
+<html>
+  <head><title>Interaction fixture</title></head>
+  <body>
+    <input id="name">
+    <p id="typed">typed: none</p>
+    <div id="hover-target">hover target</div>
+    <p id="hover">waiting</p>
+    <input id="file" type="file">
+    <p id="files">files: 0</p>
+    <p id="scroll">scrolled: no</p>
+    <div style="height: 3000px"></div>
+    <script>
+      const name = document.getElementById('name');
+      name.addEventListener('input', () => {
+        document.getElementById('typed').textContent = 'typed: ' + name.value;
+      });
+      document.getElementById('hover-target').addEventListener('mouseenter', () => {
+        document.getElementById('hover').textContent = 'hover' + 'ed';
+      });
+      document.getElementById('file').addEventListener('change', (event) => {
+        document.getElementById('files').textContent = 'files: ' + event.target.files.length;
+      });
+      window.addEventListener('scroll', () => {
+        document.getElementById('scroll').textContent =
+          'scrolled: ' + (window.scrollY > 0 ? 'yes' : 'no');
+      });
+    </script>
+  </body>
+</html>
+"#;
+
     fn scratch(tag: &str) -> Config {
         let nanos = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -1221,14 +1671,20 @@ mod tests {
 
     #[tokio::test]
     async fn an_unsupported_step_is_refused_by_name() {
-        let feature = "Feature: interactions\n  Scenario: a click\n    When I click \"Submit\"\n";
+        let feature = "Feature: interactions\n  Scenario: a drag\n    When I drag \"#card\" onto \
+                       \"#done\"\n";
         let params = json!({
             "feature": feature,
             "target_url": "file:///tmp/page.html",
         });
-        let error = run(&params, &scratch("click")).await.unwrap_err();
+        let error = run(&params, &scratch("drag")).await.unwrap_err();
         assert!(error.to_string().contains("step_not_supported"), "{error}");
-        assert!(error.to_string().contains("I click \"Submit\""), "{error}");
+        assert!(
+            error
+                .to_string()
+                .contains("I drag \"#card\" onto \"#done\""),
+            "{error}"
+        );
     }
 
     #[tokio::test]
@@ -1299,14 +1755,149 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn trace_on_failure_is_refused_by_name() {
-        let feature = "Feature: one\n  Scenario: one\n    Then I expect to see \"x\"\n";
+    async fn a_click_step_changes_the_page_state() {
+        if chrome_binary().is_none() {
+            return;
+        }
+        let config = scratch("click-step");
+        let page = config.work_dir.join("click.html");
+        std::fs::write(&page, CLICK_PAGE).expect("write the click page");
+        let target = format!("file://{}", page.display());
+        let feature = format!(
+            "Feature: click\n  Scenario: the button changes the page\n    Given I open \
+             \"{target}\"\n    When I click \"#go\"\n    Then I expect to see \"clicked\"\n"
+        );
         let params = json!({
             "feature": feature,
-            "target_url": "file:///tmp/page.html",
+            "target_url": target,
+            "timeout_per_test_ms": 20000,
+        });
+
+        let result = run(&params, &config).await.expect("the run completes");
+
+        assert_eq!(result["passed"], json!(1), "{result}");
+        assert_eq!(
+            result["scenarios"][0]["steps"][1]["status"],
+            json!("passed"),
+            "the click itself passes: {result}"
+        );
+        assert_eq!(
+            result["scenarios"][0]["steps"][2]["status"],
+            json!("passed"),
+            "the assertion sees the click's effect: {result}"
+        );
+    }
+
+    #[tokio::test]
+    async fn the_interaction_vocabulary_runs_over_cdp() {
+        if chrome_binary().is_none() {
+            return;
+        }
+        let config = scratch("interactions");
+        let page = config.work_dir.join("interactions.html");
+        std::fs::write(&page, INTERACTION_PAGE).expect("write the interaction page");
+        let upload = config.work_dir.join("upload.txt");
+        std::fs::write(&upload, "conveyor").expect("write the upload file");
+        let target = format!("file://{}", page.display());
+        let feature = format!(
+            "Feature: interactions\n  Scenario: every interaction reaches the page\n    Given I \
+             open \"{target}\"\n    When I type \"conveyor\" into \"#name\"\n    And I hover \
+             \"#hover-target\"\n    And I upload \"{upload}\" into \"#file\"\n    And I scroll \
+             down 400\n    Then I expect to see \"typed: conveyor\"\n    And I expect to see \
+             \"hovered\"\n    And I expect to see \"files: 1\"\n    And I expect to see \
+             \"scrolled: yes\"\n",
+            upload = upload.display(),
+        );
+        let params = json!({
+            "feature": feature,
+            "target_url": target,
+            "timeout_per_test_ms": 20000,
+        });
+
+        let result = run(&params, &config).await.expect("the run completes");
+
+        assert_eq!(result["passed"], json!(1), "{result}");
+        let steps = result["scenarios"][0]["steps"]
+            .as_array()
+            .expect("the scenario reports its steps");
+        for (index, step) in steps.iter().enumerate() {
+            assert_eq!(step["status"], json!("passed"), "step {index}: {step}");
+        }
+    }
+
+    #[tokio::test]
+    async fn a_failed_scenario_writes_its_trace() {
+        if chrome_binary().is_none() {
+            return;
+        }
+        let config = scratch("trace");
+        let page = config.work_dir.join("page.html");
+        std::fs::write(&page, FIXTURE).expect("write the fixture page");
+        let target = format!("file://{}", page.display());
+        let feature = format!(
+            "Feature: trace\n  Scenario: a failing assertion\n    Given I open \"{target}\"\n    \
+             Then I expect to see \"Goodbye conveyor\"\n"
+        );
+        let params = json!({
+            "feature": feature,
+            "target_url": target,
+            "timeout_per_test_ms": 20000,
             "trace_on_failure": true,
         });
-        let error = run(&params, &scratch("trace")).await.unwrap_err();
-        assert!(error.to_string().contains("trace_not_supported"), "{error}");
+
+        let result = run(&params, &config).await.expect("the run completes");
+
+        assert_eq!(result["failed"], json!(1), "{result}");
+        let name = result["scenarios"][0]["trace"]
+            .as_str()
+            .expect("the failed scenario names its trace");
+        assert_eq!(name, "a-failing-assertion.json");
+        let raw = std::fs::read_to_string(config.out_dir.join(name)).expect("the trace is written");
+        let trace: Value = serde_json::from_str(&raw).expect("the trace is JSON");
+        assert_eq!(trace["url"], json!(target), "{trace}");
+        assert_eq!(trace["steps"][0]["status"], json!("passed"), "{trace}");
+        assert_eq!(trace["steps"][1]["status"], json!("failed"), "{trace}");
+        assert!(
+            trace["steps"][1]["detail"]
+                .as_str()
+                .unwrap_or_default()
+                .contains("Goodbye conveyor"),
+            "{trace}"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_selector_that_matches_nothing_names_the_step() {
+        if chrome_binary().is_none() {
+            return;
+        }
+        let config = scratch("missing-selector");
+        let page = config.work_dir.join("page.html");
+        std::fs::write(&page, FIXTURE).expect("write the fixture page");
+        let target = format!("file://{}", page.display());
+        let feature = format!(
+            "Feature: a missing selector\n  Scenario: the click finds nothing\n    Given I open \
+             \"{target}\"\n    When I click \"#no-such-element\"\n    Then I expect to see \
+             \"Hello conveyor\"\n"
+        );
+        let params = json!({
+            "feature": feature,
+            "target_url": target,
+            "timeout_per_test_ms": 20000,
+        });
+
+        let result = run(&params, &config).await.expect("the run completes");
+
+        assert_eq!(result["failed"], json!(1), "{result}");
+        let detail = result["scenarios"][0]["steps"][1]["detail"]
+            .as_str()
+            .expect("the failing click has a detail");
+        assert!(detail.contains("click"), "{detail}");
+        assert!(detail.contains("#no-such-element"), "{detail}");
+        assert_eq!(
+            result["scenarios"][0]["steps"][2]["status"],
+            json!("passed"),
+            "the page is still live after the missing selector: {result}"
+        );
     }
 }
