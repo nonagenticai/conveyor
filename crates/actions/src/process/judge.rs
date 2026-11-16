@@ -54,41 +54,53 @@ pub enum JudgeError {
     Unreadable,
 }
 
+/// The ordered score levels the judge asks laya for.
+///
+/// laya answers a `score` question with the EXPECTED LEVEL INDEX (`Σ index × probability`), so
+/// two levels make the answer exactly `P(accepted)` in `[0, 1]` — which is what every SOP's
+/// threshold already means. A three-level rubric would score 0..2 and silently loosen every
+/// threshold by comparison.
+pub const SCORE_LEVELS: [&str; 2] = ["rejected", "accepted"];
+
 /// Build the laya request for one step output.
 ///
-/// The question is typed `score`; laya's answer object is `{score, confidence?, reason?}`.
-/// The SOP's acceptance criteria are sent as the question's `criteria`, and the output plus
-/// the step's input/card facts are rendered as the instructions — laya receives no other
-/// context.
+/// The bridge's wire contract (measured 2026-11-16, `/opt/laya-bridge/bridge.py` on pgx):
+/// `state` is required and non-empty — the task text — and a `score` question's `criteria` is an
+/// ORDERED list of 2–10 level labels, not the SOP's acceptance-criteria objects (those are the
+/// instructions to the judge, not the scale). Sending `state: ""` and the criteria objects was
+/// a live `422`: `state: field required`, `criteria: must have between 2 and 10 levels`.
 pub fn request(
     model: Option<&str>,
     output: &Value,
     acceptance_criteria: &Value,
     case_input: Option<&Value>,
 ) -> Value {
-    let mut instructions = format!(
-        "Judge the step output against these acceptance criteria.\n\nAcceptance criteria:\n{}\n\nOutput:\n{}",
-        serde_json::to_string(acceptance_criteria).unwrap_or_else(|_| "null".to_owned()),
+    let mut state = format!(
+        "Step output:\n{}",
         serde_json::to_string(output).unwrap_or_else(|_| "null".to_owned())
     );
     if let Some(input) = case_input {
-        instructions.push_str(&format!(
+        state.push_str(&format!(
             "\n\nStep input / card facts:\n{}",
             serde_json::to_string(input).unwrap_or_else(|_| "null".to_owned())
         ));
     }
+    let instructions = format!(
+        "Judge the step output in `state` against these acceptance criteria.\n\nAcceptance criteria:\n{}",
+        serde_json::to_string(acceptance_criteria).unwrap_or_else(|_| "null".to_owned())
+    );
     let mut questions = Map::new();
     questions.insert(
         JUDGE_QUESTION.to_owned(),
         json!({
             "type": "score",
             "instructions": instructions,
-            "criteria": acceptance_criteria,
+            "criteria": SCORE_LEVELS,
         }),
     );
     json!({
         "model": model.unwrap_or(DEFAULT_LAYA_MODEL),
-        "state": "",
+        "state": state,
         "questions": questions,
     })
 }
@@ -371,16 +383,30 @@ mod tests {
         );
         assert_eq!(request["model"], DEFAULT_LAYA_MODEL);
         assert_eq!(request["questions"]["accept"]["type"], "score");
+        // The bridge requires an ordered 2–10 level rubric; the SOP criteria are instructions,
+        // not the scale. Two levels keep the score equal to P(accepted).
         assert_eq!(
             request["questions"]["accept"]["criteria"],
-            json!(["the tests pass"])
+            json!(SCORE_LEVELS)
         );
+        assert_eq!(SCORE_LEVELS.len(), 2, "two levels mean P(accepted)");
         assert!(
             request["questions"]["accept"]["instructions"]
                 .as_str()
                 .unwrap()
                 .contains("the tests pass"),
-            "the criteria are also readable in the instructions"
+            "the criteria are readable in the instructions"
+        );
+        // `state` is required, non-empty, and carries the material to judge.
+        let state = request["state"].as_str().expect("state is a string");
+        assert!(!state.is_empty(), "an empty state is a 422");
+        assert!(
+            state.contains("summary"),
+            "the output is in the state: {state}"
+        );
+        assert!(
+            state.contains("card"),
+            "the case input is in the state: {state}"
         );
     }
 
