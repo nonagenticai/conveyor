@@ -59,10 +59,20 @@ attaches a file, downloads and deletes; signed out it lists the published index 
 workspace adds its tranche, `blocked_by`, measured status and evidence from `data/coverage.json`,
 groups its outputs by unit and category, and shows **Expected outputs** — the project's own
 checklist from `meta.expected_outputs`: P0's eight definition artefacts, or a delivery project's
-brief and, for V2, its analysis and architecture. Each row is absent, present-private or published;
-the first missing row is marked **next** and carries its compose template. P0's brief artefact is a
-computed `project briefs N/47` coverage row across the delivery projects. A missing output is a
-visible gap; it is not a backend gate.
+brief and, for V2, its inception analysis and architecture design. Each row is absent,
+present-private or published; the first missing row is marked **next** and carries its compose
+template. P0's brief artefact is a computed `project briefs N/47` coverage row across the delivery
+projects. A missing output is a visible gap; it is not a backend gate.
+
+**The output standard** is data: `seed/output-standard.json` owns the vocabulary and the
+per-project-class due-now and at-closure sets. `scripts/build-programme-seed.py` writes
+`meta.expected_outputs` / `meta.closure_outputs` into the seed and `data/output-standard.js` for
+this console; `documents.compose` and `documents.update` canonicalise the legacy aliases (`brief`,
+`analysis`, `architecture`) and refuse anything else with `422 unknown_category`. The project
+checklist counts the due-now set and shows the at-closure set separately; the first missing due-now
+output is **next**. The **Programme queue** on Portfolio is the programme-level work list — every
+project's published vs expected outputs, its closure count and its next output, ordered by tranche.
+The public project page shows published counts only; the public queue never counts a private draft.
 
 The **Projects** destination is the programme workspace: the tenant's projects, a project's board,
 plan link and linked issues, its cards with their process binding and the card type's expected

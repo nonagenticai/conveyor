@@ -387,9 +387,9 @@
     {
       "number": 183,
       "title": "programme: one output standard, completeness and the next-output queue",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/183",
-      "updatedAt": "2026-11-16T19:37:06Z",
+      "updatedAt": "2026-11-16T20:11:19Z",
       "labels": [
         {
           "name": "unit",
@@ -544,7 +544,7 @@
       "title": "ops: host control \u2014 a fixed-verb agent and the systemctl actions",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/172",
-      "updatedAt": "2026-11-15T21:42:44Z",
+      "updatedAt": "2026-11-16T19:59:07Z",
       "labels": [
         {
           "name": "unit",
@@ -1344,17 +1344,13 @@
     {
       "number": 95,
       "title": "estate: deploy and cut over the absorbed licenses (P4 + the live shadow window)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/95",
-      "updatedAt": "2026-11-16T18:34:01Z",
+      "updatedAt": "2026-11-16T20:11:05Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
-        },
-        {
-          "name": "status:blocked",
-          "color": "D93F0B"
         }
       ]
     },

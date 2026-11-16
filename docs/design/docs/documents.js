@@ -114,8 +114,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "ffb5c3916ccc9148f60a9c3e894261fcf2fdd9778d1084e947bc0083a2d5b0b4",
-      "bytes": 14208,
+      "sha256": "e78508a82fb6410c865ac40fda2f93b584f6ddd5c9711d5abf700b8763be94df",
+      "bytes": 15093,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {

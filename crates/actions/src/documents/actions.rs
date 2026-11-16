@@ -30,6 +30,19 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::{Page, PageIn};
 
+/// Canonicalise a category slot through the output standard, refusing an unknown value with 422.
+///
+/// An empty slot stays `None`: clearing a category is allowed. An alias (`analysis`, `brief`,
+/// `architecture`) is stored under its canonical name; anything the standard does not know is a
+/// caller error, never a free-form label.
+fn canonical_category_slot(slot: Option<String>) -> Result<Option<String>, ActionError> {
+    slot.map(|value| {
+        conveyor_domain::output_standard::canonical_category(&value)
+            .map_err(|error| invalid("category", "unknown_category", error.to_string()))
+    })
+    .transpose()
+}
+
 // ── documents.create ──────────────────────────────────────────────────────────────────────
 
 /// The create input: metadata plus the bytes as base64 (CONTRACT §6 — binary travels in JSON).
@@ -465,6 +478,7 @@ async fn documents_create(
             store::document::normalize_slot(input.unit.clone(), None),
         ),
     };
+    let category = canonical_category_slot(category)?;
     let (created, version) = create_from_bytes(
         &mut *tx,
         &ctx,
@@ -562,6 +576,7 @@ async fn documents_compose(
         ));
     }
     let category = store::document::normalize_slot(input.category.clone(), None);
+    let category = canonical_category_slot(category)?;
     let unit = store::document::normalize_slot(input.unit.clone(), None);
     let project_id = match (input.project_id, input.card_id) {
         (Some(project), Some(card)) => {
@@ -993,8 +1008,11 @@ async fn documents_update(
         .map(|body| hex(&Sha256::digest(body.as_bytes())));
     // The promoted slots: `None` leaves the stored value, an empty string clears it. The final
     // values are mirrored into `meta` so a reader that predates 0042 still sees them.
-    let category_final =
+    let mut category_final =
         store::document::normalize_slot(input.category.clone(), current.category.clone());
+    if input.category.is_some() {
+        category_final = canonical_category_slot(category_final)?;
+    }
     let unit_final = store::document::normalize_slot(input.unit.clone(), current.unit.clone());
     let meta = {
         // Metadata is merged, never replaced: `content_type` and `size_bytes` are the row's own

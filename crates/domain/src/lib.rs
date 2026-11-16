@@ -60,6 +60,7 @@ pub mod model;
 pub mod executor;
 // T0 (SPEC_V2 §4.1–§4.4): the organisation spine's release hash and binding vocabulary.
 pub mod organisation;
+pub mod output_standard;
 pub mod plan;
 pub mod process;
 // SPEC D28 / CONTRACT §21: the procedure (SOP) a step is judged against.
