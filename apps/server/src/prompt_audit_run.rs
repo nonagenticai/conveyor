@@ -135,6 +135,7 @@ pub async fn run(
         }),
         precondition: None,
         idempotency_key: Some(format!("prompt_audit.run:{audit_id}")),
+        approval_id: None,
         actor_id: Uuid::nil(),
         actor_kind: "service".to_owned(),
         role: Role::KataExecutor,

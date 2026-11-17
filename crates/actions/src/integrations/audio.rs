@@ -160,6 +160,7 @@ fn speech() -> ActionSpec {
             content_type: "audio/wav",
             title: "Narration",
         }),
+        approval_target: None,
         handler: HandlerRef::External {
             service: SPEECH_SERVICE,
             method: "POST",
@@ -201,6 +202,7 @@ fn transcribe() -> ActionSpec {
             content_type: "text/plain",
             title: "Transcript",
         }),
+        approval_target: None,
         handler: HandlerRef::External {
             service: TRANSCRIBE_SERVICE,
             method: "POST",

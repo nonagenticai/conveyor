@@ -76,6 +76,7 @@ fn request(user_id: Uuid, input: Value) -> InvokeRequest {
         input,
         precondition: None,
         idempotency_key: None,
+        approval_id: None,
         actor_id: user_id,
         actor_kind: "user".to_owned(),
         role: Role::Admin,

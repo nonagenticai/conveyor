@@ -113,6 +113,10 @@ pub struct InvokeRequest {
     pub precondition: Option<Precondition>,
     /// `Idempotency-Key`, scoped `(tenant, action name, key)` (S4-D5).
     pub idempotency_key: Option<String>,
+    /// The approved approval this call names. Required for a destructive action whose spec
+    /// declares an approval target (#282, SPEC_V2 §11.4); every other action ignores it.
+    /// It is a property of the CALL — the payload's schema stays closed.
+    pub approval_id: Option<Uuid>,
     /// The acting user.
     pub actor_id: Uuid,
     /// `user | agent | service`.
@@ -238,6 +242,10 @@ pub struct HandlerCtx {
     pub action: &'static str,
     /// `APP_KEY`.
     pub app_key: String,
+    /// The approved approval this call names (#282). A destructive action whose spec declares
+    /// an approval target is refused by [`crate::invoke::invoke`] unless this names an approved
+    /// approval for that exact target; every other action ignores it.
+    pub approval_id: Option<Uuid>,
 }
 
 impl HandlerCtx {
@@ -781,6 +789,7 @@ pub async fn invoke(
         if_match,
         action: spec.name,
         app_key: request.app_key.clone(),
+        approval_id: request.approval_id,
     };
 
     match spec.kind {

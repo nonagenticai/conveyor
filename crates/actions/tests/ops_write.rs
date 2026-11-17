@@ -21,6 +21,7 @@ fn request(action: &str, input: Value) -> InvokeRequest {
         input,
         precondition: None,
         idempotency_key: None,
+        approval_id: None,
         actor_id: Uuid::now_v7(),
         actor_kind: "user".to_owned(),
         role: Role::Admin,

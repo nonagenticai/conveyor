@@ -64,6 +64,7 @@ impl<'a> ActionCaller<'a> {
                 input,
                 precondition: precondition.map(conveyor_actions::Precondition::Version),
                 idempotency_key: None,
+                approval_id: None,
                 actor_id: self.actor,
                 actor_kind: "service".to_owned(),
                 role: Role::KataExecutor,

@@ -722,6 +722,7 @@ async fn invoke_and_record(
             row.position,
             row.attempt,
         )),
+        approval_id: None,
         actor_id: process.owner_user_id.unwrap_or(Uuid::nil()),
         // The executor is the engine, not the caller: `service` is what makes the audit row say so.
         // Its role is the synthetic tenant-admin (`kata_executor`, George 2026-11-09), which holds
@@ -1127,6 +1128,7 @@ async fn laya_verdict(
         // an outage into a `409` that cannot clear; and the call decides nothing and changes
         // nothing of ours, so asking again is the honest retry.
         idempotency_key: None,
+        approval_id: None,
         actor_id: process.owner_user_id.unwrap_or(Uuid::nil()),
         actor_kind: "service".to_owned(),
         role: Role::KataExecutor,
