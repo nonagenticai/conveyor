@@ -403,6 +403,33 @@ pub async fn list_documents_tx(
     Ok((records, next))
 }
 
+/// The output-standard categories this project has **published** — `published_at` set, `status`
+/// active, a category recorded. Ordered, so a caller's missing-set message is deterministic.
+///
+/// The inception gate (`crates/actions/src/programme.rs`) reads this: existence is not
+/// publication, and a draft must not satisfy a build-start gate. Project-scoped, not unit-scoped:
+/// a document attached to a card has no `project_id`, so it cannot satisfy a project's gate.
+pub async fn published_categories_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<Vec<String>, DocumentStoreError> {
+    let rows: Vec<String> = sqlx::query_scalar(
+        "SELECT DISTINCT category FROM document
+          WHERE tenant_id = $1
+            AND project_id = $2
+            AND published_at IS NOT NULL
+            AND status = 'active'
+            AND category IS NOT NULL
+          ORDER BY category",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project_id)
+    .fetch_all(&mut *conn)
+    .await?;
+    Ok(rows)
+}
+
 /// Every published, active text output, oldest first.
 ///
 /// This is the publish path's read: the filter is the publication decision (`publishable AND
