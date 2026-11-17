@@ -1,11 +1,28 @@
 {
   "issues": [
     {
-      "number": 259,
-      "title": "docs: CONTRIBUTING must say an outside contributor's checks wait for a maintainer's approval",
+      "number": 265,
+      "title": "usage: price the non-token GPU surfaces \u2014 images, characters and seconds",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/259",
-      "updatedAt": "2026-11-17T07:31:38Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/265",
+      "updatedAt": "2026-11-17T08:35:03Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 264,
+      "title": "programme: the inception gate \u2014 a build run waits for the published analysis and architecture",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/264",
+      "updatedAt": "2026-11-17T08:21:05Z",
       "labels": [
         {
           "name": "unit",
@@ -18,11 +35,62 @@
       ]
     },
     {
+      "number": 261,
+      "title": "estate: restore the absorbed licences' remaining telemetry families (13 of 15)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/261",
+      "updatedAt": "2026-11-17T08:07:17Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 260,
+      "title": "P0 \u2014 the MSP rigour set: benefits, dossier, tranches and stakeholders",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/260",
+      "updatedAt": "2026-11-17T07:34:17Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 259,
+      "title": "docs: CONTRIBUTING must say an outside contributor's checks wait for a maintainer's approval",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/259",
+      "updatedAt": "2026-11-17T07:52:49Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 258,
       "title": "attribution: send X-Actor-Id and the tenant-level X-Project-Id on model-call requests",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/258",
-      "updatedAt": "2026-11-17T07:31:24Z",
+      "updatedAt": "2026-11-17T07:58:09Z",
       "labels": [
         {
           "name": "unit",
@@ -39,7 +107,7 @@
       "title": "ci: the registry refresh also runs on every push to main",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/256",
-      "updatedAt": "2026-11-17T07:30:51Z",
+      "updatedAt": "2026-11-17T08:09:10Z",
       "labels": [
         {
           "name": "unit",
@@ -322,7 +390,7 @@
       "title": "programme: the rigour output categories and the architecture/tranche seed rows",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/221",
-      "updatedAt": "2026-11-16T22:34:37Z",
+      "updatedAt": "2026-11-17T07:50:56Z",
       "labels": [
         {
           "name": "unit",
@@ -500,7 +568,7 @@
       "title": "test: the bus harness accepts a runner-provided private Redis",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/195",
-      "updatedAt": "2026-11-16T07:23:47Z",
+      "updatedAt": "2026-11-17T08:34:39Z",
       "labels": [
         {
           "name": "unit",
@@ -781,15 +849,15 @@
       "title": "ops: the gated write set \u2014 restart, scale, rollback behind approvals",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/171",
-      "updatedAt": "2026-11-15T21:42:35Z",
+      "updatedAt": "2026-11-17T08:40:07Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -804,9 +872,9 @@
     {
       "number": 170,
       "title": "ops: the Kubernetes read family \u2014 a conveyor client and the ops.* reads",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/170",
-      "updatedAt": "2026-11-16T18:38:44Z",
+      "updatedAt": "2026-11-17T08:03:34Z",
       "labels": [
         {
           "name": "unit",
@@ -1296,15 +1364,15 @@
       "title": "P0 \u2014 the reuse map, the architecture/analysis pack and the per-project inception standard",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/122",
-      "updatedAt": "2026-11-16T19:03:47Z",
+      "updatedAt": "2026-11-17T07:34:01Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -1313,15 +1381,15 @@
       "title": "P0 \u2014 author the programme definition set",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/121",
-      "updatedAt": "2026-11-16T19:03:45Z",
+      "updatedAt": "2026-11-17T07:33:48Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:needs-human",
+          "color": "5319E7"
         }
       ]
     },
@@ -1622,7 +1690,7 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-16T19:11:35Z",
+      "updatedAt": "2026-11-17T08:21:28Z",
       "labels": [
         {
           "name": "unit",
@@ -1706,7 +1774,7 @@
       "title": "T11 \u2014 Metrics, metering and maturity",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/84",
-      "updatedAt": "2026-11-13T22:53:55Z",
+      "updatedAt": "2026-11-17T08:21:27Z",
       "labels": [
         {
           "name": "unit",
@@ -1748,7 +1816,7 @@
       "title": "T10 \u2014 SAFe cadence and MSP tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/82",
-      "updatedAt": "2026-11-16T19:02:51Z",
+      "updatedAt": "2026-11-17T08:21:26Z",
       "labels": [
         {
           "name": "unit",
@@ -1769,7 +1837,7 @@
       "title": "T9 \u2014 the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/81",
-      "updatedAt": "2026-11-16T19:11:57Z",
+      "updatedAt": "2026-11-17T08:21:24Z",
       "labels": [
         {
           "name": "unit",
@@ -1937,15 +2005,15 @@
       "title": "T2 \u2014 Decision ladder",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/73",
-      "updatedAt": "2026-11-16T22:42:29Z",
+      "updatedAt": "2026-11-17T08:36:19Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T2",
@@ -2109,9 +2177,9 @@
     {
       "number": 46,
       "title": "usage: the GPU-surface commercial-equivalent cost and load",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/46",
-      "updatedAt": "2026-11-17T07:22:09Z",
+      "updatedAt": "2026-11-17T08:02:17Z",
       "labels": [
         {
           "name": "unit",

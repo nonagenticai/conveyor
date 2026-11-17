@@ -204,14 +204,14 @@
       "tranche": 0,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           120,
           121,
           122
         ],
         "open": 2,
-        "ready": 2,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -252,7 +252,7 @@
       "tranche": 0,
       "units": {
         "blocked": 3,
-        "claimed": 8,
+        "claimed": 11,
         "numbers": [
           17,
           22,
@@ -281,9 +281,13 @@
           226,
           256,
           258,
-          259
+          259,
+          260,
+          261,
+          264,
+          265
         ],
-        "open": 19,
+        "open": 22,
         "ready": 7,
         "unknown": 0
       }
@@ -1951,8 +1955,8 @@
       "track": "v2",
       "tranche": 2,
       "units": {
-        "blocked": 1,
-        "claimed": 0,
+        "blocked": 0,
+        "claimed": 1,
         "numbers": [
           73
         ],
@@ -2180,7 +2184,7 @@
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 3,
+        "blocked": 2,
         "claimed": 1,
         "numbers": [
           78,
@@ -2188,7 +2192,7 @@
           171,
           172
         ],
-        "open": 4,
+        "open": 3,
         "ready": 0,
         "unknown": 0
       }
