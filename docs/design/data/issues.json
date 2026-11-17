@@ -89,7 +89,7 @@
       "title": "delivery: every unit declares its programme context \u2014 tranche, brief, ADM phase/plateau and benefits",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/280",
-      "updatedAt": "2026-11-17T10:49:35Z",
+      "updatedAt": "2026-11-17T11:36:26Z",
       "labels": [
         {
           "name": "documentation",
@@ -108,9 +108,9 @@
     {
       "number": 277,
       "title": "ci: the registry workflow's approval poll gives up before the parked run settles",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/277",
-      "updatedAt": "2026-11-17T10:03:30Z",
+      "updatedAt": "2026-11-17T10:54:27Z",
       "labels": [
         {
           "name": "unit",
@@ -142,9 +142,9 @@
     {
       "number": 272,
       "title": "seed: the capability agents' tool surface and 300s turn bound",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/272",
-      "updatedAt": "2026-11-17T09:31:39Z",
+      "updatedAt": "2026-11-17T11:55:16Z",
       "labels": [
         {
           "name": "unit",
@@ -159,9 +159,9 @@
     {
       "number": 270,
       "title": "engine: inference.chat must not be capped below the agent timeout",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/270",
-      "updatedAt": "2026-11-17T09:21:28Z",
+      "updatedAt": "2026-11-17T11:55:05Z",
       "labels": [
         {
           "name": "unit",
@@ -195,7 +195,7 @@
       "title": "programme: the inception gate \u2014 a build run waits for the published analysis and architecture",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/264",
-      "updatedAt": "2026-11-17T10:46:29Z",
+      "updatedAt": "2026-11-17T11:36:28Z",
       "labels": [
         {
           "name": "unit",
@@ -563,7 +563,7 @@
       "title": "programme: the rigour output categories and the architecture/tranche seed rows",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/221",
-      "updatedAt": "2026-11-17T07:50:56Z",
+      "updatedAt": "2026-11-17T10:50:48Z",
       "labels": [
         {
           "name": "unit",
@@ -1127,7 +1127,7 @@
       "title": "estate: absorb the content service \u2014 produce.script and the blueprint layer",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/163",
-      "updatedAt": "2026-11-16T18:26:26Z",
+      "updatedAt": "2026-11-17T10:51:15Z",
       "labels": [
         {
           "name": "unit",
@@ -2178,7 +2178,7 @@
       "title": "T2 \u2014 Decision ladder",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/73",
-      "updatedAt": "2026-11-17T10:32:13Z",
+      "updatedAt": "2026-11-17T11:37:40Z",
       "labels": [
         {
           "name": "unit",
