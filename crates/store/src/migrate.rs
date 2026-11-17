@@ -195,7 +195,8 @@ mod tests {
                 (42, "document workflow".to_owned()),
                 // #160: the tenant's registered inference destination
                 // (0043_tenant_inference_endpoint.sql).
-                (43, "tenant inference endpoint".to_owned())
+                (43, "tenant inference endpoint".to_owned()),
+                (44, "plan spine".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

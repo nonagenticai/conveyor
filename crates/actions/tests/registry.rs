@@ -73,7 +73,7 @@ use serde_json::{Value, json};
 /// **#173 adds 2 internal**: `produce.speech` and `media.transcribe` (the audio hosts). 347 → **349**.
 /// **#160 adds 2 internal**: `inference_endpoint.get|set`, the tenant's registered inference
 /// destination and its sealed credential. 349 → **351**.
-const EXPECTED: [&str; 351] = [
+const EXPECTED: [&str; 378] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -84,6 +84,9 @@ const EXPECTED: [&str; 351] = [
     "approvals.request",
     "artifacts.list",
     "audit.list",
+    "baselines.get",
+    "baselines.list",
+    "baselines.take",
     "benchmark_cases.list",
     "benchmark_runs.cancel",
     "benchmark_runs.compare",
@@ -93,9 +96,15 @@ const EXPECTED: [&str; 351] = [
     "benchmark_runs.start",
     "benchmark_runs.trend",
     "benchmark_suites.list",
+    "benefits.create",
+    "benefits.get",
+    "benefits.link",
+    "benefits.list",
     "billing.summary",
     "boards.get",
     "boards.set_member",
+    "cadences.create",
+    "cadences.list",
     "capabilities.bind_knowledge",
     "capabilities.get",
     "capabilities.list",
@@ -295,6 +304,7 @@ const EXPECTED: [&str; 351] = [
     "models.validate",
     "notifications.list",
     "notifications.update",
+    "portfolio.in_flight",
     "principles.create",
     "principles.dismiss_conflict",
     "principles.get",
@@ -326,6 +336,9 @@ const EXPECTED: [&str; 351] = [
     "programmes.get",
     "programmes.list",
     "programmes.update",
+    "project_dependencies.create",
+    "project_dependencies.delete",
+    "project_dependencies.list",
     "project_requests.approve",
     "project_requests.create",
     "project_requests.get",
@@ -348,6 +361,10 @@ const EXPECTED: [&str; 351] = [
     "publish.start",
     "publish.status",
     "quality.score",
+    "registers.create",
+    "registers.get",
+    "registers.list",
+    "registers.update",
     "repositories.create",
     "repositories.delete",
     "repositories.get",
@@ -383,6 +400,9 @@ const EXPECTED: [&str; 351] = [
     "stakeholders.delete",
     "stakeholders.get",
     "stakeholders.list",
+    "stakeholders.profile_create",
+    "stakeholders.profile_list",
+    "stakeholders.profile_update",
     "stakeholders.update",
     "task_lists.create",
     "task_lists.delete",
@@ -396,12 +416,19 @@ const EXPECTED: [&str; 351] = [
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
+    "tranches.create",
+    "tranches.list",
+    "tranches.review",
     "view_connections.create",
     "view_connections.delete",
     "view_connections.update",
     "view_objects.create",
     "view_objects.delete",
     "view_objects.update",
+    "wbs.create",
+    "wbs.get",
+    "wbs.list",
+    "wbs.update",
     "webhooks.create",
     "webhooks.delete",
     "webhooks.test",
@@ -465,7 +492,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // They are the first actions whose request carries a DOCUMENT's bytes (multipart) and the first
     // whose artefact is UTF-8 text rather than base64 — both mechanisms live in the engine.
     // #160 adds `inference_endpoint.get|set` (both internal): internal 331 → 333; external stays 18.
-    assert_eq!((internal, external), (333, 18));
+    // T1 adds the 27 plan-spine actions (wbs/baselines/registers/dependencies/in_flight/
+    // tranches/benefits/cadences/stakeholders), all internal: internal 333 → 360; external stays 18.
+    assert_eq!((internal, external), (360, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

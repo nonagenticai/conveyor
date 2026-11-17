@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 11,
+    "exists": 23,
     "extend": 8,
-    "new": 44
+    "new": 32
   },
   "rows": [
     {
@@ -84,9 +84,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "wbs_node",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE wbs_node"
+        "migrations: CREATE TABLE wbs_node"
       ]
     },
     {
@@ -94,9 +94,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "project_baseline",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE project_baseline"
+        "migrations: CREATE TABLE project_baseline"
       ]
     },
     {
@@ -104,9 +104,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "programme_cadence",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE programme_cadence"
+        "migrations: CREATE TABLE programme_cadence"
       ]
     },
     {
@@ -114,9 +114,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "programme_tranche",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE programme_tranche"
+        "migrations: CREATE TABLE programme_tranche"
       ]
     },
     {
@@ -124,9 +124,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "programme_baseline",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE programme_baseline"
+        "migrations: CREATE TABLE programme_baseline"
       ]
     },
     {
@@ -134,9 +134,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "project_register_item",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE project_register_item"
+        "migrations: CREATE TABLE project_register_item"
       ]
     },
     {
@@ -144,9 +144,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "benefit_profile",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE benefit_profile"
+        "migrations: CREATE TABLE benefit_profile"
       ]
     },
     {
@@ -154,9 +154,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "benefit_link",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE benefit_link"
+        "migrations: CREATE TABLE benefit_link"
       ]
     },
     {
@@ -164,9 +164,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "benefit_transition",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE benefit_transition"
+        "migrations: CREATE TABLE benefit_transition"
       ]
     },
     {
@@ -174,9 +174,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "stakeholder_profile",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE stakeholder_profile"
+        "migrations: CREATE TABLE stakeholder_profile"
       ]
     },
     {
@@ -334,9 +334,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "project_dependency",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE project_dependency"
+        "migrations: CREATE TABLE project_dependency"
       ]
     },
     {
@@ -396,15 +396,15 @@
       "concept": "programme/plan",
       "verdict": "extend",
       "evidence": [
-        "actions: baselines.* absent",
-        "actions: cadences.* absent",
+        "actions: baselines.* found (baselines.get, baselines.list, baselines.take)",
+        "actions: cadences.* found (cadences.create, cadences.list)",
         "actions: governed_assets.* absent",
         "actions: programme_config.* absent",
         "actions: programmes.* found (programmes.create, programmes.get, programmes.list…)",
-        "actions: project_dependencies.* absent",
-        "actions: registers.* absent",
-        "actions: tranches.* absent",
-        "actions: wbs.* absent"
+        "actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)",
+        "actions: registers.* found (registers.create, registers.get, registers.list…)",
+        "actions: tranches.* found (tranches.create, tranches.list, tranches.review)",
+        "actions: wbs.* found (wbs.create, wbs.get, wbs.list…)"
       ]
     },
     {
@@ -412,9 +412,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "benefits",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: benefits.* absent"
+        "actions: benefits.* found (benefits.create, benefits.get, benefits.link…)"
       ]
     },
     {

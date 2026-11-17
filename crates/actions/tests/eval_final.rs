@@ -101,7 +101,7 @@ async fn ready_instrument(running: &support::Running) -> (String, String) {
         let (status, body) = running
             .invoke(
                 "eval_signoffs.request",
-                TOKEN,
+                support::REVIEWER,
                 json!({ "eval_id": eval_id, "gate": gate, "ask": "review the instrument" }),
                 None,
                 None,
@@ -307,7 +307,7 @@ async fn a_two_round_climb_keeps_one_round_and_reverts_the_other_with_the_reason
     let (status, body) = running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({ "approval_id": plan["id"], "decision": "approve" }),
             None,
             None,

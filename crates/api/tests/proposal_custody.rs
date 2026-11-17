@@ -111,7 +111,7 @@ async fn a_secret_rotation_proposal_never_stores_its_value_in_the_clear() {
         &mut tx,
         seeded.tenant,
         approval_id,
-        &Decision::approve(seeded.user_id),
+        &Decision::approve(copilot::support::reviewer_id(&pg).await),
         false,
     )
     .await

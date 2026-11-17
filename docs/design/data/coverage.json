@@ -1499,9 +1499,9 @@
         "P0"
       ],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "migrations/0044_plan_spine.sql"
       ],
-      "gap": "table wbs_node, table project_baseline, table project_register_item, table project_dependency, table programme_cadence",
+      "gap": null,
       "key": "T1",
       "measured": {
         "actions": [
@@ -1513,8 +1513,8 @@
           0
         ],
         "tables": [
-          0,
-          5
+          11,
+          11
         ]
       },
       "name": "Plan spine",
@@ -1523,7 +1523,7 @@
         "T11"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 1,
       "units": {
@@ -1540,7 +1540,6 @@
     {
       "blocked_by": [
         "P0",
-        "T1",
         "T3"
       ],
       "evidence": [
@@ -1633,7 +1632,6 @@
     {
       "blocked_by": [
         "P0",
-        "T1",
         "T10",
         "T11",
         "T13",
@@ -1920,8 +1918,7 @@
     },
     {
       "blocked_by": [
-        "P0",
-        "T1"
+        "P0"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -2240,7 +2237,6 @@
     {
       "blocked_by": [
         "P0",
-        "T1",
         "T3"
       ],
       "evidence": [
@@ -2529,10 +2525,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 26,
+        "built": 27,
         "partial": 2,
         "planned": 1,
-        "proposed": 17,
+        "proposed": 16,
         "standing": 1
       },
       "total": 48,

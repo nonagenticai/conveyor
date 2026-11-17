@@ -67,7 +67,9 @@ pub mod prompt_audit;
 pub mod publish;
 pub mod rbac;
 pub mod registry;
+// T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine and the MSP rows.
 pub mod spec;
+pub mod spine;
 pub mod views;
 // S13: `workflows.*` — the engine's authoring surface (one document, versioned by key).
 pub mod workflow;

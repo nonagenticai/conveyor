@@ -233,7 +233,9 @@ async fn super_admin_only_and_the_create_sequence_writes_the_local_rows() {
     assert_eq!(status, 200, "{body}");
     assert_eq!(body.as_array().expect("array").len(), 1);
     assert_eq!(body[0]["slug"], "dev-a");
-    assert_eq!(body[0]["admins"], 1);
+    // The shared fixture seeds `dev:reviewer` (an owner) alongside alice's admin, so the
+    // platform row counts two administration-capable members.
+    assert_eq!(body[0]["admins"], 2);
 
     // Create: the local id is PROVISIONING's, not one we minted.
     let (status, body) = running
