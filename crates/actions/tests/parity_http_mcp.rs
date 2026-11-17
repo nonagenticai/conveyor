@@ -4599,6 +4599,35 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             plain("ops.ci_status", json!({"branch": "main", "limit": 5}), None),
             503,
         ),
+        // ── #171: the destructive ops writes ──────────────────────────────────────────────
+        // Each names no approval, so the gate refuses (403 `approval_required`) BEFORE any
+        // cluster call on BOTH transports. That is the parity property for a destructive
+        // action: the refusal is identical whether it arrives over HTTP or MCP, and it never
+        // depends on a cluster being reachable.
+        expecting(
+            plain(
+                "ops.restart",
+                json!({"namespace": "conveyor", "deployment": "conveyor"}),
+                None,
+            ),
+            403,
+        ),
+        expecting(
+            plain(
+                "ops.scale",
+                json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 2}),
+                None,
+            ),
+            403,
+        ),
+        expecting(
+            plain(
+                "ops.rollback",
+                json!({"namespace": "conveyor", "deployment": "conveyor"}),
+                None,
+            ),
+            403,
+        ),
         // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────
         // The response is a pure function of the input — the deck writer has no clock, no
         // random id and no hash-map order — so a replay and an execution agree byte for byte.
