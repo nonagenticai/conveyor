@@ -882,8 +882,8 @@
       "track": "v1",
       "tranche": 4,
       "units": {
-        "blocked": 1,
-        "claimed": 1,
+        "blocked": 0,
+        "claimed": 2,
         "numbers": [
           156,
           168,
