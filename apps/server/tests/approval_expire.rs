@@ -116,7 +116,7 @@ async fn seed_due_gate(db: &common::TestDb, fixture: &Fixture) -> (Uuid, Uuid) {
         "gate",
         1,
         Some(Utc::now() - ChronoDuration::minutes(5)),
-        Some(fixture.user),
+        None,
     )
     .await
     .expect("open the gate");

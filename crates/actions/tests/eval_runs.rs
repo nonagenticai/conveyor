@@ -22,7 +22,7 @@ async fn sign_off(running: &support::Running, eval_id: &str, gate: &str) -> Stri
     let (status, body) = running
         .invoke(
             "eval_signoffs.request",
-            TOKEN,
+            support::REVIEWER,
             json!({ "eval_id": eval_id, "gate": gate, "ask": "review the instrument" }),
             None,
             None,

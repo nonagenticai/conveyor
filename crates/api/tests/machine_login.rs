@@ -30,6 +30,8 @@ use uuid::Uuid;
 
 /// The agent principal this build provisions for a licence subject.
 const AGENT_SUBJECT: &str = "licence:agent-1";
+/// A second agent: a gate one agent requested cannot be decided by the same agent (§5.4).
+const AGENT2_SUBJECT: &str = "licence:agent-2";
 /// A row that exists, is a **person**, and carries a licence-shaped subject.
 const HUMAN_SUBJECT: &str = "licence:human-1";
 
@@ -93,6 +95,16 @@ async fn introspect(
                 "tenant_id": state.tenant,
                 "app": {"key": "conveyor"},
                 "subject_id": "agent-1",
+                "token_expires_at": "2099-01-01T00:00:00Z"
+            }),
+        ),
+        "good2" => (
+            200,
+            json!({
+                "active": true,
+                "tenant_id": state.tenant,
+                "app": {"key": "conveyor"},
+                "subject_id": "agent-2",
                 "token_expires_at": "2099-01-01T00:00:00Z"
             }),
         ),
@@ -166,6 +178,7 @@ async fn fixture() -> (support::Pg, support::Seeded, support::Running, LicencesS
         .expect("catalogue seed");
     conveyor_actions::board::matrix::clear_cache();
     provision(&pg, seeded.tenant_id, AGENT_SUBJECT, "agent", "member").await;
+    provision(&pg, seeded.tenant_id, AGENT2_SUBJECT, "agent", "member").await;
     provision(&pg, seeded.tenant_id, HUMAN_SUBJECT, "human", "member").await;
     let stub = LicencesStub::start(seeded.tenant_id).await;
     let running =
@@ -308,6 +321,9 @@ async fn an_agent_sees_exactly_its_allowlist_and_nothing_else() {
 async fn an_agent_opens_a_standalone_question_and_its_answer_is_recorded_as_the_agent() {
     let (pg, seeded, running, _stub) = fixture().await;
     let mut mcp = support::Mcp::connect(&running, "good").await;
+    // A second agent poses the question; `mcp` (agent-1) answers it. §5.4 refuses a requester
+    // deciding its own gate, and the answer must still record as an agent's.
+    let mut requester = support::Mcp::connect(&running, "good2").await;
 
     let created = mcp
         .call(
@@ -323,7 +339,7 @@ async fn an_agent_opens_a_standalone_question_and_its_answer_is_recorded_as_the_
 
     // S06b property (f): an escalation with NO run — the shape `open_gate_tx` cannot produce,
     // because it requires a running run to move to `waiting_approval`.
-    let asked = mcp
+    let asked = requester
         .call(
             "approvals_request",
             json!({

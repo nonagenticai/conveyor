@@ -44,6 +44,11 @@ pub struct Config {
     pub introspect_timeout_seconds: f64,
     /// `INFERENCE_ROUTER_LICENSE_INTROSPECT_FAIL_OPEN` (default true): an outage is not a verdict.
     pub introspect_fail_open: bool,
+    /// `SERVICE_ACTOR_ID` — this service's own Keycloak subject, stamped as the cost event's
+    /// `actor_id` when the caller sent no `X-Actor-Id`. Same name and meaning as every other
+    /// emitter in the estate (billing's attribution rule triages it with `printenv` in the pod).
+    /// Absent is legal: the actor stays empty, exactly as it did before the port.
+    pub service_actor_id: Option<String>,
     /// `INFERENCE_ROUTER_METERING_REDIS_URL` — the cost bus. Absent means metering is off, and the
     /// boot log says so; it is never a silent no-op.
     pub metering_redis_url: Option<String>,
@@ -252,6 +257,11 @@ impl Config {
             non_empty(lookup("INFERENCE_ROUTER_LICENSE_INTROSPECT_FAIL_OPEN"))
                 .is_none_or(|value| value.eq_ignore_ascii_case("true"));
 
+        // The actor to stamp when a caller sends no `X-Actor-Id`: a service call has no human
+        // behind it, so the acting principal is this service. No prefix here — the live
+        // deployment sets the bare name, shared with the other emitters.
+        let service_actor_id = non_empty(lookup("SERVICE_ACTOR_ID"));
+
         let metering_redis_url = non_empty(lookup("INFERENCE_ROUTER_METERING_REDIS_URL"));
         let metering_costs_enabled = non_empty(lookup("INFERENCE_ROUTER_METERING_COSTS_ENABLED"))
             .is_none_or(|value| value.eq_ignore_ascii_case("true"));
@@ -371,6 +381,7 @@ impl Config {
             introspect_url,
             introspect_timeout_seconds,
             introspect_fail_open,
+            service_actor_id,
             metering_redis_url,
             metering_costs_enabled,
             metering_costs_stream,

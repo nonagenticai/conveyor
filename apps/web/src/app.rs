@@ -18,6 +18,7 @@ use crate::screens::cockpit::Cockpit;
 use crate::screens::copilot::CopilotScreen;
 use crate::screens::evals::{EvalDetail, Evals};
 use crate::screens::improvement::Improvement;
+use crate::screens::inference::InferenceEndpoint;
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
 use crate::screens::platform::Platform;
@@ -158,6 +159,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/evals/:eval_id/:tab") view=EvalDetail/>
                             <Route path=path!("/settings/members") view=Members/>
                             <Route path=path!("/settings/roles") view=Roles/>
+                            <Route path=path!("/settings/inference") view=InferenceEndpoint/>
                             <Route path=path!("/settings/admin") view=AdminScreen/>
                             <Route path=path!("/copilot") view=CopilotScreen/>
                             <Route path=path!("/platform") view=Platform/>
@@ -281,6 +283,9 @@ fn Sidebar() -> impl IntoView {
                 })}
                 {move || ctx.has_action("roles.policy_get").then(|| view! {
                     <li><A href="/settings/roles"><span class="nav-item">"Roles & permissions"</span></A></li>
+                })}
+                {move || ctx.has_action("inference_endpoint.set").then(|| view! {
+                    <li><A href="/settings/inference"><span class="nav-item">"Inference endpoint"</span></A></li>
                 })}
                 {move || (ctx.has_action("inference_usage.report")
                     && ctx.has_action("inference_calls.list")).then(|| view! {

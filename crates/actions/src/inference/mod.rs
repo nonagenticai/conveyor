@@ -6,9 +6,12 @@
 //! was never made.
 
 pub mod calls;
+/// conveyor#160 P2: the tenant-admin registration of the inference destination and its credential.
+pub mod endpoint;
 pub mod usage;
 mod views;
 
+pub use endpoint::{EndpointView, SetEndpointIn};
 pub use views::{InferenceCallView, InferenceCallsListIn, InferenceUsageReportIn, UsageReportOut};
 
 use crate::invoke::ActionError;

@@ -124,6 +124,19 @@ SCREEN_OVERRIDES = {
         "evidence": ["docs/design/v2.js"],
         "gap": "aggregates are fixture (T11)",
     },
+    # The two rigour destinations are design-study pages: their rows and actions are proposed,
+    # never called. The status is explicit because the page functions are camelCase, which the
+    # generic body scan does not resolve — an implicit "live" would overclaim.
+    "programme": {
+        "status": "proposed",
+        "evidence": ["docs/design/v2.js"],
+        "gap": "design study; the MSP rows and actions are T1/T10",
+    },
+    "adm": {
+        "status": "proposed",
+        "evidence": ["docs/design/v2.js"],
+        "gap": "design study; the ADM rows and actions are T9",
+    },
 }
 
 FRONT = re.compile(r"^---\n(.*?)\n---\n", re.S)

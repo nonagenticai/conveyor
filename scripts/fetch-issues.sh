@@ -3,7 +3,9 @@
 #
 # The conveyor never calls GitHub at runtime. This script is run before a snapshot/publish and
 # its output is committed beside the snapshot; `conveyor snapshot` reads it and never touches
-# the network.
+# the network. The `issue-registry` workflow (.github/workflows/issue-registry.yml) runs it on
+# every push to `main` and on a daily schedule, and opens one generated-data PR when the registry
+# changes; run it by hand only to reproduce a failure or to refresh before a publish.
 #
 # ⛔ PUBLIC-SAFE BY CONSTRUCTION. The registry is published on a public site, so it carries the
 # number, a redacted title, the state, the labels and the URL only. Issue BODIES and AUTHOR

@@ -242,7 +242,7 @@ async fn open_gate(pg: &support::Pg, seeded: &support::Seeded, run_id: &str) -> 
         "gate",
         1,
         None,
-        Some(seeded.user_id),
+        Some(support::reviewer_id(pg).await),
     )
     .await
     .expect("open the gate on the running run");

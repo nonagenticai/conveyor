@@ -62,7 +62,9 @@ pub mod executor;
 pub mod organisation;
 pub mod output_standard;
 pub mod plan;
+// T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine's WSJF arithmetic and refusal vocabulary.
 pub mod process;
+pub mod spine;
 // SPEC D28 / CONTRACT §21: the procedure (SOP) a step is judged against.
 pub mod procedure;
 pub mod process_map;
