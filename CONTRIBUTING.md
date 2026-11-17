@@ -64,6 +64,10 @@ acceptance criteria and definition of done — and links the report rather than 
 3. Run the local gate before opening the pull request.
 4. Open the pull request against `main`; the head is `issue/<n>-<slug>` (from a fork,
    `<you>:issue/<n>-<slug>`). Required checks and a maintainer review gate the merge.
+   If you are not a member of the repository, GitHub holds the workflow runs from your pull request
+   until a maintainer approves them: the check shows as *Waiting for approval* and nothing is wrong
+   with your branch. Only a maintainer can release that hold; the approval is also the first look
+   at your change.
 
 ## The local gate
 
