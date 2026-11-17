@@ -280,13 +280,14 @@
           225,
           226,
           258,
-          259,
           260,
-          261,
           264,
-          265
+          265,
+          270,
+          272,
+          274
         ],
-        "open": 21,
+        "open": 22,
         "ready": 7,
         "unknown": 0
       }
@@ -2183,8 +2184,8 @@
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 2,
-        "claimed": 0,
+        "blocked": 1,
+        "claimed": 1,
         "numbers": [
           78,
           170,
