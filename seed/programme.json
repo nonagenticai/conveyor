@@ -1053,7 +1053,16 @@
         "expected_outputs": [
           "project-brief",
           "inception-analysis",
-          "architecture-design"
+          "architecture-design",
+          "architecture-principles",
+          "adm-profile",
+          "artifact-standard",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "compliance-review",
+          "waiver",
+          "maturity-assessment",
+          "skills-assessment"
         ],
         "closure_outputs": [
           "evidence",
@@ -1397,7 +1406,20 @@
           "governance",
           "reuse-map",
           "brief-template",
-          "architecture-analysis"
+          "architecture-analysis",
+          "benefit-profile",
+          "benefits-map",
+          "projects-dossier",
+          "tranche-plan",
+          "tranche-review",
+          "benefits-strategy",
+          "realization-plan",
+          "stakeholder-profiles",
+          "architecture-principles",
+          "adm-profile",
+          "artifact-standard",
+          "maturity-assessment",
+          "skills-assessment"
         ],
         "closure_outputs": []
       }
@@ -1431,7 +1453,6 @@
           205,
           212,
           213,
-          221,
           222,
           223,
           224,
@@ -1441,8 +1462,6 @@
           260,
           264,
           265,
-          270,
-          272,
           274,
           280,
           282,
