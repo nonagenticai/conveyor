@@ -301,10 +301,19 @@ gh pr create --base main --head issue/N-<slug> \
 - **Definition-of-done gate before merge** (above): every scenario in the issue has an evidence row
   at the PR head, the gate passed at that exact sha, the named tests ran, and every CARRIED-BY-#9
   part was re-checked on merged main. A green check is not the DoD.
-- Merge when green (or hand to the train owner only for an owner-declared train). Verify the PR
-  state is `MERGED` before deleting anything. Delete the branch with `git push origin --delete`
-  / the API — **never blind `gh pr merge --delete-branch`**, which can close the PR when the
-  base moved.
+- **Merge = enqueue.** main carries a `merge_queue` ruleset, so a green PR merges through the
+  queue: `gh pr merge <n> --auto` (no `--squash`, no `--delete-branch`) enqueues it, and the queue
+  squashes on the latest base. `--delete-branch` is rejected outright on a queue repo; deleting
+  the branch is a separate step after the merge.
+- Confirm with state, never with an exit code: `gh pr merge` exits 0 when it merely enqueued.
+  Read `state == MERGED` (or GraphQL `pullRequest.isInMergeQueue` while it waits) before you
+  report the PR as merged or delete anything.
+- Delete the branch after the merge with `git push origin --delete <branch>` (the queue does not
+  delete it for you).
+- **A review request means a human decision is pending.** Assignee = whoever must act; add a
+  reviewer only when a decision is actually pending, and mark the PR `status:needs-human`.
+  `delivery.yml` clears every other request on our PRs, so a request without that label is a
+  notification nobody is going to act on.
 - The issue closes via `Closes #N`. If it did not, close it with the evidence.
 
 ## CI budget and WIP cap

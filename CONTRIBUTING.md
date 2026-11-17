@@ -120,9 +120,11 @@ the report in place.
 4. Check that every check the pull request runs is green, not only the required contexts. A
    docs-only pull request skips the Rust and image jobs; that is expected. `dco` and `design-pack`
    are not required contexts, so read them — `design-pack` is what validates a design-pack change.
-5. Merge with `gh pr merge <n> --rebase --delete-branch`. Rebase keeps the contributor's commits
-   and authorship; squash only when the contributor asks, and keep their name on the commit. If the
-   branch is behind `main`, ask the contributor to update it; never force-push their branch.
+5. Merge with `gh pr merge <n> --auto` — `main` has a merge queue, so this enqueues the pull
+   request and the queue builds it on the latest base. `--squash`/`--delete-branch` are rejected
+   while the queue is enabled (the queue squashes; delete the branch after the merge). Confirm
+   with `state == MERGED`, never with the command's exit code. If the branch is behind `main`,
+   the queue handles it; never force-push a contributor's branch.
 6. Credit the work: add the row to `CONTRIBUTORS.md` and comment on the pull request naming it.
    When cutting a release, `gh release create <tag> --generate-notes` lists every pull request and
    author.
@@ -142,8 +144,10 @@ the pull request's Checks tab.
 
 ## Review and merge
 
-- A maintainer reviews every pull request, and required checks must be green.
-- A merge is a human decision. A green run alone does not merge anything.
+- A contribution from outside the team is reviewed by a maintainer before it merges; the team's
+  own pull requests merge through the queue on green, with the janitor doing the enqueue.
+- Required checks must be green in every case. A green run alone merges nothing unless the
+  author is one of ours (the janitor's allowlist) and the pull request is in the queue.
 - The sensitive paths above are owned by `@nonagenticai/maintainers` in `.github/CODEOWNERS`;
   GitHub requests that team's review on every pull request that touches one.
 - The programme is published at <https://conveyor.nonagentic.ai/design/>.
