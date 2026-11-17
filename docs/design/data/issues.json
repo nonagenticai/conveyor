@@ -263,15 +263,15 @@
       "title": "attribution: send X-Actor-Id and the tenant-level X-Project-Id on model-call requests",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/258",
-      "updatedAt": "2026-11-17T07:58:09Z",
+      "updatedAt": "2026-11-17T16:38:41Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -348,7 +348,7 @@
       "title": "console: the authoring standard \u2014 templates, a blocked publish, and the coach's rework/kata triage",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/245",
-      "updatedAt": "2026-11-17T15:45:11Z",
+      "updatedAt": "2026-11-17T16:33:42Z",
       "labels": [
         {
           "name": "unit",

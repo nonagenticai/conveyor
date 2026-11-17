@@ -960,8 +960,8 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "conveyor-domain",
+ "conveyor-render",
  "conveyor-store",
- "pulldown-cmark",
  "regex",
  "serde",
  "serde_json",
@@ -992,6 +992,7 @@ dependencies = [
  "conveyor-domain",
  "fontdb 0.24.0",
  "pdf-writer",
+ "pulldown-cmark",
  "quick-xml 0.42.0",
  "resvg",
  "serde",

@@ -82,7 +82,8 @@ use serde_json::{Value, json};
 /// **T2 adds 11 internal**: the decision ladder — `decision_policies.*` (3),
 /// `refinements.*` (2), `laya_configs.*` (2), `ladder.record|evaluate|list|apply_draft` (4).
 /// 387 → **398**.
-const EXPECTED: [&str; 398] = [
+/// **#245 adds 2 internal**: `documents.preview` and `documents.return`. 398 → **400**.
+const EXPECTED: [&str; 400] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -175,9 +176,11 @@ const EXPECTED: [&str; 398] = [
     "documents.get",
     "documents.ingest",
     "documents.list",
+    "documents.preview",
     "documents.publish",
     "documents.report",
     "documents.request_publish",
+    "documents.return",
     "documents.revision_get",
     "documents.revision_list",
     "documents.revision_restore",
@@ -528,7 +531,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // #171 adds the three `ops.*` writes (internal, destructive): 366 → 369; T2 adds the eleven
     // decision-ladder actions (decision_policies.* 3, refinements.* 2, laya_configs.* 2,
     // ladder.record|evaluate|list|apply_draft 4), all internal: 369 → 380; external stays 18.
-    assert_eq!((internal, external), (380, 18));
+    // #245 adds `documents.preview` and `documents.return` (internal): 380 → 382.
+    assert_eq!((internal, external), (382, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
