@@ -116,6 +116,26 @@ jobs:
               if not reviewers and not teams:
                   continue
 
+              # A CODEOWNERS request whose team this token cannot resolve makes the DELETE fail
+              # with 422 ("Could not resolve to a node ..."). It is invisible in `requested_teams`
+              # and visible in GraphQL as `asCodeOwner: true, requestedReviewer: null`. Those
+              # requests belong to a sensitive path and are left for a human, by design.
+              q = ("query($o:String!,$n:String!,$num:Int!){repository(owner:$o,name:$n){"
+                   "pullRequest(number:$num){reviewRequests(first:20){nodes{asCodeOwner "
+                   "requestedReviewer{__typename}}}}}}")
+              owner, name = repo.split("/", 1)
+              grc, gout, _ = gh(["graphql", "-f", f"query={q}", "-f", f"o={owner}",
+                                 "-f", f"n={name}", "-F", f"num={n}"])
+              if grc == 0:
+                  try:
+                      nodes = (json.loads(gout)["data"]["repository"]["pullRequest"]
+                               ["reviewRequests"]["nodes"]) or []
+                      if any(x.get("asCodeOwner") and not x.get("requestedReviewer") for x in nodes):
+                          summary.append(f"- #{n}: kept — a CODEOWNERS team request needs a human")
+                          continue
+                  except (KeyError, TypeError, ValueError):
+                      pass
+
               rc, out, err = gh(["-X", "DELETE", f"repos/{repo}/pulls/{n}/requested_reviewers"],
                                 {"reviewers": reviewers, "team_reviewers": teams})
               if rc == 0:

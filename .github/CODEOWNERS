@@ -1,15 +1,17 @@
 # Review ownership. GitHub reads the last matching pattern.
 #
 # `@nonagenticai/maintainers` is the owner of record: the team exists, and the repository owner is
-# a maintainer of it. GitHub requests the team's review on any pull request that touches an owned
-# path. The `main` ruleset keeps `require_code_owner_review: false`: arming it while `*` is owned
-# would require a team approval on every pull request (a blanket gate), while the owner decision
-# (#93) is a code-owner review on the sensitive paths only — remove `*` first if it is armed.
-* @nonagenticai/maintainers
+# a maintainer of it. The `main` ruleset keeps `require_code_owner_review: false`, so these
+# requests are notifications, never a gate; the owner decision (#93) is a code-owner review on the
+# **sensitive paths only**.
+#
+# The blanket `* @nonagenticai/maintainers` line was removed on 2026-11-17: it requested the team
+# on every pull request, including the automated registry refreshes, and nothing could dismiss
+# that request — the Actions token cannot resolve an org team node, so the request reached the
+# owner's inbox and blocked nothing. Do not re-add `*` while the ruleset leaves code-owner review
+# unarmed; arm the ruleset first if a blanket gate is ever wanted.
 
-# Sensitive paths: the CI definitions and the review policy itself. A change here needs a
-# code-owner approval in addition to the required checks once the ruleset requires it; GitHub
-# requests the team's review now.
+# Sensitive paths: the CI definitions and the review policy itself.
 /.github/workflows/** @nonagenticai/maintainers
 /.github/CODEOWNERS @nonagenticai/maintainers
 /SECURITY.md @nonagenticai/maintainers
