@@ -206,7 +206,10 @@ mod tests {
                 (46, "decision ladder".to_owned()),
                 // #265: the non-token surfaces' unit and per-unit rate on the catalogue, and the
                 // call's own usage_unit/usage_units on the ledger (0047_media_price.sql).
-                (47, "media price".to_owned())
+                (47, "media price".to_owned()),
+                // #172 (T7): the hosts conveyor may reach, and what each may be asked for
+                // (0048_host_registry.sql, SPEC_V2 §10.4.1). A platform fact — no tenant column.
+                (48, "host registry".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

@@ -1,0 +1,23 @@
+[package]
+name = "conveyor-host-agent"
+description = "The fixed-verb host agent: status, logs and restart over a forced-command key, so no host credential lives in a conveyor pod (T7, SPEC_V2 §10.4.1)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "conveyor_host_agent"
+path = "src/lib.rs"
+
+[[bin]]
+name = "conveyor-host-agent"
+path = "src/main.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.27.0"

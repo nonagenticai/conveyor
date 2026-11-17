@@ -13,6 +13,10 @@
 //! | `ops.flux_status` | the Flux `Kustomization` objects — the estate's reconciliation state |
 //! | `ops.ci_status` | recent GitHub Actions runs (platform `CONVEYOR_CI_TOKEN`) |
 //!
+//! #172 adds the host family (`host.rs`): `ops.host_status`, `ops.host_logs` and the destructive
+//! `ops.host_restart_unit`, which reach a bare-metal host through its own fixed-verb agent rather
+//! than the cluster API. The destination comes from `host_registry`, never from the caller.
+//!
 //! **Every input is closed** (`deny_unknown_fields`): a namespace and a label selector, never a
 //! free-form URL — the operation is named, not constructed by the caller. Names are validated
 //! here before they are interpolated into an API path.
@@ -33,6 +37,7 @@ use uuid::Uuid;
 use crate::control::invalid;
 use crate::invoke::ActionError;
 
+pub mod host;
 pub mod reads;
 pub mod writes;
 
