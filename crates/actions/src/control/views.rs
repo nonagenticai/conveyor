@@ -322,6 +322,12 @@ pub struct ApprovalRequestIn {
     /// When the expiry job may resolve it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<DateTime<Utc>>,
+    /// The typed evidence the gate resolves against (T3, #74). Stored in `meta.evidence`.
+    #[serde(default)]
+    pub evidence: Vec<crate::pm::EvidenceRef>,
+    /// Refuse an empty evidence list when true.
+    #[serde(default)]
+    pub require_evidence: bool,
 }
 
 /// `approvals.list` — the gate filters plus the shared page envelope.

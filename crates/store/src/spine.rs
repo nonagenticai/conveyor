@@ -357,12 +357,14 @@ pub struct BaselineRecord {
     pub taken_by: Uuid,
     /// Who approved it, if anyone.
     pub approved_by: Option<Uuid>,
+    /// The approved change request that advanced to this baseline (T3, #74), if any.
+    pub change_id: Option<Uuid>,
     /// The If-Match version (append-only rows keep 1).
     pub version: i64,
 }
 
 const BASELINE_COLUMNS: &str =
-    "id, project_id, kind, snapshot, taken_at, taken_by, approved_by, version";
+    "id, project_id, kind, snapshot, taken_at, taken_by, approved_by, change_id, version";
 
 /// Take a baseline: snapshot the current WBS + register facts and freeze them.
 ///
@@ -375,6 +377,7 @@ pub async fn take_baseline_tx(
     project_id: Uuid,
     kind: &str,
     taken_by: Uuid,
+    change_id: Option<Uuid>,
 ) -> Result<BaselineRecord, PlanStoreError> {
     require_project_tx(&mut *conn, tenant, project_id).await?;
     ensure_parent_tx(&mut *conn, tenant, Parent::AppUser, taken_by)
@@ -397,8 +400,8 @@ pub async fn take_baseline_tx(
         "frozen": true,
     });
     let sql = format!(
-        "INSERT INTO project_baseline (tenant_id, project_id, kind, snapshot, taken_by)
-         VALUES ($1, $2, $3, $4, $5)
+        "INSERT INTO project_baseline (tenant_id, project_id, kind, snapshot, taken_by, change_id)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING {BASELINE_COLUMNS}"
     );
     let row: BaselineRecord = sqlx::query_as(AssertSqlSafe(sql))
@@ -407,9 +410,97 @@ pub async fn take_baseline_tx(
         .bind(kind)
         .bind(&snapshot)
         .bind(taken_by)
+        .bind(change_id)
         .fetch_one(&mut *conn)
         .await?;
     Ok(row)
+}
+
+/// The newest approved baseline of `kind` for a project, or `None`.
+///
+/// T3's change guard: a project that already holds an approved baseline of a kind cannot
+/// advance past it without a change request, so this is the row the guard reads.
+pub async fn latest_approved_baseline_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+    kind: &str,
+) -> Result<Option<BaselineRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {BASELINE_COLUMNS} FROM project_baseline
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = $3 AND approved_by IS NOT NULL
+          ORDER BY taken_at DESC, id DESC LIMIT 1"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .bind(kind)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Mark a baseline approved by `approver`. Only an unapproved row moves; a second approval is a
+/// no-op that returns the row unchanged (the gate effect is idempotent under re-decision).
+pub async fn approve_baseline_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    approver: Uuid,
+) -> Result<Option<BaselineRecord>, PlanStoreError> {
+    let sql = format!(
+        "UPDATE project_baseline SET approved_by = $3, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND approved_by IS NULL
+          RETURNING {BASELINE_COLUMNS}"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(approver)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Mark a change register item approved by `approver`.
+pub async fn approve_register_item_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    approver: Uuid,
+) -> Result<Option<RegisterRecord>, PlanStoreError> {
+    let sql = format!(
+        "UPDATE project_register_item
+            SET status = 'approved', meta = meta || jsonb_build_object('approved_by', $3::text),
+                updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND kind = 'change' AND status <> 'approved'
+          RETURNING {REGISTER_COLUMNS}"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(approver.to_string())
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Write the reciprocal citation from a change request to the baseline it advanced.
+pub async fn link_change_to_baseline_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    change_id: Uuid,
+    baseline_id: Uuid,
+) -> Result<Option<RegisterRecord>, PlanStoreError> {
+    let sql = format!(
+        "UPDATE project_register_item
+            SET meta = meta || jsonb_build_object('baseline_id', $3::text), updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND kind = 'change'
+          RETURNING {REGISTER_COLUMNS}"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(change_id)
+        .bind(baseline_id.to_string())
+        .fetch_optional(&mut *conn)
+        .await?)
 }
 
 /// Read one baseline.

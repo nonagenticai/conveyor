@@ -103,6 +103,17 @@ async fn approvals_decide(
     .await
     .map_err(|error| decide_error(error, "approvals.decide"))?;
 
+    // T3: an approved PM gate moves the row it names — the charter, the baseline or the change
+    // request — and leaves a trace edge from each typed evidence item to the project. The
+    // effect rides the decision's transaction, so a failed effect rolls the decision back.
+    if approval.status == ApprovalStatus::Approved {
+        let record = store::approval::get_approval_tx(&mut *tx, ctx.tenant, approval.id)
+            .await
+            .map_err(|error| decide_error(error, "approvals.decide"))?
+            .ok_or_else(ActionError::internal)?;
+        crate::pm::apply_gate_effect_tx(&mut *tx, ctx.tenant, &record, ctx.actor_id).await?;
+    }
+
     // Only a gate that actually resolved announces it: a first approve under a two-person
     // quorum leaves the gate pending, and a "pending" gate has no terminal event.
     match approval.status {
@@ -331,6 +342,14 @@ async fn approvals_request(
     }
     if let Some(allowed) = input.allowed_decisions {
         meta.insert("allowed_decisions".to_owned(), allowed);
+    }
+    // T3: a gate resolves its typed evidence before it is opened, so an absent, draft,
+    // superseded or non-typed reference never becomes a pending gate.
+    let evidence =
+        crate::pm::resolve_evidence(&mut *tx, ctx.tenant, &input.evidence, input.require_evidence)
+            .await?;
+    if !evidence.is_empty() {
+        meta.insert("evidence".to_owned(), Value::Array(evidence));
     }
 
     let new = store::approval::NewApproval {

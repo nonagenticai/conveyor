@@ -130,6 +130,7 @@ fn end_table(end_type: &str) -> Option<&'static str> {
     match end_type {
         "governed_asset" => Some("governed_asset"),
         "card" => Some("card"),
+        "project" => Some("project"),
         _ => None,
     }
 }
