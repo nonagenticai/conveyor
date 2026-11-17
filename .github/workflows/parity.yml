@@ -1,0 +1,29 @@
+# The S00 parity contract (parity/parity.yaml) is the signed capability inventory:
+# 1,300 old-system surfaces, 218 `used`. This job keeps the contract honest — the
+# schema, the unique ids, the signed counts, and the sha256 signature recorded in
+# SUMMARY.md. A change to the contract without a re-sign fails. Once the native
+# acceptance map (parity/native.tsv) lands, the same check requires every `used`
+# id to carry a native disposition (`action:`, `test:`, `replacement:`, `dropped:`).
+name: parity
+
+on:
+  pull_request:
+    paths:
+      - 'parity/**'
+      - 'scripts/check-parity.py'
+      - '.github/workflows/parity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: the signed contract and its native map
+        run: python3 scripts/check-parity.py
