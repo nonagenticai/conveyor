@@ -87,7 +87,9 @@ use serde_json::{Value, json};
 /// 400 → **401**.
 /// **#172 adds 3 internal**: the host family — `ops.host_status|host_logs|host_restart_unit`
 /// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 401 → **404**.
-const EXPECTED: [&str; 404] = [
+/// **T3 adds 6 internal**: the PM job — `pm.charter|plan|get|route_gate|close` and
+/// `changes.request`. 404 → **410**.
+const EXPECTED: [&str; 410] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -143,6 +145,7 @@ const EXPECTED: [&str; 404] = [
     "cards.update",
     "catalogues.import",
     "catalogues.list",
+    "changes.request",
     "channels.bind",
     "channels.get",
     "channels.kinds",
@@ -341,6 +344,11 @@ const EXPECTED: [&str; 404] = [
     "ops.restart",
     "ops.rollback",
     "ops.scale",
+    "pm.charter",
+    "pm.close",
+    "pm.get",
+    "pm.plan",
+    "pm.route_gate",
     "portfolio.in_flight",
     "principles.create",
     "principles.dismiss_conflict",
@@ -543,7 +551,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // #163 adds `produce.script` (internal): 382 → 383; external stays 18.
     // #172 adds the three host actions (internal; one destructive, two reads): 383 → 386;
     // external stays 18 — they call the host agent over ssh, not a declared external service.
-    assert_eq!((internal, external), (386, 18));
+    // T3 adds the six PM actions (all internal): 386 → 392; external stays 18.
+    assert_eq!((internal, external), (392, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

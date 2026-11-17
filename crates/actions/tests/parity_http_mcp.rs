@@ -99,6 +99,13 @@ struct Ctx {
     org_job_id: Uuid,
     org_release_id: Uuid,
     org_binding_id: Uuid,
+    /// T3's PM anchor: an active `job_catalogue(job_key = 'pm')` job, its published release and a
+    /// `procedure` binding to the fixture process, seeded once before the loop. Every `pm.*` and
+    /// `changes.*` sample names [`Ctx::pm_binding_id`], because the actions refuse unless it
+    /// resolves to an active PM job; a mutating sample prepares its own projects per round.
+    pm_job_id: Uuid,
+    pm_release_id: Uuid,
+    pm_binding_id: Uuid,
     job: Mutex<Option<Uuid>>,
     /// The ids a `prepare` step wrote for this round, one queue per sample, popped once per
     /// round. They can never be static literals: every prepared row is created fresh.
@@ -1616,6 +1623,64 @@ async fn seed_parity_register(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uui
     id
 }
 
+/// Approve a project gate through the engine's ONE decision writer.
+///
+/// `pm.plan` refuses without an approved `charter` gate and `pm.close` without an approved
+/// `closure` gate. The gate is requested by alice and decided by bob because
+/// `record_decision_tx` refuses the requester's own decision (SPEC_V2 §5.4, T1/#72) — a status
+/// UPDATE would seed a state neither principal could have produced, and would stop proving the
+/// action's precondition.
+async fn seed_pm_approved_gate(pg: &support::Pg, ctx: &Ctx, project: Uuid, gate: &str) {
+    let approval = scoped(pg, ctx, async move |conn| {
+        store::approval::insert_approval_tx(
+            conn,
+            ctx.tenant,
+            &store::approval::NewApproval {
+                project_id: Some(project),
+                gate: gate.to_owned(),
+                kind: "pm".to_owned(),
+                required_decisions: 1,
+                requested_by: Some(ctx.alice_user),
+                meta: json!({ "description": format!("Approve the {gate} gate") }),
+                ..store::approval::NewApproval::new(gate, "pm")
+            },
+        )
+        .await
+        .expect("prepared PM gate")
+        .id
+    })
+    .await;
+    scoped(pg, ctx, async move |conn| {
+        store::approval::record_decision_tx(
+            conn,
+            ctx.tenant,
+            approval,
+            &conveyor_domain::Decision::approve(ctx.bob_user),
+            false,
+        )
+        .await
+        .expect("prepared PM gate decision");
+    })
+    .await;
+}
+
+/// An approved baseline on `project`: `changes.request` resolves the baseline it would replace as
+/// typed evidence, and only an `approved_by`-stamped row qualifies.
+async fn seed_pm_approved_baseline(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let baseline = seed_parity_baseline(pg, ctx, project).await;
+    scoped(pg, ctx, async move |conn| {
+        let approved = store::spine::approve_baseline_tx(conn, ctx.tenant, baseline, ctx.bob_user)
+            .await
+            .expect("approve the prepared baseline");
+        assert!(
+            approved.is_some(),
+            "the prepared baseline must still be unapproved when it is approved"
+        );
+    })
+    .await;
+    baseline
+}
+
 async fn seed_parity_edge(pg: &support::Pg, ctx: &Ctx, from: Uuid, to: Uuid) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
     let id: Uuid = sqlx::query_scalar(
@@ -2682,6 +2747,28 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             })
             .await;
             ctx.push(sample.name, run);
+        }
+        // ── T3: the PM job (#74) ─────────────────────────────────────────────────────────
+        // A fresh chartered project per round: `pm.plan` and `pm.route_gate` both name it, and a
+        // shared row would make round B a replay of round A's work rather than an execution.
+        "pm.get" | "pm.plan" | "pm.route_gate" => {
+            let project = seed_parity_project(pg, ctx).await;
+            seed_pm_approved_gate(pg, ctx, project, "charter").await;
+            ctx.push(sample.name, project);
+        }
+        "pm.close" => {
+            // Closure is terminal for the project (`close_project_tx` refuses a closed row), so
+            // each round needs its own open project with its own approved closure gate.
+            let project = seed_parity_project(pg, ctx).await;
+            seed_pm_approved_gate(pg, ctx, project, "closure").await;
+            ctx.push("pm.close", project);
+        }
+        "changes.request" => {
+            // The change gate cites the approved baseline it would replace (0048, #74).
+            let project = seed_parity_project(pg, ctx).await;
+            let baseline = seed_pm_approved_baseline(pg, ctx, project).await;
+            ctx.push("changes.request", project);
+            ctx.push("changes.request.baseline", baseline);
         }
         _ => {}
     }
@@ -4891,6 +4978,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
 
     out.extend(spine_samples());
     out.extend(ladder_samples());
+    out.extend(pm_samples());
 
     for sample in &mut out {
         if matches!(
@@ -4949,6 +5037,100 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         }
     }
     out
+}
+
+/// T3's PM samples (SPEC_V2 §6.1, §5.4, §8.4; #74), in their own frame for the same stack
+/// reason as [`spine_samples`]. The sample contract is unchanged.
+///
+/// Every sample names the fixture's `pm` binding. The mutating ones create their own project (or
+/// read a prepared one) so each round is a real execution rather than a replay of the previous
+/// round's refusal; `pm.plan` needs an approved charter gate and `pm.close` an approved closure
+/// gate, both prepared as a SECOND principal's decision.
+fn pm_samples() -> Vec<Sample> {
+    vec![
+        {
+            // The PM's view of a prepared, chartered project: project, charter, WBS, baselines
+            // and gates. A read, but prepared per round because its gates and baselines are.
+            let mut sample = plain("pm.get", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({ "project_id": ctx.pop("pm.get") }));
+            expecting(sample, 200)
+        },
+        {
+            // The key is unique per (tenant, key), so both it and the title (which derives it
+            // when absent) are minted per ROUND.
+            let mut sample = plain("pm.charter", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "key": format!("PMC-{}", Uuid::now_v7().simple()),
+                    "title": format!("Parity PM charter {}", Uuid::now_v7().simple()),
+                    "charter": "Parity charter body",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            // A prepared project whose charter gate is APPROVED: the WBS and the scope baseline
+            // are written, and the baseline gate is opened for a second principal to decide.
+            let mut sample = plain("pm.plan", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "project_id": ctx.pop("pm.plan"),
+                    "wbs": [{ "kind": "phase", "title": "Parity phase" }],
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            // A typed-evidence gate with no evidence: the empty list is legal until a caller
+            // asks for `require_evidence`.
+            let mut sample = plain("pm.route_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "project_id": ctx.pop("pm.route_gate"),
+                    "gate": "design",
+                    "kind": "pm",
+                    "evidence": [],
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            // A prepared project whose closure gate is APPROVED: the closure record is written
+            // and the project moves out of `active`.
+            let mut sample = plain("pm.close", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "project_id": ctx.pop("pm.close"),
+                    "closure": "Parity closure narrative",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            // A prepared APPROVED baseline on a prepared project: the change register item and
+            // its gate are the only path that advances a baseline (D-T1-3).
+            let mut sample = plain("changes.request", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "project_id": ctx.pop("changes.request"),
+                    "baseline_id": ctx.pop("changes.request.baseline"),
+                    "title": "Parity change",
+                    "impact": 3,
+                })
+            });
+            expecting(sample, 201)
+        },
+    ]
 }
 
 /// T2's decision-ladder samples, in their own frame for the same stack reason as
@@ -5992,6 +6174,48 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     .await
     .expect("seed the parity binding");
 
+    // T3's PM anchor (SPEC_V2 §6.1): the PM is a JOB, not a code path. An active `pm` catalogue
+    // row, its published release and a `procedure` binding to the fixture process are what every
+    // `pm.*` sample names; `assert_pm` reads exactly these three rows and refuses anything else.
+    let pm_job: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_catalogue
+             (tenant_id, job_key, industry_id, family, title, status, definition)
+         VALUES ($1, 'pm', $2, 'delivery', 'Project manager', 'active',
+                 '{\"charter\":\"pm\"}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(org_industry)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity PM job");
+    let pm_release_hash = "b".repeat(64);
+    let pm_release: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_release (tenant_id, job_id, release_hash, release_snapshot)
+         VALUES ($1, $2, $3, '{}'::jsonb) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(pm_job)
+    .bind(&pm_release_hash)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity PM release");
+    let pm_binding: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_binding
+             (tenant_id, job_id, release_id, release_hash, release_snapshot,
+              process_id, executor_kind, status, meta)
+         VALUES ($1, $2, $3, $4, '{}'::jsonb, $5, 'procedure', 'active', '{}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(pm_job)
+    .bind(pm_release)
+    .bind(&pm_release_hash)
+    .bind(Uuid::parse_str(&process_id).expect("the fixture process id is a uuid"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity PM binding");
+
     let bob_user = seed_member(&pg, &seeded, "bob").await;
     let ctx = Arc::new(Ctx {
         alice_user: seeded.user_id,
@@ -6021,9 +6245,32 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         org_job_id: org_job,
         org_release_id: org_release,
         org_binding_id: org_binding,
+        pm_job_id: pm_job,
+        pm_release_id: pm_release,
+        pm_binding_id: pm_binding,
         job: Mutex::new(None),
         prepared: Mutex::new(HashMap::new()),
     });
+
+    // T3's PM actions resolve the binding, the job and the job's status on EVERY call, and
+    // `assert_pm` refuses anything but an active `pm` job with an active binding. Read the anchor
+    // back through the same store calls so a wrong fixture shape fails here, once, rather than
+    // as six identical 403s that parity would happily report as equal.
+    scoped(&pg, &ctx, async |conn| {
+        let binding = store::organisation::job_binding_get_tx(conn, ctx.tenant, ctx.pm_binding_id)
+            .await
+            .expect("the PM binding resolves");
+        let job = store::organisation::job_get_tx(conn, ctx.tenant, binding.job_id)
+            .await
+            .expect("the PM job resolves");
+        assert_eq!(job.id, ctx.pm_job_id, "the binding names the PM job");
+        assert_eq!(job.job_key, "pm");
+        assert_eq!(job.status, "active");
+        assert_eq!(binding.release_id, ctx.pm_release_id);
+        assert_eq!(binding.status, "active");
+        assert_eq!(binding.executor_kind, "procedure");
+    })
+    .await;
 
     // S09 §5.6's sample needs a stored document per round, created here rather than in `prepare`: prepare is
     // reachable with SQL alone, and a document with verifiable bytes is not. The tenant's upstream token is a
