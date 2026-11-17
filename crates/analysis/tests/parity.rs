@@ -133,14 +133,20 @@ mod capture {
 
     const OPERATIONS: usize = 92;
     const PATHS: usize = 79;
-    const PORTED: usize = 1;
+    const PORTED: usize = 10;
     const TRANSPORT: usize = 36;
-    const DEFERRED: usize = 11;
+    const DEFERRED: usize = 2;
     const NO_CONSUMER: usize = 44;
 
     /// Every Rust entry point a `ported` row may name. Adding one here is the whole ceremony for
     /// declaring an operation ported — the port itself still has to exist for the row to be true.
-    const ENTRY_POINTS: [&str; 1] = ["analyse.site (crates/analysis)"];
+    const ENTRY_POINTS: [&str; 5] = [
+        "analyse.site (crates/analysis)",
+        "analyse.app (crates/analysis)",
+        "analyse.brand (crates/analysis)",
+        "analyse.content (crates/analysis)",
+        "analyse.report (crates/analysis)",
+    ];
     const REASONS: [&str; 3] = ["transport", "no consumer", "deferred"];
 
     const CELLS: usize = 10;

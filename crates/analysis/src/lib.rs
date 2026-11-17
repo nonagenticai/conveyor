@@ -33,8 +33,13 @@
 //! the report critic) arrive as a caller-supplied trait when they are ported; nothing in this
 //! crate holds a client today, and `Cargo.toml` has no transport dependency to hold one in.
 
+pub mod app;
+pub mod brand;
+pub mod content;
 pub mod industry;
 pub mod model;
+pub mod providers;
+pub mod report;
 pub mod rubric;
 pub mod site;
 
