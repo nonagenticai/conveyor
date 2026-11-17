@@ -44,70 +44,70 @@ capability: analysis
 
 agents:
   # ── analysis ────────────────────────────────────────────────────────────────────────
-  - {key: cap.analysis.consult, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.analysis.create, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.analysis.inspect, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.analysis.plan, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.analysis.unblock, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.analysis.consult, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.analysis.create, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.analysis.inspect, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.analysis.plan, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.analysis.unblock, capability: analysis, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── architecture ────────────────────────────────────────────────────────────────────
-  - {key: cap.architecture.consult, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.architecture.create, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.architecture.inspect, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.architecture.plan, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.architecture.unblock, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.architecture.consult, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.architecture.create, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.architecture.inspect, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.architecture.plan, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.architecture.unblock, capability: architecture, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── bddtdd ──────────────────────────────────────────────────────────────────────────
-  - {key: cap.bddtdd.consult, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.bddtdd.create, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.bddtdd.inspect, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.bddtdd.plan, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.bddtdd.unblock, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.bddtdd.consult, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.bddtdd.create, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.bddtdd.inspect, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.bddtdd.plan, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.bddtdd.unblock, capability: bdd_tdd, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── change_management ───────────────────────────────────────────────────────────────
-  - {key: cap.change_management.consult, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.change_management.create, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.change_management.inspect, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.change_management.plan, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.change_management.unblock, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.change_management.consult, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.change_management.create, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.change_management.inspect, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.change_management.plan, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.change_management.unblock, capability: change_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── design ──────────────────────────────────────────────────────────────────────────
-  - {key: cap.design.consult, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.design.create, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.design.inspect, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.design.plan, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.design.unblock, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.design.consult, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.design.create, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.design.inspect, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.design.plan, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.design.unblock, capability: design, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── development ─────────────────────────────────────────────────────────────────────
-  - {key: cap.development.consult, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.development.create, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.development.inspect, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.development.plan, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.development.unblock, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.development.consult, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.development.create, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.development.inspect, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.development.plan, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.development.unblock, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── refactoring ─────────────────────────────────────────────────────────────────────
-  - {key: cap.refactoring.consult, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.refactoring.create, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.refactoring.inspect, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.refactoring.plan, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.refactoring.unblock, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.refactoring.consult, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.refactoring.create, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.refactoring.inspect, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.refactoring.plan, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.refactoring.unblock, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── research ────────────────────────────────────────────────────────────────────────
-  - {key: cap.research.consult, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.research.create, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.research.inspect, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.research.plan, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.research.unblock, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.research.consult, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.research.create, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.research.inspect, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.research.plan, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.research.unblock, capability: research, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── testing ─────────────────────────────────────────────────────────────────────────
-  - {key: cap.testing.consult, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.testing.create, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.testing.inspect, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.testing.plan, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.testing.unblock, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.testing.consult, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.testing.create, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.testing.inspect, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.testing.plan, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.testing.unblock, capability: testing, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── project_management ──────────────────────────────────────────────────────────────
-  - {key: cap.project_management.create_type, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.project_management.select_type, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.project_management.unblock, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.project_management.update_type_card_types, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: cap.project_management.update_type_phases, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.project_management.create_type, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.project_management.select_type, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.project_management.unblock, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.project_management.update_type_card_types, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: cap.project_management.update_type_phases, capability: project_management, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── kanban_coach ────────────────────────────────────────────────────────────────────
-  - {key: cap.kanban_coach.handle_error, capability: kanban_coach, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
-  - {key: ask_fr, capability: kanban_coach, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: cap.kanban_coach.handle_error, capability: kanban_coach, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  - {key: ask_fr, capability: kanban_coach, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── kata ────────────────────────────────────────────────────────────────────────────
-  - {key: kata.open, capability: kata, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 120}
+  - {key: kata.open, capability: kata, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
 
 sops:
   # ── analysis ────────────────────────────────────────────────────────────────────────
