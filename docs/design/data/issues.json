@@ -1,11 +1,70 @@
 {
   "issues": [
     {
+      "number": 282,
+      "title": "approvals: the destructive gate is spec-declared and policy-driven, at the invoke boundary",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/282",
+      "updatedAt": "2026-11-17T10:31:10Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 280,
+      "title": "delivery: every unit declares its programme context \u2014 tranche, brief, ADM phase/plateau and benefits",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/280",
+      "updatedAt": "2026-11-17T10:28:54Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 277,
+      "title": "ci: the registry workflow's approval poll gives up before the parked run settles",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/277",
+      "updatedAt": "2026-11-17T10:03:30Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 274,
       "title": "chore(rust): toolchain 1.99.0 -> 1.100.0 (estate pin)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/274",
-      "updatedAt": "2026-11-17T09:46:22Z",
+      "updatedAt": "2026-11-17T09:53:21Z",
       "labels": [
         {
           "name": "unit",
@@ -52,7 +111,7 @@
       "title": "usage: price the non-token GPU surfaces \u2014 images, characters and seconds",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/265",
-      "updatedAt": "2026-11-17T09:33:14Z",
+      "updatedAt": "2026-11-17T10:20:12Z",
       "labels": [
         {
           "name": "unit",
@@ -86,7 +145,7 @@
       "title": "estate: restore the absorbed licences' remaining telemetry families (13 of 15)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/261",
-      "updatedAt": "2026-11-17T09:48:25Z",
+      "updatedAt": "2026-11-17T10:24:42Z",
       "labels": [
         {
           "name": "unit",
@@ -871,7 +930,7 @@
       "title": "ops: host control \u2014 a fixed-verb agent and the systemctl actions",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/172",
-      "updatedAt": "2026-11-17T09:49:26Z",
+      "updatedAt": "2026-11-17T10:14:00Z",
       "labels": [
         {
           "name": "unit",
@@ -2052,7 +2111,7 @@
       "title": "T2 \u2014 Decision ladder",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/73",
-      "updatedAt": "2026-11-17T08:53:35Z",
+      "updatedAt": "2026-11-17T10:10:42Z",
       "labels": [
         {
           "name": "unit",
