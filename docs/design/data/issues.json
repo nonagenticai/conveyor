@@ -89,7 +89,7 @@
       "title": "delivery: every unit declares its programme context \u2014 tranche, brief, ADM phase/plateau and benefits",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/280",
-      "updatedAt": "2026-11-17T11:36:26Z",
+      "updatedAt": "2026-11-17T12:05:41Z",
       "labels": [
         {
           "name": "documentation",
@@ -195,7 +195,7 @@
       "title": "programme: the inception gate \u2014 a build run waits for the published analysis and architecture",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/264",
-      "updatedAt": "2026-11-17T11:36:28Z",
+      "updatedAt": "2026-11-17T12:05:39Z",
       "labels": [
         {
           "name": "unit",
@@ -348,15 +348,15 @@
       "title": "console: the authoring standard \u2014 templates, a blocked publish, and the coach's rework/kata triage",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/245",
-      "updatedAt": "2026-11-16T22:45:16Z",
+      "updatedAt": "2026-11-17T12:34:47Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S09",
@@ -561,9 +561,9 @@
     {
       "number": 221,
       "title": "programme: the rigour output categories and the architecture/tranche seed rows",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/221",
-      "updatedAt": "2026-11-17T10:50:48Z",
+      "updatedAt": "2026-11-17T12:34:00Z",
       "labels": [
         {
           "name": "unit",
@@ -2178,7 +2178,7 @@
       "title": "T2 \u2014 Decision ladder",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/73",
-      "updatedAt": "2026-11-17T11:37:40Z",
+      "updatedAt": "2026-11-17T12:05:37Z",
       "labels": [
         {
           "name": "unit",
