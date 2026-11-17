@@ -1915,7 +1915,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>decision</td>
-<td><code>decisions.open|evaluate|decide|escalate</code>, <code>decision_options.*</code>, <code>decision_policies.*|refine</code>, <code>laya_configs.*</code></td>
+<td><code>ladder.record|evaluate|list|apply_draft</code> (the ladder's verbs; a human answer is <code>approvals.decide</code> and an escalation opens an approval, not a ladder action), <code>decision_options.*</code>, <code>decision_policies.*</code>, <code>refinements.publish|list</code>, <code>laya_configs.*</code>. ⚠️ <code>decisions.*</code> is the <strong>ADR family</strong> (<code>governance/assets.rs</code>); the ladder does not reuse it, so the §7 record and an ADR cannot be confused</td>
 </tr>
 <tr>
 <td>PM</td>

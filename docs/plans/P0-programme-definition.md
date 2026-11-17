@@ -130,6 +130,13 @@ it; it must fit the blueprint, and a deviation is a decision record, not a silen
 Both are documents on the project with `meta.category` set. They are published when accepted. A
 project without both published is an inception gap; its build units are not claimed.
 
+The unit protocol is where that programme context is recorded for every delivery unit: its issue
+carries the `Tranche` it is authorised under, the `Brief` that governs it, the `ADM phase/plateau`
+where it changes the architecture, and the `Benefits` its output is mapped to
+(`docs/plans/03-DELIVERY.md` § "Issue content contract"). The end-of-tranche review (§7) reads
+those four fields from the issue ledger, so the review's evidence is the buildout's own record and
+not a separate report.
+
 ## 6. Benefit profiles and the benefits map (mandatory)
 
 The programme is judged on benefits operations realizes after the projects close, not on the

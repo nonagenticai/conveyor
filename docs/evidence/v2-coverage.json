@@ -481,10 +481,13 @@
       "concept": "decision",
       "verdict": "new",
       "evidence": [
+        "actions: approvals.* found (approvals.decide, approvals.list, approvals.request)",
         "actions: decision_options.* absent",
-        "actions: decision_policies.* absent",
+        "actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)",
         "actions: decisions.* found (decisions.create, decisions.get, decisions.list…)",
-        "actions: laya_configs.* absent"
+        "actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)",
+        "actions: laya_configs.* found (laya_configs.create, laya_configs.list)",
+        "actions: refinements.* found (refinements.list, refinements.publish)"
       ],
       "note": "V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2)."
     },

@@ -577,6 +577,11 @@ async fn documents_compose(
     }
     let category = store::document::normalize_slot(input.category.clone(), None);
     let category = canonical_category_slot(category)?;
+    // The CLI's bulk path can create an output already public. Publication is one gate whichever
+    // action sets the bit, so the template check covers compose as well as `documents.publish`.
+    if input.publishable == Some(true) {
+        super::require_complete(category.as_deref(), Some(input.body.as_str()))?;
+    }
     let unit = store::document::normalize_slot(input.unit.clone(), None);
     let project_id = match (input.project_id, input.card_id) {
         (Some(project), Some(card)) => {
@@ -921,6 +926,20 @@ async fn documents_update(
         serde_json::to_value(DocumentOut::from_record(current.clone(), &HashMap::new()))
             .unwrap_or(Value::Null),
     )?;
+    // §7.1/§7.4: a generated draft is applied only through `ladder.apply_draft`, whose gate is
+    // an accepted L1/L3 decision. The ordinary edit path cannot attach one to a card, so the
+    // ladder's decision record cannot be bypassed by an update.
+    if input
+        .card_id
+        .is_some_and(|card| Some(card) != current.card_id)
+        && current.meta.get("generated").and_then(Value::as_bool) == Some(true)
+    {
+        return Err(ActionError::new(
+            409,
+            "draft_requires_gate",
+            "a generated draft is applied through ladder.apply_draft with an accepted decision",
+        ));
+    }
     // Publication is an admin decision, in both directions. A published row is also locked to the
     // admin: an author's edit to public content would change what a reviewer already approved
     // without a new publish decision, so the author asks for an unpublish instead.
@@ -1012,6 +1031,15 @@ async fn documents_update(
         store::document::normalize_slot(input.category.clone(), current.category.clone());
     if input.category.is_some() {
         category_final = canonical_category_slot(category_final)?;
+    }
+    // The transition to public is the gate; an edit to a row already public is never re-checked,
+    // and an unpublish never is. The body being judged is the one the row will carry after this
+    // update, so a body and a publish bit in the same call are checked together.
+    if input.publishable == Some(true) && !current.publishable {
+        super::require_complete(
+            category_final.as_deref(),
+            body.as_deref().or(current.body.as_deref()),
+        )?;
     }
     let unit_final = store::document::normalize_slot(input.unit.clone(), current.unit.clone());
     let meta = {
