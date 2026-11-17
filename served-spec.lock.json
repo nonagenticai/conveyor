@@ -174,7 +174,7 @@
     "POST /api/actions/inference_calls.list/invocations": "66b41669ce346d2e2753005b8bb49aa4d7f1379f4081bfae8d902324d343c387",
     "POST /api/actions/inference_endpoint.get/invocations": "cc77b3117763c2a4cc3f1b3bff2ca02fa4a12ff115f9daf54bd959a4de03e925",
     "POST /api/actions/inference_endpoint.set/invocations": "33ef7f2012dc6ad95c0885b7d8466de3bb11414748de12d1b2c6359620a418c4",
-    "POST /api/actions/inference_usage.report/invocations": "23301025129479af25b2b2c5f7fcb09cd427441225eee6f5faa14445e4a8b12e",
+    "POST /api/actions/inference_usage.report/invocations": "0cdb705c0410b83be5a6644f49f24ed228ddbe23d46d91e49094e9a64762e2f5",
     "POST /api/actions/invites.create/invocations": "f9d2d501c6b45c56b3dff1d7870c9ea384042f74fb97aee9f178ffac31ed4405",
     "POST /api/actions/invites.list/invocations": "fc1f0ace46fa57310d95bc0976b1dc17828b16936dde0b3e94b109bae31c2a22",
     "POST /api/actions/invites.revoke/invocations": "2239db25e91a24306269dfac3974edfcc3845ec6ddee249bef3544f58a782044",
