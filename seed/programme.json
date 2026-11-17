@@ -812,15 +812,13 @@
         ],
         "plan_status": "draft",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 2,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card"
@@ -1053,7 +1051,16 @@
         "expected_outputs": [
           "project-brief",
           "inception-analysis",
-          "architecture-design"
+          "architecture-design",
+          "architecture-principles",
+          "adm-profile",
+          "artifact-standard",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "compliance-review",
+          "waiver",
+          "maturity-assessment",
+          "skills-assessment"
         ],
         "closure_outputs": [
           "evidence",
@@ -1397,7 +1404,20 @@
           "governance",
           "reuse-map",
           "brief-template",
-          "architecture-analysis"
+          "architecture-analysis",
+          "benefit-profile",
+          "benefits-map",
+          "projects-dossier",
+          "tranche-plan",
+          "tranche-review",
+          "benefits-strategy",
+          "realization-plan",
+          "stakeholder-profiles",
+          "architecture-principles",
+          "adm-profile",
+          "artifact-standard",
+          "maturity-assessment",
+          "skills-assessment"
         ],
         "closure_outputs": []
       }
@@ -1431,7 +1451,6 @@
           205,
           212,
           213,
-          221,
           222,
           223,
           224,
@@ -1441,8 +1460,6 @@
           260,
           264,
           265,
-          270,
-          272,
           274,
           280,
           282,
