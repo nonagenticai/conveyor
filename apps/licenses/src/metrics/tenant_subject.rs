@@ -128,15 +128,20 @@ fn subject_refusals() -> &'static Mutex<BTreeMap<(String, String), String>> {
 }
 
 /// Record a refused principal-as-subject registration. Called by the guard that refused it.
+///
+/// The register is idempotent per `(keycloak_sub, keycloak_realm)` so a retrying caller cannot
+/// grow it, and the LATEST tenant name wins — the reference assigns rather than inserts, so a
+/// tenant rename is reflected on the next refusal.
 pub fn record_subject_refusal(keycloak_sub: &str, keycloak_realm: &str, tenant_name: &str) {
     // Recover from a poisoned lock instead of panicking every later scrape: a refusal must never
     // be able to take `/metrics` down.
     let mut register = subject_refusals()
         .lock()
         .unwrap_or_else(PoisonError::into_inner);
-    register
-        .entry((keycloak_sub.to_owned(), keycloak_realm.to_owned()))
-        .or_insert_with(|| tenant_name.to_owned());
+    register.insert(
+        (keycloak_sub.to_owned(), keycloak_realm.to_owned()),
+        tenant_name.to_owned(),
+    );
 }
 
 fn refusal_entries() -> Vec<((String, String), String)> {
@@ -431,8 +436,9 @@ mod tests {
                 sub == "0195f48b-d000-7000-8000-00000000ffff" && realm == "realm-test-register"
             })
             .expect("refusal recorded");
-        // First tenant name wins: a re-run does not overwrite the recorded offender.
-        assert_eq!(hit.1, "tenant-one");
+        // The register is keyed, not tallied; the latest tenant name wins, as the reference's
+        // assignment does (so a tenant rename is reflected on the next refusal).
+        assert_eq!(hit.1, "tenant-two");
         assert_eq!(
             entries
                 .iter()

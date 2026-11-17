@@ -93,7 +93,6 @@ struct Seed {
     tenant: Uuid,
     app: Uuid,
     plan: Uuid,
-    subject: Uuid,
     license: Uuid,
 }
 
@@ -155,7 +154,6 @@ async fn seed_base(pool: &PgPool) -> Seed {
         tenant,
         app,
         plan,
-        subject,
         license,
     }
 }
