@@ -192,6 +192,7 @@ async fn decide(
             input: json!({"approval_id": approval_id, "decision": "approve"}),
             precondition: None,
             idempotency_key: None,
+            approval_id: None,
             actor_id: fixture.user,
             actor_kind: "user".to_owned(),
             role: Role::Admin,

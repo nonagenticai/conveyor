@@ -449,6 +449,7 @@ fn handler_ctx(tenant: TenantId, app_key: &str) -> HandlerCtx {
         if_match: None,
         action: ACTION,
         app_key: app_key.to_owned(),
+        approval_id: None,
     }
 }
 
@@ -614,6 +615,7 @@ impl Host<'_> {
             input: request.input.clone(),
             precondition: None,
             idempotency_key: Some(request.idempotency_key.clone()),
+            approval_id: None,
             actor_id: Uuid::nil(),
             actor_kind: "service".to_owned(),
             role: Role::KataExecutor,
@@ -718,6 +720,7 @@ impl Host<'_> {
             }),
             precondition: None,
             idempotency_key: Some(request.idempotency_key.clone()),
+            approval_id: None,
             actor_id: Uuid::nil(),
             actor_kind: "service".to_owned(),
             role: Role::KataExecutor,

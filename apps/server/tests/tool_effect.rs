@@ -38,6 +38,7 @@ fn request(action: &str) -> InvokeRequest {
         input: json!({"entries": []}),
         precondition: None,
         idempotency_key: None,
+        approval_id: None,
         actor_id: Uuid::now_v7(),
         actor_kind: "user".to_string(),
         role: Role::Admin,

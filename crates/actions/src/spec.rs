@@ -736,6 +736,13 @@ pub enum ArtefactEncoding {
     Utf8,
 }
 
+/// How a destructive call's approval target is computed from its input (#282, SPEC_V2 §11.4).
+///
+/// A plain function pointer: the `#[crate::action]` macro wraps the action's own typed target
+/// function, so the spec carries `fn(&Value) -> Result<String, String>` and the invoke boundary
+/// can compute the target for any destructive action without knowing its input type.
+pub type ApprovalTarget = fn(&serde_json::Value) -> Result<String, String>;
+
 /// One invocable operation. Exactly §5.1's fields.
 #[derive(Clone, Debug)]
 pub struct ActionSpec {
@@ -757,6 +764,10 @@ pub struct ActionSpec {
     pub timeout_ms: u32,
     /// Read, write or destructive.
     pub effect: Effect,
+    /// How this action's approval target is computed from its input (#282). `None` means the
+    /// action declares no target and is therefore not gated at the invoke boundary; the
+    /// burn-down test names every destructive action still in that state.
+    pub approval_target: Option<ApprovalTarget>,
     /// Confirmation mode for channels.
     pub confirm: Confirm,
     /// The resolution scope.
