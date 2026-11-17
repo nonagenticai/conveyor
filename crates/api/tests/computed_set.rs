@@ -418,6 +418,216 @@ async fn a_failed_run_blocks_the_card_comments_once_and_starts_one_coach() {
     assert_eq!(lane_kind(&pg, card).await, "waiting");
 }
 
+/// One terminal (failed) run of `process_key` on the card — the history the coach cap counts,
+/// and the exact shape a coach's own failure leaves behind.
+async fn failed_run_of(
+    pg: &support::Pg,
+    tenant: conveyor_domain::TenantId,
+    project: Uuid,
+    card: Uuid,
+    process_key: &str,
+) -> Uuid {
+    let process_id: Uuid = sqlx::query_scalar(
+        "SELECT id FROM process
+          WHERE tenant_id = $1 AND key = $2 AND status = 'published'
+          ORDER BY version DESC LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(process_key)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the named process");
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scoped tx");
+    let mut new = conveyor_store::run::NewRun::new(project, Some(card));
+    new.process_id = Some(process_id);
+    let run = conveyor_store::run::insert_run_tx(&mut tx, tenant, &new)
+        .await
+        .expect("insert the run");
+    conveyor_store::run::fail_run_tx(
+        &mut tx,
+        tenant,
+        run.id,
+        Some("probe_failure"),
+        Some("seed: the run failed"),
+    )
+    .await
+    .expect("fail the run")
+    .expect("the queued run became failed");
+    tx.commit().await.expect("commit");
+    run.id
+}
+
+/// The card's ROOT coach runs, terminal or live.
+async fn coach_runs_on(pg: &support::Pg, tenant: Uuid, card: Uuid) -> i64 {
+    sqlx::query_scalar(
+        "SELECT count(*) FROM run r
+           JOIN process p ON p.tenant_id = r.tenant_id AND p.id = r.process_id
+          WHERE r.tenant_id = $1 AND r.card_id = $2 AND p.key = $3
+            AND r.parent_run_id IS NULL",
+    )
+    .bind(tenant)
+    .bind(card)
+    .bind(COACH_PROCESS_KEY)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the coach run count")
+}
+
+/// Fork a v2 DRAFT of the coach — the routine edit that exposed the audit finding: the latest
+/// row for the key is now a draft, while the published v1 keeps executing runs.
+async fn fork_coach_draft(pg: &support::Pg, tenant: conveyor_domain::TenantId) -> Uuid {
+    let source: Uuid = sqlx::query_scalar(
+        "SELECT id FROM process
+          WHERE tenant_id = $1 AND key = $2 AND status = 'published'
+          ORDER BY version DESC LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(COACH_PROCESS_KEY)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the published coach");
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scoped tx");
+    let draft = conveyor_store::process::fork_version_tx(&mut tx, tenant, source, None)
+        .await
+        .expect("fork the coach draft");
+    tx.commit().await.expect("commit the fork");
+    draft.id
+}
+
+/// SPEC_V2 §1.4 / §12 T4: **no coach card about a coach card.** A failed coach run is a failed
+/// run, and without this guard `err.card` answers it with another coach, forever — the live
+/// tenant reached 278 attempts on 2026-11-15.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_failed_coach_run_starts_no_coach() {
+    let (pg, seeded, running) = fixture().await;
+    seed_start_and_coach(&pg, &running, seeded.tenant).await;
+    let s = subject(&running).await;
+    let (card, _version) = create_card(&running, &s.board_id, &s.active, "the coach fails").await;
+    let card = Uuid::parse_str(&card).expect("card");
+    let project = Uuid::parse_str(&s.project_id).expect("project");
+
+    let run = failed_run_of(&pg, seeded.tenant, project, card, COACH_PROCESS_KEY).await;
+    let outcome = conveyor_actions::board::pull::err_card(&pg.runtime, APP_KEY, seeded.tenant, run)
+        .await
+        .expect("err.card");
+
+    assert!(outcome.coach_skipped, "no coach about a coach: {outcome:?}");
+    assert_eq!(outcome.coach_run_id, None, "no run was started");
+    assert_eq!(
+        coach_runs_on(&pg, seeded.tenant_id, card).await,
+        1,
+        "the failed coach is the card's only coach run"
+    );
+    assert!(outcome.commented, "the failure is still commented");
+}
+
+/// The coach's identity is the process KEY family, not a row id. A v2 draft forked from the
+/// published coach must not hide the v1 coach's history — the PR #188 audit measured that an
+/// id-keyed guard stopped recognising the coach and reset its count to zero.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_failed_coach_run_is_recognised_across_process_versions() {
+    let (pg, seeded, running) = fixture().await;
+    seed_start_and_coach(&pg, &running, seeded.tenant).await;
+    let s = subject(&running).await;
+    let (card, _version) = create_card(&running, &s.board_id, &s.active, "v2 draft").await;
+    let card = Uuid::parse_str(&card).expect("card");
+    let project = Uuid::parse_str(&s.project_id).expect("project");
+
+    // The latest row for the key is now a DRAFT; the run below is the PUBLISHED v1 coach.
+    fork_coach_draft(&pg, seeded.tenant).await;
+    let run = failed_run_of(&pg, seeded.tenant, project, card, COACH_PROCESS_KEY).await;
+    let outcome = conveyor_actions::board::pull::err_card(&pg.runtime, APP_KEY, seeded.tenant, run)
+        .await
+        .expect("err.card");
+
+    assert!(
+        outcome.coach_skipped,
+        "a v1 coach is still the coach after a v2 fork: {outcome:?}"
+    );
+    assert_eq!(outcome.coach_run_id, None, "no run was started");
+}
+
+/// A closed or archived project has no flow to protect: the failure is recorded, the coach is
+/// not started.
+async fn no_coach_for_project_status(status: &str) {
+    let (pg, seeded, running) = fixture().await;
+    seed_start_and_coach(&pg, &running, seeded.tenant).await;
+    let s = subject(&running).await;
+    let (card, _version) = create_card(&running, &s.board_id, &s.active, "closed project").await;
+    let card = Uuid::parse_str(&card).expect("card");
+    let project = Uuid::parse_str(&s.project_id).expect("project");
+
+    sqlx::query("UPDATE project SET status = $3 WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant.as_uuid())
+        .bind(project)
+        .bind(status)
+        .execute(&pg.super_pool)
+        .await
+        .expect("set the project status");
+
+    // An ORDINARY failed run, so the only refusal in play is the project's status.
+    let run = failed_run_of(&pg, seeded.tenant, project, card, START_PROCESS_KEY).await;
+    let outcome = conveyor_actions::board::pull::err_card(&pg.runtime, APP_KEY, seeded.tenant, run)
+        .await
+        .expect("err.card");
+
+    assert!(
+        outcome.coach_skipped,
+        "a {status} project is not coached: {outcome:?}"
+    );
+    assert_eq!(outcome.coach_run_id, None, "no run was started");
+    assert_eq!(
+        coach_runs_on(&pg, seeded.tenant_id, card).await,
+        0,
+        "no coach run exists"
+    );
+    assert!(outcome.commented, "the failure is still commented");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_closed_project_card_gets_no_coach() {
+    no_coach_for_project_status("closed").await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_archived_project_card_gets_no_coach() {
+    no_coach_for_project_status("archived").await;
+}
+
+/// The per-card depth cap: three terminal coach runs are history, not a reason for a fourth.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_coach_chain_stops_at_the_cap() {
+    let (pg, seeded, running) = fixture().await;
+    seed_start_and_coach(&pg, &running, seeded.tenant).await;
+    let s = subject(&running).await;
+    let (card, _version) = create_card(&running, &s.board_id, &s.active, "chain").await;
+    let card = Uuid::parse_str(&card).expect("card");
+    let project = Uuid::parse_str(&s.project_id).expect("project");
+
+    for _ in 0..conveyor_actions::board::pull::COACH_CHAIN_MAX {
+        failed_run_of(&pg, seeded.tenant, project, card, COACH_PROCESS_KEY).await;
+    }
+    // A v2 draft must not reset the count: the cap is per card and per key family.
+    fork_coach_draft(&pg, seeded.tenant).await;
+
+    // A fourth failure from an ORDINARY process, so the only refusal in play is the cap.
+    let run = failed_run_of(&pg, seeded.tenant, project, card, START_PROCESS_KEY).await;
+    let outcome = conveyor_actions::board::pull::err_card(&pg.runtime, APP_KEY, seeded.tenant, run)
+        .await
+        .expect("err.card");
+
+    assert!(
+        outcome.coach_skipped,
+        "the cap refuses a fourth coach: {outcome:?}"
+    );
+    assert_eq!(outcome.coach_run_id, None, "no run was started");
+    assert_eq!(
+        coach_runs_on(&pg, seeded.tenant_id, card).await,
+        conveyor_actions::board::pull::COACH_CHAIN_MAX,
+        "the cap holds"
+    );
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn the_retired_hook_route_is_a_404_problem() {
     let (_pg, seeded, running) = fixture().await;

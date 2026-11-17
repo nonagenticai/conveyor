@@ -133,6 +133,14 @@ pub struct ProjectUpdateIn {
     /// The new status.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+    /// The new project type — an ACTIVE `catalogue_entry(kind='project_type')` of this tenant.
+    ///
+    /// Until #206 this field did not exist, so a project created without a type could never
+    /// acquire one through the API, and every `cards.move` in it was refused
+    /// `card-move-not-allowed: the project declares no project_type`. The project and its type
+    /// are data: the API is how an operator sets or repairs them (owner direction 2026-11-16).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_type_code: Option<String>,
     /// The source repository.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub repo_url: Option<String>,

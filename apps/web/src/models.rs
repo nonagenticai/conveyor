@@ -456,6 +456,26 @@ pub struct UsageRow {
     pub unknown: i64,
     #[serde(default)]
     pub hit_ratio: f64,
+    /// The bucket's commercial-equivalent cost in USD, a decimal STRING — money is never a
+    /// float on the wire (the billing panel's rule).
+    #[serde(default)]
+    pub cost_usd: String,
+    /// Calls the ledger could price.
+    #[serde(default)]
+    pub priced_calls: i64,
+    /// Calls the ledger could NOT price — shown, never folded into $0.
+    #[serde(default)]
+    pub unpriced_calls: i64,
+    /// Wall time summed, the load side of the same window.
+    #[serde(default)]
+    pub latency_ms: i64,
+    /// The commercial unit of a uniformly non-token bucket (`image`, `character`, `second`), when
+    /// the server can name one.
+    #[serde(default)]
+    pub unit: Option<String>,
+    /// The units summed for that kind, a decimal string.
+    #[serde(default)]
+    pub units: Option<String>,
 }
 
 /// One `inference_call` ledger row. The fields the screen does not show are still parsed where

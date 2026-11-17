@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use sqlx::PgConnection;
+use std::collections::HashMap;
 use uuid::Uuid;
 
 use super::{
@@ -28,6 +29,19 @@ use crate::integrations::objects::{Objects, key_for};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::{Page, PageIn};
+
+/// Canonicalise a category slot through the output standard, refusing an unknown value with 422.
+///
+/// An empty slot stays `None`: clearing a category is allowed. An alias (`analysis`, `brief`,
+/// `architecture`) is stored under its canonical name; anything the standard does not know is a
+/// caller error, never a free-form label.
+fn canonical_category_slot(slot: Option<String>) -> Result<Option<String>, ActionError> {
+    slot.map(|value| {
+        conveyor_domain::output_standard::canonical_category(&value)
+            .map_err(|error| invalid("category", "unknown_category", error.to_string()))
+    })
+    .transpose()
+}
 
 // ── documents.create ──────────────────────────────────────────────────────────────────────
 
@@ -43,6 +57,15 @@ pub struct DocumentCreateIn {
     pub content_type: String,
     /// The bytes, base64 (standard alphabet, padded).
     pub content_base64: String,
+    /// The output this upload is an attachment of, when it is one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_document_id: Option<Uuid>,
+    /// The output-standard slot (`project-brief`, `evidence`, …).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
+    /// The programme unit (a project key or an issue number).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unit: Option<String>,
     /// Free metadata merged into the row's `meta` beside `content_type`/`size_bytes`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<Value>,
@@ -57,7 +80,9 @@ pub struct DocumentOut {
     pub project_id: Option<String>,
     /// The owning card, when the output is attached to one.
     pub card_id: Option<String>,
-    /// `document | report | export`.
+    /// The output this row is an attachment of, when it is one.
+    pub parent_document_id: Option<String>,
+    /// `document | report | export | attachment`.
     pub kind: String,
     /// The display title.
     pub title: String,
@@ -77,6 +102,26 @@ pub struct DocumentOut {
     pub meta: Value,
     /// Whether the public snapshot may carry this row.
     pub publishable: bool,
+    /// The output-standard slot (`project-brief`, `evidence`, …).
+    pub category: Option<String>,
+    /// The programme unit (a project key or an issue number).
+    pub unit: Option<String>,
+    /// The creating principal's id.
+    pub created_by: Option<String>,
+    /// The creating principal's display name; null when the row predates provenance.
+    pub created_by_name: Option<String>,
+    /// The last editing principal's id.
+    pub updated_by: Option<String>,
+    /// The last editing principal's display name.
+    pub updated_by_name: Option<String>,
+    /// When the row last became public.
+    pub published_at: Option<DateTime<Utc>>,
+    /// The principal who last published it.
+    pub published_by: Option<String>,
+    /// Their display name.
+    pub published_by_name: Option<String>,
+    /// When an author last asked an admin to publish it.
+    pub publish_requested_at: Option<DateTime<Utc>>,
     /// The optimistic-concurrency version (`ETag`).
     pub version: i64,
     /// When the row was created.
@@ -85,18 +130,24 @@ pub struct DocumentOut {
     pub updated_at: DateTime<Utc>,
 }
 
-impl From<store::document::DocumentRecord> for DocumentOut {
-    fn from(record: store::document::DocumentRecord) -> Self {
+impl DocumentOut {
+    /// Build the wire shape, resolving the three actor ids to display names.
+    pub fn from_record(
+        record: store::document::DocumentRecord,
+        names: &HashMap<Uuid, String>,
+    ) -> Self {
         let content_type = record
             .meta
             .get("content_type")
             .and_then(Value::as_str)
             .map(str::to_owned);
         let size_bytes = record.meta.get("size_bytes").and_then(Value::as_i64);
+        let name = |id: Option<Uuid>| id.and_then(|id| names.get(&id).cloned());
         Self {
             id: record.id.to_string(),
             project_id: record.project_id.map(|id| id.to_string()),
             card_id: record.card_id.map(|id| id.to_string()),
+            parent_document_id: record.parent_document_id.map(|id| id.to_string()),
             kind: record.kind,
             title: record.title,
             status: record.status,
@@ -107,11 +158,238 @@ impl From<store::document::DocumentRecord> for DocumentOut {
             external_ref: record.external_ref,
             meta: record.meta,
             publishable: record.publishable,
+            category: record.category,
+            unit: record.unit,
+            created_by: record.created_by.map(|id| id.to_string()),
+            created_by_name: name(record.created_by),
+            updated_by: record.updated_by.map(|id| id.to_string()),
+            updated_by_name: name(record.updated_by),
+            published_at: record.published_at,
+            published_by: record.published_by.map(|id| id.to_string()),
+            published_by_name: name(record.published_by),
+            publish_requested_at: record.publish_requested_at,
             version: i64::try_from(record.version.get()).unwrap_or(i64::MAX),
             created_at: record.created_at,
             updated_at: record.updated_at,
         }
     }
+}
+
+/// Whether this principal may change the public bit.
+///
+/// `kata_executor` is the synthetic machine tenant-admin (the operator CLI that imports published
+/// content); a human member can never hold it (`members.set_role` refuses it for a human). Every
+/// other write stays on `documents:write`.
+pub(super) fn can_publish(ctx: &HandlerCtx) -> bool {
+    ctx.role.is_admin() || ctx.role.is_kata_executor()
+}
+
+/// Resolve one record's author names and shape it.
+pub(super) async fn document_out_with_names(
+    conn: &mut PgConnection,
+    record: store::document::DocumentRecord,
+    action: &'static str,
+) -> Result<DocumentOut, ActionError> {
+    let names = names_for(conn, std::slice::from_ref(&record), action).await?;
+    Ok(DocumentOut::from_record(record, &names))
+}
+
+/// Resolve a page's author names in one query, then shape every row.
+pub(super) async fn documents_out_with_names(
+    conn: &mut PgConnection,
+    records: Vec<store::document::DocumentRecord>,
+    action: &'static str,
+) -> Result<Vec<DocumentOut>, ActionError> {
+    let names = names_for(conn, &records, action).await?;
+    Ok(records
+        .into_iter()
+        .map(|record| DocumentOut::from_record(record, &names))
+        .collect())
+}
+
+/// The metadata half of a byte upload: everything but the bytes themselves.
+///
+/// `documents.create` fills it from its input (after resolving an attachment's parent); the engine
+/// fills it for an external action's declared artefact. See [`create_from_bytes`].
+pub(crate) struct NewBytesDocument<'a> {
+    /// The action storing them, for the error surface only (`documents.create`, `media.generate_image`).
+    pub action: &'static str,
+    /// The display title.
+    pub title: &'a str,
+    /// The declared MIME type; it must be on the allowlist and match the bytes.
+    pub content_type: &'a str,
+    /// `document`, `report`, `export` or `attachment`.
+    pub kind: &'a str,
+    /// The owning project, when the document belongs to one.
+    pub project_id: Option<Uuid>,
+    /// The output an attachment hangs off, when this is one.
+    pub parent_document_id: Option<Uuid>,
+    /// The promoted category slot (0042).
+    pub category: Option<String>,
+    /// The promoted unit slot (0042).
+    pub unit: Option<String>,
+    /// Free metadata merged into the row's `meta` beside the server-owned facts.
+    pub meta: Option<Value>,
+}
+
+/// Store `bytes` as a tenant document: validate → store the object → insert the row (§5.2's order).
+///
+/// The one writer for an uploaded document. `documents.create` calls it with bytes a caller sent; the
+/// engine calls it with bytes an external action's response carried (`ActionSpec::artefact`). A second
+/// implementation would be a second rule about ordering, hashing, the 415/413 caps and — since the
+/// work store — the `created` revision row every document needs.
+///
+/// The row and its revision are inserted in the caller's transaction; the object is deleted again
+/// (best effort) when that insert fails.
+pub(crate) async fn create_from_bytes(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    document: NewBytesDocument<'_>,
+    bytes: Vec<u8>,
+) -> Result<(DocumentOut, u64), ActionError> {
+    let NewBytesDocument {
+        action,
+        title,
+        content_type,
+        kind,
+        project_id,
+        parent_document_id,
+        category,
+        unit,
+        meta,
+    } = document;
+    let content_type = content_type.trim().to_ascii_lowercase();
+    if !ALLOWED_CONTENT_TYPES.contains(&content_type.as_str()) {
+        return Err(ActionError::new(
+            415,
+            "unsupported_media_type",
+            format!("{content_type:?} is not an accepted content type"),
+        ));
+    }
+    if bytes.len() > MAX_UPLOAD_BYTES {
+        return Err(ActionError::new(
+            413,
+            "payload_too_large",
+            format!(
+                "the document is {} bytes; the cap is {MAX_UPLOAD_BYTES}",
+                bytes.len()
+            ),
+        ));
+    }
+    if !bytes_match_type(&content_type, &bytes) {
+        return Err(ActionError::new(
+            415,
+            "unsupported_media_type",
+            format!("the bytes are not a valid {content_type} file"),
+        ));
+    }
+
+    let content_hash = hex(&Sha256::digest(&bytes));
+    let objects = Objects::from_env().ok_or_else(|| {
+        crate::documents::object_error(
+            crate::integrations::objects::ObjectError::Unavailable,
+            action,
+        )
+    })?;
+    let id = Uuid::now_v7();
+    let key = key_for(ctx.tenant.as_uuid(), id, &content_hash);
+    objects
+        .put(&key, bytes.clone().into())
+        .await
+        .map_err(|error| crate::documents::object_error(error, action))?;
+
+    let mut meta = meta.unwrap_or_else(|| json!({}));
+    if !meta.is_object() {
+        return Err(invalid("meta", "invalid_value", "must be an object"));
+    }
+    if let Value::Object(map) = &mut meta {
+        map.insert("content_type".to_owned(), json!(content_type));
+        map.insert("size_bytes".to_owned(), json!(bytes.len() as i64));
+        // The promoted columns are authoritative; the meta copy is for readers that predate 0042.
+        if let Some(category) = &category {
+            map.insert("category".to_owned(), json!(category));
+        }
+        if let Some(unit) = &unit {
+            map.insert("unit".to_owned(), json!(unit));
+        }
+    }
+
+    let created = store::document::create_document_tx(
+        &mut *tx,
+        ctx.tenant,
+        &NewDocument {
+            id,
+            project_id,
+            kind: kind.to_owned(),
+            title: title.to_owned(),
+            status: "active".to_owned(),
+            object_key: Some(key.clone()),
+            content_hash: Some(content_hash),
+            card_id: None,
+            parent_document_id,
+            body: None,
+            external_ref: None,
+            meta,
+            publishable: false,
+            category,
+            unit,
+            created_by: Some(ctx.actor_id),
+            updated_by: Some(ctx.actor_id),
+        },
+    )
+    .await
+    .map_err(|error| {
+        // The row did not land, so the object must not either. Nothing can be done about a failed delete
+        // here and the failure is already loud; the purge job is not involved because there is no row.
+        let objects = objects.clone();
+        tokio::spawn(async move {
+            if let Err(error) = objects.delete(&key).await {
+                tracing::error!(%error, "remove the object of a document whose row failed to insert");
+            }
+        });
+        document_error(error, action)
+    })?;
+    store::document::write_document_revision_tx(
+        &mut *tx,
+        ctx.tenant,
+        &created,
+        "created",
+        Some(ctx.actor_id),
+    )
+    .await
+    .map_err(|error| document_error(error, action))?;
+
+    let version = created.version.get();
+    emit_document_event(
+        &mut *tx,
+        ctx,
+        DOCUMENT_CREATED,
+        created.id,
+        json!({"id": created.id, "version": version}),
+    )
+    .await?;
+    Ok((
+        document_out_with_names(&mut *tx, created, action).await?,
+        version,
+    ))
+}
+
+/// The three actor ids of every row, deduplicated, in one `app_user` read.
+async fn names_for(
+    conn: &mut PgConnection,
+    records: &[store::document::DocumentRecord],
+    action: &'static str,
+) -> Result<HashMap<Uuid, String>, ActionError> {
+    let mut ids: Vec<Uuid> = records
+        .iter()
+        .flat_map(|record| [record.created_by, record.updated_by, record.published_by])
+        .flatten()
+        .collect();
+    ids.sort_unstable();
+    ids.dedup();
+    store::document::author_names_tx(conn, &ids)
+        .await
+        .map_err(|error| crate::control::store_error(error, action))
 }
 
 /// Upload one document.
@@ -168,70 +446,57 @@ async fn documents_create(
         ));
     }
 
-    let content_hash = hex(&Sha256::digest(&bytes));
-    let objects = Objects::from_env().ok_or_else(|| {
-        crate::documents::object_error(
-            crate::integrations::objects::ObjectError::Unavailable,
-            action,
-        )
-    })?;
-    let id = Uuid::now_v7();
-    let key = key_for(ctx.tenant.as_uuid(), id, &content_hash);
-    objects
-        .put(&key, bytes.clone().into())
-        .await
-        .map_err(|error| crate::documents::object_error(error, action))?;
-
-    let mut meta = input.meta.unwrap_or_else(|| json!({}));
-    if !meta.is_object() {
-        return Err(invalid("meta", "invalid_value", "must be an object"));
-    }
-    if let Value::Object(map) = &mut meta {
-        map.insert("content_type".to_owned(), json!(content_type));
-        map.insert("size_bytes".to_owned(), json!(bytes.len() as i64));
-    }
-
-    let created = store::document::create_document_tx(
-        &mut *tx,
-        ctx.tenant,
-        &NewDocument {
-            id,
-            project_id: input.project_id,
-            kind: "document".to_owned(),
-            title: title.to_owned(),
-            status: "active".to_owned(),
-            object_key: Some(key.clone()),
-            content_hash: Some(content_hash),
-            card_id: None,
-            body: None,
-            external_ref: None,
-            meta,
-            publishable: false,
-        },
-    )
-    .await
-    .map_err(|error| {
-        // The row did not land, so the object must not either. Nothing can be done about a failed delete
-        // here and the failure is already loud; the purge job is not involved because there is no row.
-        let objects = objects.clone();
-        tokio::spawn(async move {
-            if let Err(error) = objects.delete(&key).await {
-                tracing::error!(%error, "remove the object of a document whose row failed to insert");
+    // An attachment is a document row whose parent is an output. One aggregate: the object key,
+    // hash, ETag and purge path are already right for a file. The parent must be this tenant's,
+    // active, and not itself an attachment; a mismatched project is a caller error, not something
+    // to silently override.
+    let (kind, project_id, parent_document_id, category, unit) = match input.parent_document_id {
+        Some(parent_id) => {
+            let parent = store::document::get_document_tx(&mut *tx, ctx.tenant, parent_id)
+                .await
+                .map_err(|error| document_error(error, action))?
+                .ok_or_else(|| ActionError::resource_not_found("such parent output"))?;
+            if parent.kind == "attachment" || parent.status != "active" {
+                return Err(ActionError::resource_not_found("such parent output"));
             }
-        });
-        document_error(error, action)
-    })?;
-
-    emit_document_event(
+            if let Some(project) = input.project_id
+                && Some(project) != parent.project_id
+            {
+                return Err(invalid(
+                    "project_id",
+                    "invalid_value",
+                    "must match the parent output's project",
+                ));
+            }
+            ("attachment", parent.project_id, Some(parent_id), None, None)
+        }
+        None => (
+            "document",
+            input.project_id,
+            None,
+            store::document::normalize_slot(input.category.clone(), None),
+            store::document::normalize_slot(input.unit.clone(), None),
+        ),
+    };
+    let category = canonical_category_slot(category)?;
+    let (created, version) = create_from_bytes(
         &mut *tx,
         &ctx,
-        DOCUMENT_CREATED,
-        created.id,
-        json!({"id": created.id, "version": created.version.get()}),
+        NewBytesDocument {
+            action,
+            title,
+            content_type: &input.content_type,
+            kind,
+            project_id,
+            parent_document_id,
+            category,
+            unit,
+            meta: input.meta,
+        },
+        bytes,
     )
     .await?;
-    let etag = etag(created.version.get());
-    Ok(HandlerOutput::created(DocumentOut::from(created)).with_etag(etag))
+    Ok(HandlerOutput::created(created).with_etag(etag(version)))
 }
 
 // ── documents.compose ─────────────────────────────────────────────────────────────────────
@@ -249,7 +514,13 @@ pub struct DocumentComposeIn {
     pub card_id: Option<Uuid>,
     /// The Markdown body.
     pub body: String,
-    /// Whether the public snapshot may carry this output. Default false.
+    /// The output-standard slot (`project-brief`, `evidence`, …).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
+    /// The programme unit (a project key or an issue number).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unit: Option<String>,
+    /// Whether the public snapshot may carry this output. Default false; only an admin may set it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub publishable: Option<bool>,
     /// Free metadata, merged beside the server-owned content facts.
@@ -295,6 +566,23 @@ async fn documents_compose(
             ),
         ));
     }
+    // Existence is not publication, and publication is an admin decision. A member composes a
+    // draft and asks; the publish action is the only way into the public window.
+    if input.publishable == Some(true) && !can_publish(&ctx) {
+        return Err(ActionError::new(
+            403,
+            "publish_forbidden",
+            "only an admin may publish an output; save it as a draft and request publish",
+        ));
+    }
+    let category = store::document::normalize_slot(input.category.clone(), None);
+    let category = canonical_category_slot(category)?;
+    // The CLI's bulk path can create an output already public. Publication is one gate whichever
+    // action sets the bit, so the template check covers compose as well as `documents.publish`.
+    if input.publishable == Some(true) {
+        super::require_complete(category.as_deref(), Some(input.body.as_str()))?;
+    }
+    let unit = store::document::normalize_slot(input.unit.clone(), None);
     let project_id = match (input.project_id, input.card_id) {
         (Some(project), Some(card)) => {
             let card_project = store::document::card_project_tx(&mut *tx, ctx.tenant, card)
@@ -324,6 +612,12 @@ async fn documents_compose(
     meta["content_type"] = json!("text/markdown");
     meta["size_bytes"] = json!(input.body.len() as i64);
     meta["sha256"] = json!(content_hash);
+    if let Some(category) = &category {
+        meta["category"] = json!(category);
+    }
+    if let Some(unit) = &unit {
+        meta["unit"] = json!(unit);
+    }
     let created = store::document::create_document_tx(
         &mut *tx,
         ctx.tenant,
@@ -331,6 +625,7 @@ async fn documents_compose(
             id: Uuid::now_v7(),
             project_id,
             card_id: input.card_id,
+            parent_document_id: None,
             kind: "document".to_owned(),
             title: title.to_owned(),
             status: "active".to_owned(),
@@ -340,7 +635,20 @@ async fn documents_compose(
             external_ref: None,
             meta,
             publishable: input.publishable.unwrap_or(false),
+            category,
+            unit,
+            created_by: Some(ctx.actor_id),
+            updated_by: Some(ctx.actor_id),
         },
+    )
+    .await
+    .map_err(|error| document_error(error, action))?;
+    store::document::write_document_revision_tx(
+        &mut *tx,
+        ctx.tenant,
+        &created,
+        "created",
+        Some(ctx.actor_id),
     )
     .await
     .map_err(|error| document_error(error, action))?;
@@ -353,7 +661,10 @@ async fn documents_compose(
     )
     .await?;
     let etag = etag(created.version.get());
-    Ok(HandlerOutput::created(DocumentOut::from(created)).with_etag(etag))
+    Ok(
+        HandlerOutput::created(document_out_with_names(&mut *tx, created, action).await?)
+            .with_etag(etag),
+    )
 }
 
 // ── documents.get ─────────────────────────────────────────────────────────────────────────
@@ -387,7 +698,10 @@ async fn documents_get(
         .map_err(|error| document_error(error, "documents.get"))?
         .ok_or_else(|| ActionError::resource_not_found("such document"))?;
     let etag = etag(record.version.get());
-    Ok(HandlerOutput::ok(DocumentOut::from(record)).with_etag(etag))
+    Ok(
+        HandlerOutput::ok(document_out_with_names(&mut *tx, record, "documents.get").await?)
+            .with_etag(etag),
+    )
 }
 
 // ── documents.list ────────────────────────────────────────────────────────────────────────
@@ -401,12 +715,24 @@ pub struct DocumentListIn {
     /// Only this card's documents.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub card_id: Option<Uuid>,
+    /// Only this output's attachments.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_document_id: Option<Uuid>,
     /// Only this kind (`document | report | export`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kind: Option<String>,
     /// Only publishable rows, or only unpublishable ones.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub publishable: Option<bool>,
+    /// Only this output-standard slot.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
+    /// Only this programme unit.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unit: Option<String>,
+    /// Only rows with (true) or without (false) a pending publish request.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publish_requested: Option<bool>,
     /// The cursor and page size.
     #[serde(flatten)]
     pub page: PageIn,
@@ -430,12 +756,12 @@ async fn documents_list(
     input: DocumentListIn,
 ) -> Result<HandlerOutput<Page<DocumentOut>>, ActionError> {
     if let Some(kind) = input.kind.as_deref()
-        && !matches!(kind, "document" | "report" | "export")
+        && !matches!(kind, "document" | "report" | "export" | "attachment")
     {
         return Err(invalid(
             "kind",
             "invalid_value",
-            "must be document, report or export",
+            "must be document, report, export or attachment",
         ));
     }
     let page = DocumentPage {
@@ -445,15 +771,29 @@ async fn documents_list(
     let filter = DocumentFilter {
         project_id: input.project_id,
         card_id: input.card_id,
+        parent_document_id: input.parent_document_id,
         kind: input.kind,
         publishable: input.publishable,
+        category: input
+            .category
+            .as_deref()
+            .map(str::trim)
+            .filter(|value| !value.is_empty())
+            .map(str::to_owned),
+        unit: input
+            .unit
+            .as_deref()
+            .map(str::trim)
+            .filter(|value| !value.is_empty())
+            .map(str::to_owned),
+        publish_requested: input.publish_requested,
     };
     let (rows, next_cursor) =
         store::document::list_documents_tx(&mut *tx, ctx.tenant, &filter, &page)
             .await
             .map_err(|error| document_error(error, "documents.list"))?;
     Ok(HandlerOutput::ok(Page {
-        items: rows.into_iter().map(DocumentOut::from).collect(),
+        items: documents_out_with_names(&mut *tx, rows, "documents.list").await?,
         next_cursor,
     }))
 }
@@ -547,9 +887,15 @@ pub struct DocumentUpdateIn {
     /// The owning card, when the caller attaches the output.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub card_id: Option<Uuid>,
-    /// Whether the public snapshot may carry this row.
+    /// Whether the public snapshot may carry this row. Only an admin may change it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub publishable: Option<bool>,
+    /// The output-standard slot; an empty string clears it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
+    /// The programme unit; an empty string clears it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unit: Option<String>,
 }
 
 /// Update a document's title and/or metadata.
@@ -577,8 +923,40 @@ async fn documents_update(
     let expected = crate::control::require_precondition_with(
         &ctx,
         action,
-        serde_json::to_value(DocumentOut::from(current.clone())).unwrap_or(Value::Null),
+        serde_json::to_value(DocumentOut::from_record(current.clone(), &HashMap::new()))
+            .unwrap_or(Value::Null),
     )?;
+    // §7.1/§7.4: a generated draft is applied only through `ladder.apply_draft`, whose gate is
+    // an accepted L1/L3 decision. The ordinary edit path cannot attach one to a card, so the
+    // ladder's decision record cannot be bypassed by an update.
+    if input
+        .card_id
+        .is_some_and(|card| Some(card) != current.card_id)
+        && current.meta.get("generated").and_then(Value::as_bool) == Some(true)
+    {
+        return Err(ActionError::new(
+            409,
+            "draft_requires_gate",
+            "a generated draft is applied through ladder.apply_draft with an accepted decision",
+        ));
+    }
+    // Publication is an admin decision, in both directions. A published row is also locked to the
+    // admin: an author's edit to public content would change what a reviewer already approved
+    // without a new publish decision, so the author asks for an unpublish instead.
+    if input.publishable.is_some() && !can_publish(&ctx) {
+        return Err(ActionError::new(
+            403,
+            "publish_forbidden",
+            "only an admin may publish or unpublish an output",
+        ));
+    }
+    if current.publishable && !can_publish(&ctx) {
+        return Err(ActionError::new(
+            409,
+            "published_locked",
+            "a published output can only be edited by an admin; ask an admin to unpublish it first",
+        ));
+    }
     if let Some(title) = input.title.as_deref()
         && title.trim().is_empty()
     {
@@ -630,17 +1008,40 @@ async fn documents_update(
     if input.card_id.is_some() {
         changed.push("card_id");
     }
+    if input.category.is_some() {
+        changed.push("category");
+    }
+    if input.unit.is_some() {
+        changed.push("unit");
+    }
     if changed.is_empty() {
         return Err(invalid(
             "title",
             "invalid_value",
-            "nothing to update: supply title, meta, body, card_id or publishable",
+            "nothing to update: supply title, meta, body, card_id, category, unit or publishable",
         ));
     }
     let body = input.body;
     let content_hash = body
         .as_deref()
         .map(|body| hex(&Sha256::digest(body.as_bytes())));
+    // The promoted slots: `None` leaves the stored value, an empty string clears it. The final
+    // values are mirrored into `meta` so a reader that predates 0042 still sees them.
+    let mut category_final =
+        store::document::normalize_slot(input.category.clone(), current.category.clone());
+    if input.category.is_some() {
+        category_final = canonical_category_slot(category_final)?;
+    }
+    // The transition to public is the gate; an edit to a row already public is never re-checked,
+    // and an unpublish never is. The body being judged is the one the row will carry after this
+    // update, so a body and a publish bit in the same call are checked together.
+    if input.publishable == Some(true) && !current.publishable {
+        super::require_complete(
+            category_final.as_deref(),
+            body.as_deref().or(current.body.as_deref()),
+        )?;
+    }
+    let unit_final = store::document::normalize_slot(input.unit.clone(), current.unit.clone());
     let meta = {
         // Metadata is merged, never replaced: `content_type` and `size_bytes` are the row's own
         // facts and a caller that only wanted to rename a document must not silently drop them.
@@ -664,7 +1065,25 @@ async fn documents_update(
             merged["size_bytes"] = json!(body.len() as i64);
             merged["sha256"] = json!(content_hash.clone().unwrap_or_default());
         }
-        if meta_changed || body.is_some() {
+        if let Value::Object(map) = &mut merged {
+            match &category_final {
+                Some(value) => {
+                    map.insert("category".to_owned(), json!(value));
+                }
+                None => {
+                    map.remove("category");
+                }
+            }
+            match &unit_final {
+                Some(value) => {
+                    map.insert("unit".to_owned(), json!(value));
+                }
+                None => {
+                    map.remove("unit");
+                }
+            }
+        }
+        if meta_changed || body.is_some() || input.category.is_some() || input.unit.is_some() {
             Some(merged)
         } else {
             None
@@ -677,11 +1096,21 @@ async fn documents_update(
         content_hash,
         card_id: input.card_id,
         publishable: input.publishable,
+        category: input.category.map(|value| value.trim().to_owned()),
+        unit: input.unit.map(|value| value.trim().to_owned()),
+        updated_by: Some(ctx.actor_id),
     };
-    let updated =
-        store::document::update_document_tx(&mut *tx, ctx.tenant, input.id, expected, &patch)
-            .await
-            .map_err(|error| document_error(error, action))?;
+    let updated = store::document::update_document_revisioned_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        expected,
+        &patch,
+        "updated",
+        Some(ctx.actor_id),
+    )
+    .await
+    .map_err(|error| document_error(error, action))?;
     emit_document_event(
         &mut *tx,
         &ctx,
@@ -691,7 +1120,10 @@ async fn documents_update(
     )
     .await?;
     let etag = etag(updated.version.get());
-    Ok(HandlerOutput::ok(DocumentOut::from(updated)).with_etag(etag))
+    Ok(
+        HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
+            .with_etag(etag),
+    )
 }
 
 // ── documents.delete ──────────────────────────────────────────────────────────────────────
@@ -721,7 +1153,8 @@ async fn documents_delete(
     let expected = crate::control::require_precondition_with(
         &ctx,
         action,
-        serde_json::to_value(DocumentOut::from(current)).unwrap_or(Value::Null),
+        serde_json::to_value(DocumentOut::from_record(current, &HashMap::new()))
+            .unwrap_or(Value::Null),
     )?;
     let deleted = store::document::set_status_tx(
         &mut *tx,
@@ -730,6 +1163,15 @@ async fn documents_delete(
         Some(expected),
         "deleted",
         None,
+    )
+    .await
+    .map_err(|error| document_error(error, action))?;
+    store::document::write_document_revision_tx(
+        &mut *tx,
+        ctx.tenant,
+        &deleted,
+        "deleted",
+        Some(ctx.actor_id),
     )
     .await
     .map_err(|error| document_error(error, action))?;
@@ -762,7 +1204,7 @@ async fn documents_delete(
 
 // ── helpers ──────────────────────────────────────────────────────────────────────────────
 
-fn etag(version: u64) -> String {
+pub(super) fn etag(version: u64) -> String {
     i64::try_from(version)
         .map(crate::control::etag_of)
         .unwrap_or_else(|_| crate::control::etag_of(1))
@@ -795,6 +1237,16 @@ fn bytes_match_type(content_type: &str, bytes: &[u8]) -> bool {
             std::str::from_utf8(bytes).is_ok() && serde_json::from_slice::<Value>(bytes).is_ok()
         }
         "text/csv" | "text/markdown" | "text/plain" => std::str::from_utf8(bytes).is_ok(),
+        // ISO-BMFF: bytes 4..8 are the `ftyp` box type. `video/mp4`, `audio/mp4` and `audio/m4b`
+        // all share it, so the declared type is the caller's claim and the container is the proof.
+        "video/mp4" => bytes.len() >= 12 && &bytes[4..8] == b"ftyp",
+        // RIFF container with a `WAVE` form type.
+        "audio/wav" => bytes.len() >= 12 && &bytes[0..4] == b"RIFF" && &bytes[8..12] == b"WAVE",
+        // MPEG audio: an ID3v2 tag, or a bare frame sync (11 set bits).
+        "audio/mpeg" => {
+            bytes.starts_with(b"ID3")
+                || matches!(bytes.first(), Some(0xff) if bytes.get(1).is_some_and(|b| b & 0xe0 == 0xe0))
+        }
         _ => false,
     }
 }
@@ -957,10 +1409,15 @@ async fn documents_report(
             object_key: None,
             content_hash: None,
             card_id: None,
+            parent_document_id: None,
             body: None,
             external_ref: None,
             meta: json!({"window_days": window_days, "params": {"project_id": input.project_id}}),
             publishable: false,
+            category: None,
+            unit: None,
+            created_by: Some(ctx.actor_id),
+            updated_by: Some(ctx.actor_id),
         },
     )
     .await
@@ -975,7 +1432,7 @@ async fn documents_report(
     .await?;
     let etag = etag(created.version.get());
     Ok(HandlerOutput::created(DocumentReportOut {
-        document: DocumentOut::from(created),
+        document: document_out_with_names(&mut *tx, created, "documents.report").await?,
         numbers,
     })
     .with_etag(etag))

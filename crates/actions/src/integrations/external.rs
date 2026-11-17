@@ -45,6 +45,61 @@ fn passthrough_output() -> Schema {
     })
 }
 
+/// The body `coding_jobs.create` sends to the coding service.
+///
+/// The engine passes an external action's input through **verbatim**, so this is the coding
+/// service's own create document, not a conveyor model. It exists so the OpenAPI operation and the
+/// MCP tool name the fields a flow or an agent must send; the service validates them again.
+#[derive(schemars::JsonSchema)]
+#[allow(dead_code)]
+struct CodingJobCreateIn {
+    /// The job kind: `test`, `lint`, `build`, `check`, `scan`, … (the coding service's JobKind).
+    kind: String,
+    /// Where the code comes from: inline files, a git ref, or an uploaded archive.
+    input: serde_json::Value,
+    /// Run against an existing workspace instead of naming one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    workspace_id: Option<String>,
+    /// A one-shot workspace named by its repository.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    workspace: Option<CodingWorkspaceIn>,
+    /// Caller-supplied dedupe key, unique per tenant; a replay returns the original job.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    idempotency_key: Option<String>,
+    /// How long the job may run inside its Pod, in seconds (1..=86400; the service defaults to 900).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    timeout_seconds: Option<u32>,
+}
+
+/// The one-shot workspace inside a coding create body.
+#[derive(schemars::JsonSchema)]
+#[allow(dead_code)]
+struct CodingWorkspaceIn {
+    repo_url: String,
+    /// The ref to check out; the coding service defaults it to `main`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    git_ref: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    toolchain: Option<String>,
+}
+
+/// The body `coding_jobs.get` sends: the job id, carried in the body because the engine has no
+/// path templating and a GET carries no body.
+#[derive(schemars::JsonSchema)]
+#[allow(dead_code)]
+struct CodingJobGetIn {
+    /// The job id returned by `coding_jobs.create`.
+    id: String,
+}
+
+fn coding_job_create_input() -> Schema {
+    schemars::schema_for!(CodingJobCreateIn)
+}
+
+fn coding_job_get_input() -> Schema {
+    schemars::schema_for!(CodingJobGetIn)
+}
+
 /// One external target: where the call goes and what it is allowed to do.
 ///
 /// Bundled into a struct rather than passed as eight positional arguments — `name, service, method, path` reads
@@ -90,12 +145,14 @@ const fn spec(target: Target) -> ActionSpec {
         },
         task_capable: false,
         captures_usage: false,
+        artefact: None,
         handler: HandlerRef::External {
             service,
             method,
             path,
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }
@@ -177,7 +234,7 @@ inventory::submit! { ActionRegistration::new(billing_summary) }
 
 /// `coding_jobs.create` — dispatch a coding task; the run keeps the returned ref (§5.3).
 fn coding_jobs_create() -> ActionSpec {
-    spec(Target {
+    let mut action = spec(Target {
         name: "coding_jobs.create",
         service: "coding",
         method: "POST",
@@ -186,7 +243,12 @@ fn coding_jobs_create() -> ActionSpec {
         timeout_ms: 30_000,
         effect: Effect::Write,
         idempotent: false,
-    })
+    });
+    // The only two externals that are a *job submission* rather than a display: their bodies are
+    // the coding service's own documents, so the manifest names the fields instead of saying
+    // nothing.
+    action.input = coding_job_create_input;
+    action
 }
 inventory::submit! { ActionRegistration::new(coding_jobs_create) }
 
@@ -194,7 +256,7 @@ inventory::submit! { ActionRegistration::new(coding_jobs_create) }
 ///
 /// A POST, not a GET, because the engine has no path templating and a GET carries no body.
 fn coding_jobs_get() -> ActionSpec {
-    spec(Target {
+    let mut action = spec(Target {
         name: "coding_jobs.get",
         service: "coding",
         method: "POST",
@@ -203,7 +265,9 @@ fn coding_jobs_get() -> ActionSpec {
         timeout_ms: 5_000,
         effect: Effect::Read,
         idempotent: true,
-    })
+    });
+    action.input = coding_job_get_input;
+    action
 }
 inventory::submit! { ActionRegistration::new(coding_jobs_get) }
 

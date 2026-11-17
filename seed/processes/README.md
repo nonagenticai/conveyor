@@ -16,6 +16,13 @@ conveyor migrate --process-catalogue --tenant <slug>
 It never rides `migrate --seed`, and `projects.create` never requires it: with no published start
 process the project, board and start card are still created, and no run is started.
 
+The install runs `seed_catalogue` for the tenant first, and that also installs the **built-in
+prompt catalogue** (`agent@1`, `copilot_system@1`, `prompt_audit@1`, D27). That is not a
+convenience: every agent above pins `prompt: agent`, and `process_runs.start` refuses a capability
+whose prompt pin is not an active prompt (`409 capability_not_ready`), so a catalogue installed
+without it has zero runnable processes. Measured on the live tenant 2026-11-15 — 123 agents, 333
+published processes, 0 prompt rows, every start refused.
+
 The files are *content*: the loader imports them into `process`, `process_step`, `procedure` (SOP)
 and `capability_agent`; nothing here is compiled into behaviour, and the database is the only
 runtime source of truth. A tenant's later edits through `processes.*` are never overwritten (the
@@ -78,7 +85,10 @@ agent:                                  # ONE capability_agent for the type
   prompt: agent                         # the compiled prompt recipe (0030's `agent`)
   model: claude-sonnet-5-5              # model registry ref
   max_iterations: 12
-  timeout_secs: 120
+  timeout_secs: 300                    # the agent loop's bound (the DB allows 1..=300); the
+                                       # inference.chat action bound must not be shorter
+  allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]
+                                       # the tool surface the model may call; empty = text only
 
 sops:
   - key: development_bug_fix.ready      # SOP key; every step of the process references one

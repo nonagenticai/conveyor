@@ -48,13 +48,14 @@
 <p>Every unit issue is a durable brief: a session that has never seen the plan must be able to decide from the issue alone whether it is ready to claim, what "done" means, and what it waits on. The shape is <code>.github/ISSUE_TEMPLATE/unit.md</code>; the rules are:</p>
 <ul>
 <li><strong>Baseline.</strong> State <code>main@&lt;sha&gt;</code> — with the date measured and the blob shas of the cited plan and audit files. The #9 train merged on 2026-11-11; a <code>#9@&lt;sha&gt;</code> reference in an older issue is historical and its parts are re-checked on merged main. A claim without a baseline is not ready.</li>
+<li><strong>Programme context.</strong> Every unit created on or after 2026-11-18 carries a <code>## Programme</code> section: the <code>Tranche</code> it is authorised under, the <code>Brief</code> that governs it, the <code>ADM phase/plateau</code> where it changes the architecture, and the <code>Benefits</code> its output is mapped to. A field names a live row/document or the issue that creates it (<code>pending #N</code>). The rule is <strong>forward-only</strong>: an issue created before the change gains the section at its next claim, in the same edit as the <code>## Claim</code> block, and an existing body is never made unready retroactively. Because the buildout is delivered under MSP and TOGAF, not merely documented by them, the end-of-tranche review reads these fields from the issue ledger.</li>
 <li><strong>References.</strong> Every spec/plan/audit/code/test reference is a path that resolves at the ref it names, or an issue number that resolves. Cite <code>path:symbol</code>; line numbers only when re-verified at the baseline. A path the issue must create is marked <code>to create</code>.</li>
 <li><strong>Parts.</strong> One part per plan Deliverable/Build-order item or audit <code>W</code>/<code>V</code> id. Each part states its measured state — <strong>DONE / PARTIAL / ABSENT / CARRIED-BY-#9</strong> — with evidence, and carries at least one BDD scenario.</li>
 <li><strong>BDD acceptance.</strong> <code>Given &lt;state&gt;, when &lt;action&gt;, then &lt;observable outcome&gt;</code> with a mandatory <code>Verify:</code> line: an exact command or <code>path::test</code>. A scenario without a verification is not acceptance; "works correctly" is not a criterion. A deployment-gated scenario says so and names its gate.</li>
 <li><strong>Dependencies — four relations, never one.</strong> <code>blocked-by</code> (cannot start), <code>acceptance-blocked-by</code> (build now, the live scenario waits), <code>blocks</code>, <code>related</code>. Each edge cites its source (plan <code>depends_on</code>, the <code>00-INDEX.md</code> row, a quoted plan precondition, the audit's order). Blockers are <strong>issues</strong>, never PRs; deployment is #18. Only a <code>blocked-by</code> sets <code>status:blocked</code>; an <code>acceptance-blocked-by</code> never freezes construction.</li>
 <li><strong>No duplication.</strong> At most one paraphrased sentence per part, then the link. The issue is a brief, not a copy of the plan.</li>
 </ul>
-<p><strong>Definition of ready</strong> — the claim gate: baseline and doc blob shas named · every reference resolves · every part has a scenario with a <code>Verify:</code> · dependencies complete, typed and cited · <code>Blocker: #N</code> present iff <code>status:blocked</code> · one-PR scope, file-disjoint or sequenced · scope corrections applied.</p>
+<p><strong>Definition of ready</strong> — the claim gate: baseline and doc blob shas named · every reference resolves · every part has a scenario with a <code>Verify:</code> · dependencies complete, typed and cited · <code>Blocker: #N</code> present iff <code>status:blocked</code> · programme fields present and resolvable (issues created on/after 2026-11-18) · one-PR scope, file-disjoint or sequenced · scope corrections applied.</p>
 <p><strong>Definition of done</strong> — the merge gate: every scenario passes at the PR head with a row in <code>Evidence at completion</code> · the repo gate is green at the exact head · tests added/updated per part, none skipped · docs updated · migrations/ledger and <code>--check-lock</code> handled when touched · live verification recorded where deployment is a prerequisite · every CARRIED-BY-#9 part re-checked on merged main · one PR <code>Closes #N</code> MERGED, issue closed, branch deleted.</p>
 <p>A <code>status:blocked</code> issue carries a plain line starting <code>Blocker: #N</code>; a <code>Blocker:</code> mention inside prose or a checklist is not a blocker line. The number is an issue, never a PR.</p>
 <h2 id="labels-and-states">Labels and states</h2>
@@ -75,12 +76,12 @@
 <tr>
 <td>claimed</td>
 <td><code>status:claimed</code></td>
-<td>branch pushed + claim comment; work in progress, no PR yet</td>
+<td>branch pushed + claim comment; work in progress — with or without an open PR</td>
 </tr>
 <tr>
 <td>in review</td>
 <td>(native)</td>
-<td>one non-draft PR open with <code>Closes #n</code></td>
+<td>one non-draft PR open with <code>Closes #n</code>; the claim label stays on the issue until it merges</td>
 </tr>
 <tr>
 <td>blocked</td>
@@ -101,6 +102,12 @@
 </table>
 <p>Every deliverable also carries <code>unit</code> and its slice label (<code>S02</code> … <code>S21</code>; two labels when it spans plans).</p>
 <p>⚠️ <strong>Assignment is not available with this repo's GitHub App token</strong> — <code>gh issue edit --add-assignee</code> fails with <em>"Assigning agents is not supported with GitHub App installation tokens"</em>. Do not depend on the assignee field. The claim is: <code>status:claimed</code> + the pushed branch + a claim comment naming the branch and HEAD. The branch is the lock; the label and comment are the readable signal.</p>
+<p>⭐ <strong>The labels are checked, hourly, by <code>scripts/ci/board.py</code></strong> (<code>.github/workflows/board.yml</code>). The label is written by hand after the branch is pushed, so it is the step that gets skipped — measured 2026-11-15, four issues carried <code>status:ready</code> while their work was live (#137/#140, then #149/#151 created ready and claimed without the label moving), and two stayed <code>status:blocked</code> on a blocker that had closed. <code>reap-stale-claims.sh</code> cannot see any of it: a claim is a <em>remote branch</em>.</p>
+<ul>
+<li><strong>Automatic, one direction only.</strong> An issue carrying <code>status:ready</code> while a branch <code>issue/&lt;n&gt;-*</code> or an open PR names it is relabelled <code>status:claimed</code>, with one comment naming the evidence. The check never moves an issue back to <code>ready</code>: a check that could return a live claim to the pool is worse than the drift it repairs.</li>
+<li><strong>Reported, never applied.</strong> <code>status:blocked</code> with no line <em>starting</em> <code>Blocker: #N</code> naming an open issue, and <code>status:claimed</code> with no branch, no PR and no update in 48 h. Releasing a claim is a human decision — the same reason the reaper defaults to report mode.</li>
+<li><strong>By hand:</strong> <code>python3 scripts/ci/board.py --repo &lt;owner/name&gt; --dry-run</code> (exit 1 when a fix is pending). The fixtures run in the <code>checks</code> job; the job summary is the record.</li>
+</ul>
 <h2 id="claim--four-checks-then-push">Claim — four checks, then push</h2>
 <p>From any checkout, before creating a branch:</p>
 <pre class="bash"><code>gh issue view N --json state,labels,comments,closedByPullRequestsReferences
@@ -234,7 +241,10 @@ git log upstream/main --grep &quot;#N&quot; --oneline</code></pre>
 <li>One CI run should follow. Red → fix locally and push the same branch (a second run is legitimate). Red twice → <code>status:blocked</code> + handoff; stop pushing.</li>
 <li>Before blaming the PR, check <code>main</code>: if main is red on the same job, this issue is the messenger, not the cause. Record it; do not "fix" someone else's red.</li>
 <li><strong>Definition-of-done gate before merge</strong> (above): every scenario in the issue has an evidence row at the PR head, the gate passed at that exact sha, the named tests ran, and every CARRIED-BY-#9 part was re-checked on merged main. A green check is not the DoD.</li>
-<li>Merge when green (or hand to the train owner only for an owner-declared train). Verify the PR state is <code>MERGED</code> before deleting anything. Delete the branch with <code>git push origin --delete</code> / the API — <strong>never blind <code>gh pr merge --delete-branch</code></strong>, which can close the PR when the base moved.</li>
+<li><strong>Merge = enqueue.</strong> main carries a <code>merge_queue</code> ruleset, so a green PR merges through the queue: <code>gh pr merge &lt;n&gt; --auto</code> (no <code>--squash</code>, no <code>--delete-branch</code>) enqueues it, and the queue squashes on the latest base. <code>--delete-branch</code> is rejected outright on a queue repo; deleting the branch is a separate step after the merge.</li>
+<li>Confirm with state, never with an exit code: <code>gh pr merge</code> exits 0 when it merely enqueued. Read <code>state == MERGED</code> (or GraphQL <code>pullRequest.isInMergeQueue</code> while it waits) before you report the PR as merged or delete anything.</li>
+<li>Delete the branch after the merge with <code>git push origin --delete &lt;branch&gt;</code> (the queue does not delete it for you).</li>
+<li><strong>A review request means a human decision is pending.</strong> Assignee = whoever must act; add a reviewer only when a decision is actually pending, and mark the PR <code>status:needs-human</code>. <code>delivery.yml</code> clears every other request on our PRs, so a request without that label is a notification nobody is going to act on.</li>
 <li>The issue closes via <code>Closes #N</code>. If it did not, close it with the evidence.</li>
 </ul>
 <h2 id="ci-budget-and-wip-cap">CI budget and WIP cap</h2>

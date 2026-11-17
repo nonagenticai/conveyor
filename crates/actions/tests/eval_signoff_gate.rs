@@ -62,7 +62,7 @@ async fn sign_off(running: &support::Running, eval_id: &str, gate: &str) -> Stri
     let (status, body) = running
         .invoke(
             "eval_signoffs.request",
-            TOKEN,
+            support::REVIEWER,
             json!({ "eval_id": eval_id, "gate": gate, "ask": "review the instrument" }),
             None,
             None,
@@ -241,7 +241,7 @@ async fn both_signoffs_a_metric_and_a_locked_split_are_what_makes_an_eval_ready(
     let (status, body) = running
         .invoke(
             "eval_signoffs.request",
-            TOKEN,
+            support::REVIEWER,
             json!({ "eval_id": eval_id, "gate": "eval_inputs", "ask": "a second look" }),
             None,
             None,

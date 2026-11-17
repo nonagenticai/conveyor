@@ -99,6 +99,13 @@ struct Ctx {
     org_job_id: Uuid,
     org_release_id: Uuid,
     org_binding_id: Uuid,
+    /// T3's PM anchor: an active `job_catalogue(job_key = 'pm')` job, its published release and a
+    /// `procedure` binding to the fixture process, seeded once before the loop. Every `pm.*` and
+    /// `changes.*` sample names [`Ctx::pm_binding_id`], because the actions refuse unless it
+    /// resolves to an active PM job; a mutating sample prepares its own projects per round.
+    pm_job_id: Uuid,
+    pm_release_id: Uuid,
+    pm_binding_id: Uuid,
     job: Mutex<Option<Uuid>>,
     /// The ids a `prepare` step wrote for this round, one queue per sample, popped once per
     /// round. They can never be static literals: every prepared row is created fresh.
@@ -738,7 +745,7 @@ async fn seed_gate(pg: &support::Pg, ctx: &Ctx) -> Uuid {
             "gate",
             1,
             None,
-            Some(ctx.alice_user),
+            Some(ctx.bob_user),
         )
         .await
         .expect("prepared gate")
@@ -1171,7 +1178,8 @@ async fn seed_eval_ready(pg: &support::Pg, ctx: &Ctx) -> Uuid {
                 conn,
                 ctx.tenant,
                 approval,
-                &conveyor_domain::Decision::approve(ctx.alice_user),
+                // The gate was requested by alice (§5.4 refuses a requester deciding it).
+                &conveyor_domain::Decision::approve(ctx.bob_user),
                 true,
             )
             .await
@@ -1540,9 +1548,422 @@ async fn seed_removable_member(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     id
 }
 
+/// A fresh project for a spine sample (unique key; the tenant's RLS applies to the owner).
+async fn seed_parity_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, $2, 'Parity spine project')
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(format!("PAR-{}", Uuid::now_v7().simple()))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert project");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_programme(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid =
+        sqlx::query_scalar("INSERT INTO programme (tenant_id, name) VALUES ($1, $2) RETURNING id")
+            .bind(ctx.tenant_id)
+            .bind(format!("Parity programme {}", Uuid::now_v7().simple()))
+            .fetch_one(&mut *tx)
+            .await
+            .expect("insert programme");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_wbs(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO wbs_node (tenant_id, project_id, kind, title)
+         VALUES ($1, $2, 'deliverable', 'Parity deliverable') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert WBS node");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_baseline(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_baseline (tenant_id, project_id, kind, snapshot, taken_by)
+         VALUES ($1, $2, 'scope', '{}'::jsonb, $3) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .bind(ctx.alice_user)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert baseline");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_register(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_register_item (tenant_id, project_id, kind, title)
+         VALUES ($1, $2, 'risk', 'Parity risk') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert register item");
+    tx.commit().await.expect("commit");
+    id
+}
+
+/// Approve a project gate through the engine's ONE decision writer.
+///
+/// `pm.plan` refuses without an approved `charter` gate and `pm.close` without an approved
+/// `closure` gate. The gate is requested by alice and decided by bob because
+/// `record_decision_tx` refuses the requester's own decision (SPEC_V2 §5.4, T1/#72) — a status
+/// UPDATE would seed a state neither principal could have produced, and would stop proving the
+/// action's precondition.
+async fn seed_pm_approved_gate(pg: &support::Pg, ctx: &Ctx, project: Uuid, gate: &str) {
+    let approval = scoped(pg, ctx, async move |conn| {
+        store::approval::insert_approval_tx(
+            conn,
+            ctx.tenant,
+            &store::approval::NewApproval {
+                project_id: Some(project),
+                gate: gate.to_owned(),
+                kind: "pm".to_owned(),
+                required_decisions: 1,
+                requested_by: Some(ctx.alice_user),
+                meta: json!({ "description": format!("Approve the {gate} gate") }),
+                ..store::approval::NewApproval::new(gate, "pm")
+            },
+        )
+        .await
+        .expect("prepared PM gate")
+        .id
+    })
+    .await;
+    scoped(pg, ctx, async move |conn| {
+        store::approval::record_decision_tx(
+            conn,
+            ctx.tenant,
+            approval,
+            &conveyor_domain::Decision::approve(ctx.bob_user),
+            false,
+        )
+        .await
+        .expect("prepared PM gate decision");
+    })
+    .await;
+}
+
+/// An approved baseline on `project`: `changes.request` resolves the baseline it would replace as
+/// typed evidence, and only an `approved_by`-stamped row qualifies.
+async fn seed_pm_approved_baseline(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let baseline = seed_parity_baseline(pg, ctx, project).await;
+    scoped(pg, ctx, async move |conn| {
+        let approved = store::spine::approve_baseline_tx(conn, ctx.tenant, baseline, ctx.bob_user)
+            .await
+            .expect("approve the prepared baseline");
+        assert!(
+            approved.is_some(),
+            "the prepared baseline must still be unapproved when it is approved"
+        );
+    })
+    .await;
+    baseline
+}
+
+async fn seed_parity_edge(pg: &support::Pg, ctx: &Ctx, from: Uuid, to: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_dependency (tenant_id, from_project, to_project, kind)
+         VALUES ($1, $2, $3, 'blocks') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(from)
+    .bind(to)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert dependency");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_tranche(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number)
+         VALUES ($1, $2, 0) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert tranche");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_benefit(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO benefit_profile (tenant_id, programme_id, reference)
+         VALUES ($1, $2, 'BEN-PARITY') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert benefit");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_profile(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO stakeholder_profile (tenant_id, programme_id, name)
+         VALUES ($1, $2, 'Parity stakeholder') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert stakeholder profile");
+    tx.commit().await.expect("commit");
+    id
+}
+
+/// Seed a decision policy for one (kind, gate) case the T2 samples evaluate and refine.
+///
+/// The kind embeds the row id, so a sample's input can derive the case from the prepared id and
+/// each prepare (and therefore each round) seeds its own case.
+async fn seed_parity_policy(pg: &support::Pg, ctx: &Ctx, kind_prefix: &str, gate: &str) -> Uuid {
+    let id = Uuid::now_v7();
+    let kind = format!("{kind_prefix}.{id}");
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let inserted: Uuid = sqlx::query_scalar(
+        "INSERT INTO decision_policy (id, tenant_id, kind, gate, threshold, fail_policy, action)
+         VALUES ($1, $2, $3, $4, 0.8, 'closed', 'block') RETURNING id",
+    )
+    .bind(id)
+    .bind(ctx.tenant_id)
+    .bind(&kind)
+    .bind(gate)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert decision policy");
+    tx.commit().await.expect("commit");
+    inserted
+}
+
+/// Seed the laya config the L1 sample pins.
+async fn seed_parity_laya(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO laya_inference_config (tenant_id, model_ref)
+         VALUES ($1, 'jev-latest') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert laya config");
+    tx.commit().await.expect("commit");
+    id
+}
+
+/// Seed an accepted L1 decision for the draft-application sample.
+async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome)
+         VALUES ($1, 'parity.case', 'laya', 'system', $2, 'accepted') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(card)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert decision");
+    tx.commit().await.expect("commit");
+    id
+}
+
+/// Seed a generated draft artefact for the application sample.
+async fn seed_parity_document(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO document (tenant_id, kind, title, status, meta)
+         VALUES ($1, 'document', 'Parity draft', 'active', '{\"generated\":true}'::jsonb)
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert document");
+    tx.commit().await.expect("commit");
+    id
+}
+
 /// Seed the rows the sample's input will name, once per round.
 async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
     match sample.name {
+        // ── T1 plan spine ─────────────────────────────────────────────────────────────────
+        "wbs.create" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("wbs.create", p);
+        }
+        "wbs.get" | "wbs.update" => {
+            let p = seed_parity_project(pg, ctx).await;
+            let w = seed_parity_wbs(pg, ctx, p).await;
+            ctx.push(sample.name, w);
+        }
+        "wbs.list" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("wbs.list", p);
+        }
+        "baselines.take" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("baselines.take", p);
+        }
+        "baselines.get" => {
+            let p = seed_parity_project(pg, ctx).await;
+            let b = seed_parity_baseline(pg, ctx, p).await;
+            ctx.push(sample.name, b);
+        }
+        "baselines.list" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("baselines.list", p);
+        }
+        "registers.create" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("registers.create", p);
+        }
+        "registers.get" | "registers.update" => {
+            let p = seed_parity_project(pg, ctx).await;
+            let r = seed_parity_register(pg, ctx, p).await;
+            ctx.push(sample.name, r);
+        }
+        "registers.list" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("registers.list", p);
+        }
+        "project_dependencies.create" => {
+            let from = seed_parity_project(pg, ctx).await;
+            let to = seed_parity_project(pg, ctx).await;
+            ctx.push("dep.create.from", from);
+            ctx.push("dep.create.to", to);
+        }
+        "project_dependencies.delete" => {
+            let from = seed_parity_project(pg, ctx).await;
+            let to = seed_parity_project(pg, ctx).await;
+            let e = seed_parity_edge(pg, ctx, from, to).await;
+            ctx.push("project_dependencies.delete", e);
+        }
+        "project_dependencies.list" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("project_dependencies.list", p);
+        }
+        "portfolio.in_flight" => {
+            // An empty set: the tenant's configured in-flight status matches no project, so
+            // the computed view is stable across both rounds.
+            sqlx::query(
+                "UPDATE tenant SET settings = jsonb_set(settings, '{portfolio,in_flight}',
+                 '[\"__parity_none__\"]'::jsonb, true) WHERE id = $1",
+            )
+            .bind(ctx.tenant_id)
+            .execute(&pg.owner)
+            .await
+            .expect("set the in-flight set");
+        }
+        "tranches.create" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("tranches.create", g);
+        }
+        "tranches.review" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let t = seed_parity_tranche(pg, ctx, g).await;
+            ctx.push("tranches.review", t);
+        }
+        "tranches.list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("tranches.list", g);
+        }
+        "benefits.create" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("benefits.create", g);
+        }
+        "benefits.get" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let b = seed_parity_benefit(pg, ctx, g).await;
+            ctx.push("benefits.get", b);
+        }
+        "benefits.list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("benefits.list", g);
+        }
+        "benefits.link" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let b = seed_parity_benefit(pg, ctx, g).await;
+            ctx.push("benefits.link.programme", g);
+            ctx.push("benefits.link.benefit", b);
+        }
+        "cadences.create" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("cadences.create", g);
+        }
+        "cadences.list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("cadences.list", g);
+        }
+        "stakeholders.profile_create" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("stakeholders.profile_create", g);
+        }
+        "stakeholders.profile_update" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let p = seed_parity_profile(pg, ctx, g).await;
+            ctx.push("stakeholders.profile_update", p);
+        }
+        "stakeholders.profile_list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("stakeholders.profile_list", g);
+        }
+        // ── T2 decision ladder ───────────────────────────────────────────────────────────
+        // One policy per (kind, gate) is the table's contract and `prepare` runs once per
+        // round, so each round seeds its own case (the kind embeds the row id).
+        "decision_policies.update" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.update", "parity_gate").await;
+            ctx.push("decision_policies.update", policy);
+        }
+        "refinements.publish" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.refine", "parity_gate").await;
+            ctx.push("refinements.publish", policy);
+        }
+        "ladder.evaluate" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.evaluate", "parity_gate").await;
+            ctx.push("ladder.evaluate.policy", policy);
+            seed_parity_laya(pg, ctx).await;
+        }
+        "ladder.record" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.record", "parity_gate").await;
+            ctx.push("ladder.record.policy", policy);
+        }
+        "ladder.apply_draft" => {
+            let card = seed_card(pg, ctx, "active").await;
+            let decision = seed_parity_decision(pg, ctx, card).await;
+            let document = seed_parity_document(pg, ctx).await;
+            ctx.push("ladder.apply_draft.card", card);
+            ctx.push("ladder.apply_draft.decision", decision);
+            ctx.push("ladder.apply_draft.document", document);
+        }
         "tenants.update_settings" => {
             sqlx::query("UPDATE tenant SET settings = '{}'::jsonb, version = 1 WHERE id = $1")
                 .bind(ctx.tenant_id)
@@ -2037,6 +2458,32 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_site_document(pg, ctx).await;
             ctx.push(sample.name, id);
         }
+        "documents.publish" | "documents.request_publish" => {
+            let id = seed_document_bytes(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        // #245: the preview needs a text body; the return needs an open publish request.
+        "documents.preview" => {
+            let id = seed_document_history(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        "documents.return" => {
+            let id = seed_document_bytes(pg, ctx).await;
+            sqlx::query(
+                "UPDATE document SET publish_requested_at = now()
+                  WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(ctx.tenant_id)
+            .bind(id)
+            .execute(&pg.super_pool)
+            .await
+            .expect("open the parity publish request");
+            ctx.push(sample.name, id);
+        }
+        "documents.revision_list" | "documents.revision_get" | "documents.revision_restore" => {
+            let id = seed_document_history(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
         "secrets.create" => {
             sqlx::query("DELETE FROM secret WHERE tenant_id = $1 AND name = 'parity-secret'")
                 .bind(ctx.tenant_id)
@@ -2306,6 +2753,28 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             })
             .await;
             ctx.push(sample.name, run);
+        }
+        // ── T3: the PM job (#74) ─────────────────────────────────────────────────────────
+        // A fresh chartered project per round: `pm.plan` and `pm.route_gate` both name it, and a
+        // shared row would make round B a replay of round A's work rather than an execution.
+        "pm.get" | "pm.plan" | "pm.route_gate" => {
+            let project = seed_parity_project(pg, ctx).await;
+            seed_pm_approved_gate(pg, ctx, project, "charter").await;
+            ctx.push(sample.name, project);
+        }
+        "pm.close" => {
+            // Closure is terminal for the project (`close_project_tx` refuses a closed row), so
+            // each round needs its own open project with its own approved closure gate.
+            let project = seed_parity_project(pg, ctx).await;
+            seed_pm_approved_gate(pg, ctx, project, "closure").await;
+            ctx.push("pm.close", project);
+        }
+        "changes.request" => {
+            // The change gate cites the approved baseline it would replace (0048, #74).
+            let project = seed_parity_project(pg, ctx).await;
+            let baseline = seed_pm_approved_baseline(pg, ctx, project).await;
+            ctx.push("changes.request", project);
+            ctx.push("changes.request.baseline", baseline);
         }
         _ => {}
     }
@@ -3376,6 +3845,20 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             json!({"messages": [{"role": "user", "content": "ping"}]}),
             None,
         ),
+        // #163: `produce.script` is the one model-backed action that is not a passthrough — it binds the
+        // answer to shot ids it derived and then enforces the duration budget. The stub answers a valid
+        // empty shot list, so this exercises the composition over both transports rather than its 502 path.
+        expecting(
+            plain(
+                "produce.script",
+                json!({
+                    "brief": "a ten-second explainer about why a shot list needs stable ids",
+                    "target_duration_ms": 10000
+                }),
+                None,
+            ),
+            200,
+        ),
         // S13 step 8: the engine's model call is the same declared external POST as the copilot's,
         // so the stub answers both; the loop's own action is a step primitive and refuses a direct
         // invocation with 409 (CONTRACT §17 — the executor drives it, not the action surface).
@@ -3446,6 +3929,37 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         on_prepared("documents.delete", Some("\"1\"")),
+        {
+            let mut sample = on_prepared("documents.publish", Some("\"1\""));
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"id": ctx.pop("documents.publish"), "publish": true}));
+            expecting(sample, 200)
+        },
+        expecting(on_prepared("documents.request_publish", Some("\"1\"")), 200),
+        // #245: the preview is a read of a saved text output; the return is the admin's rework
+        // order on a requested draft.
+        expecting(on_prepared("documents.preview", None), 200),
+        {
+            let mut sample = on_prepared("documents.return", Some("\"1\""));
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("documents.return"), "note": "Parity return"}),
+            );
+            expecting(sample, 200)
+        },
+        expecting(on_prepared("documents.revision_list", None), 200),
+        {
+            let mut sample = on_prepared("documents.revision_get", None);
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"id": ctx.pop("documents.revision_get"), "seq": 1}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = on_prepared("documents.revision_restore", Some("\"1\""));
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("documents.revision_restore"), "seq": 1}),
+            );
+            expecting(sample, 200)
+        },
         {
             // The document is created before the loop, one per round: a push cannot be repeated (the job id is
             // a fact on the row), so the queue is what makes round A and round B both real executions.
@@ -3896,6 +4410,22 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             }),
             None,
         ),
+        // ── conveyor#160: the tenant's registered inference endpoint ─────────────────────
+        // The destination is the harness's inference stub, not an invented URL: a tenant row
+        // outranks `CONVEYOR_EXTERNAL_INFERENCE_URL`, so any later model call must still reach
+        // the stub rather than the network.
+        {
+            let mut sample = plain("inference_endpoint.set", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| {
+                json!({
+                    "destination_url": std::env::var("CONVEYOR_EXTERNAL_INFERENCE_URL")
+                        .expect("the parity harness sets the inference stub"),
+                    "credential": "parity-inference-credential",
+                })
+            });
+            expecting(sample, 200)
+        },
+        expecting(plain("inference_endpoint.get", json!({}), None), 200),
         plain("prompt_audits.list", json!({"limit": 10}), None),
         {
             let mut sample = plain("prompt_audits.get", json!({}), None);
@@ -4146,7 +4676,330 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample.input = Box::new(|ctx: &Ctx| json!({"agent_id": ctx.capability_agent_id}));
             sample
         },
+        // ── #139 P3.1: the media toolkit ──────────────────────────────────────────────────
+        // Each kind enqueues one job and answers `{job_id, kind}`. The dedupe key is the payload
+        // hash, so round B joins round A's still-live job and the two bodies compare; there is no
+        // worker in this harness, so nothing executes the capability itself.
+        expecting(
+            plain("media.render_html", json!({"html": "<p>parity</p>"}), None),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.compile_video",
+                json!({"shots": [{"id": "shot-1", "seconds": 1.0}]}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.thumbnail",
+                json!({"video_url": "inputs/source.mp4"}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.concat_audio",
+                json!({"clips": [{"id": "clip-1", "audio_url": "inputs/clip.wav"}]}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.probe_video",
+                json!({"input": "inputs/source.mp4"}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.analyze_video",
+                json!({"input": "inputs/source.mp4"}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.analyze_audio",
+                json!({"input": "inputs/source.wav"}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain("media.ocr", json!({"input": "inputs/page.png"}), None),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.produce_video",
+                json!({"title": "parity card", "duration": 1.0}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.record_browser",
+                json!({
+                    "html": "<p>parity</p>",
+                    "duration_ms": 500,
+                    "width": 640,
+                    "height": 360
+                }),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "media.run_gherkin",
+                json!({
+                    "feature": "Feature: parity\n  Scenario: loads\n    Then I expect the title to be \"parity\"",
+                    "target_url": "file:///tmp/parity.html"
+                }),
+                None,
+            ),
+            200,
+        ),
+        {
+            let mut sample = plain("media.capabilities", json!({}), None);
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
+        // #174: an external action with no test host. `CONVEYOR_EXTERNAL_IMAGE_GEN_URL` is unset
+        // here, so both transports must produce the SAME typed refusal (`unconfigured`, 503) — which
+        // is the parity property that matters for a declared external action: a missing address is a
+        // visible refusal on every transport, never one transport guessing a default. A sample that
+        // rendered would mint a document id per round and could not be compared body-for-body.
+        expecting(
+            plain(
+                "media.generate_image",
+                json!({"prompt": "parity", "size": "512x512"}),
+                None,
+            ),
+            503,
+        ),
+        // ── #173: the two audio capabilities ────────────────────────────────────────────────
+        // The same property as the image action: no `CONVEYOR_EXTERNAL_TTS_URL`/
+        // `ASR_URL` in the parity environment, so both transports must answer the SAME typed
+        // refusal. A sample that reached a host would store a document and could not be compared.
+        expecting(
+            plain(
+                "produce.speech",
+                json!({"text": "parity", "speed": 1.0}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain(
+                "media.transcribe",
+                json!({"document": "0192f5b0-0000-7000-8000-000000000000"}),
+                None,
+            ),
+            503,
+        ),
+        // ── #170: the ops.* cluster reads (T7) ────────────────────────────────────────────
+        // No `OPS_TOKEN` / `KUBERNETES_SERVICE_HOST` and no `CONVEYOR_CI_TOKEN` in the test
+        // environment, so every read answers the SAME typed `unconfigured` refusal on both
+        // transports. A sample that reached a live API would not be comparable body-for-body;
+        // the parity property for this family is that a missing credential is never defaulted.
+        expecting(
+            plain(
+                "ops.pods",
+                json!({"namespace": "conveyor", "label_selector": "app=conveyor"}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain("ops.deployments", json!({"namespace": "conveyor"}), None),
+            503,
+        ),
+        expecting(
+            plain(
+                "ops.events",
+                json!({"namespace": "conveyor", "limit": 10}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain(
+                "ops.logs",
+                json!({"namespace": "conveyor", "pod": "conveyor-worker", "tail": 50}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain("ops.flux_status", json!({"namespace": "flux-system"}), None),
+            503,
+        ),
+        expecting(
+            plain("ops.ci_status", json!({"branch": "main", "limit": 5}), None),
+            503,
+        ),
+        // ── #171: the destructive ops writes ──────────────────────────────────────────────
+        // Each names no approval, so the gate refuses (403 `approval_required`) BEFORE any
+        // cluster call on BOTH transports. That is the parity property for a destructive
+        // action: the refusal is identical whether it arrives over HTTP or MCP, and it never
+        // depends on a cluster being reachable.
+        expecting(
+            plain(
+                "ops.restart",
+                json!({"namespace": "conveyor", "deployment": "conveyor"}),
+                None,
+            ),
+            403,
+        ),
+        expecting(
+            plain(
+                "ops.scale",
+                json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 2}),
+                None,
+            ),
+            403,
+        ),
+        expecting(
+            plain(
+                "ops.rollback",
+                json!({"namespace": "conveyor", "deployment": "conveyor"}),
+                None,
+            ),
+            403,
+        ),
+        // ── #172: the ops.host_* family (T7, SPEC_V2 §10.4.1) ─────────────────────────────
+        // No host is registered in the fixture database, so both reads answer the SAME typed
+        // `host_not_registered` refusal on both transports — the registry is the action layer's
+        // authority, and an unregistered host is never defaulted into a guess.
+        expecting(
+            plain(
+                "ops.host_status",
+                json!({"host": "example", "unit": "com.example.unit"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "ops.host_logs",
+                json!({"host": "example", "unit": "com.example.unit", "lines": 50}),
+                None,
+            ),
+            404,
+        ),
+        // The restart names no approval, so the gate refuses BEFORE the registry is read: the
+        // destructive refusal is identical to `ops.restart`'s on both transports.
+        expecting(
+            plain(
+                "ops.host_restart_unit",
+                json!({"host": "example", "unit": "com.example.unit"}),
+                None,
+            ),
+            403,
+        ),
+        // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────        // The response is a pure function of the input — the deck writer has no clock, no
+        // random id and no hash-map order — so a replay and an execution agree byte for byte.
+        expecting(
+            plain(
+                "decks.render",
+                json!({
+                    "format": "pptx",
+                    "deck": {
+                        "title": "Parity",
+                        "slides": [
+                            {"layout": "title", "title": "Opening", "subtitle": "Synthetic"},
+                            {"layout": "bullets", "title": "Findings", "bullets": ["one", "two"]}
+                        ]
+                    }
+                }),
+                None,
+            ),
+            200,
+        ),
+        // ── #182 slice A: the tenant's own YouTube channel ────────────────────────────────
+        // `client_set` runs first so both rounds and both transports see a configured client.
+        // No sample can reach Google: `connect` is sampled at the validation boundary, which is
+        // the one input both transports can refuse without a network call, and nothing here has
+        // a stored grant to exchange.
+        expecting(
+            plain(
+                "youtube.client_set",
+                json!({
+                    "client_id": "parity-client.apps.googleusercontent.com",
+                    "client_secret": "parity-client-secret",
+                }),
+                None,
+            ),
+            200,
+        ),
+        {
+            let mut sample = plain("youtube.client_get", json!({}), None);
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
+        // Missing `code` and `redirect_uri`: a schema refusal, never a provider call.
+        expecting(plain("youtube.connect", json!({}), None), 422),
+        {
+            let mut sample = plain("youtube.status", json!({}), None);
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
+        // No grant exists after the refused connect, so both executions answer `{connected:
+        // false}` — which is also the idempotency property, exercised twice in one round.
+        {
+            let mut sample = plain("youtube.disconnect", json!({}), None);
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
+        // ── #182 slice B: publishing ────────────────────────────────────────────────────────
+        // The enqueue is the whole action and it never calls Google. Both rounds name the same
+        // document and metadata, so the second execution joins the live job and answers the SAME
+        // `job_id` as the first — the comparison is over two real executions, not a replay.
+        {
+            let sample = plain(
+                "youtube.upload",
+                json!({
+                    "document_id": "018f3f7c-0000-7000-8000-000000000001",
+                    "title": "a parity upload",
+                    "privacy": "private",
+                }),
+                None,
+            );
+            expecting(sample, 200)
+        },
+        // Both Data API actions are sampled at the validation boundary: the invalid privacy and
+        // the malformed video id are refused before any provider call, so neither transport needs
+        // a network or a stored grant.
+        expecting(
+            plain(
+                "youtube.privacy",
+                json!({"video_id": "dQw4w9WgXcQ", "privacy": "world"}),
+                None,
+            ),
+            422,
+        ),
+        expecting(
+            plain(
+                "youtube.retract",
+                json!({"video_id": "not a video id"}),
+                None,
+            ),
+            422,
+        ),
     ];
+
+    out.extend(spine_samples());
+    out.extend(ladder_samples());
+    out.extend(pm_samples());
 
     for sample in &mut out {
         if matches!(
@@ -4197,6 +5050,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 | "fixtures.echo"
                 | "inference_calls.list"
                 | "inference_usage.report"
+                | "inference_endpoint.get"
                 | "prompt_audits.check"
                 | "prompt_findings.list"
         ) {
@@ -4204,6 +5058,414 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         }
     }
     out
+}
+
+/// T3's PM samples (SPEC_V2 §6.1, §5.4, §8.4; #74), in their own frame for the same stack
+/// reason as [`spine_samples`]. The sample contract is unchanged.
+///
+/// Every sample names the fixture's `pm` binding. The mutating ones create their own project (or
+/// read a prepared one) so each round is a real execution rather than a replay of the previous
+/// round's refusal; `pm.plan` needs an approved charter gate and `pm.close` an approved closure
+/// gate, both prepared as a SECOND principal's decision.
+fn pm_samples() -> Vec<Sample> {
+    vec![
+        {
+            // The PM's view of a prepared, chartered project: project, charter, WBS, baselines
+            // and gates. A read, but prepared per round because its gates and baselines are.
+            let mut sample = plain("pm.get", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({ "project_id": ctx.pop("pm.get") }));
+            expecting(sample, 200)
+        },
+        {
+            // The key is unique per (tenant, key), so both it and the title (which derives it
+            // when absent) are minted per ROUND.
+            let mut sample = plain("pm.charter", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "key": format!("PMC-{}", Uuid::now_v7().simple()),
+                    "title": format!("Parity PM charter {}", Uuid::now_v7().simple()),
+                    "charter": "Parity charter body",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            // A prepared project whose charter gate is APPROVED: the WBS and the scope baseline
+            // are written, and the baseline gate is opened for a second principal to decide.
+            let mut sample = plain("pm.plan", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "project_id": ctx.pop("pm.plan"),
+                    "wbs": [{ "kind": "phase", "title": "Parity phase" }],
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            // A typed-evidence gate with no evidence: the empty list is legal until a caller
+            // asks for `require_evidence`.
+            let mut sample = plain("pm.route_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "project_id": ctx.pop("pm.route_gate"),
+                    "gate": "design",
+                    "kind": "pm",
+                    "evidence": [],
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            // A prepared project whose closure gate is APPROVED: the closure record is written
+            // and the project moves out of `active`.
+            let mut sample = plain("pm.close", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "project_id": ctx.pop("pm.close"),
+                    "closure": "Parity closure narrative",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            // A prepared APPROVED baseline on a prepared project: the change register item and
+            // its gate are the only path that advances a baseline (D-T1-3).
+            let mut sample = plain("changes.request", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.pm_binding_id,
+                    "project_id": ctx.pop("changes.request"),
+                    "baseline_id": ctx.pop("changes.request.baseline"),
+                    "title": "Parity change",
+                    "impact": 3,
+                })
+            });
+            expecting(sample, 201)
+        },
+    ]
+}
+
+/// T2's decision-ladder samples, in their own frame for the same stack reason as
+/// [`spine_samples`]. The sample contract is unchanged.
+fn ladder_samples() -> Vec<Sample> {
+    vec![
+        // ── T2 decision ladder (SPEC_V2 §7, §10.3–§10.4) ────────────────────────────────
+        {
+            // The case is unique per execution: one policy per (kind, gate) is the table's
+            // contract, and round B executes rather than replays.
+            let mut sample = plain("decision_policies.create", json!({}), None);
+            sample.input = Box::new(|_: &Ctx| {
+                json!({
+                    "kind": format!("parity.create.{}", Uuid::now_v7().simple()),
+                    "gate": "parity_gate_create",
+                    "threshold": 0.8,
+                    "fail_policy": "closed",
+                    "action": "block"
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = on_prepared("decision_policies.update", Some("\"1\""));
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("decision_policies.update"), "threshold": 0.7}),
+            );
+            expecting(sample, 200)
+        },
+        expecting(plain("decision_policies.list", json!({}), None), 200),
+        {
+            let mut sample = plain("refinements.publish", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "policy_id": ctx.pop("refinements.publish"),
+                    "threshold_override": 0.5
+                })
+            });
+            expecting(sample, 200)
+        },
+        expecting(plain("refinements.list", json!({}), None), 200),
+        expecting(
+            plain(
+                "laya_configs.create",
+                json!({"model_ref": "jev-latest"}),
+                None,
+            ),
+            201,
+        ),
+        expecting(plain("laya_configs.list", json!({}), None), 200),
+        {
+            let mut sample = plain("ladder.evaluate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.evaluate.policy");
+                json!({
+                    "kind": format!("parity.evaluate.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
+                    "answer": "pass",
+                    "confidence": 0.9,
+                    "input": {"subject": "parity"}
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("ladder.record", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.record.policy");
+                json!({
+                    "rung": "rule",
+                    "kind": format!("parity.record.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
+                    "answer": "pass",
+                    "outcome": "accepted",
+                    "confidence": 1.0
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(plain("ladder.list", json!({}), None), 200),
+        {
+            let mut sample = plain("ladder.apply_draft", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "document_id": ctx.pop("ladder.apply_draft.document"),
+                    "card_id": ctx.pop("ladder.apply_draft.card"),
+                    "decision_id": ctx.pop("ladder.apply_draft.decision")
+                })
+            });
+            expecting(sample, 200)
+        },
+    ]
+}
+
+/// T1's plan-spine samples, in their own frame: the main `samples` vec literal is already
+/// large enough that one more group of closures overflows the test thread's stack in a debug
+/// build. The sample contract is unchanged.
+fn spine_samples() -> Vec<Sample> {
+    vec![
+        // ── T1 plan spine (SPEC_V2 §5.1, §5.3–§5.5, §8.2, §8.3) ─────────────────────────
+        {
+            let mut sample = plain("wbs.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("wbs.create"),
+                    "kind": "deliverable",
+                    "title": format!("Parity node {}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(on_prepared("wbs.get", None), 200),
+        {
+            let mut sample = on_prepared("wbs.update", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("wbs.update"),
+                    "title": format!("Renamed {}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("wbs.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"project_id": ctx.pop("wbs.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("baselines.take", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"project_id": ctx.pop("baselines.take")}));
+            expecting(sample, 201)
+        },
+        expecting(on_prepared("baselines.get", None), 200),
+        {
+            let mut sample = plain("baselines.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"project_id": ctx.pop("baselines.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("registers.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("registers.create"),
+                    "kind": "risk",
+                    "title": format!("Parity risk {}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(on_prepared("registers.get", None), 200),
+        {
+            let mut sample = on_prepared("registers.update", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("registers.update"),
+                    "status": "mitigated",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("registers.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"project_id": ctx.pop("registers.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("project_dependencies.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "from_project": ctx.pop("dep.create.from"),
+                    "to_project": ctx.pop("dep.create.to"),
+                    "kind": "blocks",
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(on_prepared("project_dependencies.delete", None), 200),
+        {
+            let mut sample = plain("project_dependencies.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("project_dependencies.list")
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("portfolio.in_flight", json!({}), None);
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("tranches.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("tranches.create"),
+                    "number": 0,
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("tranches.review", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("tranches.review"),
+                    "decision": "continue",
+                    "evidence": {},
+                })
+            });
+            expecting(sample, 422)
+        },
+        {
+            let mut sample = plain("tranches.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("tranches.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("benefits.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("benefits.create"),
+                    "reference": "BEN-PARITY",
+                })
+            });
+            expecting(sample, 422)
+        },
+        expecting(on_prepared("benefits.get", None), 200),
+        {
+            let mut sample = plain("benefits.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("benefits.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("benefits.link", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("benefits.link.programme"),
+                    "benefit_id": ctx.pop("benefits.link.benefit"),
+                    "output_ref": "parity output",
+                    "capability_ref": "parity capability",
+                    "operational_outcome": "parity outcome",
+                })
+            });
+            expecting(sample, 422)
+        },
+        {
+            let mut sample = plain("cadences.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("cadences.create"),
+                    "kind": "pi",
+                    "period": format!("PI-{}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("cadences.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("cadences.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("stakeholders.profile_create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("stakeholders.profile_create"),
+                    "name": format!("Parity group {}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = on_prepared("stakeholders.profile_update", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("stakeholders.profile_update"),
+                    "support_level": "high",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("stakeholders.profile_list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("stakeholders.profile_list")
+                })
+            });
+            expecting(sample, 200)
+        },
+    ]
 }
 
 /// Seed one audit and one finding for the S16 reads/decision samples, on the caller's tenant.
@@ -4747,8 +6009,20 @@ async fn benchmark_fixture(pg: &support::Pg, tenant: TenantId) -> (String, Strin
     (suite.id.to_string(), runs[0].clone(), runs[1].clone())
 }
 
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
+#[test]
+fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
+    // The registry-wide future is large; `block_on` polls it on the test thread, whose default
+    // stack overflows once every action has a sample. Run the whole test on an explicit thread.
+    std::thread::Builder::new()
+        .stack_size(64 * 1024 * 1024)
+        .spawn(|| {
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(2)
+        .thread_stack_size(64 * 1024 * 1024)
+        .enable_all()
+        .build()
+        .expect("parity runtime");
+    runtime.block_on(async {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     let stub = support::Stub::start().await;
@@ -4921,6 +6195,48 @@ async fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     .await
     .expect("seed the parity binding");
 
+    // T3's PM anchor (SPEC_V2 §6.1): the PM is a JOB, not a code path. An active `pm` catalogue
+    // row, its published release and a `procedure` binding to the fixture process are what every
+    // `pm.*` sample names; `assert_pm` reads exactly these three rows and refuses anything else.
+    let pm_job: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_catalogue
+             (tenant_id, job_key, industry_id, family, title, status, definition)
+         VALUES ($1, 'pm', $2, 'delivery', 'Project manager', 'active',
+                 '{\"charter\":\"pm\"}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(org_industry)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity PM job");
+    let pm_release_hash = "b".repeat(64);
+    let pm_release: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_release (tenant_id, job_id, release_hash, release_snapshot)
+         VALUES ($1, $2, $3, '{}'::jsonb) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(pm_job)
+    .bind(&pm_release_hash)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity PM release");
+    let pm_binding: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_binding
+             (tenant_id, job_id, release_id, release_hash, release_snapshot,
+              process_id, executor_kind, status, meta)
+         VALUES ($1, $2, $3, $4, '{}'::jsonb, $5, 'procedure', 'active', '{}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(pm_job)
+    .bind(pm_release)
+    .bind(&pm_release_hash)
+    .bind(Uuid::parse_str(&process_id).expect("the fixture process id is a uuid"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the parity PM binding");
+
     let bob_user = seed_member(&pg, &seeded, "bob").await;
     let ctx = Arc::new(Ctx {
         alice_user: seeded.user_id,
@@ -4950,9 +6266,32 @@ async fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         org_job_id: org_job,
         org_release_id: org_release,
         org_binding_id: org_binding,
+        pm_job_id: pm_job,
+        pm_release_id: pm_release,
+        pm_binding_id: pm_binding,
         job: Mutex::new(None),
         prepared: Mutex::new(HashMap::new()),
     });
+
+    // T3's PM actions resolve the binding, the job and the job's status on EVERY call, and
+    // `assert_pm` refuses anything but an active `pm` job with an active binding. Read the anchor
+    // back through the same store calls so a wrong fixture shape fails here, once, rather than
+    // as six identical 403s that parity would happily report as equal.
+    scoped(&pg, &ctx, async |conn| {
+        let binding = store::organisation::job_binding_get_tx(conn, ctx.tenant, ctx.pm_binding_id)
+            .await
+            .expect("the PM binding resolves");
+        let job = store::organisation::job_get_tx(conn, ctx.tenant, binding.job_id)
+            .await
+            .expect("the PM job resolves");
+        assert_eq!(job.id, ctx.pm_job_id, "the binding names the PM job");
+        assert_eq!(job.job_key, "pm");
+        assert_eq!(job.status, "active");
+        assert_eq!(binding.release_id, ctx.pm_release_id);
+        assert_eq!(binding.status, "active");
+        assert_eq!(binding.executor_kind, "procedure");
+    })
+    .await;
 
     // S09 §5.6's sample needs a stored document per round, created here rather than in `prepare`: prepare is
     // reachable with SQL alone, and a document with verifiable bytes is not. The tenant's upstream token is a
@@ -5192,8 +6531,12 @@ async fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
          stripping request_id/duration_ms"
     );
     running.shutdown().await;
+    });
+        })
+        .expect("spawn the parity test thread")
+        .join()
+        .expect("join the parity test thread");
 }
-
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_tool_the_role_cannot_call_is_absent_from_tools_list_and_refused_over_http() {
     let pg = support::Pg::fresh().await;
@@ -5463,6 +6806,56 @@ async fn seed_site_document(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     .execute(&pg.super_pool)
     .await
     .expect("seed a page");
+    id
+}
+
+/// A text output at version 1 plus its `created` revision: the history samples' fixture.
+async fn seed_document_history(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    use sha2::{Digest, Sha256};
+
+    let id = Uuid::now_v7();
+    let body = "# Parity history\n\nA note.";
+    let hash: String = Sha256::digest(body.as_bytes())
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
+    let meta = json!({"content_type": "text/markdown", "size_bytes": body.len() as i64});
+    sqlx::query(
+        "INSERT INTO document (id, tenant_id, kind, title, status, body, content_hash, meta,
+                               version)
+         VALUES ($1, $2, 'document', 'Parity history', 'active', $3, $4, $5, 1)",
+    )
+    .bind(id)
+    .bind(ctx.tenant_id)
+    .bind(body)
+    .bind(&hash)
+    .bind(&meta)
+    .execute(&pg.super_pool)
+    .await
+    .expect("seed a text document");
+    let content = json!({
+        "id": id.to_string(),
+        "title": "Parity history",
+        "body": body,
+        "meta": meta.clone(),
+        "publishable": false,
+        "category": null,
+        "unit": null,
+        "version": 1,
+        "object_key": null,
+        "status": "active",
+    });
+    sqlx::query(
+        "INSERT INTO revision (tenant_id, entity_type, entity_id, seq, label, content,
+                               content_hash, status)
+         VALUES ($1, 'document', $2, 1, 'created', $3, 'h', 'draft')",
+    )
+    .bind(ctx.tenant_id)
+    .bind(id)
+    .bind(content)
+    .execute(&pg.super_pool)
+    .await
+    .expect("seed the document revision");
     id
 }
 

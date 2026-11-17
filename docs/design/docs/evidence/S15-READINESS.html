@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="s15-step-12--capability-readiness--evidence">S15 step 12 — capability readiness — evidence</h1>
-<p>Measured 2026-11-09 on mini3; every Rust command through <code>rbuild</code> on m1 (CONTRACT §16).</p>
+<p>Measured 2026-11-09 on the dev box; every Rust command through <code>rbuild</code> on the build host (CONTRACT §16).</p>
 <h2 id="built">Built</h2>
 <ul>
 <li><code>crates/actions/src/capability/readiness.rs</code> — one computation, <code>capability_readiness_tx</code> (<code>domain::capability::Readiness</code> blockers): capability exists and is <code>active</code>; exactly one active <code>capability_agent</code>; its <code>prompt_ref</code> is an <strong>active</strong> catalogue pin (absent or retired is a blocker); every <code>allowed_actions</code> entry is registered; every <strong>required</strong> knowledge pack resolves to at least one leaf. <code>readiness_fields</code> maps the blockers to <code>FieldError</code> <strong>once</strong>.</li>
@@ -61,7 +61,7 @@
 </tr>
 <tr>
 <td><code>rbuild -- test -p conveyor-api --test capability_readiness -- --ignored</code></td>
-<td><strong>1 passed / 0 failed</strong> — the live missing-pack case against the real <code>strata_rag</code> (<code>mini3.local:8092</code>, compose <code>strata</code> profile up; the tenant token sealed under the test KEK)</td>
+<td><strong>1 passed / 0 failed</strong> — the live missing-pack case against the real <code>strata_rag</code> (<code>strata-rag:8092</code>, compose <code>strata</code> profile up; the tenant token sealed under the test KEK)</td>
 </tr>
 <tr>
 <td><code>rbuild -- test -p conveyor-actions --test registry</code></td>

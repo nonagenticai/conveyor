@@ -1,116 +1,128 @@
 {
   "actions_invoked": [
     {
-      "line": 757,
+      "line": 719,
       "name": "approvals.decide"
     },
     {
-      "line": 197,
+      "line": 189,
       "name": "card_types.list"
     },
     {
-      "line": 376,
+      "line": 378,
       "name": "cards.claim"
     },
     {
-      "line": 360,
+      "line": 362,
       "name": "cards.comment"
     },
     {
-      "line": 308,
+      "line": 310,
       "name": "cards.create"
     },
     {
-      "line": 337,
+      "line": 339,
       "name": "cards.move"
     },
     {
-      "line": 391,
+      "line": 393,
       "name": "cards.release"
     },
     {
-      "line": 1573,
+      "line": 1902,
       "name": "documents.compose"
     },
     {
-      "line": 1687,
+      "line": 2389,
+      "name": "documents.compose"
+    },
+    {
+      "line": 2184,
+      "name": "documents.create"
+    },
+    {
+      "line": 2255,
       "name": "documents.delete"
     },
     {
-      "line": 1666,
+      "line": 2201,
       "name": "documents.download"
     },
     {
-      "line": 1595,
+      "line": 2234,
+      "name": "documents.download"
+    },
+    {
+      "line": 1924,
       "name": "documents.get"
     },
     {
-      "line": 1651,
+      "line": 2219,
       "name": "documents.get"
     },
     {
-      "line": 554,
+      "line": 556,
       "name": "documents.list"
     },
     {
-      "line": 574,
+      "line": 579,
       "name": "documents.list"
     },
     {
-      "line": 780,
+      "line": 606,
+      "name": "documents.list"
+    },
+    {
+      "line": 2152,
+      "name": "documents.list"
+    },
+    {
+      "line": 2286,
+      "name": "documents.preview"
+    },
+    {
+      "line": 2332,
+      "name": "documents.return"
+    },
+    {
+      "line": 2073,
+      "name": "documents.revision_get"
+    },
+    {
+      "line": 2034,
+      "name": "documents.revision_list"
+    },
+    {
+      "line": 742,
       "name": "process_runs.start"
     },
     {
-      "line": 188,
+      "line": 180,
       "name": "programmes.list"
     },
     {
-      "line": 1519,
+      "line": 1833,
       "name": "projects.close"
     },
     {
-      "line": 1420,
+      "line": 1716,
       "name": "projects.create"
     },
     {
-      "line": 1429,
+      "line": 1724,
       "name": "projects.update"
     },
     {
-      "line": 665,
-      "name": "publish.start"
-    },
-    {
-      "line": 642,
-      "name": "publish.status"
-    },
-    {
-      "line": 1746,
-      "name": "repositories.create"
-    },
-    {
-      "line": 600,
-      "name": "repositories.list"
-    },
-    {
-      "line": 730,
+      "line": 692,
       "name": "runs.cancel"
     },
     {
-      "line": 708,
+      "line": 670,
       "name": "runs.get"
     },
     {
-      "line": 685,
+      "line": 647,
       "name": "runs.list"
-    },
-    {
-      "line": 1742,
-      "name": "secrets.create"
-    },
-    {
-      "line": 1776,
-      "name": "secrets.create"
     }
   ],
   "cycles": [],
@@ -160,7 +172,8 @@
           37,
           89,
           97,
-          103
+          103,
+          149
         ],
         "open": 1,
         "ready": 0,
@@ -202,14 +215,14 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 2,
-        "claimed": 1,
+        "blocked": 0,
+        "claimed": 0,
         "numbers": [
           120,
           121,
           122
         ],
-        "open": 3,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -250,8 +263,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 4,
-        "claimed": 1,
+        "blocked": 10,
+        "claimed": 6,
         "numbers": [
           17,
           22,
@@ -265,12 +278,31 @@
           93,
           95,
           102,
-          117,
-          118,
-          127
+          154,
+          164,
+          193,
+          212,
+          213,
+          222,
+          223,
+          224,
+          225,
+          260,
+          282,
+          283,
+          284,
+          285,
+          294,
+          295,
+          296,
+          299,
+          302,
+          303,
+          305,
+          307
         ],
-        "open": 9,
-        "ready": 4,
+        "open": 24,
+        "ready": 5,
         "unknown": 0
       }
     },
@@ -864,7 +896,14 @@
       "units": {
         "blocked": 0,
         "claimed": 0,
-        "numbers": [],
+        "numbers": [
+          156,
+          168,
+          183,
+          195,
+          231,
+          245
+        ],
         "open": 0,
         "ready": 0,
         "unknown": 0
@@ -986,7 +1025,7 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           6,
           26,
@@ -994,7 +1033,7 @@
           28
         ],
         "open": 4,
-        "ready": 3,
+        "ready": 4,
         "unknown": 0
       }
     },
@@ -1032,7 +1071,10 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          7
+          7,
+          136,
+          179,
+          198
         ],
         "open": 1,
         "ready": 1,
@@ -1478,9 +1520,9 @@
         "P0"
       ],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "migrations/0044_plan_spine.sql"
       ],
-      "gap": "table wbs_node, table project_baseline, table project_register_item, table project_dependency, table programme_cadence",
+      "gap": null,
       "key": "T1",
       "measured": {
         "actions": [
@@ -1492,8 +1534,8 @@
           0
         ],
         "tables": [
-          0,
-          5
+          11,
+          11
         ]
       },
       "name": "Plan spine",
@@ -1502,16 +1544,16 @@
         "T11"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 1,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           72
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1519,7 +1561,6 @@
     {
       "blocked_by": [
         "P0",
-        "T1",
         "T3"
       ],
       "evidence": [
@@ -1541,7 +1582,7 @@
           0
         ]
       },
-      "name": "SAFe cadence",
+      "name": "SAFe cadence and MSP tranches",
       "parallel_with": [
         "S05",
         "S07",
@@ -1612,7 +1653,6 @@
     {
       "blocked_by": [
         "P0",
-        "T1",
         "T10",
         "T11",
         "T13",
@@ -1620,7 +1660,6 @@
         "T15",
         "T16",
         "T17",
-        "T2",
         "T3",
         "T4",
         "T5",
@@ -1667,8 +1706,7 @@
     },
     {
       "blocked_by": [
-        "P0",
-        "T2"
+        "P0"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1699,13 +1737,13 @@
       "track": "v2",
       "tranche": 3,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           76
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1803,8 +1841,7 @@
     {
       "blocked_by": [
         "P0",
-        "T13",
-        "T2"
+        "T13"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1899,22 +1936,23 @@
     },
     {
       "blocked_by": [
-        "P0",
-        "T1"
+        "P0"
       ],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/ladder/mod.rs",
+        "crates/domain/src/ladder.rs",
+        "crates/store/src/ladder.rs"
       ],
-      "gap": "the decision tables exist as T0 schema; no decision-ladder evaluation, laya client or generation split (T2 behaviour)",
+      "gap": null,
       "key": "T2",
       "measured": {
         "actions": [
-          0,
-          0
+          11,
+          11
         ],
         "modules": [
-          0,
-          0
+          3,
+          3
         ],
         "tables": [
           0,
@@ -1926,24 +1964,23 @@
         "S03"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 2,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           73
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
     },
     {
       "blocked_by": [
-        "P0",
-        "T2"
+        "P0"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1974,8 +2011,8 @@
       "track": "v2",
       "tranche": 3,
       "units": {
-        "blocked": 1,
-        "claimed": 0,
+        "blocked": 0,
+        "claimed": 1,
         "numbers": [
           74
         ],
@@ -2035,8 +2072,7 @@
     },
     {
       "blocked_by": [
-        "P0",
-        "T2"
+        "P0"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -2125,7 +2161,6 @@
       "blocked_by": [
         "P0",
         "T13",
-        "T2",
         "T4"
       ],
       "evidence": [
@@ -2162,7 +2197,10 @@
         "blocked": 1,
         "claimed": 0,
         "numbers": [
-          78
+          78,
+          170,
+          171,
+          172
         ],
         "open": 1,
         "ready": 0,
@@ -2216,7 +2254,6 @@
     {
       "blocked_by": [
         "P0",
-        "T1",
         "T3"
       ],
       "evidence": [
@@ -2238,7 +2275,7 @@
           0
         ]
       },
-      "name": "TOGAF profile",
+      "name": "TOGAF ADM capability",
       "parallel_with": [
         "S05",
         "S07",
@@ -2265,6 +2302,15 @@
     }
   ],
   "screens": [
+    {
+      "evidence": [
+        "docs/design/v2.js"
+      ],
+      "gap": "design study; the ADM rows and actions are T9",
+      "key": "adm",
+      "status": "proposed",
+      "title": "Architecture capability"
+    },
     {
       "evidence": [
         "docs/design/v2.js"
@@ -2449,6 +2495,15 @@
       "evidence": [
         "docs/design/v2.js"
       ],
+      "gap": "design study; the MSP rows and actions are T1/T10",
+      "key": "programme",
+      "status": "proposed",
+      "title": "Programme definition"
+    },
+    {
+      "evidence": [
+        "docs/design/v2.js"
+      ],
       "gap": null,
       "key": "projects",
       "status": "live",
@@ -2487,16 +2542,18 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 26,
+        "built": 28,
         "partial": 2,
         "planned": 1,
-        "proposed": 17,
+        "proposed": 15,
         "standing": 1
       },
       "total": 48,
-      "uncovered": [],
-      "with_open_units": 33,
-      "without_open_units": 15
+      "uncovered": [
+        "P0"
+      ],
+      "with_open_units": 30,
+      "without_open_units": 18
     },
     "screens": {
       "actions_invoked": 25,
@@ -2504,9 +2561,9 @@
         "legacy": 7,
         "live": 7,
         "mixed": 3,
-        "proposed": 7
+        "proposed": 9
       },
-      "total": 24
+      "total": 26
     }
   },
   "version": 1

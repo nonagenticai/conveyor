@@ -43,12 +43,42 @@
         "project_baseline",
         "project_register_item",
         "project_dependency",
-        "programme_cadence"
+        "programme_cadence",
+        "programme_tranche",
+        "programme_baseline",
+        "benefit_profile",
+        "benefit_link",
+        "benefit_transition",
+        "stakeholder_profile"
       ]
     },
     "T2": {
-      "evidence": ["docs/SPEC_V2.md"],
-      "gap": "the decision tables exist as T0 schema; no decision-ladder evaluation, laya client or generation split (T2 behaviour)"
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "crates/domain/src/ladder.rs",
+        "crates/store/src/ladder.rs",
+        "crates/actions/src/ladder/mod.rs",
+        "crates/actions/tests/decision_ladder.rs"
+      ],
+      "gap": "slice 1 delivers the one record shape, the tenant refinement, the version pins and the gated draft application; the live laya HTTP call (reusing process/judge.rs) and decide/escalate remain follow-on work",
+      "actions": [
+        "decision_policies.create",
+        "decision_policies.list",
+        "decision_policies.update",
+        "ladder.apply_draft",
+        "ladder.evaluate",
+        "ladder.list",
+        "ladder.record",
+        "laya_configs.create",
+        "laya_configs.list",
+        "refinements.list",
+        "refinements.publish"
+      ],
+      "modules": [
+        "crates/domain/src/ladder.rs",
+        "crates/store/src/ladder.rs",
+        "crates/actions/src/ladder/mod.rs"
+      ]
     },
     "T3": {
       "evidence": ["docs/SPEC_V2.md"],

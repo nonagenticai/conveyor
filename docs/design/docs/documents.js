@@ -6,8 +6,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/README.html",
       "source": "README.md",
       "section": "Root",
-      "sha256": "28449d8dc2fdfff28ebace1650a6eafe9a305174db4991936e7752dc34552cec",
-      "bytes": 2257,
+      "sha256": "f8cf36be9644011eedb00ce8a9c52a2c4b27f3b597afc7fc0a9571cd5c710752",
+      "bytes": 2654,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/README.md"
     },
     {
@@ -24,8 +24,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC.html",
       "source": "docs/SPEC.md",
       "section": "Spec",
-      "sha256": "48b7ef9d3a5d95b7138d83ec31a440fc0b6c86634f53eee1ba99a940494d171e",
-      "bytes": 78090,
+      "sha256": "af821f73b2a20f8edb2d3fc98949348eaac2a59ab472767b9756c916b0401c6a",
+      "bytes": 78175,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC.md"
     },
     {
@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "357fc4e3f6211807119ecb8965565c207af1132e5b604ea4851aef31118385f4",
-      "bytes": 144348,
+      "sha256": "e4c28cec0136e2556a17c02f6c7bdd1816dbf98090ef90a94458035fe87a8c87",
+      "bytes": 169276,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -87,8 +87,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/decisions/0005-absorption-sequence-and-repo-scope.html",
       "source": "docs/decisions/0005-absorption-sequence-and-repo-scope.md",
       "section": "Decisions",
-      "sha256": "d058956231b4d25f7667edd9a2ac50cf141fa4d030088225a04fefc7b663ce50",
-      "bytes": 2816,
+      "sha256": "497cfc30bfe9f8e98637c6a98fd408e5d24a47688571fb864f908a5589247ee3",
+      "bytes": 4254,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0005-absorption-sequence-and-repo-scope.md"
     },
     {
@@ -96,8 +96,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/decisions/0006-tool-absorption-grouping.html",
       "source": "docs/decisions/0006-tool-absorption-grouping.md",
       "section": "Decisions",
-      "sha256": "adc8b99c210be970b1d8931dee11aa9f71b3a6b024c59bfdf628dff6539736cd",
-      "bytes": 6657,
+      "sha256": "ca641a316c68edef63cc3fed5b9c7d00f19ace9246ad3a91b52576cad3fb349b",
+      "bytes": 8138,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0006-tool-absorption-grouping.md"
     },
     {
@@ -105,8 +105,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/decisions/0007-tool-estate-conveyor-and-coding.html",
       "source": "docs/decisions/0007-tool-estate-conveyor-and-coding.md",
       "section": "Decisions",
-      "sha256": "ce47d2ab95b25eed4d73a29b0040e2f16e78a834d78f3d34bc03998bd2148217",
-      "bytes": 7520,
+      "sha256": "fe7224b056433270bf6b367692cf4b700b1e119fd82c3ed5eadd4f03e14f03c4",
+      "bytes": 7854,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0007-tool-estate-conveyor-and-coding.md"
     },
     {
@@ -114,8 +114,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "2e48a351482f750cb1b321ce7d36e1743cef99a3a8538d26fa63ee4d25082b42",
-      "bytes": 11627,
+      "sha256": "8e45c766e9b610287cebaf7bc352c2582ec7cf32f30bfd0f49afdbac2c9e86aa",
+      "bytes": 17873,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -123,8 +123,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "515ba0c7d84e201e1b0221d32ce268c5f0e765b7726ac678dcae764aac7bef67",
-      "bytes": 69023,
+      "sha256": "1f546834d0f436525019d309f72e69dd61dee57c2ab6b764ed89444e5c45ac41",
+      "bytes": 75944,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -132,8 +132,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-10-plan-audit.html",
       "source": "docs/evidence/2026-11-10-plan-audit.md",
       "section": "Evidence",
-      "sha256": "e976bd60891dc3fe47a31b76c0c1eba35ad8595a9cdbc058231569a8bc27101a",
-      "bytes": 29648,
+      "sha256": "f7e61718c7e96b91576d32ef3eabf77cd260d200b0a02f3e8a707fdc80a855b2",
+      "bytes": 29672,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-10-plan-audit.md"
     },
     {
@@ -150,8 +150,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-13-inference-router-absorption.html",
       "source": "docs/evidence/2026-11-13-inference-router-absorption.md",
       "section": "Evidence",
-      "sha256": "b86c0d474d47e5ccf8ade98c3555728e44d6f35901694e9de7016b7218fc28bb",
-      "bytes": 6631,
+      "sha256": "dc005f38374c32cb622e0a627c97330f4a9df0917f32b58aba7d3113ef1040d0",
+      "bytes": 8155,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-13-inference-router-absorption.md"
     },
     {
@@ -159,9 +159,18 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-14-licenses-absorption.html",
       "source": "docs/evidence/2026-11-14-licenses-absorption.md",
       "section": "Evidence",
-      "sha256": "7845610b509f02858589c5bd1cc0a801246bb01b829b8ba24567fccd2bce2aab",
-      "bytes": 24364,
+      "sha256": "ca136b1ef3af72f58660da24da2375a2d396d1297b2585f59534a1abaa838634",
+      "bytes": 32802,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-14-licenses-absorption.md"
+    },
+    {
+      "title": "Research cutover — 2026-11-16",
+      "path": "docs/evidence/2026-11-16-research-cutover.html",
+      "source": "docs/evidence/2026-11-16-research-cutover.md",
+      "section": "Evidence",
+      "sha256": "1cce823150b032a7fd913de3d6ed93f040e0ca36297b7adede9055181e93eeea",
+      "bytes": 8600,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-research-cutover.md"
     },
     {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
@@ -195,8 +204,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S13-ENGINE.html",
       "source": "docs/evidence/S13-ENGINE.md",
       "section": "Evidence",
-      "sha256": "88486261759d1e0013b60a836190904734cdc3a867ecb97fb2dd9bf963116ad7",
-      "bytes": 61763,
+      "sha256": "b1230ed4cf6c58616aef23ad0450770c6e36a5fe1c8d7d2007bab7863608c368",
+      "bytes": 61851,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S13-ENGINE.md"
     },
     {
@@ -204,8 +213,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S13-PROCESS.html",
       "source": "docs/evidence/S13-PROCESS.md",
       "section": "Evidence",
-      "sha256": "ca22959841d22affca97bbc99f5e09c94ab522075e883128cb3debfb7aa3996f",
-      "bytes": 18541,
+      "sha256": "4eab5d86b7b2947985056213f18ca987189be25abed0f0c7229f4766fb4db5ec",
+      "bytes": 18575,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S13-PROCESS.md"
     },
     {
@@ -222,8 +231,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S15-READINESS.html",
       "source": "docs/evidence/S15-READINESS.md",
       "section": "Evidence",
-      "sha256": "60271bd82d4181c0cb09e215f660b822b0518d75d20eca98b83b7b7a75cdef88",
-      "bytes": 6828,
+      "sha256": "73c668ec0368e5ce831cb31d7eb53babb9b09da49aebd1a05518bdd2ed9aa4b7",
+      "bytes": 6845,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S15-READINESS.md"
     },
     {
@@ -231,8 +240,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S15-RUNTIME.html",
       "source": "docs/evidence/S15-RUNTIME.md",
       "section": "Evidence",
-      "sha256": "b0724ed2b025fae50ad623ea0a36dbb67b5e0c67169fa41eb146f057c913f28b",
-      "bytes": 4793,
+      "sha256": "a8e6c72285ab9aac044a19d265a418b5dc8d340aee6d809237d3aa760b2be367",
+      "bytes": 4833,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S15-RUNTIME.md"
     },
     {
@@ -240,8 +249,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S17-CORE.html",
       "source": "docs/evidence/S17-CORE.md",
       "section": "Evidence",
-      "sha256": "be26c2d9fbc38ba499ca2bf38efa2b89c0f21d02cf612553519b3d3ef289f702",
-      "bytes": 15275,
+      "sha256": "c3e7406e7d8b95974122b81b638f674909aa2317dd7c5f22e1c44eb8dc829895",
+      "bytes": 15353,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S17-CORE.md"
     },
     {
@@ -249,8 +258,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S18-A.html",
       "source": "docs/evidence/S18-A.md",
       "section": "Evidence",
-      "sha256": "c47ec8ba592aaae7c0d433af24ffbde226c12a165d39cd7369911d8dbf21f749",
-      "bytes": 6889,
+      "sha256": "054b6dae3af241a132158dd0fd398f3dc5b31c20469ac59048c2551414336da3",
+      "bytes": 6913,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-A.md"
     },
     {
@@ -267,8 +276,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S19-B.html",
       "source": "docs/evidence/S19-B.md",
       "section": "Evidence",
-      "sha256": "dada25dce956a71af010c4f123d271b9fa61384557f820a944173728b8f4ee4a",
-      "bytes": 5584,
+      "sha256": "b43d57101275c0dd4770616a0f44f8ac2b98c1c96e8b825a4ca638ba10647bbe",
+      "bytes": 5596,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S19-B.md"
     },
     {
@@ -276,8 +285,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S19-C.html",
       "source": "docs/evidence/S19-C.md",
       "section": "Evidence",
-      "sha256": "a71c190f04b535359b8e7c0be8015d7e956370cbeafce4c4b7c002308ffa4745",
-      "bytes": 12837,
+      "sha256": "727d3a786551b947325487c3fb61623b89fff77c969267e3748255fd809b2080",
+      "bytes": 12885,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S19-C.md"
     },
     {
@@ -294,8 +303,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S21-BUDGET.html",
       "source": "docs/evidence/S21-BUDGET.md",
       "section": "Evidence",
-      "sha256": "547e85e5e63de44a7ab9f6631208b77409c03ceae5e6a5d4a9dca948f0ded0e6",
-      "bytes": 6201,
+      "sha256": "a224e5e114622e9ac2420ab0234f6b88bdd663225eff274dbdfcc28388936927",
+      "bytes": 6219,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-BUDGET.md"
     },
     {
@@ -303,8 +312,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S21-PLAN.html",
       "source": "docs/evidence/S21-PLAN.md",
       "section": "Evidence",
-      "sha256": "bb9b5e1c319d68155857b6a1ecff9c0e6027f723177070a819cc5045bfa46a09",
-      "bytes": 9280,
+      "sha256": "d443636e29dde0a62fbc76c71113ff2e6cdaa2e9d8bdd64135d26e9bd73213f1",
+      "bytes": 9316,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
     },
     {
@@ -317,12 +326,84 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-capture-2026-11-15.md"
     },
     {
+      "title": "frontendtestrunnerservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-frontend_test_runner_service.html",
+      "source": "docs/evidence/media-frontend_test_runner_service.md",
+      "section": "Evidence",
+      "sha256": "1fa8ef82bd83ac39536f58a7bfe61b1624fb8149e8f3cb2f794100efdbfdb405",
+      "bytes": 3241,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-frontend_test_runner_service.md"
+    },
+    {
+      "title": "htmlrenderservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-html_render_service.html",
+      "source": "docs/evidence/media-html_render_service.md",
+      "section": "Evidence",
+      "sha256": "ab92b97ede2a3144d03db3ad066f34f2cd0502ec9aed082b12daa30a2fee14fe",
+      "bytes": 2634,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-html_render_service.md"
+    },
+    {
+      "title": "ttsgateway capture — evidence (2026-11-15)",
+      "path": "docs/evidence/media-tts_gateway.html",
+      "source": "docs/evidence/media-tts_gateway.md",
+      "section": "Evidence",
+      "sha256": "d8694ea57fe760beb365e5a288bf04cfab78250b9df711feff206009bcfa3865",
+      "bytes": 1626,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-tts_gateway.md"
+    },
+    {
+      "title": "videoanalyzerservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-video_analyzer_service.html",
+      "source": "docs/evidence/media-video_analyzer_service.md",
+      "section": "Evidence",
+      "sha256": "70ebcd571d865d8d22d3e523cbfd0322334eacd3ddb7e946ec499a46f9e2195d",
+      "bytes": 2998,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-video_analyzer_service.md"
+    },
+    {
+      "title": "videocompilerservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-video_compiler_service.html",
+      "source": "docs/evidence/media-video_compiler_service.md",
+      "section": "Evidence",
+      "sha256": "a25a873737821bef07958e290acf2267df376d059021221d5c695d9678e8b394",
+      "bytes": 2720,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-video_compiler_service.md"
+    },
+    {
+      "title": "videoproductionservice absorption — evidence (2026-11-15)",
+      "path": "docs/evidence/media-video_production_service.html",
+      "source": "docs/evidence/media-video_production_service.md",
+      "section": "Evidence",
+      "sha256": "5862ba2f4bd2587b6bacd61da05e5210f82c1c9b3949bc27003b049b43a83b2b",
+      "bytes": 3536,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-video_production_service.md"
+    },
+    {
+      "title": "youtubeuploadservice capture — evidence (2026-11-15)",
+      "path": "docs/evidence/media-youtube_upload_service.html",
+      "source": "docs/evidence/media-youtube_upload_service.md",
+      "section": "Evidence",
+      "sha256": "4cb5ee8e83a8a17b152990abedc1061c9aba76badbb3dbdfa8fa8a790cf3cdd4",
+      "bytes": 1473,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-youtube_upload_service.md"
+    },
+    {
+      "title": "Produce contract capture — 2026-11-16",
+      "path": "docs/evidence/produce-capture-2026-11-16.html",
+      "source": "docs/evidence/produce-capture-2026-11-16.md",
+      "section": "Evidence",
+      "sha256": "077ef6e3f3ba3fad737cc65bb288092663d58dc22e7d70192af9b5f21638afed",
+      "bytes": 4420,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md"
+    },
+    {
       "title": "V1 → SPECV2 coverage",
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "d5553271169bec028228a4bad605a80e3a63d8e43d941406376b5c09abe92f73",
-      "bytes": 7731,
+      "sha256": "d0607ae9ff3e88d885a18592ddb8a88c0aa850917c16d733d511c213b69bc084",
+      "bytes": 11055,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -330,8 +411,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "8ce6f46cb69a3c63bc1053991ce4f9d426f6374014054e9e502aaed0fa799275",
-      "bytes": 248991,
+      "sha256": "360588f322d58428e9bf2709f57b6d24b6d85d401817f0690a228347c95b9e66",
+      "bytes": 250278,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -339,8 +420,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "705e54d667862701fa399f31bef18da58e7ca636acdcc3fa1c1c3efd0a3c0f04",
-      "bytes": 65834,
+      "sha256": "587eafdcc4c89b990fe063ebabe6d7784c6fe935ed515c2a7db83a2c237d862e",
+      "bytes": 65856,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -384,8 +465,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/02-source-map/40-live-state.html",
       "source": "docs/plans/02-source-map/40-live-state.md",
       "section": "Plans",
-      "sha256": "1b5d216b81810c6c9c80b6549017a6fe1bdddb1e433b6052e007368fc79b2a15",
-      "bytes": 5543,
+      "sha256": "8eb81df1c8c6bb09727b371f4f33e1b80bf721fb4da6a13e6474a53e63f5dacb",
+      "bytes": 5547,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-source-map/40-live-state.md"
     },
     {
@@ -402,8 +483,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "bc2965a26e87934c22511c4d03282d3e77c383315ae2abea816ef1a3e81ee4eb",
-      "bytes": 21408,
+      "sha256": "907752be6edaa5158b5d5e95387c7212b4bbfd22bb704dc0e2b4d31cd56ebb2e",
+      "bytes": 24267,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
@@ -411,18 +492,36 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
       "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
       "section": "Plans",
-      "sha256": "f4bf3870efe8dae259ba3e0e1fe97cb56c37faa60ac73452f835d15f6fdbdc48",
-      "bytes": 10733,
+      "sha256": "616c908515a17f02bbb15156970a91c47c203518d1120734495ccc416b04302d",
+      "bytes": 10911,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
+    },
+    {
+      "title": "05 — The w2v absorption: disposition and the production layer",
+      "path": "docs/plans/05-W2V-ABSORPTION.html",
+      "source": "docs/plans/05-W2V-ABSORPTION.md",
+      "section": "Plans",
+      "sha256": "3bcca544f04f89a22022d4da65180fbe377ef31dedbf4b8addc31e92e41f51be",
+      "bytes": 8235,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/05-W2V-ABSORPTION.md"
     },
     {
       "title": "P0 — Programme definition",
       "path": "docs/plans/P0-programme-definition.html",
       "source": "docs/plans/P0-programme-definition.md",
       "section": "Plans",
-      "sha256": "11781114924d791ebfa317a6411367da7b538315ac52f9c997ebae16d3ee6cb0",
-      "bytes": 5045,
+      "sha256": "bc9edcb4db7ae7f11f6677924b28ec68cb53040b101fe64cafedd469b9a26ec4",
+      "bytes": 13660,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
+    },
+    {
+      "title": "T9 — TOGAF ADM capability",
+      "path": "docs/plans/T9-architecture-capability.html",
+      "source": "docs/plans/T9-architecture-capability.md",
+      "section": "Plans",
+      "sha256": "9d13d42b2a2da1a2cdc1f24fe0e2fd9d554574dfa3a262c1a2f5c1fbba3acfed",
+      "bytes": 18159,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {
       "title": "Rust development process: audit and improvement plan",
@@ -447,8 +546,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S00-usage-inventory.html",
       "source": "docs/plans/slices/S00-usage-inventory.md",
       "section": "Plans",
-      "sha256": "e6c25fd6007fbfd545834a9f37a7b0b2efc169084d50eed2988fb19029e7f951",
-      "bytes": 15734,
+      "sha256": "c697558e4f64f5ea521c60973c68c65a24afdbe1760e8441c08826f4943cea29",
+      "bytes": 15740,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S00-usage-inventory.md"
     },
     {
@@ -564,8 +663,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S09-documents-integrations.html",
       "source": "docs/plans/slices/S09-documents-integrations.md",
       "section": "Plans",
-      "sha256": "3bcdef219f4335ad661311d7f46b92b97b7f82c9348ee4a3b2cf2bd90dc70b63",
-      "bytes": 22868,
+      "sha256": "3b6678c555c2538cdc5aa9934bad9b4cd7828970a34ccda9cae22118c5339427",
+      "bytes": 22878,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S09-documents-integrations.md"
     },
     {
@@ -600,8 +699,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S13-n8n-engine.html",
       "source": "docs/plans/slices/S13-n8n-engine.md",
       "section": "Plans",
-      "sha256": "3e9265c16da7dea8cb08d8c89ea4616a32a16d96709a4e9274dd5222a31e8948",
-      "bytes": 27937,
+      "sha256": "e43492310c7a938ee9fbfdbcfc775f8e60504e21c7be986790bd7c3980f273eb",
+      "bytes": 28248,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S13-n8n-engine.md"
     },
     {
@@ -609,8 +708,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S14-cutover.html",
       "source": "docs/plans/slices/S14-cutover.md",
       "section": "Plans",
-      "sha256": "2b79a00469dfd59179faa7d88657b8989bc1c2f02a69980580e59f2e17f5661e",
-      "bytes": 22640,
+      "sha256": "d7330aa5f1de3de8dd8e99a5b0cd0f783454d46e340687160b2886fedb37fe05",
+      "bytes": 22674,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S14-cutover.md"
     },
     {
@@ -618,8 +717,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S15-capability-knowledge-memory.html",
       "source": "docs/plans/slices/S15-capability-knowledge-memory.md",
       "section": "Plans",
-      "sha256": "cbc06ad66bc7c76246698b395d6b57617afcaa51cd6fa963a27d8f1b80c0d795",
-      "bytes": 27118,
+      "sha256": "5f7fa98ce36c52f8b31836e9393725dcdb638dc0fddac586be692e6f91e19bed",
+      "bytes": 27130,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S15-capability-knowledge-memory.md"
     },
     {
@@ -627,8 +726,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S16-inference-audit.html",
       "source": "docs/plans/slices/S16-inference-audit.md",
       "section": "Plans",
-      "sha256": "fd7539ca663d3edb8bfd838a0307abf411a54a27461b387d9a2c9c5dbaf36cc1",
-      "bytes": 21340,
+      "sha256": "b5d48d960766805e212a6543cf88539dda6a02ce487e5fcde4269f3f9be28ee5",
+      "bytes": 21382,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S16-inference-audit.md"
     },
     {
@@ -636,8 +735,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S17-benchmark-harness.html",
       "source": "docs/plans/slices/S17-benchmark-harness.md",
       "section": "Plans",
-      "sha256": "5b7a3e95e29e631909dff65e1be6dde141047a071805fc0af52b0ffd0f80955c",
-      "bytes": 15448,
+      "sha256": "d65b5338dc303b5f38b2343ff21592f64e454b8d5df73d3504043a94d32cd859",
+      "bytes": 15479,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S17-benchmark-harness.md"
     },
     {
@@ -672,8 +771,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "c7e1a566651860d1dc157674f892625f2925d79f7900ba0fc2050b4ecf446f83",
-      "bytes": 19182,
+      "sha256": "a78024dd459c2aa659cecf9791e8c3aee8f844161bae993d97e5c827431aa021",
+      "bytes": 19218,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

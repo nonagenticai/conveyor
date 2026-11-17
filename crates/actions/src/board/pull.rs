@@ -147,6 +147,11 @@ pub async fn wip_pull(
 /// the index is root-only and a coach for a dead run has no live parent to hang from.
 pub const COACH_ERROR_PROCESS: &str = "cap.kanban_coach.handle_error";
 
+/// The most coach root runs one card may accumulate before `err.card` stops starting them
+/// (SPEC_V2 §1.4 · §12 T4's depth cap). Three failures are enough to show the coach is not
+/// converging; a fourth would only repeat the first three.
+pub const COACH_CHAIN_MAX: i64 = 3;
+
 /// The failure comment's marker: the old flow's `BLOCKED/flow_error` line, kept verbatim so a
 /// person (and the parity ledger) can still recognise it.
 pub const ERR_CARD_COMMENT_MARKER: &str = "BLOCKED/flow_error";
@@ -164,7 +169,8 @@ pub struct ErrCardOutcome {
     /// The live root run occupying the card's slot after this call: the coach this handler
     /// started, or the one that was already there (then `coach_skipped` is true).
     pub coach_run_id: Option<Uuid>,
-    /// True when a live root run already held the card, so no coach was started.
+    /// True when no coach was started: a live root run already held the card, or the recursion
+    /// guard refused (a coach about a coach, a closed project, the chain cap).
     pub coach_skipped: bool,
 }
 
@@ -180,7 +186,8 @@ pub struct ErrCardOutcome {
 /// (`err.card:<step>:<run_id>`), so a redelivery replays the recorded outcome instead of
 /// writing a second comment or starting a second coach. The move also skips when the card is
 /// already in waiting, and the coach skips when the card already holds a live root run — the
-/// two effects a replay would otherwise duplicate.
+/// two effects a replay would otherwise duplicate — or when the recursion guard refuses
+/// ([`COACH_CHAIN_MAX`], a coach-about-a-coach, a closed project).
 ///
 /// A matrix refusal of the move is a real answer (not every card type may enter waiting); it is
 /// logged and the comment/coach still run. A transport failure is returned so the job retries.
@@ -268,15 +275,77 @@ pub async fn err_card(
                 ActionError::internal()
             }
         })?;
+
+    // The recursion guard (SPEC_V2 §1.4 · §12 T4). `live` catches only a LIVE coach; a serial
+    // chain of terminal coach runs is invisible to it, and on 2026-11-15 that chain reached 278
+    // attempts in one night. Three independent refusals, all read inside this transaction so a
+    // redelivery reaches the same answer:
+    //   * no coach about a coach — the failed run IS the coach process;
+    //   * a closed or archived project produces no work to protect;
+    //   * the per-card depth cap.
+    //
+    // Identity is the process KEY family, never a process-row id: a v2 draft forked from a
+    // published coach is a new row, so an id comparison would stop recognising the v1 coach and
+    // an id-keyed count would read zero (PR #188 audit finding F1).
+    let failed_process_key = store::run::process_key_of_run_tx(&mut tx, tenant, run_id)
+        .await
+        .map_err(|error| match error {
+            store::run::RunStoreError::Database(error) => store_error(error, action),
+            other => {
+                tracing::error!(error = %other, "err.card: read the failed run's process key");
+                ActionError::internal()
+            }
+        })?;
+    let board = store::board::get_board_tx(&mut tx, tenant, card.board_id)
+        .await
+        .map_err(|error| store_error(error, action))?
+        .ok_or_else(|| {
+            tracing::error!(%card_id, "err.card: the card's board does not exist");
+            ActionError::internal()
+        })?;
+    let project_status = store::project::get_project_tx(&mut tx, tenant, board.project_id)
+        .await
+        .map_err(|error| store_error(error, action))?
+        .map(|project| project.status);
+    let prior_coaches = store::run::count_root_runs_for_card_process_key_tx(
+        &mut tx,
+        tenant,
+        card_id,
+        COACH_ERROR_PROCESS,
+    )
+    .await
+    .map_err(|error| match error {
+        store::run::RunStoreError::Database(error) => store_error(error, action),
+        other => {
+            tracing::error!(error = %other, "err.card: count the card's coach runs");
+            ActionError::internal()
+        }
+    })?;
+    let coach_refusal = if failed_process_key.as_deref() == Some(COACH_ERROR_PROCESS) {
+        Some("no coach about a coach")
+    } else if project_status
+        .as_deref()
+        .is_some_and(|status| matches!(status, "closed" | "archived"))
+    {
+        Some("the card's project is closed")
+    } else if prior_coaches >= COACH_CHAIN_MAX {
+        Some("the coach chain reached its cap")
+    } else {
+        None
+    };
     tx.commit().await.map_err(|error| {
         tracing::error!(%error, "err.card: close the read transaction");
         ActionError::internal()
     })?;
 
+    if let Some(reason) = coach_refusal {
+        tracing::info!(%run_id, %card_id, reason, "err.card: the coach is refused");
+    }
+
     let mut outcome = ErrCardOutcome {
         card_id: Some(card_id),
         coach_run_id: live.as_ref().map(|run| run.id),
-        coach_skipped: live.is_some(),
+        coach_skipped: live.is_some() || coach_refusal.is_some(),
         ..ErrCardOutcome::default()
     };
 

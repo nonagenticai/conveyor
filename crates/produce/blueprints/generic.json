@@ -1,0 +1,19 @@
+{
+  "key": "generic",
+  "title": "Any short media piece",
+  "family": "production",
+  "phases": [
+    { "id": "brief", "action": "produce.brief", "params": {} },
+    { "id": "source_ingest", "action": "produce.asset", "params": {} },
+    { "id": "script", "action": "produce.script", "params": {} },
+    { "id": "storyboard", "action": "produce.storyboard", "params": {} },
+    { "id": "asset_search", "action": "produce.asset", "params": {} },
+    { "id": "site_capture", "action": "media.record_browser", "params": {} },
+    { "id": "stills", "action": "media.generate_image", "params": {} },
+    { "id": "generated_video", "action": "media.produce_video", "params": {} },
+    { "id": "motion_graphics", "action": "media.record_browser", "params": {} },
+    { "id": "narration", "action": "produce.speech", "params": {} },
+    { "id": "render", "action": "media.compile_video", "params": {} }
+  ],
+  "unresolved": ["brief", "source_ingest", "script", "storyboard", "asset_search", "narration"]
+}

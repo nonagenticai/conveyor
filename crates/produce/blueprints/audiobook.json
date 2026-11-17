@@ -1,0 +1,11 @@
+{
+  "key": "audiobook",
+  "title": "A narrated long-form reading",
+  "family": "production",
+  "phases": [
+    { "id": "script", "action": "produce.script", "params": {} },
+    { "id": "narration", "action": "produce.speech", "params": {} },
+    { "id": "compile", "action": "media.concat_audio", "params": {} }
+  ],
+  "unresolved": ["script", "narration"]
+}

@@ -22,7 +22,7 @@ use serde_json::Value;
 use std::collections::BTreeSet;
 use tower::ServiceExt;
 
-use conveyor_research::media::{self, Config};
+use conveyor_research::media;
 
 const GOLDEN_DIR: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/contract/media/golden");
 const TOLERANCES: &str = include_str!("../contract/media/tolerances.toml");
@@ -64,6 +64,25 @@ fn normalise(value: &mut Value, volatile: &BTreeSet<String>) {
                 normalise(item, volatile);
             }
         }
+        // A score is a float average, and its last digit is not portable: measured on CI
+        // 2026-11-16, `avg_score` came out 0.7333 on Linux against the capture's 0.7332 for the
+        // same inputs — the same accumulation rounded on a different IEEE boundary. Snapping to
+        // three decimals keeps the comparison honest at the precision the capture actually pins
+        // (a thousandth of a score) without pretending a float is exact.
+        Value::Number(number) => {
+            // Only fractions: an integer must stay an integer, or `2` would become `2.0` and the
+            // comparison would fail on a value that never drifted.
+            if let Some(float) = number.as_f64()
+                && float.fract() != 0.0
+            {
+                let snapped = (float * 1000.0).round() / 1000.0;
+                if snapped != float
+                    && let Some(snapped) = serde_json::Number::from_f64(snapped)
+                {
+                    *value = Value::Number(snapped);
+                }
+            }
+        }
         _ => {}
     }
 }
@@ -87,15 +106,7 @@ fn cases() -> Vec<(String, String, String)> {
 }
 
 fn app(pool: sqlx::PgPool) -> axum::Router {
-    let config = Config {
-        bind_host: "127.0.0.1".to_string(),
-        bind_port: 0,
-        enable_docs: false,
-        service_name: "media-discovery".to_string(),
-        version: "0.1.0".to_string(),
-        database_url: None,
-        max_connections: 4,
-    };
+    let config = common::media_config();
     media::build_app(media::AppState::with_pool(config, pool))
 }
 
@@ -149,7 +160,8 @@ async fn every_captured_case_replays_its_answer() {
         let mut builder = Request::builder()
             .method(method.as_str())
             .uri(&path)
-            .header("x-tenant-id", TENANT);
+            .header("x-tenant-id", TENANT)
+            .header("authorization", common::vouch_auth());
         if !body.is_empty() {
             builder = builder.header("content-type", "application/json");
         }

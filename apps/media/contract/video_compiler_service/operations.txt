@@ -1,0 +1,10 @@
+GET /api/jobs/{job_id}
+GET /health
+GET /health/live
+GET /health/ready
+GET /healthz
+GET /readyz
+POST /api/compile
+POST /api/concat-audio
+POST /api/jobs/cancel
+POST /api/thumbnails

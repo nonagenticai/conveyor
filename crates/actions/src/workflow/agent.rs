@@ -18,7 +18,7 @@
 //! model names but the executor did not declare is refused **before** execution
 //! (`action-not-found`) and fed back to the model, never audited after the fact (CONTRACT §17).
 
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
@@ -536,6 +536,26 @@ fn capability_not_ready(field: &str, code: &str, detail: impl Into<String>) -> A
     }])
 }
 
+/// The agent's remaining wall clock, or `None` when the cap is already spent.
+///
+/// CONTRACT §17's cap is wall clock, but the loop is pure and only learns the elapsed time from a
+/// reply between turns: a model or tool call still in flight when the cap passes would otherwise
+/// keep the step alive past it (measured live 2026-11-17: 347 753 ms against a 300 000 ms cap).
+/// The executor therefore bounds every call by what is left of the budget.
+fn budget_remaining(started: Instant, cap_ms: i64) -> Option<Duration> {
+    let cap = Duration::from_millis(u64::try_from(cap_ms).unwrap_or(u64::MAX));
+    let remaining = cap.saturating_sub(started.elapsed());
+    (!remaining.is_zero()).then_some(remaining)
+}
+
+/// The typed `agent.timeout` the loop fails with when the budget is spent.
+fn budget_spent(started: Instant, cap_ms: i64) -> ActionError {
+    typed(AgentError::Timeout {
+        elapsed_ms: started.elapsed().as_millis() as i64,
+        cap: cap_ms,
+    })
+}
+
 /// Drive one loop to its end. Every effect goes through [`invoke`], so each model call and tool
 /// call is an `action_invocation` on the run's trace id with the engine's idempotency and audit.
 pub(crate) async fn drive(
@@ -545,7 +565,26 @@ pub(crate) async fn drive(
     config: AgentConfig,
 ) -> Result<AgentRunOut, ActionError> {
     let (mut agent, mut plan) = Agent::start(config).map_err(typed)?;
+    // CONTRACT §17: an internal invocation still acts as a real principal. The loop has no user,
+    // so it resolves the tenant's service actor once — the same actor the operator CLI uses — and
+    // every model and tool call carries it. Without this the call runs as the nil uuid, and an
+    // action that records its author fails its foreign key (`documents.compose` →
+    // `document.created_by`, measured live 2026-11-17).
+    let actor_id = store::identity::tenant_actor(pool, tenant)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "agent.run: resolve the tenant actor");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                422,
+                "agent.no_actor",
+                "the tenant has no active member for an agent run to act as",
+            )
+        })?;
     let started = Instant::now();
+    let cap_ms = agent.caps().timeout_ms;
     let allowed: Vec<String> = agent
         .tool_names()
         .iter()
@@ -554,12 +593,9 @@ pub(crate) async fn drive(
     let prompt_ref = agent.prompt_ref().map(str::to_owned);
 
     loop {
-        if started.elapsed().as_millis() as i64 > agent.caps().timeout_ms {
-            return Err(typed(AgentError::Timeout {
-                elapsed_ms: started.elapsed().as_millis() as i64,
-                cap: agent.caps().timeout_ms,
-            }));
-        }
+        let Some(remaining) = budget_remaining(started, cap_ms) else {
+            return Err(budget_spent(started, cap_ms));
+        };
         match plan {
             Plan::CallModel {
                 model,
@@ -567,12 +603,19 @@ pub(crate) async fn drive(
                 tools,
             } => {
                 let turn = u32::from(agent.turns()) + 1;
-                let input = json!({
+                // An agent with NO tool surface sends no `tools` field at all, never
+                // `"tools": []`. `CompletionIn` already omits an empty array
+                // (`skip_serializing_if`), and OpenAI-compatible backends reject the empty one:
+                // vLLM answers 400 "`tools` must not be an empty array" before the model is
+                // dialled, which is how every tool-less executor failed live on 2026-11-15.
+                let mut input = json!({
                     "model": model,
                     "messages": messages.iter().map(wire_message).collect::<Vec<_>>(),
-                    "tools": tools,
                 });
-                let outcome = invoke(
+                if !tools.is_empty() {
+                    input["tools"] = json!(tools);
+                }
+                let call = invoke(
                     pool,
                     registry(),
                     tenant,
@@ -583,7 +626,7 @@ pub(crate) async fn drive(
                         idempotency_key: run
                             .idempotency_prefix
                             .map(|prefix| format!("{prefix}:turn{turn}")),
-                        actor_id: Uuid::nil(),
+                        actor_id,
                         actor_kind: "service".to_owned(),
                         role: Role::KataExecutor,
                         policy: Default::default(),
@@ -606,8 +649,10 @@ pub(crate) async fn drive(
                             correlation_id: Some(format!("run:{}", run.run_id)),
                         }),
                     },
-                )
-                .await?;
+                );
+                let outcome = tokio::time::timeout(remaining, call)
+                    .await
+                    .map_err(|_| budget_spent(started, cap_ms))??;
                 // A 5xx from the router must retry the tick, not fail the node: the caller maps
                 // this status to `Deferred`.
                 let reply = model_reply(&outcome.body)?;
@@ -616,7 +661,7 @@ pub(crate) async fn drive(
             Plan::CallTool(call) => {
                 let reply = if allowed.iter().any(|name| name == &call.name) {
                     let index = agent.tool_calls();
-                    let outcome = invoke(
+                    let invocation = invoke(
                         pool,
                         registry(),
                         tenant,
@@ -627,7 +672,7 @@ pub(crate) async fn drive(
                             idempotency_key: run
                                 .idempotency_prefix
                                 .map(|prefix| format!("{prefix}:tool{index}")),
-                            actor_id: Uuid::nil(),
+                            actor_id,
                             actor_kind: "service".to_owned(),
                             role: Role::KataExecutor,
                             policy: Default::default(),
@@ -638,8 +683,11 @@ pub(crate) async fn drive(
                             app_key: run.app_key.to_owned(),
                             usage: None,
                         },
-                    )
-                    .await;
+                    );
+                    let outcome = match tokio::time::timeout(remaining, invocation).await {
+                        Ok(result) => result,
+                        Err(_) => return Err(budget_spent(started, cap_ms)),
+                    };
                     match outcome {
                         Ok(outcome) => ToolReply {
                             id: call.id.clone(),

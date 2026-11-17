@@ -47,6 +47,7 @@ struct UsageData {
     models: UsageReport,
     callers: UsageReport,
     prompts: UsageReport,
+    projects: UsageReport,
     calls: Vec<InferenceCall>,
     has_more: bool,
 }
@@ -60,6 +61,9 @@ struct Totals {
     writes: i64,
     misses: i64,
     unknown: i64,
+    cost_usd: f64,
+    priced_calls: i64,
+    unpriced_calls: i64,
 }
 
 impl Totals {
@@ -72,8 +76,48 @@ impl Totals {
             sum.writes += row.writes;
             sum.misses += row.misses;
             sum.unknown += row.unknown;
+            sum.cost_usd += row.cost_usd.parse::<f64>().unwrap_or(0.0);
+            sum.priced_calls += row.priced_calls;
+            sum.unpriced_calls += row.unpriced_calls;
             sum
         })
+    }
+}
+
+/// A USD figure from a decimal string. Estimates stay exact-looking at small amounts (six
+/// decimals); from a cent upward they read as money.
+fn fmt_usd(value: f64) -> String {
+    if value >= 0.01 {
+        format!("${value:.2}")
+    } else {
+        format!("${value:.6}")
+    }
+}
+
+/// One report row's derived cost, parsed from the decimal string the server sends. A bucket the
+/// ledger could not price says so; it is never drawn as a zero-dollar cost.
+fn row_usd(row: &UsageRow) -> String {
+    if row.priced_calls == 0 && row.unpriced_calls > 0 {
+        "unpriced".to_owned()
+    } else {
+        fmt_usd(row.cost_usd.parse::<f64>().unwrap_or(0.0))
+    }
+}
+
+/// A bucket's unit total, or "—" when the bucket has no single honest unit (a token bucket, a
+/// mixed-unit bucket, or one containing an unpriced call).
+fn unit_label(row: &UsageRow) -> String {
+    match (&row.unit, &row.units) {
+        (Some(unit), Some(units)) => {
+            let value: f64 = units.parse().unwrap_or(0.0);
+            let count = if value.fract().abs() < f64::EPSILON {
+                format!("{value:.0}")
+            } else {
+                format!("{value:.1}")
+            };
+            format!("{count} {unit}")
+        }
+        _ => "—".to_owned(),
     }
 }
 
@@ -120,6 +164,7 @@ fn load(
         let models = report(&client, since, until, "model").await?;
         let callers = report(&client, since, until, "caller_kind").await?;
         let prompts = report(&client, since, until, "prompt_sha").await?;
+        let projects = report(&client, since, until, "project").await?;
 
         let mut input = serde_json::Map::new();
         if !caller.is_empty() {
@@ -148,6 +193,7 @@ fn load(
             models,
             callers,
             prompts,
+            projects,
             has_more: page.next_cursor.is_some(),
             calls: page.items,
         })
@@ -257,6 +303,14 @@ fn UsageBody(
     let caller_rows = data.callers.rows.clone();
     let model_count = model_rows.len();
     let caller_count = caller_rows.len();
+    let mut project_rows = data.projects.rows.clone();
+    // Costliest project first: the question is "what is this costing", not "what exists".
+    project_rows.sort_by(|a, b| {
+        let left = b.cost_usd.parse::<f64>().unwrap_or(0.0);
+        let right = a.cost_usd.parse::<f64>().unwrap_or(0.0);
+        left.partial_cmp(&right)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
     let mut prompt_rows = data.prompts.rows.clone();
     // Cache-hostile first: a prompt written and never read is the failure this screen exists
     // to show; then the lowest hit rate.
@@ -368,6 +422,11 @@ fn UsageBody(
                         value=fmt_compact(never_writes)
                         detail=format!("{} prompt hashes", never_read.len())
                     />
+                    <Tile
+                        label="Commercial equivalent".to_owned()
+                        value=fmt_usd(totals.cost_usd)
+                        detail=format!("{} priced · {} unpriced calls", fmt_int(totals.priced_calls), fmt_int(totals.unpriced_calls))
+                    />
                 </div>
 
                 <section class="panel" aria-labelledby="usage-chart-title">
@@ -416,6 +475,8 @@ fn UsageBody(
                             <thead><tr>
                                 <th>"Model"</th><th class="n">"Calls"</th><th class="n">"Hit"</th>
                                 <th class="n">"Writes"</th><th class="n">"Misses"</th><th class="n">"Tokens"</th>
+                                <th class="n">"Units"</th>
+                                <th class="n">"Equivalent"</th>
                                 <th class="n adv">"Server hits/calls"</th>
                             </tr></thead>
                             <tbody>
@@ -427,6 +488,8 @@ fn UsageBody(
                                         <td class="n">{fmt_int(row.writes)}</td>
                                         <td class="n">{fmt_int(row.misses)}</td>
                                         <td class="n">{fmt_compact(row.prompt_tokens + row.completion_tokens)}</td>
+                                        <td class="n">{unit_label(row)}</td>
+                                        <td class="n">{row_usd(row)}</td>
                                         <td class="n adv">{format!("{}%", (row.hit_ratio * 100.0).round() as i64)}</td>
                                     </tr>
                                 }).collect_view()}
@@ -459,6 +522,33 @@ fn UsageBody(
                         </table>
                     </section>
                 </div>
+
+                <section class="panel" aria-labelledby="usage-projects-title">
+                    <div class="panel-head">
+                        <h2 id="usage-projects-title">"By project — commercial equivalent"</h2>
+                        <span class="muted">{format!("{} projects · cost derived at read time", project_rows.len())}</span>
+                    </div>
+                    <table class="wtbl">
+                        <thead><tr>
+                            <th>"Project"</th><th class="n">"Calls"</th><th class="n">"Tokens"</th>
+                            <th class="n">"Wall time"</th><th class="n">"Equivalent"</th><th class="n">"Unpriced"</th>
+                        </tr></thead>
+                        <tbody>
+                            {project_rows.iter().map(|row| view! {
+                                <tr>
+                                    <td class="mono">
+                                        {if row.bucket.is_empty() { "unattributed".to_owned() } else { short_id(Some(&row.bucket)) }}
+                                    </td>
+                                    <td class="n">{fmt_int(row.calls)}</td>
+                                    <td class="n">{fmt_compact(row.prompt_tokens + row.completion_tokens)}</td>
+                                    <td class="n">{format!("{:.1}s", row.latency_ms as f64 / 1000.0)}</td>
+                                    <td class="n">{row_usd(row)}</td>
+                                    <td class="n">{if row.unpriced_calls > 0 { fmt_int(row.unpriced_calls) } else { "—".to_owned() }}</td>
+                                </tr>
+                            }).collect_view()}
+                        </tbody>
+                    </table>
+                </section>
 
                 <section class="panel" aria-labelledby="usage-prompts-title">
                     <div class="panel-head">

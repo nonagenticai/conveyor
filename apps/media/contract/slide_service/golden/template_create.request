@@ -1,0 +1,3 @@
+POST /api/templates
+{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}
+{"name":"capture_created","display_name":"Capture Created","category":"capture","layout_type":"title","slot_definitions":{"title":{"type":"text","max_length":80,"required":true}},"styling_rules":{"title_font_size":40},"default_timing_hint_seconds":6.0}

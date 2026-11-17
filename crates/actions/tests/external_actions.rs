@@ -121,3 +121,47 @@ async fn the_external_fixtures_behave_exactly_as_the_plan_states() {
 
     running.shutdown().await;
 }
+
+/// The two coding actions are the only externals that submit a job rather than read a display:
+/// their bodies are the coding service's own documents. The schema is what an agent or a flow
+/// reads to know what to send.
+#[test]
+fn the_coding_actions_document_the_body_a_caller_sends() {
+    let registry = conveyor_actions::registry::registry();
+
+    let create = registry.get("coding_jobs.create").expect("declared");
+    let schema = create.input_schema();
+    let properties = schema["properties"]
+        .as_object()
+        .unwrap_or_else(|| panic!("no properties in {schema}"));
+    for field in [
+        "kind",
+        "input",
+        "workspace_id",
+        "workspace",
+        "idempotency_key",
+        "timeout_seconds",
+    ] {
+        assert!(
+            properties.contains_key(field),
+            "{field} missing from {schema}"
+        );
+    }
+    let required: Vec<&str> = schema["required"]
+        .as_array()
+        .expect("required")
+        .iter()
+        .filter_map(|value| value.as_str())
+        .collect();
+    assert!(
+        required.contains(&"kind") && required.contains(&"input"),
+        "kind and input are required: {schema}"
+    );
+
+    let get = registry.get("coding_jobs.get").expect("declared");
+    let get_schema = get.input_schema();
+    assert!(
+        get_schema["properties"]["id"].is_object(),
+        "coding_jobs.get documents the id: {get_schema}"
+    );
+}

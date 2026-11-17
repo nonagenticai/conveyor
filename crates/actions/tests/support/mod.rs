@@ -288,6 +288,10 @@ pub struct Seeded {
 
 /// Seed `dev-a`/`alice` (and optionally another tenant) exactly as `migrate --dev-seed`
 /// does, including the active entitlement the licence gate requires.
+/// The second human every fixture can rely on: a distinct reviewer in the same tenant, so a gate
+/// that one principal requested can be decided by another (SPEC_V2 §5.4's requester exclusion).
+pub const REVIEWER: &str = "dev:reviewer";
+
 pub async fn seed(pg: &Pg, slug: &str, login: &str, name: &str) -> Seeded {
     let tenant_id: Uuid = sqlx::query_scalar(
         "INSERT INTO tenant (slug, name) VALUES ($1, $2)
@@ -323,6 +327,31 @@ pub async fn seed(pg: &Pg, slug: &str, login: &str, name: &str) -> Seeded {
     .execute(&mut *tx)
     .await
     .expect("insert membership");
+    // The requester/executor exclusion (T1) means a fixture cannot both request and decide a
+    // gate. The PRIMARY tenant carries a second admin, `dev:reviewer`, for that role; a second
+    // tenant must not, or the principal would hold two memberships and dev auth would demand
+    // `X-Active-Tenant`.
+    if slug == "dev-a" {
+        let reviewer_id: Uuid = sqlx::query_scalar(
+            "INSERT INTO app_user (oidc_subject, email, display_name)
+         VALUES ('dev:reviewer', 'reviewer@dev.invalid', 'Reviewer')
+         ON CONFLICT (oidc_subject) WHERE oidc_subject IS NOT NULL
+         DO UPDATE SET display_name = excluded.display_name
+         RETURNING id",
+        )
+        .fetch_one(&pg.owner)
+        .await
+        .expect("insert reviewer");
+        sqlx::query(
+            "INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')
+         ON CONFLICT (tenant_id, user_id) DO NOTHING",
+        )
+        .bind(tenant_id)
+        .bind(reviewer_id)
+        .execute(&mut *tx)
+        .await
+        .expect("insert reviewer membership");
+    }
     sqlx::query(
         "INSERT INTO app_licence (tenant_id, app_key, status, checked_at)
          VALUES ($1, 'conveyor', 'active', now())
@@ -344,6 +373,15 @@ pub async fn seed(pg: &Pg, slug: &str, login: &str, name: &str) -> Seeded {
         tenant_id,
         user_id,
     }
+}
+
+/// The id of the reviewer principal [`seed`] provisions. A fixture that opens a gate directly
+/// uses this as `requested_by` so the deciding user is not the requester (SPEC_V2 §5.4).
+pub async fn reviewer_id(pg: &Pg) -> Uuid {
+    sqlx::query_scalar("SELECT id FROM app_user WHERE oidc_subject = 'dev:reviewer'")
+        .fetch_one(&pg.owner)
+        .await
+        .expect("the reviewer principal is seeded")
 }
 
 /// Create and publish a checker-inspected SOP, returning its id (S13: every step names one).
@@ -654,7 +692,38 @@ impl Stub {
 ///
 /// A JSON object naming the path: an external action passes a service's document through unchanged, so the stub
 /// answers the shape the conveyor expects (an object) and lets a test assert which route was called.
-async fn external_answer(uri: axum::http::Uri) -> axum::Json<serde_json::Value> {
+///
+/// `produce.script` (#163) is the one caller that is not a passthrough: it reads `choices[0].message.content`,
+/// parses it as its own document and binds it to shot ids it derived. A catch-all answer would send it down its
+/// 502 path, which proves nothing, so the stub recognises the ask in the request and answers a valid — empty —
+/// shot list. Empty on purpose: the ids belong to the caller, and a stub that invented them would be testing
+/// the stub.
+async fn external_answer(
+    uri: axum::http::Uri,
+    body: Option<axum::Json<Value>>,
+) -> axum::Json<serde_json::Value> {
+    let asks_for_a_shot_list = body
+        .as_ref()
+        .and_then(|axum::Json(body)| body.get("messages"))
+        .and_then(Value::as_array)
+        .is_some_and(|messages| {
+            messages.iter().any(|message| {
+                message
+                    .get("content")
+                    .and_then(Value::as_str)
+                    .is_some_and(|content| content.contains("shot list"))
+            })
+        });
+    if asks_for_a_shot_list {
+        return axum::Json(serde_json::json!({
+            "choices": [{
+                "message": {
+                    "role": "assistant",
+                    "content": "{\"storyline\":\"the stub's through-line\",\"shots\":[]}"
+                }
+            }]
+        }));
+    }
     axum::Json(serde_json::json!({
         "stub": true,
         "path": uri.path(),

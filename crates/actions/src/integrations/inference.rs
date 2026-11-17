@@ -115,7 +115,10 @@ fn chat_spec(name: &'static str) -> ActionSpec {
         scopes: &[Scope::ModelWrite],
         // A replay with the same key returns the first body — one turn, one charge.
         idempotent: true,
-        timeout_ms: 60_000,
+        // The ceiling an agent row may declare (`timeout_secs` 1..=300). A shorter bound
+        // here makes the agent's own timeout unreachable: the invocation engine rolls a
+        // slow turn back before the loop can finish it.
+        timeout_ms: 300_000,
         // An outbound, billable POST: declaring it `read` told every consumer it was free and
         // side-effect-free. When S16 lands it also writes the `inference_call` ledger row.
         effect: Effect::Write,
@@ -127,12 +130,14 @@ fn chat_spec(name: &'static str) -> ActionSpec {
         },
         task_capable: false,
         captures_usage: true,
+        artefact: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",
             path: "/api/chat/completions",
             auth: Some(INFERENCE_TOKEN_SECRET),
             auth_optional: true,
+            upload: None,
         },
     }
 }
@@ -163,7 +168,7 @@ mod tests {
         assert_eq!(spec.name, "completions.create");
         assert_eq!(spec.kind, ActionKind::External);
         assert_eq!(spec.effect, Effect::Write);
-        assert_eq!(spec.timeout_ms, 60_000);
+        assert_eq!(spec.timeout_ms, 300_000);
         assert_eq!(spec.scope_names(), vec!["model:write"]);
         assert!(spec.idempotent);
         match spec.handler {
@@ -189,7 +194,7 @@ mod tests {
         assert_eq!(spec.name, "inference.chat");
         assert_eq!(spec.kind, ActionKind::External);
         assert_eq!(spec.effect, Effect::Write);
-        assert_eq!(spec.timeout_ms, 60_000);
+        assert_eq!(spec.timeout_ms, 300_000);
         assert_eq!(spec.scope_names(), vec!["model:write"]);
         assert!(spec.idempotent);
         assert!(

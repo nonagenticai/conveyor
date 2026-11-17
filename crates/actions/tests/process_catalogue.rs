@@ -475,7 +475,7 @@ async fn the_shipped_catalogue_runs_a_process_end_to_end() {
     let (status, decided) = running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({"approval_id": approval, "decision": "approve"}),
             None,
             None,

@@ -103,6 +103,18 @@ async fn introspect(
                 "token_expires_at": "2099-01-01T00:00:00Z"
             }),
         ),
+        // A second licence principal: a gate one agent requested cannot be decided by the same
+        // agent (SPEC_V2 §5.4), so the one-task test poses the question with this one.
+        "good2" => (
+            200,
+            json!({
+                "active": true,
+                "tenant_id": state.tenant,
+                "app": {"key": "conveyor"},
+                "subject_id": "agent-2",
+                "token_expires_at": "2099-01-01T00:00:00Z"
+            }),
+        ),
         _ => (500, json!({"error": "introspection failed"})),
     };
     Response::builder()
@@ -159,6 +171,7 @@ async fn fixture() -> (support::Pg, support::Seeded, LicencesStub) {
         .expect("catalogue seed");
     conveyor_actions::board::matrix::clear_cache();
     provision(&pg, seeded.tenant_id, AGENT_SUBJECT, "agent", "member").await;
+    provision(&pg, seeded.tenant_id, "licence:agent-2", "agent", "member").await;
     provision(&pg, seeded.tenant_id, "dev:carol", "human", "admin").await;
     provision(&pg, seeded.tenant_id, "dev:dave", "human", "viewer").await;
     let stub = LicencesStub::start(seeded.tenant_id).await;
@@ -251,6 +264,9 @@ async fn one_licence_principal_task_creates_reads_decides_and_closes() {
     let running =
         support::Running::start_with_config(support::config_with_licences(&pg, &stub.base)).await;
     let mut mcp = support::Mcp::connect(&running, "good").await;
+    // The second licence agent poses the question; `mcp` (agent-1) decides it. §5.4 refuses a
+    // requester deciding its own gate, and the decision must still record as an agent's.
+    let mut requester = support::Mcp::connect(&running, "good2").await;
     // The session authenticated by INTROSPECTING the licence, not by a development bearer.
     assert!(
         stub.hits.load(Ordering::SeqCst) >= 1,
@@ -330,7 +346,7 @@ async fn one_licence_principal_task_creates_reads_decides_and_closes() {
     assert_eq!(events["isError"], false, "{events}");
 
     // 3. Pose an approval (property f: no run gates it) carrying the §5 fields.
-    let asked = mcp
+    let asked = requester
         .call(
             "approvals_request",
             json!({

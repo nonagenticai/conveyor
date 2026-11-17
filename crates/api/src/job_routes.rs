@@ -88,8 +88,24 @@ async fn fence(state: &AppState, headers: &HeaderMap, job_id: Uuid) -> Result<Fe
     let job = store::jobs::get(&state.pool, claims.tenant, job_id)
         .await?
         .ok_or_else(refused)?;
-    let live_lease = job.lease_until.is_some_and(|until| until > Utc::now());
-    if job.status != "running" || job.attempts != claims.attempt || !live_lease {
+    // The pod's authorization is its ATTEMPT, not the worker's claim.
+    //
+    // A runner job is deferred between poll cycles (`store::jobs::defer` leaves the row `pending`
+    // and clears the lease so the next poll can re-claim it), while the pod runs for minutes. So
+    // requiring `running` with a live lease here would refuse every pod write that lands between
+    // two polls. Measured live 2026-11-16 on the first dispatch: the executor finished in 10 s and
+    // its `POST /result` answered 403, leaving the job `pending` for ever.
+    //
+    // `continuation` is the flag `defer` sets and only a re-claim of the same attempt clears, so
+    // it means "between two polls of the attempt whose number is in the token". A finished job is
+    // `succeeded`/`failed`/`dead`, a cancelled job is `dead`, and a superseded attempt carries a
+    // different `attempts` — all three still fall through to the same 403.
+    let attempt_is_live = match job.status.as_str() {
+        "running" => job.lease_until.is_some_and(|until| until > Utc::now()),
+        "pending" => job.continuation,
+        _ => false,
+    };
+    if !attempt_is_live || job.attempts != claims.attempt {
         return Err(refused());
     }
 

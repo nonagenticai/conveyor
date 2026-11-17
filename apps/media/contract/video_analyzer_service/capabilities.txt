@@ -1,0 +1,7 @@
+# The capability kinds this service owns after its drop table (see README.md).
+# `media.probe_video` is the ffprobe capability the analyzer's own routes expose; the job-scoped
+# CRUD is dropped for the same reason as the compiler's.
+media.probe_video
+media.analyze_video
+media.analyze_audio
+media.ocr

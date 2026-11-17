@@ -457,3 +457,121 @@ async fn andon_scenario() {
         "a released cord reports age 0"
     );
 }
+
+async fn attempts_of(db: &common::TestDb, kind: &str, dedupe: &str) -> i32 {
+    sqlx::query_scalar("SELECT attempts FROM job WHERE kind = $1 AND dedupe_key = $2")
+        .bind(kind)
+        .bind(dedupe)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("read the job's attempts")
+}
+
+/// A STOP CONTROL MUST NOT DEPEND ON THE ENTITLEMENT IT MAY NEED TO STOP.
+///
+/// While the cord is pulled the only writer of `app_licence.checked_at` is `licence.sync`; when
+/// that snapshot is stale (licences down, or the sync withheld) the licence gate must not refuse
+/// the release. The control below proves the gate is still armed for every ordinary action, so
+/// what is carved out is exactly the cord's own two actions — nothing else.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_stale_entitlement_does_not_block_the_cord() {
+    let db = common::TestDb::fresh().await;
+    let fixture = seed(&db).await;
+    conveyor_store::seed::catalogue(&db.owner)
+        .await
+        .expect("the catalogue seed");
+    conveyor_actions::board::matrix::clear_cache();
+    let served = Served::start(&db).await;
+
+    let (status, body) = served
+        .invoke(
+            "andon.engage",
+            "dev:alice",
+            json!({"reason": "stale entitlement drill"}),
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    sqlx::query(
+        "UPDATE app_licence SET checked_at = now() - interval '2 hours' WHERE tenant_id = $1",
+    )
+    .bind(fixture.tenant_id)
+    .execute(&db.super_pool)
+    .await
+    .expect("age the entitlement past STALE_AFTER");
+
+    // The gate is armed: an ordinary action is refused while the snapshot is stale.
+    let (status, body) = served
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({"title": "refused while stale", "project_type_code": "delivery"}),
+        )
+        .await;
+    assert_eq!(
+        status, 403,
+        "the licence gate must still refuse an ordinary action: {body}"
+    );
+    assert_eq!(body["type"], "licence_required", "{body}");
+
+    // The cord's own actions are not gated.
+    let (status, body) = served.invoke("andon.release", "dev:alice", json!({})).await;
+    assert_eq!(
+        status, 200,
+        "the release must not be gated by a stale entitlement: {body}"
+    );
+    assert_eq!(output(&body)["engaged"], false, "{body}");
+
+    let released: bool =
+        sqlx::query_scalar("SELECT released_at IS NOT NULL FROM andon_state WHERE tenant_id = $1")
+            .bind(fixture.tenant_id)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("read the cord");
+    assert!(
+        released,
+        "the cord is down in the row, not only the response"
+    );
+}
+
+/// `licence.sync` starts no work, and it is the only writer of the entitlement snapshot the
+/// release path depends on — so a pulled cord must NOT withhold it.
+#[tokio::test(flavor = "multi_thread")]
+async fn the_pulled_cord_still_runs_the_licence_sync() {
+    let db = common::TestDb::fresh().await;
+    let fixture = seed(&db).await;
+    conveyor_store::seed::catalogue(&db.owner)
+        .await
+        .expect("the catalogue seed");
+    conveyor_actions::board::matrix::clear_cache();
+    let served = Served::start(&db).await;
+
+    let (status, body) = served
+        .invoke("andon.engage", "dev:alice", json!({"reason": "sync drill"}))
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    // One sync (allowed) and one work-starting sibling (not), both due immediately.
+    sqlx::query(
+        "INSERT INTO job (tenant_id, kind, dedupe_key, payload)
+         VALUES ($1, 'licence.sync', 'sync-probe', '{}'::jsonb),
+                ($1, 'run.execute', 'run-probe', '{}'::jsonb)",
+    )
+    .bind(fixture.tenant_id)
+    .execute(&db.super_pool)
+    .await
+    .expect("seed the sync and a work-starting sibling");
+
+    let _worker = WorkerChild::spawn(&db);
+    wait_for(
+        "the worker to claim licence.sync while the cord is pulled",
+        Duration::from_secs(10),
+        || async { attempts_of(&db, "licence.sync", "sync-probe").await >= 1 },
+    )
+    .await;
+    assert_eq!(
+        attempts_of(&db, "run.execute", "run-probe").await,
+        0,
+        "a work-starting sibling must never be claimed under the cord"
+    );
+}

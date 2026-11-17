@@ -2,9 +2,10 @@
 //! `projects.create` · `.get` · `.close`.
 //!
 //! `create` is the one action that makes a project usable: it writes the project, its board,
-//! the template's five lanes, the **start card** and that card's **root run** in ONE
-//! transaction (S5-D5 — there is no `boards.create`, and a board-less project is unusable;
-//! S13 §5.8 — a project nobody is analysing is no more usable than a board-less one). The wire
+//! the template's five lanes and the **start card** in ONE transaction, and starts that card's
+//! **root run** when the tenant's start capability is ready (S5-D5 — there is no `boards.create`,
+//! and a board-less project is unusable; S13 §5.8 — a project nobody is analysing is no more
+//! usable than a board-less one). The wire
 //! vocabulary is fr's (`title`, `problem_statement`, `desired_outcome`);
 //! `project_type`/`repository_url` are the signed channel's names for
 //! `project_type_code`/`repo_url` and S06a maps them (S05 §5).
@@ -26,12 +27,9 @@ use crate::spec::HandlerOutput;
 
 use super::{ProjectCloseIn, ProjectCreateIn, ProjectExecuteIn, ProjectUpdateIn, views::IdIn};
 
-/// The board every new project gets. One board per project today, but the FK is the
-/// contract, not a 1:1 assumption (data-arch §2.3).
-const DEFAULT_BOARD_NAME: &str = "Board";
-
-/// The template code `projects.create` reads.
-const DEFAULT_TEMPLATE_CODE: &str = "standard";
+/// The board every new project gets, and the template it reads its lanes from. Both live in
+/// `store` so the seeds give a project exactly the board this action gives it.
+pub use conveyor_store::board::{DEFAULT_BOARD_NAME, DEFAULT_TEMPLATE_CODE};
 
 /// The card type of the start card every fresh project is born with (S13 §5.8).
 const START_CARD_TYPE_CODE: &str = "project_start_request_analysis";
@@ -195,12 +193,12 @@ async fn projects_create(
 
 /// Create the project's start card in the board's intake lane and start its root run (S13 §5.8).
 ///
-/// Both writes run in the caller's transaction: a project that exists without its start card is
-/// a project nobody is analysing, and a start card without its run is a card no worker will pick
-/// up. A tenant whose seed lacks the card type or the published process gets a typed `409`
-/// naming what is missing — a fresh project must never be created into a state the engine
-/// cannot act on. `ctx` is consumed because `process_runs_start` takes it by value.
-async fn insert_start_card_and_run(
+/// The card and the run ride the caller's transaction, but the run is contingent on the tenant's
+/// content: an absent/not-published start process and a start capability that is not ready both
+/// leave a valid project, board and start card with no run — the card can be started later from
+/// the console. Every other refusal is fatal, so a fresh project is never created into a state
+/// the engine cannot act on. `ctx` is consumed because `process_runs_start` takes it by value.
+pub(crate) async fn insert_start_card_and_run(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
     project_id: Uuid,
@@ -329,6 +327,18 @@ async fn insert_start_card_and_run(
                     process_key = START_PROCESS_KEY,
                     "projects.create: the tenant has no published start process; the project and \
                      its start card were created without a run"
+                );
+                return Ok(());
+            }
+            // A published start process whose capability is not ready (no active agent, an
+            // unregistered allowed action, a missing prompt pin) is the same observable state:
+            // the project, board and start card are valid, and a person starts the card when
+            // the content is ready. The refusal is logged; it is never silent.
+            (409, "capability_not_ready") => {
+                tracing::info!(
+                    process_key = START_PROCESS_KEY,
+                    "projects.create: the start capability is not ready; the project and its \
+                     start card were created without a run"
                 );
                 return Ok(());
             }
@@ -505,6 +515,30 @@ async fn projects_update(
             "must be draft, active, paused, closed or archived",
         ));
     }
+    // A type that names no live catalogue row would make every move deny, so it is refused
+    // here exactly as `projects.create` refuses it (#206).
+    if let Some(code) = input.project_type_code.as_deref() {
+        let code = conveyor_domain::Code::parse(code)
+            .map_err(|error| invalid("project_type_code", "invalid_value", error.to_string()))?;
+        let entry = store::catalogue::get_catalogue_entry_tx(
+            &mut *tx,
+            ctx.tenant,
+            conveyor_domain::CatalogueKind::ProjectType,
+            &code,
+        )
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read project type");
+            ActionError::internal()
+        })?;
+        if entry.is_none_or(|entry| !entry.is_active) {
+            return Err(invalid(
+                "project_type_code",
+                "invalid_value",
+                "no active project_type catalogue row has this code in this tenant",
+            ));
+        }
+    }
     let mut changed = Vec::new();
     if input.name.is_some() {
         changed.push("name");
@@ -514,6 +548,9 @@ async fn projects_update(
     }
     if input.status.is_some() {
         changed.push("status");
+    }
+    if input.project_type_code.is_some() {
+        changed.push("project_type_code");
     }
     if input.repo_url.is_some() {
         changed.push("repo_url");
@@ -525,7 +562,8 @@ async fn projects_update(
         return Err(invalid(
             "name",
             "invalid_value",
-            "nothing to update: supply name, description, status, repo_url or meta",
+            "nothing to update: supply name, description, status, project_type_code, repo_url \
+             or meta",
         ));
     }
     // Metadata is merged, not replaced: the seed owns keys this action does not (`issues`,
@@ -545,6 +583,7 @@ async fn projects_update(
         name: input.name.map(|name| name.trim().to_owned()),
         description: input.description,
         status: input.status,
+        project_type_code: input.project_type_code,
         repo_url: input.repo_url,
         meta,
     };
@@ -632,9 +671,10 @@ async fn projects_execute(
             ),
         ));
     }
-    // The programme's declared order is enforced here, not in the console: a project whose
-    // `meta.depends_on` names an open project cannot start a run.
-    crate::programme::assert_dependencies_met(&mut *tx, ctx.tenant, project.id).await?;
+    // The programme's declared order and the inception pair are enforced here, not in the
+    // console: a project whose `meta.depends_on` names an open project, or whose declared
+    // inception outputs are not published, cannot start a run.
+    crate::programme::assert_project_can_start(&mut *tx, ctx.tenant, project.id).await?;
     let (run, created) = store::run::create_project_execution_tx(&mut *tx, ctx.tenant, project.id)
         .await
         .map_err(|error| run_error(error, "projects.execute"))?;

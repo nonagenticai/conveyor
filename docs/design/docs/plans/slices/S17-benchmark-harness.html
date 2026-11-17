@@ -172,7 +172,7 @@
 cd $HOME/Movies/conveyor
 step() { printf &#39;\n=== %s ===\n&#39; &quot;$1&quot;; }
 
-# Rust runs on m1 (CONTRACT §16): `~/.local/bin/cargo` refuses inside a Cargo project on mini3.
+# Rust runs on the build host (CONTRACT §16): `~/.local/bin/cargo` refuses inside a Cargo project on the dev box.
 step &quot;fmt + clippy&quot;
 rbuild -- fmt --all -- --check
 rbuild -- clippy --workspace --all-targets -- -D warnings
@@ -201,8 +201,8 @@ rbuild -- run -q --manifest-path tools/seed-benchmark/Cargo.toml -- \
   --ids &lt;verified50-v1.json&gt; --out .seed-gate/verified50-v1.json
 cmp seed/benchmark/verified50-v1.json .seed-gate/verified50-v1.json
 
-# ⚠️ This probe observes mini3&#39;s compose `conveyor_dev`, where the operator applies `migrate`.
-# The `test` commands above run against m1&#39;s throwaway cluster, a DIFFERENT database — so the
+# ⚠️ This probe observes the dev box&#39;s compose `conveyor_dev`, where the operator applies `migrate`.
+# The `test` commands above run against the build host&#39;s throwaway cluster, a DIFFERENT database — so the
 # probe names its database rather than leaving the reader to assume it.
 step &quot;RLS on every new table (compose conveyor_dev)&quot;
 export DATABASE_URL=&#39;postgres://postgres:postgres@127.0.0.1:5439/conveyor_dev&#39;
@@ -250,7 +250,7 @@ printf &#39;\nGATE_GREEN\n&#39;</code></pre>
 <tr>
 <td>1</td>
 <td>Which node runs the eval Jobs?</td>
-<td>a designated node with a taint; the selector is deployment config, never a repointed <code>worker1</code></td>
+<td>a designated node with a taint; the selector is deployment config, never a repointed node</td>
 </tr>
 <tr>
 <td>2</td>

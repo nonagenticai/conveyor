@@ -121,12 +121,8 @@ window.installV2 = function (api, enterprise) {
     lastError: null,
     outputs: {},
     outputsLoading: null,
-    register: { items: [], loaded: false, loading: false, error: null },
-    repositories: [],
-    repositoriesLoaded: false,
-    publishRepo: null,
-    publishStatus: null,
-    publishTimer: null,
+    register: { items: [], loaded: false, loading: false, error: null, next_cursor: null },
+    requests: { items: [], loaded: false, loading: false, error: null, next_cursor: null },
     programme: null,
     runs: [],
     runsLoaded: false,
@@ -156,10 +152,8 @@ window.installV2 = function (api, enterprise) {
     cs.lastError = null;
     cs.outputs = {};
     cs.outputsLoading = null;
-    cs.repositories = [];
-    cs.repositoriesLoaded = false;
-    cs.publishRepo = null;
-    cs.publishStatus = null;
+    cs.register = { items: [], loaded: false, loading: false, error: null, next_cursor: null };
+    cs.requests = { items: [], loaded: false, loading: false, error: null, next_cursor: null };
     cs.programme = null;
     cs.runs = [];
     cs.runsLoaded = false;
@@ -167,8 +161,6 @@ window.installV2 = function (api, enterprise) {
     cs.runDetail = {};
     cs.runDetailLoading = null;
     cs.loadingAll = false;
-    if (cs.publishTimer) clearTimeout(cs.publishTimer);
-    cs.publishTimer = null;
   }
 
   async function consoleLoad() {
@@ -217,7 +209,13 @@ window.installV2 = function (api, enterprise) {
     try {
       const view = await C.get("/api/projects/" + encodeURIComponent(projectId));
       const board = list(view.boards)[0];
-      if (!board) throw new Error("This project has no board.");
+      // A project without a board is a real state, not a read failure: its outputs and
+      // checklist are documents, and the seed leaves archived rows board-less. Cache the
+      // absence so the next render does not re-fetch it and never shows "loading" forever.
+      if (!board) {
+        cs.byProject[projectId] = { board: null, lists: [], cards: [], stale: false };
+        return;
+      }
       const [boardView, cardPage] = await Promise.all([
         C.get("/api/boards/" + encodeURIComponent(board.id)),
         C.get("/api/boards/" + encodeURIComponent(board.id) + "/cards?limit=200"),
@@ -291,6 +289,10 @@ window.installV2 = function (api, enterprise) {
     const issue = cs.issues.find((row) => String(row.number) === String(issueNumber));
     if (!project || !data || data.error) {
       toast("The project's board is not loaded yet");
+      return;
+    }
+    if (!data.board) {
+      toast("This project has no board; intake a card needs one");
       return;
     }
     const lane = list(data.lists).find((row) => row.kind === "intake") || list(data.lists)[0];
@@ -555,7 +557,10 @@ window.installV2 = function (api, enterprise) {
         project_id: projectId,
         page: { limit: 100 },
       });
-      cs.outputs[projectId] = { items: list(page.items), error: null };
+      cs.outputs[projectId] = {
+        items: list(page.items).filter((doc) => doc.status !== "deleted"),
+        error: null,
+      };
     } catch (error) {
       cs.outputs[projectId] = { items: [], error };
     } finally {
@@ -564,15 +569,23 @@ window.installV2 = function (api, enterprise) {
     }
   }
 
-  // The cross-project register. One `documents.list` with no project filter: the operator sees
-  // every output in the tenant, and the project workspace reads the same rows through its own
-  // per-project cache.
-  async function consoleLoadRegister() {
-    if (!consoleOn() || cs.register.loading || cs.register.loaded) return;
+  // The cross-project register. One `documents.list` page at a time: the operator sees the
+  // tenant's outputs, and "Load more" follows the cursor instead of silently stopping at a cap.
+  async function consoleLoadRegister(more = false) {
+    if (!consoleOn() || cs.register.loading) return;
+    if (cs.register.loaded && !more) return;
     cs.register.loading = true;
     try {
-      const page = await C.action("documents.list", { page: { limit: 200 } });
-      cs.register.items = list(page.items);
+      const page = await C.action("documents.list", {
+        kind: "document",
+        page: {
+          limit: 200,
+          ...(more && cs.register.next_cursor ? { cursor: cs.register.next_cursor } : {}),
+        },
+      });
+      const items = list(page.items).filter((doc) => doc.status !== "deleted");
+      cs.register.items = more ? [...cs.register.items, ...items] : items;
+      cs.register.next_cursor = page.next_cursor || null;
       cs.register.error = null;
       cs.register.loaded = true;
     } catch (error) {
@@ -583,95 +596,44 @@ window.installV2 = function (api, enterprise) {
     }
   }
 
+  // The admin's review queue: every draft whose author asked for publication. It is a
+  // tenant-wide query, not the register's loaded page, so its count is honest at any size.
+  async function consoleLoadRequests(more = false) {
+    if (!consoleOn() || !isAdmin() || cs.requests.loading) return;
+    if (cs.requests.loaded && !more) return;
+    cs.requests.loading = true;
+    try {
+      const page = await C.action("documents.list", {
+        publish_requested: true,
+        page: {
+          limit: 50,
+          ...(more && cs.requests.next_cursor ? { cursor: cs.requests.next_cursor } : {}),
+        },
+      });
+      const items = list(page.items).filter((doc) => doc.status !== "deleted");
+      cs.requests.items = more ? [...cs.requests.items, ...items] : items;
+      cs.requests.next_cursor = page.next_cursor || null;
+      cs.requests.error = null;
+      cs.requests.loaded = true;
+    } catch (error) {
+      cs.requests.error = error;
+    } finally {
+      cs.requests.loading = false;
+      render();
+    }
+  }
+
   // After a write the register and the owning project's panel both reload. A single helper keeps
   // the two caches from disagreeing about the row that just changed.
   function consoleRefreshOutputs(projectId) {
     cs.register.loaded = false;
     cs.register.items = [];
+    cs.register.next_cursor = null;
+    cs.requests = { items: [], loaded: false, loading: false, error: null, next_cursor: null };
     if (projectId) delete cs.outputs[projectId];
     if (!consoleOn()) return;
     if (projectId) consoleLoadOutputs(projectId);
     consoleLoadRegister();
-  }
-
-  async function consoleLoadRepositories() {
-    if (!consoleOn() || cs.repositoriesLoaded) return;
-    try {
-      const page = await C.action("repositories.list", {});
-      cs.repositories = list(page.items);
-      cs.repositoriesLoaded = true;
-      let stored = "";
-      try {
-        stored = localStorage.getItem("conveyor.publish.repository") || "";
-      } catch (_) {
-        /* a private window may refuse; the selection is then per-render */
-      }
-      const found = cs.repositories.find((row) => row.id === stored);
-      const homepage = cs.repositories.find((row) => /nonagentic_homepage/.test(row.url || ""));
-      cs.publishRepo = found
-        ? found.id
-        : homepage
-          ? homepage.id
-          : (cs.repositories[0] || {}).id || null;
-    } catch (error) {
-      cs.repositories = [];
-      cs.repositoriesLoaded = true;
-      cs.lastError = error;
-    }
-    render();
-  }
-
-  const selectedRepository = () => cs.repositories.find((row) => row.id === cs.publishRepo) || null;
-
-  function consoleSelectRepository(id) {
-    cs.publishRepo = id || null;
-    try {
-      if (id) localStorage.setItem("conveyor.publish.repository", id);
-    } catch (_) {
-      /* per-render selection only */
-    }
-    cs.publishStatus = null;
-    render();
-    if (id) consolePollPublish(id, 0);
-  }
-
-  async function consolePollPublish(repositoryId, attempt) {
-    if (!consoleOn() || !repositoryId) return;
-    if (cs.publishTimer) clearTimeout(cs.publishTimer);
-    try {
-      const status = await C.action("publish.status", { repository_id: repositoryId });
-      cs.publishStatus = status;
-      render();
-      if ((status.state === "pending" || status.state === "running") && attempt < 150) {
-        cs.publishTimer = setTimeout(() => consolePollPublish(repositoryId, attempt + 1), 2000);
-      }
-    } catch (error) {
-      cs.publishStatus = { state: "error", error: consoleError(error) };
-      render();
-    }
-  }
-
-  async function consoleStartPublish() {
-    const repo = selectedRepository();
-    if (!repo) {
-      toast("Select a publish target first");
-      return;
-    }
-    if (!repo.credential_secret_id) {
-      toast("This repository has no token; save one first");
-      return;
-    }
-    try {
-      const started = await C.action("publish.start", { repository_id: repo.id });
-      cs.publishStatus = { state: started.state, job_id: started.job_id };
-      toast(started.already_running ? "A publish is already running" : "Publish enqueued");
-      render();
-      consolePollPublish(repo.id, 0);
-    } catch (error) {
-      cs.lastError = error;
-      toast("Publish refused · " + consoleError(error));
-      render();
-    }
   }
 
   /* ------------------------------------------------------------- execution room */
@@ -825,7 +787,6 @@ window.installV2 = function (api, enterprise) {
     if (signed) {
       consoleLoadProject(current.id);
       consoleLoadOutputs(current.id);
-      consoleLoadRepositories();
     }
     const select = signed
       ? `<label class="e-select">Project <select data-v2-input="project-page">${rows
@@ -875,26 +836,206 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------- outputs */
-  const outputCategoryOf = (doc) => String(((doc.meta || {}).category) || "");
-  const outputUnitOf = (doc) => String(((doc.meta || {}).unit) || "");
-  const INCEPTION_CATEGORIES = ["analysis", "architecture"];
-  const OUTPUT_CATEGORIES = [
-    "vision",
-    "blueprint",
-    "business-case",
-    "programme-plan",
-    "governance",
-    "reuse-map",
-    "brief",
-    "analysis",
-    "architecture",
-    "plan",
-    "spec",
-    "decision",
-    "evidence",
-    "handoff",
-    "report",
-  ];
+  // `seed/output-standard.json` is the source; the builder writes `data/output-standard.js` for
+  // this file. The promoted columns are authoritative; `meta` is the pre-0042 fallback.
+  const OUTPUT_STANDARD = window.CONVEYOR_OUTPUT_STANDARD || { categories: [], aliases: {} };
+  const canonicalCategory = (value) => {
+    const raw = String(value || "");
+    return (OUTPUT_STANDARD.aliases || {})[raw] || raw;
+  };
+  const outputCategoryOf = (doc) =>
+    canonicalCategory(doc.category || ((doc.meta || {}).category) || "");
+  const outputUnitOf = (doc) => String(doc.unit || ((doc.meta || {}).unit) || "");
+  const outputAuthorOf = (doc) => String(doc.created_by_name || "");
+  const outputStateOf = (doc) =>
+    doc.publishable
+      ? "public"
+      : (doc.meta || {}).rework
+        ? "returned"
+        : doc.publish_requested_at
+          ? "review requested"
+          : "draft";
+  const isAdmin = () => !!(C && C.role && C.role() === "admin");
+  const INCEPTION_CATEGORIES = ["inception-analysis", "architecture-design"];
+  const OUTPUT_CATEGORIES = list(OUTPUT_STANDARD.categories);
+
+  // The standard's template per category is data (#245); the compose dialog seeds its skeleton
+  // and the completeness panel reads the same required headings the server refuses to publish
+  // without. The normalisation mirrors the domain function exactly.
+  const outputTemplateOf = (category) =>
+    (OUTPUT_STANDARD.templates || {})[category] || null;
+  const headingKeyOf = (value) =>
+    String(value).split(/\s+/).filter(Boolean).join(" ").toLowerCase();
+  const headingsOf = (markdown) => {
+    const found = new Set();
+    let fence = null;
+    for (const line of String(markdown || "").split("\n")) {
+      const trimmed = line.replace(/^\s+/, "");
+      const opener = trimmed.match(/^(```+|~~~+)/);
+      if (opener) {
+        const marker = opener[1][0];
+        if (!fence) fence = marker;
+        else if (fence === marker) fence = null;
+        continue;
+      }
+      if (fence) continue;
+      const atx = trimmed.match(/^(#{1,6})\s+(.*?)\s*$/);
+      if (!atx) continue;
+      const text = atx[2].replace(/#+$/, "").trim();
+      if (text) found.add(headingKeyOf(text));
+    }
+    return found;
+  };
+  const missingSectionsOf = (category, body) => {
+    const template = outputTemplateOf(category);
+    if (!template) return [];
+    const present = headingsOf(body);
+    return list(template.required).filter((heading) => !present.has(headingKeyOf(heading)));
+  };
+  const completenessOf = (category, body) => {
+    const template = outputTemplateOf(category);
+    if (!template) return `<p class="muted">This category has no template in the standard.</p>`;
+    const present = headingsOf(body);
+    return `<ul class="console-completeness">${list(template.required)
+      .map((heading) =>
+        present.has(headingKeyOf(heading))
+          ? `<li class="is-present">✓ ${E(heading)}</li>`
+          : `<li class="is-missing">○ ${E(heading)}</li>`,
+      )
+      .join("")}</ul>`;
+  };
+  const findOutput = (id) =>
+    [...list(cs.requests.items), ...list(cs.register.items)].find((doc) => doc.id === id) ||
+    null;
+  const missingFromError = (error) =>
+    list(error && error.errors)
+      .filter((row) => row.code === "output_incomplete")
+      .map((row) => String(row.detail || "").replace(/^missing required section:\s*/, ""))
+      .filter(Boolean);
+
+  // The completeness panel is live on the dialog's own fields; it is not a `render()` state
+  // change, so typing never redraws (and never loses) the draft.
+  function wireCompleteness() {
+    const area = document.getElementById("output-body");
+    const slot = document.getElementById("output-completeness");
+    if (!area || !slot) return;
+    const category = document.getElementById("output-category");
+    const update = () =>
+      (slot.innerHTML = completenessOf((category || {}).value || "", area.value));
+    area.addEventListener("input", update);
+    if (category) category.addEventListener("change", update);
+    update();
+  }
+
+  // The classes a person may create a project against. The keyed classes (P0, SPEC-V2) are the
+  // programme's own rows, and `archived` is a measurement, not a creation state. #221 adds
+  // classes to the same generated standard; this list follows it without a code change.
+  const OUTPUT_CLASSES = list(OUTPUT_STANDARD.classes).filter(
+    (cls) => !(cls.when || {}).key && cls.name !== "archived",
+  );
+  const classLabel = (cls) =>
+    `${cls.name} · ${list(cls.now).join(", ")}${
+      list(cls.closure).length ? ` · closure ${list(cls.closure).join(", ")}` : ""
+    }`;
+  // Resolve a project's class exactly as the seed builder does: every `when` fact must match,
+  // first match wins, and a project that matches nothing is custom rather than guessed.
+  const classOfProject = (project) => {
+    const meta = project.meta || {};
+    const facts = {
+      key: project.key,
+      track: meta.track,
+      status: project.status,
+      measured_status: meta.measured_status,
+    };
+    return (
+      list(OUTPUT_STANDARD.classes).find((cls) =>
+        Object.entries(cls.when || {}).every(([name, value]) => facts[name] === value),
+      ) || null
+    );
+  };
+  // A class whose `when` omits a fact still needs a representative value, or the first-match
+  // resolver would fall through to the earlier class (`v2-built` is any v2 not `proposed`).
+  const CLASS_STATUS = {
+    "v2-proposed": "proposed",
+    "v2-built": "built",
+    "v1-active": "partial",
+    "v1-built": "built",
+    programme: "planned",
+  };
+  // The meta a class writes: its facts and its due-now / at-closure sets. A class with no
+  // `track`/`measured_status` fact leaves the project's current value alone.
+  const classMeta = (cls, tranche) => {
+    const meta = {
+      expected_outputs: list(cls.now),
+      closure_outputs: list(cls.closure),
+      output_class: cls.name,
+    };
+    if ((cls.when || {}).track) meta.track = cls.when.track;
+    const status = (cls.when || {}).measured_status || CLASS_STATUS[cls.name];
+    if (status) meta.measured_status = status;
+    const number = Number(tranche);
+    if (String(tranche ?? "").trim() !== "" && Number.isFinite(number)) meta.tranche = number;
+    return meta;
+  };
+
+  // The admin's review queue. Publishing is the same action as the register's Publish button;
+  // there is no approve/deny action, so the view surfaces exactly the draft that needs one.
+  function reviewRequestsPanel() {
+    if (!isAdmin()) return "";
+    consoleLoadRequests();
+    const state = cs.requests;
+    if (state.error) {
+      return panel(
+        "Review requests",
+        note(`<strong>Read refused</strong> · ${E(consoleError(state.error))}`, "bad"),
+      );
+    }
+    if (!state.loaded) return panel("Review requests", note("Loading the publish requests…"));
+    if (!state.items.length) {
+      return panel("Review requests", note("No draft is waiting for review."), B("0", ""));
+    }
+    const rows = state.items.map((doc) => {
+      const actions = [
+        C.can("documents.get")
+          ? button("Read", "request-read", `data-id="${E(doc.id)}"`, "small", "file")
+          : "",
+        C.can("documents.publish")
+          ? button(
+              "Publish",
+              "request-publish",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "shield",
+            )
+          : "",
+        C.can("documents.return")
+          ? button(
+              "Return",
+              "request-return",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "replay",
+            )
+          : "",
+        C.can("documents.compose")
+          ? button(
+              "Open a kata",
+              "request-kata",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "lightning",
+            )
+          : "",
+      ].join("");
+      const project = consoleProjects().find((row) => row.id === doc.project_id);
+      return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)}</small></td><td>${E(doc.project_key || (project || {}).key || "—")}</td><td>${E(outputAuthorOf(doc) || "—")}</td><td><small>${E(short(doc.updated_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
+    });
+    return panel(
+      "Review requests",
+      `${table(["Output", "Project", "Author", "Updated", "Operate"], rows)}${note("A request is a draft whose author asked for publication. Publishing is an admin decision; there is no separate approve action.")}`,
+      B(`${state.items.length} waiting`, "amber"),
+    );
+  }
 
   function outputsPage() {
     const signed = consoleOn();
@@ -907,14 +1048,16 @@ window.installV2 = function (api, enterprise) {
       ? cs.register.items
       : list(pack.outputs).map((row) => ({ ...row, publishable: true }));
     const projectFilter = v.outputsProject || "";
-    const visibility = v.outputsVisibility || "";
+    const stateFilter = v.outputsState || "";
     const categoryFilter = v.outputsCategory || "";
+    const unitFilter = v.outputsUnit || "";
     const categories = [...new Set(all.map(outputCategoryOf).filter(Boolean))].sort();
+    const units = [...new Set(all.map(outputUnitOf).filter(Boolean))].sort();
     const rows = all.filter((doc) => {
       if (projectFilter && doc.project_id !== projectFilter) return false;
-      if (visibility === "public" && !doc.publishable) return false;
-      if (visibility === "private" && doc.publishable) return false;
+      if (stateFilter && outputStateOf(doc) !== stateFilter) return false;
       if (categoryFilter && outputCategoryOf(doc) !== categoryFilter) return false;
+      if (unitFilter && outputUnitOf(doc) !== unitFilter) return false;
       return true;
     });
     const projectName = (doc) => {
@@ -928,17 +1071,28 @@ window.installV2 = function (api, enterprise) {
         ? ` <a class="e-project-link" href="docs/output-${E(doc.id)}.html" target="_blank" rel="noopener">public ↗</a>`
         : "";
     const filters = signed
-      ? `<div class="toolbar"><label class="e-select">Project <select data-v2-input="outputs-filter" data-key="outputsProject"><option value="">Every project</option>${consoleProjects()
-          .map(
-            (p) =>
-              `<option value="${E(p.id)}" ${projectFilter === p.id ? "selected" : ""}>${E(p.key)} · ${E(p.name)}</option>`,
-          )
-          .join("")}</select></label><label class="e-select">Visibility <select data-v2-input="outputs-filter" data-key="outputsVisibility"><option value="">Any</option><option value="public" ${visibility === "public" ? "selected" : ""}>Published</option><option value="private" ${visibility === "private" ? "selected" : ""}>Private</option></select></label><label class="e-select">Category <select data-v2-input="outputs-filter" data-key="outputsCategory"><option value="">Any</option>${categories
-          .map(
-            (c) =>
-              `<option value="${E(c)}" ${categoryFilter === c ? "selected" : ""}>${E(c)}</option>`,
-          )
-          .join("")}</select></label><span class="mono muted">${rows.length} / ${all.length} outputs</span></div>`
+      ? `<div class="toolbar">
+          <label class="e-select">Project <select data-v2-input="outputs-filter" data-key="outputsProject"><option value="">Every project</option>${consoleProjects()
+            .map(
+              (p) =>
+                `<option value="${E(p.id)}" ${projectFilter === p.id ? "selected" : ""}>${E(p.key)} · ${E(p.name)}</option>`,
+            )
+            .join("")}</select></label>
+          <label class="e-select">State <select data-v2-input="outputs-filter" data-key="outputsState"><option value="">Any</option><option value="public" ${stateFilter === "public" ? "selected" : ""}>Published</option><option value="review requested" ${stateFilter === "review requested" ? "selected" : ""}>Review requested</option><option value="draft" ${stateFilter === "draft" ? "selected" : ""}>Draft</option><option value="returned" ${stateFilter === "returned" ? "selected" : ""}>Returned</option></select></label>
+          <label class="e-select">Category <select data-v2-input="outputs-filter" data-key="outputsCategory"><option value="">Any</option>${categories
+            .map(
+              (c) =>
+                `<option value="${E(c)}" ${categoryFilter === c ? "selected" : ""}>${E(c)}</option>`,
+            )
+            .join("")}</select></label>
+          <label class="e-select">Unit <select data-v2-input="outputs-filter" data-key="outputsUnit"><option value="">Any</option>${units
+            .map(
+              (u) =>
+                `<option value="${E(u)}" ${unitFilter === u ? "selected" : ""}>${E(u)}</option>`,
+            )
+            .join("")}</select></label>
+          <span class="mono muted">${rows.length} of ${all.length} loaded</span>
+        </div>`
       : "";
     const signedRows = rows.map((doc) => {
       const actions = [
@@ -948,7 +1102,28 @@ window.installV2 = function (api, enterprise) {
         C.can("documents.update")
           ? button("Edit", "output-edit", `data-id="${E(doc.id)}"`, "small", "edit")
           : "",
-        C.can("documents.update")
+        C.can("documents.revision_list")
+          ? button(
+              "History",
+              "output-history",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "file",
+            )
+          : "",
+        C.can("documents.create")
+          ? button("Attach", "output-attach", `data-id="${E(doc.id)}"`, "small", "plus")
+          : "",
+        !doc.publishable && C.can("documents.request_publish") && !doc.publish_requested_at
+          ? button(
+              "Request publish",
+              "output-request-publish",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "shield",
+            )
+          : "",
+        isAdmin() && C.can("documents.publish")
           ? button(
               doc.publishable ? "Unpublish" : "Publish",
               "output-publish",
@@ -970,15 +1145,23 @@ window.installV2 = function (api, enterprise) {
             )
           : "",
       ].join("");
-      return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)}</small></td><td>${E(projectName(doc))}</td><td>${E(outputUnitOf(doc) || "—")}</td><td>${E(outputCategoryOf(doc) || "—")}</td><td>${B(doc.publishable ? "public" : "private", doc.publishable ? "green" : "")}${pageLink(doc)}</td><td><div class="console-actions">${actions}</div></td></tr>`;
+      const state = outputStateOf(doc);
+      return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)}</small></td><td>${E(projectName(doc))}</td><td>${E(outputUnitOf(doc) || "—")}</td><td>${E(outputCategoryOf(doc) || "—")}</td><td>${E(outputAuthorOf(doc) || "—")}</td><td>${B(state, doc.publishable ? "green" : "")}${pageLink(doc)}</td><td><div class="console-actions">${actions}</div></td></tr>`;
     });
     const publicRows = rows.map(
       (doc) =>
         `<tr><td><a class="e-project-link" href="${E(doc.path || `docs/output-${doc.id}.html`)}" target="_blank" rel="noopener"><strong>${E(doc.title)}</strong></a></td><td>${E(doc.project_key || doc.project_name || "—")}</td><td><small>${E(short(doc.updated_at, 16))}</small></td></tr>`,
     );
     const body = signed
-      ? table(["Output", "Project", "Unit", "Category", "Visibility", "Operate"], signedRows)
+      ? table(
+          ["Output", "Project", "Unit", "Category", "Author", "State", "Operate"],
+          signedRows,
+        )
       : table(["Output", "Project", "Updated"], publicRows);
+    const more =
+      signed && cs.register.next_cursor
+        ? `<div class="row" style="margin-top:10px">${button("Load more", "outputs-more", "", "small", "arrow")}</div>`
+        : "";
     const compose = signed && C.can("documents.compose")
       ? button("Compose output", "output-new-register", "", "small", "plus")
       : "";
@@ -992,14 +1175,14 @@ window.installV2 = function (api, enterprise) {
         ? "Documents read from the platform's own rows. Publishing is the output's own publishable flag; the public page follows on the next request."
         : "Published outputs only, read from the live outputs.js index.",
       signed ? true : list(pack.outputs).length > 0,
-    )}${filters}${
+    )}${filters}${signed ? reviewRequestsPanel() : ""}${
       signed && cs.register.error
         ? note(`<strong>Read refused</strong> · ${E(consoleError(cs.register.error))}`, "bad")
         : ""
     }${panel(
       "Outputs",
       (signed ? signedRows : publicRows).length
-        ? body
+        ? `${body}${more}`
         : `<p class="muted">${
             signed
               ? "No output matches these filters. Compose one, or clear a filter."
@@ -1023,13 +1206,13 @@ window.installV2 = function (api, enterprise) {
           }</td></tr>`,
       )
       .join("");
-    return panel(
+    return `${publicExpectedOutputPanel(current)}${panel(
       "All projects",
       `${table(["Project", "Status", "Track", "Plan"], [body])}${note(
         "This is the published snapshot, read-only. Sign in at the app origin to edit a project, compose outputs or publish.",
       )}`,
       B(`${rows.length} projects`, "green"),
-    );
+    )}`;
   }
 
   function coverageOf(key) {
@@ -1087,37 +1270,188 @@ window.installV2 = function (api, enterprise) {
     );
   }
 
-  function inceptionPanel(project) {
+  // The public checklist: published outputs only; a private draft never counts or renders here.
+  function publicExpectedOutputPanel(project) {
+    const title = "Expected outputs";
+    const outputs = list((window.CONVEYOR_OUTPUTS || {}).outputs).filter(
+      (doc) => doc.project_id === project.id,
+    );
+    const expected = list((project.meta || {}).expected_outputs);
+    const closure = list((project.meta || {}).closure_outputs);
+    const categories = expected.length ? expected : INCEPTION_CATEGORIES;
+    const stateOf = (category) => {
+      const docs = outputs.filter((doc) => outputCategoryOf(doc) === category);
+      return {
+        docs,
+        label: docs.length ? "published" : "missing",
+        tone: docs.length ? "green" : "bad",
+      };
+    };
+    let published = 0;
+    let nextMarked = false;
+    const row = (category, markNext) => {
+      const current = stateOf(category);
+      if (current.docs.length) published += 1;
+      const next = markNext && !current.docs.length && !nextMarked;
+      if (next) nextMarked = true;
+      return `<tr><td><strong>${E(category)}</strong>${next ? ` ${B("next", "amber")}` : ""}</td><td>${B(current.label, current.tone)}</td><td>${current.docs.length ? E(current.docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>—</td></tr>`;
+    };
+    const rows = categories.map((category) => row(category, true));
+    if (project.key === "P0") {
+      const delivery = snapshotProjects().filter(
+        (row) => row.key !== "P0" && list((row.meta || {}).expected_outputs).length > 0,
+      );
+      const briefed = new Set(
+        list((window.CONVEYOR_OUTPUTS || {}).outputs)
+          .filter((doc) => outputCategoryOf(doc) === "project-brief")
+          .map((doc) => doc.project_id),
+      );
+      const covered = delivery.filter((row) => briefed.has(row.id)).length;
+      rows.push(
+        `<tr><td><strong>project briefs</strong></td><td>${B(`${covered}/${delivery.length} published`, covered === delivery.length && delivery.length ? "green" : "amber")}</td><td><small>Across every delivery project</small></td><td>—</td></tr>`,
+      );
+    }
+    let closurePublished = 0;
+    const closureRows = closure.map((category) => {
+      const current = stateOf(category);
+      if (current.docs.length) closurePublished += 1;
+      return `<tr><td><strong>${E(category)}</strong></td><td>${B(current.label, current.tone)}</td><td>${current.docs.length ? E(current.docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>—</td></tr>`;
+    });
+    const closureBlock = closure.length
+      ? `<h4>At closure</h4>${table(["Output", "State", "Document", "Action"], closureRows)}`
+      : "";
+    return panel(
+      title,
+      `${table(["Output", "State", "Document", "Action"], rows)}${closureBlock}${note("Published outputs only. A private draft is not part of the public window.")}`,
+      B(
+        `${published}/${categories.length} published${closure.length ? ` · closure ${closurePublished}/${closure.length}` : ""}`,
+        published === categories.length ? "green" : "amber",
+      ),
+    );
+  }
+
+  // The programme work queue: published outputs against the standard's due-now set, ordered by
+  // tranche. The signed-in caller passes every document; the public one passes `outputs.js`.
+  function programmeQueue(projects, docs) {
+    const rows = projects
+      .filter((project) => list((project.meta || {}).expected_outputs).length > 0)
+      .map((project) => {
+        const expected = list((project.meta || {}).expected_outputs);
+        const closure = list((project.meta || {}).closure_outputs);
+        const mine = docs.filter((doc) => doc.project_id === project.id);
+        const isPublished = (category) =>
+          mine.some(
+            (doc) =>
+              outputCategoryOf(doc) === category &&
+              (doc.publishable || doc.publishable === undefined),
+          );
+        return {
+          project,
+          meta: project.meta || {},
+          expected,
+          closure,
+          published: expected.filter(isPublished).length,
+          closurePublished: closure.filter(isPublished).length,
+          next: expected.find((category) => !isPublished(category)) || "",
+        };
+      })
+      .sort(
+        (left, right) =>
+          (left.meta.tranche ?? 99) - (right.meta.tranche ?? 99) ||
+          String(left.project.key).localeCompare(String(right.project.key)),
+      );
+    const body = rows.map(({ project, meta, expected, closure, published, closurePublished, next }) => {
+      const measured = ((coverageOf(project.key) || {}).status) || meta.measured_status || "—";
+      return `<tr><td><strong>${E(project.key)}</strong> <small>${E(project.name)}</small></td><td>${E(meta.tranche ?? "—")}</td><td>${E(measured)}</td><td>${B(`${published}/${expected.length}`, expected.length && published === expected.length ? "green" : "amber")}</td><td>${closure.length ? E(`${closurePublished}/${closure.length}`) : "—"}</td><td>${next ? `<span class="mono">${E(next)}</span>` : "—"}</td></tr>`;
+    });
+    const due = rows.filter((row) => row.next.length > 0).length;
+    return panel(
+      "Programme queue",
+      `${table(
+        ["Project", "Tranche", "Measured", "Outputs", "Closure", "Next output"],
+        body.length ? body : [`<tr><td colspan="6">No projects.</td></tr>`],
+      )}${note("Published outputs against the due-now set; `closure` counts the at-closure set. Ordered by tranche, then project key. The next output is the first due-now category with no published document.")}`,
+      B(`${due} outputs due`, due ? "amber" : "green"),
+    );
+  }
+
+  function expectedOutputPanel(project) {
+    const title = "Expected outputs";
     const state = cs.outputs[project.id];
-    if (!state) return panel("Inception", note("Loading this project's outputs…"));
+    if (!state) return panel(title, note("Loading this project's outputs…"));
     if (state.error) {
       return panel(
-        "Inception",
+        title,
         note(`<strong>Read refused</strong> · ${E(consoleError(state.error))}`, "bad"),
       );
     }
-    let published = 0;
-    const rows = INCEPTION_CATEGORIES.map((category) => {
+    const expected = list((project.meta || {}).expected_outputs);
+    const closure = list((project.meta || {}).closure_outputs);
+    const categories = expected.length ? expected : INCEPTION_CATEGORIES;
+    const stateOf = (category) => {
       const docs = state.items.filter((doc) => outputCategoryOf(doc) === category);
       const isPublished = docs.some((doc) => doc.publishable);
-      if (isPublished) published += 1;
-      const label = docs.length ? (isPublished ? "published" : "present, private") : "missing";
-      const tone = isPublished ? "green" : docs.length ? "amber" : "bad";
-      const action = C.can("documents.compose")
+      return {
+        docs,
+        isPublished,
+        label: docs.length ? (isPublished ? "published" : "present, private") : "missing",
+        tone: isPublished ? "green" : docs.length ? "amber" : "bad",
+      };
+    };
+    const compose = (category) =>
+      C.can("documents.compose")
         ? button(
             `Compose ${category}`,
             "output-new-template",
-            `data-project="${E(project.id)}" data-category="${E(category)}"`,
+            `data-project="${E(project.id)}" data-category="${E(category)}" data-unit="${E(project.key)}"`,
             "small",
             "plus",
           )
         : "";
-      return `<tr><td><strong>${E(category)}</strong></td><td>${B(label, tone)}</td><td>${docs.length ? E(docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>${action}</td></tr>`;
+    let published = 0;
+    let nextMarked = false;
+    const row = (category, markNext) => {
+      const current = stateOf(category);
+      if (current.isPublished) published += 1;
+      // The first due-now category with no published document is the next output to compose.
+      const next = markNext && !current.isPublished && !nextMarked;
+      if (next) nextMarked = true;
+      return `<tr><td><strong>${E(category)}</strong>${next ? ` ${B("next", "amber")}` : ""}</td><td>${B(current.label, current.tone)}</td><td>${current.docs.length ? E(current.docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>${compose(category)}</td></tr>`;
+    };
+    const rows = categories.map((category) => row(category, true));
+    // P0's artefact #7 is the brief set across every delivery project; it is a computed
+    // coverage row, not a document on P0.
+    if (project.key === "P0") {
+      consoleLoadRegister();
+      const delivery = consoleProjects().filter(
+        (row) => row.key !== "P0" && list((row.meta || {}).expected_outputs).length > 0,
+      );
+      const briefed = new Set(
+        list(cs.register.items)
+          .filter((doc) => outputCategoryOf(doc) === "project-brief" && doc.publishable)
+          .map((doc) => doc.project_id),
+      );
+      const covered = delivery.filter((row) => briefed.has(row.id)).length;
+      rows.push(
+        `<tr><td><strong>project briefs</strong></td><td>${B(`${covered}/${delivery.length} published`, covered === delivery.length && delivery.length ? "green" : "amber")}</td><td><small>Across every delivery project</small></td><td></td></tr>`,
+      );
+    }
+    let closurePublished = 0;
+    const closureRows = closure.map((category) => {
+      const current = stateOf(category);
+      if (current.isPublished) closurePublished += 1;
+      return `<tr><td><strong>${E(category)}</strong></td><td>${B(current.label, current.tone)}</td><td>${current.docs.length ? E(current.docs.map((doc) => doc.title).join(" · ")) : "—"}</td><td>${compose(category)}</td></tr>`;
     });
+    const closureBlock = closure.length
+      ? `<h4>At closure</h4>${table(["Output", "State", "Document", "Action"], closureRows)}`
+      : "";
     return panel(
-      "Inception",
-      `${table(["Output", "State", "Document", "Action"], rows)}${note("A delivery project starts with an analysis and an architecture (P0 §5); both published is the inception standard. A missing one is a visible gap.")}`,
-      B(`${published}/2 published`, published === 2 ? "green" : "amber"),
+      title,
+      `${table(["Output", "State", "Document", "Action"], rows)}${closureBlock}${note("The standard's due-now set is required now; the at-closure set is required at closure. The first missing due-now row is the next output to compose. A missing output is a visible gap; publish is an admin decision.")}`,
+      B(
+        `${published}/${categories.length} published${closure.length ? ` · closure ${closurePublished}/${closure.length}` : ""}`,
+        published === categories.length ? "green" : "amber",
+      ),
     );
   }
 
@@ -1135,9 +1469,11 @@ window.installV2 = function (api, enterprise) {
         )
       : panel(
           "Board",
-          data && data.error
-            ? note(`<strong>Read refused</strong> · ${E(consoleError(data.error))}`, "bad")
-            : note("Loading this project's board…"),
+          !data
+            ? note("Loading this project's board…")
+            : data.error
+              ? note(`<strong>Read refused</strong> · ${E(consoleError(data.error))}`, "bad")
+              : note("No board. This project's outputs and checklist work without one; cards and runs need a board."),
         );
     const issueRows = issues.map(
       (issue) =>
@@ -1202,7 +1538,7 @@ window.installV2 = function (api, enterprise) {
     const failure = cs.lastError
       ? note(`<strong>Last refusal</strong> · ${E(consoleError(cs.lastError))}`, "bad")
       : "";
-    return `${failure}${coveragePanel(project)}${board}${cardPanel}${issuePanel}${inceptionPanel(project)}${projectOutputs(project)}${projectFeedback(project)}`;
+    return `${failure}${coveragePanel(project)}${board}${cardPanel}${issuePanel}${expectedOutputPanel(project)}${projectOutputs(project)}${projectFeedback(project)}`;
   }
 
   function projectOutputs(project) {
@@ -1223,7 +1559,7 @@ window.installV2 = function (api, enterprise) {
       groups.get(key).push(doc);
     });
     const rows = [...groups.entries()].flatMap(([key, docs]) => [
-      `<tr class="console-group"><td colspan="4"><strong>${E(key)}</strong></td></tr>`,
+      `<tr class="console-group"><td colspan="5"><strong>${E(key)}</strong></td></tr>`,
       ...docs.map((doc) => {
         const actions = [
           C.can("documents.get")
@@ -1232,7 +1568,28 @@ window.installV2 = function (api, enterprise) {
           C.can("documents.update")
             ? button("Edit", "output-edit", `data-id="${E(doc.id)}"`, "small", "edit")
             : "",
-          C.can("documents.update")
+          C.can("documents.revision_list")
+            ? button(
+                "History",
+                "output-history",
+                `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+                "small",
+                "file",
+              )
+            : "",
+          C.can("documents.create")
+            ? button("Attach", "output-attach", `data-id="${E(doc.id)}"`, "small", "plus")
+            : "",
+          !doc.publishable && C.can("documents.request_publish") && !doc.publish_requested_at
+            ? button(
+                "Request publish",
+                "output-request-publish",
+                `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+                "small",
+                "shield",
+              )
+            : "",
+          isAdmin() && C.can("documents.publish")
             ? button(
                 doc.publishable ? "Unpublish" : "Publish",
                 "output-publish",
@@ -1242,16 +1599,13 @@ window.installV2 = function (api, enterprise) {
               )
             : "",
         ].join("");
-        return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)} · ${E(doc.content_type || "text/markdown")}</small></td><td>${B(
-          doc.publishable ? "public" : "private",
-          doc.publishable ? "green" : "",
-        )}</td><td><small>${E(short(doc.updated_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
+        return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)} · ${E(doc.content_type || "text/markdown")}</small></td><td>${E(outputAuthorOf(doc) || "—")}</td><td>${B(outputStateOf(doc), doc.publishable ? "green" : "")}</td><td><small>${E(short(doc.updated_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
       }),
     ]);
     return panel(
       `${project.key} · Outputs`,
       rows.length
-        ? table(["Output", "Visibility", "Updated", "Operate"], rows)
+        ? table(["Output", "Author", "State", "Updated", "Operate"], rows)
         : `<p class="muted">No output yet. An output is a design note, evidence record or decision bound to this project and, optionally, a card.</p>`,
       C.can("documents.compose")
         ? button("Compose output", "output-new", `data-project="${E(project.id)}"`, "small", "plus")
@@ -1305,89 +1659,6 @@ window.installV2 = function (api, enterprise) {
     );
   }
 
-  function publishingPanel() {
-    if (!consoleOn()) return "";
-    if (!cs.repositoriesLoaded) {
-      consoleLoadRepositories();
-      return panel("Publishing", note("Loading publish targets…"));
-    }
-    const repo = selectedRepository();
-    const status = cs.publishStatus || null;
-    if (repo && !status) consolePollPublish(repo.id, 0);
-    const repoSelect = `<label class="e-select">Publish target <select data-v2-input="publish-repository"><option value="">— choose a repository —</option>${cs.repositories
-      .map(
-        (row) =>
-          `<option value="${E(row.id)}" ${row.id === cs.publishRepo ? "selected" : ""}>${E(row.url)}${
-            row.credential_secret_id ? "" : " · no token"
-          }</option>`,
-      )
-      .join("")}</select></label>`;
-    const connect = !(C.can("secrets.create") && C.can("repositories.create"))
-      ? ""
-      : `<details class="console-details"><summary>Connect a homepage repository</summary><label class="field full"><span>Repository URL</span><input id="publish-url" value="https://github.com/nonagenticai/nonagentic_homepage" spellcheck="false"></label><label class="field full"><span>Default branch</span><input id="publish-branch" value="main" spellcheck="false"></label><label class="field full"><span>Fine-grained token (contents:write, pull_requests:write)</span><input id="publish-token" type="password" autocomplete="off"></label><p class="muted">The token is sealed in the tenant's secret store and never returned.</p>${button(
-      "Save target",
-      "publish-connect",
-      "",
-      "small",
-      "plus",
-    )}</details>`;
-    const rotate = repo && C.can("repositories.update") && C.can("secrets.create")
-      ? `<details class="console-details"><summary>Rotate this target's token</summary><label class="field full"><span>New token</span><input id="publish-rotate-token" type="password" autocomplete="off"></label>${button(
-          "Save token",
-          "publish-rotate",
-          "",
-          "small",
-          "shield",
-        )}</details>`
-      : "";
-    const statusLine = status
-      ? kv([
-          [
-            "State",
-            B(
-              status.state,
-              status.state === "succeeded"
-                ? "green"
-                : status.state === "failed" || status.state === "dead" || status.state === "error"
-                  ? "bad"
-                  : "amber",
-            ),
-          ],
-          [
-            "Pull request",
-            status.pr_url
-              ? `<a class="e-project-link" href="${E(status.pr_url)}" target="_blank" rel="noopener">open ↗</a>`
-              : "—",
-          ],
-          ["Generated", E(status.generated_at || "—")],
-          ["Outputs", status.outputs == null ? "—" : String(status.outputs)],
-          ...(status.error ? [["Error", E(status.error)]] : []),
-        ])
-      : note("Select a target to read its latest publish state.");
-    const reason = !repo
-      ? "Choose or connect a repository first"
-      : !repo.credential_secret_id
-        ? "This repository has no token"
-        : !C.can("publish.start")
-          ? "You are not allowed to publish"
-          : "";
-    const publishControl = reason
-      ? `<button type="button" class="btn primary" disabled title="${E(reason)}">${I("upload")}Publish the design site</button>`
-      : button("Publish the design site", "publish-start", "", "primary", "upload");
-    return panel(
-      "Publishing",
-      `${repoSelect}${statusLine}<div class="console-actions">${publishControl}${button(
-        "Refresh status",
-        "publish-refresh",
-        "",
-        "small",
-        "replay",
-      )}</div>${connect}${rotate}${note(
-        "Publish builds the pack from the platform's rows and every publishable output, then opens a pull request on the homepage repository. A person merges it; the button never merges.",
-      )}`,
-      repo ? `<span class="console-live">GitHub PR</span>` : "",
-    );
-  }
 
   /* ------------------------------------------------------------- workspace actions */
   const closeWorkspaceDialog = () => {
@@ -1398,7 +1669,10 @@ window.installV2 = function (api, enterprise) {
 
   function consoleProjectNew() {
     if (!consoleOn()) return;
-    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" placeholder="The part of the conveyor this project delivers"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3"></textarea></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" placeholder="docs/plans/slices/S00-usage-inventory.md" spellcheck="false"></label></div>`;
+    const classes = OUTPUT_CLASSES.map(
+      (cls) => `<option value="${E(cls.name)}">${E(classLabel(cls))}</option>`,
+    ).join("");
+    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" placeholder="The part of the conveyor this project delivers"></label><label class="field full"><span>Key (optional)</span><input id="project-key" placeholder="T18" spellcheck="false"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3"></textarea></label><label class="field full"><span>Delivery class</span><select id="project-class"><option value="">Choose a class…</option>${classes}</select></label><label class="field full"><span>Tranche</span><input id="project-tranche" type="number" min="0" step="1" placeholder="0"></label><label class="field full"><span>Repository URL</span><input id="project-repo" placeholder="https://github.com/nonagenticai/conveyor" spellcheck="false"></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" placeholder="docs/plans/slices/S00-usage-inventory.md" spellcheck="false"></label><p class="muted">The class sets the expected due-now and at-closure outputs from the seeded standard. The seed owns its own 48 rows; a project created here is not in the seed.</p></div>`;
     openDialog(
       "New project",
       body,
@@ -1409,33 +1683,55 @@ window.installV2 = function (api, enterprise) {
 
   async function consoleProjectCreate() {
     const title = (document.getElementById("project-name") || {}).value || "";
+    const key = (document.getElementById("project-key") || {}).value || "";
     const description = (document.getElementById("project-description") || {}).value || "";
     const plan = (document.getElementById("project-plan") || {}).value || "";
+    const repo = (document.getElementById("project-repo") || {}).value || "";
+    const tranche = (document.getElementById("project-tranche") || {}).value || "";
+    const chosenClass = (document.getElementById("project-class") || {}).value || "";
     if (!title.trim()) {
       toast("A project needs a name");
       return;
     }
-    const programme = (cs.projects[0] || {}).programme_id || null;
+    const cls = OUTPUT_CLASSES.find((row) => row.name === chosenClass) || null;
+    // Fail closed: a project without a class would be absent from the programme queue and its
+    // checklist would fall back to a guess. The owner chooses the class, never a default.
+    if (!cls) {
+      toast("Choose a delivery class for the project");
+      return;
+    }
+    const programme =
+      (cs.programme && cs.programme.id) ||
+      (consoleProjects().find((row) => row.programme_id) || {}).programme_id ||
+      null;
+    const payload = {
+      title: title.trim(),
+      description: description.trim(),
+      programme_id: programme,
+    };
+    if (key.trim()) payload.key = key.trim().toUpperCase();
+    if (repo.trim()) payload.repo_url = repo.trim();
+    let projectId = null;
     try {
-      const created = await C.action("projects.create", {
-        title: title.trim(),
-        description: description.trim(),
-        programme_id: programme,
-      });
-      const projectId = created && created.project ? created.project.id : null;
-      // `projects.create` has no meta input: the plan path is a second, explicit patch. It is
-      // merged into the row's existing meta (projects.update preserves absent keys).
-      if (plan.trim() && projectId) {
-        await C.action("projects.update", {
-          id: projectId,
-          meta: { plan: plan.trim() },
-        });
+      const created = await C.action("projects.create", payload);
+      projectId = created && created.project ? created.project.id : null;
+      if (!projectId) throw new Error("projects.create returned no project");
+      // `projects.create` has no meta input: the class and plan are a second, explicit patch.
+      // It is merged into the row's existing meta (projects.update preserves absent keys).
+      const meta = classMeta(cls, tranche);
+      if (plan.trim()) meta.plan = plan.trim();
+      try {
+        await C.action("projects.update", { id: projectId, meta });
+      } catch (error) {
+        // The project exists — say exactly that, never a false "create refused".
+        cs.lastError = error;
+        toast("Project created, class not saved · " + consoleError(error));
       }
       closeWorkspaceDialog();
       cs.loaded = false;
       cs.byProject = {};
       v.projectPage = projectId;
-      toast(plan.trim() ? "Project created with its plan" : "Project created");
+      toast(`Project created · ${cls.name}`);
       render();
       consoleLoad();
     } catch (error) {
@@ -1449,12 +1745,20 @@ window.installV2 = function (api, enterprise) {
     const project = projectById(id);
     if (!project) return;
     const statuses = ["draft", "active", "paused", "closed", "archived"];
+    const currentClass = classOfProject(project);
+    const classes = OUTPUT_CLASSES.map(
+      (cls) =>
+        `<option value="${E(cls.name)}" ${currentClass && currentClass.name === cls.name ? "selected" : ""}>${E(classLabel(cls))}</option>`,
+    ).join("");
+    const keep = currentClass
+      ? ""
+      : `<option value="" selected>Keep the current expected outputs (no matching class)</option>`;
     const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" value="${E(project.name)}"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3">${E(project.description || "")}</textarea></label><label class="field full"><span>Status</span><select id="project-status">${statuses
       .map(
         (status) =>
           `<option value="${status}" ${status === project.status ? "selected" : ""}>${status}</option>`,
       )
-      .join("")}</select></label><label class="field full"><span>Repository URL</span><input id="project-repo" value="${E(project.repo_url || "")}" spellcheck="false"></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" value="${E(((project.meta || {}).plan) || "")}" spellcheck="false"></label><p class="muted">Saving merges the plan into the project's existing meta; other keys are preserved.</p></div>`;
+      .join("")}</select></label><label class="field full"><span>Delivery class</span><select id="project-class">${keep}${classes}</select></label><label class="field full"><span>Tranche</span><input id="project-tranche" type="number" min="0" step="1" value="${E((project.meta || {}).tranche ?? "")}"></label><label class="field full"><span>Repository URL</span><input id="project-repo" value="${E(project.repo_url || "")}" spellcheck="false"></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" value="${E(((project.meta || {}).plan) || "")}" spellcheck="false"></label><p class="muted">Choosing a class recomputes the expected due-now and at-closure outputs; other meta keys are preserved. The seed owns its own 48 rows — a later seed run restores their class and sets.</p></div>`;
     openDialog(
       `${project.key} · edit`,
       body,
@@ -1471,9 +1775,19 @@ window.installV2 = function (api, enterprise) {
     const status = (document.getElementById("project-status") || {}).value || project.status;
     const repoUrl = (document.getElementById("project-repo") || {}).value || "";
     const plan = (document.getElementById("project-plan") || {}).value || "";
+    const tranche = (document.getElementById("project-tranche") || {}).value || "";
+    const chosenClass = (document.getElementById("project-class") || {}).value || "";
     if (!name.trim()) {
       toast("A project needs a name");
       return;
+    }
+    const currentClass = classOfProject(project);
+    const cls = OUTPUT_CLASSES.find((row) => row.name === chosenClass) || null;
+    const meta = { plan: plan.trim() };
+    if (cls && (!currentClass || currentClass.name !== cls.name)) {
+      Object.assign(meta, classMeta(cls, tranche));
+    } else if (String(tranche).trim() !== "" && Number.isFinite(Number(tranche))) {
+      meta.tranche = Number(tranche);
     }
     try {
       await C.action(
@@ -1484,7 +1798,7 @@ window.installV2 = function (api, enterprise) {
           description: description.trim(),
           status,
           repo_url: repoUrl.trim(),
-          meta: { plan: plan.trim() },
+          meta,
         },
         { etag: project.version },
       );
@@ -1532,6 +1846,21 @@ window.installV2 = function (api, enterprise) {
 
   function consoleOutputNew(projectId, cardId, template = {}) {
     v.outputCard = cardId || null;
+    const project = projectId ? projectById(projectId) : null;
+    // Prefill the category with the template's, else the project's first expected output that is
+    // not yet published. The unit is the project key unless the caller named one.
+    const state = project ? cs.outputs[project.id] : null;
+    const expected = list(((project || {}).meta || {}).expected_outputs);
+    const nextCategory =
+      template.category ||
+      expected.find(
+        (category) =>
+          !(state && !state.error ? state.items : []).some(
+            (doc) => doc.publishable && outputCategoryOf(doc) === category,
+          ),
+      ) ||
+      "";
+    const unitValue = template.unit || (project ? project.key : "");
     const projectSelect = projectId
       ? ""
       : `<label class="field full"><span>Project</span><select id="output-project">${consoleProjects()
@@ -1539,21 +1868,24 @@ window.installV2 = function (api, enterprise) {
           .join("")}</select></label>`;
     const options = OUTPUT_CATEGORIES.map(
       (c) =>
-        `<option value="${E(c)}" ${template.category === c ? "selected" : ""}>${E(c)}</option>`,
+        `<option value="${E(c)}" ${nextCategory === c ? "selected" : ""}>${E(c)}</option>`,
     ).join("");
-    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}${projectSelect}<label class="field full"><span>Title</span><input id="output-title" value="${E(template.title || "")}" placeholder="What this output records"></label><label class="field full"><span>Unit (issue number)</span><input id="output-unit" placeholder="121" spellcheck="false"></label><label class="field full"><span>Category</span><select id="output-category"><option value="">—</option>${options}</select></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why.">${E(template.body || "")}</textarea></label><label class="check"><input id="output-publishable" type="checkbox"> Publish this output on the public design site</label><p class="muted">The body is capped at 256 KiB. It starts private unless you tick the box.</p></div>`;
+    const seedBody =
+      template.body ||
+      (nextCategory ? (outputTemplateOf(nextCategory) || {}).skeleton || "" : "");
+    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}${projectSelect}<label class="field full"><span>Title</span><input id="output-title" value="${E(template.title || "")}" placeholder="What this output records"></label><label class="field full"><span>Unit (project key or issue number)</span><input id="output-unit" value="${E(unitValue)}" placeholder="${E((project || {}).key || "121")}" spellcheck="false"></label><label class="field full"><span>Category</span><select id="output-category"><option value="">—</option>${options}</select></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why.">${E(seedBody)}</textarea></label><div class="output-completeness-panel"><span class="mono muted">Completeness · the standard's required sections</span><div id="output-completeness"></div></div><p class="muted">The body is capped at 256 KiB. Saving keeps it a draft; an admin publishes it after review, and the server refuses a publish missing a required section.</p></div>`;
     openDialog(
-      template.category ? `Compose ${template.category}` : "Compose output",
+      nextCategory ? `Compose ${nextCategory}` : "Compose output",
       body,
       `${button("Save output", "output-save", `data-project="${E(projectId || "")}"`, "primary", "plus")}${btn("Cancel", "close-dialog")}`,
       true,
     );
+    wireCompleteness();
   }
 
   async function consoleOutputSave(projectId) {
     const title = (document.getElementById("output-title") || {}).value || "";
     const body = (document.getElementById("output-body") || {}).value || "";
-    const publishable = !!(document.getElementById("output-publishable") || {}).checked;
     const chosen =
       (document.getElementById("output-project") || {}).value || projectId || "";
     const unit = ((document.getElementById("output-unit") || {}).value || "").trim();
@@ -1566,21 +1898,18 @@ window.installV2 = function (api, enterprise) {
       toast("Choose a project for this output");
       return;
     }
-    const meta = {};
-    if (unit) meta.unit = unit;
-    if (category) meta.category = category;
     try {
       await C.action("documents.compose", {
         project_id: chosen,
         card_id: v.outputCard || undefined,
         title: title.trim(),
         body,
-        publishable,
-        meta: Object.keys(meta).length ? meta : undefined,
+        category: category || undefined,
+        unit: unit || undefined,
       });
       v.outputCard = null;
       closeWorkspaceDialog();
-      toast(publishable ? "Output saved and marked public" : "Output saved (private)");
+      toast("Output saved as a draft");
       consoleRefreshOutputs(chosen);
     } catch (error) {
       cs.lastError = error;
@@ -1597,19 +1926,51 @@ window.installV2 = function (api, enterprise) {
       toast("Read refused · " + consoleError(error));
       return;
     }
-    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Title</span><input id="output-title" value="${E(doc.title)}"></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10">${E(doc.body || "")}</textarea></label><label class="check"><input id="output-publishable" type="checkbox" ${doc.publishable ? "checked" : ""}> Publish this output on the public design site</label><p class="muted">Version ${E(doc.version)} · content hash <span class="mono">${E(short(doc.content_hash, 12))}</span></p></div>`;
-    openDialog(
-      `Edit · ${doc.title}`,
-      body,
-      `${button("Save changes", "output-update", `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`, "primary", "shield")}${btn("Cancel", "close-dialog")}`,
-      true,
-    );
+    const locked = doc.publishable && !isAdmin();
+    const options = OUTPUT_CATEGORIES.map(
+      (c) =>
+        `<option value="${E(c)}" ${outputCategoryOf(doc) === c ? "selected" : ""}>${E(c)}</option>`,
+    ).join("");
+    const rework = (doc.meta || {}).rework;
+    const reworkNote = rework
+      ? note(
+          `<strong>Returned</strong> · ${E(rework.note || "")}${
+            list(rework.missing).length
+              ? `<br><span class="mono">Missing: ${list(rework.missing).map(E).join(", ")}</span>`
+              : ""
+          }`,
+          "amber",
+        )
+      : "";
+    const body = `<div class="dialog-body console-dialog-body">${reworkNote}${
+      doc.publishable
+        ? note(
+            locked
+              ? "<strong>Published</strong> · this output is public; only an admin can edit it. Ask an admin to unpublish it first."
+              : "<strong>Published</strong> · an edit is versioned and stays public until an admin unpublishes it.",
+          )
+        : ""
+    }<label class="field full"><span>Title</span><input id="output-title" value="${E(doc.title)}" ${locked ? "disabled" : ""}></label><label class="field full"><span>Category</span><select id="output-category" ${locked ? "disabled" : ""}><option value="">—</option>${options}</select></label><label class="field full"><span>Unit (project key or issue)</span><input id="output-unit" value="${E(outputUnitOf(doc))}" spellcheck="false" ${locked ? "disabled" : ""}></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" ${locked ? "disabled" : ""}>${E(doc.body || "")}</textarea></label><div class="output-completeness-panel"><span class="mono muted">Completeness · the standard's required sections</span><div id="output-completeness"></div></div><p class="muted">Version ${E(doc.version)} · content hash <span class="mono">${E(short(doc.content_hash, 12))}</span>. Every save keeps the previous version in the history.</p></div>`;
+    const actions = `${
+      locked
+        ? ""
+        : button(
+            "Save changes",
+            "output-update",
+            `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+            "primary",
+            "shield",
+          )
+    }${C.can("documents.preview") ? button("Preview", "output-preview", `data-id="${E(doc.id)}"`, "", "eye") : ""}${button("History", "output-history", `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`, "", "file")}${btn("Cancel", "close-dialog")}`;
+    openDialog(`Edit · ${doc.title}`, body, actions, true);
+    wireCompleteness();
   }
 
   async function consoleOutputUpdate(id, version) {
     const title = (document.getElementById("output-title") || {}).value || "";
     const body = (document.getElementById("output-body") || {}).value || "";
-    const publishable = !!(document.getElementById("output-publishable") || {}).checked;
+    const category = (document.getElementById("output-category") || {}).value || "";
+    const unit = ((document.getElementById("output-unit") || {}).value || "").trim();
     if (!title.trim() || !body.trim()) {
       toast("An output needs a title and a body");
       return;
@@ -1617,7 +1978,7 @@ window.installV2 = function (api, enterprise) {
     try {
       const updated = await C.action(
         "documents.update",
-        { id, title: title.trim(), body, publishable },
+        { id, title: title.trim(), body, category, unit },
         { etag: Number(version) },
       );
       closeWorkspaceDialog();
@@ -1633,16 +1994,223 @@ window.installV2 = function (api, enterprise) {
   async function consoleOutputPublish(id, publishable, version) {
     try {
       const updated = await C.action(
-        "documents.update",
-        { id, publishable },
+        "documents.publish",
+        { id, publish: publishable },
         { etag: Number(version) },
       );
-      toast(publishable ? "Output marked public" : "Output unpublished");
+      toast(publishable ? "Output published" : "Output unpublished");
       consoleRefreshOutputs(updated.project_id);
     } catch (error) {
       cs.lastError = error;
-      toast("Publish flag refused · " + consoleError(error));
+      const missing = missingFromError(error);
+      if (publishable && error.status === 409 && missing.length) {
+        // The block names what is missing and offers the coach's triage; it is not a dead end.
+        consoleIncompleteDialog(id, version, missing);
+        return;
+      }
+      toast("Publish refused · " + consoleError(error));
       render();
+    }
+  }
+
+  async function consoleOutputRequestPublish(id, version) {
+    try {
+      const updated = await C.action(
+        "documents.request_publish",
+        { id },
+        { etag: Number(version) },
+      );
+      toast("Publish requested");
+      consoleRefreshOutputs(updated.project_id);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Request refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  async function consoleOutputHistory(id, version) {
+    try {
+      const revisions = list(await C.action("documents.revision_list", { id, limit: 50 }));
+      const rows = revisions.map((rev) => {
+        const actions = [
+          button(
+            "View",
+            "revision-view",
+            `data-id="${E(id)}" data-seq="${E(rev.seq)}"`,
+            "small",
+            "file",
+          ),
+          C.can("documents.revision_restore")
+            ? button(
+                "Restore",
+                "revision-restore",
+                `data-id="${E(id)}" data-seq="${E(rev.seq)}" data-version="${E(version)}"`,
+                "small",
+                "replay",
+              )
+            : "",
+        ].join("");
+        return `<tr><td class="mono">v${E(rev.seq)}</td><td>${E(rev.label)}</td><td>${E(rev.author || "—")}</td><td><small>${E(short(rev.created_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
+      });
+      openDialog(
+        "History",
+        `<div class="dialog-body console-dialog-body">${
+          rows.length
+            ? table(["Version", "Change", "Author", "When", "Operate"], rows)
+            : "<p class='muted'>No revision recorded yet.</p>"
+        }<p class="muted">Restore copies the chosen text forward as a new draft; it never rewrites history and never republishes.</p></div>`,
+        btn("Close", "close-dialog"),
+        true,
+      );
+    } catch (error) {
+      toast("History refused · " + consoleError(error));
+    }
+  }
+
+  async function consoleRevisionView(id, seq) {
+    try {
+      const rev = await C.action("documents.revision_get", { id, seq: Number(seq) });
+      const content = rev.content || {};
+      const body = `<div class="dialog-body console-dialog-body">${kv([
+        ["Version", `<span class="mono">v${E(rev.seq)}</span>`],
+        ["Change", E(rev.label)],
+        ["Author", E(rev.author || "—")],
+      ])}<pre class="console-output-body">${E(content.body || "(no body)")}</pre></div>`;
+      openDialog(`Version ${seq}`, body, btn("Close", "close-dialog"), true);
+    } catch (error) {
+      toast("Version refused · " + consoleError(error));
+    }
+  }
+
+  function consoleRevisionRestore(id, seq, version) {
+    openDialog(
+      "Restore version",
+      `<div class="dialog-body console-dialog-body"><p>Restore <span class="mono">v${E(seq)}</span> as a new draft? The current version stays in the history, and the restored text is not public until an admin publishes it.</p></div>`,
+      `${button("Restore", "revision-restore-confirm", `data-id="${E(id)}" data-seq="${E(seq)}" data-version="${E(version)}"`, "primary", "replay")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleRevisionRestoreConfirm(id, seq, version) {
+    try {
+      const updated = await C.action(
+        "documents.revision_restore",
+        { id, seq: Number(seq) },
+        { etag: Number(version) },
+      );
+      closeWorkspaceDialog();
+      toast("Version restored as a draft");
+      consoleRefreshOutputs(updated.project_id);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Restore refused · " + consoleError(error));
+      render();
+    }
+  }
+
+  /* ---------------------------------------------------------- attachments */
+  const fileBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
+      reader.onerror = () => reject(reader.error || new Error("the file could not be read"));
+      reader.readAsDataURL(file);
+    });
+
+  const contentTypeOf = (name) => {
+    const extension = String(name || "").toLowerCase().split(".").pop();
+    return (
+      {
+        png: "image/png",
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        pdf: "application/pdf",
+        svg: "image/svg+xml",
+        json: "application/json",
+        csv: "text/csv",
+        md: "text/markdown",
+        txt: "text/plain",
+      }[extension] || "text/plain"
+    );
+  };
+
+  async function consoleOutputAttach(id) {
+    openDialog(
+      "Attachments",
+      `<div class="dialog-body console-dialog-body"><div id="output-attachments">Loading attachments…</div><label class="field full"><span>Add a file (10 MiB cap)</span><input type="file" data-v2-input="output-attachment" data-id="${E(id)}" accept=".png,.jpg,.jpeg,.pdf,.svg,.json,.csv,.md,.txt"></label><p class="muted">PNG and JPEG are shown inline on the public page; every other type is served as a download. An attachment is public only while its output is.</p></div>`,
+      btn("Close", "close-dialog"),
+      true,
+    );
+    consoleLoadAttachments(id);
+  }
+
+  async function consoleLoadAttachments(id) {
+    const host = document.getElementById("output-attachments");
+    if (!host) return;
+    try {
+      const page = await C.action("documents.list", {
+        parent_document_id: id,
+        kind: "attachment",
+        page: { limit: 50 },
+      });
+      const rows = list(page.items);
+      host.innerHTML = rows.length
+        ? `<ul class="console-attachments">${rows
+            .map(
+              (row) =>
+                `<li><strong>${E(row.title)}</strong> <small class="mono">${E(row.content_type || "")}${
+                  row.size_bytes ? ` · ${E(row.size_bytes)} B` : ""
+                }</small> ${C.can("documents.download") ? button("Download", "attachment-download", `data-id="${E(row.id)}" data-type="${E(row.content_type || "")}" data-name="${E(row.title)}"`, "small", "download") : ""}</li>`,
+            )
+            .join("")}</ul>`
+        : `<p class="muted">No attachment yet.</p>`;
+    } catch (error) {
+      host.innerHTML = `<p class="muted">Attachments could not be read: ${E(consoleError(error))}</p>`;
+    }
+  }
+
+  async function consoleOutputAttachFile(input) {
+    const file = input.files && input.files[0];
+    const id = input.dataset.id;
+    if (!file || !id) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast("The file is larger than 10 MiB");
+      input.value = "";
+      return;
+    }
+    try {
+      const content_base64 = await fileBase64(file);
+      await C.action("documents.create", {
+        title: file.name,
+        content_type: file.type || contentTypeOf(file.name),
+        content_base64,
+        parent_document_id: id,
+      });
+      toast("Attachment uploaded");
+      input.value = "";
+      consoleLoadAttachments(id);
+    } catch (error) {
+      cs.lastError = error;
+      toast("Attachment refused · " + consoleError(error));
+    }
+  }
+
+  async function consoleAttachmentDownload(id, contentType, filename) {
+    try {
+      const dl = await C.action("documents.download", { id });
+      const bytes = Uint8Array.from(atob(dl.content_base64 || ""), (c) => c.charCodeAt(0));
+      const blob = new Blob([bytes], {
+        type: dl.content_type || contentType || "application/octet-stream",
+      });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename || "attachment";
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      toast("Download refused · " + consoleError(error));
     }
   }
 
@@ -1698,21 +2266,160 @@ window.installV2 = function (api, enterprise) {
   function consoleOutputTemplate(projectId, category) {
     const project = projectById(projectId);
     if (!project) return;
-    const templates = {
-      analysis: {
-        category: "analysis",
-        title: `Analysis — ${project.key} ${project.name}`,
-        body: `# Analysis — ${project.key}\n\n## Current state\n\nWhat exists today, inside the conveyor repo and in the wider estate.\n\n## Reuse sources\n\nInside the conveyor repo, the wider estate, upstream crates. Name the capability and the boundary; no private host or path.\n\n## Build vs reuse\n\n## Risks\n\n`,
-      },
-      architecture: {
-        category: "architecture",
-        title: `Architecture — ${project.key} ${project.name}`,
-        body: `# Architecture — ${project.key}\n\n## Context and boundary\n\n## Aggregates, tables, actions\n\n## Decisions\n\nA deviation from the blueprint is a decision record, not a silent fork.\n\n## Acceptance\n\n`,
-      },
-    };
-    const template = templates[category];
-    if (!template) return;
-    consoleOutputNew(projectId, null, template);
+    const template = outputTemplateOf(category);
+    if (!template) {
+      toast(`No template for ${category} in the standard`);
+      return;
+    }
+    const label = category.replace(/-/g, " ");
+    const heading = label.charAt(0).toUpperCase() + label.slice(1);
+    consoleOutputNew(projectId, null, {
+      category,
+      title: `${heading} — ${project.key} ${project.name}`,
+      body: template.skeleton,
+    });
+  }
+
+  async function consoleOutputPreview(id) {
+    let preview;
+    try {
+      preview = await C.action("documents.preview", { id });
+    } catch (error) {
+      toast("Preview refused · " + consoleError(error));
+      return;
+    }
+    const missing = list(preview.missing);
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">Rendered by the same renderer as the public page. ${
+      missing.length
+        ? `Still missing: <span class="mono">${missing.map(E).join(", ")}</span>`
+        : "Every required section is present."
+    }</p><iframe class="console-preview" title="Output preview" sandbox srcdoc="${E(preview.html)}" style="width:100%;height:420px;border:1px solid var(--line);border-radius:8px;background:#fff"></iframe><p class="muted">Author HTML is shown as text and a non-http(s)/mailto link is inert; the public page would serve exactly this.</p></div>`;
+    openDialog("Preview", body, btn("Close", "close-dialog"), true);
+  }
+
+  // The triage a blocked publish offers: fix it, return it, or record a system issue as a kata.
+  function consoleIncompleteDialog(id, version, missing) {
+    const body = `<div class="dialog-body console-dialog-body"><p><strong>409 output_incomplete</strong> · the standard requires these sections before this output can be public:</p><ul class="console-completeness">${missing
+      .map((heading) => `<li class="is-missing">○ ${E(heading)}</li>`)
+      .join("")}</ul>${note("Edit the draft and publish again, return it to the author with a note, or open a kata when the gap is the system's (template, instrument or source).")}</div>`;
+    openDialog(
+      "Publish blocked · output_incomplete",
+      body,
+      `${button("Return with a note", "request-return", `data-id="${E(id)}" data-version="${E(version)}"`, "", "replay")}${button("Open a kata", "request-kata", `data-id="${E(id)}" data-version="${E(version)}"`, "", "lightning")}${button("Edit the draft", "output-edit", `data-id="${E(id)}"`, "primary", "edit")}${btn("Close", "close-dialog")}`,
+      true,
+    );
+  }
+
+  function consoleReturnDialog(id, version) {
+    const doc = findOutput(id) || {};
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">Returning <strong>${E(doc.title || "this output")}</strong> to its author. The server records the sections the standard finds missing.</p><label class="field full"><span>Reason (the author sees this)</span><textarea id="return-note" rows="4" placeholder="What must change before it can be public."></textarea></label><p class="muted">The publish request clears; the draft's content is unchanged.</p></div>`;
+    openDialog(
+      "Return this output",
+      body,
+      `${button("Return to the author", "return-save", `data-id="${E(id)}" data-version="${E(version)}"`, "primary", "replay")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleReturnSave(id, version) {
+    const noteText = ((document.getElementById("return-note") || {}).value || "").trim();
+    if (!noteText) {
+      toast("A return needs a reason");
+      return;
+    }
+    const doc = findOutput(id) || {};
+    try {
+      const returned = await C.action("documents.return", { id, note: noteText }, {
+        etag: Number(version),
+      });
+      const missing = list(((returned.meta || {}).rework || {}).missing);
+      closeWorkspaceDialog();
+      toast(
+        missing.length
+          ? `Returned · missing: ${missing.join(", ")}`
+          : "Returned to the author",
+      );
+      consoleRefreshOutputs(doc.project_id || null);
+      render();
+    } catch (error) {
+      toast("Return refused · " + consoleError(error));
+    }
+  }
+
+  function consoleKataDialog(id, version) {
+    const source = findOutput(id) || {};
+    const projects = consoleProjects();
+    const kata = projects.find((row) => row.key === "S18") || projects[0] || null;
+    const template = outputTemplateOf("decision");
+    const skeleton = template ? template.skeleton : "# Decision\n\n## Context\n\n## Decision\n\n## Consequences\n\n## Evidence\n";
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">A kata records a <strong>system</strong> defect found while reviewing. The source is returned with a note that points at the kata; the kata is a decision on the kata project, never an edit to the source.</p><label class="field full"><span>Kata project</span><select id="kata-project">${projects
+      .map(
+        (row) =>
+          `<option value="${E(row.id)}" ${kata && row.id === kata.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`,
+      )
+      .join("")}</select></label><label class="field full"><span>Coach note (what the system must fix)</span><textarea id="kata-note" rows="3" placeholder="The missing template, instrument or source."></textarea></label><label class="field full"><span>Kata body (Markdown, the decision template)</span><textarea id="kata-body" rows="8">${E(skeleton)}</textarea></label></div>`;
+    openDialog(
+      "Open a kata",
+      body,
+      `${button("Open the kata and return the source", "kata-save", `data-id="${E(id)}" data-version="${E(version)}"`, "primary", "lightning")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleKataSave(id, version) {
+    const source = findOutput(id) || {};
+    const projectId = ((document.getElementById("kata-project") || {}).value || "").trim();
+    const noteText = ((document.getElementById("kata-note") || {}).value || "").trim();
+    const body = ((document.getElementById("kata-body") || {}).value || "").trim();
+    const project = consoleProjects().find((row) => row.id === projectId);
+    if (!projectId || !project) {
+      toast("Choose the kata project");
+      return;
+    }
+    if (!noteText) {
+      toast("A kata needs the coach's note");
+      return;
+    }
+    if (!body) {
+      toast("The kata needs a body");
+      return;
+    }
+    let kata;
+    try {
+      kata = await C.action("documents.compose", {
+        project_id: projectId,
+        title: `Kata — ${source.title || "output"}`,
+        body,
+        category: "decision",
+        unit: project.key,
+        meta: {
+          kata: true,
+          system_issue: true,
+          source_document_id: id,
+          source_project_id: source.project_id || undefined,
+          coach_note: noteText,
+        },
+        publishable: true,
+      });
+    } catch (error) {
+      toast("Kata refused · " + consoleError(error));
+      return;
+    }
+    try {
+      await C.action(
+        "documents.return",
+        { id, note: `Kata ${kata.id} records the system issue: ${noteText}` },
+        { etag: Number(version) },
+      );
+      toast(`Kata ${short(kata.id, 12)} opened and the source returned`);
+    } catch (error) {
+      toast(
+        `Kata ${short(kata.id, 12)} opened; the source was not returned · ${consoleError(error)}`,
+      );
+    }
+    closeWorkspaceDialog();
+    consoleRefreshOutputs(source.project_id || null);
+    render();
   }
 
   async function consoleFeedbackIntake(issueNumber) {
@@ -1729,80 +2436,6 @@ window.installV2 = function (api, enterprise) {
     await consoleIntake(projectId, issueNumber);
   }
 
-  function consolePublishConnect() {
-    const url = (document.getElementById("publish-url") || {}).value || "";
-    const branch = (document.getElementById("publish-branch") || {}).value || "main";
-    const token = (document.getElementById("publish-token") || {}).value || "";
-    if (!url.trim() || !token.trim()) {
-      toast("A repository URL and a token are required");
-      return;
-    }
-    (async () => {
-      try {
-        const secret = await C.action("secrets.create", {
-          name: `publish.github_token.${Date.now()}`,
-          value: token.trim(),
-        });
-        const repo = await C.action("repositories.create", {
-          url: url.trim(),
-          default_branch: branch.trim() || "main",
-          credential_secret_id: secret.id,
-        });
-        cs.repositoriesLoaded = false;
-        await consoleLoadRepositories();
-        consoleSelectRepository(repo.id);
-        toast("Publish target connected");
-      } catch (error) {
-        cs.lastError = error;
-        toast("Connect refused · " + consoleError(error));
-        render();
-      }
-    })();
-  }
-
-  function consolePublishRotate() {
-    const repo = selectedRepository();
-    const token = (document.getElementById("publish-rotate-token") || {}).value || "";
-    if (!repo) {
-      toast("Select a publish target first");
-      return;
-    }
-    if (!token.trim()) {
-      toast("A new token is required");
-      return;
-    }
-    (async () => {
-      try {
-        const secret = await C.action("secrets.create", {
-          name: `publish.github_token.${Date.now()}`,
-          value: token.trim(),
-        });
-        await C.action(
-          "repositories.update",
-          { id: repo.id, credential_secret_id: secret.id },
-          { etag: repo.version },
-        );
-        cs.repositoriesLoaded = false;
-        await consoleLoadRepositories();
-        consoleSelectRepository(repo.id);
-        toast("Publish token rotated");
-      } catch (error) {
-        cs.lastError = error;
-        toast("Rotate refused · " + consoleError(error));
-        render();
-      }
-    })();
-  }
-
-  function consolePublishRefresh() {
-    const repo = selectedRepository();
-    if (!repo) {
-      toast("Select a publish target first");
-      return;
-    }
-    cs.publishStatus = null;
-    consolePollPublish(repo.id, 0);
-  }
 
   /* The Plan · Boards tab on the operator console: the tenant's own projects, its boards,
      its cards and its GitHub registry — read live, written through the action API. */
@@ -1820,14 +2453,20 @@ window.installV2 = function (api, enterprise) {
     if (!project) return panel("Boards", note("This tenant holds no projects."));
     const select = consoleProjectSelect(project);
     const data = cs.byProject[project.id];
-    if (!data || !data.board) {
-      consoleLoadProject(project.id);
-      return `${panel("Project", select)}${panel("Boards", note("Loading this project's board…"))}`;
-    }
-    if (data.error) {
+    if (data && data.error) {
       return `${panel("Project", select)}${panel(
         "Boards",
         note(`<strong>Read refused</strong> · ${E(consoleError(data.error))}`, "bad"),
+      )}`;
+    }
+    if (!data) {
+      consoleLoadProject(project.id);
+      return `${panel("Project", select)}${panel("Boards", note("Loading this project's board…"))}`;
+    }
+    if (!data.board) {
+      return `${panel("Project", select)}${panel(
+        "Boards",
+        note("No board. This project's outputs and checklist work without one; the Plan board and card intake need one."),
       )}`;
     }
     const lanes = list(data.lists);
@@ -1961,25 +2600,20 @@ window.installV2 = function (api, enterprise) {
   const dataPanel = () => {
     if (!live) return "";
     const feedback = list((live.programme || {}).feedback);
+    // Only files the public window actually serves. The old list named data/manifest.json,
+    // data/programme.json and friends, which are 404 on the live site.
     const files = [
-      "manifest.json",
-      "programme.json",
-      "organisation.json",
-      "config.json",
-      "work.json",
-      "artefacts.json",
-      "measure.json",
-      "secrets.json",
-      "evidence.json",
-      "feedback.json",
+      ["data/snapshot.js", "the published programme snapshot"],
+      ["docs/outputs.js", "the published outputs index"],
+      ["docs/documents.json", "the generated document index"],
     ];
     return panel(
       "Live data &amp; feedback",
-      `<p class="muted">Rendered from the conveyor's own rows. Snapshot <span class="mono">${E(short(live.payload_sha256))}</span> generated <strong>${E(live.generated_at || "")}</strong> at <span class="mono">${E(short(live.git_sha, 12))}</span>. The raw files are public:</p>${table(
+      `<p class="muted">Rendered from the conveyor's own rows. Snapshot <span class="mono">${E(short(live.payload_sha256))}</span> generated <strong>${E(live.generated_at || "")}</strong> at <span class="mono">${E(short(live.git_sha, 12))}</span>. The public data files:</p>${table(
         ["Data file"],
         files.map(
-          (file) =>
-            `<tr><td><a class="e-project-link" href="data/${file}" target="_blank" rel="noopener"><span class="mono">${file}</span></a></td></tr>`,
+          ([file, label]) =>
+            `<tr><td><a class="e-project-link" href="${E(file)}" target="_blank" rel="noopener"><span class="mono">${E(file)}</span></a> <small>${E(label)}</small></td></tr>`,
         ),
       )}${feedback.length ? table(
         ["Feedback", "State", "Link"],
@@ -2023,6 +2657,13 @@ window.installV2 = function (api, enterprise) {
     cycle: false,
     effectCeiling: "write",
     review: null,
+    benefit: "BEN-01",
+    tranche: 0,
+    programmeGate: null,
+    adm: "ART-001",
+    admPhase: "B",
+    admType: "all",
+    admGate: null,
   };
 
   /* ------------------------------------------------------------------ fixtures */
@@ -2237,6 +2878,221 @@ window.installV2 = function (api, enterprise) {
       { id: "DEP-09", kind: "dependency", title: "Strata pack v17 availability", owner: "architect", status: "Open", severity: "Medium", note: "required knowledge pin" },
       { id: "BEN-02", kind: "benefit", title: "Fulfilment time −40%", owner: "pm", status: "Tracking", severity: "—", note: "planned vs realised at closure" },
     ],
+    /* The MSP layer: programme definition, benefit profiles, the benefits map, tranches and
+       realization. Local fixtures — no V2 table or action exists yet (SPEC_V2 §8.3, D62). */
+    programmeDefinition: {
+      key: "PGM-CB",
+      name: "conveyor buildout",
+      sponsors: "sponsoring group · N. de Vries (chair) · G. Dekker (SRO) · R. Slot",
+      mandate: { state: "Draft", approved: "—", version: "v3" },
+      fields: [
+        ["Strategic fit", "One operating model for every conveyor work stream; the programme contributes to the mission of a self-operating organisation."],
+        ["Current position", "V1 is live; T0's organisation spine is merged; 48 projects are in flight. The programme's definition set is at tranche 0."],
+        ["Drivers", "One-off tooling cost, duplicated project machinery and unmeasured outcomes across the estate."],
+        ["Deliverables and boundaries", "The organisation spine, the plan spine, the decision ladder, the tool estate and benefits realization. Out of scope: customer-facing applications."],
+        ["Delivery and assurance", "Iterative delivery inside tranches; each tranche review decides continue, pause or stop on evidence."],
+        ["Success and constraints", "Benefits realized against their profiles; no project starts before the first tranche is authorised; public/opt-in licensing frame."],
+      ],
+      artefacts: [
+        { id: "PD-01", kind: "Mandate", title: "Programme mandate", producer: "programme manager", reviewer: "BCM", approver: "sponsoring group", version: "v3", state: "Draft", gate: "authorise the programme" },
+        { id: "PD-02", kind: "Brief", title: "Programme brief", producer: "SRO", reviewer: "programme board", approver: "sponsoring group", version: "v2", state: "Approved", gate: "authorise definition" },
+        { id: "PD-03", kind: "Blueprint", title: "Blueprint — target architecture and operating model", producer: "programme architect", reviewer: "BCM", approver: "SRO", version: "v4", state: "Approved", gate: "blueprint contract" },
+        { id: "PD-04", kind: "Business case", title: "Business case — options, appraisal and cash flow", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v3", state: "In review", gate: "investment decision" },
+        { id: "PD-05", kind: "Benefits map", title: "Benefits map and profiles", producer: "BCM", reviewer: "programme manager", approver: "SRO", version: "v2", state: "Draft", gate: "profiles accepted" },
+        { id: "PD-06", kind: "Projects dossier", title: "Projects dossier — outputs, resources, dependencies", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v5", state: "Draft", gate: "first-tranche authorisation" },
+        { id: "PD-07", kind: "Programme plan", title: "Programme plan and tranches", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v6", state: "Approved", gate: "first-tranche authorisation" },
+        { id: "PD-08", kind: "Governance", title: "Governance, roles and the strategy set", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v2", state: "Approved", gate: "governance baseline" },
+        { id: "PD-09", kind: "Stakeholders", title: "Stakeholder profiles", producer: "BCM", reviewer: "programme manager", approver: "SRO", version: "v2", state: "Draft", gate: "engagement plan" },
+        { id: "PD-10", kind: "Realization", title: "Benefits management strategy and realization plan", producer: "programme manager", reviewer: "BCM", approver: "SRO", version: "v1", state: "Draft", gate: "transition readiness" },
+      ],
+      options: [
+        ["Do nothing", "No programme; the estate keeps its duplicated machinery — rejected: the cost and the evidence gap continue."],
+        ["Programme, all four tranches", "Recommended: definition first, then the spine, knowledge/tools, operations."],
+        ["Projects only, no programme", "Cheaper to start — rejected: no shared configuration, no tranche review, no benefit owner."],
+      ],
+    },
+    benefits: [
+      { id: "BEN-01", title: "Delivery lead time", category: "efficiency", objective: "faster IT delivery", outcome: "a card reaches acceptance with less queue time", kpi: "median cycle time (days)", baseline: 14, target: 8, current: 12.1, method: "card and run timestamps, weekly", value: "€0.4m/yr avoided contractor capacity", cost: "€0.12m", owner: "BCM · delivery", area: "delivery", conditions: "jobs bound; coach enabled; WIP limits configured", deps: "T1, T4", state: "Tracking" },
+      { id: "BEN-02", title: "Evidence at every gate", category: "governance", objective: "faster IT delivery; data as an asset", outcome: "a gate decision names its evidence", kpi: "gates with an evidence reference (%)", baseline: 41, target: 95, current: 78, method: "approval × evidence join, daily", value: "non-cash", cost: "€0.05m", owner: "BCM · project office", area: "project office", conditions: "approval policies configured; evidence captured at the action", deps: "T1", state: "Tracking" },
+      { id: "BEN-03", title: "Zero-use tools retired", category: "cost", objective: "manageability; lower cost", outcome: "the estate carries only tools a job calls", kpi: "toolkits retired after a zero-call cycle", baseline: 0, target: 12, current: 4, method: "tool_call roll-up per programme cycle", value: "€0.2m/yr", cost: "€0.08m", owner: "BCM · operations", area: "operations", conditions: "tool ledger live; a probe per toolkit", deps: "T13, T14", state: "At risk" },
+      { id: "BEN-04", title: "Review latency", category: "disbenefit", objective: "sustainable delivery", outcome: "dual control added no more than 8 h to a decision", kpi: "median gate decision latency (h)", baseline: 0, target: 8, current: 5.4, method: "approval opened → decided", value: "—", cost: "—", owner: "BCM · delivery", area: "delivery", conditions: "approver on call; a gate names its expiry", deps: "T1", state: "Monitoring", disbenefit: true },
+    ],
+    benefitLinks: [
+      { output: "T1 plan spine", capability: "WBS, baseline and register rows", outcome: "the plan is managed and evidenced", benefit: "BEN-02", objective: "faster IT delivery" },
+      { output: "T3 PM job", capability: "charter, baseline and change control", outcome: "fewer unplanned changes", benefit: "BEN-01", objective: "faster IT delivery" },
+      { output: "T13 tool platform", capability: "tool call ledger + probes", outcome: "zero-use tools are visible", benefit: "BEN-03", objective: "manageability" },
+      { output: "T4 kanban coach", capability: "WIP limits + one coach card", outcome: "flow is protected", benefit: "BEN-04", objective: "sustainable delivery" },
+    ],
+    tranches: [
+      { no: 0, name: "Definition", projects: "P0, SPEC-V2, DESIGN-PUBLISH", entry: "mandate approved", exit: "definition set accepted; benefits baselined", baseline: "B0", review: "2026-12-04", state: "In review", decision: "Pending" },
+      { no: 1, name: "Organisation spine", projects: "T1, T2, T3", entry: "definition accepted", exit: "PM runs a request end to end", baseline: "B1", review: "2027-01-15", state: "Planned", decision: "—" },
+      { no: 2, name: "Knowledge and tools", projects: "T8, T13, T14", entry: "T1 accepted", exit: "a toolkit is probed and called; a lesson is promoted", baseline: "B2", review: "2027-02-26", state: "Planned", decision: "—" },
+      { no: 3, name: "Operations", projects: "T4, T5, T7, T10", entry: "T2 accepted", exit: "one incident postmortemed; one benefit transitioned and measured", baseline: "B3", review: "2027-04-09", state: "Planned", decision: "—" },
+    ],
+    realization: [
+      { benefit: "BEN-01", baselineMeasured: "— (planned 2026-12-08, 14 days)", readiness: "Amber · coach not yet bound", transition: "2027-01-12", post: "4 weekly measures", legacy: "manual cycle-time spreadsheet", owner: "BCM · delivery", state: "Planned" },
+      { benefit: "BEN-02", baselineMeasured: "2026-12-01 · 41%", readiness: "Green", transition: "2026-12-15", post: "daily join, monthly review", legacy: "gate audit export", owner: "BCM · project office", state: "In transition" },
+      { benefit: "BEN-03", baselineMeasured: "— · not measured", readiness: "Red · tool ledger not live", transition: "—", post: "—", legacy: "—", owner: "BCM · operations", state: "Blocked · baseline missing" },
+      { benefit: "BEN-04", baselineMeasured: "2026-11-20 · 0 h (no dual control)", readiness: "Green", transition: "2026-12-01", post: "weekly", legacy: "single-reviewer approvals", owner: "BCM · delivery", state: "Monitoring" },
+    ],
+    /* The TOGAF ADM capability: the Preliminary phase (principles, tailored profile, board,
+       maturity, skills), the phase rail with typed artefacts, the contracts and the compliance
+       and waiver register. Local fixtures — no V2 table or action exists (SPEC_V2 §8.1, D63). */
+    architectureCapability: {
+      key: "ARCH-CB",
+      name: "conveyor buildout architecture capability",
+      principles: [
+        { id: "P-01", statement: "One record per fact", rationale: "A second store is a second truth; the systems of record diverge silently", implications: "No derived status is stored; no shadow table; the read model computes" },
+        { id: "P-02", statement: "Rows and gates, not a document library", rationale: "A document with no lifecycle has no gate and no evidence", implications: "Every artefact carries metadata, an owner, a reviewer and a gate" },
+        { id: "P-03", statement: "Tenant configuration over code", rationale: "Policy values differ per tenant and change without a deploy", implications: "Thresholds, approval kinds and maturity sets are versioned tenant rows" },
+        { id: "P-04", statement: "Reuse before build", rationale: "The repository already holds the building block more often than not", implications: "A solution artefact names the enterprise artefact it reuses or declares the deviation" },
+        { id: "P-05", statement: "The executor cannot approve its own gate", rationale: "A gate that cannot refuse is not a gate", implications: "Requester and executor are refused as approvers; dual control defaults on" },
+        { id: "P-06", statement: "A baseline is measured before it moves", rationale: "A benefit or an architecture with no baseline cannot claim an improvement", implications: "A transition or a re-baseline goes through change control, never through a review" },
+      ],
+      profile: {
+        name: "Tailored ADM profile · software delivery",
+        phases: "Preliminary + A–H",
+        psa: "13 artefact types mandatory at inception",
+        hld: "24 artefact types mandatory by phase C",
+        sd: "18 artefact types mandatory by phase E",
+        contracts: "SAW (A) · delivery contract (F) · statement of intent (completion) · request for architecture (H)",
+        adopted: "2026-11-12 · Architecture Board decision BD-01",
+      },
+      board: {
+        name: "Architecture Board",
+        chair: "CIO",
+        members: "enterprise architects · business-unit leaders · the programme architect",
+        charter: "Support the roadmap, assess proposed changes against it, apply the principles where the roadmap is incomplete, commission solution architectures and submit them to the delivery Design Board",
+        authority: "commission architecture work · approve principles and contracts · accept or reject deviations",
+        limits: "cannot approve a delivery gate it requested · cannot waive a deviation it owns · no budget authority",
+      },
+      maturity: [
+        { dimension: "Architecture process", baseline: 2, stage1: 3, stage2: 4 },
+        { dimension: "Architecture development", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Business linkage", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Senior management involvement", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Operating unit participation", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Architecture communication", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "IT security", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "Architecture governance", baseline: 1, stage1: 2, stage2: 3 },
+        { dimension: "IT investment and acquisition", baseline: 1, stage1: 2, stage2: 3 },
+      ],
+      skills: [
+        { category: "General", role: "programme architect", current: 4, target: 4 },
+        { category: "Business skills and methods", role: "programme architect", current: 3, target: 4 },
+        { category: "Architecture skills", role: "programme architect", current: 3, target: 4 },
+        { category: "Programme and project management", role: "programme manager", current: 4, target: 4 },
+        { category: "General IT knowledge", role: "solution architect", current: 4, target: 4 },
+        { category: "Technical IT skills", role: "solution architect", current: 4, target: 5 },
+        { category: "Legal environment", role: "asset owner", current: 2, target: 3 },
+      ],
+      phases: [
+        { code: "Preliminary", name: "Preliminary", plateau: "psa", required: 5, approved: 5, missing: [], contract: "capability adopted (BD-01)", state: "Closed" },
+        { code: "A", name: "Vision", plateau: "psa", required: 6, approved: 6, missing: [], contract: "SAW-01 v2 · approved", state: "Closed" },
+        { code: "B", name: "Business", plateau: "hld", required: 24, approved: 22, missing: ["ART-011 · Business Footprint Diagram", "ART-019 · Process Flow Diagram"], contract: "BC-01 · draft", state: "In progress" },
+        { code: "C", name: "Information systems", plateau: "hld", required: 18, approved: 0, missing: [], contract: "IS-01 · not requested", state: "Planned" },
+        { code: "D", name: "Technology", plateau: "hld", required: 9, approved: 0, missing: [], contract: "TC-01 · not requested", state: "Planned" },
+        { code: "E", name: "Opportunities & solutions", plateau: "sd", required: 6, approved: 0, missing: [], contract: "SC-01 · not requested", state: "Planned" },
+        { code: "F", name: "Migration planning", plateau: "sd", required: 4, approved: 0, missing: [], contract: "DC-01 · not requested", state: "Planned" },
+        { code: "G", name: "Implementation governance", plateau: "sd", required: 1, approved: 0, missing: [], contract: "per-delivery compliance", state: "Planned" },
+        { code: "H", name: "Change management", plateau: "sd", required: 3, approved: 0, missing: [], contract: "RAW-01 · none", state: "Planned" },
+      ],
+      contracts: [
+        { id: "SAW-01", kind: "Statement of Architecture Work", phase: "A", version: "v2", state: "Approved", owner: "programme architect", reviewer: "architecture forum", body: "assignment, scope, responsibilities, acceptance criteria" },
+        { id: "BC-01", kind: "Business contract", phase: "B", version: "v1", state: "Draft", owner: "domain architect", reviewer: "Architecture Board", body: "business architecture delivered, review method" },
+        { id: "DC-01", kind: "Delivery contract", phase: "F", version: "v1", state: "Not requested", owner: "programme manager", reviewer: "asset owner", body: "delivery commitments and compliance method" },
+        { id: "SI-01", kind: "Statement of intent", phase: "completion", version: "—", state: "Not requested", owner: "asset owner", reviewer: "Architecture Board", body: "intended use, ownership, measures of effectiveness" },
+        { id: "RAW-01", kind: "Request for Architecture Work", phase: "H", version: "—", state: "None", owner: "business sponsor", reviewer: "Design Board", body: "further architecture work with a Lean Canvas" },
+      ],
+      artifacts: [
+        { id: "ART-001", title: "Principles catalog", type: "catalog", phase: "Preliminary", plateau: "psa", state: "Approved", version: "v3", owner: "programme architect", reviewer: "Architecture Board", reviewed: "2026-11-12", document: "document · arch-principles-v3", entries: 6 },
+        { id: "ART-002", title: "Principle derivation diagram", type: "diagram", phase: "Preliminary", plateau: "psa", state: "Approved", version: "v2", owner: "programme architect", reviewer: "Architecture Board", reviewed: "2026-11-12", document: "document · arch-principles-v3#derivation", entries: 2, viewpoint: "ArchiMate 3.1 / Motivation" },
+        { id: "ART-003", title: "Stakeholder map and matrix", type: "matrix", phase: "A", plateau: "psa", state: "Approved", version: "v2", owner: "programme architect", reviewer: "SRO", reviewed: "2026-11-13", document: "document · arch-vision-v2", entries: 6 },
+        { id: "ART-004", title: "Driver / goal / objective catalog", type: "catalog", phase: "A", plateau: "psa", state: "Approved", version: "v1", owner: "programme architect", reviewer: "SRO", reviewed: "2026-11-13", document: "document · arch-vision-v2#motivation", entries: 7 },
+        { id: "ART-005", title: "Requirements catalog", type: "catalog", phase: "A", plateau: "psa", state: "Approved", version: "v4", owner: "requirements lead", reviewer: "Architecture Board", reviewed: "2026-11-13", document: "document · arch-requirements-v4", entries: 41 },
+        { id: "ART-006", title: "Solution concept diagram", type: "diagram", phase: "A", plateau: "psa", state: "Approved", version: "v2", owner: "solution architect", reviewer: "Architecture Board", reviewed: "2026-11-13", document: "document · arch-vision-v2#concept", entries: 3, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-007", title: "Benefits diagram", type: "diagram", phase: "E", plateau: "sd", state: "Draft", version: "v1", owner: "BCM", reviewer: "SRO", reviewed: "—", document: "document · arch-benefits-draft", entries: 4, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-008", title: "Business service / function catalog", type: "catalog", phase: "B", plateau: "hld", state: "Approved", version: "v2", owner: "domain architect", reviewer: "SRO", reviewed: "2026-11-15", document: "document · arch-business-v2", entries: 18 },
+        { id: "ART-009", title: "Process / event / control / product catalog", type: "catalog", phase: "B", plateau: "hld", state: "Approved", version: "v1", owner: "domain architect", reviewer: "SRO", reviewed: "2026-11-15", document: "document · arch-business-v2#process", entries: 26 },
+        { id: "ART-010", title: "Actor / role matrix", type: "matrix", phase: "B", plateau: "hld", state: "Approved", version: "v1", owner: "domain architect", reviewer: "SRO", reviewed: "2026-11-15", document: "document · arch-business-v2#actors", entries: 12 },
+        { id: "ART-011", title: "Business footprint diagram", type: "diagram", phase: "B", plateau: "hld", state: "Draft", version: "v1", owner: "domain architect", reviewer: "SRO", reviewed: "—", document: "document · arch-business-draft", entries: 5, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-012", title: "Data entity / data component catalog", type: "catalog", phase: "C", plateau: "hld", state: "Approved", version: "v2", owner: "data architect", reviewer: "Architecture Board", reviewed: "2026-11-15", document: "document · arch-data-v2", entries: 31 },
+        { id: "ART-013", title: "Application portfolio catalog", type: "catalog", phase: "C", plateau: "hld", state: "Approved", version: "v2", owner: "application architect", reviewer: "Architecture Board", reviewed: "2026-11-15", document: "document · arch-application-v2", entries: 24 },
+        { id: "ART-014", title: "Application / data matrix", type: "matrix", phase: "C", plateau: "hld", state: "Draft", version: "v1", owner: "application architect", reviewer: "Architecture Board", reviewed: "—", document: "document · arch-application-draft", entries: 20 },
+        { id: "ART-015", title: "Technology standards catalog", type: "catalog", phase: "D", plateau: "hld", state: "Approved", version: "v2", owner: "platform architect", reviewer: "Architecture Board", reviewed: "2026-11-15", document: "document · arch-technology-v2", entries: 15 },
+        { id: "ART-016", title: "Application communication diagram", type: "diagram", phase: "C", plateau: "sd", state: "Planned", version: "—", owner: "application architect", reviewer: "Architecture Board", reviewed: "—", document: "—", entries: 0, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-017", title: "Project context diagram", type: "diagram", phase: "E", plateau: "sd", state: "Planned", version: "—", owner: "solution architect", reviewer: "Design Board", reviewed: "—", document: "—", entries: 0, viewpoint: "ArchiMate 3.1 / Layered" },
+        { id: "ART-018", title: "Technology portfolio catalog", type: "catalog", phase: "D", plateau: "sd", state: "Planned", version: "—", owner: "platform architect", reviewer: "Architecture Board", reviewed: "—", document: "—", entries: 0 },
+        { id: "ART-019", title: "Process flow diagram", type: "diagram", phase: "B", plateau: "hld", state: "Draft", version: "v1", owner: "domain architect", reviewer: "SRO", reviewed: "—", document: "document · arch-business-draft#flow", entries: 7, viewpoint: "ArchiMate 3.1 / Process" },
+      ],
+      artifactEntries: {
+        "ART-003": {
+          caption: "Stakeholder map · power × interest",
+          headers: ["Stakeholder", "Power", "Interest", "Engagement"],
+          rows: [
+            ["Executive leadership", "high", "low", "keep satisfied · mandate and funding"],
+            ["Business unit leaders", "high", "high", "manage closely · operating-practice change"],
+            ["Asset owners", "high", "high", "manage closely · waiver acceptance"],
+            ["IT management", "medium", "high", "manage closely · delivery interface"],
+            ["Project managers", "low", "high", "keep informed · phase inputs"],
+            ["Operations / DevOps", "low", "high", "keep informed · run evidence"],
+          ],
+        },
+        "ART-005": {
+          caption: "Requirements catalog · condition / constraint / assumption / delta",
+          headers: ["UID", "Type", "Requirement", "Category", "Priority", "Source", "Owner"],
+          rows: [
+            ["REQ-011", "condition", "A gate decision names its evidence", "governance", "must", "SRO", "programme board"],
+            ["REQ-012", "constraint", "No second store for any fact", "data", "must", "CIO", "architecture board"],
+            ["REQ-013", "assumption", "The buildout runs on one tenant per industry", "scope", "should", "programme manager", "SRO"],
+            ["REQ-014", "delta", "Phase B artefacts replace the V1 rail map", "business", "could", "domain architect", "SRO"],
+          ],
+        },
+        "ART-010": {
+          caption: "Actor / role matrix",
+          headers: ["Actor", "Role", "Responsibility"],
+          rows: [
+            ["programme manager", "accountable", "owns the tranche plan and the gate route"],
+            ["programme architect", "responsible", "authors the artefacts and the contracts"],
+            ["BCM", "consulted", "owns the benefit profiles and the transitions"],
+            ["SRO", "accountable", "decides the tranche and the design gate"],
+          ],
+        },
+      },
+      artifactLinks: [
+        { from: "ART-001", to: "ART-002", kind: "derivation" },
+        { from: "ART-003", to: "ART-002", kind: "derivation" },
+        { from: "ART-004", to: "ART-002", kind: "derivation" },
+        { from: "ART-002", to: "ART-005", kind: "derivation" },
+        { from: "ART-005", to: "ART-006", kind: "realization" },
+        { from: "ART-004", to: "ART-008", kind: "derivation" },
+        { from: "ART-008", to: "ART-011", kind: "derivation" },
+        { from: "ART-012", to: "ART-014", kind: "dependency" },
+        { from: "ART-013", to: "ART-014", kind: "dependency" },
+        { from: "ART-013", to: "ART-016", kind: "derivation" },
+        { from: "ART-013", to: "ART-017", kind: "reuse" },
+        { from: "ART-015", to: "ART-018", kind: "derivation" },
+        { from: "ART-004", to: "ART-007", kind: "derivation" },
+      ],
+      boardDecisions: [
+        { id: "BD-01", decision: "Adopt the tailored ADM profile", evidence: "profile v1 · phased A–H · contract kinds", state: "Approved" },
+        { id: "BD-02", decision: "Approve principles catalog v3", evidence: "P-01…P-06 with rationale and implications", state: "Approved" },
+        { id: "BD-03", decision: "Commission the T9 solution architecture", evidence: "SAW-01 · scope and acceptance", state: "Approved" },
+        { id: "BD-04", decision: "Accept waiver W-01 for T13", evidence: "asset owner acceptance · review 2027-01-15", state: "Approved" },
+      ],
+      compliance: [
+        { project: "T1 plan spine", contract: "DC-01", level: "Consistent", findings: "two SD artefacts deferred; no deviation from the data model", date: "2026-11-14" },
+        { project: "T9 ADM capability", contract: "SAW-01", level: "Compliant", findings: "phase A artefacts approved; the IS contract is not yet requested", date: "2026-11-15" },
+        { project: "T13 tool platform", contract: "DC-02", level: "Non-conformant", findings: "the tool_call row omits the credential alias", date: "2026-11-15" },
+      ],
+      waivers: [
+        { id: "W-01", project: "T13 tool platform", deviation: "credential alias recorded in the broker log, not the tool_call row", owner: "asset owner · operations", mitigation: "broker-log join until T13b", costRisk: "€0.1m · low", review: "2027-01-15", state: "Active" },
+      ],
+      hOutcomes: [
+        { id: "H-01", finding: "two competing identity contracts in the estate", outcome: "Change request CR-019", state: "Routed to the change gate" },
+        { id: "H-02", finding: "a gate never refused in a full cycle", outcome: "Kata candidate K-014", state: "Routed to the kata lane" },
+      ],
+    },
     changes: [
       { id: "CR-018", title: "Add delegated identity scope", baseline: "B3", impact: "scope +2 deliverables · schedule +9 d · cost +€0.8m · risk medium", rationale: "", state: "Draft" },
       { id: "CR-017", title: "Move portal gate to PI-2026.4", baseline: "B2", impact: "schedule −14 d · cost −€0.2m · risk low", rationale: "Programme board rationale recorded", state: "Approved" },
@@ -2856,10 +3712,10 @@ window.installV2 = function (api, enterprise) {
           ? snapshotProjects().length
           : db.projects.length;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Non-Agentic AI<small>Organisation workspace</small></span><span>⌄</span></div><nav>
-      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
+      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("programme", "Programme definition", "shield")}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
       <div class="nav-group"><div class="nav-label">ORGANISATION</div>${N("organisation", "Organisation", "layers")}${N("jobs", "Jobs", "board", F.jobs.length)}${N("agents", "Agents", "agent")}${N("toolkits", "Tools", "tools")}${N("types", "Project types", "grid")}</div>
       <div class="nav-group"><div class="nav-label">PROCEDURES &amp; AUTHORING</div>${N("procedures", "Procedures", "flow")}${N("capabilities", "Capabilities", "layers")}${N("authoring", "Authoring", "book")}</div>
-      <div class="nav-group"><div class="nav-label">GOVERN &amp; DESIGN</div>${N("assurance", "Assurance &amp; baselines", "shield")}${N("constraints", "Flow &amp; constraints", "branch")}${N("requirements", "Requirements", "file")}${N("principles", "Principles", "book")}${N("models", "Architecture &amp; UML", "model")}${N("architecture", "System architecture", "model")}${N("documents", "Documents", "file")}</div>
+      <div class="nav-group"><div class="nav-label">GOVERN &amp; DESIGN</div>${N("assurance", "Assurance &amp; baselines", "shield")}${N("constraints", "Flow &amp; constraints", "branch")}${N("requirements", "Requirements", "file")}${N("principles", "Principles", "book")}${N("models", "Architecture &amp; UML", "model")}${N("adm", "Architecture capability", "shield")}${N("architecture", "System architecture", "model")}${N("documents", "Documents", "file")}</div>
       <div class="nav-group"><div class="nav-label">KNOWLEDGE &amp; MEMORY</div>${N("knowledge-design", "Knowledge design", "branch")}${N("knowledge", "Sources &amp; retrieval", "book")}${N("memory", "Memory explorer", "layers")}</div>
       <div class="nav-group"><div class="nav-label">MEASURE &amp; IMPROVE</div>${N("improve", "Improve", "chart")}${N("evals", "Evaluation studio", "shield")}${N("hillclimb", "Hillclimb lab", "branch")}${N("benchmarks", "Benchmark harness", "code")}${N("usage", "Inference &amp; prompt audit", "chart")}${N("metering", "Metering", "chart")}</div>
       <div class="nav-group"><div class="nav-label">OPERATIONS</div>${N("operations", "Operations", "run")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>SPEC_V2 design study</div></div>`;
@@ -2871,6 +3727,7 @@ window.installV2 = function (api, enterprise) {
   // design study. The signed-in page never renders a fixture project or a fixture programme.
   function consolePortfolio() {
     if (!cs.loaded && !cs.loading && !cs.error) consoleLoad();
+    consoleLoadRegister();
     const rows = consoleProjects();
     const index = new Map(cs.issues.map((row) => [String(row.number), row]));
     // No programme row is a real answer for a tenant: render the absence. Naming a fixture
@@ -2968,7 +3825,7 @@ window.installV2 = function (api, enterprise) {
         : tab === "Programme"
           ? panel(
               "Programme",
-              `${summary}${note(
+              `${summary}${programmeQueue(rows, list(cs.register.items))}${note(
                 "Shared configuration, WSJF, cadence and metering are V2 aggregates (T1/T10/T11) that do not exist yet. This page shows the rows the platform owns today.",
               )}`,
               B(programme ? programme.status || "active" : "no programme row", programme ? "green" : ""),
@@ -3025,7 +3882,7 @@ window.installV2 = function (api, enterprise) {
     )}${consoleRibbon(
       `The published programme snapshot${programme.name ? ` · ${E(programme.name)}` : ""}: ${rows.length} projects and their dependency edges.`,
       rows.length > 0,
-    )}${panel(
+    )}${programmeQueue(rows, list((window.CONVEYOR_OUTPUTS || {}).outputs))}${panel(
       "Projects",
       `<p class="muted">Every row is a programme project in the published snapshot, with the GitHub units linked on it.</p>${table(
         ["Project", "Tranche", "Status", "Measured", "Units"],
@@ -3043,6 +3900,329 @@ window.installV2 = function (api, enterprise) {
           : [`<tr><td colspan="2">No dependency edges are published.</td></tr>`],
       )}`,
     )}</div>`;
+  }
+
+  /* ------------------------------------------------ Programme definition (MSP) */
+  // SPEC_V2 §8.3 / D62: the definition set, benefit profiles and the benefits map, tranches and
+  // their reviews, and benefits realization. Local fixtures only — no V2 table or action exists.
+  // The pages map gates every non-public destination, so the public site never renders this page.
+  function programmeDefinitionPage() {
+    const tab = v.tab.programme || "Definition";
+    const def = F.programmeDefinition;
+    const benefit = F.benefits.find((b) => b.id === v.benefit) || F.benefits[0];
+    const tranche = F.tranches.find((t) => t.no === v.tranche) || F.tranches[0];
+    const row = F.realization.find((r) => r.benefit === benefit.id) || F.realization[0];
+    const gate = v.programmeGate;
+    const span = Math.max(benefit.baseline, benefit.target, benefit.current, 1);
+    const pct = (n) => Math.min(100, Math.round((n / span) * 100));
+    const bar = `<div class="v2-bar" style="position:relative"><i style="width:${pct(benefit.current)}%"></i></div><div class="row" style="justify-content:space-between;margin-top:4px"><small class="muted">baseline ${E(benefit.baseline)}</small><small class="muted">current ${E(benefit.current)}</small><small class="muted">target ${E(benefit.target)}</small></div>`;
+    const reviewEvidence =
+      tranche.no === 0
+        ? [
+            ["Baselines frozen and approved", "B0 · B1"],
+            ["Benefits against their profiles", "BEN-02 78% · BEN-03 at risk"],
+            ["Risk and issue register", "2 open · 1 high"],
+            ["Blueprint alignment", "no deviation"],
+            ["Tranche exit criteria", "3 of 4 met"],
+          ]
+        : [["First review is due on " + tranche.review, "not started"]];
+
+    const definition =
+      `${panel("Mandate · " + def.name, `${table(
+        ["Field", "Entry"],
+        def.fields.map(([field, entry]) => `<tr><td><strong>${E(field)}</strong></td><td>${E(entry)}</td></tr>`),
+      )}${kv([
+        ["Producer", "programme manager"],
+        ["Reviewer", "BCM"],
+        ["Approver", "sponsoring group"],
+        ["Version", E(def.mandate.version)],
+        ["State", B(gate === "mandate-ok" ? "Approved" : def.mandate.state, gate === "mandate-ok" ? "green" : "amber")],
+        ["Sponsors", E(def.sponsors)],
+      ])}${gate === "mandate-ok" ? note("<strong>Approved</strong> · the sponsoring group authorised the mandate. The programme may enter definition; the brief is the next gate.", "ok") : gate === "mandate-return" ? note("<strong>Returned</strong> · the sponsoring group returned the mandate. No definition work starts and no delivery project is opened.", "bad") : note("The mandate is a decision, not a document: the sponsoring group approves the six fields, then the brief, then the first tranche. The programme cannot skip a gate.")}`, `${button("Approve the mandate", "programme-mandate", "", "small", "shield")}${button("Return for revision", "programme-mandate-return", "", "small", "replay")}`)}` +
+      `${panel("Definition set", `${table(
+        ["ID", "Artefact", "Producer", "Reviewer", "Approver", "Version", "State", "Gate"],
+        def.artefacts.map((a) => `<tr><td class="mono">${E(a.id)}</td><td><strong>${E(a.title)}</strong><small>${E(a.kind)}</small></td><td><small>${E(a.producer)}</small></td><td><small>${E(a.reviewer)}</small></td><td><small>${E(a.approver)}</small></td><td>${E(a.version)}</td><td>${B(a.state, a.state === "Approved" ? "green" : a.state === "In review" ? "amber" : "")}</td><td><small>${E(a.gate)}</small></td></tr>`),
+      )}${note("Every artefact names its producer, reviewer and approver. The set is the programme's, not a document library: a missing approval is a missing gate.")}`, B(`${def.artefacts.length} artefacts`))}` +
+      `${panel("Delivery options", `${table(
+        ["Option", "Assessment"],
+        def.options.map(([option, assessment]) => `<tr><td><strong>${E(option)}</strong></td><td>${E(assessment)}</td></tr>`),
+      )}${note("Doing nothing is always an option and is assessed as one. The business case has two return paths: redesign the future state, or rework the project solutions.")}`)}`;
+
+    const benefits =
+      `<div class="v2-split"><div>${panel("Benefit profiles", `${table(
+        ["ID", "Benefit", "Owner", "State"],
+        F.benefits.map((b) => `<tr data-v2="benefit" data-id="${b.id}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="benefit" data-id="${b.id}">${E(b.id)}</button></td><td><strong>${E(b.title)}</strong><small>${E(b.kpi)}</small></td><td><small>${E(b.owner)}</small></td><td>${B(b.state, b.state === "Tracking" ? "green" : b.state === "At risk" ? "amber" : "")}</td></tr>`),
+      )}`, B(`${F.benefits.length} profiles`))}</div><div>${panel(
+        "Profile · " + benefit.id,
+        `${kv([
+          ["Benefit", E(benefit.title)],
+          ["Category", E(benefit.category)],
+          ["Objective", E(benefit.objective)],
+          ["Observable outcome", E(benefit.outcome)],
+          ["KPI", E(benefit.kpi)],
+          ["Measurement method", E(benefit.method)],
+          ["Financial value", E(benefit.value)],
+          ["Cost to realize", E(benefit.cost)],
+          ["Conditions", E(benefit.conditions)],
+          ["Dependencies", E(benefit.deps)],
+          ["Owner", E(benefit.owner)],
+          ["Operational area", E(benefit.area)],
+        ])}${bar}${note("A capability gives a team a new option; whether it uses the option, and whether use improves performance, are separate questions. The baseline is measured while the old practice is still observable.")}`,
+        B(benefit.state, benefit.state === "Tracking" ? "green" : "amber"),
+      )}</div></div>${panel("Benefits map", `${table(
+        ["Output", "Capability", "Operational outcome", "Benefit", "Strategic objective"],
+        F.benefitLinks.map((l) => `<tr><td><strong>${E(l.output)}</strong></td><td>${E(l.capability)}</td><td>${E(l.outcome)}</td><td class="mono">${E(l.benefit)}</td><td>${E(l.objective)}</td></tr>`),
+      )}${note("Read left to right. A dependency slip names the benefits put at risk through these edges. A disbenefit is tracked with the same profile discipline.")}`)}`;
+
+    const tranches =
+      `<div class="v2-split"><div>${panel("Tranches", `${table(
+        ["#", "Tranche", "Projects", "Baseline", "Review", "State"],
+        F.tranches.map((t) => `<tr data-v2="tranche-review" data-id="${t.no}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="tranche-review" data-id="${t.no}">${t.no}</button></td><td><strong>${E(t.name)}</strong></td><td><small>${E(t.projects)}</small></td><td>${E(t.baseline)}</td><td>${E(t.review)}</td><td>${B(t.state, t.state === "In review" ? "amber" : "")}</td></tr>`),
+      )}`, B(`${F.tranches.length} tranches`))}</div><div>${panel(
+        "Review · tranche " + tranche.no,
+        `${kv([
+          ["Tranche", E(tranche.name)],
+          ["Projects", E(tranche.projects)],
+          ["Entry criteria", E(tranche.entry)],
+          ["Exit criteria", E(tranche.exit)],
+          ["Management baseline", E(tranche.baseline)],
+          ["Review", E(tranche.review)],
+          ["Decision", E(tranche.decision)],
+        ])}${table(
+          ["Evidence", "State"],
+          reviewEvidence.map((r) => `<tr><td>${E(r[0])}</td><td>${E(r[1])}</td></tr>`),
+        )}${gate === "tranche-continue" ? note("<strong>Decision recorded · continue</strong> · tranche 0 closes and B1 becomes the management baseline for tranche 1. The next tranche is authorised on this evidence.", "ok") : gate === "tranche-hold" ? note("<strong>Decision recorded · pause</strong> · tranche 1 does not start; the definition set returns to the board with the named gaps.", "bad") : note("A review with no evidence is refused. A re-baseline goes through change control; the review never rewrites the baseline.")}`,
+        `${button("Continue to tranche 1", "tranche-continue", "", "small", "shield")}${button("Hold the tranche", "tranche-hold", "", "small", "replay")}`,
+      )}</div></div>${note("A tranche is not a PI: the PI cadence is the delivery rhythm inside it; the review is the sponsoring group's decision to continue, pause or stop on evidence.")}`;
+
+    const realization =
+      `${panel("Transition and measurement", `${table(
+        ["Benefit", "Baseline measured", "Readiness", "Transition", "Post-transition", "Legacy retired", "Owner", "State"],
+        F.realization.map((r) => `<tr data-v2="transition-select" data-id="${r.benefit}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="transition-select" data-id="${r.benefit}">${E(r.benefit)}</button></td><td><small>${E(r.baselineMeasured)}</small></td><td><small>${E(r.readiness)}</small></td><td>${E(r.transition)}</td><td><small>${E(r.post)}</small></td><td><small>${E(r.legacy)}</small></td><td><small>${E(r.owner)}</small></td><td>${B(r.state, r.state.startsWith("Blocked") ? "amber" : r.state === "Monitoring" ? "green" : "")}</td></tr>`),
+      )}${note("The BCM measures the baseline before the transition, plans it, assesses readiness, enacts it, measures post-transition and retires the legacy practice. A benefit whose baseline was never measured cannot claim an improvement.")}`)}` +
+      `${panel("Selected benefit · " + benefit.id, `${kv([
+        ["Benefit", E(benefit.title)],
+        ["Baseline", E(row.baselineMeasured)],
+        ["Readiness", E(row.readiness)],
+        ["Transition", E(row.transition)],
+        ["Post-transition measurement", E(row.post)],
+        ["Legacy retirement", E(row.legacy)],
+        ["Post-closure owner", E(row.owner)],
+      ])}${gate === "transition-ok" ? note("<strong>Transition recorded</strong> · the post-transition measurement opens on the planned date; the legacy practice is retired after the first post measure. The comparison with the baseline is the sponsor's evidence.", "ok") : gate === "transition-blocked" ? note("<strong>422 benefit_baseline_missing</strong> · this benefit has no measured baseline. Measure the baseline first; the tool ledger is not live.", "bad") : note("The transition is the BCM's procedure. It is not a status change on the project, and the programme does not close until the realization plan names who keeps measuring.")}`, button("Record the transition", "transition-record", "", "small", "run"))}`;
+
+    const content =
+      tab === "Definition"
+        ? definition
+        : tab === "Benefits map & profiles"
+          ? benefits
+          : tab === "Tranches & reviews"
+            ? tranches
+            : realization;
+
+    return `<div class="page enterprise">${heading(
+      "Programme definition",
+      "The programme's mandate, brief, blueprint, business case, benefits, tranches and realized outcomes — the MSP layer of SPEC_V2.",
+      `${route("Portfolio", "portfolio", "", "layers")}${route("Plan & WBS", "plan", "", "board")}`,
+      "PORTFOLIO & PLAN",
+    )}${ribbon("MSP programme definition and benefits realization: programme_tranche, benefit_profile, benefit_link, benefit_transition and the extended governed_asset kinds. Proposed in T1/T10; D62.")}${tabs(["Definition", "Benefits map & profiles", "Tranches & reviews", "Benefits realization"], tab, "programme")}${content}</div>`;
+  }
+
+  /* --------------------------------------- Architecture capability (TOGAF ADM) */
+  // SPEC_V2 §8.1 / D63: the Preliminary capability, the ADM phase rail with typed artefacts, the
+  // artefact repository and the board/compliance register. Local fixtures only — no V2 table or
+  // action exists. The pages map gates every non-public destination, so the public site never
+  // renders this page.
+  function architectureCapabilityPage() {
+    const cap = F.architectureCapability;
+    const tab = v.tab.adm || "Capability";
+    const gate = v.admGate;
+    const art = cap.artifacts.find((a) => a.id === v.adm) || cap.artifacts[0];
+    const phase = cap.phases.find((p) => p.code === v.admPhase) || cap.phases[2];
+    const typeFilter = v.admType || "all";
+    const tone = (state) =>
+      state === "Approved" || state === "Closed"
+        ? "green"
+        : state === "Draft" || state === "In progress"
+          ? "amber"
+          : "";
+    const score = (n) => B(String(n), n >= 4 ? "green" : n >= 2 ? "" : "amber");
+    const missing = phase.missing.length
+      ? phase.missing
+      : phase.approved < phase.required
+        ? [`${phase.required - phase.approved} mandatory artefacts are not yet approved`]
+        : [];
+
+    const capability =
+      `<div class="v2-split"><div>${panel(
+        "Principles catalog · ART-001 v3",
+        `${table(
+          ["ID", "Principle", "Rationale", "Implications"],
+          cap.principles.map((p) => `<tr><td class="mono">${E(p.id)}</td><td><strong>${E(p.statement)}</strong></td><td><small>${E(p.rationale)}</small></td><td><small>${E(p.implications)}</small></td></tr>`),
+        )}${note("The principles catalog is an ordinary artefact: entries are rows, the Architecture Board approves the version, and a change supersedes it.")}`,
+        B("approved · v3", "green"),
+      )}</div><div>${panel(
+        "Tailored ADM profile",
+        `${kv([
+          ["Profile", E(cap.profile.name)],
+          ["Phases", E(cap.profile.phases)],
+          ["PSA set", E(cap.profile.psa)],
+          ["HLD set", E(cap.profile.hld)],
+          ["SD set", E(cap.profile.sd)],
+          ["Contracts", E(cap.profile.contracts)],
+          ["Adopted", E(cap.profile.adopted)],
+        ])}${note("The profile is the tenant's tailoring: which phases run, which artefact types are mandatory per phase and plateau, and which contract closes each phase. The mandatory set grows with the assessed maturity.")}`,
+      )}${panel(
+        "Architecture Board",
+        `${kv([
+          ["Body", E(cap.board.name)],
+          ["Chair", E(cap.board.chair)],
+          ["Membership", E(cap.board.members)],
+          ["Charter", E(cap.board.charter)],
+          ["Commissioning authority", E(cap.board.authority)],
+          ["Decision limits", E(cap.board.limits)],
+        ])}${note("The board is a governance body with authority rows, not a meeting. It cannot approve a delivery gate it requested and cannot waive a deviation it owns.")}`,
+        B("charter · BD-01", "green"),
+      )}</div></div>` +
+      `<div class="v2-split"><div>${panel(
+        "Maturity · nine dimensions",
+        `${table(
+          ["Dimension", "Baseline", "Stage 1", "Stage 2"],
+          cap.maturity.map((m) => `<tr><td>${E(m.dimension)}</td><td>${score(m.baseline)}</td><td>${score(m.stage1)}</td><td>${score(m.stage2)}</td></tr>`),
+        )}${note("Scale 0–5: none, initial, under development, defined, managed, measured. Each stage is a milestone a tranche review holds the capability to; the baseline is dated evidence, not an assertion.")}`,
+      )}</div><div>${panel(
+        "Skills · seven categories",
+        `${table(
+          ["Category", "Role", "Current", "Target"],
+          cap.skills.map((s) => `<tr><td>${E(s.category)}</td><td><small>${E(s.role)}</small></td><td>${score(s.current)}</td><td>${score(s.target)}</td></tr>`),
+        )}${note("The Architecture Skills Framework assesses proficiency per role. The development plan is a Preliminary-phase output, aligned with the maturity stages.")}`,
+      )}</div></div>`;
+
+    const advanceNote =
+      gate === "adm-advance-closed"
+        ? note(`<strong>Phase already closed</strong> · ${E(phase.code)} reached its contract and no further advance is recorded.`, "ok")
+        : gate === "adm-advance-refused"
+          ? note(`<strong>422 phase_artifacts_missing</strong> · ${E(missing.join(" · "))}. ${E(phase.contract)} is not live; the phase stays open and no contract row is written.`, "bad")
+          : gate === "adm-advance-ok"
+            ? note(`<strong>Phase closed</strong> · every mandatory artefact is approved and the contract is live. The next phase is open.`, "ok")
+            : note("A phase closes only when every artefact the profile marks mandatory is approved, the required links resolve and its contract is live. The refusal names the missing artefact, never a generic error.");
+
+    const phases =
+      `<div class="v2-split"><div>${panel(
+        "Phase rail",
+        `${table(
+          ["Phase", "Plateau", "Mandatory", "Approved", "Contract", "State"],
+          cap.phases.map((p) => `<tr data-v2="adm-phase" data-id="${E(p.code)}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="adm-phase" data-id="${E(p.code)}">${E(p.code)}</button></td><td>${E(p.plateau)}</td><td>${p.required}</td><td>${p.approved}</td><td><small>${E(p.contract)}</small></td><td>${B(p.state, tone(p.state))}</td></tr>`),
+        )}${note("Each phase is a WBS node. Its mandatory set comes from the standard filtered by the profile; it closes on an approved contract; a phase cannot be skipped.")}`,
+      )}</div><div>${panel(
+        "Phase · " + phase.code + " " + phase.name,
+        `${kv([
+          ["Plateau", E(phase.plateau)],
+          ["Mandatory artefacts", `${phase.approved} approved of ${phase.required}`],
+          ["Contract", E(phase.contract)],
+          ["State", B(phase.state, tone(phase.state))],
+        ])}${missing.length ? `<h4>Missing mandatory set</h4><ul>${missing.map((m) => `<li>${E(m)}</li>`).join("")}</ul>` : ""}${advanceNote}`,
+        button("Advance the phase", "adm-advance", "", "small", "run"),
+      )}${panel(
+        "Contracts across the ADM",
+        `${table(
+          ["ID", "Contract", "Phase", "Version", "State", "Owner", "Reviewer"],
+          cap.contracts.map((c) => `<tr><td class="mono">${E(c.id)}</td><td><strong>${E(c.kind)}</strong><small>${E(c.body)}</small></td><td>${E(c.phase)}</td><td>${E(c.version)}</td><td>${B(c.state, c.state === "Approved" ? "green" : c.state === "Draft" ? "amber" : "")}</td><td><small>${E(c.owner)}</small></td><td><small>${E(c.reviewer)}</small></td></tr>`),
+        )}${note("The Statement of Architecture Work is distinct from the designs produced under it. A contract change is a new version and re-opens its gate; the approved body is immutable.")}`,
+      )}</div></div>`;
+
+    const entries =
+      cap.artifactEntries[art.id] ||
+      (art.id === "ART-001"
+        ? {
+            caption: "Principles catalog entries · statement, rationale, implications",
+            headers: ["ID", "Statement", "Rationale", "Implications"],
+            rows: cap.principles.map((p) => [p.id, p.statement, p.rationale, p.implications]),
+          }
+        : null);
+    const links = cap.artifactLinks.filter((l) => l.from === art.id || l.to === art.id);
+    const entryBlock = entries
+      ? `${table(
+          entries.headers,
+          entries.rows.map((r) => `<tr>${r.map((cell) => `<td>${E(cell)}</td>`).join("")}</tr>`),
+        )}${note(E(entries.caption))}`
+      : art.type === "diagram"
+        ? `${kv([
+            ["Viewpoint", E(art.viewpoint)],
+            ["Metamodel", "ArchiMate 3.1"],
+            ["Document", E(art.document)],
+          ])}${note("A diagram is a document with typed metadata and a viewpoint, not a live metamodel. The row carries the metadata; the pixels live in the document.")}`
+        : note("No entries are recorded on this artefact yet.");
+    const artifacts =
+      `<div class="toolbar"><span class="mono muted">TYPE</span>${["all", "catalog", "matrix", "diagram"].map((t) => `<button class="btn ${typeFilter === t ? "selected" : ""}" data-v2="adm-type" data-id="${t}">${E(t)}</button>`).join("")}</div>` +
+      `<div class="v2-split"><div>${panel(
+        "Artefact repository",
+        `${table(
+          ["ID", "Artefact", "Type", "Phase", "Plateau", "State", "Version", "Owner"],
+          cap.artifacts
+            .filter((a) => typeFilter === "all" || a.type === typeFilter)
+            .map((a) => `<tr data-v2="adm-artifact" data-id="${a.id}" style="cursor:pointer" class="${a.id === art.id ? "selected" : ""}"><td><button type="button" class="btn small" data-v2="adm-artifact" data-id="${a.id}">${E(a.id)}</button></td><td><strong>${E(a.title)}</strong></td><td>${B(a.type, a.type === "catalog" ? "purple" : a.type === "matrix" ? "" : "amber")}</td><td><small>${E(a.phase)}</small></td><td>${E(a.plateau)}</td><td>${B(a.state, tone(a.state))}</td><td>${E(a.version)}</td><td><small>${E(a.owner)}</small></td></tr>`),
+        )}${note("A catalog is queried, a matrix is joined, a diagram is a document with a viewpoint. The repository answers what an artefact derives from, realizes and reuses.")}`,
+        B(`${cap.artifacts.length} artefacts`),
+      )}</div><div>${panel(
+        "Artefact · " + art.id,
+        `${kv([
+          ["Title", E(art.title)],
+          ["Type", B(art.type, art.type === "catalog" ? "purple" : art.type === "matrix" ? "" : "amber")],
+          ["Phase", E(art.phase)],
+          ["Plateau", E(art.plateau)],
+          ["Status", B(art.state, tone(art.state))],
+          ["Version", E(art.version)],
+          ["Author", E(art.owner)],
+          ["Reviewer", E(art.reviewer)],
+          ["Review date", E(art.reviewed)],
+          ["Document", E(art.document)],
+          ["Entries", E(art.entries)],
+        ])}${gate === "adm-artifact-approved" ? note(`<strong>Approved</strong> · a new version supersedes ${E(art.version)}; the approved body is unchanged and the phase gate re-opens.`, "ok") : ""}${entryBlock}`,
+        button("Approve a new version", "adm-approve", "", "small", "shield"),
+      )}${panel(
+        "Links · derivation, realization, reuse, dependency",
+        `${links.length ? table(["Kind", "Direction", "Other artefact"], links.map((l) => `<tr><td class="mono">${E(l.kind)}</td><td>${l.from === art.id ? "out" : "in"}</td><td><strong>${E(l.from === art.id ? l.to : l.from)}</strong></td></tr>`)) : note("No links are recorded on this artefact.")}`,
+      )}</div></div>`;
+
+    const board =
+      `<div class="v2-split"><div>${panel(
+        "Architecture Board decisions",
+        `${table(
+          ["ID", "Decision", "Evidence", "State"],
+          cap.boardDecisions.map((d) => `<tr><td class="mono">${E(d.id)}</td><td><strong>${E(d.decision)}</strong></td><td><small>${E(d.evidence)}</small></td><td>${B(d.state, "green")}</td></tr>`),
+        )}${note("The board supports the roadmap, assesses changes against it, applies the principles and commissions solution architectures. Its decision limits are rows, not convention.")}`,
+      )}${panel(
+        "Phase H outcomes · exactly one per review",
+        `${table(
+          ["Review", "Finding", "Outcome", "State"],
+          cap.hOutcomes.map((h) => `<tr><td class="mono">${E(h.id)}</td><td>${E(h.finding)}</td><td><strong>${E(h.outcome)}</strong></td><td><small>${E(h.state)}</small></td></tr>`),
+        )}${gate === "adm-h-change" ? note("<strong>Change request recorded</strong> · CR-020 with its impact block is routed to the change gate; the project baseline is unchanged until that gate is approved.", "ok") : gate === "adm-h-kata" ? note("<strong>Kata candidate recorded</strong> · K-015 is routed to the kata lane and no change register row is written.", "ok") : gate === "adm-h-refused" ? note("<strong>422 phase_h_outcome_exists</strong> · this review already recorded a change request. A review has exactly one outcome.", "bad") : note("A change review records exactly one outcome: a change request with impact, or a kata candidate. A review with no verdict cannot close phase H. A Request for Architecture Work opens further architecture work.")}`,
+        `${button("Record a change", "adm-h-change", "", "small", "shield")}${button("Record a kata", "adm-h-kata", "", "small", "chart")}`,
+      )}</div><div>${panel(
+        "Compliance reviews · six levels",
+        `${table(
+          ["Project", "Contract", "Level", "Findings", "Date"],
+          cap.compliance.map((c) => `<tr><td><strong>${E(c.project)}</strong></td><td class="mono">${E(c.contract)}</td><td>${B(c.level, c.level === "Non-conformant" ? "bad" : c.level === "Compliant" || c.level === "Fully conformant" ? "green" : "amber")}</td><td><small>${E(c.findings)}</small></td><td>${E(c.date)}</td></tr>`),
+        )}${gate === "adm-review-recorded" ? note("<strong>Review recorded · Consistent</strong> · one level per review; the findings are the evidence the delivery project carries.", "ok") : gate === "adm-review-refused" ? note("<strong>422 compliance_level_exists</strong> · a review records exactly one of the six levels; a second is refused.", "bad") : note("The levels describe different relationships, not a maturity ladder: irrelevant, consistent, compliant, conformant, fully conformant, non-conformant.")}`,
+        `${button("Record a review", "adm-review", "", "small", "check")}${button("Record a second level", "adm-review-second", "", "small", "replay")}`,
+      )}${panel(
+        "Waivers",
+        `${table(
+          ["ID", "Project", "Deviation", "Accepting owner", "Mitigation", "Cost / risk", "Review", "State"],
+          cap.waivers.map((w) => `<tr><td class="mono">${E(w.id)}</td><td>${E(w.project)}</td><td><small>${E(w.deviation)}</small></td><td>${E(w.owner)}</td><td><small>${E(w.mitigation)}</small></td><td>${E(w.costRisk)}</td><td>${E(w.review)}</td><td>${B(w.state, "amber")}</td></tr>`),
+        )}${gate === "adm-waiver-refused" ? note("<strong>422 waiver_owner_required</strong> · a waiver without an accepting asset owner and a reassessment date is refused; the deviation stays non-conformant.", "bad") : gate === "adm-waiver-ok" ? note("<strong>Waiver W-02 recorded</strong> · accepting owner asset owner · operations; reassessment 2027-02-12.", "ok") : note("A deviation is rejected, mitigated, or accepted for a defined period. The asset owner accepts the risk — outages, maintenance and additional cost.")}`,
+        `${button("Record a waiver", "adm-waiver", "", "small", "shield")}${button("Record with owner + date", "adm-waiver-ok", "", "small", "check")}`,
+      )}</div></div>`;
+
+    const content =
+      tab === "Capability" ? capability : tab === "ADM phases" ? phases : tab === "Artefact repository" ? artifacts : board;
+
+    return `<div class="page enterprise">${heading(
+      "Architecture capability",
+      "The TOGAF ADM as a capability and a project: principles, the tailored profile, the typed artefact repository, the phase contracts, the board, compliance and waivers — SPEC_V2 §8.1.",
+      `${route("Programme definition", "programme", "", "shield")}${route("System architecture", "architecture", "", "model")}`,
+      "GOVERN & DESIGN",
+    )}${ribbon("TOGAF ADM capability: architecture_artifact (catalog | matrix | diagram), artifact_type, adm_profile, architecture_contract, architecture_compliance_review, architecture_waiver, governance_body, architecture_maturity, architecture_skill_assessment. Proposed in T9; D63.")}${tabs(["Capability", "ADM phases", "Artefact repository", "Board & compliance"], tab, "adm")}${content}</div>`;
   }
 
   /* -------------------------------------------------------------- Validation */
@@ -3798,7 +4978,7 @@ window.installV2 = function (api, enterprise) {
       );
     const summary = `<div class="metrics">${[
       [openRows.length, "Open units", `${claimed.length} claimed · ${blocked.length} blocked`, "green"],
-      [ready.length, "Ready to claim", "no branch, no PR, no claim comment", "purple"],
+      [ready.length, "Marked ready", "published issue snapshot; verify on GitHub", "purple"],
       [
         blocked.length,
         "Blocked",
@@ -3813,9 +4993,23 @@ window.installV2 = function (api, enterprise) {
           )}</div><div class="metric-number">${E(value)}</div><small>${E(sub)}</small></div>`,
       )
       .join("")}</div>`;
+    const startHere = panel(
+      "Choose a first contribution",
+      `${table(
+        ["Time", "Path", "Start here"],
+        [
+          ["5 min", "Report design friction", "Name the page, what you expected and what happened. A screenshot is optional."],
+          ["15–30 min", "Review the proposal", "Find one unclear term, a missing decision or an assumption that fails in practice."],
+          ["30+ min", "Improve docs or code", "Take a maintainer-triaged unit with acceptance criteria. A typo, a broken link or a docs clarification can go straight to a pull request."],
+        ].map((row) => `<tr><td><strong>${E(row[0])}</strong></td><td>${E(row[1])}</td><td>${E(row[2])}</td></tr>`),
+      )}${note(
+        `V1 is the live build record; <a href="https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md" target="_blank" rel="noopener">SPEC_V2 defines V2 ↗</a> and this site marks what is live and what is still proposed. AI coding assistants are welcome: you review the diff, run the checks and sign off your own commits. Every merged contribution is credited in <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTORS.md" target="_blank" rel="noopener">CONTRIBUTORS.md ↗</a> unless the contributor opts out. See the <a href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">contribution workflow ↗</a>.`,
+      )}<div class="toolbar"><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send design feedback ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md" target="_blank" rel="noopener">Review the V2 proposal ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/issues?q=is%3Aissue+is%3Aopen+label%3Aunit" target="_blank" rel="noopener">Browse unit issues ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contribution workflow ↗</a></div>`,
+      B("START HERE", "purple"),
+    );
     const protocol = panel(
       "How a unit is claimed",
-      `<p class="muted">The claim is four empty checks, a pushed branch and a comment. Until all four are empty the unit is someone else's; join it, never start a parallel branch.</p><pre class="v2-code">gh issue view N --json state,labels,comments,closedByPullRequestsReferences
+      `<p class="muted">A change that does not alter behaviour — a typo, a broken link, a docs clarification — can go straight to a pull request; no claim is needed.</p><p class="muted">For a unit, the claim is four empty checks, a pushed branch and a comment. Until all four are empty the unit is someone else's; join it, never start a parallel branch.</p><pre class="v2-code">gh issue view N --json state,labels,comments,closedByPullRequestsReferences
 gh pr list --state all --search "#N"
 git ls-remote --heads origin "issue/N-*"
 git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mono">issue/N-&lt;slug&gt;</span>, add <span class="mono">status:claimed</span> and a comment naming the branch and HEAD. One issue is one branch and exactly one PR with <span class="mono">Closes #N</span>. A contributor without write access comments with the plan; a maintainer applies the claim.</p><div class="toolbar"><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=unit.md" target="_blank" rel="noopener">Propose a unit ↗</a><a class="btn" href="https://github.com/nonagenticai/conveyor/issues/new?template=feedback.yml" target="_blank" rel="noopener">Report design feedback ↗</a><a class="btn" href="${E(
@@ -3825,13 +5019,13 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     );
     return `<div class="page enterprise">${heading(
       "Contribute",
-      "The programme is public. Take a ready unit, send a design report, or discuss the design; claims and code live on GitHub.",
+      "Start with design feedback, review the proposal, or take an accepted unit of work; a small fix can go straight to a pull request. Claims and code live on GitHub.",
       `${route("Projects", "projects", "", "projects")}`,
       "PORTFOLIO & PLAN",
     )}${consoleRibbon(
-      "Ready units are read from the GitHub issue registry at publish; this page writes nothing.",
+      "Issue status is a published snapshot, not a live claim lock. Verify the issue, branch and PR on GitHub before starting; this page writes nothing.",
       registry.length > 0,
-    )}${summary}${
+    )}${summary}${startHere}${
       panels.join("") ||
       note(
         "No ready unit is published right now. A unit becomes <span class='mono'>status:ready</span> when its dependencies are met.",
@@ -3841,6 +5035,8 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
 
   const pages = {
     portfolio,
+    programme: programmeDefinitionPage,
+    adm: architectureCapabilityPage,
     plan,
     validation,
     projects: projectsPage,
@@ -3892,6 +5088,8 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
   };
   const titles = {
     portfolio: "Portfolio",
+    programme: "Programme definition",
+    adm: "Architecture capability",
     plan: "Plan & WBS",
     validation: "Validation",
     projects: "Projects",
@@ -3918,6 +5116,13 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     const inner = pages[key];
     pages[key] = () => (studyOn() ? inner() : signInGate(titles[key] || key));
   }
+  // Every public programme page carries the same feedback affordance: Discussions and a
+  // prefilled issue. Signed out only — the operator console has the actions, and the public
+  // page writes nothing and makes no GitHub call (the links are anchors).
+  for (const key of PUBLIC_PAGES) {
+    const inner = pages[key];
+    pages[key] = () => (consoleOn() ? inner() : `${inner()}${dataPanel()}`);
+  }
 
   /* ------------------------------------------------------------------ events */
   document.addEventListener("change", (event) => {
@@ -3936,11 +5141,6 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
       render();
       return;
     }
-    const publishRepo = event.target.closest('[data-v2-input="publish-repository"]');
-    if (publishRepo) {
-      consoleSelectRepository(publishRepo.value);
-      return;
-    }
     const planProject = event.target.closest('[data-v2-input="plan-project"]');
     if (planProject) {
       v.planProject = planProject.value;
@@ -3956,6 +5156,11 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     if (outputsFilter) {
       v[outputsFilter.dataset.key] = outputsFilter.value;
       render();
+      return;
+    }
+    const attachment = event.target.closest('[data-v2-input="output-attachment"]');
+    if (attachment) {
+      consoleOutputAttachFile(attachment);
       return;
     }
     const el = event.target.closest('[data-v2-input="pko-search"]');
@@ -4090,6 +5295,53 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
       case "output-delete-confirm":
         consoleOutputDeleteConfirm(d.id, d.version);
         break;
+      case "output-request-publish":
+        consoleOutputRequestPublish(d.id, d.version);
+        break;
+      /* the admin's review queue: the same actions, a distinct control so the register's own
+         buttons stay unambiguous */
+      case "request-read":
+        consoleOutputRead(d.id);
+        break;
+      case "request-publish":
+        consoleOutputPublish(d.id, true, d.version);
+        break;
+      case "request-return":
+        consoleReturnDialog(d.id, d.version);
+        break;
+      case "return-save":
+        consoleReturnSave(d.id, d.version);
+        break;
+      case "request-kata":
+        consoleKataDialog(d.id, d.version);
+        break;
+      case "kata-save":
+        consoleKataSave(d.id, d.version);
+        break;
+      case "output-preview":
+        consoleOutputPreview(d.id);
+        break;
+      case "output-history":
+        consoleOutputHistory(d.id, d.version);
+        break;
+      case "output-attach":
+        consoleOutputAttach(d.id);
+        break;
+      case "revision-view":
+        consoleRevisionView(d.id, d.seq);
+        break;
+      case "revision-restore":
+        consoleRevisionRestore(d.id, d.seq, d.version);
+        break;
+      case "revision-restore-confirm":
+        consoleRevisionRestoreConfirm(d.id, d.seq, d.version);
+        break;
+      case "attachment-download":
+        consoleAttachmentDownload(d.id, d.type, d.name);
+        break;
+      case "outputs-more":
+        consoleLoadRegister(true);
+        break;
       case "output-new-register":
         consoleOutputNew();
         break;
@@ -4099,26 +5351,131 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
       case "feedback-intake":
         consoleFeedbackIntake(d.issue);
         break;
-      case "publish-start":
-        consoleStartPublish();
-        break;
-      case "publish-refresh":
-        consolePublishRefresh();
-        break;
-      case "publish-connect":
-        consolePublishConnect();
-        break;
-      case "publish-rotate":
-        consolePublishRotate();
-        break;
       case "tab":
         v.tab[d.key] = d.value;
         render();
+        break;
+      case "adm-type":
+        v.admType = d.id;
+        render();
+        break;
+      case "adm-artifact":
+        v.adm = d.id;
+        v.admGate = null;
+        render();
+        break;
+      case "adm-phase":
+        v.admPhase = d.id;
+        v.admGate = null;
+        render();
+        break;
+      case "adm-advance": {
+        const ph = F.architectureCapability.phases.find((p) => p.code === v.admPhase);
+        const blocked = ph && (ph.missing.length || ph.approved < ph.required);
+        v.admGate = !ph
+          ? null
+          : ph.state === "Closed"
+            ? "adm-advance-closed"
+            : blocked
+              ? "adm-advance-refused"
+              : "adm-advance-ok";
+        render();
+        toast(
+          v.admGate === "adm-advance-refused"
+            ? "422 phase_artifacts_missing · the phase stays open"
+            : v.admGate === "adm-advance-closed"
+              ? "Phase already closed · no further advance"
+              : "Phase closed · the next phase is open",
+        );
+        break;
+      }
+      case "adm-approve":
+        v.admGate = "adm-artifact-approved";
+        render();
+        toast("Artefact approved · a new version supersedes the old; the phase gate re-opens");
+        break;
+      case "adm-review":
+        v.admGate = "adm-review-recorded";
+        render();
+        toast("Compliance review recorded · Consistent");
+        break;
+      case "adm-review-second":
+        v.admGate = "adm-review-refused";
+        render();
+        toast("422 compliance_level_exists · one level per review");
+        break;
+      case "adm-waiver":
+        v.admGate = "adm-waiver-refused";
+        render();
+        toast("422 waiver_owner_required · name the accepting owner and the review date");
+        break;
+      case "adm-waiver-ok":
+        v.admGate = "adm-waiver-ok";
+        render();
+        toast("Waiver W-02 recorded · reassessment 2027-02-12");
+        break;
+      case "adm-h-change":
+      case "adm-h-kata":
+        v.admGate =
+          v.admGate === "adm-h-change" || v.admGate === "adm-h-kata" ? "adm-h-refused" : d.v2;
+        render();
+        toast(
+          v.admGate === "adm-h-refused"
+            ? "422 phase_h_outcome_exists · exactly one outcome per review"
+            : v.admGate === "adm-h-change"
+              ? "Change request recorded · routed to the change gate"
+              : "Kata candidate recorded · routed to the kata lane",
+        );
         break;
       case "programme":
         v.programme = d.id;
         render();
         break;
+      case "programme-mandate":
+        v.programmeGate = "mandate-ok";
+        render();
+        toast("Mandate approved · the sponsoring group authorised the programme");
+        break;
+      case "programme-mandate-return":
+        v.programmeGate = "mandate-return";
+        render();
+        toast("Mandate returned · no definition work starts");
+        break;
+      case "benefit":
+      case "transition-select":
+        v.benefit = d.id;
+        v.programmeGate = null;
+        render();
+        break;
+      case "tranche-review":
+        v.tranche = Number(d.id);
+        v.programmeGate = null;
+        render();
+        break;
+      case "tranche-continue":
+        v.programmeGate = "tranche-continue";
+        render();
+        toast("Tranche review recorded · continue");
+        break;
+      case "tranche-hold":
+        v.programmeGate = "tranche-hold";
+        render();
+        toast("Tranche review recorded · pause");
+        break;
+      case "transition-record": {
+        const record = F.realization.find((r) => r.benefit === v.benefit);
+        v.programmeGate =
+          record && !String(record.baselineMeasured).includes("not measured")
+            ? "transition-ok"
+            : "transition-blocked";
+        render();
+        toast(
+          v.programmeGate === "transition-ok"
+            ? "Transition recorded · post-transition measurement opens"
+            : "422 benefit_baseline_missing · measure the baseline first",
+        );
+        break;
+      }
       case "job":
         v.job = d.id;
         render();

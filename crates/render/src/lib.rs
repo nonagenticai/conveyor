@@ -36,6 +36,7 @@
 
 mod font;
 mod ids;
+pub mod markdown;
 mod pdf;
 mod png;
 mod svg;
@@ -211,6 +212,40 @@ pub fn render(
 /// Render SVG only — the artefact the PNG and PDF are both encoded from.
 pub fn render_svg(model: &ModelSnapshot, view_id: Option<Uuid>) -> Result<Vec<u8>, RenderError> {
     svg::render(model, view_id)
+}
+
+/// Rasterise an SVG document to PNG at the renderer's own scale rule.
+///
+/// This is the same [`png::render`] the model path uses, exposed for a producer that lays its own
+/// pages out (the deck authoring path, ADR 0007 §7). It is deliberately **not** a second renderer:
+/// there is one `usvg` parse, one scale rule and one embedded face set in this crate.
+pub fn svg_to_png(svg: &[u8]) -> Result<Vec<u8>, RenderError> {
+    let bytes = png::render(svg)?;
+    if bytes.len() > MAX_RENDER_BYTES {
+        return Err(RenderError::TooLarge {
+            format: "png",
+            bytes: bytes.len(),
+            cap: MAX_RENDER_BYTES,
+        });
+    }
+    Ok(bytes)
+}
+
+/// Convert a sequence of SVG documents into one multi-page PDF, one page per document.
+///
+/// Page size comes from each document's own `width`/`height`, so a deck's 16:9 pages and a
+/// document's A4 page can coexist in one file. Exposed for the deck authoring path for the same
+/// reason as [`svg_to_png`]: one layout pass, not a second.
+pub fn pdf_from_svgs(pages: &[&[u8]]) -> Result<Vec<u8>, RenderError> {
+    let bytes = pdf::render_pages(pages)?;
+    if bytes.len() > MAX_RENDER_BYTES {
+        return Err(RenderError::TooLarge {
+            format: "pdf",
+            bytes: bytes.len(),
+            cap: MAX_RENDER_BYTES,
+        });
+    }
+    Ok(bytes)
 }
 
 /// Lowercase hex SHA-256, the digest every artefact is named by.

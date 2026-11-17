@@ -129,12 +129,21 @@ window.ConveyorConsole = (function () {
       (state.config && state.config.client_id) ||
       "",
     tenant: state.tenant || "",
+    role: roleOf(),
     issuer: (state.config && state.config.issuer) || "",
     error: state.error ? String(state.error.message || state.error) : null,
     manifestError: state.manifestError
       ? String(state.manifestError.message || state.manifestError)
       : null,
   });
+
+  /** The caller's role in the active tenant, or "". */
+  const roleOf = () => {
+    const memberships = (state.me && state.me.memberships) || [];
+    const row =
+      memberships.find((membership) => membership.slug === state.tenant) || memberships[0];
+    return row && row.role ? String(row.role) : "";
+  };
 
   /* ------------------------------------------------------------------ requests */
   const headersFor = (extra = {}) => {
@@ -178,7 +187,10 @@ window.ConveyorConsole = (function () {
       credentials: "same-origin",
       body: JSON.stringify({ input: input == null ? {} : input }),
     });
-    return (await handle(response, path)).json();
+    const body = await (await handle(response, path)).json();
+    // The action route wraps the handler output in `{output}`; the pack's stub returns the bare
+    // output. Unwrap the live envelope and pass a bare body through unchanged.
+    return body && typeof body === "object" && "output" in body ? body.output : body;
   }
 
   async function issues() {
@@ -387,6 +399,8 @@ window.ConveyorConsole = (function () {
     /** The principal and tenant, or null. */
     me: () => state.me,
     tenant: () => state.tenant,
+    /** The caller's role in the active tenant, or "". */
+    role: roleOf,
     /** A Set of the action names this caller may invoke, or null. */
     manifest: () => state.manifest,
     can: (name) => !!state.token && !!state.manifest && state.manifest.has(name),

@@ -28,6 +28,8 @@ pub mod capability;
 // S06d: the connector standard — grants, compiled defaults, the machine floor and adapters.
 pub mod channel;
 pub mod control;
+// #161 P3: the deck toolkit — one action rendering the model to .pptx, PDF or PNG.
+pub mod deck;
 pub mod documents;
 pub mod eval;
 pub mod fixtures;
@@ -42,16 +44,23 @@ pub mod invoke;
 pub mod knowledge;
 pub mod lock;
 pub mod mcp;
+// #139 P3.1: the media group's toolkit — one action per capability kind, plus the probe.
+pub mod media;
+pub mod produce;
 // S15: work-package memory — remember (the only writing action) and recall.
 pub mod memory;
 pub mod model;
 pub mod openapi;
+// T7 (#170): the cluster operations read family — `ops.pods|deployments|events|logs|flux_status|
+// ci_status`, served by the `conveyor-ops` client.
+pub mod ops;
 // T0 (SPEC_V2 §4, §10.4): the organisation spine — industries, the job catalogue, immutable
 // releases and bindings.
 pub mod organisation;
 pub mod portfolio;
 pub mod process;
 // SPEC D28 / CONTRACT §21: the SOP (procedure) that judges a process step.
+pub mod pm;
 pub mod procedure;
 // SPEC D30 / CONTRACT §21: the user-facing process map — two read actions.
 pub mod process_map;
@@ -65,10 +74,17 @@ pub mod prompt_audit;
 pub mod publish;
 pub mod rbac;
 pub mod registry;
+// T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine and the MSP rows.
 pub mod spec;
+pub mod spine;
+// T2 (SPEC_V2 §7): the decision ladder — `ladder.*` over `decision_policies.*`,
+// `refinements.*` and `laya_configs.*`.
+pub mod ladder;
 pub mod views;
 // S13: `workflows.*` — the engine's authoring surface (one document, versioned by key).
 pub mod workflow;
+// #182 slice A: the tenant's own YouTube channel — OAuth client, connect, status, disconnect.
+pub mod youtube;
 
 pub use invoke::{
     ActionError, Authority, HandlerCtx, InvokeOutcome, InvokeRequest, MAX_DEPTH, Precondition,

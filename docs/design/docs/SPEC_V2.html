@@ -966,7 +966,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </table>
 <p><strong>The hard rule:</strong> L2 has no path to a state transition. A generated output is stored as a draft artefact (<code>governed_asset</code>, <code>document</code>, or a code patch); applying it is an <strong>action</strong>, and the action's gate is L1/L3. The Rust type system enforces this: the generation result type is not accepted by any transition function.</p>
 <h3 id="72-the-laya-contract">7.2 The laya contract</h3>
-<p><code>POST /v1/systemone {model, state, questions}</code> — <code>state</code> is the task text and <code>questions</code> is keyed by qid; each question is <code>{type: noul|choice|score, instructions, criteria}</code> and the response carries <code>answers.&lt;qid&gt;</code>. <code>noul</code> is a scalar answer, <code>choice</code> picks one of 2–255 labelled options, <code>score</code> is a 2–10 ordered scale; probabilities are carried for the types that provide them. The estate's laya is live on pgx behind a Jev-compatible bridge (<code>:9210</code>), ~17–21 ms per request (measured 2026-10-10).</p>
+<p><code>POST /v1/systemone {model, state, questions}</code> — <code>state</code> is the task text and <code>questions</code> is keyed by qid; each question is <code>{type: noul|choice|score, instructions, criteria}</code> and the response carries <code>answers.&lt;qid&gt;</code>. <code>noul</code> is a scalar answer, <code>choice</code> picks one of 2–255 labelled options, <code>score</code> is a 2–10 ordered scale; probabilities are carried for the types that provide them. The estate's laya is live on the DGX host behind a Jev-compatible bridge (<code>:9210</code>), ~17–21 ms per request (measured 2026-10-10).</p>
 <p>V2 rules:</p>
 <ul>
 <li><strong>Options are rows</strong> (<code>decision_option</code>), authored and versioned, never free text from a prompt.</li>
@@ -1163,68 +1163,118 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <h3 id="77-compiled-prompts">7.7 Compiled prompts</h3>
 <p>V1 D27/S21 stands: a prompt is compiled at run time from the run's sources — instruction, procedure, capability/role, knowledge and project/card sections in trust order — with character budgets, a measured refusal over budget, and a recorded <code>prompt_sha256</code>. The compiled text is never stored. Missing required source → <code>409 capability_not_ready</code> naming the pin and section, <strong>before</strong> a model call. An identical recipe + facts compiles byte-identically. For an <code>internal_agent</code> step the four sources of §4.5 — knowledge, episodic memory, the PDDL request and the curated tool list — are compiled into the same envelope; there is no other prompt compiler in the system.</p>
 <hr />
-<h2 id="8-executable-rigour--togaf-safe-pmp">8. Executable rigour — TOGAF, SAFe, PMP</h2>
+<h2 id="8-executable-rigour--togaf-safe-pmp-msp">8. Executable rigour — TOGAF, SAFe, PMP, MSP</h2>
 <p>The point of this section is that the rigour is <strong>not a document library</strong>. Every artefact below is a row with a lifecycle; every gate is an approval; every claim links to evidence.</p>
-<h3 id="81-togaf-adm-as-an-architecture-project-type">8.1 TOGAF ADM as an architecture project type</h3>
-<p>An <code>architecture</code> project walks the ADM phases as WBS nodes, each with its required artefacts and a contract gate:</p>
+<h3 id="81-togaf-adm-as-an-architecture-capability">8.1 TOGAF ADM as an architecture capability</h3>
+<p>TOGAF's ADM is implemented as a <strong>capability first and a project second</strong>. The Preliminary phase establishes the capability; an <code>architecture</code> project then walks the phases as WBS nodes; and every artefact a phase produces is a typed row with a lifecycle, not a file in a library.</p>
+<p><strong>The capability (Preliminary phase).</strong> Six things are established before architecture work starts:</p>
 <table>
 <thead>
 <tr>
-<th>Phase</th>
-<th>Artefacts (governed assets)</th>
+<th>Capability area</th>
+<th>V2 row</th>
 <th>Gate</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>Architecture principles</td>
+<td><code>architecture_artifact(type='principles_catalog')</code>; each entry <code>{uid, statement, rationale, implications}</code></td>
+<td>the Architecture Board approves the catalogue</td>
+</tr>
+<tr>
+<td>Tailored ADM</td>
+<td><code>adm_profile(phase_set, artifact_requirements, contract_kinds)</code> — which phases, which artefacts are mandatory per phase and plateau, which contract closes each phase</td>
+<td>the board adopts the profile</td>
+</tr>
+<tr>
+<td>Repository and artefact standard</td>
+<td><code>artifact_type</code> catalogue (the standard's types, phase and plateau) + <code>architecture_artifact</code> rows</td>
+<td>the repository is seeded and the standard adopted</td>
+</tr>
+<tr>
+<td>Architecture Board</td>
+<td><code>governance_body(kind='architecture_board')</code> + membership, charter, commissioning authority and decision limits</td>
+<td>the charter is approved and the board convened</td>
+</tr>
+<tr>
+<td>Governance, contracts and waivers</td>
+<td><code>architecture_contract</code> + <code>architecture_waiver</code></td>
+<td>the governance baseline is recorded</td>
+</tr>
+<tr>
+<td>Maturity and skills</td>
+<td><code>architecture_maturity(dimension, score 0–5, stage)</code> + <code>architecture_skill_assessment(role, skill, proficiency)</code></td>
+<td>the baseline is assessed and its development plan approved</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The artefact standard.</strong> <code>architecture_artifact</code> is the parent; <strong>catalog</strong>, <strong>matrix</strong> and <strong>diagram</strong> are its three types, and each inherits the common metadata: title, status, version, author and date, reviewer and review date, the related change initiative or project, the rationale (purpose, stakeholders, scope), and the published document or the architecture contract it sits under. Type-specific metadata: a <strong>catalog</strong> names its unique identifier, item name and description of use or structure; a <strong>matrix</strong> names its axes (usually two); a <strong>diagram</strong> names its building block/metamodel and viewpoint. The entries are rows (<code>architecture_artifact_entry</code>: <code>axis_a</code>, <code>axis_b</code>, <code>value</code>), so a catalogue is queryable and a matrix is joinable — an artefact is metadata plus entries plus a document, never a blob.</p>
+<p>The standard groups artefacts into three <strong>plateaus</strong>: the <strong>Project Start Architecture</strong> (drivers/goals/objectives, principles, stakeholders, requirements, actors/roles, application portfolio, solution concept, benefits), the <strong>High-Level Design</strong> (business service/function, data entity/component, business interaction, application organisation/data, business footprint, functional decomposition, conceptual data, technology standards), and the <strong>Solution Design</strong> (process flows, logical data, interfaces, application communication/migration, technology portfolio, platform decomposition, processing, project context). A project's tailored profile names which plateau its current phase requires. Artefact-to-artefact dependencies are <code>architecture_artifact_link</code> edges (<code>derivation | realization | reuse | dependency</code>), so the repository answers <em>what this artefact derives from, what it realises, and what it reuses</em>.</p>
+<p><strong>The phases.</strong> Each phase is a WBS node; its mandatory artefact set comes from the standard, filtered by the tenant's <code>adm_profile</code>; it closes on an approved <code>architecture_contract</code>; a phase cannot be skipped.</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Mandatory artefacts (from the standard)</th>
+<th>Contract / gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td><strong>Preliminary</strong></td>
-<td>architecture principles, tailored ADM profile</td>
-<td>principles approved</td>
+<td>Principles Catalog; Principle Derivation and Principle Realization diagrams; tailored ADM profile; maturity and skills baseline</td>
+<td>principles approved; capability adopted</td>
 </tr>
 <tr>
 <td><strong>A — Vision</strong></td>
-<td>scope, stakeholders, architecture vision, constraints</td>
-<td>vision contract</td>
+<td>Stakeholder Map and Matrix; Driver/Goal/Objective Catalog; Requirements Catalog; Solution Concept Diagram; <strong>Statement of Architecture Work</strong></td>
+<td>the SAW is approved (vision contract)</td>
 </tr>
 <tr>
 <td><strong>B — Business</strong></td>
-<td>business architecture, capabilities, value streams</td>
+<td>Business Service/Function, Process/Event/Control/Product, Value Stream, Business Capabilities, Value Stream Stages, Contract/Measure catalogs; Business Interaction, Actor/Role, Value Stream/Capability, Strategy/Capability, Capability/Organization matrices; Business Footprint, Business Service/Information, Functional Decomposition, Product Lifecycle, Business Model Canvas, Business Capability Map, Value Stream Map, Goal/Objective/Service, Business Use Case, Process Flow, Event diagrams</td>
 <td>business contract</td>
 </tr>
 <tr>
 <td><strong>C — Information systems</strong></td>
-<td>data + application architecture</td>
-<td>IS contract</td>
+<td>Data Entity/Data Component Catalog; Data Entity/Business Function and Application/Data matrices; Conceptual, Logical and Data Dissemination diagrams; Application Portfolio and Interface catalogs; Application/Organization, Role/Application, Application/Function, Application Interaction matrices; Application Communication, Application Use Case, Process/Application Realization, Application Migration, Software Distribution diagrams</td>
+<td>IS contract (data + application)</td>
 </tr>
 <tr>
 <td><strong>D — Technology</strong></td>
-<td>platform, infrastructure, deployment topology</td>
+<td>Technology Standards and Technology Portfolio catalogs; Application/Technology and System/Technology matrices; Platform Decomposition, Processing, Environments and Locations diagrams</td>
 <td>technology contract</td>
 </tr>
 <tr>
 <td><strong>E — Opportunities &amp; solutions</strong></td>
-<td>gap analysis, candidate solutions, work packages</td>
+<td>gap analysis, candidate solutions, work packages; <strong>Project Context Diagram</strong> (the work package against the affected organisation, functions, services, applications, data and technology); <strong>Benefits Diagram</strong> (goals, outcomes, measurements, sub-benefits, benefits)</td>
 <td>solution contract</td>
 </tr>
 <tr>
 <td><strong>F — Migration planning</strong></td>
-<td>roadmap, increments, dependencies, cost/benefit</td>
+<td>roadmap, increments, dependencies, cost/benefit; the migration and delivery contracts</td>
 <td>migration contract</td>
 </tr>
 <tr>
 <td><strong>G — Implementation governance</strong></td>
-<td>compliance reviews attached to delivery projects</td>
+<td>a per-delivery <strong>compliance review</strong> against the governing contract, its compliance level and its waivers</td>
 <td>per-delivery compliance</td>
 </tr>
 <tr>
 <td><strong>H — Change management</strong></td>
-<td>monitoring, new requests, lessons</td>
-<td>change review → kata/PM</td>
+<td>monitoring, new requests, lessons; exactly one typed outcome — a change request with impact, or a kata candidate; a <strong>Request for Architecture Work</strong> when the architecture no longer meets its purpose</td>
+<td>change review</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Requirements management is continuous</strong>, not a phase: every requirement/principle/ADR is a <code>governed_asset</code> linked by <code>trace_link</code> to the cards, runs and evidence that realise it. A delivery project cannot pass its design gate without the architecture contract that governs it; a contract change is a new version and a new gate.</p>
-<p>Scope note: this is a <strong>lean ADM profile</strong> for software delivery, not a claim of TOGAF certification or full conformance. The phases, artefacts and gates are the ones the organisation will actually use and measure.</p>
+<p><strong>Requirements management is continuous</strong>, not a phase. The <strong>Requirements Catalog</strong> types every requirement as <code>condition | constraint | assumption | delta</code>; every requirement, principle and ADR is a governed asset trace-linked to the artefacts, contracts, cards, runs and evidence that realise it. The chain the standard defines is the trace chain of §8.5: stakeholder and driver → goal → principle → requirement → service → evidence.</p>
+<p><strong>Compliance is a typed review, not a checkbox.</strong> A review records exactly one of the standard's relationships between the project and the architecture specification — <code>irrelevant</code>, <code>consistent</code>, <code>compliant</code>, <code>conformant</code>, <code>fully_conformant</code> or <code>non_conformant</code> — with its findings. A deviation is rejected, mitigated, or accepted for a defined period through a <strong>waiver</strong> naming the accepting asset owner, the reason, the additional cost and risk, and the reassessment date. A waiver without an owner and a review date is refused.</p>
+<p><strong>The contracts are the gate objects.</strong> <code>architecture_contract</code> carries four kinds across the ADM: the <strong>Statement of Architecture Work</strong> (A — assignment, scope, responsibilities, acceptance criteria; distinct from the designs produced under it), the <strong>delivery contract</strong> (after F — delivery commitments and the method for assessing compliance), the <strong>statement of intent / business usage agreement</strong> (at completion — intended use, ownership, measures of effectiveness), and the <strong>Request for Architecture Work</strong> (H — further architecture work, reviewed by the Design Board). A contract change is a new version and re-opens its gate; the approved version's body is immutable.</p>
+<p><strong>Maturity and skills are measured, not asserted.</strong> The <strong>architecture maturity</strong> assessment scores nine dimensions (architecture process; architecture development; business linkage; senior-management involvement; operating-unit participation; architecture communication; IT security; architecture governance; IT investment and acquisition strategy) on 0–5 (none, initial, under development, defined, managed, measured), per stage, with a baseline and milestones. The <strong>Architecture Skills Framework</strong> assesses seven categories (general; business skills and methods; architecture skills; programme/project management; general IT knowledge; technical IT skills; legal environment) at a proficiency level per role. Both are dated rows with evidence; the development plan is a set of milestones a tranche review can hold the capability to.</p>
+<p><strong>The Architecture Board is a position set with authority rows.</strong> It supports the architecture roadmap, assesses proposed changes against it, applies the principles where the roadmap is incomplete, commissions solution architectures, and submits them to the delivery Design Board. Its membership (enterprise architects, the CIO, business-unit leaders), charter, commissioning authority and decision limits are <code>governance_body</code> rows and authority rows, not prose.</p>
+<p>A delivery project cannot pass its design gate without the contract that governs it; the phase-G review is per delivery project, and its compliance level and waivers attach to that delivery's evidence. The conveyor's own buildout runs under this capability: P0 is the Preliminary-phase and programme-definition project, and the delivery slices T1–T17 each sit under the contract that governs them.</p>
+<p>Scope note: this is a <strong>tailored ADM profile</strong> for software delivery, not a claim of TOGAF certification or full conformance. The standard's full catalogue is the reference; the tenant's <code>adm_profile</code> names the mandatory set per phase and plateau, and that set grows with the assessed maturity. The phases, artefacts and gates are the ones the organisation will actually use and measure.</p>
 <h3 id="82-safe-as-the-programme-cadence">8.2 SAFe as the programme cadence</h3>
 <table>
 <thead>
@@ -1265,7 +1315,164 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tbody>
 </table>
 <p><strong>WSJF is arithmetic, not opinion:</strong> <code>(business_value + time_criticality + risk_reduction) / job_size</code>, all four typed integer fields on the backlog/WBS row. The computed score is never stored; the inputs are. An LLM may draft the narrative, never the numbers.</p>
-<h3 id="83-pmp-artefacts-as-typed-rows">8.3 PMP artefacts as typed rows</h3>
+<h3 id="83-msp-as-the-programme-definition-and-benefits-realization">8.3 MSP as the programme definition and benefits realization</h3>
+<p>SAFe gives the programme its cadence; MSP gives it its <strong>definition and its benefit track</strong>. A programme is not a large project: it is a temporary organisation that exists to deliver benefits through projects, and it is judged on the improvement operations realizes after those projects close. V2 implements that lifecycle as rows and gates, not as a document library.</p>
+<p><strong>Capability is not use, and use is not improvement.</strong> A delivered capability gives a team a new option. Whether the team uses it, and whether use improves performance, are separate questions. A benefit is a <strong>measurable improvement</strong> resulting from an outcome, valued by at least one stakeholder, that contributes to an organisational objective. A <code>project_register_item(kind='benefit')</code> with no baseline, target, measurement method and owner is not a benefit; it is a wish.</p>
+<table>
+<thead>
+<tr>
+<th>MSP artefact</th>
+<th>V2 row</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mandate — strategic fit, current position, drivers, deliverables/boundaries, delivery and assurance, success and constraints</td>
+<td><code>governed_asset(kind='mandate')</code> on the programme-definition project</td>
+<td>the sponsoring group authorises the mandate</td>
+</tr>
+<tr>
+<td>Programme brief — outline vision, benefit categories, cost/timescale/effort, risks and support, delivery options including doing nothing, candidate projects and timing, current operations</td>
+<td><code>governed_asset(kind='programme_brief')</code></td>
+<td>the sponsoring group approves the brief and authorises definition</td>
+</tr>
+<tr>
+<td>Blueprint — processes/business models, organisation and skills, technology and data, current/intermediate/target states</td>
+<td><code>governed_asset(kind='blueprint')</code> + the §8.1 architecture content</td>
+<td>blueprint contract</td>
+</tr>
+<tr>
+<td>Business case — strategic objectives and realistic benefits, options including doing nothing, investment appraisal, cash flow, and how the investment delivers the capabilities the benefits depend on</td>
+<td><code>governed_asset(kind='business_case')</code></td>
+<td>investment decision; an unacceptable case returns to the future state or the project solutions</td>
+</tr>
+<tr>
+<td>Benefit profile</td>
+<td><code>benefit_profile</code> (six field groups, below), indexed by <code>project_register_item(kind='benefit')</code></td>
+<td>the BCM and SRO approve; the baseline is measured before the transition</td>
+</tr>
+<tr>
+<td>Benefits map</td>
+<td><code>benefit_link</code> edges: output → capability → operational outcome → benefit/disbenefit → strategic objective</td>
+<td>the map is accepted with the profiles</td>
+</tr>
+<tr>
+<td>Projects dossier</td>
+<td><code>project</code> rows + programme membership, each with outputs, resources, timescales, dependencies, requirements, budget, contribution and risks</td>
+<td>first-tranche authorisation</td>
+</tr>
+<tr>
+<td>Programme plan and tranches</td>
+<td><code>programme_tranche</code> + the T1 plan spine</td>
+<td>end-of-tranche review: continue / pause / stop</td>
+</tr>
+<tr>
+<td>Refined vision</td>
+<td><code>governed_asset(kind='refined_vision')</code></td>
+<td>programme board</td>
+</tr>
+<tr>
+<td>Management, governance and boundary baselines</td>
+<td><code>programme_baseline(kind='management' | 'governance' | 'boundary')</code></td>
+<td>the baseline that the next tranche is managed against</td>
+</tr>
+<tr>
+<td>Benefits management strategy and benefits realization plan</td>
+<td><code>governed_asset(kind='benefits_strategy' | 'benefits_realization_plan')</code></td>
+<td>transition readiness</td>
+</tr>
+<tr>
+<td>Stakeholder profiles</td>
+<td><code>stakeholder_profile</code> rows</td>
+<td>engagement plan accepted with the profiles</td>
+</tr>
+<tr>
+<td>Information, risk, issue, monitoring, communications, quality and resource strategies and plans</td>
+<td><code>governed_asset</code> kinds + the existing risk/issue registers (§8.4)</td>
+<td>the programme board's governance baseline</td>
+</tr>
+<tr>
+<td>Transition and realization</td>
+<td><code>benefit_transition</code> per benefit: baseline measured, readiness, enact, post-transition measurement, legacy retirement</td>
+<td>the benefit review</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The benefit profile is the measurement record.</strong> Its six field groups are mandatory:</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identification and purpose</td>
+<td>reference, description, category, objectives, observable outcome</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>affected KPIs, baseline, target, measurement method, financial value where expressible</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>the cost of realizing the benefit, including the associated business change</td>
+</tr>
+<tr>
+<td>Conditions</td>
+<td>capabilities required, outcomes that must already exist, changes to operating practice</td>
+</tr>
+<tr>
+<td>Uncertainty and dependencies</td>
+<td>related risks and issues, and dependencies outside the programme</td>
+</tr>
+<tr>
+<td>Responsibility and attribution</td>
+<td>who realizes it, the benefit owner (BCM), and the operational area to which the improvement is attributed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A tranche is not a PI.</strong> A PI is the delivery rhythm; a tranche is the unit the programme manages and reviews together. <code>programme_tranche(number, state, entry_criteria, exit_criteria, baseline_ref, review_at)</code> holds the unit; the review is an approval (<code>gate='tranche_review'</code>) with the sponsoring group as approver and the baselines, the benefit status and the risk register as its evidence. A project does not start before the first tranche is authorised; a review continues, pauses or stops, and a re-baseline goes through change control, never through the review itself. The preparation plan for definition is P0's own plan, not a separate artefact: it names the resources, boundaries, controls and cost of producing the definition set.</p>
+<table>
+<thead>
+<tr>
+<th>Tranche activity</th>
+<th>V2 mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Establish</td>
+<td>programme board, office and working environment are positions and rows; the tranche's cards are materialised</td>
+</tr>
+<tr>
+<td>Direct the work</td>
+<td>the PM job appoints delivery, runs risk workshops, handles project exceptions and manages the teams through cards</td>
+</tr>
+<tr>
+<td>Exercise control</td>
+<td>gates, the risk/issue registers, communications, audits and assurance reviews</td>
+</tr>
+<tr>
+<td>Maintain alignment</td>
+<td>blueprint against current strategy; a deviation is a change request or a kata, never a silent fork</td>
+</tr>
+<tr>
+<td>Manage resources</td>
+<td>the resource plan, procurement and contracts as governed assets, and metering</td>
+</tr>
+<tr>
+<td>Review and close</td>
+<td>the end-of-tranche review gate, the transition to operations and the next tranche's preparation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Benefits realization is a procedure after delivery.</strong> For each benefit the BCM: measures the baseline while the old practice is still observable; monitors against the profile; plans the transition; communicates the change; assesses readiness; enacts it; measures the post-transition performance; retires the superseded practice and system; and keeps measuring until the realization plan names who continues after programme closure. The comparison with the baseline is the evidence the sponsor uses to judge the change. A benefit whose baseline was never measured cannot claim an improvement.</p>
+<p><strong>Roles are positions, not code paths.</strong> The sponsoring group, SRO, programme board, programme office, programme manager, programme architect, BCM, PMO lead and quality manager are <code>job_key</code>s with authority rows (D50). The SRO is accountable for the coherent capability and the benefits; the BCM owns each benefit and the transition; the PM owns project delivery; the programme board is the SRO's decision forum. The conveyor's own buildout runs under these roles: PM, BCM, SRO and architect are jobs using the same card, run, approval and event primitives.</p>
+<p><strong>Rules.</strong> A benefit without baseline, target, method and owner is refused. Every benefit names the capability it depends on and the operational area that must change. A dependency slip names the benefits put at risk through the benefit-map edges. A tranche review with no evidence is refused. A gate that never refused a tranche or a benefit in a full cycle is flagged as broken, not healthy. The programme closes only with a realization plan that names post-closure measurement. These rules satisfy P10: the named procedures are programme definition, tranche review and benefits realization; the metrics are benefits realised versus planned, tranche gate outcomes and benefit-at-risk count, all computed from rows.</p>
+<h3 id="84-pmp-artefacts-as-typed-rows">8.4 PMP artefacts as typed rows</h3>
 <table>
 <thead>
 <tr>
@@ -1300,16 +1507,18 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 </tbody>
 </table>
-<p>The registers are deliberately one table, not five: the v4 design had separate PM tables and V1 measured RM's <code>pm_*</code> at zero usage. One generic register with a <code>kind</code> CHECK is leaner and still queryable.</p>
-<h3 id="84-the-trace-chain">8.4 The trace chain</h3>
-<pre><code>requirement / principle / ADR (approved)
+<p>The registers are deliberately one table, not five: the v4 design had separate PM tables and V1 measured RM's <code>pm_*</code> at zero usage. One generic register with a <code>kind</code> CHECK is leaner and still queryable. The benefit profile is the one exception: a register row indexes the benefit, and the profile holds the measurement fields that a generic register must not carry.</p>
+<h3 id="85-the-trace-chain">8.5 The trace chain</h3>
+<pre><code>stakeholder / driver → goal (approved)
+   → principle / requirement / ADR (approved)
+   → architecture artefact (approved: catalog | matrix | diagram)
    → architecture contract (approved)
    → project charter (approved)
    → WBS deliverable → work package (card) → run → step → artefact / evidence
    → acceptance (approval) → closure</code></pre>
 <p><code>trace_link</code> is V1's existing edge; V2 requires the link at creation time for architecture-governed work. The governance screen answers one question end to end: <em>which requirement does this run prove, and where is the evidence?</em></p>
-<h3 id="85-what-is-not-claimed">8.5 What is not claimed</h3>
-<p>No TOGAF certification, no SAFe compliance badge, no PMP certification. No full ADM conformance, no portfolio optimiser, no schedule solver. The claim is narrower and testable: <strong>the artefacts and gates the organisation uses are rows, the process runs, and the evidence is traceable.</strong></p>
+<h3 id="86-what-is-not-claimed">8.6 What is not claimed</h3>
+<p>No TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP certification or conformance badge. No full ADM conformance, no ArchiMate modelling tool (a diagram is a document with typed metadata and a viewpoint, not a live metamodel), no portfolio optimiser, no schedule solver, no benefit-forecasting model. The claim is narrower and testable: <strong>the artefacts and gates the organisation uses are rows, the process runs, the benefit is measured against a baseline, and the evidence is traceable.</strong></p>
 <hr />
 <h2 id="9-self-development-and-operations">9. Self-development and operations</h2>
 <h3 id="91-development-projects--the-conveyor-builds-itself">9.1 Development projects — the conveyor builds itself</h3>
@@ -1383,7 +1592,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>the conveyor broker only (§11.3)</td>
 </tr>
 <tr>
-<td>Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings</td>
+<td>Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, architecture artefacts and contracts, compliance reviews and waivers, maturity and skills assessments, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings</td>
 <td><strong><code>conveyor</code></strong></td>
 <td>humans; the agent front end over <code>/mcp</code></td>
 </tr>
@@ -1399,7 +1608,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>Models/inference</td>
-<td><code>inference-router</code> for text; <code>mlx-api</code>/<code>modality-gateway</code> for media; laya on pgx</td>
+<td><code>inference-router</code> for text; <code>mlx-api</code>/<code>modality-gateway</code> for media; laya on the DGX host</td>
 <td>conveyor</td>
 </tr>
 <tr>
@@ -1530,9 +1739,94 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>state machine; materialises cards</td>
 </tr>
 <tr>
+<td><code>programme_tranche</code></td>
+<td>the unit the programme manages and reviews together</td>
+<td>number, state, entry/exit criteria, baseline ref, review date; the review is an approval</td>
+</tr>
+<tr>
+<td><code>programme_baseline</code></td>
+<td>the management, governance and boundary baselines</td>
+<td><code>kind</code> CHECK; immutable; a tranche is managed against a version</td>
+</tr>
+<tr>
 <td><code>project_register_item</code></td>
 <td>risk/issue/assumption/dependency/benefit/change</td>
-<td>one generic register, six kinds</td>
+<td>one generic register, six kinds; a benefit row indexes its profile</td>
+</tr>
+<tr>
+<td><code>benefit_profile</code></td>
+<td>the measurable improvement behind a benefit row</td>
+<td>six field groups (§8.3): purpose, performance, cost, conditions, uncertainty, responsibility; baseline, target and method are mandatory</td>
+</tr>
+<tr>
+<td><code>benefit_link</code></td>
+<td>the benefits-map edges</td>
+<td><code>output → capability → operational outcome → benefit/disbenefit → strategic objective</code>; also the dependency that puts a benefit at risk</td>
+</tr>
+<tr>
+<td><code>benefit_transition</code></td>
+<td>the realization record per benefit</td>
+<td>baseline measured, readiness, enact, post-transition measurement, legacy retirement, post-closure owner</td>
+</tr>
+<tr>
+<td><code>stakeholder_profile</code></td>
+<td>stakeholder concerns, influence, interest, exposure, support and engagement target</td>
+<td>programme- or project-scoped; trends over time</td>
+</tr>
+<tr>
+<td><code>architecture_artifact</code></td>
+<td>the typed architecture artefact (§8.1)</td>
+<td>common metadata + <code>type ∈ catalog|matrix|diagram</code>, <code>phase_code</code>, <code>plateau ∈ psa|hld|sd</code>; versioned and superseded, never edited in place once approved</td>
+</tr>
+<tr>
+<td><code>architecture_artifact_entry</code></td>
+<td>a catalog item or a matrix cell</td>
+<td><code>axis_a</code>, <code>axis_b</code>, <code>value</code>; a catalog uses one axis, a matrix two</td>
+</tr>
+<tr>
+<td><code>architecture_artifact_link</code></td>
+<td>artefact-to-artefact edges</td>
+<td><code>derivation | realization | reuse | dependency</code>; the repository's trace</td>
+</tr>
+<tr>
+<td><code>artifact_type</code></td>
+<td>the seeded artefact standard</td>
+<td>type, phase, plateau, mandatory flag; the tenant's profile filters it</td>
+</tr>
+<tr>
+<td><code>adm_profile</code></td>
+<td>the tailored ADM</td>
+<td>phase set, mandatory artefact types per phase and plateau, contract kinds</td>
+</tr>
+<tr>
+<td><code>architecture_contract</code></td>
+<td>SAW, delivery contract, statement of intent, request for architecture work</td>
+<td><code>kind</code>, <code>phase_code</code>, version; a change re-opens its gate; the approved body is immutable</td>
+</tr>
+<tr>
+<td><code>architecture_compliance_review</code></td>
+<td>one typed verdict per delivery project</td>
+<td>the six §8.1 levels, findings and evidence refs</td>
+</tr>
+<tr>
+<td><code>architecture_waiver</code></td>
+<td>a time-boxed accepted deviation</td>
+<td>accepting owner, reason, cost/risk, reassessment date</td>
+</tr>
+<tr>
+<td><code>governance_body</code></td>
+<td>the Architecture Board and other decision forums</td>
+<td>membership, charter, commissioning authority, decision limits</td>
+</tr>
+<tr>
+<td><code>architecture_maturity</code></td>
+<td>the capability assessment</td>
+<td>nine dimensions, score 0–5, stage, date, evidence</td>
+</tr>
+<tr>
+<td><code>architecture_skill_assessment</code></td>
+<td>the Skills Framework assessment</td>
+<td>seven categories, role/<code>job_key</code>, proficiency, date</td>
 </tr>
 <tr>
 <td><code>decision</code></td>
@@ -1581,7 +1875,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 </tbody>
 </table>
-<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | architecture_contract | closure | postmortem | sop_source</code>), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and a PKO pin. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
+<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case | refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier</code>; a programme-level asset is attached to the programme-definition project; the architecture contract has its own table so a phase gate never depends on a generic asset row), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and a PKO pin. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
 <h3 id="104-action-families">10.4 Action families</h3>
 <table>
 <thead>
@@ -1593,7 +1887,15 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tbody>
 <tr>
 <td>programme/plan</td>
-<td><code>programmes.*</code>, <code>programme_config.*</code>, <code>project_dependencies.*</code>, <code>cadences.*</code>, <code>wbs.*</code>, <code>baselines.*</code>, <code>registers.*</code></td>
+<td><code>programmes.*</code>, <code>programme_config.*</code>, <code>governed_assets.compose|submit|approve</code> (the MSP artefacts), <code>tranches.*</code>, <code>tranches.review</code>, <code>project_dependencies.*</code>, <code>cadences.*</code>, <code>wbs.*</code>, <code>baselines.*</code>, <code>registers.*</code></td>
+</tr>
+<tr>
+<td>benefits</td>
+<td><code>benefits.list|get|create|update</code>, <code>benefits.link|unlink</code>, <code>benefits.baseline|transition|measure|close</code></td>
+</tr>
+<tr>
+<td>architecture</td>
+<td><code>architecture.artifacts.list|get|create|update|approve|supersede|link</code>, <code>architecture.repository.search</code> (reuse), <code>architecture.contracts.request|approve|supersede</code>, <code>architecture.phases.advance</code>, <code>architecture.reviews.record|waive</code>, <code>architecture.board.decide</code>, <code>architecture.maturity.assess|plan</code>, <code>architecture.skills.assess</code>, <code>architecture.profile.get|tailor</code></td>
 </tr>
 <tr>
 <td>organisation</td>
@@ -1613,7 +1915,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>decision</td>
-<td><code>decisions.open|evaluate|decide|escalate</code>, <code>decision_options.*</code>, <code>decision_policies.*|refine</code>, <code>laya_configs.*</code></td>
+<td><code>ladder.record|evaluate|list|apply_draft</code> (the ladder's verbs; a human answer is <code>approvals.decide</code> and an escalation opens an approval, not a ladder action), <code>decision_options.*</code>, <code>decision_policies.*</code>, <code>refinements.publish|list</code>, <code>laya_configs.*</code>. ⚠️ <code>decisions.*</code> is the <strong>ADR family</strong> (<code>governance/assets.rs</code>); the ladder does not reuse it, so the §7 record and an ADR cannot be confused</td>
 </tr>
 <tr>
 <td>PM</td>
@@ -1693,6 +1995,14 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><strong>Portfolio</strong></td>
 <td>portfolio view (in-flight projects + programmes), programme shared config + dependency graph, backlog + WSJF, cadence (PI planning, demo, retro), capacity, metering per project</td>
+</tr>
+<tr>
+<td><strong>Programme</strong></td>
+<td>mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realized benefits</td>
+</tr>
+<tr>
+<td><strong>Architecture</strong></td>
+<td>Preliminary capability (principles, tailored ADM, board charter, maturity and skills); ADM phases A–H with their artefact sets and contracts; the artefact repository (catalog/matrix/diagram, plateau filter, trace and reuse); compliance reviews and waivers; the Statement of Architecture Work and the Request for Architecture Work</td>
 </tr>
 <tr>
 <td><strong>Plan</strong></td>
@@ -1806,7 +2116,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>AHTAPol evidence</td>
 </tr>
 <tr>
-<td><code>lean4_prover</code> :8812 (mini1 host)</td>
+<td><code>lean4_prover</code> :8812 (the media host)</td>
 <td>Lean 4 typecheck/elaborate/prove over REST</td>
 <td>live</td>
 <td>verification, SOP formal checks</td>
@@ -1818,7 +2128,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>AHTAPol screening</td>
 </tr>
 <tr>
-<td><code>w2v-orchestrator</code> :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on mini1)</td>
+<td><code>w2v-orchestrator</code> :6300 + stage fleet (analysis, content, slide, tts-gateway, video-production, video-analyzer, app-inspector, bdd-playwright, youtube-upload, frontend-test-runner, html-render; external asr/tts/image-gen on the media host)</td>
 <td>deliverable runs and stage capabilities; rendered artifacts</td>
 <td>live; <strong>migration target — rewritten in Rust in this workspace: <code>apps/media</code> executor images and the <code>analysis</code> library (ADR 0007, D54)</strong></td>
 <td>media production</td>
@@ -1873,7 +2183,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <li><strong>Legacy kag is archived and not a tool.</strong> Every kag repo — <code>kag</code>, <code>kag_orchestrator</code>, <code>kag_graph_service</code>, <code>kag_common</code>, <code>kag_clients</code>, <code>kag-frontend</code>, <code>hirag_service</code>, <code>karma_service</code>, <code>neo4j</code>, <code>n8n-nodes-kag</code> — is archived on GitHub (measured 2026-11-11), and no kag, hirag, karma or neo4j deployment exists in the cluster. The direction is a <strong>Rust rewrite</strong>, with the home decided per capability in <code>docs/SPEC_LEGACY_KAG.md</code>, the separate spec this V2 creates; neo4j, hirag and karma are explicitly undecided there. <code>strata_ingest</code> and <code>strata_rag</code> are the live, shared ingest/retrieval services both platforms use, and the conveyor binds them at least to the extent the agent platform already does (D54).</li>
 <li><strong>External sources stay behind services.</strong> PubMed, Europe PMC, ClinicalTrials.gov, NICE, GIN/INAHTA, EMA/FDA, ICD-11, SNOMED CT, ATC/DDD, RxNorm and the rest are called by the services that own their licences and rate limits, not by conveyor jobs directly (D42). Migration is expected, not exceptional: where a Python source must change to fit the conveyor's contracts it is re-architected rather than line-ported (owner, 2026-11-11).</li>
 <li><strong>Planned tools enter as <code>draft</code>.</strong> An AHTAPol service that is specified but not live gets a catalogue entry and no binding; it cannot be called until its slice deploys it and its probe passes (P8).</li>
-<li><strong><code>8812</code> is two distinct services.</strong> <code>lean4_prover</code> is a launchd process on the mini1 host reached by a ServiceEntry; the AHTAPol R stats sidecar is a separate planned container reached only by 8808 and 8813 over internal HTTP. Same port number, different hosts and networks — never the same toolkit, and a port is not an identity.</li>
+<li><strong><code>8812</code> is two distinct services.</strong> <code>lean4_prover</code> is a launchd process on the media host reached by a ServiceEntry; the AHTAPol R stats sidecar is a separate planned container reached only by 8808 and 8813 over internal HTTP. Same port number, different hosts and networks — never the same toolkit, and a port is not an identity.</li>
 <li><strong>AHTAPol's own documents overstate deployment.</strong> They describe <code>evidence_review</code> :8810 and research output :8811 as "existing live"; the cluster has no deployment of either (measured 2026-11-11). The catalogue follows the cluster, not the document: both are <code>draft</code> until a slice deploys them and a probe passes.</li>
 <li><strong>AHTAPol's plan assumes archived kag components.</strong> Its service documents call the kag gateway, <code>karma_service</code> :8801, <code>hirag_service</code> and <code>kag_orchestrator</code> :8806; every one is archived and none is deployed. Their functions are re-homed per <code>docs/SPEC_LEGACY_KAG.md</code> before the AHTAPol slice that needs them, and none may be bound as a tool (R19).</li>
 </ul>
@@ -2001,8 +2311,8 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>T1</strong></td>
-<td><strong>Plan spine</strong> — <code>wbs_node</code>, <code>project_baseline</code>, <code>project_register_item</code>, <code>project_dependency</code>, programme <code>shared_config</code> and cadence; project types; DoD</td>
-<td>one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused</td>
+<td><strong>Plan spine</strong> — <code>wbs_node</code>, <code>project_baseline</code>, <code>project_register_item</code>, <code>project_dependency</code>, programme <code>shared_config</code> and cadence; <code>programme_tranche</code>, <code>benefit_profile</code>, <code>benefit_link</code> and the programme-definition kinds; project types; DoD</td>
+<td>one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused; a benefit profile without baseline, target, method or owner is refused; a benefit-map edge names its five levels</td>
 </tr>
 <tr>
 <td><strong>T2</strong></td>
@@ -2041,13 +2351,13 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>T9</strong></td>
-<td><strong>TOGAF profile</strong> — architecture project type, phases A–H, contracts, delivery-project compliance</td>
-<td>an architecture project passes A–F with contracts; a delivery project without its contract is refused at design; H produces a change/kata</td>
+<td><strong>TOGAF ADM capability</strong> — Preliminary phase (principles, tailored ADM, the artefact standard and repository, the Architecture Board, governance, maturity and skills), the architecture project type, phases A–H with typed artefacts and contracts, delivery-project compliance and waivers</td>
+<td>an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata</td>
 </tr>
 <tr>
 <td><strong>T10</strong></td>
-<td><strong>SAFe cadence</strong> — backlog, WSJF, PI planning, demo, inspect &amp; adapt</td>
-<td>PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons</td>
+<td><strong>SAFe cadence and MSP tranches</strong> — backlog, WSJF, PI planning, demo, inspect &amp; adapt; tranche review, benefits strategy and realization plan</td>
+<td>PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized</td>
 </tr>
 <tr>
 <td><strong>T11</strong></td>
@@ -2057,7 +2367,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><strong>T12</strong></td>
 <td><strong>One organisation loop</strong> — the acceptance of V2</td>
-<td>one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget</td>
+<td>one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area</td>
 </tr>
 <tr>
 <td><strong>T13</strong></td>
@@ -2467,6 +2777,16 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><strong>D61</strong></td>
 <td><strong>Executor seam; external runtime deferred</strong></td>
 <td>The conveyor keeps <strong>one runtime</strong>: <code>procedure</code> and <code>internal_agent</code> are two implementations of one internal <code>Executor</code> contract, and <code>executor_kind</code> is an extensible enum rather than a branch through the run path. <strong>An external runtime is an explicit non-goal</strong> until four conditions hold: a generic work-packet ingress returning per-step evidence the conveyor can verify (not outcome-level); governance at the boundary (a produce-only runtime, the conveyor ships); separate owners and roadmaps; and it beats the internal agent on the conveyor's own benchmark. D33/D44 stand — the agent platform is a front end, not a runtime — and D46's two live kinds stand. The product boundary is <code>/mcp</code>; only stateless infrastructure is shared (inference-router, strata, MinIO, tool backends). The seam preserves the option at near-zero cost (proposed 2026-11-11, from the independent runtime review)</td>
+</tr>
+<tr>
+<td><strong>D62</strong></td>
+<td><strong>Programme definition and benefits realization (MSP)</strong></td>
+<td>V2 adopts MSP's programme lifecycle as rows and gates. The <strong>mandate, programme brief, blueprint, business case, refined vision and governance strategies</strong> are <code>governed_asset</code> kinds on the programme-definition project. <code>benefit_profile</code> is the mandatory measurement record behind <code>project_register_item(kind='benefit')</code>; <code>benefit_link</code> carries the benefits map (output → capability → operational outcome → benefit → objective); <code>programme_tranche</code> carries the management/review unit, and its review is an approval with the baselines, benefit status and risk register as evidence; <code>benefit_transition</code> carries the baseline measurement, transition, post-transition measurement and legacy retirement. A benefit without baseline, target, method and owner is refused; a project does not start before the first tranche is authorised; the programme closes only with a realization plan naming post-closure measurement. The SRO, BCM, sponsoring group and programme board are positions with authority rows, not code paths (proposed 2026-11-16, from the programme-architecture and benefits-realization review)</td>
+</tr>
+<tr>
+<td><strong>D63</strong></td>
+<td><strong>TOGAF ADM as an artefact-typed architecture capability</strong></td>
+<td>The ADM is a capability before it is a project. The <strong>Preliminary phase</strong> establishes the architecture principles, the tailored <code>adm_profile</code>, the artefact standard and repository, the Architecture Board (<code>governance_body</code> with a charter and decision limits), governance and contracts, and the maturity and skills baseline. An <code>architecture</code> project walks phases A–H as WBS nodes; each phase's mandatory artefact set comes from the standard filtered by the profile, and each phase closes on an approved <code>architecture_contract</code> (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work). Every artefact is a typed row — <strong>catalog, matrix or diagram</strong>, with the common metadata, a phase and a plateau (PSA / HLD / SD) — whose entries and artefact-to-artefact links are rows, so the repository answers derivation, realization and reuse. The Requirements Catalog is continuous, with requirements typed <code>condition | constraint | assumption | delta</code>. A compliance review records exactly one of the six standard levels, and a deviation is rejected, mitigated or waived with a named accepting owner and a reassessment date. A delivery project cannot pass design without the live contract that governs it; a phase-H review produces exactly one change request or kata candidate. Maturity (nine dimensions, 0–5) and skills (seven categories) are dated assessments, not assertions. No ArchiMate tool and no full conformance are claimed (proposed 2026-11-16, from the TOGAF ADM and architecture-artefact standards review)</td>
 </tr>
 </tbody>
 </table>

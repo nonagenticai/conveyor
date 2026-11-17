@@ -12,12 +12,14 @@ publish.workspace = true
 # pure library — no sqlx, no axum, no clock, no filesystem read at runtime.
 conveyor-domain = { path = "../domain" }
 fontdb = { workspace = true }
+pulldown-cmark = { workspace = true }
 quick-xml = { workspace = true }
 resvg = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 sha2 = { workspace = true }
 svg2pdf = { workspace = true }
+pdf-writer = { workspace = true }
 thiserror = { workspace = true }
 ttf-parser = { workspace = true }
 usvg = { workspace = true }

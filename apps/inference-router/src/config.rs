@@ -21,6 +21,9 @@ pub const DEFAULT_PROVIDERS_CONFIG: &str = "/config/providers.yaml";
 pub struct Config {
     /// The listener address (`BIND_ADDR`, else `0.0.0.0:$INFERENCE_ROUTER_PORT`).
     pub bind: SocketAddr,
+    /// `INFERENCE_ROUTER_METRICS_PORT` — the dedicated Prometheus scrape port. Absent or `0`
+    /// disables the listener; the API port never serves `/metrics`.
+    pub metrics_port: u16,
     /// The service's own database. Required to serve; `--print-openapi` never reads it.
     pub database_url: Option<String>,
     /// The provider catalog YAML (the live ConfigMap's mount path by default).
@@ -41,6 +44,11 @@ pub struct Config {
     pub introspect_timeout_seconds: f64,
     /// `INFERENCE_ROUTER_LICENSE_INTROSPECT_FAIL_OPEN` (default true): an outage is not a verdict.
     pub introspect_fail_open: bool,
+    /// `SERVICE_ACTOR_ID` — this service's own Keycloak subject, stamped as the cost event's
+    /// `actor_id` when the caller sent no `X-Actor-Id`. Same name and meaning as every other
+    /// emitter in the estate (billing's attribution rule triages it with `printenv` in the pod).
+    /// Absent is legal: the actor stays empty, exactly as it did before the port.
+    pub service_actor_id: Option<String>,
     /// `INFERENCE_ROUTER_METERING_REDIS_URL` — the cost bus. Absent means metering is off, and the
     /// boot log says so; it is never a silent no-op.
     pub metering_redis_url: Option<String>,
@@ -139,6 +147,8 @@ pub enum ConfigError {
     InvalidBind(String),
     #[error("INFERENCE_ROUTER_PORT is not a port number: {0}")]
     InvalidPort(String),
+    #[error("INFERENCE_ROUTER_METRICS_PORT is not a port number: {0}")]
+    InvalidMetricsPort(String),
     #[error("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT is not a positive number of seconds: {0}")]
     InvalidSlotWait(String),
     #[error("INFERENCE_ROUTER_INTROSPECT_MODE is not one of off/observe/enforce: {0}")]
@@ -187,6 +197,13 @@ impl Config {
                 };
                 SocketAddr::from((Ipv4Addr::UNSPECIFIED, port))
             }
+        };
+        // The scrape listener's port. Absent or `0` is "off"; it is never the API port.
+        let metrics_port: u16 = match non_empty(lookup("INFERENCE_ROUTER_METRICS_PORT")) {
+            Some(raw) => raw
+                .parse()
+                .map_err(|_| ConfigError::InvalidMetricsPort(raw.clone()))?,
+            None => 0,
         };
 
         // The live Secret supplies `INFERENCE_ROUTER_DATABASE_URL`; `DATABASE_URL` is the
@@ -239,6 +256,11 @@ impl Config {
         let introspect_fail_open =
             non_empty(lookup("INFERENCE_ROUTER_LICENSE_INTROSPECT_FAIL_OPEN"))
                 .is_none_or(|value| value.eq_ignore_ascii_case("true"));
+
+        // The actor to stamp when a caller sends no `X-Actor-Id`: a service call has no human
+        // behind it, so the acting principal is this service. No prefix here — the live
+        // deployment sets the bare name, shared with the other emitters.
+        let service_actor_id = non_empty(lookup("SERVICE_ACTOR_ID"));
 
         let metering_redis_url = non_empty(lookup("INFERENCE_ROUTER_METERING_REDIS_URL"));
         let metering_costs_enabled = non_empty(lookup("INFERENCE_ROUTER_METERING_COSTS_ENABLED"))
@@ -349,6 +371,7 @@ impl Config {
 
         Ok(Self {
             bind,
+            metrics_port,
             database_url,
             providers_config_path,
             environment,
@@ -358,6 +381,7 @@ impl Config {
             introspect_url,
             introspect_timeout_seconds,
             introspect_fail_open,
+            service_actor_id,
             metering_redis_url,
             metering_costs_enabled,
             metering_costs_stream,

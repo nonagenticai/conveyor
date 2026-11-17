@@ -308,12 +308,26 @@ pub struct ApprovalRequestIn {
     /// The decisions a responder may give; stored in `meta.allowed_decisions`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_decisions: Option<Value>,
+    /// The exact thing this gate authorises, stored in `meta.target`.
+    ///
+    /// A destructive action (the `ops.*` write family) refuses to run unless the approval's
+    /// target equals the target the call names — an approval for one deployment can never
+    /// authorise a restart of another. Optional because every gate that predates the ops
+    /// writes has none; a gate with no target authorises no destructive call.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub target: Option<String>,
     /// How many distinct approvals resolve it. Defaults to one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub required_decisions: Option<u16>,
     /// When the expiry job may resolve it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<DateTime<Utc>>,
+    /// The typed evidence the gate resolves against (T3, #74). Stored in `meta.evidence`.
+    #[serde(default)]
+    pub evidence: Vec<crate::pm::EvidenceRef>,
+    /// Refuse an empty evidence list when true.
+    #[serde(default)]
+    pub require_evidence: bool,
 }
 
 /// `approvals.list` — the gate filters plus the shared page envelope.

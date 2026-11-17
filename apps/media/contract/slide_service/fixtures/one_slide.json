@@ -1,0 +1,16 @@
+{
+  "title": "Synthetic capture deck",
+  "template_ids": ["00000000-0000-0000-0000-0000000000d1"],
+  "slides": [
+    {
+      "template_id": "00000000-0000-0000-0000-0000000000d1",
+      "role": "title",
+      "content": {
+        "eyebrow": "Capture",
+        "title": "Synthetic capture deck",
+        "subtitle": "One slide rendered by Chromium."
+      }
+    }
+  ],
+  "content_shaper": {"enabled": false}
+}

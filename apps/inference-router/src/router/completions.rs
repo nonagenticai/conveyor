@@ -23,10 +23,15 @@ use crate::contract::schemas::{
     ChatCompletionRequest, ChatCompletionResponse, HTTPValidationError, Usage,
 };
 use crate::ledger::{self, CallContext, LedgerRow, StreamRow};
-use crate::metering::{CostEvent, ZERO_COST_USD};
+use crate::metering::{
+    CostEvent, ZERO_COST_USD, licence_is_absent, tenant_id_rejection_reason, tenant_is_unattributed,
+};
 use crate::policy::{self, ResolvedHop};
 use crate::provider::ChunkStream;
-use crate::routing::{CompletionOutcome, ProviderAttempt, Refusal, ServedHop, ServedStream};
+use crate::routing::{
+    CompletionOutcome, OUTCOME_EMPTY, OUTCOME_EMPTY_RESULT, OUTCOME_ERROR, OUTCOME_OK,
+    ProviderAttempt, Refusal, ServedHop, ServedStream,
+};
 use crate::state::AppState;
 use crate::stream::{
     STREAM_CLIENT_DISCONNECT, STREAM_COMPLETED, STREAM_UPSTREAM_ERROR, StreamCapture,
@@ -127,6 +132,19 @@ pub async fn create_chat_completion(
         Ok(caller) => caller,
         Err(refusal) => return refusal.into_response(),
     };
+    // The admission counter, booked here for the same reason the reference books it inside the
+    // handler: the licence gate above already ran, so a refused caller is NEVER counted, while both
+    // the streaming and the non-streaming paths below are. Only a real UUID reaches the ledger;
+    // the metric is what tells absent, valid and malformed apart.
+    let project_outcome = match project_id(&headers) {
+        Some(_) => "valid",
+        None if attribution(&headers, "x-project-id").is_some() => "malformed",
+        None => "absent",
+    };
+    let x_app_id = headers
+        .get("x-app-id")
+        .and_then(|value| value.to_str().ok());
+    crate::metrics::record_project_id(project_outcome, &crate::metrics::caller_label(x_app_id));
     if request.stream {
         return stream_completion(state, headers, request, identity, effective).await;
     }
@@ -160,6 +178,7 @@ pub async fn create_chat_completion(
         tenant_id: effective.tenant_id.clone(),
         license_id: identity.license_id.clone(),
         delegated_by: effective.delegated_by.clone(),
+        actor_id: actor_id(&headers, state.config().service_actor_id.as_deref()),
         ..CallContext::default()
     };
     record(
@@ -283,6 +302,38 @@ fn attribution(headers: &HeaderMap, name: &str) -> Option<String> {
         .map(str::to_owned)
 }
 
+/// The caller's `X-Project-Id`, when it is a UUID. Absent, non-UTF-8 and blank all mean "the caller
+/// sent none", and a present value that is not a UUID means the same thing — a bad header never
+/// fails a request. The admission metric records which of the three happened; the ledger stores
+/// only a real identifier.
+fn project_id(headers: &HeaderMap) -> Option<String> {
+    let value = attribution(headers, "x-project-id")?;
+    uuid::Uuid::parse_str(&value).ok().map(|_| value)
+}
+
+/// The actor to stamp on a cost event: the caller's `X-Actor-Id` when it is a UUID, else the
+/// service's own subject (`SERVICE_ACTOR_ID`).
+///
+/// A call no human made belongs to the calling service, which is what the billing attribution
+/// rule means by `actor_id` and what its triage instructs (`printenv SERVICE_ACTOR_ID` in the
+/// emitter pod). This is the estate-wide convention; the Python reference instead classified the
+/// introspected licence holder as `tenant`/`member` and never defaulted a person. That
+/// classification is not ported here because the Rust introspection client does not parse the
+/// subject kind — the explicit env value is the port's equivalent and is set on the Deployment.
+///
+/// Absent, blank, non-UTF-8 and non-UUID header values all mean "no actor was sent": a bad header
+/// never fails a request, and an unset service id leaves the field empty rather than invented.
+fn actor_id(headers: &HeaderMap, service_actor: Option<&str>) -> Option<String> {
+    let sent =
+        attribution(headers, "x-actor-id").filter(|value| uuid::Uuid::parse_str(value).is_ok());
+    sent.or_else(|| {
+        service_actor
+            .map(str::trim)
+            .filter(|value| uuid::Uuid::parse_str(value).is_ok())
+            .map(str::to_owned)
+    })
+}
+
 /// Add the attribution headers and the policy hop to a call context. Shared by the
 /// non-streaming and the streaming write paths so the two rows cannot drift.
 fn attributed(
@@ -294,10 +345,11 @@ fn attributed(
     CallContext {
         correlation_id: attribution(headers, "x-correlation-id"),
         worker_name: attribution(headers, "x-worker-name"),
+        app_id: attribution(headers, "x-app-id"),
         stage: attribution(headers, "x-stage"),
         trace_id: attribution(headers, "x-aa-trace-id"),
         card_id: attribution(headers, "x-aa-card-id"),
-        project_id: attribution(headers, "x-project-id"),
+        project_id: project_id(headers),
         parent_execution_id: attribution(headers, "x-aa-parent-exec"),
         // Only a policy-routed request carries these; a global-routed one leaves them null.
         policy_version: decision.map(|decision| decision.version),
@@ -329,10 +381,30 @@ fn capture_allowed(headers: &HeaderMap, allowlist: &[String]) -> bool {
     !app_id.is_empty() && allowlist.iter().any(|caller| caller.trim() == app_id)
 }
 
+/// Write one ledger row, booking a refused write onto the write-failure family.
+///
+/// `db_error` is the reference's insert/commit failure (`inference_ledger.py:717`);
+/// `db_not_initialised` is its missing-session-factory outcome (`:619`), which in this port is the
+/// absent pool only unit and health builds have. The reference's other two reasons are NOT
+/// simulated, because their mechanisms do not exist here: `backpressure` needs its bounded
+/// in-flight task set, and `stream_capture` needs its swallowed `on_finish` finaliser. Both writes
+/// in this port are awaited inline in the request path, so neither can fail independently; the two
+/// pre-seeded series stay, so "always zero" is distinguishable from "never registered".
+async fn write_ledger(state: &AppState, row: &LedgerRow) {
+    let Some(pool) = state.deps().ledger.as_ref() else {
+        crate::metrics::record_write_failed("db_not_initialised");
+        return;
+    };
+    if let Err(error) = ledger::insert(pool, row).await {
+        crate::metrics::record_write_failed("db_error");
+        tracing::warn!(%error, "inference ledger write failed");
+    }
+}
+
 /// One ledger row for the served attempt, and one cost event per attempt.
 ///
-/// Both failures are logged and dropped: the reference never turns a write-path problem into a
-/// failed inference, and neither does this port.
+/// Both failures are booked, logged and dropped: the reference never turns a write-path problem
+/// into a failed inference, and neither does this port.
 async fn record(
     state: &AppState,
     context: CallContext,
@@ -348,11 +420,13 @@ async fn record(
         capture_allowed(headers, &state.config().inference_capture_allowed_callers);
 
     let served = outcome.response.as_ref().ok();
-    let served_attempt = outcome.attempts.iter().rev().find(|a| a.failure.is_none());
+    // The served row is the answer the caller actually received: the LAST attempt, whatever its
+    // outcome. A blank 200 (a ground-truth provider, or before the retry lands) is still a call the
+    // caller saw; the attempt's `outcome` feeds the metric and the retry decision, not this
+    // selection.
+    let served_attempt = served.and(outcome.attempts.last());
 
-    if let (Some(pool), Some(response), Some(attempt)) =
-        (state.deps().ledger.as_ref(), served, served_attempt)
-    {
+    if let (Some(response), Some(attempt)) = (served, served_attempt) {
         let row = LedgerRow::served(
             &context,
             request,
@@ -360,12 +434,39 @@ async fn record(
             attempt.bodies.as_ref(),
             attempt.latency.as_millis() as i64,
         );
-        if let Err(error) = ledger::insert(pool, &row).await {
-            tracing::warn!(%error, "inference ledger write failed");
+        write_ledger(state, &row).await;
+    } else if let Err(refusal) = &outcome.response {
+        // A request that reached a provider is a call the estate paid for, even when the answer is
+        // refused — the reference records it (measured 2026-11-15 from the contract oracle: the
+        // second-blank refusal lands a row with status '502' and no response columns). A refusal
+        // taken BEFORE dispatch — policy, budget, auth, validation — has no attempt and writes
+        // none, so the row is gated on the attempts rather than on the outcome alone.
+        if !outcome.attempts.is_empty() {
+            let latency_ms: i64 = outcome
+                .attempts
+                .iter()
+                .map(|attempt| attempt.latency.as_millis() as i64)
+                .sum();
+            let row = LedgerRow::refused(
+                &context,
+                request,
+                &refusal.status.as_u16().to_string(),
+                latency_ms,
+            );
+            write_ledger(state, &row).await;
         }
     }
 
+    let caller = crate::metrics::caller_label(context.app_id.as_deref());
     for (index, attempt) in outcome.attempts.iter().enumerate() {
+        crate::metrics::record_attempt(
+            &attempt.provider,
+            attempt.path,
+            attempt.outcome,
+            &caller,
+            attempt.latency,
+            attempt_reason(attempt.outcome, attempt),
+        );
         let event = cost_event(
             &context,
             request,
@@ -373,9 +474,130 @@ async fn record(
             attempt,
             index > 0,
             reservation_id,
+            state.router().catalog().provider(&attempt.provider),
         );
-        state.deps().cost.emit(&event).await;
+        emit_cost(state, &event).await;
     }
+}
+
+/// The `provider_errors_total` reason for one attempt.
+///
+/// Only two populations carry one: a failed attempt (its classification) and a completed-but-blank
+/// one (`upstream_empty_response`). `empty_result` is an observation, not an error — it deliberately
+/// books nothing, so it cannot be paged on as a failure.
+fn attempt_reason(outcome: &str, attempt: &ProviderAttempt) -> Option<&'static str> {
+    match outcome {
+        OUTCOME_EMPTY => Some("upstream_empty_response"),
+        OUTCOME_ERROR => attempt
+            .failure
+            .as_ref()
+            .map(|failure| failure.classification),
+        _ => None,
+    }
+}
+
+/// The unlicensed trio's inputs for one event, or `None` when the event carries a licence.
+///
+/// Split out of [`emit_cost`] so the classification is unit-testable without a live recorder. The
+/// reference decides "unlicensed" on the licence identifier alone ([`licence_is_absent`] — none,
+/// blank, or the literal `unknown`); the caller and worker labels go through the same bounded
+/// normalisers as every other family, so a raw header can never reach a series.
+fn unlicensed_trio(event: &CostEvent) -> Option<(String, String, f64, i64)> {
+    if !licence_is_absent(&event.license_id) {
+        return None;
+    }
+    let caller = crate::metrics::caller_label(event.app_id.as_deref());
+    let worker = crate::metrics::worker_label(event.worker_name.as_deref());
+    // A malformed decimal books zero dollars; it never fails the request.
+    let cost_usd = event.cost_usd.parse::<f64>().unwrap_or(0.0);
+    let tokens = event.input_tokens.max(0) + event.output_tokens.max(0);
+    Some((caller, worker, cost_usd, tokens))
+}
+
+/// Book one cost event: refuse an unattributable tenant FIRST, then the unlicensed trio, then the
+/// XADD, then the token totals ONLY when the sink confirms delivery.
+///
+/// The order is the reference's own (`metering.py` :574, :679, :797-835, then :1011-1035). Billing
+/// dead-letters an event with no usable tenant, so the reference never emits one — it counts the
+/// refusal on its own alert-keyed family and returns before the trio, the XADD and the tokens. The
+/// trio then records what was spent without a licence whether or not the stream write succeeds
+/// (the spend happened either way), while `tokens_total` is booked after a successful XADD, so a
+/// dropped event cannot inflate the token families. Every emit site goes through this one helper
+/// so none can drift.
+async fn emit_cost(state: &AppState, event: &CostEvent) {
+    if tenant_is_unattributed(&event.tenant_id) {
+        crate::metrics::record_cost_unattributed(&event.service_key, &event.provider);
+        return;
+    }
+    if let Some(reason) = event
+        .tenant_id
+        .as_deref()
+        .and_then(tenant_id_rejection_reason)
+    {
+        crate::metrics::record_cost_malformed_tenant(&event.service_key, &event.provider, reason);
+        return;
+    }
+    if let Some((caller, worker, cost_usd, tokens)) = unlicensed_trio(event) {
+        crate::metrics::record_cost_unlicensed(
+            &event.service_key,
+            &event.provider,
+            &caller,
+            &worker,
+            cost_usd,
+            tokens,
+        );
+    }
+    if state.deps().cost.emit(event).await {
+        crate::metrics::record_tokens(
+            &event.service_key,
+            &event.provider,
+            "prompt",
+            event.input_tokens,
+        );
+        crate::metrics::record_tokens(
+            &event.service_key,
+            &event.provider,
+            "completion",
+            event.output_tokens,
+        );
+    }
+}
+
+/// The terminal outcome of a streamed attempt, as the reference's `_record_stream_attempt`
+/// computes it.
+///
+/// A stream that never reached `[DONE]` — client disconnect or an upstream error mid-stream — is
+/// `aborted`: we do not know what it would have produced, so counting it `empty` would let a
+/// flaky caller manufacture the signal the empty-completion alert exists to detect. Only a
+/// completed stream is classified, and a tool-call reply is a complete answer with no text.
+fn stream_outcome(status: &'static str, capture: &StreamCapture) -> &'static str {
+    if status != STREAM_COMPLETED {
+        return "aborted";
+    }
+    match crate::empty::text_reason(capture.content(), capture.saw_tool_call()) {
+        Some(crate::empty::EmptyReason::EmptyResult) => OUTCOME_EMPTY_RESULT,
+        Some(crate::empty::EmptyReason::Blank) => OUTCOME_EMPTY,
+        None => OUTCOME_OK,
+    }
+}
+
+/// The reference's `calculate_cost`: tokens × the per-million catalog price ÷ 10^6, rendered at
+/// the fixed 8 decimals the cost event carries (`metering.py:411-429`). A provider the catalog
+/// does not know prices at zero, and negative token counts never price negative — the reference's
+/// `max(0.0, …)` clamp.
+fn cost_usd(
+    input_tokens: i64,
+    output_tokens: i64,
+    entry: Option<&crate::catalog::ProviderEntry>,
+) -> String {
+    let Some(entry) = entry else {
+        return ZERO_COST_USD.to_owned();
+    };
+    let input_tokens = input_tokens.max(0) as f64;
+    let output_tokens = output_tokens.max(0) as f64;
+    let usd = (input_tokens * entry.cost_input_per_1m + output_tokens * entry.cost_output_per_1m)
+        / 1_000_000.0;
+    format!("{:.8}", usd.max(0.0))
 }
 
 fn cost_event(
@@ -385,8 +607,13 @@ fn cost_event(
     attempt: &ProviderAttempt,
     fallback_used: bool,
     reservation_id: Option<&str>,
+    catalog_entry: Option<&crate::catalog::ProviderEntry>,
 ) -> CostEvent {
-    let usage = served.map(|response| &response.usage);
+    // Tokens are per ATTEMPT, never the served response's: every attempt spends its own tokens,
+    // and a failed attempt (no usage) must bill zero rather than inherit the served usage.
+    let usage = attempt.usage.as_ref();
+    let input_tokens = usage.map_or(0, |usage| usage.prompt_tokens);
+    let output_tokens = usage.map_or(0, |usage| usage.completion_tokens);
     CostEvent {
         tenant_id: context.tenant_id.clone(),
         license_id: context.license_id.clone(),
@@ -401,11 +628,11 @@ fn cost_event(
             .clone()
             .unwrap_or_else(|| request.model.clone()),
         served_model: served.and_then(|response| response.served_model.clone()),
-        input_tokens: usage.map_or(0, |usage| usage.prompt_tokens),
-        output_tokens: usage.map_or(0, |usage| usage.completion_tokens),
+        input_tokens,
+        output_tokens,
         cache_creation_input_tokens: usage.map_or(0, |usage| usage.cache_creation_input_tokens),
         cache_read_input_tokens: usage.map_or(0, |usage| usage.cache_read_input_tokens),
-        cost_usd: ZERO_COST_USD.to_owned(),
+        cost_usd: cost_usd(input_tokens, output_tokens, catalog_entry),
         latency_ms: attempt.latency.as_millis() as i64,
         schema_id: Some("default".to_owned()),
         fallback_used,
@@ -420,6 +647,7 @@ fn cost_event(
         // settlement draining another caller's hold.
         reservation_id: reservation_id.map(str::to_owned),
         project_id: context.project_id.clone(),
+        actor_id: context.actor_id.clone(),
         card_id: context.card_id.clone(),
         execution_id: context.parent_execution_id.clone(),
         delegated_by: context.delegated_by.clone(),
@@ -464,6 +692,7 @@ async fn stream_completion(
             tenant_id: effective.tenant_id.clone(),
             license_id: identity.license_id.clone(),
             delegated_by: effective.delegated_by.clone(),
+            actor_id: actor_id(&headers, state.config().service_actor_id.as_deref()),
             ..CallContext::default()
         },
         &headers,
@@ -646,36 +875,46 @@ async fn finalise_stream(
     status: &'static str,
 ) {
     let latency = started.elapsed().as_millis() as i64;
-    if let Some(pool) = state.deps().ledger.as_ref() {
-        let response_sha256 = capture.response_sha256();
-        let row = LedgerRow::streamed(
-            &context,
-            &request,
-            StreamRow {
-                served_provider: capture.served_provider.as_deref(),
-                served_model: capture.served_model.as_deref(),
-                finish_reason: capture.finish_reason(),
-                response_sha256: response_sha256.as_deref(),
-                response_json_valid: capture.response_json_valid(),
-                status: if status == STREAM_COMPLETED {
-                    "ok"
-                } else {
-                    "error"
-                }
-                .to_owned(),
-                stream_status: Some(status),
-            },
-            latency,
-        );
-        if let Err(error) = ledger::insert(pool, &row).await {
-            tracing::warn!(%error, "inference ledger write failed");
-        }
-    }
+    let response_sha256 = capture.response_sha256();
+    let row = LedgerRow::streamed(
+        &context,
+        &request,
+        StreamRow {
+            served_provider: capture.served_provider.as_deref(),
+            served_model: capture.served_model.as_deref(),
+            finish_reason: capture.finish_reason(),
+            response_sha256: response_sha256.as_deref(),
+            response_json_valid: capture.response_json_valid(),
+            status: if status == STREAM_COMPLETED {
+                "ok"
+            } else {
+                "error"
+            }
+            .to_owned(),
+            stream_status: Some(status),
+        },
+        latency,
+    );
+    write_ledger(&state, &row).await;
     let served_attempt = attempts
         .iter()
         .rposition(|attempt| attempt.failure.is_none());
+    let caller = crate::metrics::caller_label(context.app_id.as_deref());
     for (index, attempt) in attempts.iter().enumerate() {
         let served = Some(index) == served_attempt;
+        let outcome = if served {
+            stream_outcome(status, &capture)
+        } else {
+            attempt.outcome
+        };
+        crate::metrics::record_attempt(
+            &attempt.provider,
+            attempt.path,
+            outcome,
+            &caller,
+            attempt.latency,
+            attempt_reason(outcome, attempt),
+        );
         let event = stream_cost_event(
             &context,
             &request,
@@ -693,8 +932,9 @@ async fn finalise_stream(
             } else {
                 None
             },
+            state.router().catalog().provider(&attempt.provider),
         );
-        state.deps().cost.emit(&event).await;
+        emit_cost(&state, &event).await;
     }
 }
 
@@ -710,26 +950,31 @@ async fn record_unopened_stream(
     started: Instant,
 ) {
     let latency = started.elapsed().as_millis() as i64;
-    if let Some(pool) = state.deps().ledger.as_ref() {
-        let row = LedgerRow::streamed(
-            &context,
-            request,
-            StreamRow {
-                served_provider: None,
-                served_model: None,
-                finish_reason: None,
-                response_sha256: None,
-                response_json_valid: None,
-                status: status.as_u16().to_string(),
-                stream_status: None,
-            },
-            latency,
-        );
-        if let Err(error) = ledger::insert(pool, &row).await {
-            tracing::warn!(%error, "inference ledger write failed");
-        }
-    }
+    let row = LedgerRow::streamed(
+        &context,
+        request,
+        StreamRow {
+            served_provider: None,
+            served_model: None,
+            finish_reason: None,
+            response_sha256: None,
+            response_json_valid: None,
+            status: status.as_u16().to_string(),
+            stream_status: None,
+        },
+        latency,
+    );
+    write_ledger(state, &row).await;
+    let caller = crate::metrics::caller_label(context.app_id.as_deref());
     for (index, attempt) in attempts.iter().enumerate() {
+        crate::metrics::record_attempt(
+            &attempt.provider,
+            attempt.path,
+            attempt.outcome,
+            &caller,
+            attempt.latency,
+            attempt_reason(attempt.outcome, attempt),
+        );
         let event = stream_cost_event(
             &context,
             request,
@@ -739,8 +984,9 @@ async fn record_unopened_stream(
             None,
             None,
             None,
+            state.router().catalog().provider(&attempt.provider),
         );
-        state.deps().cost.emit(&event).await;
+        emit_cost(state, &event).await;
     }
 }
 
@@ -756,7 +1002,10 @@ fn stream_cost_event(
     usage: Option<&Usage>,
     served_model: Option<&str>,
     provider_request_id: Option<&str>,
+    catalog_entry: Option<&crate::catalog::ProviderEntry>,
 ) -> CostEvent {
+    let input_tokens = usage.map_or(0, |usage| usage.prompt_tokens);
+    let output_tokens = usage.map_or(0, |usage| usage.completion_tokens);
     CostEvent {
         tenant_id: context.tenant_id.clone(),
         license_id: context.license_id.clone(),
@@ -771,11 +1020,11 @@ fn stream_cost_event(
             .clone()
             .unwrap_or_else(|| request.model.clone()),
         served_model: served_model.map(str::to_owned),
-        input_tokens: usage.map_or(0, |usage| usage.prompt_tokens),
-        output_tokens: usage.map_or(0, |usage| usage.completion_tokens),
+        input_tokens,
+        output_tokens,
         cache_creation_input_tokens: usage.map_or(0, |usage| usage.cache_creation_input_tokens),
         cache_read_input_tokens: usage.map_or(0, |usage| usage.cache_read_input_tokens),
-        cost_usd: ZERO_COST_USD.to_owned(),
+        cost_usd: cost_usd(input_tokens, output_tokens, catalog_entry),
         latency_ms: attempt.latency.as_millis() as i64,
         schema_id: Some("default".to_owned()),
         fallback_used,
@@ -788,6 +1037,7 @@ fn stream_cost_event(
         ),
         reservation_id: reservation_id.map(str::to_owned),
         project_id: context.project_id.clone(),
+        actor_id: context.actor_id.clone(),
         card_id: context.card_id.clone(),
         execution_id: context.parent_execution_id.clone(),
         delegated_by: context.delegated_by.clone(),
@@ -949,6 +1199,47 @@ mod tests {
         assert!(text.contains("\"provider_request_id\":\"chatcmpl-stub\""));
     }
 
+    #[test]
+    fn the_unlicensed_trio_is_classified_on_the_licence_alone() {
+        let mut event = crate::metering::CostEvent {
+            service_key: "inference-router".to_owned(),
+            provider: "trio-provider".to_owned(),
+            // Negative input is clamped: the trio books max(0,input) + max(0,output).
+            input_tokens: -4,
+            output_tokens: 3,
+            cost_usd: "0.25000000".to_owned(),
+            app_id: Some("w2v".to_owned()),
+            worker_name: Some("core-app".to_owned()),
+            ..crate::metering::CostEvent::default()
+        };
+        assert_eq!(
+            super::unlicensed_trio(&event),
+            Some(("w2v".to_owned(), "core-app".to_owned(), 0.25, 3)),
+            "no licence at all: the trio moves, labelled through the bounded normalisers"
+        );
+
+        event.license_id = Some("unknown".to_owned());
+        assert!(
+            super::unlicensed_trio(&event).is_some(),
+            "the licence server's unresolved literal is unlicensed"
+        );
+
+        event.license_id = Some("lic-0123456789abcdef".to_owned());
+        assert_eq!(
+            super::unlicensed_trio(&event),
+            None,
+            "a licence present means no unlicensed cost"
+        );
+
+        event.license_id = None;
+        event.cost_usd = "not-a-decimal".to_owned();
+        assert_eq!(
+            super::unlicensed_trio(&event).map(|trio| trio.2),
+            Some(0.0),
+            "a malformed decimal books zero dollars rather than failing"
+        );
+    }
+
     #[tokio::test]
     async fn an_invalid_body_is_the_reference_422_document() {
         let (state, _stub) = state_with_stub().await;
@@ -973,5 +1264,41 @@ mod tests {
         assert_eq!(body["detail"][0]["loc"], json!(["body", "messages"]));
         assert_eq!(body["detail"][0]["msg"], "Field required");
         assert_eq!(body["detail"][0]["input"], json!({"model": "stub-model"}));
+    }
+
+    #[test]
+    fn the_actor_is_the_sent_header_then_the_service_subject() {
+        use axum::http::{HeaderMap, HeaderValue};
+
+        use super::actor_id;
+
+        let service = "98a72edd-06ee-408f-9f08-f88ce35897a5";
+        let human = "01a1681e-81f2-7487-af71-b888fed32b37";
+        let mut headers = HeaderMap::new();
+        // No header: a call no human made belongs to the calling service.
+        assert_eq!(
+            actor_id(&headers, Some(service)),
+            Some(service.to_owned()),
+            "the service subject is the fallback"
+        );
+        // A valid header wins over the service subject.
+        headers.insert("x-actor-id", HeaderValue::from_static(human));
+        assert_eq!(
+            actor_id(&headers, Some(service)),
+            Some(human.to_owned()),
+            "the caller's own actor wins"
+        );
+        // A malformed or blank header never fails a request and never wins.
+        for sent in ["not-a-uuid", "   "] {
+            headers.insert("x-actor-id", HeaderValue::from_str(sent).expect("header"));
+            assert_eq!(
+                actor_id(&headers, Some(service)),
+                Some(service.to_owned()),
+                "a bad header falls back to the service subject"
+            );
+        }
+        // Neither present, or a malformed fallback: absent, never invented.
+        assert_eq!(actor_id(&HeaderMap::new(), None), None);
+        assert_eq!(actor_id(&HeaderMap::new(), Some("not-a-uuid")), None);
     }
 }

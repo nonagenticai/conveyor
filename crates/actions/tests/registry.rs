@@ -61,7 +61,35 @@ use serde_json::{Value, json};
 /// because `card_type` is deliberately not one of the eleven catalogue namespaces. 304 → **305**.
 /// **T0 adds 15 internal**: `industries.*` (3), `job_catalogue.*` (5), `job_releases.*` (3) and
 /// `job_bindings.*` (4) — the organisation spine (SPEC_V2 §4, §10.4). 305 → **320**.
-const EXPECTED: [&str; 320] = [
+/// **#139 P3.1 adds 9 internal**: the eight media capability kinds and the `media.capabilities`
+/// probe. 320 → **332** (the three video kinds joined after the first measurement).
+/// **#161 P3 adds 1 internal**: `decks.render`, the deck toolkit. 332 → **333**.
+/// **#182 slice A adds 5 internal**: the tenant's own YouTube channel —
+/// `youtube.client_set|client_get|connect|status|disconnect`. 333 → **338**.
+/// **#182 slice B adds 3 internal**: `youtube.upload|privacy|retract`. 338 → **341**.
+/// **#156 adds 5 internal**: the work-store publish/request/revision actions. 341 → **346**.
+/// **#174 adds 1 external**: `media.generate_image`, the MOSS-Image host over the engine's own
+/// declared-external path (it is the first action to declare an `Artefact`). 346 → **347**.
+/// **#173 adds 2 external**: `produce.speech` and `media.transcribe` (the audio hosts). 347 → **349**.
+/// **#160 adds 2 internal**: `inference_endpoint.get|set`, the tenant's registered inference
+/// destination and its sealed credential. 349 → **351**.
+/// **T1 adds 27 internal**: the plan spine (wbs/baselines/registers/dependencies/in_flight/
+/// tranches/benefits/cadences/stakeholders). 351 → **378**.
+/// **#170 adds 6 internal**: the `ops.*` cluster read family (T7) —
+/// `ops.pods|deployments|events|logs|flux_status|ci_status`. 378 → **384**.
+/// **#171 adds 3 internal**: the gated `ops.*` writes — `ops.restart|scale|rollback`.
+/// 384 → **387**.
+/// **T2 adds 11 internal**: the decision ladder — `decision_policies.*` (3),
+/// `refinements.*` (2), `laya_configs.*` (2), `ladder.record|evaluate|list|apply_draft` (4).
+/// 387 → **398**.
+/// **#245 adds 2 internal**: `documents.preview` and `documents.return`. 398 → **400**.
+/// **#163 adds 1 internal**: `produce.script`, the blueprint layer's dispatch.
+/// 400 → **401**.
+/// **#172 adds 3 internal**: the host family — `ops.host_status|host_logs|host_restart_unit`
+/// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 401 → **404**.
+/// **T3 adds 6 internal**: the PM job — `pm.charter|plan|get|route_gate|close` and
+/// `changes.request`. 404 → **410**.
+const EXPECTED: [&str; 410] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -72,6 +100,9 @@ const EXPECTED: [&str; 320] = [
     "approvals.request",
     "artifacts.list",
     "audit.list",
+    "baselines.get",
+    "baselines.list",
+    "baselines.take",
     "benchmark_cases.list",
     "benchmark_runs.cancel",
     "benchmark_runs.compare",
@@ -81,9 +112,15 @@ const EXPECTED: [&str; 320] = [
     "benchmark_runs.start",
     "benchmark_runs.trend",
     "benchmark_suites.list",
+    "benefits.create",
+    "benefits.get",
+    "benefits.link",
+    "benefits.list",
     "billing.summary",
     "boards.get",
     "boards.set_member",
+    "cadences.create",
+    "cadences.list",
     "capabilities.bind_knowledge",
     "capabilities.get",
     "capabilities.list",
@@ -108,6 +145,7 @@ const EXPECTED: [&str; 320] = [
     "cards.update",
     "catalogues.import",
     "catalogues.list",
+    "changes.request",
     "channels.bind",
     "channels.get",
     "channels.kinds",
@@ -132,6 +170,10 @@ const EXPECTED: [&str; 320] = [
     "decisions.list",
     "decisions.transition",
     "decisions.update",
+    "decks.render",
+    "decision_policies.create",
+    "decision_policies.list",
+    "decision_policies.update",
     "departments.create",
     "departments.list",
     "documents.compose",
@@ -141,7 +183,14 @@ const EXPECTED: [&str; 320] = [
     "documents.get",
     "documents.ingest",
     "documents.list",
+    "documents.preview",
+    "documents.publish",
     "documents.report",
+    "documents.request_publish",
+    "documents.return",
+    "documents.revision_get",
+    "documents.revision_list",
+    "documents.revision_restore",
     "documents.update",
     "eval_audits.get",
     "eval_audits.list",
@@ -196,6 +245,8 @@ const EXPECTED: [&str; 320] = [
     "industries.list",
     "inference.chat",
     "inference_calls.list",
+    "inference_endpoint.get",
+    "inference_endpoint.set",
     "inference_usage.report",
     "invites.create",
     "invites.list",
@@ -218,12 +269,32 @@ const EXPECTED: [&str; 320] = [
     "labels.create",
     "labels.delete",
     "labels.update",
+    "ladder.apply_draft",
+    "ladder.evaluate",
+    "ladder.list",
+    "ladder.record",
     "laya.judge",
+    "laya_configs.create",
+    "laya_configs.list",
     "licences.get",
     "lists.create",
     "lists.move",
     "lists.update",
     "me.get",
+    "media.analyze_audio",
+    "media.analyze_video",
+    "media.capabilities",
+    "media.compile_video",
+    "media.concat_audio",
+    "media.generate_image",
+    "media.ocr",
+    "media.probe_video",
+    "media.produce_video",
+    "media.record_browser",
+    "media.render_html",
+    "media.run_gherkin",
+    "media.thumbnail",
+    "media.transcribe",
     "members.list",
     "members.remove",
     "members.set_role",
@@ -261,6 +332,24 @@ const EXPECTED: [&str; 320] = [
     "models.validate",
     "notifications.list",
     "notifications.update",
+    "ops.ci_status",
+    "ops.deployments",
+    "ops.events",
+    "ops.flux_status",
+    "ops.host_logs",
+    "ops.host_restart_unit",
+    "ops.host_status",
+    "ops.logs",
+    "ops.pods",
+    "ops.restart",
+    "ops.rollback",
+    "ops.scale",
+    "pm.charter",
+    "pm.close",
+    "pm.get",
+    "pm.plan",
+    "pm.route_gate",
+    "portfolio.in_flight",
     "principles.create",
     "principles.dismiss_conflict",
     "principles.get",
@@ -274,6 +363,7 @@ const EXPECTED: [&str; 320] = [
     "procedures.publish",
     "procedures.retire",
     "procedures.update",
+    "produce.speech",
     "process_maps.create",
     "process_maps.get",
     "process_maps.list",
@@ -287,10 +377,14 @@ const EXPECTED: [&str; 320] = [
     "processes.publish",
     "processes.retire",
     "processes.update",
+    "produce.script",
     "programmes.create",
     "programmes.get",
     "programmes.list",
     "programmes.update",
+    "project_dependencies.create",
+    "project_dependencies.delete",
+    "project_dependencies.list",
     "project_requests.approve",
     "project_requests.create",
     "project_requests.get",
@@ -313,6 +407,12 @@ const EXPECTED: [&str; 320] = [
     "publish.start",
     "publish.status",
     "quality.score",
+    "refinements.list",
+    "refinements.publish",
+    "registers.create",
+    "registers.get",
+    "registers.list",
+    "registers.update",
     "repositories.create",
     "repositories.delete",
     "repositories.get",
@@ -348,6 +448,9 @@ const EXPECTED: [&str; 320] = [
     "stakeholders.delete",
     "stakeholders.get",
     "stakeholders.list",
+    "stakeholders.profile_create",
+    "stakeholders.profile_list",
+    "stakeholders.profile_update",
     "stakeholders.update",
     "task_lists.create",
     "task_lists.delete",
@@ -361,12 +464,19 @@ const EXPECTED: [&str; 320] = [
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
+    "tranches.create",
+    "tranches.list",
+    "tranches.review",
     "view_connections.create",
     "view_connections.delete",
     "view_connections.update",
     "view_objects.create",
     "view_objects.delete",
     "view_objects.update",
+    "wbs.create",
+    "wbs.get",
+    "wbs.list",
+    "wbs.update",
     "webhooks.create",
     "webhooks.delete",
     "webhooks.test",
@@ -382,6 +492,14 @@ const EXPECTED: [&str; 320] = [
     "workflow_runs.get",
     "workflow_runs.start",
     "workflow_traces.export",
+    "youtube.client_get",
+    "youtube.client_set",
+    "youtube.connect",
+    "youtube.disconnect",
+    "youtube.privacy",
+    "youtube.retract",
+    "youtube.status",
+    "youtube.upload",
 ];
 
 #[test]
@@ -411,8 +529,30 @@ fn the_registry_is_exactly_the_declared_set() {
     // reads existed and the domain validator was unreachable through the API.
     // The external count moves exactly once, at step 8 — every other addition is internal.
     // #92 adds `card_types.list` (internal, read): 289 → 290; T0 adds 15 internal actions
-    // (the organisation spine): 290 → 305.
-    assert_eq!((internal, external), (305, 15));
+    // (the organisation spine): 290 → 305; #139 P3.1 adds the twelve media actions: 305 → 317;
+    // #161 P3 adds `decks.render` (internal, write): 317 → 318; #182 slice A adds the five
+    // `youtube.*` actions (internal): 318 → 323; slice B adds `youtube.upload|privacy|retract`:
+    // 323 → 326; the work store (#156) adds five internal actions
+    // (`documents.publish`, `documents.request_publish`, the three `documents.revision_*`):
+    // 326 → 331. #174 adds `media.generate_image` (external): the external count has moved a second
+    // time, 15 → 16, because it is the first action that calls a service AND stores what it returned.
+    // #173 adds `produce.speech` and `media.transcribe` (both external): 331 → 333, external 16 → 18.
+    // They are the first actions whose request carries a DOCUMENT's bytes (multipart) and the first
+    // whose artefact is UTF-8 text rather than base64 — both mechanisms live in the engine.
+    // #160 adds `inference_endpoint.get|set` (both internal): internal 331 → 333; external stays 18.
+    // T1 adds the 27 plan-spine actions (wbs/baselines/registers/dependencies/in_flight/
+    // tranches/benefits/cadences/stakeholders), all internal: internal 333 → 360; external stays 18.
+    // #170 adds the six `ops.*` reads (internal, read): 360 → 366. The external count stays at 18 —
+    // they call the cluster API through `conveyor-ops`, not a declared external service.
+    // #171 adds the three `ops.*` writes (internal, destructive): 366 → 369; T2 adds the eleven
+    // decision-ladder actions (decision_policies.* 3, refinements.* 2, laya_configs.* 2,
+    // ladder.record|evaluate|list|apply_draft 4), all internal: 369 → 380; external stays 18.
+    // #245 adds `documents.preview` and `documents.return` (internal): 380 → 382.
+    // #163 adds `produce.script` (internal): 382 → 383; external stays 18.
+    // #172 adds the three host actions (internal; one destructive, two reads): 383 → 386;
+    // external stays 18 — they call the host agent over ssh, not a declared external service.
+    // T3 adds the six PM actions (all internal): 386 → 392; external stays 18.
+    assert_eq!((internal, external), (392, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

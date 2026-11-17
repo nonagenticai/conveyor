@@ -58,8 +58,15 @@ fn no_handler_calls_a_service_directly() {
     //   * `github.rs`   — #70's publish transport behind the `publish.design` worker job. The job owns
     //     the attempt/dead-letter and records the PR result; no action handler calls it, and the token
     //     is opened only inside the job. Added 2026-11-13.
+    //   * `youtube.rs`  — #182's Google OAuth token exchange behind `youtube.connect`. The actions
+    //     depend on the `YouTubeProvider` trait; this file is the one transport, it owns its own
+    //     timeout and it never reads an error body. Added 2026-11-16.
+    //   * `produce.rs`  — #163's `produce.script`: the model call is one leg of a composition whose
+    //     other legs (shot identity, the duration budget) are local and cannot be expressed as a
+    //     passthrough. Same shape as `ingest.rs`; the transport owns its timeout and error mapping.
+    //     Added 2026-11-16.
     // A new name here is a decision, not an accident: the list is compared exactly.
-    const ALLOWED: [&str; 7] = [
+    const ALLOWED: [&str; 9] = [
         "invoke.rs",
         "webhooks.rs",
         "channels.rs",
@@ -67,6 +74,8 @@ fn no_handler_calls_a_service_directly() {
         "strata.rs",
         "webhook.rs",
         "github.rs",
+        "youtube.rs",
+        "produce.rs",
     ];
 
     let mut offenders = Vec::new();
@@ -159,15 +168,22 @@ fn every_external_action_declares_its_services_path_prefix() {
     //   laya                 /v1      the Jev System-1 bridge: /v1/systemone (care-bus' measured client)
     //   fixtures             ""       tests/fixtures/external/openapi.json: /echo, /fail, /slow, /timeout
     //   worker_management    ""       the Python services mount bare: /workers, /providers, /graphs
-    const PREFIXES: [(&str, &str); 8] = [
+    //   image_gen            ""       mlx_inference mounts its OpenAI-compatible routes bare:
+    //                                 http/capabilities.rs:57-70 (`/v1/images/generations`)
+    //   tts                  /api     the narration route `tts_compat.rs` mounts: /api/tts/synthesize
+    //   asr                  /v1      the OpenAI-shaped transcription route: /v1/audio/transcriptions
+    const PREFIXES: [(&str, &str); 11] = [
         ("worker_management", ""),
         ("fixtures", ""),
+        ("image_gen", ""),
         ("artifacts", "/api"),
         ("billing_service", "/api"),
         ("coding", "/api"),
         ("strata_rag", "/api"),
         ("inference", "/api"),
         ("laya", "/v1"),
+        ("tts", "/api"),
+        ("asr", "/v1"),
     ];
 
     let mut seen: BTreeSet<&str> = BTreeSet::new();

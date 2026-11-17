@@ -20,7 +20,7 @@ separate catalogue entries (`§11.2` identities), so the broker never learns the
 |---|---|---|
 | `apps/scientific` | the scientific research service; the evidence-review service | **absorbed, not deployed** (#105 merged). The live deployment is still the Python image and sits at zero replicas |
 | `apps/research` | the web-scraper service; the media-discovery service | **in flight** — #117 merged into `apps/research`, #118 in flight; ADR 0007 keeps it here |
-| `apps/media` | the browser-rendered producers; the ffmpeg producers; the thin speech fan-out and video-publish operations | **decided, unclaimed** (#139); ADR 0007 keeps it in this workspace as two executor images, with `analyse.*` as a library |
+| `apps/media` | the browser-rendered producers; the ffmpeg producers; the thin speech fan-out and video-publish operations | **absorbed** (#139 merged 2026-11-15): two executor images, twelve `media.*` actions, the captured contract and its drop table; `analyse.*` stays a library |
 | `apps/lean4-prover` | the Lean 4 prover | **absorbed, not deployed** (#116 merged). The live deployment is still the pre-absorption image; the deployable stays separate for its toolchain state and node pin |
 | `apps/coding` | the `coding-*` fleet | **join the existing Rust repository, never a second rewrite** (ADR 0006). The Python fleet is still deployed and is not the current implementation |
 | external — `strata_ingest`, `strata_rag` | shared ingest and retrieval | done (ADR 0005 §2); they are tool-estate members but not repository scope |
@@ -38,8 +38,9 @@ Two lessons this table makes visible, both recorded rather than fixed here:
 - **"Merged" and "live" are different claims.** Two groups are fully absorbed in code and still
   serve the legacy image. Any statement that the estate is Rust must be read as "the rewrite exists",
   not "the old service is off".
-- **`apps/media` is the one decided group with no issue.** ADR 0006 §Consequences says "one issue
-  per app"; #139 supplies the missing one.
+- **`apps/media` is no longer the group without an issue.** ADR 0006 §Consequences said "one issue
+  per app"; #139 supplied it and merged. The production family (`produce.*`) is now the one family
+  with no issue and no code — it is carried by `05-W2V-ABSORPTION.md` §3 and #163.
 
 ### 1.1 Archived and needing no decision
 

@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 12,
+    "exists": 27,
     "extend": 8,
-    "new": 24
+    "new": 28
   },
   "rows": [
     {
@@ -84,9 +84,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "wbs_node",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE wbs_node"
+        "migrations: CREATE TABLE wbs_node"
       ]
     },
     {
@@ -94,9 +94,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "project_baseline",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE project_baseline"
+        "migrations: CREATE TABLE project_baseline"
       ]
     },
     {
@@ -104,9 +104,29 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "programme_cadence",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE programme_cadence"
+        "migrations: CREATE TABLE programme_cadence"
+      ]
+    },
+    {
+      "id": "table:programme_tranche",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "programme_tranche",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE programme_tranche"
+      ]
+    },
+    {
+      "id": "table:programme_baseline",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "programme_baseline",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE programme_baseline"
       ]
     },
     {
@@ -114,9 +134,159 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "project_register_item",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE project_register_item"
+      ]
+    },
+    {
+      "id": "table:benefit_profile",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "benefit_profile",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE benefit_profile"
+      ]
+    },
+    {
+      "id": "table:benefit_link",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "benefit_link",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE benefit_link"
+      ]
+    },
+    {
+      "id": "table:benefit_transition",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "benefit_transition",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE benefit_transition"
+      ]
+    },
+    {
+      "id": "table:stakeholder_profile",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "stakeholder_profile",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE stakeholder_profile"
+      ]
+    },
+    {
+      "id": "table:architecture_artifact",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "architecture_artifact",
       "verdict": "new",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE project_register_item"
+        "migrations: no CREATE/ALTER TABLE architecture_artifact"
+      ]
+    },
+    {
+      "id": "table:architecture_artifact_entry",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "architecture_artifact_entry",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE architecture_artifact_entry"
+      ]
+    },
+    {
+      "id": "table:architecture_artifact_link",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "architecture_artifact_link",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE architecture_artifact_link"
+      ]
+    },
+    {
+      "id": "table:artifact_type",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "artifact_type",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE artifact_type"
+      ]
+    },
+    {
+      "id": "table:adm_profile",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "adm_profile",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE adm_profile"
+      ]
+    },
+    {
+      "id": "table:architecture_contract",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "architecture_contract",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE architecture_contract"
+      ]
+    },
+    {
+      "id": "table:architecture_compliance_review",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "architecture_compliance_review",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE architecture_compliance_review"
+      ]
+    },
+    {
+      "id": "table:architecture_waiver",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "architecture_waiver",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE architecture_waiver"
+      ]
+    },
+    {
+      "id": "table:governance_body",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "governance_body",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE governance_body"
+      ]
+    },
+    {
+      "id": "table:architecture_maturity",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "architecture_maturity",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE architecture_maturity"
+      ]
+    },
+    {
+      "id": "table:architecture_skill_assessment",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "architecture_skill_assessment",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE architecture_skill_assessment"
       ]
     },
     {
@@ -164,9 +334,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "project_dependency",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE project_dependency"
+        "migrations: CREATE TABLE project_dependency"
       ]
     },
     {
@@ -226,13 +396,35 @@
       "concept": "programme/plan",
       "verdict": "extend",
       "evidence": [
-        "actions: baselines.* absent",
-        "actions: cadences.* absent",
+        "actions: baselines.* found (baselines.get, baselines.list, baselines.take)",
+        "actions: cadences.* found (cadences.create, cadences.list)",
+        "actions: governed_assets.* absent",
         "actions: programme_config.* absent",
         "actions: programmes.* found (programmes.create, programmes.get, programmes.list…)",
-        "actions: project_dependencies.* absent",
-        "actions: registers.* absent",
-        "actions: wbs.* absent"
+        "actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)",
+        "actions: registers.* found (registers.create, registers.get, registers.list…)",
+        "actions: tranches.* found (tranches.create, tranches.list, tranches.review)",
+        "actions: wbs.* found (wbs.create, wbs.get, wbs.list…)"
+      ]
+    },
+    {
+      "id": "actions:benefits",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "benefits",
+      "verdict": "exists",
+      "evidence": [
+        "actions: benefits.* found (benefits.create, benefits.get, benefits.link…)"
+      ]
+    },
+    {
+      "id": "actions:architecture",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "architecture",
+      "verdict": "new",
+      "evidence": [
+        "actions: architecture.* absent"
       ]
     },
     {
@@ -289,10 +481,13 @@
       "concept": "decision",
       "verdict": "new",
       "evidence": [
+        "actions: approvals.* found (approvals.decide, approvals.list, approvals.request)",
         "actions: decision_options.* absent",
-        "actions: decision_policies.* absent",
+        "actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)",
         "actions: decisions.* found (decisions.create, decisions.get, decisions.list…)",
-        "actions: laya_configs.* absent"
+        "actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)",
+        "actions: laya_configs.* found (laya_configs.create, laya_configs.list)",
+        "actions: refinements.* found (refinements.list, refinements.publish)"
       ],
       "note": "V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2)."
     },
@@ -301,9 +496,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "PM",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: pm.* absent"
+        "actions: pm.* found (pm.charter, pm.close, pm.get…)"
       ]
     },
     {
@@ -342,9 +537,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "operations",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: ops.* absent"
+        "actions: ops.* found (ops.ci_status, ops.deployments, ops.events…)"
       ]
     },
     {
@@ -362,9 +557,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "production",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: produce.* absent"
+        "actions: produce.* found (produce.script)"
       ]
     },
     {

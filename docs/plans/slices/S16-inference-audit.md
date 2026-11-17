@@ -103,7 +103,7 @@ capture time (owner 2026-11-09, answering §10 Q2), so the audit is started by t
 
 ## 6. Build order
 
-1. Migration + `crates/store/src/migrate.rs` touch (the macro embeds at compile time). apply migration 0024 to the dev database (a m1-built binary against the compose DB; CONTRACT §16).
+1. Migration + `crates/store/src/migrate.rs` touch (the macro embeds at compile time). apply migration 0024 to the dev database (a the build host-built binary against the compose DB; CONTRACT §16).
 2. `domain::inference`: `Usage` parsing, `cache_status()` with its four-way rule, and the bucket arithmetic. `rbuild -- test -p conveyor-domain inference`.
 3. `store::inference`: the insert (called from the engine), the keyset list, the aggregate. `rbuild -- test -p conveyor-store inference_`.
 4. `spec.rs` + derive: `captures_usage`; declare it on `completions.create`. `rbuild -- test -p conveyor-actions registry`.
@@ -130,13 +130,13 @@ capture time (owner 2026-11-09, answering §10 Q2), so the audit is started by t
     with `acknowledge_findings: true` to override, and the override is recorded on the publish's `audit_event`.
     `rbuild -- test -p conveyor-actions procedure_publish_audit_gate`.
 14. The two pruners on `schedule` rows. `rbuild -- test -p conveyor-server pruners`.
-15. Whole gate below — `rbuild --gate` (fmt + clippy + `test --locked`) on m1 (CONTRACT §16).
+15. Whole gate below — `rbuild --gate` (fmt + clippy + `test --locked`) on the build host (CONTRACT §16).
 
 ## 7. Gate
 
 ```bash
 set -euo pipefail
-# CONTRACT §16: Rust runs on m1 through rbuild; mini3's cargo refuses inside a Cargo project.
+# CONTRACT §16: Rust runs on the build host through rbuild; the dev box's cargo refuses inside a Cargo project.
 # 1. the three tables exist with RLS forced (a policy without FORCE reads zero rows and proves nothing)
 test "$(psql "$DATABASE_URL" -tAc "SELECT count(*) FROM pg_class WHERE relname IN
   ('inference_call','prompt_audit','prompt_audit_finding') AND relrowsecurity AND relforcerowsecurity")" -eq 3

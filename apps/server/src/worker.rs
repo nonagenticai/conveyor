@@ -28,7 +28,8 @@
 //! `memory.consolidate` (one digest per card, on run completion only), S13 §5.8's `err.card` (a
 //! failed run's move → comment → coach), and S19/S20's eval kinds `eval.case.run`,
 //! `eval.regrade`, `eval.grade` (the one-shot per-output grade), `eval.run.tick` and
-//! `eval.reap`.
+//! `eval.reap`. #182 slice B adds `youtube.upload`, the one arm that needs the claimed row's id:
+//! it records the provider's video id there so a retry of the SAME job cannot upload twice.
 //!
 //! The bus consumer executes one notification: a `card.moved` into the ACTIVE lane runs
 //! `wip.pull` for that board (§5.8). Everything else on the stream is either a `process.step`
@@ -82,11 +83,19 @@ pub const RETRY_AFTER: Duration = Duration::from_secs(30);
 /// Runner-backed kinds (#144) are deliberately absent: they start Kubernetes Jobs and spend
 /// compute, which is exactly what pulling the cord is meant to stop. `runner.reap` is absent too —
 /// it deletes objects rather than starting work, but it is not a delivery path.
-pub const ANDON_ALLOWED_KINDS: [&str; 4] = [
+///
+/// `licence.sync` is here for the reporting reason and one more: it starts nothing either, and it
+/// is the ONLY writer of the entitlement snapshot (`app_licence.checked_at`) that the action API's
+/// licence gate reads. Withholding it makes the cord its own lock — the snapshot ages past
+/// `STALE_AFTER`, `RequireLicence` refuses every action route including `andon.release`, and only a
+/// database edit can release the cord. Measured 2026-11-16: pulled 00:11:43, stale by 03:46,
+/// released by hand at 03:58:47.
+pub const ANDON_ALLOWED_KINDS: [&str; 5] = [
     "delivery.send",
     "approval.closed.emit",
     "interaction.dispatch",
     "interaction.close",
+    "licence.sync",
 ];
 
 /// One `card.lease_sweep` pass clears at most this many expired leases.
@@ -372,15 +381,7 @@ impl Worker {
         let outcome = if crate::runner_dispatch::handles(&self.config, &job.kind) {
             crate::runner_dispatch::step(&self.pool, &self.config, tenant, job).await
         } else {
-            run_kind(
-                &self.pool,
-                &self.config,
-                self.licence.as_ref(),
-                tenant,
-                &job.kind,
-                &job.payload,
-            )
-            .await
+            run_job(&self.pool, &self.config, self.licence.as_ref(), tenant, job).await
         };
         renewal.abort();
 
@@ -441,7 +442,6 @@ impl Worker {
     }
 }
 
-/// Run one job kind. Public so tests exercise the exact dispatch the worker uses.
 /// One uuid out of a job payload, or a permanent failure naming what is missing.
 fn payload_uuid(payload: &serde_json::Value, key: &str) -> Result<Uuid, JobFailure> {
     payload
@@ -451,11 +451,50 @@ fn payload_uuid(payload: &serde_json::Value, key: &str) -> Result<Uuid, JobFailu
         .ok_or_else(|| JobFailure::permanent(format!("the job payload has no usable `{key}`")))
 }
 
+/// Run one claimed job, its row id included.
+///
+/// The id is what an arm needs to record a result on the row it is running
+/// (`store::jobs::record_result`). `run_kind` deliberately cannot supply one, so a kind that
+/// requires it refuses there instead of writing to no row — which is why the tests below that
+/// exercise the whole dispatch use this entry point.
+pub async fn run_job(
+    pool: &PgPool,
+    config: &Config,
+    licence: Option<&LicenceSyncClient>,
+    tenant: TenantId,
+    job: &Job,
+) -> Result<(), JobFailure> {
+    dispatch(
+        pool,
+        config,
+        licence,
+        tenant,
+        Some(job.id),
+        &job.kind,
+        &job.payload,
+    )
+    .await
+}
+
+/// Run one job kind **without** a row. Public so tests exercise the exact dispatch the worker
+/// uses; a kind that records a result on its own row needs [`run_job`] and refuses here.
 pub async fn run_kind(
     pool: &PgPool,
     config: &Config,
     licence: Option<&LicenceSyncClient>,
     tenant: TenantId,
+    kind: &str,
+    payload: &serde_json::Value,
+) -> Result<(), JobFailure> {
+    dispatch(pool, config, licence, tenant, None, kind, payload).await
+}
+
+async fn dispatch(
+    pool: &PgPool,
+    config: &Config,
+    licence: Option<&LicenceSyncClient>,
+    tenant: TenantId,
+    job_id: Option<Uuid>,
     kind: &str,
     payload: &serde_json::Value,
 ) -> Result<(), JobFailure> {
@@ -492,7 +531,15 @@ pub async fn run_kind(
             )
             .await
             .map_err(db)?;
-            tracing::info!(tenant = %tenant, deleted, "model.prune");
+            let documents = store::prune::document_revision_prune(
+                pool,
+                tenant,
+                store::prune::DOCUMENT_REVISION_KEEP,
+                store::prune::PRUNE_BATCH,
+            )
+            .await
+            .map_err(db)?;
+            tracing::info!(tenant = %tenant, deleted, documents, "model.prune");
         }
         "validation.prune" => {
             let deleted = store::prune::validation_run_prune(
@@ -549,12 +596,24 @@ pub async fn run_kind(
                         .map_err(|error| {
                             JobFailure::retryable(format!("clear the document content: {error}"))
                         })?;
+                    // The revisions hold the same content; a purge removes them with the body.
+                    let revisions =
+                        store::document::delete_revisions_tx(&mut tx, tenant, document_id)
+                            .await
+                            .map_err(|error| {
+                                JobFailure::retryable(format!(
+                                    "remove the document history: {error}"
+                                ))
+                            })?;
                     let mut changed = Vec::new();
                     if had_object {
                         changed.push("object_key");
                     }
                     if had_body {
                         changed.push("body");
+                    }
+                    if revisions > 0 {
+                        changed.push("revisions");
                     }
                     let event = store::NewEvent {
                         topic: format!("document:{document_id}"),
@@ -843,6 +902,17 @@ pub async fn run_kind(
         "benchmark.improvement.run" => {
             crate::benchmark_improvement::run(pool, tenant, &config.app_key, payload).await?
         }
+        // #182 slice B: upload one document to the tenant's own YouTube channel. The row id is
+        // required, not optional: the recorded `video_id` lives on this job's own payload and is
+        // the retry's evidence that the upload already happened.
+        "youtube.upload" => {
+            let job_id = job_id.ok_or_else(|| {
+                JobFailure::permanent(
+                    "youtube.upload records its video id on the job row; it cannot run without one",
+                )
+            })?;
+            crate::youtube_upload::run(pool, tenant, job_id, payload).await?
+        }
         other => {
             return Err(JobFailure::permanent(format!(
                 "unknown job kind {other:?}: this build registers event.prune, job.prune, \
@@ -852,7 +922,7 @@ pub async fn run_kind(
                  quality.score, model.validate, copilot.turn.reap, copilot.proposal.sweep, \
                  copilot.proposal.execute, benchmark.run.poll, benchmark.reap, \
                  eval.case.run, eval.regrade, eval.grade, eval.run.tick, eval.reap, \
-                 document.purge, publish.design and memory.consolidate"
+                 document.purge, publish.design, youtube.upload and memory.consolidate"
             )));
         }
     }

@@ -46,13 +46,46 @@ const PROJECT = {
   phase_code: null,
   owner_user_id: null,
   repo_url: "https://github.com/nonagenticai/conveyor",
-  meta: { issues: [2, 3], plan: "docs/plans/slices/S02-skeleton.md", track: "v1" },
+  meta: {
+    issues: [2, 3],
+    plan: "docs/plans/slices/S02-skeleton.md",
+    track: "v1",
+    expected_outputs: [
+      "project-brief",
+      "inception-analysis",
+      "architecture-design",
+    ],
+    closure_outputs: ["evidence", "closure-review"],
+  },
+  version: 1,
+};
+
+// A project the seed can leave without a board (an archived row, or a row from before #165).
+const NOBOARD = {
+  id: "p-noboard",
+  key: "X1",
+  name: "A project left without a board",
+  description: "",
+  status: "active",
+  programme_id: "prog-1",
+  project_type_code: "delivery",
+  phase_code: null,
+  owner_user_id: null,
+  repo_url: null,
+  meta: {
+    track: "v2",
+    measured_status: "proposed",
+    tranche: 9,
+    expected_outputs: ["project-brief", "inception-analysis", "architecture-design"],
+    closure_outputs: ["evidence", "closure-review"],
+  },
   version: 1,
 };
 
 function freshState() {
   return {
     project: JSON.parse(JSON.stringify(PROJECT)),
+    noBoard: JSON.parse(JSON.stringify(NOBOARD)),
     documents: [],
     repositories: [],
     publish: null,
@@ -117,6 +150,7 @@ function freshState() {
     requests: [],
     listBodies: [],
     planPatches: [],
+    createPatches: [],
     failProjects: 0,
     failMove: 0,
     failDocument: 0,
@@ -287,6 +321,14 @@ function startServer({ config, state, snapshot }) {
           "documents.update",
           "documents.download",
           "documents.delete",
+          "documents.create",
+          "documents.publish",
+          "documents.request_publish",
+          "documents.preview",
+          "documents.return",
+          "documents.revision_list",
+          "documents.revision_get",
+          "documents.revision_restore",
           "projects.create",
           "projects.close",
           "projects.update",
@@ -312,10 +354,14 @@ function startServer({ config, state, snapshot }) {
       }
       if (pathname === "/api/projects" && req.method === "GET") {
         if (state.failProjects) return json(res, state.failProjects, { title: "Unauthorized", detail: "authentication required" });
-        return json(res, 200, { items: [state.project], next_cursor: null });
+        return json(res, 200, { items: [state.project, state.noBoard], next_cursor: null });
       }
       if (pathname === "/api/projects/p-s02" && req.method === "GET") {
         return json(res, 200, { project: state.project, boards: [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }] });
+      }
+      if (pathname === "/api/projects/p-noboard" && req.method === "GET") {
+        // No board: a real state, not a read failure.
+        return json(res, 200, { project: state.noBoard, boards: [] });
       }
       if (pathname === "/api/boards/b-s02" && req.method === "GET") {
         return json(res, 200, boardView());
@@ -554,22 +600,32 @@ function startServer({ config, state, snapshot }) {
         return readBody(req, (body) => {
           try {
             const input = body.input || {};
-            if (input.id !== "p-s02") {
-              // The create-time plan patch: `projects.create` has no meta, so the console
-              // follows it with a plan update. No If-Match — the row was just created.
-              assert.equal(req.headers["if-match"], undefined, "the create-time plan patch has no If-Match");
+            const target =
+              input.id === "p-s02"
+                ? state.project
+                : input.id === "p-noboard"
+                  ? state.noBoard
+                  : null;
+            if (!target) {
+              // The create-time class/plan patch: `projects.create` has no meta, so the console
+              // follows it with one update. No If-Match — the row was just created.
+              assert.equal(req.headers["if-match"], undefined, "the create-time patch has no If-Match");
               state.planPatches.push(input.meta && input.meta.plan);
+              state.createPatches.push(input.meta || {});
               return json(res, 200, { project: { id: input.id, version: 2 } });
             }
-            assert.equal(req.headers["if-match"], `"${state.project.version}"`, "projects.update carries If-Match");
+            assert.equal(req.headers["if-match"], `"${target.version}"`, "projects.update carries If-Match");
             for (const key of ["name", "description", "status", "repo_url"]) {
-              if (input[key] !== undefined) state.project[key] = input[key];
+              if (input[key] !== undefined) target[key] = input[key];
             }
-            if (input.meta) state.project.meta = Object.assign({}, state.project.meta, input.meta);
-            state.project.version += 1;
+            if (input.meta) target.meta = Object.assign({}, target.meta, input.meta);
+            target.version += 1;
             json(res, 200, {
-              project: state.project,
-              boards: [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }],
+              project: target,
+              boards:
+                input.id === "p-s02"
+                  ? [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }]
+                  : [],
             });
           } catch (error) {
             console.error("stub projects.update:", error);
@@ -581,17 +637,25 @@ function startServer({ config, state, snapshot }) {
       if (pathname === "/api/actions/documents.list/invocations") {
         return readBody(req, (body) => {
           const scoped = body.input.project_id;
+          const parent = body.input.parent_document_id;
           assert.ok(
-            scoped === undefined || scoped === "p-s02",
+            scoped === undefined || ["p-s02", "p-noboard"].includes(scoped),
             "documents.list is project-scoped or the cross-project register",
           );
-          state.listBodies.push(scoped === undefined ? "register" : scoped);
-          const items = state.documents.map((doc) => {
-            const summary = Object.assign({}, doc);
-            delete summary.body;
-            return summary;
-          });
-          json(res, 200, { items, next_cursor: null });
+          if (parent === undefined) {
+            state.listBodies.push(scoped === undefined ? "register" : scoped);
+          }
+          const requested = body.input.publish_requested;
+          const items = state.documents
+            .filter((doc) => (parent === undefined ? doc.kind !== "attachment" : doc.parent_document_id === parent))
+            .filter((doc) => (scoped === undefined ? true : doc.project_id === scoped))
+            .filter((doc) => (requested === undefined ? true : !!doc.publish_requested_at))
+            .map((doc) => {
+              const summary = Object.assign({}, doc);
+              delete summary.body;
+              return summary;
+            });
+          json(res, 200, { output: { items, next_cursor: null } });
         });
         return;
       }
@@ -600,10 +664,12 @@ function startServer({ config, state, snapshot }) {
           const input = body.input || {};
           assert.equal(input.project_id, "p-s02", "documents.compose is scoped to the project");
           assert.ok(input.title && input.body, "documents.compose sends a title and a body");
+          state.lastCompose = input;
           const doc = {
             id: `d-${state.documents.length + 1}`,
             project_id: input.project_id,
             card_id: input.card_id || null,
+            parent_document_id: null,
             kind: "document",
             title: input.title,
             status: "active",
@@ -613,6 +679,16 @@ function startServer({ config, state, snapshot }) {
             body: input.body,
             external_ref: null,
             meta: input.meta || {},
+            category: input.category || null,
+            unit: input.unit || null,
+            created_by: "u-1",
+            created_by_name: "Test Operator",
+            updated_by: "u-1",
+            updated_by_name: "Test Operator",
+            published_at: null,
+            published_by: null,
+            published_by_name: null,
+            publish_requested_at: null,
             publishable: !!input.publishable,
             version: 1,
             created_at: "2026-11-13T00:00:00Z",
@@ -623,10 +699,177 @@ function startServer({ config, state, snapshot }) {
         });
         return;
       }
+      if (pathname === "/api/actions/documents.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.ok(input.parent_document_id, "an attachment names its parent output");
+          assert.ok(input.content_base64, "an attachment carries its bytes");
+          const attachment = {
+            id: `a-${state.documents.length + 1}`,
+            project_id: "p-s02",
+            card_id: null,
+            parent_document_id: input.parent_document_id,
+            kind: "attachment",
+            title: input.title,
+            status: "active",
+            content_type: input.content_type,
+            size_bytes: 8,
+            content_hash: "b".repeat(64),
+            body: null,
+            external_ref: null,
+            meta: { content_type: input.content_type, size_bytes: 8 },
+            category: null,
+            unit: null,
+            created_by: "u-1",
+            created_by_name: "Test Operator",
+            publishable: false,
+            version: 1,
+            created_at: "2026-11-13T00:00:00Z",
+            updated_at: "2026-11-13T00:00:00Z",
+          };
+          state.documents.push(attachment);
+          json(res, 201, attachment);
+        });
+        return;
+      }
       if (pathname === "/api/actions/documents.get/invocations") {
         return readBody(req, (body) => {
           const doc = state.documents.find((row) => row.id === body.input.id);
           if (!doc) return json(res, 404, { title: "Not Found", detail: "no such document" });
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.publish/invocations") {
+        return readBody(req, (body) => {
+          if (state.failPublishIncomplete && body.input.publish) {
+            state.failPublishIncomplete = false;
+            return json(res, 409, {
+              title: "Conflict",
+              code: "output_incomplete",
+              detail: "the output is missing required sections: Boundary, Who it serves",
+              errors: [
+                { field: "body", code: "output_incomplete", detail: "missing required section: Boundary" },
+                { field: "body", code: "output_incomplete", detail: "missing required section: Who it serves" },
+              ],
+            });
+          }
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.publish names a real document");
+          assert.equal(req.headers["if-match"], `"${doc.version}"`, "documents.publish carries If-Match");
+          doc.publishable = !!body.input.publish;
+          doc.published_at = doc.publishable ? "2026-11-13T00:00:00Z" : null;
+          doc.published_by = doc.publishable ? "u-1" : null;
+          doc.published_by_name = doc.publishable ? "Test Operator" : null;
+          doc.publish_requested_at = null;
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.request_publish/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.request_publish names a real document");
+          assert.equal(
+            req.headers["if-match"],
+            `"${doc.version}"`,
+            "documents.request_publish carries If-Match",
+          );
+          doc.publish_requested_at = "2026-11-13T00:00:00Z";
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.return/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.return names a real document");
+          assert.equal(req.headers["if-match"], `"${doc.version}"`, "documents.return carries If-Match");
+          assert.ok(
+            typeof body.input.note === "string" && body.input.note.trim(),
+            "documents.return carries the note",
+          );
+          if (!doc.publish_requested_at) {
+            return json(res, 409, {
+              title: "Conflict",
+              code: "not_requested",
+              detail: "no publish request is open on this output",
+            });
+          }
+          doc.publish_requested_at = null;
+          doc.meta = Object.assign({}, doc.meta || {}, {
+            rework: {
+              note: body.input.note,
+              missing: ["Boundary", "Who it serves"],
+              by: "u-1",
+              at: "2026-11-17T00:00:00Z",
+              of_version: doc.version,
+            },
+          });
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.preview/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.preview names a real document");
+          json(res, 200, {
+            output: {
+              html: `<h1>${doc.title}</h1><p>preview body</p>`,
+              category: doc.category,
+              missing: ["Boundary", "Who it serves"],
+            },
+          });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.revision_list/invocations") {
+        return readBody(req, (body) => {
+          assert.ok(body.input.id, "documents.revision_list names its document");
+          json(res, 200, [
+            {
+              id: "r-1",
+              seq: 1,
+              label: "created",
+              content_hash: "c".repeat(64),
+              author_id: "u-1",
+              author: "Test Operator",
+              status: "draft",
+              created_at: "2026-11-13T00:00:00Z",
+            },
+          ]);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.revision_get/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          json(res, 200, {
+            id: "r-1",
+            seq: body.input.seq,
+            label: "created",
+            content_hash: "c".repeat(64),
+            author_id: "u-1",
+            author: "Test Operator",
+            status: "draft",
+            created_at: "2026-11-13T00:00:00Z",
+            content: { body: doc ? doc.body : "", title: doc ? doc.title : "" },
+          });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.revision_restore/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.revision_restore names a real document");
+          assert.equal(
+            req.headers["if-match"],
+            `"${doc.version}"`,
+            "documents.revision_restore carries If-Match",
+          );
+          doc.version += 1;
+          doc.publishable = false;
           json(res, 200, doc);
         });
         return;
@@ -647,7 +890,8 @@ function startServer({ config, state, snapshot }) {
             doc.body = body.input.body;
             doc.size_bytes = body.input.body.length;
           }
-          if (body.input.publishable !== undefined) doc.publishable = body.input.publishable;
+          if (body.input.category !== undefined) doc.category = body.input.category || null;
+          if (body.input.unit !== undefined) doc.unit = body.input.unit || null;
           doc.version += 1;
           json(res, 200, doc);
         });
@@ -921,16 +1165,32 @@ function readBody(req, done) {
       const portfolioText = await page.locator("#main").innerText();
       assert.match(portfolioText, /S02/, "the live portfolio renders the snapshot's project");
       assert.match(portfolioText, /Skeleton/, "the real project name renders");
+      assert.match(portfolioText, /Programme queue/, "the public queue renders");
       assert.doesNotMatch(
         portfolioText,
         /Identity & access|Citizen services/,
         "no fixture project on the live portfolio",
       );
+      await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#projects`);
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      const publicProjectText = await page.locator("#main").innerText();
+      assert.match(
+        publicProjectText,
+        /Expected outputs/,
+        "the public project shows the standard's checklist",
+      );
+      assert.doesNotMatch(
+        publicProjectText,
+        /present, private/,
+        "no private draft is public",
+      );
       await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#contribute`);
       await page.waitForSelector(".page");
       await page.waitForTimeout(200);
       const contributeText = await page.locator("#main").innerText();
-      assert.match(contributeText, /Ready to claim/, "contribute renders the ready summary");
+      assert.match(contributeText, /Marked ready/, "contribute renders the ready summary");
+      assert.match(contributeText, /verify on GitHub/, "the ready count is labelled a snapshot");
       assert.match(contributeText, /#2/, "a ready unit links its issue");
       assert.match(contributeText, /Unassigned/, "an unlinked ready unit is grouped honestly");
       assert.match(contributeText, /How a unit is claimed/, "the claim protocol renders");
@@ -1028,13 +1288,22 @@ function readBody(req, done) {
       await page.waitForSelector('[data-v2="output-new"][data-project="p-s02"]');
       await page.click('[data-v2="output-new"][data-project="p-s02"]');
       await page.waitForSelector("#output-title");
+      assert.equal(
+        await page.locator("#output-unit").inputValue(),
+        "S02",
+        "compose prefills the project key as the unit",
+      );
+      assert.equal(
+        await page.locator("#output-category").inputValue(),
+        "project-brief",
+        "compose prefills the first expected output that is not yet published",
+      );
       await page.fill("#output-title", "S02 design note");
       await page.fill("#output-body", "# Design note\n\nA decision recorded from the console.");
       await page.fill("#output-unit", "7");
-      await page.selectOption("#output-category", "analysis");
-      await page.check("#output-publishable");
+      await page.selectOption("#output-category", "project-brief");
       await page.click('[data-v2="output-save"][data-project="p-s02"]');
-      await page.waitForSelector("text=Output saved and marked public");
+      await page.waitForSelector("text=Output saved as a draft");
       assert.ok(
         consoleState.requests.some((row) => row.path === "/api/actions/documents.compose/invocations"),
         "documents.compose was sent",
@@ -1045,31 +1314,185 @@ function readBody(req, done) {
       const workspaceText = await page.locator("#main").innerText();
       assert.match(workspaceText, /Programme truth/, "the coverage panel renders");
       assert.match(workspaceText, /T1/, "the coverage row's tranche renders");
-      assert.match(workspaceText, /7 · analysis/, "the output is grouped by unit and category");
-      assert.match(workspaceText, /1\/2 published/, "one inception output is published");
-      await page.click('[data-v2="output-new-template"][data-category="analysis"]');
+      assert.match(workspaceText, /7 · project-brief/, "the output is grouped by unit and category");
+      assert.match(workspaceText, /project-brief/, "the project's expected outputs render");
+      assert.match(workspaceText, /0\/3 published/, "no expected output is published yet");
+      await page.click(
+        '[data-v2="output-new-template"][data-category="inception-analysis"]',
+      );
       await page.waitForSelector("#output-category");
       assert.equal(
         await page.locator("#output-category").inputValue(),
-        "analysis",
+        "inception-analysis",
         "the inception template pre-sets its category",
       );
       assert.match(
         await page.locator("#output-body").inputValue(),
         /Reuse sources/,
-        "the analysis template carries the reuse prompt",
+        "the inception template carries the reuse prompt",
       );
       await page.click('#dialog [data-action="close-dialog"]');
       await page.waitForFunction(() => !document.getElementById("dialog").open);
 
+      // ── the admin publish decision ──────────────────────────────────────────────────
+      await page.click('[data-v2="output-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Output published");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.publish/invocations",
+        ),
+        "documents.publish was sent",
+      );
+      assert.equal(consoleState.documents[0].publishable, true, "the publish decision crossed the wire");
+
+      // ── attachments: upload through documents.create, parent-bound ──────────────────
+      await page.click('[data-v2="output-attach"][data-id="d-1"]');
+      await page.waitForSelector("#output-attachments");
+      await page.setInputFiles('[data-v2-input="output-attachment"]', {
+        name: "evidence.png",
+        mimeType: "image/png",
+        buffer: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      });
+      await page.waitForSelector("text=Attachment uploaded");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.create/invocations",
+        ),
+        "documents.create was sent for the attachment",
+      );
+      await page.click('#dialog [data-action="close-dialog"]');
+      await page.waitForFunction(() => !document.getElementById("dialog").open);
+
+      // ── history: the revision list is read, not guessed ─────────────────────────────
+      await page.click('[data-v2="output-history"][data-id="d-1"]');
+      await page.waitForSelector("text=v1");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.revision_list/invocations",
+        ),
+        "documents.revision_list was sent",
+      );
+      await page.click('#dialog [data-action="close-dialog"]');
+      await page.waitForFunction(() => !document.getElementById("dialog").open);
+
+      // ── unpublish, then the author's publish request ────────────────────────────────
       await page.click('[data-v2="output-publish"][data-id="d-1"]');
       await page.waitForSelector("text=Output unpublished");
+      await page.waitForSelector('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.click('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Publish requested");
       assert.ok(
-        consoleState.requests.some((row) => row.path === "/api/actions/documents.update/invocations"),
-        "documents.update was sent",
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.request_publish/invocations",
+        ),
+        "documents.request_publish was sent",
       );
       assert.equal(consoleState.documents[0].publishable, false, "the publish flag crossed the wire");
-      await page.waitForSelector("text=0/2 published");
+      await page.waitForSelector("text=0/3 published");
+      assert.ok(
+        !consoleState.requests.some((row) => /publish\.(start|status)/.test(row.path)),
+        "the console never calls the removed publish.start/publish.status path",
+      );
+
+      // ── #245: completeness, preview, the blocked publish and the coach's triage ─────
+      await page.waitForSelector('[data-v2="output-edit"][data-id="d-1"]');
+      await page.click('[data-v2="output-edit"][data-id="d-1"]');
+      await page.waitForSelector("#output-completeness");
+      const completeness = await page.locator("#output-completeness").innerText();
+      assert.match(completeness, /Outcome/, "the completeness panel lists the template's headings");
+      assert.match(completeness, /○/, "an absent heading is marked missing");
+      await page.fill(
+        "#output-body",
+        "# S02 brief\n\n## Outcome\n\nO\n\n## Boundary\n\nB\n\n## Reuse sources\n\nR\n\n## Inception units\n\nI\n\n## Dependencies\n\nD\n\n## Acceptance\n\nA\n\n## Capabilities\n\nC\n\n## Plan\n\nP\n",
+      );
+      assert.match(
+        await page.locator("#output-completeness").innerText(),
+        /✓/,
+        "a present heading is marked present",
+      );
+      await page.click('[data-v2="output-preview"][data-id="d-1"]');
+      await page.waitForSelector("iframe.console-preview");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.preview/invocations",
+        ),
+        "documents.preview was sent",
+      );
+      assert.match(
+        (await page.locator("iframe.console-preview").getAttribute("srcdoc")) || "",
+        /preview body/,
+        "the preview renders the server's html",
+      );
+      await page.click('#dialog [data-action="close-dialog"]');
+      await page.waitForFunction(() => !document.getElementById("dialog").open);
+
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#outputs`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForSelector('[data-v2="request-publish"][data-id="d-1"]');
+      consoleState.failPublishIncomplete = true;
+      await page.click('[data-v2="request-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Publish blocked");
+      const blocked = await page.locator("#dialog").innerText();
+      assert.match(blocked, /Boundary/, "the 409 names a missing heading");
+      assert.equal(
+        await page.locator('#dialog [data-v2="request-return"]').count(),
+        1,
+        "the triage offers Return",
+      );
+      assert.equal(
+        await page.locator('#dialog [data-v2="request-kata"]').count(),
+        1,
+        "the triage offers a kata",
+      );
+      await page.click('#dialog [data-action="close-dialog"]');
+      await page.waitForFunction(() => !document.getElementById("dialog").open);
+
+      await page.click('[data-v2="request-return"][data-id="d-1"]');
+      await page.waitForSelector("#return-note");
+      await page.fill("#return-note", "Add the boundary and the audience.");
+      await page.click('[data-v2="return-save"][data-id="d-1"]');
+      await page.waitForSelector("text=Returned · missing");
+      const returnedDoc = consoleState.documents.find((row) => row.id === "d-1");
+      assert.equal(returnedDoc.publish_requested_at, null, "the return cleared the request");
+      assert.equal(
+        returnedDoc.meta.rework.note,
+        "Add the boundary and the audience.",
+        "the note crossed the wire",
+      );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.return/invocations",
+        ),
+        "documents.return was sent",
+      );
+
+      await page.waitForSelector('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.click('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Publish requested");
+      await page.click('[data-v2="request-kata"][data-id="d-1"]');
+      await page.waitForSelector("#kata-note");
+      await page.fill("#kata-note", "The template has no audience section.");
+      await page.click('[data-v2="kata-save"][data-id="d-1"]');
+      await page.waitForSelector("text=opened");
+      assert.equal(
+        consoleState.lastCompose && consoleState.lastCompose.category,
+        "decision",
+        "the kata is a decision",
+      );
+      assert.equal(consoleState.lastCompose.publishable, true, "the kata is published");
+      assert.equal(consoleState.lastCompose.meta.kata, true, "the kata carries its meta");
+      assert.ok(
+        consoleState.requests.filter(
+          (row) => row.path === "/api/actions/documents.return/invocations",
+        ).length >= 2,
+        "the source was returned again, linking the kata",
+      );
+      consoleState.documents = consoleState.documents.filter(
+        (row) => !(row.meta && row.meta.kata),
+      );
+      await page.waitForSelector('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.click('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Publish requested");
 
       // ── the cross-project register: unfiltered list, publish, download, delete ───────
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#outputs`);
@@ -1083,14 +1506,32 @@ function readBody(req, done) {
       assert.match(registerText, /S02 design note/, "the register lists the output");
       assert.match(registerText, /S02 · Skeleton/, "the register names the project");
       assert.match(registerText, /7/, "the register shows the unit");
-      assert.match(registerText, /analysis/, "the register shows the category");
-      await page.click('[data-v2="output-publish"][data-id="d-1"]');
-      await page.waitForSelector("text=Output marked public");
+      assert.match(registerText, /project-brief/, "the register shows the category");
+      assert.match(registerText, /Test Operator/, "the register shows the author");
+      assert.equal(
+        await page.locator('select[data-key="outputsUnit"]').count(),
+        1,
+        "the register has a unit filter",
+      );
+      await page.selectOption('select[data-key="outputsUnit"]', "7");
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("S02 design note"),
+      );
+      // The admin's review queue: the pending request is visible and actionable in one place.
+      const reviewQueueText = await page.locator("#main").innerText();
+      assert.match(reviewQueueText, /Review requests/, "the admin sees the review queue");
+      assert.equal(
+        await page.locator('[data-v2="request-publish"][data-id="d-1"]').count(),
+        1,
+        "the pending request is actionable from the queue",
+      );
+      await page.click('[data-v2="request-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Output published");
       await page.waitForSelector('a[href="docs/output-d-1.html"]');
       assert.equal(
         consoleState.documents[0].publishable,
         true,
-        "the register publishes through documents.update",
+        "the register publishes through documents.publish",
       );
       const [downloadEvent] = await Promise.all([
         page.waitForEvent("download"),
@@ -1104,22 +1545,75 @@ function readBody(req, done) {
       await page.waitForSelector('[data-v2="output-delete-confirm"]');
       await page.click('[data-v2="output-delete-confirm"]');
       await page.waitForSelector("text=Output deleted");
-      assert.equal(consoleState.documents.length, 0, "the delete crossed the wire");
+      assert.equal(
+        consoleState.documents.filter((row) => row.kind !== "attachment").length,
+        0,
+        "the delete crossed the wire",
+      );
+      // A soft-deleted row is returned by documents.list; the register must not render it.
+      consoleState.documents.push({
+        id: "d-deleted",
+        project_id: "p-s02",
+        kind: "document",
+        title: "A deleted row must not render",
+        status: "deleted",
+        category: "project-brief",
+        unit: "7",
+        publishable: false,
+        version: 1,
+        meta: {},
+        created_by_name: "Test Operator",
+      });
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#outputs`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForTimeout(400);
+      assert.ok(
+        !(await page.locator("#main").innerText()).includes("A deleted row must not render"),
+        "a soft-deleted row is hidden from the register",
+      );
 
       // ── a new project's plan reaches projects.update (create has no meta) ───────────
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#projects`);
       await page.waitForSelector('[data-v2="project-new"]');
       await page.click('[data-v2="project-new"]');
       await page.waitForSelector("#project-name");
+      // The class picker is generated from the same standard the Python gate reads.
+      const classCount = await page.evaluate(
+        () =>
+          (window.CONVEYOR_OUTPUT_STANDARD.classes || []).filter(
+            (cls) => !(cls.when || {}).key && cls.name !== "archived",
+          ).length,
+      );
+      assert.equal(
+        await page.locator("#project-class option").count(),
+        classCount + 1,
+        "the class picker follows the output standard",
+      );
       await page.fill("#project-name", "A new part of the conveyor");
       await page.fill("#project-plan", "docs/plans/slices/S00-usage-inventory.md");
+      // Fail closed: a project without a class is not created and never guessed into one.
       await page.click('[data-v2="project-create"]');
-      await page.waitForSelector("text=Project created with its plan");
+      await page.waitForSelector("text=Choose a delivery class for the project");
+      assert.equal(consoleState.createPatches.length, 0, "no class creates nothing");
+      await page.selectOption("#project-class", "v2-proposed");
+      await page.fill("#project-tranche", "4");
+      await page.click('[data-v2="project-create"]');
+      await page.waitForSelector("text=Project created · v2-proposed");
       assert.deepEqual(
         consoleState.planPatches,
         ["docs/plans/slices/S00-usage-inventory.md"],
         "the plan reaches projects.update",
       );
+      const createPatch = consoleState.createPatches.at(-1);
+      assert.deepEqual(createPatch.expected_outputs, [
+        "project-brief",
+        "inception-analysis",
+        "architecture-design",
+      ]);
+      assert.deepEqual(createPatch.closure_outputs, ["evidence", "closure-review"]);
+      assert.equal(createPatch.track, "v2", "the class facts are written");
+      assert.equal(createPatch.measured_status, "proposed");
+      assert.equal(createPatch.tranche, 4, "the tranche reaches projects.update");
 
       await page.click('[data-v2="feedback-intake"][data-issue="9"]');
       await page.waitForSelector("text=Issue #9 intaken as a card");
@@ -1127,6 +1621,39 @@ function readBody(req, done) {
         consoleState.cards.some((card) => card.meta && card.meta.issue === 9),
         "the feedback issue became a card",
       );
+
+      // ── a project without a board opens its checklist; its class can be changed ──────
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#projects`);
+      await page.waitForSelector('[data-v2-input="project-page"]');
+      await page.selectOption('[data-v2-input="project-page"]', "p-noboard");
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("No board"),
+      );
+      const noBoardText = await page.locator("#main").innerText();
+      assert.match(noBoardText, /Expected outputs/, "the checklist renders without a board");
+      assert.doesNotMatch(
+        noBoardText,
+        /Read refused · This project has no board/,
+        "a missing board is a state, not a refusal",
+      );
+      await page.click('[data-v2="project-edit"][data-id="p-noboard"]');
+      await page.waitForSelector("#project-class");
+      await page.selectOption("#project-class", "v2-built");
+      await page.fill("#project-tranche", "3");
+      await page.click('[data-v2="project-save"][data-id="p-noboard"]');
+      await page.waitForSelector("text=Project updated");
+      assert.deepEqual(
+        consoleState.noBoard.meta.expected_outputs,
+        ["project-brief", "evidence"],
+        "the class change recomputes the due-now set",
+      );
+      assert.deepEqual(consoleState.noBoard.meta.closure_outputs, ["closure-review"]);
+      assert.equal(consoleState.noBoard.meta.track, "v2");
+      assert.equal(consoleState.noBoard.meta.measured_status, "built");
+      assert.equal(consoleState.noBoard.meta.tranche, 3);
+      // Back to the board-bearing project for the execution-room section below.
+      await page.selectOption('[data-v2-input="project-page"]', "p-s02");
+      await page.waitForSelector('[data-v2="run-start"][data-id="c-2"]');
 
       // The pack-PR publish path is gone from the programme workspace: publishing is the
       // output's own `publishable` flag (the toggle asserted above).
@@ -1205,6 +1732,13 @@ function readBody(req, done) {
         /Identity & access|Citizen services/,
         "no fixture project is rendered signed in",
       );
+      await page.click('[data-v2="tab"][data-key="portfolio"][data-value="Programme"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Programme queue"),
+      );
+      const queueText = await page.locator("#main").innerText();
+      assert.match(queueText, /Programme queue/, "the programme queue renders");
+      assert.match(queueText, /outputs due/, "the queue counts the due outputs");
 
       // back to the Plan board for the 412/401 honesty checks
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#plan`);

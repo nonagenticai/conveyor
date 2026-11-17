@@ -21,21 +21,62 @@ use std::sync::LazyLock;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
+use base64::Engine as _;
 use conveyor_auth::{Role, ScopePolicy};
 use conveyor_domain::{Id, TenantId};
 use conveyor_store as store;
 use conveyor_store::audit::{self, AuditEntry};
 use conveyor_store::idempotency::{self, Lookup};
+use rust_decimal::Decimal;
 use serde_json::Value;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::registry::Registry;
-use crate::spec::{ActionKind, FieldError, HandlerRef, validate_input};
+use crate::spec::{ActionKind, Effect, FieldError, HandlerRef, Tenancy, validate_input};
 use crate::views::InvocationResponse;
 
 /// The invocation depth at which a call chain is refused (S04 trap 6).
 pub const MAX_DEPTH: u32 = 8;
+
+/// The caller's tenant on the wire to an external service that declares `Tenancy::Tenant`.
+///
+/// The coding service resolves a job by this header; without it every job lands in the service's
+/// default tenant instead of the caller's.
+pub const TENANT_HEADER: &str = "X-Tenant-Id";
+
+/// The acting principal on the wire to a billable model call.
+///
+/// The inference-router records a cost event's `actor_id` from this header, falling back to its
+/// own `SERVICE_ACTOR_ID` when it is absent (#235). Billing's actor axis counts an event as
+/// attributed only when the field is non-null, so a caller that omits the human it is acting for
+/// bills a model call to no one.
+pub const ACTOR_HEADER: &str = "X-Actor-Id";
+
+/// The tenant-level project id on the wire to a billable model call.
+///
+/// The inference-router stores it as the cost event's `project_id`. Billing's owner ruling
+/// (2026-10-07) defines this value for an app with no fr project concept: the tenant uuid with
+/// its 32 hex characters reversed. Billing keeps it without an fr ownership lookup, and it is
+/// deliberately NOT the tenant id — `project_id == tenant_id` stays a forged-project signal.
+pub const PROJECT_HEADER: &str = "X-Project-Id";
+
+/// The project id a project-less app sends for a tenant's own spend (billing owner ruling,
+/// 2026-10-07).
+///
+/// The tenant uuid's 32 lowercase hex characters are reversed and re-formatted `8-4-4-4-12`. An
+/// involution — applying it twice returns the input — which is what lets billing map an asserted
+/// tenant-level project id back to the one tenant it belongs to without a lookup table.
+///
+/// Fixed vector, from the billing implementation's docstring (a cross-service contract; the two
+/// must agree byte for byte): `0195f48b-d000-7000-8000-000000000100` ->
+/// `00100000-0000-0008-0007-000db84f5910`.
+pub fn tenant_level_project_id(tenant: TenantId) -> Uuid {
+    let hex = tenant.as_uuid().simple().to_string();
+    let reversed: String = hex.chars().rev().collect();
+    // 32 lowercase hex characters are a valid simple uuid, so this cannot fail for a TenantId.
+    Uuid::parse_str(&reversed).expect("32 hex characters form a uuid")
+}
 
 /// The circuit breaker's failure count inside its window.
 pub const BREAKER_THRESHOLD: usize = 5;
@@ -169,6 +210,10 @@ struct CaptureRow {
     served_model: Option<String>,
     usage: Option<conveyor_domain::inference::Usage>,
     cache_status: &'static str,
+    /// The commercial unit for a non-token surface, and its measured count. Both are `None` for a
+    /// token call; a media call with no measurable unit is unpriced, never $0.
+    usage_unit: Option<&'static str>,
+    usage_units: Option<Decimal>,
     latency_ms: i32,
 }
 
@@ -572,6 +617,35 @@ pub fn service_url(service: &str) -> Option<String> {
         .filter(|value| !value.trim().is_empty())
 }
 
+/// The destination a tenant registered for `service`, or `None` when it registered none.
+///
+/// The tenant's own row wins over the platform environment: the credential was already
+/// per-tenant while the destination was process-global, and #160 removes that asymmetry. Only the
+/// inference service has tenant-scoped destinations today; every other external action keeps the
+/// environment-only resolution. A store error is logged and treated as "not registered", so a
+/// config-read failure cannot take the platform default away with it.
+async fn tenant_service_url(pool: &PgPool, tenant: TenantId, service: &str) -> Option<String> {
+    if service != crate::integrations::inference::SERVICE {
+        return None;
+    }
+    let mut tx = match store::begin_scoped(pool, tenant).await {
+        Ok(tx) => tx,
+        Err(error) => {
+            tracing::warn!(%error, service, "scope the tenant inference endpoint read");
+            return None;
+        }
+    };
+    let registered = store::tenant_inference::destination(&mut tx, tenant).await;
+    let _ = tx.rollback().await;
+    match registered {
+        Ok(value) => value,
+        Err(error) => {
+            tracing::warn!(%error, service, "read the tenant inference endpoint");
+            None
+        }
+    }
+}
+
 /// The bearer a sealed secret carries.
 ///
 /// A tenant's BYO credential is stored raw; a token written from the licences API is the JSON
@@ -600,6 +674,67 @@ fn bearer_from_secret(bytes: Vec<u8>) -> Option<String> {
 }
 
 // ── the engine ──────────────────────────────────────────────────────────────────────────
+
+/// The ceiling a job binding declares for itself, if any.
+///
+/// A binding's `meta` carries `limits.effect_ceiling` (or a top-level `effect_ceiling`). Absent
+/// means "no narrower ceiling than the action's own". An **unrecognised** value is an error, not
+/// an unlimited ceiling: a typo in a binding must never widen what a job can do.
+pub fn binding_ceiling(meta: &Value) -> Result<Option<Effect>, ActionError> {
+    let raw = meta
+        .get("limits")
+        .and_then(|limits| limits.get("effect_ceiling"))
+        .or_else(|| meta.get("effect_ceiling"));
+    let Some(raw) = raw else {
+        return Ok(None);
+    };
+    let Some(text) = raw.as_str() else {
+        return Err(ActionError::new(
+            400,
+            "bad_binding",
+            "a binding's effect_ceiling must be a string",
+        ));
+    };
+    Effect::parse(text).map(Some).ok_or_else(|| {
+        ActionError::new(
+            400,
+            "bad_binding",
+            format!("effect_ceiling {text:?} is not read, write or destructive"),
+        )
+    })
+}
+
+/// Invoke through a job binding: the action's effect may not exceed what the binding allows.
+///
+/// This is the entry a bound caller (a job, a procedure step, the broker) uses. The check runs
+/// before the action's input is validated and before any handler or database work, so a call that
+/// the binding does not permit has no backend effect at all — the error is the only trace.
+pub async fn invoke_bound(
+    pool: &PgPool,
+    registry: &Registry,
+    tenant: TenantId,
+    binding_meta: &Value,
+    request: InvokeRequest,
+) -> Result<InvokeOutcome, ActionError> {
+    let Some(spec) = registry.get(&request.action) else {
+        return Err(ActionError::not_found(&request.action));
+    };
+    if let Some(ceiling) = binding_ceiling(binding_meta)?
+        && spec.effect.rank() > ceiling.rank()
+    {
+        return Err(ActionError::new(
+            403,
+            "effect_ceiling",
+            format!(
+                "{} is a {} action and this binding allows at most {}",
+                spec.name,
+                spec.effect.as_str(),
+                ceiling.as_str()
+            ),
+        ));
+    }
+    invoke(pool, registry, tenant, request).await
+}
 
 /// Invoke one action.
 pub async fn invoke(
@@ -839,6 +974,45 @@ async fn invoke_internal(
     }
 }
 
+/// The three non-token surfaces, keyed by the handler's service. Any other external (the router)
+/// returns `None` and keeps the token identity.
+fn media_surface(service: &str) -> Option<(&'static str, &'static str)> {
+    match service {
+        crate::integrations::imagegen::SERVICE => {
+            Some((crate::integrations::imagegen::SERVICE, "image"))
+        }
+        crate::integrations::audio::SPEECH_SERVICE => {
+            Some((crate::integrations::audio::SPEECH_SERVICE, "character"))
+        }
+        crate::integrations::audio::TRANSCRIBE_SERVICE => {
+            Some((crate::integrations::audio::TRANSCRIBE_SERVICE, "second"))
+        }
+        _ => None,
+    }
+}
+
+/// The unit count a media request and response measure. A unit the surface cannot report is
+/// `None`, which the report counts as unpriced rather than $0.
+fn media_units(
+    surface: &str,
+    input: &Value,
+    output: &Value,
+    upload_seconds: Option<Decimal>,
+) -> Option<Decimal> {
+    match surface {
+        crate::integrations::imagegen::SERVICE => output
+            .get("data")
+            .and_then(Value::as_array)
+            .map(|data| Decimal::from(data.len() as u64)),
+        crate::integrations::audio::SPEECH_SERVICE => input
+            .get("text")
+            .and_then(Value::as_str)
+            .map(|text| Decimal::from(text.chars().count() as u64)),
+        crate::integrations::audio::TRANSCRIBE_SERVICE => upload_seconds,
+        _ => None,
+    }
+}
+
 async fn invoke_external(
     pool: &PgPool,
     spec: &crate::spec::ActionSpec,
@@ -853,6 +1027,7 @@ async fn invoke_external(
         path,
         auth,
         auth_optional,
+        upload,
     } = spec.handler
     else {
         return Err(ActionError::internal());
@@ -918,7 +1093,11 @@ async fn invoke_external(
         return Err(ActionError::circuit_open(spec.name));
     }
 
-    let Some(base) = service_url(service) else {
+    let base = match tenant_service_url(pool, ctx.tenant, service).await {
+        Some(url) => Some(url),
+        None => service_url(service),
+    };
+    let Some(base) = base else {
         let elapsed = started.elapsed().as_millis() as i32;
         record_failure(
             pool,
@@ -982,18 +1161,85 @@ async fn invoke_external(
         .usage
         .as_ref()
         .and_then(|usage| usage.correlation_id.clone());
-    let mut builder = match method {
-        "POST" => client.post(&url).json(&input),
-        "PUT" => client.put(&url).json(&input),
-        "PATCH" => client.patch(&url).json(&input),
-        "DELETE" => client.delete(&url).json(&input),
-        _ => client.get(&url),
+    // The transcription host answers only text, so the uploaded WAV's own duration is the only
+    // length the ledger can price. Measured before the bytes are moved into the multipart part.
+    let mut upload_units: Option<Decimal> = None;
+    let mut builder = match upload {
+        Some(upload) => {
+            // One document's bytes, fetched under the caller's tenant and hash-verified by the
+            // same `fetch_bytes` a documents byte route uses. The document id never reaches the
+            // service and no store credential leaves this process.
+            let loaded = {
+                let member = input
+                    .get(upload.input)
+                    .and_then(Value::as_str)
+                    .ok_or_else(|| {
+                        ActionError::invalid_input(vec![FieldError {
+                            field: upload.input.to_owned(),
+                            code: "required".to_owned(),
+                            detail: "the document to upload is required".to_owned(),
+                        }])
+                    })?;
+                let id: Uuid = member.parse().map_err(|_| {
+                    ActionError::invalid_input(vec![FieldError {
+                        field: upload.input.to_owned(),
+                        code: "invalid_value".to_owned(),
+                        detail: "the document to upload must be a document id".to_owned(),
+                    }])
+                })?;
+                let mut tx = store::begin_scoped(pool, ctx.tenant)
+                    .await
+                    .map_err(|_| ActionError::internal())?;
+                let loaded =
+                    crate::documents::actions::fetch_bytes(&mut tx, ctx.tenant, id, spec.name)
+                        .await?;
+                let _ = tx.rollback().await;
+                loaded
+            };
+            upload_units = crate::integrations::audio::wav_duration_secs(&loaded.bytes);
+            let part = reqwest::multipart::Part::bytes(loaded.bytes)
+                .file_name("upload")
+                .mime_str(&loaded.content_type)
+                .map_err(|_| ActionError::internal())?;
+            let form = reqwest::multipart::Form::new().part(upload.field.to_owned(), part);
+            client.post(&url).multipart(form)
+        }
+        None => match method {
+            "POST" => client.post(&url).json(&input),
+            "PUT" => client.put(&url).json(&input),
+            "PATCH" => client.patch(&url).json(&input),
+            "DELETE" => client.delete(&url).json(&input),
+            _ => client.get(&url),
+        },
     };
     if let Some(correlation) = &correlation {
         builder = builder.header("X-Correlation-Id", correlation);
     }
+    // The caller's tenant, for the external actions that scope themselves to it (every current
+    // one). `ctx` is Copy and is not consumed until the failure recorder below.
+    if spec.tenancy == Tenancy::Tenant {
+        builder = builder.header(TENANT_HEADER, ctx.tenant.to_string());
+        // Model calls also carry the attribution identity. Without the actor the router books
+        // the cost event with no actor at all (its fallback is the router's own service
+        // account); without the project it books no project, which is exactly what the two
+        // `service_key=inference-router` coverage floors fire on. The project value is the
+        // tenant-level id the billing owner ruling defines for an app with no fr project.
+        if spec.captures_usage {
+            builder = builder.header(ACTOR_HEADER, ctx.actor_id.to_string());
+            builder = builder.header(
+                PROJECT_HEADER,
+                tenant_level_project_id(ctx.tenant).to_string(),
+            );
+        }
+    }
     if let Some(token) = &bearer {
         builder = builder.bearer_auth(token);
+    }
+    // A declared artefact carries its payload inside the JSON response (CONTRACT §6), so ask for
+    // JSON explicitly instead of relying on the service's default. It matters: the narration
+    // contract answers raw `audio/wav` unless `Accept` names JSON.
+    if spec.artefact.is_some() {
+        builder = builder.header(reqwest::header::ACCEPT, "application/json");
     }
 
     let result = tokio::time::timeout(
@@ -1068,8 +1314,18 @@ async fn invoke_external(
     };
     breaker_record_success(ctx.tenant, spec.name);
 
+    // S09 §5.2: a declared artefact is written HERE, in the engine, not by a handler — the same rule
+    // the ledger row follows one block below. The external call already happened, so the fact it
+    // produced is committed in its own transaction; a failure is a real failure of the action's
+    // contract (it promised a document) and is recorded as such.
+    let output = match spec.artefact {
+        Some(artefact) => materialise_artefact(pool, spec, &ctx, artefact, output).await?,
+        None => output,
+    };
+
     // S16: one ledger row for a successful model call. The engine owns the response and this
     // transaction; a handler-side writer would be a second path for the same fact.
+    let media = media_surface(service);
     let capture = request
         .usage
         .as_ref()
@@ -1078,6 +1334,7 @@ async fn invoke_external(
             let captured = conveyor_domain::inference::capture(
                 request.input.get("model").and_then(Value::as_str),
                 &output,
+                media.map(|(surface, _)| surface),
             );
             CaptureRow {
                 caller_kind: usage.caller_kind,
@@ -1096,6 +1353,10 @@ async fn invoke_external(
                 served_model: captured.served_model,
                 usage: captured.usage,
                 cache_status: captured.cache_status.as_str(),
+                usage_unit: media.map(|(_, unit)| unit),
+                usage_units: media.and_then(|(surface, _)| {
+                    media_units(surface, &request.input, &output, upload_units)
+                }),
                 latency_ms: elapsed,
             }
         });
@@ -1137,6 +1398,84 @@ async fn invoke_external(
         replayed: false,
         invocation_id: Some(invocation_id),
     })
+}
+
+/// Write an external action's declared artefact as a tenant document (S09 §5.2).
+///
+/// The bytes travel base64 inside the service's JSON response (CONTRACT §6). This decodes the
+/// declared member, stores it through the ONE document writer — the same validation, ordering and
+/// caps `documents.create` uses — and adds a `document` member to the response the caller receives,
+/// so the artefact is addressable without a second lookup.
+///
+/// A response that does not carry the declared member is a `502`: the service answered, but not with
+/// what the action's contract says it produces.
+async fn materialise_artefact(
+    pool: &PgPool,
+    spec: &crate::spec::ActionSpec,
+    ctx: &HandlerCtx,
+    artefact: crate::spec::Artefact,
+    mut output: Value,
+) -> Result<Value, ActionError> {
+    let pointer: String = artefact
+        .field
+        .split('.')
+        .map(|segment| format!("/{segment}"))
+        .collect();
+    let encoded = output
+        .pointer(&pointer)
+        .and_then(Value::as_str)
+        .ok_or_else(|| {
+            ActionError::new(
+                502,
+                "artefact_missing",
+                format!("the response carried no {} member", artefact.field),
+            )
+        })?;
+    let bytes = match artefact.encoding {
+        crate::spec::ArtefactEncoding::Base64 => base64::engine::general_purpose::STANDARD
+            .decode(encoded.trim())
+            .map_err(|_| {
+                ActionError::new(
+                    502,
+                    "artefact_invalid",
+                    format!("the {} member is not base64", artefact.field),
+                )
+            })?,
+        crate::spec::ArtefactEncoding::Utf8 => encoded.as_bytes().to_vec(),
+    };
+
+    let mut tx = store::begin_scoped(pool, ctx.tenant)
+        .await
+        .map_err(|_| ActionError::internal())?;
+    store::actions::set_statement_timeout(&mut tx, BOOKKEEPING_TIMEOUT_MS)
+        .await
+        .map_err(|_| ActionError::internal())?;
+    let (document, _version) = crate::documents::actions::create_from_bytes(
+        &mut tx,
+        ctx,
+        crate::documents::actions::NewBytesDocument {
+            action: spec.name,
+            title: artefact.title,
+            content_type: artefact.content_type,
+            kind: "document",
+            project_id: None,
+            parent_document_id: None,
+            category: None,
+            unit: None,
+            meta: None,
+        },
+        bytes,
+    )
+    .await?;
+    tx.commit().await.map_err(|_| ActionError::internal())?;
+
+    if let Value::Object(map) = &mut output {
+        map.insert(
+            "document".to_owned(),
+            serde_json::to_value(&document).map_err(ActionError::serialize)?,
+        );
+    }
+    Ok(output)
 }
 
 /// Write `action_invocation`, `audit_event` and the idempotency response in the caller's
@@ -1225,6 +1564,8 @@ async fn record_bookkeeping(
             served_model: capture.served_model.as_deref(),
             usage: capture.usage,
             cache_status: capture.cache_status,
+            usage_unit: capture.usage_unit,
+            usage_units: capture.usage_units,
             latency_ms: capture.latency_ms,
             outcome: "ok",
         };
@@ -1335,6 +1676,27 @@ mod tests {
     /// A fresh tenant id for a breaker test; nil is refused by the domain type.
     fn a_tenant() -> TenantId {
         TenantId::from_uuid(Uuid::now_v7()).expect("non-nil")
+    }
+
+    #[test]
+    fn the_tenant_level_project_id_matches_the_billing_contract_and_is_an_involution() {
+        let tenant = TenantId::parse("0195f48b-d000-7000-8000-000000000100").expect("uuid");
+        let project = tenant_level_project_id(tenant);
+        assert_eq!(
+            project.to_string(),
+            "00100000-0000-0008-0007-000db84f5910",
+            "the billing owner ruling's fixed vector"
+        );
+        assert_eq!(
+            tenant_level_project_id(TenantId::from_uuid(project).expect("non-nil")),
+            tenant.as_uuid(),
+            "the transform is an involution, so billing can map it back without a lookup"
+        );
+        assert_ne!(
+            project,
+            tenant.as_uuid(),
+            "the tenant-level project must never equal the tenant id"
+        );
     }
 
     #[test]

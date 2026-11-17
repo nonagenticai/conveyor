@@ -660,7 +660,7 @@ async fn approval_list_projects_who_decided_and_through_which_channel() {
     let (status, body) = running
         .invoke(
             "approvals.request",
-            TOKEN,
+            support::REVIEWER,
             json!({"card_id": card, "gate": "signoff", "kind": "process"}),
             None,
             None,

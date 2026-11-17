@@ -765,6 +765,25 @@ pub async fn get_approval_tx(
     row.map(ApprovalRecordRow::into_record).transpose()
 }
 
+/// The `meta` document of one approval row, exactly as written at request time.
+///
+/// The read projection (`get_approval_tx`) carries the gate's state, not its free-form meta;
+/// a destructive action needs `meta.target` — the exact thing the gate authorises — so this is
+/// a second, narrow read rather than widening a projection seven call sites construct.
+pub async fn approval_meta_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    approval_id: Uuid,
+) -> Result<Option<Value>, ApprovalStoreError> {
+    let row: Option<(Value,)> =
+        sqlx::query_as("SELECT meta FROM approval WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(approval_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    Ok(row.map(|(meta,)| meta))
+}
+
 /// Record one decision and apply it to the gate, in the caller's transaction.
 ///
 /// Order is deliberate: lock the gate, count the approvals that came before, ask the domain
@@ -786,6 +805,20 @@ pub async fn record_decision_tx(
         .fetch_optional(&mut *conn)
         .await?;
     let row = row.ok_or(ApprovalStoreError::NotFound)?;
+    // T1 P1.3 / SPEC_V2 §5.4: the requester cannot decide the gate that judges their own work.
+    // This is the one writer every decision path traverses, so the exclusion lives here rather
+    // than in a UI or in `approvals.decide` alone.
+    let requested_by: Option<Uuid> =
+        sqlx::query_scalar("SELECT requested_by FROM approval WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(approval_id)
+            .fetch_one(&mut *conn)
+            .await?;
+    if requested_by == Some(decision.approver_id) {
+        return Err(ApprovalStoreError::Illegal(
+            ApprovalError::RequesterCannotDecide,
+        ));
+    }
     // W1 (S06d): an eval gate is a person's act, and only a person holding `evals:approve` may
     // decide it. This check lives HERE — the one writer every decision path traverses — so
     // `approvals.decide`, `eval_signoffs.decide`, MCP `tasks/update` and a connector reply

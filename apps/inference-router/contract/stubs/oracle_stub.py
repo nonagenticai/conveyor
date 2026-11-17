@@ -69,8 +69,32 @@ SUBJECTS = {DELEGATED_TOKEN: DELEGATING_SUBJECT}
 USAGE = {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
 CONTENT = "stub completion"
 
+# The two empty-completion classes the reference tells apart, produced on demand so the contract
+# capture can record the reference's OWN answer to each. Keyed on the PROMPT, not on a new
+# catalog model: a model or alias would add a row to the `models` and `provider_models` goldens,
+# and the catalog must stay byte-stable for every existing case.
+BLANK_PROMPT = "__stub_blank__"
+EMPTY_RESULT_PROMPT = "__stub_empty_result__"
+
+
+def last_user_content(request: dict) -> str:
+    """The prompt the router forwarded. Messages pass through verbatim."""
+    for message in reversed(request.get("messages") or []):
+        if isinstance(message, dict) and message.get("role") == "user":
+            content = message.get("content")
+            return content if isinstance(content, str) else ""
+    return ""
+
 
 def completion(request: dict) -> dict:
+    content = CONTENT
+    prompt = last_user_content(request)
+    if prompt == BLANK_PROMPT:
+        # A 2xx with no bytes: the reference retries it once and refuses a second blank.
+        content = ""
+    elif prompt == EMPTY_RESULT_PROMPT:
+        # Schema-valid but vacuous: empty_result, served and never retried.
+        content = "{}"
     return {
         "id": "chatcmpl-stub",
         "object": "chat.completion",
@@ -79,7 +103,7 @@ def completion(request: dict) -> dict:
         "choices": [
             {
                 "index": 0,
-                "message": {"role": "assistant", "content": CONTENT},
+                "message": {"role": "assistant", "content": content},
                 "finish_reason": "stop",
             }
         ],

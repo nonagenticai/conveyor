@@ -80,6 +80,8 @@ enum LivePath {
     Outputs,
     /// `/design/docs/output-<uuid>.html`
     Page(Uuid),
+    /// `/design/docs/attachment-<uuid>`
+    Attachment(Uuid),
     /// The output-page shape with an id that does not parse. It is a live path, so it must answer
     /// `404 no-store` rather than fall through to the static 404.
     Malformed,
@@ -90,6 +92,9 @@ fn live_path(path: &str) -> Option<LivePath> {
         "/design/data/snapshot.js" => return Some(LivePath::Snapshot),
         "/design/docs/outputs.js" => return Some(LivePath::Outputs),
         _ => {}
+    }
+    if let Some(id) = path.strip_prefix("/design/docs/attachment-") {
+        return Some(Uuid::parse_str(id).map_or(LivePath::Malformed, LivePath::Attachment));
     }
     let id = path
         .strip_prefix("/design/docs/output-")?
@@ -122,6 +127,11 @@ async fn answer(state: &AppState, live: LivePath, head: bool, headers: &HeaderMa
     if matches!(live, LivePath::Malformed) {
         return miss(StatusCode::NOT_FOUND, "no such output");
     }
+    // An attachment's bytes live in the object store, not in the cached site view: one read of the
+    // row, one storage read, and the same ETag/`no-store` discipline as the other live paths.
+    if let LivePath::Attachment(id) = live {
+        return answer_attachment(state, slug, id, head, headers).await;
+    }
 
     let (view, stale) = match build_or_cached(state, slug).await {
         Ok(value) => value,
@@ -149,7 +159,9 @@ async fn answer(state: &AppState, live: LivePath, head: bool, headers: &HeaderMa
             Some(page) => (page.as_bytes(), "text/html; charset=utf-8"),
             None => return miss(StatusCode::NOT_FOUND, "no such output"),
         },
-        LivePath::Malformed => unreachable!("malformed paths answer before the build"),
+        LivePath::Attachment(_) | LivePath::Malformed => {
+            unreachable!("attachment and malformed paths answer before the build")
+        }
     };
 
     let etag = format!("\"{}\"", sha256_hex(bytes));
@@ -237,21 +249,164 @@ fn issues_registry() -> Value {
 }
 
 fn not_modified(headers: &HeaderMap, etag: &str) -> Option<Response> {
+    not_modified_with(headers, etag, HIT_CACHE)
+}
+
+fn not_modified_with(headers: &HeaderMap, etag: &str, cache: &'static str) -> Option<Response> {
     let candidate = headers.get(header::IF_NONE_MATCH)?.to_str().ok()?;
-    candidate
+    if !candidate
         .split(',')
-        .map(|value| value.trim())
+        .map(str::trim)
         .any(|value| value == etag || value == "*")
-        .then(|| {
-            (
-                StatusCode::NOT_MODIFIED,
-                [
-                    (header::ETAG, etag.to_owned()),
-                    (header::CACHE_CONTROL, HIT_CACHE.to_owned()),
-                ],
-            )
-                .into_response()
-        })
+    {
+        return None;
+    }
+    let mut response = StatusCode::NOT_MODIFIED.into_response();
+    let response_headers = response.headers_mut();
+    response_headers.insert(header::ETAG, HeaderValue::from_str(etag).ok()?);
+    response_headers.insert(header::CACHE_CONTROL, HeaderValue::from_static(cache));
+    Some(response)
+}
+
+/// Serve one published attachment's bytes.
+///
+/// The row is read in the public tenant and must be an active attachment whose parent is active
+/// and publishable. The bytes are re-hashed and compared with the row's hash — a mismatch is
+/// corruption, never a file. Only PNG and JPEG are `inline`; PDF, SVG, JSON, CSV and text are
+/// downloads, with `nosniff` and a sandbox CSP on every response.
+async fn answer_attachment(
+    state: &AppState,
+    slug: &str,
+    id: Uuid,
+    head: bool,
+    headers: &HeaderMap,
+) -> Response {
+    let tenant = match store::tenants::id_by_slug(&state.pool, slug).await {
+        Ok(Some(tenant)) => tenant,
+        Ok(None) => return miss(StatusCode::NOT_FOUND, "no public tenant is configured"),
+        Err(error) => {
+            tracing::error!(%error, "the public tenant could not be read");
+            return problem(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "the public view is unavailable",
+            );
+        }
+    };
+    let mut tx = match store::begin_scoped_read_only(&state.pool, tenant).await {
+        Ok(tx) => tx,
+        Err(error) => {
+            tracing::error!(%error, "the attachment read could not start");
+            return problem(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "the public view is unavailable",
+            );
+        }
+    };
+    let record = match store::document::get_published_attachment_tx(&mut tx, tenant, id).await {
+        Ok(record) => record,
+        Err(error) => {
+            tracing::error!(%error, "the attachment row could not be read");
+            let _ = tx.rollback().await;
+            return problem(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "the public view is unavailable",
+            );
+        }
+    };
+    let _ = tx.rollback().await;
+    let Some(record) = record else {
+        return miss(StatusCode::NOT_FOUND, "no such attachment");
+    };
+    let (Some(key), Some(expected_hash)) =
+        (record.object_key.as_deref(), record.content_hash.as_deref())
+    else {
+        return miss(StatusCode::NOT_FOUND, "no such attachment bytes");
+    };
+    let Some(objects) = conveyor_actions::integrations::objects::Objects::from_env() else {
+        tracing::error!("the object store is not configured");
+        return problem(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "the attachment store is unavailable",
+        );
+    };
+    let bytes = match objects.get(key).await {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            tracing::error!(%error, %id, "an attachment object could not be read");
+            return problem(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "the attachment could not be read",
+            );
+        }
+    };
+    if sha256_hex(&bytes) != expected_hash {
+        tracing::error!(%id, "an attachment's bytes do not match its recorded hash");
+        return problem(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "the attachment failed its integrity check",
+        );
+    }
+    let etag = format!("\"{expected_hash}\"");
+    if let Some(response) = not_modified_with(headers, &etag, HIT_CACHE) {
+        return response;
+    }
+    let content_type = record
+        .meta
+        .get("content_type")
+        .and_then(Value::as_str)
+        .unwrap_or("application/octet-stream");
+    let disposition = if matches!(content_type, "image/png" | "image/jpeg") {
+        format!("inline; filename=\"{}\"", safe_filename(&record.title))
+    } else {
+        format!("attachment; filename=\"{}\"", safe_filename(&record.title))
+    };
+    let mut response = StatusCode::OK.into_response();
+    let response_headers = response.headers_mut();
+    response_headers.insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_str(content_type)
+            .unwrap_or(HeaderValue::from_static("application/octet-stream")),
+    );
+    response_headers.insert(
+        header::ETAG,
+        HeaderValue::from_str(&etag).expect("a sha256 etag is a valid header value"),
+    );
+    response_headers.insert(header::CACHE_CONTROL, HeaderValue::from_static(HIT_CACHE));
+    response_headers.insert(
+        header::X_CONTENT_TYPE_OPTIONS,
+        HeaderValue::from_static("nosniff"),
+    );
+    response_headers.insert(
+        header::CONTENT_DISPOSITION,
+        HeaderValue::from_str(&disposition).expect("the filename is sanitised ASCII"),
+    );
+    response_headers.insert(
+        header::CONTENT_SECURITY_POLICY,
+        HeaderValue::from_static("default-src 'none'; sandbox"),
+    );
+    if !head {
+        *response.body_mut() = Body::from(bytes);
+    }
+    response
+}
+
+/// A file name safe for a `Content-Disposition` value: ASCII letters, digits, space, `-`, `_`, `.`;
+/// no leading dots; bounded. The attachment's title is user-controlled.
+fn safe_filename(title: &str) -> String {
+    let mut out = String::with_capacity(title.len().min(120));
+    for character in title.chars().take(120) {
+        if character.is_ascii_alphanumeric() || matches!(character, ' ' | '-' | '_' | '.') {
+            out.push(character);
+        } else {
+            out.push('_');
+        }
+    }
+    let cleaned = out.trim().trim_matches('.').trim();
+    if cleaned.is_empty() {
+        "attachment".to_owned()
+    } else {
+        cleaned.to_owned()
+    }
 }
 
 fn hit(bytes: &[u8], content_type: &str, etag: &str, head: bool, stale: bool) -> Response {

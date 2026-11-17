@@ -722,8 +722,8 @@ migrations/      one baseline + forward migrations</code></pre>
 </tr>
 <tr>
 <td>R12</td>
-<td><strong>The grading node is <code>hp1</code></strong> (owner decision 2026-11-09: a node selector plus a quota). The old harness pinned <code>worker1</code> for its 1.1–1.24 GB eval pods; worker1 was wiped 2026-11-01. <code>hp1</code> is not hp2 (CI capacity) and not mf1 (MinIO + the PG standby). The sandbox stays fail-closed (<code>503 benchmark_sandbox_not_configured</code>) until the first live run.</td>
-<td>The parser-parity check and all pure logic run without a cluster; the sandbox is fail-closed (<code>503 benchmark_sandbox_not_configured</code>). The node selector/taint is deployment config, recorded as <code>hp1</code>, never silently repointed.</td>
+<td><strong>Benchmark sandbox Jobs run on the grading node</strong> (owner decision 2026-11-09: a node selector plus a quota). The old harness pinned the retired node for its 1.1–1.24 GB eval pods; the retired node was wiped 2026-11-01. the grading node is not the CI node (CI capacity) and not the object-store host (MinIO + the PG standby). The sandbox stays fail-closed (<code>503 benchmark_sandbox_not_configured</code>) until the first live run.</td>
+<td>The parser-parity check and all pure logic run without a cluster; the sandbox is fail-closed (<code>503 benchmark_sandbox_not_configured</code>). The node selector/taint is deployment config, recorded as the grading node, never silently repointed.</td>
 </tr>
 <tr>
 <td>R13</td>

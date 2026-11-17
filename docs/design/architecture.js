@@ -347,6 +347,7 @@ window.ArchitecturePack = (function () {
   subgraph ARCH["SPEC_V2 architecture"]
     ORG["Organisation spine"]:::v2
     PLAN["Portfolio, programme and plan"]:::v2
+    ADM["Architecture capability (TOGAF ADM)"]:::v2
     RUN["Execution, run and gate"]:::v1
     DEC["Decision ladder"]:::v2
     KM["Knowledge and memory"]:::v1
@@ -358,7 +359,7 @@ window.ArchitecturePack = (function () {
   end
   subgraph UI["Studio destinations"]
     U1["Programme control and Projects"]:::ui
-    U2["Portfolio and Plan and WBS"]:::ui
+    U2["Portfolio, Programme definition and Plan and WBS"]:::ui
     U3["Execution room, Runs and Decision inbox"]:::ui
     U4["Organisation, Jobs and Agents"]:::ui
     U5["Knowledge design, Sources and Memory"]:::ui
@@ -367,11 +368,14 @@ window.ArchitecturePack = (function () {
     U8["Operations and Assurance"]:::ui
     U9["Metering and Usage and audit"]:::ui
     U10["Requirements, Principles, Models and Types"]:::ui
+    U11["Architecture capability"]:::ui
   end
   ORG --> U4
   ORG --> U10
   PLAN --> U1
   PLAN --> U2
+  ADM --> U11
+  ADM --> U10
   RUN --> U3
   DEC --> U3
   KM --> U5
@@ -474,6 +478,8 @@ window.ArchitecturePack = (function () {
   const UI_ROWS = [
     ["Programme control", "overview", "Portfolio read model · programme cadence", "§5.1, §8.2", "R"],
     ["Portfolio", "portfolio", "Computed portfolio · programme shared config · dependencies · WSJF · metering", "§5.1, §5.5, §8.2, D49", "P"],
+    ["Programme definition", "programme", "Mandate · brief · business case · benefit_profile · benefit_link · programme_tranche · benefit_transition", "§8.3, D62", "P"],
+    ["Architecture capability", "adm", "architecture_artifact (catalog | matrix | diagram) · artifact_type · adm_profile · architecture_contract · compliance review · waiver · governance_body · maturity · skills", "§8.1, D63", "P"],
     ["Projects", "projects", "Project · WBS node · work package (card)", "§5.1–§5.5", "R"],
     ["Outputs", "outputs", "Output register · unit · category · publish flag · public page", "§10.5, docs/design", "R"],
     ["Contribute", "contribute", "GitHub issue registry · ready units · claim protocol · feedback", "§10.5, 03-DELIVERY", "R"],

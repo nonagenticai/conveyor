@@ -33,6 +33,33 @@ ROOT = Path(__file__).resolve().parents[1]
 PROGRAMME_NAME = "conveyor buildout"
 PROGRAMME_KEY = "conveyor-buildout"
 REPO_URL = "https://github.com/nonagenticai/conveyor"
+STANDARD_PATH = ROOT / "seed" / "output-standard.json"
+CONSOLE_STANDARD_PATH = ROOT / "docs" / "design" / "data" / "output-standard.js"
+
+
+def load_standard() -> dict:
+    return json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
+
+
+def standard_class(std: dict, project: dict, measured_status: str) -> dict:
+    """Resolve the project's standard class from its facts; fail closed on no match."""
+    facts = {
+        "key": project["key"],
+        "track": project["track"],
+        "status": project.get("status", ""),
+        "measured_status": measured_status,
+    }
+    for cls in std["classes"]:
+        if all(facts.get(key) == value for key, value in cls["when"].items()):
+            return cls
+    raise SystemExit(
+        f"build-programme-seed: no output-standard class for {project['key']} "
+        f"(track {project['track']!r}, measured {measured_status!r})"
+    )
+
+
+def render_standard_js(std: dict) -> str:
+    return "window.CONVEYOR_OUTPUT_STANDARD = " + json.dumps(std, indent=2, ensure_ascii=False) + ";\n"
 
 # The cross-cutting units that are not a `S##`/`T##` plan. Their issues are assigned by
 # number — these are the public repository's numbers after the 2026-11-12 recreation.
@@ -56,8 +83,9 @@ CROSS_CUTTING = {
         "plan": "docs/design/STUDIO-SPEC.md",
         "track": "programme",
         # #89 (the V2 registration in the seed/index), #97 (the console's live engine proof)
-        # and #103 (the measured programme truth) are the pack/console surface.
-        "issues": [32, 33, 36, 37, 89, 97, 103],
+        # and #103 (the measured programme truth) are the pack/console surface. #149 is the
+        # work store: expected outputs and the project checklist on the same console.
+        "issues": [32, 33, 36, 37, 89, 97, 103, 149],
     },
     "PLATFORM": {
         "name": "CI, runners and platform",
@@ -69,6 +97,10 @@ CROSS_CUTTING = {
         "issues": [17, 22, 43, 44, 45, 46, 55, 57, 71, 93, 95, 102],
     },
 }
+
+# The output standard is data, not constants: `seed/output-standard.json` owns the vocabulary
+# and the per-class required sets. The builder resolves one class per project and emits
+# `meta.expected_outputs` / `meta.closure_outputs`; `scripts/check-output-standard.py` is the gate.
 
 # SPEC_V2 §12 (the dependency sentence, kept as data because prose parsing is not a parser).
 # "T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 and T13;
@@ -387,6 +419,7 @@ def build() -> dict:
         return ("Z", 0, project["key"])
 
     coverage = coverage_statuses()
+    std = load_standard()
     out_projects = []
     for project in sorted(projects, key=project_order):
         project_issues = sorted(issues_by_project.get(project["key"], []), key=lambda i: i["number"])
@@ -396,12 +429,14 @@ def build() -> dict:
                 numbers.append(number)
         numbers.sort()
         measured = coverage.get(project["key"], {})
+        status = derive_status(project, project_issues, coverage)
+        cls = standard_class(std, project, measured.get("status", ""))
         out_projects.append(
             {
                 "key": project["key"],
                 "name": project["name"],
                 "description": project["description"],
-                "status": derive_status(project, project_issues, coverage),
+                "status": status,
                 "repo_url": REPO_URL,
                 "meta": {
                     "plan": project["plan"],
@@ -412,6 +447,8 @@ def build() -> dict:
                     "status_source": "measured coverage + open GitHub issues + plan frontmatter",
                     "measured_status": measured.get("status", ""),
                     "tranche": measured.get("tranche", 0),
+                    "expected_outputs": list(cls["now"]),
+                    "closure_outputs": list(cls["closure"]),
                     **({"gate": project["gate"]} if project.get("gate") else {}),
                 },
             }
@@ -460,20 +497,33 @@ def main() -> None:
     args = parser.parse_args()
 
     programme = build()
+    std = load_standard()
+    console_rendered = render_standard_js(std)
     out = Path(args.out)
     rendered = json.dumps(programme, indent=2, ensure_ascii=False) + "\n"
     if args.check:
         current = out.read_text() if out.exists() else ""
         if current != rendered:
             sys.exit(f"build-programme-seed: {out} is stale; re-run without --check")
+        current_console = (
+            CONSOLE_STANDARD_PATH.read_text() if CONSOLE_STANDARD_PATH.exists() else ""
+        )
+        if current_console != console_rendered:
+            sys.exit(
+                f"build-programme-seed: {CONSOLE_STANDARD_PATH} is stale; re-run without --check"
+            )
         print(f"build-programme-seed: {out} is current")
+        print(f"build-programme-seed: {CONSOLE_STANDARD_PATH} is current")
         return
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(rendered)
+    CONSOLE_STANDARD_PATH.parent.mkdir(parents=True, exist_ok=True)
+    CONSOLE_STANDARD_PATH.write_text(console_rendered)
     print(
         f"build-programme-seed: wrote {out} — {len(programme['projects'])} projects, "
         f"{sum(len(p['meta']['issues']) for p in programme['projects'])} issue links"
     )
+    print(f"build-programme-seed: wrote {CONSOLE_STANDARD_PATH}")
     if args.write_docs:
         write_doc_headers(programme["projects"])
         print("build-programme-seed: plan headers updated")

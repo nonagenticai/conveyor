@@ -188,7 +188,29 @@ mod tests {
                 (40, "organisation".to_owned()),
                 // #144 (ADR 0007 §Decision 3–4): `runner_run` — one row per dispatched attempt —
                 // and `runner_artefact`, the manifest a polled result is checked against.
-                (41, "runner".to_owned())
+                (41, "runner".to_owned()),
+                // #156: the work store — provenance, the publish request, promoted
+                // `category`/`unit`, and the attachment kind on `document`
+                // (0042_document_workflow.sql).
+                (42, "document workflow".to_owned()),
+                // #160: the tenant's registered inference destination
+                // (0043_tenant_inference_endpoint.sql).
+                (43, "tenant inference endpoint".to_owned()),
+                // #72 (T1): the plan spine rows and their actions (0044_plan_spine.sql).
+                (44, "plan spine".to_owned()),
+                // #46: the commercial-equivalent price per model, the price side of the
+                // read-time cost derivation (0045_commercial_price.sql).
+                (45, "commercial price".to_owned()),
+                // #73 (T2): the decision ladder's rungs, answer, option-set version, the three
+                // version pins, the actor and the approval link (0046_decision_ladder.sql).
+                (46, "decision ladder".to_owned()),
+                // #265: the non-token surfaces' unit and per-unit rate on the catalogue, and the
+                // call's own usage_unit/usage_units on the ledger (0047_media_price.sql).
+                (47, "media price".to_owned()),
+                // #172 (T7): the hosts conveyor may reach, and what each may be asked for
+                // (0048_host_registry.sql, SPEC_V2 §10.4.1). A platform fact — no tenant column.
+                (48, "host registry".to_owned()),
+                (49, "pm job".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

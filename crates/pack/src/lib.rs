@@ -10,6 +10,7 @@
 //! The extraction exists because `crates/api` cannot depend on `apps/server` (the server already
 //! depends on the API). One library keeps the live view and the CLI output byte-identical.
 
+pub mod export;
 pub mod live;
 pub mod outputs;
 pub mod snapshot;

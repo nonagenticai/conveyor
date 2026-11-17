@@ -101,7 +101,7 @@ async fn ready_instrument(running: &support::Running, cases: usize) -> (String, 
         let (status, body) = running
             .invoke(
                 "eval_signoffs.request",
-                TOKEN,
+                support::REVIEWER,
                 json!({ "eval_id": eval_id, "gate": gate, "ask": "review the instrument" }),
                 None,
                 None,
@@ -167,7 +167,7 @@ async fn approve_plan(running: &support::Running, eval_id: &str) -> String {
     let (status, body) = running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({ "approval_id": approval_id, "decision": "approve" }),
             None,
             None,
@@ -680,7 +680,7 @@ async fn approve_each_round_refuses_execution_until_the_round_is_decided() {
     let (status, body) = running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({ "approval_id": round_gate, "decision": "approve" }),
             None,
             None,

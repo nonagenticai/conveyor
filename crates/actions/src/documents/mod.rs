@@ -26,6 +26,7 @@ use crate::spec::FieldError;
 pub mod actions;
 pub mod ingest;
 pub mod repositories;
+pub mod revisions;
 pub mod secrets;
 
 /// The upload cap, in bytes: 10 MiB exactly (S09 §5.2).
@@ -36,15 +37,26 @@ pub const MAX_UPLOAD_BYTES: usize = 10 * 1024 * 1024;
 pub const MAX_OUTPUT_BYTES: usize = 256 * 1024;
 
 /// The content types a document may declare. `application/octet-stream` is deliberately absent.
-pub const ALLOWED_CONTENT_TYPES: [&str; 8] = [
+/// Every type the store will hold, each with a magic-byte check in
+/// `actions::bytes_match_type` — the allowlist and the verification are one decision and must
+/// change together.
+///
+/// The three media types are here because a media executor's INPUT is a document: a
+/// `runner/v1` job reads its footage through `GET /api/jobs/{id}/inputs/{name}`, and that route
+/// resolves a document row. Without them a tenant had no way to put a video in a job at all
+/// (#185). A 10 MiB upload cap still applies, so this is for short clips and stills, not masters.
+pub const ALLOWED_CONTENT_TYPES: [&str; 11] = [
     "application/pdf",
     "application/json",
+    "audio/mpeg",
+    "audio/wav",
     "image/jpeg",
     "image/png",
     "image/svg+xml",
     "text/csv",
     "text/markdown",
     "text/plain",
+    "video/mp4",
 ];
 
 /// The event type every document mutation emits.
@@ -55,8 +67,51 @@ pub const DOCUMENT_UPDATED: &str = "document.updated";
 pub const DOCUMENT_DELETED: &str = "document.deleted";
 /// Emitted by `documents.ingest` — the upstream job id has been recorded on the row.
 pub const DOCUMENT_INGESTED: &str = "document.ingested";
+/// Emitted by `documents.publish` when an output enters the public window.
+pub const DOCUMENT_PUBLISHED: &str = "document.published";
+/// Emitted by `documents.publish` when an output leaves it.
+pub const DOCUMENT_UNPUBLISHED: &str = "document.unpublished";
+/// Emitted by `documents.request_publish` — an author's signal to an admin.
+pub const DOCUMENT_PUBLISH_REQUESTED: &str = "document.publish_requested";
+/// Emitted by `documents.return` — the admin's rework order on a requested draft.
+pub const DOCUMENT_RETURNED: &str = "document.returned";
 /// The job kind that removes a tombstoned document's object.
 pub const DOCUMENT_PURGE_KIND: &str = "document.purge";
+
+/// The publish gate: a text output may not become public without its category's required
+/// headings. Unknown categories and bodyless (object) documents are never blocked — the standard
+/// cannot say what they require. The refusal names every missing heading so the console can offer
+/// the triage, and it is a transition check: an already-published row is never re-checked.
+pub(crate) fn require_complete(
+    category: Option<&str>,
+    body: Option<&str>,
+) -> Result<(), ActionError> {
+    let (Some(category), Some(body)) = (category, body) else {
+        return Ok(());
+    };
+    let missing = conveyor_domain::output_standard::missing_sections(category, body);
+    if missing.is_empty() {
+        return Ok(());
+    }
+    Err(ActionError::new(
+        409,
+        "output_incomplete",
+        format!(
+            "the output is missing required sections: {}",
+            missing.join(", ")
+        ),
+    )
+    .with_errors(
+        missing
+            .into_iter()
+            .map(|heading| FieldError {
+                field: "body".to_owned(),
+                code: "output_incomplete".to_owned(),
+                detail: format!("missing required section: {heading}"),
+            })
+            .collect(),
+    ))
+}
 
 /// Append one document event in the caller's transaction.
 pub async fn emit_document_event(

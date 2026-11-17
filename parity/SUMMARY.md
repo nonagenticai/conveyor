@@ -5,7 +5,10 @@ from it and S14 gates on 100 % of `used`.
 
 ```
 signed_off: georgedekker 2026-11-08
-  sha256: 866acfc96fa2a608c98f13551243f7a75b47060bc3fa6b55751086f774d6ef25
+  sha256: 2d7b93c56a07703ffb4293d9425f447339e151a09a036771d2d708ae7786e4e8
+  sanitised: 2026-11-12 (ef8302b, 2c51115) — private references scrubbed from the evidence
+             strings; the ids, counts and statuses are unchanged. This is the hash of the
+             public file, and `scripts/check-parity.py` enforces it.
   note: recorded by agent on owner instruction 2026-11-08. Every `used` id will be built at cutover
         and every `dropped` id will not.
 ```

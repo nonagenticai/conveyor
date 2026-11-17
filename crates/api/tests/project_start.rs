@@ -233,3 +233,154 @@ async fn without_a_tenant_start_process_the_project_and_card_exist_with_no_run()
     assert_eq!(cards, 1, "one start card");
     assert_eq!(runs, 0, "no tenant process, so no run");
 }
+
+/// Install a published start process with no per-step agent, so the process's capability is the
+/// readiness subject. The shipped type file carries its own agent; this test needs the binding to
+/// be the only executor, exactly the shape `capability_readiness.rs` proves.
+async fn install_start_process(running: &support::Running) -> String {
+    let sop =
+        support::publish_sop(running, &format!("start-{}-sop", Uuid::now_v7().simple())).await;
+    let steps = json!([
+        {"action": "cards.claim", "procedure_id": sop,
+         "input_template": {"id": "{{card.id}}", "_version": "{{card.version}}"}},
+        {"action": "cards.comment", "procedure_id": sop,
+         "input_template": {"id": "{{card.id}}", "body": "done"}}
+    ]);
+    let (status, body) = running
+        .invoke(
+            "processes.create",
+            TOKEN,
+            json!({
+                "key": START_PROCESS_KEY,
+                "title": "Start request analysis",
+                "card_type_code": "project_start_request_analysis",
+                "steps": steps,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let id = text(output(&body), "id");
+    let (status, body) = running
+        .invoke(
+            "processes.publish",
+            TOKEN,
+            json!({"process_id": id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    id
+}
+
+/// #231 — a published start process whose capability is NOT ready (the live A5-absent state)
+/// is the same observable outcome as no process: project, board and start card exist, no run.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_unready_start_capability_creates_the_project_and_card_with_no_run() {
+    let (pg, running, seeded) = fixture().await;
+    start_card_type(&pg, seeded.tenant).await;
+    let process_id = Uuid::parse_str(&install_start_process(&running).await).expect("process id");
+
+    // A capability whose executor names an action the registry does not have: the readiness
+    // projection reports `action_not_registered` and `process_runs.start` refuses 409
+    // `capability_not_ready` before any run row.
+    let capability: Uuid = sqlx::query_scalar(
+        "INSERT INTO capability (tenant_id, code, label, status)
+         VALUES ($1, $2, 'Unready', 'active') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("unready-{}", Uuid::now_v7().simple()))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the unready capability");
+    sqlx::query(
+        "INSERT INTO capability_agent
+             (tenant_id, capability_id, key, role, status, model_ref, prompt_ref, allowed_actions)
+         VALUES ($1, $2, $3, 'tool_agent', 'active', 'local-llm', NULL, $4)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(capability)
+    .bind(format!("agent-{}", Uuid::now_v7().simple()))
+    .bind(vec!["does.not_exist".to_owned()])
+    .execute(&pg.super_pool)
+    .await
+    .expect("the unready agent");
+    sqlx::query("UPDATE process SET capability_id = $3 WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant_id)
+        .bind(process_id)
+        .bind(capability)
+        .execute(&pg.super_pool)
+        .await
+        .expect("bind the unready capability to the start process");
+
+    let (status, body) = running
+        .invoke(
+            "projects.create",
+            TOKEN,
+            json!({"title": "Unready start capability", "key": "UNREADY"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let project_id = Uuid::parse_str(&text(output(&body), "id")).expect("project id");
+    let (boards, cards, runs): (i64, i64, i64) = sqlx::query_as(
+        "SELECT (SELECT count(*) FROM board WHERE tenant_id = $1 AND project_id = $2),
+                (SELECT count(*) FROM card  WHERE tenant_id = $1 AND archived_at IS NULL),
+                (SELECT count(*) FROM run   WHERE tenant_id = $1)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the created rows");
+    assert_eq!(boards, 1, "the create kept its board");
+    assert_eq!(cards, 1, "the start card is written");
+    assert_eq!(runs, 0, "an unready capability writes no run");
+}
+
+/// #231 — only `capability_not_ready` is tolerated; a different typed 409 still rolls the
+/// whole create back.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_non_capability_refusal_still_rolls_the_create_back() {
+    let (pg, running, seeded) = fixture().await;
+    seed_start_process(&pg, seeded.tenant).await;
+    start_card_type(&pg, seeded.tenant).await;
+    sqlx::query(
+        "UPDATE card_type SET is_active = false
+          WHERE tenant_id = $1 AND code = 'project_start_request_analysis'",
+    )
+    .bind(seeded.tenant_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("deactivate the start card type");
+
+    let (status, body) = running
+        .invoke(
+            "projects.create",
+            TOKEN,
+            json!({"title": "Rollback fixture", "key": "ROLLBACK"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    let (projects, boards, cards): (i64, i64, i64) = sqlx::query_as(
+        "SELECT (SELECT count(*) FROM project WHERE tenant_id = $1 AND key = 'ROLLBACK'),
+                (SELECT count(*) FROM board   WHERE tenant_id = $1),
+                (SELECT count(*) FROM card    WHERE tenant_id = $1)",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the rolled-back rows");
+    assert_eq!(projects, 0, "the failed create left a project row");
+    assert_eq!(boards, 0, "the failed create left a board");
+    assert_eq!(cards, 0, "the failed create left a card");
+}

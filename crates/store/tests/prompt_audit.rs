@@ -209,6 +209,8 @@ async fn the_cadence_counts_the_ledger_and_excludes_the_audit_itself() {
                 served_model: None,
                 usage: None,
                 cache_status: CacheStatus::Unknown.as_str(),
+                usage_unit: None,
+                usage_units: None,
                 latency_ms: 1,
                 outcome: "ok",
             },

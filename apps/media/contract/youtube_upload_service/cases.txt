@@ -1,0 +1,41 @@
+# name | METHOD | path | headers | body
+#
+# Identity: every authenticated case carries `X-Tenant-Id: Bearer <opaque>` — the licence-credential
+# shape the orchestrator sends. The capture rig points LICENSE_INTROSPECT_URL at a local stub whose
+# answer is ONE active licence (tenant 00000000-0000-0000-0000-0000000000c1, subject
+# 00000000-0000-0000-0000-0000000000a1, the latter listed in AUTH_DELEGATING_SUBJECTS). The licence
+# lane therefore runs for real, and the app's orchestrator-SA gate is satisfied without a cluster.
+# `/api/upload*`, `/api/settings*` and `/api/auth/*` additionally demand the real caller tenant in
+# `X-Owner-Tenant-Id`, honoured only from that service account. `/api/admin/*` is the mirror image:
+# it REFUSES `X-Owner-Tenant-Id` (403 "operator routes are not owner-tenant scoped"), so the admin
+# cases carry the licence credential only.
+#
+# Order is load-bearing: the empty job list is captured before `upload_submit` creates a job, and
+# `auth_connect` is captured before `settings_put` stores an OAuth client (connect would embed its
+# client_id). The scratch database must be freshly migrated for each capture.
+health|GET|/health||
+health_live|GET|/health/live||
+health_ready|GET|/health/ready||
+healthz|GET|/healthz||
+readyz|GET|/readyz||
+root|GET|/||
+upload_jobs_empty|GET|/api/upload/jobs|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+job_get_missing|GET|/api/upload/jobs/00000000-0000-0000-0000-0000000000ff|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+settings_get|GET|/api/settings|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+auth_status_not_connected|GET|/api/auth/status|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+auth_connect|POST|/api/auth/connect|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+auth_disconnect_missing|DELETE|/api/auth/disconnect|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+auth_callback_no_params|GET|/api/auth/callback||
+auth_callback_bad_state|GET|/api/auth/callback?code=capture-bogus&state=capture-bogus||
+upload_submit|POST|/api/upload|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"file_source":"https://example.invalid/capture-video.mp4","title":"Capture synthetic video"}
+upload_submit_validation|POST|/api/upload|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{}
+retract_missing|POST|/api/upload/jobs/00000000-0000-0000-0000-0000000000ff/retract|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+privacy_missing|POST|/api/upload/jobs/00000000-0000-0000-0000-0000000000ff/privacy|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"privacy_status":"unlisted"}
+privacy_validation|POST|/api/upload/jobs/00000000-0000-0000-0000-0000000000ff/privacy|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"privacy_status":"private"}
+settings_oauth_put|PUT|/api/settings/oauth-client|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|{"client_id":"capture-synthetic-client-id","client_secret":"capture-synthetic-client-secret"}
+settings_oauth_delete|DELETE|/api/settings/oauth-client|{"X-Tenant-Id":"Bearer capture-licence-token-0001","X-Owner-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}|
+admin_platform_get|GET|/api/admin/platform-channel|{"X-Tenant-Id":"Bearer capture-licence-token-0001"}|
+admin_platform_put_validation|PUT|/api/admin/platform-channel|{"X-Tenant-Id":"Bearer capture-licence-token-0001"}|{"client_id":"capture-synthetic-client-id","channel_id":"UCcapture0000000000000","channel_title":"Capture Channel","default_for_tenants":false}
+admin_tenant_put|PUT|/api/admin/tenants/00000000-0000-0000-0000-0000000000c1/platform-channel|{"X-Tenant-Id":"Bearer capture-licence-token-0001"}|{"allowed":true}
+admin_tenants_get|GET|/api/admin/tenant-settings|{"X-Tenant-Id":"Bearer capture-licence-token-0001"}|
+upload_jobs_no_tenant|GET|/api/upload/jobs||

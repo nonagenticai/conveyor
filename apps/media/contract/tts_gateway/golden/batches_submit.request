@@ -1,0 +1,3 @@
+POST /api/tts/batches
+{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}
+{"batch_id":"capture-batch-0001","chunks":[{"ref":"c1","text":"Synthetic capture sentence one."},{"ref":"c2","text":"Synthetic capture sentence two.","speed":1.25}]}

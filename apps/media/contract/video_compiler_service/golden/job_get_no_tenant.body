@@ -1,0 +1,1 @@
+{"error":{"code":"TENANT_REQUIRED","message":"trusted-network requests must forward the requestor's X-Tenant-Id","status":401,"request_id":"01a1dff5-efaf-7417-95fd-99b2c61fb300","timestamp":"2026-11-15T16:06:39Z"}}

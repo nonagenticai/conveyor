@@ -1,0 +1,20 @@
+{
+  "service": "tts_gateway",
+  "image_digest": "sha256:8068472f07537acb42b2e5d26e7ec0b05b3da223a5ab5d9ac9dc25ba96428d99",
+  "source_commit": "",
+  "taken": "2026-11-15T15:58:21Z",
+  "operations": 10,
+  "paths": 10,
+  "op_list": [
+    "GET /api/tts/batches/{batch_id}",
+    "GET /health",
+    "GET /livez",
+    "GET /readyz",
+    "POST /api/tts/batches",
+    "POST /api/tts/claim",
+    "POST /api/tts/jobs/{job_id}/fail",
+    "POST /api/tts/jobs/{job_id}/heartbeat",
+    "POST /api/tts/jobs/{job_id}/release",
+    "POST /api/tts/jobs/{job_id}/result"
+  ]
+}

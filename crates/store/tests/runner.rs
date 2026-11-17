@@ -256,3 +256,52 @@ async fn artefacts_cascade_with_the_run() {
     assert_eq!(runs, 0, "the attempt row cascades");
     assert_eq!(artefacts, 0, "the artefacts cascade through the run");
 }
+
+/// A dispatched pod outlives the worker's claim, so its writes must be accepted BETWEEN polls.
+///
+/// `jobs::defer` leaves the row `pending` with the lease cleared and `continuation = true` (that
+/// is what keeps the next claim from spending an attempt). Fencing the pod's write on
+/// `status = 'running'` therefore refuses it almost always: measured live 2026-11-16, the first
+/// real dispatch finished in 10 s and its `POST /result` was answered first 403 and then 409.
+#[tokio::test]
+async fn a_deferred_attempt_records_its_result() {
+    let db = common::TestDb::fresh().await;
+    let tenant = a_tenant(&db).await;
+    let job = a_claimed_job(&db.runtime, tenant).await;
+    runner::begin(&db.runtime, tenant, &new_run(job.id, job.attempts))
+        .await
+        .expect("begin")
+        .expect("a new attempt inserts");
+
+    let lease = job.lease_token.expect("the claim set a lease token");
+    assert!(
+        jobs::defer(&db.runtime, tenant, job.id, lease, Duration::from_secs(5))
+            .await
+            .expect("defer"),
+        "the lease holder may defer"
+    );
+    let deferred = jobs::get(&db.runtime, tenant, job.id)
+        .await
+        .expect("read the job")
+        .expect("the row is still there");
+    println!(
+        "job after defer: status={} continuation={} lease={:?}",
+        deferred.status, deferred.continuation, deferred.lease_until
+    );
+    assert_eq!(deferred.status, "pending");
+    assert!(deferred.continuation);
+
+    let accepted = runner::record_result(
+        &db.runtime,
+        tenant,
+        job.id,
+        job.attempts,
+        &json!({ "status": "succeeded" }),
+    )
+    .await
+    .expect("the deferred write runs");
+    assert!(
+        accepted,
+        "a deferred attempt is still the live attempt, so its result is recorded"
+    );
+}

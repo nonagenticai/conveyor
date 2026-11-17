@@ -1,0 +1,12 @@
+{
+  "key": "demo_video",
+  "title": "A product demonstration",
+  "family": "production",
+  "phases": [
+    { "id": "brief", "action": "produce.brief", "params": {} },
+    { "id": "screen_capture", "action": "media.record_browser", "params": {} },
+    { "id": "narration", "action": "produce.speech", "params": {} },
+    { "id": "render", "action": "media.compile_video", "params": {} }
+  ],
+  "unresolved": ["brief", "narration"]
+}

@@ -3,12 +3,20 @@
 #   docker build -f docker/Dockerfile.service \
 #     --build-arg PACKAGE=conveyor-server --build-arg BIN=conveyor -t conveyor-server .
 #
+# A **media executor** builds from the same file with `TOOLS` set: `TOOLS=chromium` installs the
+# browser the `conveyor-media-browser` binary drives, `TOOLS=ffmpeg` installs ffmpeg, ffprobe and
+# tesseract for `conveyor-media-ffmpeg`. The executor still exits after one instruction; the
+# `BIND_ADDR`/`EXPOSE` below are for the service default and are inert for a Job pod.
+#
 # Public base images only, pinned by digest: this file is built by the public CI and by outside
 # contributors. An estate build may override BASE_IMAGE without editing the file.
 # RUST_TOOLCHAIN must equal rust-toolchain.toml (the `checks` job asserts the root Dockerfile;
 # this file states the same value).
-ARG RUST_TOOLCHAIN=1.99.0
+ARG RUST_TOOLCHAIN=1.100.0
 ARG BASE_IMAGE=docker.io/library/debian:12-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
+# `""` (a service), `chromium`, or `ffmpeg`. Anything else is refused by the build, so a typo can
+# never ship an image that silently lacks the tool its capability shells out to.
+ARG TOOLS=
 
 FROM ${BASE_IMAGE} AS build
 ARG RUST_TOOLCHAIN
@@ -37,11 +45,23 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-servic
     && install -D -m 0755 "target/release/${BIN}" /out/service
 
 FROM ${BASE_IMAGE} AS runtime
+ARG TOOLS
+# chromium: the browser the browser executor drives. fonts-liberation: the documents name faces
+# Chromium must have or it renders boxes. ffmpeg + tesseract-ocr + eng: every ffmpeg capability
+# shells out to them, and `media.ocr` refuses a language the image does not carry.
 # hadolint ignore=DL3008
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
+    && case "${TOOLS}" in \
+         "") ;; \
+         chromium) apt-get install -y --no-install-recommends chromium fonts-liberation ;; \
+         ffmpeg) apt-get install -y --no-install-recommends ffmpeg tesseract-ocr tesseract-ocr-eng ;; \
+         *) echo "unknown TOOLS=${TOOLS}: expected '', chromium or ffmpeg" >&2; exit 1 ;; \
+       esac \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=build /out/service /usr/local/bin/service
-ENV BIND_ADDR=0.0.0.0:8080
+# The browser executor reads this; a service image never touches it.
+ENV CHROME_BIN=/usr/bin/chromium \
+    BIND_ADDR=0.0.0.0:8080
 EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/service"]

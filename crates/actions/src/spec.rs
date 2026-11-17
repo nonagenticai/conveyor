@@ -53,6 +53,10 @@ pub enum Effect {
     Read,
     /// Creates or updates.
     Write,
+    /// Costs the tenant money without deleting anything: a model call, a render, a metered render
+    /// seconds. Ranked above `write` because an approval ceiling that permits writes must not
+    /// silently permit spending, and below `destructive` because nothing is removed (§11.4).
+    Spend,
     /// Deletes or irreversibly transitions.
     Destructive,
 }
@@ -63,7 +67,33 @@ impl Effect {
         match self {
             Self::Read => "read",
             Self::Write => "write",
+            Self::Spend => "spend",
             Self::Destructive => "destructive",
+        }
+    }
+
+    /// How far up the scale this effect sits: `read < write < spend < destructive`.
+    ///
+    /// The order is the whole point of a binding's ceiling — a job bound to `read` may not reach a
+    /// `write`, and comparisons are made on this rank, never on the string.
+    pub fn rank(self) -> u8 {
+        match self {
+            Self::Read => 0,
+            Self::Write => 1,
+            Self::Spend => 2,
+            Self::Destructive => 3,
+        }
+    }
+
+    /// Parse the manifest/OpenAPI spelling. `None` for anything else, so an unknown ceiling is
+    /// refused rather than silently treated as unlimited.
+    pub fn parse(text: &str) -> Option<Self> {
+        match text {
+            "read" => Some(Self::Read),
+            "write" => Some(Self::Write),
+            "spend" => Some(Self::Spend),
+            "destructive" => Some(Self::Destructive),
+            _ => None,
         }
     }
 }
@@ -202,6 +232,11 @@ pub enum Scope {
     IntegrationsRead,
     /// Dispatch work to an external service (`coding_jobs.create`).
     IntegrationsWrite,
+    // T7 — the hostile-authority surface (SPEC_V2 §11.4): restarting, scaling and rolling back
+    // a workload. Admin-only, and never sufficient on its own — every `ops.*` write also names
+    // an approved approval (see `control::approvals::require_approval_tx`).
+    /// Restart, scale and roll back cluster workloads.
+    OpsWrite,
     // S11 — executable processes: ordered registry actions on one card.
     /// Read process templates, their steps and their published revisions.
     ProcessesRead,
@@ -258,7 +293,7 @@ pub enum Scope {
 
 impl Scope {
     /// Every scope this build knows.
-    pub const ALL: [Scope; 65] = [
+    pub const ALL: [Scope; 66] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -324,6 +359,7 @@ impl Scope {
         Scope::CapabilitiesWrite,
         Scope::OrganisationRead,
         Scope::OrganisationWrite,
+        Scope::OpsWrite,
     ];
 
     /// The wire spelling (`<resource>:<verb>`).
@@ -379,6 +415,7 @@ impl Scope {
             Self::SecretsWrite => "secrets:write",
             Self::IntegrationsRead => "integrations:read",
             Self::IntegrationsWrite => "integrations:write",
+            Self::OpsWrite => "ops:write",
             Self::ProcessesRead => "processes:read",
             Self::ProcessesWrite => "processes:write",
             Self::BenchmarksRead => "benchmarks:read",
@@ -481,7 +518,8 @@ impl Scope {
             | Self::BoardsWrite
             | Self::ListsWrite
             | Self::CardsWrite
-            | Self::OrganisationWrite => admin,
+            | Self::OrganisationWrite
+            | Self::OpsWrite => admin,
             // ⛔ NOT the `admin` predicate: that includes `Role::KataExecutor`, a machine
             // role, and a scope a machine holds cannot be a sign-off (CONTRACT §20 trap 1).
             Self::EvalsApprove => matches!(role, Role::Admin),
@@ -576,6 +614,11 @@ pub enum HandlerRef {
         /// (`secrets.create`/`rotate`), and the service itself is the one that decides whether
         /// an anonymous call is acceptable. The engine never substitutes a platform token.
         auth_optional: bool,
+        /// When set, the request is `multipart/form-data` carrying one document's bytes instead of
+        /// a JSON body. The document is named by an input member, fetched under the caller's
+        /// tenant and hash-verified exactly as a documents byte route does — the service never
+        /// receives a store credential or a URL.
+        upload: Option<Upload>,
     },
     /// No handler yet: S13's engine.
     Workflow,
@@ -594,6 +637,19 @@ impl std::fmt::Debug for HandlerRef {
             Self::Workflow => write!(f, "HandlerRef::Workflow"),
         }
     }
+}
+
+/// A document to upload with an external call, as `multipart/form-data`.
+///
+/// The service contract decides the field name; the action's input decides which document. Neither
+/// is inferred, because a service that silently accepted the wrong part name would answer with a
+/// transcript of nothing rather than an error.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Upload {
+    /// The input member that names the document (a UUID string).
+    pub input: &'static str,
+    /// The multipart field name the service expects.
+    pub field: &'static str,
 }
 
 /// The copilot's tier for an action (S10 §5.2; fr's `PROJECT_AGENT_CORE` / `PROJECT_AGENT_SEARCHABLE`).
@@ -647,6 +703,39 @@ pub struct AgentHints {
     pub proposal_required: bool,
 }
 
+/// One external action's response, materialised as a tenant document (S09 §5.2, §11.4).
+///
+/// The engine owns the external call, so it also owns the artefact that call produced: a handler-side
+/// writer would be a second path for the same fact, exactly as with the `inference_call` row. The
+/// bytes travel as base64 inside the service's JSON response (CONTRACT §6), and the engine writes
+/// them to the object store, inserts the document row and adds a `document` member to the response the
+/// caller receives.
+///
+/// Deliberately **not** part of [`ActionSpec::canonical`]: it describes what the engine does with a
+/// response, not the wire contract of the operation itself — the same reasoning as
+/// [`ActionSpec::captures_usage`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Artefact {
+    /// The dotted path into the response JSON holding the payload, e.g. `"data.0.b64_json"`.
+    pub field: &'static str,
+    /// How that member carries the bytes.
+    pub encoding: ArtefactEncoding,
+    /// The MIME type declared on the document. It must be on `documents`' allowlist and must match
+    /// the decoded bytes.
+    pub content_type: &'static str,
+    /// The document title.
+    pub title: &'static str,
+}
+
+/// How an [`Artefact`]'s bytes travel in the service's JSON response.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ArtefactEncoding {
+    /// A base64 string — every binary payload, and the shape CONTRACT §6 names.
+    Base64,
+    /// A UTF-8 string carried verbatim: a transcript, a script, a rendered document already in text.
+    Utf8,
+}
+
 /// One invocable operation. Exactly §5.1's fields.
 #[derive(Clone, Debug)]
 pub struct ActionSpec {
@@ -684,6 +773,10 @@ pub struct ActionSpec {
     /// [`ActionSpec::task_capable`], it is **not** part of [`ActionSpec::canonical`], so declaring
     /// it does not move an operation's hash.
     pub captures_usage: bool,
+    /// The response member the engine materialises as a tenant document, when the action produces
+    /// one. Defaulted by the derive to `None`; like [`ActionSpec::captures_usage`], it is **not**
+    /// part of [`ActionSpec::canonical`].
+    pub artefact: Option<Artefact>,
     /// Where the work happens.
     pub handler: HandlerRef,
 }
@@ -919,7 +1012,8 @@ mod tests {
         assert_eq!(Scope::CapabilitiesWrite.as_str(), "capabilities:write");
         assert_eq!(Scope::OrganisationRead.as_str(), "organisation:read");
         assert_eq!(Scope::OrganisationWrite.as_str(), "organisation:write");
-        assert_eq!(Scope::ALL.len(), 65);
+        assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
+        assert_eq!(Scope::ALL.len(), 66);
     }
 
     #[test]

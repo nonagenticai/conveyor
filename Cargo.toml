@@ -17,7 +17,7 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.99.0"
+rust-version = "1.100.0"
 license = "Apache-2.0"
 publish = false
 
@@ -25,6 +25,9 @@ publish = false
 # Exact pins, from the template (0c7396a) and this slice's plan. A floating version is how
 # two services silently diverge; bump deliberately, never by accident.
 tokio = { version = "1.53.3", features = ["full"] }
+# The browser image drives Chromium over CDP: a client-side websocket, no TLS (ws:// on loopback),
+# and `handshake` only. Pinned like every other dependency; nothing else in the workspace uses it.
+tokio-tungstenite = { version = "0.24.0", default-features = false, features = ["handshake"] }
 axum = "0.8.9"
 # Runtime queries only (sqlx::query / query_as with binds). The `macros` feature exists for
 # `sqlx::migrate!`, which embeds migrations/ and needs no database at build time. `uuid`
@@ -77,6 +80,12 @@ reqwest = { version = "0.13.5", default-features = false, features = [
     # `multipart`: `documents.ingest` pushes the bytes to `strata_ingest`, whose only file route is
     # multipart/form-data (S09 §5.6).
     "multipart",
+    # `form`: #182's Google OAuth token exchange is an `application/x-www-form-urlencoded` POST;
+    # reqwest 0.13 gates `RequestBuilder::form` behind this feature.
+    "form",
+    # `query`: #182's three Data API calls carry small query strings (`part=status`,
+    # `uploadType=resumable`, `id=…`); reqwest 0.13 gates `RequestBuilder::query` likewise.
+    "query",
 ] }
 base64 = "0.23.1"
 # `timestamptz` in Rust (job leases, event timestamps, licence expiry) and the schedule
@@ -134,6 +143,9 @@ insta = { version = "1.49.0", features = ["json"] }
 resvg = { version = "0.45.1", default-features = false, features = ["text"] }
 usvg = { version = "0.45.1", default-features = false, features = ["text"] }
 svg2pdf = { version = "0.13.0", default-features = false, features = ["text"] }
+# The same version `svg2pdf 0.13.0` builds against: the deck renderer assembles one multi-page
+# document from several SVG chunks, and the chunk types must be the ones that crate produces.
+pdf-writer = "0.12.0"
 # `usvg::Options::fontdb` is an `Arc<fontdb::Database>`, and the renderer must register the
 # vendored faces into it. 0.23 is the version `usvg 0.45.1` declares — a 0.24 here would put
 # two `fontdb`s in the graph and the registration would be invisible to the parser.

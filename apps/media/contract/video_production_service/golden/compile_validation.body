@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"shot_list: Field required (and 1 more)","status":422,"request_id":"01a1e021-c811-768a-9806-bbb772291772","timestamp":"2026-11-15T16:54:32Z","details":[{"loc":["body","shot_list"],"msg":"Field required","type":"missing"},{"loc":["body","recordings"],"msg":"Field required","type":"missing"}]}}

@@ -60,8 +60,14 @@ pub mod model;
 pub mod executor;
 // T0 (SPEC_V2 §4.1–§4.4): the organisation spine's release hash and binding vocabulary.
 pub mod organisation;
+pub mod output_standard;
 pub mod plan;
+// T2 (SPEC_V2 §7): the decision ladder's rungs, fail vocabulary, reproducibility pins and the
+// L2 draft type no card transition accepts.
+pub mod ladder;
+// T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine's WSJF arithmetic and refusal vocabulary.
 pub mod process;
+pub mod spine;
 // SPEC D28 / CONTRACT §21: the procedure (SOP) a step is judged against.
 pub mod procedure;
 pub mod process_map;

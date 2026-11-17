@@ -123,6 +123,11 @@ async fn an_edit_voids_both_signoffs_and_locking_a_split_does_not() {
             .fetch_one(&db.super_pool)
             .await
             .expect("seed app_user");
+    let requester: Uuid =
+        sqlx::query_scalar("INSERT INTO app_user (display_name) VALUES ('requester') RETURNING id")
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("seed the requester");
     let schema = json!({});
     let tags = vec!["suite".to_owned()];
     let attachments = json!([]);
@@ -226,7 +231,7 @@ async fn an_edit_voids_both_signoffs_and_locking_a_split_does_not() {
         eval.id,
         "eval_inputs",
         &digest_before,
-        user,
+        requester,
     )
     .await;
     approve_signoff(&mut tx, tenant, inputs_approval, user).await;
@@ -258,7 +263,7 @@ async fn an_edit_voids_both_signoffs_and_locking_a_split_does_not() {
         eval.id,
         "eval_grading",
         &digest_before,
-        user,
+        requester,
     )
     .await;
     approve_signoff(&mut tx, tenant, grading_approval, user).await;
@@ -332,8 +337,15 @@ async fn an_edit_voids_both_signoffs_and_locking_a_split_does_not() {
 
     // ── 5. a re-request reopens the gate: readiness reads the LATEST row ───────────────
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
-    let reopened_inputs =
-        request_signoff(&mut tx, tenant, eval.id, "eval_inputs", &digest_after, user).await;
+    let reopened_inputs = request_signoff(
+        &mut tx,
+        tenant,
+        eval.id,
+        "eval_inputs",
+        &digest_after,
+        requester,
+    )
+    .await;
     tx.commit().await.expect("commit the re-request");
 
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
@@ -360,7 +372,7 @@ async fn an_edit_voids_both_signoffs_and_locking_a_split_does_not() {
         eval.id,
         "eval_grading",
         &digest_after,
-        user,
+        requester,
     )
     .await;
     approve_signoff(&mut tx, tenant, fresh_grading, user).await;
@@ -425,13 +437,18 @@ async fn a_machine_or_an_unscoped_human_cannot_decide_an_eval_gate() {
             .fetch_one(&db.super_pool)
             .await
             .expect("seed app_user");
+    let requester: Uuid =
+        sqlx::query_scalar("INSERT INTO app_user (display_name) VALUES ('requester') RETURNING id")
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("seed the requester");
     let schema = json!({});
 
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
     let eval = insert_eval_tx(&mut tx, tenant, &new_eval("w1-eval", &schema, user))
         .await
         .expect("insert the eval");
-    let approval = request_signoff(&mut tx, tenant, eval.id, "eval_inputs", "sha", user).await;
+    let approval = request_signoff(&mut tx, tenant, eval.id, "eval_inputs", "sha", requester).await;
     tx.commit().await.expect("commit");
 
     // A machine's decision is refused even if the caller passes `eval_authorized = true`.

@@ -41,12 +41,14 @@ fn echo_spec() -> ActionSpec {
         agent: AgentHints::default(),
         task_capable: false,
         captures_usage: false,
+        artefact: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",
             path: "/echo",
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }
@@ -75,12 +77,14 @@ fn slow_spec() -> ActionSpec {
         agent: AgentHints::default(),
         task_capable: false,
         captures_usage: false,
+        artefact: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",
             path: "/slow",
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }
@@ -108,12 +112,14 @@ fn fail_spec() -> ActionSpec {
         agent: AgentHints::default(),
         task_capable: false,
         captures_usage: false,
+        artefact: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",
             path: "/fail",
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }
@@ -141,12 +147,14 @@ fn timeout_spec() -> ActionSpec {
         agent: AgentHints::default(),
         task_capable: false,
         captures_usage: false,
+        artefact: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",
             path: "/timeout",
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }

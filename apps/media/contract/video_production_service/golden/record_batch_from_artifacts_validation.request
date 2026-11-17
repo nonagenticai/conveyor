@@ -1,0 +1,3 @@
+POST /api/record/batch_from_artifacts
+{"X-Tenant-Id":"00000000-0000-0000-0000-0000000000c1"}
+{"project_id":"proj-1","parts":[]}

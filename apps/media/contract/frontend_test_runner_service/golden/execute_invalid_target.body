@@ -1,0 +1,1 @@
+{"error":{"code":"VALIDATION_ERROR","message":"target_url: target_url must use http or https scheme: [redacted]","status":422,"request_id":"01a1e0a1-9600-772f-9560-f63f5e441a4e","timestamp":"2026-11-15T19:14:08Z","details":[{"loc":["body","target_url"],"msg":"target_url must use http or https scheme: [redacted]","type":"value_error"}]}}
