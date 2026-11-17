@@ -755,6 +755,56 @@ pub async fn set_publishable_tx(
     Ok(row.into())
 }
 
+/// An admin's rework order on a requested draft: clear the request and record the note and the
+/// sections the standard found missing, in one UPDATE. The content version does not move — the
+/// row is unchanged; the order is metadata about it.
+pub async fn return_publish_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected_version: Version,
+    actor: Uuid,
+    note: &str,
+    missing: &[String],
+) -> Result<DocumentRecord, DocumentStoreError> {
+    let current = lock_document_tx(&mut *conn, tenant, id).await?;
+    if current.version != expected_version {
+        return Err(DocumentStoreError::VersionMismatch {
+            current: current.version,
+        });
+    }
+    let sql = format!(
+        "UPDATE document
+            SET publish_requested_at = NULL,
+                meta = jsonb_set(
+                    coalesce(meta, '{{}}'::jsonb),
+                    '{{rework}}',
+                    jsonb_build_object(
+                        'note', $3::text,
+                        'missing', $4::jsonb,
+                        'by', $5::uuid,
+                        'at', now(),
+                        'of_version', $6::bigint
+                    ),
+                    true
+                ),
+                updated_by = $5,
+                updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+          RETURNING {DOCUMENT_COLUMNS}"
+    );
+    let row: DocumentRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(note)
+        .bind(serde_json::to_value(missing).unwrap_or_else(|_| serde_json::json!([])))
+        .bind(actor)
+        .bind(i64::try_from(current.version.get()).unwrap_or(i64::MAX))
+        .fetch_one(&mut *conn)
+        .await?;
+    Ok(row.into())
+}
+
 /// Record an author's "ready for an admin" signal. No content version bump: the request is a flag,
 /// not an edit, and a second request is harmless.
 pub async fn request_publish_tx(

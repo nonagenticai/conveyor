@@ -36,6 +36,7 @@
 
 mod font;
 mod ids;
+pub mod markdown;
 mod pdf;
 mod png;
 mod svg;

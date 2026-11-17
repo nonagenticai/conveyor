@@ -79,7 +79,9 @@ use serde_json::{Value, json};
 /// `ops.pods|deployments|events|logs|flux_status|ci_status`. 378 → **384**.
 /// **#171 adds 3 internal**: the gated `ops.*` writes — `ops.restart|scale|rollback`.
 /// 384 → **387**.
-const EXPECTED: [&str; 387] = [
+/// **#245 adds 2 internal**: `documents.preview` (the one renderer) and `documents.return`
+/// (the admin rework order). 387 → **389**.
+const EXPECTED: [&str; 389] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -169,9 +171,11 @@ const EXPECTED: [&str; 387] = [
     "documents.get",
     "documents.ingest",
     "documents.list",
+    "documents.preview",
     "documents.publish",
     "documents.report",
     "documents.request_publish",
+    "documents.return",
     "documents.revision_get",
     "documents.revision_list",
     "documents.revision_restore",
@@ -512,7 +516,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // #170 adds the six `ops.*` reads (internal, read): 360 → 366. The external count stays at 18 —
     // they call the cluster API through `conveyor-ops`, not a declared external service.
     // #171 adds the three `ops.*` writes (internal, destructive): 366 → 369; external stays 18.
-    assert_eq!((internal, external), (369, 18));
+    // #245 adds `documents.preview` and `documents.return` (internal): 369 → 371.
+    assert_eq!((internal, external), (371, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
