@@ -190,7 +190,11 @@ async fn a_draft_inception_pair_refuses_the_build() {
     let detail = body["detail"].as_str().expect("a detail");
     assert!(detail.contains(PAIR[0]), "{detail}");
     assert!(detail.contains(PAIR[1]), "{detail}");
-    assert_eq!(run_count(&pg, &project).await, baseline_runs, "the start path wrote a run");
+    assert_eq!(
+        run_count(&pg, &project).await,
+        baseline_runs,
+        "the start path wrote a run"
+    );
 
     let (status, body) = execute_project(&running, &project).await;
     assert_eq!(status, 409, "{body}");
@@ -212,7 +216,10 @@ async fn a_draft_inception_pair_refuses_the_build() {
         "the accepted start wrote exactly one run"
     );
     let (status, body) = start_card_run(&running, &card).await;
-    assert!(status < 500, "the gate is satisfied: {body} (status {status})");
+    assert!(
+        status < 500,
+        "the gate is satisfied: {body} (status {status})"
+    );
     assert_ne!(
         body["type"], "inception_missing",
         "the gate is satisfied: {body} (status {status})"
