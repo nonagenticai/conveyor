@@ -717,11 +717,12 @@ pub async fn delete_register_tx(
     id: Uuid,
     expected: i64,
 ) -> Result<(), PlanStoreError> {
-    let current = get_register_tx(&mut *conn, tenant, id)
-        .await?
-        .ok_or(PlanStoreError::NotFound {
-            what: "register item",
-        })?;
+    let current =
+        get_register_tx(&mut *conn, tenant, id)
+            .await?
+            .ok_or(PlanStoreError::NotFound {
+                what: "register item",
+            })?;
     if current.version != expected {
         return Err(PlanStoreError::Stale {
             what: "register item",
@@ -1507,11 +1508,12 @@ pub async fn update_benefit_tx(
     expected: i64,
     patch: &BenefitPatch,
 ) -> Result<BenefitRecord, PlanStoreError> {
-    let current = get_benefit_tx(&mut *conn, tenant, id)
-        .await?
-        .ok_or(PlanStoreError::NotFound {
-            what: "benefit profile",
-        })?;
+    let current =
+        get_benefit_tx(&mut *conn, tenant, id)
+            .await?
+            .ok_or(PlanStoreError::NotFound {
+                what: "benefit profile",
+            })?;
     if current.version != expected {
         return Err(PlanStoreError::Stale {
             what: "benefit profile",
@@ -1605,11 +1607,12 @@ pub async fn delete_benefit_tx(
     id: Uuid,
     expected: i64,
 ) -> Result<(), PlanStoreError> {
-    let current = get_benefit_tx(&mut *conn, tenant, id)
-        .await?
-        .ok_or(PlanStoreError::NotFound {
-            what: "benefit profile",
-        })?;
+    let current =
+        get_benefit_tx(&mut *conn, tenant, id)
+            .await?
+            .ok_or(PlanStoreError::NotFound {
+                what: "benefit profile",
+            })?;
     if current.version != expected {
         return Err(PlanStoreError::Stale {
             what: "benefit profile",
@@ -1775,13 +1778,12 @@ pub async fn delete_benefit_link_tx(
     id: Uuid,
     expected: i64,
 ) -> Result<(), PlanStoreError> {
-    let version: Option<i64> = sqlx::query_scalar(
-        "SELECT version FROM benefit_link WHERE tenant_id = $1 AND id = $2",
-    )
-    .bind(tenant.as_uuid())
-    .bind(id)
-    .fetch_optional(&mut *conn)
-    .await?;
+    let version: Option<i64> =
+        sqlx::query_scalar("SELECT version FROM benefit_link WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(id)
+            .fetch_optional(&mut *conn)
+            .await?;
     match version {
         None => {
             return Err(PlanStoreError::NotFound {
@@ -2089,11 +2091,16 @@ pub async fn update_cadence_tx(
     expected: i64,
     patch: &CadencePatch,
 ) -> Result<CadenceRecord, PlanStoreError> {
-    let current = get_cadence_tx(&mut *conn, tenant, id)
-        .await?
-        .ok_or(PlanStoreError::NotFound { what: "cadence row" })?;
+    let current =
+        get_cadence_tx(&mut *conn, tenant, id)
+            .await?
+            .ok_or(PlanStoreError::NotFound {
+                what: "cadence row",
+            })?;
     if current.version != expected {
-        return Err(PlanStoreError::Stale { what: "cadence row" });
+        return Err(PlanStoreError::Stale {
+            what: "cadence row",
+        });
     }
     let sql = format!(
         "UPDATE programme_cadence SET
@@ -2113,7 +2120,9 @@ pub async fn update_cadence_tx(
         .bind(&patch.meta)
         .fetch_optional(&mut *conn)
         .await?;
-    row.ok_or(PlanStoreError::Stale { what: "cadence row" })
+    row.ok_or(PlanStoreError::Stale {
+        what: "cadence row",
+    })
 }
 
 /// Remove a cadence row.
@@ -2123,11 +2132,16 @@ pub async fn delete_cadence_tx(
     id: Uuid,
     expected: i64,
 ) -> Result<(), PlanStoreError> {
-    let current = get_cadence_tx(&mut *conn, tenant, id)
-        .await?
-        .ok_or(PlanStoreError::NotFound { what: "cadence row" })?;
+    let current =
+        get_cadence_tx(&mut *conn, tenant, id)
+            .await?
+            .ok_or(PlanStoreError::NotFound {
+                what: "cadence row",
+            })?;
     if current.version != expected {
-        return Err(PlanStoreError::Stale { what: "cadence row" });
+        return Err(PlanStoreError::Stale {
+            what: "cadence row",
+        });
     }
     let changed = sqlx::query(
         "DELETE FROM programme_cadence WHERE tenant_id = $1 AND id = $2 AND version = $3",
@@ -2139,7 +2153,9 @@ pub async fn delete_cadence_tx(
     .await?
     .rows_affected();
     if changed == 0 {
-        return Err(PlanStoreError::Stale { what: "cadence row" });
+        return Err(PlanStoreError::Stale {
+            what: "cadence row",
+        });
     }
     Ok(())
 }
@@ -2315,11 +2331,12 @@ pub async fn update_stakeholder_tx(
     expected: i64,
     patch: &StakeholderPatch,
 ) -> Result<StakeholderRecord, PlanStoreError> {
-    let current = get_stakeholder_tx(&mut *conn, tenant, id)
-        .await?
-        .ok_or(PlanStoreError::NotFound {
-            what: "stakeholder profile",
-        })?;
+    let current =
+        get_stakeholder_tx(&mut *conn, tenant, id)
+            .await?
+            .ok_or(PlanStoreError::NotFound {
+                what: "stakeholder profile",
+            })?;
     if current.version != expected {
         return Err(PlanStoreError::Stale {
             what: "stakeholder profile",
@@ -2373,11 +2390,12 @@ pub async fn delete_stakeholder_profile_tx(
     id: Uuid,
     expected: i64,
 ) -> Result<(), PlanStoreError> {
-    let current = get_stakeholder_tx(&mut *conn, tenant, id)
-        .await?
-        .ok_or(PlanStoreError::NotFound {
-            what: "stakeholder profile",
-        })?;
+    let current =
+        get_stakeholder_tx(&mut *conn, tenant, id)
+            .await?
+            .ok_or(PlanStoreError::NotFound {
+                what: "stakeholder profile",
+            })?;
     if current.version != expected {
         return Err(PlanStoreError::Stale {
             what: "stakeholder profile",

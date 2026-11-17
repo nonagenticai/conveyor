@@ -114,8 +114,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "8e45c766e9b610287cebaf7bc352c2582ec7cf32f30bfd0f49afdbac2c9e86aa",
-      "bytes": 17873,
+      "sha256": "415942957fe0ca06bb470dae61088a445116abc4f025adecbe4c99c6bfc1e75c",
+      "bytes": 18510,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -393,8 +393,8 @@
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "3bf74082677d5da0a3c33f8b65efcd66e64986e4621fe469422c2c67210c01f7",
-      "bytes": 11002,
+      "sha256": "0dd3a6dc21f46d8ec25d2b24a5e6bd7fe8d94940eb393a4bdba1d74d20bf7f56",
+      "bytes": 11031,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {

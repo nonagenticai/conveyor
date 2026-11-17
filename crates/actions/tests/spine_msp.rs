@@ -106,11 +106,18 @@ async fn create_benefit(
         )
         .await;
     assert_eq!(status, 201, "{body}");
-    let etag = headers.get("etag").cloned().expect("the benefit carries an ETag");
+    let etag = headers
+        .get("etag")
+        .cloned()
+        .expect("the benefit carries an ETag");
     (id_of(output(&body), "id"), etag)
 }
 
-async fn create_tranche(running: &support::Running, programme: &str, number: i32) -> (String, String) {
+async fn create_tranche(
+    running: &support::Running,
+    programme: &str,
+    number: i32,
+) -> (String, String) {
     let (status, headers, body) = running
         .invoke_full(
             "tranches.create",
@@ -122,7 +129,10 @@ async fn create_tranche(running: &support::Running, programme: &str, number: i32
         )
         .await;
     assert_eq!(status, 201, "{body}");
-    let etag = headers.get("etag").cloned().expect("the tranche carries an ETag");
+    let etag = headers
+        .get("etag")
+        .cloned()
+        .expect("the tranche carries an ETag");
     (id_of(output(&body), "id"), etag)
 }
 
@@ -145,7 +155,10 @@ async fn benefit_update_requires_current_version() {
         )
         .await;
     assert_eq!(status, 412, "{stale}");
-    assert_eq!(stale["status"], 412, "the refusal carries its status: {stale}");
+    assert_eq!(
+        stale["status"], 412,
+        "the refusal carries its status: {stale}"
+    );
 
     let (status, missing) = running
         .invoke(
@@ -289,7 +302,10 @@ async fn benefit_links_are_listable_and_removable() {
         .await;
     assert_eq!(status, 201, "{linked}");
     let link = id_of(output(&linked), "id");
-    let etag = headers.get("etag").cloned().expect("the edge carries an ETag");
+    let etag = headers
+        .get("etag")
+        .cloned()
+        .expect("the edge carries an ETag");
 
     let (status, listed) = running
         .invoke(
@@ -451,12 +467,7 @@ async fn msp_deletes_and_refusals() {
             "cadences.update",
             "dev:alice",
             json!({"id": cadence_id, "period": "PI-2027.2", "state": "active"}),
-            Some(
-                headers
-                    .get("etag")
-                    .expect("cadence etag")
-                    .as_str(),
-            ),
+            Some(headers.get("etag").expect("cadence etag").as_str()),
             None,
             None,
         )
@@ -628,12 +639,7 @@ async fn msp_deletes_and_refusals() {
             "stakeholders.profile_update",
             "dev:alice",
             json!({"id": profile_id, "importance": "critical", "support_level": "high"}),
-            Some(
-                headers
-                    .get("etag")
-                    .expect("profile etag")
-                    .as_str(),
-            ),
+            Some(headers.get("etag").expect("profile etag").as_str()),
             None,
             None,
         )

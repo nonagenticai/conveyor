@@ -291,17 +291,35 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
 
     let msp = std::fs::read_to_string(dir.join("msp.json")).expect("msp.json");
     assert!(msp.contains("BEN-SNAP"), "the benefit profile is public");
-    assert!(msp.contains("Sponsoring group"), "the stakeholder profile is public");
+    assert!(
+        msp.contains("Sponsoring group"),
+        "the stakeholder profile is public"
+    );
     assert!(msp.contains("PI-2027.1"), "the cadence row is public");
-    assert!(msp.contains("Snapshot deliverable"), "the WBS node is public");
+    assert!(
+        msp.contains("Snapshot deliverable"),
+        "the WBS node is public"
+    );
     assert!(msp.contains("Snapshot risk"), "the register item is public");
     assert!(msp.contains("blocks"), "the typed dependency is public");
     assert!(!msp.contains("alice@example.com"), "MSP emails are masked");
-    assert!(msp.contains("***@redacted"), "the MSP email is visibly masked");
-    assert!(!msp.contains(&token), "an MSP token-shaped string is redacted");
+    assert!(
+        msp.contains("***@redacted"),
+        "the MSP email is visibly masked"
+    );
+    assert!(
+        !msp.contains(&token),
+        "an MSP token-shaped string is redacted"
+    );
     let snapshot_js = std::fs::read_to_string(dir.join("snapshot.js")).expect("snapshot.js");
-    assert!(snapshot_js.contains("\"msp\""), "the wrapper carries the msp section");
-    assert!(!snapshot_js.contains(&token), "the wrapper redacts the MSP token");
+    assert!(
+        snapshot_js.contains("\"msp\""),
+        "the wrapper carries the msp section"
+    );
+    assert!(
+        !snapshot_js.contains(&token),
+        "the wrapper redacts the MSP token"
+    );
 
     let secrets = std::fs::read_to_string(dir.join("secrets.json")).expect("secrets.json");
     assert!(

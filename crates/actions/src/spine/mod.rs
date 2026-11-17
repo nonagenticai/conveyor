@@ -2243,7 +2243,11 @@ async fn benefits_transition_upsert(
         &ctx,
         "benefit_transition",
         record.id,
-        if current.is_some() { "updated" } else { "created" },
+        if current.is_some() {
+            "updated"
+        } else {
+            "created"
+        },
     )
     .await?;
     Ok(HandlerOutput::ok(benefit_transition_out(&record)).with_etag(etag_of(record.version)))
@@ -2770,13 +2774,6 @@ async fn stakeholders_profile_delete(
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
-    emit_spine_event(
-        &mut *tx,
-        &ctx,
-        "stakeholder_profile",
-        input.id,
-        "deleted",
-    )
-    .await?;
+    emit_spine_event(&mut *tx, &ctx, "stakeholder_profile", input.id, "deleted").await?;
     Ok(HandlerOutput::no_content(()))
 }
