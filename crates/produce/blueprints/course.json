@@ -1,0 +1,12 @@
+{
+  "key": "course",
+  "title": "A multi-lesson course",
+  "family": "production",
+  "phases": [
+    { "id": "outline", "action": "produce.script", "params": {} },
+    { "id": "per_lesson_compilation", "action": "media.compile_video", "params": {} },
+    { "id": "stitch", "action": "media.compile_video", "params": {} },
+    { "id": "thumbnail", "action": "media.thumbnail", "params": {} }
+  ],
+  "unresolved": ["outline"]
+}

@@ -12,7 +12,7 @@
 # contributors. An estate build may override BASE_IMAGE without editing the file.
 # RUST_TOOLCHAIN must equal rust-toolchain.toml (the `checks` job asserts the root Dockerfile;
 # this file states the same value).
-ARG RUST_TOOLCHAIN=1.99.0
+ARG RUST_TOOLCHAIN=1.100.0
 ARG BASE_IMAGE=docker.io/library/debian:12-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
 # `""` (a service), `chromium`, or `ffmpeg`. Anything else is refused by the build, so a typo can
 # never ship an image that silently lacks the tool its capability shells out to.

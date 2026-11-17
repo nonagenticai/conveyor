@@ -8,7 +8,7 @@
 # The base is debian-slim rather than a Rust image (there is no glibc Rust image that fits),
 # so the pinned toolchain is installed by rustup; builder, web and runtime share one glibc.
 # RUST_TOOLCHAIN must equal rust-toolchain.toml.
-ARG RUST_TOOLCHAIN=1.99.0
+ARG RUST_TOOLCHAIN=1.100.0
 ARG BASE_IMAGE=docker.io/library/debian:12-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
 
 FROM ${BASE_IMAGE} AS build

@@ -1,0 +1,14 @@
+{
+  "key": "lesson",
+  "title": "One narrated lesson",
+  "family": "production",
+  "phases": [
+    { "id": "script", "action": "produce.script", "params": {} },
+    { "id": "slides", "action": "decks.render", "params": {} },
+    { "id": "stills", "action": "media.generate_image", "params": {} },
+    { "id": "narration", "action": "produce.speech", "params": {} },
+    { "id": "record", "action": "media.record_browser", "params": {} },
+    { "id": "compile", "action": "media.compile_video", "params": {} }
+  ],
+  "unresolved": ["script", "narration"]
+}

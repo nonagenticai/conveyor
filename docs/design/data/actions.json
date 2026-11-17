@@ -280,6 +280,7 @@
     "processes.publish",
     "processes.retire",
     "processes.update",
+    "produce.script",
     "produce.speech",
     "programmes.create",
     "programmes.get",

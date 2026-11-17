@@ -83,9 +83,11 @@ use serde_json::{Value, json};
 /// `refinements.*` (2), `laya_configs.*` (2), `ladder.record|evaluate|list|apply_draft` (4).
 /// 387 → **398**.
 /// **#245 adds 2 internal**: `documents.preview` and `documents.return`. 398 → **400**.
+/// **#163 adds 1 internal**: `produce.script`, the blueprint layer's dispatch.
+/// 400 → **401**.
 /// **#172 adds 3 internal**: the host family — `ops.host_status|host_logs|host_restart_unit`
-/// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 400 → **403**.
-const EXPECTED: [&str; 403] = [
+/// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 401 → **404**.
+const EXPECTED: [&str; 404] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -367,6 +369,7 @@ const EXPECTED: [&str; 403] = [
     "processes.publish",
     "processes.retire",
     "processes.update",
+    "produce.script",
     "programmes.create",
     "programmes.get",
     "programmes.list",
@@ -537,9 +540,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // decision-ladder actions (decision_policies.* 3, refinements.* 2, laya_configs.* 2,
     // ladder.record|evaluate|list|apply_draft 4), all internal: 369 → 380; external stays 18.
     // #245 adds `documents.preview` and `documents.return` (internal): 380 → 382.
-    // #172 adds the three host actions (internal; one destructive, two reads): 382 → 385;
+    // #163 adds `produce.script` (internal): 382 → 383; external stays 18.
+    // #172 adds the three host actions (internal; one destructive, two reads): 383 → 386;
     // external stays 18 — they call the host agent over ssh, not a declared external service.
-    assert_eq!((internal, external), (385, 18));
+    assert_eq!((internal, external), (386, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
