@@ -2,8 +2,7 @@
 
 Part of #213. Its single `blocked-by` (#205, the research cutover) closed on 2026-11-17 at
 14:30Z; the deployment half merged the same evening as
-[gitops-production#5323](https://github.com/nonagenticai/gitops-production/pull/5323)
-(`22d4b10`), Flux reconciled, and this document records what changed.
+the deployment repository's PR 5323 (`22d4b10`), Flux reconciled, and this document records what changed.
 
 **What was wrong.** The 17 Deployments in namespace `w2v` had reported `0/0` with no pod for
 weeks, and the 16 Services answered only those dead backends. `studio.nonagentic.ai` therefore
@@ -19,7 +18,7 @@ statement.
 | `services/w2v/services.yaml` | 16 Services | every one answered only the above |
 | `services/w2v/poddisruptionbudget.yaml` | 1 PDB set | over Deployments that no longer exist |
 | the `replicas:` transformer + ~800-line `patches:` block | — | every patch targeted a Deployment removed here |
-| `services-istio/w2v/virtualservice.yaml` → VS `w2v` | 1 VS | it routed `studio.nonagentic.ai` and `w2v.internal` at the dead backends |
+| `services-istio/w2v/virtualservice.yaml` → VS `w2v` | 1 VS | it routed the two hosts below at the dead backends |
 | `services-istio/w2v/destinationrule.yaml` | 1 DR | its only subject was `w2v-frontend` |
 
 **Kept, and stated in the kustomization:** the namespace, `pv-worker3.yaml`, `storage.yaml`
@@ -87,8 +86,8 @@ $ curl -sS -o /dev/null -w '%{http_code}' https://studio.nonagentic.ai
 404          # was 503 before the change
 $ curl -sS -o /dev/null -w '%{http_code}' https://w2v.nonagentic.ai
 308          # unchanged: the legacy redirect carries no backend
-$ getent hosts w2v.internal          # in-cluster, from a conveyor pod
-100.81.177.99   w2v.internal        # the ingress address, unchanged
+$ getent hosts <the namespace's in-cluster name>   # from a conveyor pod
+<the ingress address>  <the same name>            # unchanged
 ```
 
 ### P2.3 — the namespace's Redis is named by nobody else
@@ -120,16 +119,16 @@ request and passed, which is the run that matters.
 
 ## The third consequence: a dark DNS name
 
-Removing the `w2v` VirtualService left `w2v.internal` in the master's dnsmasq pointing at the
-gateway VIP with nothing behind it. The next pull request to touch
+Removing the `w2v` VirtualService left the namespace's in-cluster DNS name in the master's
+dnsmasq pointing at the gateway VIP with nothing behind it. The next pull request to touch
 `scripts/host-configs/**` surfaced it:
 
 ```
-ERROR [dnsmasq] w2v.internal points at the gateway VIP (100.81.177.99) but has NO VirtualService,
+ERROR [dnsmasq] <the name> points at the gateway VIP (<the address>) but has NO VirtualService,
 no coredns-static-hosts entry, and is not in GATEWAY_VIP_NON_VS — it is a DARK name
 ```
 
 That check is right, and it is the reason a removal is not finished when the manifests go: a
 name that still claims to exist but answers 404 is worse than a name that is gone. The record
-was removed in [gitops-production#5325](https://github.com/nonagenticai/gitops-production/pull/5325),
+was removed in the deployment repository's PR 5325,
 and `check-host-config-consistency.py` then reported *0 error(s), 0 warning(s) across 5 hosts*.
