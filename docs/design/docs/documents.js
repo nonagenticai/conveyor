@@ -164,6 +164,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-14-licenses-absorption.md"
     },
     {
+      "title": "Research cutover — 2026-11-16",
+      "path": "docs/evidence/2026-11-16-research-cutover.html",
+      "source": "docs/evidence/2026-11-16-research-cutover.md",
+      "section": "Evidence",
+      "sha256": "e6eb82e763510e13d929e962c556afedbfbf0d6a78250f33692075a8d07d75a5",
+      "bytes": 6288,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-research-cutover.md"
+    },
+    {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
       "path": "docs/evidence/D23-EVAL-CALLER.html",
       "source": "docs/evidence/D23-EVAL-CALLER.md",
