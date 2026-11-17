@@ -267,7 +267,13 @@ fn claim_probe(claim_type: &str) -> Option<fn(&Html) -> bool> {
 /// static artifact, or a bare path) is NOT assumed to be a homepage — unknown never suppresses a
 /// finding.
 fn is_homepage_url(url: &str) -> bool {
-    let Ok(parsed) = Url::parse(url) else {
+    // Python's `urlparse` gives a scheme-relative URL a host; `Url::parse` needs a scheme.
+    let trimmed = url.trim_start();
+    let candidate = match trimmed.strip_prefix("//") {
+        Some(rest) => format!("https://{rest}"),
+        None => trimmed.to_owned(),
+    };
+    let Ok(parsed) = Url::parse(&candidate) else {
         return false;
     };
     let has_host = parsed.host_str().is_some_and(|host| !host.is_empty());
@@ -478,7 +484,7 @@ fn is_contact_form<'a>(form: ElementRef<'a>, html: &'a Html) -> bool {
 
     if !message_fields.is_empty() {
         let mut context = vec![
-            submit.clone(),
+            submit,
             form_identity(form),
             form.attr("action").unwrap_or("").to_owned(),
             form_heading(form, html),
@@ -511,18 +517,7 @@ fn is_search_form<'a>(
         || form
             .descendent_elements()
             .any(|el| el.value().name() == "search")
-        || {
-            let mut current = form.parent().and_then(ElementRef::wrap);
-            let mut inside = false;
-            while let Some(ancestor) = current {
-                if ancestor.value().name() == "search" {
-                    inside = true;
-                    break;
-                }
-                current = ancestor.parent().and_then(ElementRef::wrap);
-            }
-            inside
-        }
+        || has_ancestor_named(form, "search")
     {
         return true;
     }
@@ -560,7 +555,7 @@ fn is_search_form<'a>(
 }
 
 /// A comment, reply or review form (WordPress `wp-comments-post.php` and kin).
-fn is_feedback_form<'a>(form: ElementRef<'a>, submit: &str) -> bool {
+fn is_feedback_form(form: ElementRef<'_>, submit: &str) -> bool {
     let identity = format!(
         "{} {}",
         form_identity(form),
@@ -574,13 +569,25 @@ fn is_feedback_form<'a>(form: ElementRef<'a>, submit: &str) -> bool {
     }
     form.descendent_elements().any(|field| {
         matches!(field.value().name(), "input" | "textarea" | "select")
-            && field
+            && (field
                 .attr("name")
                 .is_some_and(|name| FEEDBACK_FIELD_NAME_RE.is_match(name))
-            || field
-                .attr("id")
-                .is_some_and(|id| FEEDBACK_FIELD_NAME_RE.is_match(id))
+                || field
+                    .attr("id")
+                    .is_some_and(|id| FEEDBACK_FIELD_NAME_RE.is_match(id)))
     })
+}
+
+/// Whether an ancestor of `element` has the given tag name (`find_parent`).
+fn has_ancestor_named(element: ElementRef<'_>, name: &str) -> bool {
+    let mut current = element.parent().and_then(ElementRef::wrap);
+    while let Some(ancestor) = current {
+        if ancestor.value().name() == name {
+            return true;
+        }
+        current = ancestor.parent().and_then(ElementRef::wrap);
+    }
+    false
 }
 
 /// `_FEEDBACK_MARKER_RE`: the plain alternatives, plus `review` only when it is not preceded by a
@@ -618,7 +625,7 @@ fn field_label<'a>(field: ElementRef<'a>, html: &'a Html) -> String {
         "aria-label",
         "title",
     ]
-    .iter()
+    .into_iter()
     .map(|attr| field.attr(attr).unwrap_or("").to_owned())
     .collect();
     if let Some(label) = field.attr("id").filter(|id| !id.is_empty()).and_then(|id| {
