@@ -1,7 +1,7 @@
 {
   "actions_invoked": [
     {
-      "line": 1225,
+      "line": 1237,
       "name": "approvals.decide"
     },
     {
@@ -29,71 +29,71 @@
       "name": "cards.release"
     },
     {
-      "line": 2408,
+      "line": 2420,
       "name": "documents.compose"
     },
     {
-      "line": 2895,
+      "line": 2907,
       "name": "documents.compose"
     },
     {
-      "line": 2690,
+      "line": 2702,
       "name": "documents.create"
     },
     {
-      "line": 2761,
+      "line": 2773,
       "name": "documents.delete"
     },
     {
-      "line": 2707,
+      "line": 2719,
       "name": "documents.download"
     },
     {
-      "line": 2740,
+      "line": 2752,
       "name": "documents.download"
     },
     {
-      "line": 2430,
+      "line": 2442,
       "name": "documents.get"
     },
     {
-      "line": 2725,
+      "line": 2737,
       "name": "documents.get"
     },
     {
-      "line": 1062,
+      "line": 1074,
       "name": "documents.list"
     },
     {
-      "line": 1085,
+      "line": 1097,
       "name": "documents.list"
     },
     {
-      "line": 1112,
+      "line": 1124,
       "name": "documents.list"
     },
     {
-      "line": 2658,
+      "line": 2670,
       "name": "documents.list"
     },
     {
-      "line": 2792,
+      "line": 2804,
       "name": "documents.preview"
     },
     {
-      "line": 2838,
+      "line": 2850,
       "name": "documents.return"
     },
     {
-      "line": 2579,
+      "line": 2591,
       "name": "documents.revision_get"
     },
     {
-      "line": 2540,
+      "line": 2552,
       "name": "documents.revision_list"
     },
     {
-      "line": 1248,
+      "line": 1260,
       "name": "process_runs.start"
     },
     {
@@ -105,27 +105,27 @@
       "name": "programmes.list"
     },
     {
-      "line": 2339,
+      "line": 2351,
       "name": "projects.close"
     },
     {
-      "line": 2222,
+      "line": 2234,
       "name": "projects.create"
     },
     {
-      "line": 2230,
+      "line": 2242,
       "name": "projects.update"
     },
     {
-      "line": 1198,
+      "line": 1210,
       "name": "runs.cancel"
     },
     {
-      "line": 1176,
+      "line": 1188,
       "name": "runs.get"
     },
     {
-      "line": 1153,
+      "line": 1165,
       "name": "runs.list"
     }
   ],
@@ -268,8 +268,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 6,
-        "claimed": 4,
+        "blocked": 9,
+        "claimed": 7,
         "numbers": [
           17,
           22,
@@ -284,25 +284,29 @@
           95,
           102,
           154,
-          163,
           164,
           193,
+          212,
           213,
           222,
           223,
           224,
           225,
-          226,
-          258,
           260,
-          265,
-          274,
           282,
           283,
           284,
-          285
+          285,
+          294,
+          295,
+          296,
+          299,
+          302,
+          303,
+          305,
+          307
         ],
-        "open": 15,
+        "open": 24,
         "ready": 5,
         "unknown": 0
       }
