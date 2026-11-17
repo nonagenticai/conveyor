@@ -1677,6 +1677,46 @@ async fn seed_parity_profile(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uu
     id
 }
 
+async fn seed_parity_benefit_link(
+    pg: &support::Pg,
+    ctx: &Ctx,
+    programme: Uuid,
+    benefit: Uuid,
+) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO benefit_link
+             (tenant_id, programme_id, output_ref, capability_ref, operational_outcome,
+              benefit_id, strategic_objective, kind)
+         VALUES ($1, $2, 'parity output', 'parity capability', 'parity outcome', $3,
+                 'parity objective', 'benefit') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .bind(benefit)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert benefit link");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_cadence(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_cadence (tenant_id, programme_id, kind, period)
+         VALUES ($1, $2, 'pi', $3) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .bind(format!("PI-{}", Uuid::now_v7().simple()))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert cadence");
+    tx.commit().await.expect("commit");
+    id
+}
+
 /// Seed a decision policy for one (kind, gate) case the T2 samples evaluate and refine.
 ///
 /// The kind embeds the row id, so a sample's input can derive the case from the prepared id and
@@ -1849,6 +1889,59 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let b = seed_parity_benefit(pg, ctx, g).await;
             ctx.push("benefits.link.programme", g);
             ctx.push("benefits.link.benefit", b);
+        }
+        "benefits.update" | "benefits.delete" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let b = seed_parity_benefit(pg, ctx, g).await;
+            ctx.push(sample.name, b);
+        }
+        "benefits.link_list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push(sample.name, g);
+        }
+        "benefits.unlink" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let b = seed_parity_benefit(pg, ctx, g).await;
+            let l = seed_parity_benefit_link(pg, ctx, g, b).await;
+            ctx.push(sample.name, l);
+        }
+        "benefits.transition_list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push(sample.name, g);
+        }
+        "benefits.transition_upsert" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let b = seed_parity_benefit(pg, ctx, g).await;
+            ctx.push(sample.name, b);
+        }
+        "tranches.update" | "tranches.delete" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let t = seed_parity_tranche(pg, ctx, g).await;
+            ctx.push(sample.name, t);
+        }
+        "tranches.review_list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push(sample.name, g);
+        }
+        "cadences.update" | "cadences.delete" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let c = seed_parity_cadence(pg, ctx, g).await;
+            ctx.push(sample.name, c);
+        }
+        "wbs.delete" => {
+            let p = seed_parity_project(pg, ctx).await;
+            let w = seed_parity_wbs(pg, ctx, p).await;
+            ctx.push(sample.name, w);
+        }
+        "registers.delete" => {
+            let p = seed_parity_project(pg, ctx).await;
+            let r = seed_parity_register(pg, ctx, p).await;
+            ctx.push(sample.name, r);
+        }
+        "stakeholders.profile_delete" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let profile = seed_parity_profile(pg, ctx, g).await;
+            ctx.push(sample.name, profile);
         }
         "cadences.create" => {
             let g = seed_parity_programme(pg, ctx).await;
@@ -5262,6 +5355,61 @@ fn spine_samples() -> Vec<Sample> {
             });
             expecting(sample, 200)
         },
+        // ── the MSP edit/delete surface (#305) ──────────────────────────────────────────
+        // The seeded benefit has no baseline/target/method/owner, so an edit reaches the
+        // completeness rule and both transports must refuse identically.
+        {
+            let mut sample = on_prepared("benefits.update", Some("\"1\""));
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("benefits.update"), "category": "efficiency"}),
+            );
+            expecting(sample, 422)
+        },
+        expecting(on_prepared("benefits.delete", Some("\"1\"")), 204),
+        {
+            let mut sample = plain("benefits.link_list", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("benefits.link_list")}));
+            expecting(sample, 200)
+        },
+        expecting(on_prepared("benefits.unlink", Some("\"1\"")), 204),
+        {
+            let mut sample = plain("benefits.transition_list", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("benefits.transition_list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("benefits.transition_upsert", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "benefit_id": ctx.pop("benefits.transition_upsert"),
+                    "baseline_measured_at": "2026-11-17T00:00:00Z",
+                    "readiness": {"state": "ready"},
+                })
+            });
+            expecting(sample, 200)
+        },
+        expecting(on_prepared("tranches.update", Some("\"1\"")), 200),
+        expecting(on_prepared("tranches.delete", Some("\"1\"")), 204),
+        {
+            let mut sample = plain("tranches.review_list", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("tranches.review_list")}));
+            expecting(sample, 200)
+        },
+        expecting(on_prepared("cadences.update", Some("\"1\"")), 200),
+        expecting(on_prepared("cadences.delete", Some("\"1\"")), 204),
+        expecting(on_prepared("wbs.delete", Some("\"1\"")), 204),
+        expecting(on_prepared("registers.delete", Some("\"1\"")), 204),
+        expecting(
+            on_prepared("stakeholders.profile_delete", Some("\"1\"")),
+            204,
+        ),
     ]
 }
 
