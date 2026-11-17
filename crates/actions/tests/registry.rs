@@ -85,7 +85,7 @@ use serde_json::{Value, json};
 /// **#245 adds 2 internal**: `documents.preview` and `documents.return`. 398 → **400**.
 /// **#163 adds 1 internal**: `produce.script`, the blueprint layer's dispatch.
 /// 400 → **401**.
-const EXPECTED: [&str; 401] = [
+const EXPECTED: [&str; 415] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -109,14 +109,22 @@ const EXPECTED: [&str; 401] = [
     "benchmark_runs.trend",
     "benchmark_suites.list",
     "benefits.create",
+    "benefits.delete",
     "benefits.get",
     "benefits.link",
+    "benefits.link_list",
     "benefits.list",
+    "benefits.transition_list",
+    "benefits.transition_upsert",
+    "benefits.unlink",
+    "benefits.update",
     "billing.summary",
     "boards.get",
     "boards.set_member",
     "cadences.create",
+    "cadences.delete",
     "cadences.list",
+    "cadences.update",
     "capabilities.bind_knowledge",
     "capabilities.get",
     "capabilities.list",
@@ -397,6 +405,7 @@ const EXPECTED: [&str; 401] = [
     "refinements.list",
     "refinements.publish",
     "registers.create",
+    "registers.delete",
     "registers.get",
     "registers.list",
     "registers.update",
@@ -436,6 +445,7 @@ const EXPECTED: [&str; 401] = [
     "stakeholders.get",
     "stakeholders.list",
     "stakeholders.profile_create",
+    "stakeholders.profile_delete",
     "stakeholders.profile_list",
     "stakeholders.profile_update",
     "stakeholders.update",
@@ -452,8 +462,11 @@ const EXPECTED: [&str; 401] = [
     "trace_links.delete",
     "trace_links.list",
     "tranches.create",
+    "tranches.delete",
     "tranches.list",
     "tranches.review",
+    "tranches.review_list",
+    "tranches.update",
     "view_connections.create",
     "view_connections.delete",
     "view_connections.update",
@@ -461,6 +474,7 @@ const EXPECTED: [&str; 401] = [
     "view_objects.delete",
     "view_objects.update",
     "wbs.create",
+    "wbs.delete",
     "wbs.get",
     "wbs.list",
     "wbs.update",
@@ -536,7 +550,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // ladder.record|evaluate|list|apply_draft 4), all internal: 369 → 380; external stays 18.
     // #245 adds `documents.preview` and `documents.return` (internal): 380 → 382.
     // #163 adds `produce.script` (internal): 382 → 383; external stays 18.
-    assert_eq!((internal, external), (383, 18));
+    // #305 adds the fourteen MSP edit/read actions (benefits update/delete/link_list/unlink/
+    // transition_list/transition_upsert, tranches update/delete/review_list, cadences
+    // update/delete, wbs.delete, registers.delete, stakeholders.profile_delete), all internal:
+    // 383 → 397; external stays 18.
+    assert_eq!((internal, external), (397, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

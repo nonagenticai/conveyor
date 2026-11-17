@@ -28,6 +28,10 @@ pub struct SnapshotData {
     pub config: Value,
     /// `work.json` data: boards, lists, cards, runs, approvals, comments, people.
     pub work: Value,
+    /// `msp.json` data: the programme-definition records — benefit profiles, the benefits map,
+    /// realization, stakeholder profiles, tranches and their reviews, baselines, cadence, WBS,
+    /// registers and typed project dependencies.
+    pub msp: Value,
     /// `artefacts.json` data: governed assets and document metadata.
     pub artefacts: Value,
     /// `measure.json` data: inference aggregates (no prompt or response bodies exist).
@@ -344,6 +348,143 @@ pub async fn snapshot_tx(
     .fetch_one(&mut *conn)
     .await?;
 
+    // The MSP records (#305). Explicit columns: a later migration's column cannot leak in. The
+    // actor ids are joined to a display name, matching the work section's convention.
+    let benefit_profiles = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.reference, t.id), '[]'::jsonb) FROM (
+             SELECT id, programme_id, project_id, register_item_id, reference, description,
+                    category, objectives, observable_outcome, kpis, baseline, target,
+                    measurement_method, financial_value, cost, capabilities, preconditions,
+                    risks, owner_job_id, benefit_owner_job_id, operational_area, status, version,
+                    created_at, updated_at
+               FROM benefit_profile WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let benefit_links = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.benefit_id, t.created_at, t.id), '[]'::jsonb) FROM (
+             SELECT id, programme_id, output_ref, capability_ref, operational_outcome, benefit_id,
+                    strategic_objective, kind, version, created_at
+               FROM benefit_link WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let benefit_transitions = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.benefit_id, t.created_at, t.id), '[]'::jsonb) FROM (
+             SELECT id, benefit_id, baseline_measured_at, readiness, enacted_at, post_measured_at,
+                    retired_at, evidence, version, created_at, updated_at
+               FROM benefit_transition WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let stakeholder_profiles = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.name, t.id), '[]'::jsonb) FROM (
+             SELECT id, programme_id, project_id, name, concerns, sensitivities, importance,
+                    influence, interest, exposure, support_level, support_trend,
+                    engagement_target, benefits, disbenefits, version, created_at, updated_at
+               FROM stakeholder_profile WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let tranches = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.programme_id, t.number), '[]'::jsonb) FROM (
+             SELECT id, programme_id, number, state, entry_criteria, exit_criteria, baseline_ref,
+                    review_at, version, created_at, updated_at
+               FROM programme_tranche WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let tranche_reviews = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.tranche_id, t.reviewed_at, t.id), '[]'::jsonb) FROM (
+             SELECT r.id, r.tranche_id, r.decision, r.evidence, r.reviewed_by,
+                    u.display_name AS reviewer_name, r.reviewed_at, r.version
+               FROM programme_tranche_review r
+               LEFT JOIN app_user u ON u.id = r.reviewed_by
+              WHERE r.tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let programme_baselines = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.programme_id, t.kind, t.taken_at, t.id), '[]'::jsonb) FROM (
+             SELECT b.id, b.programme_id, b.kind, b.snapshot, b.taken_at, b.taken_by,
+                    ub.display_name AS taken_by_name, b.approved_by,
+                    ua.display_name AS approved_by_name, b.version, b.created_at
+               FROM programme_baseline b
+               LEFT JOIN app_user ub ON ub.id = b.taken_by
+               LEFT JOIN app_user ua ON ua.id = b.approved_by
+              WHERE b.tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let cadences = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.programme_id, t.kind, t.period, t.id), '[]'::jsonb) FROM (
+             SELECT id, programme_id, kind, period, state, meta, version, created_at, updated_at
+               FROM programme_cadence WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let wbs_nodes = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id, t.parent_id, t.position, t.id), '[]'::jsonb) FROM (
+             SELECT id, project_id, parent_id, position::float8 AS position, kind, title, body,
+                    status, acceptance, evidence, card_id, business_value, time_criticality,
+                    risk_reduction, job_size, version, created_at, updated_at
+               FROM wbs_node WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let project_baselines = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id, t.taken_at, t.id), '[]'::jsonb) FROM (
+             SELECT b.id, b.project_id, b.kind, b.snapshot, b.taken_at, b.taken_by,
+                    ub.display_name AS taken_by_name, b.approved_by,
+                    ua.display_name AS approved_by_name, b.version, b.created_at
+               FROM project_baseline b
+               LEFT JOIN app_user ub ON ub.id = b.taken_by
+               LEFT JOIN app_user ua ON ua.id = b.approved_by
+              WHERE b.tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let register_items = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id, t.created_at, t.id), '[]'::jsonb) FROM (
+             SELECT id, project_id, kind, code, title, body, owner_job_id, status, severity,
+                    probability, impact, links, baseline_ref, meta, version, created_at, updated_at
+               FROM project_register_item WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let project_dependencies = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.from_project, t.to_project, t.kind, t.id), '[]'::jsonb) FROM (
+             SELECT id, programme_id, from_project, to_project, kind, status, meta, version,
+                    created_at, updated_at
+               FROM project_dependency WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+
     Ok(SnapshotData {
         programme: json!({"programme": programme, "projects": projects}),
         // T0: the organisation spine (§4) — industries, the placed departments, the job
@@ -372,6 +513,20 @@ pub async fn snapshot_tx(
             "approval_decisions": approval_decisions,
             "comments": comments,
             "people": people
+        }),
+        msp: json!({
+            "benefit_profiles": benefit_profiles,
+            "benefit_links": benefit_links,
+            "benefit_transitions": benefit_transitions,
+            "stakeholder_profiles": stakeholder_profiles,
+            "tranches": tranches,
+            "tranche_reviews": tranche_reviews,
+            "programme_baselines": programme_baselines,
+            "cadences": cadences,
+            "wbs_nodes": wbs_nodes,
+            "project_baselines": project_baselines,
+            "register_items": register_items,
+            "project_dependencies": project_dependencies
         }),
         artefacts: json!({"governed_assets": assets, "documents": documents}),
         measure: json!({

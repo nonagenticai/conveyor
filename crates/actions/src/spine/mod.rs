@@ -32,10 +32,11 @@ use crate::views::{Page, PageIn};
 
 pub use crate::board::views::IdIn;
 pub use store::spine::{
-    BaselineRecord, BenefitLinkRecord, BenefitRecord, CadenceRecord, DependencyRecord,
-    InFlightRecord, NewBenefitLink, NewBenefitProfile, NewRegisterItem, NewStakeholderProfile,
-    NewWbsNode, PlanStoreError, RegisterRecord, StakeholderRecord, TrancheRecord, WbsPatch,
-    WbsRecord,
+    BaselineRecord, BenefitLinkRecord, BenefitPatch, BenefitRecord, CadencePatch, CadenceRecord,
+    DependencyRecord, InFlightRecord, NewBenefitLink, NewBenefitProfile, NewRegisterItem,
+    NewStakeholderProfile, NewWbsNode, PlanStoreError, RegisterRecord, StakeholderPatch,
+    StakeholderRecord, TranchePatch, TrancheRecord, TrancheReviewRecord, TransitionPatch,
+    TransitionRecord, WbsPatch, WbsRecord,
 };
 
 /// The one event every spine mutation emits.
@@ -107,7 +108,17 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "tranche_evidence_missing",
             "a tranche review needs baselines, benefit status and the risk register",
         ),
+        PlanStoreError::Illegal(PlanError::BenefitBaselineMissing) => invalid(
+            "baseline",
+            "benefit_baseline_missing",
+            "a benefit with no measured baseline cannot record a post-transition measurement",
+        ),
         PlanStoreError::Illegal(other) => invalid("input", "plan_refused", other.to_string()),
+        PlanStoreError::Conflict { what, why } => ActionError::new(
+            409,
+            "conflict",
+            format!("the {what} cannot be removed: {why}"),
+        ),
         PlanStoreError::Vocabulary { what, value } => {
             tracing::error!(what, value = %value, "a stored spine value is outside the domain");
             ActionError::internal()
@@ -576,6 +587,59 @@ pub struct TrancheReviewIn {
     pub evidence: Value,
 }
 
+/// `tranches.update`; `If-Match` is required.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TrancheUpdateIn {
+    /// The tranche.
+    pub id: Uuid,
+    /// Entry criteria.
+    pub entry_criteria: Option<Value>,
+    /// Exit criteria.
+    pub exit_criteria: Option<Value>,
+    /// The programme baseline it is managed against.
+    pub baseline_ref: Option<Uuid>,
+    /// The review date.
+    pub review_at: Option<DateTime<Utc>>,
+}
+
+/// `tranches.review_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TrancheReviewListIn {
+    /// The programme whose reviews are read.
+    pub programme_id: Uuid,
+}
+
+/// A recorded tranche review as `tranches.review_list` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TrancheReviewOut {
+    /// The row id.
+    pub id: String,
+    /// The reviewed tranche.
+    pub tranche_id: String,
+    /// `continue | pause | stop`.
+    pub decision: String,
+    /// The evidence the decision was taken on.
+    pub evidence: Value,
+    /// The acting user.
+    pub reviewed_by: String,
+    /// When the review was recorded.
+    pub reviewed_at: DateTime<Utc>,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+fn tranche_review_out(record: &TrancheReviewRecord) -> TrancheReviewOut {
+    TrancheReviewOut {
+        id: record.id.to_string(),
+        tranche_id: record.tranche_id.to_string(),
+        decision: record.decision.clone(),
+        evidence: record.evidence.clone(),
+        reviewed_by: record.reviewed_by.to_string(),
+        reviewed_at: record.reviewed_at,
+        version: record.version,
+    }
+}
+
 /// `tranches.list`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct TrancheListIn {
@@ -757,6 +821,137 @@ pub struct BenefitLinkOut {
 pub struct BenefitListIn {
     /// The programme whose benefits are read.
     pub programme_id: Uuid,
+}
+
+/// `benefits.update`; `If-Match` is required.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitUpdateIn {
+    /// The profile to edit.
+    pub id: Uuid,
+    /// The project.
+    pub project_id: Option<Uuid>,
+    /// The register row that indexes the benefit.
+    pub register_item_id: Option<Uuid>,
+    /// The reference.
+    pub reference: Option<String>,
+    /// The description.
+    pub description: Option<String>,
+    /// The category.
+    pub category: Option<String>,
+    /// The objectives.
+    pub objectives: Option<Value>,
+    /// The observable outcome.
+    pub observable_outcome: Option<String>,
+    /// The KPIs.
+    pub kpis: Option<Value>,
+    /// The measured baseline.
+    pub baseline: Option<Value>,
+    /// The target.
+    pub target: Option<Value>,
+    /// The measurement method.
+    pub measurement_method: Option<String>,
+    /// The financial value.
+    pub financial_value: Option<String>,
+    /// The cost.
+    pub cost: Option<Value>,
+    /// Required capabilities.
+    pub capabilities: Option<Value>,
+    /// Preconditions.
+    pub preconditions: Option<Value>,
+    /// Risks.
+    pub risks: Option<Value>,
+    /// The owning job.
+    pub owner_job_id: Option<Uuid>,
+    /// The BCM job.
+    pub benefit_owner_job_id: Option<Uuid>,
+    /// The operational area.
+    pub operational_area: Option<String>,
+    /// `draft | active | realized | disbenefit | closed`.
+    pub status: Option<String>,
+}
+
+/// `benefits.link_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitLinkListIn {
+    /// The programme whose edges are read.
+    pub programme_id: Uuid,
+}
+
+/// `benefits.transition_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitTransitionListIn {
+    /// The programme whose realization records are read.
+    pub programme_id: Uuid,
+}
+
+/// `benefits.transition_upsert`; `If-Match` is required when the record exists.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitTransitionUpsertIn {
+    /// The benefit.
+    pub benefit_id: Uuid,
+    /// When the baseline was measured.
+    pub baseline_measured_at: Option<DateTime<Utc>>,
+    /// The readiness assessment.
+    pub readiness: Option<Value>,
+    /// When the transition was enacted.
+    pub enacted_at: Option<DateTime<Utc>>,
+    /// When the post-transition measurement was taken.
+    pub post_measured_at: Option<DateTime<Utc>>,
+    /// When the legacy practice was retired.
+    pub retired_at: Option<DateTime<Utc>>,
+    /// The evidence.
+    pub evidence: Option<Value>,
+}
+
+/// A realization record as `benefits.transition_*` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitTransitionOut {
+    /// The row id.
+    pub id: String,
+    /// The benefit.
+    pub benefit_id: String,
+    /// When the baseline was measured.
+    pub baseline_measured_at: Option<DateTime<Utc>>,
+    /// The readiness assessment.
+    pub readiness: Value,
+    /// When the transition was enacted.
+    pub enacted_at: Option<DateTime<Utc>>,
+    /// When the post-transition measurement was taken.
+    pub post_measured_at: Option<DateTime<Utc>>,
+    /// When the legacy practice was retired.
+    pub retired_at: Option<DateTime<Utc>>,
+    /// The evidence.
+    pub evidence: Value,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+fn benefit_link_out(record: &BenefitLinkRecord) -> BenefitLinkOut {
+    BenefitLinkOut {
+        id: record.id.to_string(),
+        programme_id: record.programme_id.to_string(),
+        output_ref: record.output_ref.clone(),
+        capability_ref: record.capability_ref.clone(),
+        operational_outcome: record.operational_outcome.clone(),
+        benefit_id: record.benefit_id.to_string(),
+        strategic_objective: record.strategic_objective.clone(),
+        kind: record.kind.clone(),
+        version: record.version,
+    }
+}
+
+fn benefit_transition_out(record: &TransitionRecord) -> BenefitTransitionOut {
+    BenefitTransitionOut {
+        id: record.id.to_string(),
+        benefit_id: record.benefit_id.to_string(),
+        baseline_measured_at: record.baseline_measured_at,
+        readiness: record.readiness.clone(),
+        enacted_at: record.enacted_at,
+        post_measured_at: record.post_measured_at,
+        retired_at: record.retired_at,
+        evidence: record.evidence.clone(),
+        version: record.version,
+    }
 }
 
 // ── WBS actions ─────────────────────────────────────────────────────────────────────────
@@ -962,6 +1157,44 @@ async fn wbs_list(
         items,
         next_cursor: None,
     })
+}
+
+/// Remove a WBS node; a node with children is refused.
+#[crate::action(
+    name = "wbs.delete",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "destructive",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn wbs_delete(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<()>, ActionError> {
+    let current = store::spine::get_wbs_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such WBS node"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    store::spine::delete_wbs_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "wbs_node", input.id, "deleted").await?;
+    Ok(HandlerOutput::no_content(()))
 }
 
 // ── baseline actions ────────────────────────────────────────────────────────────────────
@@ -1212,6 +1445,44 @@ async fn registers_list(
     })
 }
 
+/// Remove a register item; an item a benefit profile indexes is refused.
+#[crate::action(
+    name = "registers.delete",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "destructive",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn registers_delete(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<()>, ActionError> {
+    let current = store::spine::get_register_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such register item"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    store::spine::delete_register_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "project_register_item", input.id, "deleted").await?;
+    Ok(HandlerOutput::no_content(()))
+}
+
 // ── dependency actions ─────────────────────────────────────────────────────────────────
 
 /// Create a dependency edge; a cycle is refused in the same transaction.
@@ -1403,6 +1674,7 @@ async fn tranches_review(
         input.id,
         input.decision.trim(),
         &input.evidence,
+        ctx.actor_id,
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
@@ -1432,6 +1704,114 @@ async fn tranches_list(
         .map_err(|error| spine_error(error, ctx.action))?;
     Ok(Page {
         items: records.iter().map(tranche_out).collect(),
+        next_cursor: None,
+    })
+}
+
+/// Edit a tranche's plan fields; the state changes only through the review.
+#[crate::action(
+    name = "tranches.update",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn tranches_update(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: TrancheUpdateIn,
+) -> Result<HandlerOutput<TrancheOut>, ActionError> {
+    let current = store::spine::get_tranche_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such tranche"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    let record = store::spine::update_tranche_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+        &TranchePatch {
+            entry_criteria: input.entry_criteria,
+            exit_criteria: input.exit_criteria,
+            baseline_ref: input.baseline_ref,
+            review_at: input.review_at,
+        },
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "programme_tranche", record.id, "updated").await?;
+    Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// Remove a tranche. A reviewed tranche is refused: the review is history.
+#[crate::action(
+    name = "tranches.delete",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "destructive",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn tranches_delete(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<()>, ActionError> {
+    let current = store::spine::get_tranche_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such tranche"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    store::spine::delete_tranche_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "programme_tranche", input.id, "deleted").await?;
+    Ok(HandlerOutput::no_content(()))
+}
+
+/// List a programme's recorded tranche reviews.
+#[crate::action(
+    name = "tranches.review_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn tranches_review_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: TrancheReviewListIn,
+) -> Result<Page<TrancheReviewOut>, ActionError> {
+    let records = store::spine::list_tranche_reviews_tx(&mut *tx, ctx.tenant, input.programme_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(tranche_review_out).collect(),
         next_cursor: None,
     })
 }
@@ -1512,12 +1892,12 @@ async fn benefits_get(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: IdIn,
-) -> Result<BenefitOut, ActionError> {
+) -> Result<HandlerOutput<BenefitOut>, ActionError> {
     let record = store::spine::get_benefit_tx(&mut *tx, ctx.tenant, input.id)
         .await
         .map_err(|error| spine_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such benefit profile"))?;
-    Ok(benefit_out(&record))
+    Ok(HandlerOutput::ok(benefit_out(&record)).with_etag(etag_of(record.version)))
 }
 
 /// List a programme's benefit profiles.
@@ -1601,6 +1981,274 @@ async fn benefits_link(
     .with_etag(etag_of(record.version)))
 }
 
+/// Edit a benefit profile; the merged measurement record is re-validated.
+#[crate::action(
+    name = "benefits.update",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_update(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BenefitUpdateIn,
+) -> Result<HandlerOutput<BenefitOut>, ActionError> {
+    if let Some(status) = input.status.as_deref()
+        && !matches!(
+            status,
+            "draft" | "active" | "realized" | "disbenefit" | "closed"
+        )
+    {
+        return Err(invalid(
+            "status",
+            "unknown_status",
+            "status must be draft, active, realized, disbenefit or closed",
+        ));
+    }
+    let reference = match input.reference {
+        Some(reference) => {
+            let trimmed = reference.trim().to_owned();
+            if trimmed.is_empty() {
+                return Err(invalid("reference", "required", "a reference is required"));
+            }
+            Some(trimmed)
+        }
+        None => None,
+    };
+    let current = store::spine::get_benefit_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such benefit profile"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    let record = store::spine::update_benefit_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+        &BenefitPatch {
+            project_id: input.project_id,
+            register_item_id: input.register_item_id,
+            reference,
+            description: input.description,
+            category: input.category,
+            objectives: input.objectives,
+            observable_outcome: input.observable_outcome,
+            kpis: input.kpis,
+            baseline: input.baseline,
+            target: input.target,
+            measurement_method: input.measurement_method,
+            financial_value: input.financial_value,
+            cost: input.cost,
+            capabilities: input.capabilities,
+            preconditions: input.preconditions,
+            risks: input.risks,
+            owner_job_id: input.owner_job_id,
+            benefit_owner_job_id: input.benefit_owner_job_id,
+            operational_area: input.operational_area,
+            status: input.status,
+        },
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "benefit_profile", record.id, "updated").await?;
+    Ok(HandlerOutput::ok(benefit_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// Remove a benefit profile; its links and transition cascade.
+#[crate::action(
+    name = "benefits.delete",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "destructive",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_delete(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<()>, ActionError> {
+    let current = store::spine::get_benefit_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such benefit profile"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    store::spine::delete_benefit_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "benefit_profile", input.id, "deleted").await?;
+    Ok(HandlerOutput::no_content(()))
+}
+
+/// List a programme's benefits-map edges.
+#[crate::action(
+    name = "benefits.link_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_link_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BenefitLinkListIn,
+) -> Result<Page<BenefitLinkOut>, ActionError> {
+    let records = store::spine::list_benefit_links_tx(&mut *tx, ctx.tenant, input.programme_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(benefit_link_out).collect(),
+        next_cursor: None,
+    })
+}
+
+/// Remove one benefits-map edge.
+#[crate::action(
+    name = "benefits.unlink",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "destructive",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_unlink(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<()>, ActionError> {
+    let current = store::spine::get_benefit_link_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such benefits-map edge"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    store::spine::delete_benefit_link_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "benefit_link", input.id, "deleted").await?;
+    Ok(HandlerOutput::no_content(()))
+}
+
+/// List a programme's benefit realization records.
+#[crate::action(
+    name = "benefits.transition_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_transition_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BenefitTransitionListIn,
+) -> Result<Page<BenefitTransitionOut>, ActionError> {
+    let records = store::spine::list_transitions_tx(&mut *tx, ctx.tenant, input.programme_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(benefit_transition_out).collect(),
+        next_cursor: None,
+    })
+}
+
+/// Create or correct a benefit's realization record.
+#[crate::action(
+    name = "benefits.transition_upsert",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_transition_upsert(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BenefitTransitionUpsertIn,
+) -> Result<HandlerOutput<BenefitTransitionOut>, ActionError> {
+    let current = store::spine::get_transition_tx(&mut *tx, ctx.tenant, input.benefit_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    let expected = match &current {
+        Some(current) => {
+            let expected = require_precondition_with(
+                &ctx,
+                ctx.action,
+                serde_json::json!({ "version": current.version }),
+            )?;
+            Some(i64::try_from(expected.get()).unwrap_or(i64::MAX))
+        }
+        None => None,
+    };
+    let record = store::spine::upsert_transition_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.benefit_id,
+        expected,
+        &TransitionPatch {
+            baseline_measured_at: input.baseline_measured_at,
+            readiness: input.readiness,
+            enacted_at: input.enacted_at,
+            post_measured_at: input.post_measured_at,
+            retired_at: input.retired_at,
+            evidence: input.evidence,
+        },
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "benefit_transition",
+        record.id,
+        if current.is_some() { "updated" } else { "created" },
+    )
+    .await?;
+    Ok(HandlerOutput::ok(benefit_transition_out(&record)).with_etag(etag_of(record.version)))
+}
+
 // ── cadence and stakeholder views ───────────────────────────────────────────────────────
 
 /// A cadence row as `cadences.*` returns it.
@@ -1643,6 +2291,19 @@ pub struct CadenceCreateIn {
     pub kind: String,
     /// The period label (e.g. `PI-2027.1`).
     pub period: String,
+    /// Free-form metadata.
+    pub meta: Option<Value>,
+}
+
+/// `cadences.update`; `If-Match` is required.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CadenceUpdateIn {
+    /// The cadence row.
+    pub id: Uuid,
+    /// The period label.
+    pub period: Option<String>,
+    /// The state.
+    pub state: Option<String>,
     /// Free-form metadata.
     pub meta: Option<Value>,
 }
@@ -1750,14 +2411,30 @@ pub struct StakeholderCreateIn {
 pub struct StakeholderUpdateIn {
     /// The profile to edit.
     pub id: Uuid,
+    /// The name.
+    pub name: Option<String>,
+    /// The new concerns.
+    pub concerns: Option<String>,
+    /// The new sensitivities.
+    pub sensitivities: Option<String>,
+    /// The new importance.
+    pub importance: Option<String>,
+    /// The new influence.
+    pub influence: Option<String>,
+    /// The new interest.
+    pub interest: Option<String>,
+    /// The new exposure.
+    pub exposure: Option<String>,
     /// The new support level.
     pub support_level: Option<String>,
     /// The new support trend.
     pub support_trend: Option<String>,
     /// The new engagement target.
     pub engagement_target: Option<String>,
-    /// The new concerns.
-    pub concerns: Option<String>,
+    /// The benefits distributed to the group.
+    pub benefits: Option<Value>,
+    /// The disbenefits distributed to the group.
+    pub disbenefits: Option<Value>,
 }
 
 /// `stakeholders.profile_list`.
@@ -1837,6 +2514,97 @@ async fn cadences_list(
         items: records.iter().map(cadence_out).collect(),
         next_cursor: None,
     })
+}
+
+/// Edit a cadence row.
+#[crate::action(
+    name = "cadences.update",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_update(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CadenceUpdateIn,
+) -> Result<HandlerOutput<CadenceOut>, ActionError> {
+    let current = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    let period = match input.period {
+        Some(period) => {
+            let trimmed = period.trim().to_owned();
+            if trimmed.is_empty() {
+                return Err(invalid("period", "required", "a period label is required"));
+            }
+            Some(trimmed)
+        }
+        None => None,
+    };
+    let record = store::spine::update_cadence_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+        &CadencePatch {
+            period,
+            state: input.state,
+            meta: input.meta,
+        },
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "programme_cadence", record.id, "updated").await?;
+    Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// Remove a cadence row.
+#[crate::action(
+    name = "cadences.delete",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "destructive",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_delete(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<()>, ActionError> {
+    let current = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    store::spine::delete_cadence_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "programme_cadence", input.id, "deleted").await?;
+    Ok(HandlerOutput::no_content(()))
 }
 
 /// Create a stakeholder profile.
@@ -1921,10 +2689,20 @@ async fn stakeholders_profile_update(
         ctx.tenant,
         input.id,
         i64::try_from(expected.get()).unwrap_or(i64::MAX),
-        input.support_level.as_deref(),
-        input.support_trend.as_deref(),
-        input.engagement_target.as_deref(),
-        input.concerns.as_deref(),
+        &StakeholderPatch {
+            name: input.name,
+            concerns: input.concerns,
+            sensitivities: input.sensitivities,
+            importance: input.importance,
+            influence: input.influence,
+            interest: input.interest,
+            exposure: input.exposure,
+            support_level: input.support_level,
+            support_trend: input.support_trend,
+            engagement_target: input.engagement_target,
+            benefits: input.benefits,
+            disbenefits: input.disbenefits,
+        },
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
@@ -1956,4 +2734,49 @@ async fn stakeholders_profile_list(
         items: records.iter().map(stakeholder_out).collect(),
         next_cursor: None,
     })
+}
+
+/// Remove a stakeholder profile.
+#[crate::action(
+    name = "stakeholders.profile_delete",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "destructive",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn stakeholders_profile_delete(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<()>, ActionError> {
+    let current = store::spine::get_stakeholder_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such stakeholder profile"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    store::spine::delete_stakeholder_profile_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "stakeholder_profile",
+        input.id,
+        "deleted",
+    )
+    .await?;
+    Ok(HandlerOutput::no_content(()))
 }

@@ -51,6 +51,14 @@ pub enum PlanStoreError {
         /// The stored value.
         value: String,
     },
+    /// The row cannot be removed while a dependent row names it.
+    #[error("the {what} cannot be removed: {why}")]
+    Conflict {
+        /// The row's noun.
+        what: &'static str,
+        /// Why the removal is refused.
+        why: &'static str,
+    },
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -336,6 +344,47 @@ pub async fn list_wbs_tx(
         .bind(project_id)
         .fetch_all(&mut *conn)
         .await?)
+}
+
+/// Remove a WBS node. A node with children is refused: removing a parent must not silently
+/// remove its subtree.
+pub async fn delete_wbs_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+) -> Result<(), PlanStoreError> {
+    let current = get_wbs_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "WBS node" })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale { what: "WBS node" });
+    }
+    let has_children: bool = sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM wbs_node WHERE tenant_id = $1 AND parent_id = $2)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if has_children {
+        return Err(PlanStoreError::Conflict {
+            what: "WBS node",
+            why: "it has child nodes",
+        });
+    }
+    let changed =
+        sqlx::query("DELETE FROM wbs_node WHERE tenant_id = $1 AND id = $2 AND version = $3")
+            .bind(tenant.as_uuid())
+            .bind(id)
+            .bind(expected)
+            .execute(&mut *conn)
+            .await?
+            .rows_affected();
+    if changed == 0 {
+        return Err(PlanStoreError::Stale { what: "WBS node" });
+    }
+    Ok(())
 }
 
 // ── project_baseline ─────────────────────────────────────────────────────────────────────
@@ -660,6 +709,54 @@ pub async fn update_register_tx(
     })
 }
 
+/// Remove a register item. An item a benefit profile indexes is refused: the measurement record
+/// must keep its register row.
+pub async fn delete_register_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+) -> Result<(), PlanStoreError> {
+    let current = get_register_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "register item",
+        })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale {
+            what: "register item",
+        });
+    }
+    let referenced: bool = sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM benefit_profile WHERE tenant_id = $1 AND register_item_id = $2)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if referenced {
+        return Err(PlanStoreError::Conflict {
+            what: "register item",
+            why: "a benefit profile indexes it",
+        });
+    }
+    let changed = sqlx::query(
+        "DELETE FROM project_register_item WHERE tenant_id = $1 AND id = $2 AND version = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(expected)
+    .execute(&mut *conn)
+    .await?
+    .rows_affected();
+    if changed == 0 {
+        return Err(PlanStoreError::Stale {
+            what: "register item",
+        });
+    }
+    Ok(())
+}
+
 // ── project_dependency ──────────────────────────────────────────────────────────────────
 
 /// A dependency edge.
@@ -939,12 +1036,17 @@ pub async fn list_tranches_tx(
 }
 
 /// Record a tranche review decision, refusing an evidence-less review (D-T1-10).
+///
+/// The review is an MSP record, not a status: the decision and the evidence are inserted before
+/// the state transition in the caller's transaction, so a review can be read back and a failure
+/// leaves neither row changed.
 pub async fn review_tranche_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     id: Uuid,
     decision: &str,
     evidence: &Value,
+    reviewed_by: Uuid,
 ) -> Result<TrancheRecord, PlanStoreError> {
     if !tranche_review_has_evidence(evidence) {
         return Err(PlanStoreError::Illegal(
@@ -962,6 +1064,25 @@ pub async fn review_tranche_tx(
             });
         }
     };
+    get_tranche_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
+    ensure_parent_tx(&mut *conn, tenant, Parent::AppUser, reviewed_by)
+        .await
+        .map_err(PlanStoreError::Parent)?;
+    let sql = format!(
+        "INSERT INTO programme_tranche_review (tenant_id, tranche_id, decision, evidence, reviewed_by)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING {TRANCHE_REVIEW_COLUMNS}"
+    );
+    let _review: TrancheReviewRecord = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(decision)
+        .bind(evidence)
+        .bind(reviewed_by)
+        .fetch_one(&mut *conn)
+        .await?;
     let sql = format!(
         "UPDATE programme_tranche SET state = $3, version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2
@@ -974,6 +1095,153 @@ pub async fn review_tranche_tx(
         .fetch_optional(&mut *conn)
         .await?;
     row.ok_or(PlanStoreError::NotFound { what: "tranche" })
+}
+
+/// A recorded tranche review.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct TrancheReviewRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The reviewed tranche.
+    pub tranche_id: Uuid,
+    /// `continue | pause | stop`.
+    pub decision: String,
+    /// The evidence the decision was taken on.
+    pub evidence: Value,
+    /// The acting user.
+    pub reviewed_by: Uuid,
+    /// When the review was recorded.
+    pub reviewed_at: DateTime<Utc>,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+const TRANCHE_REVIEW_COLUMNS: &str =
+    "id, tranche_id, decision, evidence, reviewed_by, reviewed_at, version";
+
+/// List a programme's tranche reviews, newest first.
+pub async fn list_tranche_reviews_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<TrancheReviewRecord>, PlanStoreError> {
+    let sql = "SELECT r.id, r.tranche_id, r.decision, r.evidence, r.reviewed_by, r.reviewed_at,
+                      r.version
+                 FROM programme_tranche_review r
+                 JOIN programme_tranche t ON t.id = r.tranche_id AND t.tenant_id = r.tenant_id
+                WHERE r.tenant_id = $1 AND t.programme_id = $2
+                ORDER BY r.reviewed_at DESC, r.id DESC";
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// The editable fields of a tranche. `number` and `state` are not here: the number is the
+/// programme's order and the state is the review's outcome.
+#[derive(Clone, Debug, Default)]
+pub struct TranchePatch {
+    /// Entry criteria.
+    pub entry_criteria: Option<Value>,
+    /// Exit criteria.
+    pub exit_criteria: Option<Value>,
+    /// The baseline it is managed against.
+    pub baseline_ref: Option<Uuid>,
+    /// The review date.
+    pub review_at: Option<DateTime<Utc>>,
+}
+
+/// Edit a tranche's plan fields; the state changes only through [`review_tranche_tx`].
+pub async fn update_tranche_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    patch: &TranchePatch,
+) -> Result<TrancheRecord, PlanStoreError> {
+    let current = get_tranche_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale { what: "tranche" });
+    }
+    if let Some(baseline_ref) = patch.baseline_ref {
+        let present: bool = sqlx::query_scalar(
+            "SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)",
+        )
+        .bind(tenant.as_uuid())
+        .bind(baseline_ref)
+        .fetch_one(&mut *conn)
+        .await?;
+        if !present {
+            return Err(PlanStoreError::NotFound {
+                what: "programme baseline",
+            });
+        }
+    }
+    let sql = format!(
+        "UPDATE programme_tranche SET
+            entry_criteria = coalesce($4, entry_criteria),
+            exit_criteria = coalesce($5, exit_criteria),
+            baseline_ref = coalesce($6, baseline_ref),
+            review_at = coalesce($7, review_at),
+            version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3
+          RETURNING {TRANCHE_COLUMNS}"
+    );
+    let row: Option<TrancheRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(&patch.entry_criteria)
+        .bind(&patch.exit_criteria)
+        .bind(patch.baseline_ref)
+        .bind(patch.review_at)
+        .fetch_optional(&mut *conn)
+        .await?;
+    row.ok_or(PlanStoreError::Stale { what: "tranche" })
+}
+
+/// Remove a tranche. A recorded review is history: a reviewed tranche is refused.
+pub async fn delete_tranche_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+) -> Result<(), PlanStoreError> {
+    let current = get_tranche_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale { what: "tranche" });
+    }
+    let reviewed: bool = sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM programme_tranche_review WHERE tenant_id = $1 AND tranche_id = $2)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if reviewed {
+        return Err(PlanStoreError::Conflict {
+            what: "tranche",
+            why: "it carries a recorded review",
+        });
+    }
+    let changed = sqlx::query(
+        "DELETE FROM programme_tranche WHERE tenant_id = $1 AND id = $2 AND version = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(expected)
+    .execute(&mut *conn)
+    .await?
+    .rows_affected();
+    if changed == 0 {
+        return Err(PlanStoreError::Stale { what: "tranche" });
+    }
+    Ok(())
 }
 
 // ── benefit_profile / benefit_link ─────────────────────────────────────────────────────
@@ -1186,6 +1454,184 @@ pub async fn list_benefits_tx(
         .await?)
 }
 
+/// The editable fields of a benefit profile. The programme is the row's parent, not a field.
+#[derive(Clone, Debug, Default)]
+pub struct BenefitPatch {
+    /// The project.
+    pub project_id: Option<Uuid>,
+    /// The register row.
+    pub register_item_id: Option<Uuid>,
+    /// The reference.
+    pub reference: Option<String>,
+    /// The description.
+    pub description: Option<String>,
+    /// The category.
+    pub category: Option<String>,
+    /// The objectives.
+    pub objectives: Option<Value>,
+    /// The observable outcome.
+    pub observable_outcome: Option<String>,
+    /// The KPIs.
+    pub kpis: Option<Value>,
+    /// The measured baseline.
+    pub baseline: Option<Value>,
+    /// The target.
+    pub target: Option<Value>,
+    /// The measurement method.
+    pub measurement_method: Option<String>,
+    /// The financial value.
+    pub financial_value: Option<String>,
+    /// The cost.
+    pub cost: Option<Value>,
+    /// Required capabilities.
+    pub capabilities: Option<Value>,
+    /// Preconditions.
+    pub preconditions: Option<Value>,
+    /// Risks.
+    pub risks: Option<Value>,
+    /// The owning job.
+    pub owner_job_id: Option<Uuid>,
+    /// The BCM job.
+    pub benefit_owner_job_id: Option<Uuid>,
+    /// The operational area.
+    pub operational_area: Option<String>,
+    /// The status.
+    pub status: Option<String>,
+}
+
+/// Edit a benefit profile, re-validating the merged measurement record (D-T1-9).
+pub async fn update_benefit_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    patch: &BenefitPatch,
+) -> Result<BenefitRecord, PlanStoreError> {
+    let current = get_benefit_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "benefit profile",
+        })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale {
+            what: "benefit profile",
+        });
+    }
+    ensure_optional_parent_tx(&mut *conn, tenant, Parent::Project, patch.project_id)
+        .await
+        .map_err(PlanStoreError::Parent)?;
+    for owner in [patch.owner_job_id, patch.benefit_owner_job_id]
+        .into_iter()
+        .flatten()
+    {
+        ensure_job_tx(&mut *conn, tenant, owner).await?;
+    }
+    let fields = BenefitProfileFields {
+        baseline: patch.baseline.clone().or_else(|| current.baseline.clone()),
+        target: patch.target.clone().or_else(|| current.target.clone()),
+        measurement_method: patch
+            .measurement_method
+            .clone()
+            .unwrap_or_else(|| current.measurement_method.clone()),
+        benefit_owner_job_id: patch.benefit_owner_job_id.or(current.benefit_owner_job_id),
+    };
+    let missing = benefit_profile_missing(&fields);
+    if !missing.is_empty() {
+        return Err(PlanStoreError::Illegal(
+            PlanError::BenefitProfileIncomplete { missing },
+        ));
+    }
+    let sql = format!(
+        "UPDATE benefit_profile SET
+            project_id = coalesce($4, project_id),
+            register_item_id = coalesce($5, register_item_id),
+            reference = coalesce($6, reference),
+            description = coalesce($7, description),
+            category = coalesce($8, category),
+            objectives = coalesce($9, objectives),
+            observable_outcome = coalesce($10, observable_outcome),
+            kpis = coalesce($11, kpis),
+            baseline = coalesce($12, baseline),
+            target = coalesce($13, target),
+            measurement_method = coalesce($14, measurement_method),
+            financial_value = coalesce($15, financial_value),
+            cost = coalesce($16, cost),
+            capabilities = coalesce($17, capabilities),
+            preconditions = coalesce($18, preconditions),
+            risks = coalesce($19, risks),
+            owner_job_id = coalesce($20, owner_job_id),
+            benefit_owner_job_id = coalesce($21, benefit_owner_job_id),
+            operational_area = coalesce($22, operational_area),
+            status = coalesce($23, status),
+            version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3
+          RETURNING {BENEFIT_COLUMNS}"
+    );
+    let row: Option<BenefitRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(patch.project_id)
+        .bind(patch.register_item_id)
+        .bind(&patch.reference)
+        .bind(&patch.description)
+        .bind(&patch.category)
+        .bind(&patch.objectives)
+        .bind(&patch.observable_outcome)
+        .bind(&patch.kpis)
+        .bind(&patch.baseline)
+        .bind(&patch.target)
+        .bind(&patch.measurement_method)
+        .bind(&patch.financial_value)
+        .bind(&patch.cost)
+        .bind(&patch.capabilities)
+        .bind(&patch.preconditions)
+        .bind(&patch.risks)
+        .bind(patch.owner_job_id)
+        .bind(patch.benefit_owner_job_id)
+        .bind(&patch.operational_area)
+        .bind(&patch.status)
+        .fetch_optional(&mut *conn)
+        .await?;
+    row.ok_or(PlanStoreError::Stale {
+        what: "benefit profile",
+    })
+}
+
+/// Remove a benefit profile; its links and transitions cascade with it.
+pub async fn delete_benefit_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+) -> Result<(), PlanStoreError> {
+    let current = get_benefit_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "benefit profile",
+        })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale {
+            what: "benefit profile",
+        });
+    }
+    let changed = sqlx::query(
+        "DELETE FROM benefit_profile WHERE tenant_id = $1 AND id = $2 AND version = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(expected)
+    .execute(&mut *conn)
+    .await?
+    .rows_affected();
+    if changed == 0 {
+        return Err(PlanStoreError::Stale {
+            what: "benefit profile",
+        });
+    }
+    Ok(())
+}
+
 /// A benefits-map edge.
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct BenefitLinkRecord {
@@ -1288,6 +1734,259 @@ pub async fn insert_benefit_link_tx(
     Ok(row)
 }
 
+/// Read one benefits-map edge.
+pub async fn get_benefit_link_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<BenefitLinkRecord>, PlanStoreError> {
+    let sql = "SELECT id, programme_id, output_ref, capability_ref, operational_outcome,
+                      benefit_id, strategic_objective, kind, version
+                 FROM benefit_link WHERE tenant_id = $1 AND id = $2";
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// List a programme's benefits-map edges.
+pub async fn list_benefit_links_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<BenefitLinkRecord>, PlanStoreError> {
+    let sql = "SELECT id, programme_id, output_ref, capability_ref, operational_outcome,
+                      benefit_id, strategic_objective, kind, version
+                 FROM benefit_link
+                WHERE tenant_id = $1 AND programme_id = $2
+                ORDER BY created_at, id";
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// Remove one benefits-map edge.
+pub async fn delete_benefit_link_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+) -> Result<(), PlanStoreError> {
+    let version: Option<i64> = sqlx::query_scalar(
+        "SELECT version FROM benefit_link WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match version {
+        None => {
+            return Err(PlanStoreError::NotFound {
+                what: "benefits-map edge",
+            });
+        }
+        Some(version) if version != expected => {
+            return Err(PlanStoreError::Stale {
+                what: "benefits-map edge",
+            });
+        }
+        Some(_) => {}
+    }
+    let changed =
+        sqlx::query("DELETE FROM benefit_link WHERE tenant_id = $1 AND id = $2 AND version = $3")
+            .bind(tenant.as_uuid())
+            .bind(id)
+            .bind(expected)
+            .execute(&mut *conn)
+            .await?
+            .rows_affected();
+    if changed == 0 {
+        return Err(PlanStoreError::Stale {
+            what: "benefits-map edge",
+        });
+    }
+    Ok(())
+}
+
+// ── benefit_transition ──────────────────────────────────────────────────────────────────
+// The realization record: baseline measured → readiness → enacted → post measured → legacy
+// retired. One row per benefit; a correction updates it in place.
+
+/// A benefit's realization record.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct TransitionRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The benefit.
+    pub benefit_id: Uuid,
+    /// When the baseline was measured.
+    pub baseline_measured_at: Option<DateTime<Utc>>,
+    /// The readiness assessment.
+    pub readiness: Value,
+    /// When the transition was enacted.
+    pub enacted_at: Option<DateTime<Utc>>,
+    /// When the post-transition measurement was taken.
+    pub post_measured_at: Option<DateTime<Utc>>,
+    /// When the legacy practice was retired.
+    pub retired_at: Option<DateTime<Utc>>,
+    /// The evidence.
+    pub evidence: Value,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+const TRANSITION_COLUMNS: &str = "id, benefit_id, baseline_measured_at, readiness, enacted_at, \
+    post_measured_at, retired_at, evidence, version";
+
+/// The editable fields of a realization record. `None` leaves the stored value in place.
+#[derive(Clone, Debug, Default)]
+pub struct TransitionPatch {
+    /// When the baseline was measured.
+    pub baseline_measured_at: Option<DateTime<Utc>>,
+    /// The readiness assessment.
+    pub readiness: Option<Value>,
+    /// When the transition was enacted.
+    pub enacted_at: Option<DateTime<Utc>>,
+    /// When the post-transition measurement was taken.
+    pub post_measured_at: Option<DateTime<Utc>>,
+    /// When the legacy practice was retired.
+    pub retired_at: Option<DateTime<Utc>>,
+    /// The evidence.
+    pub evidence: Option<Value>,
+}
+
+/// Read one benefit's realization record.
+pub async fn get_transition_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+) -> Result<Option<TransitionRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {TRANSITION_COLUMNS} FROM benefit_transition
+          WHERE tenant_id = $1 AND benefit_id = $2 ORDER BY created_at, id LIMIT 1"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(benefit_id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// List a programme's realization records.
+pub async fn list_transitions_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<TransitionRecord>, PlanStoreError> {
+    let sql = "SELECT t.id, t.benefit_id, t.baseline_measured_at, t.readiness, t.enacted_at,
+                      t.post_measured_at, t.retired_at, t.evidence, t.version
+                 FROM benefit_transition t
+                 JOIN benefit_profile b ON b.id = t.benefit_id AND b.tenant_id = t.tenant_id
+                WHERE t.tenant_id = $1 AND b.programme_id = $2
+                ORDER BY t.benefit_id, t.created_at, t.id";
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// Create or correct a benefit's realization record; a post-transition measurement without a
+/// measured baseline is refused (D-T1-9).
+pub async fn upsert_transition_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+    expected: Option<i64>,
+    patch: &TransitionPatch,
+) -> Result<TransitionRecord, PlanStoreError> {
+    let owned: bool = sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM benefit_profile WHERE tenant_id = $1 AND id = $2)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(benefit_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if !owned {
+        return Err(PlanStoreError::NotFound {
+            what: "benefit profile",
+        });
+    }
+    let current = get_transition_tx(&mut *conn, tenant, benefit_id).await?;
+    if let Some(current) = &current
+        && Some(current.version) != expected
+    {
+        return Err(PlanStoreError::Stale {
+            what: "benefit transition",
+        });
+    }
+    let baseline = patch
+        .baseline_measured_at
+        .or(current.as_ref().and_then(|row| row.baseline_measured_at));
+    let post = patch
+        .post_measured_at
+        .or(current.as_ref().and_then(|row| row.post_measured_at));
+    if post.is_some() && baseline.is_none() {
+        return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
+    }
+    match current {
+        Some(current) => {
+            let sql = format!(
+                "UPDATE benefit_transition SET
+                    baseline_measured_at = coalesce($3, baseline_measured_at),
+                    readiness = coalesce($4, readiness),
+                    enacted_at = coalesce($5, enacted_at),
+                    post_measured_at = coalesce($6, post_measured_at),
+                    retired_at = coalesce($7, retired_at),
+                    evidence = coalesce($8, evidence),
+                    version = version + 1, updated_at = now()
+                  WHERE tenant_id = $1 AND id = $2 AND version = $9
+                  RETURNING {TRANSITION_COLUMNS}"
+            );
+            let row: Option<TransitionRecord> = sqlx::query_as(AssertSqlSafe(sql))
+                .bind(tenant.as_uuid())
+                .bind(current.id)
+                .bind(patch.baseline_measured_at)
+                .bind(&patch.readiness)
+                .bind(patch.enacted_at)
+                .bind(patch.post_measured_at)
+                .bind(patch.retired_at)
+                .bind(&patch.evidence)
+                .bind(current.version)
+                .fetch_optional(&mut *conn)
+                .await?;
+            row.ok_or(PlanStoreError::Stale {
+                what: "benefit transition",
+            })
+        }
+        None => {
+            let sql = format!(
+                "INSERT INTO benefit_transition
+                    (tenant_id, benefit_id, baseline_measured_at, readiness, enacted_at,
+                     post_measured_at, retired_at, evidence)
+                 VALUES ($1, $2, $3, coalesce($4, '{{}}'::jsonb), $5, $6, $7,
+                         coalesce($8, '[]'::jsonb))
+                 RETURNING {TRANSITION_COLUMNS}"
+            );
+            let row: TransitionRecord = sqlx::query_as(AssertSqlSafe(sql))
+                .bind(tenant.as_uuid())
+                .bind(benefit_id)
+                .bind(patch.baseline_measured_at)
+                .bind(&patch.readiness)
+                .bind(patch.enacted_at)
+                .bind(patch.post_measured_at)
+                .bind(patch.retired_at)
+                .bind(&patch.evidence)
+                .fetch_one(&mut *conn)
+                .await?;
+            Ok(row)
+        }
+    }
+}
+
 // ── programme_cadence ───────────────────────────────────────────────────────────────────
 // T1 stores the cadence row; T10 materialises its cards. No scheduler is built here.
 
@@ -1353,6 +2052,96 @@ pub async fn list_cadences_tx(
         .bind(programme_id)
         .fetch_all(&mut *conn)
         .await?)
+}
+
+/// Read one cadence row.
+pub async fn get_cadence_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<CadenceRecord>, PlanStoreError> {
+    let sql =
+        format!("SELECT {CADENCE_COLUMNS} FROM programme_cadence WHERE tenant_id = $1 AND id = $2");
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// The editable fields of a cadence row. The kind is the row's identity in the rhythm; a
+/// correction changes the period, the state or the metadata.
+#[derive(Clone, Debug, Default)]
+pub struct CadencePatch {
+    /// The period label.
+    pub period: Option<String>,
+    /// The state.
+    pub state: Option<String>,
+    /// Free-form metadata.
+    pub meta: Option<Value>,
+}
+
+/// Edit a cadence row.
+pub async fn update_cadence_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    patch: &CadencePatch,
+) -> Result<CadenceRecord, PlanStoreError> {
+    let current = get_cadence_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "cadence row" })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale { what: "cadence row" });
+    }
+    let sql = format!(
+        "UPDATE programme_cadence SET
+            period = coalesce($4, period),
+            state = coalesce($5, state),
+            meta = coalesce($6, meta),
+            version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3
+          RETURNING {CADENCE_COLUMNS}"
+    );
+    let row: Option<CadenceRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(&patch.period)
+        .bind(&patch.state)
+        .bind(&patch.meta)
+        .fetch_optional(&mut *conn)
+        .await?;
+    row.ok_or(PlanStoreError::Stale { what: "cadence row" })
+}
+
+/// Remove a cadence row.
+pub async fn delete_cadence_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+) -> Result<(), PlanStoreError> {
+    let current = get_cadence_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "cadence row" })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale { what: "cadence row" });
+    }
+    let changed = sqlx::query(
+        "DELETE FROM programme_cadence WHERE tenant_id = $1 AND id = $2 AND version = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(expected)
+    .execute(&mut *conn)
+    .await?
+    .rows_affected();
+    if changed == 0 {
+        return Err(PlanStoreError::Stale { what: "cadence row" });
+    }
+    Ok(())
 }
 
 // ── stakeholder_profile ─────────────────────────────────────────────────────────────────
@@ -1489,24 +2278,67 @@ pub async fn get_stakeholder_tx(
         .await?)
 }
 
+/// The editable fields of a stakeholder profile.
+#[derive(Clone, Debug, Default)]
+pub struct StakeholderPatch {
+    /// The name.
+    pub name: Option<String>,
+    /// Concerns.
+    pub concerns: Option<String>,
+    /// Sensitivities.
+    pub sensitivities: Option<String>,
+    /// Importance.
+    pub importance: Option<String>,
+    /// Influence.
+    pub influence: Option<String>,
+    /// Interest.
+    pub interest: Option<String>,
+    /// Exposure.
+    pub exposure: Option<String>,
+    /// Support level.
+    pub support_level: Option<String>,
+    /// Support trend.
+    pub support_trend: Option<String>,
+    /// Engagement target.
+    pub engagement_target: Option<String>,
+    /// Benefits distributed to the group.
+    pub benefits: Option<Value>,
+    /// Disbenefits distributed to the group.
+    pub disbenefits: Option<Value>,
+}
+
 /// Edit a stakeholder profile under `If-Match`.
-#[allow(clippy::too_many_arguments)]
 pub async fn update_stakeholder_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     id: Uuid,
     expected: i64,
-    support_level: Option<&str>,
-    support_trend: Option<&str>,
-    engagement_target: Option<&str>,
-    concerns: Option<&str>,
+    patch: &StakeholderPatch,
 ) -> Result<StakeholderRecord, PlanStoreError> {
+    let current = get_stakeholder_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "stakeholder profile",
+        })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale {
+            what: "stakeholder profile",
+        });
+    }
     let sql = format!(
         "UPDATE stakeholder_profile SET
-            support_level = coalesce($4, support_level),
-            support_trend = coalesce($5, support_trend),
-            engagement_target = coalesce($6, engagement_target),
-            concerns = coalesce($7, concerns),
+            name = coalesce($4, name),
+            concerns = coalesce($5, concerns),
+            sensitivities = coalesce($6, sensitivities),
+            importance = coalesce($7, importance),
+            influence = coalesce($8, influence),
+            interest = coalesce($9, interest),
+            exposure = coalesce($10, exposure),
+            support_level = coalesce($11, support_level),
+            support_trend = coalesce($12, support_trend),
+            engagement_target = coalesce($13, engagement_target),
+            benefits = coalesce($14, benefits),
+            disbenefits = coalesce($15, disbenefits),
             version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3
           RETURNING {STAKEHOLDER_COLUMNS}"
@@ -1515,15 +2347,57 @@ pub async fn update_stakeholder_tx(
         .bind(tenant.as_uuid())
         .bind(id)
         .bind(expected)
-        .bind(support_level)
-        .bind(support_trend)
-        .bind(engagement_target)
-        .bind(concerns)
+        .bind(&patch.name)
+        .bind(&patch.concerns)
+        .bind(&patch.sensitivities)
+        .bind(&patch.importance)
+        .bind(&patch.influence)
+        .bind(&patch.interest)
+        .bind(&patch.exposure)
+        .bind(&patch.support_level)
+        .bind(&patch.support_trend)
+        .bind(&patch.engagement_target)
+        .bind(&patch.benefits)
+        .bind(&patch.disbenefits)
         .fetch_optional(&mut *conn)
         .await?;
     row.ok_or(PlanStoreError::Stale {
         what: "stakeholder profile",
     })
+}
+
+/// Remove a stakeholder profile.
+pub async fn delete_stakeholder_profile_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+) -> Result<(), PlanStoreError> {
+    let current = get_stakeholder_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "stakeholder profile",
+        })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale {
+            what: "stakeholder profile",
+        });
+    }
+    let changed = sqlx::query(
+        "DELETE FROM stakeholder_profile WHERE tenant_id = $1 AND id = $2 AND version = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(expected)
+    .execute(&mut *conn)
+    .await?
+    .rows_affected();
+    if changed == 0 {
+        return Err(PlanStoreError::Stale {
+            what: "stakeholder profile",
+        });
+    }
+    Ok(())
 }
 
 /// List a programme's stakeholder profiles.
