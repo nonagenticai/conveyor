@@ -4628,8 +4628,37 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             403,
         ),
-        // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────
-        // The response is a pure function of the input — the deck writer has no clock, no
+        // ── #172: the ops.host_* family (T7, SPEC_V2 §10.4.1) ─────────────────────────────
+        // No host is registered in the fixture database, so both reads answer the SAME typed
+        // `host_not_registered` refusal on both transports — the registry is the action layer's
+        // authority, and an unregistered host is never defaulted into a guess.
+        expecting(
+            plain(
+                "ops.host_status",
+                json!({"host": "example", "unit": "com.example.unit"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "ops.host_logs",
+                json!({"host": "example", "unit": "com.example.unit", "lines": 50}),
+                None,
+            ),
+            404,
+        ),
+        // The restart names no approval, so the gate refuses BEFORE the registry is read: the
+        // destructive refusal is identical to `ops.restart`'s on both transports.
+        expecting(
+            plain(
+                "ops.host_restart_unit",
+                json!({"host": "example", "unit": "com.example.unit"}),
+                None,
+            ),
+            403,
+        ),
+        // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────        // The response is a pure function of the input — the deck writer has no clock, no
         // random id and no hash-map order — so a replay and an execution agree byte for byte.
         expecting(
             plain(

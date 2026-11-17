@@ -79,7 +79,9 @@ use serde_json::{Value, json};
 /// `ops.pods|deployments|events|logs|flux_status|ci_status`. 378 → **384**.
 /// **#171 adds 3 internal**: the gated `ops.*` writes — `ops.restart|scale|rollback`.
 /// 384 → **387**.
-const EXPECTED: [&str; 387] = [
+/// **#172 adds 3 internal**: the host family — `ops.host_status|host_logs|host_restart_unit`
+/// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 387 → **390**.
+const EXPECTED: [&str; 390] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -314,6 +316,9 @@ const EXPECTED: [&str; 387] = [
     "ops.deployments",
     "ops.events",
     "ops.flux_status",
+    "ops.host_logs",
+    "ops.host_restart_unit",
+    "ops.host_status",
     "ops.logs",
     "ops.pods",
     "ops.restart",
@@ -512,7 +517,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // #170 adds the six `ops.*` reads (internal, read): 360 → 366. The external count stays at 18 —
     // they call the cluster API through `conveyor-ops`, not a declared external service.
     // #171 adds the three `ops.*` writes (internal, destructive): 366 → 369; external stays 18.
-    assert_eq!((internal, external), (369, 18));
+    // #172 adds the three host actions (internal; one destructive, two reads): 369 → 372;
+    // external stays 18 — they call the host agent over ssh, not a declared external service.
+    assert_eq!((internal, external), (372, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
