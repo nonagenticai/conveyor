@@ -209,11 +209,18 @@ async fn speech_writes_one_object() {
         .expect("the stored bytes");
     assert!(stored.starts_with(b"RIFF"), "the WAV the host returned");
 
-    let calls: i64 = sqlx::query_scalar("SELECT count(*) FROM inference_call")
-        .fetch_one(&pg.super_pool)
-        .await
-        .expect("the ledger");
-    assert_eq!(calls, 1, "one synthesis, one ledger row");
+    let call: (String, Option<String>, Option<f64>) =
+        sqlx::query_as("SELECT model, usage_unit, usage_units::float8 FROM inference_call")
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("the ledger");
+    assert_eq!(call.0, "tts", "the surface is the pricing identity");
+    assert_eq!(call.1.as_deref(), Some("character"));
+    assert_eq!(
+        call.2,
+        Some("a short line".chars().count() as f64),
+        "the commercial TTS unit is the input text"
+    );
 }
 
 /// P1.2 — no configured endpoint is a visible refusal, before any call.
@@ -320,11 +327,18 @@ async fn transcribe_stores_a_transcript() {
         "hello from the transcript"
     );
 
-    let calls: i64 = sqlx::query_scalar("SELECT count(*) FROM inference_call")
-        .fetch_one(&pg.super_pool)
-        .await
-        .expect("the ledger");
-    assert_eq!(calls, 1, "one transcription, one ledger row");
+    let call: (String, Option<String>, Option<f64>) =
+        sqlx::query_as("SELECT model, usage_unit, usage_units::float8 FROM inference_call")
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("the ledger");
+    assert_eq!(call.0, "asr", "the surface is the pricing identity");
+    assert_eq!(call.1.as_deref(), Some("second"));
+    assert_eq!(
+        call.2,
+        Some(0.0),
+        "the 44-byte fixture has an empty data chunk, so its WAV duration is zero"
+    );
 }
 
 /// P2.2 — an unknown document is refused before the service is called.

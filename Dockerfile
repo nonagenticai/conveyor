@@ -8,7 +8,7 @@
 # The base is debian-slim rather than a Rust image (there is no glibc Rust image that fits),
 # so the pinned toolchain is installed by rustup; builder, web and runtime share one glibc.
 # RUST_TOOLCHAIN must equal rust-toolchain.toml.
-ARG RUST_TOOLCHAIN=1.99.0
+ARG RUST_TOOLCHAIN=1.100.0
 ARG BASE_IMAGE=docker.io/library/debian:12-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
 
 FROM ${BASE_IMAGE} AS build
@@ -98,9 +98,12 @@ FROM ${BASE_IMAGE} AS runtime
 ARG GIT_SHA=unknown
 ENV CONVEYOR_GIT_SHA=${GIT_SHA}
 # ca-certificates: outbound https (rustls platform roots, OIDC JWKS). curl: the HEALTHCHECK.
+# openssh-client (#172): the `ops.host_*` family reaches a bare-metal host through its
+# forced-command agent over ssh, and the client spawns the real binary rather than linking a
+# second SSH implementation. The key and the pinned known_hosts come from a mounted emptyDir.
 # hadolint ignore=DL3008
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl \
+    && apt-get install -y --no-install-recommends ca-certificates curl openssh-client \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system --gid 65532 app \
     && useradd --system --uid 65532 --gid 65532 --home-dir /var/lib/app --create-home app

@@ -38,11 +38,18 @@ project; T1–T17 are the delivery projects the phase-G reviews govern.
 | Part | State | Evidence |
 |---|---|---|
 | Artefact model | ABSENT | `git grep -n 'architecture_artifact\|artifact_type' -- crates migrations` → 0 hits |
-| ADM phases and contracts | ABSENT | `git grep -n 'architecture_contract\|adm_profile' -- crates migrations` → 0 hits; `governed_asset.kind` is `requirement\|principle\|adr` (`migrations/0002_domain.sql:256`) |
+| ADM phases and contracts | ABSENT | `git grep -n 'architecture_contract\|adm_profile\|architecture_artifact' -- crates migrations` → 0 hits; `governed_asset.kind` is widened to 15 kinds by `migrations/0044_plan_spine.sql:413-418` (T1) but `architecture_artifact` is not among them |
 | Delivery design gate | ABSENT | `git grep -n 'design_gate' -- crates migrations` → 0 hits |
 | Compliance and waivers | ABSENT | no review or waiver table exists; no compliance level is stored |
-| Capability assessment | ABSENT | no maturity or skills row exists |
-| Phase H outcome | ABSENT | `project_register_item` allows `resource\|risk\|benefit` only (`migrations/0008_s08_portfolio.sql:112`); no kata table |
+| Capability assessment | ABSENT | no maturity or skills row exists (P0's `maturity-assessment`/`skills-assessment` documents are the proposed baseline, not a measured row) |
+| Phase H outcome | ABSENT | `project_register_item` is the six-kind register of `migrations/0044_plan_spine.sql:100` (`risk\|issue\|assumption\|dependency\|benefit\|change`); no kata table |
+
+**Preliminary content, measured 2026-11-17.** P0's five Preliminary documents are published —
+`architecture-principles` (PF-1), `adm-profile` (ADM-1), `artifact-standard` (AS-1),
+`maturity-assessment` (MA-1) and `skills-assessment` (SA-1), delivered by #122's A7 and each
+stating "proposed for P0 acceptance". The Board charter is proposed inside PF-1; the
+`architecture_board` governance-body row, the contract and waiver rows, and the typed artefact
+repository are this plan's deliverables (D2–D4), not P0 content.
 
 Reused, not rebuilt: `governed_asset` (requirements, principles, ADRs and their supersession),
 `trace_link` (both directions, unique edge), `catalogue_entry` (the project-type × card-type matrix

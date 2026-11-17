@@ -294,11 +294,12 @@ pub(crate) async fn process_runs_start(
         .map_err(|error| crate::control::store_error(error, ACTION))?
         .ok_or_else(|| ActionError::resource_not_found("board"))?;
 
-    // The programme's declared order: a card on a project whose `meta.depends_on` names an
-    // open project cannot start a ROOT run. A child run is a step already executing inside a
+    // The programme's declared order and the inception pair: a card on a project whose
+    // `meta.depends_on` names an open project, or whose declared inception outputs are not
+    // published, cannot start a ROOT run. A child run is a step already executing inside a
     // started process; re-checking there would break a live run when a status moves.
     if input.parent_run_id.is_none() {
-        crate::programme::assert_dependencies_met(&mut *tx, ctx.tenant, board.project_id).await?;
+        crate::programme::assert_project_can_start(&mut *tx, ctx.tenant, board.project_id).await?;
     }
 
     let process = resolve_version(&mut *tx, ctx.tenant, &input).await?;

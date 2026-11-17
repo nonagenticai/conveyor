@@ -44,6 +44,7 @@ pub mod lock;
 pub mod mcp;
 // #139 P3.1: the media group's toolkit — one action per capability kind, plus the probe.
 pub mod media;
+pub mod produce;
 // S15: work-package memory — remember (the only writing action) and recall.
 pub mod memory;
 pub mod model;
@@ -73,6 +74,9 @@ pub mod registry;
 // T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine and the MSP rows.
 pub mod spec;
 pub mod spine;
+// T2 (SPEC_V2 §7): the decision ladder — `ladder.*` over `decision_policies.*`,
+// `refinements.*` and `laya_configs.*`.
+pub mod ladder;
 pub mod views;
 // S13: `workflows.*` — the engine's authoring surface (one document, versioned by key).
 pub mod workflow;

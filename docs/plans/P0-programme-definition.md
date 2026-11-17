@@ -130,6 +130,13 @@ it; it must fit the blueprint, and a deviation is a decision record, not a silen
 Both are documents on the project with `meta.category` set. They are published when accepted. A
 project without both published is an inception gap; its build units are not claimed.
 
+The unit protocol is where that programme context is recorded for every delivery unit: its issue
+carries the `Tranche` it is authorised under, the `Brief` that governs it, the `ADM phase/plateau`
+where it changes the architecture, and the `Benefits` its output is mapped to
+(`docs/plans/03-DELIVERY.md` § "Issue content contract"). The end-of-tranche review (§7) reads
+those four fields from the issue ledger, so the review's evidence is the buildout's own record and
+not a separate report.
+
 ## 6. Benefit profiles and the benefits map (mandatory)
 
 The programme is judged on benefits operations realizes after the projects close, not on the
@@ -171,13 +178,18 @@ register, and the blueprint alignment. A review with no evidence is refused. A r
 through change control; the review does not rewrite the baseline. The first tranche is authorised
 only after the definition set is accepted, and no delivery project starts before that authorisation.
 
+The authorisation is the P0 **`tranche-review`** output — the last of the P0 class's 21 categories
+(seed `output-standard.json`) and the sponsoring group's recorded decision with its evidence. The
+programme's closure gate (#302) refuses P0's close while that output is unpublished, so the order
+is enforced by the engine, not remembered by the session.
+
 ## 8. Acceptance
 
-- The definition set is published as documents on P0. The seed's P0 set carries its eight
-  categories today; the benefits, dossier, tranche and realization categories (§12 T1/T10) and the
-  architecture-principles, artefact-standard, ADM-profile and capability-assessment categories
-  (§12 T9) are added by the slice that lands the rows, because an expected output needs a template
-  and a category the document vocabulary accepts.
+- The definition set is published as documents on P0: the P0 class carries **21 categories**
+  (`seed/output-standard.json`, #221/#262). Measured 2026-11-17: 20 are published; `tranche-review`
+  (the first-tranche authorisation above) is the owner's act. The architecture-principles,
+  artefact-standard, ADM-profile, maturity and skills categories (§12 T9) were published by #122's
+  A7 as "proposed for P0 acceptance"; the typed rows behind them are T9's (#81).
 - The programme plan lists 48 projects (P0 + 47) with tranches and dependencies.
 - Every benefit has a profile with baseline, target, method and owner, and at least one benefits-map
   path to a strategic objective.

@@ -27,6 +27,7 @@ use conveyor_domain::{Id, TenantId};
 use conveyor_store as store;
 use conveyor_store::audit::{self, AuditEntry};
 use conveyor_store::idempotency::{self, Lookup};
+use rust_decimal::Decimal;
 use serde_json::Value;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -43,6 +44,39 @@ pub const MAX_DEPTH: u32 = 8;
 /// The coding service resolves a job by this header; without it every job lands in the service's
 /// default tenant instead of the caller's.
 pub const TENANT_HEADER: &str = "X-Tenant-Id";
+
+/// The acting principal on the wire to a billable model call.
+///
+/// The inference-router records a cost event's `actor_id` from this header, falling back to its
+/// own `SERVICE_ACTOR_ID` when it is absent (#235). Billing's actor axis counts an event as
+/// attributed only when the field is non-null, so a caller that omits the human it is acting for
+/// bills a model call to no one.
+pub const ACTOR_HEADER: &str = "X-Actor-Id";
+
+/// The tenant-level project id on the wire to a billable model call.
+///
+/// The inference-router stores it as the cost event's `project_id`. Billing's owner ruling
+/// (2026-10-07) defines this value for an app with no fr project concept: the tenant uuid with
+/// its 32 hex characters reversed. Billing keeps it without an fr ownership lookup, and it is
+/// deliberately NOT the tenant id — `project_id == tenant_id` stays a forged-project signal.
+pub const PROJECT_HEADER: &str = "X-Project-Id";
+
+/// The project id a project-less app sends for a tenant's own spend (billing owner ruling,
+/// 2026-10-07).
+///
+/// The tenant uuid's 32 lowercase hex characters are reversed and re-formatted `8-4-4-4-12`. An
+/// involution — applying it twice returns the input — which is what lets billing map an asserted
+/// tenant-level project id back to the one tenant it belongs to without a lookup table.
+///
+/// Fixed vector, from the billing implementation's docstring (a cross-service contract; the two
+/// must agree byte for byte): `0195f48b-d000-7000-8000-000000000100` ->
+/// `00100000-0000-0008-0007-000db84f5910`.
+pub fn tenant_level_project_id(tenant: TenantId) -> Uuid {
+    let hex = tenant.as_uuid().simple().to_string();
+    let reversed: String = hex.chars().rev().collect();
+    // 32 lowercase hex characters are a valid simple uuid, so this cannot fail for a TenantId.
+    Uuid::parse_str(&reversed).expect("32 hex characters form a uuid")
+}
 
 /// The circuit breaker's failure count inside its window.
 pub const BREAKER_THRESHOLD: usize = 5;
@@ -180,6 +214,10 @@ struct CaptureRow {
     served_model: Option<String>,
     usage: Option<conveyor_domain::inference::Usage>,
     cache_status: &'static str,
+    /// The commercial unit for a non-token surface, and its measured count. Both are `None` for a
+    /// token call; a media call with no measurable unit is unpriced, never $0.
+    usage_unit: Option<&'static str>,
+    usage_units: Option<Decimal>,
     latency_ms: i32,
 }
 
@@ -945,6 +983,45 @@ async fn invoke_internal(
     }
 }
 
+/// The three non-token surfaces, keyed by the handler's service. Any other external (the router)
+/// returns `None` and keeps the token identity.
+fn media_surface(service: &str) -> Option<(&'static str, &'static str)> {
+    match service {
+        crate::integrations::imagegen::SERVICE => {
+            Some((crate::integrations::imagegen::SERVICE, "image"))
+        }
+        crate::integrations::audio::SPEECH_SERVICE => {
+            Some((crate::integrations::audio::SPEECH_SERVICE, "character"))
+        }
+        crate::integrations::audio::TRANSCRIBE_SERVICE => {
+            Some((crate::integrations::audio::TRANSCRIBE_SERVICE, "second"))
+        }
+        _ => None,
+    }
+}
+
+/// The unit count a media request and response measure. A unit the surface cannot report is
+/// `None`, which the report counts as unpriced rather than $0.
+fn media_units(
+    surface: &str,
+    input: &Value,
+    output: &Value,
+    upload_seconds: Option<Decimal>,
+) -> Option<Decimal> {
+    match surface {
+        crate::integrations::imagegen::SERVICE => output
+            .get("data")
+            .and_then(Value::as_array)
+            .map(|data| Decimal::from(data.len() as u64)),
+        crate::integrations::audio::SPEECH_SERVICE => input
+            .get("text")
+            .and_then(Value::as_str)
+            .map(|text| Decimal::from(text.chars().count() as u64)),
+        crate::integrations::audio::TRANSCRIBE_SERVICE => upload_seconds,
+        _ => None,
+    }
+}
+
 async fn invoke_external(
     pool: &PgPool,
     spec: &crate::spec::ActionSpec,
@@ -1093,6 +1170,9 @@ async fn invoke_external(
         .usage
         .as_ref()
         .and_then(|usage| usage.correlation_id.clone());
+    // The transcription host answers only text, so the uploaded WAV's own duration is the only
+    // length the ledger can price. Measured before the bytes are moved into the multipart part.
+    let mut upload_units: Option<Decimal> = None;
     let mut builder = match upload {
         Some(upload) => {
             // One document's bytes, fetched under the caller's tenant and hash-verified by the
@@ -1125,6 +1205,7 @@ async fn invoke_external(
                 let _ = tx.rollback().await;
                 loaded
             };
+            upload_units = crate::integrations::audio::wav_duration_secs(&loaded.bytes);
             let part = reqwest::multipart::Part::bytes(loaded.bytes)
                 .file_name("upload")
                 .mime_str(&loaded.content_type)
@@ -1147,6 +1228,18 @@ async fn invoke_external(
     // one). `ctx` is Copy and is not consumed until the failure recorder below.
     if spec.tenancy == Tenancy::Tenant {
         builder = builder.header(TENANT_HEADER, ctx.tenant.to_string());
+        // Model calls also carry the attribution identity. Without the actor the router books
+        // the cost event with no actor at all (its fallback is the router's own service
+        // account); without the project it books no project, which is exactly what the two
+        // `service_key=inference-router` coverage floors fire on. The project value is the
+        // tenant-level id the billing owner ruling defines for an app with no fr project.
+        if spec.captures_usage {
+            builder = builder.header(ACTOR_HEADER, ctx.actor_id.to_string());
+            builder = builder.header(
+                PROJECT_HEADER,
+                tenant_level_project_id(ctx.tenant).to_string(),
+            );
+        }
     }
     if let Some(token) = &bearer {
         builder = builder.bearer_auth(token);
@@ -1241,6 +1334,7 @@ async fn invoke_external(
 
     // S16: one ledger row for a successful model call. The engine owns the response and this
     // transaction; a handler-side writer would be a second path for the same fact.
+    let media = media_surface(service);
     let capture = request
         .usage
         .as_ref()
@@ -1249,6 +1343,7 @@ async fn invoke_external(
             let captured = conveyor_domain::inference::capture(
                 request.input.get("model").and_then(Value::as_str),
                 &output,
+                media.map(|(surface, _)| surface),
             );
             CaptureRow {
                 caller_kind: usage.caller_kind,
@@ -1267,6 +1362,10 @@ async fn invoke_external(
                 served_model: captured.served_model,
                 usage: captured.usage,
                 cache_status: captured.cache_status.as_str(),
+                usage_unit: media.map(|(_, unit)| unit),
+                usage_units: media.and_then(|(surface, _)| {
+                    media_units(surface, &request.input, &output, upload_units)
+                }),
                 latency_ms: elapsed,
             }
         });
@@ -1474,6 +1573,8 @@ async fn record_bookkeeping(
             served_model: capture.served_model.as_deref(),
             usage: capture.usage,
             cache_status: capture.cache_status,
+            usage_unit: capture.usage_unit,
+            usage_units: capture.usage_units,
             latency_ms: capture.latency_ms,
             outcome: "ok",
         };
@@ -1584,6 +1685,27 @@ mod tests {
     /// A fresh tenant id for a breaker test; nil is refused by the domain type.
     fn a_tenant() -> TenantId {
         TenantId::from_uuid(Uuid::now_v7()).expect("non-nil")
+    }
+
+    #[test]
+    fn the_tenant_level_project_id_matches_the_billing_contract_and_is_an_involution() {
+        let tenant = TenantId::parse("0195f48b-d000-7000-8000-000000000100").expect("uuid");
+        let project = tenant_level_project_id(tenant);
+        assert_eq!(
+            project.to_string(),
+            "00100000-0000-0008-0007-000db84f5910",
+            "the billing owner ruling's fixed vector"
+        );
+        assert_eq!(
+            tenant_level_project_id(TenantId::from_uuid(project).expect("non-nil")),
+            tenant.as_uuid(),
+            "the transform is an involution, so billing can map it back without a lookup"
+        );
+        assert_ne!(
+            project,
+            tenant.as_uuid(),
+            "the tenant-level project must never equal the tenant id"
+        );
     }
 
     #[test]

@@ -52,6 +52,14 @@ shape is `.github/ISSUE_TEMPLATE/unit.md`; the rules are:
 - **Baseline.** State `main@<sha>` — with the date measured and the blob shas of the cited plan and
   audit files. The #9 train merged on 2026-11-11; a `#9@<sha>` reference in an older issue is
   historical and its parts are re-checked on merged main. A claim without a baseline is not ready.
+- **Programme context.** Every unit created on or after 2026-11-18 carries a `## Programme`
+  section: the `Tranche` it is authorised under, the `Brief` that governs it, the
+  `ADM phase/plateau` where it changes the architecture, and the `Benefits` its output is mapped
+  to. A field names a live row/document or the issue that creates it (`pending #N`). The rule is
+  **forward-only**: an issue created before the change gains the section at its next claim, in the
+  same edit as the `## Claim` block, and an existing body is never made unready retroactively.
+  Because the buildout is delivered under MSP and TOGAF, not merely documented by them, the
+  end-of-tranche review reads these fields from the issue ledger.
 - **References.** Every spec/plan/audit/code/test reference is a path that resolves at the ref it
   names, or an issue number that resolves. Cite `path:symbol`; line numbers only when re-verified at
   the baseline. A path the issue must create is marked `to create`.
@@ -72,8 +80,9 @@ shape is `.github/ISSUE_TEMPLATE/unit.md`; the rules are:
 
 **Definition of ready** — the claim gate: baseline and doc blob shas named · every reference resolves
 · every part has a scenario with a `Verify:` · dependencies complete, typed and cited ·
-`Blocker: #N` present iff `status:blocked` · one-PR scope, file-disjoint or sequenced · scope
-corrections applied.
+`Blocker: #N` present iff `status:blocked` · programme fields present and resolvable (issues
+created on/after 2026-11-18) · one-PR scope, file-disjoint or sequenced · scope corrections
+applied.
 
 **Definition of done** — the merge gate: every scenario passes at the PR head with a row in
 `Evidence at completion` · the repo gate is green at the exact head · tests added/updated per part,
@@ -292,10 +301,19 @@ gh pr create --base main --head issue/N-<slug> \
 - **Definition-of-done gate before merge** (above): every scenario in the issue has an evidence row
   at the PR head, the gate passed at that exact sha, the named tests ran, and every CARRIED-BY-#9
   part was re-checked on merged main. A green check is not the DoD.
-- Merge when green (or hand to the train owner only for an owner-declared train). Verify the PR
-  state is `MERGED` before deleting anything. Delete the branch with `git push origin --delete`
-  / the API — **never blind `gh pr merge --delete-branch`**, which can close the PR when the
-  base moved.
+- **Merge = enqueue.** main carries a `merge_queue` ruleset, so a green PR merges through the
+  queue: `gh pr merge <n> --auto` (no `--squash`, no `--delete-branch`) enqueues it, and the queue
+  squashes on the latest base. `--delete-branch` is rejected outright on a queue repo; deleting
+  the branch is a separate step after the merge.
+- Confirm with state, never with an exit code: `gh pr merge` exits 0 when it merely enqueued.
+  Read `state == MERGED` (or GraphQL `pullRequest.isInMergeQueue` while it waits) before you
+  report the PR as merged or delete anything.
+- Delete the branch after the merge with `git push origin --delete <branch>` (the queue does not
+  delete it for you).
+- **A review request means a human decision is pending.** Assignee = whoever must act; add a
+  reviewer only when a decision is actually pending, and mark the PR `status:needs-human`.
+  `delivery.yml` clears every other request on our PRs, so a request without that label is a
+  notification nobody is going to act on.
 - The issue closes via `Closes #N`. If it did not, close it with the evidence.
 
 ## CI budget and WIP cap

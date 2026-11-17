@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 24 |
+| `exists` | implemented in code and backed by real rows | 25 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
-| `new` | absent | 31 |
+| `new` | absent | 30 |
 
 ## Rows
 
@@ -57,14 +57,14 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:procedures` | §10.4 | actions | procedures | `extend` | actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: pko.* absent<br>actions: procedures.* found (procedures.create, procedures.get, procedures.list…) |
 | `actions:authoring` | §10.4 | actions | authoring | `new` | actions: authoring.* absent |
 | `actions:approvals` | §10.4 | actions | approvals | `extend` | actions: approval_policies.* absent<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request) |
-| `actions:decision` | §10.4 | actions | decision | `new` | actions: decision_options.* absent<br>actions: decision_policies.* absent<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: laya_configs.* absent<br>*V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).* |
+| `actions:decision` | §10.4 | actions | decision | `new` | actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br>*V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).* |
 | `actions:PM` | §10.4 | actions | PM | `new` | actions: pm.* absent |
 | `actions:coach` | §10.4 | actions | coach | `new` | actions: coach.* absent |
 | `actions:kata` | §10.4 | actions | kata | `new` | actions: kata.* absent<br>*V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5.* |
 | `actions:development` | §10.4 | actions | development | `new` | actions: dev.* absent |
 | `actions:operations` | §10.4 | actions | operations | `exists` | actions: ops.* found (ops.ci_status, ops.deployments, ops.events…) |
 | `actions:analysis` | §10.4 | actions | analysis | `new` | actions: analyse.* absent |
-| `actions:production` | §10.4 | actions | production | `new` | actions: produce.* absent |
+| `actions:production` | §10.4 | actions | production | `exists` | actions: produce.* found (produce.script) |
 | `actions:tools` | §10.4 | actions | tools | `new` | actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* absent<br>actions: tools.* absent |
 | `actions:memory` | §10.4 | actions | memory | `new` | actions: lessons.* absent |
 | `actions:metrics` | §10.4 | actions | metrics | `new` | actions: metrics.* absent |

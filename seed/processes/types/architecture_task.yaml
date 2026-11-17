@@ -18,15 +18,17 @@ agent:
   prompt: agent
   model: claude-sonnet-5-5
   max_iterations: 12
-  timeout_secs: 120
+  timeout_secs: 300
+  allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]
 
 sops:
   - key: architecture_task.ready
     title: Architecture task — definition of ready
     definition_of_ready: {checks: [epic_directive_present]}
-    definition_of_done: {checks: [outline_within_card_scope]}
+    definition_of_done: {checks: [outline_within_card_scope, draft_artifact_composed]}
     acceptance_criteria:
       - {name: outline_within_card_scope, text: "The outline holds only the task's three sections — task, evaluation_method and directive_for_subtasks — and adds nothing the epic did not ask for."}
+      - {name: draft_artifact_composed, text: "The step's draft artefact was created by calling documents.compose: the run records that call and the answer reflects the document it produced. An answer that describes an outline without the call is not ready, however good the outline reads."}
     inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
     outputs: [draft_artifact_id]
 

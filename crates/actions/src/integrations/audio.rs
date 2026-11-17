@@ -46,6 +46,59 @@ const SPEECH_ARTEFACT_FIELD: &str = "audio_base64";
 /// The member the transcription route puts the text in.
 const TRANSCRIPT_FIELD: &str = "text";
 
+/// The duration of a RIFF/WAVE file in seconds, or `None` when the bytes are not a complete WAV.
+///
+/// The transcription host answers only `{"text": …}`, so the only length the engine can price is
+/// the uploaded document's own. The bytes are already in hand for the multipart part, and the parse
+/// is pure — no IO and no host extension. A non-WAV upload is `None`, which the report counts as
+/// unpriced, never as $0.
+pub(crate) fn wav_duration_secs(bytes: &[u8]) -> Option<rust_decimal::Decimal> {
+    if bytes.len() < 12 || &bytes[0..4] != b"RIFF" || &bytes[8..12] != b"WAVE" {
+        return None;
+    }
+    let mut pos = 12usize;
+    let mut byte_rate: Option<u32> = None;
+    let mut data_len: Option<u32> = None;
+    while pos + 8 <= bytes.len() {
+        let id = &bytes[pos..pos + 4];
+        let size = u32::from_le_bytes([
+            bytes[pos + 4],
+            bytes[pos + 5],
+            bytes[pos + 6],
+            bytes[pos + 7],
+        ]) as usize;
+        let body = pos + 8;
+        let end = body.checked_add(size)?;
+        match id {
+            b"fmt " if size >= 16 && end <= bytes.len() => {
+                byte_rate = Some(u32::from_le_bytes([
+                    bytes[body + 8],
+                    bytes[body + 9],
+                    bytes[body + 10],
+                    bytes[body + 11],
+                ]));
+            }
+            b"data" => {
+                // A truncated data chunk is not a measurement; the host refuses it anyway.
+                if end > bytes.len() {
+                    return None;
+                }
+                data_len = Some(u32::try_from(size).ok()?);
+                break;
+            }
+            _ => {}
+        }
+        if end > bytes.len() {
+            break;
+        }
+        // RIFF chunks are word-aligned: an odd size carries one pad byte.
+        pos = end + (size & 1);
+    }
+    let byte_rate = byte_rate.filter(|rate| *rate > 0)?;
+    let data_len = data_len?;
+    Some(rust_decimal::Decimal::from(data_len) / rust_decimal::Decimal::from(byte_rate))
+}
+
 /// `produce.speech`: text in, one stored WAV document out.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
@@ -320,5 +373,41 @@ mod tests {
         );
         let value = serde_json::json!({"text": "hello", "speed": 1.0});
         assert!(serde_json::from_value::<SpeechIn>(value).is_ok());
+    }
+
+    #[test]
+    fn a_wav_duration_is_read_from_the_header() {
+        assert_eq!(
+            wav_duration_secs(&wav(2)),
+            Some(rust_decimal::Decimal::new(2, 0))
+        );
+        assert_eq!(
+            wav_duration_secs(&wav(0)),
+            Some(rust_decimal::Decimal::ZERO),
+            "a zero-length data chunk is zero seconds, not an unknown"
+        );
+        assert_eq!(wav_duration_secs(b"not a wave file"), None);
+        assert_eq!(wav_duration_secs(&wav(1)[..20]), None, "truncated");
+    }
+
+    /// A header-shaped fixture whose data chunk really carries `seconds` of silence.
+    fn wav(seconds: u32) -> Vec<u8> {
+        let byte_rate = 48_000u32;
+        let data = byte_rate * seconds;
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(b"RIFF");
+        bytes.extend_from_slice(&(36 + data).to_le_bytes());
+        bytes.extend_from_slice(b"WAVEfmt ");
+        bytes.extend_from_slice(&16u32.to_le_bytes());
+        bytes.extend_from_slice(&1u16.to_le_bytes()); // PCM
+        bytes.extend_from_slice(&1u16.to_le_bytes()); // mono
+        bytes.extend_from_slice(&24_000u32.to_le_bytes());
+        bytes.extend_from_slice(&byte_rate.to_le_bytes());
+        bytes.extend_from_slice(&2u16.to_le_bytes()); // block align
+        bytes.extend_from_slice(&16u16.to_le_bytes()); // bits
+        bytes.extend_from_slice(b"data");
+        bytes.extend_from_slice(&data.to_le_bytes());
+        bytes.resize(bytes.len() + data as usize, 0);
+        bytes
     }
 }

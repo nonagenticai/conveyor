@@ -709,7 +709,9 @@ dependencies = [
  "conveyor-bus",
  "conveyor-deck",
  "conveyor-domain",
+ "conveyor-host",
  "conveyor-ops",
+ "conveyor-produce",
  "conveyor-render",
  "conveyor-store",
  "conveyor-workflow",
@@ -728,6 +730,7 @@ dependencies = [
  "sha2 0.11.1",
  "sqlx",
  "tar",
+ "tempfile",
  "thiserror 2.0.21",
  "tokio",
  "tower",
@@ -837,6 +840,25 @@ dependencies = [
  "sha2 0.11.1",
  "thiserror 2.0.21",
  "uuid",
+]
+
+[[package]]
+name = "conveyor-host"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tokio",
+]
+
+[[package]]
+name = "conveyor-host-agent"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tempfile",
 ]
 
 [[package]]
@@ -960,8 +982,8 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "conveyor-domain",
+ "conveyor-render",
  "conveyor-store",
- "pulldown-cmark",
  "regex",
  "serde",
  "serde_json",
@@ -986,12 +1008,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-produce"
+version = "0.1.0"
+dependencies = [
+ "conveyor-actions",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "conveyor-render"
 version = "0.1.0"
 dependencies = [
  "conveyor-domain",
  "fontdb 0.24.0",
  "pdf-writer",
+ "pulldown-cmark",
  "quick-xml 0.42.0",
  "resvg",
  "serde",

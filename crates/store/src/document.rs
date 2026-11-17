@@ -403,6 +403,33 @@ pub async fn list_documents_tx(
     Ok((records, next))
 }
 
+/// The output-standard categories this project has **published** — `published_at` set, `status`
+/// active, a category recorded. Ordered, so a caller's missing-set message is deterministic.
+///
+/// The inception gate (`crates/actions/src/programme.rs`) reads this: existence is not
+/// publication, and a draft must not satisfy a build-start gate. Project-scoped, not unit-scoped:
+/// a document attached to a card has no `project_id`, so it cannot satisfy a project's gate.
+pub async fn published_categories_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<Vec<String>, DocumentStoreError> {
+    let rows: Vec<String> = sqlx::query_scalar(
+        "SELECT DISTINCT category FROM document
+          WHERE tenant_id = $1
+            AND project_id = $2
+            AND published_at IS NOT NULL
+            AND status = 'active'
+            AND category IS NOT NULL
+          ORDER BY category",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project_id)
+    .fetch_all(&mut *conn)
+    .await?;
+    Ok(rows)
+}
+
 /// Every published, active text output, oldest first.
 ///
 /// This is the publish path's read: the filter is the publication decision (`publishable AND
@@ -750,6 +777,56 @@ pub async fn set_publishable_tx(
         .bind(id)
         .bind(publish)
         .bind(actor)
+        .fetch_one(&mut *conn)
+        .await?;
+    Ok(row.into())
+}
+
+/// An admin's rework order on a requested draft: clear the request and record the note and the
+/// sections the standard found missing, in one UPDATE. The content version does not move — the
+/// row is unchanged; the order is metadata about it.
+pub async fn return_publish_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected_version: Version,
+    actor: Uuid,
+    note: &str,
+    missing: &[String],
+) -> Result<DocumentRecord, DocumentStoreError> {
+    let current = lock_document_tx(&mut *conn, tenant, id).await?;
+    if current.version != expected_version {
+        return Err(DocumentStoreError::VersionMismatch {
+            current: current.version,
+        });
+    }
+    let sql = format!(
+        "UPDATE document
+            SET publish_requested_at = NULL,
+                meta = jsonb_set(
+                    coalesce(meta, '{{}}'::jsonb),
+                    '{{rework}}',
+                    jsonb_build_object(
+                        'note', $3::text,
+                        'missing', $4::jsonb,
+                        'by', $5::uuid,
+                        'at', now(),
+                        'of_version', $6::bigint
+                    ),
+                    true
+                ),
+                updated_by = $5,
+                updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+          RETURNING {DOCUMENT_COLUMNS}"
+    );
+    let row: DocumentRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(note)
+        .bind(serde_json::to_value(missing).unwrap_or_else(|_| serde_json::json!([])))
+        .bind(actor)
+        .bind(i64::try_from(current.version.get()).unwrap_or(i64::MAX))
         .fetch_one(&mut *conn)
         .await?;
     Ok(row.into())

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Produce contract capture — 2026-11-16 · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="produce-contract-capture--2026-11-16">Produce contract capture — 2026-11-16</h1>
+<p>The content service the <code>produce.script</code> family absorbs (narrative and script). Captured from the pinned image, not from the rewrite: a document regenerated from the implementation cannot fail for the reason the parity test exists.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>service</td>
+<td>content service (narrative, script)</td>
+</tr>
+<tr>
+<td>image_digest</td>
+<td>sha256:71a79a0fd5392e36b8920f696f398c6dc8906933276735d9dfab88ae24e9e743</td>
+</tr>
+<tr>
+<td>source_revision</td>
+<td>c542e35d8c7dc0df5182877b9a130a663daac333</td>
+</tr>
+<tr>
+<td>capture_date</td>
+<td>2026-11-16</td>
+</tr>
+<tr>
+<td>openapi_sha256</td>
+<td>28de38166d3c3dc4068e54471ec0f6fd0bd4fab5c033fe73e40c824fb3d5027d</td>
+</tr>
+<tr>
+<td>openapi</td>
+<td>3.1.0</td>
+</tr>
+<tr>
+<td>operations</td>
+<td>25</td>
+</tr>
+<tr>
+<td>capture_method</td>
+<td>in-image ASGI <code>app.openapi()</code>, FastAPI JSONResponse separators</td>
+</tr>
+</tbody>
+</table>
+<p>The service boots its HTTP server only with a database and Redis present, so the document was read from the same ASGI object the <code>/openapi.json</code> route serialises, inside the same image at the same digest. The bytes are the bytes that route returns.</p>
+<h2 id="drop-table">Drop table</h2>
+<p>One row per operation in the captured document. A disposition is <code>ported</code>, <code>dropped: transport</code>, <code>dropped: no consumer</code> or <code>dropped: deferred</code>; the test <code>crates/produce/tests/parity.rs::capture</code> fails on an operation with no row or an illegal disposition. Decisions are recorded in <code>crates/produce/contract/dispositions.tsv</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Disposition</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /health</code></td>
+<td>dropped: transport</td>
+<td>liveness belongs to the runtime shape; an action has no process to health-check</td>
+</tr>
+<tr>
+<td><code>GET /health/live</code></td>
+<td>dropped: transport</td>
+<td>liveness belongs to the runtime shape</td>
+</tr>
+<tr>
+<td><code>GET /healthz</code></td>
+<td>dropped: transport</td>
+<td>duplicate liveness route</td>
+</tr>
+<tr>
+<td><code>GET /health/ready</code></td>
+<td>dropped: transport</td>
+<td>readiness belongs to the runtime shape</td>
+</tr>
+<tr>
+<td><code>GET /readyz</code></td>
+<td>dropped: transport</td>
+<td>duplicate readiness route</td>
+</tr>
+<tr>
+<td><code>POST /api/storyline</code></td>
+<td>ported</td>
+<td>the storyline and its shot list, the first half of P3.1</td>
+</tr>
+<tr>
+<td><code>GET /api/storyline/{job_id}</code></td>
+<td>dropped: transport</td>
+<td>polling shape; the action returns the storyline synchronously</td>
+</tr>
+<tr>
+<td><code>POST /api/storyline/plan</code></td>
+<td>dropped: no consumer</td>
+<td>the storyline operation returns its plan as part of the result; no caller needs a plan-only projection</td>
+</tr>
+<tr>
+<td><code>POST /api/storyline/from-findings</code></td>
+<td>dropped: deferred</td>
+<td>needs the analysis family's findings model, which is not in this crate; no blueprint in plan 04 section 2 names it yet</td>
+</tr>
+<tr>
+<td><code>POST /api/shotlist</code></td>
+<td>ported</td>
+<td>the shot list with stable shot ids, the second half of P3.1</td>
+</tr>
+<tr>
+<td><code>POST /api/shotlist/enhance</code></td>
+<td>dropped: deferred</td>
+<td>no blueprint names shot-list enhancement; port it when a deliverable needs it</td>
+</tr>
+<tr>
+<td><code>POST /api/shotlist/from-findings</code></td>
+<td>dropped: deferred</td>
+<td>same findings model as the storyline conversion; no blueprint names it yet</td>
+</tr>
+<tr>
+<td><code>POST /api/narration</code></td>
+<td>ported</td>
+<td>narration text, named in P3</td>
+</tr>
+<tr>
+<td><code>GET /api/narration/{job_id}</code></td>
+<td>dropped: transport</td>
+<td>polling shape; the action returns the narration synchronously</td>
+</tr>
+<tr>
+<td><code>POST /api/narration/shotlist</code></td>
+<td>ported</td>
+<td>narration keyed to a shot list; the form the action takes because the shot list is an input</td>
+</tr>
+<tr>
+<td><code>POST /api/narrative/extract</code></td>
+<td>dropped: deferred</td>
+<td>extracts narrative text from a supplied document; no blueprint in plan 04 section 2 names that input format</td>
+</tr>
+<tr>
+<td><code>POST /api/scripts/generate</code></td>
+<td>ported</td>
+<td>script generation, named in P3</td>
+</tr>
+<tr>
+<td><code>POST /api/scripts/generate/batch</code></td>
+<td>dropped: transport</td>
+<td>a fan-out over N single calls; the workflow engine supplies concurrency</td>
+</tr>
+<tr>
+<td><code>POST /api/scripts/generate/campaign-pack</code></td>
+<td>dropped: deferred</td>
+<td>multi-asset campaign generation needs the campaign blueprint, which is not among the sixteen</td>
+</tr>
+<tr>
+<td><code>DELETE /api/scripts/jobs/{job_id}</code></td>
+<td>dropped: transport</td>
+<td>cancellation is the runner's; an action invocation has no job to cancel</td>
+</tr>
+<tr>
+<td><code>GET /api/scripts/jobs/{job_id}</code></td>
+<td>dropped: transport</td>
+<td>polling shape; the action returns its result</td>
+</tr>
+<tr>
+<td><code>POST /api/scripts/jobs/{job_id}/validate</code></td>
+<td>ported</td>
+<td>duration-budget validation with the offending shot ids, P3.2</td>
+</tr>
+<tr>
+<td><code>POST /api/scripts/jobs/{job_id}/scaffold</code></td>
+<td>dropped: no consumer</td>
+<td>writes a project tree to disk; file delivery is the pack's job and no blueprint names this output</td>
+</tr>
+<tr>
+<td><code>GET /api/scripts/batches/{batch_id}</code></td>
+<td>dropped: transport</td>
+<td>polling shape for the batch fan-out</td>
+</tr>
+<tr>
+<td><code>GET /</code></td>
+<td>dropped: transport</td>
+<td>the capability is an action, not an HTTP service; there is no root document to serve</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>25</strong></td>
+<td><strong>6 ported, 12 transport, 2 no consumer, 5 deferred</strong></td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/produce-capture-2026-11-16.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

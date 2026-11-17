@@ -79,6 +79,8 @@ pub mod inference;
 pub mod invite;
 pub mod jobs;
 pub mod label;
+// T2 (SPEC_V2 §7): the decision ladder's policies, refinements, laya configs and decisions.
+pub mod ladder;
 pub mod licence;
 pub mod list;
 pub mod listen;

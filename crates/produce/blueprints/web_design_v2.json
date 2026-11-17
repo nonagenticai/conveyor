@@ -1,0 +1,12 @@
+{
+  "key": "web_design_v2",
+  "title": "The redesign, second generation",
+  "family": "analysis",
+  "phases": [
+    { "id": "capture", "action": "analyse.site", "params": {} },
+    { "id": "redesign", "action": "produce.redesign", "params": {} },
+    { "id": "screenshot", "action": "media.render_html", "params": {} },
+    { "id": "deliver", "action": "produce.deliver", "params": {} }
+  ],
+  "unresolved": ["capture", "redesign", "deliver"]
+}

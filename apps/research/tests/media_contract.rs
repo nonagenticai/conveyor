@@ -13,22 +13,14 @@ use axum::http::{Request, StatusCode};
 use http_body_util::BodyExt;
 use tower::ServiceExt;
 
-use conveyor_research::media::{self, Config};
+use conveyor_research::media;
 
 const SEED: &str = include_str!("../contract/media/seed.sql");
 const TENANT: &str = "00000000-0000-7000-8000-000000000001";
 const OTHER_TENANT: &str = "00000000-0000-7000-8000-000000000002";
 
 fn app(pool: sqlx::PgPool) -> axum::Router {
-    let config = Config {
-        bind_host: "127.0.0.1".to_string(),
-        bind_port: 0,
-        enable_docs: false,
-        service_name: "media-discovery".to_string(),
-        version: "0.1.0".to_string(),
-        database_url: None,
-        max_connections: 4,
-    };
+    let config = common::media_config();
     media::build_app(media::AppState::with_pool(config, pool))
 }
 
@@ -141,6 +133,7 @@ async fn a_second_tenant_sees_nothing() {
             Request::builder()
                 .uri("/api/items/10000000-0000-7000-8000-000000000001")
                 .header("x-tenant-id", TENANT)
+                .header("authorization", common::vouch_auth())
                 .body(Body::empty())
                 .expect("build"),
         )
@@ -155,6 +148,7 @@ async fn a_second_tenant_sees_nothing() {
             Request::builder()
                 .uri("/api/items/10000000-0000-7000-8000-000000000001")
                 .header("x-tenant-id", OTHER_TENANT)
+                .header("authorization", common::vouch_auth())
                 .body(Body::empty())
                 .expect("build"),
         )
@@ -168,6 +162,7 @@ async fn a_second_tenant_sees_nothing() {
             Request::builder()
                 .uri("/api/collections")
                 .header("x-tenant-id", OTHER_TENANT)
+                .header("authorization", common::vouch_auth())
                 .body(Body::empty())
                 .expect("build"),
         )

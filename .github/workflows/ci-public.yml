@@ -20,14 +20,23 @@ name: ci
 
 on:
   pull_request:
+  # The main ruleset carries the merge_queue rule, and a queued PR is validated on a synthetic
+  # merge-group ref: the queue waits for the required checks to appear on THAT ref. Without this
+  # trigger those checks never run, and every queued PR sits in AWAITING_CHECKS forever (measured
+  # on this very PR before this line existed). classify treats any non-pull_request event as
+  # docs_only=false, and dco is pull_request-only and not a required context, so the queue runs
+  # the same gates the PR did.
+  merge_group:
   push:
     branches: [main]
   workflow_dispatch:
 
-# Never cancel a run for main: its image job is what deploys.
+# Never cancel a run for main: its image job is what deploys. Never cancel a merge_group run
+# either: it is the queue's verdict on a queued PR, and a re-run for the same queue ref must not
+# kill the predecessor mid-build (measured 2026-11-17: the rule was true for queue refs).
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.event_name != 'merge_group' }}
 
 permissions:
   contents: read
@@ -204,7 +213,9 @@ jobs:
   # Playwright is pinned and installed here: six checks launch a headless chromium, and the
   # pack has no package.json of its own.
   design-pack:
-    if: ${{ !github.event.repository.private }}
+    # Not a required context and up to 20 minutes long: on a merge_group run it would sit on the
+    # queue's critical path for no gate. The pull_request run is where the pack is validated.
+    if: ${{ !github.event.repository.private && github.event_name != 'merge_group' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -221,6 +232,7 @@ jobs:
           python3 scripts/build-v2-coverage.py --check
           python3 scripts/check-output-standard.py --self-test
           python3 scripts/check-output-standard.py
+          python3 scripts/ci/board.py --self-test
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs
           node docs/design/scripts/check-docs.cjs
@@ -494,6 +506,12 @@ jobs:
           - package: conveyor-research
             bin: conveyor-research-media
             image: conveyor-research-media
+          # #212: the absorbed scientific service. The image name must NOT be the legacy
+          # `scientific-processor`: that package is Flux-tracked, so publishing into it would
+          # auto-deploy an untested image to the Deployment with no flag, window or rollback.
+          - package: conveyor-scientific
+            bin: conveyor-scientific
+            image: conveyor-scientific
           # The two media executor images (ADR 0007 §1–3): one package, two binaries, one image
           # each. `tools` installs what the binary shells out to — measured on the push run of
           # 2026-11-16, a generic runtime built fine and then failed `--version`: an executor has

@@ -1,0 +1,12 @@
+{
+  "key": "audit_video",
+  "title": "A video quality audit",
+  "family": "analysis",
+  "phases": [
+    { "id": "extract_frames", "action": "analyse.extract_frames", "params": {} },
+    { "id": "ocr", "action": "media.ocr", "params": {} },
+    { "id": "vision_verification", "action": "analyse.video", "params": {} },
+    { "id": "report", "action": "analyse.report", "params": {} }
+  ],
+  "unresolved": ["extract_frames", "vision_verification", "report"]
+}

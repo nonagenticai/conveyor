@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Research cutover — 2026-11-16 · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-research-cutover.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="research-cutover--2026-11-16">Research cutover — 2026-11-16</h1>
+<p>Part of #205. The two Rust binaries were deployed (<code>gitops-production#5297</code>), the scraper was cut over (<code>#5303</code>), and the Python <code>media_discovery</code> was retired in favour of the Rust media binary (<code>gitops-production#5306</code>) — <strong>with conveyor#226 still open</strong>: the port had dropped the reference's tenant gate. On 2026-11-17 the media Deployment was withdrawn to 0 replicas (gitops#5318) and the gate was restored (conveyor#226, this document's "The media gate" section); the Deployment returns behind the restored gate in the deployment repository.</p>
+<h2 id="digests-deployed">Digests deployed</h2>
+<table>
+<thead>
+<tr>
+<th>Binary</th>
+<th>Image</th>
+<th>Digest</th>
+<th>Source commit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conveyor-research</code></td>
+<td><code>ghcr.io/nonagenticai/conveyor-research</code></td>
+<td><code>sha256:8991e468baa0305b880c4881a4917761c80261f77c4fe27dff373e803facb2b7</code></td>
+<td><code>bfe86aa</code></td>
+</tr>
+<tr>
+<td><code>conveyor-research-media</code></td>
+<td><code>ghcr.io/nonagenticai/conveyor-research-media</code></td>
+<td><code>sha256:4a4d25c9200805cd1a20895482d04c675823b7cc0c8e7593736d3f7c2ee3f0f7</code></td>
+<td><code>bfe86aa</code></td>
+</tr>
+</tbody>
+</table>
+<p>Both are public ghcr packages, pulled anonymously — no imagePullSecret.</p>
+<h2 id="deploy">Deploy</h2>
+<table>
+<thead>
+<tr>
+<th>Deployment</th>
+<th>Namespace</th>
+<th>Service</th>
+<th>Database</th>
+<th>State after deploy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>research</code></td>
+<td><code>webscraper</code></td>
+<td><code>research:9119</code></td>
+<td>none (stateless)</td>
+<td>1/1, 0 restarts</td>
+</tr>
+<tr>
+<td><code>media</code></td>
+<td><code>media-discovery</code></td>
+<td><code>research-media:8809</code></td>
+<td>the existing <code>media_discovery</code> database</td>
+<td>1/1, 0 restarts</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why the existing namespaces, not a new <code>research</code> namespace.</strong> <code>default-restrict</code> is a hand-written per-namespace policy in the shared <code>clusters/strato/policies/network/baseline-networkpolicies.yaml</code>; a new namespace would need its own entry there, plus its own egress rule, PSA and ambient labels. The two existing namespaces already carry all of it, proven. #205's P2.1 verifies <code>-n research</code> and is amended here to <code>-n webscraper</code> for that reason.</p>
+<h2 id="the-adopted-database-needed-one-explicit-step">The adopted database needed one explicit step</h2>
+<p><code>apps/research/migrations/0001_media_baseline.sql</code> is a <code>pg_dump --schema-only</code> of the reference's own database. sqlx would have re-run it against the schema it was dumped from and crashed (<code>relation "collection_items" already exists</code>, measured). Measured state before the fix: <code>alembic_version = c7a1f4e9b820</code> — the exact revision the baseline was captured from — and no <code>_sqlx_migrations</code> table.</p>
+<p>Resolution: a one-shot Job (<code>media-baseline-seed</code>) let the binary create the empty <code>_sqlx_migrations</code> table, then the baseline was seeded as applied:</p>
+<pre><code>version = 1, description = &#39;media baseline&#39;, success = true,
+checksum = sha384(0001_media_baseline.sql) = 4d10d854…559551b0d24cc6898c053a796f2311cc29101</code></pre>
+<p>Re-running the binary then booted cleanly: <code>media-discovery 0.1.0 on 0.0.0.0:8809</code>. The row is created by sqlx's own DDL, not by hand, so the shape cannot drift from the library's expectations.</p>
+<h2 id="shadow-table-p31">Shadow table (P3.1)</h2>
+<p>Five public URLs, both binaries answering the same request. Bodies compared field by field after removing <code>processing_time_seconds</code>.</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>https://example.com</code></td>
+<td>equal except <code>.url</code></td>
+</tr>
+<tr>
+<td><code>https://www.rust-lang.org</code></td>
+<td>equal except <code>.url</code></td>
+</tr>
+<tr>
+<td><code>https://en.wikipedia.org/wiki/Lean_(proof_assistant)</code></td>
+<td>equal except <code>.url</code></td>
+</tr>
+<tr>
+<td><code>https://httpbin.org/html</code></td>
+<td><code>.url</code>, plus <code>text_content</code> / <code>markdown_content</code></td>
+</tr>
+<tr>
+<td><code>https://www.gnu.org/</code></td>
+<td>equal except <code>.url</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Differences, named — <code>unexplained = 0</code></strong></p>
+<ol type="1">
+<li><code>.url</code> — the reference echoes the normalised URL (<code>https://example.com/</code>); the port echoes the request's verbatim. Cosmetic; not reproduced.</li>
+<li><code>text_content</code> / <code>markdown_content</code> on httpbin — where the reference's primary extractor won it drops the leading <code>&lt;h1&gt;Herman Melville - Moby-Dick&lt;/h1&gt;</code>; the port uses the boilerplate-strip baseline always. Documented in <code>apps/research/contract/README.md</code> ("the BeautifulSoup boilerplate-strip baseline is ported verbatim; trafilatura is not"), not a port defect.</li>
+</ol>
+<p><strong>Media (P2.3)</strong> — <code>media_collections</code> holds 0 rows, so the scenario "an existing collection is read" cannot be run as written. Proxied with an item read:</p>
+<table>
+<thead>
+<tr>
+<th>Call</th>
+<th>Reference</th>
+<th>Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /api/items/019ddddf-…</code> with <code>X-Tenant-Id</code></td>
+<td><strong>401</strong> — a bare tenant header needs a service token</td>
+<td><strong>200</strong> + the full row</td>
+</tr>
+</tbody>
+</table>
+<p>That difference was the port's missing gate, not a row defect: #226. It is closed — the port now refuses a bare tenant without a vouch (401), refuses a service token whose subject is not on <code>MEDIA_DISCOVERY_ONBEHALF_SUBJECTS</code> (403), serves <code>X-Tenant-Id: Bearer &lt;licence&gt;</code> with the licence's tenant, and keeps the vouch from re-labelling the named tenant. The three shapes are pinned in <code>apps/research/tests/tenant.rs</code>.</p>
+<h2 id="cutover-p4-scraper-half-only">Cutover (P4, scraper half only)</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mcp <code>WEBSCRAPER_URL</code> → <code>http://research.webscraper.svc.cluster.local:9119</code></td>
+<td>read back from the reconciled Deployment</td>
+</tr>
+<tr>
+<td>n8n-facing <code>webscraper-host-vs</code> destination → <code>research</code> Service</td>
+<td>the internal service DNS name unchanged</td>
+</tr>
+<tr>
+<td>Python <code>webscraper</code> Deployment, Service and egress policy removed</td>
+<td><code>kubectl -n webscraper get deploy,svc</code> lists only <code>research</code></td>
+</tr>
+<tr>
+<td>live request after the flip</td>
+<td><code>POST http://research:9119/api/scrape/url</code> → the example.com body</td>
+</tr>
+<tr>
+<td>mcp restarted on the new URL</td>
+<td>pod <code>1/1 Running</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="not-done-and-why">Not done, and why</h2>
+<ul>
+<li><p><strong>The media gate (RESOLVED 2026-11-17, #226).</strong> At the time of the cutover the port trusted a bare <code>X-Tenant-Id</code>; the reference demands a credential. The exposure was closed by withdrawing the Deployment (gitops#5318), and the gate was restored in conveyor#226 — see "The media gate" below.</p></li>
+<li><p><strong>Retiring <code>webscraper_service</code></strong> — done, under the owner's 2026-11-17 procedure. The first attempt used the session's <code>gh</code> shim (<code>~/.claude/bin/gh</code>), which is a GitHub App installation token with <code>permissions.admin=false</code>, so it was refused <code>403 Resource not accessible by integration</code>. The real binary <code>/opt/homebrew/bin/gh</code> is the owner's account and has admin; the steps then completed:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rename</td>
+<td><code>nonagenticai/webscraper_service</code> → <code>nonagenticai/webscraper_service-archive</code></td>
+</tr>
+<tr>
+<td>transfer</td>
+<td>→ <code>nonagenticai-archive/webscraper_service-archive</code> (private, full history kept)</td>
+</tr>
+<tr>
+<td>republish</td>
+<td><code>nonagenticai/webscraper_service</code> created <strong>public</strong>, <strong>1 commit</strong>, 102 files, no history</td>
+</tr>
+</tbody>
+</table>
+<p>Cleaning applied before publication, measured on the export: <code>.secrets.baseline</code> and <code>docker-compose.override.yml</code> dropped; four internal service DNS names, one public API hostname and one private LAN IP replaced with <code>example.com</code> hosts. <code>betterleaks</code> after cleaning: 5 findings, all test-fixture passwords (<code>username="alice", password="s3cr3t"</code> and equivalent), zero real credentials. The public README now opens with a retired notice pointing at <code>apps/research</code>.</p>
+<p>Note for future retirements: the High-alert gate is vacuous on this repo — it has no code scanning configured at all (<code>403 Advanced Security must be enabled</code>), so "no high alerts" means "not scanned", not "clean".</p></li>
+<li><p><strong><code>webscraper-env</code>.</strong> Unreferenced after the cutover, deliberately not deleted in a Deployment swap; a separate auditable act.</p></li>
+</ul>
+<h2 id="the-media-gate-2026-11-17-226">The media gate (2026-11-17, #226)</h2>
+<p>The reference's gate was three behaviours, each now ported and pinned by a test:</p>
+<table>
+<thead>
+<tr>
+<th>Credential</th>
+<th>Reference</th>
+<th>This service</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>none</td>
+<td>401 <code>AUTHENTICATION_REQUIRED</code></td>
+<td>401, same code, <code>WWW-Authenticate: Bearer</code></td>
+</tr>
+<tr>
+<td><code>X-Tenant-Id: Bearer &lt;licence&gt;</code></td>
+<td>the licence's tenant</td>
+<td>introspected at <code>LICENSE_INTROSPECT_URL</code>; inactive/unknown/tenant-less → 401</td>
+</tr>
+<tr>
+<td>bare <code>X-Tenant-Id</code> + <code>Authorization: Bearer &lt;service licence&gt;</code></td>
+<td>the NAMED tenant, only for an allowlisted subject</td>
+<td>same; empty allowlist → every bare tenant refused (fail-closed)</td>
+</tr>
+<tr>
+<td>bare <code>X-Tenant-Id</code> alone</td>
+<td>401 — a claim is not a credential</td>
+<td>401</td>
+</tr>
+<tr>
+<td>a non-uuid tenant</td>
+<td>400 <code>INVALID_TENANT_ID</code></td>
+<td>400, same code</td>
+</tr>
+</tbody>
+</table>
+<p>Deviations, deliberate: no introspection cache (the reference caches 5 min; this service has had zero callers and a fresh check never serves a revoked licence from cache) and no trusted-CIDR branch (the vouch is required for every caller — strictly stricter than the reference's peer allowance).</p>
+<p>Sequence, recorded honestly: the Python service was retired before the gate was restored, so on 2026-11-17 the Deployment was first <strong>withdrawn to 0 replicas</strong> (gitops#5318 — measured zero callers: a cluster-wide workload sweep matched only the Deployment itself, and the parent kustomization already recorded "zero callers in 7d"), then returned behind the restored gate. The live verification of the three shapes and the pinned digest are recorded on conveyor#226.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-16-research-cutover.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

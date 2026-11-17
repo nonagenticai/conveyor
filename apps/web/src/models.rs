@@ -469,6 +469,13 @@ pub struct UsageRow {
     /// Wall time summed, the load side of the same window.
     #[serde(default)]
     pub latency_ms: i64,
+    /// The commercial unit of a uniformly non-token bucket (`image`, `character`, `second`), when
+    /// the server can name one.
+    #[serde(default)]
+    pub unit: Option<String>,
+    /// The units summed for that kind, a decimal string.
+    #[serde(default)]
+    pub units: Option<String>,
 }
 
 /// One `inference_call` ledger row. The fields the screen does not show are still parsed where

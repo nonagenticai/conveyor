@@ -18,7 +18,7 @@
 //! model names but the executor did not declare is refused **before** execution
 //! (`action-not-found`) and fed back to the model, never audited after the fact (CONTRACT §17).
 
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
@@ -536,6 +536,26 @@ fn capability_not_ready(field: &str, code: &str, detail: impl Into<String>) -> A
     }])
 }
 
+/// The agent's remaining wall clock, or `None` when the cap is already spent.
+///
+/// CONTRACT §17's cap is wall clock, but the loop is pure and only learns the elapsed time from a
+/// reply between turns: a model or tool call still in flight when the cap passes would otherwise
+/// keep the step alive past it (measured live 2026-11-17: 347 753 ms against a 300 000 ms cap).
+/// The executor therefore bounds every call by what is left of the budget.
+fn budget_remaining(started: Instant, cap_ms: i64) -> Option<Duration> {
+    let cap = Duration::from_millis(u64::try_from(cap_ms).unwrap_or(u64::MAX));
+    let remaining = cap.saturating_sub(started.elapsed());
+    (!remaining.is_zero()).then_some(remaining)
+}
+
+/// The typed `agent.timeout` the loop fails with when the budget is spent.
+fn budget_spent(started: Instant, cap_ms: i64) -> ActionError {
+    typed(AgentError::Timeout {
+        elapsed_ms: started.elapsed().as_millis() as i64,
+        cap: cap_ms,
+    })
+}
+
 /// Drive one loop to its end. Every effect goes through [`invoke`], so each model call and tool
 /// call is an `action_invocation` on the run's trace id with the engine's idempotency and audit.
 pub(crate) async fn drive(
@@ -546,6 +566,7 @@ pub(crate) async fn drive(
 ) -> Result<AgentRunOut, ActionError> {
     let (mut agent, mut plan) = Agent::start(config).map_err(typed)?;
     let started = Instant::now();
+    let cap_ms = agent.caps().timeout_ms;
     let allowed: Vec<String> = agent
         .tool_names()
         .iter()
@@ -554,12 +575,9 @@ pub(crate) async fn drive(
     let prompt_ref = agent.prompt_ref().map(str::to_owned);
 
     loop {
-        if started.elapsed().as_millis() as i64 > agent.caps().timeout_ms {
-            return Err(typed(AgentError::Timeout {
-                elapsed_ms: started.elapsed().as_millis() as i64,
-                cap: agent.caps().timeout_ms,
-            }));
-        }
+        let Some(remaining) = budget_remaining(started, cap_ms) else {
+            return Err(budget_spent(started, cap_ms));
+        };
         match plan {
             Plan::CallModel {
                 model,
@@ -579,7 +597,7 @@ pub(crate) async fn drive(
                 if !tools.is_empty() {
                     input["tools"] = json!(tools);
                 }
-                let outcome = invoke(
+                let call = invoke(
                     pool,
                     registry(),
                     tenant,
@@ -614,8 +632,10 @@ pub(crate) async fn drive(
                             correlation_id: Some(format!("run:{}", run.run_id)),
                         }),
                     },
-                )
-                .await?;
+                );
+                let outcome = tokio::time::timeout(remaining, call)
+                    .await
+                    .map_err(|_| budget_spent(started, cap_ms))??;
                 // A 5xx from the router must retry the tick, not fail the node: the caller maps
                 // this status to `Deferred`.
                 let reply = model_reply(&outcome.body)?;
@@ -624,7 +644,7 @@ pub(crate) async fn drive(
             Plan::CallTool(call) => {
                 let reply = if allowed.iter().any(|name| name == &call.name) {
                     let index = agent.tool_calls();
-                    let outcome = invoke(
+                    let invocation = invoke(
                         pool,
                         registry(),
                         tenant,
@@ -647,8 +667,11 @@ pub(crate) async fn drive(
                             app_key: run.app_key.to_owned(),
                             usage: None,
                         },
-                    )
-                    .await;
+                    );
+                    let outcome = match tokio::time::timeout(remaining, invocation).await {
+                        Ok(result) => result,
+                        Err(_) => return Err(budget_spent(started, cap_ms)),
+                    };
                     match outcome {
                         Ok(outcome) => ToolReply {
                             id: call.id.clone(),

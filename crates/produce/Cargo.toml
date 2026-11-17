@@ -1,0 +1,19 @@
+[package]
+name = "conveyor-produce"
+description = "The production family: the captured content-service contract (P1), and the blueprints that follow."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+# The manifest takes the registered action names as an argument so the library never links the
+# store or the HTTP client. The tests pass the live registry from here.
+conveyor-actions = { path = "../actions" }

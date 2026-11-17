@@ -9,13 +9,20 @@ Run the `issue-pickup` skill before creating any branch. One issue = one branch 
 plan's remaining work is **one issue** (owner rule 2026-11-11), unless an explicit ≤5 split is written down.
 `03-DELIVERY.md` is the authority.
 
-**Queue status 2026-11-14.** The V1 `S##` plans, the V2 `T0–T17` slices and the three
+**Queue status 2026-11-17.** The V1 `S##` plans, the V2 `T0–T17` slices and the three
 cross-cutting projects are registered. The V2 units are #34 (T0) and #72–#88 (T1–T17);
 `seed/programme.json` links them and `scripts/build-programme-seed.py` regenerates that mapping.
-`docs/design/data/coverage.json` is the measured status and tranche of every project — the
-slice frontmatter, the migrations, the compiled action registry and `v2.js` are the evidence,
-and `docs/design/scripts/check-coverage.cjs` is the gate. ADR 0005 still fixes the absorption
-order — absorption first (#44 → #45 → #46), the product spine behind it.
+Measured 2026-11-17: T0, T1 (`e3d7c4e`) and T2 (`39363ba`) are merged; **#74 (T3) is claimed** and
+#76 (T13) is the other ready unit; #74 is the T-chain's remaining construction blocker and it
+unblocks T9 (#81), T10 (#82), T11 (#84) and T12 (#88). The programme's own state was measured the
+same day: P0 has **20 of its 21** expected outputs published — `tranche-review`, the sponsoring
+group's first-tranche authorisation, is the owner's act — T1 is closed live with its inception
+pair, and T2/T3 are active. Two gate units carry the MSP/TOGAF process: **#302** (the closure gate:
+a project cannot close while a declared output is unpublished) and **#303** (the benefit/tranche
+retirement path). `docs/design/data/coverage.json` is the measured status and tranche of every
+project — the slice frontmatter, the migrations, the compiled action registry and `v2.js` are the
+evidence, and `docs/design/scripts/check-coverage.cjs` is the gate. ADR 0005 still fixes the
+absorption order — absorption first (#44 → #45 → #46), the product spine behind it.
 
 ## Programme `conveyor-buildout`
 
@@ -32,9 +39,12 @@ registered GitHub issues are its units. `seed/programme.json` is the mapping of 
 - `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM` — the cross-cutting units.
 
 Each project carries `meta.plan`, `meta.track` and `meta.issues`; each slice plan carries a
-one-line `Programme project:` header. `migrate --seed` installs the programme and its projects
-idempotently (`crates/store/src/seed_programme.rs`), and `conveyor snapshot` publishes the same
-rows to the public design site.
+one-line `Programme project:` header. Each delivery unit's issue carries the same context in four
+fields — `Tranche`, `Brief`, `ADM phase/plateau` and `Benefits` — defined in `03-DELIVERY.md` §
+"Issue content contract", so a tranche review can read the buildout's issue ledger directly.
+`migrate --seed` installs the programme and its projects idempotently
+(`crates/store/src/seed_programme.rs`), and `conveyor snapshot` publishes the same rows to the
+public design site.
 
 **Status 2026-11-07:** plan set complete — 19 slice plans, the binding data architecture, the contract and five
 source maps. `docs/SPEC.md` is the approved spec; `01-CONTRACT.md` is the cross-slice rulebook and outranks

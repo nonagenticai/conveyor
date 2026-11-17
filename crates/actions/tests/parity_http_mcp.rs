@@ -1677,6 +1677,76 @@ async fn seed_parity_profile(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uu
     id
 }
 
+/// Seed a decision policy for one (kind, gate) case the T2 samples evaluate and refine.
+///
+/// The kind embeds the row id, so a sample's input can derive the case from the prepared id and
+/// each prepare (and therefore each round) seeds its own case.
+async fn seed_parity_policy(pg: &support::Pg, ctx: &Ctx, kind_prefix: &str, gate: &str) -> Uuid {
+    let id = Uuid::now_v7();
+    let kind = format!("{kind_prefix}.{id}");
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let inserted: Uuid = sqlx::query_scalar(
+        "INSERT INTO decision_policy (id, tenant_id, kind, gate, threshold, fail_policy, action)
+         VALUES ($1, $2, $3, $4, 0.8, 'closed', 'block') RETURNING id",
+    )
+    .bind(id)
+    .bind(ctx.tenant_id)
+    .bind(&kind)
+    .bind(gate)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert decision policy");
+    tx.commit().await.expect("commit");
+    inserted
+}
+
+/// Seed the laya config the L1 sample pins.
+async fn seed_parity_laya(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO laya_inference_config (tenant_id, model_ref)
+         VALUES ($1, 'jev-latest') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert laya config");
+    tx.commit().await.expect("commit");
+    id
+}
+
+/// Seed an accepted L1 decision for the draft-application sample.
+async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome)
+         VALUES ($1, 'parity.case', 'laya', 'system', $2, 'accepted') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(card)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert decision");
+    tx.commit().await.expect("commit");
+    id
+}
+
+/// Seed a generated draft artefact for the application sample.
+async fn seed_parity_document(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO document (tenant_id, kind, title, status, meta)
+         VALUES ($1, 'document', 'Parity draft', 'active', '{\"generated\":true}'::jsonb)
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert document");
+    tx.commit().await.expect("commit");
+    id
+}
+
 /// Seed the rows the sample's input will name, once per round.
 async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
     match sample.name {
@@ -1800,6 +1870,34 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         "stakeholders.profile_list" => {
             let g = seed_parity_programme(pg, ctx).await;
             ctx.push("stakeholders.profile_list", g);
+        }
+        // ── T2 decision ladder ───────────────────────────────────────────────────────────
+        // One policy per (kind, gate) is the table's contract and `prepare` runs once per
+        // round, so each round seeds its own case (the kind embeds the row id).
+        "decision_policies.update" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.update", "parity_gate").await;
+            ctx.push("decision_policies.update", policy);
+        }
+        "refinements.publish" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.refine", "parity_gate").await;
+            ctx.push("refinements.publish", policy);
+        }
+        "ladder.evaluate" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.evaluate", "parity_gate").await;
+            ctx.push("ladder.evaluate.policy", policy);
+            seed_parity_laya(pg, ctx).await;
+        }
+        "ladder.record" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.record", "parity_gate").await;
+            ctx.push("ladder.record.policy", policy);
+        }
+        "ladder.apply_draft" => {
+            let card = seed_card(pg, ctx, "active").await;
+            let decision = seed_parity_decision(pg, ctx, card).await;
+            let document = seed_parity_document(pg, ctx).await;
+            ctx.push("ladder.apply_draft.card", card);
+            ctx.push("ladder.apply_draft.decision", decision);
+            ctx.push("ladder.apply_draft.document", document);
         }
         "tenants.update_settings" => {
             sqlx::query("UPDATE tenant SET settings = '{}'::jsonb, version = 1 WHERE id = $1")
@@ -2291,6 +2389,24 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         }
         "documents.publish" | "documents.request_publish" => {
             let id = seed_document_bytes(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        // #245: the preview needs a text body; the return needs an open publish request.
+        "documents.preview" => {
+            let id = seed_document_history(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        "documents.return" => {
+            let id = seed_document_bytes(pg, ctx).await;
+            sqlx::query(
+                "UPDATE document SET publish_requested_at = now()
+                  WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(ctx.tenant_id)
+            .bind(id)
+            .execute(&pg.super_pool)
+            .await
+            .expect("open the parity publish request");
             ctx.push(sample.name, id);
         }
         "documents.revision_list" | "documents.revision_get" | "documents.revision_restore" => {
@@ -3636,6 +3752,20 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             json!({"messages": [{"role": "user", "content": "ping"}]}),
             None,
         ),
+        // #163: `produce.script` is the one model-backed action that is not a passthrough — it binds the
+        // answer to shot ids it derived and then enforces the duration budget. The stub answers a valid
+        // empty shot list, so this exercises the composition over both transports rather than its 502 path.
+        expecting(
+            plain(
+                "produce.script",
+                json!({
+                    "brief": "a ten-second explainer about why a shot list needs stable ids",
+                    "target_duration_ms": 10000
+                }),
+                None,
+            ),
+            200,
+        ),
         // S13 step 8: the engine's model call is the same declared external POST as the copilot's,
         // so the stub answers both; the loop's own action is a step primitive and refuses a direct
         // invocation with 409 (CONTRACT §17 — the executor drives it, not the action surface).
@@ -3698,6 +3828,16 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             expecting(sample, 200)
         },
         expecting(on_prepared("documents.request_publish", Some("\"1\"")), 200),
+        // #245: the preview is a read of a saved text output; the return is the admin's rework
+        // order on a requested draft.
+        expecting(on_prepared("documents.preview", None), 200),
+        {
+            let mut sample = on_prepared("documents.return", Some("\"1\""));
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("documents.return"), "note": "Parity return"}),
+            );
+            expecting(sample, 200)
+        },
         expecting(on_prepared("documents.revision_list", None), 200),
         {
             let mut sample = on_prepared("documents.revision_get", None);
@@ -4628,8 +4768,37 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             403,
         ),
-        // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────
-        // The response is a pure function of the input — the deck writer has no clock, no
+        // ── #172: the ops.host_* family (T7, SPEC_V2 §10.4.1) ─────────────────────────────
+        // No host is registered in the fixture database, so both reads answer the SAME typed
+        // `host_not_registered` refusal on both transports — the registry is the action layer's
+        // authority, and an unregistered host is never defaulted into a guess.
+        expecting(
+            plain(
+                "ops.host_status",
+                json!({"host": "example", "unit": "com.example.unit"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "ops.host_logs",
+                json!({"host": "example", "unit": "com.example.unit", "lines": 50}),
+                None,
+            ),
+            404,
+        ),
+        // The restart names no approval, so the gate refuses BEFORE the registry is read: the
+        // destructive refusal is identical to `ops.restart`'s on both transports.
+        expecting(
+            plain(
+                "ops.host_restart_unit",
+                json!({"host": "example", "unit": "com.example.unit"}),
+                None,
+            ),
+            403,
+        ),
+        // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────        // The response is a pure function of the input — the deck writer has no clock, no
         // random id and no hash-map order — so a replay and an execution agree byte for byte.
         expecting(
             plain(
@@ -4721,6 +4890,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
     ];
 
     out.extend(spine_samples());
+    out.extend(ladder_samples());
 
     for sample in &mut out {
         if matches!(
@@ -4779,6 +4949,102 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         }
     }
     out
+}
+
+/// T2's decision-ladder samples, in their own frame for the same stack reason as
+/// [`spine_samples`]. The sample contract is unchanged.
+fn ladder_samples() -> Vec<Sample> {
+    vec![
+        // ── T2 decision ladder (SPEC_V2 §7, §10.3–§10.4) ────────────────────────────────
+        {
+            // The case is unique per execution: one policy per (kind, gate) is the table's
+            // contract, and round B executes rather than replays.
+            let mut sample = plain("decision_policies.create", json!({}), None);
+            sample.input = Box::new(|_: &Ctx| {
+                json!({
+                    "kind": format!("parity.create.{}", Uuid::now_v7().simple()),
+                    "gate": "parity_gate_create",
+                    "threshold": 0.8,
+                    "fail_policy": "closed",
+                    "action": "block"
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = on_prepared("decision_policies.update", Some("\"1\""));
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("decision_policies.update"), "threshold": 0.7}),
+            );
+            expecting(sample, 200)
+        },
+        expecting(plain("decision_policies.list", json!({}), None), 200),
+        {
+            let mut sample = plain("refinements.publish", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "policy_id": ctx.pop("refinements.publish"),
+                    "threshold_override": 0.5
+                })
+            });
+            expecting(sample, 200)
+        },
+        expecting(plain("refinements.list", json!({}), None), 200),
+        expecting(
+            plain(
+                "laya_configs.create",
+                json!({"model_ref": "jev-latest"}),
+                None,
+            ),
+            201,
+        ),
+        expecting(plain("laya_configs.list", json!({}), None), 200),
+        {
+            let mut sample = plain("ladder.evaluate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.evaluate.policy");
+                json!({
+                    "kind": format!("parity.evaluate.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
+                    "answer": "pass",
+                    "confidence": 0.9,
+                    "input": {"subject": "parity"}
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("ladder.record", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.record.policy");
+                json!({
+                    "rung": "rule",
+                    "kind": format!("parity.record.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
+                    "answer": "pass",
+                    "outcome": "accepted",
+                    "confidence": 1.0
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(plain("ladder.list", json!({}), None), 200),
+        {
+            let mut sample = plain("ladder.apply_draft", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "document_id": ctx.pop("ladder.apply_draft.document"),
+                    "card_id": ctx.pop("ladder.apply_draft.card"),
+                    "decision_id": ctx.pop("ladder.apply_draft.decision")
+                })
+            });
+            expecting(sample, 200)
+        },
+    ]
 }
 
 /// T1's plan-spine samples, in their own frame: the main `samples` vec literal is already
