@@ -109,4 +109,40 @@ mod tests {
             );
         }
     }
+
+    /// The rigour vocabulary (#221) is part of the closed set: a class may require it and a
+    /// document may carry it. Removing one is a standard change, never a silent rename.
+    #[test]
+    fn the_rigour_categories_are_in_the_vocabulary() {
+        let vocabulary = categories();
+        for category in [
+            "benefit-profile",
+            "benefits-map",
+            "projects-dossier",
+            "tranche-plan",
+            "tranche-review",
+            "benefits-strategy",
+            "realization-plan",
+            "stakeholder-profiles",
+            "architecture-principles",
+            "adm-profile",
+            "artifact-standard",
+            "architecture-artifact",
+            "statement-of-architecture-work",
+            "compliance-review",
+            "waiver",
+            "maturity-assessment",
+            "skills-assessment",
+        ] {
+            assert!(
+                vocabulary.iter().any(|value| value == category),
+                "{category} is missing from seed/output-standard.json"
+            );
+            assert_eq!(
+                canonical_category(category).expect("rigour category"),
+                category,
+                "a rigour category canonicalises to itself"
+            );
+        }
+    }
 }
