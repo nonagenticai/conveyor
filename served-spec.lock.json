@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "e123a3da4cfb2ae391742f7e219278fd587db40f6bf2770256fc69376e7283c4",
+    "GET /api/actions": "850aec496cf37e9c99df9858e05b8be06fa4f870d8571f525abcb6b491feaebb",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -269,6 +269,9 @@
     "POST /api/actions/ops.deployments/invocations": "b3126f9aa0943b45577facbeb643c6a6abca9b4c289298c15c68411bac6e1705",
     "POST /api/actions/ops.events/invocations": "ec4690050aed54127d5985e3af5e65c0a5c589c55a49832723384fd35dcfe993",
     "POST /api/actions/ops.flux_status/invocations": "466ceb30888e1b6a18c7e0802af5554193e9852618644b9d94379282ba3ba1b6",
+    "POST /api/actions/ops.host_logs/invocations": "833b0520550f1e97656f307c3bb9c1f509c1f5016b661831507912a0585de902",
+    "POST /api/actions/ops.host_restart_unit/invocations": "7b533ef363cd96f71d7ac4675bea2a974ae69fae2af46e0f7ca7db48c48b2a69",
+    "POST /api/actions/ops.host_status/invocations": "6430238d71be7711f0ef84d20b478f697236c2598c18ce287c36eb46bf1b9c3a",
     "POST /api/actions/ops.logs/invocations": "3034fee9c0605413b1e7dc8662d256c1090919e0d22bfe2dc8fc11f588db452e",
     "POST /api/actions/ops.pods/invocations": "f5754b05bb18ed3ff7e0234becf0b6267dbde8a2919f634242cf61a1f14d46ba",
     "POST /api/actions/ops.restart/invocations": "7dcdae6cb0b3aedc29f8892f7943a09fbfaa96b013de3114922351ba0ecae28a",
