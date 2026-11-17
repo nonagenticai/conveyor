@@ -208,8 +208,8 @@ mod tests {
                 // call's own usage_unit/usage_units on the ledger (0047_media_price.sql).
                 (47, "media price".to_owned()),
                 // #305: the durable tranche-review record — the decision and the evidence a
-                // review was taken on (0048_tranche_review.sql).
-                (48, "tranche review".to_owned())
+                // review was taken on (0049_tranche_review.sql).
+                (49, "tranche review".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
