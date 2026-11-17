@@ -207,11 +207,30 @@ impl Client {
         Ok(body)
     }
 
-    async fn get(
+    /// `PATCH path` with an RFC 7386 merge-patch body, parsed as JSON.
+    ///
+    /// The write half of the family. `dryRun=All` rides in `query`, so a dry run and a real
+    /// write take the SAME code path and differ only in the query string — the property the
+    /// `ops.*` write tests rely on.
+    pub async fn patch_json(
         &self,
         path: &str,
         query: &[(&str, String)],
-    ) -> Result<(reqwest::StatusCode, String), OpsError> {
+        body: &Value,
+    ) -> Result<Value, OpsError> {
+        let (status, text) = self.patch(path, query, body).await?;
+        if !status.is_success() {
+            return Err(OpsError::Api {
+                status: status.as_u16(),
+                body: capped(&text),
+            });
+        }
+        serde_json::from_str(&text)
+            .map_err(|error| OpsError::Transport(format!("the API answered non-JSON: {error}")))
+    }
+
+    /// The request URL for one absolute API path and its query pairs.
+    fn url(&self, path: &str, query: &[(&str, String)]) -> Result<reqwest::Url, OpsError> {
         if !path.starts_with('/') {
             return Err(OpsError::Config(format!(
                 "{path:?} is not an absolute API path"
@@ -225,6 +244,45 @@ impl Client {
                 pairs.append_pair(key, value);
             }
         }
+        Ok(url)
+    }
+
+    async fn patch(
+        &self,
+        path: &str,
+        query: &[(&str, String)],
+        body: &Value,
+    ) -> Result<(reqwest::StatusCode, String), OpsError> {
+        let url = self.url(path, query)?;
+        let payload = serde_json::to_vec(body)
+            .map_err(|error| OpsError::Config(format!("request body: {error}")))?;
+        let response = self
+            .http
+            .patch(url)
+            .bearer_auth(&self.token)
+            .header(reqwest::header::ACCEPT, "application/json")
+            .header(
+                reqwest::header::CONTENT_TYPE,
+                "application/merge-patch+json",
+            )
+            .body(payload)
+            .send()
+            .await
+            .map_err(|error| OpsError::Transport(error.to_string()))?;
+        let status = response.status();
+        let body = response
+            .text()
+            .await
+            .map_err(|error| OpsError::Transport(error.to_string()))?;
+        Ok((status, body))
+    }
+
+    async fn get(
+        &self,
+        path: &str,
+        query: &[(&str, String)],
+    ) -> Result<(reqwest::StatusCode, String), OpsError> {
+        let url = self.url(path, query)?;
         let response = self
             .http
             .get(url)

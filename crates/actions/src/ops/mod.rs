@@ -28,11 +28,13 @@ use conveyor_ops::OpsError;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use uuid::Uuid;
 
 use crate::control::invalid;
 use crate::invoke::ActionError;
 
 pub mod reads;
+pub mod writes;
 
 /// The service key the refusals name.
 pub const SERVICE: &str = "ops";
@@ -155,6 +157,104 @@ pub struct CiOut {
     pub count: usize,
     /// The run objects, exactly as GitHub returned them.
     pub runs: Vec<Value>,
+}
+
+/// `ops.restart` input.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct RestartIn {
+    /// The namespace of the workload.
+    pub namespace: String,
+    /// The Deployment to restart.
+    pub deployment: String,
+    /// The approved approval that authorises this exact restart.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub approval_id: Option<Uuid>,
+    /// Return the request that WOULD be made and change nothing.
+    #[serde(default)]
+    pub dry_run: bool,
+}
+
+/// `ops.scale` input.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ScaleIn {
+    /// The namespace of the workload.
+    pub namespace: String,
+    /// The Deployment to scale.
+    pub deployment: String,
+    /// The replica count to set.
+    pub replicas: u32,
+    /// The approved approval that authorises this exact scale.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub approval_id: Option<Uuid>,
+    /// Return the request that WOULD be made and change nothing.
+    #[serde(default)]
+    pub dry_run: bool,
+}
+
+/// `ops.rollback` input.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct RollbackIn {
+    /// The namespace of the workload.
+    pub namespace: String,
+    /// The Deployment to roll back.
+    pub deployment: String,
+    /// The revision to restore; defaults to the revision before the current one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub revision: Option<u32>,
+    /// The approved approval that authorises this exact rollback.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub approval_id: Option<Uuid>,
+    /// Return the request that WOULD be made and change nothing.
+    #[serde(default)]
+    pub dry_run: bool,
+}
+
+/// One check in a write's read-back.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CheckOut {
+    /// What was checked.
+    pub name: String,
+    /// Whether the observed state satisfies it.
+    pub ok: bool,
+    /// The observation, as text (never a whole object).
+    pub detail: String,
+}
+
+/// The request a write made (or, on a dry run, would make).
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct RequestOut {
+    /// The HTTP method.
+    pub method: String,
+    /// The API path.
+    pub path: String,
+    /// The query pairs, `dryRun=All` included when it was a dry run.
+    pub query: Vec<String>,
+    /// The merge-patch body.
+    pub body: Value,
+}
+
+/// What a destructive write answers.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct WriteOut {
+    /// The namespace written.
+    pub namespace: String,
+    /// The Deployment written.
+    pub deployment: String,
+    /// `restart`, `scale` or `rollback`.
+    pub operation: String,
+    /// The exact thing the approval authorised.
+    pub target: String,
+    /// The approval that authorised the call.
+    pub approval_id: Option<Uuid>,
+    /// Whether anything was written.
+    pub dry_run: bool,
+    /// The request made, or the one a dry run would make.
+    pub request: RequestOut,
+    /// The read-back observations.
+    pub checks: Vec<CheckOut>,
 }
 
 /// Clamp a requested page size into the read family's bounds.
