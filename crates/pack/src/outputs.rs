@@ -2,8 +2,9 @@
 //! Platform outputs on the public design site: one standalone HTML page per published output,
 //! plus the `outputs.js` index the Documents destination reads.
 //!
-//! **Static, not runtime.** The pack has no Markdown renderer and makes no request; a published
-//! body is rendered here, at publish time, into `docs/output-<id>.html`. `outputs.js` is the
+//! **Static, not runtime.** The pack makes no request; a published body is rendered here, at
+//! publish time, into `docs/output-<id>.html` by `conveyor_render::markdown`, the same renderer
+//! the operator's preview calls. `outputs.js` is the
 //! index (`window.CONVEYOR_OUTPUTS = {…}`), and `docs/design/docs.js` only lists it.
 //!
 //! **The filter is the publication decision.** Only `publishable AND status='active'` rows with a
@@ -19,9 +20,9 @@ use std::path::Path;
 
 use conveyor_domain::Project;
 use conveyor_domain::TenantId;
+pub use conveyor_render::markdown::render_markdown;
 use conveyor_store as store;
 use conveyor_store::document::DocumentRecord;
-use pulldown_cmark::{CowStr, Event, Options, Parser, Tag, html};
 use serde::Serialize;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -232,66 +233,6 @@ pub fn outputs_js(
         "window.CONVEYOR_OUTPUTS = {};\n",
         serde_json::to_string(&value)?
     ))
-}
-
-/// Render a Markdown body to HTML with raw HTML neutralised and unsafe URL schemes refused.
-pub fn render_markdown(markdown: &str) -> String {
-    let parser = Parser::new_ext(
-        markdown,
-        Options::ENABLE_TABLES | Options::ENABLE_STRIKETHROUGH | Options::ENABLE_TASKLISTS,
-    );
-    let events = parser.map(|event| match event {
-        // An author's raw HTML is a design note, not markup for this site. Display it as text;
-        // the HTML writer escapes it. Dropping it would silently lose the author's words.
-        Event::Html(text) | Event::InlineHtml(text) => Event::Text(text),
-        Event::Start(Tag::Link {
-            link_type,
-            dest_url,
-            title,
-            id,
-        }) if !safe_href(&dest_url) => Event::Start(Tag::Link {
-            link_type,
-            dest_url: CowStr::from("#"),
-            title,
-            id,
-        }),
-        Event::Start(Tag::Image {
-            link_type,
-            dest_url,
-            title,
-            id,
-        }) if !safe_href(&dest_url) => Event::Start(Tag::Image {
-            link_type,
-            dest_url: CowStr::from("#"),
-            title,
-            id,
-        }),
-        other => other,
-    });
-    let mut out = String::new();
-    html::push_html(&mut out, events);
-    out
-}
-
-/// A URL is safe when it is relative, a fragment, or an `http`, `https` or `mailto` URL.
-///
-/// The scheme is read before the first `/`, `?` or `#`; anything else is refused, including
-/// `javascript:`, `data:`, `vbscript:` and `file:` with any leading whitespace or mixed case.
-fn safe_href(raw: &str) -> bool {
-    let value = raw.trim();
-    if value.is_empty() || value.starts_with('#') || value.starts_with('/') {
-        return true;
-    }
-    if value.starts_with("./") || value.starts_with("../") {
-        return true;
-    }
-    let scheme_end = value.find(['/', '?', '#']).unwrap_or(value.len());
-    let head = &value[..scheme_end];
-    let Some(colon) = head.find(':') else {
-        return true; // a relative URL with no scheme
-    };
-    let scheme = head[..colon].to_ascii_lowercase();
-    matches!(scheme.as_str(), "http" | "https" | "mailto")
 }
 
 /// Fill the docs template for one output page.

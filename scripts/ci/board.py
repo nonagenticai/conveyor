@@ -23,7 +23,7 @@ closed at 00:37:54Z.
 `reap-stale-claims.sh` cannot catch any of this, by design: *a claim is a REMOTE BRANCH*,
 so it reads branches and never labels. This reads the labels and the branches together.
 
-THE THREE RULES, AND WHY ONLY ONE OF THEM ACTS
+THE FOUR RULES, AND WHY ONLY ONE OF THEM ACTS
 ----------------------------------------------
 A (acts)    `status:ready` + a live branch or an open PR -> `status:claimed`, one comment.
             Safe because it moves in ONE direction only. A check that could also move an
@@ -34,12 +34,17 @@ B (reports) `status:blocked` with no line starting `Blocker: #N`, or whose every
 C (reports) `status:claimed` with no branch, no PR, and no update in 48 h — the reaper's
             two tests applied to the label. Reporting only: releasing a human's claim
             stays a human decision, which is also why the reaper defaults to report mode.
+P (reports) a `unit` issue created on or after PROGRAMME_SINCE with no `## Programme` section,
+            or with a field row empty. The delivery contract makes the four programme fields
+            (tranche, brief, ADM phase/plateau, benefits) part of the Definition of ready for
+            issues created on/after that date; the report is how a skipped field is seen.
+            Issues created before the change are exempt until claimed (forward-only rule).
 
 A rule's evidence is always printed. A wrong fix is silent; a printed verdict is not, and
 the job summary is the record a later session reads.
 
 USAGE
-    board.py --repo nonagenticai/conveyor            # apply rule A, report B and C
+    board.py --repo nonagenticai/conveyor            # apply rule A, report B, C and P
     board.py --repo nonagenticai/conveyor --dry-run  # print the plan, write nothing
     board.py --self-test                             # fixtures only, no network, no git
 
@@ -67,6 +72,13 @@ READY = "status:ready"
 CLAIMED = "status:claimed"
 BLOCKED = "status:blocked"
 NEEDS_HUMAN = "status:needs-human"
+UNIT = "unit"
+
+# `03-DELIVERY.md` § "Issue content contract": the programme context is required for issues
+# created on/after this date; an earlier issue gains it at its next claim. Keep the two in step.
+PROGRAMME_SINCE = dt.date(2026, 11, 18)
+PROGRAMME_HEADING = "## Programme"
+PROGRAMME_FIELDS = ("Tranche", "Brief", "ADM phase/plateau", "Benefits")
 
 # `03-DELIVERY.md`: "A `status:blocked` issue carries a plain line STARTING `Blocker: #N`;
 # a `Blocker:` mention inside prose or a checklist is not a blocker line." So the line must
@@ -105,6 +117,41 @@ def blockers_of(body: str) -> list[int]:
             if value not in seen:
                 seen.append(value)
     return seen
+
+
+def programme_gaps(body: str) -> list[str]:
+    """The programme fields this body is missing or leaves empty.
+
+    `[]` means the section is present and all four rows carry a value. A body with no
+    `## Programme` heading returns every field name, so the report says what to add rather than
+    only that something is absent. A row value of `—` (the template's ready-state placeholder)
+    counts as empty: the template's own blank must not pass as a filled field.
+    """
+    lines = body.splitlines()
+    try:
+        start = next(i for i, line in enumerate(lines) if line.strip() == PROGRAMME_HEADING)
+    except StopIteration:
+        return list(PROGRAMME_FIELDS)
+    gaps: list[str] = []
+    found: set[str] = set()
+    for line in lines[start + 1 :]:
+        if line.startswith("## "):
+            break
+        # Template rows: `| Field | Value |`. The heading row and the separator are skipped by
+        # the field-name match; a value that is the placeholder or blank is a gap.
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) != 2:
+            continue
+        field, value = cells
+        if field not in PROGRAMME_FIELDS:
+            continue
+        found.add(field)
+        if not value or value in {"—", "-"}:
+            gaps.append(field)
+    for field in PROGRAMME_FIELDS:
+        if field not in found:
+            gaps.append(field)
+    return gaps
 
 
 def branch_for(number: int, branches) -> str | None:
@@ -205,6 +252,20 @@ def plan(issues, prs, branches, blocker_state, now):
                         ),
                     }
                 )
+
+        # Rule P: the programme context. Forward-only: an issue created before the contract
+        # changed is exempt (it gains the section at its next claim), and this rule never edits.
+        if UNIT in labels and issue["created"].date() >= PROGRAMME_SINCE:
+            gaps = programme_gaps(issue["body"])
+            if gaps:
+                reports.append(
+                    {
+                        "rule": "P",
+                        "number": number,
+                        "title": issue["title"],
+                        "why": "no `## Programme` section or empty field(s): " + ", ".join(gaps),
+                    }
+                )
     return fixes, reports
 
 
@@ -248,7 +309,7 @@ def load_issues(repo: str):
     raw = json.loads(
         gh(
             "issue", "list", "--repo", repo, "--state", "open", "--limit", LIMIT,
-            "--json", "number,title,labels,updatedAt,body",
+            "--json", "number,title,labels,createdAt,updatedAt,body",
         )
     )
     return [
@@ -256,6 +317,7 @@ def load_issues(repo: str):
             "number": item["number"],
             "title": item["title"],
             "labels": [label["name"] for label in item["labels"]],
+            "created": parse_ts(item["createdAt"]),
             "updated": parse_ts(item["updatedAt"]),
             "body": item.get("body") or "",
         }
@@ -372,11 +434,12 @@ def self_test() -> int:
     """Fixture matrix. No network, no git, no clock."""
     now = dt.datetime(2026, 11, 15, 19, 0, tzinfo=dt.timezone.utc)
 
-    def issue(number, labels, body="", age_hours=0, title=None):
+    def issue(number, labels, body="", age_hours=0, title=None, created=None):
         return {
             "number": number,
             "title": title or f"issue {number}",
             "labels": list(labels),
+            "created": created or now - dt.timedelta(days=30),
             "updated": now - dt.timedelta(hours=age_hours),
             "body": body,
         }
@@ -491,6 +554,56 @@ def self_test() -> int:
             [], [], [], [],
         ),
         ("needs-human -> ignored", [issue(97, [NEEDS_HUMAN])], [], [], [], []),
+        (
+            # The contract is forward-only: an issue created before PROGRAMME_SINCE keeps its
+            # historical body; it gains the section at its next claim.
+            "unit created before the programme contract -> no report",
+            [issue(280, [UNIT, READY])],
+            [], [], [], [],
+        ),
+        (
+            "unit created after the programme contract, no section -> report P",
+            [issue(280, [UNIT, READY], created=now + dt.timedelta(days=4))],
+            [], [], [], ["P:280"],
+        ),
+        (
+            "unit created after the programme contract, section filled -> no report",
+            [
+                issue(
+                    280,
+                    [UNIT, READY],
+                    body=(
+                        "## Programme\n\n"
+                        "| Field | Value |\n|---|---|\n"
+                        "| Tranche | 1 |\n"
+                        "| Brief | project-brief-p0 |\n"
+                        "| ADM phase/plateau | A / PSA |\n"
+                        "| Benefits | benefit-personal-throughput |\n"
+                    ),
+                    created=now + dt.timedelta(days=4),
+                )
+            ],
+            [], [], [], [],
+        ),
+        (
+            "unit created after the programme contract, empty Tranche -> report P",
+            [
+                issue(
+                    280,
+                    [UNIT, READY],
+                    body=(
+                        "## Programme\n\n"
+                        "| Field | Value |\n|---|---|\n"
+                        "| Tranche | — |\n"
+                        "| Brief | pending #122 |\n"
+                        "| ADM phase/plateau | — (no architecture change) |\n"
+                        "| Benefits | enabling — no direct benefit |\n"
+                    ),
+                    created=now + dt.timedelta(days=4),
+                )
+            ],
+            [], [], [], ["P:280"],
+        ),
     ]
 
     failures = 0

@@ -12,7 +12,7 @@ chrono = { workspace = true }
 conveyor-domain = { path = "../domain" }
 conveyor-store = { path = "../store" }
 # Platform outputs: the Markdown -> HTML renderer.
-pulldown-cmark = { workspace = true }
+conveyor-render = { path = "../render" }
 # The snapshot's redaction safety net.
 regex = { workspace = true }
 serde = { workspace = true }
