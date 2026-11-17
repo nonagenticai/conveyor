@@ -730,3 +730,46 @@ async fn transition_requires_baseline_before_post() {
     assert_eq!(status, 200, "{listed}");
     assert_eq!(output(&listed)["items"].as_array().map(Vec::len), Some(1));
 }
+
+/// P1.7 — the new rows are tenant-scoped: dev-b cannot read, edit or delete dev-a's.
+#[tokio::test(flavor = "multi_thread")]
+async fn another_tenants_msp_rows_are_invisible() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Tenant A programme").await;
+    let job = create_owner_job(&pg, &seeded).await;
+    let (benefit, etag) = create_benefit(&running, &programme, job).await;
+
+    let (status, body) = running
+        .invoke(
+            "benefits.get",
+            "dev:bob",
+            json!({"id": benefit}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 404, "{body}");
+    let (status, body) = running
+        .invoke(
+            "benefits.update",
+            "dev:bob",
+            json!({"id": benefit, "description": "hijacked"}),
+            Some(etag.as_str()),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 404, "{body}");
+    let (status, body) = running
+        .invoke(
+            "benefits.delete",
+            "dev:bob",
+            json!({"id": benefit}),
+            Some(etag.as_str()),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 404, "{body}");
+}
