@@ -207,7 +207,7 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
         )
         .await;
     assert_eq!(status, 200, "{list}");
-    let items = list["items"].as_array().expect("items");
+    let items = output(&list)["items"].as_array().expect("items");
     assert_eq!(items.len(), 3, "{list}");
 
     let rungs: Vec<&str> = items
@@ -279,6 +279,9 @@ async fn a_refinement_changes_a_threshold_without_a_code_change() {
     )
     .await;
 
+    // An L1 decision pins the laya config it used, so one must exist.
+    create_laya_config(&running).await;
+
     // The platform policy at 0.8 refuses an 0.7 answer.
     let (status, refused) = evaluate(&running, 0.7).await;
     assert_eq!(status, 201, "{refused}");
@@ -339,7 +342,11 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
     // A laya decision with no laya config to pin is refused: the pin is mandatory, not a default.
     let (status, unpinned) = evaluate(&running, 0.9).await;
     assert_eq!(status, 422, "{unpinned}");
-    assert_eq!(output(&unpinned)["type"], "pins_incomplete", "{unpinned}");
+    assert_eq!(
+        output(&unpinned)["errors"][0]["code"],
+        "pins_incomplete",
+        "{unpinned}"
+    );
 
     create_laya_config(&running).await;
 
@@ -371,7 +378,7 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
     let first_id = id_of(output(&first), "id");
     let pinned: i64 = sqlx::query_scalar("SELECT policy_version FROM decision WHERE id = $1::uuid")
         .bind(&first_id)
-        .fetch_one(&pg.owner)
+        .fetch_one(&pg.super_pool)
         .await
         .expect("read the stored pin");
     assert_eq!(
