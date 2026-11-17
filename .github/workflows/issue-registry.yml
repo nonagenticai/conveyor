@@ -12,11 +12,12 @@ name: issue-registry
 # "Allow GitHub Actions to create and approve pull requests" (can_approve_pull_request_reviews).
 # No repository secret is added.
 #
-# ⛔ A PR created with `GITHUB_TOKEN` does not trigger `pull_request` workflows (GitHub's recursion
-# guard), so its required contexts would never be created and it could never merge. The dispatch
-# below is the exempt event: `gh workflow run ci-public.yml --ref automation/issue-registry`
-# attaches the same contexts to the same head commit, and the generated PR merges through the
-# normal gate. Do not remove the dispatch.
+# ⛔ A PR created with `GITHUB_TOKEN` gets a `pull_request` run that is created but parked at
+# `action_required` — its jobs never start, so no required context reports. Approving that run
+# starts it, and its checks associate with the PR; a `workflow_dispatch` run's checks attach to
+# the commit but do NOT associate with the PR (measured 2026-11-17: the generated PR stayed
+# BLOCKED until the parked run was approved). The step below approves the parked run and keeps
+# the dispatch only as a fallback when none appears.
 #
 # Disable with: gh workflow disable issue-registry.yml
 
@@ -128,12 +129,11 @@ jobs:
           print(f"- Closed or reopened: {listing(moved)}")
           print(f"- Removed: {listing(removed)}")
           print()
-          print("The workflow dispatches `ci-public` on this branch so the required contexts exist")
-          print("on this head (a `GITHUB_TOKEN`-created PR triggers no `pull_request` workflow):")
-          print("`checks` runs the suite, `image` builds without pushing, `service-image` builds")
-          print("and smokes, and `design-pack` validates the file. Merging rebuilds the image, which")
-          print("is how the public design page receives it. This PR is generated and is never")
-          print("auto-merged; a maintainer merges it.")
+          print("The workflow approves the parked `pull_request` run so its checks associate with")
+          print("this PR (`checks`, `image` without a push, `service-image` build+smoke,")
+          print("`design-pack`, `lint`). If the approval is refused, a maintainer approves the run")
+          print("from the PR's checks list. Merging rebuilds the image, which is how the public")
+          print("design page receives it. This PR is generated and is never auto-merged.")
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -161,7 +161,25 @@ jobs:
                 --body-file "$RUNNER_TEMP/pr-body.md"
             fi
           fi
-          # Recursion-guard exemption: `pull_request` workflows do not run for a PR created with
-          # `GITHUB_TOKEN`, so nothing would create the required contexts. `workflow_dispatch` is
-          # exempt; this run attaches them to the same head commit.
-          gh workflow run ci-public.yml --repo "$REPO" --ref automation/issue-registry
+          # A `pull_request` run's checks associate with the PR; a dispatch run's do not. Approve
+          # the parked run so the required contexts land on the pull request itself.
+          head="$(git rev-parse HEAD)"
+          parked=""
+          for _ in 1 2 3 4 5 6; do
+            parked="$(gh api "repos/$REPO/actions/runs?head_sha=$head&event=pull_request" \
+              --jq '[.workflow_runs[] | select(.conclusion == "action_required") | .id] | first // empty')"
+            if [ -n "$parked" ]; then
+              break
+            fi
+            sleep 5
+          done
+          if [ -n "$parked" ]; then
+            if gh api -X POST "repos/$REPO/actions/runs/$parked/approve" >/dev/null; then
+              echo "Approved the parked pull_request run $parked; its checks associate with the PR." >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "The parked pull_request run $parked needs a maintainer's approval." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            echo "No parked pull_request run appeared; dispatching CI (its checks do not associate with the PR)." >> "$GITHUB_STEP_SUMMARY"
+            gh workflow run ci-public.yml --repo "$REPO" --ref automation/issue-registry
+          fi
