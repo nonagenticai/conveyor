@@ -345,9 +345,13 @@ async fn approvals_request(
     }
     // T3: a gate resolves its typed evidence before it is opened, so an absent, draft,
     // superseded or non-typed reference never becomes a pending gate.
-    let evidence =
-        crate::pm::resolve_evidence(&mut *tx, ctx.tenant, &input.evidence, input.require_evidence)
-            .await?;
+    let evidence = crate::pm::resolve_evidence(
+        &mut *tx,
+        ctx.tenant,
+        &input.evidence,
+        input.require_evidence,
+    )
+    .await?;
     if !evidence.is_empty() {
         meta.insert("evidence".to_owned(), Value::Array(evidence));
     }

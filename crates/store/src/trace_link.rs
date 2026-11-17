@@ -18,9 +18,10 @@ use uuid::Uuid;
 /// The end types a trace link may name, and therefore the only tables this module resolves.
 ///
 /// The name **is** the table: `governed_asset` covers requirements, principles and ADRs (the
-/// asset's `kind` distinguishes them); `card` is a work item. A new end type is a code change
+/// asset's `kind` distinguishes them); `card` is a work item; `project` is the programme
+/// project a gate's evidence traces to (T3). A new end type is a code change
 /// here, never an input.
-pub const END_TYPES: [&str; 2] = ["governed_asset", "card"];
+pub const END_TYPES: [&str; 3] = ["governed_asset", "card", "project"];
 
 /// The five edge kinds `trace_link_kind_check` admits (0002_domain.sql).
 pub const LINK_KINDS: [&str; 5] = ["traces", "realises", "derives", "satisfies", "conflicts"];

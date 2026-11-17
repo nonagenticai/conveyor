@@ -995,14 +995,8 @@ async fn baselines_take(
             "kind must be scope, schedule or cost",
         ));
     }
-    let record = take_baseline_guarded(
-        &mut *tx,
-        &ctx,
-        input.project_id,
-        &kind,
-        input.change_id,
-    )
-    .await?;
+    let record =
+        take_baseline_guarded(&mut *tx, &ctx, input.project_id, &kind, input.change_id).await?;
     emit_spine_event(&mut *tx, &ctx, "project_baseline", record.id, "created").await?;
     Ok(HandlerOutput::created(baseline_out(&record)).with_etag(etag_of(record.version)))
 }

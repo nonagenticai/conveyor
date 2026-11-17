@@ -87,7 +87,9 @@ use serde_json::{Value, json};
 /// 400 → **401**.
 /// **#172 adds 3 internal**: the host family — `ops.host_status|host_logs|host_restart_unit`
 /// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 401 → **404**.
-const EXPECTED: [&str; 404] = [
+/// **T3 adds 6 internal**: the PM job — `pm.charter|plan|get|route_gate|close` and
+/// `changes.request`. 404 → **410**.
+const EXPECTED: [&str; 410] = [
     "actions.describe",
     "actions.list",
     "agent.run",

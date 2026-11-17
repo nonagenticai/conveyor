@@ -13,7 +13,7 @@
 //! edge (S07).
 
 use conveyor_domain::spine::WsjfInputs;
-use conveyor_domain::{AssetKind, AssetStatus, ApprovalStatus};
+use conveyor_domain::{ApprovalStatus, AssetKind, AssetStatus};
 use conveyor_store as store;
 use conveyor_store::approval::{ApprovalRecord, NewApproval};
 use conveyor_store::governance::NewAsset;
@@ -135,29 +135,31 @@ async fn assert_pm(
     tenant: store::TenantId,
     binding_id: Uuid,
 ) -> Result<(), ActionError> {
-    let binding = match store::organisation::job_binding_get_tx(&mut *conn, tenant, binding_id)
-        .await
-    {
-        Ok(binding) => binding,
-        Err(store::organisation::OrganisationStoreError::NotFound(_)) => {
-            return Err(ActionError::new(
-                403,
-                "not_pm_job",
-                "the job binding is unknown in this tenant",
-            ));
-        }
-        Err(other) => {
-            tracing::error!(error = %other, "pm: read binding");
-            return Err(ActionError::internal());
-        }
-    };
+    let binding =
+        match store::organisation::job_binding_get_tx(&mut *conn, tenant, binding_id).await {
+            Ok(binding) => binding,
+            Err(store::organisation::OrganisationStoreError::NotFound(_)) => {
+                return Err(ActionError::new(
+                    403,
+                    "not_pm_job",
+                    "the job binding is unknown in this tenant",
+                ));
+            }
+            Err(other) => {
+                tracing::error!(error = %other, "pm: read binding");
+                return Err(ActionError::internal());
+            }
+        };
     let job = store::organisation::job_get_tx(&mut *conn, tenant, binding.job_id)
         .await
         .map_err(|error| {
             tracing::error!(%error, "pm: read job");
             ActionError::internal()
         })?;
-    if !job.job_key.eq_ignore_ascii_case(PM_JOB_KEY) || job.status != "active" || binding.status != "active" {
+    if !job.job_key.eq_ignore_ascii_case(PM_JOB_KEY)
+        || job.status != "active"
+        || binding.status != "active"
+    {
         return Err(ActionError::new(
             403,
             "not_pm_job",
@@ -556,8 +558,13 @@ async fn pm_route_gate(
             "required_decisions must be between 1 and 255",
         ));
     }
-    let evidence =
-        resolve_evidence(&mut *tx, ctx.tenant, &input.evidence, input.require_evidence).await?;
+    let evidence = resolve_evidence(
+        &mut *tx,
+        ctx.tenant,
+        &input.evidence,
+        input.require_evidence,
+    )
+    .await?;
     let approval_id = open_gate(
         &mut *tx,
         &ctx,
@@ -646,18 +653,7 @@ async fn pm_close(
             tracing::error!(%error, "pm.close: insert closure");
             ActionError::internal()
         })?;
-    store::governance::transition_asset_tx(
-        &mut *tx,
-        ctx.tenant,
-        asset.id,
-        AssetStatus::Approved,
-        Some(ctx.actor_id),
-    )
-    .await
-    .map_err(|error| {
-        tracing::error!(%error, "pm.close: approve closure");
-        ActionError::internal()
-    })?;
+    approve_asset(&mut *tx, ctx.tenant, asset.id, ctx.actor_id).await?;
     let closed = store::project::close_project_tx(
         &mut *tx,
         ctx.tenant,
@@ -768,16 +764,30 @@ async fn pm_get(
         project: json!({ "id": project.id, "key": project.key, "name": project.name,
                          "status": project.status, "version": project.version }),
         charter_asset_id,
-        wbs: json!(wbs.iter().map(|node| json!({
-            "id": node.id, "kind": node.kind, "title": node.title, "status": node.status,
-        })).collect::<Vec<_>>()),
-        baselines: json!(baselines.iter().map(|row| json!({
-            "id": row.id, "kind": row.kind, "approved_by": row.approved_by,
-            "change_id": row.change_id, "taken_at": row.taken_at,
-        })).collect::<Vec<_>>()),
-        gates: json!(gates.iter().map(|(id, gate, status)| json!({
-            "id": id, "gate": gate, "status": status,
-        })).collect::<Vec<_>>()),
+        wbs: json!(
+            wbs.iter()
+                .map(|node| json!({
+                    "id": node.id, "kind": node.kind, "title": node.title, "status": node.status,
+                }))
+                .collect::<Vec<_>>()
+        ),
+        baselines: json!(
+            baselines
+                .iter()
+                .map(|row| json!({
+                    "id": row.id, "kind": row.kind, "approved_by": row.approved_by,
+                    "change_id": row.change_id, "taken_at": row.taken_at,
+                }))
+                .collect::<Vec<_>>()
+        ),
+        gates: json!(
+            gates
+                .iter()
+                .map(|(id, gate, status)| json!({
+                    "id": id, "gate": gate, "status": status,
+                }))
+                .collect::<Vec<_>>()
+        ),
     }))
 }
 
@@ -869,6 +879,76 @@ async fn changes_request(
     }))
 }
 
+/// Move a governed asset to `approved` through its legal lifecycle.
+///
+/// `insert_asset_tx` writes `draft` (0002's default), and the domain refuses `draft -> approved`;
+/// the approval is the gate's act, so the effect walks `draft -> in_review -> approved` itself.
+async fn approve_asset(
+    conn: &mut PgConnection,
+    tenant: store::TenantId,
+    asset_id: Uuid,
+    approver: Uuid,
+) -> Result<(), ActionError> {
+    let asset = store::governance::get_asset_tx(&mut *conn, tenant, asset_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "gate effect: read asset");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| ActionError::resource_not_found("governed_asset"))?;
+    match asset.status {
+        AssetStatus::Draft => {
+            store::governance::transition_asset_tx(
+                &mut *conn,
+                tenant,
+                asset_id,
+                AssetStatus::InReview,
+                Some(approver),
+            )
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "gate effect: asset in_review");
+                ActionError::internal()
+            })?;
+            store::governance::transition_asset_tx(
+                &mut *conn,
+                tenant,
+                asset_id,
+                AssetStatus::Approved,
+                Some(approver),
+            )
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "gate effect: asset approved");
+                ActionError::internal()
+            })?;
+        }
+        AssetStatus::InReview => {
+            store::governance::transition_asset_tx(
+                &mut *conn,
+                tenant,
+                asset_id,
+                AssetStatus::Approved,
+                Some(approver),
+            )
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "gate effect: asset approved");
+                ActionError::internal()
+            })?;
+        }
+        AssetStatus::Approved => {}
+        other => {
+            return Err(ActionError::new(
+                409,
+                "asset_not_approvable",
+                format!("asset {asset_id} is {}; it cannot be approved", other.as_str()),
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// Apply a resolved gate's effects in the decision's own transaction.
 ///
 /// Called only for an `approved` gate: the charter asset, the baseline or the change row named
@@ -897,18 +977,7 @@ pub(crate) async fn apply_gate_effect_tx(
             .and_then(|raw| raw.parse::<Uuid>().ok())
     };
     if let Some(asset_id) = id_of("charter_asset_id") {
-        store::governance::transition_asset_tx(
-            &mut *tx,
-            tenant,
-            asset_id,
-            AssetStatus::Approved,
-            Some(approver),
-        )
-        .await
-        .map_err(|error| {
-            tracing::error!(%error, "gate effect: approve charter");
-            ActionError::internal()
-        })?;
+        approve_asset(&mut *tx, tenant, asset_id, approver).await?;
     }
     if let Some(baseline_id) = id_of("baseline_id") {
         store::spine::approve_baseline_tx(&mut *tx, tenant, baseline_id, approver)
