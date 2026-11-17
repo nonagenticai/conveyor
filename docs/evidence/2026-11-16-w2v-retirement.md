@@ -117,3 +117,19 @@ now-orphaned `w2v/*` entries rather than being silenced. `build-all.sh` at the m
 
 A `clusters/**` merge fires no workflow by design (#3930); the PR's `validate` job ran on the pull
 request and passed, which is the run that matters.
+
+## The third consequence: a dark DNS name
+
+Removing the `w2v` VirtualService left `w2v.internal` in the master's dnsmasq pointing at the
+gateway VIP with nothing behind it. The next pull request to touch
+`scripts/host-configs/**` surfaced it:
+
+```
+ERROR [dnsmasq] w2v.internal points at the gateway VIP (100.81.177.99) but has NO VirtualService,
+no coredns-static-hosts entry, and is not in GATEWAY_VIP_NON_VS — it is a DARK name
+```
+
+That check is right, and it is the reason a removal is not finished when the manifests go: a
+name that still claims to exist but answers 404 is worse than a name that is gone. The record
+was removed in [gitops-production#5325](https://github.com/nonagenticai/gitops-production/pull/5325),
+and `check-host-config-consistency.py` then reported *0 error(s), 0 warning(s) across 5 hosts*.
