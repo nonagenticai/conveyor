@@ -798,7 +798,7 @@
       "key": "T2",
       "name": "Decision ladder",
       "description": "SPEC_V2 slice T2 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1458,7 +1458,6 @@
           260,
           265,
           274,
-          280,
           282,
           283,
           284,
