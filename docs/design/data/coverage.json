@@ -252,7 +252,7 @@
       "tranche": 0,
       "units": {
         "blocked": 6,
-        "claimed": 12,
+        "claimed": 11,
         "numbers": [
           17,
           22,
@@ -273,7 +273,6 @@
           205,
           212,
           213,
-          221,
           222,
           223,
           224,
@@ -290,7 +289,7 @@
           284,
           285
         ],
-        "open": 25,
+        "open": 24,
         "ready": 6,
         "unknown": 0
       }
@@ -883,8 +882,8 @@
       "track": "v1",
       "tranche": 4,
       "units": {
-        "blocked": 1,
-        "claimed": 1,
+        "blocked": 0,
+        "claimed": 2,
         "numbers": [
           156,
           168,
