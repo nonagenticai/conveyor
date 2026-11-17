@@ -192,34 +192,44 @@ pub async fn get_policy_tx(
         .await?)
 }
 
+/// The fields a policy change may set; an absent field keeps the stored value.
+#[derive(Clone, Debug, Default)]
+pub struct PolicyPatch {
+    /// The new threshold in 0–1.
+    pub threshold: Option<f64>,
+    /// `closed | open`.
+    pub fail_policy: Option<String>,
+    /// `handover | block | annotate`.
+    pub action: Option<String>,
+    /// The replacement metadata.
+    pub meta: Option<Value>,
+}
+
 /// Change a policy's threshold, fail behaviour or action. A policy change is a new version;
 /// the caller's `expected` version makes a concurrent change a 412, never a lost update.
 pub async fn update_policy_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     id: Uuid,
-    threshold: Option<f64>,
-    fail_policy: Option<&str>,
-    action: Option<&str>,
-    meta: Option<&Value>,
+    patch: &PolicyPatch,
     expected: Option<i64>,
 ) -> Result<PolicyRecord, LadderStoreError> {
-    if let Some(threshold) = threshold {
+    if let Some(threshold) = patch.threshold {
         conveyor_domain::ladder::in_unit_interval("threshold", threshold)?;
     }
-    if let Some(value) = fail_policy {
-        if FailPolicy::parse(value).is_none() {
-            return Err(LadderStoreError::Illegal(LadderError::UnknownFailPolicy {
-                value: value.to_owned(),
-            }));
-        }
+    if let Some(value) = patch.fail_policy.as_deref()
+        && FailPolicy::parse(value).is_none()
+    {
+        return Err(LadderStoreError::Illegal(LadderError::UnknownFailPolicy {
+            value: value.to_owned(),
+        }));
     }
-    if let Some(value) = action {
-        if FailAction::parse(value).is_none() {
-            return Err(LadderStoreError::Illegal(LadderError::UnknownFailAction {
-                value: value.to_owned(),
-            }));
-        }
+    if let Some(value) = patch.action.as_deref()
+        && FailAction::parse(value).is_none()
+    {
+        return Err(LadderStoreError::Illegal(LadderError::UnknownFailAction {
+            value: value.to_owned(),
+        }));
     }
     let current =
         get_policy_tx(&mut *conn, tenant, id)
@@ -242,10 +252,10 @@ pub async fn update_policy_tx(
     let row = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(id)
-        .bind(threshold.or(current.threshold))
-        .bind(fail_policy.unwrap_or(&current.fail_policy))
-        .bind(action.unwrap_or(&current.action))
-        .bind(meta.unwrap_or(&current.meta))
+        .bind(patch.threshold.or(current.threshold))
+        .bind(patch.fail_policy.as_deref().unwrap_or(&current.fail_policy))
+        .bind(patch.action.as_deref().unwrap_or(&current.action))
+        .bind(patch.meta.as_ref().unwrap_or(&current.meta))
         .fetch_one(&mut *conn)
         .await?;
     Ok(row)
@@ -324,12 +334,12 @@ pub async fn publish_refinement_tx(
     if let Some(threshold) = new.threshold_override {
         conveyor_domain::ladder::in_unit_interval("threshold_override", threshold)?;
     }
-    if let Some(value) = &new.fail_action {
-        if FailAction::parse(value).is_none() {
-            return Err(LadderStoreError::Illegal(LadderError::UnknownFailAction {
-                value: value.clone(),
-            }));
-        }
+    if let Some(value) = &new.fail_action
+        && FailAction::parse(value).is_none()
+    {
+        return Err(LadderStoreError::Illegal(LadderError::UnknownFailAction {
+            value: value.clone(),
+        }));
     }
     let present: bool = sqlx::query_scalar(
         "SELECT EXISTS (SELECT 1 FROM decision_policy WHERE tenant_id = $1 AND id = $2)",
@@ -785,10 +795,10 @@ pub async fn record_decision_tx(
         if !is_input_hash(hash) {
             return Err(LadderStoreError::Illegal(LadderError::InputHashShape));
         }
-    } else if let Some(hash) = new.input_hash.as_deref() {
-        if !is_input_hash(hash) {
-            return Err(LadderStoreError::Illegal(LadderError::InputHashShape));
-        }
+    } else if let Some(hash) = new.input_hash.as_deref()
+        && !is_input_hash(hash)
+    {
+        return Err(LadderStoreError::Illegal(LadderError::InputHashShape));
     }
     ensure_optional_parent_tx(&mut *conn, tenant, Parent::Project, new.project_id)
         .await

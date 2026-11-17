@@ -322,10 +322,12 @@ async fn decision_policies_update(
         &mut *tx,
         ctx.tenant,
         input.id,
-        input.threshold,
-        input.fail_policy.as_deref(),
-        input.action.as_deref(),
-        input.meta.as_ref(),
+        &store::ladder::PolicyPatch {
+            threshold: input.threshold,
+            fail_policy: input.fail_policy,
+            action: input.action,
+            meta: input.meta,
+        },
         Some(expected),
     )
     .await
@@ -1120,7 +1122,7 @@ async fn ladder_apply_draft(
         .await
         .map_err(|error| ladder_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("decision"))?;
-    let rung = Rung::parse(&decision.rung).ok_or_else(|| ActionError::internal())?;
+    let rung = Rung::parse(&decision.rung).ok_or_else(ActionError::internal)?;
     if matches!(rung, Rung::Rule) || decision.outcome.as_deref() != Some("accepted") {
         return Err(ActionError::new(
             422,
@@ -1142,14 +1144,14 @@ async fn ladder_apply_draft(
             ActionError::internal()
         })?
         .ok_or_else(|| ActionError::resource_not_found("document"))?;
-    if let Some(existing) = document.card_id {
-        if existing != input.card_id {
-            return Err(ActionError::new(
-                409,
-                "document_already_attached",
-                "the draft is already attached to another card",
-            ));
-        }
+    if let Some(existing) = document.card_id
+        && existing != input.card_id
+    {
+        return Err(ActionError::new(
+            409,
+            "document_already_attached",
+            "the draft is already attached to another card",
+        ));
     }
     let patch = store::document::DocumentPatch {
         title: None,
