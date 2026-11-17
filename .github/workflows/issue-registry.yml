@@ -7,6 +7,12 @@ name: issue-registry
 # run the generators. This workflow runs the sanctioned generators on a schedule and opens ONE
 # reviewable, generated-data PR. It never merges.
 #
+# ⛔ THE SCHEDULE ALONE IS NOT ENOUGH. GitHub's `schedule` event is best-effort, and this repo
+# drops most of its triggers: measured 2026-11-17, the hourly `board` cron (live since
+# 2026-11-15T19:35Z) produced 5 runs in ~35 h, and the 04:23Z trigger here produced none. A merge
+# to `main` is the event that always fires, so this workflow also runs on every push to `main`.
+# Both extra cases are cheap: the no-change path below exits without a branch and without a PR.
+#
 # The zero-secret path (docs/decisions/0003-public-ci.md): the only credential is the automatic
 # `GITHUB_TOKEN`, which needs the repository setting
 # "Allow GitHub Actions to create and approve pull requests" (can_approve_pull_request_reviews).
@@ -22,6 +28,8 @@ name: issue-registry
 # Disable with: gh workflow disable issue-registry.yml
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: "23 4 * * *"
   workflow_dispatch:
