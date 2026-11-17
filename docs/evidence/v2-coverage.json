@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 25,
+    "exists": 26,
     "extend": 8,
-    "new": 30
+    "new": 29
   },
   "rows": [
     {
@@ -496,9 +496,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "PM",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: pm.* absent"
+        "actions: pm.* found (pm.charter, pm.close, pm.get…)"
       ]
     },
     {

@@ -198,7 +198,7 @@ async fn projects_create(
 /// leave a valid project, board and start card with no run — the card can be started later from
 /// the console. Every other refusal is fatal, so a fresh project is never created into a state
 /// the engine cannot act on. `ctx` is consumed because `process_runs_start` takes it by value.
-async fn insert_start_card_and_run(
+pub(crate) async fn insert_start_card_and_run(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
     project_id: Uuid,

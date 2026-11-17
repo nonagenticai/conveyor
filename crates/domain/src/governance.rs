@@ -16,7 +16,9 @@ use serde_json::Value;
 
 use crate::ids::Version;
 
-/// The three governed-asset kinds.
+/// The governed-asset kinds — the one lifecycle for requirements, principles, ADRs and the
+/// MSP narrative artefacts (0044 widened the CHECK to the full vocabulary; T3 adds the PM's
+/// charter and closure).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AssetKind {
@@ -26,11 +28,51 @@ pub enum AssetKind {
     Principle,
     /// An architecture decision record.
     Adr,
+    /// The PM's project charter.
+    Charter,
+    /// The PM's closure record.
+    Closure,
+    /// A postmortem.
+    Postmortem,
+    /// An SOP source document.
+    SopSource,
+    /// The programme mandate.
+    Mandate,
+    /// The programme brief.
+    ProgrammeBrief,
+    /// The blueprint.
+    Blueprint,
+    /// The business case.
+    BusinessCase,
+    /// The refined vision.
+    RefinedVision,
+    /// The benefits management strategy.
+    BenefitsStrategy,
+    /// The benefits realization plan.
+    BenefitsRealizationPlan,
+    /// The projects dossier.
+    ProjectsDossier,
 }
 
 impl AssetKind {
     /// Every kind.
-    pub const ALL: [AssetKind; 3] = [AssetKind::Requirement, AssetKind::Principle, AssetKind::Adr];
+    pub const ALL: [AssetKind; 15] = [
+        AssetKind::Requirement,
+        AssetKind::Principle,
+        AssetKind::Adr,
+        AssetKind::Charter,
+        AssetKind::Closure,
+        AssetKind::Postmortem,
+        AssetKind::SopSource,
+        AssetKind::Mandate,
+        AssetKind::ProgrammeBrief,
+        AssetKind::Blueprint,
+        AssetKind::BusinessCase,
+        AssetKind::RefinedVision,
+        AssetKind::BenefitsStrategy,
+        AssetKind::BenefitsRealizationPlan,
+        AssetKind::ProjectsDossier,
+    ];
 
     /// The stored `governed_asset.kind`.
     pub fn as_str(self) -> &'static str {
@@ -38,6 +80,18 @@ impl AssetKind {
             AssetKind::Requirement => "requirement",
             AssetKind::Principle => "principle",
             AssetKind::Adr => "adr",
+            AssetKind::Charter => "charter",
+            AssetKind::Closure => "closure",
+            AssetKind::Postmortem => "postmortem",
+            AssetKind::SopSource => "sop_source",
+            AssetKind::Mandate => "mandate",
+            AssetKind::ProgrammeBrief => "programme_brief",
+            AssetKind::Blueprint => "blueprint",
+            AssetKind::BusinessCase => "business_case",
+            AssetKind::RefinedVision => "refined_vision",
+            AssetKind::BenefitsStrategy => "benefits_strategy",
+            AssetKind::BenefitsRealizationPlan => "benefits_realization_plan",
+            AssetKind::ProjectsDossier => "projects_dossier",
         }
     }
 }

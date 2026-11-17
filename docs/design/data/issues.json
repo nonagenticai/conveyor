@@ -1,11 +1,113 @@
 {
   "issues": [
     {
+      "number": 311,
+      "title": "engine: an agent run cannot compose a document \u2014 its tool calls run as the nil actor",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/311",
+      "updatedAt": "2026-11-17T22:05:23Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 307,
+      "title": "engine: a capability-agent run finishes inside its budget and composes its artefact",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/307",
+      "updatedAt": "2026-11-17T20:59:41Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 305,
+      "title": "console: the programme definition and MSP surfaces are live, public and editable",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/305",
+      "updatedAt": "2026-11-17T22:01:30Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 304,
+      "title": "docs: the programme's measured state and the MSP/TOGAF gate record",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/304",
+      "updatedAt": "2026-11-17T19:58:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 303,
+      "title": "programme: a governed retirement path for benefit profiles and tranches",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/303",
+      "updatedAt": "2026-11-17T19:15:27Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 302,
+      "title": "programme: the closure gate \u2014 a project cannot close while a declared output is unpublished",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/302",
+      "updatedAt": "2026-11-17T19:15:25Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
       "number": 300,
       "title": "delivery: review requests are cleared automatically and parked runs get approved",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/300",
-      "updatedAt": "2026-11-17T19:12:21Z",
+      "updatedAt": "2026-11-17T19:15:53Z",
       "labels": [
         {
           "name": "unit",
@@ -1089,9 +1191,9 @@
     {
       "number": 172,
       "title": "ops: host control \u2014 a fixed-verb agent and the systemctl actions",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/172",
-      "updatedAt": "2026-11-17T10:14:00Z",
+      "updatedAt": "2026-11-17T20:30:47Z",
       "labels": [
         {
           "name": "unit",
@@ -1629,9 +1731,9 @@
     {
       "number": 122,
       "title": "P0 \u2014 the reuse map, the architecture/analysis pack and the per-project inception standard",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/122",
-      "updatedAt": "2026-11-17T14:31:10Z",
+      "updatedAt": "2026-11-17T20:00:38Z",
       "labels": [
         {
           "name": "unit",
@@ -1646,9 +1748,9 @@
     {
       "number": 121,
       "title": "P0 \u2014 author the programme definition set",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/121",
-      "updatedAt": "2026-11-17T07:33:48Z",
+      "updatedAt": "2026-11-17T20:00:34Z",
       "labels": [
         {
           "name": "unit",
@@ -1957,7 +2059,7 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-17T15:38:18Z",
+      "updatedAt": "2026-11-17T19:29:49Z",
       "labels": [
         {
           "name": "unit",
@@ -2041,7 +2143,7 @@
       "title": "T11 \u2014 Metrics, metering and maturity",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/84",
-      "updatedAt": "2026-11-17T08:21:27Z",
+      "updatedAt": "2026-11-17T19:29:48Z",
       "labels": [
         {
           "name": "unit",
@@ -2083,7 +2185,7 @@
       "title": "T10 \u2014 SAFe cadence and MSP tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/82",
-      "updatedAt": "2026-11-17T08:21:26Z",
+      "updatedAt": "2026-11-17T19:29:46Z",
       "labels": [
         {
           "name": "unit",
@@ -2104,7 +2206,7 @@
       "title": "T9 \u2014 the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/81",
-      "updatedAt": "2026-11-17T08:21:24Z",
+      "updatedAt": "2026-11-17T19:29:44Z",
       "labels": [
         {
           "name": "unit",
@@ -2251,15 +2353,15 @@
       "title": "T3 \u2014 PM job",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/74",
-      "updatedAt": "2026-11-17T15:38:21Z",
+      "updatedAt": "2026-11-17T21:39:46Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T3",
