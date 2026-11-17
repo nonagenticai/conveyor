@@ -30,7 +30,8 @@ agent:
   prompt: agent
   model: claude-sonnet-5-5
   max_iterations: 12
-  timeout_secs: 120
+  timeout_secs: 300
+  allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]
 
 sops:
   - key: rewrite_slice.ready
