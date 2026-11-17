@@ -38,6 +38,8 @@ pub enum Parent {
     CardType,
     /// `run`.
     Run,
+    /// `approval` — T2's human rung cites the approval row it records.
+    Approval,
     /// `model` — S08's governance model header.
     Model,
     /// `model_element`.
@@ -71,6 +73,7 @@ impl Parent {
             Parent::CustomField => "custom_field",
             Parent::CardType => "card_type",
             Parent::Run => "run",
+            Parent::Approval => "approval",
             Parent::Model => "model",
             Parent::ModelElement => "model_element",
             Parent::ModelRelationship => "model_relationship",

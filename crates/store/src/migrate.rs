@@ -200,7 +200,10 @@ mod tests {
                 (44, "plan spine".to_owned()),
                 // #46: the commercial-equivalent price per model, the price side of the
                 // read-time cost derivation (0045_commercial_price.sql).
-                (45, "commercial price".to_owned())
+                (45, "commercial price".to_owned()),
+                // #73 (T2): the decision ladder's rungs, answer, option-set version, the three
+                // version pins, the actor and the approval link (0046_decision_ladder.sql).
+                (46, "decision ladder".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
