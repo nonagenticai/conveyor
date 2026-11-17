@@ -1866,20 +1866,33 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push("stakeholders.profile_list", g);
         }
         // ── T2 decision ladder ───────────────────────────────────────────────────────────
+        // One policy per (kind, gate) is the table's contract and `prepare` runs once per
+        // round, so each round seeds its own case.
         "decision_policies.update" => {
-            let policy = seed_parity_policy(pg, ctx, "parity.update", "parity_gate_update").await;
+            let case = Uuid::now_v7();
+            let policy =
+                seed_parity_policy(pg, ctx, &format!("parity.update.{case}"), "parity_gate").await;
             ctx.push("decision_policies.update", policy);
         }
         "refinements.publish" => {
-            let policy = seed_parity_policy(pg, ctx, "parity.refine", "parity_gate_refine").await;
+            let case = Uuid::now_v7();
+            let policy =
+                seed_parity_policy(pg, ctx, &format!("parity.refine.{case}"), "parity_gate").await;
             ctx.push("refinements.publish", policy);
         }
         "ladder.evaluate" => {
-            seed_parity_policy(pg, ctx, "parity.evaluate", "parity_gate_evaluate").await;
+            let case = Uuid::now_v7();
+            let policy =
+                seed_parity_policy(pg, ctx, &format!("parity.evaluate.{case}"), "parity_gate")
+                    .await;
+            ctx.push("ladder.evaluate.policy", policy);
             seed_parity_laya(pg, ctx).await;
         }
         "ladder.record" => {
-            seed_parity_policy(pg, ctx, "parity.record", "parity_gate_record").await;
+            let case = Uuid::now_v7();
+            let policy =
+                seed_parity_policy(pg, ctx, &format!("parity.record.{case}"), "parity_gate").await;
+            ctx.push("ladder.record.policy", policy);
         }
         "ladder.apply_draft" => {
             let card = seed_card(pg, ctx, "active").await;
@@ -4922,10 +4935,11 @@ fn ladder_samples() -> Vec<Sample> {
         {
             let mut sample = plain("ladder.evaluate", json!({}), None);
             sample.prepare = true;
-            sample.input = Box::new(|_: &Ctx| {
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.evaluate.policy");
                 json!({
-                    "kind": "parity.evaluate",
-                    "gate": "parity_gate_evaluate",
+                    "kind": format!("parity.evaluate.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
                     "answer": "pass",
                     "confidence": 0.9,
                     "input": {"subject": "parity"}
@@ -4936,11 +4950,12 @@ fn ladder_samples() -> Vec<Sample> {
         {
             let mut sample = plain("ladder.record", json!({}), None);
             sample.prepare = true;
-            sample.input = Box::new(|_: &Ctx| {
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.record.policy");
                 json!({
                     "rung": "rule",
-                    "kind": "parity.record",
-                    "gate": "parity_gate_record",
+                    "kind": format!("parity.record.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
                     "answer": "pass",
                     "outcome": "accepted",
                     "confidence": 1.0
