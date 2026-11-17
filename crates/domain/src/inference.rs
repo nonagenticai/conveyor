@@ -175,14 +175,31 @@ pub struct CapturedUsage {
     pub cache_status: CacheStatus,
 }
 
-/// Build the ledger's derived fields from the request and the response.
-pub fn capture(requested_model: Option<&str>, response: &Value) -> CapturedUsage {
+/// Build the ledger's derived fields from the request, the response and the surface.
+///
+/// `surface` is `Some` only for the three non-token external actions. Their responses name no
+/// model, so the surface is the pricing identity: the ledger stores it as `model` and leaves
+/// `served_model` empty. A routed token call passes `None` and keeps the alias/served behaviour.
+pub fn capture(
+    requested_model: Option<&str>,
+    response: &Value,
+    surface: Option<&str>,
+) -> CapturedUsage {
+    let usage = Usage::from_response(response);
+    let cache_status = CacheStatus::of(usage.as_ref());
+    if let Some(surface) = surface.filter(|value| !value.is_empty()) {
+        return CapturedUsage {
+            usage,
+            model: surface.to_owned(),
+            served_model: None,
+            cache_status,
+        };
+    }
     let served_model = response
         .get("model")
         .and_then(Value::as_str)
         .filter(|value| !value.is_empty())
         .map(str::to_owned);
-    let usage = Usage::from_response(response);
     let model = requested_model
         .filter(|value| !value.is_empty())
         .map(str::to_owned)
@@ -192,7 +209,7 @@ pub fn capture(requested_model: Option<&str>, response: &Value) -> CapturedUsage
         usage,
         model,
         served_model,
-        cache_status: CacheStatus::of(usage.as_ref()),
+        cache_status,
     }
 }
 
@@ -202,6 +219,40 @@ pub fn capture(requested_model: Option<&str>, response: &Value) -> CapturedUsage
 /// this value is what answers *which prompt* is cache-hostile (owner decision, 2026-11-09).
 pub fn prompt_sha256(prompt: &Value) -> String {
     crate::compare::content_hash(prompt)
+}
+
+/// The commercial unit a non-token surface bills in.
+///
+/// The token surfaces bill per token; these three are the units the media hosts answer in, and the
+/// price catalogue uses the same spelling. A call whose unit cannot be measured stays unpriced.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum UsageUnit {
+    /// One rendered image.
+    Image,
+    /// One character of input text (speech synthesis).
+    Character,
+    /// One second of audio (transcription).
+    Second,
+}
+
+impl UsageUnit {
+    /// Every unit, in price-catalogue order.
+    pub const ALL: [UsageUnit; 3] = [UsageUnit::Image, UsageUnit::Character, UsageUnit::Second];
+
+    /// The stored spelling (also the price row's `unit`).
+    pub fn as_str(self) -> &'static str {
+        match self {
+            UsageUnit::Image => "image",
+            UsageUnit::Character => "character",
+            UsageUnit::Second => "second",
+        }
+    }
+
+    /// Read a stored or requested unit.
+    pub fn parse(raw: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|unit| unit.as_str() == raw)
+    }
 }
 
 /// The dimensions `inference_usage.report` may group by.
@@ -283,6 +334,12 @@ pub struct UsageRow {
     pub unpriced_calls: i64,
     /// Wall time summed — the load side of the same window.
     pub latency_ms: i64,
+    /// The commercial unit the bucket is priced in, when the bucket is uniformly non-token.
+    /// `None` for a token bucket, a mixed bucket, or one with an unpriced call — a partial unit
+    /// total would be a lie, so the report leaves it out rather than summing a subset.
+    pub unit: Option<String>,
+    /// The units summed for that kind, when [`Self::unit`] is `Some`.
+    pub units: Option<Decimal>,
 }
 
 /// The share of calls served from cache; `0.0` when the bucket is empty.
@@ -350,14 +407,33 @@ mod tests {
 
     #[test]
     fn model_identity_prefers_requested_and_reports_served() {
-        let captured = capture(Some("alias"), &json!({"model": "served"}));
+        let captured = capture(Some("alias"), &json!({"model": "served"}), None);
         assert_eq!(captured.model, "alias");
         assert_eq!(captured.served_model.as_deref(), Some("served"));
-        let served_only = capture(None, &json!({"model": "served"}));
+        let served_only = capture(None, &json!({"model": "served"}), None);
         assert_eq!(served_only.model, "served");
-        let unnamed = capture(None, &json!({}));
+        let unnamed = capture(None, &json!({}), None);
         assert_eq!(unnamed.model, "unrouted");
         assert!(unnamed.served_model.is_none());
+    }
+
+    #[test]
+    fn a_media_surface_is_the_pricing_identity() {
+        let captured = capture(None, &json!({"provider": "kokoro"}), Some("tts"));
+        assert_eq!(captured.model, "tts");
+        assert!(
+            captured.served_model.is_none(),
+            "a media surface is not a routed model"
+        );
+        assert_eq!(captured.cache_status, CacheStatus::Unknown);
+    }
+
+    #[test]
+    fn usage_units_round_trip() {
+        for unit in UsageUnit::ALL {
+            assert_eq!(UsageUnit::parse(unit.as_str()), Some(unit));
+        }
+        assert_eq!(UsageUnit::parse("token"), None);
     }
 
     #[test]

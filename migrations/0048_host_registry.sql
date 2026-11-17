@@ -1,4 +1,4 @@
--- 0047_host_registry.sql — the hosts conveyor may reach, and what each may be asked for.
+-- 0048_host_registry.sql — the hosts conveyor may reach, and what each may be asked for.
 --
 -- SPEC_V2 §10.4.1 fixes the mechanism: a host row names an addressable host and its role, a
 -- per-host agent holds the host credential, the agent answers a forced-command verb set, and the

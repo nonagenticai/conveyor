@@ -60,6 +60,39 @@ impl ApiError {
         Self::new(StatusCode::UNAUTHORIZED, "Authentication required")
     }
 
+    /// `401 AUTHENTICATION_REQUIRED` — the reference's `_unauthorized` shape, with its message.
+    /// `IntoResponse` adds the `WWW-Authenticate: Bearer` challenge to every 401.
+    pub fn authentication_required(message: impl Into<String>) -> Self {
+        Self {
+            status: StatusCode::UNAUTHORIZED,
+            message: message.into(),
+            code: Some("AUTHENTICATION_REQUIRED".to_string()),
+            details: None,
+        }
+    }
+
+    /// `400 INVALID_TENANT_ID` — a tenant header that is not a UUID. Deliberately not a 401: no
+    /// credential would make the value parse, so the request is malformed.
+    pub fn invalid_tenant(message: impl Into<String>) -> Self {
+        Self {
+            status: StatusCode::BAD_REQUEST,
+            message: message.into(),
+            code: Some("INVALID_TENANT_ID".to_string()),
+            details: None,
+        }
+    }
+
+    /// `403 TENANT_TOKEN_REQUIRED` — the caller authenticated, but its subject may not assert
+    /// the tenant it named.
+    pub fn tenant_token_required(message: impl Into<String>) -> Self {
+        Self {
+            status: StatusCode::FORBIDDEN,
+            message: message.into(),
+            code: Some("TENANT_TOKEN_REQUIRED".to_string()),
+            details: None,
+        }
+    }
+
     /// `501` — a capability the reference itself does not implement.
     pub fn not_implemented(message: impl Into<String>) -> Self {
         Self::new(StatusCode::NOT_IMPLEMENTED, message)
@@ -115,7 +148,16 @@ impl From<sqlx::Error> for ApiError {
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
-        (self.status, Json(self.body())).into_response()
+        let mut response = (self.status, Json(self.body())).into_response();
+        if response.status() == StatusCode::UNAUTHORIZED {
+            // The reference's `_unauthorized` challenge; a 401 without it tells a client to
+            // retry with nothing.
+            response.headers_mut().insert(
+                axum::http::header::WWW_AUTHENTICATE,
+                axum::http::HeaderValue::from_static("Bearer"),
+            );
+        }
+        response
     }
 }
 

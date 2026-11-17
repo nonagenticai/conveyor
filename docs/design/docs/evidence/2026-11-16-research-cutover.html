@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="research-cutover--2026-11-16">Research cutover — 2026-11-16</h1>
-<p>Part of #205. The two Rust binaries were deployed as shadows (<code>gitops-production#5297</code>), the scraper was cut over (<code>#5303</code>); the media cutover is <strong>blocked</strong> by #226 and did not happen.</p>
+<p>Part of #205. The two Rust binaries were deployed (<code>gitops-production#5297</code>), the scraper was cut over (<code>#5303</code>), and the Python <code>media_discovery</code> was retired in favour of the Rust media binary (<code>gitops-production#5306</code>) — <strong>with conveyor#226 still open</strong>: the port had dropped the reference's tenant gate. On 2026-11-17 the media Deployment was withdrawn to 0 replicas (gitops#5318) and the gate was restored (conveyor#226, this document's "The media gate" section); the Deployment returns behind the restored gate in the deployment repository.</p>
 <h2 id="digests-deployed">Digests deployed</h2>
 <table>
 <thead>
@@ -140,7 +140,7 @@ checksum = sha384(0001_media_baseline.sql) = 4d10d854…559551b0d24cc6898c053a79
 </tr>
 </tbody>
 </table>
-<p>That is the whole reason the media cutover did not happen: see #226. The row content itself matched.</p>
+<p>That difference was the port's missing gate, not a row defect: #226. It is closed — the port now refuses a bare tenant without a vouch (401), refuses a service token whose subject is not on <code>MEDIA_DISCOVERY_ONBEHALF_SUBJECTS</code> (403), serves <code>X-Tenant-Id: Bearer &lt;licence&gt;</code> with the licence's tenant, and keeps the vouch from re-labelling the named tenant. The three shapes are pinned in <code>apps/research/tests/tenant.rs</code>.</p>
 <h2 id="cutover-p4-scraper-half-only">Cutover (P4, scraper half only)</h2>
 <table>
 <thead>
@@ -174,7 +174,7 @@ checksum = sha384(0001_media_baseline.sql) = 4d10d854…559551b0d24cc6898c053a79
 </table>
 <h2 id="not-done-and-why">Not done, and why</h2>
 <ul>
-<li><p><strong>The media cutover.</strong> #226: the port trusts a bare <code>X-Tenant-Id</code>; the reference demands a token. <code>media-discovery</code> keeps running, and its repo stays unarchived.</p></li>
+<li><p><strong>The media gate (RESOLVED 2026-11-17, #226).</strong> At the time of the cutover the port trusted a bare <code>X-Tenant-Id</code>; the reference demands a credential. The exposure was closed by withdrawing the Deployment (gitops#5318), and the gate was restored in conveyor#226 — see "The media gate" below.</p></li>
 <li><p><strong>Retiring <code>webscraper_service</code></strong> — done, under the owner's 2026-11-17 procedure. The first attempt used the session's <code>gh</code> shim (<code>~/.claude/bin/gh</code>), which is a GitHub App installation token with <code>permissions.admin=false</code>, so it was refused <code>403 Resource not accessible by integration</code>. The real binary <code>/opt/homebrew/bin/gh</code> is the owner's account and has admin; the steps then completed:</p>
 <table>
 <thead>
@@ -202,6 +202,46 @@ checksum = sha384(0001_media_baseline.sql) = 4d10d854…559551b0d24cc6898c053a79
 <p>Note for future retirements: the High-alert gate is vacuous on this repo — it has no code scanning configured at all (<code>403 Advanced Security must be enabled</code>), so "no high alerts" means "not scanned", not "clean".</p></li>
 <li><p><strong><code>webscraper-env</code>.</strong> Unreferenced after the cutover, deliberately not deleted in a Deployment swap; a separate auditable act.</p></li>
 </ul>
+<h2 id="the-media-gate-2026-11-17-226">The media gate (2026-11-17, #226)</h2>
+<p>The reference's gate was three behaviours, each now ported and pinned by a test:</p>
+<table>
+<thead>
+<tr>
+<th>Credential</th>
+<th>Reference</th>
+<th>This service</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>none</td>
+<td>401 <code>AUTHENTICATION_REQUIRED</code></td>
+<td>401, same code, <code>WWW-Authenticate: Bearer</code></td>
+</tr>
+<tr>
+<td><code>X-Tenant-Id: Bearer &lt;licence&gt;</code></td>
+<td>the licence's tenant</td>
+<td>introspected at <code>LICENSE_INTROSPECT_URL</code>; inactive/unknown/tenant-less → 401</td>
+</tr>
+<tr>
+<td>bare <code>X-Tenant-Id</code> + <code>Authorization: Bearer &lt;service licence&gt;</code></td>
+<td>the NAMED tenant, only for an allowlisted subject</td>
+<td>same; empty allowlist → every bare tenant refused (fail-closed)</td>
+</tr>
+<tr>
+<td>bare <code>X-Tenant-Id</code> alone</td>
+<td>401 — a claim is not a credential</td>
+<td>401</td>
+</tr>
+<tr>
+<td>a non-uuid tenant</td>
+<td>400 <code>INVALID_TENANT_ID</code></td>
+<td>400, same code</td>
+</tr>
+</tbody>
+</table>
+<p>Deviations, deliberate: no introspection cache (the reference caches 5 min; this service has had zero callers and a fresh check never serves a revoked licence from cache) and no trusted-CIDR branch (the vouch is required for every caller — strictly stricter than the reference's peer allowance).</p>
+<p>Sequence, recorded honestly: the Python service was retired before the gate was restored, so on 2026-11-17 the Deployment was first <strong>withdrawn to 0 replicas</strong> (gitops#5318 — measured zero callers: a cluster-wide workload sweep matched only the Deployment itself, and the parent kustomization already recorded "zero callers in 7d"), then returned behind the restored gate. The live verification of the three shapes and the pinned digest are recorded on conveyor#226.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/2026-11-16-research-cutover.md</code> at build time.</span>

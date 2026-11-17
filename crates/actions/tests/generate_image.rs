@@ -187,11 +187,14 @@ async fn generate_image_writes_one_object() {
         "the caller is given the document, not the base64"
     );
 
-    let calls: i64 = sqlx::query_scalar("SELECT count(*) FROM inference_call")
-        .fetch_one(&pg.super_pool)
-        .await
-        .expect("the ledger");
-    assert_eq!(calls, 1, "one render, one ledger row");
+    let call: (String, Option<String>, Option<f64>) =
+        sqlx::query_as("SELECT model, usage_unit, usage_units::float8 FROM inference_call")
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("the ledger");
+    assert_eq!(call.0, "image_gen", "the surface is the pricing identity");
+    assert_eq!(call.1.as_deref(), Some("image"));
+    assert_eq!(call.2, Some(1.0), "one render, one image");
 }
 
 /// P1.1 — an unknown field is refused by the schema, not silently dropped.

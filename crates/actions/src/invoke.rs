@@ -27,6 +27,7 @@ use conveyor_domain::{Id, TenantId};
 use conveyor_store as store;
 use conveyor_store::audit::{self, AuditEntry};
 use conveyor_store::idempotency::{self, Lookup};
+use rust_decimal::Decimal;
 use serde_json::Value;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -209,6 +210,10 @@ struct CaptureRow {
     served_model: Option<String>,
     usage: Option<conveyor_domain::inference::Usage>,
     cache_status: &'static str,
+    /// The commercial unit for a non-token surface, and its measured count. Both are `None` for a
+    /// token call; a media call with no measurable unit is unpriced, never $0.
+    usage_unit: Option<&'static str>,
+    usage_units: Option<Decimal>,
     latency_ms: i32,
 }
 
@@ -969,6 +974,45 @@ async fn invoke_internal(
     }
 }
 
+/// The three non-token surfaces, keyed by the handler's service. Any other external (the router)
+/// returns `None` and keeps the token identity.
+fn media_surface(service: &str) -> Option<(&'static str, &'static str)> {
+    match service {
+        crate::integrations::imagegen::SERVICE => {
+            Some((crate::integrations::imagegen::SERVICE, "image"))
+        }
+        crate::integrations::audio::SPEECH_SERVICE => {
+            Some((crate::integrations::audio::SPEECH_SERVICE, "character"))
+        }
+        crate::integrations::audio::TRANSCRIBE_SERVICE => {
+            Some((crate::integrations::audio::TRANSCRIBE_SERVICE, "second"))
+        }
+        _ => None,
+    }
+}
+
+/// The unit count a media request and response measure. A unit the surface cannot report is
+/// `None`, which the report counts as unpriced rather than $0.
+fn media_units(
+    surface: &str,
+    input: &Value,
+    output: &Value,
+    upload_seconds: Option<Decimal>,
+) -> Option<Decimal> {
+    match surface {
+        crate::integrations::imagegen::SERVICE => output
+            .get("data")
+            .and_then(Value::as_array)
+            .map(|data| Decimal::from(data.len() as u64)),
+        crate::integrations::audio::SPEECH_SERVICE => input
+            .get("text")
+            .and_then(Value::as_str)
+            .map(|text| Decimal::from(text.chars().count() as u64)),
+        crate::integrations::audio::TRANSCRIBE_SERVICE => upload_seconds,
+        _ => None,
+    }
+}
+
 async fn invoke_external(
     pool: &PgPool,
     spec: &crate::spec::ActionSpec,
@@ -1117,6 +1161,9 @@ async fn invoke_external(
         .usage
         .as_ref()
         .and_then(|usage| usage.correlation_id.clone());
+    // The transcription host answers only text, so the uploaded WAV's own duration is the only
+    // length the ledger can price. Measured before the bytes are moved into the multipart part.
+    let mut upload_units: Option<Decimal> = None;
     let mut builder = match upload {
         Some(upload) => {
             // One document's bytes, fetched under the caller's tenant and hash-verified by the
@@ -1149,6 +1196,7 @@ async fn invoke_external(
                 let _ = tx.rollback().await;
                 loaded
             };
+            upload_units = crate::integrations::audio::wav_duration_secs(&loaded.bytes);
             let part = reqwest::multipart::Part::bytes(loaded.bytes)
                 .file_name("upload")
                 .mime_str(&loaded.content_type)
@@ -1277,6 +1325,7 @@ async fn invoke_external(
 
     // S16: one ledger row for a successful model call. The engine owns the response and this
     // transaction; a handler-side writer would be a second path for the same fact.
+    let media = media_surface(service);
     let capture = request
         .usage
         .as_ref()
@@ -1285,6 +1334,7 @@ async fn invoke_external(
             let captured = conveyor_domain::inference::capture(
                 request.input.get("model").and_then(Value::as_str),
                 &output,
+                media.map(|(surface, _)| surface),
             );
             CaptureRow {
                 caller_kind: usage.caller_kind,
@@ -1303,6 +1353,10 @@ async fn invoke_external(
                 served_model: captured.served_model,
                 usage: captured.usage,
                 cache_status: captured.cache_status.as_str(),
+                usage_unit: media.map(|(_, unit)| unit),
+                usage_units: media.and_then(|(surface, _)| {
+                    media_units(surface, &request.input, &output, upload_units)
+                }),
                 latency_ms: elapsed,
             }
         });
@@ -1510,6 +1564,8 @@ async fn record_bookkeeping(
             served_model: capture.served_model.as_deref(),
             usage: capture.usage,
             cache_status: capture.cache_status,
+            usage_unit: capture.usage_unit,
+            usage_units: capture.usage_units,
             latency_ms: capture.latency_ms,
             outcome: "ok",
         };
