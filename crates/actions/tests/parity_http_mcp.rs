@@ -2391,6 +2391,24 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_document_bytes(pg, ctx).await;
             ctx.push(sample.name, id);
         }
+        // #245: the preview needs a text body; the return needs an open publish request.
+        "documents.preview" => {
+            let id = seed_document_history(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        "documents.return" => {
+            let id = seed_document_bytes(pg, ctx).await;
+            sqlx::query(
+                "UPDATE document SET publish_requested_at = now()
+                  WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(ctx.tenant_id)
+            .bind(id)
+            .execute(&pg.super_pool)
+            .await
+            .expect("open the parity publish request");
+            ctx.push(sample.name, id);
+        }
         "documents.revision_list" | "documents.revision_get" | "documents.revision_restore" => {
             let id = seed_document_history(pg, ctx).await;
             ctx.push(sample.name, id);
@@ -3796,6 +3814,16 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             expecting(sample, 200)
         },
         expecting(on_prepared("documents.request_publish", Some("\"1\"")), 200),
+        // #245: the preview is a read of a saved text output; the return is the admin's rework
+        // order on a requested draft.
+        expecting(on_prepared("documents.preview", None), 200),
+        {
+            let mut sample = on_prepared("documents.return", Some("\"1\""));
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("documents.return"), "note": "Parity return"}),
+            );
+            expecting(sample, 200)
+        },
         expecting(on_prepared("documents.revision_list", None), 200),
         {
             let mut sample = on_prepared("documents.revision_get", None);

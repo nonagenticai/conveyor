@@ -1,7 +1,7 @@
 {
   "actions_invoked": [
     {
-      "line": 716,
+      "line": 719,
       "name": "approvals.decide"
     },
     {
@@ -29,31 +29,35 @@
       "name": "cards.release"
     },
     {
-      "line": 1803,
+      "line": 1902,
       "name": "documents.compose"
     },
     {
-      "line": 2067,
+      "line": 2389,
+      "name": "documents.compose"
+    },
+    {
+      "line": 2184,
       "name": "documents.create"
     },
     {
-      "line": 2138,
+      "line": 2255,
       "name": "documents.delete"
     },
     {
-      "line": 2084,
+      "line": 2201,
       "name": "documents.download"
     },
     {
-      "line": 2117,
+      "line": 2234,
       "name": "documents.download"
     },
     {
-      "line": 1825,
+      "line": 1924,
       "name": "documents.get"
     },
     {
-      "line": 2102,
+      "line": 2219,
       "name": "documents.get"
     },
     {
@@ -61,27 +65,35 @@
       "name": "documents.list"
     },
     {
-      "line": 576,
+      "line": 579,
       "name": "documents.list"
     },
     {
-      "line": 603,
+      "line": 606,
       "name": "documents.list"
     },
     {
-      "line": 2035,
+      "line": 2152,
       "name": "documents.list"
     },
     {
-      "line": 1956,
+      "line": 2286,
+      "name": "documents.preview"
+    },
+    {
+      "line": 2332,
+      "name": "documents.return"
+    },
+    {
+      "line": 2073,
       "name": "documents.revision_get"
     },
     {
-      "line": 1917,
+      "line": 2034,
       "name": "documents.revision_list"
     },
     {
-      "line": 739,
+      "line": 742,
       "name": "process_runs.start"
     },
     {
@@ -89,27 +101,27 @@
       "name": "programmes.list"
     },
     {
-      "line": 1738,
+      "line": 1833,
       "name": "projects.close"
     },
     {
-      "line": 1621,
+      "line": 1716,
       "name": "projects.create"
     },
     {
-      "line": 1629,
+      "line": 1724,
       "name": "projects.update"
     },
     {
-      "line": 689,
+      "line": 692,
       "name": "runs.cancel"
     },
     {
-      "line": 667,
+      "line": 670,
       "name": "runs.get"
     },
     {
-      "line": 644,
+      "line": 647,
       "name": "runs.list"
     }
   ],
@@ -252,7 +264,7 @@
       "tranche": 0,
       "units": {
         "blocked": 6,
-        "claimed": 7,
+        "claimed": 8,
         "numbers": [
           17,
           22,
@@ -286,7 +298,7 @@
           285
         ],
         "open": 20,
-        "ready": 6,
+        "ready": 5,
         "unknown": 0
       }
     },
@@ -2538,7 +2550,7 @@
       "without_open_units": 16
     },
     "screens": {
-      "actions_invoked": 23,
+      "actions_invoked": 25,
       "by_status": {
         "legacy": 7,
         "live": 7,

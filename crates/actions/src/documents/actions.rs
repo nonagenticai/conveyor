@@ -577,6 +577,11 @@ async fn documents_compose(
     }
     let category = store::document::normalize_slot(input.category.clone(), None);
     let category = canonical_category_slot(category)?;
+    // The CLI's bulk path can create an output already public. Publication is one gate whichever
+    // action sets the bit, so the template check covers compose as well as `documents.publish`.
+    if input.publishable == Some(true) {
+        super::require_complete(category.as_deref(), Some(input.body.as_str()))?;
+    }
     let unit = store::document::normalize_slot(input.unit.clone(), None);
     let project_id = match (input.project_id, input.card_id) {
         (Some(project), Some(card)) => {
@@ -1026,6 +1031,15 @@ async fn documents_update(
         store::document::normalize_slot(input.category.clone(), current.category.clone());
     if input.category.is_some() {
         category_final = canonical_category_slot(category_final)?;
+    }
+    // The transition to public is the gate; an edit to a row already public is never re-checked,
+    // and an unpublish never is. The body being judged is the one the row will carry after this
+    // update, so a body and a publish bit in the same call are checked together.
+    if input.publishable == Some(true) && !current.publishable {
+        super::require_complete(
+            category_final.as_deref(),
+            body.as_deref().or(current.body.as_deref()),
+        )?;
     }
     let unit_final = store::document::normalize_slot(input.unit.clone(), current.unit.clone());
     let meta = {
