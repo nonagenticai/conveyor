@@ -17,8 +17,17 @@ use conveyor_licenses::config::Config;
 use conveyor_licenses::router;
 use conveyor_licenses::state::AppState;
 use sqlx::PgPool;
+use std::sync::atomic::{AtomicU64, Ordering};
 use tower::ServiceExt;
+
 use uuid::Uuid;
+
+/// The workspace's `uuid` features do not include `v4`; a counter is enough here — every value
+/// must merely be distinct, and starting at 1 keeps it clear of the sentinel (`…0000`).
+fn fresh_uuid() -> Uuid {
+    static COUNTER: AtomicU64 = AtomicU64::new(1);
+    Uuid::from_u128(u128::from(COUNTER.fetch_add(1, Ordering::Relaxed)))
+}
 
 fn state(pool: PgPool) -> AppState {
     AppState::new(
@@ -89,11 +98,11 @@ struct Seed {
 }
 
 async fn seed_base(pool: &PgPool) -> Seed {
-    let tenant = Uuid::new_v4();
-    let app = Uuid::new_v4();
-    let plan = Uuid::new_v4();
-    let subject = Uuid::new_v4();
-    let license = Uuid::new_v4();
+    let tenant = fresh_uuid();
+    let app = fresh_uuid();
+    let plan = fresh_uuid();
+    let subject = fresh_uuid();
+    let license = fresh_uuid();
     sqlx::query("INSERT INTO tenant_owner (key, display_name) VALUES ('owner-m', 'Owner M')")
         .execute(pool)
         .await
@@ -157,13 +166,25 @@ async fn insert_license(
     status: &str,
     expires_at: Option<DateTime<Utc>>,
 ) -> Uuid {
-    let id = Uuid::new_v4();
+    let id = fresh_uuid();
+    // Each licence needs its OWN subject: `uq_license_active_tenant_app_subject` is unique on
+    // (tenant, app, subject) for active rows, so two active licences cannot share one subject.
+    let subject = fresh_uuid();
+    sqlx::query(
+        "INSERT INTO subject (id, keycloak_sub, keycloak_realm, created_at)
+         VALUES ($1, $2, 'portal', now())",
+    )
+    .bind(subject)
+    .bind(format!("licence-subject-{subject}"))
+    .execute(pool)
+    .await
+    .expect("licence subject");
     sqlx::query(
         "INSERT INTO license (id, subject_id, app_id, plan_id, status, starts_at, tenant_id, expires_at)
          VALUES ($1, $2, $3, $4, $5, now(), $6, $7)",
     )
     .bind(id)
-    .bind(seed.subject)
+    .bind(subject)
     .bind(seed.app)
     .bind(seed.plan)
     .bind(status)
@@ -182,7 +203,7 @@ async fn insert_token(
     expires_at: Option<DateTime<Utc>>,
     revoked: bool,
 ) -> Uuid {
-    let id = Uuid::new_v4();
+    let id = fresh_uuid();
     sqlx::query(
         "INSERT INTO token (id, license_id, token_hash, token_type, created_at, expires_at, revoked)
          VALUES ($1, $2, $3, 'api', $4, $5, $6)",
@@ -599,23 +620,23 @@ async fn tenant_families() {
     // The sentinel tenant matches BOTH doors: one subject claims it as its keycloak_sub, another
     // carries it as its row id.
     insert_tenant(sentinel, "default-anon").await;
-    insert_subject(Uuid::new_v4(), SENTINEL.to_owned()).await;
+    insert_subject(fresh_uuid(), SENTINEL.to_owned()).await;
     insert_subject(sentinel, "sentinel-row-id-door".to_owned()).await;
 
     // keycloak_sub door, with a CASE DIFFERENCE: the SQL folds both sides.
-    let sub_tenant = Uuid::new_v4();
+    let sub_tenant = fresh_uuid();
     insert_tenant(sub_tenant, "tenant-sub").await;
-    insert_subject(Uuid::new_v4(), sub_tenant.to_string().to_uppercase()).await;
+    insert_subject(fresh_uuid(), sub_tenant.to_string().to_uppercase()).await;
 
     // subject_id door: the tenant's own id IS a subject row id.
-    let sid_subject = Uuid::new_v4();
+    let sid_subject = fresh_uuid();
     insert_subject(sid_subject, "unrelated-sid-sub".to_owned()).await;
     insert_tenant(sid_subject, "tenant-sid").await;
 
     // Both doors at once: one tenant id that is a keycloak_sub AND another subject's row id.
-    let both = Uuid::new_v4();
+    let both = fresh_uuid();
     insert_tenant(both, "tenant-both").await;
-    insert_subject(Uuid::new_v4(), both.to_string()).await;
+    insert_subject(fresh_uuid(), both.to_string()).await;
     insert_subject(both, "unrelated-both-sub".to_owned()).await;
 
     let text = scrape(router::router(state(db.pool.clone()))).await;

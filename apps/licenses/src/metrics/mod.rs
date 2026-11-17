@@ -91,12 +91,13 @@ impl Family {
     /// an expiry today) must be distinguishable from a missing one.
     pub(crate) fn render(&self) -> String {
         let mut out = format!(
-            "# HELP {} {}\n# TYPE {} gauge\n",
-            self.name, self.help, self.name
+            "# HELP {name} {help}\n# TYPE {name} gauge\n",
+            name = self.name,
+            help = self.help
         );
         for (values, value) in &self.samples {
             if self.labels.is_empty() {
-                out.push_str(&format!("{} {}\n", self.name, value));
+                out.push_str(&format!("{name} {value}\n", name = self.name));
                 continue;
             }
             out.push_str(self.name);
@@ -110,7 +111,7 @@ impl Family {
                 out.push_str(&escape(label_value));
                 out.push('"');
             }
-            out.push_str(&format!("}} {}\n", value));
+            out.push_str(&format!("}} {value}\n"));
         }
         out
     }

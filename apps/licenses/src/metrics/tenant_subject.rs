@@ -108,13 +108,10 @@ fn matching_counts_sql() -> String {
 /// applies to the `keycloak_sub` door; everything else is a violation.
 fn classify(tenant_id: &str, match_kind: &str) -> &'static str {
     let lowered = tenant_id.trim().to_ascii_lowercase();
-    if SENTINEL_TENANT_IDS.iter().any(|id| *id == lowered.as_str()) {
+    if SENTINEL_TENANT_IDS.contains(&lowered.as_str()) {
         return CLASS_SENTINEL;
     }
-    if match_kind == MATCH_KEYCLOAK_SUB
-        && RETIRED_PRINCIPAL_TENANT_IDS
-            .iter()
-            .any(|id| *id == lowered.as_str())
+    if match_kind == MATCH_KEYCLOAK_SUB && RETIRED_PRINCIPAL_TENANT_IDS.contains(&lowered.as_str())
     {
         return CLASS_RETIRED_PRINCIPAL;
     }
@@ -229,8 +226,9 @@ const SEED_REFUSALS_HELP: &str = "Distinct (tenant_id, tenant_name) entries the 
      Keycloak principal id. A register, not a tally: re-running the seed does not grow it. This \
      service has no boot seed, so the register has no producer and reads 0.";
 
-const SEED_REFUSED_HELP: &str = "1 per refused boot-seed entry; the `match` label names which door caught it. Absent while \
-     the seed-refusal register is empty.";
+// The named seed-refusal family has no producer here (no boot seed), so it is absent by design —
+// the reference's own rendering of an empty register. No help constant is needed for a family the
+// collector never emits.
 
 const SUBJECT_REFUSALS_HELP: &str = "Distinct (keycloak_sub, keycloak_realm) subject registrations this process refused because \
      that sub is already a tenants.id. A register, not a tally.";
