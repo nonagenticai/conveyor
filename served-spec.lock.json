@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "44e0313ec31036c58912a9d0f26e5fad32c31f3e960edadd574e476a1f349a9d",
+    "GET /api/actions": "ca3de1e73bbe32a9cb30cb13a61a4f365537273d863fda24b1e7ac074c403bad",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -30,7 +30,7 @@
     "POST /api/actions/andon.release/invocations": "669a570fc1a07ae3a5d2e52a203191a7353126d4eaf46edd7992308787f27537",
     "POST /api/actions/approvals.decide/invocations": "c219c07364e45524561d5487c0a8f10d967136c33bfcaefb12f7d25fe6524efa",
     "POST /api/actions/approvals.list/invocations": "9b11b31d9168092723333d7e1e7b04c33bfb3dcd2315ff9632ee1bb6c843e8db",
-    "POST /api/actions/approvals.request/invocations": "1868599a0e54493b44c38afdfa7cd5c4d4b15ae843c6283f2b21d45c7f22250b",
+    "POST /api/actions/approvals.request/invocations": "54f63263148f09ef094c1a9e39d1b18df3a77dcb8d70904c5d45867bafa14b70",
     "POST /api/actions/artifacts.list/invocations": "5ffda7fcfc8e1707666f42e3189d50760a2bec7589878fa599d7d92e116d2cf7",
     "POST /api/actions/audit.list/invocations": "f08fd6574e6ac314263b6df0fc843699fde6a4eebf9f761c84548d908c755c06",
     "POST /api/actions/baselines.get/invocations": "9e523e441feff165c6a712bed78c339b802c84091fe21b48d745f067b64d5005",
@@ -259,6 +259,9 @@
     "POST /api/actions/ops.flux_status/invocations": "466ceb30888e1b6a18c7e0802af5554193e9852618644b9d94379282ba3ba1b6",
     "POST /api/actions/ops.logs/invocations": "3034fee9c0605413b1e7dc8662d256c1090919e0d22bfe2dc8fc11f588db452e",
     "POST /api/actions/ops.pods/invocations": "f5754b05bb18ed3ff7e0234becf0b6267dbde8a2919f634242cf61a1f14d46ba",
+    "POST /api/actions/ops.restart/invocations": "7dcdae6cb0b3aedc29f8892f7943a09fbfaa96b013de3114922351ba0ecae28a",
+    "POST /api/actions/ops.rollback/invocations": "1a14a94dbe5b39301b0801ac252b452d467501c681024d9df8285426addc0b65",
+    "POST /api/actions/ops.scale/invocations": "b04e5a56951eb289a6f654720a0d3920f45e058a7c3fb10aadfc547917ea034d",
     "POST /api/actions/portfolio.in_flight/invocations": "62559319fa386bc3c448f08b7185a473f894e00f5e59a20b66453d13a32014db",
     "POST /api/actions/principles.create/invocations": "272f9ce128ed44593b1b46f7bf8337d0fd4aaa76baf7f5d092edcbe14e30a314",
     "POST /api/actions/principles.dismiss_conflict/invocations": "94f556c2cdd408e2f70286fb1bffad1ce6212dc16dd31257a34920b4cc266244",
