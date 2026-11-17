@@ -162,33 +162,57 @@ async fn execute_project(running: &support::Running, project: &str) -> (u16, Val
         .await
 }
 
+/// The tenant's run rows for one project. The superuser pool is used to *read* the durable
+/// outcome of a refusal — the gate's promise is "writes no run", and only the table can prove it.
+async fn run_count(pg: &support::Pg, project: &str) -> i64 {
+    sqlx::query_scalar("SELECT count(*) FROM run WHERE project_id = $1::uuid")
+        .bind(project)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count runs")
+}
+
 /// P1.1 — a draft pair refuses the build; publishing both lets the identical start proceed.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_draft_inception_pair_refuses_the_build() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, _seeded) = fixture().await;
     let (project, _board, card) = create_project(&running, "Inception draft").await;
     declare_outputs(&running, &project, &PAIR).await;
     let (analysis, analysis_version) = compose(&running, &project, PAIR[0]).await;
     let (architecture, architecture_version) = compose(&running, &project, PAIR[1]).await;
+    // `projects.create` already wrote the start card's root run; the gate must write none.
+    let baseline_runs = run_count(&pg, &project).await;
 
-    // Both paths refuse while the pair is a draft.
+    // Both paths refuse while the pair is a draft, and neither writes a run row.
     let (status, body) = start_card_run(&running, &card).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "inception_missing", "{body}");
     let detail = body["detail"].as_str().expect("a detail");
     assert!(detail.contains(PAIR[0]), "{detail}");
     assert!(detail.contains(PAIR[1]), "{detail}");
+    assert_eq!(run_count(&pg, &project).await, baseline_runs, "the start path wrote a run");
 
     let (status, body) = execute_project(&running, &project).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "inception_missing", "{body}");
+    assert_eq!(
+        run_count(&pg, &project).await,
+        baseline_runs,
+        "the execute path wrote a run"
+    );
 
     // The same call proceeds once both outputs are published.
     publish(&running, &analysis, analysis_version).await;
     publish(&running, &architecture, architecture_version).await;
     let (status, body) = execute_project(&running, &project).await;
     assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        run_count(&pg, &project).await,
+        baseline_runs + 1,
+        "the accepted start wrote exactly one run"
+    );
     let (status, body) = start_card_run(&running, &card).await;
+    assert!(status < 500, "the gate is satisfied: {body} (status {status})");
     assert_ne!(
         body["type"], "inception_missing",
         "the gate is satisfied: {body} (status {status})"
@@ -213,9 +237,10 @@ async fn a_project_without_the_pair_is_unchanged() {
 /// P1.3 — both start paths share the gate: identical reason, identical detail.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn both_start_paths_share_the_inception_gate() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, _seeded) = fixture().await;
     let (project, _board, card) = create_project(&running, "Shared gate").await;
     declare_outputs(&running, &project, &PAIR).await;
+    let baseline_runs = run_count(&pg, &project).await;
 
     let (card_status, card_body) = start_card_run(&running, &card).await;
     let (project_status, project_body) = execute_project(&running, &project).await;
@@ -230,21 +255,32 @@ async fn both_start_paths_share_the_inception_gate() {
     let detail = card_body["detail"].as_str().expect("a detail");
     assert!(detail.contains(PAIR[0]), "{detail}");
     assert!(detail.contains(PAIR[1]), "{detail}");
+    assert_eq!(
+        run_count(&pg, &project).await,
+        baseline_runs,
+        "a refused path wrote a run"
+    );
 }
 
 /// P2.1 — `expected_outputs` is the switch: gaining the pair applies the gate with no code change.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn the_expected_outputs_are_the_switch() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, _seeded) = fixture().await;
     let (project, _board, _card) = create_project(&running, "Switch").await;
 
     // No declared pair: the project starts.
     let (status, body) = execute_project(&running, &project).await;
     assert_eq!(status, 200, "{body}");
 
-    // The same project gains the pair; the next start is refused, with no rebuild.
+    // The same project gains the pair; the next start is refused, with no rebuild and no run.
     declare_outputs(&running, &project, &PAIR).await;
+    let baseline_runs = run_count(&pg, &project).await;
     let (status, body) = execute_project(&running, &project).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "inception_missing", "{body}");
+    assert_eq!(
+        run_count(&pg, &project).await,
+        baseline_runs,
+        "the refused start wrote a run"
+    );
 }
