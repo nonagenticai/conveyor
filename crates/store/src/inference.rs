@@ -12,6 +12,7 @@
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
 use conveyor_domain::inference::{Usage, UsageGroup, UsageRow, hit_ratio};
+use rust_decimal::Decimal;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -237,13 +238,22 @@ struct UsageAggregateRow {
     writes: i64,
     misses: i64,
     unknown: i64,
+    priced_calls: i64,
+    unpriced_calls: i64,
+    latency_ms: i64,
+    cost_usd: Decimal,
 }
 
 /// The aggregate behind `inference_usage.report`.
 ///
 /// The bucket expression is chosen from the closed [`UsageGroup`] enum — never from input text —
 /// so the dynamic SQL has no writable surface. `model` groups on the served model with the
-/// requested one as the fallback (owner decision, 2026-11-09).
+/// requested one as the fallback (owner decision, 2026-11-09). `project` joins the run the call
+/// belongs to; a call with no run is the empty bucket, visible rather than dropped.
+///
+/// Cost is derived from the ledger and `commercial_price` at read time (SPEC_V2 D52) and is
+/// never stored. A model with no price contributes zero to `cost_usd` and is counted in
+/// `unpriced_calls` — "no price" must not render as "free".
 pub async fn usage_rows_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -253,24 +263,35 @@ pub async fn usage_rows_tx(
 ) -> Result<Vec<UsageRow>, InferenceStoreError> {
     let bucket = match group {
         UsageGroup::Day => {
-            "to_char(date_trunc('day', created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD')"
+            "to_char(date_trunc('day', ic.created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD')"
         }
-        UsageGroup::Model => "coalesce(served_model, model)",
-        UsageGroup::CallerKind => "caller_kind",
-        UsageGroup::CacheStatus => "cache_status",
-        UsageGroup::PromptSha => "coalesce(prompt_sha256, '')",
+        UsageGroup::Model => "coalesce(ic.served_model, ic.model)",
+        UsageGroup::CallerKind => "ic.caller_kind",
+        UsageGroup::CacheStatus => "ic.cache_status",
+        UsageGroup::PromptSha => "coalesce(ic.prompt_sha256, '')",
+        UsageGroup::Project => "coalesce(r.project_id::text, '')",
     };
     let sql = format!(
         "SELECT {bucket} AS bucket,
                 count(*)::bigint AS calls,
-                coalesce(sum(prompt_tokens), 0)::bigint AS prompt_tokens,
-                coalesce(sum(completion_tokens), 0)::bigint AS completion_tokens,
-                count(*) FILTER (WHERE cache_status = 'hit')::bigint AS hits,
-                count(*) FILTER (WHERE cache_status = 'write')::bigint AS writes,
-                count(*) FILTER (WHERE cache_status = 'miss')::bigint AS misses,
-                count(*) FILTER (WHERE cache_status = 'unknown')::bigint AS unknown
-           FROM inference_call
-          WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3
+                coalesce(sum(ic.prompt_tokens), 0)::bigint AS prompt_tokens,
+                coalesce(sum(ic.completion_tokens), 0)::bigint AS completion_tokens,
+                count(*) FILTER (WHERE ic.cache_status = 'hit')::bigint AS hits,
+                count(*) FILTER (WHERE ic.cache_status = 'write')::bigint AS writes,
+                count(*) FILTER (WHERE ic.cache_status = 'miss')::bigint AS misses,
+                count(*) FILTER (WHERE ic.cache_status = 'unknown')::bigint AS unknown,
+                count(*) FILTER (WHERE p.model IS NOT NULL)::bigint AS priced_calls,
+                count(*) FILTER (WHERE p.model IS NULL)::bigint AS unpriced_calls,
+                coalesce(sum(ic.latency_ms), 0)::bigint AS latency_ms,
+                coalesce(round(sum(
+                    (ic.prompt_tokens::numeric * p.input_usd_per_1m
+                     + ic.completion_tokens::numeric * p.output_usd_per_1m) / 1000000
+                ), 6), 0)::numeric(18,6) AS cost_usd
+           FROM inference_call ic
+           LEFT JOIN commercial_price p
+                  ON p.model = coalesce(ic.served_model, ic.model)
+           LEFT JOIN run r ON r.id = ic.run_id
+          WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3
           GROUP BY 1
           ORDER BY 1"
     );
@@ -292,6 +313,10 @@ pub async fn usage_rows_tx(
             misses: row.misses,
             unknown: row.unknown,
             hit_ratio: hit_ratio(row.hits, row.calls),
+            cost_usd: row.cost_usd,
+            priced_calls: row.priced_calls,
+            unpriced_calls: row.unpriced_calls,
+            latency_ms: row.latency_ms,
         })
         .collect())
 }

@@ -1,0 +1,19 @@
+[package]
+name = "conveyor-ops"
+description = "The cluster operations client: the in-cluster Kubernetes API reads behind the ops.* action family (T7, SPEC_V2 §10.4.1)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# The same choice recorded in `crates/runner/src/cluster.rs` and `apps/server/src/sandbox.rs`:
+# hand-rolled REST calls over the workspace client, never the `kube` crate.
+reqwest = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+axum = { workspace = true }
+tokio = { workspace = true }

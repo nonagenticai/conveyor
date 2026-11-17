@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 23 |
+| `exists` | implemented in code and backed by real rows | 24 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
-| `new` | absent | 32 |
+| `new` | absent | 31 |
 
 ## Rows
 
@@ -62,7 +62,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:coach` | §10.4 | actions | coach | `new` | actions: coach.* absent |
 | `actions:kata` | §10.4 | actions | kata | `new` | actions: kata.* absent<br>*V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5.* |
 | `actions:development` | §10.4 | actions | development | `new` | actions: dev.* absent |
-| `actions:operations` | §10.4 | actions | operations | `new` | actions: ops.* absent |
+| `actions:operations` | §10.4 | actions | operations | `exists` | actions: ops.* found (ops.ci_status, ops.deployments, ops.events…) |
 | `actions:analysis` | §10.4 | actions | analysis | `new` | actions: analyse.* absent |
 | `actions:production` | §10.4 | actions | production | `new` | actions: produce.* absent |
 | `actions:tools` | §10.4 | actions | tools | `new` | actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* absent<br>actions: tools.* absent |
