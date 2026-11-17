@@ -70,6 +70,14 @@ async fn a_coding_job_carries_the_callers_tenant_and_verbatim_body() {
         Some(expected.as_str()),
         "the coding service sees the caller's tenant"
     );
+    assert!(
+        headers.get("x-actor-id").is_none(),
+        "only model calls carry the billing actor: a coding job is not billed to a principal"
+    );
+    assert!(
+        headers.get("x-project-id").is_none(),
+        "only model calls carry the billing project"
+    );
     assert_eq!(sent, body, "an external input is passed through verbatim");
 
     running.shutdown().await;
