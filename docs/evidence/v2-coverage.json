@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 23,
+    "exists": 24,
     "extend": 8,
-    "new": 32
+    "new": 31
   },
   "rows": [
     {
@@ -534,9 +534,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "operations",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: ops.* absent"
+        "actions: ops.* found (ops.ci_status, ops.deployments, ops.events…)"
       ]
     },
     {
