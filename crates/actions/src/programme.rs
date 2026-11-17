@@ -1,8 +1,10 @@
 #![forbid(unsafe_code)]
-//! Programme ordering — a project may not start while a declared dependency is open.
+//! Programme ordering — a project may not start while a declared dependency is open, and a
+//! delivery project may not start until its inception outputs are published.
 //!
 //! `project.meta.depends_on` is the programme's declared order (`seed/programme.json`, written
-//! by the seed loader). It is enforced at the two run-start paths, never left to the UI:
+//! by the seed loader) and `project.meta.expected_outputs` is its output standard. Both are
+//! enforced at the two run-start paths, never left to the UI:
 //!
 //! * `process_runs.start` — a card's run (`crates/actions/src/process/runs.rs`);
 //! * `projects.execute` — the project's durable execution task.
@@ -14,7 +16,7 @@
 use std::collections::HashMap;
 
 use conveyor_domain::Project;
-use conveyor_store::{TenantId, project as project_store};
+use conveyor_store::{TenantId, document as document_store, project as project_store};
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -113,6 +115,93 @@ pub(crate) async fn assert_dependencies_met(
             open.join(", ")
         ),
     ))
+}
+
+/// The two inception categories the output standard declares for a delivery project (P0's
+/// inception standard, #221's canonical spelling). A project that names both in
+/// `meta.expected_outputs` may not start a build run until both are published.
+pub(crate) const INCEPTION_CATEGORIES: [&str; 2] = ["inception-analysis", "architecture-design"];
+
+/// The output-standard categories a project declares it will produce, trimmed, de-duplicated and
+/// in declaration order. Absent or non-array `expected_outputs` is empty — a project that declares
+/// nothing is subject to no output gate.
+pub(crate) fn expected_outputs(meta: &Value) -> Vec<String> {
+    let mut outputs: Vec<String> = Vec::new();
+    if let Some(items) = meta.get("expected_outputs").and_then(Value::as_array) {
+        for item in items {
+            let Some(slot) = item.as_str().map(str::trim).filter(|slot| !slot.is_empty()) else {
+                continue;
+            };
+            if !outputs.iter().any(|seen| seen.as_str() == slot) {
+                outputs.push(slot.to_owned());
+            }
+        }
+    }
+    outputs
+}
+
+/// Refuse with `409 inception_missing` unless every inception category the project declares is
+/// published.
+///
+/// The switch is the project's own `meta.expected_outputs`: a project that names neither
+/// category (P0, the platform, every V1-built slice) is unchanged, and a project that gains the
+/// pair applies the gate without a code change. Publication is `published_at IS NOT NULL` on an
+/// active document of this project with the category — a draft is not publication.
+pub(crate) async fn assert_inception_published(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<(), ActionError> {
+    let project = project_store::get_project_tx(&mut *tx, tenant, project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "inception: read project");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| ActionError::resource_not_found("project"))?;
+    let outputs = expected_outputs(&project.meta);
+    let required: Vec<&str> = INCEPTION_CATEGORIES
+        .iter()
+        .copied()
+        .filter(|category| outputs.iter().any(|slot| slot.as_str() == *category))
+        .collect();
+    if required.is_empty() {
+        return Ok(());
+    }
+    let published = document_store::published_categories_tx(&mut *tx, tenant, project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "inception: read published categories");
+            ActionError::internal()
+        })?;
+    let missing: Vec<&str> = required
+        .iter()
+        .copied()
+        .filter(|category| !published.iter().any(|slot| slot.as_str() == *category))
+        .collect();
+    if missing.is_empty() {
+        return Ok(());
+    }
+    Err(ActionError::new(
+        409,
+        "inception_missing",
+        format!(
+            "project {} cannot start until its inception outputs are published (missing: {})",
+            project.key,
+            missing.join(", ")
+        ),
+    ))
+}
+
+/// The one build-start gate both run paths call, so they cannot diverge: the programme's declared
+/// order first, then the inception outputs.
+pub(crate) async fn assert_project_can_start(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<(), ActionError> {
+    assert_dependencies_met(&mut *tx, tenant, project_id).await?;
+    assert_inception_published(&mut *tx, tenant, project_id).await
 }
 
 /// A dependency is met when its project is closed or archived. `archived` covers a superseded
