@@ -921,6 +921,20 @@ async fn documents_update(
         serde_json::to_value(DocumentOut::from_record(current.clone(), &HashMap::new()))
             .unwrap_or(Value::Null),
     )?;
+    // §7.1/§7.4: a generated draft is applied only through `ladder.apply_draft`, whose gate is
+    // an accepted L1/L3 decision. The ordinary edit path cannot attach one to a card, so the
+    // ladder's decision record cannot be bypassed by an update.
+    if input
+        .card_id
+        .is_some_and(|card| Some(card) != current.card_id)
+        && current.meta.get("generated").and_then(Value::as_bool) == Some(true)
+    {
+        return Err(ActionError::new(
+            409,
+            "draft_requires_gate",
+            "a generated draft is applied through ladder.apply_draft with an accepted decision",
+        ));
+    }
     // Publication is an admin decision, in both directions. A published row is also locked to the
     // admin: an author's edit to public content would change what a reviewer already approved
     // without a new publish decision, so the author asks for an unpublish instead.

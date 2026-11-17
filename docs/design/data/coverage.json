@@ -252,7 +252,7 @@
       "tranche": 0,
       "units": {
         "blocked": 6,
-        "claimed": 11,
+        "claimed": 8,
         "numbers": [
           17,
           22,
@@ -270,8 +270,6 @@
           163,
           164,
           193,
-          205,
-          212,
           213,
           222,
           223,
@@ -280,7 +278,6 @@
           226,
           258,
           260,
-          264,
           265,
           274,
           280,
@@ -289,7 +286,7 @@
           284,
           285
         ],
-        "open": 24,
+        "open": 21,
         "ready": 6,
         "unknown": 0
       }
@@ -1648,7 +1645,6 @@
         "T15",
         "T16",
         "T17",
-        "T2",
         "T3",
         "T4",
         "T5",
@@ -1695,8 +1691,7 @@
     },
     {
       "blocked_by": [
-        "P0",
-        "T2"
+        "P0"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1831,8 +1826,7 @@
     {
       "blocked_by": [
         "P0",
-        "T13",
-        "T2"
+        "T13"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1930,18 +1924,20 @@
         "P0"
       ],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/ladder/mod.rs",
+        "crates/domain/src/ladder.rs",
+        "crates/store/src/ladder.rs"
       ],
-      "gap": "the decision tables exist as T0 schema; no decision-ladder evaluation, laya client or generation split (T2 behaviour)",
+      "gap": null,
       "key": "T2",
       "measured": {
         "actions": [
-          0,
-          0
+          11,
+          11
         ],
         "modules": [
-          0,
-          0
+          3,
+          3
         ],
         "tables": [
           0,
@@ -1953,7 +1949,7 @@
         "S03"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 2,
       "units": {
@@ -1969,8 +1965,7 @@
     },
     {
       "blocked_by": [
-        "P0",
-        "T2"
+        "P0"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -2062,8 +2057,7 @@
     },
     {
       "blocked_by": [
-        "P0",
-        "T2"
+        "P0"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -2152,7 +2146,6 @@
       "blocked_by": [
         "P0",
         "T13",
-        "T2",
         "T4"
       ],
       "evidence": [
@@ -2534,10 +2527,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 27,
+        "built": 28,
         "partial": 2,
         "planned": 1,
-        "proposed": 16,
+        "proposed": 15,
         "standing": 1
       },
       "total": 48,

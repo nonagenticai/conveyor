@@ -79,7 +79,10 @@ use serde_json::{Value, json};
 /// `ops.pods|deployments|events|logs|flux_status|ci_status`. 378 → **384**.
 /// **#171 adds 3 internal**: the gated `ops.*` writes — `ops.restart|scale|rollback`.
 /// 384 → **387**.
-const EXPECTED: [&str; 387] = [
+/// **T2 adds 11 internal**: the decision ladder — `decision_policies.*` (3),
+/// `refinements.*` (2), `laya_configs.*` (2), `ladder.record|evaluate|list|apply_draft` (4).
+/// 387 → **398**.
+const EXPECTED: [&str; 398] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -160,6 +163,9 @@ const EXPECTED: [&str; 387] = [
     "decisions.transition",
     "decisions.update",
     "decks.render",
+    "decision_policies.create",
+    "decision_policies.list",
+    "decision_policies.update",
     "departments.create",
     "departments.list",
     "documents.compose",
@@ -253,7 +259,13 @@ const EXPECTED: [&str; 387] = [
     "labels.create",
     "labels.delete",
     "labels.update",
+    "ladder.apply_draft",
+    "ladder.evaluate",
+    "ladder.list",
+    "ladder.record",
     "laya.judge",
+    "laya_configs.create",
+    "laya_configs.list",
     "licences.get",
     "lists.create",
     "lists.move",
@@ -376,6 +388,8 @@ const EXPECTED: [&str; 387] = [
     "publish.start",
     "publish.status",
     "quality.score",
+    "refinements.list",
+    "refinements.publish",
     "registers.create",
     "registers.get",
     "registers.list",
@@ -511,8 +525,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // tranches/benefits/cadences/stakeholders), all internal: internal 333 → 360; external stays 18.
     // #170 adds the six `ops.*` reads (internal, read): 360 → 366. The external count stays at 18 —
     // they call the cluster API through `conveyor-ops`, not a declared external service.
-    // #171 adds the three `ops.*` writes (internal, destructive): 366 → 369; external stays 18.
-    assert_eq!((internal, external), (369, 18));
+    // #171 adds the three `ops.*` writes (internal, destructive): 366 → 369; T2 adds the eleven
+    // decision-ladder actions (decision_policies.* 3, refinements.* 2, laya_configs.* 2,
+    // ladder.record|evaluate|list|apply_draft 4), all internal: 369 → 380; external stays 18.
+    assert_eq!((internal, external), (380, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
