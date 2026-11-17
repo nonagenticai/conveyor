@@ -76,6 +76,15 @@ pub struct Config {
     pub version: String,
     pub database_url: Option<String>,
     pub max_connections: u32,
+    /// The licences service's introspection endpoint (`LICENSE_INTROSPECT_URL`). Unset means
+    /// every credential is refused — the reference's own fail-closed behaviour.
+    pub license_introspect_url: Option<String>,
+    /// The service `subject_id`s permitted to vouch for a bare `X-Tenant-Id`
+    /// (`MEDIA_DISCOVERY_ONBEHALF_SUBJECTS`, CSV). Empty means NO bare tenant is honoured.
+    pub onbehalf_subjects: Vec<String>,
+    /// Wall-clock budget for one introspection (`LICENSE_INTROSPECT_TIMEOUT`, seconds; the
+    /// reference's 10 s default).
+    pub license_introspect_timeout: std::time::Duration,
 }
 
 impl Default for Config {
@@ -102,6 +111,26 @@ impl Config {
                 .ok()
                 .and_then(|value| value.parse().ok())
                 .unwrap_or(10),
+            license_introspect_url: std::env::var("LICENSE_INTROSPECT_URL")
+                .ok()
+                .map(|url| url.trim().to_string())
+                .filter(|url| !url.is_empty()),
+            onbehalf_subjects: std::env::var("MEDIA_DISCOVERY_ONBEHALF_SUBJECTS")
+                .map(|raw| {
+                    raw.split(',')
+                        .map(str::trim)
+                        .filter(|subject| !subject.is_empty())
+                        .map(str::to_owned)
+                        .collect()
+                })
+                .unwrap_or_default(),
+            license_introspect_timeout: std::time::Duration::from_secs_f64(
+                std::env::var("LICENSE_INTROSPECT_TIMEOUT")
+                    .ok()
+                    .and_then(|value| value.parse().ok())
+                    .filter(|seconds: &f64| *seconds > 0.0)
+                    .unwrap_or(10.0),
+            ),
         }
     }
 
@@ -114,20 +143,34 @@ impl Config {
 pub struct AppState {
     pub config: Arc<Config>,
     pub pool: Option<PgPool>,
+    /// The client used for licence introspection. One per process, bounded by the configured
+    /// timeout; the reference opened a client per call, which this does not need to reproduce.
+    pub http: reqwest::Client,
 }
 
 impl AppState {
+    fn http_client(config: &Config) -> reqwest::Client {
+        reqwest::Client::builder()
+            .timeout(config.license_introspect_timeout)
+            .build()
+            .expect("building the HTTP client for licence introspection")
+    }
+
     pub fn new(config: Config) -> Self {
+        let http = Self::http_client(&config);
         Self {
             config: Arc::new(config),
             pool: None,
+            http,
         }
     }
 
     pub fn with_pool(config: Config, pool: PgPool) -> Self {
+        let http = Self::http_client(&config);
         Self {
             config: Arc::new(config),
             pool: Some(pool),
+            http,
         }
     }
 

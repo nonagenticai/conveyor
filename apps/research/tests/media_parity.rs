@@ -22,7 +22,7 @@ use serde_json::Value;
 use std::collections::BTreeSet;
 use tower::ServiceExt;
 
-use conveyor_research::media::{self, Config};
+use conveyor_research::media;
 
 const GOLDEN_DIR: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/contract/media/golden");
 const TOLERANCES: &str = include_str!("../contract/media/tolerances.toml");
@@ -106,15 +106,7 @@ fn cases() -> Vec<(String, String, String)> {
 }
 
 fn app(pool: sqlx::PgPool) -> axum::Router {
-    let config = Config {
-        bind_host: "127.0.0.1".to_string(),
-        bind_port: 0,
-        enable_docs: false,
-        service_name: "media-discovery".to_string(),
-        version: "0.1.0".to_string(),
-        database_url: None,
-        max_connections: 4,
-    };
+    let config = common::media_config();
     media::build_app(media::AppState::with_pool(config, pool))
 }
 
@@ -168,7 +160,8 @@ async fn every_captured_case_replays_its_answer() {
         let mut builder = Request::builder()
             .method(method.as_str())
             .uri(&path)
-            .header("x-tenant-id", TENANT);
+            .header("x-tenant-id", TENANT)
+            .header("authorization", common::vouch_auth());
         if !body.is_empty() {
             builder = builder.header("content-type", "application/json");
         }

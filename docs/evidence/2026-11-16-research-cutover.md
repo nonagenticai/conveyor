@@ -1,7 +1,11 @@
 # Research cutover — 2026-11-16
 
-Part of #205. The two Rust binaries were deployed as shadows (`gitops-production#5297`), the scraper
-was cut over (`#5303`); the media cutover is **blocked** by #226 and did not happen.
+Part of #205. The two Rust binaries were deployed (`gitops-production#5297`), the scraper was cut
+over (`#5303`), and the Python `media_discovery` was retired in favour of the Rust media binary
+(`gitops-production#5306`) — **with conveyor#226 still open**: the port had dropped the reference's
+tenant gate. On 2026-11-17 the media Deployment was withdrawn to 0 replicas (gitops#5318) and the
+gate was restored (conveyor#226, this document's "The media gate" section); the Deployment returns
+behind the restored gate in the deployment repository.
 
 ## Digests deployed
 
@@ -73,7 +77,11 @@ read" cannot be run as written. Proxied with an item read:
 |---|---|---|
 | `GET /api/items/019ddddf-…` with `X-Tenant-Id` | **401** — a bare tenant header needs a service token | **200** + the full row |
 
-That is the whole reason the media cutover did not happen: see #226. The row content itself matched.
+That difference was the port's missing gate, not a row defect: #226. It is closed — the port now
+refuses a bare tenant without a vouch (401), refuses a service token whose subject is not on
+`MEDIA_DISCOVERY_ONBEHALF_SUBJECTS` (403), serves `X-Tenant-Id: Bearer <licence>` with the
+licence's tenant, and keeps the vouch from re-labelling the named tenant. The three shapes are
+pinned in `apps/research/tests/tenant.rs`.
 
 ## Cutover (P4, scraper half only)
 
@@ -87,8 +95,9 @@ That is the whole reason the media cutover did not happen: see #226. The row con
 
 ## Not done, and why
 
-- **The media cutover.** #226: the port trusts a bare `X-Tenant-Id`; the reference demands a token.
-  `media-discovery` keeps running, and its repo stays unarchived.
+- **The media gate (RESOLVED 2026-11-17, #226).** At the time of the cutover the port trusted a
+  bare `X-Tenant-Id`; the reference demands a credential. The exposure was closed by withdrawing the
+  Deployment (gitops#5318), and the gate was restored in conveyor#226 — see "The media gate" below.
 - **Retiring `webscraper_service`** — done, under the owner's 2026-11-17 procedure. The first
   attempt used the session's `gh` shim (`~/.claude/bin/gh`), which is a GitHub App installation
   token with `permissions.admin=false`, so it was refused `403 Resource not accessible by
@@ -112,3 +121,26 @@ That is the whole reason the media cutover did not happen: see #226. The row con
   "not scanned", not "clean".
 - **`webscraper-env`.** Unreferenced after the cutover, deliberately not deleted in a Deployment
   swap; a separate auditable act.
+
+## The media gate (2026-11-17, #226)
+
+The reference's gate was three behaviours, each now ported and pinned by a test:
+
+| Credential | Reference | This service |
+|---|---|---|
+| none | 401 `AUTHENTICATION_REQUIRED` | 401, same code, `WWW-Authenticate: Bearer` |
+| `X-Tenant-Id: Bearer <licence>` | the licence's tenant | introspected at `LICENSE_INTROSPECT_URL`; inactive/unknown/tenant-less → 401 |
+| bare `X-Tenant-Id` + `Authorization: Bearer <service licence>` | the NAMED tenant, only for an allowlisted subject | same; empty allowlist → every bare tenant refused (fail-closed) |
+| bare `X-Tenant-Id` alone | 401 — a claim is not a credential | 401 |
+| a non-uuid tenant | 400 `INVALID_TENANT_ID` | 400, same code |
+
+Deviations, deliberate: no introspection cache (the reference caches 5 min; this service has had
+zero callers and a fresh check never serves a revoked licence from cache) and no trusted-CIDR
+branch (the vouch is required for every caller — strictly stricter than the reference's peer
+allowance).
+
+Sequence, recorded honestly: the Python service was retired before the gate was restored, so on
+2026-11-17 the Deployment was first **withdrawn to 0 replicas** (gitops#5318 — measured zero
+callers: a cluster-wide workload sweep matched only the Deployment itself, and the parent
+kustomization already recorded "zero callers in 7d"), then returned behind the restored gate.
+The live verification of the three shapes and the pinned digest are recorded on conveyor#226.

@@ -230,3 +230,95 @@ impl Drop for TestDb {
         .join();
     }
 }
+
+// ── the licence-introspection stub ────────────────────────────────────────────────────────────
+//
+// The media service now verifies every credential at `LICENSE_INTROSPECT_URL`. Tests point it at a
+// process-local axum server that answers by TOKEN PREFIX, so a test names the credential shape it
+// wants and nothing is mocked inside the binary under test:
+//
+//   licence-<uuid>   an ACTIVE licence naming that tenant, no subject (the licence path)
+//   vouch-…          an ACTIVE licence whose subject may vouch (and whose OWN tenant differs, so
+//                    the "the vouch never re-labels" assertion has something to catch)
+//   stranger-…       an ACTIVE licence whose subject is NOT on the allowlist
+//   anything else    inactive (the negative control every refusal is paired with)
+
+pub const VOUCH_SUBJECT: &str = "0195f48b-d000-7000-8000-0000000000c3";
+pub const STRANGER_SUBJECT: &str = "0195f48b-d000-7000-8000-0000000000d4";
+pub const VOUCH_TOKEN: &str = "vouch-test-token";
+/// The vouch token's licence names this tenant — deliberately NOT the tenant a test names.
+pub const LICENCE_OWN_TENANT: &str = "00000000-0000-7000-8000-0000000000b2";
+
+pub fn vouch_auth() -> String {
+    format!("Bearer {VOUCH_TOKEN}")
+}
+
+/// A config whose gate is satisfied by the stub, for the suites that exercise non-auth behaviour.
+pub fn media_config() -> conveyor_research::media::Config {
+    conveyor_research::media::Config {
+        bind_host: "127.0.0.1".to_string(),
+        bind_port: 0,
+        enable_docs: false,
+        service_name: "media-discovery".to_string(),
+        version: "0.1.0".to_string(),
+        database_url: None,
+        max_connections: 4,
+        license_introspect_url: Some(introspect_url().to_string()),
+        onbehalf_subjects: vec![VOUCH_SUBJECT.to_string()],
+        license_introspect_timeout: Duration::from_secs(5),
+    }
+}
+
+/// The stub's URL, started once per test binary on first use.
+pub fn introspect_url() -> &'static str {
+    static URL: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    URL.get_or_init(|| {
+        let (ready_tx, ready_rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let runtime = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .expect("stub runtime");
+            runtime.block_on(async move {
+                let app = axum::Router::new()
+                    .route("/license/introspect", axum::routing::post(stub_introspect));
+                let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+                    .await
+                    .expect("stub bind");
+                let address = listener.local_addr().expect("stub address");
+                ready_tx
+                    .send(format!("http://{address}/license/introspect"))
+                    .expect("stub ready channel");
+                axum::serve(listener, app).await.expect("stub serve");
+            });
+        });
+        ready_rx.recv().expect("the stub starts")
+    })
+}
+
+async fn stub_introspect(
+    axum::Json(body): axum::Json<serde_json::Value>,
+) -> axum::Json<serde_json::Value> {
+    let token = body
+        .get("token")
+        .and_then(|value| value.as_str())
+        .unwrap_or("");
+    let payload = if let Some(tenant) = token.strip_prefix("licence-") {
+        serde_json::json!({
+            "active": true, "tenant_id": tenant, "subject_id": null, "license_id": "stub"
+        })
+    } else if token.starts_with("vouch-") {
+        serde_json::json!({
+            "active": true, "tenant_id": LICENCE_OWN_TENANT, "subject_id": VOUCH_SUBJECT,
+            "license_id": "stub"
+        })
+    } else if token.starts_with("stranger-") {
+        serde_json::json!({
+            "active": true, "tenant_id": LICENCE_OWN_TENANT, "subject_id": STRANGER_SUBJECT,
+            "license_id": "stub"
+        })
+    } else {
+        serde_json::json!({ "active": false })
+    };
+    axum::Json(payload)
+}
