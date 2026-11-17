@@ -168,8 +168,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-16-research-cutover.html",
       "source": "docs/evidence/2026-11-16-research-cutover.md",
       "section": "Evidence",
-      "sha256": "e6eb82e763510e13d929e962c556afedbfbf0d6a78250f33692075a8d07d75a5",
-      "bytes": 6288,
+      "sha256": "1cce823150b032a7fd913de3d6ed93f040e0ca36297b7adede9055181e93eeea",
+      "bytes": 8600,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-research-cutover.md"
     },
     {
