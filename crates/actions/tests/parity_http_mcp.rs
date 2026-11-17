@@ -1678,20 +1678,26 @@ async fn seed_parity_profile(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uu
 }
 
 /// Seed a decision policy for one (kind, gate) case the T2 samples evaluate and refine.
-async fn seed_parity_policy(pg: &support::Pg, ctx: &Ctx, kind: &str, gate: &str) -> Uuid {
+///
+/// The kind embeds the row id, so a sample's input can derive the case from the prepared id and
+/// each prepare (and therefore each round) seeds its own case.
+async fn seed_parity_policy(pg: &support::Pg, ctx: &Ctx, kind_prefix: &str, gate: &str) -> Uuid {
+    let id = Uuid::now_v7();
+    let kind = format!("{kind_prefix}.{id}");
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
-    let id: Uuid = sqlx::query_scalar(
-        "INSERT INTO decision_policy (tenant_id, kind, gate, threshold, fail_policy, action)
-         VALUES ($1, $2, $3, 0.8, 'closed', 'block') RETURNING id",
+    let inserted: Uuid = sqlx::query_scalar(
+        "INSERT INTO decision_policy (id, tenant_id, kind, gate, threshold, fail_policy, action)
+         VALUES ($1, $2, $3, $4, 0.8, 'closed', 'block') RETURNING id",
     )
+    .bind(id)
     .bind(ctx.tenant_id)
-    .bind(kind)
+    .bind(&kind)
     .bind(gate)
     .fetch_one(&mut *tx)
     .await
     .expect("insert decision policy");
     tx.commit().await.expect("commit");
-    id
+    inserted
 }
 
 /// Seed the laya config the L1 sample pins.
@@ -1867,31 +1873,22 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         }
         // ── T2 decision ladder ───────────────────────────────────────────────────────────
         // One policy per (kind, gate) is the table's contract and `prepare` runs once per
-        // round, so each round seeds its own case.
+        // round, so each round seeds its own case (the kind embeds the row id).
         "decision_policies.update" => {
-            let case = Uuid::now_v7();
-            let policy =
-                seed_parity_policy(pg, ctx, &format!("parity.update.{case}"), "parity_gate").await;
+            let policy = seed_parity_policy(pg, ctx, "parity.update", "parity_gate").await;
             ctx.push("decision_policies.update", policy);
         }
         "refinements.publish" => {
-            let case = Uuid::now_v7();
-            let policy =
-                seed_parity_policy(pg, ctx, &format!("parity.refine.{case}"), "parity_gate").await;
+            let policy = seed_parity_policy(pg, ctx, "parity.refine", "parity_gate").await;
             ctx.push("refinements.publish", policy);
         }
         "ladder.evaluate" => {
-            let case = Uuid::now_v7();
-            let policy =
-                seed_parity_policy(pg, ctx, &format!("parity.evaluate.{case}"), "parity_gate")
-                    .await;
+            let policy = seed_parity_policy(pg, ctx, "parity.evaluate", "parity_gate").await;
             ctx.push("ladder.evaluate.policy", policy);
             seed_parity_laya(pg, ctx).await;
         }
         "ladder.record" => {
-            let case = Uuid::now_v7();
-            let policy =
-                seed_parity_policy(pg, ctx, &format!("parity.record.{case}"), "parity_gate").await;
+            let policy = seed_parity_policy(pg, ctx, "parity.record", "parity_gate").await;
             ctx.push("ladder.record.policy", policy);
         }
         "ladder.apply_draft" => {

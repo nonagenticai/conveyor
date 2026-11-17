@@ -79,7 +79,10 @@ use serde_json::{Value, json};
 /// `ops.pods|deployments|events|logs|flux_status|ci_status`. 378 → **384**.
 /// **#171 adds 3 internal**: the gated `ops.*` writes — `ops.restart|scale|rollback`.
 /// 384 → **387**.
-const EXPECTED: [&str; 387] = [
+/// **T2 adds 11 internal**: the decision ladder — `decision_policies.*` (3),
+/// `refinements.*` (2), `laya_configs.*` (2), `ladder.record|evaluate|list|apply_draft` (4).
+/// 387 → **398**.
+const EXPECTED: [&str; 398] = [
     "actions.describe",
     "actions.list",
     "agent.run",
