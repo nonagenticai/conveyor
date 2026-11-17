@@ -1677,14 +1677,16 @@ async fn seed_parity_profile(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uu
     id
 }
 
-/// Seed the decision policy the T2 samples evaluate and refine.
-async fn seed_parity_policy(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+/// Seed a decision policy for one (kind, gate) case the T2 samples evaluate and refine.
+async fn seed_parity_policy(pg: &support::Pg, ctx: &Ctx, kind: &str, gate: &str) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
     let id: Uuid = sqlx::query_scalar(
         "INSERT INTO decision_policy (tenant_id, kind, gate, threshold, fail_policy, action)
-         VALUES ($1, 'parity.case', 'parity_gate', 0.8, 'closed', 'block') RETURNING id",
+         VALUES ($1, $2, $3, 0.8, 'closed', 'block') RETURNING id",
     )
     .bind(ctx.tenant_id)
+    .bind(kind)
+    .bind(gate)
     .fetch_one(&mut *tx)
     .await
     .expect("insert decision policy");
@@ -1865,16 +1867,19 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         }
         // ── T2 decision ladder ───────────────────────────────────────────────────────────
         "decision_policies.update" => {
-            let policy = seed_parity_policy(pg, ctx).await;
+            let policy = seed_parity_policy(pg, ctx, "parity.update", "parity_gate_update").await;
             ctx.push("decision_policies.update", policy);
         }
         "refinements.publish" => {
-            let policy = seed_parity_policy(pg, ctx).await;
+            let policy = seed_parity_policy(pg, ctx, "parity.refine", "parity_gate_refine").await;
             ctx.push("refinements.publish", policy);
         }
-        "ladder.evaluate" | "ladder.record" => {
-            seed_parity_policy(pg, ctx).await;
+        "ladder.evaluate" => {
+            seed_parity_policy(pg, ctx, "parity.evaluate", "parity_gate_evaluate").await;
             seed_parity_laya(pg, ctx).await;
+        }
+        "ladder.record" => {
+            seed_parity_policy(pg, ctx, "parity.record", "parity_gate_record").await;
         }
         "ladder.apply_draft" => {
             let card = seed_card(pg, ctx, "active").await;
@@ -4870,20 +4875,21 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
 fn ladder_samples() -> Vec<Sample> {
     vec![
         // ── T2 decision ladder (SPEC_V2 §7, §10.3–§10.4) ────────────────────────────────
-        expecting(
-            plain(
-                "decision_policies.create",
+        {
+            // The case is unique per execution: one policy per (kind, gate) is the table's
+            // contract, and round B executes rather than replays.
+            let mut sample = plain("decision_policies.create", json!({}), None);
+            sample.input = Box::new(|_: &Ctx| {
                 json!({
-                    "kind": "parity.case",
-                    "gate": "parity_gate",
+                    "kind": format!("parity.create.{}", Uuid::now_v7().simple()),
+                    "gate": "parity_gate_create",
                     "threshold": 0.8,
                     "fail_policy": "closed",
                     "action": "block"
-                }),
-                None,
-            ),
-            201,
-        ),
+                })
+            });
+            expecting(sample, 201)
+        },
         {
             let mut sample = on_prepared("decision_policies.update", Some("\"1\""));
             sample.input = Box::new(
@@ -4918,8 +4924,8 @@ fn ladder_samples() -> Vec<Sample> {
             sample.prepare = true;
             sample.input = Box::new(|_: &Ctx| {
                 json!({
-                    "kind": "parity.case",
-                    "gate": "parity_gate",
+                    "kind": "parity.evaluate",
+                    "gate": "parity_gate_evaluate",
                     "answer": "pass",
                     "confidence": 0.9,
                     "input": {"subject": "parity"}
@@ -4933,8 +4939,8 @@ fn ladder_samples() -> Vec<Sample> {
             sample.input = Box::new(|_: &Ctx| {
                 json!({
                     "rung": "rule",
-                    "kind": "parity.case",
-                    "gate": "parity_gate",
+                    "kind": "parity.record",
+                    "gate": "parity_gate_record",
                     "answer": "pass",
                     "outcome": "accepted",
                     "confidence": 1.0
@@ -4942,10 +4948,7 @@ fn ladder_samples() -> Vec<Sample> {
             });
             expecting(sample, 201)
         },
-        expecting(
-            plain("ladder.list", json!({"kind": "parity.case"}), None),
-            200,
-        ),
+        expecting(plain("ladder.list", json!({}), None), 200),
         {
             let mut sample = plain("ladder.apply_draft", json!({}), None);
             sample.prepare = true;
