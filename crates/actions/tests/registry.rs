@@ -89,9 +89,10 @@ use serde_json::{Value, json};
 /// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 401 → **404**.
 /// **T3 adds 6 internal**: the PM job — `pm.charter|plan|get|route_gate|close` and
 /// `changes.request`. 404 → **410**.
-const EXPECTED: [&str; 410] = [
+const EXPECTED: [&str; 411] = [
     "actions.describe",
     "actions.list",
+    "analyse.site",
     "agent.run",
     "andon.engage",
     "andon.release",
@@ -552,7 +553,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // #172 adds the three host actions (internal; one destructive, two reads): 383 → 386;
     // external stays 18 — they call the host agent over ssh, not a declared external service.
     // T3 adds the six PM actions (all internal): 386 → 392; external stays 18.
-    assert_eq!((internal, external), (392, 18));
+    // #154 P3 adds `analyse.site` (internal, read): 392 → 393; external stays 18.
+    assert_eq!((internal, external), (393, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
