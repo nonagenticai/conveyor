@@ -210,12 +210,16 @@ mod tests {
     }
 
     /// The seam is what makes the branch load-bearing: if the `if let` in `private_url_with` is
-    /// removed, this test receives the fallback and fails.
+    /// removed, this test receives the fallback and fails. The fallback PANICS rather than
+    /// resolving: a start that happens above the branch must fail too, not pass because its future
+    /// was ready.
     #[tokio::test]
     async fn a_private_url_from_the_environment_wins_without_starting_a_container() {
         let url = private_url_with(
             |key| (key == "TEST_REDIS_PRIVATE_URL").then(|| "redis://127.0.0.1:6380/".to_owned()),
-            std::future::ready("docker-container".to_owned()),
+            std::future::poll_fn(|_| -> std::task::Poll<String> {
+                panic!("the environment URL must short-circuit before a container is started")
+            }),
         )
         .await;
         assert_eq!(url, "redis://127.0.0.1:6380/");
