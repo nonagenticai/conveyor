@@ -738,7 +738,7 @@ async fn seed_gate(pg: &support::Pg, ctx: &Ctx) -> Uuid {
             "gate",
             1,
             None,
-            Some(ctx.alice_user),
+            Some(ctx.bob_user),
         )
         .await
         .expect("prepared gate")

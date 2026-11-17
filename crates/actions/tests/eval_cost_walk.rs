@@ -112,7 +112,7 @@ async fn ready_instrument(running: &support::Running) -> (String, String) {
         let (status, body) = running
             .invoke(
                 "eval_signoffs.request",
-                TOKEN,
+                support::REVIEWER,
                 json!({ "eval_id": eval_id, "gate": gate, "ask": "review the instrument" }),
                 None,
                 None,
@@ -200,7 +200,7 @@ async fn approve_plan(running: &support::Running) -> String {
     let (status, body) = running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({ "approval_id": approval_id, "decision": "approve" }),
             None,
             None,
