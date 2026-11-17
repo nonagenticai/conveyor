@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 25,
-    "extend": 8,
-    "new": 30
+    "exists": 27,
+    "extend": 7,
+    "new": 29
   },
   "rows": [
     {
@@ -74,9 +74,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "approval_policy",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE approval_policy"
+        "migrations: CREATE TABLE approval_policy"
       ]
     },
     {
@@ -468,9 +468,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "approvals",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
-        "actions: approval_policies.* absent",
+        "actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)",
         "actions: approvals.* found (approvals.decide, approvals.list, approvals.request)"
       ]
     },
