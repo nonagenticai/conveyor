@@ -768,7 +768,7 @@
       "key": "T1",
       "name": "Plan spine",
       "description": "SPEC_V2 slice T1 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1436,7 +1436,13 @@
           223,
           224,
           225,
-          226
+          226,
+          258,
+          259,
+          260,
+          261,
+          264,
+          265
         ],
         "depends_on": [],
         "plan_status": "active",
