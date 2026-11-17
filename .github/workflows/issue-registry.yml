@@ -73,7 +73,8 @@ jobs:
           python3 scripts/build-coverage.py --check
           python3 scripts/build-v2-coverage.py
           python3 scripts/build-v2-coverage.py --check
-          python3 docs/design/scripts/build-docs.py
+          # `--check` needs no pandoc (the design-pack job runs it on the same stock runner); the
+          # generator does, and the registry refresh never changes a Markdown source.
           python3 docs/design/scripts/build-docs.py --check
           if [ -z "$(git status --porcelain -- docs/design/data seed/programme.json docs/design/docs)" ]; then
             echo "The registry and its derived data match GitHub; no branch, no PR." >> "$GITHUB_STEP_SUMMARY"
