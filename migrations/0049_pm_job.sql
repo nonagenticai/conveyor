@@ -1,4 +1,4 @@
--- 0048_pm_job.sql — T3: the PM job (SPEC_V2 §6.1, §5.4, §8.4; GitHub issue #74).
+-- 0049_pm_job.sql — T3: the PM job (SPEC_V2 §6.1, §5.4, §8.4; GitHub issue #74).
 --
 -- Forward only: never edited after this slice closes (CONTRACT §2).
 --
