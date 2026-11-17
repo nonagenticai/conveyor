@@ -268,7 +268,7 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 9,
+        "blocked": 7,
         "claimed": 7,
         "numbers": [
           17,
@@ -305,10 +305,10 @@
           303,
           305,
           307,
-          314
+          319
         ],
         "open": 25,
-        "ready": 6,
+        "ready": 8,
         "unknown": 0
       }
     },
@@ -2002,11 +2002,11 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           74
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2532,9 +2532,11 @@
         "standing": 1
       },
       "total": 48,
-      "uncovered": [],
-      "with_open_units": 30,
-      "without_open_units": 18
+      "uncovered": [
+        "T3"
+      ],
+      "with_open_units": 29,
+      "without_open_units": 19
     },
     "screens": {
       "actions_invoked": 25,

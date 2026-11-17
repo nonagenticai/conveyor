@@ -17,9 +17,17 @@ name: board
 # (claimed with no branch and no update in 48 h) are reported in the job summary and never
 # applied -- releasing a claim stays a human decision.
 #
+# THE CRON ALONE IS NOT ENOUGH. GitHub's `schedule` event is best-effort and this repository drops
+# most of its fires: measured 2026-11-17, this hourly cron produced 5 runs in ~35 h, and no
+# workflow here produced a scheduled run after 19:00Z that day. A merge to main always fires — and
+# a merge is exactly what closes an issue and moves its label — so `push: [main]` is the trigger
+# that makes the contract actually checked. The cron stays as the second net.
+#
 # Disable with: gh workflow disable board.yml
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: "0 * * * *"
   workflow_dispatch:

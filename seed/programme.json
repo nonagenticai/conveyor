@@ -828,7 +828,7 @@
       "key": "T3",
       "name": "PM job",
       "description": "SPEC_V2 slice T3 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "draft",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1466,7 +1466,7 @@
           303,
           305,
           307,
-          314
+          319
         ],
         "depends_on": [],
         "plan_status": "active",

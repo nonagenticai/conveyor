@@ -18,6 +18,19 @@
 # never enables auto-merge and never approves a review. The merge queue and the green-PR janitor
 # remain the only merge authority in this estate.
 #
+# WHY PUSH IS A TRIGGER, NOT ONLY THE CRON
+# ----------------------------------------
+# GitHub's `schedule` event is best-effort and this repository drops most of its fires. Measured
+# 2026-11-17: `delivery` had produced **0** scheduled runs in the ~3 h after it merged (19:12Z),
+# and **no** workflow on conveyor, agent or claude-fleet produced a scheduled run after 19:00Z.
+# The same failure is recorded in `issue-registry.yml` (the hourly `board` cron produced 5 runs in
+# ~35 h), which is why that workflow also runs on `push: [main]`. A merge to main always fires, so
+# it is the backstop that makes both jobs actually run; the cron stays as the second net.
+#
+# Because of this the sweep below had never executed until a manual dispatch on 2026-11-17
+# (run 44187170687), which approved the two runs it found parked. The job was right; its trigger
+# was not.
+
 # The default workflow token is read-only on this repo (measured 2026-11-17:
 # `actions/permissions/workflow` -> `default_workflow_permissions: read`), so every write is
 # granted per job, never at workflow level.
@@ -27,6 +40,8 @@ name: delivery
 on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review, labeled, unlabeled, review_requested]
+  push:
+    branches: [main]
   schedule:
     - cron: "17 * * * *"
   workflow_dispatch:

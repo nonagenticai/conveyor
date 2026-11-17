@@ -1,11 +1,28 @@
 {
   "issues": [
     {
+      "number": 319,
+      "title": "estate: absorb the evidence-review service into apps/scientific \u2014 the review family, its schema and its seal",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/319",
+      "updatedAt": "2026-11-17T23:07:39Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
       "number": 314,
       "title": "delivery: a merge to main runs the sweep, because GitHub drops this repo's cron",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/314",
-      "updatedAt": "2026-11-17T22:21:25Z",
+      "updatedAt": "2026-11-17T23:07:00Z",
       "labels": [
         {
           "name": "unit",
@@ -56,7 +73,7 @@
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-17T22:19:38Z",
+      "updatedAt": "2026-11-17T22:55:15Z",
       "labels": [
         {
           "name": "unit",
@@ -90,15 +107,15 @@
       "title": "programme: a governed retirement path for benefit profiles and tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/303",
-      "updatedAt": "2026-11-17T19:15:27Z",
+      "updatedAt": "2026-11-17T22:46:10Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
@@ -141,7 +158,7 @@
       "title": "estate: scientific's caller tenant is unauthenticated \u2014 a bare X-Tenant-Id is trusted",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/299",
-      "updatedAt": "2026-11-17T17:59:40Z",
+      "updatedAt": "2026-11-17T22:57:59Z",
       "labels": [
         {
           "name": "unit",
@@ -836,15 +853,15 @@
       "title": "estate: retire the dead w2v namespace surface (17 zero-replica Deployments, their Services, and the dead routes)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/213",
-      "updatedAt": "2026-11-17T22:25:52Z",
+      "updatedAt": "2026-11-17T23:03:05Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -2076,7 +2093,7 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-17T19:29:49Z",
+      "updatedAt": "2026-11-17T22:46:13Z",
       "labels": [
         {
           "name": "unit",
@@ -2368,9 +2385,9 @@
     {
       "number": 74,
       "title": "T3 \u2014 PM job",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/74",
-      "updatedAt": "2026-11-17T22:36:45Z",
+      "updatedAt": "2026-11-17T22:56:41Z",
       "labels": [
         {
           "name": "unit",
