@@ -786,6 +786,20 @@ pub async fn record_decision_tx(
         .fetch_optional(&mut *conn)
         .await?;
     let row = row.ok_or(ApprovalStoreError::NotFound)?;
+    // T1 P1.3 / SPEC_V2 §5.4: the requester cannot decide the gate that judges their own work.
+    // This is the one writer every decision path traverses, so the exclusion lives here rather
+    // than in a UI or in `approvals.decide` alone.
+    let requested_by: Option<Uuid> =
+        sqlx::query_scalar("SELECT requested_by FROM approval WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(approval_id)
+            .fetch_one(&mut *conn)
+            .await?;
+    if requested_by == Some(decision.approver_id) {
+        return Err(ApprovalStoreError::Illegal(
+            ApprovalError::RequesterCannotDecide,
+        ));
+    }
     // W1 (S06d): an eval gate is a person's act, and only a person holding `evals:approve` may
     // decide it. This check lives HERE — the one writer every decision path traverses — so
     // `approvals.decide`, `eval_signoffs.decide`, MCP `tasks/update` and a connector reply

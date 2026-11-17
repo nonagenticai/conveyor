@@ -351,7 +351,8 @@
           168,
           183,
           195,
-          231
+          231,
+          245
         ],
         "depends_on": [
           "S03",
@@ -781,15 +782,13 @@
         ],
         "plan_status": "draft",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 1,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused; a benefit profile without baseline, target, method or owner is refused; a benefit-map edge names its five levels"
@@ -1432,14 +1431,12 @@
           205,
           212,
           213,
-          216,
           221,
           222,
           223,
           224,
           225,
-          226,
-          235
+          226
         ],
         "depends_on": [],
         "plan_status": "active",

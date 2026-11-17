@@ -312,13 +312,17 @@ fn s08_owns_no_principles_or_decisions_action() {
     .map(|family| (family, count(family)))
     .collect();
 
-    // The nine portfolio actions that survive.
+    // The nine portfolio actions that survive; T1 adds the three MSP stakeholder-profile
+    // actions under the same prefix, so this count is now eight.
     assert_eq!(owners["programmes"], 4);
-    assert_eq!(owners["stakeholders"], 5);
-    // The five families migration 0011 removed, each at zero — a resurrection fails here.
+    assert_eq!(owners["stakeholders"], 8);
+    // The S08 registers aggregate migration 0011 removed stays dead. `registers.*` now names
+    // T1's one six-kind plan-spine register (create/get/list/update) — a different family with
+    // the same prefix, not a resurrection of `register_item`'s old PM shape.
+    assert_eq!(owners["registers"], 4);
+    // The families with no successor remain at zero — a resurrection fails here.
     assert_eq!(owners["project_capabilities"], 0);
     assert_eq!(owners["deliverables"], 0);
-    assert_eq!(owners["registers"], 0);
     assert_eq!(owners["tocs"], 0);
     assert_eq!(owners["toc_nodes"], 0);
     // S07's own counts, unchanged: seven principles and five decisions.

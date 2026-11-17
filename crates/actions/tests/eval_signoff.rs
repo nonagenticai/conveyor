@@ -111,7 +111,14 @@ async fn a_request_stores_the_gate_and_the_current_digest_and_admits_one_pending
     let (eval_id, version_id) = eval_with_version(&running).await;
 
     // A supplied artifact cannot change what a gating sign-off covers.
-    let (status, body) = request(&running, TOKEN, &eval_id, "eval_inputs", Some("deadbeef")).await;
+    let (status, body) = request(
+        &running,
+        support::REVIEWER,
+        &eval_id,
+        "eval_inputs",
+        Some("deadbeef"),
+    )
+    .await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(body["output"]["gate"], "eval_inputs");
     assert_eq!(body["output"]["kind"], "eval");
@@ -153,12 +160,12 @@ async fn a_request_stores_the_gate_and_the_current_digest_and_admits_one_pending
     assert_eq!(row.4.as_deref(), Some("please sign"));
 
     // One pending sign-off per (tenant, eval, gate): the index is the guarantee.
-    let (status, body) = request(&running, TOKEN, &eval_id, "eval_inputs", None).await;
+    let (status, body) = request(&running, support::REVIEWER, &eval_id, "eval_inputs", None).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "signoff_pending");
 
     // A different gate is a different row.
-    let (status, body) = request(&running, TOKEN, &eval_id, "eval_grading", None).await;
+    let (status, body) = request(&running, support::REVIEWER, &eval_id, "eval_grading", None).await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(body["output"]["gate"], "eval_grading");
     let grading_approval = body["output"]["id"].as_str().expect("id").to_owned();
@@ -187,7 +194,7 @@ async fn a_request_stores_the_gate_and_the_current_digest_and_admits_one_pending
     assert_eq!(cost.as_deref(), Some("cost-artifact"));
 
     // `eval_harness` without an artifact falls back to the digest, exactly like the gating two.
-    let (status, body) = request(&running, TOKEN, &eval_id, "eval_harness", None).await;
+    let (status, body) = request(&running, support::REVIEWER, &eval_id, "eval_harness", None).await;
     assert_eq!(status, 200, "{body}");
 
     // ── decide ──
@@ -256,7 +263,7 @@ async fn only_a_human_with_the_approve_scope_may_decide() {
     let running = support::Running::start(&pg).await;
     let (eval_id, _version_id) = eval_with_version(&running).await;
 
-    let (status, body) = request(&running, TOKEN, &eval_id, "eval_inputs", None).await;
+    let (status, body) = request(&running, support::REVIEWER, &eval_id, "eval_inputs", None).await;
     assert_eq!(status, 200, "{body}");
     let approval_id = body["output"]["id"].as_str().expect("id").to_owned();
 
@@ -425,12 +432,12 @@ async fn a_request_needs_a_version_a_known_gate_and_a_visible_eval() {
         .await;
     assert_eq!(status, 201, "{body}");
     let eval_id = body["output"]["id"].as_str().expect("eval id").to_owned();
-    let (status, body) = request(&running, TOKEN, &eval_id, "eval_inputs", None).await;
+    let (status, body) = request(&running, support::REVIEWER, &eval_id, "eval_inputs", None).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "eval_not_ready");
 
     // A gate outside the four is a 422.
-    let (status, body) = request(&running, TOKEN, &eval_id, "eval_vibes", None).await;
+    let (status, body) = request(&running, support::REVIEWER, &eval_id, "eval_vibes", None).await;
     assert_eq!(status, 422, "{body}");
     assert_eq!(body["errors"][0]["field"], "gate");
 
@@ -441,7 +448,7 @@ async fn a_request_needs_a_version_a_known_gate_and_a_visible_eval() {
 
     // And bob cannot decide it either.
     let (eval_id, _version) = eval_with_version(&running).await;
-    let (status, body) = request(&running, TOKEN, &eval_id, "eval_inputs", None).await;
+    let (status, body) = request(&running, support::REVIEWER, &eval_id, "eval_inputs", None).await;
     assert_eq!(status, 200, "{body}");
     let approval_id = body["output"]["id"].as_str().expect("id").to_owned();
     let (status, body) = running

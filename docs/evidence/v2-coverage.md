@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 11 |
+| `exists` | implemented in code and backed by real rows | 23 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
-| `new` | absent | 44 |
+| `new` | absent | 32 |
 
 ## Rows
 
@@ -19,16 +19,16 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:job_release` | §10.3 | table | job_release | `exists` | migrations: CREATE TABLE job_release |
 | `table:job_binding` | §10.3 | table | job_binding | `exists` | migrations: CREATE TABLE job_binding |
 | `table:approval_policy` | §10.3 | table | approval_policy | `new` | migrations: no CREATE/ALTER TABLE approval_policy |
-| `table:wbs_node` | §10.3 | table | wbs_node | `new` | migrations: no CREATE/ALTER TABLE wbs_node |
-| `table:project_baseline` | §10.3 | table | project_baseline | `new` | migrations: no CREATE/ALTER TABLE project_baseline |
-| `table:programme_cadence` | §10.3 | table | programme_cadence | `new` | migrations: no CREATE/ALTER TABLE programme_cadence |
-| `table:programme_tranche` | §10.3 | table | programme_tranche | `new` | migrations: no CREATE/ALTER TABLE programme_tranche |
-| `table:programme_baseline` | §10.3 | table | programme_baseline | `new` | migrations: no CREATE/ALTER TABLE programme_baseline |
-| `table:project_register_item` | §10.3 | table | project_register_item | `new` | migrations: no CREATE/ALTER TABLE project_register_item |
-| `table:benefit_profile` | §10.3 | table | benefit_profile | `new` | migrations: no CREATE/ALTER TABLE benefit_profile |
-| `table:benefit_link` | §10.3 | table | benefit_link | `new` | migrations: no CREATE/ALTER TABLE benefit_link |
-| `table:benefit_transition` | §10.3 | table | benefit_transition | `new` | migrations: no CREATE/ALTER TABLE benefit_transition |
-| `table:stakeholder_profile` | §10.3 | table | stakeholder_profile | `new` | migrations: no CREATE/ALTER TABLE stakeholder_profile |
+| `table:wbs_node` | §10.3 | table | wbs_node | `exists` | migrations: CREATE TABLE wbs_node |
+| `table:project_baseline` | §10.3 | table | project_baseline | `exists` | migrations: CREATE TABLE project_baseline |
+| `table:programme_cadence` | §10.3 | table | programme_cadence | `exists` | migrations: CREATE TABLE programme_cadence |
+| `table:programme_tranche` | §10.3 | table | programme_tranche | `exists` | migrations: CREATE TABLE programme_tranche |
+| `table:programme_baseline` | §10.3 | table | programme_baseline | `exists` | migrations: CREATE TABLE programme_baseline |
+| `table:project_register_item` | §10.3 | table | project_register_item | `exists` | migrations: CREATE TABLE project_register_item |
+| `table:benefit_profile` | §10.3 | table | benefit_profile | `exists` | migrations: CREATE TABLE benefit_profile |
+| `table:benefit_link` | §10.3 | table | benefit_link | `exists` | migrations: CREATE TABLE benefit_link |
+| `table:benefit_transition` | §10.3 | table | benefit_transition | `exists` | migrations: CREATE TABLE benefit_transition |
+| `table:stakeholder_profile` | §10.3 | table | stakeholder_profile | `exists` | migrations: CREATE TABLE stakeholder_profile |
 | `table:architecture_artifact` | §10.3 | table | architecture_artifact | `new` | migrations: no CREATE/ALTER TABLE architecture_artifact |
 | `table:architecture_artifact_entry` | §10.3 | table | architecture_artifact_entry | `new` | migrations: no CREATE/ALTER TABLE architecture_artifact_entry |
 | `table:architecture_artifact_link` | §10.3 | table | architecture_artifact_link | `new` | migrations: no CREATE/ALTER TABLE architecture_artifact_link |
@@ -44,14 +44,14 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:decision_option` | §10.3 | table | decision_option | `exists` | migrations: CREATE TABLE decision_option |
 | `table:decision_policy` | §10.3 | table | decision_policy | `exists` | migrations: CREATE TABLE decision_policy |
 | `table:lesson` | §10.3 | table | lesson | `new` | migrations: no CREATE/ALTER TABLE lesson |
-| `table:project_dependency` | §10.3 | table | project_dependency | `new` | migrations: no CREATE/ALTER TABLE project_dependency |
+| `table:project_dependency` | §10.3 | table | project_dependency | `exists` | migrations: CREATE TABLE project_dependency |
 | `table:decision_policy_refinement` | §10.3 | table | decision_policy_refinement | `exists` | migrations: CREATE TABLE decision_policy_refinement |
 | `table:laya_inference_config` | §10.3 | table | laya_inference_config | `exists` | migrations: CREATE TABLE laya_inference_config |
 | `table:pko_release` | §10.3 | table | pko_release | `new` | migrations: no CREATE/ALTER TABLE pko_release |
 | `table:pko_entity` | §10.3 | table | pko_entity | `new` | migrations: no CREATE/ALTER TABLE pko_entity |
 | `table:pko_relation` | §10.3 | table | pko_relation | `new` | migrations: no CREATE/ALTER TABLE pko_relation |
-| `actions:programme/plan` | §10.4 | actions | programme/plan | `extend` | actions: baselines.* absent<br>actions: cadences.* absent<br>actions: governed_assets.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* absent<br>actions: registers.* absent<br>actions: tranches.* absent<br>actions: wbs.* absent |
-| `actions:benefits` | §10.4 | actions | benefits | `new` | actions: benefits.* absent |
+| `actions:programme/plan` | §10.4 | actions | programme/plan | `extend` | actions: baselines.* found (baselines.get, baselines.list, baselines.take)<br>actions: cadences.* found (cadences.create, cadences.list)<br>actions: governed_assets.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)<br>actions: registers.* found (registers.create, registers.get, registers.list…)<br>actions: tranches.* found (tranches.create, tranches.list, tranches.review)<br>actions: wbs.* found (wbs.create, wbs.get, wbs.list…) |
+| `actions:benefits` | §10.4 | actions | benefits | `exists` | actions: benefits.* found (benefits.create, benefits.get, benefits.link…) |
 | `actions:architecture` | §10.4 | actions | architecture | `new` | actions: architecture.* absent |
 | `actions:organisation` | §10.4 | actions | organisation | `exists` | actions: departments.* found (departments.create, departments.list)<br>actions: industries.* found (industries.create, industries.get, industries.list)<br>actions: job_bindings.* found (job_bindings.create, job_bindings.get, job_bindings.list…)<br>actions: job_releases.* found (job_releases.list, job_releases.publish, job_releases.retire)<br>actions: jobs.* found (jobs.list, jobs.retry) |
 | `actions:procedures` | §10.4 | actions | procedures | `extend` | actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: pko.* absent<br>actions: procedures.* found (procedures.create, procedures.get, procedures.list…) |

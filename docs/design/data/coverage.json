@@ -252,7 +252,7 @@
       "tranche": 0,
       "units": {
         "blocked": 3,
-        "claimed": 6,
+        "claimed": 7,
         "numbers": [
           17,
           22,
@@ -273,17 +273,15 @@
           205,
           212,
           213,
-          216,
           221,
           222,
           223,
           224,
           225,
-          226,
-          235
+          226
         ],
-        "open": 18,
-        "ready": 9,
+        "open": 16,
+        "ready": 5,
         "unknown": 0
       }
     },
@@ -875,16 +873,17 @@
       "track": "v1",
       "tranche": 4,
       "units": {
-        "blocked": 0,
+        "blocked": 1,
         "claimed": 1,
         "numbers": [
           156,
           168,
           183,
           195,
-          231
+          231,
+          245
         ],
-        "open": 1,
+        "open": 2,
         "ready": 0,
         "unknown": 0
       }
@@ -1500,9 +1499,9 @@
         "P0"
       ],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "migrations/0044_plan_spine.sql"
       ],
-      "gap": "table wbs_node, table project_baseline, table project_register_item, table project_dependency, table programme_cadence",
+      "gap": null,
       "key": "T1",
       "measured": {
         "actions": [
@@ -1514,8 +1513,8 @@
           0
         ],
         "tables": [
-          0,
-          5
+          11,
+          11
         ]
       },
       "name": "Plan spine",
@@ -1524,12 +1523,12 @@
         "T11"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 1,
       "units": {
-        "blocked": 1,
-        "claimed": 0,
+        "blocked": 0,
+        "claimed": 1,
         "numbers": [
           72
         ],
@@ -1541,7 +1540,6 @@
     {
       "blocked_by": [
         "P0",
-        "T1",
         "T3"
       ],
       "evidence": [
@@ -1634,7 +1632,6 @@
     {
       "blocked_by": [
         "P0",
-        "T1",
         "T10",
         "T11",
         "T13",
@@ -1921,8 +1918,7 @@
     },
     {
       "blocked_by": [
-        "P0",
-        "T1"
+        "P0"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -2241,7 +2237,6 @@
     {
       "blocked_by": [
         "P0",
-        "T1",
         "T3"
       ],
       "evidence": [
@@ -2530,10 +2525,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 26,
+        "built": 27,
         "partial": 2,
         "planned": 1,
-        "proposed": 17,
+        "proposed": 16,
         "standing": 1
       },
       "total": 48,

@@ -264,7 +264,7 @@ async fn the_golden_path_claim_run_gate_approve_finish_and_move_to_done() {
         "gate",
         1,
         None,
-        Some(seeded.user_id),
+        Some(support::reviewer_id(&pg).await),
     )
     .await
     .expect("open the gate on the running run");

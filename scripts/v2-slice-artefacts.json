@@ -43,7 +43,13 @@
         "project_baseline",
         "project_register_item",
         "project_dependency",
-        "programme_cadence"
+        "programme_cadence",
+        "programme_tranche",
+        "programme_baseline",
+        "benefit_profile",
+        "benefit_link",
+        "benefit_transition",
+        "stakeholder_profile"
       ]
     },
     "T2": {

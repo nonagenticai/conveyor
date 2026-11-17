@@ -176,7 +176,7 @@ pub async fn seed_tenant(pool: &PgPool, slug: &str) -> Seeded {
     .bind(tenant)
     .bind(run)
     .bind(project)
-    .bind(user)
+    .bind(None::<Uuid>)
     .fetch_one(pool)
     .await
     .expect("seed approval");

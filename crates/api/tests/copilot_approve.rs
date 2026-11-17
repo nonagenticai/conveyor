@@ -55,7 +55,7 @@ async fn approval_gates_execution_and_a_second_decision_changes_nothing() {
     let (status, decided) = running
         .invoke(
             "approvals.decide",
-            token,
+            copilot::support::REVIEWER,
             json!({"approval_id": approval_id, "decision": "approve"}),
             None,
             None,
@@ -115,7 +115,7 @@ async fn approval_gates_execution_and_a_second_decision_changes_nothing() {
     let (second, second_body) = running
         .invoke(
             "approvals.decide",
-            token,
+            copilot::support::REVIEWER,
             json!({"approval_id": approval_id, "decision": "approve"}),
             None,
             None,
