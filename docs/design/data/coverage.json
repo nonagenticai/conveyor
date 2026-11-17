@@ -305,11 +305,12 @@
           303,
           305,
           307,
-          319
+          319,
+          321
         ],
         "open": 25,
         "ready": 8,
-        "unknown": 0
+        "unknown": 1
       }
     },
     {
@@ -1563,9 +1564,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T3"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -1660,7 +1659,6 @@
         "T15",
         "T16",
         "T17",
-        "T3",
         "T4",
         "T5",
         "T6",
@@ -1884,8 +1882,7 @@
     },
     {
       "blocked_by": [
-        "T16",
-        "T3"
+        "T16"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1973,18 +1970,18 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/pm/mod.rs"
       ],
-      "gap": "no PM job: no charter, WBS, baseline, staffing, gate routing or closure run",
+      "gap": null,
       "key": "T3",
       "measured": {
         "actions": [
-          0,
-          0
+          6,
+          6
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
           0,
@@ -1997,7 +1994,7 @@
         "T13"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 3,
       "units": {
@@ -2012,9 +2009,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T3"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -2236,9 +2231,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T3"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -2525,16 +2518,14 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 29,
+        "built": 30,
         "partial": 2,
         "planned": 0,
-        "proposed": 15,
+        "proposed": 14,
         "standing": 1
       },
       "total": 48,
-      "uncovered": [
-        "T3"
-      ],
+      "uncovered": [],
       "with_open_units": 29,
       "without_open_units": 19
     },

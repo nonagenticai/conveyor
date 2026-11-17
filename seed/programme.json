@@ -828,7 +828,7 @@
       "key": "T3",
       "name": "PM job",
       "description": "SPEC_V2 slice T3 (docs/SPEC_V2.md §12)",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -842,15 +842,13 @@
         ],
         "plan_status": "draft",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 3,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request"
@@ -1466,7 +1464,8 @@
           303,
           305,
           307,
-          319
+          319,
+          321
         ],
         "depends_on": [],
         "plan_status": "active",
