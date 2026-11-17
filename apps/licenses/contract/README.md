@@ -60,6 +60,11 @@ a reason (a row without one fails the run).
 `licenses.access` line logs method, path, status, duration and caller and nothing else — so an
 organic window cannot be recorded. The probe window belongs to the deployment (#95).
 
+`record-corpus.sh --base URL --out FILE` supplies that window's missing input: it replays the
+`golden/` request set against a live service — the **pinned old** one, per the manifest — and
+writes the JSONL corpus `shadow.sh --corpus` consumes. The corpus is a live capture, so it is
+never committed; only `shadow-report.json` is.
+
 Neither runner treats an empty corpus as a pass: `cases=0` is exit 3.
 
 `shadow.sh --self-test --corpus …` proves the comparator can fail: identical bodies compare

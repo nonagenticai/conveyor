@@ -330,7 +330,7 @@ async fn cancel_voids_a_pending_gate_and_the_gate_can_no_longer_be_answered() {
     let (status, body) = running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({"approval_id": approval, "decision": "approve"}),
             None,
             None,

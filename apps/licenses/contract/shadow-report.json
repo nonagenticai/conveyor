@@ -1,0 +1,32 @@
+{
+  "cases": 6,
+  "equal": 6,
+  "tolerated": 0,
+  "unexplained": 0,
+  "verdicts": [
+    {
+      "id": "sha256:fbfc473a699d2a2f525d565ab456c8753a8a1e8f6af81fbfc47e175e65126aa2",
+      "verdict": "equal"
+    },
+    {
+      "id": "sha256:ad74baafb4179e7434142220f31d98e03fe6665ce3afa91ab8b941539d634843",
+      "verdict": "equal"
+    },
+    {
+      "id": "sha256:b59aa4da3c6e52241946915f1d385d8a5bf031ca8caf2e7d8bda83b0b79fe41e",
+      "verdict": "equal"
+    },
+    {
+      "id": "sha256:5197e1c755b6c2d21441e01f9218649678d09d6c094a2b89d2bfe4065dd94560",
+      "verdict": "equal"
+    },
+    {
+      "id": "sha256:c3305e89bf4c88a817ce26bb5f03a182ebd722cf08ace662d465bc559d3d7c8e",
+      "verdict": "equal"
+    },
+    {
+      "id": "sha256:21b0f4a4f025e60850f3601f7c2c162f12e2d721637590d202405c808d6ae00a",
+      "verdict": "equal"
+    }
+  ]
+}

@@ -292,7 +292,7 @@ async fn decide(running: &support::Running, approval: Uuid, decision: &str) -> (
     running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({"approval_id": approval, "decision": decision}),
             None,
             None,

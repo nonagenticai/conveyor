@@ -16,6 +16,7 @@ pub mod config;
 pub mod contract;
 pub mod db;
 pub mod error;
+pub mod metrics;
 pub mod router;
 pub mod state;
 

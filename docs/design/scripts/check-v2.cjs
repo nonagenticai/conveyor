@@ -96,6 +96,8 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       "jobtypes",
       "tools",
       "constraints",
+      "programme",
+      "adm",
     ])
       check(
         (await page.locator(`#sidebar [data-page="${id}"]`).count()) === 0,
@@ -130,7 +132,16 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       (await content()).includes("part of the conveyor design study"),
       "a legacy study page is a sign-in gate publicly",
     );
-    for (const id of ["organisation", "jobs", "operations", "toolkits", "metering", "jobtypes"]) {
+    for (const id of [
+      "organisation",
+      "jobs",
+      "operations",
+      "toolkits",
+      "metering",
+      "jobtypes",
+      "programme",
+      "adm",
+    ]) {
       await nav(id, "?design=1");
       check(
         (await page.locator("h1").count()) === 1,
@@ -141,6 +152,103 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
         `the reviewer mode is not the gate for ${id}`,
       );
     }
+
+    // 4a. The programme-definition destination carries the MSP layer end to end.
+    await nav("programme", "?design=1");
+    check((await content()).includes("Definition set"), "the programme definition set renders");
+    await page
+      .locator('[data-v2="tab"][data-value="Benefits map & profiles"]')
+      .first()
+      .click();
+    check((await content()).includes("Benefits map"), "the benefits map renders");
+    await page
+      .locator('[data-v2="tab"][data-value="Tranches & reviews"]')
+      .first()
+      .click();
+    check((await content()).includes("Review · tranche 0"), "the tranche review renders");
+    await page
+      .locator('[data-v2="tab"][data-value="Benefits map & profiles"]')
+      .first()
+      .click();
+    await page.locator('[data-v2="benefit"][data-id="BEN-03"]').first().click();
+    await page
+      .locator('[data-v2="tab"][data-value="Benefits realization"]')
+      .first()
+      .click();
+    check(
+      (await content()).includes("not measured"),
+      "a benefit without a measured baseline is visible",
+    );
+    await page.locator('[data-v2="transition-record"]').first().click();
+    check(
+      (await content()).includes("benefit_baseline_missing"),
+      "a transition without a baseline is refused",
+    );
+    for (const width of [1440, 1024, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await nav("programme", "?design=1");
+      check(
+        (await page.locator("h1").count()) === 1,
+        `programme definition renders at ${width}`,
+      );
+      check(!(await overflow()), `programme definition has no page overflow at ${width}`);
+    }
+    await page.setViewportSize({ width: 1440, height: 1060 });
+    await nav("programme");
+    check(
+      (await content()).includes("part of the conveyor design study"),
+      "the programme destination is a sign-in gate publicly",
+    );
+
+    // 4b. The architecture-capability destination carries the TOGAF ADM layer end to end.
+    await nav("adm", "?design=1");
+    check((await content()).includes("Principles catalog"), "the principles catalog renders");
+    check((await content()).includes("Tailored ADM profile"), "the tailored ADM profile renders");
+    await page.locator('[data-v2="tab"][data-value="ADM phases"]').first().click();
+    check((await content()).includes("Phase rail"), "the ADM phase rail renders");
+    check((await content()).includes("Contracts across the ADM"), "the four contract kinds render");
+    await page.locator('[data-v2="adm-advance"]').first().click();
+    check(
+      (await content()).includes("phase_artifacts_missing"),
+      "a phase with a draft mandatory artefact is refused",
+    );
+    await page.locator('[data-v2="tab"][data-value="Artefact repository"]').first().click();
+    await page.locator('[data-v2="adm-artifact"][data-id="ART-005"]').first().click();
+    check((await content()).includes("Requirements catalog"), "a catalog opens with its entries");
+    check((await content()).includes("REQ-011"), "the catalog's entries are rows");
+    await page.locator('[data-v2="adm-artifact"][data-id="ART-003"]').first().click();
+    check((await content()).includes("Stakeholder map"), "a matrix opens with its axes");
+    await page.locator('[data-v2="adm-approve"]').first().click();
+    check(
+      (await content()).includes("a new version supersedes"),
+      "an approval supersedes the version",
+    );
+    await page.locator('[data-v2="tab"][data-value="Board & compliance"]').first().click();
+    check((await content()).includes("Compliance reviews"), "the compliance register renders");
+    await page.locator('[data-v2="adm-waiver"]').first().click();
+    check(
+      (await content()).includes("waiver_owner_required"),
+      "a waiver without an owner and date is refused",
+    );
+    await page.locator('[data-v2="adm-h-change"]').first().click();
+    check((await content()).includes("Change request recorded"), "phase H records a change");
+    await page.locator('[data-v2="adm-h-kata"]').first().click();
+    check(
+      (await content()).includes("phase_h_outcome_exists"),
+      "phase H records exactly one outcome per review",
+    );
+    for (const width of [1440, 1024, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await nav("adm", "?design=1");
+      check((await page.locator("h1").count()) === 1, `architecture capability renders at ${width}`);
+      check(!(await overflow()), `architecture capability has no page overflow at ${width}`);
+    }
+    await page.setViewportSize({ width: 1440, height: 1060 });
+    await nav("adm");
+    check(
+      (await content()).includes("part of the conveyor design study"),
+      "the architecture capability is a sign-in gate publicly",
+    );
 
     // 5. Without a snapshot every public page is honest; the coverage pack is still real.
     await nav("portfolio");
@@ -280,6 +388,48 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       await nav(id);
       await page.evaluate(() => document.fonts.ready);
       await page.screenshot({ path: shot(`conveyor-v2-${id}.png`) });
+    }
+
+    // 9b. On a live snapshot every public page carries the feedback affordance, and the data
+    // panel names only files the window actually serves. The snapshot is injected before the
+    // page scripts so `live` is true without an HTTP server or a real publish.
+    await page.addInitScript(() => {
+      Object.defineProperty(window, "CONVEYOR_SNAPSHOT", {
+        configurable: true,
+        set() {},
+        get() {
+          return {
+            schema: "design-snapshot/v1",
+            tenant: "nonagentic",
+            generated_at: "2026-11-16T00:00:00Z",
+            git_sha: "a".repeat(40),
+            payload_sha256: "b".repeat(64),
+            programme: { feedback: [], projects: [] },
+            work: { boards: [], lists: [], cards: [] },
+            organisation: {},
+            measure: {},
+          };
+        },
+      });
+    });
+    for (const id of destinations) {
+      await nav(id);
+      const text = await content();
+      check(text.includes("Live data & feedback"), `${id} carries the live data and feedback panel`);
+      check(
+        (await page
+          .locator('#main a[href="https://github.com/nonagenticai/conveyor/discussions"]')
+          .count()) >= 1,
+        `${id} links Discussions`,
+      );
+      check(
+        (await page
+          .locator('#main a[href*="/issues/new?labels=feedback"]')
+          .count()) === 1,
+        `${id} links the prefilled report`,
+      );
+      check(!text.includes("data/manifest.json"), `${id} carries no dead data link`);
+      check(!text.includes("data/programme.json"), `${id} carries no dead programme link`);
     }
 
     check(errors.length === 0, "no browser runtime errors: " + errors.join(" | "));

@@ -508,6 +508,159 @@
 <li><strong>Probe window.</strong> #95 P3.1/P3.2 records the live window. Because the service captures no request bodies, a live window must come from the candidate's own traffic; and the recorded golden set (<code>capture-goldens.sh</code>/<code>oracle.sh</code> from a pinned synthetic seed) is the missing input for <code>verify.sh</code>'s <code>unexplained=0</code> leg. Neither is claimed here.</li>
 <li><strong>Retirement.</strong> <code>nonagenticai/licenses</code> is not archived until every consumer in the table above is off it. <code>license-authz</code> is not a consumer to switch; it stays external.</li>
 </ol>
+<h2 id="cutover-execution-2026-11-16-95">Cutover execution (2026-11-16, #95)</h2>
+<p>Environment at the cutover: the Python Deployment <code>licenses</code> ran 2/2 on <code>sha256:6eee5af0…</code>; the Rust Deployment ran on <code>sha256:3d5a6d6c…</code>, the digest #203's main push published. Every consumer already called <code>http://licenses.licenses.svc.cluster.local:8544</code> (<code>LICENCES_BASE_URL</code> in the conveyor Deployment, <code>LICENSE_INTROSPECT_URL</code> in license-authz and the dependent manifests), so <strong>no consumer environment changed</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Result</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P3.1 probe window</td>
+<td><code>record-corpus.sh</code> recorded the 6-case golden request set from the live Python service; <code>shadow.sh --corpus … --candidate &lt;rust&gt;</code> → <code>cases=6 equal=6 unexplained=0</code>. A wider exploratory set (tokenless <code>byo-mode</code>, unknown app, unknown app plans, <code>/regions</code>, two unauthenticated admin/internal reads) was also 6/6 equal.</td>
+<td><code>contract/shadow-report.json</code> (counts and hashed case ids only)</td>
+</tr>
+<tr>
+<td>P3.2 organic window</td>
+<td><strong>NOT MEASURABLE</strong>, exactly as the reference states: the service captures no request bodies. No zero-traffic claim is made; the probe window above is the recorded substitute.</td>
+<td><code>shadow.sh --live</code> exits 3</td>
+</tr>
+<tr>
+<td>P2.1 four CronJobs</td>
+<td>Switched to <code>/usr/local/bin/service expire-stale|reconcile-metering|reap-expired|revoke-expired-tokens</code> with schedules, env values, <code>Forbid</code>, <code>backoffLimit</code> and <code>restartPolicy</code> unchanged. Each ran live in an <strong>ownerRef-free</strong> Job (a <code>--from=cronjob</code> copy would have forged <code>lastSuccessfulTime</code>): exit 0 and one JSON line each — expire-stale converged (0 selected), metering-reconcile scanned 516 and converged, reap-expired converged (0 reapable), revoke-expired-tokens acted 5 and converged. The CronJob status fields were unchanged afterwards.</td>
+<td>gitops <code>2c3702c94f</code></td>
+</tr>
+<tr>
+<td>P2.2 live commands + introspection</td>
+<td>The four scheduled commands ran live (row above). Introspection is exercised live by license-authz on every gated request (40 responses in the 5 minutes after the flip, all 200). A production <strong>mint</strong> was not performed — no production writes by policy; the mint/get legs are proven same-seed in <code>contract/cron-parity.md</code> and the #45 HTTP parity.</td>
+<td>this row</td>
+</tr>
+<tr>
+<td>P4.1 flip</td>
+<td><code>conveyor-licenses</code> (2/2 Ready, <code>app: licenses</code>, same digest) took the Service, then the Python Deployment was parked at 0. Live after: the Service's endpoints are exactly the two Rust pod IPs; <code>licenses-pdb</code> ALLOWED DISRUPTIONS 1; <code>/health</code>, <code>/health/ready</code>, <code>/health/live</code> 200; unauthenticated <code>/licenses/active</code> 401; golden replay through the Service <code>cases=6 unexplained=0</code>.</td>
+<td>gitops <code>b064a3a410</code>, <code>7dbc434e94</code></td>
+</tr>
+<tr>
+<td>Observation window</td>
+<td>45 minutes after the flip: 377 license-authz responses, all 200; two organic <code>licence.sync</code> successes against the Rust Service (19:20:13Z and 19:35:02Z, conveyor worker); both Rust pods 0 restarts; the scheduled <code>:37</code> CronJob run fired and converged.</td>
+<td>conveyor worker logs; authz logs</td>
+</tr>
+<tr>
+<td>P4.2 rollback</td>
+<td><strong>Executed</strong>, four steps in the router order: (1) Python returns to 2/2 and the four CronJobs revert to the Python image (#5296) — four endpoints, no gap; (2) <code>conveyor-licenses</code> scales to 0, Python alone serves, replay through the Service <code>cases=6 unexplained=0</code> (#5300); (3) <code>conveyor-licenses</code> returns to 2/2 beside Python (#5301); (4) a revert of step 1 parks Python and returns the CronJobs to Rust (#5302). Final state re-verified: two Rust endpoints, replay 6/6, CronJobs on the Rust binary.</td>
+<td>gitops #5296, #5300, #5301, #5302</td>
+</tr>
+</tbody>
+</table>
+<h3 id="recorded-deviations-at-cutover">Recorded deviations at cutover</h3>
+<ul>
+<li><strong><code>CORS_ALLOWED_ORIGINS</code>, <code>ENABLE_DOCS</code>, <code>DEFAULT_TENANT_ID</code> are not implemented in the Rust binary.</strong> <code>DEFAULT_TENANT_ID</code> is a documented no-op in the reference (<code>licenses/main.py:361-364</code>); every consumer in the table above is server-side, so CORS is unexercised; <code>/openapi.json</code> is served by both (the capture and <code>--check-lock</code> depend on it).</li>
+<li><strong><code>/metrics</code> families: closed by #261 (2026-11-17).</strong> At cutover the binary served the endpoint but emitted 2 of the reference's 15 families, so the Deployment carried no scrape annotations and an explicit <code>alerting.nonagentic.ai/coverage: "none"</code>. gitops #5308 removed the opt-out and restored the annotations with the first family (token expiry + <code>collector_up</code>); #261 ports the remaining 13 — see "Telemetry parity" below.</li>
+<li><strong>No live production mint.</strong> The one-mint leg of P2.2 is not executed against production data; its evidence is the same-seed parity artifact, not a live write.</li>
+</ul>
+<h2 id="telemetry-parity-2026-11-17-261">Telemetry parity (2026-11-17, #261)</h2>
+<p>The Python service's <code>/metrics</code> registered <strong>two collectors</strong> on one private registry, for <strong>15 gauge families</strong>. At cutover the Rust binary emitted two of them. Three gitops alert rules read families that did not exist, and <code>max(...) &gt; 0</code> over an absent vector is <strong>silent, not red</strong> — none of the three carries an <code>absent()</code> guard, deliberately:</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Severity</th>
+<th>Read (absent since cutover)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LicenseTokenAlreadyExpired</code></td>
+<td>critical</td>
+<td><code>nonagentic_license_expired_rows{kind="token",revoked="false",lifetime_class!="short"}</code></td>
+</tr>
+<tr>
+<td><code>LicenseAlreadyExpired</code></td>
+<td>warning</td>
+<td><code>nonagentic_license_expired_rows{kind="license",revoked="false"}</code></td>
+</tr>
+<tr>
+<td><code>LicenseTenantIdIsKeycloakPrincipal</code></td>
+<td>warning</td>
+<td><code>nonagentic_license_tenant_is_subject_rows{class="violation"}</code> — the sole authoriser of the tenant-id-is-a-principal detector</td>
+</tr>
+</tbody>
+</table>
+<p><code>apps/licenses/src/metrics/</code> now owns both collectors (<code>expiry</code>, <code>tenant_subject</code>); the handler in <code>router/observability.rs</code> only renders them. The contract is the reference's, family by family:</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Population / semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nonagentic_license_token_expiry_timestamp_seconds</code></td>
+<td>non-revoked tokens with an expiry; absolute epoch; <code>lifetime_class</code> short/lt7d/lt30d/lt60d/standard</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expiry_timestamp_seconds</code></td>
+<td><code>status='active'</code> licences with an expiry</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expiry_coverage_rows</code></td>
+<td>live rows split by <code>has_expiry</code> (NULL = perpetual, always emitted both ways)</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expired_rows</code></td>
+<td>exact past-expiry counts; <strong>all 12</strong> <code>(kind,revoked,class)</code> pairs seeded at 0</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expiry_series_truncated</code></td>
+<td>per-class cap flag (<code>&gt;= cap</code>), all 6 pairs seeded</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expiry_collector_up</code></td>
+<td>1/0; <strong>on 0 no other expiry family is emitted</strong></td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_subject_collector_up</code></td>
+<td>1/0</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_is_subject_source_measured</code></td>
+<td><code>licences_subject</code>=1, <code>keycloak_principal</code>=0 (the unmeasured door stays visibly unmeasured)</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_is_subject_rows</code></td>
+<td>exact counts; 3 classes × 2 match kinds, all six seeded</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_is_subject</code></td>
+<td>one named row per offending identity (no <code>keycloak_realm</code> label)</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_is_subject_series_truncated</code></td>
+<td>500-row cap flag</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_subject_principal_refusals</code> / <code>..._refused</code></td>
+<td>register fed by the bundle subject guard; emitted <strong>before</strong> the collector gate</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_seed_principal_refusals</code> / <code>..._refused</code></td>
+<td>boot-seed register; no boot seed in this service → 0 / absent</td>
+</tr>
+</tbody>
+</table>
+<p>Token rows are fetched <strong>per lifetime class</strong> with the reference's own caps (2000; 200 for <code>short</code>; 500 for <code>lt7d</code>; 2000 for <code>lt30d</code>/<code>lt60d</code>), each <code>ORDER BY expires_at ASC LIMIT</code> in SQL, so truncation can only drop the least urgent rows and hourly tokens cannot evict the long-lived rows the reissue bands depend on. A single shared cap — the pre-#261 shape — is exactly that bug.</p>
+<h3 id="recorded-deviations-1">Recorded deviations</h3>
+<ul>
+<li><strong>No 60-second snapshot TTL.</strong> The reference caches because its engine used NullPool (a fresh connection per scrape). This service uses a pooled connection and these tables are small (327 live tokens, 833 licences, 159 tenants at measurement), so a fresh snapshot per scrape is strictly fresher at ~14 indexed queries.</li>
+<li><strong>The seed-refusal register has no producer.</strong> The reference refuses principal ids at a boot seed; this service has no boot seed, so <code>tenant_seed_principal_refusals</code> reads 0 and the named family is absent — the reference's own clean-estate rendering.</li>
+<li><strong>Content type is <code>text/plain; version=0.0.4</code>.</strong> The payload is the basic text exposition (no <code># EOF</code>); the reference's library default string is <code>1.0.0</code>. Prometheus accepts both.</li>
+<li><strong>Live verification is recorded on #261.</strong> The image does not exist until this merge publishes it; the deployed scrape and the alert evaluation are recorded on the issue and in the ledger.</li>
+</ul>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/2026-11-14-licenses-absorption.md</code> at build time.</span>

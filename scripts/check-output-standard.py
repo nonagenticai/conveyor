@@ -160,6 +160,16 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
         if cls.get("name") not in matched:
             errors.append(f"class {cls.get('name')!r} matches no project")
 
+    # Every category is either required by some class or explicitly on demand. A new category
+    # that fits nowhere is a vocabulary orphan, not a checklist slot.
+    required: set[str] = set()
+    for cls in classes:
+        required.update(cls.get("now") or [])
+        required.update(cls.get("closure") or [])
+    orphans = set(categories) - required - {ON_DEMAND}
+    if orphans:
+        errors.append(f"categories covered by no class and not on demand: {sorted(orphans)}")
+
     if console != std:
         errors.append("docs/design/data/output-standard.js does not equal seed/output-standard.json")
 

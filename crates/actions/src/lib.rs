@@ -49,6 +49,9 @@ pub mod produce;
 pub mod memory;
 pub mod model;
 pub mod openapi;
+// T7 (#170): the cluster operations read family — `ops.pods|deployments|events|logs|flux_status|
+// ci_status`, served by the `conveyor-ops` client.
+pub mod ops;
 // T0 (SPEC_V2 §4, §10.4): the organisation spine — industries, the job catalogue, immutable
 // releases and bindings.
 pub mod organisation;
@@ -68,7 +71,9 @@ pub mod prompt_audit;
 pub mod publish;
 pub mod rbac;
 pub mod registry;
+// T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine and the MSP rows.
 pub mod spec;
+pub mod spine;
 pub mod views;
 // S13: `workflows.*` — the engine's authoring surface (one document, versioned by key).
 pub mod workflow;
