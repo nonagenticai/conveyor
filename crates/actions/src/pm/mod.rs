@@ -550,6 +550,10 @@ async fn pm_route_gate(
     if gate.is_empty() {
         return Err(ActionError::new(422, "required", "gate must not be empty"));
     }
+    let kind = input.kind.trim();
+    if kind.is_empty() {
+        return Err(ActionError::new(422, "required", "kind must not be empty"));
+    }
     let required = input.required_decisions.unwrap_or(1);
     if !(1..=255).contains(&required) {
         return Err(ActionError::new(
@@ -570,7 +574,7 @@ async fn pm_route_gate(
         &ctx,
         input.project_id,
         gate,
-        input.kind.trim(),
+        kind,
         required,
         json!({
             "description": input.description,
@@ -835,6 +839,20 @@ async fn changes_request(
     input: ChangeRequestIn,
 ) -> Result<HandlerOutput<ChangeRequestOut>, ActionError> {
     assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
+    let impact = i32::try_from(input.impact).map_err(|_| {
+        ActionError::new(422, "invalid_value", "impact must fit a 32-bit integer")
+    })?;
+    // The change gate resolves the approved baseline it would replace before it is opened.
+    let evidence = resolve_evidence(
+        &mut *tx,
+        ctx.tenant,
+        &[EvidenceRef {
+            kind: "baseline".to_owned(),
+            id: input.baseline_id,
+        }],
+        true,
+    )
+    .await?;
     let change = store::spine::insert_register_tx(
         &mut *tx,
         ctx.tenant,
@@ -848,7 +866,7 @@ async fn changes_request(
             status: "open".to_owned(),
             severity: None,
             probability: None,
-            impact: Some(input.impact as i32),
+            impact: Some(impact),
             links: Value::Array(Vec::new()),
             baseline_ref: Some(input.baseline_id),
             meta: json!({ "impact": input.impact }),
@@ -869,7 +887,7 @@ async fn changes_request(
         json!({
             "change_id": change.id.to_string(),
             "description": format!("Approve change {}", change.id),
-            "evidence": [{ "kind": "baseline", "id": input.baseline_id }],
+            "evidence": evidence,
         }),
     )
     .await?;
