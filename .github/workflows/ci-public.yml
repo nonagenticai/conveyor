@@ -20,6 +20,13 @@ name: ci
 
 on:
   pull_request:
+  # The main ruleset carries the merge_queue rule, and a queued PR is validated on a synthetic
+  # merge-group ref: the queue waits for the required checks to appear on THAT ref. Without this
+  # trigger those checks never run, and every queued PR sits in AWAITING_CHECKS forever (measured
+  # on this very PR before this line existed). classify treats any non-pull_request event as
+  # docs_only=false, and dco is pull_request-only and not a required context, so the queue runs
+  # the same gates the PR did.
+  merge_group:
   push:
     branches: [main]
   workflow_dispatch:
