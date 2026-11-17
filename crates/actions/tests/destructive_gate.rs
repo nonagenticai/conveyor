@@ -5,7 +5,7 @@
 //! * an approved approval for **another object** cannot authorise this call;
 //! * a destructive call that names **no** approval is refused before any backend exists;
 //! * every destructive action either declares its target or is named in [`UNGATED`] — so a new
-//!   one cannot ship ungated, and the 27 still to be adopted are a visible list rather than
+//!   one cannot ship ungated, and the ones still to be adopted are a visible list rather than
 //!   silence (#283 empties it);
 //! * a target is a **pure function of the input**: two calls with the same input authorise the
 //!   same object, so an approval cannot be satisfied by something that drifts.
@@ -93,6 +93,8 @@ const UNGATED: &[&str] = &[
     "model_relationships.delete",
     "model_views.delete",
     "models.delete",
+    // T3 (#313) added the PM job; `pm.close` is destructive and declares no target yet.
+    "pm.close",
     "project_dependencies.delete",
     "projects.close",
     "repositories.delete",
@@ -171,7 +173,7 @@ fn every_destructive_action_is_gated_or_listed() {
          or the list names one that has since declared its target"
     );
     // The four the engine can gate today are declared, and nothing else is: a stray declaration
-    // in the 27 would silently change behaviour before #283 lands its tests.
+    // in the burn-down would silently change behaviour before #283 lands its tests.
     gated.sort_unstable();
     let mut declared: Vec<&str> = declaring_targets()
         .into_iter()
