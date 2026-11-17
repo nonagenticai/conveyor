@@ -1,6 +1,23 @@
 {
   "issues": [
     {
+      "number": 253,
+      "title": "ci: the refresh approves its parked pull_request run so the generated PR is mergeable",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/253",
+      "updatedAt": "2026-11-17T01:28:00Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 251,
       "title": "ci: the registry refresh must not require pandoc",
       "state": "CLOSED",
