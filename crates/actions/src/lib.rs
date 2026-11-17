@@ -48,6 +48,9 @@ pub mod media;
 pub mod memory;
 pub mod model;
 pub mod openapi;
+// T7 (#170): the cluster operations read family — `ops.pods|deployments|events|logs|flux_status|
+// ci_status`, served by the `conveyor-ops` client.
+pub mod ops;
 // T0 (SPEC_V2 §4, §10.4): the organisation spine — industries, the job catalogue, immutable
 // releases and bindings.
 pub mod organisation;

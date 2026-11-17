@@ -70,10 +70,14 @@ use serde_json::{Value, json};
 /// **#156 adds 5 internal**: the work-store publish/request/revision actions. 341 → **346**.
 /// **#174 adds 1 external**: `media.generate_image`, the MOSS-Image host over the engine's own
 /// declared-external path (it is the first action to declare an `Artefact`). 346 → **347**.
-/// **#173 adds 2 internal**: `produce.speech` and `media.transcribe` (the audio hosts). 347 → **349**.
+/// **#173 adds 2 external**: `produce.speech` and `media.transcribe` (the audio hosts). 347 → **349**.
 /// **#160 adds 2 internal**: `inference_endpoint.get|set`, the tenant's registered inference
 /// destination and its sealed credential. 349 → **351**.
-const EXPECTED: [&str; 378] = [
+/// **T1 adds 27 internal**: the plan spine (wbs/baselines/registers/dependencies/in_flight/
+/// tranches/benefits/cadences/stakeholders). 351 → **378**.
+/// **#170 adds 6 internal**: the `ops.*` cluster read family (T7) —
+/// `ops.pods|deployments|events|logs|flux_status|ci_status`. 378 → **384**.
+const EXPECTED: [&str; 384] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -304,6 +308,12 @@ const EXPECTED: [&str; 378] = [
     "models.validate",
     "notifications.list",
     "notifications.update",
+    "ops.ci_status",
+    "ops.deployments",
+    "ops.events",
+    "ops.flux_status",
+    "ops.logs",
+    "ops.pods",
     "portfolio.in_flight",
     "principles.create",
     "principles.dismiss_conflict",
@@ -494,7 +504,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // #160 adds `inference_endpoint.get|set` (both internal): internal 331 → 333; external stays 18.
     // T1 adds the 27 plan-spine actions (wbs/baselines/registers/dependencies/in_flight/
     // tranches/benefits/cadences/stakeholders), all internal: internal 333 → 360; external stays 18.
-    assert_eq!((internal, external), (360, 18));
+    // #170 adds the six `ops.*` reads (internal, read): 360 → 366. The external count stays at 18 —
+    // they call the cluster API through `conveyor-ops`, not a declared external service.
+    assert_eq!((internal, external), (366, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
