@@ -224,6 +224,14 @@ pub async fn create_or_get_subject_for_mint(
                 "create_or_get_subject: REFUSING to register a subject whose id is ALREADY a \
                  tenant and holds NO licences — a genuinely new principal-as-subject registration"
             );
+            // The refusal is a metric, not just a log line: the exporter's
+            // `subject_principal_refusals` register is what makes a prevented registration
+            // visible without reading the pod logs.
+            crate::metrics::tenant_subject::record_subject_refusal(
+                keycloak_sub,
+                keycloak_realm,
+                &tenant_name,
+            );
             return Err(CreateSubjectError::Refused {
                 message: format!(
                     "cannot register subject {keycloak_sub:?}: that id is already registered \

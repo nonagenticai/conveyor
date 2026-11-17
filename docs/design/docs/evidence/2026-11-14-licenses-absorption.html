@@ -559,8 +559,107 @@
 <h3 id="recorded-deviations-at-cutover">Recorded deviations at cutover</h3>
 <ul>
 <li><strong><code>CORS_ALLOWED_ORIGINS</code>, <code>ENABLE_DOCS</code>, <code>DEFAULT_TENANT_ID</code> are not implemented in the Rust binary.</strong> <code>DEFAULT_TENANT_ID</code> is a documented no-op in the reference (<code>licenses/main.py:361-364</code>); every consumer in the table above is server-side, so CORS is unexercised; <code>/openapi.json</code> is served by both (the capture and <code>--check-lock</code> depend on it).</li>
-<li><strong><code>/metrics</code> families are not ported.</strong> The binary serves the endpoint (<code>apps/licenses/src/router/observability.rs</code>) but emits none of the licence-expiry families the Python collector (<code>services/expiry_metrics.py</code>) provided. The Deployment therefore does <strong>not</strong> carry the Python pod's <code>prometheus.io/*</code> annotations — a target with none of those series reads as covered while nothing is measured — and keeps an explicit <code>alerting.nonagentic.ai/coverage: "none"</code> with that reason. Porting the families is a follow-up.</li>
+<li><strong><code>/metrics</code> families: closed by #261 (2026-11-17).</strong> At cutover the binary served the endpoint but emitted 2 of the reference's 15 families, so the Deployment carried no scrape annotations and an explicit <code>alerting.nonagentic.ai/coverage: "none"</code>. gitops #5308 removed the opt-out and restored the annotations with the first family (token expiry + <code>collector_up</code>); #261 ports the remaining 13 — see "Telemetry parity" below.</li>
 <li><strong>No live production mint.</strong> The one-mint leg of P2.2 is not executed against production data; its evidence is the same-seed parity artifact, not a live write.</li>
+</ul>
+<h2 id="telemetry-parity-2026-11-17-261">Telemetry parity (2026-11-17, #261)</h2>
+<p>The Python service's <code>/metrics</code> registered <strong>two collectors</strong> on one private registry, for <strong>15 gauge families</strong>. At cutover the Rust binary emitted two of them. Three gitops alert rules read families that did not exist, and <code>max(...) &gt; 0</code> over an absent vector is <strong>silent, not red</strong> — none of the three carries an <code>absent()</code> guard, deliberately:</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Severity</th>
+<th>Read (absent since cutover)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LicenseTokenAlreadyExpired</code></td>
+<td>critical</td>
+<td><code>nonagentic_license_expired_rows{kind="token",revoked="false",lifetime_class!="short"}</code></td>
+</tr>
+<tr>
+<td><code>LicenseAlreadyExpired</code></td>
+<td>warning</td>
+<td><code>nonagentic_license_expired_rows{kind="license",revoked="false"}</code></td>
+</tr>
+<tr>
+<td><code>LicenseTenantIdIsKeycloakPrincipal</code></td>
+<td>warning</td>
+<td><code>nonagentic_license_tenant_is_subject_rows{class="violation"}</code> — the sole authoriser of the tenant-id-is-a-principal detector</td>
+</tr>
+</tbody>
+</table>
+<p><code>apps/licenses/src/metrics/</code> now owns both collectors (<code>expiry</code>, <code>tenant_subject</code>); the handler in <code>router/observability.rs</code> only renders them. The contract is the reference's, family by family:</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Population / semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nonagentic_license_token_expiry_timestamp_seconds</code></td>
+<td>non-revoked tokens with an expiry; absolute epoch; <code>lifetime_class</code> short/lt7d/lt30d/lt60d/standard</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expiry_timestamp_seconds</code></td>
+<td><code>status='active'</code> licences with an expiry</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expiry_coverage_rows</code></td>
+<td>live rows split by <code>has_expiry</code> (NULL = perpetual, always emitted both ways)</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expired_rows</code></td>
+<td>exact past-expiry counts; <strong>all 12</strong> <code>(kind,revoked,class)</code> pairs seeded at 0</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expiry_series_truncated</code></td>
+<td>per-class cap flag (<code>&gt;= cap</code>), all 6 pairs seeded</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_expiry_collector_up</code></td>
+<td>1/0; <strong>on 0 no other expiry family is emitted</strong></td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_subject_collector_up</code></td>
+<td>1/0</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_is_subject_source_measured</code></td>
+<td><code>licences_subject</code>=1, <code>keycloak_principal</code>=0 (the unmeasured door stays visibly unmeasured)</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_is_subject_rows</code></td>
+<td>exact counts; 3 classes × 2 match kinds, all six seeded</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_is_subject</code></td>
+<td>one named row per offending identity (no <code>keycloak_realm</code> label)</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_is_subject_series_truncated</code></td>
+<td>500-row cap flag</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_subject_principal_refusals</code> / <code>..._refused</code></td>
+<td>register fed by the bundle subject guard; emitted <strong>before</strong> the collector gate</td>
+</tr>
+<tr>
+<td><code>nonagentic_license_tenant_seed_principal_refusals</code> / <code>..._refused</code></td>
+<td>boot-seed register; no boot seed in this service → 0 / absent</td>
+</tr>
+</tbody>
+</table>
+<p>Token rows are fetched <strong>per lifetime class</strong> with the reference's own caps (2000; 200 for <code>short</code>; 500 for <code>lt7d</code>; 2000 for <code>lt30d</code>/<code>lt60d</code>), each <code>ORDER BY expires_at ASC LIMIT</code> in SQL, so truncation can only drop the least urgent rows and hourly tokens cannot evict the long-lived rows the reissue bands depend on. A single shared cap — the pre-#261 shape — is exactly that bug.</p>
+<h3 id="recorded-deviations-1">Recorded deviations</h3>
+<ul>
+<li><strong>No 60-second snapshot TTL.</strong> The reference caches because its engine used NullPool (a fresh connection per scrape). This service uses a pooled connection and these tables are small (327 live tokens, 833 licences, 159 tenants at measurement), so a fresh snapshot per scrape is strictly fresher at ~14 indexed queries.</li>
+<li><strong>The seed-refusal register has no producer.</strong> The reference refuses principal ids at a boot seed; this service has no boot seed, so <code>tenant_seed_principal_refusals</code> reads 0 and the named family is absent — the reference's own clean-estate rendering.</li>
+<li><strong>Content type is <code>text/plain; version=0.0.4</code>.</strong> The payload is the basic text exposition (no <code># EOF</code>); the reference's library default string is <code>1.0.0</code>. Prometheus accepts both.</li>
+<li><strong>Live verification is recorded on #261.</strong> The image does not exist until this merge publishes it; the deployed scrape and the alert evaluation are recorded on the issue and in the ledger.</li>
 </ul>
 </main>
     <footer class="doc-footer">

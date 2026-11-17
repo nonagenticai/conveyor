@@ -114,8 +114,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "84952e2d6a78e7833aa7988535b1f1548fa5c7843ca832799451d5a80b440696",
-      "bytes": 16639,
+      "sha256": "c1dba5b017664af8ed63d6302f2b131303f104deabc12c0c28c673cd8ee0603a",
+      "bytes": 16668,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -159,8 +159,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-14-licenses-absorption.html",
       "source": "docs/evidence/2026-11-14-licenses-absorption.md",
       "section": "Evidence",
-      "sha256": "cc938193b70d9a36b041a9f2be9b40658bb35deab12fbee9426937a3e932ddbc",
-      "bytes": 28913,
+      "sha256": "ca136b1ef3af72f58660da24da2375a2d396d1297b2585f59534a1abaa838634",
+      "bytes": 32802,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-14-licenses-absorption.md"
     },
     {

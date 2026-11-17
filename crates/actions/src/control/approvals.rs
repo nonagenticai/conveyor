@@ -323,6 +323,7 @@ async fn approvals_request(
     for (key, value) in [
         ("description", input.description),
         ("proposed_answer", input.proposed_answer),
+        ("target", input.target),
     ] {
         if let Some(value) = value {
             meta.insert(key.to_owned(), Value::String(value));
@@ -359,6 +360,81 @@ async fn approvals_request(
             ActionError::internal()
         })?;
     Ok(approval_out(&record))
+}
+
+/// The gate a destructive action passes before it reaches a backend.
+///
+/// SPEC_V2 §11.4: `destructive` = approval + dry-run + dual control. The approval row is the
+/// control-plane primitive this crate already owns; this function is the one place a handler
+/// asks it, so `ops.restart`, `ops.scale` and `ops.rollback` cannot disagree about what an
+/// approval authorises. It runs in the caller's transaction and **before any cluster call**.
+///
+/// Refused (403) when the id is absent, unknown in this tenant, not approved, opened for a
+/// different action, or naming a different target. The target is the exact thing the call will
+/// mutate (`namespace/deployment/name`, plus the replicas or revision where they matter), so an
+/// approval for one deployment can never authorise another.
+pub async fn require_approval_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    action: &'static str,
+    target: &str,
+    approval_id: Option<Uuid>,
+) -> Result<Uuid, ActionError> {
+    let Some(id) = approval_id else {
+        return Err(ActionError::new(
+            403,
+            "approval_required",
+            format!(
+                "{action} is destructive: an approved approval for `{target}` must be named in `approval_id`"
+            ),
+        ));
+    };
+    let record = store::approval::get_approval_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| approval_error(error, action))?
+        .ok_or_else(|| {
+            ActionError::new(
+                403,
+                "approval_not_found",
+                format!("no approval {id} in this tenant"),
+            )
+        })?;
+    if record.approval.status != ApprovalStatus::Approved {
+        return Err(ActionError::new(
+            403,
+            "approval_not_approved",
+            format!(
+                "approval {id} is {}; only an approved gate authorises {action}",
+                record.approval.status.as_str()
+            ),
+        ));
+    }
+    if record.approval.gate != action {
+        return Err(ActionError::new(
+            403,
+            "approval_wrong_action",
+            format!(
+                "approval {id} was opened for {:?}, not {action}",
+                record.approval.gate
+            ),
+        ));
+    }
+    let meta = store::approval::approval_meta_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| approval_error(error, action))?
+        .unwrap_or(Value::Null);
+    let approved_target = meta
+        .get("target")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    if approved_target != target {
+        return Err(ActionError::new(
+            403,
+            "approval_wrong_target",
+            format!("approval {id} authorises {approved_target:?}, not {target:?}"),
+        ));
+    }
+    Ok(id)
 }
 
 fn parse_decision(raw: &str) -> Result<DecisionKind, ActionError> {

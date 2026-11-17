@@ -232,6 +232,11 @@ pub enum Scope {
     IntegrationsRead,
     /// Dispatch work to an external service (`coding_jobs.create`).
     IntegrationsWrite,
+    // T7 — the hostile-authority surface (SPEC_V2 §11.4): restarting, scaling and rolling back
+    // a workload. Admin-only, and never sufficient on its own — every `ops.*` write also names
+    // an approved approval (see `control::approvals::require_approval_tx`).
+    /// Restart, scale and roll back cluster workloads.
+    OpsWrite,
     // S11 — executable processes: ordered registry actions on one card.
     /// Read process templates, their steps and their published revisions.
     ProcessesRead,
@@ -288,7 +293,7 @@ pub enum Scope {
 
 impl Scope {
     /// Every scope this build knows.
-    pub const ALL: [Scope; 65] = [
+    pub const ALL: [Scope; 66] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -354,6 +359,7 @@ impl Scope {
         Scope::CapabilitiesWrite,
         Scope::OrganisationRead,
         Scope::OrganisationWrite,
+        Scope::OpsWrite,
     ];
 
     /// The wire spelling (`<resource>:<verb>`).
@@ -409,6 +415,7 @@ impl Scope {
             Self::SecretsWrite => "secrets:write",
             Self::IntegrationsRead => "integrations:read",
             Self::IntegrationsWrite => "integrations:write",
+            Self::OpsWrite => "ops:write",
             Self::ProcessesRead => "processes:read",
             Self::ProcessesWrite => "processes:write",
             Self::BenchmarksRead => "benchmarks:read",
@@ -511,7 +518,8 @@ impl Scope {
             | Self::BoardsWrite
             | Self::ListsWrite
             | Self::CardsWrite
-            | Self::OrganisationWrite => admin,
+            | Self::OrganisationWrite
+            | Self::OpsWrite => admin,
             // ⛔ NOT the `admin` predicate: that includes `Role::KataExecutor`, a machine
             // role, and a scope a machine holds cannot be a sign-off (CONTRACT §20 trap 1).
             Self::EvalsApprove => matches!(role, Role::Admin),
@@ -1004,7 +1012,8 @@ mod tests {
         assert_eq!(Scope::CapabilitiesWrite.as_str(), "capabilities:write");
         assert_eq!(Scope::OrganisationRead.as_str(), "organisation:read");
         assert_eq!(Scope::OrganisationWrite.as_str(), "organisation:write");
-        assert_eq!(Scope::ALL.len(), 65);
+        assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
+        assert_eq!(Scope::ALL.len(), 66);
     }
 
     #[test]
