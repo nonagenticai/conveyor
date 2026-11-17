@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 11 |
+| `exists` | implemented in code and backed by real rows | 12 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
-| `new` | absent | 25 |
+| `new` | absent | 24 |
 
 ## Rows
 
@@ -45,7 +45,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:development` | §10.4 | actions | development | `new` | actions: dev.* absent |
 | `actions:operations` | §10.4 | actions | operations | `new` | actions: ops.* absent |
 | `actions:analysis` | §10.4 | actions | analysis | `new` | actions: analyse.* absent |
-| `actions:production` | §10.4 | actions | production | `new` | actions: produce.* absent |
+| `actions:production` | §10.4 | actions | production | `exists` | actions: produce.* found (produce.script) |
 | `actions:tools` | §10.4 | actions | tools | `new` | actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* absent<br>actions: tools.* absent |
 | `actions:memory` | §10.4 | actions | memory | `new` | actions: lessons.* absent |
 | `actions:metrics` | §10.4 | actions | metrics | `new` | actions: metrics.* absent |
