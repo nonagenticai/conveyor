@@ -901,6 +901,11 @@ async fn invoke_internal(
     }
 
     let work = async {
+        // #282: the destructive gate, once, before any handler runs. It sits inside `work` and
+        // not before it because a refusal here is recorded by `record_failure` below — an
+        // unapproved destructive call leaves an `action_invocation` and an `audit_event` saying
+        // so, which a refusal thrown before the timeout wrapper would not.
+        crate::control::approvals::enforce_destructive_gate(&mut tx, &ctx, spec, &input).await?;
         let output = handler(&mut tx, ctx.clone(), input.clone()).await?;
         let elapsed = started.elapsed().as_millis().min(i32::MAX as u128) as i32;
         let response = InvocationResponse::new(

@@ -87,12 +87,15 @@ use serde_json::{Value, json};
 /// 400 → **401**.
 /// **#172 adds 3 internal**: the host family — `ops.host_status|host_logs|host_restart_unit`
 /// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 401 → **404**.
-const EXPECTED: [&str; 404] = [
+const EXPECTED: [&str; 407] = [
     "actions.describe",
     "actions.list",
     "agent.run",
     "andon.engage",
     "andon.release",
+    "approval_policies.get",
+    "approval_policies.list",
+    "approval_policies.set",
     "approvals.decide",
     "approvals.list",
     "approvals.request",
@@ -543,7 +546,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // #163 adds `produce.script` (internal): 382 → 383; external stays 18.
     // #172 adds the three host actions (internal; one destructive, two reads): 383 → 386;
     // external stays 18 — they call the host agent over ssh, not a declared external service.
-    assert_eq!((internal, external), (386, 18));
+    // #282 adds `approval_policies.list|get|set` (internal): 386 → 389; external stays 18 — they
+    // read and write our own table, and the gate they configure is enforced in the engine.
+    assert_eq!((internal, external), (389, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

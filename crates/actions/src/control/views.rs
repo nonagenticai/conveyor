@@ -310,12 +310,26 @@ pub struct ApprovalRequestIn {
     pub allowed_decisions: Option<Value>,
     /// The exact thing this gate authorises, stored in `meta.target`.
     ///
-    /// A destructive action (the `ops.*` write family) refuses to run unless the approval's
-    /// target equals the target the call names — an approval for one deployment can never
-    /// authorise a restart of another. Optional because every gate that predates the ops
-    /// writes has none; a gate with no target authorises no destructive call.
+    /// A destructive action refuses to run unless the approval's target equals the target the
+    /// call names — an approval for one deployment can never authorise a restart of another.
+    /// Optional because every gate that predates the ops writes has none; a gate with no target
+    /// authorises no destructive call.
+    ///
+    /// Prefer `action` + `input` below: the target string is then computed by the action itself
+    /// (#282), so a caller cannot mistype it into a gate that authorises nothing.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub target: Option<String>,
+    /// The destructive action this gate will authorise (#282).
+    ///
+    /// When present, `input` must be the input that action will be invoked with, and
+    /// `meta.target` is computed from it by the same function the invoke boundary uses. That is
+    /// what makes an approval and the call it authorises agree by construction rather than by a
+    /// caller copying a string correctly.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub action: Option<String>,
+    /// The input the named `action` will be invoked with; ignored without `action`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<Value>,
     /// How many distinct approvals resolve it. Defaults to one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub required_decisions: Option<u16>,
@@ -748,4 +762,41 @@ pub struct ChannelPolicySetIn {
 pub struct ChannelPolicyResetIn {
     /// The machine connector kind.
     pub channel_kind: String,
+}
+
+/// One action's gating policy as `approval_policies.*` returns it (#282).
+///
+/// A policy the tenant never set still has an answer here: the strict default, so a reader never
+/// has to interpret an absent row as a decision.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ApprovalPolicyOut {
+    /// The action the policy governs.
+    pub action: String,
+    /// `required` — an approved approval naming the exact target is needed; `waived` — it is not.
+    pub approval: String,
+    /// `forbidden` — the requester cannot decide its own gate (§5.4); `allowed` — they may.
+    pub self_approval: String,
+}
+
+/// `approval_policies.get` input.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ApprovalPolicyGetIn {
+    /// The action whose policy is asked for.
+    pub action: String,
+}
+
+/// `approval_policies.set` input — the complete decision for one action.
+///
+/// Both settings are required: a `set` replaces the whole policy, so leaving one out would mean
+/// silently resetting it to the default rather than leaving it alone.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ApprovalPolicySetIn {
+    /// The destructive action whose gating this decides.
+    pub action: String,
+    /// `required` or `waived`.
+    pub approval: String,
+    /// `forbidden` or `allowed`.
+    pub self_approval: String,
 }
