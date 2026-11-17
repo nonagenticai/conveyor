@@ -557,7 +557,10 @@ window.installV2 = function (api, enterprise) {
         project_id: projectId,
         page: { limit: 100 },
       });
-      cs.outputs[projectId] = { items: list(page.items), error: null };
+      cs.outputs[projectId] = {
+        items: list(page.items).filter((doc) => doc.status !== "deleted"),
+        error: null,
+      };
     } catch (error) {
       cs.outputs[projectId] = { items: [], error };
     } finally {
@@ -580,7 +583,7 @@ window.installV2 = function (api, enterprise) {
           ...(more && cs.register.next_cursor ? { cursor: cs.register.next_cursor } : {}),
         },
       });
-      const items = list(page.items);
+      const items = list(page.items).filter((doc) => doc.status !== "deleted");
       cs.register.items = more ? [...cs.register.items, ...items] : items;
       cs.register.next_cursor = page.next_cursor || null;
       cs.register.error = null;
@@ -607,7 +610,7 @@ window.installV2 = function (api, enterprise) {
           ...(more && cs.requests.next_cursor ? { cursor: cs.requests.next_cursor } : {}),
         },
       });
-      const items = list(page.items);
+      const items = list(page.items).filter((doc) => doc.status !== "deleted");
       cs.requests.items = more ? [...cs.requests.items, ...items] : items;
       cs.requests.next_cursor = page.next_cursor || null;
       cs.requests.error = null;
@@ -845,10 +848,84 @@ window.installV2 = function (api, enterprise) {
   const outputUnitOf = (doc) => String(doc.unit || ((doc.meta || {}).unit) || "");
   const outputAuthorOf = (doc) => String(doc.created_by_name || "");
   const outputStateOf = (doc) =>
-    doc.publishable ? "public" : doc.publish_requested_at ? "review requested" : "draft";
+    doc.publishable
+      ? "public"
+      : (doc.meta || {}).rework
+        ? "returned"
+        : doc.publish_requested_at
+          ? "review requested"
+          : "draft";
   const isAdmin = () => !!(C && C.role && C.role() === "admin");
   const INCEPTION_CATEGORIES = ["inception-analysis", "architecture-design"];
   const OUTPUT_CATEGORIES = list(OUTPUT_STANDARD.categories);
+
+  // The standard's template per category is data (#245); the compose dialog seeds its skeleton
+  // and the completeness panel reads the same required headings the server refuses to publish
+  // without. The normalisation mirrors the domain function exactly.
+  const outputTemplateOf = (category) =>
+    (OUTPUT_STANDARD.templates || {})[category] || null;
+  const headingKeyOf = (value) =>
+    String(value).split(/\s+/).filter(Boolean).join(" ").toLowerCase();
+  const headingsOf = (markdown) => {
+    const found = new Set();
+    let fence = null;
+    for (const line of String(markdown || "").split("\n")) {
+      const trimmed = line.replace(/^\s+/, "");
+      const opener = trimmed.match(/^(```+|~~~+)/);
+      if (opener) {
+        const marker = opener[1][0];
+        if (!fence) fence = marker;
+        else if (fence === marker) fence = null;
+        continue;
+      }
+      if (fence) continue;
+      const atx = trimmed.match(/^(#{1,6})\s+(.*?)\s*$/);
+      if (!atx) continue;
+      const text = atx[2].replace(/#+$/, "").trim();
+      if (text) found.add(headingKeyOf(text));
+    }
+    return found;
+  };
+  const missingSectionsOf = (category, body) => {
+    const template = outputTemplateOf(category);
+    if (!template) return [];
+    const present = headingsOf(body);
+    return list(template.required).filter((heading) => !present.has(headingKeyOf(heading)));
+  };
+  const completenessOf = (category, body) => {
+    const template = outputTemplateOf(category);
+    if (!template) return `<p class="muted">This category has no template in the standard.</p>`;
+    const present = headingsOf(body);
+    return `<ul class="console-completeness">${list(template.required)
+      .map((heading) =>
+        present.has(headingKeyOf(heading))
+          ? `<li class="is-present">✓ ${E(heading)}</li>`
+          : `<li class="is-missing">○ ${E(heading)}</li>`,
+      )
+      .join("")}</ul>`;
+  };
+  const findOutput = (id) =>
+    [...list(cs.requests.items), ...list(cs.register.items)].find((doc) => doc.id === id) ||
+    null;
+  const missingFromError = (error) =>
+    list(error && error.errors)
+      .filter((row) => row.code === "output_incomplete")
+      .map((row) => String(row.detail || "").replace(/^missing required section:\s*/, ""))
+      .filter(Boolean);
+
+  // The completeness panel is live on the dialog's own fields; it is not a `render()` state
+  // change, so typing never redraws (and never loses) the draft.
+  function wireCompleteness() {
+    const area = document.getElementById("output-body");
+    const slot = document.getElementById("output-completeness");
+    if (!area || !slot) return;
+    const category = document.getElementById("output-category");
+    const update = () =>
+      (slot.innerHTML = completenessOf((category || {}).value || "", area.value));
+    area.addEventListener("input", update);
+    if (category) category.addEventListener("change", update);
+    update();
+  }
 
   // The classes a person may create a project against. The keyed classes (P0, SPEC-V2) are the
   // programme's own rows, and `archived` is a measurement, not a creation state. #221 adds
@@ -931,6 +1008,24 @@ window.installV2 = function (api, enterprise) {
               "shield",
             )
           : "",
+        C.can("documents.return")
+          ? button(
+              "Return",
+              "request-return",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "replay",
+            )
+          : "",
+        C.can("documents.compose")
+          ? button(
+              "Open a kata",
+              "request-kata",
+              `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`,
+              "small",
+              "lightning",
+            )
+          : "",
       ].join("");
       const project = consoleProjects().find((row) => row.id === doc.project_id);
       return `<tr><td><strong>${E(doc.title)}</strong><small class="mono">v${E(doc.version)}</small></td><td>${E(doc.project_key || (project || {}).key || "—")}</td><td>${E(outputAuthorOf(doc) || "—")}</td><td><small>${E(short(doc.updated_at, 16))}</small></td><td><div class="console-actions">${actions}</div></td></tr>`;
@@ -983,7 +1078,7 @@ window.installV2 = function (api, enterprise) {
                 `<option value="${E(p.id)}" ${projectFilter === p.id ? "selected" : ""}>${E(p.key)} · ${E(p.name)}</option>`,
             )
             .join("")}</select></label>
-          <label class="e-select">State <select data-v2-input="outputs-filter" data-key="outputsState"><option value="">Any</option><option value="public" ${stateFilter === "public" ? "selected" : ""}>Published</option><option value="review requested" ${stateFilter === "review requested" ? "selected" : ""}>Review requested</option><option value="draft" ${stateFilter === "draft" ? "selected" : ""}>Draft</option></select></label>
+          <label class="e-select">State <select data-v2-input="outputs-filter" data-key="outputsState"><option value="">Any</option><option value="public" ${stateFilter === "public" ? "selected" : ""}>Published</option><option value="review requested" ${stateFilter === "review requested" ? "selected" : ""}>Review requested</option><option value="draft" ${stateFilter === "draft" ? "selected" : ""}>Draft</option><option value="returned" ${stateFilter === "returned" ? "selected" : ""}>Returned</option></select></label>
           <label class="e-select">Category <select data-v2-input="outputs-filter" data-key="outputsCategory"><option value="">Any</option>${categories
             .map(
               (c) =>
@@ -1775,13 +1870,17 @@ window.installV2 = function (api, enterprise) {
       (c) =>
         `<option value="${E(c)}" ${nextCategory === c ? "selected" : ""}>${E(c)}</option>`,
     ).join("");
-    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}${projectSelect}<label class="field full"><span>Title</span><input id="output-title" value="${E(template.title || "")}" placeholder="What this output records"></label><label class="field full"><span>Unit (project key or issue number)</span><input id="output-unit" value="${E(unitValue)}" placeholder="${E((project || {}).key || "121")}" spellcheck="false"></label><label class="field full"><span>Category</span><select id="output-category"><option value="">—</option>${options}</select></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why.">${E(template.body || "")}</textarea></label><p class="muted">The body is capped at 256 KiB. Saving keeps it a draft; an admin publishes it after review.</p></div>`;
+    const seedBody =
+      template.body ||
+      (nextCategory ? (outputTemplateOf(nextCategory) || {}).skeleton || "" : "");
+    const body = `<div class="dialog-body console-dialog-body">${cardId ? `<p class="muted">Bound to card <span class="mono">${E(short(cardId, 12))}</span>.</p>` : ""}${projectSelect}<label class="field full"><span>Title</span><input id="output-title" value="${E(template.title || "")}" placeholder="What this output records"></label><label class="field full"><span>Unit (project key or issue number)</span><input id="output-unit" value="${E(unitValue)}" placeholder="${E((project || {}).key || "121")}" spellcheck="false"></label><label class="field full"><span>Category</span><select id="output-category"><option value="">—</option>${options}</select></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" placeholder="# Design note&#10;&#10;What was decided and why.">${E(seedBody)}</textarea></label><div class="output-completeness-panel"><span class="mono muted">Completeness · the standard's required sections</span><div id="output-completeness"></div></div><p class="muted">The body is capped at 256 KiB. Saving keeps it a draft; an admin publishes it after review, and the server refuses a publish missing a required section.</p></div>`;
     openDialog(
       nextCategory ? `Compose ${nextCategory}` : "Compose output",
       body,
       `${button("Save output", "output-save", `data-project="${E(projectId || "")}"`, "primary", "plus")}${btn("Cancel", "close-dialog")}`,
       true,
     );
+    wireCompleteness();
   }
 
   async function consoleOutputSave(projectId) {
@@ -1832,7 +1931,18 @@ window.installV2 = function (api, enterprise) {
       (c) =>
         `<option value="${E(c)}" ${outputCategoryOf(doc) === c ? "selected" : ""}>${E(c)}</option>`,
     ).join("");
-    const body = `<div class="dialog-body console-dialog-body">${
+    const rework = (doc.meta || {}).rework;
+    const reworkNote = rework
+      ? note(
+          `<strong>Returned</strong> · ${E(rework.note || "")}${
+            list(rework.missing).length
+              ? `<br><span class="mono">Missing: ${list(rework.missing).map(E).join(", ")}</span>`
+              : ""
+          }`,
+          "amber",
+        )
+      : "";
+    const body = `<div class="dialog-body console-dialog-body">${reworkNote}${
       doc.publishable
         ? note(
             locked
@@ -1840,7 +1950,7 @@ window.installV2 = function (api, enterprise) {
               : "<strong>Published</strong> · an edit is versioned and stays public until an admin unpublishes it.",
           )
         : ""
-    }<label class="field full"><span>Title</span><input id="output-title" value="${E(doc.title)}" ${locked ? "disabled" : ""}></label><label class="field full"><span>Category</span><select id="output-category" ${locked ? "disabled" : ""}><option value="">—</option>${options}</select></label><label class="field full"><span>Unit (project key or issue)</span><input id="output-unit" value="${E(outputUnitOf(doc))}" spellcheck="false" ${locked ? "disabled" : ""}></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" ${locked ? "disabled" : ""}>${E(doc.body || "")}</textarea></label><p class="muted">Version ${E(doc.version)} · content hash <span class="mono">${E(short(doc.content_hash, 12))}</span>. Every save keeps the previous version in the history.</p></div>`;
+    }<label class="field full"><span>Title</span><input id="output-title" value="${E(doc.title)}" ${locked ? "disabled" : ""}></label><label class="field full"><span>Category</span><select id="output-category" ${locked ? "disabled" : ""}><option value="">—</option>${options}</select></label><label class="field full"><span>Unit (project key or issue)</span><input id="output-unit" value="${E(outputUnitOf(doc))}" spellcheck="false" ${locked ? "disabled" : ""}></label><label class="field full"><span>Body (Markdown)</span><textarea id="output-body" rows="10" ${locked ? "disabled" : ""}>${E(doc.body || "")}</textarea></label><div class="output-completeness-panel"><span class="mono muted">Completeness · the standard's required sections</span><div id="output-completeness"></div></div><p class="muted">Version ${E(doc.version)} · content hash <span class="mono">${E(short(doc.content_hash, 12))}</span>. Every save keeps the previous version in the history.</p></div>`;
     const actions = `${
       locked
         ? ""
@@ -1851,8 +1961,9 @@ window.installV2 = function (api, enterprise) {
             "primary",
             "shield",
           )
-    }${button("History", "output-history", `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`, "", "file")}${btn("Cancel", "close-dialog")}`;
+    }${C.can("documents.preview") ? button("Preview", "output-preview", `data-id="${E(doc.id)}"`, "", "eye") : ""}${button("History", "output-history", `data-id="${E(doc.id)}" data-version="${E(doc.version)}"`, "", "file")}${btn("Cancel", "close-dialog")}`;
     openDialog(`Edit · ${doc.title}`, body, actions, true);
+    wireCompleteness();
   }
 
   async function consoleOutputUpdate(id, version) {
@@ -1891,6 +2002,12 @@ window.installV2 = function (api, enterprise) {
       consoleRefreshOutputs(updated.project_id);
     } catch (error) {
       cs.lastError = error;
+      const missing = missingFromError(error);
+      if (publishable && error.status === 409 && missing.length) {
+        // The block names what is missing and offers the coach's triage; it is not a dead end.
+        consoleIncompleteDialog(id, version, missing);
+        return;
+      }
       toast("Publish refused · " + consoleError(error));
       render();
     }
@@ -2149,83 +2266,160 @@ window.installV2 = function (api, enterprise) {
   function consoleOutputTemplate(projectId, category) {
     const project = projectById(projectId);
     if (!project) return;
+    const template = outputTemplateOf(category);
+    if (!template) {
+      toast(`No template for ${category} in the standard`);
+      return;
+    }
     const label = category.replace(/-/g, " ");
     const heading = label.charAt(0).toUpperCase() + label.slice(1);
-    const inceptionBody = `# Inception analysis — ${project.key}\n\n## Current state\n\nWhat exists today, inside the conveyor repo and in the wider estate.\n\n## Reuse sources\n\nInside the conveyor repo, the wider estate, upstream crates. Name the capability and the boundary; no private host or path.\n\n## Build vs reuse\n\n## Risks\n\n`;
-    const architectureBody = `# Architecture — ${project.key}\n\n## Context and boundary\n\n## Aggregates, tables, actions\n\n## Decisions\n\nA deviation from the blueprint is a decision record, not a silent fork.\n\n## Acceptance\n\n`;
-    const templates = {
-      "inception-analysis": {
-        category: "inception-analysis",
-        title: `Inception analysis — ${project.key} ${project.name}`,
-        body: inceptionBody,
-      },
-      analysis: {
-        category: "analysis",
-        title: `Inception analysis — ${project.key} ${project.name}`,
-        body: inceptionBody,
-      },
-      "architecture-design": {
-        category: "architecture-design",
-        title: `Architecture — ${project.key} ${project.name}`,
-        body: architectureBody,
-      },
-      architecture: {
-        category: "architecture",
-        title: `Architecture — ${project.key} ${project.name}`,
-        body: architectureBody,
-      },
-      "project-brief": {
-        category: "project-brief",
-        title: `Project brief — ${project.key} ${project.name}`,
-        body: `# ${project.key} — ${project.name}\n\n**Track:** ${(project.meta || {}).track || ""} · **Tranche:** ${(project.meta || {}).tranche ?? ""} · **Plan:** \`${(project.meta || {}).plan || ""}\`\n\n## Outcome\n\nOne sentence: what is true after this project that is not true now.\n\n## Boundary\n\nIn scope, out of scope, and the surfaces it must not fork.\n\n## Reuse sources\n\n| Source | What to reuse | Analysis question |\n|---|---|---|\n| | | |\n\n## Inception units\n\n1. \`analysis\` — current state, reuse, contract/licence, build-vs-reuse, risks.\n2. \`architecture\` — aggregates, tables, actions, modules, integrations, decision record, acceptance.\n\n## Dependencies\n\n## Acceptance\n\n- Scenario: \n  Verify: \`\`\n\n## Capabilities\n\n## Gaps\n\n`,
-      },
-      "brief-template": {
-        category: "brief-template",
-        title: "Project brief template — the mandatory fields",
-        body: `# Project brief template\n\nEvery delivery project brief carries:\n\n| Field | Content |\n|---|---|\n| Outcome | One sentence: what is true after the project that is not true now |\n| Boundary | Out of scope, and which existing surfaces it must not fork |\n| Reuse sources | Paths inside conveyor; estate services/modules; upstream crates. Each with the analysis question |\n| Inception units | \`analysis\` and \`architecture\`, the project's first two claims |\n| Dependencies | Typed: blocked-by, acceptance-blocked-by, blocks, related |\n| Acceptance | BDD scenario per part with a \`Verify:\` command |\n| Capabilities | The organisation positions/capabilities that own it |\n| Plan | The slice/S## plan path, or the T## SPEC_V2 section |\n`,
-      },
-      "architecture-analysis": {
-        category: "architecture-analysis",
-        title: "Architecture and analysis pack — current state, options, risks",
-        body: `# Architecture and analysis pack\n\n## Current state\n\n## Options considered\n\n## Risks\n\n## Dependency map\n\n`,
-      },
-      vision: {
-        category: "vision",
-        title: "Vision and mandate",
-        body: `# Vision and mandate\n\n## Purpose\n\n## Outcomes\n\n## Boundary\n\n## Who it serves\n\n`,
-      },
-      blueprint: {
-        category: "blueprint",
-        title: "Blueprint — the target architecture and operating model",
-        body: `# Blueprint\n\n## Aggregates and services\n\n## Action registry and data model\n\n## Deployment estate\n\n## The to-be the projects deliver\n\n`,
-      },
-      "business-case": {
-        category: "business-case",
-        title: "Business case",
-        body: `# Business case\n\n## Why now\n\n## Benefit map\n\n## Cost and risk posture\n\n## Licensing frame\n\n`,
-      },
-      "programme-plan": {
-        category: "programme-plan",
-        title: "Programme plan — tranches and projects",
-        body: `# Programme plan\n\n## Tranches\n\n## Projects and sequencing\n\n## Gates\n\n## First three months\n\n`,
-      },
-      governance: {
-        category: "governance",
-        title: "Governance and organisation",
-        body: `# Governance and organisation\n\n## Roles\n\n## Decision ladder\n\n## Assurance\n\n## The unit protocol\n\n`,
-      },
-      "reuse-map": {
-        category: "reuse-map",
-        title: "Reuse map",
-        body: `# Reuse map\n\n| Source | Reuse candidate | Boundary | Licence/contract constraint |\n|---|---|---|---|\n| | | | |\n`,
-      },
-    };
-    const template = templates[category] || {
+    consoleOutputNew(projectId, null, {
       category,
       title: `${heading} — ${project.key} ${project.name}`,
-      body: `# ${heading} — ${project.key}\n\n## Purpose\n\n## Content\n\n## Evidence\n\n`,
-    };
-    consoleOutputNew(projectId, null, template);
+      body: template.skeleton,
+    });
+  }
+
+  async function consoleOutputPreview(id) {
+    let preview;
+    try {
+      preview = await C.action("documents.preview", { id });
+    } catch (error) {
+      toast("Preview refused · " + consoleError(error));
+      return;
+    }
+    const missing = list(preview.missing);
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">Rendered by the same renderer as the public page. ${
+      missing.length
+        ? `Still missing: <span class="mono">${missing.map(E).join(", ")}</span>`
+        : "Every required section is present."
+    }</p><iframe class="console-preview" title="Output preview" sandbox srcdoc="${E(preview.html)}" style="width:100%;height:420px;border:1px solid var(--line);border-radius:8px;background:#fff"></iframe><p class="muted">Author HTML is shown as text and a non-http(s)/mailto link is inert; the public page would serve exactly this.</p></div>`;
+    openDialog("Preview", body, btn("Close", "close-dialog"), true);
+  }
+
+  // The triage a blocked publish offers: fix it, return it, or record a system issue as a kata.
+  function consoleIncompleteDialog(id, version, missing) {
+    const body = `<div class="dialog-body console-dialog-body"><p><strong>409 output_incomplete</strong> · the standard requires these sections before this output can be public:</p><ul class="console-completeness">${missing
+      .map((heading) => `<li class="is-missing">○ ${E(heading)}</li>`)
+      .join("")}</ul>${note("Edit the draft and publish again, return it to the author with a note, or open a kata when the gap is the system's (template, instrument or source).")}</div>`;
+    openDialog(
+      "Publish blocked · output_incomplete",
+      body,
+      `${button("Return with a note", "request-return", `data-id="${E(id)}" data-version="${E(version)}"`, "", "replay")}${button("Open a kata", "request-kata", `data-id="${E(id)}" data-version="${E(version)}"`, "", "lightning")}${button("Edit the draft", "output-edit", `data-id="${E(id)}"`, "primary", "edit")}${btn("Close", "close-dialog")}`,
+      true,
+    );
+  }
+
+  function consoleReturnDialog(id, version) {
+    const doc = findOutput(id) || {};
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">Returning <strong>${E(doc.title || "this output")}</strong> to its author. The server records the sections the standard finds missing.</p><label class="field full"><span>Reason (the author sees this)</span><textarea id="return-note" rows="4" placeholder="What must change before it can be public."></textarea></label><p class="muted">The publish request clears; the draft's content is unchanged.</p></div>`;
+    openDialog(
+      "Return this output",
+      body,
+      `${button("Return to the author", "return-save", `data-id="${E(id)}" data-version="${E(version)}"`, "primary", "replay")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleReturnSave(id, version) {
+    const noteText = ((document.getElementById("return-note") || {}).value || "").trim();
+    if (!noteText) {
+      toast("A return needs a reason");
+      return;
+    }
+    const doc = findOutput(id) || {};
+    try {
+      const returned = await C.action("documents.return", { id, note: noteText }, {
+        etag: Number(version),
+      });
+      const missing = list(((returned.meta || {}).rework || {}).missing);
+      closeWorkspaceDialog();
+      toast(
+        missing.length
+          ? `Returned · missing: ${missing.join(", ")}`
+          : "Returned to the author",
+      );
+      consoleRefreshOutputs(doc.project_id || null);
+      render();
+    } catch (error) {
+      toast("Return refused · " + consoleError(error));
+    }
+  }
+
+  function consoleKataDialog(id, version) {
+    const source = findOutput(id) || {};
+    const projects = consoleProjects();
+    const kata = projects.find((row) => row.key === "S18") || projects[0] || null;
+    const template = outputTemplateOf("decision");
+    const skeleton = template ? template.skeleton : "# Decision\n\n## Context\n\n## Decision\n\n## Consequences\n\n## Evidence\n";
+    const body = `<div class="dialog-body console-dialog-body"><p class="muted">A kata records a <strong>system</strong> defect found while reviewing. The source is returned with a note that points at the kata; the kata is a decision on the kata project, never an edit to the source.</p><label class="field full"><span>Kata project</span><select id="kata-project">${projects
+      .map(
+        (row) =>
+          `<option value="${E(row.id)}" ${kata && row.id === kata.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`,
+      )
+      .join("")}</select></label><label class="field full"><span>Coach note (what the system must fix)</span><textarea id="kata-note" rows="3" placeholder="The missing template, instrument or source."></textarea></label><label class="field full"><span>Kata body (Markdown, the decision template)</span><textarea id="kata-body" rows="8">${E(skeleton)}</textarea></label></div>`;
+    openDialog(
+      "Open a kata",
+      body,
+      `${button("Open the kata and return the source", "kata-save", `data-id="${E(id)}" data-version="${E(version)}"`, "primary", "lightning")}${btn("Cancel", "close-dialog")}`,
+      true,
+    );
+  }
+
+  async function consoleKataSave(id, version) {
+    const source = findOutput(id) || {};
+    const projectId = ((document.getElementById("kata-project") || {}).value || "").trim();
+    const noteText = ((document.getElementById("kata-note") || {}).value || "").trim();
+    const body = ((document.getElementById("kata-body") || {}).value || "").trim();
+    const project = consoleProjects().find((row) => row.id === projectId);
+    if (!projectId || !project) {
+      toast("Choose the kata project");
+      return;
+    }
+    if (!noteText) {
+      toast("A kata needs the coach's note");
+      return;
+    }
+    if (!body) {
+      toast("The kata needs a body");
+      return;
+    }
+    let kata;
+    try {
+      kata = await C.action("documents.compose", {
+        project_id: projectId,
+        title: `Kata — ${source.title || "output"}`,
+        body,
+        category: "decision",
+        unit: project.key,
+        meta: {
+          kata: true,
+          system_issue: true,
+          source_document_id: id,
+          source_project_id: source.project_id || undefined,
+          coach_note: noteText,
+        },
+        publishable: true,
+      });
+    } catch (error) {
+      toast("Kata refused · " + consoleError(error));
+      return;
+    }
+    try {
+      await C.action(
+        "documents.return",
+        { id, note: `Kata ${kata.id} records the system issue: ${noteText}` },
+        { etag: Number(version) },
+      );
+      toast(`Kata ${short(kata.id, 12)} opened and the source returned`);
+    } catch (error) {
+      toast(
+        `Kata ${short(kata.id, 12)} opened; the source was not returned · ${consoleError(error)}`,
+      );
+    }
+    closeWorkspaceDialog();
+    consoleRefreshOutputs(source.project_id || null);
+    render();
   }
 
   async function consoleFeedbackIntake(issueNumber) {
@@ -5111,6 +5305,21 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         break;
       case "request-publish":
         consoleOutputPublish(d.id, true, d.version);
+        break;
+      case "request-return":
+        consoleReturnDialog(d.id, d.version);
+        break;
+      case "return-save":
+        consoleReturnSave(d.id, d.version);
+        break;
+      case "request-kata":
+        consoleKataDialog(d.id, d.version);
+        break;
+      case "kata-save":
+        consoleKataSave(d.id, d.version);
+        break;
+      case "output-preview":
+        consoleOutputPreview(d.id);
         break;
       case "output-history":
         consoleOutputHistory(d.id, d.version);
