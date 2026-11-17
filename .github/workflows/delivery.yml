@@ -1,0 +1,241 @@
+# delivery — clear review requests nobody must act on, and approve runs parked on a human click.
+#
+# WHY THIS EXISTS
+# ---------------
+# Two kinds of noise reached the owner and neither needed him:
+#
+#  1. Review requests. Sessions add `--add-reviewer` by habit, and the ruleset can request a team
+#     on an unattributed push. Required approvals on main are 0 (measured 2026-11-17), so the
+#     request blocked nothing — it only filled an inbox. A review request must mean one thing:
+#     a human decision is pending. On this repo that is the `status:needs-human` label, and
+#     nothing else.
+#  2. Parked workflow runs. A run whose pull request was opened with the workflow token sits at
+#     `action_required` until a maintainer approves it. On 2026-11-16 one waited ~18 h (#292).
+#     `issue-registry.yml` already approves its OWN run; this sweep is the general net, with the
+#     attribution rule below because this repository is public.
+#
+# INVARIANT — read before changing anything here: this workflow never merges a pull request,
+# never enables auto-merge and never approves a review. The merge queue and the green-PR janitor
+# remain the only merge authority in this estate.
+#
+# The default workflow token is read-only on this repo (measured 2026-11-17:
+# `actions/permissions/workflow` -> `default_workflow_permissions: read`), so every write is
+# granted per job, never at workflow level.
+
+name: delivery
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, labeled, unlabeled, review_requested]
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: delivery-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  # Clears open review requests on our own PRs unless `status:needs-human` asks for a human.
+  # Runs on the pull_request event for that one PR, and on the hourly sweep for every open PR.
+  clear-requests:
+    name: clear-requests
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      EVENT_PR: ${{ github.event.pull_request.number }}
+    steps:
+      - name: clear the requests nobody must act on
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+
+          repo = os.environ["REPO"]
+          event_pr = os.environ.get("EVENT_PR", "").strip()
+          gate = "status:needs-human"
+          # The PR authors this workflow may act on. A stranger's or a fork's PR is never touched
+          # (the head-repository check below is the real gate; this is the identity half).
+          ours = {
+              "georgedekker", "georgiedekker",
+              "nonagenticai-claude[bot]", "nonagenticai-github-projects[bot]",
+              "github-actions[bot]", "dependabot[bot]",
+          }
+          summary = []
+
+          def gh(args, payload=None):
+              cmd = ["gh", "api"] + args
+              if payload is not None:
+                  cmd += ["--input", "-"]
+              r = subprocess.run(cmd, input=json.dumps(payload) if payload is not None else None,
+                                 capture_output=True, text=True, timeout=60)
+              return r.returncode, r.stdout, r.stderr
+
+          # `gh pr list` is not an `api` call, so it gets its own runner.
+          def list_open():
+              r = subprocess.run(["gh", "pr", "list", "-R", repo, "--state", "open",
+                                  "--limit", "200", "--json", "number", "--jq", ".[].number"],
+                                 capture_output=True, text=True, timeout=60)
+              if r.returncode != 0:
+                  print(f"::error::gh pr list failed: {r.stderr.strip()[:300]}")
+                  sys.exit(1)
+              return [int(x) for x in r.stdout.split() if x.strip()]
+
+          numbers = [int(event_pr)] if event_pr else list_open()
+          failed = 0
+          for n in numbers:
+              rc, out, err = gh([f"repos/{repo}/pulls/{n}"])
+              if rc != 0:
+                  summary.append(f"- #{n}: could not read ({err.strip()[:120]})")
+                  failed += 1
+                  continue
+              pr = json.loads(out)
+              author = ((pr.get("user") or {}).get("login") or "")
+              head_repo = ((pr.get("head") or {}).get("repo") or {}).get("full_name") or ""
+              labels = {l.get("name") for l in (pr.get("labels") or [])}
+              reviewers = [u.get("login") for u in (pr.get("requested_reviewers") or []) if u.get("login")]
+              teams = [t.get("slug") for t in (pr.get("requested_teams") or []) if t.get("slug")]
+
+              if author not in ours:
+                  summary.append(f"- #{n}: kept — author `{author}` is not ours")
+                  continue
+              if head_repo != repo:
+                  summary.append(f"- #{n}: kept — head `{head_repo}` is not this repository")
+                  continue
+              if gate in labels:
+                  summary.append(f"- #{n}: kept — `{gate}` asks for a human decision")
+                  continue
+              if not reviewers and not teams:
+                  continue
+
+              rc, out, err = gh(["-X", "DELETE", f"repos/{repo}/pulls/{n}/requested_reviewers"],
+                                {"reviewers": reviewers, "team_reviewers": teams})
+              if rc == 0:
+                  removed = ", ".join(reviewers + [f"team:{t}" for t in teams])
+                  summary.append(f"- #{n}: cleared {removed}")
+              else:
+                  summary.append(f"- #{n}: clear FAILED ({err.strip()[:160]})")
+                  failed += 1
+
+          print("\n".join(summary) if summary else "Nothing to clear.")
+          step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          if step_summary:
+              with open(step_summary, "a", encoding="utf-8") as fh:
+                  fh.write("### delivery: review requests\n\n")
+                  fh.write("\n".join(summary) if summary else "Nothing to clear.\n")
+                  fh.write("\n")
+          sys.exit(1 if failed else 0)
+          PY
+
+  # Approves `action_required` runs that belong to this repository's own workflows and its own
+  # pull requests. Anything unattributable is printed in the job summary and left parked: this is
+  # a public repository, so a fork run must never be green-lit by us.
+  sweep-parked:
+    name: sweep-parked
+    if: ${{ !github.event.repository.private && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: write
+      pull-requests: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: approve our parked runs, name everyone else's
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+
+          repo = os.environ["REPO"]
+          ours = {
+              "georgedekker", "georgiedekker",
+              "nonagenticai-claude[bot]", "nonagenticai-github-projects[bot]",
+              "github-actions[bot]", "dependabot[bot]",
+          }
+          summary, failed = [], 0
+
+          def api(args):
+              r = subprocess.run(["gh", "api"] + args, capture_output=True, text=True, timeout=60)
+              return r.returncode, r.stdout, r.stderr
+
+          rc, out, err = api([f"repos/{repo}/actions/runs?status=action_required&per_page=50"])
+          if rc != 0:
+              print(f"::error::listing parked runs failed: {err.strip()[:300]}")
+              sys.exit(1)
+          runs = json.loads(out).get("workflow_runs", [])
+          if not runs:
+              summary.append("No parked runs.")
+
+          for run in runs:
+              rid = run.get("id")
+              path = run.get("path") or ""
+              head_repo = ((run.get("head_repository") or {}).get("full_name")) or ""
+              event = run.get("event") or ""
+              prs = [p.get("number") for p in (run.get("pull_requests") or []) if p.get("number")]
+
+              def keep(reason):
+                  summary.append(f"- run `{rid}` (`{path}`): LEFT PARKED — {reason}")
+
+              if head_repo != repo:
+                  keep(f"head repository is `{head_repo or 'unknown'}`")
+                  continue
+              if event != "pull_request":
+                  keep(f"event is `{event}`")
+                  continue
+              if not path.startswith(".github/workflows/"):
+                  keep("not a workflow of this repository")
+                  continue
+              if not prs:
+                  keep("no pull request is attached to the run")
+                  continue
+
+              attributable = False
+              why = "no open PR of ours at the run's head"
+              for n in prs:
+                  rc, pout, perr = api([f"repos/{repo}/pulls/{n}"])
+                  if rc != 0:
+                      why = f"PR #{n} unreadable"
+                      break
+                  pr = json.loads(pout)
+                  author = ((pr.get("user") or {}).get("login") or "")
+                  pr_head_repo = ((pr.get("head") or {}).get("repo") or {}).get("full_name") or ""
+                  if pr.get("state") != "open":
+                      why = f"PR #{n} is `{pr.get('state')}`"
+                      continue
+                  if pr_head_repo != repo:
+                      why = f"PR #{n} head is `{pr_head_repo}`"
+                      continue
+                  if author not in ours:
+                      why = f"PR #{n} author `{author}` is not ours"
+                      continue
+                  attributable = True
+                  break
+
+              if not attributable:
+                  keep(why)
+                  continue
+
+              rc, _, err = api(["-X", "POST", f"repos/{repo}/actions/runs/{rid}/approve"])
+              if rc == 0:
+                  summary.append(f"- run `{rid}` (`{path}`): APPROVED")
+              else:
+                  summary.append(f"- run `{rid}` (`{path}`): approve FAILED ({err.strip()[:160]})")
+                  failed += 1
+
+          print("\n".join(summary))
+          step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          if step_summary:
+              with open(step_summary, "a", encoding="utf-8") as fh:
+                  fh.write("### delivery: parked runs\n\n" + "\n".join(summary) + "\n")
+          sys.exit(1 if failed else 0)
+          PY

@@ -31,10 +31,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Never cancel a run for main: its image job is what deploys.
+# Never cancel a run for main: its image job is what deploys. Never cancel a merge_group run
+# either: it is the queue's verdict on a queued PR, and a re-run for the same queue ref must not
+# kill the predecessor mid-build (measured 2026-11-17: the rule was true for queue refs).
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.event_name != 'merge_group' }}
 
 permissions:
   contents: read
@@ -211,7 +213,9 @@ jobs:
   # Playwright is pinned and installed here: six checks launch a headless chromium, and the
   # pack has no package.json of its own.
   design-pack:
-    if: ${{ !github.event.repository.private }}
+    # Not a required context and up to 20 minutes long: on a merge_group run it would sit on the
+    # queue's critical path for no gate. The pull_request run is where the pack is validated.
+    if: ${{ !github.event.repository.private && github.event_name != 'merge_group' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
