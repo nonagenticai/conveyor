@@ -1669,10 +1669,9 @@ async fn seed_pm_approved_gate(pg: &support::Pg, ctx: &Ctx, project: Uuid, gate:
 async fn seed_pm_approved_baseline(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
     let baseline = seed_parity_baseline(pg, ctx, project).await;
     scoped(pg, ctx, async move |conn| {
-        let approved =
-            store::spine::approve_baseline_tx(conn, ctx.tenant, baseline, ctx.bob_user)
-                .await
-                .expect("approve the prepared baseline");
+        let approved = store::spine::approve_baseline_tx(conn, ctx.tenant, baseline, ctx.bob_user)
+            .await
+            .expect("approve the prepared baseline");
         assert!(
             approved.is_some(),
             "the prepared baseline must still be unapproved when it is approved"

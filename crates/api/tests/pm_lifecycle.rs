@@ -303,14 +303,13 @@ async fn the_pm_charters_plans_and_baselines_a_request() {
     }
 
     // The charter gate's effect is the asset's approval, so read the row itself.
-    let asset_status: String = sqlx::query_scalar(
-        "SELECT status FROM governed_asset WHERE tenant_id = $1 AND id = $2",
-    )
-    .bind(seeded.tenant_id)
-    .bind(charter_asset_id)
-    .fetch_one(&pg.super_pool)
-    .await
-    .expect("the charter asset");
+    let asset_status: String =
+        sqlx::query_scalar("SELECT status FROM governed_asset WHERE tenant_id = $1 AND id = $2")
+            .bind(seeded.tenant_id)
+            .bind(charter_asset_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("the charter asset");
     assert_eq!(
         asset_status, "approved",
         "approving the charter gate did not approve the charter asset"

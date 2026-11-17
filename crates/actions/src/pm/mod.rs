@@ -839,9 +839,8 @@ async fn changes_request(
     input: ChangeRequestIn,
 ) -> Result<HandlerOutput<ChangeRequestOut>, ActionError> {
     assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
-    let impact = i32::try_from(input.impact).map_err(|_| {
-        ActionError::new(422, "invalid_value", "impact must fit a 32-bit integer")
-    })?;
+    let impact = i32::try_from(input.impact)
+        .map_err(|_| ActionError::new(422, "invalid_value", "impact must fit a 32-bit integer"))?;
     // The change gate resolves the approved baseline it would replace before it is opened.
     let evidence = resolve_evidence(
         &mut *tx,
@@ -960,7 +959,10 @@ async fn approve_asset(
             return Err(ActionError::new(
                 409,
                 "asset_not_approvable",
-                format!("asset {asset_id} is {}; it cannot be approved", other.as_str()),
+                format!(
+                    "asset {asset_id} is {}; it cannot be approved",
+                    other.as_str()
+                ),
             ));
         }
     }
