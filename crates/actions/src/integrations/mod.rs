@@ -26,3 +26,5 @@ pub mod objects;
 pub mod strata;
 // #182 slice A: Google's OAuth token endpoint, behind `crate::youtube::YouTubeProvider`.
 pub mod youtube;
+// #173: the two audio capabilities of the model hosts — `produce.speech`, `media.transcribe`.
+pub mod audio;

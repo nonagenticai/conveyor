@@ -2,9 +2,10 @@
 //! `projects.create` · `.get` · `.close`.
 //!
 //! `create` is the one action that makes a project usable: it writes the project, its board,
-//! the template's five lanes, the **start card** and that card's **root run** in ONE
-//! transaction (S5-D5 — there is no `boards.create`, and a board-less project is unusable;
-//! S13 §5.8 — a project nobody is analysing is no more usable than a board-less one). The wire
+//! the template's five lanes and the **start card** in ONE transaction, and starts that card's
+//! **root run** when the tenant's start capability is ready (S5-D5 — there is no `boards.create`,
+//! and a board-less project is unusable; S13 §5.8 — a project nobody is analysing is no more
+//! usable than a board-less one). The wire
 //! vocabulary is fr's (`title`, `problem_statement`, `desired_outcome`);
 //! `project_type`/`repository_url` are the signed channel's names for
 //! `project_type_code`/`repo_url` and S06a maps them (S05 §5).
@@ -192,11 +193,11 @@ async fn projects_create(
 
 /// Create the project's start card in the board's intake lane and start its root run (S13 §5.8).
 ///
-/// Both writes run in the caller's transaction: a project that exists without its start card is
-/// a project nobody is analysing, and a start card without its run is a card no worker will pick
-/// up. A tenant whose seed lacks the card type or the published process gets a typed `409`
-/// naming what is missing — a fresh project must never be created into a state the engine
-/// cannot act on. `ctx` is consumed because `process_runs_start` takes it by value.
+/// The card and the run ride the caller's transaction, but the run is contingent on the tenant's
+/// content: an absent/not-published start process and a start capability that is not ready both
+/// leave a valid project, board and start card with no run — the card can be started later from
+/// the console. Every other refusal is fatal, so a fresh project is never created into a state
+/// the engine cannot act on. `ctx` is consumed because `process_runs_start` takes it by value.
 async fn insert_start_card_and_run(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
@@ -326,6 +327,18 @@ async fn insert_start_card_and_run(
                     process_key = START_PROCESS_KEY,
                     "projects.create: the tenant has no published start process; the project and \
                      its start card were created without a run"
+                );
+                return Ok(());
+            }
+            // A published start process whose capability is not ready (no active agent, an
+            // unregistered allowed action, a missing prompt pin) is the same observable state:
+            // the project, board and start card are valid, and a person starts the card when
+            // the content is ready. The refusal is logged; it is never silent.
+            (409, "capability_not_ready") => {
+                tracing::info!(
+                    process_key = START_PROCESS_KEY,
+                    "projects.create: the start capability is not ready; the project and its \
+                     start card were created without a run"
                 );
                 return Ok(());
             }

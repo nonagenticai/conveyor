@@ -238,6 +238,9 @@ pub enum ApprovalError {
     /// A quorum of zero is not a gate.
     #[error("required_decisions must be at least 1")]
     InvalidRequirement,
+    /// The requester cannot decide the gate that judges their own work (SPEC_V2 §5.4, T1 P1.3).
+    #[error("the requester cannot decide their own gate")]
+    RequesterCannotDecide,
     /// `expire` was called before `expires_at` (or the gate has no expiry at all).
     #[error("the approval is not yet due to expire (expires_at={expires_at:?}, at={at})")]
     NotDue {

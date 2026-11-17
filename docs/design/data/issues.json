@@ -1,11 +1,531 @@
 {
   "issues": [
     {
-      "number": 149,
-      "title": "programme: the work store \u2014 expected outputs and the project checklist",
+      "number": 253,
+      "title": "ci: the refresh approves its parked pull_request run so the generated PR is mergeable",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/253",
+      "updatedAt": "2026-11-17T01:28:00Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 251,
+      "title": "ci: the registry refresh must not require pandoc",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/251",
+      "updatedAt": "2026-11-17T00:28:57Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 248,
+      "title": "ci: the registry refresh must regenerate the derived design-pack data",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/248",
+      "updatedAt": "2026-11-17T00:06:43Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 245,
+      "title": "console: the authoring standard \u2014 templates, a blocked publish, and the coach's rework/kata triage",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/149",
-      "updatedAt": "2026-11-15T15:56:14Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/245",
+      "updatedAt": "2026-11-16T22:45:16Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "S09",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 243,
+      "title": "programme: amend ADR 0005 \u2014 the absorption sequence ends at #45, the V2 spine is unblocked",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/243",
+      "updatedAt": "2026-11-16T22:42:18Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 241,
+      "title": "docs: point CODEOWNERS at the maintainers team and make the contribution guide true",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/241",
+      "updatedAt": "2026-11-16T23:46:06Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 239,
+      "title": "ci: serialise and give headroom to the browser tests that share the CDP launch lock",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/239",
+      "updatedAt": "2026-11-16T23:30:20Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 237,
+      "title": "design: automate the published issue registry refresh",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/237",
+      "updatedAt": "2026-11-16T23:12:40Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 235,
+      "title": "Rust telemetry parity: cost-event attribution + licence-expiry metrics",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/235",
+      "updatedAt": "2026-11-16T22:19:09Z",
+      "labels": []
+    },
+    {
+      "number": 231,
+      "title": "console: the programme store is operable \u2014 workspace, project class, review requests and public feedback",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/231",
+      "updatedAt": "2026-11-16T21:42:37Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S09",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 226,
+      "title": "research-media: the tenant gate is unauthenticated \u2014 a bare X-Tenant-Id is trusted (blocks #205 P4)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/226",
+      "updatedAt": "2026-11-16T19:35:56Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 225,
+      "title": ".github: add a Good first issues link to the new-issue chooser",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/225",
+      "updatedAt": "2026-11-16T19:34:04Z",
+      "labels": [
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 224,
+      "title": "docs: CONTRIBUTING must say how to install Playwright for the design-pack checks",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/224",
+      "updatedAt": "2026-11-16T19:34:02Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 223,
+      "title": "docs: reconcile the issue-first rule in docs/plans/03-DELIVERY.md with the human small-fix path",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/223",
+      "updatedAt": "2026-11-16T19:34:01Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 222,
+      "title": "docs: repair the four broken relative links in docs/design/legacy/UI-SPEC.md",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/222",
+      "updatedAt": "2026-11-16T19:33:59Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 221,
+      "title": "programme: the rigour output categories and the architecture/tranche seed rows",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/221",
+      "updatedAt": "2026-11-16T22:34:37Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 219,
+      "title": "docs: make contribution easy to start, credited, and accepted by the maintainer",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/219",
+      "updatedAt": "2026-11-16T19:19:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 216,
+      "title": "programme: the MSP and TOGAF rigour layer (V2 + P0 + T9 plan + design study)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/216",
+      "updatedAt": "2026-11-16T22:02:45Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 214,
+      "title": "deploy: bind media.generate_image to the image host \u2014 the URL env and the egress rule",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/214",
+      "updatedAt": "2026-11-16T20:25:17Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 213,
+      "title": "estate: retire the dead w2v namespace surface (17 zero-replica Deployments, their Services, and the dead routes)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/213",
+      "updatedAt": "2026-11-16T16:34:36Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 212,
+      "title": "estate: deploy and cut over the absorbed scientific service",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/212",
+      "updatedAt": "2026-11-16T23:10:32Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 206,
+      "title": "projects.update cannot set project_type_code \u2014 a typeless project refuses every card move",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/206",
+      "updatedAt": "2026-11-16T10:31:44Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 205,
+      "title": "estate: deploy and cut over the absorbed research (webscraper + media-discovery)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/205",
+      "updatedAt": "2026-11-16T23:10:35Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 203,
+      "title": "estate: publish the two research service images (webscraper + media-discovery)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/203",
+      "updatedAt": "2026-11-16T17:17:38Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 198,
+      "title": "engine: the laya judge request does not match the service contract (422)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/198",
+      "updatedAt": "2026-11-16T09:41:54Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S13",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 196,
+      "title": "docs: the design pack names the estate's nodes in prose (36 mentions, 16 documents)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/196",
+      "updatedAt": "2026-11-16T07:40:01Z",
+      "labels": []
+    },
+    {
+      "number": 195,
+      "title": "test: the bus harness accepts a runner-provided private Redis",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/195",
+      "updatedAt": "2026-11-16T07:23:47Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S09",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 194,
+      "title": "engine: a pulled andon cord makes its own release path unreachable \u2014 licence.sync is blocked and the release action needs a fresh licence",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/194",
+      "updatedAt": "2026-11-16T16:40:23Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 193,
+      "title": "research: media_parity asserts avg_score, a mean of fields the tolerances declare volatile",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/193",
+      "updatedAt": "2026-11-16T19:34:11Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057ff"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 190,
+      "title": "ci: publish the two media executor images by digest",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/190",
+      "updatedAt": "2026-11-16T05:26:01Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 185,
+      "title": "estate: deploy the media executor images and prove one live job per image",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/185",
+      "updatedAt": "2026-11-16T13:48:22Z",
       "labels": [
         {
           "name": "unit",
@@ -18,11 +538,494 @@
       ]
     },
     {
+      "number": 184,
+      "title": "security: no estate machine name in the public tree (mini3.local in 7 places)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/184",
+      "updatedAt": "2026-11-16T07:18:48Z",
+      "labels": []
+    },
+    {
+      "number": 183,
+      "title": "programme: one output standard, completeness and the next-output queue",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/183",
+      "updatedAt": "2026-11-16T20:11:19Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S09",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 182,
+      "title": "estate: YouTube publishing \u2014 OAuth, upload, privacy and retract as thin operations",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/182",
+      "updatedAt": "2026-11-16T01:51:44Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 181,
+      "title": "media: the Gherkin runner drives real interactions over CDP, with a trace on failure",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/181",
+      "updatedAt": "2026-11-16T01:23:55Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 179,
+      "title": "engine: err.card must not coach a coach \u2014 cap the recursion and skip closed projects",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/179",
+      "updatedAt": "2026-11-16T02:55:16Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S13",
+          "color": "6E7781"
+        },
+        {
+          "name": "T4",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 177,
+      "title": "engine: the agent loop sends tools: [] \u2014 vLLM rejects it with 400 and no agent step can run",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/177",
+      "updatedAt": "2026-11-16T07:22:54Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 174,
+      "title": "estate: image generation \u2014 media.generate_image over the MOSS-Image host",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/174",
+      "updatedAt": "2026-11-16T10:52:42Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 173,
+      "title": "estate: speech and transcription \u2014 produce.speech and media.transcribe",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/173",
+      "updatedAt": "2026-11-16T18:47:16Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 172,
+      "title": "ops: host control \u2014 a fixed-verb agent and the systemctl actions",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/172",
+      "updatedAt": "2026-11-16T19:59:07Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        },
+        {
+          "name": "T7",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 171,
+      "title": "ops: the gated write set \u2014 restart, scale, rollback behind approvals",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/171",
+      "updatedAt": "2026-11-15T21:42:35Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        },
+        {
+          "name": "T7",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 170,
+      "title": "ops: the Kubernetes read family \u2014 a conveyor client and the ops.* reads",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/170",
+      "updatedAt": "2026-11-16T18:38:44Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        },
+        {
+          "name": "T7",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 168,
+      "title": "integrations: the coding jobs actions reach the live coding service \u2014 tenant header, typed inputs and the URL",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/168",
+      "updatedAt": "2026-11-15T23:03:26Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S09",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 167,
+      "title": "ci: the sse_board 200 ms property fails the full-suite gate on a loaded box (it measures the write, not just the delivery)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/167",
+      "updatedAt": "2026-11-16T00:09:14Z",
+      "labels": [
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 164,
+      "title": "estate: analyse.video \u2014 the video audit family over executor evidence",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/164",
+      "updatedAt": "2026-11-15T20:57:29Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 163,
+      "title": "estate: absorb the content service \u2014 produce.script and the blueprint layer",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/163",
+      "updatedAt": "2026-11-16T18:26:26Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 162,
+      "title": "docs: the w2v absorption record \u2014 what shipped, the produce layer, and the corrected estate table",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/162",
+      "updatedAt": "2026-11-16T19:01:47Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 161,
+      "title": "estate: author and render slide decks in Rust \u2014 crates/deck, OOXML plus PDF/PNG, absorbing slide_service",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/161",
+      "updatedAt": "2026-11-15T22:18:04Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 160,
+      "title": "executor: the inference endpoint is TENANT configuration \u2014 a tenant-admin registers it in the console, not a platform env var",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/160",
+      "updatedAt": "2026-11-16T21:15:50Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 159,
+      "title": "seed: a seeded tenant can start a process \u2014 the prompt catalogue ships with the seed, and seeded projects get their board",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/159",
+      "updatedAt": "2026-11-15T21:52:17Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 156,
+      "title": "console: give programme outputs provenance \u2014 authors, revisions, attachments and an admin publish gate",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/156",
+      "updatedAt": "2026-11-16T09:55:54Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S09",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 155,
+      "title": "board: enforce the status-label contract instead of remembering it",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/155",
+      "updatedAt": "2026-11-15T19:35:06Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 154,
+      "title": "estate: absorb the analysis service into crates/analysis \u2014 the analyse.* library",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/154",
+      "updatedAt": "2026-11-16T18:26:32Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 151,
+      "title": "programme: the one-way export \u2014 published outputs to programme/",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/151",
+      "updatedAt": "2026-11-16T08:52:02Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 149,
+      "title": "programme: the work store \u2014 expected outputs and the project checklist",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/149",
+      "updatedAt": "2026-11-16T08:32:49Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 144,
       "title": "estate: the runner substrate \u2014 job dispatch, token-fenced bytes and the runner/v1 contract",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/144",
-      "updatedAt": "2026-11-15T11:40:14Z",
+      "updatedAt": "2026-11-15T16:41:30Z",
       "labels": [
         {
           "name": "unit",
@@ -58,9 +1061,9 @@
     {
       "number": 140,
       "title": "estate: Rust inference-router empty-completion parity \u2014 classify, retry once, refuse (blocks #71 P4)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/140",
-      "updatedAt": "2026-11-15T15:47:30Z",
+      "updatedAt": "2026-11-15T17:08:29Z",
       "labels": [
         {
           "name": "unit",
@@ -79,9 +1082,9 @@
     {
       "number": 139,
       "title": "estate: absorb the media services into apps/media \u2014 runtime-grouped, browser and ffmpeg split by image",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/139",
-      "updatedAt": "2026-11-15T15:53:26Z",
+      "updatedAt": "2026-11-15T20:53:23Z",
       "labels": [
         {
           "name": "unit",
@@ -121,9 +1124,9 @@
     {
       "number": 137,
       "title": "estate: give the Rust inference-router /metrics parity before the #71 cutover",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/137",
-      "updatedAt": "2026-11-15T15:47:29Z",
+      "updatedAt": "2026-11-15T23:35:40Z",
       "labels": [
         {
           "name": "unit",
@@ -242,15 +1245,15 @@
       "title": "P0 \u2014 the reuse map, the architecture/analysis pack and the per-project inception standard",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/122",
-      "updatedAt": "2026-11-14T21:50:51Z",
+      "updatedAt": "2026-11-16T19:03:47Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
@@ -259,15 +1262,15 @@
       "title": "P0 \u2014 author the programme definition set",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/121",
-      "updatedAt": "2026-11-14T21:50:49Z",
+      "updatedAt": "2026-11-16T19:03:45Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
@@ -487,7 +1490,7 @@
       "title": "console: the live engine proof (A5) against the deployed revision",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/97",
-      "updatedAt": "2026-11-14T10:06:55Z",
+      "updatedAt": "2026-11-15T22:22:09Z",
       "labels": [
         {
           "name": "unit",
@@ -502,17 +1505,13 @@
     {
       "number": 95,
       "title": "estate: deploy and cut over the absorbed licenses (P4 + the live shadow window)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/95",
-      "updatedAt": "2026-11-15T10:06:54Z",
+      "updatedAt": "2026-11-16T20:11:05Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
-        },
-        {
-          "name": "status:blocked",
-          "color": "D93F0B"
         }
       ]
     },
@@ -572,7 +1571,7 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-13T22:53:23Z",
+      "updatedAt": "2026-11-16T19:11:35Z",
       "labels": [
         {
           "name": "unit",
@@ -695,10 +1694,10 @@
     },
     {
       "number": 82,
-      "title": "T10 \u2014 SAFe cadence",
+      "title": "T10 \u2014 SAFe cadence and MSP tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/82",
-      "updatedAt": "2026-11-13T22:53:51Z",
+      "updatedAt": "2026-11-16T19:02:51Z",
       "labels": [
         {
           "name": "unit",
@@ -716,10 +1715,10 @@
     },
     {
       "number": 81,
-      "title": "T9 \u2014 TOGAF profile",
+      "title": "T9 \u2014 the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/81",
-      "updatedAt": "2026-11-13T22:53:49Z",
+      "updatedAt": "2026-11-16T19:11:57Z",
       "labels": [
         {
           "name": "unit",
@@ -824,7 +1823,7 @@
       "title": "T13 \u2014 Tool platform",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/76",
-      "updatedAt": "2026-11-13T22:53:38Z",
+      "updatedAt": "2026-11-16T22:42:32Z",
       "labels": [
         {
           "name": "unit",
@@ -866,7 +1865,7 @@
       "title": "T3 \u2014 PM job",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/74",
-      "updatedAt": "2026-11-13T22:53:33Z",
+      "updatedAt": "2026-11-16T22:42:31Z",
       "labels": [
         {
           "name": "unit",
@@ -887,7 +1886,7 @@
       "title": "T2 \u2014 Decision ladder",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/73",
-      "updatedAt": "2026-11-13T22:53:31Z",
+      "updatedAt": "2026-11-16T22:42:29Z",
       "labels": [
         {
           "name": "unit",
@@ -908,15 +1907,15 @@
       "title": "T1 \u2014 Plan spine",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/72",
-      "updatedAt": "2026-11-13T22:53:29Z",
+      "updatedAt": "2026-11-16T22:55:23Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T1",
@@ -927,9 +1926,9 @@
     {
       "number": 71,
       "title": "estate: deploy and cut over the absorbed inference-router (P4 + the live shadow window)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/71",
-      "updatedAt": "2026-11-15T09:50:43Z",
+      "updatedAt": "2026-11-16T18:46:20Z",
       "labels": [
         {
           "name": "unit",
@@ -1062,10 +2061,10 @@
     },
     {
       "number": 46,
-      "title": "estate: absorb billing-service \u2014 contract, Rust rewrite, parity, metering reconciliation, cutover",
+      "title": "usage: the GPU-surface commercial-equivalent cost and load",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/46",
-      "updatedAt": "2026-11-15T09:42:57Z",
+      "updatedAt": "2026-11-16T23:36:21Z",
       "labels": [
         {
           "name": "unit",
@@ -1467,7 +2466,7 @@
       "title": "CI cost: merge-run tree equality (deferred, measurement-gated)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/22",
-      "updatedAt": "2026-11-13T06:32:14Z",
+      "updatedAt": "2026-11-15T19:05:43Z",
       "labels": [
         {
           "name": "unit",

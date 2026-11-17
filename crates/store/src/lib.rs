@@ -91,8 +91,10 @@ pub mod parent;
 pub mod platform;
 pub mod pool;
 pub mod portfolio;
+// T1 (SPEC_V2 §5.1, §5.3–§5.5, §8.3): the plan spine and the MSP rows.
 pub mod position;
 pub mod process;
+pub mod spine;
 // The judge/park writes the step executor needs (0033's run_step.judge and the run tree).
 pub mod process_judge;
 // SPEC D29: the default process catalogue — `seed/processes/**`, parsed and applied.
@@ -130,6 +132,9 @@ pub mod seed_organisation;
 pub mod seed_programme;
 pub mod snapshot;
 pub mod task;
+// #160: the tenant's registered inference destination — one row per tenant, read by the executor
+// before it falls back to the platform environment.
+pub mod tenant_inference;
 pub mod tenants;
 pub mod trace_link;
 pub mod validation;

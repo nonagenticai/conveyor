@@ -232,6 +232,11 @@ pub enum Scope {
     IntegrationsRead,
     /// Dispatch work to an external service (`coding_jobs.create`).
     IntegrationsWrite,
+    // T7 — the hostile-authority surface (SPEC_V2 §11.4): restarting, scaling and rolling back
+    // a workload. Admin-only, and never sufficient on its own — every `ops.*` write also names
+    // an approved approval (see `control::approvals::require_approval_tx`).
+    /// Restart, scale and roll back cluster workloads.
+    OpsWrite,
     // S11 — executable processes: ordered registry actions on one card.
     /// Read process templates, their steps and their published revisions.
     ProcessesRead,
@@ -288,7 +293,7 @@ pub enum Scope {
 
 impl Scope {
     /// Every scope this build knows.
-    pub const ALL: [Scope; 65] = [
+    pub const ALL: [Scope; 66] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -354,6 +359,7 @@ impl Scope {
         Scope::CapabilitiesWrite,
         Scope::OrganisationRead,
         Scope::OrganisationWrite,
+        Scope::OpsWrite,
     ];
 
     /// The wire spelling (`<resource>:<verb>`).
@@ -409,6 +415,7 @@ impl Scope {
             Self::SecretsWrite => "secrets:write",
             Self::IntegrationsRead => "integrations:read",
             Self::IntegrationsWrite => "integrations:write",
+            Self::OpsWrite => "ops:write",
             Self::ProcessesRead => "processes:read",
             Self::ProcessesWrite => "processes:write",
             Self::BenchmarksRead => "benchmarks:read",
@@ -511,7 +518,8 @@ impl Scope {
             | Self::BoardsWrite
             | Self::ListsWrite
             | Self::CardsWrite
-            | Self::OrganisationWrite => admin,
+            | Self::OrganisationWrite
+            | Self::OpsWrite => admin,
             // ⛔ NOT the `admin` predicate: that includes `Role::KataExecutor`, a machine
             // role, and a scope a machine holds cannot be a sign-off (CONTRACT §20 trap 1).
             Self::EvalsApprove => matches!(role, Role::Admin),
@@ -606,6 +614,11 @@ pub enum HandlerRef {
         /// (`secrets.create`/`rotate`), and the service itself is the one that decides whether
         /// an anonymous call is acceptable. The engine never substitutes a platform token.
         auth_optional: bool,
+        /// When set, the request is `multipart/form-data` carrying one document's bytes instead of
+        /// a JSON body. The document is named by an input member, fetched under the caller's
+        /// tenant and hash-verified exactly as a documents byte route does — the service never
+        /// receives a store credential or a URL.
+        upload: Option<Upload>,
     },
     /// No handler yet: S13's engine.
     Workflow,
@@ -624,6 +637,19 @@ impl std::fmt::Debug for HandlerRef {
             Self::Workflow => write!(f, "HandlerRef::Workflow"),
         }
     }
+}
+
+/// A document to upload with an external call, as `multipart/form-data`.
+///
+/// The service contract decides the field name; the action's input decides which document. Neither
+/// is inferred, because a service that silently accepted the wrong part name would answer with a
+/// transcript of nothing rather than an error.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Upload {
+    /// The input member that names the document (a UUID string).
+    pub input: &'static str,
+    /// The multipart field name the service expects.
+    pub field: &'static str,
 }
 
 /// The copilot's tier for an action (S10 §5.2; fr's `PROJECT_AGENT_CORE` / `PROJECT_AGENT_SEARCHABLE`).
@@ -690,13 +716,24 @@ pub struct AgentHints {
 /// [`ActionSpec::captures_usage`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Artefact {
-    /// The dotted path into the response JSON holding a base64 payload, e.g. `"data.0.b64_json"`.
+    /// The dotted path into the response JSON holding the payload, e.g. `"data.0.b64_json"`.
     pub field: &'static str,
+    /// How that member carries the bytes.
+    pub encoding: ArtefactEncoding,
     /// The MIME type declared on the document. It must be on `documents`' allowlist and must match
     /// the decoded bytes.
     pub content_type: &'static str,
     /// The document title.
     pub title: &'static str,
+}
+
+/// How an [`Artefact`]'s bytes travel in the service's JSON response.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ArtefactEncoding {
+    /// A base64 string — every binary payload, and the shape CONTRACT §6 names.
+    Base64,
+    /// A UTF-8 string carried verbatim: a transcript, a script, a rendered document already in text.
+    Utf8,
 }
 
 /// One invocable operation. Exactly §5.1's fields.
@@ -975,7 +1012,8 @@ mod tests {
         assert_eq!(Scope::CapabilitiesWrite.as_str(), "capabilities:write");
         assert_eq!(Scope::OrganisationRead.as_str(), "organisation:read");
         assert_eq!(Scope::OrganisationWrite.as_str(), "organisation:write");
-        assert_eq!(Scope::ALL.len(), 65);
+        assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
+        assert_eq!(Scope::ALL.len(), 66);
     }
 
     #[test]
