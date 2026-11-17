@@ -80,7 +80,7 @@ That is the whole reason the media cutover did not happen: see #226. The row con
 | Action | Evidence |
 |---|---|
 | mcp `WEBSCRAPER_URL` → `http://research.webscraper.svc.cluster.local:9119` | read back from the reconciled Deployment |
-| n8n-facing `webscraper-host-vs` destination → `research` Service | `webscraper.internal` unchanged |
+| n8n-facing `webscraper-host-vs` destination → `research` Service | the internal service DNS name unchanged |
 | Python `webscraper` Deployment, Service and egress policy removed | `kubectl -n webscraper get deploy,svc` lists only `research` |
 | live request after the flip | `POST http://research:9119/api/scrape/url` → the example.com body |
 | mcp restarted on the new URL | pod `1/1 Running` |
@@ -102,9 +102,8 @@ That is the whole reason the media cutover did not happen: see #226. The row con
   | republish | `nonagenticai/webscraper_service` created **public**, **1 commit**, 102 files, no history |
 
   Cleaning applied before publication, measured on the export: `.secrets.baseline` and
-  `docker-compose.override.yml` dropped; `registry.internal`, `pypiserver.internal`,
-  `postgres.internal`, `api.nonagentic.ai`, `webscraper.internal` and one private LAN IP replaced
-  with `example.com` hosts. `betterleaks` after cleaning: 5 findings, all test-fixture passwords
+  `docker-compose.override.yml` dropped; four internal service DNS names, one public API hostname
+  and one private LAN IP replaced with `example.com` hosts. `betterleaks` after cleaning: 5 findings, all test-fixture passwords
   (`username="alice", password="s3cr3t"` and equivalent), zero real credentials. The public README
   now opens with a retired notice pointing at `apps/research`.
 
