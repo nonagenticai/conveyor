@@ -160,9 +160,9 @@ struct Fixture {
     instance_id: String,
 }
 
-/// One tenant, one active capability agent (a tool-less, prompt-less agent — a benchmark run has
-/// no run/procedure facts to render a catalogue prompt from), one seeded suite and one `conveyor`
-/// run over its single instance.
+/// One tenant with one active member (the principal an agent run acts as), one active capability
+/// agent (a tool-less, prompt-less agent — a benchmark run has no run/procedure facts to render a
+/// catalogue prompt from), one seeded suite and one `conveyor` run over its single instance.
 async fn fixture(db: &common::TestDb, problem: &str) -> Fixture {
     let slug = format!("producer-{}", Uuid::now_v7());
     let tenant_id: Uuid =
@@ -172,6 +172,21 @@ async fn fixture(db: &common::TestDb, problem: &str) -> Fixture {
             .await
             .expect("tenant");
     let tenant = TenantId::from_uuid(tenant_id).expect("non-nil tenant");
+
+    // An agent invocation acts as a real principal (CONTRACT §17): the loop resolves the tenant's
+    // first active admin, so the fixture must have one.
+    let actor: Uuid = sqlx::query_scalar(
+        "INSERT INTO app_user (display_name) VALUES ('benchmark actor') RETURNING id",
+    )
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("actor");
+    sqlx::query("INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')")
+        .bind(tenant_id)
+        .bind(actor)
+        .execute(&db.super_pool)
+        .await
+        .expect("the tenant's actor");
 
     let mut tx = store::begin_scoped(&db.runtime, tenant)
         .await
