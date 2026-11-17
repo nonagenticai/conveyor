@@ -9,6 +9,7 @@
 //! The class is derived from the RESPONSE only: a caller that asked for a cache breakpoint still
 //! misses on a cold prefix.
 
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -217,16 +218,19 @@ pub enum UsageGroup {
     CacheStatus,
     /// The rendered prompt's SHA-256.
     PromptSha,
+    /// The run's project; a call with no run is the empty bucket.
+    Project,
 }
 
 impl UsageGroup {
     /// Every dimension.
-    pub const ALL: [UsageGroup; 5] = [
+    pub const ALL: [UsageGroup; 6] = [
         UsageGroup::Day,
         UsageGroup::Model,
         UsageGroup::CallerKind,
         UsageGroup::CacheStatus,
         UsageGroup::PromptSha,
+        UsageGroup::Project,
     ];
 
     /// The stored spelling (also the report's `group_by` input).
@@ -237,6 +241,7 @@ impl UsageGroup {
             UsageGroup::CallerKind => "caller_kind",
             UsageGroup::CacheStatus => "cache_status",
             UsageGroup::PromptSha => "prompt_sha",
+            UsageGroup::Project => "project",
         }
     }
 
@@ -249,7 +254,7 @@ impl UsageGroup {
 /// One report row.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UsageRow {
-    /// The group's value (a date, a model, a caller kind, a cache class or a SHA).
+    /// The group's value (a date, a model, a caller kind, a cache class, a SHA or a project).
     pub bucket: String,
     /// Calls in the bucket.
     pub calls: i64,
@@ -267,6 +272,17 @@ pub struct UsageRow {
     pub unknown: i64,
     /// `hits / calls`, `0.0` for an empty bucket.
     pub hit_ratio: f64,
+    /// What the bucket's tokens would cost on the commercial equivalent, in USD. Derived at
+    /// read time from `commercial_price` (SPEC_V2 D52) — tokens are stored, money is not.
+    /// An unpriced model contributes zero here and is counted in `unpriced_calls`, never
+    /// rendered as free.
+    pub cost_usd: Decimal,
+    /// Calls in the bucket whose model has a commercial price.
+    pub priced_calls: i64,
+    /// Calls in the bucket whose model has NO commercial price.
+    pub unpriced_calls: i64,
+    /// Wall time summed — the load side of the same window.
+    pub latency_ms: i64,
 }
 
 /// The share of calls served from cache; `0.0` when the bucket is empty.

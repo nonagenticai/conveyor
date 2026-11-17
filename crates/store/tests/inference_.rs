@@ -10,6 +10,7 @@ use conveyor_domain::TenantId;
 use conveyor_domain::inference::{CacheStatus, Usage, UsageGroup};
 use conveyor_store::inference::{ListCalls, NewInferenceCall};
 use conveyor_store::{begin_scoped, inference};
+use rust_decimal::Decimal;
 use uuid::Uuid;
 
 async fn tenant(db: &support::TestDb, slug: &str) -> TenantId {
@@ -181,4 +182,121 @@ async fn the_cache_check_refuses_a_hit_with_no_read_tokens() {
     let message = format!("{error}");
     assert!(message.contains("inference_call_cache_status") || message.contains("violat"));
     tx.rollback().await.expect("rollback");
+}
+
+#[tokio::test]
+async fn usage_cost_is_derived_at_read_time_and_projects_are_visible() {
+    let db = support::TestDb::fresh().await;
+    let tenant = tenant(&db, "s16-usage-cost").await;
+
+    // Two projects and their runs, so the project dimension has something to bucket on.
+    let mut projects = Vec::new();
+    for key in ["p1", "p2"] {
+        let project: Uuid = sqlx::query_scalar(
+            "INSERT INTO project (tenant_id, key, name) VALUES ($1, $2, $2) RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("seed project");
+        let run: Uuid = sqlx::query_scalar(
+            "INSERT INTO run (tenant_id, project_id, status) VALUES ($1, $2, 'queued') RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(project)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("seed run");
+        projects.push((project, run));
+    }
+
+    // `local-llm` is the seeded commercial price: 0.14 in / 0.28 out per 1M tokens.
+    let big = Usage {
+        prompt_tokens: 1_000_000,
+        completion_tokens: 1_000_000,
+        total_tokens: 2_000_000,
+        ..Usage::default()
+    };
+    let small = Usage {
+        prompt_tokens: 10,
+        total_tokens: 10,
+        ..Usage::default()
+    };
+    let unpriceable = Usage {
+        prompt_tokens: 1_000_000,
+        total_tokens: 1_000_000,
+        ..Usage::default()
+    };
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let mut first = call("local-llm", None, Some(big));
+    first.run_id = Some(projects[0].1);
+    inference::insert_call_tx(&mut tx, tenant, &first)
+        .await
+        .expect("insert priced big");
+    let mut second = call("local-llm", None, Some(small));
+    second.run_id = Some(projects[1].1);
+    inference::insert_call_tx(&mut tx, tenant, &second)
+        .await
+        .expect("insert priced small");
+    inference::insert_call_tx(&mut tx, tenant, &call("mystery", None, Some(unpriceable)))
+        .await
+        .expect("insert unpriced");
+    tx.commit().await.expect("commit");
+
+    let now = Utc::now();
+    let (since, until) = (now - Duration::hours(1), now + Duration::hours(1));
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let by_model = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Model, since, until)
+        .await
+        .expect("model report");
+    let llm = by_model
+        .iter()
+        .find(|row| row.bucket == "local-llm")
+        .expect("local-llm bucket");
+    assert_eq!((llm.calls, llm.priced_calls, llm.unpriced_calls), (2, 2, 0));
+    assert_eq!(
+        llm.cost_usd,
+        Decimal::new(420_001, 6),
+        "1M in + 1M out at 0.14/0.28 plus 10 in = 0.4200014, rounded to 6"
+    );
+    assert_eq!(llm.latency_ms, 2, "the load side is summed wall time");
+    let mystery = by_model
+        .iter()
+        .find(|row| row.bucket == "mystery")
+        .expect("unpriced bucket");
+    assert_eq!(
+        (mystery.calls, mystery.priced_calls, mystery.unpriced_calls),
+        (1, 0, 1),
+        "a model with no price is counted unpriced"
+    );
+    assert_eq!(
+        mystery.cost_usd,
+        Decimal::ZERO,
+        "an unpriced call contributes no cost — and is never rendered as free-priced"
+    );
+
+    let by_project = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Project, since, until)
+        .await
+        .expect("project report");
+    let one = by_project
+        .iter()
+        .find(|row| row.bucket == projects[0].0.to_string())
+        .expect("first project bucket");
+    assert_eq!(one.calls, 1);
+    assert_eq!(one.cost_usd, Decimal::new(420_000, 6));
+    let two = by_project
+        .iter()
+        .find(|row| row.bucket == projects[1].0.to_string())
+        .expect("second project bucket");
+    assert_eq!(two.calls, 1);
+    assert_eq!(two.cost_usd, Decimal::new(1, 6));
+    let unattributed = by_project
+        .iter()
+        .find(|row| row.bucket.is_empty())
+        .expect("a call with no run is its own visible bucket");
+    assert_eq!((unattributed.calls, unattributed.unpriced_calls), (1, 1));
+    tx.commit().await.expect("commit");
 }
