@@ -58,6 +58,11 @@ async fn a_second_pending_signoff_is_refused() {
             .fetch_one(&db.super_pool)
             .await
             .expect("seed app_user");
+    let requester: Uuid =
+        sqlx::query_scalar("INSERT INTO app_user (display_name) VALUES ('requester') RETURNING id")
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("seed the requester");
     let schema = serde_json::json!({});
 
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
@@ -73,7 +78,7 @@ async fn a_second_pending_signoff_is_refused() {
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
     let mut gate = NewApproval::new("eval_inputs", "eval");
     gate.eval_id = Some(eval_a.id);
-    gate.requested_by = Some(approver);
+    gate.requested_by = Some(requester);
     gate.meta = serde_json::json!({"artifact_sha256": "digest-a"});
     let first = insert_approval_tx(&mut tx, tenant, &gate)
         .await
@@ -118,7 +123,7 @@ async fn a_second_pending_signoff_is_refused() {
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
     let mut grading = NewApproval::new("eval_grading", "eval");
     grading.eval_id = Some(eval_a.id);
-    grading.requested_by = Some(approver);
+    grading.requested_by = Some(requester);
     insert_approval_tx(&mut tx, tenant, &grading)
         .await
         .expect("eval_grading is a different pending gate and must be accepted");
@@ -128,7 +133,7 @@ async fn a_second_pending_signoff_is_refused() {
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
     let mut other_eval = NewApproval::new("eval_inputs", "eval");
     other_eval.eval_id = Some(eval_b.id);
-    other_eval.requested_by = Some(approver);
+    other_eval.requested_by = Some(requester);
     insert_approval_tx(&mut tx, tenant, &other_eval)
         .await
         .expect("eval_inputs on another eval must be accepted");
@@ -148,7 +153,7 @@ async fn a_second_pending_signoff_is_refused() {
     assert_eq!(decided.status, ApprovalStatus::Approved);
     let mut re_request = NewApproval::new("eval_inputs", "eval");
     re_request.eval_id = Some(eval_a.id);
-    re_request.requested_by = Some(approver);
+    re_request.requested_by = Some(requester);
     let reopened = insert_approval_tx(&mut tx, tenant, &re_request)
         .await
         .expect("the index is partial (status = 'pending'), so a decided row frees the slot");
