@@ -39,6 +39,8 @@ fn call<'a>(prompt_ref: Option<&'a str>, usage: Option<Usage>) -> NewInferenceCa
         served_model: Some("served"),
         usage,
         cache_status: CacheStatus::of(usage.as_ref()).as_str(),
+        usage_unit: None,
+        usage_units: None,
         latency_ms: 7,
         outcome: "ok",
     }

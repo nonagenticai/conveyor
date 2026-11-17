@@ -203,7 +203,10 @@ mod tests {
                 (45, "commercial price".to_owned()),
                 // #73 (T2): the decision ladder's rungs, answer, option-set version, the three
                 // version pins, the actor and the approval link (0046_decision_ladder.sql).
-                (46, "decision ladder".to_owned())
+                (46, "decision ladder".to_owned()),
+                // #265: the non-token surfaces' unit and per-unit rate on the catalogue, and the
+                // call's own usage_unit/usage_units on the ledger (0047_media_price.sql).
+                (47, "media price".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

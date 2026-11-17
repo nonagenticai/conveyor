@@ -57,6 +57,11 @@ pub struct NewInferenceCall<'a> {
     pub usage: Option<Usage>,
     /// `hit | write | miss | unknown` (derived from `usage` by the domain).
     pub cache_status: &'a str,
+    /// The commercial unit for a non-token surface (`image | character | second`); `None` for a
+    /// token call.
+    pub usage_unit: Option<&'a str>,
+    /// The unit count; `None` when the surface could not measure one (unpriced, never $0).
+    pub usage_units: Option<Decimal>,
     /// The call's wall time.
     pub latency_ms: i32,
     /// `ok | refused | error | timeout`.
@@ -134,14 +139,14 @@ pub async fn insert_call_tx(
              prompt_ref, prompt_version, prompt_sha256,
              model, served_model, prompt_tokens, completion_tokens, total_tokens,
              cache_creation_input_tokens, cache_read_input_tokens, cache_status,
-             latency_ms, outcome
+             latency_ms, outcome, usage_unit, usage_units
          ) VALUES (
              $1, $2, $3, $4, $5,
              $6, $7, $8, $9,
              $10, $11, $12,
              $13, $14, $15, $16, $17,
              $18, $19, $20,
-             $21, $22
+             $21, $22, $23, $24
          ) RETURNING id",
     )
     .bind(tenant.as_uuid())
@@ -166,6 +171,8 @@ pub async fn insert_call_tx(
     .bind(call.cache_status)
     .bind(call.latency_ms)
     .bind(call.outcome)
+    .bind(call.usage_unit)
+    .bind(call.usage_units)
     .fetch_one(&mut *conn)
     .await?;
     Ok(id)
@@ -242,6 +249,8 @@ struct UsageAggregateRow {
     unpriced_calls: i64,
     latency_ms: i64,
     cost_usd: Decimal,
+    unit: Option<String>,
+    units: Option<Decimal>,
 }
 
 /// The aggregate behind `inference_usage.report`.
@@ -254,6 +263,11 @@ struct UsageAggregateRow {
 /// Cost is derived from the ledger and `commercial_price` at read time (SPEC_V2 D52) and is
 /// never stored. A model with no price contributes zero to `cost_usd` and is counted in
 /// `unpriced_calls` — "no price" must not render as "free".
+///
+/// A non-token call is priced by its unit (`image`, `character`, `second`); the bucket's
+/// `unit`/`units` are reported only when every call in it was priced and they share one kind. A
+/// mixed or partially priced bucket keeps an exact USD sum and a NULL unit total — a partial unit
+/// count would be a lie.
 pub async fn usage_rows_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -263,35 +277,56 @@ pub async fn usage_rows_tx(
 ) -> Result<Vec<UsageRow>, InferenceStoreError> {
     let bucket = match group {
         UsageGroup::Day => {
-            "to_char(date_trunc('day', ic.created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD')"
+            "to_char(date_trunc('day', c.created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD')"
         }
-        UsageGroup::Model => "coalesce(ic.served_model, ic.model)",
-        UsageGroup::CallerKind => "ic.caller_kind",
-        UsageGroup::CacheStatus => "ic.cache_status",
-        UsageGroup::PromptSha => "coalesce(ic.prompt_sha256, '')",
-        UsageGroup::Project => "coalesce(r.project_id::text, '')",
+        UsageGroup::Model => "coalesce(c.served_model, c.model)",
+        UsageGroup::CallerKind => "c.caller_kind",
+        UsageGroup::CacheStatus => "c.cache_status",
+        UsageGroup::PromptSha => "coalesce(c.prompt_sha256, '')",
+        UsageGroup::Project => "coalesce(c.project_id::text, '')",
     };
     let sql = format!(
-        "SELECT {bucket} AS bucket,
+        "WITH priced AS (
+             SELECT ic.*,
+                    r.project_id,
+                    CASE
+                        WHEN p.model IS NULL THEN NULL
+                        WHEN p.unit = 'token' THEN
+                            (ic.prompt_tokens::numeric * p.input_usd_per_1m
+                             + ic.completion_tokens::numeric * p.output_usd_per_1m) / 1000000
+                        WHEN ic.usage_units IS NOT NULL THEN ic.usage_units * p.unit_usd
+                        ELSE NULL
+                    END AS row_cost,
+                    p.unit AS price_unit,
+                    CASE WHEN p.unit = 'token' THEN NULL ELSE ic.usage_units END AS non_token_units
+               FROM inference_call ic
+               LEFT JOIN commercial_price p
+                      ON p.model = coalesce(ic.served_model, ic.model)
+                     AND ((p.unit = 'token' AND ic.usage_unit IS NULL) OR p.unit = ic.usage_unit)
+               LEFT JOIN run r ON r.id = ic.run_id
+              WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3
+         )
+         SELECT {bucket} AS bucket,
                 count(*)::bigint AS calls,
-                coalesce(sum(ic.prompt_tokens), 0)::bigint AS prompt_tokens,
-                coalesce(sum(ic.completion_tokens), 0)::bigint AS completion_tokens,
-                count(*) FILTER (WHERE ic.cache_status = 'hit')::bigint AS hits,
-                count(*) FILTER (WHERE ic.cache_status = 'write')::bigint AS writes,
-                count(*) FILTER (WHERE ic.cache_status = 'miss')::bigint AS misses,
-                count(*) FILTER (WHERE ic.cache_status = 'unknown')::bigint AS unknown,
-                count(*) FILTER (WHERE p.model IS NOT NULL)::bigint AS priced_calls,
-                count(*) FILTER (WHERE p.model IS NULL)::bigint AS unpriced_calls,
-                coalesce(sum(ic.latency_ms), 0)::bigint AS latency_ms,
-                coalesce(round(sum(
-                    (ic.prompt_tokens::numeric * p.input_usd_per_1m
-                     + ic.completion_tokens::numeric * p.output_usd_per_1m) / 1000000
-                ), 6), 0)::numeric(18,6) AS cost_usd
-           FROM inference_call ic
-           LEFT JOIN commercial_price p
-                  ON p.model = coalesce(ic.served_model, ic.model)
-           LEFT JOIN run r ON r.id = ic.run_id
-          WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3
+                coalesce(sum(c.prompt_tokens), 0)::bigint AS prompt_tokens,
+                coalesce(sum(c.completion_tokens), 0)::bigint AS completion_tokens,
+                count(*) FILTER (WHERE c.cache_status = 'hit')::bigint AS hits,
+                count(*) FILTER (WHERE c.cache_status = 'write')::bigint AS writes,
+                count(*) FILTER (WHERE c.cache_status = 'miss')::bigint AS misses,
+                count(*) FILTER (WHERE c.cache_status = 'unknown')::bigint AS unknown,
+                count(row_cost)::bigint AS priced_calls,
+                (count(*) - count(row_cost))::bigint AS unpriced_calls,
+                coalesce(sum(c.latency_ms), 0)::bigint AS latency_ms,
+                coalesce(round(sum(row_cost), 6), 0)::numeric(18,6) AS cost_usd,
+                CASE WHEN count(row_cost) = count(*)
+                          AND count(DISTINCT price_unit) = 1
+                          AND max(price_unit) <> 'token'
+                     THEN max(price_unit) END AS unit,
+                CASE WHEN count(row_cost) = count(*)
+                          AND count(DISTINCT price_unit) = 1
+                          AND max(price_unit) <> 'token'
+                     THEN sum(non_token_units) END AS units
+           FROM priced c
           GROUP BY 1
           ORDER BY 1"
     );
@@ -317,6 +352,8 @@ pub async fn usage_rows_tx(
             priced_calls: row.priced_calls,
             unpriced_calls: row.unpriced_calls,
             latency_ms: row.latency_ms,
+            unit: row.unit,
+            units: row.units,
         })
         .collect())
 }
