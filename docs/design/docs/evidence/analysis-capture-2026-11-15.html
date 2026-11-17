@@ -316,9 +316,9 @@
 <td>/api/brand/extract</td>
 <td>extract_brand</td>
 <td>brand</td>
-<td>dropped</td>
-<td>deferred</td>
-<td>caller: w2v_orchestrator/src/api/routes/brand.py:47 (P5)</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.brand (crates/analysis)</td>
 <td>deterministic extraction from supplied analysis data; no LLM or vision</td>
 <td>BrandExtractRequest</td>
 <td>BrandResponse</td>
@@ -328,10 +328,10 @@
 <td>/api/brand/from-url</td>
 <td>extract_brand_from_url</td>
 <td>brand</td>
-<td>dropped</td>
-<td>deferred</td>
-<td>caller: w2v_orchestrator/src/clients/brand_extractor_client.py:48 (P5)</td>
-<td>fetch, DOM/colour/font scan and LLM stages, then persists the result</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.brand (crates/analysis)</td>
+<td>the caller captures the page and supplies its facts; extraction is <code>brand::extract</code></td>
 <td>BrandFromUrlRequest</td>
 <td>BrandResponse</td>
 </tr>
@@ -388,10 +388,10 @@
 <td>/api/brand/score-artifact</td>
 <td>score_artifact</td>
 <td>artifact-score</td>
-<td>dropped</td>
-<td>deferred</td>
-<td>caller: docs/MERQI_BRANDING_COACH_W2V_CONTRACT.md section 1 (P5)</td>
-<td>static SEO, accessibility and performance scanners plus deterministic aggregation</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.app (crates/analysis)</td>
+<td>the SEO base scan plus the a11y and perf scanners over the supplied HTML</td>
 <td>ArtifactScoreRequest</td>
 <td>ArtifactScoreResponse</td>
 </tr>
@@ -400,10 +400,10 @@
 <td>/api/brand/score-delta</td>
 <td>score_delta</td>
 <td>artifact-score</td>
-<td>dropped</td>
-<td>deferred</td>
-<td>caller: docs/MERQI_BRANDING_COACH_W2V_CONTRACT.md section 2 (P5)</td>
-<td>scores a before/after pair and diffs findings and category deltas</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.app (crates/analysis)</td>
+<td>both sides scored by <code>app::score_artifact</code>, then diffed by stable check id</td>
 <td>ScoreDeltaRequest</td>
 <td>ScoreDeltaResponse</td>
 </tr>
@@ -424,9 +424,9 @@
 <td>/api/brands/compare</td>
 <td>compare_brands</td>
 <td>brands</td>
-<td>dropped</td>
-<td>deferred</td>
-<td>part: P5.2</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.brand (crates/analysis)</td>
 <td>deterministic field, colour and font comparison of two snapshots</td>
 <td>BrandComparisonRequest</td>
 <td>BrandComparisonResponse</td>
@@ -640,10 +640,10 @@
 <td>/api/critique</td>
 <td>create_critique</td>
 <td>critique</td>
-<td>dropped</td>
-<td>deferred</td>
-<td>caller: w2v_orchestrator/src/api/routes/critique.py:124 (P5)</td>
-<td>fetch, deterministic a11y/perf/security scanners, LLM ux and summary</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.app (crates/analysis)</td>
+<td>the deterministic a11y/perf/security scanners; the LLM ux and summary calls are the caller's</td>
 <td>CritiqueRequest</td>
 <td>CritiqueJobResponse</td>
 </tr>
@@ -724,10 +724,10 @@
 <td>/api/critique/compare</td>
 <td>compare_critiques</td>
 <td>critique</td>
-<td>dropped</td>
-<td>deferred</td>
-<td>caller: w2v_orchestrator/src/clients/critique_client.py:65 (P5)</td>
-<td>deterministic finding diff and score deltas</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.report (crates/analysis)</td>
+<td>deterministic finding diff and score deltas over supplied findings</td>
 <td>-</td>
 <td>ComparisonResponse</td>
 </tr>
@@ -988,10 +988,10 @@
 <td>/api/cro/score</td>
 <td>score_cro</td>
 <td>cro</td>
-<td>dropped</td>
-<td>deferred</td>
-<td>caller: w2v_orchestrator/src/clients/analysis_scorecard_client.py:156 (P6)</td>
-<td>deterministic CRO scorecard over supplied pages plus an optional LLM judge</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.content (crates/analysis)</td>
+<td>the deterministic CRO scanner and its rubric score over the supplied HTML</td>
 <td>CroScoreRequest</td>
 <td>CroScoreResponse</td>
 </tr>
@@ -1012,10 +1012,10 @@
 <td>/api/marketing/scorecard</td>
 <td>score_marketing</td>
 <td>marketing</td>
-<td>dropped</td>
-<td>deferred</td>
-<td>caller: w2v_orchestrator/src/clients/analysis_scorecard_client.py:206 (P6)</td>
-<td>deterministic marketing scorecard over supplied context plus optional LLM assessments</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.content (crates/analysis)</td>
+<td>the deterministic marketing scanner and its rubric score over the supplied HTML</td>
 <td>MarketingScorecardRequest</td>
 <td>MarketingScorecardResponse</td>
 </tr>
@@ -1298,7 +1298,7 @@
 <tbody>
 <tr>
 <td>ported</td>
-<td>1 — <code>audit_seo</code></td>
+<td>10 — <code>audit_seo</code> and the nine analysis cores P5/P6 ported into <code>analyse.app</code>, <code>analyse.brand</code>, <code>analyse.content</code> and <code>analyse.report</code></td>
 </tr>
 <tr>
 <td>dropped: transport</td>
@@ -1306,7 +1306,7 @@
 </tr>
 <tr>
 <td>dropped: deferred</td>
-<td>11</td>
+<td>2</td>
 </tr>
 <tr>
 <td>dropped: no consumer</td>
@@ -1318,7 +1318,7 @@
 </tr>
 </tbody>
 </table>
-<p>Read the <code>transport</code> count with its guard in mind: every one of those 36 rows names the conveyor surface that replaces it. Of the 11 deferred rows, 10 name a measured caller and one — <code>compare_brands</code> — is required by part P5.2 and says so.</p>
+<p>Read the <code>transport</code> count with its guard in mind: every one of those 36 rows names the conveyor surface that replaces it. The 2 remaining deferred rows are the LLM page-analysis pipeline (<code>start_analysis</code>) and the ICP derivation (<code>analyze_icp_from_url</code>); both name their measured caller, and both are the caller's transport plus prompt, not a deterministic core this crate owns.</p>
 <h2 id="consumers-and-their-calls">Consumers and their calls</h2>
 <p>Measured by searching the estate for calls to the service's base URL and for the literal paths in the table above. Covered: the orchestrator's source and scenario scripts, the frontend's source, the course service, the content service, the video production service, the compose files and the repository's own scripts. The service resolves through the discovery name <code>analysis</code>.</p>
 <table>

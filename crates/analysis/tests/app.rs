@@ -2,8 +2,9 @@
 //! performance and security findings the source's deterministic scanners produced, and the overall
 //! score is the source's category-weighted mean.
 
-use conveyor_analysis::app::{HttpEvidence, PageEvidence, TlsEvidence, analyse};
-use conveyor_analysis::model::{Category, Document};
+use conveyor_analysis::app::ux::UxClaim;
+use conveyor_analysis::app::{HttpEvidence, PageEvidence, TlsEvidence, analyse, analyse_with_ux};
+use conveyor_analysis::model::{Category, Document, Severity};
 
 fn bundle() -> PageEvidence {
     let html = r#"<html>
@@ -173,4 +174,101 @@ fn a_clean_bundle_scores_one_hundred() {
             .collect::<Vec<_>>()
     );
     assert_eq!(report.scorecard.overall_score, 100.0);
+}
+
+fn claim(
+    kind: &str,
+    severity: Severity,
+    title: &str,
+    claim_type: &str,
+    scope: &str,
+    evidence: Option<&str>,
+) -> UxClaim {
+    UxClaim {
+        kind: kind.to_owned(),
+        severity,
+        title: title.to_owned(),
+        description: "d".to_owned(),
+        recommendation: "r".to_owned(),
+        claim_type: claim_type.to_owned(),
+        scope: scope.to_owned(),
+        evidence: evidence.map(str::to_owned),
+        selector: None,
+    }
+}
+
+fn evidence_with(html: &str) -> PageEvidence {
+    PageEvidence::new(
+        Document::new("https://acme.test/about", html),
+        HttpEvidence::default(),
+    )
+}
+
+#[test]
+fn a_contradicted_ux_claim_is_dropped_not_scored() {
+    let evidence = evidence_with(
+        r##"<html lang="en"><body><a href="mailto:hello@acme.test">Email us</a></body></html>"##,
+    );
+    let claims = [claim(
+        "issue",
+        Severity::Critical,
+        "No way to reach the business",
+        "missing_contact_method",
+        "page",
+        None,
+    )];
+    let report = analyse_with_ux(&evidence, &claims);
+    assert!(
+        report
+            .findings
+            .iter()
+            .all(|finding| finding.category != Category::Ux),
+        "a mailto link disproves the claim; got {:?}",
+        report
+            .findings
+            .iter()
+            .map(|finding| finding.check_id())
+            .collect::<Vec<_>>()
+    );
+}
+
+#[test]
+fn an_unverified_critical_claim_is_demoted_to_high() {
+    let evidence = evidence_with(r#"<html lang="en"><body><h1>Page</h1></body></html>"#);
+    let claims = [claim(
+        "issue",
+        Severity::Critical,
+        "Something vague",
+        "other",
+        "page",
+        None,
+    )];
+    let report = analyse_with_ux(&evidence, &claims);
+    let ux: Vec<_> = report
+        .findings
+        .iter()
+        .filter(|finding| finding.category == Category::Ux)
+        .collect();
+    assert_eq!(ux.len(), 1, "the unverified claim is kept as an issue");
+    assert_eq!(ux[0].severity, Severity::High, "critical becomes high");
+}
+
+#[test]
+fn a_strength_is_not_an_issue() {
+    let evidence = evidence_with(r#"<html lang="en"><body><h1>Page</h1></body></html>"#);
+    let claims = [claim(
+        "strength",
+        Severity::Low,
+        "Clear heading",
+        "other",
+        "page",
+        None,
+    )];
+    let report = analyse_with_ux(&evidence, &claims);
+    assert!(
+        report
+            .findings
+            .iter()
+            .all(|finding| finding.category != Category::Ux)
+    );
 }
