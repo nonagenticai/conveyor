@@ -371,12 +371,21 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/media-youtube_upload_service.md"
     },
     {
+      "title": "Produce contract capture — 2026-11-16",
+      "path": "docs/evidence/produce-capture-2026-11-16.html",
+      "source": "docs/evidence/produce-capture-2026-11-16.md",
+      "section": "Evidence",
+      "sha256": "077ef6e3f3ba3fad737cc65bb288092663d58dc22e7d70192af9b5f21638afed",
+      "bytes": 4420,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md"
+    },
+    {
       "title": "V1 → SPECV2 coverage",
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "73bcd670b496cde5658fc0df2f49209337f5d77be0489bac0b2b6859661065c4",
-      "bytes": 10630,
+      "sha256": "92ed4e856978df18368235f3a6107e1a4bba7c5c56ba4abe1c6cc0d9cf8796d3",
+      "bytes": 10649,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
