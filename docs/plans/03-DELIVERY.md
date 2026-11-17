@@ -52,6 +52,14 @@ shape is `.github/ISSUE_TEMPLATE/unit.md`; the rules are:
 - **Baseline.** State `main@<sha>` — with the date measured and the blob shas of the cited plan and
   audit files. The #9 train merged on 2026-11-11; a `#9@<sha>` reference in an older issue is
   historical and its parts are re-checked on merged main. A claim without a baseline is not ready.
+- **Programme context.** Every unit created on or after 2026-11-18 carries a `## Programme`
+  section: the `Tranche` it is authorised under, the `Brief` that governs it, the
+  `ADM phase/plateau` where it changes the architecture, and the `Benefits` its output is mapped
+  to. A field names a live row/document or the issue that creates it (`pending #N`). The rule is
+  **forward-only**: an issue created before the change gains the section at its next claim, in the
+  same edit as the `## Claim` block, and an existing body is never made unready retroactively.
+  Because the buildout is delivered under MSP and TOGAF, not merely documented by them, the
+  end-of-tranche review reads these fields from the issue ledger.
 - **References.** Every spec/plan/audit/code/test reference is a path that resolves at the ref it
   names, or an issue number that resolves. Cite `path:symbol`; line numbers only when re-verified at
   the baseline. A path the issue must create is marked `to create`.
@@ -72,8 +80,9 @@ shape is `.github/ISSUE_TEMPLATE/unit.md`; the rules are:
 
 **Definition of ready** — the claim gate: baseline and doc blob shas named · every reference resolves
 · every part has a scenario with a `Verify:` · dependencies complete, typed and cited ·
-`Blocker: #N` present iff `status:blocked` · one-PR scope, file-disjoint or sequenced · scope
-corrections applied.
+`Blocker: #N` present iff `status:blocked` · programme fields present and resolvable (issues
+created on/after 2026-11-18) · one-PR scope, file-disjoint or sequenced · scope corrections
+applied.
 
 **Definition of done** — the merge gate: every scenario passes at the PR head with a row in
 `Evidence at completion` · the repo gate is green at the exact head · tests added/updated per part,

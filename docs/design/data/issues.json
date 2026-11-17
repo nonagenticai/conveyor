@@ -87,9 +87,9 @@
     {
       "number": 280,
       "title": "delivery: every unit declares its programme context \u2014 tranche, brief, ADM phase/plateau and benefits",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/280",
-      "updatedAt": "2026-11-17T15:10:12Z",
+      "updatedAt": "2026-11-17T16:06:20Z",
       "labels": [
         {
           "name": "documentation",
@@ -263,15 +263,15 @@
       "title": "attribution: send X-Actor-Id and the tenant-level X-Project-Id on model-call requests",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/258",
-      "updatedAt": "2026-11-17T07:58:09Z",
+      "updatedAt": "2026-11-17T16:38:41Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -348,7 +348,7 @@
       "title": "console: the authoring standard \u2014 templates, a blocked publish, and the coach's rework/kata triage",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/245",
-      "updatedAt": "2026-11-17T15:12:32Z",
+      "updatedAt": "2026-11-17T16:33:42Z",
       "labels": [
         {
           "name": "unit",
@@ -1863,7 +1863,7 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-17T08:21:28Z",
+      "updatedAt": "2026-11-17T15:38:18Z",
       "labels": [
         {
           "name": "unit",
@@ -1926,7 +1926,7 @@
       "title": "T16 \u2014 SOP, RDF/OWL and process-document ingestion",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/85",
-      "updatedAt": "2026-11-13T22:53:58Z",
+      "updatedAt": "2026-11-17T15:38:16Z",
       "labels": [
         {
           "name": "unit",
@@ -2073,7 +2073,7 @@
       "title": "T7 \u2014 Operations",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/78",
-      "updatedAt": "2026-11-13T22:53:42Z",
+      "updatedAt": "2026-11-17T15:38:13Z",
       "labels": [
         {
           "name": "unit",
@@ -2094,7 +2094,7 @@
       "title": "T5 \u2014 Kata",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/77",
-      "updatedAt": "2026-11-13T22:53:40Z",
+      "updatedAt": "2026-11-17T15:38:10Z",
       "labels": [
         {
           "name": "unit",
@@ -2115,15 +2115,15 @@
       "title": "T13 \u2014 Tool platform",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/76",
-      "updatedAt": "2026-11-16T22:42:32Z",
+      "updatedAt": "2026-11-17T15:38:25Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "T13",
@@ -2157,15 +2157,15 @@
       "title": "T3 \u2014 PM job",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/74",
-      "updatedAt": "2026-11-16T22:42:31Z",
+      "updatedAt": "2026-11-17T15:38:21Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "T3",
@@ -2176,9 +2176,9 @@
     {
       "number": 73,
       "title": "T2 \u2014 Decision ladder",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/73",
-      "updatedAt": "2026-11-17T15:10:10Z",
+      "updatedAt": "2026-11-17T15:37:01Z",
       "labels": [
         {
           "name": "unit",
