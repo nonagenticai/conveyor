@@ -501,8 +501,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/P0-programme-definition.html",
       "source": "docs/plans/P0-programme-definition.md",
       "section": "Plans",
-      "sha256": "9dd7b89725b966290f488a753e08597405479c8232eed13d623680a19ce45f4f",
-      "bytes": 13274,
+      "sha256": "5857cfd57770dc47ae19a1e9086a5c12e07d1f15028c330ef436c156856dfed9",
+      "bytes": 13272,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
     },
     {

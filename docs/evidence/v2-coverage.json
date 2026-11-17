@@ -397,14 +397,14 @@
       "verdict": "extend",
       "evidence": [
         "actions: baselines.* found (baselines.get, baselines.list, baselines.take)",
-        "actions: cadences.* found (cadences.create, cadences.list)",
+        "actions: cadences.* found (cadences.create, cadences.delete, cadences.list…)",
         "actions: governed_assets.* absent",
         "actions: programme_config.* absent",
         "actions: programmes.* found (programmes.create, programmes.get, programmes.list…)",
         "actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)",
-        "actions: registers.* found (registers.create, registers.get, registers.list…)",
-        "actions: tranches.* found (tranches.create, tranches.list, tranches.review)",
-        "actions: wbs.* found (wbs.create, wbs.get, wbs.list…)"
+        "actions: registers.* found (registers.create, registers.delete, registers.get…)",
+        "actions: tranches.* found (tranches.create, tranches.delete, tranches.list…)",
+        "actions: wbs.* found (wbs.create, wbs.delete, wbs.get…)"
       ]
     },
     {
@@ -414,7 +414,7 @@
       "concept": "benefits",
       "verdict": "exists",
       "evidence": [
-        "actions: benefits.* found (benefits.create, benefits.get, benefits.link…)"
+        "actions: benefits.* found (benefits.create, benefits.delete, benefits.get…)"
       ]
     },
     {
