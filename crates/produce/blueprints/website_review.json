@@ -1,0 +1,11 @@
+{
+  "key": "website_review",
+  "title": "A site assessment",
+  "family": "analysis",
+  "phases": [
+    { "id": "capture", "action": "analyse.site", "params": {} },
+    { "id": "analyse", "action": "analyse.assess", "params": {} },
+    { "id": "report", "action": "analyse.report", "params": {} }
+  ],
+  "unresolved": ["capture", "analyse", "report"]
+}

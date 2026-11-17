@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "723d5fac09a65ea2b32449b5233ed1a719618b1ffe8b8b19c39eda88f35dddd2",
+    "GET /api/actions": "8a5fa50f5bbeb3256cb30e1834c46651321fc2cd8fbafd623293cc007886c2eb",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -300,6 +300,7 @@
     "POST /api/actions/processes.publish/invocations": "e2d76cdcddc4c434ad8d108ae8e37d8c5c4ca5e6e54cfd48c4783faf050bedf7",
     "POST /api/actions/processes.retire/invocations": "ac95a6fd0976ad93251f24cf9fed93d6f8c3ea700d35a7bfdc76a4d202eec208",
     "POST /api/actions/processes.update/invocations": "f69a2c56ffda8d126971229dde11956b851b9fa24dd3569614ce28e3dddab2e7",
+    "POST /api/actions/produce.script/invocations": "1021a03886b1cb1352bd2319782a4ab6c0080f974df4e7958f11ebe598d93b71",
     "POST /api/actions/produce.speech/invocations": "becead1373642766412c82ea691dd48d903553adf7f07a6f8deb1d7144bd606e",
     "POST /api/actions/programmes.create/invocations": "b5cc3b767f344db72bb89468a6d7938ee9181db5fea66f255c8664e50370f96b",
     "POST /api/actions/programmes.get/invocations": "864ffb0f942733824478e395439330f438450bdfd6e56a33c919d91aad50110d",

@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 24,
+    "exists": 25,
     "extend": 8,
-    "new": 31
+    "new": 30
   },
   "rows": [
     {
@@ -557,9 +557,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "production",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: produce.* absent"
+        "actions: produce.* found (produce.script)"
       ]
     },
     {

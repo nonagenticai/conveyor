@@ -710,6 +710,7 @@ dependencies = [
  "conveyor-deck",
  "conveyor-domain",
  "conveyor-ops",
+ "conveyor-produce",
  "conveyor-render",
  "conveyor-store",
  "conveyor-workflow",
@@ -983,6 +984,17 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "conveyor-produce"
+version = "0.1.0"
+dependencies = [
+ "conveyor-actions",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

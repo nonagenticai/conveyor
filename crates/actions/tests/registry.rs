@@ -83,7 +83,9 @@ use serde_json::{Value, json};
 /// `refinements.*` (2), `laya_configs.*` (2), `ladder.record|evaluate|list|apply_draft` (4).
 /// 387 → **398**.
 /// **#245 adds 2 internal**: `documents.preview` and `documents.return`. 398 → **400**.
-const EXPECTED: [&str; 400] = [
+/// **#163 adds 1 internal**: `produce.script`, the blueprint layer's dispatch.
+/// 400 → **401**.
+const EXPECTED: [&str; 401] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -362,6 +364,7 @@ const EXPECTED: [&str; 400] = [
     "processes.publish",
     "processes.retire",
     "processes.update",
+    "produce.script",
     "programmes.create",
     "programmes.get",
     "programmes.list",
@@ -532,7 +535,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // decision-ladder actions (decision_policies.* 3, refinements.* 2, laya_configs.* 2,
     // ladder.record|evaluate|list|apply_draft 4), all internal: 369 → 380; external stays 18.
     // #245 adds `documents.preview` and `documents.return` (internal): 380 → 382.
-    assert_eq!((internal, external), (382, 18));
+    // #163 adds `produce.script` (internal): 382 → 383; external stays 18.
+    assert_eq!((internal, external), (383, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

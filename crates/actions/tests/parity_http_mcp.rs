@@ -3752,6 +3752,20 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             json!({"messages": [{"role": "user", "content": "ping"}]}),
             None,
         ),
+        // #163: `produce.script` is the one model-backed action that is not a passthrough — it binds the
+        // answer to shot ids it derived and then enforces the duration budget. The stub answers a valid
+        // empty shot list, so this exercises the composition over both transports rather than its 502 path.
+        expecting(
+            plain(
+                "produce.script",
+                json!({
+                    "brief": "a ten-second explainer about why a shot list needs stable ids",
+                    "target_duration_ms": 10000
+                }),
+                None,
+            ),
+            200,
+        ),
         // S13 step 8: the engine's model call is the same declared external POST as the copilot's,
         // so the stub answers both; the loop's own action is a step primitive and refuses a direct
         // invocation with 409 (CONTRACT §17 — the executor drives it, not the action surface).

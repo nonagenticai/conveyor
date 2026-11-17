@@ -61,8 +61,12 @@ fn no_handler_calls_a_service_directly() {
     //   * `youtube.rs`  — #182's Google OAuth token exchange behind `youtube.connect`. The actions
     //     depend on the `YouTubeProvider` trait; this file is the one transport, it owns its own
     //     timeout and it never reads an error body. Added 2026-11-16.
+    //   * `produce.rs`  — #163's `produce.script`: the model call is one leg of a composition whose
+    //     other legs (shot identity, the duration budget) are local and cannot be expressed as a
+    //     passthrough. Same shape as `ingest.rs`; the transport owns its timeout and error mapping.
+    //     Added 2026-11-16.
     // A new name here is a decision, not an accident: the list is compared exactly.
-    const ALLOWED: [&str; 8] = [
+    const ALLOWED: [&str; 9] = [
         "invoke.rs",
         "webhooks.rs",
         "channels.rs",
@@ -71,6 +75,7 @@ fn no_handler_calls_a_service_directly() {
         "webhook.rs",
         "github.rs",
         "youtube.rs",
+        "produce.rs",
     ];
 
     let mut offenders = Vec::new();

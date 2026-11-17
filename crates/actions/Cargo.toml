@@ -16,6 +16,9 @@ conveyor-domain = { path = "../domain" }
 # #170 (T7): the cluster operations client behind `ops.*` — the credential, the fail-closed
 # configuration and the read transport live there, not in this crate.
 conveyor-ops = { path = "../ops" }
+# #163 P3: `produce.script` binds the model's prose to shot ids the library derives; the id and
+# budget rules live there, free of transport, and are tested without a model.
+conveyor-produce = { path = "../produce" }
 conveyor-workflow = { path = "../workflow" }
 # The three exchange actions (S08 B2) call the pure renderer; CONTRACT §1 records the edge.
 conveyor-render = { path = "../render" }

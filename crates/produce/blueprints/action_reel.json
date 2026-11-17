@@ -1,0 +1,11 @@
+{
+  "key": "action_reel",
+  "title": "A montage",
+  "family": "production",
+  "phases": [
+    { "id": "brief", "action": "produce.brief", "params": {} },
+    { "id": "assets", "action": "produce.asset", "params": {} },
+    { "id": "render", "action": "media.compile_video", "params": {} }
+  ],
+  "unresolved": ["brief", "assets"]
+}
