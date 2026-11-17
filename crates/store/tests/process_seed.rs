@@ -280,7 +280,25 @@ async fn applying_the_catalogue_twice_inserts_nothing_and_creates_no_version_two
     assert_eq!(agent.3.as_deref(), Some("agent@1"));
     assert_eq!(agent.4, "claude-sonnet-5-5");
     assert_eq!(agent.5, 12);
-    assert_eq!(agent.6, 120);
+    assert_eq!(agent.6, 300);
+    let tools: Vec<String> = sqlx::query_scalar(
+        "SELECT allowed_actions FROM capability_agent
+          WHERE tenant_id = $1 AND key = 'development_bug_fix'",
+    )
+    .bind(seed.tenant)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("the created agent's tool surface");
+    assert_eq!(
+        tools,
+        vec![
+            "documents.compose",
+            "documents.get",
+            "documents.list",
+            "cards.get",
+            "cards.comment"
+        ]
+    );
 
     // The READY process resolved its step's SOP, agent and capability to uuids.
     let ready: Uuid = sqlx::query_scalar(
