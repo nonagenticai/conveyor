@@ -56,8 +56,36 @@ pub async fn bus() -> Bus {
 /// failed CI with `NOGROUP` inside `a_large_job_round_trips_intact` while the flush test itself
 /// passed. This deliberately never consults `TEST_REDIS_URL`/`REDIS_URL`: a caller-provided URL is
 /// exactly the shared server the flush test must not touch.
+///
+/// A runner may instead provide a **second, private** server through `TEST_REDIS_PRIVATE_URL` (the
+/// coding gate's kata Pod starts one on another port and exports it). That URL wins and no
+/// container is started — the kata Pod has no docker.
 pub async fn private_url() -> String {
-    start_container().await
+    private_url_with(|key| std::env::var(key).ok(), start_container()).await
+}
+
+/// The decision [`private_url`] makes, with both dependencies injected.
+///
+/// `start` is a future, not a call: the environment branch must short-circuit before a container
+/// is ever started. The test below passes a ready future and asserts the environment URL wins, so
+/// deleting the branch fails the test instead of leaving it green while the kata Pod (which has no
+/// docker) panics in `start_container`.
+async fn private_url_with(
+    get: impl Fn(&str) -> Option<String>,
+    start: impl std::future::Future<Output = String>,
+) -> String {
+    if let Some(url) = private_url_from(get) {
+        return url;
+    }
+    start.await
+}
+
+/// The private URL the environment names, if any. Pure, so a test can prove the decision without
+/// touching the process environment.
+fn private_url_from(get: impl Fn(&str) -> Option<String>) -> Option<String> {
+    get("TEST_REDIS_PRIVATE_URL")
+        .map(|value| value.trim().to_owned())
+        .filter(|value| !value.is_empty())
 }
 
 fn image() -> String {
@@ -154,4 +182,53 @@ fn spawn_watcher(container: &str) {
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{private_url_from, private_url_with};
+
+    #[test]
+    fn a_private_url_from_the_environment_wins() {
+        let named = |value: &'static str| {
+            move |key: &str| (key == "TEST_REDIS_PRIVATE_URL").then(|| value.to_owned())
+        };
+        assert_eq!(
+            private_url_from(named("redis://127.0.0.1:6380/")).as_deref(),
+            Some("redis://127.0.0.1:6380/")
+        );
+        assert_eq!(
+            private_url_from(|_| None),
+            None,
+            "unset falls back to docker"
+        );
+        assert_eq!(
+            private_url_from(|_| Some("  ".to_owned())),
+            None,
+            "blank falls back to docker"
+        );
+    }
+
+    /// The seam is what makes the branch load-bearing: if the `if let` in `private_url_with` is
+    /// removed, this test receives the fallback and fails. The fallback PANICS rather than
+    /// resolving: a start that happens above the branch must fail too, not pass because its future
+    /// was ready.
+    #[tokio::test]
+    async fn a_private_url_from_the_environment_wins_without_starting_a_container() {
+        let url = private_url_with(
+            |key| (key == "TEST_REDIS_PRIVATE_URL").then(|| "redis://127.0.0.1:6380/".to_owned()),
+            std::future::poll_fn(|_| -> std::task::Poll<String> {
+                panic!("the environment URL must short-circuit before a container is started")
+            }),
+        )
+        .await;
+        assert_eq!(url, "redis://127.0.0.1:6380/");
+    }
+
+    #[tokio::test]
+    async fn a_private_url_falls_back_to_the_container() {
+        let url =
+            private_url_with(|_| None, std::future::ready("docker-container".to_owned())).await;
+        assert_eq!(url, "docker-container");
+    }
 }
