@@ -51,7 +51,7 @@ async fn a_crashed_execution_replays_on_the_proposal_key_and_runs_nothing_twice(
     let (status, decided) = running
         .invoke(
             "approvals.decide",
-            token,
+            copilot::support::REVIEWER,
             json!({"approval_id": approval_id, "decision": "approve"}),
             None,
             None,
