@@ -3721,9 +3721,9 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(on_prepared("documents.preview", None), 200),
         {
             let mut sample = on_prepared("documents.return", Some("\"1\""));
-            sample.input = Box::new(|ctx: &Ctx| {
-                json!({"id": ctx.pop("documents.return"), "note": "Parity return"})
-            });
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("documents.return"), "note": "Parity return"}),
+            );
             expecting(sample, 200)
         },
         expecting(on_prepared("documents.revision_list", None), 200),
