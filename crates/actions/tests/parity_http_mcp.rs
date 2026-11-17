@@ -738,7 +738,7 @@ async fn seed_gate(pg: &support::Pg, ctx: &Ctx) -> Uuid {
             "gate",
             1,
             None,
-            Some(ctx.alice_user),
+            Some(ctx.bob_user),
         )
         .await
         .expect("prepared gate")
@@ -1171,7 +1171,8 @@ async fn seed_eval_ready(pg: &support::Pg, ctx: &Ctx) -> Uuid {
                 conn,
                 ctx.tenant,
                 approval,
-                &conveyor_domain::Decision::approve(ctx.alice_user),
+                // The gate was requested by alice (§5.4 refuses a requester deciding it).
+                &conveyor_domain::Decision::approve(ctx.bob_user),
                 true,
             )
             .await
@@ -1540,9 +1541,266 @@ async fn seed_removable_member(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     id
 }
 
+/// A fresh project for a spine sample (unique key; the tenant's RLS applies to the owner).
+async fn seed_parity_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, $2, 'Parity spine project')
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(format!("PAR-{}", Uuid::now_v7().simple()))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert project");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_programme(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid =
+        sqlx::query_scalar("INSERT INTO programme (tenant_id, name) VALUES ($1, $2) RETURNING id")
+            .bind(ctx.tenant_id)
+            .bind(format!("Parity programme {}", Uuid::now_v7().simple()))
+            .fetch_one(&mut *tx)
+            .await
+            .expect("insert programme");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_wbs(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO wbs_node (tenant_id, project_id, kind, title)
+         VALUES ($1, $2, 'deliverable', 'Parity deliverable') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert WBS node");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_baseline(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_baseline (tenant_id, project_id, kind, snapshot, taken_by)
+         VALUES ($1, $2, 'scope', '{}'::jsonb, $3) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .bind(ctx.alice_user)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert baseline");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_register(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_register_item (tenant_id, project_id, kind, title)
+         VALUES ($1, $2, 'risk', 'Parity risk') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert register item");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_edge(pg: &support::Pg, ctx: &Ctx, from: Uuid, to: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_dependency (tenant_id, from_project, to_project, kind)
+         VALUES ($1, $2, $3, 'blocks') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(from)
+    .bind(to)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert dependency");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_tranche(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number)
+         VALUES ($1, $2, 0) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert tranche");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_benefit(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO benefit_profile (tenant_id, programme_id, reference)
+         VALUES ($1, $2, 'BEN-PARITY') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert benefit");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_profile(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO stakeholder_profile (tenant_id, programme_id, name)
+         VALUES ($1, $2, 'Parity stakeholder') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert stakeholder profile");
+    tx.commit().await.expect("commit");
+    id
+}
+
 /// Seed the rows the sample's input will name, once per round.
 async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
     match sample.name {
+        // ── T1 plan spine ─────────────────────────────────────────────────────────────────
+        "wbs.create" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("wbs.create", p);
+        }
+        "wbs.get" | "wbs.update" => {
+            let p = seed_parity_project(pg, ctx).await;
+            let w = seed_parity_wbs(pg, ctx, p).await;
+            ctx.push(sample.name, w);
+        }
+        "wbs.list" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("wbs.list", p);
+        }
+        "baselines.take" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("baselines.take", p);
+        }
+        "baselines.get" => {
+            let p = seed_parity_project(pg, ctx).await;
+            let b = seed_parity_baseline(pg, ctx, p).await;
+            ctx.push(sample.name, b);
+        }
+        "baselines.list" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("baselines.list", p);
+        }
+        "registers.create" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("registers.create", p);
+        }
+        "registers.get" | "registers.update" => {
+            let p = seed_parity_project(pg, ctx).await;
+            let r = seed_parity_register(pg, ctx, p).await;
+            ctx.push(sample.name, r);
+        }
+        "registers.list" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("registers.list", p);
+        }
+        "project_dependencies.create" => {
+            let from = seed_parity_project(pg, ctx).await;
+            let to = seed_parity_project(pg, ctx).await;
+            ctx.push("dep.create.from", from);
+            ctx.push("dep.create.to", to);
+        }
+        "project_dependencies.delete" => {
+            let from = seed_parity_project(pg, ctx).await;
+            let to = seed_parity_project(pg, ctx).await;
+            let e = seed_parity_edge(pg, ctx, from, to).await;
+            ctx.push("project_dependencies.delete", e);
+        }
+        "project_dependencies.list" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("project_dependencies.list", p);
+        }
+        "portfolio.in_flight" => {
+            // An empty set: the tenant's configured in-flight status matches no project, so
+            // the computed view is stable across both rounds.
+            sqlx::query(
+                "UPDATE tenant SET settings = jsonb_set(settings, '{portfolio,in_flight}',
+                 '[\"__parity_none__\"]'::jsonb, true) WHERE id = $1",
+            )
+            .bind(ctx.tenant_id)
+            .execute(&pg.owner)
+            .await
+            .expect("set the in-flight set");
+        }
+        "tranches.create" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("tranches.create", g);
+        }
+        "tranches.review" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let t = seed_parity_tranche(pg, ctx, g).await;
+            ctx.push("tranches.review", t);
+        }
+        "tranches.list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("tranches.list", g);
+        }
+        "benefits.create" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("benefits.create", g);
+        }
+        "benefits.get" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let b = seed_parity_benefit(pg, ctx, g).await;
+            ctx.push("benefits.get", b);
+        }
+        "benefits.list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("benefits.list", g);
+        }
+        "benefits.link" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let b = seed_parity_benefit(pg, ctx, g).await;
+            ctx.push("benefits.link.programme", g);
+            ctx.push("benefits.link.benefit", b);
+        }
+        "cadences.create" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("cadences.create", g);
+        }
+        "cadences.list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("cadences.list", g);
+        }
+        "stakeholders.profile_create" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("stakeholders.profile_create", g);
+        }
+        "stakeholders.profile_update" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let p = seed_parity_profile(pg, ctx, g).await;
+            ctx.push("stakeholders.profile_update", p);
+        }
+        "stakeholders.profile_list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("stakeholders.profile_list", g);
+        }
         "tenants.update_settings" => {
             sqlx::query("UPDATE tenant SET settings = '{}'::jsonb, version = 1 WHERE id = $1")
                 .bind(ctx.tenant_id)
@@ -3904,6 +4162,22 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             }),
             None,
         ),
+        // ── conveyor#160: the tenant's registered inference endpoint ─────────────────────
+        // The destination is the harness's inference stub, not an invented URL: a tenant row
+        // outranks `CONVEYOR_EXTERNAL_INFERENCE_URL`, so any later model call must still reach
+        // the stub rather than the network.
+        {
+            let mut sample = plain("inference_endpoint.set", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| {
+                json!({
+                    "destination_url": std::env::var("CONVEYOR_EXTERNAL_INFERENCE_URL")
+                        .expect("the parity harness sets the inference stub"),
+                    "credential": "parity-inference-credential",
+                })
+            });
+            expecting(sample, 200)
+        },
+        expecting(plain("inference_endpoint.get", json!({}), None), 200),
         plain("prompt_audits.list", json!({"limit": 10}), None),
         {
             let mut sample = plain("prompt_audits.get", json!({}), None);
@@ -4264,6 +4538,96 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             503,
         ),
+        // ── #173: the two audio capabilities ────────────────────────────────────────────────
+        // The same property as the image action: no `CONVEYOR_EXTERNAL_TTS_URL`/
+        // `ASR_URL` in the parity environment, so both transports must answer the SAME typed
+        // refusal. A sample that reached a host would store a document and could not be compared.
+        expecting(
+            plain(
+                "produce.speech",
+                json!({"text": "parity", "speed": 1.0}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain(
+                "media.transcribe",
+                json!({"document": "0192f5b0-0000-7000-8000-000000000000"}),
+                None,
+            ),
+            503,
+        ),
+        // ── #170: the ops.* cluster reads (T7) ────────────────────────────────────────────
+        // No `OPS_TOKEN` / `KUBERNETES_SERVICE_HOST` and no `CONVEYOR_CI_TOKEN` in the test
+        // environment, so every read answers the SAME typed `unconfigured` refusal on both
+        // transports. A sample that reached a live API would not be comparable body-for-body;
+        // the parity property for this family is that a missing credential is never defaulted.
+        expecting(
+            plain(
+                "ops.pods",
+                json!({"namespace": "conveyor", "label_selector": "app=conveyor"}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain("ops.deployments", json!({"namespace": "conveyor"}), None),
+            503,
+        ),
+        expecting(
+            plain(
+                "ops.events",
+                json!({"namespace": "conveyor", "limit": 10}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain(
+                "ops.logs",
+                json!({"namespace": "conveyor", "pod": "conveyor-worker", "tail": 50}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain("ops.flux_status", json!({"namespace": "flux-system"}), None),
+            503,
+        ),
+        expecting(
+            plain("ops.ci_status", json!({"branch": "main", "limit": 5}), None),
+            503,
+        ),
+        // ── #171: the destructive ops writes ──────────────────────────────────────────────
+        // Each names no approval, so the gate refuses (403 `approval_required`) BEFORE any
+        // cluster call on BOTH transports. That is the parity property for a destructive
+        // action: the refusal is identical whether it arrives over HTTP or MCP, and it never
+        // depends on a cluster being reachable.
+        expecting(
+            plain(
+                "ops.restart",
+                json!({"namespace": "conveyor", "deployment": "conveyor"}),
+                None,
+            ),
+            403,
+        ),
+        expecting(
+            plain(
+                "ops.scale",
+                json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 2}),
+                None,
+            ),
+            403,
+        ),
+        expecting(
+            plain(
+                "ops.rollback",
+                json!({"namespace": "conveyor", "deployment": "conveyor"}),
+                None,
+            ),
+            403,
+        ),
         // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────
         // The response is a pure function of the input — the deck writer has no clock, no
         // random id and no hash-map order — so a replay and an execution agree byte for byte.
@@ -4356,6 +4720,8 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         ),
     ];
 
+    out.extend(spine_samples());
+
     for sample in &mut out {
         if matches!(
             sample.name,
@@ -4405,6 +4771,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 | "fixtures.echo"
                 | "inference_calls.list"
                 | "inference_usage.report"
+                | "inference_endpoint.get"
                 | "prompt_audits.check"
                 | "prompt_findings.list"
         ) {
@@ -4412,6 +4779,224 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         }
     }
     out
+}
+
+/// T1's plan-spine samples, in their own frame: the main `samples` vec literal is already
+/// large enough that one more group of closures overflows the test thread's stack in a debug
+/// build. The sample contract is unchanged.
+fn spine_samples() -> Vec<Sample> {
+    vec![
+        // ── T1 plan spine (SPEC_V2 §5.1, §5.3–§5.5, §8.2, §8.3) ─────────────────────────
+        {
+            let mut sample = plain("wbs.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("wbs.create"),
+                    "kind": "deliverable",
+                    "title": format!("Parity node {}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(on_prepared("wbs.get", None), 200),
+        {
+            let mut sample = on_prepared("wbs.update", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("wbs.update"),
+                    "title": format!("Renamed {}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("wbs.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"project_id": ctx.pop("wbs.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("baselines.take", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"project_id": ctx.pop("baselines.take")}));
+            expecting(sample, 201)
+        },
+        expecting(on_prepared("baselines.get", None), 200),
+        {
+            let mut sample = plain("baselines.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"project_id": ctx.pop("baselines.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("registers.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("registers.create"),
+                    "kind": "risk",
+                    "title": format!("Parity risk {}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(on_prepared("registers.get", None), 200),
+        {
+            let mut sample = on_prepared("registers.update", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("registers.update"),
+                    "status": "mitigated",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("registers.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"project_id": ctx.pop("registers.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("project_dependencies.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "from_project": ctx.pop("dep.create.from"),
+                    "to_project": ctx.pop("dep.create.to"),
+                    "kind": "blocks",
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(on_prepared("project_dependencies.delete", None), 200),
+        {
+            let mut sample = plain("project_dependencies.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("project_dependencies.list")
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("portfolio.in_flight", json!({}), None);
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("tranches.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("tranches.create"),
+                    "number": 0,
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("tranches.review", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("tranches.review"),
+                    "decision": "continue",
+                    "evidence": {},
+                })
+            });
+            expecting(sample, 422)
+        },
+        {
+            let mut sample = plain("tranches.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("tranches.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("benefits.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("benefits.create"),
+                    "reference": "BEN-PARITY",
+                })
+            });
+            expecting(sample, 422)
+        },
+        expecting(on_prepared("benefits.get", None), 200),
+        {
+            let mut sample = plain("benefits.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("benefits.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("benefits.link", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("benefits.link.programme"),
+                    "benefit_id": ctx.pop("benefits.link.benefit"),
+                    "output_ref": "parity output",
+                    "capability_ref": "parity capability",
+                    "operational_outcome": "parity outcome",
+                })
+            });
+            expecting(sample, 422)
+        },
+        {
+            let mut sample = plain("cadences.create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("cadences.create"),
+                    "kind": "pi",
+                    "period": format!("PI-{}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("cadences.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("cadences.list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("stakeholders.profile_create", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("stakeholders.profile_create"),
+                    "name": format!("Parity group {}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = on_prepared("stakeholders.profile_update", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("stakeholders.profile_update"),
+                    "support_level": "high",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("stakeholders.profile_list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("stakeholders.profile_list")
+                })
+            });
+            expecting(sample, 200)
+        },
+    ]
 }
 
 /// Seed one audit and one finding for the S16 reads/decision samples, on the caller's tenant.
@@ -4955,8 +5540,20 @@ async fn benchmark_fixture(pg: &support::Pg, tenant: TenantId) -> (String, Strin
     (suite.id.to_string(), runs[0].clone(), runs[1].clone())
 }
 
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
+#[test]
+fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
+    // The registry-wide future is large; `block_on` polls it on the test thread, whose default
+    // stack overflows once every action has a sample. Run the whole test on an explicit thread.
+    std::thread::Builder::new()
+        .stack_size(64 * 1024 * 1024)
+        .spawn(|| {
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(2)
+        .thread_stack_size(64 * 1024 * 1024)
+        .enable_all()
+        .build()
+        .expect("parity runtime");
+    runtime.block_on(async {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     let stub = support::Stub::start().await;
@@ -5400,8 +5997,12 @@ async fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
          stripping request_id/duration_ms"
     );
     running.shutdown().await;
+    });
+        })
+        .expect("spawn the parity test thread")
+        .join()
+        .expect("join the parity test thread");
 }
-
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_tool_the_role_cannot_call_is_absent_from_tools_list_and_refused_over_http() {
     let pg = support::Pg::fresh().await;

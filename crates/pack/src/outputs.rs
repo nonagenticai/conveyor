@@ -310,7 +310,11 @@ pub fn output_page(
     if let Some(author) = author.filter(|author| !author.is_empty()) {
         source.push_str(&format!(" · {author}"));
     }
-    let body_html = format!("{body_html}{}", attachments_html(attachments));
+    let body_html = format!(
+        "{body_html}{}{}",
+        attachments_html(attachments),
+        feedback_html()
+    );
     // Body last: a body that happens to contain a placeholder string must not be rewritten.
     TEMPLATE
         .replace("$root$", "../")
@@ -351,6 +355,13 @@ fn attachments_html(attachments: &[AttachmentEntry]) -> String {
     out
 }
 
+/// The public feedback affordance appended to every output page: one Discussions anchor. It is
+/// a constant link, never user content and never a script, so the page stays readable without
+/// JavaScript and the sanitised body contract is unchanged.
+fn feedback_html() -> &'static str {
+    "<p class=\"output-feedback\"><a href=\"https://github.com/nonagenticai/conveyor/discussions\">Discuss this output ↗</a></p>"
+}
+
 /// Escape a value for HTML text or an attribute.
 fn escape_html(value: &str) -> String {
     let mut out = String::with_capacity(value.len());
@@ -380,6 +391,25 @@ mod tests {
         assert!(html.contains("&lt;script&gt;"), "{html}");
         assert!(html.contains("&lt;img"), "{html}");
         assert!(html.contains("alert(1)"), "{html}");
+    }
+
+    #[test]
+    fn every_output_page_carries_the_discussion_link_and_no_dead_data_link() {
+        let html = output_page(
+            "A title",
+            "<p>body</p>",
+            "2026-11-16",
+            Some("T1"),
+            Some("Alice"),
+            &[],
+        );
+        assert!(
+            html.contains("https://github.com/nonagenticai/conveyor/discussions"),
+            "{html}"
+        );
+        assert!(html.contains("Discuss this output"), "{html}");
+        assert!(!html.contains("data/programme.json"), "{html}");
+        assert!(!html.contains("data/manifest.json"), "{html}");
     }
 
     #[test]

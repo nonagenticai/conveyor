@@ -1,36 +1,32 @@
 //! `GET /metrics` — the Prometheus scrape endpoint.
 //!
-//! The live Python service exposes `/metrics` outside its OpenAPI schema; the router serves the
-//! same path here. It is in the auth middleware's public set and is deliberately NOT in `ROUTES`
-//! or the `OpenApi` document: `--check-lock` compares documented JSON operations, and a scrape
-//! endpoint is neither.
+//! The endpoint is deliberately NOT a documented JSON operation: it is absent from `ROUTES` and
+//! from the `OpenApi` document, so `--check-lock` (which compares documented operations) does not
+//! see it. It IS in the auth middleware's public set (`auth::PUBLIC_ENDPOINTS`), because the
+//! scraper carries no credential.
+//!
+//! The families live in `crate::metrics`, which owns both collectors the Python reference
+//! registered on this path: licence/token expiry (`metrics::expiry`) and the tenant/subject
+//! invariant (`metrics::tenant_subject`). This handler only renders them — the response is always
+//! 200, whatever the database does; a failed collector reports itself with
+//! `..._collector_up 0` rather than by failing the scrape.
 
-use std::sync::OnceLock;
-
+use axum::extract::State;
 use axum::http::{HeaderValue, StatusCode, header};
 use axum::response::{IntoResponse, Response};
-use metrics_exporter_prometheus::{PrometheusBuilder, PrometheusHandle};
 
-/// The process-wide recorder. `install_recorder` may run once per process; tests that build
-/// several routers reuse the same registry.
-fn handle() -> &'static PrometheusHandle {
-    static HANDLE: OnceLock<PrometheusHandle> = OnceLock::new();
-    HANDLE.get_or_init(|| {
-        PrometheusBuilder::new()
-            .install_recorder()
-            .expect("installing the Prometheus recorder once per process")
-    })
-}
+use crate::state::AppState;
 
 /// `GET /metrics`. Always 200: the scrape must answer even when the database does not.
-pub async fn metrics() -> Response {
+pub async fn metrics(State(state): State<AppState>) -> Response {
+    let body = crate::metrics::render(&state.pool).await;
     (
         StatusCode::OK,
         [(
             header::CONTENT_TYPE,
             HeaderValue::from_static("text/plain; version=0.0.4; charset=utf-8"),
         )],
-        handle().render(),
+        body,
     )
         .into_response()
 }

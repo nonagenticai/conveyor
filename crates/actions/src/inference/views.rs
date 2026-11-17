@@ -92,7 +92,7 @@ pub struct InferenceUsageReportIn {
     pub since: DateTime<Utc>,
     /// Exclusive upper bound on the call time.
     pub until: DateTime<Utc>,
-    /// `day | model | caller_kind | cache_status | prompt_sha`.
+    /// `day | model | caller_kind | cache_status | prompt_sha | project`.
     pub group_by: String,
 }
 
@@ -130,6 +130,15 @@ pub struct UsageRowView {
     pub unknown: i64,
     /// `hits / calls`.
     pub hit_ratio: f64,
+    /// What the bucket's tokens would cost on the commercial equivalent, in USD, as a decimal
+    /// string. Derived at read time; an unpriced model contributes `0` and is counted below.
+    pub cost_usd: String,
+    /// Calls in the bucket whose model has a commercial price.
+    pub priced_calls: i64,
+    /// Calls in the bucket whose model has NO commercial price — never rendered as free.
+    pub unpriced_calls: i64,
+    /// Wall time summed for the bucket, the load side of the same window.
+    pub latency_ms: i64,
 }
 
 impl From<conveyor_domain::inference::UsageRow> for UsageRowView {
@@ -144,6 +153,10 @@ impl From<conveyor_domain::inference::UsageRow> for UsageRowView {
             misses: row.misses,
             unknown: row.unknown,
             hit_ratio: row.hit_ratio,
+            cost_usd: row.cost_usd.to_string(),
+            priced_calls: row.priced_calls,
+            unpriced_calls: row.unpriced_calls,
+            latency_ms: row.latency_ms,
         }
     }
 }

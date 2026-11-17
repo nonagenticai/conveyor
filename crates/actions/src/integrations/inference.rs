@@ -134,6 +134,7 @@ fn chat_spec(name: &'static str) -> ActionSpec {
             path: "/api/chat/completions",
             auth: Some(INFERENCE_TOKEN_SECRET),
             auth_optional: true,
+            upload: None,
         },
     }
 }

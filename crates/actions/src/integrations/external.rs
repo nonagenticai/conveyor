@@ -152,6 +152,7 @@ const fn spec(target: Target) -> ActionSpec {
             path,
             auth: None,
             auth_optional: false,
+            upload: None,
         },
     }
 }

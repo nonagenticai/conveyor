@@ -214,6 +214,8 @@ fn variant_path(kind: &str, value: &str) -> syn::Result<String> {
         ("scope", "secrets:write") => "SecretsWrite",
         ("scope", "integrations:read") => "IntegrationsRead",
         ("scope", "integrations:write") => "IntegrationsWrite",
+        // T7 (SPEC_V2 §11.4): the destructive ops family's one scope, admin-only.
+        ("scope", "ops:write") => "OpsWrite",
         ("scope", "processes:read") => "ProcessesRead",
         ("scope", "processes:write") => "ProcessesWrite",
         // S17. The benchmark harness's two scopes; no benchmark action is agent-reachable.

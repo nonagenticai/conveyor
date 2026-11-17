@@ -192,7 +192,15 @@ mod tests {
                 // #156: the work store — provenance, the publish request, promoted
                 // `category`/`unit`, and the attachment kind on `document`
                 // (0042_document_workflow.sql).
-                (42, "document workflow".to_owned())
+                (42, "document workflow".to_owned()),
+                // #160: the tenant's registered inference destination
+                // (0043_tenant_inference_endpoint.sql).
+                (43, "tenant inference endpoint".to_owned()),
+                // #72 (T1): the plan spine rows and their actions (0044_plan_spine.sql).
+                (44, "plan spine".to_owned()),
+                // #46: the commercial-equivalent price per model, the price side of the
+                // read-time cost derivation (0045_commercial_price.sql).
+                (45, "commercial price".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

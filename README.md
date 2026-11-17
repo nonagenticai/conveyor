@@ -7,15 +7,21 @@
 The new conveyor: one Rust application (workspace in `crates/` and `apps/`), Postgres 18, Leptos
 web UI.
 
-- Design and roadmap: <https://nonagentic.ai/design/>
+- Design and roadmap: <https://conveyor.nonagentic.ai/design/>
 - Product spec: `docs/SPEC.md`
 - Plan index and slice statuses: `docs/plans/00-INDEX.md`
 - Delivery protocol: `docs/plans/03-DELIVERY.md`
 - Remaining-work audit: `docs/evidence/2026-11-10-plan-audit.md`
 - Decisions: `docs/decisions/`
 
-Work is claimed by a GitHub issue. The queue is `gh issue list --label unit --state open`; run the
-`issue-pickup` skill before creating a branch. One issue = one branch `issue/<n>-<slug>` = one PR.
+New here? [`CONTRIBUTING.md`](CONTRIBUTING.md) starts with five-minute paths that do not need Rust,
+and merged contributions are credited in [`CONTRIBUTORS.md`](CONTRIBUTORS.md) unless the contributor
+opts out.
+
+Behaviour changes start from a maintainer-triaged GitHub unit issue. The queue is
+`gh issue list --label unit --state open`; one issue = one branch `issue/<n>-<slug>` = one PR. A
+change that does not alter behaviour — a typo, a broken link, a docs clarification — can go straight
+to a pull request; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md) · Security: [`SECURITY.md`](SECURITY.md) ·
 Conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) · Licence: Apache-2.0 ([`LICENSE`](LICENSE)).
@@ -27,10 +33,9 @@ Report vulnerabilities privately through the repository's Security tab — see
 
 ## Contributing
 
-Issues and pull requests are welcome. See
-[`CONTRIBUTING.md`](https://github.com/nonagenticai/.github/blob/main/CONTRIBUTING.md) for the
-organisation-wide rules; setup, test and lint commands are in this README. Commits carry DCO
-sign-off.
+Issues and pull requests are welcome. [`CONTRIBUTING.md`](CONTRIBUTING.md) lists the five-minute
+first steps, the local gate, DCO sign-off, the small-fix path and how maintainers accept a
+contribution; [`CONTRIBUTORS.md`](CONTRIBUTORS.md) records merged contributions.
 
 ## Licensing
 

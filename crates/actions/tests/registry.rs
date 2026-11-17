@@ -70,7 +70,16 @@ use serde_json::{Value, json};
 /// **#156 adds 5 internal**: the work-store publish/request/revision actions. 341 → **346**.
 /// **#174 adds 1 external**: `media.generate_image`, the MOSS-Image host over the engine's own
 /// declared-external path (it is the first action to declare an `Artefact`). 346 → **347**.
-const EXPECTED: [&str; 347] = [
+/// **#173 adds 2 external**: `produce.speech` and `media.transcribe` (the audio hosts). 347 → **349**.
+/// **#160 adds 2 internal**: `inference_endpoint.get|set`, the tenant's registered inference
+/// destination and its sealed credential. 349 → **351**.
+/// **T1 adds 27 internal**: the plan spine (wbs/baselines/registers/dependencies/in_flight/
+/// tranches/benefits/cadences/stakeholders). 351 → **378**.
+/// **#170 adds 6 internal**: the `ops.*` cluster read family (T7) —
+/// `ops.pods|deployments|events|logs|flux_status|ci_status`. 378 → **384**.
+/// **#171 adds 3 internal**: the gated `ops.*` writes — `ops.restart|scale|rollback`.
+/// 384 → **387**.
+const EXPECTED: [&str; 387] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -81,6 +90,9 @@ const EXPECTED: [&str; 347] = [
     "approvals.request",
     "artifacts.list",
     "audit.list",
+    "baselines.get",
+    "baselines.list",
+    "baselines.take",
     "benchmark_cases.list",
     "benchmark_runs.cancel",
     "benchmark_runs.compare",
@@ -90,9 +102,15 @@ const EXPECTED: [&str; 347] = [
     "benchmark_runs.start",
     "benchmark_runs.trend",
     "benchmark_suites.list",
+    "benefits.create",
+    "benefits.get",
+    "benefits.link",
+    "benefits.list",
     "billing.summary",
     "boards.get",
     "boards.set_member",
+    "cadences.create",
+    "cadences.list",
     "capabilities.bind_knowledge",
     "capabilities.get",
     "capabilities.list",
@@ -211,6 +229,8 @@ const EXPECTED: [&str; 347] = [
     "industries.list",
     "inference.chat",
     "inference_calls.list",
+    "inference_endpoint.get",
+    "inference_endpoint.set",
     "inference_usage.report",
     "invites.create",
     "invites.list",
@@ -252,6 +272,7 @@ const EXPECTED: [&str; 347] = [
     "media.render_html",
     "media.run_gherkin",
     "media.thumbnail",
+    "media.transcribe",
     "members.list",
     "members.remove",
     "members.set_role",
@@ -289,6 +310,16 @@ const EXPECTED: [&str; 347] = [
     "models.validate",
     "notifications.list",
     "notifications.update",
+    "ops.ci_status",
+    "ops.deployments",
+    "ops.events",
+    "ops.flux_status",
+    "ops.logs",
+    "ops.pods",
+    "ops.restart",
+    "ops.rollback",
+    "ops.scale",
+    "portfolio.in_flight",
     "principles.create",
     "principles.dismiss_conflict",
     "principles.get",
@@ -302,6 +333,7 @@ const EXPECTED: [&str; 347] = [
     "procedures.publish",
     "procedures.retire",
     "procedures.update",
+    "produce.speech",
     "process_maps.create",
     "process_maps.get",
     "process_maps.list",
@@ -319,6 +351,9 @@ const EXPECTED: [&str; 347] = [
     "programmes.get",
     "programmes.list",
     "programmes.update",
+    "project_dependencies.create",
+    "project_dependencies.delete",
+    "project_dependencies.list",
     "project_requests.approve",
     "project_requests.create",
     "project_requests.get",
@@ -341,6 +376,10 @@ const EXPECTED: [&str; 347] = [
     "publish.start",
     "publish.status",
     "quality.score",
+    "registers.create",
+    "registers.get",
+    "registers.list",
+    "registers.update",
     "repositories.create",
     "repositories.delete",
     "repositories.get",
@@ -376,6 +415,9 @@ const EXPECTED: [&str; 347] = [
     "stakeholders.delete",
     "stakeholders.get",
     "stakeholders.list",
+    "stakeholders.profile_create",
+    "stakeholders.profile_list",
+    "stakeholders.profile_update",
     "stakeholders.update",
     "task_lists.create",
     "task_lists.delete",
@@ -389,12 +431,19 @@ const EXPECTED: [&str; 347] = [
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
+    "tranches.create",
+    "tranches.list",
+    "tranches.review",
     "view_connections.create",
     "view_connections.delete",
     "view_connections.update",
     "view_objects.create",
     "view_objects.delete",
     "view_objects.update",
+    "wbs.create",
+    "wbs.get",
+    "wbs.list",
+    "wbs.update",
     "webhooks.create",
     "webhooks.delete",
     "webhooks.test",
@@ -454,7 +503,16 @@ fn the_registry_is_exactly_the_declared_set() {
     // (`documents.publish`, `documents.request_publish`, the three `documents.revision_*`):
     // 326 → 331. #174 adds `media.generate_image` (external): the external count has moved a second
     // time, 15 → 16, because it is the first action that calls a service AND stores what it returned.
-    assert_eq!((internal, external), (331, 16));
+    // #173 adds `produce.speech` and `media.transcribe` (both external): 331 → 333, external 16 → 18.
+    // They are the first actions whose request carries a DOCUMENT's bytes (multipart) and the first
+    // whose artefact is UTF-8 text rather than base64 — both mechanisms live in the engine.
+    // #160 adds `inference_endpoint.get|set` (both internal): internal 331 → 333; external stays 18.
+    // T1 adds the 27 plan-spine actions (wbs/baselines/registers/dependencies/in_flight/
+    // tranches/benefits/cadences/stakeholders), all internal: internal 333 → 360; external stays 18.
+    // #170 adds the six `ops.*` reads (internal, read): 360 → 366. The external count stays at 18 —
+    // they call the cluster API through `conveyor-ops`, not a declared external service.
+    // #171 adds the three `ops.*` writes (internal, destructive): 366 → 369; external stays 18.
+    assert_eq!((internal, external), (369, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

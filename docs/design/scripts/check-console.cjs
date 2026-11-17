@@ -50,7 +50,34 @@ const PROJECT = {
     issues: [2, 3],
     plan: "docs/plans/slices/S02-skeleton.md",
     track: "v1",
-    expected_outputs: ["project-brief", "analysis", "architecture"],
+    expected_outputs: [
+      "project-brief",
+      "inception-analysis",
+      "architecture-design",
+    ],
+    closure_outputs: ["evidence", "closure-review"],
+  },
+  version: 1,
+};
+
+// A project the seed can leave without a board (an archived row, or a row from before #165).
+const NOBOARD = {
+  id: "p-noboard",
+  key: "X1",
+  name: "A project left without a board",
+  description: "",
+  status: "active",
+  programme_id: "prog-1",
+  project_type_code: "delivery",
+  phase_code: null,
+  owner_user_id: null,
+  repo_url: null,
+  meta: {
+    track: "v2",
+    measured_status: "proposed",
+    tranche: 9,
+    expected_outputs: ["project-brief", "inception-analysis", "architecture-design"],
+    closure_outputs: ["evidence", "closure-review"],
   },
   version: 1,
 };
@@ -58,6 +85,7 @@ const PROJECT = {
 function freshState() {
   return {
     project: JSON.parse(JSON.stringify(PROJECT)),
+    noBoard: JSON.parse(JSON.stringify(NOBOARD)),
     documents: [],
     repositories: [],
     publish: null,
@@ -122,6 +150,7 @@ function freshState() {
     requests: [],
     listBodies: [],
     planPatches: [],
+    createPatches: [],
     failProjects: 0,
     failMove: 0,
     failDocument: 0,
@@ -323,10 +352,14 @@ function startServer({ config, state, snapshot }) {
       }
       if (pathname === "/api/projects" && req.method === "GET") {
         if (state.failProjects) return json(res, state.failProjects, { title: "Unauthorized", detail: "authentication required" });
-        return json(res, 200, { items: [state.project], next_cursor: null });
+        return json(res, 200, { items: [state.project, state.noBoard], next_cursor: null });
       }
       if (pathname === "/api/projects/p-s02" && req.method === "GET") {
         return json(res, 200, { project: state.project, boards: [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }] });
+      }
+      if (pathname === "/api/projects/p-noboard" && req.method === "GET") {
+        // No board: a real state, not a read failure.
+        return json(res, 200, { project: state.noBoard, boards: [] });
       }
       if (pathname === "/api/boards/b-s02" && req.method === "GET") {
         return json(res, 200, boardView());
@@ -565,22 +598,32 @@ function startServer({ config, state, snapshot }) {
         return readBody(req, (body) => {
           try {
             const input = body.input || {};
-            if (input.id !== "p-s02") {
-              // The create-time plan patch: `projects.create` has no meta, so the console
-              // follows it with a plan update. No If-Match — the row was just created.
-              assert.equal(req.headers["if-match"], undefined, "the create-time plan patch has no If-Match");
+            const target =
+              input.id === "p-s02"
+                ? state.project
+                : input.id === "p-noboard"
+                  ? state.noBoard
+                  : null;
+            if (!target) {
+              // The create-time class/plan patch: `projects.create` has no meta, so the console
+              // follows it with one update. No If-Match — the row was just created.
+              assert.equal(req.headers["if-match"], undefined, "the create-time patch has no If-Match");
               state.planPatches.push(input.meta && input.meta.plan);
+              state.createPatches.push(input.meta || {});
               return json(res, 200, { project: { id: input.id, version: 2 } });
             }
-            assert.equal(req.headers["if-match"], `"${state.project.version}"`, "projects.update carries If-Match");
+            assert.equal(req.headers["if-match"], `"${target.version}"`, "projects.update carries If-Match");
             for (const key of ["name", "description", "status", "repo_url"]) {
-              if (input[key] !== undefined) state.project[key] = input[key];
+              if (input[key] !== undefined) target[key] = input[key];
             }
-            if (input.meta) state.project.meta = Object.assign({}, state.project.meta, input.meta);
-            state.project.version += 1;
+            if (input.meta) target.meta = Object.assign({}, target.meta, input.meta);
+            target.version += 1;
             json(res, 200, {
-              project: state.project,
-              boards: [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }],
+              project: target,
+              boards:
+                input.id === "p-s02"
+                  ? [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }]
+                  : [],
             });
           } catch (error) {
             console.error("stub projects.update:", error);
@@ -594,20 +637,23 @@ function startServer({ config, state, snapshot }) {
           const scoped = body.input.project_id;
           const parent = body.input.parent_document_id;
           assert.ok(
-            scoped === undefined || scoped === "p-s02",
+            scoped === undefined || ["p-s02", "p-noboard"].includes(scoped),
             "documents.list is project-scoped or the cross-project register",
           );
           if (parent === undefined) {
             state.listBodies.push(scoped === undefined ? "register" : scoped);
           }
+          const requested = body.input.publish_requested;
           const items = state.documents
             .filter((doc) => (parent === undefined ? doc.kind !== "attachment" : doc.parent_document_id === parent))
+            .filter((doc) => (scoped === undefined ? true : doc.project_id === scoped))
+            .filter((doc) => (requested === undefined ? true : !!doc.publish_requested_at))
             .map((doc) => {
               const summary = Object.assign({}, doc);
               delete summary.body;
               return summary;
             });
-          json(res, 200, { items, next_cursor: null });
+          json(res, 200, { output: { items, next_cursor: null } });
         });
         return;
       }
@@ -1060,16 +1106,32 @@ function readBody(req, done) {
       const portfolioText = await page.locator("#main").innerText();
       assert.match(portfolioText, /S02/, "the live portfolio renders the snapshot's project");
       assert.match(portfolioText, /Skeleton/, "the real project name renders");
+      assert.match(portfolioText, /Programme queue/, "the public queue renders");
       assert.doesNotMatch(
         portfolioText,
         /Identity & access|Citizen services/,
         "no fixture project on the live portfolio",
       );
+      await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#projects`);
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      const publicProjectText = await page.locator("#main").innerText();
+      assert.match(
+        publicProjectText,
+        /Expected outputs/,
+        "the public project shows the standard's checklist",
+      );
+      assert.doesNotMatch(
+        publicProjectText,
+        /present, private/,
+        "no private draft is public",
+      );
       await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#contribute`);
       await page.waitForSelector(".page");
       await page.waitForTimeout(200);
       const contributeText = await page.locator("#main").innerText();
-      assert.match(contributeText, /Ready to claim/, "contribute renders the ready summary");
+      assert.match(contributeText, /Marked ready/, "contribute renders the ready summary");
+      assert.match(contributeText, /verify on GitHub/, "the ready count is labelled a snapshot");
       assert.match(contributeText, /#2/, "a ready unit links its issue");
       assert.match(contributeText, /Unassigned/, "an unlinked ready unit is grouped honestly");
       assert.match(contributeText, /How a unit is claimed/, "the claim protocol renders");
@@ -1196,17 +1258,19 @@ function readBody(req, done) {
       assert.match(workspaceText, /7 · project-brief/, "the output is grouped by unit and category");
       assert.match(workspaceText, /project-brief/, "the project's expected outputs render");
       assert.match(workspaceText, /0\/3 published/, "no expected output is published yet");
-      await page.click('[data-v2="output-new-template"][data-category="analysis"]');
+      await page.click(
+        '[data-v2="output-new-template"][data-category="inception-analysis"]',
+      );
       await page.waitForSelector("#output-category");
       assert.equal(
         await page.locator("#output-category").inputValue(),
-        "analysis",
-        "the analysis template pre-sets its category",
+        "inception-analysis",
+        "the inception template pre-sets its category",
       );
       assert.match(
         await page.locator("#output-body").inputValue(),
         /Reuse sources/,
-        "the analysis template carries the reuse prompt",
+        "the inception template carries the reuse prompt",
       );
       await page.click('#dialog [data-action="close-dialog"]');
       await page.waitForFunction(() => !document.getElementById("dialog").open);
@@ -1294,7 +1358,15 @@ function readBody(req, done) {
       await page.waitForFunction(() =>
         document.querySelector("#main").innerText.includes("S02 design note"),
       );
-      await page.click('[data-v2="output-publish"][data-id="d-1"]');
+      // The admin's review queue: the pending request is visible and actionable in one place.
+      const reviewQueueText = await page.locator("#main").innerText();
+      assert.match(reviewQueueText, /Review requests/, "the admin sees the review queue");
+      assert.equal(
+        await page.locator('[data-v2="request-publish"][data-id="d-1"]').count(),
+        1,
+        "the pending request is actionable from the queue",
+      );
+      await page.click('[data-v2="request-publish"][data-id="d-1"]');
       await page.waitForSelector("text=Output published");
       await page.waitForSelector('a[href="docs/output-d-1.html"]');
       assert.equal(
@@ -1325,15 +1397,43 @@ function readBody(req, done) {
       await page.waitForSelector('[data-v2="project-new"]');
       await page.click('[data-v2="project-new"]');
       await page.waitForSelector("#project-name");
+      // The class picker is generated from the same standard the Python gate reads.
+      const classCount = await page.evaluate(
+        () =>
+          (window.CONVEYOR_OUTPUT_STANDARD.classes || []).filter(
+            (cls) => !(cls.when || {}).key && cls.name !== "archived",
+          ).length,
+      );
+      assert.equal(
+        await page.locator("#project-class option").count(),
+        classCount + 1,
+        "the class picker follows the output standard",
+      );
       await page.fill("#project-name", "A new part of the conveyor");
       await page.fill("#project-plan", "docs/plans/slices/S00-usage-inventory.md");
+      // Fail closed: a project without a class is not created and never guessed into one.
       await page.click('[data-v2="project-create"]');
-      await page.waitForSelector("text=Project created with its plan");
+      await page.waitForSelector("text=Choose a delivery class for the project");
+      assert.equal(consoleState.createPatches.length, 0, "no class creates nothing");
+      await page.selectOption("#project-class", "v2-proposed");
+      await page.fill("#project-tranche", "4");
+      await page.click('[data-v2="project-create"]');
+      await page.waitForSelector("text=Project created · v2-proposed");
       assert.deepEqual(
         consoleState.planPatches,
         ["docs/plans/slices/S00-usage-inventory.md"],
         "the plan reaches projects.update",
       );
+      const createPatch = consoleState.createPatches.at(-1);
+      assert.deepEqual(createPatch.expected_outputs, [
+        "project-brief",
+        "inception-analysis",
+        "architecture-design",
+      ]);
+      assert.deepEqual(createPatch.closure_outputs, ["evidence", "closure-review"]);
+      assert.equal(createPatch.track, "v2", "the class facts are written");
+      assert.equal(createPatch.measured_status, "proposed");
+      assert.equal(createPatch.tranche, 4, "the tranche reaches projects.update");
 
       await page.click('[data-v2="feedback-intake"][data-issue="9"]');
       await page.waitForSelector("text=Issue #9 intaken as a card");
@@ -1341,6 +1441,39 @@ function readBody(req, done) {
         consoleState.cards.some((card) => card.meta && card.meta.issue === 9),
         "the feedback issue became a card",
       );
+
+      // ── a project without a board opens its checklist; its class can be changed ──────
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#projects`);
+      await page.waitForSelector('[data-v2-input="project-page"]');
+      await page.selectOption('[data-v2-input="project-page"]', "p-noboard");
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("No board"),
+      );
+      const noBoardText = await page.locator("#main").innerText();
+      assert.match(noBoardText, /Expected outputs/, "the checklist renders without a board");
+      assert.doesNotMatch(
+        noBoardText,
+        /Read refused · This project has no board/,
+        "a missing board is a state, not a refusal",
+      );
+      await page.click('[data-v2="project-edit"][data-id="p-noboard"]');
+      await page.waitForSelector("#project-class");
+      await page.selectOption("#project-class", "v2-built");
+      await page.fill("#project-tranche", "3");
+      await page.click('[data-v2="project-save"][data-id="p-noboard"]');
+      await page.waitForSelector("text=Project updated");
+      assert.deepEqual(
+        consoleState.noBoard.meta.expected_outputs,
+        ["project-brief", "evidence"],
+        "the class change recomputes the due-now set",
+      );
+      assert.deepEqual(consoleState.noBoard.meta.closure_outputs, ["closure-review"]);
+      assert.equal(consoleState.noBoard.meta.track, "v2");
+      assert.equal(consoleState.noBoard.meta.measured_status, "built");
+      assert.equal(consoleState.noBoard.meta.tranche, 3);
+      // Back to the board-bearing project for the execution-room section below.
+      await page.selectOption('[data-v2-input="project-page"]', "p-s02");
+      await page.waitForSelector('[data-v2="run-start"][data-id="c-2"]');
 
       // The pack-PR publish path is gone from the programme workspace: publishing is the
       // output's own `publishable` flag (the toggle asserted above).
@@ -1419,6 +1552,13 @@ function readBody(req, done) {
         /Identity & access|Citizen services/,
         "no fixture project is rendered signed in",
       );
+      await page.click('[data-v2="tab"][data-key="portfolio"][data-value="Programme"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Programme queue"),
+      );
+      const queueText = await page.locator("#main").innerText();
+      assert.match(queueText, /Programme queue/, "the programme queue renders");
+      assert.match(queueText, /outputs due/, "the queue counts the due outputs");
 
       // back to the Plan board for the 412/401 honesty checks
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#plan`);

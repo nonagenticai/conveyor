@@ -19,6 +19,7 @@ const SCREENS: &[(&str, &str)] = &[
     ("Runs", "/runs"),
     ("Members", "/settings/members"),
     ("Roles & permissions", "/settings/roles"),
+    ("Inference endpoint", "/settings/inference"),
 ];
 
 #[component]

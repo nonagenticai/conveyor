@@ -157,7 +157,7 @@ async fn mcp_tasks_lifecycle_is_the_run_lifecycle() {
     );
 
     // ── c. wait: a pending approval is an inputRequest keyed by its id ────────────────────
-    let approval = request_approval(&running, "dev:alice", &project_id).await;
+    let approval = request_approval(&running, support::REVIEWER, &project_id).await;
     let view = task_get(&mut mcp, &task_id).await;
     assert_eq!(view["status"], "input_required", "{view}");
     assert!(
@@ -246,7 +246,7 @@ async fn mcp_tasks_lifecycle_is_the_run_lifecycle() {
         cancelled_task, task_id,
         "a finished run is not the live one"
     );
-    let gate = request_approval(&running, "dev:alice", &project_id).await;
+    let gate = request_approval(&running, support::REVIEWER, &project_id).await;
     let blank = mcp
         .raw(
             "tasks/update",

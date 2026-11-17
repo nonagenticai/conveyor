@@ -165,7 +165,9 @@ fn every_external_action_declares_its_services_path_prefix() {
     //   worker_management    ""       the Python services mount bare: /workers, /providers, /graphs
     //   image_gen            ""       mlx_inference mounts its OpenAI-compatible routes bare:
     //                                 http/capabilities.rs:57-70 (`/v1/images/generations`)
-    const PREFIXES: [(&str, &str); 9] = [
+    //   tts                  /api     the narration route `tts_compat.rs` mounts: /api/tts/synthesize
+    //   asr                  /v1      the OpenAI-shaped transcription route: /v1/audio/transcriptions
+    const PREFIXES: [(&str, &str); 11] = [
         ("worker_management", ""),
         ("fixtures", ""),
         ("image_gen", ""),
@@ -175,6 +177,8 @@ fn every_external_action_declares_its_services_path_prefix() {
         ("strata_rag", "/api"),
         ("inference", "/api"),
         ("laya", "/v1"),
+        ("tts", "/api"),
+        ("asr", "/v1"),
     ];
 
     let mut seen: BTreeSet<&str> = BTreeSet::new();

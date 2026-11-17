@@ -70,6 +70,23 @@ async fn the_list_filters_and_the_report_groups_on_the_served_model() {
     assert_eq!(served["calls"].as_i64(), Some(1));
     assert_eq!(served["hits"].as_i64(), Some(1));
     assert_eq!(served["hit_ratio"].as_f64(), Some(1.0));
+    assert_eq!(
+        served["priced_calls"].as_i64(),
+        Some(0),
+        "no commercial price row names served-a"
+    );
+    assert_eq!(
+        served["unpriced_calls"].as_i64(),
+        Some(1),
+        "an unpriced model is counted, never rendered as free-priced"
+    );
+    assert_eq!(
+        served["cost_usd"]
+            .as_str()
+            .and_then(|raw| raw.parse::<f64>().ok()),
+        Some(0.0),
+        "money is a decimal STRING; an unpriced call contributes zero; row: {served}"
+    );
     let alias = rows
         .iter()
         .find(|row| row["bucket"] == "alias")
