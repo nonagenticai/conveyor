@@ -481,6 +481,7 @@
       "concept": "decision",
       "verdict": "new",
       "evidence": [
+        "actions: approvals.* found (approvals.decide, approvals.list, approvals.request)",
         "actions: decision_options.* absent",
         "actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)",
         "actions: decisions.* found (decisions.create, decisions.get, decisions.list…)",
