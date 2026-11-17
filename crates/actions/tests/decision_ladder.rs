@@ -250,7 +250,7 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
 
 /// P2.1 — a tenant refinement changes the threshold with no code change.
 #[tokio::test(flavor = "multi_thread")]
-async fn a_refinement_changes_the_threshold_without_a_build() {
+async fn a_refinement_changes_a_threshold_without_a_code_change() {
     let (_pg, running, _seeded) = fixture().await;
     let (policy_id, _etag) =
         create_policy(&running, "gate.precheck", Some("capability_ready"), 0.8, "closed", "block").await;
@@ -290,11 +290,10 @@ async fn a_refinement_changes_the_threshold_without_a_build() {
 
 /// P3.1 — every decision pins the versions it read; a later change does not rewrite the row.
 #[tokio::test(flavor = "multi_thread")]
-async fn every_decision_pins_the_versions_it_read() {
+async fn every_decision_pins_the_refinement_and_laya_config_versions() {
     let (pg, running, _seeded) = fixture().await;
     let (policy_id, etag) =
         create_policy(&running, "gate.precheck", Some("capability_ready"), 0.8, "closed", "block").await;
-    create_laya_config(&running).await;
     running
         .invoke(
             "refinements.publish",
@@ -305,6 +304,13 @@ async fn every_decision_pins_the_versions_it_read() {
             None,
         )
         .await;
+
+    // A laya decision with no laya config to pin is refused: the pin is mandatory, not a default.
+    let (status, unpinned) = evaluate(&running, 0.9).await;
+    assert_eq!(status, 422, "{unpinned}");
+    assert_eq!(output(&unpinned)["type"], "pins_incomplete", "{unpinned}");
+
+    create_laya_config(&running).await;
 
     let (status, first) = evaluate(&running, 0.9).await;
     assert_eq!(status, 201, "{first}");
