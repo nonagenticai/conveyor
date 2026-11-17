@@ -85,7 +85,9 @@ use serde_json::{Value, json};
 /// **#245 adds 2 internal**: `documents.preview` and `documents.return`. 398 → **400**.
 /// **#163 adds 1 internal**: `produce.script`, the blueprint layer's dispatch.
 /// 400 → **401**.
-const EXPECTED: [&str; 415] = [
+/// **#172 adds 3 internal**: the host family — `ops.host_status|host_logs|host_restart_unit`
+/// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 401 → **404**.
+const EXPECTED: [&str; 418] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -339,6 +341,9 @@ const EXPECTED: [&str; 415] = [
     "ops.deployments",
     "ops.events",
     "ops.flux_status",
+    "ops.host_logs",
+    "ops.host_restart_unit",
+    "ops.host_status",
     "ops.logs",
     "ops.pods",
     "ops.restart",
@@ -550,11 +555,13 @@ fn the_registry_is_exactly_the_declared_set() {
     // ladder.record|evaluate|list|apply_draft 4), all internal: 369 → 380; external stays 18.
     // #245 adds `documents.preview` and `documents.return` (internal): 380 → 382.
     // #163 adds `produce.script` (internal): 382 → 383; external stays 18.
+    // #172 adds the three host actions (internal; one destructive, two reads): 383 → 386;
+    // external stays 18 — they call the host agent over ssh, not a declared external service.
     // #305 adds the fourteen MSP edit/read actions (benefits update/delete/link_list/unlink/
     // transition_list/transition_upsert, tranches update/delete/review_list, cadences
     // update/delete, wbs.delete, registers.delete, stakeholders.profile_delete), all internal:
-    // 383 → 397; external stays 18.
-    assert_eq!((internal, external), (397, 18));
+    // 386 -> 400; external stays 18.
+    assert_eq!((internal, external), (400, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -46,7 +46,7 @@
 <tr>
 <td>ADM phases and contracts</td>
 <td>ABSENT</td>
-<td><code>git grep -n 'architecture_contract|adm_profile' -- crates migrations</code> → 0 hits; <code>governed_asset.kind</code> is <code>requirement|principle|adr</code> (<code>migrations/0002_domain.sql:256</code>)</td>
+<td><code>git grep -n 'architecture_contract|adm_profile|architecture_artifact' -- crates migrations</code> → 0 hits; <code>governed_asset.kind</code> is widened to 15 kinds by <code>migrations/0044_plan_spine.sql:413-418</code> (T1) but <code>architecture_artifact</code> is not among them</td>
 </tr>
 <tr>
 <td>Delivery design gate</td>
@@ -61,15 +61,16 @@
 <tr>
 <td>Capability assessment</td>
 <td>ABSENT</td>
-<td>no maturity or skills row exists</td>
+<td>no maturity or skills row exists (P0's <code>maturity-assessment</code>/<code>skills-assessment</code> documents are the proposed baseline, not a measured row)</td>
 </tr>
 <tr>
 <td>Phase H outcome</td>
 <td>ABSENT</td>
-<td><code>project_register_item</code> allows <code>resource|risk|benefit</code> only (<code>migrations/0008_s08_portfolio.sql:112</code>); no kata table</td>
+<td><code>project_register_item</code> is the six-kind register of <code>migrations/0044_plan_spine.sql:100</code> (<code>risk|issue|assumption|dependency|benefit|change</code>); no kata table</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Preliminary content, measured 2026-11-17.</strong> P0's five Preliminary documents are published — <code>architecture-principles</code> (PF-1), <code>adm-profile</code> (ADM-1), <code>artifact-standard</code> (AS-1), <code>maturity-assessment</code> (MA-1) and <code>skills-assessment</code> (SA-1), delivered by #122's A7 and each stating "proposed for P0 acceptance". The Board charter is proposed inside PF-1; the <code>architecture_board</code> governance-body row, the contract and waiver rows, and the typed artefact repository are this plan's deliverables (D2–D4), not P0 content.</p>
 <p>Reused, not rebuilt: <code>governed_asset</code> (requirements, principles, ADRs and their supersession), <code>trace_link</code> (both directions, unique edge), <code>catalogue_entry</code> (the project-type × card-type matrix and the seeded phase catalogue), <code>process_step.kind='gate'</code> (parks a step until an approval exists), the approval primitive (<code>approval</code>, <code>approval_decision</code>, dual control), <code>document</code> + MinIO for artefact documents, <code>wbs_node</code> for phase nodes (T1), and the PM's gate routing (T3).</p>
 <h2 id="3-scope">3. Scope</h2>
 <p><strong>IN</strong> — the eleven tables of SPEC_V2 §10.3; the <code>architecture.*</code> action family; the four contract kinds; the six compliance levels; the waiver register; the maturity and skills assessments; the Architecture Board as a governance body; the <code>architecture</code> project type with Preliminary and A–H as WBS nodes; the delivery design gate and the phase-G review; the Architecture destination in the console; the seed's T9 gate and the T9/P0 expected-output categories.</p>

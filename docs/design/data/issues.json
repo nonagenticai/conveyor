@@ -3,9 +3,9 @@
     {
       "number": 307,
       "title": "engine: a capability-agent run finishes inside its budget and composes its artefact",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/307",
-      "updatedAt": "2026-11-17T19:39:55Z",
+      "updatedAt": "2026-11-17T20:20:45Z",
       "labels": [
         {
           "name": "unit",
@@ -22,7 +22,7 @@
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-17T19:18:22Z",
+      "updatedAt": "2026-11-17T20:02:57Z",
       "labels": [
         {
           "name": "unit",
@@ -2336,7 +2336,7 @@
       "title": "T3 \u2014 PM job",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/74",
-      "updatedAt": "2026-11-17T19:46:06Z",
+      "updatedAt": "2026-11-17T20:19:49Z",
       "labels": [
         {
           "name": "unit",
