@@ -1,19 +1,82 @@
 {
   "issues": [
     {
-      "number": 282,
-      "title": "approvals: the destructive gate is spec-declared and policy-driven, at the invoke boundary",
+      "number": 285,
+      "title": "console: the destructive approval flow \u2014 one helper, every call site, and the approvals screen",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/282",
-      "updatedAt": "2026-11-17T10:31:10Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/285",
+      "updatedAt": "2026-11-17T10:32:09Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 284,
+      "title": "copilot: a proposed destructive action binds the approval it was granted",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/284",
+      "updatedAt": "2026-11-17T10:32:04Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 283,
+      "title": "approvals: the 27 ungated destructive actions declare their targets, with a drift guard",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/283",
+      "updatedAt": "2026-11-17T10:33:01Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 282,
+      "title": "approvals: the destructive gate is spec-declared and policy-driven, at the invoke boundary",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/282",
+      "updatedAt": "2026-11-17T10:42:25Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -26,7 +89,7 @@
       "title": "delivery: every unit declares its programme context \u2014 tranche, brief, ADM phase/plateau and benefits",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/280",
-      "updatedAt": "2026-11-17T10:28:54Z",
+      "updatedAt": "2026-11-17T10:50:37Z",
       "labels": [
         {
           "name": "documentation",
@@ -45,9 +108,9 @@
     {
       "number": 277,
       "title": "ci: the registry workflow's approval poll gives up before the parked run settles",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/277",
-      "updatedAt": "2026-11-17T10:03:30Z",
+      "updatedAt": "2026-11-17T10:54:27Z",
       "labels": [
         {
           "name": "unit",
@@ -62,13 +125,17 @@
     {
       "number": 274,
       "title": "chore(rust): toolchain 1.99.0 -> 1.100.0 (estate pin)",
-      "state": "CLOSED",
+      "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/274",
-      "updatedAt": "2026-11-17T09:53:21Z",
+      "updatedAt": "2026-11-17T10:47:34Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -128,15 +195,15 @@
       "title": "programme: the inception gate \u2014 a build run waits for the published analysis and architecture",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/264",
-      "updatedAt": "2026-11-17T08:21:05Z",
+      "updatedAt": "2026-11-17T10:54:01Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -496,7 +563,7 @@
       "title": "programme: the rigour output categories and the architecture/tranche seed rows",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/221",
-      "updatedAt": "2026-11-17T07:50:56Z",
+      "updatedAt": "2026-11-17T10:50:48Z",
       "labels": [
         {
           "name": "unit",
@@ -611,7 +678,7 @@
       "title": "estate: deploy and cut over the absorbed research (webscraper + media-discovery)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/205",
-      "updatedAt": "2026-11-16T23:10:35Z",
+      "updatedAt": "2026-11-17T10:47:58Z",
       "labels": [
         {
           "name": "unit",
@@ -1060,7 +1127,7 @@
       "title": "estate: absorb the content service \u2014 produce.script and the blueprint layer",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/163",
-      "updatedAt": "2026-11-16T18:26:26Z",
+      "updatedAt": "2026-11-17T10:51:15Z",
       "labels": [
         {
           "name": "unit",
@@ -2111,7 +2178,7 @@
       "title": "T2 \u2014 Decision ladder",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/73",
-      "updatedAt": "2026-11-17T10:10:42Z",
+      "updatedAt": "2026-11-17T10:53:03Z",
       "labels": [
         {
           "name": "unit",
