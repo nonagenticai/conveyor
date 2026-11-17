@@ -551,7 +551,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // #163 adds `produce.script` (internal): 382 → 383; external stays 18.
     // #172 adds the three host actions (internal; one destructive, two reads): 383 → 386;
     // external stays 18 — they call the host agent over ssh, not a declared external service.
-    assert_eq!((internal, external), (386, 18));
+    // T3 adds the six PM actions (all internal): 386 → 392; external stays 18.
+    assert_eq!((internal, external), (392, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
