@@ -1200,7 +1200,7 @@ in §11.8.
 | procedures | `procedures.ingest_sop\|ingest_process\|ingest_rdf\|draft\|validate\|publish`, `capabilities.design\|publish`, `pko.import_rdf\|edit\|publish\|pin` |
 | authoring | `authoring.intake\|draft\|review\|publish`, `authoring.assets` |
 | approvals | `approval_policies.list\|get\|set`, `approvals.request\|decide\|escalate` |
-| decision | `decisions.open\|evaluate\|decide\|escalate`, `decision_options.*`, `decision_policies.*\|refine`, `laya_configs.*` |
+| decision | `ladder.record\|evaluate\|decide\|escalate` (the ladder's verbs), `decision_options.*`, `decision_policies.*`, `refinements.publish\|list`, `laya_configs.*`. ⚠️ `decisions.*` is the **ADR family** (`governance/assets.rs`); the ladder does not reuse it, so the §7 record and an ADR cannot be confused |
 | PM | `pm.charter`, `pm.plan`, `pm.baseline`, `pm.close` |
 | coach | `coach.interrupt`, `coach.triage`, `coach.remedy`, `coach.escalate` |
 | kata | `kata.open\|observe\|analyse\|propose\|measure\|adopt\|propagate\|close` |
