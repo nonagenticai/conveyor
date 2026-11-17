@@ -329,9 +329,11 @@ async fn a_process_step_naming_agent_run_drives_the_loop_and_a_replay_is_a_noop(
     assert_eq!(out["tool_calls"][0]["is_error"], false);
     assert_eq!(calls.load(Ordering::SeqCst), 2, "two model calls");
 
-    // Two model calls + one tool call, all on the run's trace id.
-    let invocations: Vec<(String, String, Option<String>)> = sqlx::query_as(
-        "SELECT action, outcome, trace_id FROM action_invocation
+    // Two model calls + one tool call, all on the run's trace id, all acting as the tenant's
+    // service actor: an internal invocation still carries a real principal, so an action that
+    // records its author (documents.compose → document.created_by) can succeed.
+    let invocations: Vec<(String, String, Option<String>, Uuid)> = sqlx::query_as(
+        "SELECT action, outcome, trace_id, actor_id FROM action_invocation
           WHERE tenant_id = $1 AND trace_id = $2 ORDER BY created_at, action",
     )
     .bind(seeded.tenant_id)
@@ -354,6 +356,10 @@ async fn a_process_step_naming_agent_run_drives_the_loop_and_a_replay_is_a_noop(
             .iter()
             .all(|row| row.2.as_deref() == Some(format!("run:{run}").as_str())),
         "every invocation carries the run trace id: {invocations:?}"
+    );
+    assert!(
+        invocations.iter().all(|row| !row.3.is_nil()),
+        "an agent invocation acts as a real user, never the nil uuid: {invocations:?}"
     );
 
     // The run settles when the last step records.
