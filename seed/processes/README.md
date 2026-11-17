@@ -85,7 +85,10 @@ agent:                                  # ONE capability_agent for the type
   prompt: agent                         # the compiled prompt recipe (0030's `agent`)
   model: claude-sonnet-5-5              # model registry ref
   max_iterations: 12
-  timeout_secs: 120
+  timeout_secs: 300                    # the agent loop's bound (the DB allows 1..=300); the
+                                       # inference.chat action bound must not be shorter
+  allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]
+                                       # the tool surface the model may call; empty = text only
 
 sops:
   - key: development_bug_fix.ready      # SOP key; every step of the process references one
