@@ -565,6 +565,24 @@ pub(crate) async fn drive(
     config: AgentConfig,
 ) -> Result<AgentRunOut, ActionError> {
     let (mut agent, mut plan) = Agent::start(config).map_err(typed)?;
+    // CONTRACT §17: an internal invocation still acts as a real principal. The loop has no user,
+    // so it resolves the tenant's service actor once — the same actor the operator CLI uses — and
+    // every model and tool call carries it. Without this the call runs as the nil uuid, and an
+    // action that records its author fails its foreign key (`documents.compose` →
+    // `document.created_by`, measured live 2026-11-17).
+    let actor_id = store::identity::tenant_actor(pool, tenant)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "agent.run: resolve the tenant actor");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                422,
+                "agent.no_actor",
+                "the tenant has no active member for an agent run to act as",
+            )
+        })?;
     let started = Instant::now();
     let cap_ms = agent.caps().timeout_ms;
     let allowed: Vec<String> = agent
@@ -608,7 +626,7 @@ pub(crate) async fn drive(
                         idempotency_key: run
                             .idempotency_prefix
                             .map(|prefix| format!("{prefix}:turn{turn}")),
-                        actor_id: Uuid::nil(),
+                        actor_id,
                         actor_kind: "service".to_owned(),
                         role: Role::KataExecutor,
                         policy: Default::default(),
@@ -654,7 +672,7 @@ pub(crate) async fn drive(
                             idempotency_key: run
                                 .idempotency_prefix
                                 .map(|prefix| format!("{prefix}:tool{index}")),
-                            actor_id: Uuid::nil(),
+                            actor_id,
                             actor_kind: "service".to_owned(),
                             role: Role::KataExecutor,
                             policy: Default::default(),

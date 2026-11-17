@@ -1,11 +1,11 @@
 {
   "issues": [
     {
-      "number": 307,
-      "title": "engine: a capability-agent run finishes inside its budget and composes its artefact",
-      "state": "CLOSED",
-      "url": "https://github.com/nonagenticai/conveyor/issues/307",
-      "updatedAt": "2026-11-17T20:20:45Z",
+      "number": 314,
+      "title": "delivery: a merge to main runs the sweep, because GitHub drops this repo's cron",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/314",
+      "updatedAt": "2026-11-17T22:21:25Z",
       "labels": [
         {
           "name": "unit",
@@ -18,11 +18,45 @@
       ]
     },
     {
+      "number": 311,
+      "title": "engine: an agent run cannot compose a document \u2014 its tool calls run as the nil actor",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/311",
+      "updatedAt": "2026-11-17T22:34:49Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 307,
+      "title": "engine: a capability-agent run finishes inside its budget and composes its artefact",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/307",
+      "updatedAt": "2026-11-17T22:34:42Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
       "number": 305,
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-17T20:02:57Z",
+      "updatedAt": "2026-11-17T22:19:38Z",
       "labels": [
         {
           "name": "unit",
@@ -73,15 +107,15 @@
       "title": "programme: the closure gate \u2014 a project cannot close while a declared output is unpublished",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/302",
-      "updatedAt": "2026-11-17T19:15:25Z",
+      "updatedAt": "2026-11-17T22:46:06Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         }
       ]
     },
@@ -239,7 +273,7 @@
       "title": "approvals: the destructive gate is spec-declared and policy-driven, at the invoke boundary",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/282",
-      "updatedAt": "2026-11-17T17:44:05Z",
+      "updatedAt": "2026-11-17T22:25:50Z",
       "labels": [
         {
           "name": "unit",
@@ -802,7 +836,7 @@
       "title": "estate: retire the dead w2v namespace surface (17 zero-replica Deployments, their Services, and the dead routes)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/213",
-      "updatedAt": "2026-11-16T16:34:36Z",
+      "updatedAt": "2026-11-17T22:25:52Z",
       "labels": [
         {
           "name": "unit",
@@ -1176,7 +1210,7 @@
       "title": "ops: host control \u2014 a fixed-verb agent and the systemctl actions",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/172",
-      "updatedAt": "2026-11-17T19:58:08Z",
+      "updatedAt": "2026-11-17T20:30:47Z",
       "labels": [
         {
           "name": "unit",
@@ -2126,15 +2160,15 @@
       "title": "T11 \u2014 Metrics, metering and maturity",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/84",
-      "updatedAt": "2026-11-17T19:29:48Z",
+      "updatedAt": "2026-11-17T22:46:02Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "T11",
@@ -2168,15 +2202,15 @@
       "title": "T10 \u2014 SAFe cadence and MSP tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/82",
-      "updatedAt": "2026-11-17T19:29:46Z",
+      "updatedAt": "2026-11-17T22:45:58Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "T10",
@@ -2189,15 +2223,15 @@
       "title": "T9 \u2014 the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/81",
-      "updatedAt": "2026-11-17T19:29:44Z",
+      "updatedAt": "2026-11-17T22:45:54Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "T9",
@@ -2336,7 +2370,7 @@
       "title": "T3 \u2014 PM job",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/74",
-      "updatedAt": "2026-11-17T20:19:49Z",
+      "updatedAt": "2026-11-17T22:36:45Z",
       "labels": [
         {
           "name": "unit",
