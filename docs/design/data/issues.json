@@ -1,11 +1,45 @@
 {
   "issues": [
     {
+      "number": 253,
+      "title": "ci: the refresh approves its parked pull_request run so the generated PR is mergeable",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/253",
+      "updatedAt": "2026-11-17T01:28:00Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 251,
+      "title": "ci: the registry refresh must not require pandoc",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/251",
+      "updatedAt": "2026-11-17T00:28:57Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 248,
       "title": "ci: the registry refresh must regenerate the derived design-pack data",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/248",
-      "updatedAt": "2026-11-16T23:48:08Z",
+      "updatedAt": "2026-11-17T00:06:43Z",
       "labels": [
         {
           "name": "unit",
