@@ -1,6 +1,92 @@
 {
   "issues": [
     {
+      "number": 300,
+      "title": "delivery: review requests are cleared automatically and parked runs get approved",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/300",
+      "updatedAt": "2026-11-17T19:12:21Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 299,
+      "title": "estate: scientific's caller tenant is unauthenticated \u2014 a bare X-Tenant-Id is trusted",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/299",
+      "updatedAt": "2026-11-17T17:59:40Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 296,
+      "title": "parity: S14 and #29 cite the native map, not delete the contract",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/296",
+      "updatedAt": "2026-11-17T17:43:24Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 295,
+      "title": "parity: re-home the per-card claim/fact ledger",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/295",
+      "updatedAt": "2026-11-17T17:43:22Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 294,
+      "title": "parity: the native acceptance map for the 218 used surfaces",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/294",
+      "updatedAt": "2026-11-17T17:43:13Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 293,
+      "title": "parity: validate and sign the S00 contract",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/293",
+      "updatedAt": "2026-11-17T18:49:46Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 285,
       "title": "console: the destructive approval flow \u2014 one helper, every call site, and the approvals screen",
       "state": "OPEN",
@@ -68,7 +154,7 @@
       "title": "approvals: the destructive gate is spec-declared and policy-driven, at the invoke boundary",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/282",
-      "updatedAt": "2026-11-17T10:42:25Z",
+      "updatedAt": "2026-11-17T17:44:05Z",
       "labels": [
         {
           "name": "unit",
@@ -125,9 +211,9 @@
     {
       "number": 274,
       "title": "chore(rust): toolchain 1.99.0 -> 1.100.0 (estate pin)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/274",
-      "updatedAt": "2026-11-17T10:47:34Z",
+      "updatedAt": "2026-11-17T18:00:02Z",
       "labels": [
         {
           "name": "unit",
@@ -176,9 +262,9 @@
     {
       "number": 265,
       "title": "usage: price the non-token GPU surfaces \u2014 images, characters and seconds",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/265",
-      "updatedAt": "2026-11-17T10:20:12Z",
+      "updatedAt": "2026-11-17T19:08:19Z",
       "labels": [
         {
           "name": "unit",
@@ -261,9 +347,9 @@
     {
       "number": 258,
       "title": "attribution: send X-Actor-Id and the tenant-level X-Project-Id on model-call requests",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/258",
-      "updatedAt": "2026-11-17T16:38:41Z",
+      "updatedAt": "2026-11-17T18:00:02Z",
       "labels": [
         {
           "name": "unit",
@@ -346,9 +432,9 @@
     {
       "number": 245,
       "title": "console: the authoring standard \u2014 templates, a blocked publish, and the coach's rework/kata triage",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/245",
-      "updatedAt": "2026-11-17T16:33:42Z",
+      "updatedAt": "2026-11-17T17:45:20Z",
       "labels": [
         {
           "name": "unit",
@@ -468,13 +554,17 @@
     {
       "number": 226,
       "title": "research-media: the tenant gate is unauthenticated \u2014 a bare X-Tenant-Id is trusted (blocks #205 P4)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/226",
-      "updatedAt": "2026-11-16T19:35:56Z",
+      "updatedAt": "2026-11-17T19:11:45Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -642,9 +732,9 @@
     {
       "number": 212,
       "title": "estate: deploy and cut over the absorbed scientific service",
-      "state": "CLOSED",
+      "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/212",
-      "updatedAt": "2026-11-17T13:32:48Z",
+      "updatedAt": "2026-11-17T18:20:47Z",
       "labels": [
         {
           "name": "unit",
@@ -653,6 +743,10 @@
         {
           "name": "status:claimed",
           "color": "FBCA04"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
         }
       ]
     },
@@ -678,7 +772,7 @@
       "title": "estate: deploy and cut over the absorbed research (webscraper + media-discovery)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/205",
-      "updatedAt": "2026-11-17T14:30:35Z",
+      "updatedAt": "2026-11-17T19:11:52Z",
       "labels": [
         {
           "name": "unit",
@@ -741,7 +835,7 @@
       "title": "test: the bus harness accepts a runner-provided private Redis",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/195",
-      "updatedAt": "2026-11-17T15:04:53Z",
+      "updatedAt": "2026-11-17T19:01:38Z",
       "labels": [
         {
           "name": "unit",
@@ -1125,9 +1219,9 @@
     {
       "number": 163,
       "title": "estate: absorb the content service \u2014 produce.script and the blueprint layer",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/163",
-      "updatedAt": "2026-11-17T10:51:15Z",
+      "updatedAt": "2026-11-17T18:24:39Z",
       "labels": [
         {
           "name": "unit",
