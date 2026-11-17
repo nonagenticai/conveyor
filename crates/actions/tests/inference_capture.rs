@@ -28,10 +28,22 @@ async fn a_real_external_call_records_the_router_usage_field_for_field() {
                         .and_then(|value| value.to_str().ok())
                         .unwrap_or("missing")
                         .to_owned();
+                    let actor = headers
+                        .get("x-actor-id")
+                        .and_then(|value| value.to_str().ok())
+                        .unwrap_or("missing")
+                        .to_owned();
+                    let project = headers
+                        .get("x-project-id")
+                        .and_then(|value| value.to_str().ok())
+                        .unwrap_or("missing")
+                        .to_owned();
                     axum::Json(json!({
                         "id": "chatcmpl-test",
                         "model": "served-model",
                         "correlation": correlation,
+                        "actor": actor,
+                        "project": project,
                         "choices": [{
                             "index": 0,
                             "message": {"role": "assistant", "content": "ok"},
@@ -91,6 +103,16 @@ async fn a_real_external_call_records_the_router_usage_field_for_field() {
         .await
         .expect("the external call");
     assert_eq!(outcome.status, 200, "{}", outcome.body);
+    assert_eq!(
+        outcome.body["output"]["actor"],
+        json!(seeded.user_id.to_string()),
+        "the router records the acting principal from X-Actor-Id"
+    );
+    assert_eq!(
+        outcome.body["output"]["project"],
+        json!(conveyor_actions::invoke::tenant_level_project_id(seeded.tenant).to_string()),
+        "the router records the tenant-level project id from X-Project-Id"
+    );
 
     #[derive(sqlx::FromRow)]
     struct LedgerRow {
