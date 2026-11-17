@@ -183,7 +183,8 @@ pub async fn get_policy_tx(
     tenant: TenantId,
     id: Uuid,
 ) -> Result<Option<PolicyRecord>, LadderStoreError> {
-    let sql = format!("SELECT {POLICY_COLUMNS} FROM decision_policy WHERE tenant_id = $1 AND id = $2");
+    let sql =
+        format!("SELECT {POLICY_COLUMNS} FROM decision_policy WHERE tenant_id = $1 AND id = $2");
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(id)
@@ -220,11 +221,12 @@ pub async fn update_policy_tx(
             }));
         }
     }
-    let current = get_policy_tx(&mut *conn, tenant, id)
-        .await?
-        .ok_or(LadderStoreError::NotFound {
-            what: "decision_policy",
-        })?;
+    let current =
+        get_policy_tx(&mut *conn, tenant, id)
+            .await?
+            .ok_or(LadderStoreError::NotFound {
+                what: "decision_policy",
+            })?;
     if expected.is_some_and(|version| version != current.version) {
         return Err(LadderStoreError::Stale {
             what: "decision_policy",
@@ -558,11 +560,9 @@ impl EffectivePolicy {
 
     /// The fail policy in force.
     pub fn fail_policy(&self) -> Result<FailPolicy, LadderStoreError> {
-        FailPolicy::parse(&self.policy.fail_policy).ok_or_else(|| {
-            LadderStoreError::Vocabulary {
-                what: "decision policy fail_policy",
-                value: self.policy.fail_policy.clone(),
-            }
+        FailPolicy::parse(&self.policy.fail_policy).ok_or_else(|| LadderStoreError::Vocabulary {
+            what: "decision policy fail_policy",
+            value: self.policy.fail_policy.clone(),
         })
     }
 

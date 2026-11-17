@@ -107,7 +107,15 @@ async fn evaluate(running: &support::Running, confidence: f64) -> (u16, Value) {
 #[tokio::test(flavor = "multi_thread")]
 async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
     let (_pg, running, _seeded) = fixture().await;
-    create_policy(&running, "gate.precheck", Some("capability_ready"), 0.8, "closed", "handover").await;
+    create_policy(
+        &running,
+        "gate.precheck",
+        Some("capability_ready"),
+        0.8,
+        "closed",
+        "handover",
+    )
+    .await;
     create_laya_config(&running).await;
 
     // L0 — a deterministic rule outcome.
@@ -223,12 +231,21 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
             keys
         })
         .collect();
-    assert_eq!(shape[0], shape[1], "the rule and laya rows disagree on columns");
-    assert_eq!(shape[1], shape[2], "the laya and human rows disagree on columns");
+    assert_eq!(
+        shape[0], shape[1],
+        "the rule and laya rows disagree on columns"
+    );
+    assert_eq!(
+        shape[1], shape[2],
+        "the laya and human rows disagree on columns"
+    );
 
     for row in items {
         assert_eq!(row["kind"], "gate.precheck", "{row}");
-        assert!(row["policy_id"].is_string(), "every rung names its policy: {row}");
+        assert!(
+            row["policy_id"].is_string(),
+            "every rung names its policy: {row}"
+        );
         assert!(row["policy_version"].is_number(), "{row}");
         assert!(row["answer"].is_string(), "{row}");
         assert!(row["confidence"].is_number(), "{row}");
@@ -252,8 +269,15 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
 #[tokio::test(flavor = "multi_thread")]
 async fn a_refinement_changes_a_threshold_without_a_code_change() {
     let (_pg, running, _seeded) = fixture().await;
-    let (policy_id, _etag) =
-        create_policy(&running, "gate.precheck", Some("capability_ready"), 0.8, "closed", "block").await;
+    let (policy_id, _etag) = create_policy(
+        &running,
+        "gate.precheck",
+        Some("capability_ready"),
+        0.8,
+        "closed",
+        "block",
+    )
+    .await;
 
     // The platform policy at 0.8 refuses an 0.7 answer.
     let (status, refused) = evaluate(&running, 0.7).await;
@@ -292,8 +316,15 @@ async fn a_refinement_changes_a_threshold_without_a_code_change() {
 #[tokio::test(flavor = "multi_thread")]
 async fn every_decision_pins_the_refinement_and_laya_config_versions() {
     let (pg, running, _seeded) = fixture().await;
-    let (policy_id, etag) =
-        create_policy(&running, "gate.precheck", Some("capability_ready"), 0.8, "closed", "block").await;
+    let (policy_id, etag) = create_policy(
+        &running,
+        "gate.precheck",
+        Some("capability_ready"),
+        0.8,
+        "closed",
+        "block",
+    )
+    .await;
     running
         .invoke(
             "refinements.publish",
@@ -343,7 +374,10 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
         .fetch_one(&pg.owner)
         .await
         .expect("read the stored pin");
-    assert_eq!(pinned, 1, "the recorded decision's pin moved with the policy");
+    assert_eq!(
+        pinned, 1,
+        "the recorded decision's pin moved with the policy"
+    );
 }
 
 /// P4.1/P4.2 — a generated draft is applied only through the gated action.
@@ -354,7 +388,15 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
 #[tokio::test(flavor = "multi_thread")]
 async fn a_generated_draft_cannot_transition_a_card() {
     let (_pg, running, _seeded) = fixture().await;
-    create_policy(&running, "gate.precheck", Some("capability_ready"), 0.8, "closed", "block").await;
+    create_policy(
+        &running,
+        "gate.precheck",
+        Some("capability_ready"),
+        0.8,
+        "closed",
+        "block",
+    )
+    .await;
     create_laya_config(&running).await;
 
     // A project, its board, an active lane and a card to apply to.
@@ -552,6 +594,9 @@ async fn a_generated_draft_cannot_transition_a_card() {
             None,
         )
         .await;
-    assert_eq!(status, 409, "the generated draft was attached by an edit: {bypass}");
+    assert_eq!(
+        status, 409,
+        "the generated draft was attached by an edit: {bypass}"
+    );
     assert_eq!(output(&bypass)["type"], "draft_requires_gate", "{bypass}");
 }

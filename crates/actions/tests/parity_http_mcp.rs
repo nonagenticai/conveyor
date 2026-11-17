@@ -4886,9 +4886,9 @@ fn ladder_samples() -> Vec<Sample> {
         ),
         {
             let mut sample = on_prepared("decision_policies.update", Some("\"1\""));
-            sample.input = Box::new(|ctx: &Ctx| {
-                json!({"id": ctx.pop("decision_policies.update"), "threshold": 0.7})
-            });
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"id": ctx.pop("decision_policies.update"), "threshold": 0.7}),
+            );
             expecting(sample, 200)
         },
         expecting(plain("decision_policies.list", json!({}), None), 200),
@@ -4905,7 +4905,11 @@ fn ladder_samples() -> Vec<Sample> {
         },
         expecting(plain("refinements.list", json!({}), None), 200),
         expecting(
-            plain("laya_configs.create", json!({"model_ref": "jev-latest"}), None),
+            plain(
+                "laya_configs.create",
+                json!({"model_ref": "jev-latest"}),
+                None,
+            ),
             201,
         ),
         expecting(plain("laya_configs.list", json!({}), None), 200),
@@ -4938,7 +4942,10 @@ fn ladder_samples() -> Vec<Sample> {
             });
             expecting(sample, 201)
         },
-        expecting(plain("ladder.list", json!({"kind": "parity.case"}), None), 200),
+        expecting(
+            plain("ladder.list", json!({"kind": "parity.case"}), None),
+            200,
+        ),
         {
             let mut sample = plain("ladder.apply_draft", json!({}), None);
             sample.prepare = true;

@@ -34,8 +34,8 @@ use crate::spec::HandlerOutput;
 use crate::views::Page;
 
 pub use store::ladder::{
-    DecisionRecord, EffectivePolicy, LadderStoreError, LayaConfigRecord, NewDecision, NewLayaConfig,
-    NewOption, NewPolicy, NewRefinement, PolicyRecord, RefinementRecord,
+    DecisionRecord, EffectivePolicy, LadderStoreError, LayaConfigRecord, NewDecision,
+    NewLayaConfig, NewOption, NewPolicy, NewRefinement, PolicyRecord, RefinementRecord,
 };
 
 /// The one event every ladder mutation emits.
@@ -169,11 +169,10 @@ fn input_hash_of(
         "confidence": confidence,
         "input": input.unwrap_or(&Value::Null),
     });
-    let bytes = serde_json::to_vec(&basis)
-        .map_err(|error| {
-            tracing::error!(%error, "serialize the decision input basis");
-            ActionError::internal()
-        })?;
+    let bytes = serde_json::to_vec(&basis).map_err(|error| {
+        tracing::error!(%error, "serialize the decision input basis");
+        ActionError::internal()
+    })?;
     Ok(crate::spec::sha256_hex(&bytes))
 }
 
@@ -796,7 +795,9 @@ async fn ladder_evaluate(
         )?,
     };
     let pins = effective.pins();
-    let laya_config_id = input.laya_config_id.or(effective.laya_config.as_ref().map(|row| row.id));
+    let laya_config_id = input
+        .laya_config_id
+        .or(effective.laya_config.as_ref().map(|row| row.id));
     let laya_config_version = match input.laya_config_id {
         Some(id) => {
             let config = store::ladder::get_laya_config_tx(&mut *tx, ctx.tenant, id)
@@ -827,9 +828,7 @@ async fn ladder_evaluate(
             question,
             answer: input.answer.clone(),
             option_set_version,
-            probabilities: input
-                .probabilities
-                .unwrap_or_else(|| serde_json::json!({})),
+            probabilities: input.probabilities.unwrap_or_else(|| serde_json::json!({})),
             confidence: Some(confidence),
             input_hash: Some(hash),
             policy_id: Some(effective.policy.id),
@@ -953,14 +952,10 @@ async fn ladder_record(
                 )
             }
             (None, _) => {
-                let effective = store::ladder::effective_policy_tx(
-                    &mut *tx,
-                    ctx.tenant,
-                    kind,
-                    gate.as_deref(),
-                )
-                .await
-                .map_err(|error| ladder_error(error, ctx.action))?;
+                let effective =
+                    store::ladder::effective_policy_tx(&mut *tx, ctx.tenant, kind, gate.as_deref())
+                        .await
+                        .map_err(|error| ladder_error(error, ctx.action))?;
                 match effective {
                     Some(effective) => {
                         let pins = effective.pins();
@@ -973,10 +968,7 @@ async fn ladder_record(
                     }
                     None if matches!(rung, Rung::Human) => (None, None, None, None),
                     None => {
-                        return Err(ladder_error(
-                            LadderError::PolicyMissing.into(),
-                            ctx.action,
-                        ));
+                        return Err(ladder_error(LadderError::PolicyMissing.into(), ctx.action));
                     }
                 }
             }
@@ -1136,10 +1128,7 @@ async fn ladder_apply_draft(
             "applying a generated draft needs an accepted L1 or L3 decision",
         ));
     }
-    if decision
-        .card_id
-        .is_some_and(|card| card != input.card_id)
-    {
+    if decision.card_id.is_some_and(|card| card != input.card_id) {
         return Err(ActionError::new(
             422,
             "draft_requires_gate",
@@ -1195,4 +1184,3 @@ async fn ladder_apply_draft(
     })
     .with_etag(updated.version.etag()))
 }
-
