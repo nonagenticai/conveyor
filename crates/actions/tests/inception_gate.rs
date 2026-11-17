@@ -106,7 +106,11 @@ async fn compose(running: &support::Running, project: &str, category: &str) -> (
             json!({
                 "title": format!("{category} of {project}"),
                 "project_id": project,
-                "body": format!("# {category}\n\nwritten by the inception gate test"),
+                // The standard's own skeleton: a published output must carry its required
+                // headings (#245), and this fixture publishes the pair the gate reads.
+                "body": conveyor_domain::output_standard::template(category)
+                    .map(|template| template.skeleton)
+                    .unwrap_or_else(|| format!("# {category}\n\nwritten by the inception gate test")),
                 "category": category,
             }),
             None,

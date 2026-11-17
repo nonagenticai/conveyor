@@ -1,4 +1,4 @@
--- 0046_media_price.sql — the non-token GPU surfaces get a unit and a per-unit price.
+-- 0047_media_price.sql — the non-token GPU surfaces get a unit and a per-unit price.
 --
 -- 0045 priced tokens. The engine also writes a ledger row for the external media actions
 -- (`media.generate_image`, `produce.speech`, `media.transcribe`), but those responses carry no

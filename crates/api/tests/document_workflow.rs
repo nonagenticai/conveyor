@@ -62,7 +62,9 @@ async fn a_member_drafts_and_requests_an_admin_publishes_and_history_restores() 
             "dev:bob",
             json!({
                 "title": "S02 brief",
-                "body": "# S02 brief\n\nThe outcome and the boundary.",
+                // The standard's template: a publishable project brief carries every required
+                // heading. The blocked publish is #245's gate; this test is the workflow above it.
+                "body": "# S02 brief\n\n## Outcome\n\nWhat is true after S02.\n\n## Boundary\n\nIn scope; out of scope.\n\n## Reuse sources\n\ndocs/SPEC_V2.md §1.\n\n## Inception units\n\nanalysis and architecture.\n\n## Dependencies\n\nnone.\n\n## Acceptance\n\nGiven S02, when the test runs, then it passes.\n\n## Capabilities\n\nS02.\n\n## Plan\n\ndocs/plans/slices/S02.md.\n",
                 "category": "project-brief",
                 "unit": "S02",
             }),
@@ -219,7 +221,7 @@ async fn a_member_drafts_and_requests_an_admin_publishes_and_history_restores() 
         output(&version)["content"]["body"]
             .as_str()
             .unwrap_or_default()
-            .contains("The outcome and the boundary"),
+            .contains("What is true after S02"),
         "{version}"
     );
 

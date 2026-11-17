@@ -32,9 +32,12 @@ registered GitHub issues are its units. `seed/programme.json` is the mapping of 
 - `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM` — the cross-cutting units.
 
 Each project carries `meta.plan`, `meta.track` and `meta.issues`; each slice plan carries a
-one-line `Programme project:` header. `migrate --seed` installs the programme and its projects
-idempotently (`crates/store/src/seed_programme.rs`), and `conveyor snapshot` publishes the same
-rows to the public design site.
+one-line `Programme project:` header. Each delivery unit's issue carries the same context in four
+fields — `Tranche`, `Brief`, `ADM phase/plateau` and `Benefits` — defined in `03-DELIVERY.md` §
+"Issue content contract", so a tranche review can read the buildout's issue ledger directly.
+`migrate --seed` installs the programme and its projects idempotently
+(`crates/store/src/seed_programme.rs`), and `conveyor snapshot` publishes the same rows to the
+public design site.
 
 **Status 2026-11-07:** plan set complete — 19 slice plans, the binding data architecture, the contract and five
 source maps. `docs/SPEC.md` is the approved spec; `01-CONTRACT.md` is the cross-slice rulebook and outranks

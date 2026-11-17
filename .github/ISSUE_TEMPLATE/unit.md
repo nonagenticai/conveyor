@@ -18,6 +18,19 @@ outcome, not the plan's objective.>
 <`docs/plans/slices/S##-*.md` §… · its `00-INDEX.md` row · `docs/evidence/2026-11-10-plan-audit.md`
 §W…/V…. Links only — never paste plan prose.>
 
+## Programme
+<The programme context (MSP/TOGAF). Every field names a live row or document, or the issue that
+creates it (`pending #N`). A unit created on or after 2026-11-18 without this section is reported
+by `scripts/ci/board.py` and is not ready to claim. See `docs/plans/03-DELIVERY.md` § "Issue
+content contract".>
+
+| Field | Value |
+|---|---|
+| Tranche | `programme_tranche` number the unit is authorised under (`0` for definition units), or `pending #N` |
+| Brief | the project brief document id/path from P0's definition set, or `pending #122` |
+| ADM phase/plateau | `Preliminary` or `A`–`H`, plus `PSA` / `HLD` / `SD` where the unit changes the architecture; otherwise `— (no architecture change)` |
+| Benefits | benefit-profile id(s) in the benefits map this output is mapped to, or `enabling — no direct benefit` with one sentence of reason |
+
 ## Claim
 <Written at claim time; HEAD updated on every push. Leave the em-dashes while the issue is ready.>
 
