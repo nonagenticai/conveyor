@@ -58,6 +58,7 @@ pub mod organisation;
 pub mod portfolio;
 pub mod process;
 // SPEC D28 / CONTRACT §21: the SOP (procedure) that judges a process step.
+pub mod pm;
 pub mod procedure;
 // SPEC D30 / CONTRACT §21: the user-facing process map — two read actions.
 pub mod process_map;

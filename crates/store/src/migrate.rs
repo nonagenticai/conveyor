@@ -210,7 +210,8 @@ mod tests {
                 // #172 (T7): the hosts conveyor may reach, and what each may be asked for
                 // (0048_host_registry.sql, SPEC_V2 §10.4.1). A platform fact — no tenant column.
                 (48, "host registry".to_owned()),
-                (49, "approval policies".to_owned())
+                (49, "pm job".to_owned()),
+                (50, "approval policies".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

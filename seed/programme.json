@@ -1381,7 +1381,7 @@
       "key": "P0",
       "name": "Programme definition — vision, blueprint, plan and project briefs",
       "description": "Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
-      "status": "active",
+      "status": "draft",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/P0-programme-definition.md",
@@ -1461,7 +1461,11 @@
           294,
           295,
           296,
-          299
+          299,
+          302,
+          303,
+          305,
+          307
         ],
         "depends_on": [],
         "plan_status": "active",

@@ -305,6 +305,10 @@ pub struct BaselineTakeIn {
     pub project_id: Uuid,
     /// `scope | schedule | cost`; `scope` when absent.
     pub kind: Option<String>,
+    /// The approved change request that authorises advancing past an approved baseline
+    /// (T3, #74). Required when an approved baseline of this `kind` already exists.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
 }
 
 /// `baselines.list`.
@@ -992,11 +996,73 @@ async fn baselines_take(
         ));
     }
     let record =
-        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, input.project_id, &kind, ctx.actor_id)
-            .await
-            .map_err(|error| spine_error(error, ctx.action))?;
+        take_baseline_guarded(&mut *tx, &ctx, input.project_id, &kind, input.change_id).await?;
     emit_spine_event(&mut *tx, &ctx, "project_baseline", record.id, "created").await?;
     Ok(HandlerOutput::created(baseline_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// Take a baseline under T3's change guard: an approved baseline of the same kind advances only
+/// through an approved change request that names it. The change row and the new baseline cite
+/// each other (`change_id` on the baseline, `meta.baseline_id` on the change).
+async fn take_baseline_guarded(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project_id: Uuid,
+    kind: &str,
+    change_id: Option<Uuid>,
+) -> Result<store::spine::BaselineRecord, ActionError> {
+    let action = "baselines.take";
+    if let Some(previous) =
+        store::spine::latest_approved_baseline_tx(tx, ctx.tenant, project_id, kind)
+            .await
+            .map_err(|error| spine_error(error, action))?
+    {
+        let Some(change_id) = change_id else {
+            return Err(ActionError::new(
+                409,
+                "change_request_required",
+                format!(
+                    "project {project_id} already holds an approved {kind} baseline ({}); a new \
+                     baseline needs an approved change request in `change_id`",
+                    previous.id
+                ),
+            ));
+        };
+        let change = store::spine::get_register_tx(tx, ctx.tenant, change_id)
+            .await
+            .map_err(|error| spine_error(error, action))?
+            .ok_or_else(|| invalid("change_id", "not_found", "no such change request"))?;
+        if change.kind != "change"
+            || change.status != "approved"
+            || change.baseline_ref != Some(previous.id)
+        {
+            return Err(ActionError::new(
+                409,
+                "change_request_invalid",
+                format!(
+                    "change {change_id} must be an approved change whose baseline_ref is the \
+                     approved baseline {}",
+                    previous.id
+                ),
+            ));
+        }
+    } else if change_id.is_some() {
+        return Err(invalid(
+            "change_id",
+            "not_applicable",
+            "there is no approved baseline of this kind to change",
+        ));
+    }
+    let record =
+        store::spine::take_baseline_tx(tx, ctx.tenant, project_id, kind, ctx.actor_id, change_id)
+            .await
+            .map_err(|error| spine_error(error, action))?;
+    if let Some(change_id) = change_id {
+        store::spine::link_change_to_baseline_tx(tx, ctx.tenant, change_id, record.id)
+            .await
+            .map_err(|error| spine_error(error, action))?;
+    }
+    Ok(record)
 }
 
 /// Read one baseline.
