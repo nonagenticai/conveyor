@@ -200,7 +200,10 @@ mod tests {
                 (44, "plan spine".to_owned()),
                 // #46: the commercial-equivalent price per model, the price side of the
                 // read-time cost derivation (0045_commercial_price.sql).
-                (45, "commercial price".to_owned())
+                (45, "commercial price".to_owned()),
+                // #265: the non-token surfaces' unit and per-unit rate on the catalogue, and the
+                // call's own usage_unit/usage_units on the ledger (0046_media_price.sql).
+                (46, "media price".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

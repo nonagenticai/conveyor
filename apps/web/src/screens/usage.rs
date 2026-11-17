@@ -94,9 +94,31 @@ fn fmt_usd(value: f64) -> String {
     }
 }
 
-/// One report row's derived cost, parsed from the decimal string the server sends.
+/// One report row's derived cost, parsed from the decimal string the server sends. A bucket the
+/// ledger could not price says so; it is never drawn as a zero-dollar cost.
 fn row_usd(row: &UsageRow) -> String {
-    fmt_usd(row.cost_usd.parse::<f64>().unwrap_or(0.0))
+    if row.priced_calls == 0 && row.unpriced_calls > 0 {
+        "unpriced".to_owned()
+    } else {
+        fmt_usd(row.cost_usd.parse::<f64>().unwrap_or(0.0))
+    }
+}
+
+/// A bucket's unit total, or "—" when the bucket has no single honest unit (a token bucket, a
+/// mixed-unit bucket, or one containing an unpriced call).
+fn unit_label(row: &UsageRow) -> String {
+    match (&row.unit, &row.units) {
+        (Some(unit), Some(units)) => {
+            let value: f64 = units.parse().unwrap_or(0.0);
+            let count = if value.fract().abs() < f64::EPSILON {
+                format!("{value:.0}")
+            } else {
+                format!("{value:.1}")
+            };
+            format!("{count} {unit}")
+        }
+        _ => "—".to_owned(),
+    }
 }
 
 async fn report(
@@ -453,6 +475,7 @@ fn UsageBody(
                             <thead><tr>
                                 <th>"Model"</th><th class="n">"Calls"</th><th class="n">"Hit"</th>
                                 <th class="n">"Writes"</th><th class="n">"Misses"</th><th class="n">"Tokens"</th>
+                                <th class="n">"Units"</th>
                                 <th class="n">"Equivalent"</th>
                                 <th class="n adv">"Server hits/calls"</th>
                             </tr></thead>
@@ -465,6 +488,7 @@ fn UsageBody(
                                         <td class="n">{fmt_int(row.writes)}</td>
                                         <td class="n">{fmt_int(row.misses)}</td>
                                         <td class="n">{fmt_compact(row.prompt_tokens + row.completion_tokens)}</td>
+                                        <td class="n">{unit_label(row)}</td>
                                         <td class="n">{row_usd(row)}</td>
                                         <td class="n adv">{format!("{}%", (row.hit_ratio * 100.0).round() as i64)}</td>
                                     </tr>

@@ -20,6 +20,9 @@ test("usage reads the seeded ledger and filters the call table", async ({ page }
   await expect(page.locator(".tile", { hasText: "Calls" }).locator(".tv")).toHaveText("12");
   await expect(page.locator(".tile", { hasText: "Writes never read" }).locator(".tv")).toHaveText("3");
 
+  // The model table names the non-token unit column; the seed is token-only, so the cells are "—".
+  await expect(page.locator("table.wtbl thead").first().getByText("Units")).toBeVisible();
+
   // Three day buckets, one 12-row call table, and the cache-hostile prompt sorts first.
   await expect(page.locator(".chart .col")).toHaveCount(3);
   await expect(page.locator("table.calls tbody tr")).toHaveCount(12);
