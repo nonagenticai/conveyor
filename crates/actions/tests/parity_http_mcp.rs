@@ -4558,6 +4558,47 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             503,
         ),
+        // ── #170: the ops.* cluster reads (T7) ────────────────────────────────────────────
+        // No `OPS_TOKEN` / `KUBERNETES_SERVICE_HOST` and no `CONVEYOR_CI_TOKEN` in the test
+        // environment, so every read answers the SAME typed `unconfigured` refusal on both
+        // transports. A sample that reached a live API would not be comparable body-for-body;
+        // the parity property for this family is that a missing credential is never defaulted.
+        expecting(
+            plain(
+                "ops.pods",
+                json!({"namespace": "conveyor", "label_selector": "app=conveyor"}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain("ops.deployments", json!({"namespace": "conveyor"}), None),
+            503,
+        ),
+        expecting(
+            plain(
+                "ops.events",
+                json!({"namespace": "conveyor", "limit": 10}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain(
+                "ops.logs",
+                json!({"namespace": "conveyor", "pod": "conveyor-worker", "tail": 50}),
+                None,
+            ),
+            503,
+        ),
+        expecting(
+            plain("ops.flux_status", json!({"namespace": "flux-system"}), None),
+            503,
+        ),
+        expecting(
+            plain("ops.ci_status", json!({"branch": "main", "limit": 5}), None),
+            503,
+        ),
         // ── #161 P3: the deck toolkit ─────────────────────────────────────────────────────
         // The response is a pure function of the input — the deck writer has no clock, no
         // random id and no hash-map order — so a replay and an execution agree byte for byte.

@@ -13,6 +13,9 @@ conveyor-auth = { path = "../auth" }
 # #161 P3: `decks.render` renders the deck model; the action layer holds no OOXML writer.
 conveyor-deck = { path = "../deck" }
 conveyor-domain = { path = "../domain" }
+# #170 (T7): the cluster operations client behind `ops.*` — the credential, the fail-closed
+# configuration and the read transport live there, not in this crate.
+conveyor-ops = { path = "../ops" }
 conveyor-workflow = { path = "../workflow" }
 # The three exchange actions (S08 B2) call the pure renderer; CONTRACT §1 records the edge.
 conveyor-render = { path = "../render" }
