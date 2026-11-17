@@ -15,7 +15,24 @@
     "reuse-map",
     "brief-template",
     "architecture-analysis",
-    "spec"
+    "spec",
+    "benefit-profile",
+    "benefits-map",
+    "projects-dossier",
+    "tranche-plan",
+    "tranche-review",
+    "benefits-strategy",
+    "realization-plan",
+    "stakeholder-profiles",
+    "architecture-principles",
+    "adm-profile",
+    "artifact-standard",
+    "architecture-artifact",
+    "statement-of-architecture-work",
+    "compliance-review",
+    "waiver",
+    "maturity-assessment",
+    "skills-assessment"
   ],
   "aliases": {
     "brief": "project-brief",
@@ -46,7 +63,20 @@
         "governance",
         "reuse-map",
         "brief-template",
-        "architecture-analysis"
+        "architecture-analysis",
+        "benefit-profile",
+        "benefits-map",
+        "projects-dossier",
+        "tranche-plan",
+        "tranche-review",
+        "benefits-strategy",
+        "realization-plan",
+        "stakeholder-profiles",
+        "architecture-principles",
+        "adm-profile",
+        "artifact-standard",
+        "maturity-assessment",
+        "skills-assessment"
       ],
       "closure": []
     },
@@ -59,6 +89,30 @@
         "spec"
       ],
       "closure": []
+    },
+    {
+      "name": "t9",
+      "when": {
+        "key": "T9"
+      },
+      "now": [
+        "project-brief",
+        "inception-analysis",
+        "architecture-design",
+        "architecture-principles",
+        "adm-profile",
+        "artifact-standard",
+        "architecture-artifact",
+        "statement-of-architecture-work",
+        "compliance-review",
+        "waiver",
+        "maturity-assessment",
+        "skills-assessment"
+      ],
+      "closure": [
+        "evidence",
+        "closure-review"
+      ]
     },
     {
       "name": "v2-proposed",
