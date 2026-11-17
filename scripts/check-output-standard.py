@@ -8,10 +8,12 @@ and writes `docs/design/data/output-standard.js` for the console. This gate refu
   * an unknown category, alias target or matching fact;
   * a project whose resolved class or seed meta disagrees with the standard;
   * a class that matches no project;
+  * a category with no template, an empty or duplicate required heading, a required heading
+    absent from the skeleton, or a URL in a skeleton;
   * a console copy that is not byte-for-byte the standard's JSON.
 
 Run it before every push: `python3 scripts/check-output-standard.py`. `--self-test` proves the
-gate refuses the four failure shapes; `--check-copy` checks only the generated console copy.
+gate refuses each failure shape; `--check-copy` checks only the generated console copy.
 """
 
 from __future__ import annotations
@@ -29,6 +31,34 @@ SEED_PATH = ROOT / "seed" / "programme.json"
 CONSOLE_PATH = ROOT / "docs" / "design" / "data" / "output-standard.js"
 FACTS = {"key", "track", "status", "measured_status"}
 ON_DEMAND = "decision"
+FENCE = re.compile(r"^\s*(```+|~~~+)")
+ATX = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
+
+
+def heading_key(value: str) -> str:
+    """Case-insensitive, whitespace-collapsed: the action layer compares the same way."""
+    return " ".join(value.split()).strip().lower()
+
+
+def headings(markdown: str) -> set[str]:
+    """ATX headings outside fenced code, normalised."""
+    found: set[str] = set()
+    fence: str | None = None
+    for line in markdown.splitlines():
+        opener = FENCE.match(line)
+        if opener:
+            marker = opener.group(1)[0]
+            if fence is None:
+                fence = marker
+            elif fence == marker:
+                fence = None
+            continue
+        if fence is not None:
+            continue
+        match = ATX.match(line)
+        if match:
+            found.add(heading_key(match.group(2)))
+    return found
 
 
 def read_json(path: Path) -> dict:
@@ -74,8 +104,8 @@ def resolve(std: dict, project: dict) -> dict | None:
 
 def validate(std: dict, seed: dict, console: dict) -> list[str]:
     errors: list[str] = []
-    if std.get("version") != 1:
-        errors.append(f"standard version is {std.get('version')!r}, expected 1")
+    if std.get("version") != 2:
+        errors.append(f"standard version is {std.get('version')!r}, expected 2")
 
     categories = std.get("categories")
     if not isinstance(categories, list) or not categories:
@@ -131,6 +161,50 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
         closure = cls.get("closure") or []
         if set(now) & set(closure):
             errors.append(f"class {name!r} repeats a category in now and closure")
+
+    templates = std.get("templates")
+    if not isinstance(templates, dict):
+        errors.append("templates must be an object keyed by category")
+        templates = {}
+    for unknown in sorted(set(templates) - set(categories)):
+        errors.append(f"template for unknown category {unknown!r}")
+    for category in categories:
+        template = templates.get(category)
+        if not isinstance(template, dict):
+            errors.append(f"category {category!r} has no template")
+            continue
+        required = template.get("required")
+        optional = template.get("optional", [])
+        if not isinstance(required, list) or not required:
+            errors.append(f"template {category!r} required must be a non-empty list")
+            required = []
+        if not isinstance(optional, list):
+            errors.append(f"template {category!r} optional must be a list")
+            optional = []
+        seen: set[str] = set()
+        for heading in required:
+            if not isinstance(heading, str) or not heading.strip():
+                errors.append(f"template {category!r} has an empty required heading")
+                continue
+            key = heading_key(heading)
+            if key in seen:
+                errors.append(f"template {category!r} repeats required heading {heading!r}")
+            seen.add(key)
+        optional_keys = {heading_key(h) for h in optional if isinstance(h, str)}
+        if seen & optional_keys:
+            errors.append(f"template {category!r} lists a heading as both required and optional")
+        skeleton = template.get("skeleton")
+        if not isinstance(skeleton, str) or not skeleton.strip():
+            errors.append(f"template {category!r} has no skeleton")
+            continue
+        present = headings(skeleton)
+        for heading in required:
+            if isinstance(heading, str) and heading_key(heading) not in present:
+                errors.append(
+                    f"template {category!r} skeleton lacks required heading {heading!r}"
+                )
+        if "://" in skeleton or "www." in skeleton.lower():
+            errors.append(f"template {category!r} skeleton carries a URL")
 
     if not isinstance(seed.get("projects"), list) or not seed["projects"]:
         errors.append("seed has no projects")
@@ -194,6 +268,27 @@ def self_test(std: dict, seed: dict, console: dict) -> int:
     bad = copy.deepcopy(console)
     bad["categories"].append("not-a-category")
     cases.append(("console copy drifts", std, seed, bad))
+
+    bad = copy.deepcopy(std)
+    bad["templates"].pop("vision")
+    cases.append(("a category without a template", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["vision"]["required"] = []
+    cases.append(("an empty required list", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["vision"]["required"].append(bad["templates"]["vision"]["required"][0])
+    cases.append(("a duplicate required heading", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["vision"]["skeleton"] = "# Vision\n\n## Purpose\n"
+    bad["templates"]["vision"]["required"].append("A heading not in the skeleton")
+    cases.append(("a required heading absent from the skeleton", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["vision"]["skeleton"] += "\nSee https://example.com for the method.\n"
+    cases.append(("a URL in the skeleton", bad, seed, console))
 
     failures = 0
     for label, case_std, case_seed, case_console in cases:

@@ -73,8 +73,45 @@ pub const DOCUMENT_PUBLISHED: &str = "document.published";
 pub const DOCUMENT_UNPUBLISHED: &str = "document.unpublished";
 /// Emitted by `documents.request_publish` — an author's signal to an admin.
 pub const DOCUMENT_PUBLISH_REQUESTED: &str = "document.publish_requested";
+/// Emitted by `documents.return` — the admin's rework order on a requested draft.
+pub const DOCUMENT_RETURNED: &str = "document.returned";
 /// The job kind that removes a tombstoned document's object.
 pub const DOCUMENT_PURGE_KIND: &str = "document.purge";
+
+/// The publish gate: a text output may not become public without its category's required
+/// headings. Unknown categories and bodyless (object) documents are never blocked — the standard
+/// cannot say what they require. The refusal names every missing heading so the console can offer
+/// the triage, and it is a transition check: an already-published row is never re-checked.
+pub(crate) fn require_complete(
+    category: Option<&str>,
+    body: Option<&str>,
+) -> Result<(), ActionError> {
+    let (Some(category), Some(body)) = (category, body) else {
+        return Ok(());
+    };
+    let missing = conveyor_domain::output_standard::missing_sections(category, body);
+    if missing.is_empty() {
+        return Ok(());
+    }
+    Err(ActionError::new(
+        409,
+        "output_incomplete",
+        format!(
+            "the output is missing required sections: {}",
+            missing.join(", ")
+        ),
+    )
+    .with_errors(
+        missing
+            .into_iter()
+            .map(|heading| FieldError {
+                field: "body".to_owned(),
+                code: "output_incomplete".to_owned(),
+                detail: format!("missing required section: {heading}"),
+            })
+            .collect(),
+    ))
+}
 
 /// Append one document event in the caller's transaction.
 pub async fn emit_document_event(

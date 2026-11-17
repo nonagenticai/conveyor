@@ -81,6 +81,20 @@ output is **next**. The **Programme queue** on Portfolio is the programme-level 
 project's published vs expected outputs, its closure count and its next output, ordered by tranche.
 The public project page shows published counts only; the public queue never counts a private draft.
 
+**The authoring standard** (`seed/output-standard.json` version 2) carries a `templates` map: one
+entry per category with its required headings, optional headings and a Markdown skeleton. The
+console seeds the skeleton on compose and shows a live **completeness** panel; **Preview** renders a
+saved draft with the same `conveyor_render::markdown` the public page uses. The server blocks the
+transition to public — through `documents.publish` or a `documents.compose`/`documents.update` that
+sets `publishable: true` — with `409 output_incomplete` naming every missing heading; an unpublish
+and an already-published row are never checked, so the outputs that predate the templates stay
+public. The admin's review queue can **Return** a requested draft with a note (`documents.return`:
+the request clears, `meta.rework` records the note and the missing sections in one UPDATE, and
+`document.returned` is the event) or **Open a kata** — a published `decision` on the kata project
+carrying `{kata, system_issue, source_document_id, source_project_id, coach_note}` — which returns
+the source with a note linking the kata. A returned draft shows the **returned** state in the
+register and its project.
+
 The **Projects** destination is the programme workspace: the tenant's projects, a project's board,
 plan link and linked issues, its cards with their process binding and the card type's expected
 outputs, its text **outputs** (compose, edit, request publish, admin publish, history, attachments)

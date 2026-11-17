@@ -324,6 +324,8 @@ function startServer({ config, state, snapshot }) {
           "documents.create",
           "documents.publish",
           "documents.request_publish",
+          "documents.preview",
+          "documents.return",
           "documents.revision_list",
           "documents.revision_get",
           "documents.revision_restore",
@@ -662,6 +664,7 @@ function startServer({ config, state, snapshot }) {
           const input = body.input || {};
           assert.equal(input.project_id, "p-s02", "documents.compose is scoped to the project");
           assert.ok(input.title && input.body, "documents.compose sends a title and a body");
+          state.lastCompose = input;
           const doc = {
             id: `d-${state.documents.length + 1}`,
             project_id: input.project_id,
@@ -675,7 +678,7 @@ function startServer({ config, state, snapshot }) {
             content_hash: "a".repeat(64),
             body: input.body,
             external_ref: null,
-            meta: {},
+            meta: input.meta || {},
             category: input.category || null,
             unit: input.unit || null,
             created_by: "u-1",
@@ -686,7 +689,7 @@ function startServer({ config, state, snapshot }) {
             published_by: null,
             published_by_name: null,
             publish_requested_at: null,
-            publishable: false,
+            publishable: !!input.publishable,
             version: 1,
             created_at: "2026-11-13T00:00:00Z",
             updated_at: "2026-11-13T00:00:00Z",
@@ -739,6 +742,18 @@ function startServer({ config, state, snapshot }) {
       }
       if (pathname === "/api/actions/documents.publish/invocations") {
         return readBody(req, (body) => {
+          if (state.failPublishIncomplete && body.input.publish) {
+            state.failPublishIncomplete = false;
+            return json(res, 409, {
+              title: "Conflict",
+              code: "output_incomplete",
+              detail: "the output is missing required sections: Boundary, Who it serves",
+              errors: [
+                { field: "body", code: "output_incomplete", detail: "missing required section: Boundary" },
+                { field: "body", code: "output_incomplete", detail: "missing required section: Who it serves" },
+              ],
+            });
+          }
           const doc = state.documents.find((row) => row.id === body.input.id);
           assert.ok(doc, "documents.publish names a real document");
           assert.equal(req.headers["if-match"], `"${doc.version}"`, "documents.publish carries If-Match");
@@ -762,6 +777,50 @@ function startServer({ config, state, snapshot }) {
           );
           doc.publish_requested_at = "2026-11-13T00:00:00Z";
           json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.return/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.return names a real document");
+          assert.equal(req.headers["if-match"], `"${doc.version}"`, "documents.return carries If-Match");
+          assert.ok(
+            typeof body.input.note === "string" && body.input.note.trim(),
+            "documents.return carries the note",
+          );
+          if (!doc.publish_requested_at) {
+            return json(res, 409, {
+              title: "Conflict",
+              code: "not_requested",
+              detail: "no publish request is open on this output",
+            });
+          }
+          doc.publish_requested_at = null;
+          doc.meta = Object.assign({}, doc.meta || {}, {
+            rework: {
+              note: body.input.note,
+              missing: ["Boundary", "Who it serves"],
+              by: "u-1",
+              at: "2026-11-17T00:00:00Z",
+              of_version: doc.version,
+            },
+          });
+          json(res, 200, doc);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/documents.preview/invocations") {
+        return readBody(req, (body) => {
+          const doc = state.documents.find((row) => row.id === body.input.id);
+          assert.ok(doc, "documents.preview names a real document");
+          json(res, 200, {
+            output: {
+              html: `<h1>${doc.title}</h1><p>preview body</p>`,
+              category: doc.category,
+              missing: ["Boundary", "Who it serves"],
+            },
+          });
         });
         return;
       }
@@ -1335,6 +1394,106 @@ function readBody(req, done) {
         "the console never calls the removed publish.start/publish.status path",
       );
 
+      // ── #245: completeness, preview, the blocked publish and the coach's triage ─────
+      await page.waitForSelector('[data-v2="output-edit"][data-id="d-1"]');
+      await page.click('[data-v2="output-edit"][data-id="d-1"]');
+      await page.waitForSelector("#output-completeness");
+      const completeness = await page.locator("#output-completeness").innerText();
+      assert.match(completeness, /Outcome/, "the completeness panel lists the template's headings");
+      assert.match(completeness, /○/, "an absent heading is marked missing");
+      await page.fill(
+        "#output-body",
+        "# S02 brief\n\n## Outcome\n\nO\n\n## Boundary\n\nB\n\n## Reuse sources\n\nR\n\n## Inception units\n\nI\n\n## Dependencies\n\nD\n\n## Acceptance\n\nA\n\n## Capabilities\n\nC\n\n## Plan\n\nP\n",
+      );
+      assert.match(
+        await page.locator("#output-completeness").innerText(),
+        /✓/,
+        "a present heading is marked present",
+      );
+      await page.click('[data-v2="output-preview"][data-id="d-1"]');
+      await page.waitForSelector("iframe.console-preview");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.preview/invocations",
+        ),
+        "documents.preview was sent",
+      );
+      assert.match(
+        (await page.locator("iframe.console-preview").getAttribute("srcdoc")) || "",
+        /preview body/,
+        "the preview renders the server's html",
+      );
+      await page.click('#dialog [data-action="close-dialog"]');
+      await page.waitForFunction(() => !document.getElementById("dialog").open);
+
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#outputs`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForSelector('[data-v2="request-publish"][data-id="d-1"]');
+      consoleState.failPublishIncomplete = true;
+      await page.click('[data-v2="request-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Publish blocked");
+      const blocked = await page.locator("#dialog").innerText();
+      assert.match(blocked, /Boundary/, "the 409 names a missing heading");
+      assert.equal(
+        await page.locator('#dialog [data-v2="request-return"]').count(),
+        1,
+        "the triage offers Return",
+      );
+      assert.equal(
+        await page.locator('#dialog [data-v2="request-kata"]').count(),
+        1,
+        "the triage offers a kata",
+      );
+      await page.click('#dialog [data-action="close-dialog"]');
+      await page.waitForFunction(() => !document.getElementById("dialog").open);
+
+      await page.click('[data-v2="request-return"][data-id="d-1"]');
+      await page.waitForSelector("#return-note");
+      await page.fill("#return-note", "Add the boundary and the audience.");
+      await page.click('[data-v2="return-save"][data-id="d-1"]');
+      await page.waitForSelector("text=Returned · missing");
+      const returnedDoc = consoleState.documents.find((row) => row.id === "d-1");
+      assert.equal(returnedDoc.publish_requested_at, null, "the return cleared the request");
+      assert.equal(
+        returnedDoc.meta.rework.note,
+        "Add the boundary and the audience.",
+        "the note crossed the wire",
+      );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/documents.return/invocations",
+        ),
+        "documents.return was sent",
+      );
+
+      await page.waitForSelector('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.click('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Publish requested");
+      await page.click('[data-v2="request-kata"][data-id="d-1"]');
+      await page.waitForSelector("#kata-note");
+      await page.fill("#kata-note", "The template has no audience section.");
+      await page.click('[data-v2="kata-save"][data-id="d-1"]');
+      await page.waitForSelector("text=opened");
+      assert.equal(
+        consoleState.lastCompose && consoleState.lastCompose.category,
+        "decision",
+        "the kata is a decision",
+      );
+      assert.equal(consoleState.lastCompose.publishable, true, "the kata is published");
+      assert.equal(consoleState.lastCompose.meta.kata, true, "the kata carries its meta");
+      assert.ok(
+        consoleState.requests.filter(
+          (row) => row.path === "/api/actions/documents.return/invocations",
+        ).length >= 2,
+        "the source was returned again, linking the kata",
+      );
+      consoleState.documents = consoleState.documents.filter(
+        (row) => !(row.meta && row.meta.kata),
+      );
+      await page.waitForSelector('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.click('[data-v2="output-request-publish"][data-id="d-1"]');
+      await page.waitForSelector("text=Publish requested");
+
       // ── the cross-project register: unfiltered list, publish, download, delete ───────
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#outputs`);
       await page.waitForSelector('#console-chip[data-state="in"]');
@@ -1390,6 +1549,27 @@ function readBody(req, done) {
         consoleState.documents.filter((row) => row.kind !== "attachment").length,
         0,
         "the delete crossed the wire",
+      );
+      // A soft-deleted row is returned by documents.list; the register must not render it.
+      consoleState.documents.push({
+        id: "d-deleted",
+        project_id: "p-s02",
+        kind: "document",
+        title: "A deleted row must not render",
+        status: "deleted",
+        category: "project-brief",
+        unit: "7",
+        publishable: false,
+        version: 1,
+        meta: {},
+        created_by_name: "Test Operator",
+      });
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#outputs`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForTimeout(400);
+      assert.ok(
+        !(await page.locator("#main").innerText()).includes("A deleted row must not render"),
+        "a soft-deleted row is hidden from the register",
       );
 
       // ── a new project's plan reaches projects.update (create has no meta) ───────────

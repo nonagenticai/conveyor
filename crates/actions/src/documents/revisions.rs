@@ -20,8 +20,8 @@ use uuid::Uuid;
 
 use super::actions::{DocumentIdIn, DocumentOut, can_publish, document_out_with_names, etag};
 use super::{
-    DOCUMENT_PUBLISH_REQUESTED, DOCUMENT_PUBLISHED, DOCUMENT_UNPUBLISHED, DOCUMENT_UPDATED,
-    document_error, emit_document_event, invalid,
+    DOCUMENT_PUBLISH_REQUESTED, DOCUMENT_PUBLISHED, DOCUMENT_RETURNED, DOCUMENT_UNPUBLISHED,
+    DOCUMENT_UPDATED, document_error, emit_document_event, invalid,
 };
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
@@ -70,12 +70,21 @@ async fn documents_publish(
         .await
         .map_err(|error| document_error(error, action))?
         .ok_or_else(|| ActionError::resource_not_found("such document"))?;
+    let was_published = current.publishable;
+    let category = current.category.clone();
+    let body = current.body.clone();
     let expected = crate::control::require_precondition_with(
         &ctx,
         action,
         serde_json::to_value(DocumentOut::from_record(current, &HashMap::new()))
             .unwrap_or(Value::Null),
     )?;
+    // The standard's gate is on the transition: publishing an unpublished text output needs its
+    // category's required headings. An unpublish is always free, and an already-published row is
+    // never re-checked — the 86 outputs published before the templates stay public.
+    if input.publish && !was_published {
+        super::require_complete(category.as_deref(), body.as_deref())?;
+    }
     let updated = store::document::set_publishable_tx(
         &mut *tx,
         ctx.tenant,
@@ -159,6 +168,160 @@ async fn documents_request_publish(
         HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
             .with_etag(etag),
     )
+}
+
+// ── documents.return ─────────────────────────────────────────────────────────────────────
+
+/// The admin's rework order on a requested draft.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct DocumentReturnIn {
+    /// The document id.
+    pub id: Uuid,
+    /// Why it is returned. The author sees this note; it is the order, not a comment.
+    pub note: String,
+}
+
+/// Return a requested draft to its author with a note and the sections the standard found
+/// missing. No content version moves: the request flag clears and the order lands in `meta.rework`
+/// in one UPDATE, and `document.returned` is the authoritative record. A system defect found while
+/// reviewing is a kata (a decision on the kata project), composed by the caller before this action.
+#[crate::action(
+    name = "documents.return",
+    version = 1,
+    kind = "internal",
+    scopes = ["documents:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn documents_return(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: DocumentReturnIn,
+) -> Result<HandlerOutput<DocumentOut>, ActionError> {
+    let action = "documents.return";
+    if !can_publish(&ctx) {
+        return Err(ActionError::new(
+            403,
+            "publish_forbidden",
+            "only an admin may return a draft",
+        ));
+    }
+    let note = input.note.trim();
+    if note.is_empty() {
+        return Err(invalid("note", "required", "a return needs a reason"));
+    }
+    let current = store::document::get_document_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| document_error(error, action))?
+        .ok_or_else(|| ActionError::resource_not_found("such document"))?;
+    if current.publishable {
+        return Err(ActionError::new(
+            409,
+            "published_locked",
+            "this output is public; unpublish it before returning it for rework",
+        ));
+    }
+    if current.publish_requested_at.is_none() {
+        return Err(ActionError::new(
+            409,
+            "not_requested",
+            "no publish request is open on this output",
+        ));
+    }
+    let missing = match (current.category.as_deref(), current.body.as_deref()) {
+        (Some(category), Some(body)) => {
+            conveyor_domain::output_standard::missing_sections(category, body)
+        }
+        _ => Vec::new(),
+    };
+    let expected = crate::control::require_precondition_with(
+        &ctx,
+        action,
+        serde_json::to_value(DocumentOut::from_record(current, &HashMap::new()))
+            .unwrap_or(Value::Null),
+    )?;
+    let updated = store::document::return_publish_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        expected,
+        ctx.actor_id,
+        note,
+        &missing,
+    )
+    .await
+    .map_err(|error| document_error(error, action))?;
+    emit_document_event(
+        &mut *tx,
+        &ctx,
+        DOCUMENT_RETURNED,
+        updated.id,
+        json!({"id": updated.id, "by": ctx.actor_id, "missing": missing}),
+    )
+    .await?;
+    let etag = etag(updated.version.get());
+    Ok(
+        HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
+            .with_etag(etag),
+    )
+}
+
+// ── documents.preview ────────────────────────────────────────────────────────────────────
+
+/// One saved output rendered as the public page would serve it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct DocumentPreviewOut {
+    /// The body rendered with raw HTML neutralised and unsafe schemes refused.
+    pub html: String,
+    /// The output-standard slot, when one is recorded.
+    pub category: Option<String>,
+    /// The required headings this body is still missing.
+    pub missing: Vec<String>,
+}
+
+/// Preview a saved text output. Id-only and tenant-scoped: there is no arbitrary-body oracle, and
+/// the renderer is the same one the public page uses, so the preview cannot promise markup the
+/// public page would refuse.
+#[crate::action(
+    name = "documents.preview",
+    version = 1,
+    kind = "internal",
+    scopes = ["documents:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn documents_preview(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: DocumentIdIn,
+) -> Result<HandlerOutput<DocumentPreviewOut>, ActionError> {
+    let action = "documents.preview";
+    let current = store::document::get_document_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| document_error(error, action))?
+        .ok_or_else(|| ActionError::resource_not_found("such document"))?;
+    let Some(body) = current.body.as_deref() else {
+        return Err(ActionError::new(
+            409,
+            "not_text",
+            "this document holds bytes, not a text body; there is nothing to preview",
+        ));
+    };
+    let missing = match current.category.as_deref() {
+        Some(category) => conveyor_domain::output_standard::missing_sections(category, body),
+        None => Vec::new(),
+    };
+    Ok(HandlerOutput::ok(DocumentPreviewOut {
+        html: conveyor_render::markdown::render_markdown(body),
+        category: current.category.clone(),
+        missing,
+    }))
 }
 
 // ── documents.revision_list / .get ────────────────────────────────────────────────────────
