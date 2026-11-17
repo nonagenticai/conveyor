@@ -45,6 +45,15 @@ pub struct Config {
     /// configured", and every route that reads it answers empty rather than failing — the old
     /// service's behaviour, kept because it is what makes the routes usable before the cutover.
     pub objects: Option<ObjectsConfig>,
+    /// The licences service's introspection endpoint (`LICENSE_INTROSPECT_URL`). Unset means
+    /// every credential is refused — the reference's fail-closed behaviour.
+    pub license_introspect_url: Option<String>,
+    /// The service `subject_id`s permitted to assert a tenant other than their licence's
+    /// (`SCIENTIFIC_PROCESSOR_ONBEHALF_SUBJECTS`, CSV). Empty ⇒ no assertion is ever permitted.
+    pub onbehalf_subjects: Vec<String>,
+    /// Wall-clock budget for one introspection (`LICENSE_INTROSPECT_TIMEOUT`, seconds; the
+    /// reference's 10 s default).
+    pub license_introspect_timeout: Duration,
 }
 
 /// The MinIO/S3 endpoint and credentials, under the old service's variable names.
@@ -133,6 +142,25 @@ impl Config {
             downstream_license_token: lookup(vars, "SCIENTIFIC_PROCESSOR_DOWNSTREAM_LICENSE_TOKEN")
                 .map(str::to_owned),
             objects: ObjectsConfig::from_lookup(vars),
+            license_introspect_url: lookup(vars, "LICENSE_INTROSPECT_URL")
+                .map(str::trim)
+                .filter(|url| !url.is_empty())
+                .map(str::to_owned),
+            onbehalf_subjects: lookup(vars, "SCIENTIFIC_PROCESSOR_ONBEHALF_SUBJECTS")
+                .map(|raw| {
+                    raw.split(',')
+                        .map(str::trim)
+                        .filter(|subject| !subject.is_empty())
+                        .map(str::to_owned)
+                        .collect()
+                })
+                .unwrap_or_default(),
+            license_introspect_timeout: Duration::from_secs_f64(
+                lookup(vars, "LICENSE_INTROSPECT_TIMEOUT")
+                    .and_then(|value| value.parse::<f64>().ok())
+                    .filter(|seconds| *seconds > 0.0)
+                    .unwrap_or(10.0),
+            ),
         })
     }
 

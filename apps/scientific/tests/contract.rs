@@ -8,6 +8,8 @@
 
 use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
+mod support;
+
 use conveyor_scientific::config::Config;
 use conveyor_scientific::contract;
 use conveyor_scientific::router;
@@ -24,10 +26,13 @@ fn served_openapi_equals_the_lock() {
 }
 
 fn state(vars: &[(&str, &str)]) -> Shared {
-    let pairs: Vec<(String, String)> = vars
+    // Every suite authenticates through the licence stub (conveyor#299): the gate refuses a
+    // request without a proven tenant, so the config must name the introspector.
+    let mut pairs: Vec<(String, String)> = vars
         .iter()
         .map(|(key, value)| ((*key).to_owned(), (*value).to_owned()))
         .collect();
+    pairs.extend(support::auth_vars());
     Arc::new(AppState::new(
         Config::from_lookup(&pairs).expect("the environment parses"),
     ))
@@ -42,7 +47,8 @@ async fn call(
 ) -> (StatusCode, Option<String>, Value) {
     let mut request = Request::builder().method(method).uri(path);
     if let Some(tenant) = tenant {
-        request = request.header("x-tenant-id", tenant);
+        // The licence carrier: the stub's `licence-<tenant>` introspects active for that tenant.
+        request = request.header("x-tenant-id", support::licence_header(tenant));
     }
     let request = match body {
         Some(body) => request
@@ -97,7 +103,7 @@ async fn a_z3_verification_is_refused_by_name() {
         state(&[]),
         "POST",
         "/api/formal/verify",
-        None,
+        Some("t1"),
         Some(json!({"formal_expression": "x > 0", "language": "z3"})),
     )
     .await;
@@ -140,7 +146,7 @@ async fn a_saturated_prover_is_a_503_the_caller_can_redrive() {
         ]),
         "POST",
         "/api/formal/verify",
-        None,
+        Some("t1"),
         Some(json!({
             "formal_expression": "theorem t : True := by trivial",
             "language": "lean4",
@@ -157,8 +163,8 @@ async fn a_saturated_prover_is_a_503_the_caller_can_redrive() {
 #[tokio::test]
 async fn proofs_need_a_tenant_and_answer_empty_without_a_store() {
     let (status, _, body) = call(state(&[]), "GET", "/api/formal/proofs/c1", None, None).await;
-    assert_eq!(status, StatusCode::BAD_REQUEST);
-    assert_eq!(body["detail"], "X-Tenant-Id is required");
+    assert_eq!(status, StatusCode::UNAUTHORIZED);
+    assert_eq!(body["error"]["code"], "AUTHENTICATION_REQUIRED");
 
     let (status, _, body) =
         call(state(&[]), "GET", "/api/formal/proofs/c1", Some("t1"), None).await;
@@ -168,7 +174,7 @@ async fn proofs_need_a_tenant_and_answer_empty_without_a_store() {
 
 #[tokio::test]
 async fn pipeline_status_answers_every_field_the_capture_names() {
-    let (status, _, body) = call(state(&[]), "GET", "/api/pipeline/status", None, None).await;
+    let (status, _, body) = call(state(&[]), "GET", "/api/pipeline/status", Some("t1"), None).await;
     assert_eq!(status, StatusCode::OK);
     for field in [
         "running",
@@ -201,7 +207,7 @@ async fn history_is_empty_without_a_store_and_scoped_to_the_caller() {
     assert_eq!(body["entries"], json!([]));
 
     let (status, _, _) = call(state(&[]), "GET", "/api/pipeline/history/e1", None, None).await;
-    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert_eq!(status, StatusCode::UNAUTHORIZED);
 }
 
 #[tokio::test]

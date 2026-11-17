@@ -29,6 +29,7 @@ serde_json = { workspace = true }
 statrs = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+uuid = { workspace = true }
 tracing = { workspace = true }
 utoipa = { workspace = true }
 
