@@ -114,8 +114,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "8e45c766e9b610287cebaf7bc352c2582ec7cf32f30bfd0f49afdbac2c9e86aa",
-      "bytes": 17873,
+      "sha256": "415942957fe0ca06bb470dae61088a445116abc4f025adecbe4c99c6bfc1e75c",
+      "bytes": 18510,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -411,8 +411,8 @@
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "6c5f5f042cb79a502c397851ee31e19201f926509e37167c8ad7e86c1d108455",
-      "bytes": 11102,
+      "sha256": "b073df88e0a326b6d273abfa1ed61236b75a5af01c47a0cfd830e8c02d71e2b6",
+      "bytes": 11131,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -519,8 +519,8 @@
       "path": "docs/plans/P0-programme-definition.html",
       "source": "docs/plans/P0-programme-definition.md",
       "section": "Plans",
-      "sha256": "bc9edcb4db7ae7f11f6677924b28ec68cb53040b101fe64cafedd469b9a26ec4",
-      "bytes": 13660,
+      "sha256": "538f4aa69586234a3a03c4adb93a51fb30dac859e0b6dc7681ef04988f18cd50",
+      "bytes": 13658,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
     },
     {

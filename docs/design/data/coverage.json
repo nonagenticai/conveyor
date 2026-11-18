@@ -1,7 +1,7 @@
 {
   "actions_invoked": [
     {
-      "line": 719,
+      "line": 1237,
       "name": "approvals.decide"
     },
     {
@@ -29,71 +29,71 @@
       "name": "cards.release"
     },
     {
-      "line": 1902,
+      "line": 2420,
       "name": "documents.compose"
     },
     {
-      "line": 2389,
+      "line": 2907,
       "name": "documents.compose"
     },
     {
-      "line": 2184,
+      "line": 2702,
       "name": "documents.create"
     },
     {
-      "line": 2255,
+      "line": 2773,
       "name": "documents.delete"
     },
     {
-      "line": 2201,
+      "line": 2719,
       "name": "documents.download"
     },
     {
-      "line": 2234,
+      "line": 2752,
       "name": "documents.download"
     },
     {
-      "line": 1924,
+      "line": 2442,
       "name": "documents.get"
     },
     {
-      "line": 2219,
+      "line": 2737,
       "name": "documents.get"
     },
     {
-      "line": 556,
+      "line": 1074,
       "name": "documents.list"
     },
     {
-      "line": 579,
+      "line": 1097,
       "name": "documents.list"
     },
     {
-      "line": 606,
+      "line": 1124,
       "name": "documents.list"
     },
     {
-      "line": 2152,
+      "line": 2670,
       "name": "documents.list"
     },
     {
-      "line": 2286,
+      "line": 2804,
       "name": "documents.preview"
     },
     {
-      "line": 2332,
+      "line": 2850,
       "name": "documents.return"
     },
     {
-      "line": 2073,
+      "line": 2591,
       "name": "documents.revision_get"
     },
     {
-      "line": 2034,
+      "line": 2552,
       "name": "documents.revision_list"
     },
     {
-      "line": 742,
+      "line": 1260,
       "name": "process_runs.start"
     },
     {
@@ -101,27 +101,31 @@
       "name": "programmes.list"
     },
     {
-      "line": 1833,
+      "line": 655,
+      "name": "programmes.list"
+    },
+    {
+      "line": 2351,
       "name": "projects.close"
     },
     {
-      "line": 1716,
+      "line": 2234,
       "name": "projects.create"
     },
     {
-      "line": 1724,
+      "line": 2242,
       "name": "projects.update"
     },
     {
-      "line": 692,
+      "line": 1210,
       "name": "runs.cancel"
     },
     {
-      "line": 670,
+      "line": 1188,
       "name": "runs.get"
     },
     {
-      "line": 647,
+      "line": 1165,
       "name": "runs.list"
     }
   ],
@@ -2435,18 +2439,18 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "in-flight boards are live; WBS, baseline and registers are fixture (T1)",
+      "gap": null,
       "key": "plan",
-      "status": "mixed",
+      "status": "live",
       "title": "Plan & WBS"
     },
     {
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "project rows are snapshot-filled; programmes, backlog, WBS, baseline and registers are fixture (T1)",
+      "gap": null,
       "key": "portfolio",
-      "status": "mixed",
+      "status": "live",
       "title": "Portfolio"
     },
     {
@@ -2462,9 +2466,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "design study; the MSP rows and actions are T1/T10",
+      "gap": null,
       "key": "programme",
-      "status": "proposed",
+      "status": "live",
       "title": "Programme definition"
     },
     {
@@ -2524,9 +2528,9 @@
       "actions_invoked": 25,
       "by_status": {
         "legacy": 7,
-        "live": 7,
-        "mixed": 3,
-        "proposed": 9
+        "live": 10,
+        "mixed": 1,
+        "proposed": 8
       },
       "total": 26
     }

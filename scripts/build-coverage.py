@@ -96,14 +96,14 @@ SLICE_EVIDENCE = {
 # derived from the source, not from this table.
 SCREEN_OVERRIDES = {
     "portfolio": {
-        "status": "mixed",
+        "status": "live",
         "evidence": ["docs/design/v2.js"],
-        "gap": "project rows are snapshot-filled; programmes, backlog, WBS, baseline and registers are fixture (T1)",
+        "gap": None,
     },
     "plan": {
-        "status": "mixed",
+        "status": "live",
         "evidence": ["docs/design/v2.js"],
-        "gap": "in-flight boards are live; WBS, baseline and registers are fixture (T1)",
+        "gap": None,
     },
     "projects": {"status": "live", "evidence": ["docs/design/v2.js"], "gap": None},
     "contribute": {
@@ -131,13 +131,14 @@ SCREEN_OVERRIDES = {
         "evidence": ["docs/design/v2.js"],
         "gap": "aggregates are fixture (T11)",
     },
-    # The two rigour destinations are design-study pages: their rows and actions are proposed,
-    # never called. The status is explicit because the page functions are camelCase, which the
-    # generic body scan does not resolve — an implicit "live" would overclaim.
+    # The MSP destination is live: signed in its five tabs read/write the programme store, and
+    # signed out it renders the published `msp` snapshot read-only (issue #305). The status is
+    # explicit because the page function is camelCase, which the generic body scan does not
+    # resolve — an implicit "live" would be an accident, not a measurement.
     "programme": {
-        "status": "proposed",
+        "status": "live",
         "evidence": ["docs/design/v2.js"],
-        "gap": "design study; the MSP rows and actions are T1/T10",
+        "gap": None,
     },
     "adm": {
         "status": "proposed",
