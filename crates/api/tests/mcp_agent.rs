@@ -412,6 +412,25 @@ async fn one_licence_principal_task_creates_reads_decides_and_closes() {
     assert_eq!(meta["proposed_answer"], "the first", "{meta}");
     assert_eq!(meta["allowed_decisions"], json!(["approve", "reject"]));
 
+    // #282/#283: `projects.close` is destructive and `/mcp` carries no approval id (the MCP
+    // invoke path passes `approval_id: None`). This test is the licence-authenticated task
+    // flow, not the gate, so the tenant waives that one action.
+    let (status, waived) = running
+        .invoke(
+            "approval_policies.set",
+            "dev:alice",
+            json!({
+                "action": "projects.close",
+                "approval": "waived",
+                "self_approval": "forbidden",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "waive projects.close: {waived}");
+
     // 5. Close.
     let closed = mcp
         .call(
