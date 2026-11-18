@@ -489,9 +489,8 @@ mod tests {
 
     #[test]
     fn repository_urls_parse() {
-        let repo =
-            RepoRef::parse("https://github.com/nonagenticai/nonagentic_homepage").expect("https");
-        assert_eq!(repo.slug(), "nonagenticai/nonagentic_homepage");
+        let repo = RepoRef::parse("https://github.com/nonagenticai/conveyor").expect("https");
+        assert_eq!(repo.slug(), "nonagenticai/conveyor");
         let repo = RepoRef::parse("git@github.com:nonagenticai/conveyor.git").expect("ssh");
         assert_eq!(repo.slug(), "nonagenticai/conveyor");
         assert!(RepoRef::parse("https://gitlab.com/a/b").is_none());

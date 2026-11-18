@@ -2,7 +2,7 @@
 //! `publish.start` · `publish.status` — the console's one publish button.
 //!
 //! A publish is a **job**, not a request: `publish.start` enqueues `publish.design` and returns
-//! the job id; the worker builds the pack and opens a pull request on the homepage repository;
+//! the job id; the worker builds the pack and opens a pull request on the pack repository;
 //! `publish.status` reports the job and the PR URL the worker recorded.
 //!
 //! The target is a `repository` row with a sealed credential secret. The action refuses a
@@ -31,7 +31,7 @@ pub fn dedupe_key(repository_id: Uuid) -> String {
 /// The start input: the repository to publish to.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct PublishStartIn {
-    /// The `repository` row naming the homepage repository and its credential secret.
+    /// The `repository` row naming the pack repository and its credential secret.
     pub repository_id: Uuid,
 }
 
