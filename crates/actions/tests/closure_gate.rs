@@ -121,28 +121,45 @@ async fn publish(running: &support::Running, id: &str, version: i64) -> i64 {
 }
 
 /// Tombstone one output; its row survives with `status='deleted'` and stops counting.
-async fn delete_document(running: &support::Running, id: &str, version: i64) {
+///
+/// #283: a document delete is destructive, so it names an approved gate for this document.
+async fn delete_document(
+    pg: &support::Pg,
+    tenant: conveyor_domain::TenantId,
+    running: &support::Running,
+    id: &str,
+    version: i64,
+) {
     let (status, body) = running
-        .invoke(
+        .invoke_gated(
+            pg,
+            tenant,
             "documents.delete",
             TOKEN,
             json!({"id": id}),
             Some(&format!("\"{version}\"")),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{body}");
 }
 
-async fn close(running: &support::Running, project: &str) -> (u16, Value) {
+/// `projects.close`, through the approval the engine demands for a destructive action (#283).
+///
+/// The gate these tests assert is the CLOSURE gate — a different one — so the approval is opened
+/// first and what the close then meets is still the closure refusal (or the close itself).
+async fn close(
+    pg: &support::Pg,
+    tenant: conveyor_domain::TenantId,
+    running: &support::Running,
+    project: &str,
+) -> (u16, Value) {
     running
-        .invoke(
+        .invoke_gated(
+            pg,
+            tenant,
             "projects.close",
             TOKEN,
             json!({"id": project}),
-            None,
-            None,
             None,
         )
         .await
@@ -225,7 +242,7 @@ async fn an_expected_output_blocks_close() {
     compose(&running, &project, "project-brief").await;
     compose(&running, &project, "evidence").await;
 
-    let (status, body) = close(&running, &project).await;
+    let (status, body) = close(&_pg, _seeded.tenant, &running, &project).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "closure_outputs_missing", "{body}");
     assert_eq!(
@@ -270,7 +287,7 @@ async fn all_outputs_published_close_proceeds() {
     let (evidence, evidence_version) = compose(&running, &project, "evidence").await;
     publish(&running, &evidence, evidence_version).await;
 
-    let (status, body) = close(&running, &project).await;
+    let (status, body) = close(&_pg, _seeded.tenant, &running, &project).await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(
         output(&body)["project"]["status"],
@@ -285,7 +302,7 @@ async fn a_project_without_a_declaration_is_unchanged() {
     let (_pg, running, _seeded) = fixture().await;
     let (project, _version) = create_project(&running, "Closure undeclared").await;
 
-    let (status, body) = close(&running, &project).await;
+    let (status, body) = close(&_pg, _seeded.tenant, &running, &project).await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["project"]["status"], "closed", "{body}");
 }
@@ -312,12 +329,12 @@ async fn a_draft_deleted_or_foreign_output_does_not_count() {
     // A published output the project later tombstoned.
     let (evidence, evidence_version) = compose(&running, &project, "evidence").await;
     let evidence_version = publish(&running, &evidence, evidence_version).await;
-    delete_document(&running, &evidence, evidence_version).await;
+    delete_document(&_pg, _seeded.tenant, &running, &evidence, evidence_version).await;
     // A published output of another project.
     let (review, review_version) = compose(&running, &other, "closure-review").await;
     publish(&running, &review, review_version).await;
 
-    let (status, body) = close(&running, &project).await;
+    let (status, body) = close(&_pg, _seeded.tenant, &running, &project).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "closure_outputs_missing", "{body}");
     assert_eq!(
@@ -347,7 +364,7 @@ async fn a_missing_closure_review_blocks_close() {
     let (brief, brief_version) = compose(&running, &project, "project-brief").await;
     publish(&running, &brief, brief_version).await;
 
-    let (status, body) = close(&running, &project).await;
+    let (status, body) = close(&_pg, _seeded.tenant, &running, &project).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "closure_outputs_missing", "{body}");
     assert_eq!(missing(&body), vec!["closure-review".to_owned()], "{body}");
@@ -362,7 +379,7 @@ async fn a_class_without_closure_outputs_is_unchanged() {
     let (brief, brief_version) = compose(&running, &project, "project-brief").await;
     publish(&running, &brief, brief_version).await;
 
-    let (status, body) = close(&running, &project).await;
+    let (status, body) = close(&_pg, _seeded.tenant, &running, &project).await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["project"]["status"], "closed", "{body}");
 }
@@ -385,7 +402,7 @@ async fn the_refusal_writes_nothing() {
     let runs_before = run_count(&pg, &project).await;
     let approvals_before = approval_count(&pg, &project).await;
 
-    let (status, body) = close(&running, &project).await;
+    let (status, body) = close(&pg, _seeded.tenant, &running, &project).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "closure_outputs_missing", "{body}");
     assert_eq!(
@@ -428,7 +445,7 @@ async fn the_p0_class_without_the_tranche_review_is_refused() {
         publish(&running, &id, doc_version).await;
     }
 
-    let (status, body) = close(&running, &project).await;
+    let (status, body) = close(&_pg, _seeded.tenant, &running, &project).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "closure_outputs_missing", "{body}");
     assert_eq!(
