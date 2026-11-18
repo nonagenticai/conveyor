@@ -60,3 +60,9 @@ REVOKE UPDATE ON trace_link FROM conveyor_runtime;
 -- cannot rewrite the hash/snapshot that a binding and its runs pin.
 REVOKE UPDATE, DELETE ON job_release FROM conveyor_runtime;
 GRANT UPDATE (status, version, updated_at) ON job_release TO conveyor_runtime;
+
+-- T13 (0052): `tool_call` is the broker's ledger — one row per call that reached a resolved tool,
+-- written once with its input hash and sizes. A retry INSERTs a new row; nothing edits a past
+-- call, and a run's retention removes the link (the FK is ON DELETE SET NULL) rather than the
+-- evidence. UPDATE and DELETE are withheld from the runtime role.
+REVOKE UPDATE, DELETE ON tool_call FROM conveyor_runtime;
