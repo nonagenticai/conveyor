@@ -1,5 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 
+// Runs FIRST (the `00-` prefix): the assertions below pin dev-a's seeded ledger to exactly 12
+// calls, and later specs legitimately add `inference_call` rows when they execute a run (the
+// cockpit's New run reaches the provider through the worker). The copilot spec follows the same
+// rule by writing to a platform tenant instead of dev-a. A file whose fixtures are an exact
+// baseline must observe it before anything else writes.
+
 const baseURL = process.env.BASE_URL ?? "http://127.0.0.1:8931";
 
 /** Swap the dev cookie. The file's storageState is alice; bob is the empty tenant. */
@@ -10,15 +16,22 @@ async function as(page: Page, login: string) {
   ]);
 }
 
+/** A stat tile by its exact label: the detail line may also contain the word (e.g. "unpriced calls"). */
+function tile(page: Page, label: string) {
+  return page
+    .locator(".tile")
+    .filter({ has: page.locator(".tk", { hasText: new RegExp(`^${label}$`) }) });
+}
+
 test("usage reads the seeded ledger and filters the call table", async ({ page }) => {
   await page.goto("/measure/usage");
   await expect(page.getByRole("heading", { name: "Usage & cache" })).toBeVisible();
 
   // The dev ledger is 12 calls: 5 hits, 3 writes, 3 misses, 1 unknown.
   // The design's ratio is hits / (hits + misses) — 5 / 8 = 62.5%, shown as 63%.
-  await expect(page.locator(".tile", { hasText: "Cache hit ratio" }).locator(".tv")).toHaveText("63%");
-  await expect(page.locator(".tile", { hasText: "Calls" }).locator(".tv")).toHaveText("12");
-  await expect(page.locator(".tile", { hasText: "Writes never read" }).locator(".tv")).toHaveText("3");
+  await expect(tile(page, "Cache hit ratio").locator(".tv")).toHaveText("63%");
+  await expect(tile(page, "Calls").locator(".tv")).toHaveText("12");
+  await expect(tile(page, "Writes never read").locator(".tv")).toHaveText("3");
 
   // The model table names the non-token unit column; the seed is token-only, so the cells are "—".
   await expect(page.locator("table.wtbl thead").first().getByText("Units")).toBeVisible();

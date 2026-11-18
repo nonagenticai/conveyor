@@ -5,7 +5,7 @@ const baseURL = process.env.BASE_URL ?? "http://127.0.0.1:8931";
 /**
  * Run as the platform admin in a platform tenant (kata/execution), not dev-a:
  * a copilot turn writes an `inference_call` ledger row, and dev-a's exact ledger is a
- * baseline assertion in usage.spec.ts. A third tenant keeps the seeded counts intact.
+ * baseline assertion in 00-usage.spec.ts. A third tenant keeps the seeded counts intact.
  */
 async function asPlatformAdmin(page: Page) {
   const host = new URL(baseURL).hostname;
