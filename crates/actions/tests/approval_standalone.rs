@@ -144,6 +144,85 @@ async fn a_standalone_gate_authorises_the_call_it_names() {
     assert_eq!(outcome.body["output"]["dry_run"], json!(true));
 }
 
+/// P2.1 — the dev seed's second human: the principal who did NOT request the gate decides it.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_second_principal_decides_a_gate_the_first_requested() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+
+    // 1. Alice requests the gate; she is its requester.
+    let requested = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approvals.request",
+            json!({
+                "gate": "ops.scale",
+                "kind": "action",
+                "action": "ops.scale",
+                "input": scale_input(),
+                "description": "scale conveyor to 3",
+            }),
+            None,
+        ),
+    )
+    .await
+    .expect("a gate that names a destructive action needs no parent");
+    let approval_id = requested.body["output"]["id"]
+        .as_str()
+        .expect("the gate id")
+        .to_owned();
+    assert_eq!(
+        requested.body["output"]["requested_by"],
+        json!(seeded.user_id.to_string()),
+        "the requester is the authenticated principal"
+    );
+
+    // 2. Her own decision is refused: §5.4's requester exclusion is the default.
+    let refused = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approvals.decide",
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+        ),
+    )
+    .await
+    .expect_err("the requester cannot decide the gate that judges their own work");
+    assert_eq!(refused.status, 409, "{}", refused.detail);
+    assert_eq!(refused.code, "conflict");
+    assert_eq!(
+        refused.detail, "the requester cannot decide their own gate",
+        "the refusal must be the store's RequesterCannotDecide mapping"
+    );
+
+    // 3. The second human in the same tenant decides it, and the gate approves.
+    let reviewer = support::reviewer_id(&pg).await;
+    let decided = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            reviewer,
+            "approvals.decide",
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+        ),
+    )
+    .await
+    .expect("a second principal decides the gate");
+    assert_eq!(
+        decided.body["output"]["status"],
+        json!("approved"),
+        "one decision from the other principal resolves the gate"
+    );
+}
+
 /// P1.1's refusal — nothing to read, nothing to authorise.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_standalone_gate_needs_an_action() {

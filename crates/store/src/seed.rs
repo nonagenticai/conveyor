@@ -1,5 +1,5 @@
-//! `migrate --dev-seed`: the two development tenants, one user each, their memberships and
-//! active dev licences.
+//! `migrate --dev-seed`: the two development tenants, `dev-a` with two members and `dev-b`
+//! with one, their memberships and active dev licences.
 //!
 //! CONTRACT §10 and S02 §6 step 9: `dev-a`/`alice` and `dev-b`/`bob`, so `Bearer dev:alice`
 //! IS the dev-a principal and every later gate that reads
@@ -52,9 +52,12 @@ pub const DEV_TENANTS: [(&str, &str); 4] = [
     ("execution", "Execution"),
 ];
 
-/// `(oidc_subject, email, display_name, tenant slug)` for the one member of each tenant.
-pub const DEV_USERS: [(&str, &str, &str, &str); 2] = [
+/// `(oidc_subject, email, display_name, tenant slug)` for the dev principals: the one member of
+/// each tenant, plus `dev:reviewer`, a second admin of `dev-a` so a gate one principal requested
+/// can be decided by another (SPEC_V2 §5.4's requester exclusion).
+pub const DEV_USERS: [(&str, &str, &str, &str); 3] = [
     ("dev:alice", "alice@dev.invalid", "Alice", "dev-a"),
+    ("dev:reviewer", "reviewer@dev.invalid", "Reviewer", "dev-a"),
     ("dev:bob", "bob@dev.invalid", "Bob", "dev-b"),
 ];
 
