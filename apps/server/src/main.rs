@@ -277,6 +277,12 @@ enum ActionCommand {
         /// A file holding `{"input": …}` or the bare input document.
         #[arg(long)]
         input: PathBuf,
+        /// The approved approval a destructive action names (#282).
+        ///
+        /// The id is a property of the CALL, not of the payload: no action input carries one, so
+        /// without this flag a destructive invoke from the CLI could never satisfy its gate.
+        #[arg(long)]
+        approval_id: Option<uuid::Uuid>,
     },
 }
 
@@ -1040,6 +1046,7 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     tenant,
                     name,
                     input,
+                    approval_id,
                 },
         } => {
             let tenant_id = store::tenants::id_by_slug(&pool, &tenant)
@@ -1051,7 +1058,7 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                 .await
                 .map_err(|error| RunError::Refused(error.to_string()))?;
             let output = caller
-                .call(&name, input, None)
+                .call_gated(&name, input, None, approval_id)
                 .await
                 .map_err(|error| RunError::Refused(error.to_string()))?;
             println!("{}", serde_json::to_string_pretty(&output)?);

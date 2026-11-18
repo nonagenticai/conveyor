@@ -29,6 +29,8 @@ pub mod approvals;
 pub mod cards;
 pub mod channels;
 pub mod messages;
+// #282: the tenant's decision about how one destructive action is gated.
+pub mod policies;
 pub mod runs;
 pub mod views;
 

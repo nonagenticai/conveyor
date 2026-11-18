@@ -368,6 +368,7 @@ pub async fn execute(
             input,
             precondition: None,
             idempotency_key: Some(key.clone()),
+            approval_id: None,
             actor_id: proposer_id.unwrap_or(approval_id),
             actor_kind: proposer_kind.to_owned(),
             role: proposer_role.unwrap_or(Role::Member),

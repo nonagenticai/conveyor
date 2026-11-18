@@ -92,8 +92,8 @@ pub use registry::{
     ActionRegistration, Registry, RegistryError, assert_registry_consistent, registry,
 };
 pub use spec::{
-    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, FieldError, HandlerFn,
-    HandlerFuture, HandlerOutput, HandlerRef, Schema, Scope, Tenancy, validate_input,
+    ActionKind, ActionSpec, AgentHints, AgentTier, ApprovalTarget, Confirm, Effect, FieldError,
+    HandlerFn, HandlerFuture, HandlerOutput, HandlerRef, Schema, Scope, Tenancy, validate_input,
 };
 pub use views::{
     ActionManifest, ActionManifestEntry, ActionSpecView, InvocationBody, InvocationResponse, Page,

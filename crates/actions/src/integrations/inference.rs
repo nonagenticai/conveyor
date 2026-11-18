@@ -131,6 +131,7 @@ fn chat_spec(name: &'static str) -> ActionSpec {
         task_capable: false,
         captures_usage: true,
         artefact: None,
+        approval_target: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",

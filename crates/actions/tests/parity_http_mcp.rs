@@ -3278,6 +3278,22 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         plain("approvals.list", json!({"limit": 10}), None),
+        // ── #282: the tenant's approval policy ───────────────────────────────────────────
+        // The list is whatever the round has written so far, so it is read before the `set`
+        // below and compared for agreement between transports rather than for contents.
+        plain("approval_policies.list", json!({}), None),
+        plain(
+            "approval_policies.get",
+            json!({"action": "ops.restart"}),
+            None,
+        ),
+        // Writing the STRICT default is the one `set` that cannot affect any other sample: it
+        // is what a tenant with no row already gets, so the round stays idempotent.
+        plain(
+            "approval_policies.set",
+            json!({"action": "ops.restart", "approval": "required", "self_approval": "forbidden"}),
+            None,
+        ),
         // ── S06's comms surface ─────────────────────────────────────────────────────────
         {
             // Two recipients, so the response carries one delivery id per person. A fresh

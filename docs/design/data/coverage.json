@@ -183,7 +183,9 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/plans/P0-programme-definition.md"
+        "docs/plans/P0-programme-definition.md",
+        "docs/design/docs/plans/P0-programme-definition.html",
+        "seed/programme.json"
       ],
       "gap": null,
       "key": "P0",

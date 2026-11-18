@@ -330,11 +330,25 @@ async fn approvals_request(
         ));
     }
 
+    // #282: a gate opened for a destructive action computes its own target, so the string in
+    // `meta.target` and the string the invoke boundary will compare against cannot disagree.
+    if let Some(action) = input.action.as_deref()
+        && action != gate
+    {
+        return Err(invalid(
+            "gate",
+            "invalid_value",
+            "a gate opened for an action must carry that action's name as its gate",
+        ));
+    }
+    let target =
+        resolve_request_target(input.action.as_deref(), input.input.as_ref(), input.target)?;
+
     let mut meta = serde_json::Map::new();
     for (key, value) in [
         ("description", input.description),
         ("proposed_answer", input.proposed_answer),
-        ("target", input.target),
+        ("target", target),
     ] {
         if let Some(value) = value {
             meta.insert(key.to_owned(), Value::String(value));
@@ -458,6 +472,107 @@ pub async fn require_approval_tx(
         ));
     }
     Ok(id)
+}
+
+/// The target a gate will authorise, computed the way the invoke boundary will compute it.
+///
+/// Either the caller names the action **and** the input it will later invoke with — and the
+/// action's own target function answers — or it names a literal target. Naming both is allowed
+/// only when they agree; a gate whose target cannot match the call it was opened for authorises
+/// nothing, and a caller that believes otherwise has a bug worth refusing here.
+fn resolve_request_target(
+    action: Option<&str>,
+    input: Option<&Value>,
+    literal: Option<String>,
+) -> Result<Option<String>, ActionError> {
+    let Some(action) = action else {
+        return Ok(literal);
+    };
+    let spec = crate::registry::registry().get(action).ok_or_else(|| {
+        invalid(
+            "action",
+            "invalid_value",
+            format!("no action named {action:?}"),
+        )
+    })?;
+    let Some(compute) = spec.approval_target else {
+        return Err(invalid(
+            "action",
+            "invalid_value",
+            format!("{action} declares no approval target, so a gate cannot authorise it"),
+        ));
+    };
+    let Some(input) = input else {
+        return Err(invalid(
+            "input",
+            "missing",
+            "naming an action requires the input it will be invoked with",
+        ));
+    };
+    let computed = compute(input).map_err(|detail| invalid("input", "invalid_value", &detail))?;
+    if let Some(literal) = &literal
+        && literal != &computed
+    {
+        return Err(invalid(
+            "target",
+            "invalid_value",
+            format!("the target {literal:?} disagrees with the {action} target {computed:?}"),
+        ));
+    }
+    Ok(Some(computed))
+}
+
+/// The destructive gate, enforced once at the invoke boundary (conveyor#282).
+///
+/// SPEC_V2 §11.4 says a destructive action runs only behind an approval; until #282 that rule was
+/// kept by three handlers remembering to ask. They can forget, and most never asked at all. This
+/// function is the one place the engine applies it, so a destructive action cannot be written
+/// without a decision about its gate:
+///
+/// * `Effect::Read` / `Effect::Write` — nothing to gate, return immediately;
+/// * `Effect::Destructive` **without** a declared target — ungated, and named in the burn-down
+///   constant (`crates/actions/tests/destructive_gate.rs`) rather than silently ignored; #283
+///   empties that list;
+/// * `Effect::Destructive` **with** a target — compute the canonical target from the input the
+///   caller actually sent, read this tenant's policy for the action, and either waive or demand
+///   an approved approval naming exactly that target.
+///
+/// The policy read is the only way an un-approved destructive call is admitted, and a missing
+/// policy row is `required` (see `store::approval_policy`). A `dry_run` passes this gate too: it
+/// changes nothing, but it still answers with what a real call would do, and the §11.4 rule does
+/// not carve dry runs out.
+pub async fn enforce_destructive_gate(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    spec: &crate::spec::ActionSpec,
+    input: &Value,
+) -> Result<(), ActionError> {
+    if spec.effect != crate::spec::Effect::Destructive {
+        return Ok(());
+    }
+    let Some(compute) = spec.approval_target else {
+        // Ungated by design until #283 declares its target; the burn-down test is the ledger.
+        return Ok(());
+    };
+    let target = compute(input).map_err(|detail| {
+        ActionError::invalid_input(vec![crate::spec::FieldError {
+            field: "input".to_owned(),
+            code: "invalid_value".to_owned(),
+            detail: format!("this action declares no approval target for this input: {detail}"),
+        }])
+    })?;
+    let waived = store::approval_policy::waives(&mut *tx, ctx.tenant, spec.name)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, action = spec.name, "read approval policy");
+            ActionError::internal()
+        })?;
+    if waived {
+        return Ok(());
+    }
+    require_approval_tx(tx, ctx, spec.name, &target, ctx.approval_id)
+        .await
+        .map(|_| ())
 }
 
 fn parse_decision(raw: &str) -> Result<DecisionKind, ActionError> {

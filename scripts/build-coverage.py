@@ -46,13 +46,17 @@ MODULE_ALIASES = {
 # measured directly and the evidence path is checked. No status here is inferred from prose.
 SLICE_EVIDENCE = {
     # P0 is the programme-definition project: its plan declares no tables/actions/modules, so its
-    # deliverable is the definition set itself. Units #121 (the set) and #122 (the reuse map,
-    # architecture/analysis pack and inception standard) closed COMPLETED on 2026-11-17 with the
-    # documents published (owner authorisation recorded in #305), so the project is BUILT; the
-    # evidence is the plan the published set implements.
+    # status is the plan's existence plus the definition set's publication (#121/#122). All three
+    # units are closed (#120, #121, #122) and the set is published, so the row is `built`; leaving
+    # it `planned` made `validate` fail its "a non-built project has no open unit" assertion on
+    # main, which turned `design-pack` red on every branch (measured 2026-11-17).
     "P0": {
         "status": "built",
-        "evidence": ["docs/plans/P0-programme-definition.md"],
+        "evidence": [
+            "docs/plans/P0-programme-definition.md",
+            "docs/design/docs/plans/P0-programme-definition.html",
+            "seed/programme.json",
+        ],
         "gap": None,
     },
     "S00": {

@@ -180,6 +180,7 @@ fn generate_image() -> ActionSpec {
             content_type: "image/png",
             title: "Generated image",
         }),
+        approval_target: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",
