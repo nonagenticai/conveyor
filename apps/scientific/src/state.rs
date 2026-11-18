@@ -30,6 +30,8 @@ pub struct AppState {
     /// treats as "empty" and every write route refuses by name.
     pub objects: Option<Arc<dyn ObjectStore>>,
     pub pipeline: PipelineState,
+    /// The client the tenant gate introspects licences with (same one the downstream clients use).
+    pub http: reqwest::Client,
 }
 
 pub type Shared = Arc<AppState>;
@@ -68,6 +70,7 @@ impl AppState {
             embeddings,
             objects,
             pipeline: PipelineState::default(),
+            http,
         }
     }
 }
