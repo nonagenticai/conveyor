@@ -84,7 +84,7 @@ async fn seed_programme_links_the_registered_issues() {
     // is `docs/design/data/issues.json` (the exported registry) → `seed/programme.json`
     // (`scripts/build-programme-seed.py`); this assertion must follow it, never the retired
     // private numbering ([16, 41, 42, 43] / [38] before the flip).
-    assert_eq!(issues, serde_json::json!([6, 26, 27, 28]));
+    assert_eq!(issues, serde_json::json!([6, 26, 27, 28, 370]));
 
     let spec: serde_json::Value = sqlx::query_scalar(
         "SELECT meta -> 'issues' FROM project WHERE tenant_id = $1 AND key = 'SPEC-V2'",
