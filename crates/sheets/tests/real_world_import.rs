@@ -103,11 +103,12 @@ const WORKBOOK_RELS: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="
 /// is a date because the *style* says so, not because of its number.
 const STYLES: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<numFmts count="1"><numFmt numFmtId="164" formatCode="0.00&quot; kg&quot;"/></numFmts>
 <fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>
 <fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>
 <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
 <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs>
+<cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs>
 </styleSheet>"#;
 
 const SHARED_STRINGS: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -121,7 +122,7 @@ const SHEET1: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
 <sheetData>
 <row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c></row>
-<row r="2"><c r="A2"><v>42</v></c><c r="B2" s="1"><v>45292</v></c><c r="C2"><f>SUM(A2:A2)</f><v>42</v></c></row>
+<row r="2"><c r="A2"><v>42</v></c><c r="B2" s="1"><v>45292</v></c><c r="C2"><f>SUM(A2:A2)</f><v>42</v></c><c r="D2" s="2"><v>12.5</v></c></row>
 </sheetData>
 <mergeCells count="1"><mergeCell ref="A3:B3"/></mergeCells>
 </worksheet>"#;
@@ -184,4 +185,14 @@ fn imports_formulas_dates_and_merged_cells() {
         workbook.sheets[1].rows.is_empty(),
         "an empty sheet stays empty"
     );
+}
+
+/// A custom format id is a documented loss: the cell reads as General, never as an invented
+/// nearest format, and the workbook still opens.
+#[test]
+fn an_unknown_format_id_is_general() {
+    let workbook = from_xlsx(&foreign_workbook()).expect("a foreign workbook reads");
+    let cell = &workbook.sheets[0].rows[1][3];
+    assert_eq!(cell.value, CellValue::Number(12.5));
+    assert_eq!(cell.format, None, "an unmapped id is General, not a guess");
 }

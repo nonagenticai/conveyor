@@ -212,6 +212,12 @@ fn dates_and_number_formats_survive() {
             second: 59
         })
     );
+    assert_eq!(
+        read.sheets[0].rows[0][2].format,
+        Some(NumberFormat::Percent),
+        "a percentage is the number plus its format"
+    );
+    assert_eq!(read.sheets[0].rows[0][2].value, CellValue::Number(0.25));
     // A date in the 1900 bug window (before March) still names the right day.
     assert_eq!(
         read.sheets[0].rows[1][0].value,
@@ -250,4 +256,72 @@ fn merges_and_sheet_order_survive() {
         vec!["Second", "First"]
     );
     assert_eq!(read.sheets[0].merged, workbook.sheets[0].merged);
+}
+
+/// Every format the writer can emit survives the round trip, and the second export is the same
+/// bytes: a format is part of the artefact, not a display hint applied afterwards.
+#[test]
+fn formats_survive_export_and_import() {
+    let workbook = Workbook {
+        sheets: vec![Sheet {
+            name: "Formats".to_string(),
+            rows: vec![vec![
+                Cell {
+                    value: CellValue::Number(3.0),
+                    formula: None,
+                    format: Some(NumberFormat::Integer),
+                },
+                Cell {
+                    value: CellValue::Number(1234.5678),
+                    formula: None,
+                    format: Some(NumberFormat::Decimal),
+                },
+                Cell {
+                    value: CellValue::Number(0.25),
+                    formula: None,
+                    format: Some(NumberFormat::Percent),
+                },
+                Cell {
+                    value: CellValue::Text("as text".to_string()),
+                    formula: None,
+                    format: Some(NumberFormat::Text),
+                },
+                Cell::new(CellValue::Date(Date {
+                    year: 2026,
+                    month: 11,
+                    day: 18,
+                })),
+                Cell::new(CellValue::DateTime(DateTime {
+                    year: 2026,
+                    month: 11,
+                    day: 18,
+                    hour: 6,
+                    minute: 30,
+                    second: 0,
+                })),
+            ]],
+            column_widths: Vec::new(),
+            frozen_rows: 0,
+            merged: Vec::new(),
+        }],
+    };
+    let bytes = to_xlsx(&workbook).expect("the workbook writes");
+    let read = from_xlsx(&bytes).expect("it reads back");
+    let formats: Vec<Option<NumberFormat>> = read.sheets[0].rows[0]
+        .iter()
+        .map(|cell| cell.format)
+        .collect();
+    assert_eq!(
+        formats,
+        vec![
+            Some(NumberFormat::Integer),
+            Some(NumberFormat::Decimal),
+            Some(NumberFormat::Percent),
+            Some(NumberFormat::Text),
+            Some(NumberFormat::Date),
+            Some(NumberFormat::DateTime),
+        ]
+    );
+    let again = to_xlsx(&read).expect("the imported workbook writes");
+    assert_eq!(again, bytes, "the round trip is byte-identical");
 }

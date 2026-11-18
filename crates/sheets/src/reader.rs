@@ -9,18 +9,21 @@
 //! # What is not preserved on import
 //!
 //! Column widths and frozen rows are presentation a foreign workbook is free to set in ways the
-//! model does not model, so they read back as "default width" and "not frozen". The values,
-//! formulas, cached results, dates, merged ranges, sheet names and sheet order are preserved.
+//! model does not model, so they read back as "default width" and "not frozen". A number format
+//! outside the seven built-ins (a custom currency code, say) reads as General: a documented loss,
+//! never an invented format. The values, formulas, cached results, the seven formats, dates,
+//! merged ranges, sheet names and sheet order are preserved.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::io::Cursor;
 
-use calamine::{Data, Dimensions, Reader, Xlsx, open_workbook_from_rs};
+use calamine::{Data, Dimensions, Reader, StyleRange, Xlsx, open_workbook_from_rs};
 
 use crate::a1;
 use crate::error::{MAX_CELLS, MAX_COLUMNS, MAX_INPUT_BYTES, MAX_ROWS, MAX_SHEETS, SheetsError};
 use crate::model::{
-    Cell, CellValue, Date, DateTime, MergeRange, Sheet, Workbook, parse_date, parse_datetime,
+    Cell, CellValue, Date, DateTime, MergeRange, NumberFormat, Sheet, Workbook, parse_date,
+    parse_datetime,
 };
 
 /// Read a `.xlsx` into the workbook model.
@@ -60,7 +63,15 @@ pub fn from_xlsx(bytes: &[u8]) -> Result<Workbook, SheetsError> {
                 reason: format!("sheet {index}: {error}"),
             })?;
         let formulas = workbook.worksheet_formula(name).ok();
-        sheets.push(read_sheet(index, name, &range, formulas.as_ref(), &merges)?);
+        let styles = workbook.worksheet_style(name).ok();
+        sheets.push(read_sheet(
+            index,
+            name,
+            &range,
+            formulas.as_ref(),
+            &merges,
+            styles.as_ref(),
+        )?);
     }
 
     Workbook { sheets }.canonical()
@@ -73,6 +84,7 @@ fn read_sheet(
     range: &calamine::Range<Data>,
     formulas: Option<&calamine::Range<String>>,
     merges: &[Dimensions],
+    styles: Option<&StyleRange>,
 ) -> Result<Sheet, SheetsError> {
     let (start_row, start_column) = range.start().unwrap_or((0, 0));
 
@@ -115,6 +127,21 @@ fn read_sheet(
         });
     }
 
+    // The formats, recovered from each cell's style: a percentage is a number plus a format, and
+    // the format lives in the style table, not in the value.
+    let mut formats: HashMap<(u32, u32), NumberFormat> = HashMap::new();
+    if let Some(styles) = styles {
+        for (row, column, style) in styles.cells() {
+            let id = style
+                .number_format
+                .as_ref()
+                .and_then(|format| format.format_id);
+            if let Some(format) = id.and_then(format_for_id) {
+                formats.insert((row, column), format);
+            }
+        }
+    }
+
     // Sparse first, rectangular never: a sheet whose only content is at row 100,000 must not
     // allocate a 100,000 × 1,024 grid to hold one cell. Rows are materialised only to the width
     // their own last cell needs, and a row with no cells stays empty.
@@ -139,12 +166,18 @@ fn read_sheet(
             .map(|formula| formula.trim().trim_start_matches('=').to_string())
             .filter(|formula| !formula.is_empty());
         let value = read_value(index, &reference, data)?;
+        // A date format over a value the reader typed as a number is the workbook's own
+        // inconsistency: fall back to General rather than refuse a cell we can carry.
+        let format = formats.get(&absolute).copied().filter(|format| {
+            !matches!(format, NumberFormat::Date | NumberFormat::DateTime)
+                || matches!(value, CellValue::Date(_) | CellValue::DateTime(_))
+        });
         sparse.insert(
             (absolute_row, absolute_column),
             Cell {
                 value,
                 formula,
-                format: None,
+                format,
             },
         );
     }
@@ -195,6 +228,23 @@ fn materialise(
         rows.push(cells);
     }
     Ok(rows)
+}
+
+/// The model's format for a SpreadsheetML built-in id.
+///
+/// Only the seven the writer emits are mapped. A custom format (id 164 and above) returns `None`
+/// — General — because inventing a nearest format would be a silent substitution, and refusing
+/// the cell would reject an ordinary workbook.
+fn format_for_id(id: u32) -> Option<NumberFormat> {
+    match id {
+        1 => Some(NumberFormat::Integer),
+        2 => Some(NumberFormat::Decimal),
+        9 => Some(NumberFormat::Percent),
+        14 => Some(NumberFormat::Date),
+        22 => Some(NumberFormat::DateTime),
+        49 => Some(NumberFormat::Text),
+        _ => None,
+    }
 }
 
 /// One cell's value, refusing what the model has no lossless form for.
