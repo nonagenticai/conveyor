@@ -774,12 +774,15 @@ fn TracePanel(
                                                 <button class="btn small" on:click=move |_| {
                                                     let id = id.clone();
                                                     let ctx = ctx;
-                                                    leptos::task::spawn_local(async move {
-                                                        match ctx.invoke("trace_links.delete", json!({"id": id}), InvokeOptions::default()).await {
-                                                            Ok(_) => refresh.run(()),
-                                                            Err(error) => notice.set(Some(error.to_string())),
-                                                        }
-                                                    });
+                                                    // #285: removing an edge is destructive.
+                                                    crate::approvals::run_destructive(
+                                                        ctx,
+                                                        "trace_links.delete",
+                                                        json!({"id": id}),
+                                                        InvokeOptions::default(),
+                                                        move |_| refresh.run(()),
+                                                        || {},
+                                                    );
                                                 }>"Remove"</button>
                                             })}
                                         </td>

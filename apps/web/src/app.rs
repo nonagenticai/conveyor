@@ -12,6 +12,7 @@ use crate::api::{ApiError, Manifest};
 use crate::auth;
 use crate::palette::Palette;
 use crate::screens::admin::AdminScreen;
+use crate::screens::approvals::Approvals;
 use crate::screens::benchmarks::{BenchmarkRunDetail, Benchmarks};
 use crate::screens::boards::{BoardIndex, BoardScreen};
 use crate::screens::cockpit::Cockpit;
@@ -139,6 +140,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/board/:board_id") view=BoardScreen/>
                             <Route path=path!("/card/:card_id") view=Cockpit/>
                             <Route path=path!("/runs") view=RunQueue/>
+                            <Route path=path!("/approvals") view=Approvals/>
                             <Route path=path!("/runs/:run_id") view=RunDetail/>
                             <Route path=path!("/design/requirements") view=RequirementsScreen/>
                             <Route path=path!("/design/requirements/:id") view=RequirementDetail/>
@@ -265,6 +267,9 @@ fn Sidebar() -> impl IntoView {
                 <li><A href="/" exact=true><span class="nav-item">"Today"</span></A></li>
                 <li><A href="/boards"><span class="nav-item">"Board"</span></A></li>
                 <li><A href="/runs"><span class="nav-item">"Runs"</span></A></li>
+                {move || ctx.has_action("approvals.list").then(|| view! {
+                    <li><A href="/approvals"><span class="nav-item">"Approvals"</span></A></li>
+                })}
                 {move || ctx.has_action("processes.list").then(|| view! {
                     <li><A href="/build/processes"><span class="nav-item">"Build"</span></A></li>
                 })}

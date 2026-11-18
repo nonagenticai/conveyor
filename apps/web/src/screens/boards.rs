@@ -994,13 +994,18 @@ fn CardTile(
                     move |event: web_sys::MouseEvent| {
                         event.stop_propagation();
                         let strip_card = strip_card.clone();
-                        run_write(
+                        // #285: archiving is destructive, so it goes through the approval path —
+                        // the card moves only once the gate it names is approved.
+                        crate::approvals::run_destructive(
                             ctx,
                             "cards.archive",
                             json!({ "id": id.clone() }),
-                            Some(version),
-                            move |ok| {
-                                if ok {
+                            InvokeOptions {
+                                if_match: Some(version),
+                                ..InvokeOptions::default()
+                            },
+                            move |outcome| {
+                                if outcome.is_done() {
                                     archived.update(|items| items.push(strip_card.clone()));
                                 }
                                 resource.refetch();
@@ -1390,11 +1395,13 @@ fn FieldRow(
             warn(ctx, "Choose a field first.");
             return;
         }
-        run_write(
+        // #285: clearing a value is destructive — the previous value is gone — so it takes the
+        // approval path like every other destructive call.
+        crate::approvals::run_destructive(
             ctx,
             "custom_fields.clear_value",
             json!({ "card_id": clear_id.clone(), "custom_field_id": field_id }),
-            None,
+            InvokeOptions::default(),
             move |_| resource.refetch(),
             || {},
         );
