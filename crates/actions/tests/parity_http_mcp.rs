@@ -557,6 +557,19 @@ async fn seed_card_label(pg: &support::Pg, ctx: &Ctx, card: Uuid, label: Uuid) {
     .await
 }
 
+/// The MCP result's structured body, with an absent value read as `null`.
+///
+/// MCP requires `structuredContent` to be an object, so rmcp >= 3.11 omits it when an
+/// action's body is `null` (measured on `cards.archive`, rmcp 3.9.0 -> 3.11.0). The caller
+/// still compares the value against the HTTP body, so a *dropped object* — the regression
+/// this test exists to catch — fails on the equality rather than escaping here.
+fn structured_content(result: &Value) -> Value {
+    result
+        .get("structuredContent")
+        .cloned()
+        .unwrap_or(Value::Null)
+}
+
 async fn seed_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     let key = format!("PR-{}", Uuid::now_v7().simple());
     scoped(pg, ctx, async |conn| {
@@ -6619,10 +6632,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                     Some(&format!("det-mcp-{}", sample.name)),
                 )
                 .await;
-            let structured = result
-                .get("structuredContent")
-                .cloned()
-                .unwrap_or_else(|| panic!("{} has no structuredContent: {result}", sample.name));
+            let structured = structured_content(&result);
             assert_outcome(&sample, status_h, &result);
             assert_eq!(
                 normalise(sample.name, structured.clone()),
@@ -6658,10 +6668,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                 Some(&key_a),
             )
             .await;
-        let structured_a = result_a
-            .get("structuredContent")
-            .cloned()
-            .unwrap_or_else(|| panic!("{} has no structuredContent: {result_a}", sample.name));
+        let structured_a = structured_content(&result_a);
         assert_outcome(&sample, status_a, &result_a);
         assert_eq!(
             normalise(sample.name, structured_a.clone()),
@@ -6684,10 +6691,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                 Some(&key_b),
             )
             .await;
-        let structured_b = result_b
-            .get("structuredContent")
-            .cloned()
-            .unwrap_or_else(|| panic!("{} has no structuredContent: {result_b}", sample.name));
+        let structured_b = structured_content(&result_b);
         let (status_b, http_b) = running
             .invoke(
                 sample.name,
