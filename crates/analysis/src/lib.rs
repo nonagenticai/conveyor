@@ -42,6 +42,7 @@ pub mod providers;
 pub mod report;
 pub mod rubric;
 pub mod site;
+pub mod video;
 
 pub use model::{Category, Document, Finding, Grade, Report, Scorecard, Severity};
 pub use rubric::Rubric;

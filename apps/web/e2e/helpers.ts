@@ -28,25 +28,88 @@ export function authFor(login = "alice"): Record<string, string> {
   return { authorization: `Bearer ${oidcToken()}` };
 }
 
-/** Invoke a real action. A failed call throws with the API's problem body, never a silent null. */
+/**
+ * Invoke a real action. A failed call throws with the API's problem body, never a silent null.
+ *
+ * `approvalId` is what a destructive action needs (#282): the id travels BESIDE `input`, not
+ * inside it, because every action input is `deny_unknown_fields`.
+ */
 export async function invoke<T = unknown>(
   request: APIRequestContext,
   name: string,
   input: unknown,
   ifMatch?: number,
   login = "alice",
+  approvalId?: string,
 ): Promise<T> {
   const headers: Record<string, string> = { ...authFor(login) };
   if (ifMatch !== undefined) headers["if-match"] = String(ifMatch);
   const response = await request.post(`/api/actions/${name}/invocations`, {
     headers,
-    data: { input },
+    data: approvalId ? { input, approval_id: approvalId } : { input },
   });
   if (!response.ok()) {
     throw new Error(`${name}: ${response.status()} ${await response.text()}`);
   }
   const document = await response.json();
   return document.output as T;
+}
+
+/**
+ * This tenant lets a requester decide their own gate for `action` (#285's self-approval path).
+ *
+ * The dev seed gives each tenant ONE member, so a spec that needs a destructive action to
+ * actually run has to be the tenant's policy that allows it rather than a second principal.
+ * `approval: required` is kept: the gate still exists and is still decided — that is the
+ * console's flow, not a bypass of it.
+ */
+export async function allowSelfApproval(
+  request: APIRequestContext,
+  action: string,
+  login = "alice",
+): Promise<void> {
+  await invoke(
+    request,
+    "approval_policies.set",
+    { action, approval: "required", self_approval: "allowed" },
+    undefined,
+    login,
+  );
+}
+
+/**
+ * Request a gate for `action`, approve it as the same principal, and invoke with its id.
+ *
+ * The fixture path for a spec that needs a destructive call to have happened (a cleanup, a
+ * seeded row) without driving the console. Pair it with [`allowSelfApproval`].
+ */
+export async function approvedInvoke<T = unknown>(
+  request: APIRequestContext,
+  name: string,
+  input: unknown,
+  login = "alice",
+): Promise<T> {
+  const gate = await invoke<{ id: string }>(
+    request,
+    "approvals.request",
+    {
+      gate: name,
+      kind: "action",
+      action: name,
+      input,
+      proposed_input: input,
+    },
+    undefined,
+    login,
+  );
+  await invoke(
+    request,
+    "approvals.decide",
+    { approval_id: gate.id, decision: "approve" },
+    undefined,
+    login,
+  );
+  return invoke<T>(request, name, input, undefined, login, gate.id);
 }
 
 export async function getJson<T = unknown>(

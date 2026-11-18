@@ -84,15 +84,10 @@ const UNGATED: &[&str] = &[
     "benefits.delete",
     "benefits.unlink",
     "cadences.delete",
-    "cards.archive",
     "channels.unbind",
     "comments.delete",
-    "custom_fields.clear_value",
     "custom_fields.delete",
     "documents.delete",
-    "eval_cases.delete",
-    "eval_metrics.delete",
-    "evals.retire",
     "labels.delete",
     "model_elements.delete",
     "model_relationships.delete",
@@ -111,7 +106,6 @@ const UNGATED: &[&str] = &[
     "stakeholders.profile_delete",
     "task_lists.delete",
     "tasks.delete",
-    "trace_links.delete",
     "tranches.delete",
     "view_connections.delete",
     "view_objects.delete",
@@ -119,12 +113,33 @@ const UNGATED: &[&str] = &[
     "webhooks.delete",
 ];
 
-/// The four actions that declare a target today, with an input each target accepts.
+/// Every action that declares a target today, with an input each target accepts.
 ///
-/// `host` names a host that need not exist: the target is computed from the input and the gate
-/// runs before the registry row is read, which is exactly the property a dry run relies on.
+/// The inputs name ids that need not exist: a target is computed from the input, and the gate
+/// runs before the object is read — which is exactly the property a dry run relies on. `ops`
+/// rows name a host that need not exist for the same reason.
+///
+/// #285 added the six the console invokes (`cards.archive`, `custom_fields.clear_value`, the
+/// eval family, `trace_links.delete`); #283 adds the rest and empties [`UNGATED`].
 fn declaring_targets() -> Vec<(&'static str, Value)> {
+    let id = Uuid::nil().to_string();
+    let other = Uuid::max().to_string();
     vec![
+        ("cards.archive", json!({ "id": id })),
+        (
+            "custom_fields.clear_value",
+            json!({ "card_id": id, "custom_field_id": other }),
+        ),
+        ("evals.retire", json!({ "id": id })),
+        (
+            "eval_cases.delete",
+            json!({ "version_id": other, "id": id }),
+        ),
+        (
+            "eval_metrics.delete",
+            json!({ "version_id": other, "id": id }),
+        ),
+        ("trace_links.delete", json!({ "id": id })),
         (
             "ops.restart",
             json!({"namespace": "conveyor", "deployment": "conveyor"}),
@@ -159,8 +174,8 @@ fn every_destructive_action_is_gated_or_listed() {
         }
         // The gate runs in `invoke_internal`'s transaction. An external handler is dispatched by
         // `invoke_external`, which opens no transaction of its own — so an external destructive
-        // action would escape the gate entirely. All 31 are internal today; this keeps a future
-        // one from being the first silently ungated action in the registry.
+        // action would escape the gate entirely. Every destructive action is internal today;
+        // this keeps a future one from being the first silently ungated action in the registry.
         assert_eq!(
             spec.kind,
             conveyor_actions::ActionKind::Internal,
@@ -181,8 +196,8 @@ fn every_destructive_action_is_gated_or_listed() {
         "a destructive action declares no approval target and is not on the burn-down list, \
          or the list names one that has since declared its target"
     );
-    // The four the engine can gate today are declared, and nothing else is: a stray declaration
-    // in the burn-down would silently change behaviour before #283 lands its tests.
+    // Exactly the actions the engine can gate today are declared, and nothing else is: a stray
+    // declaration in the burn-down would silently change behaviour before #283 lands its tests.
     gated.sort_unstable();
     let mut declared: Vec<&str> = declaring_targets()
         .into_iter()

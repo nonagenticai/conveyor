@@ -13,6 +13,10 @@ pub mod conversations;
 pub mod proposal;
 pub mod turns;
 
+/// The catalogue pin the copilot compiles its system message from. Re-exported so the prompt
+/// audit inventories the same recipe the copilot executes (S16 W8).
+pub use turns::SYSTEM_PROMPT_REF;
+
 use axum::Json;
 use conveyor_store::TenantId;
 use conveyor_store::copilot::CopilotStoreError;

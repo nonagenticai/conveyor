@@ -139,6 +139,7 @@ fn request(action: &str, user_id: Uuid, input: Value) -> InvokeRequest {
             eval_run_id: None,
             prompt_ref: Some("agent:audio".to_owned()),
             prompt_version: None,
+            prompt_sha256: None,
             correlation_id: Some("corr-audio".to_owned()),
         }),
     }

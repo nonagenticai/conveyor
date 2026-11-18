@@ -147,6 +147,11 @@ async fn trace_links_create(
     Ok(HandlerOutput::created(trace_link_out(&record)))
 }
 
+/// `trace_links.delete`'s approval target: the edge being removed.
+fn target_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("trace_link/{}", input.id))
+}
+
 /// Remove one trace edge. `trace_link` is immutable and carries no version, so there is no
 /// `If-Match`: the id is the whole precondition.
 #[crate::action(
@@ -158,7 +163,8 @@ async fn trace_links_create(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_delete"
 )]
 async fn trace_links_delete(
     tx: &mut PgConnection,

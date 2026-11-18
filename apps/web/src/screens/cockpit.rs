@@ -150,6 +150,7 @@ fn CockpitBody(
                     InvokeOptions {
                         if_match: Some(edit_version),
                         idempotency_key: None,
+                        approval_id: None,
                     },
                 )
                 .await
@@ -446,6 +447,7 @@ fn act(
                 InvokeOptions {
                     if_match,
                     idempotency_key: None,
+                    approval_id: None,
                 },
             )
             .await;

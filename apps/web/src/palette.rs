@@ -17,6 +17,7 @@ const SCREENS: &[(&str, &str)] = &[
     ("Today", "/"),
     ("Board", "/boards"),
     ("Runs", "/runs"),
+    ("Approvals", "/approvals"),
     ("Members", "/settings/members"),
     ("Roles & permissions", "/settings/roles"),
     ("Inference endpoint", "/settings/inference"),

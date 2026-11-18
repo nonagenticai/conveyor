@@ -451,3 +451,107 @@ mod capture {
         }
     }
 }
+
+mod video {
+    //! P1 of conveyor#164: the retired video-analysis service's captured operations are each served
+    //! by an executor kind or dropped with a reason. The capture and its own enforcement live with
+    //! the media app (#139, `apps/media/tests/parity.rs`); this module is the analysis unit's gate
+    //! on that same contract, so the two units cannot drift apart.
+
+    const CONTRACT: &str = include_str!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../apps/media/contract/parity.toml"
+    ));
+
+    #[derive(serde::Deserialize)]
+    struct Contract {
+        #[serde(default)]
+        operation: Vec<Operation>,
+        #[serde(default)]
+        new: Vec<NewKind>,
+    }
+
+    #[derive(serde::Deserialize)]
+    struct Operation {
+        service: String,
+        operation: String,
+        disposition: String,
+        #[serde(default)]
+        kind: Option<String>,
+        #[serde(default)]
+        reason: Option<String>,
+    }
+
+    #[derive(serde::Deserialize)]
+    struct NewKind {
+        kind: String,
+        #[serde(default)]
+        reason: String,
+    }
+
+    fn contract() -> Contract {
+        toml::from_str(CONTRACT).expect("the media parity contract parses")
+    }
+
+    #[test]
+    fn the_video_capture_accounts_for_every_operation() {
+        let contract = contract();
+        let rows: Vec<&Operation> = contract
+            .operation
+            .iter()
+            .filter(|row| row.service == "video_analyzer_service")
+            .collect();
+        assert_eq!(rows.len(), 14, "the captured operation count moved");
+
+        let mut kinds = 0;
+        let mut drops = 0;
+        for row in &rows {
+            match row.disposition.as_str() {
+                "kind" => {
+                    kinds += 1;
+                    let kind = row
+                        .kind
+                        .as_deref()
+                        .unwrap_or_else(|| panic!("{}: a kind row names its kind", row.operation));
+                    assert!(
+                        kind.starts_with("media."),
+                        "{}: `{kind}` is not an executor kind",
+                        row.operation
+                    );
+                }
+                "drop" => {
+                    drops += 1;
+                    assert!(
+                        row.reason
+                            .as_deref()
+                            .is_some_and(|reason| !reason.trim().is_empty()),
+                        "{}: a drop names a reason",
+                        row.operation
+                    );
+                }
+                other => panic!("{}: `{other}` is not a disposition", row.operation),
+            }
+        }
+        assert_eq!(
+            (kinds, drops),
+            (3, 11),
+            "three operations are served as kinds and eleven are dropped"
+        );
+
+        // Two kinds are new, not ported; both say so, and neither is claimed as parity.
+        let new_kinds: Vec<&str> = contract
+            .new
+            .iter()
+            .filter(|row| row.kind == "media.probe_video" || row.kind == "media.ocr")
+            .map(|row| row.kind.as_str())
+            .collect();
+        assert_eq!(new_kinds.len(), 2, "probe_video and ocr are the new kinds");
+        for row in &contract.new {
+            assert!(
+                !row.reason.trim().is_empty(),
+                "{}: a new kind states why it exists",
+                row.kind
+            );
+        }
+    }
+}

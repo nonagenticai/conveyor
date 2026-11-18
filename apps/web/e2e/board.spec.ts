@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createBoardCard, invoke } from "./helpers";
+import { allowSelfApproval, createBoardCard, invoke } from "./helpers";
 
 // The board is the first screen where a write matters: `cards.move` carries the card's
 // version as If-Match, and the lane is the state. Both pointer and keyboard paths are real.
@@ -47,10 +47,16 @@ test("a pointer drag moves a card into another lane", async ({ page, request }) 
 
 test("a project, its card, an edit and an archive round-trip through the UI", async ({
   page,
+  request,
 }) => {
   const stamp = Date.now();
   const projectTitle = `AAA Playwright board ${stamp}`;
   const cardName = `Playwright card ${stamp}`;
+
+  // #285: archiving is destructive and runs only behind a gate. The dev seed has one principal
+  // per tenant, so the tenant allows the requester to decide — the console still requests,
+  // decides and invokes; nothing here skips the gate.
+  await allowSelfApproval(request, "cards.archive");
 
   await page.goto("/boards");
   await expect(page.getByRole("heading", { name: "Board", exact: true })).toBeVisible();

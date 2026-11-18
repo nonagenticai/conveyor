@@ -248,6 +248,11 @@ async fn eval_cases_update(
     Ok(view)
 }
 
+/// `eval_cases.delete`'s approval target: the case being removed.
+fn target_delete(input: &CaseDeleteIn) -> Result<String, String> {
+    Ok(format!("eval_case/{}", input.id))
+}
+
 /// Delete one case.
 #[crate::action(
     name = "eval_cases.delete",
@@ -258,7 +263,8 @@ async fn eval_cases_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_delete"
 )]
 async fn eval_cases_delete(
     tx: &mut PgConnection,

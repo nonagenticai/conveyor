@@ -4056,6 +4056,27 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         {
+            // #164: the video family is a pure function of the supplied executor evidence — both
+            // transports must agree on every finding and every score.
+            plain(
+                "analyse.video",
+                json!({
+                    "url": "https://example.test/parity.mp4",
+                    "container": {
+                        "duration_s": 30.0,
+                        "width": 1920,
+                        "height": 1080,
+                        "fps": 30.0,
+                        "video_bitrate_kbps": 5000.0
+                    },
+                    "scenes": [{"start_s": 0.0, "end_s": 30.0, "mean_motion": 2.0}],
+                    "ocr": [],
+                    "audio": {"loudness_lufs": -16.0, "beat_count": 60}
+                }),
+                None,
+            )
+        },
+        {
             let mut sample = on_prepared("documents.update", Some("\"1\""));
             sample.input = Box::new(
                 |ctx: &Ctx| json!({"id": ctx.pop("documents.update"), "title": "Parity document (edited)"}),
@@ -5187,6 +5208,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 | "inference_endpoint.get"
                 | "prompt_audits.check"
                 | "prompt_findings.list"
+                | "analyse.video"
         ) {
             sample.deterministic = true;
         }

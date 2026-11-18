@@ -957,24 +957,21 @@ fn EvalHeader(
         let eval_id = retire_id.clone();
         let ctx = ctx;
         busy.set(true);
-        leptos::task::spawn_local(async move {
-            match ctx
-                .invoke(
-                    "evals.retire",
-                    // `EvalIdIn` reads `id`; `eval_id` stays as the alias the slice names.
-                    json!({"id": eval_id.clone(), "eval_id": eval_id}),
-                    InvokeOptions::default(),
-                )
-                .await
-            {
-                Ok(_) => {
+        // #285: retiring is destructive, so it asks for (and waits on) an approval.
+        crate::approvals::run_destructive(
+            ctx,
+            "evals.retire",
+            // `EvalIdIn` reads `id`; `eval_id` stays as the alias the slice names.
+            json!({"id": eval_id.clone(), "eval_id": eval_id}),
+            InvokeOptions::default(),
+            move |outcome| {
+                if outcome.is_done() {
                     notice.set(Some("Eval retired.".into()));
-                    refresh.run(());
                 }
-                Err(error) => notice.set(Some(error.to_string())),
-            }
-            busy.set(false);
-        });
+                refresh.run(());
+            },
+            move || busy.set(false),
+        );
     });
 
     view! {
@@ -1365,22 +1362,20 @@ fn CasesTab(
     let delete_case = Callback::new(move |id: String| {
         let version_id = delete_version.clone();
         let ctx = ctx;
-        leptos::task::spawn_local(async move {
-            match ctx
-                .invoke(
-                    "eval_cases.delete",
-                    json!({"version_id": version_id, "id": id}),
-                    InvokeOptions::default(),
-                )
-                .await
-            {
-                Ok(_) => {
+        // #285: a case delete is destructive and goes through the approval path.
+        crate::approvals::run_destructive(
+            ctx,
+            "eval_cases.delete",
+            json!({"version_id": version_id, "id": id}),
+            InvokeOptions::default(),
+            move |outcome| {
+                if outcome.is_done() {
                     notice.set(Some("Case deleted.".into()));
-                    refresh.run(());
                 }
-                Err(error) => notice.set(Some(error.to_string())),
-            }
-        });
+                refresh.run(());
+            },
+            || {},
+        );
     });
 
     // ── the metric editor ──
@@ -1515,22 +1510,20 @@ fn CasesTab(
     let delete_metric = Callback::new(move |id: String| {
         let version_id = delete_metric_version.clone();
         let ctx = ctx;
-        leptos::task::spawn_local(async move {
-            match ctx
-                .invoke(
-                    "eval_metrics.delete",
-                    json!({"version_id": version_id, "id": id}),
-                    InvokeOptions::default(),
-                )
-                .await
-            {
-                Ok(_) => {
+        // #285: a metric delete is destructive and goes through the approval path.
+        crate::approvals::run_destructive(
+            ctx,
+            "eval_metrics.delete",
+            json!({"version_id": version_id, "id": id}),
+            InvokeOptions::default(),
+            move |outcome| {
+                if outcome.is_done() {
                     notice.set(Some("Metric deleted.".into()));
-                    refresh.run(());
                 }
-                Err(error) => notice.set(Some(error.to_string())),
-            }
-        });
+                refresh.run(());
+            },
+            || {},
+        );
     });
 
     view! {

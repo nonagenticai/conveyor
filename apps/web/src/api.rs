@@ -107,6 +107,12 @@ pub struct InvokeOptions {
     pub if_match: Option<i64>,
     /// A replay-safe key; sent as `Idempotency-Key`.
     pub idempotency_key: Option<String>,
+    /// The approved approval a destructive action names (conveyor#282).
+    ///
+    /// A property of the CALL, not of the payload: every action input is
+    /// `deny_unknown_fields`, so the id travels beside `input` and the engine reads it from
+    /// there. `None` for every read and every write whose effect is not destructive.
+    pub approval_id: Option<String>,
 }
 
 #[allow(dead_code)]
@@ -209,7 +215,10 @@ impl Client {
         input: Value,
         options: InvokeOptions,
     ) -> Result<Invocation, ApiError> {
-        let body = serde_json::json!({ "input": input }).to_string();
+        let body = match &options.approval_id {
+            None => serde_json::json!({ "input": input }).to_string(),
+            Some(id) => serde_json::json!({ "input": input, "approval_id": id }).to_string(),
+        };
         let mut headers: Vec<(&str, String)> =
             vec![("content-type", "application/json".to_owned())];
         if let Some(version) = options.if_match {

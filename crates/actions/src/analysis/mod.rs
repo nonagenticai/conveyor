@@ -12,3 +12,4 @@
 //! caller that wants a live page scrapes it into a document first.
 
 pub mod actions;
+pub mod video;

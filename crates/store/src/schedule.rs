@@ -32,7 +32,7 @@ use crate::tenants;
 /// `licence.sync` every 5 minutes keeps `app_licence.checked_at` inside the one-hour
 /// staleness window (`crates/auth`'s `LICENCE_MAX_AGE_SECS`) with twelve missed runs to
 /// spare — the licence extractor refuses a row older than that.
-pub const DEFAULT_SCHEDULES: [(&str, &str); 22] = [
+pub const DEFAULT_SCHEDULES: [(&str, &str); 24] = [
     ("event.prune", "15 3 * * *"),
     ("job.prune", "45 3 * * *"),
     // The three rules §6 stated and nothing produced until 0012: the invocation trace (30 d), terminal
@@ -59,6 +59,11 @@ pub const DEFAULT_SCHEDULES: [(&str, &str); 22] = [
     ("eval.reap", "*/5 * * * *"),
     // S19 Part C: the eval transcript's 90-day retention (data-architecture §6).
     ("eval.prune", "50 3 * * *"),
+    // S16 W8: the two retention producers whose handlers existed with no schedule row. The
+    // inference ledger and the prompt audit's findings are tenant data with a fixed age; each
+    // is a schedule row so a stopped worker resumes it (CONTRACT §7).
+    ("inference_call.prune", "55 3 * * *"),
+    ("prompt_audit.prune", "10 4 * * *"),
     ("approval.expire", "* * * * *"),
     // The close hand-off to the signed mcp channel: every closed gate is queued once.
     ("approval.closed.emit", "* * * * *"),
