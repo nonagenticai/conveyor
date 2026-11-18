@@ -1195,7 +1195,7 @@ in §11.8.
 |---|---|
 | programme/plan | `programmes.*`, `programme_config.*`, `governed_assets.compose\|submit\|approve` (the MSP artefacts), `tranches.*`, `tranches.review`, `project_dependencies.*`, `cadences.*`, `wbs.*`, `baselines.*`, `registers.*` |
 | benefits | `benefits.list\|get\|create\|update\|retire`, `benefits.link\|unlink`, `benefits.baseline\|transition\|measure\|close` |
-| architecture | `architecture.artifacts.list\|get\|create\|update\|approve\|supersede\|link`, `architecture.repository.search` (reuse), `architecture.contracts.request\|approve\|supersede`, `architecture.phases.advance`, `architecture.reviews.record\|waive`, `architecture.board.decide`, `architecture.maturity.assess\|plan`, `architecture.skills.assess`, `architecture.profile.get\|tailor` |
+| architecture | `architecture.artifacts_list\|get\|create\|update\|approve\|supersede\|link`, `architecture.repository_search` (reuse), `architecture.contracts_request\|approve\|supersede`, `architecture.phases_advance`, `architecture.reviews_record\|waive`, `architecture.board_decide`, `architecture.maturity_assess\|plan`, `architecture.skills_assess`, `architecture.profile_get\|tailor` — the action macro requires exactly one dot, so the family is `architecture.<noun>_<verb>` |
 | organisation | `industries.*`, `departments.*`, `jobs.create\|update\|release\|retire`, `job_releases.publish\|retire`, `job_bindings.create\|retire\|list` |
 | procedures | `procedures.ingest_sop\|ingest_process\|ingest_rdf\|draft\|validate\|publish`, `capabilities.design\|publish`, `pko.import_rdf\|edit\|publish\|pin` |
 | authoring | `authoring.intake\|draft\|review\|publish`, `authoring.assets` |
