@@ -97,7 +97,7 @@ pub(crate) async fn invoke_broker(
             ActionError::internal()
         })?;
 
-    let mut run = store::tool::run_context(&mut *tx, ctx.tenant, call.run_id)
+    let mut run = store::tool::run_context(&mut tx, ctx.tenant, call.run_id)
         .await
         .map_err(|error| {
             tracing::error!(%error, run = %call.run_id, "broker: read the run");
@@ -106,7 +106,7 @@ pub(crate) async fn invoke_broker(
         .ok_or_else(|| not_ready(format!("no run {} in this tenant", call.run_id)))?;
 
     if let Some(step_id) = call.step_id {
-        let belongs = store::tool::step_belongs_to_run(&mut *tx, ctx.tenant, run.run_id, step_id)
+        let belongs = store::tool::step_belongs_to_run(&mut tx, ctx.tenant, run.run_id, step_id)
             .await
             .map_err(|error| {
                 tracing::error!(%error, step = %step_id, "broker: read the step");
@@ -124,7 +124,7 @@ pub(crate) async fn invoke_broker(
         run.run_step_id = Some(step_id);
     }
 
-    let tool = store::tool::resolve(&mut *tx, ctx.tenant, &run, toolkit_key, tool_key)
+    let tool = store::tool::resolve(&mut tx, ctx.tenant, &run, toolkit_key, tool_key)
         .await
         .map_err(|error| {
             tracing::error!(%error, tool = %call.tool, "broker: resolve the tool");
@@ -178,7 +178,7 @@ pub(crate) async fn invoke_broker(
     }
 
     if effect == Effect::Destructive {
-        let waived = store::approval_policy::waives(&mut *tx, ctx.tenant, "tools.call")
+        let waived = store::approval_policy::waives(&mut tx, ctx.tenant, "tools.call")
             .await
             .map_err(|error| {
                 tracing::error!(%error, tool = %call.tool, "broker: read the approval policy");
@@ -186,7 +186,7 @@ pub(crate) async fn invoke_broker(
             })?;
         if !waived {
             crate::control::approvals::require_approval_tx(
-                &mut *tx,
+                &mut tx,
                 &ctx,
                 "tools.call",
                 &call.tool,
