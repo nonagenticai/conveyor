@@ -166,6 +166,9 @@ pub enum PlanError {
     /// A project in a programme starts before the first tranche is authorised.
     #[error("tranche_not_authorised")]
     TrancheNotAuthorised,
+    /// A tranche baseline changes only through a cited, approved change request.
+    #[error("rebaseline_requires_change")]
+    RebaselineRequiresChange,
     /// The programme has no benefits realization plan.
     #[error("realization_plan_missing")]
     RealizationPlanMissing,

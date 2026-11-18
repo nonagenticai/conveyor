@@ -1163,7 +1163,7 @@ pub async fn review_tranche_tx(
             });
         }
     };
-    get_tranche_tx(&mut *conn, tenant, id)
+    let reviewed = get_tranche_tx(&mut *conn, tenant, id)
         .await?
         .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
     ensure_parent_tx(&mut *conn, tenant, Parent::AppUser, reviewed_by)
@@ -1174,7 +1174,7 @@ pub async fn review_tranche_tx(
          VALUES ($1, $2, $3, $4, $5)
          RETURNING {TRANCHE_REVIEW_COLUMNS}"
     );
-    let _review: TrancheReviewRecord = sqlx::query_as(AssertSqlSafe(sql))
+    let review: TrancheReviewRecord = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(id)
         .bind(decision)
@@ -1182,6 +1182,23 @@ pub async fn review_tranche_tx(
         .bind(reviewed_by)
         .fetch_one(&mut *conn)
         .await?;
+    // A `continue` authorises the next tranche in the same write: the review's outcome is what
+    // authorises it, and the start gate reads the state (and the review that set it), never a
+    // second document.
+    if decision == "continue" {
+        sqlx::query(
+            "UPDATE programme_tranche
+                SET state = 'authorised', authorised_at = now(),
+                    authorisation_review_id = $4, version = version + 1, updated_at = now()
+              WHERE tenant_id = $1 AND programme_id = $2 AND number = $3 AND state = 'planned'",
+        )
+        .bind(tenant.as_uuid())
+        .bind(reviewed.programme_id)
+        .bind(reviewed.number + 1)
+        .bind(review.id)
+        .execute(&mut *conn)
+        .await?;
+    }
     let sql = format!(
         "UPDATE programme_tranche SET state = $3, version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2
@@ -1194,6 +1211,43 @@ pub async fn review_tranche_tx(
         .fetch_optional(&mut *conn)
         .await?;
     row.ok_or(PlanStoreError::NotFound { what: "tranche" })
+}
+
+/// The programme tranche that governs a project's start: its number and state, when the
+/// project belongs to a programme with tranche rows.
+///
+/// The project's `meta.tranche` names its tranche; a project that declares none is governed by
+/// the first delivery tranche (number 1).
+pub async fn project_tranche_state_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<Option<(i32, String)>, PlanStoreError> {
+    let project: Option<(Option<Uuid>, Value)> =
+        sqlx::query_as("SELECT programme_id, meta FROM project WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(project_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let (programme, meta) = project.ok_or(PlanStoreError::NotFound { what: "project" })?;
+    let Some(programme) = programme else {
+        return Ok(None);
+    };
+    let number = meta
+        .get("tranche")
+        .and_then(Value::as_i64)
+        .and_then(|value| i32::try_from(value).ok())
+        .unwrap_or(1);
+    let state: Option<String> = sqlx::query_scalar(
+        "SELECT state FROM programme_tranche
+          WHERE tenant_id = $1 AND programme_id = $2 AND number = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme)
+    .bind(number)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(state.map(|state| (number, state)))
 }
 
 /// A recorded tranche review.
@@ -1249,6 +1303,8 @@ pub struct TranchePatch {
     pub baseline_ref: Option<Uuid>,
     /// The review date.
     pub review_at: Option<DateTime<Utc>>,
+    /// The approved change request that authorises a baseline change, if one is being made.
+    pub change_ref: Option<Uuid>,
 }
 
 /// Edit a tranche's plan fields; the state changes only through [`review_tranche_tx`].
@@ -1277,6 +1333,30 @@ pub async fn update_tranche_tx(
             return Err(PlanStoreError::NotFound {
                 what: "programme baseline",
             });
+        }
+        // A re-baseline is a change, never an edit: the new baseline cites an approved change
+        // request of a project in the same programme (SPEC §8.3's tranche rule).
+        if current.baseline_ref != Some(baseline_ref) {
+            let change_ref = patch
+                .change_ref
+                .ok_or(PlanStoreError::Illegal(PlanError::RebaselineRequiresChange))?;
+            let approved: bool = sqlx::query_scalar(
+                "SELECT EXISTS (
+                    SELECT 1
+                      FROM project_register_item r
+                      JOIN project p ON p.tenant_id = r.tenant_id AND p.id = r.project_id
+                     WHERE r.tenant_id = $1 AND r.id = $2 AND r.kind = 'change'
+                       AND r.status = 'approved' AND p.programme_id = $3
+                 )",
+            )
+            .bind(tenant.as_uuid())
+            .bind(change_ref)
+            .bind(current.programme_id)
+            .fetch_one(&mut *conn)
+            .await?;
+            if !approved {
+                return Err(PlanStoreError::Illegal(PlanError::ChangeNotApproved));
+            }
         }
     }
     let sql = format!(
@@ -2564,8 +2644,8 @@ pub async fn materialise_pi_tx(
             what: "intake lane",
         })?;
     let active = lanes.iter().find(|(_, kind, _)| kind == "active");
-    let (live, slots): (i64, i64) = match active {
-        None => (0, 0),
+    let slots: i64 = match active {
+        None => 0,
         Some((active_id, _, wip)) => {
             let live: i64 = sqlx::query_scalar(
                 "SELECT count(*) FROM card WHERE tenant_id = $1 AND list_id = $2",
@@ -2574,11 +2654,10 @@ pub async fn materialise_pi_tx(
             .bind(active_id)
             .fetch_one(&mut *conn)
             .await?;
-            let slots = match wip {
+            match wip {
                 Some(limit) => (i64::from(*limit) - live).max(0),
                 None => i64::MAX,
-            };
-            (live, slots)
+            }
         }
     };
     if slots == 0 {
@@ -2943,6 +3022,202 @@ pub async fn close_retro_tx(
     )
     .bind(tenant.as_uuid())
     .bind(card_id)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}
+
+/// Refuse a project start when the programme's tranche has not been authorised.
+///
+/// The rule is the domain's (`PlanError::TrancheNotAuthorised`); the action maps it to
+/// `409 tranche_not_authorised`. A project outside a programme, or in a programme with no
+/// tranche rows, is unchanged.
+pub async fn assert_project_tranche_authorised_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<(), PlanStoreError> {
+    match project_tranche_state_tx(&mut *conn, tenant, project_id).await? {
+        None => Ok(()),
+        Some((_number, state))
+            if matches!(state.as_str(), "authorised" | "in_review" | "closed") =>
+        {
+            Ok(())
+        }
+        Some((_number, _state)) => Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised)),
+    }
+}
+
+/// Record a dependency slip: the slipped project's output is late, so the benefits mapped to
+/// that output are at risk.
+///
+/// The benefits come from the map's edges — `benefit_link.output_ref` names a `wbs_node` id —
+/// never from prose: the response carries the ids the register and the console render.
+pub struct DependencySlip {
+    /// The dependency edge that slipped.
+    pub dependency_id: Uuid,
+    /// The benefits the map puts at risk, deduplicated.
+    pub benefits: Vec<Uuid>,
+}
+
+pub async fn record_dependency_slip_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    dependency_id: Uuid,
+) -> Result<DependencySlip, PlanStoreError> {
+    let row: Option<(Uuid, Uuid)> = sqlx::query_as(
+        "SELECT from_project, to_project FROM project_dependency
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(dependency_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (_from, to_project) = row.ok_or(PlanStoreError::NotFound {
+        what: "project dependency",
+    })?;
+    let benefits: Vec<Uuid> = sqlx::query_scalar(
+        "SELECT DISTINCT l.benefit_id
+           FROM benefit_link l
+           JOIN wbs_node w ON w.tenant_id = l.tenant_id AND w.id::text = l.output_ref
+          WHERE l.tenant_id = $1 AND w.project_id = $2
+          ORDER BY l.benefit_id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(to_project)
+    .fetch_all(&mut *conn)
+    .await?;
+    sqlx::query(
+        "UPDATE project_dependency
+            SET status = 'slipped', version = version + 1, updated_at = now(),
+                meta = meta || jsonb_build_object('slipped_at', now())
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(dependency_id)
+    .execute(&mut *conn)
+    .await?;
+    Ok(DependencySlip {
+        dependency_id,
+        benefits,
+    })
+}
+
+/// A benefit's realization: the measured baseline, the post-transition measurement and the
+/// delta, attributed to the operational area the profile names.
+pub struct BenefitRealization {
+    /// The benefit.
+    pub benefit_id: Uuid,
+    /// When the baseline was measured.
+    pub baseline_measured_at: Option<DateTime<Utc>>,
+    /// When the post-transition measurement was taken.
+    pub post_measured_at: Option<DateTime<Utc>>,
+    /// The operational area the improvement is attributed to.
+    pub operational_area: String,
+    /// The baseline value, when the profile records one.
+    pub baseline_value: Option<f64>,
+    /// The post-transition value, when the transition's evidence records one.
+    pub post_value: Option<f64>,
+    /// `post - baseline`, when both values exist.
+    pub delta: Option<f64>,
+    /// When the legacy practice was retired.
+    pub retired_at: Option<DateTime<Utc>>,
+}
+
+pub async fn benefit_realization_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+) -> Result<BenefitRealization, PlanStoreError> {
+    let profile: Option<(Value, String)> = sqlx::query_as(
+        "SELECT coalesce(baseline, '{}'::jsonb), operational_area FROM benefit_profile
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(benefit_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (baseline, operational_area) = profile.ok_or(PlanStoreError::NotFound {
+        what: "benefit profile",
+    })?;
+    let transition = get_transition_tx(&mut *conn, tenant, benefit_id)
+        .await?
+        .ok_or(PlanStoreError::Conflict {
+            what: "benefit realization",
+            why: "the transition has not started",
+        })?;
+    if transition.post_measured_at.is_some() && transition.baseline_measured_at.is_none() {
+        return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
+    }
+    let baseline_value = baseline.get("value").and_then(Value::as_f64).or_else(|| {
+        transition
+            .evidence
+            .get("baseline_value")
+            .and_then(Value::as_f64)
+    });
+    let post_value = transition
+        .evidence
+        .get("post_value")
+        .and_then(Value::as_f64);
+    let delta = match (baseline_value, post_value) {
+        (Some(baseline), Some(post)) => Some(post - baseline),
+        _ => None,
+    };
+    Ok(BenefitRealization {
+        benefit_id,
+        baseline_measured_at: transition.baseline_measured_at,
+        post_measured_at: transition.post_measured_at,
+        operational_area,
+        baseline_value,
+        post_value,
+        delta,
+        retired_at: transition.retired_at,
+    })
+}
+
+/// Close a programme: its realization plan must name who continues the measurement.
+///
+/// "No plan" and "a plan with no owner" are different refusals, because they need different
+/// work; both write nothing.
+pub async fn close_programme_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<(), PlanStoreError> {
+    let exists: bool = sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM programme WHERE tenant_id = $1 AND id = $2)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if !exists {
+        return Err(PlanStoreError::NotFound { what: "programme" });
+    }
+    let plans: Vec<Option<String>> = sqlx::query_scalar(
+        "SELECT a.meta->>'post_closure_owner'
+           FROM governed_asset a
+           JOIN project p ON p.tenant_id = a.tenant_id AND p.id = a.project_id
+          WHERE a.tenant_id = $1 AND p.programme_id = $2
+            AND a.kind = 'benefits_realization_plan'
+          ORDER BY a.updated_at DESC",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme_id)
+    .fetch_all(&mut *conn)
+    .await?;
+    let Some(owner) = plans.first() else {
+        return Err(PlanStoreError::Illegal(PlanError::RealizationPlanMissing));
+    };
+    if owner.as_deref().is_none_or(|value| value.trim().is_empty()) {
+        return Err(PlanStoreError::Illegal(PlanError::PostClosureOwnerMissing));
+    }
+    sqlx::query(
+        "UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme_id)
     .execute(&mut *conn)
     .await?;
     Ok(())
