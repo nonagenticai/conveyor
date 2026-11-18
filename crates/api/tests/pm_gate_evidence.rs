@@ -55,7 +55,7 @@ async fn fixture() -> Fixture {
         .await
         .expect("scope");
     let contract = conveyor_store::architecture::request_contract_tx(
-        &mut *tx,
+        &mut tx,
         seeded.tenant,
         &conveyor_store::architecture::NewContract {
             project_id: project,
@@ -69,7 +69,7 @@ async fn fixture() -> Fixture {
     .await
     .expect("request the governing contract");
     conveyor_store::architecture::approve_contract_tx(
-        &mut *tx,
+        &mut tx,
         seeded.tenant,
         contract.id,
         contract.version,

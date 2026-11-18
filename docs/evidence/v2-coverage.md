@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 29 |
+| `exists` | implemented in code and backed by real rows | 41 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 7 |
-| `new` | absent | 27 |
+| `new` | absent | 15 |
 
 ## Rows
 
@@ -29,17 +29,17 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:benefit_link` | §10.3 | table | benefit_link | `exists` | migrations: CREATE TABLE benefit_link |
 | `table:benefit_transition` | §10.3 | table | benefit_transition | `exists` | migrations: CREATE TABLE benefit_transition |
 | `table:stakeholder_profile` | §10.3 | table | stakeholder_profile | `exists` | migrations: CREATE TABLE stakeholder_profile |
-| `table:architecture_artifact` | §10.3 | table | architecture_artifact | `new` | migrations: no CREATE/ALTER TABLE architecture_artifact |
-| `table:architecture_artifact_entry` | §10.3 | table | architecture_artifact_entry | `new` | migrations: no CREATE/ALTER TABLE architecture_artifact_entry |
-| `table:architecture_artifact_link` | §10.3 | table | architecture_artifact_link | `new` | migrations: no CREATE/ALTER TABLE architecture_artifact_link |
-| `table:artifact_type` | §10.3 | table | artifact_type | `new` | migrations: no CREATE/ALTER TABLE artifact_type |
-| `table:adm_profile` | §10.3 | table | adm_profile | `new` | migrations: no CREATE/ALTER TABLE adm_profile |
-| `table:architecture_contract` | §10.3 | table | architecture_contract | `new` | migrations: no CREATE/ALTER TABLE architecture_contract |
-| `table:architecture_compliance_review` | §10.3 | table | architecture_compliance_review | `new` | migrations: no CREATE/ALTER TABLE architecture_compliance_review |
-| `table:architecture_waiver` | §10.3 | table | architecture_waiver | `new` | migrations: no CREATE/ALTER TABLE architecture_waiver |
-| `table:governance_body` | §10.3 | table | governance_body | `new` | migrations: no CREATE/ALTER TABLE governance_body |
-| `table:architecture_maturity` | §10.3 | table | architecture_maturity | `new` | migrations: no CREATE/ALTER TABLE architecture_maturity |
-| `table:architecture_skill_assessment` | §10.3 | table | architecture_skill_assessment | `new` | migrations: no CREATE/ALTER TABLE architecture_skill_assessment |
+| `table:architecture_artifact` | §10.3 | table | architecture_artifact | `exists` | migrations: CREATE TABLE architecture_artifact |
+| `table:architecture_artifact_entry` | §10.3 | table | architecture_artifact_entry | `exists` | migrations: CREATE TABLE architecture_artifact_entry |
+| `table:architecture_artifact_link` | §10.3 | table | architecture_artifact_link | `exists` | migrations: CREATE TABLE architecture_artifact_link |
+| `table:artifact_type` | §10.3 | table | artifact_type | `exists` | migrations: CREATE TABLE artifact_type |
+| `table:adm_profile` | §10.3 | table | adm_profile | `exists` | migrations: CREATE TABLE adm_profile |
+| `table:architecture_contract` | §10.3 | table | architecture_contract | `exists` | migrations: CREATE TABLE architecture_contract |
+| `table:architecture_compliance_review` | §10.3 | table | architecture_compliance_review | `exists` | migrations: CREATE TABLE architecture_compliance_review |
+| `table:architecture_waiver` | §10.3 | table | architecture_waiver | `exists` | migrations: CREATE TABLE architecture_waiver |
+| `table:governance_body` | §10.3 | table | governance_body | `exists` | migrations: CREATE TABLE governance_body |
+| `table:architecture_maturity` | §10.3 | table | architecture_maturity | `exists` | migrations: CREATE TABLE architecture_maturity |
+| `table:architecture_skill_assessment` | §10.3 | table | architecture_skill_assessment | `exists` | migrations: CREATE TABLE architecture_skill_assessment |
 | `table:decision` | §10.3 | table | decision | `exists` | migrations: CREATE TABLE decision |
 | `table:decision_option` | §10.3 | table | decision_option | `exists` | migrations: CREATE TABLE decision_option |
 | `table:decision_policy` | §10.3 | table | decision_policy | `exists` | migrations: CREATE TABLE decision_policy |
@@ -52,7 +52,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:pko_relation` | §10.3 | table | pko_relation | `new` | migrations: no CREATE/ALTER TABLE pko_relation |
 | `actions:programme/plan` | §10.4 | actions | programme/plan | `extend` | actions: baselines.* found (baselines.get, baselines.list, baselines.take)<br>actions: cadences.* found (cadences.create, cadences.delete, cadences.list…)<br>actions: governed_assets.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)<br>actions: registers.* found (registers.create, registers.delete, registers.get…)<br>actions: tranches.* found (tranches.create, tranches.delete, tranches.list…)<br>actions: wbs.* found (wbs.create, wbs.delete, wbs.get…) |
 | `actions:benefits` | §10.4 | actions | benefits | `exists` | actions: benefits.* found (benefits.create, benefits.delete, benefits.get…) |
-| `actions:architecture` | §10.4 | actions | architecture | `new` | actions: architecture.* absent |
+| `actions:architecture` | §10.4 | actions | architecture | `exists` | actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…) |
 | `actions:organisation` | §10.4 | actions | organisation | `exists` | actions: departments.* found (departments.create, departments.list)<br>actions: industries.* found (industries.create, industries.get, industries.list)<br>actions: job_bindings.* found (job_bindings.create, job_bindings.get, job_bindings.list…)<br>actions: job_releases.* found (job_releases.list, job_releases.publish, job_releases.retire)<br>actions: jobs.* found (jobs.list, jobs.retry) |
 | `actions:procedures` | §10.4 | actions | procedures | `extend` | actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: pko.* absent<br>actions: procedures.* found (procedures.create, procedures.get, procedures.list…) |
 | `actions:authoring` | §10.4 | actions | authoring | `new` | actions: authoring.* absent |
