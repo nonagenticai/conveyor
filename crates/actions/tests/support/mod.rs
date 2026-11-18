@@ -384,6 +384,53 @@ pub async fn reviewer_id(pg: &Pg) -> Uuid {
         .expect("the reviewer principal is seeded")
 }
 
+/// An APPROVED gate for `action` with exactly this input, for a test that has to get past the
+/// destructive gate (#282, #285).
+///
+/// The gate is **requested through the real action**, so `meta.target` is computed by the same
+/// function the invoke boundary compares — a fixture cannot mistype it. It is then decided in
+/// SQL, because the requester may not decide their own gate under the default policy and the
+/// fixture has one principal per tenant.
+pub async fn approved_gate(
+    pg: &Pg,
+    tenant: TenantId,
+    running: &Running,
+    login: &str,
+    action: &str,
+    input: &Value,
+) -> Uuid {
+    let (status, body) = running
+        .invoke(
+            "approvals.request",
+            login,
+            json!({
+                "gate": action,
+                "kind": "action",
+                "action": action,
+                "input": input,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "open a gate for {action}: {body}");
+    let id = body["output"]["id"]
+        .as_str()
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+        .unwrap_or_else(|| panic!("{action}: the gate id: {body}"));
+    let mut tx = begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope the approval update");
+    sqlx::query("UPDATE approval SET status = 'approved' WHERE id = $1")
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .expect("approve the gate");
+    tx.commit().await.expect("commit the gate");
+    id
+}
+
 /// Create and publish a checker-inspected SOP, returning its id (S13: every step names one).
 ///
 /// `processes.publish` refuses a step with no `procedure_id`, so a process fixture must have a
@@ -623,6 +670,45 @@ impl Running {
             Some(token),
             &headers,
             Some(json!({ "input": input })),
+        )
+        .await
+    }
+
+    /// [`Running::invoke`] naming an approved gate — what a destructive action needs (#282).
+    pub async fn invoke_approved(
+        &self,
+        action: &str,
+        token: &str,
+        input: Value,
+        if_match: Option<&str>,
+        approval_id: uuid::Uuid,
+    ) -> (u16, Value) {
+        let (status, _headers, body) = self
+            .invoke_approved_full(action, token, input, if_match, approval_id)
+            .await;
+        (status, body)
+    }
+
+    /// [`Running::invoke_approved`] plus the response headers.
+    pub async fn invoke_approved_full(
+        &self,
+        action: &str,
+        token: &str,
+        input: Value,
+        if_match: Option<&str>,
+        approval_id: uuid::Uuid,
+    ) -> (u16, std::collections::HashMap<String, String>, Value) {
+        let mut headers: Vec<(&str, &str)> = Vec::new();
+        if let Some(version) = if_match {
+            headers.push(("if-match", version));
+        }
+        let path = format!("/api/actions/{action}/invocations");
+        self.http_full(
+            reqwest::Method::POST,
+            &path,
+            Some(token),
+            &headers,
+            Some(json!({ "input": input, "approval_id": approval_id })),
         )
         .await
     }

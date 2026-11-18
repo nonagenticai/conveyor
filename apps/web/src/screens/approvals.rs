@@ -74,11 +74,7 @@ fn load(ctx: AppCtx) -> LocalResource<Result<ApprovalsData, ApiError>> {
             };
             policies.insert(row.gate.clone(), pair);
         }
-        let me = ctx
-            .me
-            .get()
-            .map(|me| me.principal.id)
-            .unwrap_or_default();
+        let me = ctx.me.get().map(|me| me.principal.id).unwrap_or_default();
         Ok(ApprovalsData {
             rows: page.items,
             policies,

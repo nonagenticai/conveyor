@@ -197,7 +197,9 @@ async fn an_untargeted_action_cannot_open_a_standalone_gate() {
     assert_eq!(error.status, 422, "{}", error.detail);
     assert_eq!(error.errors[0].field, "action");
     assert!(
-        error.errors[0].detail.contains("declares no approval target"),
+        error.errors[0]
+            .detail
+            .contains("declares no approval target"),
         "{}",
         error.errors[0].detail
     );

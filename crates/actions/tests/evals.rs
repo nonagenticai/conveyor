@@ -212,8 +212,19 @@ async fn evals_create_get_list_update_and_retire_emit_one_event_each() {
     );
 
     // ── retire ──
+    // #285: retiring is destructive. The gate names this eval, so the same approval authorises
+    // the retry below — the second call reaches the handler and its terminal-state refusal.
+    let retire_gate = support::approved_gate(
+        &pg,
+        seeded.tenant,
+        &running,
+        TOKEN,
+        "evals.retire",
+        &json!({ "id": id }),
+    )
+    .await;
     let (status, body) = running
-        .invoke("evals.retire", TOKEN, json!({ "id": id }), None, None, None)
+        .invoke_approved("evals.retire", TOKEN, json!({ "id": id }), None, retire_gate)
         .await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(body["output"]["status"], "retired");
@@ -222,7 +233,7 @@ async fn evals_create_get_list_update_and_retire_emit_one_event_each() {
 
     // `retired` is terminal: the domain refuses the second retire, and the action says 409.
     let (status, body) = running
-        .invoke("evals.retire", TOKEN, json!({ "id": id }), None, None, None)
+        .invoke_approved("evals.retire", TOKEN, json!({ "id": id }), None, retire_gate)
         .await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "conflict");

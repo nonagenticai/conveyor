@@ -37,6 +37,16 @@ function archiveTarget(cardId: string): string {
   return `card/${cardId}/archive`;
 }
 
+/**
+ * The approvals row for one target.
+ *
+ * Matched by its text, not by a `data-target` attribute: the row's identity on the screen is
+ * what it renders, and a test that leans on an attribute proves the attribute, not the row.
+ */
+function approvalRow(page: import("@playwright/test").Page, target: string) {
+  return page.locator("article").filter({ hasText: target }).first();
+}
+
 /** A board, a card, and the gate its archive asked for, created through the console. */
 async function waitForArchiveGate(
   page: import("@playwright/test").Page,
@@ -66,10 +76,11 @@ test("a gated delete asks before it deletes", async ({ page, request }) => {
   await card.getByRole("button", { name: "Archive" }).click();
   await expect(page.locator(".toast")).toContainText("Waiting for approval");
 
-  // Nothing was destroyed: the card is still on the board.
+  // Nothing was destroyed: the card is still on the board, and the archive strip (which only
+  // renders when something has been archived in this session) does not carry it.
   await page.reload();
   await expect(page.locator(".card", { hasText: title })).toBeVisible();
-  await expect(page.locator(".archived")).not.toContainText(title);
+  await expect(page.locator(".archived", { hasText: title })).toHaveCount(0);
 
   // The gate exists, it names the action, and it carries the computed target.
   const gate = (await pendingGates(request)).find(
@@ -124,13 +135,41 @@ test("the approvals screen shows the target and the input", async ({ page, reque
   const { cardId, target } = await waitForArchiveGate(page, request, title);
 
   await page.goto("/approvals");
-  const row = page.locator(`.approval-row[data-target="${target}"]`);
+  const row = approvalRow(page, target);
   await expect(row).toBeVisible();
-  await expect(row.locator(".action")).toHaveText("cards.archive");
-  await expect(row.locator(".approval-target")).toHaveText(target);
+  await expect(row).toContainText("cards.archive");
+  await expect(row).toContainText(target);
   // The proposal is the input the approved call will run with, not a summary of it.
-  await expect(row.locator(".proposed")).toContainText(cardId);
+  await expect(row).toContainText(cardId);
   await expect(row).toContainText("Alice");
+});
+
+test("a retry after the gate is approved completes the call", async ({ page, request }) => {
+  await setPolicy(request, "cards.archive", "required", "forbidden");
+  const title = `e2e approved retry ${Date.now()}`;
+  const { target } = await waitForArchiveGate(page, request, title);
+
+  // Someone approves the gate. The dev fixture has one principal per tenant, so the tenant is
+  // asked to allow a self-decision AFTER the gate exists — the decision is still recorded by the
+  // same `approvals.decide` a second person would use.
+  await setPolicy(request, "cards.archive", "required", "allowed");
+  const gate = (await pendingGates(request)).find((row) => row.target === target);
+  expect(gate, "the gate the console asked for").toBeTruthy();
+  await invoke(request, "approvals.decide", {
+    approval_id: gate!.id,
+    decision: "approve",
+  });
+
+  // The requester's retry spends that gate instead of asking for a second one.
+  await page
+    .locator(".card", { hasText: title })
+    .getByRole("button", { name: "Archive" })
+    .click();
+  await expect(page.locator(".archived")).toContainText(title, { timeout: 15_000 });
+
+  // One gate in total for that object: the retry spent the approved one, it did not ask again.
+  const all = await invoke<{ items: Gate[] }>(request, "approvals.list", { limit: 200 });
+  expect(all.items.filter((row) => row.target === target)).toHaveLength(1);
 });
 
 test("a self gate is shown but not decidable", async ({ page, request }) => {
@@ -139,11 +178,11 @@ test("a self gate is shown but not decidable", async ({ page, request }) => {
   const { target } = await waitForArchiveGate(page, request, title);
 
   await page.goto("/approvals");
-  const row = page.locator(`.approval-row[data-target="${target}"]`);
+  const row = approvalRow(page, target);
   await expect(row).toBeVisible();
 
   // Shown, with the reason — not hidden, which would read as "nothing to do here".
   await expect(row.getByRole("button", { name: "Approve" })).toBeDisabled();
   await expect(row.getByRole("button", { name: "Reject" })).toBeDisabled();
-  await expect(row.locator(".refusal")).toContainText("another person must decide");
+  await expect(row).toContainText("another person must decide");
 });

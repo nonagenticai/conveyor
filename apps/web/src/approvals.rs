@@ -15,11 +15,25 @@
 //! 4. `self_approval: allowed` → decide it and invoke with the id; `forbidden` (the default) →
 //!    stop and say so, because someone else has to approve it.
 
+use std::cell::RefCell;
+use std::collections::HashMap;
+
 use leptos::prelude::*;
 use serde_json::{Value, json};
 
 use crate::api::{ApiError, InvokeOptions};
 use crate::state::AppCtx;
+
+thread_local! {
+    /// The gate each action is waiting on, for this browser session.
+    ///
+    /// A gate approved by someone else is not executed for you: nothing replays the call. So the
+    /// requester's retry is what completes it, and this is what that retry looks up — otherwise
+    /// every retry would open a SECOND gate for the same object and the approver's first answer
+    /// would authorise nothing. Session-scoped on purpose: a reload forgets, and a forgotten
+    /// gate is a stale row on the approvals screen, never a wrong execution.
+    static WAITING: RefCell<HashMap<&'static str, String>> = RefCell::new(HashMap::new());
+}
 
 /// What a destructive attempt did.
 #[derive(Clone, Debug)]
@@ -81,6 +95,25 @@ async fn attempt(
         return call(ctx, action, input, options).await;
     }
 
+    // A retry after someone approved the gate this session is waiting on: finish the call with
+    // it instead of asking for a second gate. A refusal here falls through to a fresh ask.
+    if let Some(approval_id) = WAITING.with(|waiting| waiting.borrow().get(action).cloned()) {
+        let retried = call(
+            ctx,
+            action,
+            input.clone(),
+            InvokeOptions {
+                approval_id: Some(approval_id),
+                ..options.clone()
+            },
+        )
+        .await;
+        if matches!(retried, Destructive::Done) {
+            WAITING.with(|waiting| waiting.borrow_mut().remove(action));
+            return retried;
+        }
+    }
+
     let requested = ctx
         .invoke(
             "approvals.request",
@@ -114,6 +147,8 @@ async fn attempt(
     };
 
     if self_approval != "allowed" {
+        // Remember what this session is waiting on so the retry completes the call.
+        WAITING.with(|waiting| waiting.borrow_mut().insert(action, approval_id.clone()));
         return Destructive::Waiting { approval_id };
     }
     if let Err(error) = ctx
@@ -126,7 +161,7 @@ async fn attempt(
     {
         return Destructive::Failed(error);
     }
-    call(
+    let outcome = call(
         ctx,
         action,
         input,
@@ -135,7 +170,11 @@ async fn attempt(
             ..options
         },
     )
-    .await
+    .await;
+    if matches!(outcome, Destructive::Done) {
+        WAITING.with(|waiting| waiting.borrow_mut().remove(action));
+    }
+    outcome
 }
 
 /// The tenant's policy for one action; the engine's own defaults when it cannot be read.
