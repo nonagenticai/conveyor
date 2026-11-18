@@ -1,0 +1,1811 @@
+//! The TOGAF ADM store: the artefact repository, the tailored profile, the board, the four
+//! contract kinds, the phase gates, compliance reviews and waivers, maturity and skills
+//! (SPEC_V2 §8.1, §10.3, D63; T9, issue #81).
+//!
+//! The rules this module enforces, not merely stores:
+//!
+//! - an approved artefact is immutable: an update is refused and a supersede writes a new
+//!   version that cites the old one, so the approved body never changes;
+//! - a phase advances only when every mandatory artefact its profile names is approved, the
+//!   phase's contract is live, every earlier phase is accepted, and (for H) exactly one typed
+//!   outcome is recorded — and a refusal writes nothing;
+//! - one compliance level per delivery contract: a second level is a conflict, not an edit;
+//! - a waiver without an accepting owner or a reassessment date is refused;
+//! - a maturity assessment covers all nine dimensions, a skills assessment all seven
+//!   categories, each exactly once.
+
+use chrono::{DateTime, Utc};
+use conveyor_domain::TenantId;
+use conveyor_domain::architecture as vocab;
+use serde_json::{Value, json};
+use sqlx::{AssertSqlSafe, PgConnection};
+use uuid::Uuid;
+
+/// Why an architecture write or read failed.
+#[derive(Debug, thiserror::Error)]
+pub enum ArchitectureStoreError {
+    /// The database refused the statement.
+    #[error(transparent)]
+    Database(#[from] sqlx::Error),
+    /// No such row in this tenant.
+    #[error("the {0} does not exist in this tenant")]
+    NotFound(&'static str),
+    /// The row moved underneath the caller.
+    #[error("the {0} moved; the caller's version is stale")]
+    Stale(&'static str),
+    /// A rule of the capability refused the write.
+    #[error(transparent)]
+    Illegal(#[from] ArchitectureRule),
+    /// A uniqueness rule refused the write.
+    #[error("the {what} conflicts: {why}")]
+    Conflict {
+        /// The row kind.
+        what: &'static str,
+        /// Why.
+        why: &'static str,
+    },
+}
+
+/// The capability's refusal vocabulary.
+#[derive(Debug, thiserror::Error, PartialEq, Eq)]
+pub enum ArchitectureRule {
+    /// An approved artefact cannot be edited; supersede it instead.
+    #[error("an approved artefact is immutable; supersede it with a new version")]
+    ApprovedImmutable,
+    /// A phase is missing a mandatory approved artefact.
+    #[error("the phase is missing the mandatory approved artefact {0:?}")]
+    MissingMandatory(String),
+    /// The phase's contract is not live.
+    #[error("the phase's contract {0:?} is not live")]
+    ContractNotLive(String),
+    /// The project has no live governing contract at its design gate.
+    #[error("the delivery project has no live architecture contract")]
+    DesignContractMissing,
+    /// The phase is not the next one.
+    #[error("phase {requested:?} cannot follow {current:?}")]
+    PhaseOutOfOrder {
+        /// The phase the project is on.
+        current: String,
+        /// The requested phase.
+        requested: String,
+    },
+    /// A phase-H review has no typed outcome.
+    #[error("the phase-H review has no recorded change or kata outcome")]
+    OutcomeRequired,
+    /// The outcome names a change that is not an approved change row of the project.
+    #[error("the outcome's change {0} is not an approved change row of this project")]
+    OutcomeNotApproved(Uuid),
+    /// The score set is not the standard's full set.
+    #[error("the {what} assessment is missing or repeats {value:?}")]
+    AssessmentIncomplete {
+        /// `maturity` or `skills`.
+        what: &'static str,
+        /// The missing or repeated key.
+        value: String,
+    },
+    /// A score is outside 0–5.
+    #[error("the score {0} is outside 0–5")]
+    ScoreOutOfRange(i32),
+    /// A waiver has no owner or no reassessment date.
+    #[error("a waiver needs an accepting owner and a reassessment date")]
+    WaiverNeedsOwnerAndDate,
+    /// The tenant has no ADM profile to gate against.
+    #[error("the tenant has no ADM profile; tailor one before advancing a phase")]
+    NoProfile,
+}
+
+/// An artefact row.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ArtifactRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// Owning project, if any.
+    pub project_id: Option<Uuid>,
+    /// The standard type, if any.
+    pub artifact_type_id: Option<Uuid>,
+    /// ADM phase.
+    pub phase_code: String,
+    /// Plateau.
+    pub plateau: String,
+    /// catalog | matrix | diagram | principles_catalog.
+    pub artifact_kind: String,
+    /// Title.
+    pub title: String,
+    /// draft | in_review | approved | superseded | archived.
+    pub status: String,
+    /// The artefact's own version (bumped by a supersede).
+    pub artifact_version: i64,
+    /// Author.
+    pub author_id: Option<Uuid>,
+    /// Authored at.
+    pub authored_at: Option<DateTime<Utc>>,
+    /// Reviewer.
+    pub reviewer_id: Option<Uuid>,
+    /// Reviewed at.
+    pub reviewed_at: Option<DateTime<Utc>>,
+    /// The related change initiative or project.
+    pub change_initiative: String,
+    /// Why it exists.
+    pub purpose: String,
+    /// Stakeholders.
+    pub stakeholders: Value,
+    /// Scope.
+    pub scope: String,
+    /// The published document.
+    pub document_id: Option<Uuid>,
+    /// The contract it sits under.
+    pub contract_id: Option<Uuid>,
+    /// The artefact this version supersedes.
+    pub supersedes_id: Option<Uuid>,
+    /// The artefact that supersedes this one.
+    pub superseded_by_id: Option<Uuid>,
+    /// Type-specific metadata (uid/name/use, axes, viewpoint).
+    pub meta: Value,
+    /// The If-Match version.
+    pub version: i64,
+    /// Created at.
+    pub created_at: DateTime<Utc>,
+    /// Updated at.
+    pub updated_at: DateTime<Utc>,
+}
+
+/// One catalog item or matrix cell.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct EntryRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// The artefact.
+    pub artifact_id: Uuid,
+    /// First axis.
+    pub axis_a: String,
+    /// Second axis (empty for a catalog).
+    pub axis_b: String,
+    /// The cell's value.
+    pub value: Value,
+    /// Display order.
+    pub position: i32,
+    /// The row version.
+    pub version: i64,
+}
+
+/// One artefact-to-artefact edge.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ArtifactLinkRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// From.
+    pub from_artifact_id: Uuid,
+    /// To.
+    pub to_artifact_id: Uuid,
+    /// derivation | realization | reuse | dependency.
+    pub kind: String,
+    /// The row version.
+    pub version: i64,
+}
+
+/// The seeded artefact standard's row.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ArtifactTypeRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// Stable key.
+    pub key: String,
+    /// Display name.
+    pub name: String,
+    /// catalog | matrix | diagram | principles_catalog.
+    pub artifact_kind: String,
+    /// ADM phase.
+    pub phase_code: String,
+    /// Plateau.
+    pub plateau: String,
+    /// Whether the standard marks it mandatory.
+    pub mandatory: bool,
+    /// Display order.
+    pub position: i32,
+}
+
+/// The tenant's tailored ADM.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ProfileRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// Stable key.
+    pub key: String,
+    /// Display name.
+    pub name: String,
+    /// The phase set.
+    pub phase_set: Value,
+    /// `phase → plateau → [artifact_type keys]`.
+    pub artifact_requirements: Value,
+    /// `phase → contract kind`.
+    pub contract_kinds: Value,
+    /// draft | adopted | retired.
+    pub status: String,
+    /// When adopted.
+    pub adopted_at: Option<DateTime<Utc>>,
+    /// The board decision.
+    pub board_decision_id: Option<Uuid>,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+/// A governance body.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct GovernanceBodyRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// architecture_board | design_board | other.
+    pub kind: String,
+    /// Stable key.
+    pub key: String,
+    /// Display name.
+    pub name: String,
+    /// The charter.
+    pub charter: String,
+    /// The commissioning authority.
+    pub commissioning_authority: String,
+    /// Decision limits.
+    pub decision_limits: Value,
+    /// Members.
+    pub members: Value,
+    /// draft | active | retired.
+    pub status: String,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+/// An architecture contract.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ContractRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// The governing project.
+    pub project_id: Uuid,
+    /// The four kinds.
+    pub kind: String,
+    /// The ADM phase it closes.
+    pub phase_code: String,
+    /// Title.
+    pub title: String,
+    /// The contract body.
+    pub body: Value,
+    /// draft | live | superseded.
+    pub status: String,
+    /// The approving gate.
+    pub approval_id: Option<Uuid>,
+    /// Who approved it.
+    pub approved_by: Option<Uuid>,
+    /// When.
+    pub approved_at: Option<DateTime<Utc>>,
+    /// Supersedes.
+    pub supersedes_id: Option<Uuid>,
+    /// Superseded by.
+    pub superseded_by_id: Option<Uuid>,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+/// One compliance review.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ReviewRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// The delivery project.
+    pub project_id: Uuid,
+    /// The governing contract.
+    pub contract_id: Uuid,
+    /// The one level.
+    pub level: String,
+    /// Findings.
+    pub findings: Value,
+    /// Evidence refs.
+    pub evidence: Value,
+    /// For phase H: `{ "kind": "change" | "kata", ... }`.
+    pub outcome: Option<Value>,
+    /// Who reviewed.
+    pub reviewed_by: Uuid,
+    /// When.
+    pub reviewed_at: DateTime<Utc>,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+/// A time-boxed accepted deviation.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct WaiverRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// The review it attaches to.
+    pub review_id: Uuid,
+    /// The accepting asset owner.
+    pub owner_user_id: Uuid,
+    /// Why.
+    pub reason: String,
+    /// Additional cost.
+    pub cost_impact: String,
+    /// Additional risk.
+    pub risk_impact: String,
+    /// The reassessment date.
+    pub reassessment_at: DateTime<Utc>,
+    /// active | expired | closed.
+    pub status: String,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+/// One maturity dimension's score.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct MaturityRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// The assessment group.
+    pub assessment_id: Uuid,
+    /// The stage.
+    pub stage: String,
+    /// The dimension.
+    pub dimension: String,
+    /// 0–5.
+    pub score: i32,
+    /// When measured.
+    pub assessed_at: DateTime<Utc>,
+    /// Evidence.
+    pub evidence: Value,
+}
+
+/// One skills category's proficiency.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct SkillRecord {
+    /// Row id.
+    pub id: Uuid,
+    /// The assessment group.
+    pub assessment_id: Uuid,
+    /// The role.
+    pub role: String,
+    /// The job key.
+    pub job_key: String,
+    /// The category.
+    pub category: String,
+    /// 0–5.
+    pub proficiency: i32,
+    /// When measured.
+    pub assessed_at: DateTime<Utc>,
+    /// Evidence.
+    pub evidence: Value,
+}
+
+/// What a phase advance returns.
+#[derive(Clone, Debug)]
+pub struct PhaseAdvance {
+    /// The phase that closed.
+    pub closed_phase: String,
+    /// The phase now open, if any.
+    pub next_phase: Option<String>,
+    /// The approved artefact ids the gate resolved.
+    pub artifact_ids: Vec<Uuid>,
+    /// The live contract that closed it, if one was required.
+    pub contract_id: Option<Uuid>,
+}
+
+const ARTIFACT_COLUMNS: &str = "id, project_id, artifact_type_id, phase_code, plateau, \
+    artifact_kind, title, status, artifact_version, author_id, authored_at, reviewer_id, \
+    reviewed_at, change_initiative, purpose, stakeholders, scope, document_id, contract_id, \
+    supersedes_id, superseded_by_id, meta, version, created_at, updated_at";
+const ENTRY_COLUMNS: &str = "id, artifact_id, axis_a, axis_b, value, position, version";
+const LINK_COLUMNS: &str = "id, from_artifact_id, to_artifact_id, kind, version";
+const TYPE_COLUMNS: &str = "id, key, name, artifact_kind, phase_code, plateau, mandatory, position";
+const PROFILE_COLUMNS: &str = "id, key, name, phase_set, artifact_requirements, contract_kinds, \
+    status, adopted_at, board_decision_id, version";
+const BODY_COLUMNS: &str = "id, kind, key, name, charter, commissioning_authority, \
+    decision_limits, members, status, version";
+const CONTRACT_COLUMNS: &str = "id, project_id, kind, phase_code, title, body, status, \
+    approval_id, approved_by, approved_at, supersedes_id, superseded_by_id, version";
+const REVIEW_COLUMNS: &str = "id, project_id, contract_id, level, findings, evidence, outcome, \
+    reviewed_by, reviewed_at, version";
+const WAIVER_COLUMNS: &str = "id, review_id, owner_user_id, reason, cost_impact, risk_impact, \
+    reassessment_at, status, version";
+const MATURITY_COLUMNS: &str = "id, assessment_id, stage, dimension, score, assessed_at, evidence";
+const SKILL_COLUMNS: &str = "id, assessment_id, role, job_key, category, proficiency, \
+    assessed_at, evidence";
+
+/// One entry supplied by a create/update.
+#[derive(Clone, Debug)]
+pub struct NewEntry {
+    /// First axis.
+    pub axis_a: String,
+    /// Second axis (empty for a catalog).
+    pub axis_b: String,
+    /// The cell's value.
+    pub value: Value,
+    /// Display order.
+    pub position: i32,
+}
+
+/// A new artefact.
+#[derive(Clone, Debug)]
+pub struct NewArtifact {
+    /// The owning project.
+    pub project_id: Option<Uuid>,
+    /// The standard type.
+    pub artifact_type_id: Option<Uuid>,
+    /// ADM phase.
+    pub phase_code: String,
+    /// Plateau.
+    pub plateau: String,
+    /// catalog | matrix | diagram | principles_catalog.
+    pub artifact_kind: String,
+    /// Title.
+    pub title: String,
+    /// The related change initiative.
+    pub change_initiative: Option<String>,
+    /// Why it exists.
+    pub purpose: Option<String>,
+    /// Stakeholders.
+    pub stakeholders: Option<Value>,
+    /// Scope.
+    pub scope: Option<String>,
+    /// The published document.
+    pub document_id: Option<Uuid>,
+    /// The contract it sits under.
+    pub contract_id: Option<Uuid>,
+    /// Type-specific metadata.
+    pub meta: Option<Value>,
+    /// The author.
+    pub author_id: Option<Uuid>,
+}
+
+/// The fields an update may change.
+#[derive(Clone, Debug, Default)]
+pub struct ArtifactPatch {
+    /// Title.
+    pub title: Option<String>,
+    /// The related change initiative.
+    pub change_initiative: Option<String>,
+    /// Why it exists.
+    pub purpose: Option<String>,
+    /// Stakeholders.
+    pub stakeholders: Option<Value>,
+    /// Scope.
+    pub scope: Option<String>,
+    /// The document.
+    pub document_id: Option<Uuid>,
+    /// The contract.
+    pub contract_id: Option<Uuid>,
+    /// Type-specific metadata.
+    pub meta: Option<Value>,
+    /// Replacement entries; `None` leaves them untouched.
+    pub entries: Option<Vec<NewEntry>>,
+}
+
+/// Insert the starter artefact standard if the tenant has none; returns rows inserted.
+pub async fn seed_standard_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+) -> Result<u64, ArchitectureStoreError> {
+    let rows: [(&str, &str, &str, &str, &str, bool); 10] = [
+        ("principles_catalog", "Principles Catalog", "principles_catalog", "preliminary", "psa", true),
+        ("principle_derivation", "Principle Derivation Diagram", "diagram", "preliminary", "psa", true),
+        ("principle_realization", "Principle Realization Diagram", "diagram", "preliminary", "psa", true),
+        ("stakeholder_map", "Stakeholder Map", "matrix", "a", "psa", true),
+        ("driver_goal_objective", "Driver/Goal/Objective Catalog", "catalog", "a", "psa", true),
+        ("requirements_catalog", "Requirements Catalog", "catalog", "a", "psa", true),
+        ("solution_concept", "Solution Concept Diagram", "diagram", "a", "psa", true),
+        ("business_capability_map", "Business Capability Map", "diagram", "b", "hld", true),
+        ("data_entity_catalog", "Data Entity/Data Component Catalog", "catalog", "c", "hld", true),
+        ("technology_standards", "Technology Standards Catalog", "catalog", "d", "hld", true),
+    ];
+    let mut inserted = 0_u64;
+    for (position, (key, name, kind, phase, plateau, mandatory)) in rows.iter().enumerate() {
+        let result = sqlx::query(
+            "INSERT INTO artifact_type
+                (tenant_id, key, name, artifact_kind, phase_code, plateau, mandatory, position)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+             ON CONFLICT (tenant_id, key, phase_code, plateau) DO NOTHING",
+        )
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .bind(name)
+        .bind(kind)
+        .bind(phase)
+        .bind(plateau)
+        .bind(mandatory)
+        .bind(position as i32)
+        .execute(&mut *conn)
+        .await?;
+        inserted += result.rows_affected();
+    }
+    Ok(inserted)
+}
+
+/// List the seeded standard.
+pub async fn list_standard_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+) -> Result<Vec<ArtifactTypeRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {TYPE_COLUMNS} FROM artifact_type
+          WHERE tenant_id = $1 ORDER BY phase_code, plateau, position, key"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+async fn insert_entries_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    artifact_id: Uuid,
+    entries: &[NewEntry],
+) -> Result<(), ArchitectureStoreError> {
+    for entry in entries {
+        if entry.axis_a.trim().is_empty() {
+            return Err(ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(
+                "entry axis_a".to_owned(),
+            )));
+        }
+        sqlx::query(
+            "INSERT INTO architecture_artifact_entry
+                (tenant_id, artifact_id, axis_a, axis_b, value, position)
+             VALUES ($1, $2, $3, $4, $5, $6)
+             ON CONFLICT (tenant_id, artifact_id, axis_a, axis_b)
+             DO UPDATE SET value = EXCLUDED.value, position = EXCLUDED.position,
+                           version = architecture_artifact_entry.version + 1, updated_at = now()",
+        )
+        .bind(tenant.as_uuid())
+        .bind(artifact_id)
+        .bind(entry.axis_a.trim())
+        .bind(entry.axis_b.trim())
+        .bind(&entry.value)
+        .bind(entry.position)
+        .execute(&mut *conn)
+        .await?;
+    }
+    Ok(())
+}
+
+/// Create an artefact and its entries.
+pub async fn create_artifact_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewArtifact,
+    entries: &[NewEntry],
+) -> Result<ArtifactRecord, ArchitectureStoreError> {
+    vocab::require_phase(&new.phase_code).map_err(|_| {
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(
+            format!("phase {}", new.phase_code),
+        ))
+    })?;
+    vocab::require_plateau(&new.plateau).map_err(|_| {
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(
+            format!("plateau {}", new.plateau),
+        ))
+    })?;
+    vocab::require_artifact_kind(&new.artifact_kind).map_err(|_| {
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(format!(
+            "artefact kind {}",
+            new.artifact_kind
+        )))
+    })?;
+    let sql = format!(
+        "INSERT INTO architecture_artifact
+            (tenant_id, project_id, artifact_type_id, phase_code, plateau, artifact_kind,
+             title, change_initiative, purpose, stakeholders, scope, document_id, contract_id,
+             meta, author_id, authored_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, now())
+         RETURNING {ARTIFACT_COLUMNS}"
+    );
+    let record: ArtifactRecord = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.project_id)
+        .bind(new.artifact_type_id)
+        .bind(&new.phase_code)
+        .bind(&new.plateau)
+        .bind(&new.artifact_kind)
+        .bind(new.title.trim())
+        .bind(new.change_initiative.clone().unwrap_or_default())
+        .bind(new.purpose.clone().unwrap_or_default())
+        .bind(new.stakeholders.clone().unwrap_or_else(|| json!([])))
+        .bind(new.scope.clone().unwrap_or_default())
+        .bind(new.document_id)
+        .bind(new.contract_id)
+        .bind(new.meta.clone().unwrap_or_else(|| json!({})))
+        .bind(new.author_id)
+        .fetch_one(&mut *conn)
+        .await?;
+    insert_entries_tx(&mut *conn, tenant, record.id, entries).await?;
+    Ok(record)
+}
+
+/// Read one artefact.
+pub async fn get_artifact_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<ArtifactRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {ARTIFACT_COLUMNS} FROM architecture_artifact WHERE tenant_id = $1 AND id = $2"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// List artefacts, optionally filtered.
+pub async fn list_artifacts_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Option<Uuid>,
+    phase_code: Option<&str>,
+    plateau: Option<&str>,
+) -> Result<Vec<ArtifactRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {ARTIFACT_COLUMNS} FROM architecture_artifact
+          WHERE tenant_id = $1
+            AND ($2::uuid IS NULL OR project_id = $2)
+            AND ($3::text IS NULL OR phase_code = $3)
+            AND ($4::text IS NULL OR plateau = $4)
+          ORDER BY created_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .bind(phase_code)
+        .bind(plateau)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// List an artefact's entries.
+pub async fn list_entries_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    artifact_id: Uuid,
+) -> Result<Vec<EntryRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {ENTRY_COLUMNS} FROM architecture_artifact_entry
+          WHERE tenant_id = $1 AND artifact_id = $2 ORDER BY position, axis_a, axis_b"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(artifact_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// Edit a draft artefact; an approved row is refused.
+pub async fn update_artifact_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    patch: &ArtifactPatch,
+) -> Result<ArtifactRecord, ArchitectureStoreError> {
+    let current = get_artifact_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(ArchitectureStoreError::NotFound("architecture artefact"))?;
+    if current.version != expected {
+        return Err(ArchitectureStoreError::Stale("architecture artefact"));
+    }
+    if current.status != "draft" && current.status != "in_review" {
+        return Err(ArchitectureStoreError::Illegal(
+            ArchitectureRule::ApprovedImmutable,
+        ));
+    }
+    let sql = format!(
+        "UPDATE architecture_artifact SET
+            title = coalesce($4, title),
+            change_initiative = coalesce($5, change_initiative),
+            purpose = coalesce($6, purpose),
+            stakeholders = coalesce($7, stakeholders),
+            scope = coalesce($8, scope),
+            document_id = coalesce($9, document_id),
+            contract_id = coalesce($10, contract_id),
+            meta = coalesce($11, meta),
+            version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3
+          RETURNING {ARTIFACT_COLUMNS}"
+    );
+    let record: Option<ArtifactRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(patch.title.as_deref().map(str::trim))
+        .bind(&patch.change_initiative)
+        .bind(&patch.purpose)
+        .bind(&patch.stakeholders)
+        .bind(&patch.scope)
+        .bind(patch.document_id)
+        .bind(patch.contract_id)
+        .bind(&patch.meta)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let record = record.ok_or(ArchitectureStoreError::Stale("architecture artefact"))?;
+    if let Some(entries) = &patch.entries {
+        insert_entries_tx(&mut *conn, tenant, id, entries).await?;
+    }
+    Ok(record)
+}
+
+/// Approve an artefact.
+pub async fn approve_artifact_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    reviewer: Uuid,
+) -> Result<ArtifactRecord, ArchitectureStoreError> {
+    let sql = format!(
+        "UPDATE architecture_artifact
+            SET status = 'approved', reviewer_id = $4, reviewed_at = now(),
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3
+            AND status IN ('draft', 'in_review')
+          RETURNING {ARTIFACT_COLUMNS}"
+    );
+    let record: Option<ArtifactRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(reviewer)
+        .fetch_optional(&mut *conn)
+        .await?;
+    record.ok_or_else(|| {
+        ArchitectureStoreError::Illegal(ArchitectureRule::ApprovedImmutable)
+    })
+}
+
+/// Supersede an artefact with a new draft version; the approved body is unchanged.
+pub async fn supersede_artifact_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    author: Option<Uuid>,
+) -> Result<ArtifactRecord, ArchitectureStoreError> {
+    let current = get_artifact_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(ArchitectureStoreError::NotFound("architecture artefact"))?;
+    if current.version != expected {
+        return Err(ArchitectureStoreError::Stale("architecture artefact"));
+    }
+    if current.status == "superseded" || current.status == "archived" {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "architecture artefact",
+            why: "it is already superseded or archived",
+        });
+    }
+    let sql = format!(
+        "INSERT INTO architecture_artifact
+            (tenant_id, project_id, artifact_type_id, phase_code, plateau, artifact_kind,
+             title, change_initiative, purpose, stakeholders, scope, document_id, contract_id,
+             meta, author_id, authored_at, artifact_version, supersedes_id)
+         SELECT tenant_id, project_id, artifact_type_id, phase_code, plateau, artifact_kind,
+                title, change_initiative, purpose, stakeholders, scope, document_id, contract_id,
+                meta, $4, now(), artifact_version + 1, id
+           FROM architecture_artifact WHERE tenant_id = $1 AND id = $2
+         RETURNING {ARTIFACT_COLUMNS}"
+    );
+    let record: ArtifactRecord = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(author)
+        .fetch_one(&mut *conn)
+        .await?;
+    sqlx::query(
+        "UPDATE architecture_artifact
+            SET status = 'superseded', superseded_by_id = $3, version = version + 1,
+                updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(record.id)
+    .execute(&mut *conn)
+    .await?;
+    Ok(record)
+}
+
+/// Link two artefacts.
+pub async fn link_artifacts_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    from: Uuid,
+    to: Uuid,
+    kind: &str,
+) -> Result<ArtifactLinkRecord, ArchitectureStoreError> {
+    vocab::require_link_kind(kind).map_err(|_| {
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(format!(
+            "link kind {kind}"
+        )))
+    })?;
+    if from == to {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "architecture artefact link",
+            why: "an artefact cannot link to itself",
+        });
+    }
+    let sql = format!(
+        "INSERT INTO architecture_artifact_link
+            (tenant_id, from_artifact_id, to_artifact_id, kind)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (tenant_id, from_artifact_id, to_artifact_id, kind) DO NOTHING
+         RETURNING {LINK_COLUMNS}"
+    );
+    let inserted: Option<ArtifactLinkRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(from)
+        .bind(to)
+        .bind(kind)
+        .fetch_optional(&mut *conn)
+        .await?;
+    if let Some(record) = inserted {
+        return Ok(record);
+    }
+    let sql = format!(
+        "SELECT {LINK_COLUMNS} FROM architecture_artifact_link
+          WHERE tenant_id = $1 AND from_artifact_id = $2 AND to_artifact_id = $3 AND kind = $4"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(from)
+        .bind(to)
+        .bind(kind)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(ArchitectureStoreError::Database)
+}
+
+/// Search the repository for reuse.
+pub async fn search_repository_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    query: Option<&str>,
+    plateau: Option<&str>,
+    kind: Option<&str>,
+) -> Result<Vec<ArtifactRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {ARTIFACT_COLUMNS} FROM architecture_artifact
+          WHERE tenant_id = $1
+            AND status IN ('approved', 'in_review')
+            AND ($2::text IS NULL OR title ILIKE '%' || $2 || '%'
+                 OR purpose ILIKE '%' || $2 || '%'
+                 OR meta::text ILIKE '%' || $2 || '%')
+            AND ($3::text IS NULL OR plateau = $3)
+            AND ($4::text IS NULL OR artifact_kind = $4)
+          ORDER BY artifact_version DESC, created_at DESC LIMIT 100"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(query)
+        .bind(plateau)
+        .bind(kind)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// A new tailored profile.
+#[derive(Clone, Debug)]
+pub struct NewProfile {
+    /// Stable key.
+    pub key: String,
+    /// Display name.
+    pub name: String,
+    /// The phase set.
+    pub phase_set: Value,
+    /// `phase → plateau → [artifact_type keys]`.
+    pub artifact_requirements: Value,
+    /// `phase → contract kind`.
+    pub contract_kinds: Value,
+}
+
+/// Read the tenant's profile: a named one, else the adopted one, else the newest.
+pub async fn get_profile_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: Option<&str>,
+) -> Result<Option<ProfileRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {PROFILE_COLUMNS} FROM adm_profile
+          WHERE tenant_id = $1
+            AND (($2::text IS NOT NULL AND key = $2) OR $2::text IS NULL)
+          ORDER BY (status = 'adopted') DESC, updated_at DESC LIMIT 1"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Create or replace a draft profile by key.
+pub async fn upsert_profile_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewProfile,
+) -> Result<ProfileRecord, ArchitectureStoreError> {
+    if new.key.trim().is_empty() || new.name.trim().is_empty() {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "adm profile",
+            why: "a key and a name are required",
+        });
+    }
+    let sql = format!(
+        "INSERT INTO adm_profile
+            (tenant_id, key, name, phase_set, artifact_requirements, contract_kinds)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT (tenant_id, key) DO UPDATE SET
+            name = EXCLUDED.name,
+            phase_set = EXCLUDED.phase_set,
+            artifact_requirements = EXCLUDED.artifact_requirements,
+            contract_kinds = EXCLUDED.contract_kinds,
+            version = adm_profile.version + 1,
+            updated_at = now()
+          WHERE adm_profile.status <> 'retired'
+         RETURNING {PROFILE_COLUMNS}"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.key.trim())
+        .bind(new.name.trim())
+        .bind(&new.phase_set)
+        .bind(&new.artifact_requirements)
+        .bind(&new.contract_kinds)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(ArchitectureStoreError::Conflict {
+            what: "adm profile",
+            why: "it is retired",
+        })
+}
+
+/// Adopt a profile; the board decision is required.
+pub async fn adopt_profile_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    board_decision_id: Uuid,
+) -> Result<ProfileRecord, ArchitectureStoreError> {
+    let sql = format!(
+        "UPDATE adm_profile
+            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3 AND status = 'draft'
+         RETURNING {PROFILE_COLUMNS}"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(board_decision_id)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(ArchitectureStoreError::Stale("adm profile"))
+}
+
+/// A new governance body.
+#[derive(Clone, Debug)]
+pub struct NewBody {
+    /// architecture_board | design_board | other.
+    pub kind: String,
+    /// Stable key.
+    pub key: String,
+    /// Display name.
+    pub name: String,
+    /// The charter.
+    pub charter: String,
+    /// The commissioning authority.
+    pub commissioning_authority: String,
+    /// Decision limits.
+    pub decision_limits: Value,
+    /// Members.
+    pub members: Value,
+}
+
+/// Create a governance body.
+pub async fn create_body_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewBody,
+) -> Result<GovernanceBodyRecord, ArchitectureStoreError> {
+    let sql = format!(
+        "INSERT INTO governance_body
+            (tenant_id, kind, key, name, charter, commissioning_authority, decision_limits, members)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING {BODY_COLUMNS}"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(&new.kind)
+        .bind(new.key.trim())
+        .bind(new.name.trim())
+        .bind(&new.charter)
+        .bind(&new.commissioning_authority)
+        .bind(&new.decision_limits)
+        .bind(&new.members)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(ArchitectureStoreError::Database)
+}
+
+/// Read a governance body.
+pub async fn get_body_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<GovernanceBodyRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {BODY_COLUMNS} FROM governance_body WHERE tenant_id = $1 AND id = $2"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Record a board decision; the approval row is the decision's durable record.
+pub async fn decide_board_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    body_id: Uuid,
+    decision: &str,
+    evidence: Value,
+    decided_by: Uuid,
+) -> Result<Uuid, ArchitectureStoreError> {
+    if decision != "approved" && decision != "rejected" {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "board decision",
+            why: "the decision must be approved or rejected",
+        });
+    }
+    get_body_tx(&mut *conn, tenant, body_id)
+        .await?
+        .ok_or(ArchitectureStoreError::NotFound("governance body"))?;
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO approval
+            (tenant_id, gate, kind, status, required_decisions, requested_by, meta)
+         VALUES ($1, 'architecture_board', 'architecture_board', $2, 1, $3, $4)
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(decision)
+    .bind(decided_by)
+    .bind(json!({ "body_id": body_id, "evidence": evidence }))
+    .fetch_one(&mut *conn)
+    .await?;
+    Ok(id)
+}
+
+/// A new contract.
+#[derive(Clone, Debug)]
+pub struct NewContract {
+    /// The governing project.
+    pub project_id: Uuid,
+    /// The kind.
+    pub kind: String,
+    /// The phase it closes.
+    pub phase_code: String,
+    /// Title.
+    pub title: String,
+    /// The body.
+    pub body: Value,
+    /// The contract it replaces, if any.
+    pub supersedes_id: Option<Uuid>,
+}
+
+/// Request a contract (draft); a supersede retires the old version in the same write.
+pub async fn request_contract_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewContract,
+) -> Result<ContractRecord, ArchitectureStoreError> {
+    vocab::require_contract_kind(&new.kind).map_err(|_| {
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(format!(
+            "contract kind {}",
+            new.kind
+        )))
+    })?;
+    vocab::require_phase(&new.phase_code).map_err(|_| {
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(format!(
+            "phase {}",
+            new.phase_code
+        )))
+    })?;
+    if let Some(old) = new.supersedes_id {
+        sqlx::query(
+            "UPDATE architecture_contract
+                SET status = 'superseded', version = version + 1, updated_at = now()
+              WHERE tenant_id = $1 AND id = $2 AND status IN ('draft', 'live')",
+        )
+        .bind(tenant.as_uuid())
+        .bind(old)
+        .execute(&mut *conn)
+        .await?;
+    }
+    let sql = format!(
+        "INSERT INTO architecture_contract
+            (tenant_id, project_id, kind, phase_code, title, body, supersedes_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING {CONTRACT_COLUMNS}"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.project_id)
+        .bind(&new.kind)
+        .bind(&new.phase_code)
+        .bind(new.title.trim())
+        .bind(&new.body)
+        .bind(new.supersedes_id)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(ArchitectureStoreError::Database)
+}
+
+/// Approve a draft contract into `live`; an existing live sibling must be superseded first.
+pub async fn approve_contract_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    approved_by: Uuid,
+) -> Result<ContractRecord, ArchitectureStoreError> {
+    let current = get_contract_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(ArchitectureStoreError::NotFound("architecture contract"))?;
+    if current.version != expected {
+        return Err(ArchitectureStoreError::Stale("architecture contract"));
+    }
+    if current.status != "draft" {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "architecture contract",
+            why: "only a draft contract can be approved",
+        });
+    }
+    let live: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM architecture_contract
+             WHERE tenant_id = $1 AND project_id = $2 AND kind = $3 AND phase_code = $4
+               AND status = 'live' AND id <> $5
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(current.project_id)
+    .bind(&current.kind)
+    .bind(&current.phase_code)
+    .bind(id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if live {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "architecture contract",
+            why: "a live contract of this kind exists; supersede it first",
+        });
+    }
+    let sql = format!(
+        "UPDATE architecture_contract
+            SET status = 'live', approved_by = $4, approved_at = now(),
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3 AND status = 'draft'
+         RETURNING {CONTRACT_COLUMNS}"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(approved_by)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(ArchitectureStoreError::Stale("architecture contract"))
+}
+
+/// Supersede a live or draft contract.
+pub async fn supersede_contract_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+) -> Result<ContractRecord, ArchitectureStoreError> {
+    let sql = format!(
+        "UPDATE architecture_contract
+            SET status = 'superseded', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3 AND status IN ('draft', 'live')
+         RETURNING {CONTRACT_COLUMNS}"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(ArchitectureStoreError::Stale("architecture contract"))
+}
+
+/// Read a contract.
+pub async fn get_contract_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<ContractRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {CONTRACT_COLUMNS} FROM architecture_contract
+          WHERE tenant_id = $1 AND id = $2"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// List a project's contracts.
+pub async fn list_contracts_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Option<Uuid>,
+) -> Result<Vec<ContractRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {CONTRACT_COLUMNS} FROM architecture_contract
+          WHERE tenant_id = $1 AND ($2::uuid IS NULL OR project_id = $2)
+          ORDER BY created_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// Materialise the phase WBS nodes for an architecture project.
+pub async fn materialise_phases_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+    phases: &[String],
+) -> Result<Vec<Uuid>, ArchitectureStoreError> {
+    let mut ids = Vec::with_capacity(phases.len());
+    for (position, phase) in phases.iter().enumerate() {
+        let exists: bool = sqlx::query_scalar(
+            "SELECT EXISTS (
+                SELECT 1 FROM wbs_node
+                 WHERE tenant_id = $1 AND project_id = $2 AND kind = 'phase'
+                   AND meta->>'phase_code' = $3
+            )",
+        )
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .bind(phase)
+        .fetch_one(&mut *conn)
+        .await?;
+        if exists {
+            continue;
+        }
+        let id: Uuid = sqlx::query_scalar(
+            "INSERT INTO wbs_node
+                (tenant_id, project_id, position, kind, title, status, meta)
+             VALUES ($1, $2, $3, 'phase', $4, 'open', $5)
+             RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .bind(position as i64)
+        .bind(format!("Phase {phase}"))
+        .bind(json!({ "phase_code": phase }))
+        .fetch_one(&mut *conn)
+        .await?;
+        ids.push(id);
+    }
+    Ok(ids)
+}
+
+/// Advance an architecture project's current phase when the gate is satisfied.
+pub async fn advance_phase_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+    requested: &str,
+    profile_key: Option<&str>,
+) -> Result<PhaseAdvance, ArchitectureStoreError> {
+    vocab::require_phase(requested).map_err(|_| {
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(format!(
+            "phase {requested}"
+        )))
+    })?;
+    let profile = get_profile_tx(&mut *conn, tenant, profile_key)
+        .await?
+        .ok_or(ArchitectureStoreError::Illegal(ArchitectureRule::NoProfile))?;
+    let nodes: Vec<(Uuid, String, String)> = sqlx::query_as(
+        "SELECT id, meta->>'phase_code', status FROM wbs_node
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'phase'
+          ORDER BY position, created_at",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project_id)
+    .fetch_all(&mut *conn)
+    .await?;
+    if nodes.is_empty() {
+        return Err(ArchitectureStoreError::Illegal(
+            ArchitectureRule::PhaseOutOfOrder {
+                current: "none".to_owned(),
+                requested: requested.to_owned(),
+            },
+        ));
+    }
+    let (node_id, current, _status) = nodes
+        .iter()
+        .find(|(_, phase, _)| phase == requested)
+        .cloned()
+        .ok_or_else(|| ArchitectureStoreError::Illegal(ArchitectureRule::PhaseOutOfOrder {
+            current: nodes
+                .iter()
+                .find(|(_, _, status)| status == "open")
+                .map(|(_, phase, _)| phase.clone())
+                .unwrap_or_else(|| "h".to_owned()),
+            requested: requested.to_owned(),
+        }))?;
+    let first_open = nodes
+        .iter()
+        .find(|(_, _, status)| status == "open")
+        .map(|(_, phase, _)| phase.clone())
+        .unwrap_or(current.clone());
+    if first_open != requested {
+        return Err(ArchitectureStoreError::Illegal(
+            ArchitectureRule::PhaseOutOfOrder {
+                current: first_open,
+                requested: requested.to_owned(),
+            },
+        ));
+    }
+    // Mandatory artefacts: the union of the phase's required type keys.
+    let mut required: Vec<String> = Vec::new();
+    if let Some(phase) = profile.artifact_requirements.get(requested) {
+        match phase {
+            Value::Array(items) => {
+                required.extend(items.iter().filter_map(|v| v.as_str()).map(str::to_owned));
+            }
+            Value::Object(plateaus) => {
+                for items in plateaus.values() {
+                    if let Some(items) = items.as_array() {
+                        required
+                            .extend(items.iter().filter_map(|v| v.as_str()).map(str::to_owned));
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    let mut artifact_ids = Vec::new();
+    for key in &required {
+        let id: Option<Uuid> = sqlx::query_scalar(
+            "SELECT a.id FROM architecture_artifact a
+               JOIN artifact_type t ON t.id = a.artifact_type_id AND t.tenant_id = a.tenant_id
+              WHERE a.tenant_id = $1 AND a.project_id = $2 AND a.phase_code = $3
+                AND a.status = 'approved' AND t.key = $4
+              LIMIT 1",
+        )
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .bind(requested)
+        .bind(key)
+        .fetch_optional(&mut *conn)
+        .await?;
+        match id {
+            Some(id) => artifact_ids.push(id),
+            None => {
+                return Err(ArchitectureStoreError::Illegal(
+                    ArchitectureRule::MissingMandatory(key.clone()),
+                ))
+            }
+        }
+    }
+    // The phase's contract, when the profile names one.
+    let required_kind = profile
+        .contract_kinds
+        .get(requested)
+        .and_then(|value| match value {
+            Value::String(kind) if kind != "none" => Some(kind.clone()),
+            _ => None,
+        });
+    let mut contract_id = None;
+    if let Some(kind) = required_kind {
+        let live: Option<Uuid> = sqlx::query_scalar(
+            "SELECT id FROM architecture_contract
+              WHERE tenant_id = $1 AND project_id = $2 AND kind = $3 AND phase_code = $4
+                AND status = 'live' LIMIT 1",
+        )
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .bind(&kind)
+        .bind(requested)
+        .fetch_optional(&mut *conn)
+        .await?;
+        match live {
+            Some(id) => contract_id = Some(id),
+            None => {
+                return Err(ArchitectureStoreError::Illegal(
+                    ArchitectureRule::ContractNotLive(kind),
+                ))
+            }
+        }
+    }
+    // Phase H: exactly one typed outcome must be recorded.
+    if requested == "h" {
+        let recorded: bool = sqlx::query_scalar(
+            "SELECT EXISTS (
+                SELECT 1 FROM architecture_compliance_review
+                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL
+            )",
+        )
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .fetch_one(&mut *conn)
+        .await?;
+        if !recorded {
+            return Err(ArchitectureStoreError::Illegal(
+                ArchitectureRule::OutcomeRequired,
+            ));
+        }
+    }
+    let evidence = json!({
+        "artifacts": artifact_ids.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "contract": contract_id.map(|id| id.to_string()),
+    });
+    sqlx::query(
+        "UPDATE wbs_node
+            SET status = 'accepted', evidence = $4, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = 'open'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(node_id)
+    .bind(evidence)
+    .execute(&mut *conn)
+    .await?;
+    Ok(PhaseAdvance {
+        closed_phase: requested.to_owned(),
+        next_phase: vocab::next_phase(requested).map(str::to_owned),
+        artifact_ids,
+        contract_id,
+    })
+}
+
+/// A new compliance review.
+#[derive(Clone, Debug)]
+pub struct NewReview {
+    /// The delivery project.
+    pub project_id: Uuid,
+    /// The governing contract.
+    pub contract_id: Uuid,
+    /// The one level.
+    pub level: String,
+    /// Findings.
+    pub findings: Value,
+    /// Evidence refs.
+    pub evidence: Value,
+    /// Phase H's one typed outcome.
+    pub outcome: Option<Value>,
+    /// Who reviewed.
+    pub reviewed_by: Uuid,
+}
+
+/// Record the one compliance level a delivery contract gets.
+pub async fn record_review_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewReview,
+) -> Result<ReviewRecord, ArchitectureStoreError> {
+    vocab::require_compliance_level(&new.level).map_err(|_| {
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(format!(
+            "compliance level {}",
+            new.level
+        )))
+    })?;
+    let contract = get_contract_tx(&mut *conn, tenant, new.contract_id)
+        .await?
+        .ok_or(ArchitectureStoreError::NotFound("architecture contract"))?;
+    if contract.project_id != new.project_id {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "compliance review",
+            why: "the contract does not govern that project",
+        });
+    }
+    if let Some(outcome) = &new.outcome {
+        let kind = outcome.get("kind").and_then(Value::as_str).unwrap_or("");
+        if kind != "change" && kind != "kata" {
+            return Err(ArchitectureStoreError::Conflict {
+                what: "phase-H outcome",
+                why: "the outcome kind must be change or kata",
+            });
+        }
+        if kind == "change" {
+            let change_id = outcome
+                .get("change_id")
+                .and_then(Value::as_str)
+                .and_then(|value| Uuid::parse_str(value).ok())
+                .ok_or(ArchitectureStoreError::Conflict {
+                    what: "phase-H outcome",
+                    why: "a change outcome names its change_id",
+                })?;
+            let present: bool = sqlx::query_scalar(
+                "SELECT EXISTS (
+                    SELECT 1 FROM project_register_item
+                     WHERE tenant_id = $1 AND id = $2 AND project_id = $3 AND kind = 'change'
+                )",
+            )
+            .bind(tenant.as_uuid())
+            .bind(change_id)
+            .bind(new.project_id)
+            .fetch_one(&mut *conn)
+            .await?;
+            if !present {
+                return Err(ArchitectureStoreError::Illegal(
+                    ArchitectureRule::OutcomeNotApproved(change_id),
+                ));
+            }
+        }
+    }
+    let sql = format!(
+        "INSERT INTO architecture_compliance_review
+            (tenant_id, project_id, contract_id, level, findings, evidence, outcome, reviewed_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         ON CONFLICT (tenant_id, project_id, contract_id) DO NOTHING
+         RETURNING {REVIEW_COLUMNS}"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.project_id)
+        .bind(new.contract_id)
+        .bind(&new.level)
+        .bind(&new.findings)
+        .bind(&new.evidence)
+        .bind(&new.outcome)
+        .bind(new.reviewed_by)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(ArchitectureStoreError::Conflict {
+            what: "compliance review",
+            why: "this delivery contract already records its one level",
+        })
+}
+
+/// A new waiver.
+#[derive(Clone, Debug)]
+pub struct NewWaiver {
+    /// The review.
+    pub review_id: Uuid,
+    /// The accepting asset owner.
+    pub owner_user_id: Option<Uuid>,
+    /// Why.
+    pub reason: String,
+    /// Additional cost.
+    pub cost_impact: String,
+    /// Additional risk.
+    pub risk_impact: String,
+    /// The reassessment date.
+    pub reassessment_at: Option<DateTime<Utc>>,
+}
+
+/// Grant a time-boxed waiver; an owner and a date are mandatory.
+pub async fn waive_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewWaiver,
+) -> Result<WaiverRecord, ArchitectureStoreError> {
+    let (Some(owner), Some(at)) = (new.owner_user_id, new.reassessment_at) else {
+        return Err(ArchitectureStoreError::Illegal(
+            ArchitectureRule::WaiverNeedsOwnerAndDate,
+        ));
+    };
+    if new.reason.trim().is_empty() {
+        return Err(ArchitectureStoreError::Illegal(
+            ArchitectureRule::WaiverNeedsOwnerAndDate,
+        ));
+    }
+    let review: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM architecture_compliance_review WHERE tenant_id = $1 AND id = $2
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(new.review_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if !review {
+        return Err(ArchitectureStoreError::NotFound("compliance review"));
+    }
+    let sql = format!(
+        "INSERT INTO architecture_waiver
+            (tenant_id, review_id, owner_user_id, reason, cost_impact, risk_impact, reassessment_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING {WAIVER_COLUMNS}"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.review_id)
+        .bind(owner)
+        .bind(new.reason.trim())
+        .bind(&new.cost_impact)
+        .bind(&new.risk_impact)
+        .bind(at)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(ArchitectureStoreError::Database)
+}
+
+fn require_scores(
+    what: &'static str,
+    expected: &[&str],
+    scores: &[(String, i32)],
+) -> Result<(), ArchitectureStoreError> {
+    for (key, score) in scores {
+        if !(0..=5).contains(score) {
+            return Err(ArchitectureStoreError::Illegal(
+                ArchitectureRule::ScoreOutOfRange(*score),
+            ));
+        }
+        if !expected.contains(&key.as_str()) {
+            return Err(ArchitectureStoreError::Illegal(
+                ArchitectureRule::AssessmentIncomplete {
+                    what,
+                    value: key.clone(),
+                },
+            ));
+        }
+    }
+    for key in expected {
+        if !scores.iter().any(|(k, _)| k == key) {
+            return Err(ArchitectureStoreError::Illegal(
+                ArchitectureRule::AssessmentIncomplete {
+                    what,
+                    value: (*key).to_owned(),
+                },
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// Record all nine maturity dimensions for one stage.
+pub async fn assess_maturity_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    assessment_id: Uuid,
+    stage: &str,
+    scores: &[(String, i32)],
+    evidence: Value,
+) -> Result<Vec<MaturityRecord>, ArchitectureStoreError> {
+    require_scores("maturity", &vocab::MATURITY_DIMENSIONS, scores)?;
+    let mut rows = Vec::with_capacity(scores.len());
+    for (dimension, score) in scores {
+        let sql = format!(
+            "INSERT INTO architecture_maturity
+                (tenant_id, assessment_id, stage, dimension, score, evidence)
+             VALUES ($1, $2, $3, $4, $5, $6)
+             ON CONFLICT (tenant_id, assessment_id, dimension) DO NOTHING
+             RETURNING {MATURITY_COLUMNS}"
+        );
+        let row: Option<MaturityRecord> = sqlx::query_as(AssertSqlSafe(sql))
+            .bind(tenant.as_uuid())
+            .bind(assessment_id)
+            .bind(stage.trim())
+            .bind(dimension)
+            .bind(score)
+            .bind(&evidence)
+            .fetch_optional(&mut *conn)
+            .await?;
+        if let Some(row) = row {
+            rows.push(row);
+        }
+    }
+    Ok(rows)
+}
+
+/// Record all seven skills categories for one role.
+pub async fn assess_skills_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    assessment_id: Uuid,
+    role: &str,
+    job_key: &str,
+    scores: &[(String, i32)],
+    evidence: Value,
+) -> Result<Vec<SkillRecord>, ArchitectureStoreError> {
+    require_scores("skills", &vocab::SKILL_CATEGORIES, scores)?;
+    let mut rows = Vec::with_capacity(scores.len());
+    for (category, proficiency) in scores {
+        let sql = format!(
+            "INSERT INTO architecture_skill_assessment
+                (tenant_id, assessment_id, role, job_key, category, proficiency, evidence)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             ON CONFLICT (tenant_id, assessment_id, role, category) DO NOTHING
+             RETURNING {SKILL_COLUMNS}"
+        );
+        let row: Option<SkillRecord> = sqlx::query_as(AssertSqlSafe(sql))
+            .bind(tenant.as_uuid())
+            .bind(assessment_id)
+            .bind(role.trim())
+            .bind(job_key)
+            .bind(category)
+            .bind(proficiency)
+            .bind(&evidence)
+            .fetch_optional(&mut *conn)
+            .await?;
+        if let Some(row) = row {
+            rows.push(row);
+        }
+    }
+    Ok(rows)
+}
+
+/// Record the maturity development plan as WBS milestones under the capability's project.
+pub async fn plan_maturity_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+    assessment_id: Option<Uuid>,
+    milestones: &[String],
+) -> Result<Vec<Uuid>, ArchitectureStoreError> {
+    if let Some(id) = assessment_id {
+        let present: bool = sqlx::query_scalar(
+            "SELECT EXISTS (
+                SELECT 1 FROM architecture_maturity WHERE tenant_id = $1 AND assessment_id = $2
+            )",
+        )
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_one(&mut *conn)
+        .await?;
+        if !present {
+            return Err(ArchitectureStoreError::NotFound("maturity assessment"));
+        }
+    }
+    let mut ids = Vec::with_capacity(milestones.len());
+    for (position, title) in milestones.iter().enumerate() {
+        if title.trim().is_empty() {
+            continue;
+        }
+        let id: Uuid = sqlx::query_scalar(
+            "INSERT INTO wbs_node
+                (tenant_id, project_id, position, kind, title, status, meta)
+             VALUES ($1, $2, $3, 'milestone', $4, 'open', $5)
+             RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .bind(position as i64)
+        .bind(title.trim())
+        .bind(json!({ "assessment_id": assessment_id.map(|id| id.to_string()) }))
+        .fetch_one(&mut *conn)
+        .await?;
+        ids.push(id);
+    }
+    Ok(ids)
+}
+
+/// The live contract that governs a delivery project's design gate.
+pub async fn assert_design_contract_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<ContractRecord, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {CONTRACT_COLUMNS} FROM architecture_contract
+          WHERE tenant_id = $1 AND project_id = $2 AND status = 'live'
+          ORDER BY CASE kind
+                     WHEN 'delivery_contract' THEN 0
+                     WHEN 'statement_of_architecture_work' THEN 1
+                     ELSE 2
+                   END, approved_at DESC
+          LIMIT 1"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(ArchitectureStoreError::Illegal(
+            ArchitectureRule::DesignContractMissing,
+        ))
+}

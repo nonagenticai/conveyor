@@ -26,6 +26,7 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 use crate::board::projects::{insert_board_from_template, insert_start_card_and_run};
+use crate::control::store_error;
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
@@ -561,6 +562,22 @@ async fn pm_route_gate(
             "invalid_value",
             "required_decisions must be between 1 and 255",
         ));
+    }
+    // T9 (SPEC_V2 §8.1, D63): a delivery project cannot pass its design gate without the live
+    // architecture contract that governs it. The refusal writes no approval row.
+    if gate == "design" {
+        store::architecture::assert_design_contract_tx(&mut *tx, ctx.tenant, input.project_id)
+            .await
+            .map_err(|error| match error {
+                store::architecture::ArchitectureStoreError::Database(error) => {
+                    store_error(error, ctx.action)
+                }
+                _ => ActionError::new(
+                    409,
+                    "architecture_contract_missing",
+                    "the delivery project has no live architecture contract",
+                ),
+            })?;
     }
     let evidence = resolve_evidence(
         &mut *tx,
