@@ -215,9 +215,12 @@ mod tests {
                 // #305: the durable tranche-review record — the decision and the evidence a
                 // review was taken on (0051_tranche_review.sql).
                 (51, "tranche review".to_owned()),
+                // #303: the governed retirement path for benefit profiles and tranches
+                // (0052_benefit_retire.sql).
+                (52, "benefit retire".to_owned()),
                 // #295 (ADR 0008): the per-card append-only claim/fact ledger
-                // (0052_card_ledger.sql).
-                (52, "card ledger".to_owned())
+                // (0053_card_ledger.sql).
+                (53, "card ledger".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
