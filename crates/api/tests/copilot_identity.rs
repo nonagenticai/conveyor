@@ -8,6 +8,7 @@
 mod copilot;
 
 use conveyor_store::begin_scoped;
+use serde_json::json;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn the_copilot_records_the_compiled_recipe_identity() {
@@ -79,4 +80,57 @@ async fn a_missing_recipe_refuses_before_the_model_call_with_a_typed_409() {
     );
     assert_eq!(body["type"], "capability_not_ready", "{body}");
     assert_eq!(model.hits(), 0, "the refusal precedes every model call");
+}
+
+/// P1 (W7's "every usage-capturing action"): a tool the copilot runs is a real invocation.
+///
+/// The copilot surface includes model-capturing actions, so a tool call can be a paid model call.
+/// It must carry the turn's context into `inference_call` rather than vanish from the ledger.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_copilot_tool_that_is_a_model_call_still_reaches_the_ledger() {
+    let pg = copilot::support::Pg::fresh().await;
+    let _seeded = copilot::support::seed(&pg, "dev-a", "alice", "Alice").await;
+    copilot::catalogue(&pg).await;
+    let model = copilot::Model::start().await;
+    let running = copilot::boot(&pg, &model).await;
+
+    // Round 1 asks for the tool; the tool itself calls the model (the stub answers it); round 2
+    // finishes the turn.
+    model.tool_call(
+        "completions_create",
+        json!({
+            "model": "alias-model",
+            "messages": [{"role": "user", "content": "a call inside a tool"}]
+        }),
+    );
+    model.text("the tool answered");
+    model.text("done");
+
+    let conversation = copilot::conversation(&running, "dev:alice").await;
+    let (status, body) = copilot::turn(&running, "dev:alice", conversation, "use the tool").await;
+    assert_eq!(status, 201, "{body}");
+
+    let rows: Vec<(String, Option<uuid::Uuid>)> = sqlx::query_as(
+        "SELECT caller_kind, conversation_turn_id
+           FROM inference_call
+          WHERE tenant_id = $1
+          ORDER BY created_at",
+    )
+    .bind(_seeded.tenant_id)
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("the ledger rows");
+    assert_eq!(
+        rows.len(),
+        3,
+        "round 1, the tool's own model call, and round 2: {rows:?}"
+    );
+    assert!(
+        rows.iter().all(|(kind, _)| kind == "copilot"),
+        "every call in the turn names the copilot: {rows:?}"
+    );
+    assert!(
+        rows.iter().all(|(_, turn)| turn.is_some()),
+        "every row joins the conversation turn: {rows:?}"
+    );
 }

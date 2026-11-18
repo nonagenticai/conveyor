@@ -701,7 +701,20 @@ pub(crate) async fn drive(
                             trace_id: Some(format!("run:{}", run.run_id)),
                             depth: run.depth.saturating_add(1),
                             app_key: run.app_key.to_owned(),
-                            usage: None,
+                            // A tool the model names is still an invocation the run owns. If the
+                            // tool is itself a model-capturing action (the surface can include
+                            // one), the ledger must see it rather than lose a paid call.
+                            usage: Some(UsageContext {
+                                caller_kind: CallerKind::AgentRun,
+                                run_id: Some(run.run_id),
+                                run_step_id: run.run_step_id,
+                                conversation_turn_id: None,
+                                eval_run_id: None,
+                                prompt_ref: None,
+                                prompt_version: None,
+                                prompt_sha256: None,
+                                correlation_id: Some(format!("run:{}", run.run_id)),
+                            }),
                         },
                     );
                     let outcome = match tokio::time::timeout(remaining, invocation).await {

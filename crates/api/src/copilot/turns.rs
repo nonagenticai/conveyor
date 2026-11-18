@@ -533,6 +533,7 @@ async fn run(
             match invoke_action(
                 state,
                 caller,
+                turn_id,
                 spec,
                 &input,
                 &format!("turn:{turn_id}:{round}:{key}"),
@@ -679,6 +680,7 @@ fn parse_answer(body: &Value) -> Result<Answer, ActionError> {
 async fn invoke_action(
     state: &AppState,
     caller: &Caller,
+    turn_id: Uuid,
     spec: &ActionSpec,
     input: &Value,
     idempotency_key: &str,
@@ -702,7 +704,20 @@ async fn invoke_action(
             trace_id: None,
             depth: 0,
             app_key: state.config.app_key.clone(),
-            usage: None,
+            // A copilot tool call is a real invocation in the turn. The surface includes
+            // model-capturing actions (`completions.create`), so an uncontexted tool call would
+            // be a paid call with no ledger row (S16 W7).
+            usage: Some(conveyor_actions::UsageContext {
+                caller_kind: conveyor_domain::inference::CallerKind::Copilot,
+                run_id: None,
+                run_step_id: None,
+                conversation_turn_id: Some(turn_id),
+                eval_run_id: None,
+                prompt_ref: None,
+                prompt_version: None,
+                prompt_sha256: None,
+                correlation_id: Some(format!("turn:{turn_id}")),
+            }),
         },
     )
     .await?;
