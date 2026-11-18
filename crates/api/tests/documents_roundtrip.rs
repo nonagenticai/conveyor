@@ -132,14 +132,15 @@ async fn a_document_round_trips_through_the_action_and_the_route() {
     );
 
     // ── delete: tombstone + purge, and the object is GONE ───────────────────────────────
+    // #283: destructive; the gate names this object.
     let (status, deleted) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            alice.tenant,
             "documents.delete",
             "dev:alice",
             json!({"id": document}),
             Some("\"1\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{deleted}");

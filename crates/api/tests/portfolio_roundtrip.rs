@@ -190,14 +190,15 @@ async fn every_family_round_trips_and_announces_one_event_per_mutation() {
     assert_eq!(listed.len(), 1);
     assert_eq!(listed[0]["id"], stakeholder_id.as_str());
 
+    // #283: destructive; the gate names this object.
     let (status, deleted) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            alice.tenant,
             "stakeholders.delete",
             "dev:alice",
             json!({"id": stakeholder_id}),
             Some("\"2\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "a delete has no body: {deleted}");

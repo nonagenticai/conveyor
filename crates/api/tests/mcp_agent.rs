@@ -412,6 +412,24 @@ async fn one_licence_principal_task_creates_reads_decides_and_closes() {
     assert_eq!(meta["proposed_answer"], "the first", "{meta}");
     assert_eq!(meta["allowed_decisions"], json!(["approve", "reject"]));
 
+    // #282/#283: `projects.close` is destructive and `/mcp` carries no approval id (the MCP
+    // invoke path passes `approval_id: None`). This test is the licence-authenticated task
+    // flow, not the gate, so the tenant waives that one action — written straight to the
+    // policy table, because this server authenticates licences only and a dev bearer is refused.
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, seeded.tenant)
+        .await
+        .expect("scope the policy write");
+    sqlx::query(
+        "INSERT INTO approval_policy (tenant_id, action, approval, self_approval)
+         VALUES ($1, 'projects.close', 'waived', 'forbidden')
+         ON CONFLICT (tenant_id, action) DO UPDATE SET approval = 'waived'",
+    )
+    .bind(seeded.tenant_id)
+    .execute(&mut *tx)
+    .await
+    .expect("waive projects.close");
+    tx.commit().await.expect("commit the waiver");
+
     // 5. Close.
     let closed = mcp
         .call(

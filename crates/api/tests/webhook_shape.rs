@@ -508,25 +508,27 @@ async fn webhook_crud_is_write_once_and_the_card_move_envelope_is_exact() {
     );
 
     // ── delete: If-Match, 204, then the row is gone ────────────────────────────────────
+    // #283: destructive; the gate names this object.
     let (status, refused) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "webhooks.delete",
             "dev:alice",
             json!({"id": webhook_id}),
-            None,
-            None,
             None,
         )
         .await;
     assert_eq!(status, 412, "{refused}");
+    // #283: destructive; the gate names this object.
     let (status, deleted) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "webhooks.delete",
             "dev:alice",
             json!({"id": webhook_id}),
             Some("\"2\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{deleted}");
@@ -541,14 +543,15 @@ async fn webhook_crud_is_write_once_and_the_card_move_envelope_is_exact() {
         .await;
     assert_eq!(status, 200);
     assert_eq!(listed["items"].as_array().expect("items").len(), 0);
+    // #283: destructive; the gate names this object.
     let (status, gone) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "webhooks.delete",
             "dev:alice",
             json!({"id": webhook_id}),
             Some("\"3\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 404, "{gone}");

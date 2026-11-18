@@ -1205,6 +1205,11 @@ async fn wbs_list(
     })
 }
 
+/// `wbs.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_wbs_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("wbs/{}", input.id))
+}
+
 /// Remove a WBS node; a node with children is refused.
 #[crate::action(
     name = "wbs.delete",
@@ -1215,7 +1220,8 @@ async fn wbs_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_wbs_delete",
 )]
 async fn wbs_delete(
     tx: &mut PgConnection,
@@ -1553,6 +1559,11 @@ async fn registers_list(
     })
 }
 
+/// `registers.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_registers_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("register/{}", input.id))
+}
+
 /// Remove a register item; an item a benefit profile indexes is refused.
 #[crate::action(
     name = "registers.delete",
@@ -1563,7 +1574,8 @@ async fn registers_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_registers_delete",
 )]
 async fn registers_delete(
     tx: &mut PgConnection,
@@ -1633,6 +1645,11 @@ async fn project_dependencies_create(
     Ok(HandlerOutput::created(dependency_out(&record)).with_etag(etag_of(record.version)))
 }
 
+/// `project_dependencies.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_project_dependencies_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("project_dependency/{}", input.id))
+}
+
 /// Delete a dependency edge.
 #[crate::action(
     name = "project_dependencies.delete",
@@ -1643,7 +1660,8 @@ async fn project_dependencies_create(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_project_dependencies_delete",
 )]
 async fn project_dependencies_delete(
     tx: &mut PgConnection,
@@ -1865,6 +1883,11 @@ async fn tranches_update(
     Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
 }
 
+/// `tranches.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_tranches_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("tranche/{}", input.id))
+}
+
 /// Remove a tranche. A reviewed tranche is refused: the review is history.
 #[crate::action(
     name = "tranches.delete",
@@ -1875,7 +1898,8 @@ async fn tranches_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_tranches_delete",
 )]
 async fn tranches_delete(
     tx: &mut PgConnection,
@@ -2190,6 +2214,11 @@ async fn benefits_update(
     Ok(HandlerOutput::ok(benefit_out(&record)).with_etag(etag_of(record.version)))
 }
 
+/// `benefits.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_benefits_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("benefit/{}", input.id))
+}
+
 /// Remove a benefit profile; its links and transition cascade.
 #[crate::action(
     name = "benefits.delete",
@@ -2200,7 +2229,8 @@ async fn benefits_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_benefits_delete",
 )]
 async fn benefits_delete(
     tx: &mut PgConnection,
@@ -2254,6 +2284,11 @@ async fn benefits_link_list(
     })
 }
 
+/// `benefits.unlink`'s approval target: what the gate authorises, computed from the input alone.
+fn target_benefits_unlink(input: &IdIn) -> Result<String, String> {
+    Ok(format!("benefit/{}/unlink", input.id))
+}
+
 /// Remove one benefits-map edge.
 #[crate::action(
     name = "benefits.unlink",
@@ -2264,7 +2299,8 @@ async fn benefits_link_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_benefits_unlink",
 )]
 async fn benefits_unlink(
     tx: &mut PgConnection,
@@ -2802,6 +2838,11 @@ async fn cadences_update(
     Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
 }
 
+/// `cadences.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_cadences_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("cadence/{}", input.id))
+}
+
 /// Remove a cadence row.
 #[crate::action(
     name = "cadences.delete",
@@ -2812,7 +2853,8 @@ async fn cadences_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_cadences_delete",
 )]
 async fn cadences_delete(
     tx: &mut PgConnection,
@@ -2969,6 +3011,11 @@ async fn stakeholders_profile_list(
     })
 }
 
+/// `stakeholders.profile_delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_stakeholders_profile_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("stakeholder/{}/profile", input.id))
+}
+
 /// Remove a stakeholder profile.
 #[crate::action(
     name = "stakeholders.profile_delete",
@@ -2979,7 +3026,8 @@ async fn stakeholders_profile_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_stakeholders_profile_delete",
 )]
 async fn stakeholders_profile_delete(
     tx: &mut PgConnection,
