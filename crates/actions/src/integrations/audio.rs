@@ -311,7 +311,7 @@ mod tests {
                 assert_eq!(path, "/api/tts/synthesize");
                 assert!(upload.is_none(), "speech sends JSON, not a file");
             }
-            HandlerRef::Internal(_) | HandlerRef::Workflow => {
+            HandlerRef::Internal(_) | HandlerRef::Workflow | HandlerRef::Broker => {
                 panic!("produce.speech must be a declared external action")
             }
         }
@@ -340,7 +340,7 @@ mod tests {
                 assert_eq!(upload.input, "document");
                 assert_eq!(upload.field, "file");
             }
-            HandlerRef::Internal(_) | HandlerRef::Workflow => {
+            HandlerRef::Internal(_) | HandlerRef::Workflow | HandlerRef::Broker => {
                 panic!("media.transcribe must be a declared external action")
             }
         }

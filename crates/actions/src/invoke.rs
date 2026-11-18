@@ -830,6 +830,14 @@ pub async fn invoke(
         approval_id: request.approval_id,
     };
 
+    // T13 (SPEC_V2 §11.3): the tool broker is dispatched here, on the pool, because it must
+    // resolve the run's binding in a read-only transaction, call the destination through the
+    // declared external action, and write the `tool_call` ledger AFTER that handler transaction
+    // rolls back — none of which an internal handler's `&mut tx` can do.
+    if matches!(spec.handler, HandlerRef::Broker) {
+        return crate::broker::invoke_broker(pool, spec, ctx, input, &request).await;
+    }
+
     match spec.kind {
         ActionKind::Internal => invoke_internal(pool, spec, ctx, input, input_hash, &request).await,
         ActionKind::External => invoke_external(pool, spec, ctx, input, input_hash, &request).await,
