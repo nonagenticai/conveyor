@@ -12,6 +12,9 @@ publish.workspace = true
 # refusals. Deliberately no zip crate: `src/zip.rs` writes the stored archive itself so the
 # determinism contract is a property of this code, not a feature flag of a dependency.
 conveyor-render = { path = "../render" }
+# #366: the stored-ZIP writer moved here so the `.xlsx` writer emits the same deterministic
+# archive rather than a second implementation of the same contract.
+conveyor-zipstore = { path = "../zipstore" }
 schemars = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

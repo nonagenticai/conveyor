@@ -35,7 +35,6 @@
 //! ```
 
 mod ooxml;
-mod zip;
 
 use std::fs;
 use std::io::ErrorKind;
@@ -267,7 +266,7 @@ pub fn to_pngs(deck: &Deck, base: &Path) -> Result<Vec<Vec<u8>>, DeckError> {
 /// artefacts of one deck (the PNG-per-slide form) packages them without a second writer and
 /// without a second determinism contract. A part that does not fit ZIP32 is refused by name.
 pub fn zip_parts(parts: &[(&str, &[u8])]) -> Result<Vec<u8>, DeckError> {
-    zip::archive(parts).map_err(|part| DeckError::PackageTooLarge { part })
+    conveyor_zipstore::archive(parts).map_err(|part| DeckError::PackageTooLarge { part })
 }
 
 /// The prepared images as `(media type, bytes)` — the shape the SVG layout embeds as a data URI.

@@ -127,6 +127,12 @@ quote = "1.0.41"
 proc-macro2 = "1.0.103"
 proptest = "1.12.0"
 insta = { version = "1.49.0", features = ["json"] }
+# ── #366: the spreadsheet reader ────────────────────────────────────────────────────────────
+# READING only. A real workbook is deflated and carries shared strings, relationships and
+# style-resolved dates; that parsing surface is not worth hand-rolling and has no determinism
+# value. WRITING is ours (`crates/sheets` + `crates/zipstore`), because the byte-for-byte
+# reproducibility of what we produce is a contract, not a feature flag of a dependency.
+calamine = "0.38.0"
 # ── S08 Part B2: the renderer ──────────────────────────────────────────────────────────────
 # ONE `usvg` tree serves all three formats: `resvg` rasterises it, `svg2pdf` converts it, so
 # PNG and PDF cannot disagree about the page. The versions are a MATCHED SET, not three

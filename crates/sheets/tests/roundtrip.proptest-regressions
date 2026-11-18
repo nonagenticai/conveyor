@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc efdcec7cb8a1984b0c3c0a85fa2bcd8f5266b1ac935b80eaa9ab3c39885a69fc # shrinks to input = Workbook { sheets: [Sheet { name: "A", rows: [[], [Cell { value: Bool(false), formula: None, format: None }]], column_widths: [], frozen_rows: 0, merged: [] }] }
