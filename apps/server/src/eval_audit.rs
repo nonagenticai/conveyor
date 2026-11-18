@@ -551,6 +551,7 @@ async fn judge_controls(
                 input: request,
                 precondition: None,
                 idempotency_key: None,
+                approval_id: None,
                 actor_id: Uuid::nil(),
                 actor_kind: "service".to_owned(),
                 role: Role::KataExecutor,

@@ -42,6 +42,7 @@ fn echo_spec() -> ActionSpec {
         task_capable: false,
         captures_usage: false,
         artefact: None,
+        approval_target: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",
@@ -78,6 +79,7 @@ fn slow_spec() -> ActionSpec {
         task_capable: false,
         captures_usage: false,
         artefact: None,
+        approval_target: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",
@@ -113,6 +115,7 @@ fn fail_spec() -> ActionSpec {
         task_capable: false,
         captures_usage: false,
         artefact: None,
+        approval_target: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",
@@ -148,6 +151,7 @@ fn timeout_spec() -> ActionSpec {
         task_capable: false,
         captures_usage: false,
         artefact: None,
+        approval_target: None,
         handler: HandlerRef::External {
             service: SERVICE,
             method: "POST",

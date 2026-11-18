@@ -49,6 +49,21 @@ impl<'a> ActionCaller<'a> {
         input: Value,
         precondition: Option<i64>,
     ) -> Result<Value, CallError> {
+        self.call_gated(name, input, precondition, None).await
+    }
+
+    /// As [`call`], for a destructive action whose approval the caller names (#282).
+    ///
+    /// The id is the CALL's, not the payload's: no action input carries an `approval_id` any more
+    /// (the four that did lost it when the gate moved into the engine), so without this the CLI
+    /// could invoke a destructive action and never satisfy its gate.
+    pub async fn call_gated(
+        &self,
+        name: &str,
+        input: Value,
+        precondition: Option<i64>,
+        approval_id: Option<Uuid>,
+    ) -> Result<Value, CallError> {
         let spec = registry()
             .get(name)
             .ok_or_else(|| CallError::NotFound(name.to_owned()))?;
@@ -64,6 +79,7 @@ impl<'a> ActionCaller<'a> {
                 input,
                 precondition: precondition.map(conveyor_actions::Precondition::Version),
                 idempotency_key: None,
+                approval_id,
                 actor_id: self.actor,
                 actor_kind: "service".to_owned(),
                 role: Role::KataExecutor,

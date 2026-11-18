@@ -209,6 +209,7 @@ fn request(gate: &Gate, action: &str, input: Value) -> InvokeRequest {
         input,
         precondition: None,
         idempotency_key: None,
+        approval_id: None,
         actor_id: gate.user,
         actor_kind: "user".to_owned(),
         role: Role::Admin,

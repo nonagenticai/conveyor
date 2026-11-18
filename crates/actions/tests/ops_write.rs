@@ -16,11 +16,17 @@ use uuid::Uuid;
 
 /// A request as an admin caller (the only role that holds `ops:write`).
 fn request(action: &str, input: Value) -> InvokeRequest {
+    request_gated(action, input, None)
+}
+
+/// As [`request`], naming the approved approval the call carries (#282: the id is the CALL's).
+fn request_gated(action: &str, input: Value, approval_id: Option<Uuid>) -> InvokeRequest {
     InvokeRequest {
         action: action.to_owned(),
         input,
         precondition: None,
         idempotency_key: None,
+        approval_id,
         actor_id: Uuid::now_v7(),
         actor_kind: "user".to_owned(),
         role: Role::Admin,
@@ -108,10 +114,10 @@ async fn a_dry_run_makes_no_write() {
         &pg.runtime,
         registry(),
         seeded.tenant,
-        request(
+        request_gated(
             "ops.scale",
-            json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 3,
-                   "approval_id": approval_id, "dry_run": true}),
+            json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 3, "dry_run": true}),
+            Some(approval_id),
         ),
     )
     .await
@@ -148,10 +154,10 @@ async fn an_approval_for_another_target_is_refused() {
         &pg.runtime,
         registry(),
         seeded.tenant,
-        request(
+        request_gated(
             "ops.scale",
-            json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 2,
-                   "approval_id": approval_id, "dry_run": true}),
+            json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 2, "dry_run": true}),
+            Some(approval_id),
         ),
     )
     .await
@@ -221,10 +227,10 @@ async fn the_write_reads_back() {
         &pg.runtime,
         registry(),
         seeded.tenant,
-        request(
+        request_gated(
             "ops.scale",
-            json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 3,
-                   "approval_id": approval_id}),
+            json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 3}),
+            Some(approval_id),
         ),
     )
     .await

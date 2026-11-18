@@ -143,6 +143,7 @@ pub async fn run_case(
             input: request.clone(),
             precondition: None,
             idempotency_key: Some(format!("eval.case.run:{run_id}:{case_id}:{rep}")),
+            approval_id: None,
             actor_id: Uuid::nil(),
             actor_kind: "service".to_owned(),
             role: Role::KataExecutor,
@@ -918,6 +919,7 @@ async fn invoke_judge(
             input: request,
             precondition: None,
             idempotency_key: None,
+            approval_id: None,
             actor_id: Uuid::nil(),
             actor_kind: "service".to_owned(),
             role: Role::KataExecutor,
@@ -1051,6 +1053,7 @@ fn service_ctx(tenant: TenantId, app_key: &str, action: &'static str) -> Handler
         if_match: None,
         action,
         app_key: app_key.to_owned(),
+        approval_id: None,
     }
 }
 

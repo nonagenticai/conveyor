@@ -647,6 +647,7 @@ async fn invoke(
             input,
             precondition: None,
             idempotency_key: None,
+            approval_id: None,
             actor_id: fixture.alice,
             actor_kind: "user".to_owned(),
             role: Role::Admin,
