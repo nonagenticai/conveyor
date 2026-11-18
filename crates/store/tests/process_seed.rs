@@ -100,6 +100,71 @@ fn the_exemplar_type_file_yields_four_processes_and_five_sops() {
     }
 }
 
+/// The architecture task's READY process composes the draft artefact from the agent's answer:
+/// the live content is seed content too, so the seed must carry the same three steps and the
+/// acceptance that names the answer as the document body (#338).
+#[test]
+fn the_architecture_task_ready_process_composes_the_artefact_from_the_agents_answer() {
+    let catalogue = process_seed::catalogue().expect("the embedded catalogue validates");
+    let file = catalogue
+        .types
+        .iter()
+        .find(|file| file.card_type == "architecture_task")
+        .expect("the architecture_task type file is embedded");
+
+    let ready = file
+        .processes
+        .iter()
+        .find(|process| process.key == "architecture_task.READY")
+        .expect("the READY process is embedded");
+    let steps: Vec<(&str, &str)> = ready
+        .steps
+        .iter()
+        .map(|step| {
+            (
+                step.kind.as_deref().unwrap_or("inferred"),
+                step.action.as_str(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        steps,
+        [
+            ("agent", "agent.run"),
+            ("computed", "documents.compose"),
+            ("computed", "cards.move"),
+        ],
+        "the agent's answer is composed into the artefact, then the card moves"
+    );
+
+    let sop = file
+        .sops
+        .iter()
+        .find(|sop| sop.key == "architecture_task.ready")
+        .expect("the READY SOP is embedded");
+    let names: Vec<&str> = sop
+        .acceptance_criteria
+        .as_array()
+        .expect("the criteria are an array")
+        .iter()
+        .filter_map(|criterion| criterion["name"].as_str())
+        .collect();
+    assert_eq!(
+        names,
+        ["outline_within_card_scope", "answer_is_the_document_body"]
+    );
+
+    let agent = file
+        .agents
+        .iter()
+        .find(|agent| agent.key == "architecture_task")
+        .expect("the agent is embedded");
+    assert!(
+        agent.allowed_actions.is_empty(),
+        "the model writes the answer; the process composes the artefact"
+    );
+}
+
 /// Seed every capability the embedded catalogue names. `migrate --seed` imports the real 17-row
 /// vocabulary; the fixture reads the codes out of the catalogue itself so it survives the
 /// catalogue growing file by file.
