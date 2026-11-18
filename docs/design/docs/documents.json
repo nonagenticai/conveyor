@@ -335,6 +335,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
     },
     {
+      "title": "The analysis service — capture and drop table (2026-11-15)",
+      "path": "docs/evidence/analysis-capture-2026-11-15.html",
+      "source": "docs/evidence/analysis-capture-2026-11-15.md",
+      "section": "Evidence",
+      "sha256": "6c5b53d667640bb8531b7dbd336742d364518e2c7b7733de9f4971c1148e8307",
+      "bytes": 28868,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-capture-2026-11-15.md"
+    },
+    {
       "title": "frontendtestrunnerservice absorption — evidence (2026-11-15)",
       "path": "docs/evidence/media-frontend_test_runner_service.html",
       "source": "docs/evidence/media-frontend_test_runner_service.md",
@@ -411,8 +420,8 @@
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "b073df88e0a326b6d273abfa1ed61236b75a5af01c47a0cfd830e8c02d71e2b6",
-      "bytes": 11131,
+      "sha256": "3ff351d29ab98031c6fa07e58bd0c96382b4e95a4e0074081019a5de06dbe444",
+      "bytes": 11148,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -501,8 +510,8 @@
       "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.html",
       "source": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
       "section": "Plans",
-      "sha256": "2b019753c7bf963b15679f46b85688a960fda162716b309fd80c37de35fa553d",
-      "bytes": 10450,
+      "sha256": "616c908515a17f02bbb15156970a91c47c203518d1120734495ccc416b04302d",
+      "bytes": 10911,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/04-TOOL-ESTATE-INVENTORY.md"
     },
     {

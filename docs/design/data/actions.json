@@ -3,6 +3,7 @@
     "actions.describe",
     "actions.list",
     "agent.run",
+    "analyse.site",
     "andon.engage",
     "andon.release",
     "approval_policies.get",

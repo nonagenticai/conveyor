@@ -1,0 +1,1429 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The analysis service — capture and drop table (2026-11-15) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-capture-2026-11-15.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-analysis-service--capture-and-drop-table-2026-11-15">The analysis service — capture and drop table (2026-11-15)</h1>
+<p>Issue #154 · part P1 · branch <code>issue/154-analysis</code>. This is the contract the absorption is measured by: every operation the captured service serves is on this page, and every operation that is not ported says why. The service's repository is private and is not linked from this public document; it is identified by the revision and digest below.</p>
+<h2 id="the-pin">The pin</h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Service</td>
+<td>the analysis stage service of the media estate (FastAPI, OpenAPI 3.1.0, service version <code>0.1.0</code>)</td>
+</tr>
+<tr>
+<td><code>source_revision</code></td>
+<td><code>086e7f5c1248e0b880bdf5eeb0978abde6f70e55</code> — <code>origin/main</code>, 2026-10-22</td>
+</tr>
+<tr>
+<td><code>image_digest</code></td>
+<td><code>sha256:dcffb3784abb50d7a7a270d0366918cb25d121508d7cd36bc5a835ff5de1b2cc</code> — the container image the pod actually runs</td>
+</tr>
+<tr>
+<td><code>capture_date</code></td>
+<td>2026-11-15</td>
+</tr>
+<tr>
+<td><code>openapi_sha256</code></td>
+<td><code>1bcd3894d5b4bce38151c8df8c4d7d13318cd567c028f0e28929bee0339d3b34</code> (222,684 bytes)</td>
+</tr>
+<tr>
+<td>Served document</td>
+<td><a href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-openapi-2026-11-15.json"><code>analysis-openapi-2026-11-15.json</code></a> — the bytes exactly as served, committed unmodified</td>
+</tr>
+<tr>
+<td>Shape</td>
+<td><strong>92 operations</strong> over <strong>79 paths</strong>, 180 component schemas, no <code>servers</code> block</td>
+</tr>
+</tbody>
+</table>
+<p>Two facts about how the document was obtained, because both are easy to get wrong:</p>
+<ol type="1">
+<li><strong>It was read from the running pod's own loopback</strong>, through the deployment's exec surface, not from a source tree. The document is therefore the contract the live image serves, not what some checkout says it should serve.</li>
+<li><strong>The gitops manifest is behind the pod.</strong> It pins image <code>sha256:65e9e34f783b36855769397dae64c12355d72bf12460054fa1d2a2dd3630da02</code> while the pod runs <code>sha256:dcffb378…</code>. The digest above is the one measured against the served bytes; a reader who checks the manifest will find a different number and should believe the pod.</li>
+</ol>
+<h3 id="which-revision-the-served-document-is">Which revision the served document is</h3>
+<p>The working copy of the service's repository on this machine sits on a branch that no longer exists upstream, at <code>fad3856</code>, which is <strong>not</strong> an ancestor of <code>origin/main</code>. It must not be used as the source of truth. The served document proves which line it came from: <code>SeoAuditResponse</code> in the served document carries <code>unmeasured_groups</code>, <code>coverage</code>, <code>projection</code>, <code>grounding</code>, <code>exec_summary</code>, <code>critique</code>, <code>facts</code>, <code>ai</code> and <code>scored_at</code>, and its <code>group_scores</code> accepts <code>null</code> — all of which exist only on the <code>origin/main</code> line. The stale checkout's model has none of them and <code>group_scores: dict[str, float]</code> with no nulls.</p>
+<p>Every classification below was read from <code>origin/main</code> for the same reason.</p>
+<h2 id="what-the-service-is">What the service is</h2>
+<p>Twelve domain tags plus a health surface. The tag counts are the served document's.</p>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Operations</th>
+<th>What it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>health</td>
+<td>7</td>
+<td>liveness/readiness/startup probes, Prometheus metrics, the root banner</td>
+</tr>
+<tr>
+<td>analyze</td>
+<td>9</td>
+<td>the page-analysis pipeline: submit, poll, cancel, artifacts, page classification, narrative, its own sub-review</td>
+</tr>
+<tr>
+<td>context</td>
+<td>3</td>
+<td>context inference, validation and enrichment</td>
+</tr>
+<tr>
+<td>context-profiles</td>
+<td>4</td>
+<td>CRUD for stored context profiles</td>
+</tr>
+<tr>
+<td>critique</td>
+<td>34</td>
+<td>the website critique pipeline and everything around it: jobs, batches, schedules, suppressions, analytics, findings, exports, reports, scoring weights, config overrides</td>
+</tr>
+<tr>
+<td>review</td>
+<td>13</td>
+<td>the qualitative review pipeline: jobs, batches, comparison, findings, summary, video, usage, domain history</td>
+</tr>
+<tr>
+<td>brand</td>
+<td>6</td>
+<td>brand extraction from a URL or a document, batch extraction, logo assets</td>
+</tr>
+<tr>
+<td>brands</td>
+<td>9</td>
+<td>the stored brand-snapshot store: list, get, override, history, export, quality, cache invalidation, logo, comparison</td>
+</tr>
+<tr>
+<td>icp</td>
+<td>1</td>
+<td>ideal-customer-profile derivation from a URL</td>
+</tr>
+<tr>
+<td>artifact-score</td>
+<td>2</td>
+<td>quality scoring of an artifact, and the before/after delta</td>
+</tr>
+<tr>
+<td>cro</td>
+<td>1</td>
+<td>the conversion scorecard for one page</td>
+</tr>
+<tr>
+<td>seo_audit</td>
+<td>1</td>
+<td>the SEO health score for one page</td>
+</tr>
+<tr>
+<td>marketing</td>
+<td>1</td>
+<td>the marketing scorecard for one brand/context</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-classification-rule">The classification rule</h2>
+<p>Every row carries exactly one <code>state</code> and, when dropped, exactly one <code>reason</code>. The reason literals are the issue's; what each one is allowed to mean here is fixed so that a row can be checked rather than believed. First match wins:</p>
+<ol type="1">
+<li><strong>ported</strong> — a Rust entry point exists today. The <code>ground</code> cell names it, and the ported assertions live in <code>crates/analysis/tests/parity.rs</code>.</li>
+<li><strong>dropped: transport</strong> — the operation's subject <em>is</em> the service's own plumbing: liveness, metrics, job/batch/schedule ledger rows, progress streams, artefact and export bytes, logo bytes. Conveyor already owns that surface, so porting it would be a second copy of the platform. <strong>A row may only claim this reason if its <code>ground</code> cell names the conveyor surface that replaces it</strong> (<code>conveyor:liveness</code>, <code>conveyor:job-engine</code>, <code>conveyor:scheduler</code>, <code>conveyor:artefact-store</code>). A row that cannot name one is not transport.</li>
+<li><strong>dropped: deferred</strong> — an analysis core the port plan owns. The <code>ground</code> cell names the measured caller (<code>caller: &lt;path:line&gt;</code>) or the part of this issue that requires it (<code>part: P5</code>, <code>P6</code>).</li>
+<li><strong>dropped: no consumer</strong> — analysis-shaped, and neither 2 nor 3 holds. This is the issue's default for an operation with no measurable consumer; the scope of the consumer search is stated under “Consumers” below so a later reader can repeat it.</li>
+</ol>
+<p>Columns: <code>method | path | operation_id | tag | state | reason | ground | evidence | request_ref | response_ref</code>. <code>evidence</code> is what the handler's own work is, read from <code>origin/main</code> — the phrase that makes the reason checkable, not a restatement of it.</p>
+<p><code>-</code> means "nothing declared": no request body, no response model, or no ground. It is never used in the <code>reason</code> column of a dropped row.</p>
+<h2 id="the-drop-table">The drop table</h2>
+<!-- BEGIN CAPTURE -->
+
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>path</th>
+<th>operation_id</th>
+<th>tag</th>
+<th>state</th>
+<th>reason</th>
+<th>ground</th>
+<th>evidence</th>
+<th>request_ref</th>
+<th>response_ref</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/</td>
+<td>service_root</td>
+<td>health</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:liveness</td>
+<td>root banner listing the service and its endpoint names</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/analyze</td>
+<td>list_analysis_jobs</td>
+<td>analyze</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>paged tenant-scoped job row list with a status filter</td>
+<td>-</td>
+<td>AnalysisJobListResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/analyze</td>
+<td>start_analysis</td>
+<td>analyze</td>
+<td>dropped</td>
+<td>deferred</td>
+<td>caller: course_service/src/clients/analysis_client.py:48 (P6)</td>
+<td>persists a job then runs the page-analysis and LLM site pipeline</td>
+<td>AnalyzeRequest</td>
+<td>AnalysisJobResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/analyze/narrative</td>
+<td>extract_narrative</td>
+<td>analyze</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>deterministic hook and quote selection from supplied analysed pages</td>
+<td>NarrativeRequest</td>
+<td>NarrativeResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/analyze/pages</td>
+<td>classify_pages</td>
+<td>analyze</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>deterministic HTML parse and page-type classification, no LLM</td>
+<td>ClassifyRequest</td>
+<td>ClassifyResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/analyze/review</td>
+<td>start_analyze_subreview</td>
+<td>analyze</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>reads a completed analysis and dispatches LLM reviews</td>
+<td>src__domains__analyze__schemas__ReviewRequest</td>
+<td>src__domains__analyze__schemas__ReviewJobResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/analyze/review/{review_job_id}</td>
+<td>get_analyze_subreview</td>
+<td>analyze</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>tiered lookup of a stored sub-review result</td>
+<td>-</td>
+<td>src__domains__analyze__schemas__ReviewResultResponse</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/api/analyze/{job_id}</td>
+<td>cancel_analysis</td>
+<td>analyze</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>tenant-scoped status flip on a job row</td>
+<td>-</td>
+<td>CancelJobResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/analyze/{job_id}</td>
+<td>get_analysis</td>
+<td>analyze</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>memory, redis then database read of one job row</td>
+<td>-</td>
+<td>AnalysisResultResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/analyze/{job_id}/artifacts</td>
+<td>get_analysis_artifacts</td>
+<td>analyze</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:artefact-store</td>
+<td>cached then stored read of a job's artefacts</td>
+<td>-</td>
+<td>ArtifactsResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/brand/batch-extract</td>
+<td>batch_extract_brand</td>
+<td>brand</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>concurrent per-URL runs of the brand pipeline</td>
+<td>BatchExtractRequest</td>
+<td>BatchExtractResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/brand/extract</td>
+<td>extract_brand</td>
+<td>brand</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.brand (crates/analysis)</td>
+<td>deterministic extraction from supplied analysis data; no LLM or vision</td>
+<td>BrandExtractRequest</td>
+<td>BrandResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/brand/from-url</td>
+<td>extract_brand_from_url</td>
+<td>brand</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.brand (crates/analysis)</td>
+<td>the caller captures the page and supplies its facts; extraction is <code>brand::extract</code></td>
+<td>BrandFromUrlRequest</td>
+<td>BrandResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/brand/icp-from-url</td>
+<td>analyze_icp_from_url</td>
+<td>icp</td>
+<td>dropped</td>
+<td>deferred</td>
+<td>caller: w2v_orchestrator/src/api/routes/brand.py:55 (P6)</td>
+<td>scrapes landing, pricing and about pages, then an LLM produces the ICP</td>
+<td>ICPFromUrlRequest</td>
+<td>ICPResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/brand/logo/download</td>
+<td>download_brand_logo</td>
+<td>brand</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>SSRF-guarded download, content-type check, blob and row insert</td>
+<td>LogoDownloadRequest</td>
+<td>LogoAssetResponse</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/api/brand/logo/{asset_id}</td>
+<td>delete_brand_logo</td>
+<td>brand</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>tenant-scoped asset row and blob delete</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/brand/logo/{asset_id}</td>
+<td>get_brand_logo</td>
+<td>brand</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:artefact-store</td>
+<td>asset row lookup then stored image bytes</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/brand/score-artifact</td>
+<td>score_artifact</td>
+<td>artifact-score</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.app (crates/analysis)</td>
+<td>the SEO base scan plus the a11y and perf scanners over the supplied HTML</td>
+<td>ArtifactScoreRequest</td>
+<td>ArtifactScoreResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/brand/score-delta</td>
+<td>score_delta</td>
+<td>artifact-score</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.app (crates/analysis)</td>
+<td>both sides scored by <code>app::score_artifact</code>, then diffed by stable check id</td>
+<td>ScoreDeltaRequest</td>
+<td>ScoreDeltaResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/brands</td>
+<td>list_brands</td>
+<td>brands</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>paginated tenant-scoped brand query</td>
+<td>-</td>
+<td>BrandListResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/brands/compare</td>
+<td>compare_brands</td>
+<td>brands</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.brand (crates/analysis)</td>
+<td>deterministic field, colour and font comparison of two snapshots</td>
+<td>BrandComparisonRequest</td>
+<td>BrandComparisonResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/brands/{domain}</td>
+<td>get_brand</td>
+<td>brands</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>cache-first read of a stored brand row</td>
+<td>-</td>
+<td>BrandResponse</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/api/brands/{domain}/cache</td>
+<td>invalidate_brand_cache</td>
+<td>brands</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>redis cache key deletion only</td>
+<td>-</td>
+<td>CacheInvalidationResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/brands/{domain}/export</td>
+<td>export_brand</td>
+<td>brands</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>flattens a stored brand to CSS variables and a fonts URL</td>
+<td>-</td>
+<td>BrandExportResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/brands/{domain}/history</td>
+<td>get_brand_history</td>
+<td>brands</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>reads stored brand version snapshots</td>
+<td>-</td>
+<td>BrandHistoryResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/brands/{domain}/logo</td>
+<td>get_brand_domain_logo</td>
+<td>brands</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:artefact-store</td>
+<td>latest domain asset streamed as bytes</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>/api/brands/{domain}/override</td>
+<td>override_brand</td>
+<td>brands</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>applies overrides, diffs fields and performs a versioned upsert</td>
+<td>BrandOverrideRequest</td>
+<td>BrandOverrideResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/brands/{domain}/quality</td>
+<td>get_brand_quality_report</td>
+<td>brands</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>stored score or deterministic consistency scoring over the brand row</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/config/overrides</td>
+<td>get_critique_config_overrides</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>enumerates redis overrides</td>
+<td>-</td>
+<td>ConfigOverridesResponse</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/api/config/overrides/{section}/{key}</td>
+<td>delete_critique_config_override</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>deletes a redis override key</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/context/enrich</td>
+<td>enrich_context</td>
+<td>context</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>deterministic merge of supplied and inferred context</td>
+<td>object</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/context/infer</td>
+<td>infer_context</td>
+<td>context</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>heuristic URL and page-type inference over supplied pages</td>
+<td>object</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/context/profiles/</td>
+<td>list_context_profiles</td>
+<td>context-profiles</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>tenant-scoped profile row list; conveyor has no profile store</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/context/profiles/</td>
+<td>create_context_profile</td>
+<td>context-profiles</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>inserts a tenant-scoped profile row</td>
+<td>ContextProfileCreate</td>
+<td>ContextProfileResponse</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/api/context/profiles/{profile_id}</td>
+<td>delete_context_profile</td>
+<td>context-profiles</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>deletes a tenant-scoped profile row</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/context/profiles/{profile_id}</td>
+<td>get_context_profile</td>
+<td>context-profiles</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>reads one tenant-scoped profile row</td>
+<td>-</td>
+<td>ContextProfileResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/context/validate</td>
+<td>validate_context</td>
+<td>context</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>deterministic URL and pattern validation, no external calls</td>
+<td>object</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique</td>
+<td>list_critiques</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>paginated tenant-scoped job query</td>
+<td>-</td>
+<td>CritiqueListResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/critique</td>
+<td>create_critique</td>
+<td>critique</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.app (crates/analysis)</td>
+<td>the deterministic a11y/perf/security scanners; the LLM ux and summary calls are the caller's</td>
+<td>CritiqueRequest</td>
+<td>CritiqueJobResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/analytics/domain/{domain}</td>
+<td>get_critique_domain_analytics</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>SQL aggregates over stored jobs and findings</td>
+<td>-</td>
+<td>DomainAnalyticsResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/analytics/findings/top</td>
+<td>get_critique_top_findings</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>ranks recurring findings from stored jobs</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/analytics/summary</td>
+<td>get_critique_tenant_summary</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>tenant-wide aggregates from stored rows</td>
+<td>-</td>
+<td>TenantAnalyticsResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/analytics/trends</td>
+<td>get_critique_analytics_trends</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>domain score time series from stored jobs</td>
+<td>-</td>
+<td>DomainTrendResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/critique/batch</td>
+<td>create_critique_batch</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>creates N jobs over the critique pipeline</td>
+<td>BatchCritiqueRequest</td>
+<td>BatchCritiqueResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/batch/{batch_id}</td>
+<td>get_critique_batch_status</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>batch counters recomputed from job rows</td>
+<td>-</td>
+<td>src__domains__critique__schemas__BatchStatusResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/compare</td>
+<td>compare_critiques</td>
+<td>critique</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.report (crates/analysis)</td>
+<td>deterministic finding diff and score deltas over supplied findings</td>
+<td>-</td>
+<td>ComparisonResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/compare/history</td>
+<td>list_critique_compare_history</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>recent completed jobs, diffs the latest two</td>
+<td>-</td>
+<td>HistoricalComparisonResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/schedules</td>
+<td>list_critique_schedules</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:scheduler</td>
+<td>inline tenant-scoped schedule query</td>
+<td>-</td>
+<td>ScheduleListResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/critique/schedules</td>
+<td>create_critique_schedule</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:scheduler</td>
+<td>inserts a schedule row and computes the next cron run</td>
+<td>CreateScheduleRequest</td>
+<td>ScheduleResponse</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/api/critique/schedules/{schedule_id}</td>
+<td>delete_critique_schedule</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:scheduler</td>
+<td>tenant-scoped schedule row delete</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/schedules/{schedule_id}</td>
+<td>get_critique_schedule</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:scheduler</td>
+<td>tenant-scoped schedule row read</td>
+<td>-</td>
+<td>ScheduleResponse</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>/api/critique/schedules/{schedule_id}</td>
+<td>update_critique_schedule</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:scheduler</td>
+<td>mutates the row and recomputes the cron schedule</td>
+<td>UpdateScheduleRequest</td>
+<td>ScheduleResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/suppressions</td>
+<td>list_critique_suppressions</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>inline tenant-scoped suppression query</td>
+<td>-</td>
+<td>SuppressionListResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/critique/suppressions</td>
+<td>create_critique_suppression</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>inserts a suppression row</td>
+<td>CreateSuppressionRequest</td>
+<td>SuppressionResponse</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/api/critique/suppressions/{suppression_id}</td>
+<td>delete_critique_suppression</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>tenant-scoped suppression row delete</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/api/critique/{job_id}</td>
+<td>delete_critique</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>deletes the job and its findings</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/{job_id}</td>
+<td>get_critique</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>single tenant-scoped job row</td>
+<td>-</td>
+<td>CritiqueResultResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/{job_id}/export/csv</td>
+<td>export_critique_csv</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:artefact-store</td>
+<td>findings rows rendered to CSV bytes</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/{job_id}/export/sarif</td>
+<td>export_critique_sarif</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:artefact-store</td>
+<td>findings rows rendered to SARIF JSON</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/{job_id}/findings</td>
+<td>get_critique_findings</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>in-route filter and paginate of stored findings</td>
+<td>-</td>
+<td>src__domains__critique__schemas__FindingsListResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/{job_id}/findings/unified</td>
+<td>get_critique_unified_findings</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>converts stored findings to the unified schema</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/critique/{job_id}/findings/{finding_id}/acknowledge</td>
+<td>acknowledge_critique_finding</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>inserts a suppression and flips a finding flag</td>
+<td>AcknowledgeFindingRequest</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/{job_id}/progress</td>
+<td>stream_critique_progress</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>SSE from redis with a database ownership preflight</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/{job_id}/report</td>
+<td>get_critique_report</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:artefact-store</td>
+<td>regenerates html and json from stored markdown</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/critique/{job_id}/report/pdf</td>
+<td>get_critique_report_pdf</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:artefact-store</td>
+<td>html report to pdf bytes</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/critique/{job_id}/rerun</td>
+<td>rerun_critique</td>
+<td>critique</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>clones the job and forces a rescan</td>
+<td>RerunRequest</td>
+<td>CritiqueJobResponse</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>/api/critique/{job_id}/tags</td>
+<td>update_critique_job_tags</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>overwrites the tags column</td>
+<td>TagsUpdateRequest</td>
+<td>CritiqueResultResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/cro/score</td>
+<td>score_cro</td>
+<td>cro</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.content (crates/analysis)</td>
+<td>the deterministic CRO scanner and its rubric score over the supplied HTML</td>
+<td>CroScoreRequest</td>
+<td>CroScoreResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/domain/{domain}/history</td>
+<td>get_review_domain_history</td>
+<td>review</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>rescored stored jobs; trend computed from the score sequence</td>
+<td>-</td>
+<td>DomainHistoryResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/marketing/scorecard</td>
+<td>score_marketing</td>
+<td>marketing</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.content (crates/analysis)</td>
+<td>the deterministic marketing scanner and its rubric score over the supplied HTML</td>
+<td>MarketingScorecardRequest</td>
+<td>MarketingScorecardResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/review</td>
+<td>list_reviews</td>
+<td>review</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>paginated tenant-scoped job rows; no computation</td>
+<td>-</td>
+<td>ReviewListResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/review</td>
+<td>start_review</td>
+<td>review</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>LLM-backed qualitative review; creates a job row then drives prompt to text</td>
+<td>src__domains__review__schemas__ReviewRequest</td>
+<td>src__domains__review__schemas__ReviewJobResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/review/batch</td>
+<td>start_batch_review</td>
+<td>review</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>creates job and batch rows over the same LLM review pipeline</td>
+<td>BatchReviewRequest</td>
+<td>BatchReviewResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/review/batch/{batch_id}</td>
+<td>get_review_batch_status</td>
+<td>review</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>batch progress recomputed from child job rows</td>
+<td>-</td>
+<td>src__domains__review__schemas__BatchStatusResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/review/compare</td>
+<td>compare_reviews</td>
+<td>review</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>deterministic score deltas between two stored completed jobs</td>
+<td>-</td>
+<td>ReviewComparisonResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/review/{job_id}</td>
+<td>get_review</td>
+<td>review</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>cache-first then job row lookup</td>
+<td>-</td>
+<td>src__domains__review__schemas__ReviewResultResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/review/{job_id}/findings</td>
+<td>get_review_findings</td>
+<td>review</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>normalises stored category scores into a filtered finding list</td>
+<td>-</td>
+<td>src__domains__review__schemas__FindingsListResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/review/{job_id}/progress</td>
+<td>get_review_progress</td>
+<td>review</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:job-engine</td>
+<td>SSE loop polling the job row once a second</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/review/{job_id}/report</td>
+<td>get_review_report</td>
+<td>review</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:artefact-store</td>
+<td>renders markdown, html, json and pdf from stored results</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/review/{job_id}/summary</td>
+<td>get_review_summary</td>
+<td>review</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>deterministic aggregate score, grade and top findings over stored results</td>
+<td>-</td>
+<td>ReviewSummary</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/review/{job_id}/video</td>
+<td>request_review_video</td>
+<td>review</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>POSTs findings to the video compile endpoint and returns its job id</td>
+<td>-</td>
+<td>ReviewVideoResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/scoring/weights</td>
+<td>get_critique_scoring_weights</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>operator-only redis weights</td>
+<td>-</td>
+<td>ScoringWeightsResponse</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>/api/scoring/weights</td>
+<td>update_critique_scoring_weights</td>
+<td>critique</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>operator-only redis overrides</td>
+<td>ScoringWeightsUpdateRequest</td>
+<td>ScoringWeightsResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/seo/audit</td>
+<td>audit_seo</td>
+<td>seo_audit</td>
+<td>ported</td>
+<td>-</td>
+<td>analyse.site (crates/analysis)</td>
+<td>deterministic base scan plus the seven audit groups over supplied URL and HTML</td>
+<td>SeoAuditRequest</td>
+<td>SeoAuditResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/usage</td>
+<td>get_review_usage</td>
+<td>review</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>-</td>
+<td>reads stored daily usage counters for a tenant and date range</td>
+<td>-</td>
+<td>UsageListResponse</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/health</td>
+<td>health_check</td>
+<td>health</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:liveness</td>
+<td>component health rollup</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/health/live</td>
+<td>health_live</td>
+<td>health</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:liveness</td>
+<td>liveness probe, no dependencies</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/health/ready</td>
+<td>health_ready</td>
+<td>health</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:liveness</td>
+<td>readiness probe over database, redis and storage</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/health/startup</td>
+<td>health_startup</td>
+<td>health</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:liveness</td>
+<td>startup probe</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/healthz</td>
+<td>health.live</td>
+<td>health</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:liveness</td>
+<td>duplicate liveness probe on the probe path</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/metrics</td>
+<td>prometheus_metrics</td>
+<td>health</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:liveness</td>
+<td>Prometheus exposition of process counters</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/readyz</td>
+<td>health.ready</td>
+<td>health</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:liveness</td>
+<td>duplicate readiness probe on the probe path</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<!-- END CAPTURE -->
+
+<h2 id="counts">Counts</h2>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Rows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ported</td>
+<td>10 — <code>audit_seo</code> and the nine analysis cores P5/P6 ported into <code>analyse.app</code>, <code>analyse.brand</code>, <code>analyse.content</code> and <code>analyse.report</code></td>
+</tr>
+<tr>
+<td>dropped: transport</td>
+<td>36</td>
+</tr>
+<tr>
+<td>dropped: deferred</td>
+<td>2</td>
+</tr>
+<tr>
+<td>dropped: no consumer</td>
+<td>44</td>
+</tr>
+<tr>
+<td><strong>total</strong></td>
+<td><strong>92</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Read the <code>transport</code> count with its guard in mind: every one of those 36 rows names the conveyor surface that replaces it. The 2 remaining deferred rows are the LLM page-analysis pipeline (<code>start_analysis</code>) and the ICP derivation (<code>analyze_icp_from_url</code>); both name their measured caller, and both are the caller's transport plus prompt, not a deterministic core this crate owns.</p>
+<h2 id="consumers-and-their-calls">Consumers and their calls</h2>
+<p>Measured by searching the estate for calls to the service's base URL and for the literal paths in the table above. Covered: the orchestrator's source and scenario scripts, the frontend's source, the course service, the content service, the video production service, the compose files and the repository's own scripts. The service resolves through the discovery name <code>analysis</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Caller</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>start_analysis</code></td>
+<td><code>course_service/src/clients/analysis_client.py:48</code></td>
+</tr>
+<tr>
+<td><code>get_analysis</code></td>
+<td><code>course_service/src/clients/analysis_client.py:55</code> (poll at <code>:64</code>)</td>
+</tr>
+<tr>
+<td><code>create_critique</code></td>
+<td><code>w2v_orchestrator/src/api/routes/critique.py:124</code>; <code>w2v_orchestrator/src/clients/critique_client.py:52</code></td>
+</tr>
+<tr>
+<td><code>list_critiques</code></td>
+<td><code>w2v_orchestrator/src/api/routes/critique.py:142</code></td>
+</tr>
+<tr>
+<td><code>get_critique</code></td>
+<td><code>w2v_orchestrator/src/api/routes/critique.py:172</code>; <code>critique_client.py:56</code></td>
+</tr>
+<tr>
+<td><code>compare_critiques</code></td>
+<td><code>w2v_orchestrator/src/api/routes/critique.py:158</code>; <code>critique_client.py:65</code></td>
+</tr>
+<tr>
+<td><code>stream_critique_progress</code></td>
+<td><code>w2v_orchestrator/src/api/routes/critique.py:182</code> (<code>proxy_stream</code>)</td>
+</tr>
+<tr>
+<td><code>get_critique_report_pdf</code></td>
+<td><code>w2v_orchestrator/src/api/routes/critique.py:183</code>; <code>w2v_frontend/src/lib/api/downloads.ts</code> (<code>critiqueReportPdf</code>)</td>
+</tr>
+<tr>
+<td><code>score_cro</code></td>
+<td><code>w2v_orchestrator/src/clients/analysis_scorecard_client.py:156</code></td>
+</tr>
+<tr>
+<td><code>audit_seo</code></td>
+<td><code>w2v_orchestrator/src/clients/analysis_scorecard_client.py:188</code></td>
+</tr>
+<tr>
+<td><code>score_marketing</code></td>
+<td><code>w2v_orchestrator/src/clients/analysis_scorecard_client.py:206</code></td>
+</tr>
+<tr>
+<td><code>extract_brand_from_url</code></td>
+<td><code>w2v_orchestrator/src/api/routes/brand.py:40</code>; <code>brand_extractor_client.py:48</code></td>
+</tr>
+<tr>
+<td><code>extract_brand</code></td>
+<td><code>w2v_orchestrator/src/api/routes/brand.py:47</code></td>
+</tr>
+<tr>
+<td><code>analyze_icp_from_url</code></td>
+<td><code>w2v_orchestrator/src/api/routes/brand.py:55</code></td>
+</tr>
+<tr>
+<td><code>score_artifact</code></td>
+<td>contract: <code>docs/MERQI_BRANDING_COACH_W2V_CONTRACT.md</code> §1; exercised by <code>w2v_orchestrator/scripts/e2e_scenarios/score_artifact_happy.json</code></td>
+</tr>
+<tr>
+<td><code>score_delta</code></td>
+<td>contract: <code>docs/MERQI_BRANDING_COACH_W2V_CONTRACT.md</code> §2</td>
+</tr>
+</tbody>
+</table>
+<p>Fourteen of these are code callers; two cite a downstream product contract with no code on this box. The remaining 76 operations have no caller in that set of repositories — that is the measurement the <code>no consumer</code> rows rest on, and it is falsifiable by searching the same trees again.</p>
+<h2 id="what-this-corrects">What this corrects</h2>
+<ul>
+<li>The issue's "46 <code>operation_id</code>s across 9 domains" is stale. Measured: <strong>92 operations across 12 domain tags plus health</strong>. This document is the measurement; the issue body is not.</li>
+<li>The issue's open question 1 ("which of the 46 captured operations has a measured consumer?") is answered per row: 16 of 92 have one, each with a file and line below.</li>
+<li>P5's <code>analyse.brand</code> comparison is <code>compare_brands</code>, which has no production caller — it is required by part P5.2, and the row says so rather than pretending a caller exists.</li>
+</ul>
+<h2 id="deviations-recorded-rather-than-hidden">Deviations, recorded rather than hidden</h2>
+<ol type="1">
+<li><strong>No live request was issued.</strong> Around two thirds of these operations mutate production rows (create, cancel, delete, batch, schedule). The pair per row is the <strong>contract pair</strong> read from the committed served document — request schema, response schema, declared success status — not a recorded transaction. This capture therefore supports coverage and wiring claims, not semantic parity. Behavioural samples, where a later part needs them, come from the source's own tests.</li>
+<li><strong>One pin for the document, not one per row.</strong> Repeating a digest 92 times is noise; each row addresses its pair by schema name into the committed document, which is pinned once.</li>
+<li><strong>The gitops manifest does not match the pod</strong> (see the pin). Deployment drift is out of scope for this unit; the capture records what runs.</li>
+<li><strong>The P3/P4 port was written from the stale checkout.</strong> The SEO scanner on <code>origin/main</code> has moved since: <code>geo.py</code> (+111 lines), <code>schema_coverage.py</code> (+97), <code>eeat.py</code> and <code>internal_linking.py</code> (±14), and the check-id set changed at the edges (<code>+seo-robots-txt-errored</code>, <code>+seo-sitemap-errored</code>, <code>−seo-keyword-intent</code>). The scoring kernel did <strong>not</strong> move — the group weights, the decay, the floor, <code>k</code> and the severity weights are identical, and <code>composite.py</code> only adds unmeasured-bucket handling, which does not apply when every group runs. The ported row's <code>ground</code> carries this footnote; re-porting <code>geo</code> and <code>schema_coverage</code> is an owner decision, not a silent edit inside P1.</li>
+</ol>
+<h2 id="how-to-re-capture">How to re-capture</h2>
+<pre><code># the digest the running pod reports
+kubectl -n w2v get pod -l app=analysis-service -o jsonpath=&#39;{.items[0].status.containerStatuses[0].imageID}&#39;
+
+# the contract it serves, read over the pod&#39;s own loopback
+kubectl -n w2v exec deploy/analysis-service -- python3 -c \
+  &#39;import urllib.request,sys;sys.stdout.write(urllib.request.urlopen(&quot;http://127.0.0.1:6303/openapi.json&quot;,timeout=15).read().decode())&#39; \
+  &gt; analysis-openapi-&lt;date&gt;.json
+
+shasum -a 256 analysis-openapi-&lt;date&gt;.json</code></pre>
+<p>Re-capture both together. A document from one pod and a digest from another is not a pin, it is a coincidence.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/analysis-capture-2026-11-15.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
