@@ -322,9 +322,9 @@
     {
       "number": 295,
       "title": "parity: re-home the per-card claim/fact ledger",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/295",
-      "updatedAt": "2026-11-18T08:32:58Z",
+      "updatedAt": "2026-11-18T14:09:14Z",
       "labels": [
         {
           "name": "unit",
