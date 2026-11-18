@@ -19,16 +19,21 @@ agent:
   model: claude-sonnet-5-5
   max_iterations: 12
   timeout_secs: 300
-  allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]
+  # The model writes the answer; the READY process composes the draft artefact from it (step 2).
+  # The surface is EMPTY on purpose: measured 2026-11-18, a 12-turn loop spends the whole 300 s
+  # budget reading and never reaches a final answer (the last two runs both died at 300 001 ms with
+  # no output). The engine omits the `tools` field for an empty surface, so vLLM's empty-array 400
+  # cannot occur; the agent answers in one turn and the process stores the answer (#307, #338).
+  allowed_actions: []
 
 sops:
   - key: architecture_task.ready
     title: Architecture task — definition of ready
     definition_of_ready: {checks: [epic_directive_present]}
-    definition_of_done: {checks: [outline_within_card_scope, draft_artifact_composed]}
+    definition_of_done: {checks: [outline_within_card_scope, answer_is_the_document_body]}
     acceptance_criteria:
       - {name: outline_within_card_scope, text: "The outline holds only the task's three sections — task, evaluation_method and directive_for_subtasks — and adds nothing the epic did not ask for."}
-      - {name: draft_artifact_composed, text: "The step's draft artefact was created by calling documents.compose: the run records that call and the answer reflects the document it produced. An answer that describes an outline without the call is not ready, however good the outline reads."}
+      - {name: answer_is_the_document_body, text: "The answer is the complete draft artefact body — the task, evaluation_method and directive_for_subtasks sections with their content — not a plan to write it and not a description of steps taken. The READY process stores this answer verbatim as the draft document."}
     inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
     outputs: [draft_artifact_id]
 
@@ -88,7 +93,24 @@ processes:
         on_result: fail
         max_attempts: 1
         input_template: {stage: ready, phase: readying}
+      # The artefact is the process's, not the model's: the answer the agent wrote becomes the
+      # draft document, so a run that never calls a tool still delivers (SPEC §12; #338).
       - position: 2
+        kind: computed
+        actor: system
+        action: documents.compose
+        sop: architecture_task.system
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          title: "{{card.name}} — draft artefact"
+          body: "{{steps.1.output.output}}"
+          project_id: "{{run.project_id}}"
+          card_id: "{{card.id}}"
+          # No category: this is the READY draft, and the standard's section check belongs to the
+          # categorised artefact a later stage publishes, not to the outline that seeds it.
+          publishable: false
+      - position: 3
         kind: computed
         actor: system
         action: cards.move
