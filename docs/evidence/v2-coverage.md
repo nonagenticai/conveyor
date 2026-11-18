@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 42 |
+| `exists` | implemented in code and backed by real rows | 43 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 7 |
-| `new` | absent | 14 |
+| `new` | absent | 13 |
 
 ## Rows
 
@@ -59,7 +59,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:approvals` | §10.4 | actions | approvals | `exists` | actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request) |
 | `actions:decision` | §10.4 | actions | decision | `new` | actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br>*V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).* |
 | `actions:PM` | §10.4 | actions | PM | `exists` | actions: pm.* found (pm.charter, pm.close, pm.get…) |
-| `actions:coach` | §10.4 | actions | coach | `new` | actions: coach.* absent |
+| `actions:coach` | §10.4 | actions | coach | `exists` | actions: coach.* found (coach.escalate, coach.interrupt, coach.remedy…) |
 | `actions:kata` | §10.4 | actions | kata | `new` | actions: kata.* absent<br>*V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5.* |
 | `actions:development` | §10.4 | actions | development | `new` | actions: dev.* absent |
 | `actions:operations` | §10.4 | actions | operations | `exists` | actions: ops.* found (ops.ci_status, ops.deployments, ops.events…) |
