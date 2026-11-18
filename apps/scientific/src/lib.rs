@@ -8,6 +8,7 @@
 //! capture, which is the only direction that can fail for the reason the check exists.
 #![forbid(unsafe_code)]
 
+pub mod auth;
 pub mod cache;
 pub mod clients;
 pub mod config;

@@ -269,7 +269,7 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 6,
+        "blocked": 5,
         "claimed": 9,
         "numbers": [
           17,
@@ -299,17 +299,14 @@
           294,
           295,
           296,
-          299,
           302,
           303,
           305,
           307,
-          319,
-          323,
-          325
+          319
         ],
-        "open": 25,
-        "ready": 7,
+        "open": 22,
+        "ready": 5,
         "unknown": 0
       }
     },

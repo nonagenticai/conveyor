@@ -3,9 +3,9 @@
     {
       "number": 325,
       "title": "docs: index the w2v retirement evidence so check-docs is green on main",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/325",
-      "updatedAt": "2026-11-18T00:24:06Z",
+      "updatedAt": "2026-11-18T01:03:42Z",
       "labels": [
         {
           "name": "unit",
@@ -20,9 +20,9 @@
     {
       "number": 323,
       "title": "design-pack is red on main: P0 is 'uncovered' after its three units closed",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/323",
-      "updatedAt": "2026-11-18T00:13:01Z",
+      "updatedAt": "2026-11-18T01:28:59Z",
       "labels": [
         {
           "name": "bug",
@@ -124,7 +124,7 @@
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-18T00:40:31Z",
+      "updatedAt": "2026-11-18T00:41:32Z",
       "labels": [
         {
           "name": "unit",
@@ -158,15 +158,15 @@
       "title": "programme: a governed retirement path for benefit profiles and tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/303",
-      "updatedAt": "2026-11-17T22:46:10Z",
+      "updatedAt": "2026-11-18T01:21:12Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -175,15 +175,15 @@
       "title": "programme: the closure gate \u2014 a project cannot close while a declared output is unpublished",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/302",
-      "updatedAt": "2026-11-17T22:46:06Z",
+      "updatedAt": "2026-11-18T01:06:59Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -207,9 +207,9 @@
     {
       "number": 299,
       "title": "estate: scientific's caller tenant is unauthenticated \u2014 a bare X-Tenant-Id is trusted",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/299",
-      "updatedAt": "2026-11-17T22:57:59Z",
+      "updatedAt": "2026-11-18T01:23:34Z",
       "labels": [
         {
           "name": "unit",
@@ -502,7 +502,7 @@
       "title": "P0 \u2014 the MSP rigour set: benefits, dossier, tranches and stakeholders",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/260",
-      "updatedAt": "2026-11-17T14:31:08Z",
+      "updatedAt": "2026-11-18T01:08:08Z",
       "labels": [
         {
           "name": "unit",
@@ -921,7 +921,7 @@
       "title": "estate: deploy and cut over the absorbed scientific service",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/212",
-      "updatedAt": "2026-11-17T18:20:47Z",
+      "updatedAt": "2026-11-18T01:23:51Z",
       "labels": [
         {
           "name": "unit",
@@ -930,10 +930,6 @@
         {
           "name": "status:claimed",
           "color": "FBCA04"
-        },
-        {
-          "name": "status:blocked",
-          "color": "D93F0B"
         }
       ]
     },

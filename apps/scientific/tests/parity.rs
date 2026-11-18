@@ -12,6 +12,8 @@ use std::path::{Path, PathBuf};
 
 use axum::body::Body;
 use axum::http::{Request, StatusCode};
+mod support;
+
 use conveyor_scientific::config::Config;
 use conveyor_scientific::router;
 use conveyor_scientific::state::AppState;
@@ -141,8 +143,9 @@ fn compare(
 #[tokio::test]
 async fn golden_replay_matches_the_capture() {
     let tolerances = load_tolerances();
+    // The gate needs a credential on every `/api` replay (conveyor#299).
     let state = std::sync::Arc::new(AppState::new(
-        Config::from_lookup(&[]).expect("defaults parse"),
+        Config::from_lookup(&support::auth_vars()).expect("defaults parse"),
     ));
     let app = router::router(state);
 
@@ -169,6 +172,7 @@ async fn golden_replay_matches_the_capture() {
             .method(method)
             .uri(path)
             .header("content-type", "application/json")
+            .header("x-tenant-id", support::licence_header("t1"))
             .body(body)
             .expect("request builds");
         let response = app
