@@ -29,7 +29,7 @@ task, and fr / requirements_management / Planka decommissioned — each dumped f
 |---|---|---|
 | P1 | S13 closed | `ssh -i ~/.ssh/deploy-key admin@192.0.2.10 "sudo -u postgres psql -d n8n -Atc 'select count(*) from workflow_entity where \"activeVersionId\" is not null'"` → `0` — **S13's close deactivates every flow it replaces, so 0 is produced there, not here**; `parity/n8n-dispositions.tsv` (S13's deliverable) has 348 rows |
 | P2 | S06b closed | `docs/evidence/S06b-agent-task.md` exists with a `run_id`, a project id and one decided approval, plus the imported tool keys (`projects.create`, not `tool.*`) |
-| P3 | `parity.yaml` signed | `yq -r '[.[]|select(.status=="used")]|length' parity/parity.yaml` > 0; schema check green; SUMMARY has a dated sign line |
+| P3 | the contract and its native map | `python3 scripts/check-parity.py --require-native` green: the signed `parity/parity.yaml` is the capability input and `parity/native.tsv` is the acceptance gate — every `used` id carries an `action:` / `test:` / `replacement:` / `dropped:` disposition. The legacy `probe:` acceptances are reachability evidence, not the gate |
 | P4 | Old system frozen (D8) | `docs/cutover/freeze-log.md` exists, its freeze date is set, and every fr/RM/`kanban` commit merged since has a disposition (`absorbed` / `not-applicable` / `dropped`) |
 | P5 | 8930 free | local: `lsof -nP -iTCP:8930 -sTCP:LISTEN` → empty (measured free 2026-11-07). In-cluster: `kubectl get svc -A -o json \| jq -r '.items[].spec.ports[]?.port' \| grep -x 8930` → empty |
 | P6 | Disk | `df -h /srv/backups` on master ≥ 3× the three dumps; doubt ⇒ STOP, never prune |
@@ -169,21 +169,23 @@ cd $HOME/Movies/conveyor
 #   export E2E_USER=<the Keycloak test user>     E2E_PASS=<its password>   (S12's suite logs in with real OIDC
 #                                                                          here: dev-auth is refused in production)
 
-# 1. Parity (R5). S00 §7 makes `acceptance` a typed REFERENCE — `test:<crate>::<name>`,
-#    `e2e:<spec>::<name>`, `probe:<METHOD> <path>` — not a shell command, so run each KIND
-#    rather than piping the strings into a shell (that would exit 127 on the first item).
-test -z "$(yq -r '.[] | select(.status == "used") | select((.acceptance // "") | test("^(test|e2e|probe):") | not) | .id' parity/parity.yaml)"
-cargo test --workspace                                     # every test:<crate>::<name>
+# 1. Native acceptance (R5). The gate is `parity/native.tsv`: every used id resolves to an
+#    `action:`, `test:`, `replacement:` or `dropped:` disposition, and the check refuses a
+#    missing or unknown row. The signed contract stays the capability input; the legacy
+#    `probe:` acceptances are a reachability record, NOT the acceptance gate (S00 audit §V2).
+python3 scripts/check-parity.py --require-native
+cargo test --workspace                                     # every test:<crate>::<name> behind an action
 npx playwright install chromium                                          # a clean host has no browser (S12 §6 step 0)
 BASE_URL="$BASE" npx playwright test -c apps/web/playwright.config.ts   # every e2e:<spec>::<name>, against the deployed app (S12's config skips its webServer when BASE_URL is set)
+# Reachability record (optional, not the gate): the legacy probes still answer against the
+# deployed app. A probe is evidence the old surface is reachable during the window; it is not
+# what decides acceptance — the native map is.
 yq -r '.[] | select(.status == "used") | .acceptance | select(test("^probe:")) | sub("^probe:"; "")' parity/parity.yaml \
   | while read -r m p; do printf '%s %s %s\n' "$(curl -s -o /dev/null -w '%{http_code}' -H "authorization: Bearer $TOK" -X "$m" "$BASE$p")" "$m" "$p"; done \
   > docs/cutover/evidence/R5-probes.txt
-test "$(yq '[.[] | select(.status == "used") | select(.acceptance // "" | test("^probe:"))] | length' parity/parity.yaml)" \
-     -eq "$(wc -l < docs/cutover/evidence/R5-probes.txt | tr -d ' ')"     # one row per probe acceptance; empty only when there are none
 ! grep -qE '^(0[0-9][0-9]|5[0-9][0-9]) ' docs/cutover/evidence/R5-probes.txt   # no connect failure (000) and no 5xx
-# R5-parity-final.txt still records pass/fail per parity id — the probes above prove reachability,
-# the per-item expectation lives in that file.
+# R5-parity-final.txt records the native disposition per parity id — the probes above prove
+# reachability; the per-item expectation is the native map's `native` column.
 
 # 2. The new app is alive.
 test "$(curl -s -o /dev/null -w '%{http_code}' "$BASE/health")" = 200
