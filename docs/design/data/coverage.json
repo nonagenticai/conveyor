@@ -289,9 +289,10 @@
           223,
           224,
           225,
-          319
+          319,
+          356
         ],
-        "open": 8,
+        "open": 9,
         "ready": 5,
         "unknown": 0
       }
@@ -1646,8 +1647,7 @@
         "T5",
         "T6",
         "T7",
-        "T8",
-        "T9"
+        "T8"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -2216,22 +2216,23 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/architecture.rs",
+        "migrations/0054_architecture.sql"
       ],
-      "gap": "no architecture project type and no TOGAF phase contracts",
+      "gap": null,
       "key": "T9",
       "measured": {
         "actions": [
-          0,
-          0
+          26,
+          26
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
-          0,
-          0
+          11,
+          11
         ]
       },
       "name": "TOGAF ADM capability",
@@ -2245,16 +2246,16 @@
         "T4"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           81
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2501,16 +2502,16 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 30,
+        "built": 31,
         "partial": 2,
         "planned": 0,
-        "proposed": 14,
+        "proposed": 13,
         "standing": 1
       },
       "total": 48,
       "uncovered": [],
-      "with_open_units": 28,
-      "without_open_units": 20
+      "with_open_units": 27,
+      "without_open_units": 21
     },
     "screens": {
       "actions_invoked": 25,

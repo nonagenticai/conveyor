@@ -1,6 +1,19 @@
 {
   "issues": [
     {
+      "number": 356,
+      "title": "docs: measure T9 as built \u2014 the slice descriptor and the plan's status",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/356",
+      "updatedAt": "2026-11-18T15:23:52Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
       "number": 349,
       "title": "programme: the 8 remaining declared outputs \u2014 SPEC-V2 spec, T1\u2013T3 evidence, T0\u2013T3 closure reviews",
       "state": "CLOSED",
@@ -2382,9 +2395,9 @@
     {
       "number": 81,
       "title": "T9 \u2014 the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/81",
-      "updatedAt": "2026-11-18T10:58:07Z",
+      "updatedAt": "2026-11-18T15:02:44Z",
       "labels": [
         {
           "name": "unit",
