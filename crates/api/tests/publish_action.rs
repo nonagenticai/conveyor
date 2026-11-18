@@ -22,7 +22,7 @@ async fn a_target_without_a_token_is_not_publishable() {
         .invoke(
             "repositories.create",
             "dev:alice",
-            json!({"url": "https://github.com/nonagenticai/nonagentic_homepage"}),
+            json!({"url": "https://github.com/nonagenticai/conveyor"}),
             None,
             None,
             None,

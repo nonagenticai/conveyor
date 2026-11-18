@@ -641,7 +641,7 @@ async fn dispatch(
             }
             tx.commit().await.map_err(db)?;
         }
-        // The console's Publish button: build the public pack and open the homepage PR. The job
+        // The console's Publish button: build the public pack and open the pack PR. The job
         // has one attempt (the action enqueues `max_attempts = 1`), so a failure after the PR is
         // opened is dead with the URL in `last_error`, never a second PR.
         "publish.design" => {

@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-//! `publish.design` — build the public pack and open a homepage PR.
+//! `publish.design` — build the public pack and open a pack PR.
 //!
 //! The job is the console button's worker half. It:
 //!
@@ -7,8 +7,8 @@
 //! 2. builds the data snapshot and the publishable output pages into a temp directory, using the
 //!    same [`crate::snapshot`] and [`crate::publish_outputs`] code as the manual publisher;
 //! 3. overlays those files on the pack the deployed image serves (`/srv/site/design`);
-//! 4. commits the delta to one `publish/design-*` branch and opens a PR — both `design/` and
-//!    `dist/design/` are written because the homepage copies the pack verbatim into `dist/`;
+//! 4. commits the delta to one `publish/design-*` branch and opens a PR — the pack lands under
+//!    `docs/design/` in this repository, the tree the app image serves;
 //! 5. records the PR URL on the job row (`payload.result`) and appends `publish.completed`.
 //!
 //! **It never merges.** The PR is the human gate. **It never retries a opened PR**: the job has
@@ -312,28 +312,51 @@ async fn publish(
 
 /// Every repository path a pack file must occupy.
 ///
-/// `studio.html` is also the directory index: the homepage build copies it to
-/// `dist/design/index.html`. Every other file exists in both the source mirror and `dist`.
+/// The pack lives in this repository under `docs/design/` — the same tree the app image copies
+/// and serves at `/design`. `studio.html` needs no `index.html`: the API serves it as the
+/// directory index (`crates/api/src/web.rs`).
 fn targets(files: &BTreeMap<String, Vec<u8>>) -> BTreeMap<String, Vec<u8>> {
-    let mut out = BTreeMap::new();
-    for (rel, bytes) in files {
-        out.insert(format!("design/{rel}"), bytes.clone());
-        out.insert(format!("dist/design/{rel}"), bytes.clone());
-        if rel == "studio.html" {
-            out.insert("dist/design/index.html".to_owned(), bytes.clone());
-        }
-    }
-    out
+    files
+        .iter()
+        .map(|(rel, bytes)| (format!("docs/design/{rel}"), bytes.clone()))
+        .collect()
 }
 
-/// Stale files under `design/` or `dist/design/` that the new pack no longer contains.
+/// The generated files the publisher owns: the snapshot's data files and the published output
+/// pages. Everything else under `docs/design/` is hand-authored (documents, decisions, scripts,
+/// the issue registry) and a publish never deletes it.
+const GENERATED_DATA: [&str; 12] = [
+    "programme.json",
+    "organisation.json",
+    "config.json",
+    "work.json",
+    "msp.json",
+    "artefacts.json",
+    "measure.json",
+    "secrets.json",
+    "evidence.json",
+    "feedback.json",
+    "snapshot.js",
+    "manifest.json",
+];
+
+/// True when a repository path is a file the publisher generates and may therefore delete when
+/// a later pack no longer contains it.
+fn is_generated_path(path: &str) -> bool {
+    if let Some(rest) = path.strip_prefix("docs/design/data/") {
+        return GENERATED_DATA.contains(&rest);
+    }
+    if let Some(rest) = path.strip_prefix("docs/design/docs/") {
+        return rest == "outputs.js" || rest.starts_with("output-");
+    }
+    false
+}
+
+/// Stale generated files under `docs/design/` that the new pack no longer contains.
 fn deletions(remote: &[TreeEntry], targets: &BTreeMap<String, Vec<u8>>) -> Vec<TreeChange> {
     remote
         .iter()
-        .filter(|entry| {
-            (entry.path.starts_with("design/") || entry.path.starts_with("dist/design/"))
-                && !targets.contains_key(&entry.path)
-        })
+        .filter(|entry| is_generated_path(&entry.path) && !targets.contains_key(&entry.path))
         .map(|entry| TreeChange {
             path: entry.path.clone(),
             sha: None,
@@ -449,43 +472,60 @@ mod tests {
     }
 
     #[test]
-    fn studio_html_also_writes_the_dist_index() {
+    fn pack_files_land_under_docs_design() {
         let mut files = BTreeMap::new();
         files.insert("studio.html".to_owned(), b"x".to_vec());
         let targets = targets(&files);
-        assert!(targets.contains_key("design/studio.html"));
-        assert!(targets.contains_key("dist/design/studio.html"));
-        assert!(targets.contains_key("dist/design/index.html"));
+        assert!(targets.contains_key("docs/design/studio.html"));
+        assert!(
+            !targets
+                .keys()
+                .any(|path| path.starts_with("design/") || path.starts_with("dist/")),
+            "the retired repo layout must not be written"
+        );
     }
 
     #[test]
-    fn stale_output_pages_are_deleted_and_current_ones_are_not() {
+    fn stale_generated_pages_are_deleted_and_hand_authored_files_are_not() {
         let mut files = BTreeMap::new();
         files.insert("docs/output-new.html".to_owned(), b"x".to_vec());
         let targets = targets(&files);
         let remote = vec![
-            entry("design/docs/output-new.html"),
-            entry("design/docs/output-old.html"),
-            entry("dist/design/docs/output-old.html"),
-            entry("design/index.html"),
-            entry("index.html"),
-            entry("assets/keep.png"),
+            entry("docs/design/docs/output-new.html"),
+            entry("docs/design/docs/output-old.html"),
+            entry("docs/design/docs/outputs.js"),
+            entry("docs/design/data/snapshot.js"),
+            entry("docs/design/data/issues.json"),
+            entry("docs/design/data/coverage.json"),
+            entry("docs/design/docs/documents.js"),
+            entry("docs/design/README.md"),
+            entry("docs/design/scripts/build-docs.py"),
+            entry("docs/design/studio.html"),
+            entry("docs/evidence/keep.md"),
+            entry("README.md"),
         ];
         let deletes: Vec<String> = deletions(&remote, &targets)
             .into_iter()
             .map(|change| change.path)
             .collect();
-        assert!(!deletes.contains(&"design/docs/output-new.html".to_owned()));
-        assert!(deletes.contains(&"design/docs/output-old.html".to_owned()));
-        assert!(deletes.contains(&"dist/design/docs/output-old.html".to_owned()));
-        assert!(deletes.contains(&"design/index.html".to_owned()));
-        assert!(
-            !deletes.contains(&"index.html".to_owned()),
-            "outside the design pack"
-        );
-        assert!(
-            !deletes.contains(&"assets/keep.png".to_owned()),
-            "outside the design pack"
-        );
+        assert!(!deletes.contains(&"docs/design/docs/output-new.html".to_owned()));
+        assert!(deletes.contains(&"docs/design/docs/output-old.html".to_owned()));
+        assert!(deletes.contains(&"docs/design/docs/outputs.js".to_owned()));
+        assert!(deletes.contains(&"docs/design/data/snapshot.js".to_owned()));
+        for keep in [
+            "docs/design/data/issues.json",
+            "docs/design/data/coverage.json",
+            "docs/design/docs/documents.js",
+            "docs/design/README.md",
+            "docs/design/scripts/build-docs.py",
+            "docs/design/studio.html",
+            "docs/evidence/keep.md",
+            "README.md",
+        ] {
+            assert!(
+                !deletes.contains(&keep.to_owned()),
+                "{keep} is hand-authored and must not be deleted"
+            );
+        }
     }
 }
