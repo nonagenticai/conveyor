@@ -8,6 +8,7 @@ pub mod benchmark_producer;
 pub mod benchmark_worker;
 // S13/CONTRACT §7: the outbox relay — unpublished `event` rows to Redis Streams.
 pub mod bus_relay;
+pub mod cadence;
 pub mod eval_audit;
 pub mod eval_runner;
 pub mod eval_worker;

@@ -151,8 +151,14 @@
       "gap": null
     },
     "T10": {
-      "evidence": ["docs/SPEC_V2.md"],
-      "gap": "no backlog materialisation, PI planning, demo or inspect-and-adapt cadence"
+      "tables": ["programme_demo_credit"],
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "crates/store/tests/programme_cadence.rs",
+        "crates/store/tests/tranche_review.rs",
+        "crates/store/tests/benefit_transition.rs"
+      ],
+      "gap": null
     },
     "T11": {
       "evidence": ["docs/SPEC_V2.md"],

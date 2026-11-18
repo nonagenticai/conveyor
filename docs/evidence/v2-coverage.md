@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 41 |
+| `exists` | implemented in code and backed by real rows | 42 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 7 |
-| `new` | absent | 15 |
+| `new` | absent | 14 |
 
 ## Rows
 
@@ -43,7 +43,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:decision` | §10.3 | table | decision | `exists` | migrations: CREATE TABLE decision |
 | `table:decision_option` | §10.3 | table | decision_option | `exists` | migrations: CREATE TABLE decision_option |
 | `table:decision_policy` | §10.3 | table | decision_policy | `exists` | migrations: CREATE TABLE decision_policy |
-| `table:lesson` | §10.3 | table | lesson | `new` | migrations: no CREATE/ALTER TABLE lesson |
+| `table:lesson` | §10.3 | table | lesson | `exists` | migrations: CREATE TABLE lesson |
 | `table:project_dependency` | §10.3 | table | project_dependency | `exists` | migrations: CREATE TABLE project_dependency |
 | `table:decision_policy_refinement` | §10.3 | table | decision_policy_refinement | `exists` | migrations: CREATE TABLE decision_policy_refinement |
 | `table:laya_inference_config` | §10.3 | table | laya_inference_config | `exists` | migrations: CREATE TABLE laya_inference_config |

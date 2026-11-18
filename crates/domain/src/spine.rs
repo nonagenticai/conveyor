@@ -140,6 +140,41 @@ pub enum PlanError {
     /// The tranche is already retired.
     #[error("tranche_retired")]
     TrancheRetired,
+    /// The cadence's kind does not match the operation that reads it.
+    #[error("the cadence is {actual:?}; this operation needs {expected:?}")]
+    CadenceWrongKind {
+        /// The kind the operation needs.
+        expected: &'static str,
+        /// The kind the row carries.
+        actual: String,
+    },
+    /// A cadence names no target board in its metadata.
+    #[error("the cadence names no target board in meta.board_id")]
+    CadenceBoardMissing,
+    /// A cadence names no card type in its metadata, or the code is unknown.
+    #[error("the cadence names no known card type in meta.card_type_code")]
+    CadenceCardTypeMissing,
+    /// A demo credit names a deliverable that is not accepted.
+    #[error("a demo credit needs a completed (accepted) deliverable")]
+    DemoDeliverableNotComplete,
+    /// A demo credit names a deliverable with no evidence ref — no demo, no credit.
+    #[error("gate_evidence_missing")]
+    DemoEvidenceMissing,
+    /// A retro closes while one of its findings has no lesson.
+    #[error("the retro finding {0:?} has no lesson")]
+    RetroFindingWithoutLesson(String),
+    /// A project in a programme starts before the first tranche is authorised.
+    #[error("tranche_not_authorised")]
+    TrancheNotAuthorised,
+    /// A tranche baseline changes only through a cited, approved change request.
+    #[error("rebaseline_requires_change")]
+    RebaselineRequiresChange,
+    /// The programme has no benefits realization plan.
+    #[error("realization_plan_missing")]
+    RealizationPlanMissing,
+    /// The realization plan does not name who continues measurement after closure.
+    #[error("post_closure_owner_missing")]
+    PostClosureOwnerMissing,
 }
 
 /// Compute the WSJF score from the four stored inputs.

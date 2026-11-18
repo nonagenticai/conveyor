@@ -282,6 +282,23 @@ pub(crate) async fn assert_project_can_start(
     tenant: TenantId,
     project_id: Uuid,
 ) -> Result<(), ActionError> {
+    // T10 (#82): the MSP order comes first — the sponsoring group authorises the tranche
+    // before any project in it starts.
+    conveyor_store::spine::assert_project_tranche_authorised_tx(&mut *tx, tenant, project_id)
+        .await
+        .map_err(|error| match error {
+            conveyor_store::spine::PlanStoreError::Illegal(
+                conveyor_domain::spine::PlanError::TrancheNotAuthorised,
+            ) => ActionError::new(
+                409,
+                "tranche_not_authorised",
+                "the project's tranche is not authorised; the sponsoring group's review authorises it",
+            ),
+            other => {
+                tracing::error!(error = %other, "programme: tranche authorisation");
+                ActionError::internal()
+            }
+        })?;
     assert_dependencies_met(&mut *tx, tenant, project_id).await?;
     assert_inception_published(&mut *tx, tenant, project_id).await
 }

@@ -632,6 +632,9 @@ pub struct TrancheUpdateIn {
     pub baseline_ref: Option<Uuid>,
     /// The review date.
     pub review_at: Option<DateTime<Utc>>,
+    /// The approved change request that authorises a baseline change, if one is being made.
+    #[serde(default)]
+    pub change_ref: Option<Uuid>,
 }
 
 /// `tranches.review_list`.
@@ -1875,6 +1878,7 @@ async fn tranches_update(
             exit_criteria: input.exit_criteria,
             baseline_ref: input.baseline_ref,
             review_at: input.review_at,
+            change_ref: input.change_ref,
         },
     )
     .await
