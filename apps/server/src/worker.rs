@@ -279,6 +279,13 @@ impl Worker {
         let tenants = store::tenants::active_ids(&self.pool).await?;
         let lease_secs = self.config.job_lease_secs as i64;
         for tenant in tenants {
+            // The cadence tick (T10): a planned PI cadence drafts its backlog inside the active
+            // lane's WIP slots. It writes rows, never runs a job, so it is safe while the cord
+            // is engaged — and it must run every pass, or a cadence created after startup would
+            // wait for a restart.
+            if let Err(error) = crate::cadence::tick(&self.pool, tenant).await {
+                tracing::warn!(%error, %tenant, "cadence tick failed");
+            }
             // Read the cord before claiming, every tick: the state is a row, so a release
             // takes effect on the next pass without restarting any process.
             let engaged = andon_engaged(&self.pool, tenant).await;

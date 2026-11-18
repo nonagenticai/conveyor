@@ -2484,6 +2484,192 @@ pub async fn delete_cadence_tx(
     Ok(())
 }
 
+/// What a PI materialisation wrote.
+#[derive(Clone, Debug, Default)]
+pub struct PiMaterialisation {
+    /// The cards created, in WSJF order.
+    pub cards: Vec<Uuid>,
+    /// The backlog rows the WIP bound left untouched.
+    pub backlog_left: i64,
+}
+
+/// Materialise a `kind='pi'` cadence: draft the next cadence's cards from the standing backlog.
+///
+/// The backlog is a `wbs_node(kind='deliverable', status='open')` row with no card yet. The
+/// score is `(business_value + time_criticality + risk_reduction) / job_size`, computed in the
+/// ordering and never stored (D-T1-4). The drafts land in the board named by
+/// `meta.board_id`'s intake lane, bounded by the active lane's `wip_limit` minus the cards live
+/// there; the cadence then moves `planned → materialised` in the same transaction, so a second
+/// tick creates nothing. A tick with no free slot writes nothing and leaves the cadence
+/// `planned`, so a later tick still drafts.
+pub async fn materialise_pi_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<PiMaterialisation, PlanStoreError> {
+    let cadence = get_cadence_tx(&mut *conn, tenant, cadence_id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "cadence row",
+        })?;
+    if cadence.kind != "pi" {
+        return Err(PlanStoreError::Illegal(PlanError::CadenceWrongKind {
+            expected: "pi",
+            actual: cadence.kind.clone(),
+        }));
+    }
+    if cadence.state != "planned" {
+        return Ok(PiMaterialisation::default());
+    }
+    let board_id: Uuid = cadence
+        .meta
+        .get("board_id")
+        .and_then(Value::as_str)
+        .and_then(|value| Uuid::parse_str(value).ok())
+        .ok_or(PlanStoreError::Illegal(PlanError::CadenceBoardMissing))?;
+    let card_type_code = cadence
+        .meta
+        .get("card_type_code")
+        .and_then(Value::as_str)
+        .ok_or(PlanStoreError::Illegal(PlanError::CadenceCardTypeMissing))?
+        .to_owned();
+    let project_id: Option<Uuid> =
+        sqlx::query_scalar("SELECT project_id FROM board WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(board_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let project_id = project_id.ok_or(PlanStoreError::NotFound { what: "board" })?;
+    let card_type_id: Option<Uuid> =
+        sqlx::query_scalar("SELECT id FROM card_type WHERE tenant_id = $1 AND code = $2")
+            .bind(tenant.as_uuid())
+            .bind(&card_type_code)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let card_type_id =
+        card_type_id.ok_or(PlanStoreError::Illegal(PlanError::CadenceCardTypeMissing))?;
+
+    let lanes: Vec<(Uuid, String, Option<i32>)> = sqlx::query_as(
+        "SELECT id, kind, wip_limit FROM list WHERE tenant_id = $1 AND board_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .fetch_all(&mut *conn)
+    .await?;
+    let intake = lanes
+        .iter()
+        .find(|(_, kind, _)| kind == "intake")
+        .map(|(id, _, _)| *id)
+        .ok_or(PlanStoreError::NotFound {
+            what: "intake lane",
+        })?;
+    let active = lanes.iter().find(|(_, kind, _)| kind == "active");
+    let (live, slots): (i64, i64) = match active {
+        None => (0, 0),
+        Some((active_id, _, wip)) => {
+            let live: i64 = sqlx::query_scalar(
+                "SELECT count(*) FROM card WHERE tenant_id = $1 AND list_id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(active_id)
+            .fetch_one(&mut *conn)
+            .await?;
+            let slots = match wip {
+                Some(limit) => (i64::from(*limit) - live).max(0),
+                None => i64::MAX,
+            };
+            (live, slots)
+        }
+    };
+    if slots == 0 {
+        return Ok(PiMaterialisation::default());
+    }
+
+    let backlog_sql = "SELECT id, title, business_value, time_criticality, risk_reduction, job_size
+           FROM wbs_node
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'
+            AND status = 'open' AND card_id IS NULL";
+    let rows: Vec<(Uuid, String, i32, i32, i32, i32)> = sqlx::query_as(AssertSqlSafe(format!(
+        "{backlog_sql}
+         ORDER BY ((business_value + time_criticality + risk_reduction)::numeric / job_size) DESC,
+                  position, id
+         LIMIT $3"
+    )))
+    .bind(tenant.as_uuid())
+    .bind(project_id)
+    .bind(slots)
+    .fetch_all(&mut *conn)
+    .await?;
+    let backlog_total: i64 = sqlx::query_scalar(AssertSqlSafe(format!(
+        "SELECT count(*) FROM ({backlog_sql}) backlog"
+    )))
+    .bind(tenant.as_uuid())
+    .bind(project_id)
+    .fetch_one(&mut *conn)
+    .await?;
+
+    let mut cards = Vec::with_capacity(rows.len());
+    for (index, (node_id, title, business_value, time_criticality, risk_reduction, job_size)) in
+        rows.iter().enumerate()
+    {
+        // The domain is the arithmetic's single owner: a row whose inputs do not score is not
+        // drafted, even if a CHECK were ever loosened.
+        conveyor_domain::spine::wsjf(WsjfInputs {
+            business_value: *business_value,
+            time_criticality: *time_criticality,
+            risk_reduction: *risk_reduction,
+            job_size: *job_size,
+        })?;
+        let card_id: Uuid = sqlx::query_scalar(
+            "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, description,
+                               position, meta)
+             SELECT $1, l.board_id, l.id, $3, $4, '', $5, $6
+               FROM list l
+              WHERE l.tenant_id = $1 AND l.id = $2
+             RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(intake)
+        .bind(card_type_id)
+        .bind(title)
+        .bind(rust_decimal::Decimal::from(index as i64))
+        .bind(serde_json::json!({
+            "wbs_node_id": node_id,
+            "cadence_id": cadence_id,
+        }))
+        .fetch_one(&mut *conn)
+        .await?;
+        sqlx::query(
+            "UPDATE wbs_node SET card_id = $3, version = version + 1, updated_at = now()
+              WHERE tenant_id = $1 AND id = $2",
+        )
+        .bind(tenant.as_uuid())
+        .bind(node_id)
+        .bind(card_id)
+        .execute(&mut *conn)
+        .await?;
+        cards.push(card_id);
+    }
+
+    sqlx::query(
+        "UPDATE programme_cadence
+            SET state = 'materialised', version = version + 1, updated_at = now(),
+                meta = meta || jsonb_build_object('materialised_at', now(),
+                                                  'drafted', $3::int)
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id)
+    .bind(i32::try_from(cards.len()).unwrap_or(i32::MAX))
+    .execute(&mut *conn)
+    .await?;
+
+    Ok(PiMaterialisation {
+        backlog_left: backlog_total - i64::try_from(cards.len()).unwrap_or(i64::MAX),
+        cards,
+    })
+}
+
 // ── stakeholder_profile ─────────────────────────────────────────────────────────────────
 // The MSP profile: concerns, influence, exposure, support and engagement. Distinct from
 // `project_stakeholder` (0008), which records who is involved, not what they care about.
