@@ -1,0 +1,219 @@
+id	surface	native	reference
+P-0069	GET /	test:conveyor-api::the_entry_document_and_a_route_shaped_path_serve_index_html	crates/api/src/web.rs::the_entry_document_and_a_route_shaped_path_serve_index_html (the SPA entry at /)
+P-0121	GET /api/agui/threads	test:conveyor-api::one_completed_turn_serializes_to_the_golden_frames	crates/api/src/copilot/agui.rs::frames — S0 kept the adapter for P-0121; threads are conversations
+P-0123	GET /api/andon	test:conveyor-server::the_cord_refuses_new_runs_pauses_the_worker_drains_on_release_and_moves_the_gauge	apps/server/tests/andon.rs::the_cord_refuses_new_runs_pauses_the_worker_drains_on_release_and_moves_the_gauge
+P-0126	GET /api/approvals	action:approvals.list	crates/actions/src/control/approvals.rs::approvals_list
+P-0127	GET /api/approvals/{approvalId}	action:approvals.list	crates/actions/src/control/approvals.rs::approvals_list — a gate is addressed by its run/card/project filter; runs.get carries a run's gates
+P-0131	GET /api/approvals/all	action:approvals.list	crates/actions/src/control/approvals.rs::approvals_list
+P-0207	GET /api/assets/decisions	action:decisions.list	crates/actions/src/governance/assets.rs::decisions_list
+P-0235	GET /api/assets/principles	action:principles.list	crates/actions/src/governance/assets.rs::principles_list
+P-0239	GET /api/assets/requirements	action:requirements.list	crates/actions/src/governance/assets.rs::requirements_list
+P-0256	GET /api/auth/me	action:me.get	crates/actions/src/handlers.rs::me_get
+P-0279	GET /api/conveyor/project-types	replacement:catalogues.list	crates/actions/src/governance/catalogues.rs::catalogues_list (kind='project_type')
+P-0283	GET /api/documents	action:documents.list	crates/actions/src/documents/actions.rs::documents_list
+P-0293	GET /api/internal/andon	test:conveyor-server::the_cord_refuses_new_runs_pauses_the_worker_drains_on_release_and_moves_the_gauge	apps/server/tests/andon.rs::the_cord_refuses_new_runs_pauses_the_worker_drains_on_release_and_moves_the_gauge
+P-0294	GET /api/internal/cards/{cardId}/platform-owner	dropped:no-platform-owner	docs/SPEC.md D32 — a role is per tenant membership; there is no platform owner of a card
+P-0295	GET /api/internal/github-app/binding	replacement:repositories.get	crates/actions/src/documents/repositories.rs::repositories_get (installation_ref carries the GitHub App handle)
+P-0296	GET /api/internal/projects/tenant-map	dropped:tenant-map-retired	docs/SPEC.md D12 + D32 — billing stays separate and every row carries its tenant_id; no cross-tenant map is exposed
+P-0304	GET /api/license/status	action:licences.get	crates/actions/src/handlers.rs::licences_get
+P-0307	GET /api/me/budget/status	replacement:billing.summary	crates/actions/src/integrations/external.rs::billing_summary (GET /api/billing/overview; D12 keeps billing in billing_service)
+P-0312	GET /api/me/dept-roles	replacement:me.get	crates/actions/src/handlers.rs::me_get + docs/plans/02-DATA-ARCHITECTURE.md §2.1 (membership carries role and department_id)
+P-0317	GET /api/me/notifications/unread-count	replacement:notifications.list	crates/actions/src/control/messages.rs::notifications_list (the unread filter)
+P-0322	GET /api/me/super-admin	replacement:me.get	crates/actions/src/handlers.rs::me_get; the session document carries is_super_admin (crates/api/src/routes/me.rs::MeView)
+P-0328	GET /api/me/usage/summary	replacement:inference_usage.report	crates/actions/src/inference/usage.rs::inference_usage_report (D23 ledger)
+P-0329	GET /api/me/workspace	replacement:tenants.get	crates/actions/src/handlers.rs::tenants_get + docs/plans/02-DATA-ARCHITECTURE.md §7.1 (workspaces → tenant)
+P-0330	GET /api/me/workspaces	replacement:me.get	crates/actions/src/handlers.rs::me_get (memberships) + docs/plans/02-DATA-ARCHITECTURE.md §7.1 (workspaces → tenant)
+P-0333	GET /api/metrics/prom	test:conveyor-server::the_health_and_metrics_routes_are_not_licence_gated	apps/server/tests/events.rs::the_health_and_metrics_routes_are_not_licence_gated (/metrics is the Prometheus scrape)
+P-0337	GET /api/projects	test:conveyor-actions::the_twelve_board_actions_work_over_http	crates/api/src/board.rs::projects + crates/actions/tests/board.rs::the_twelve_board_actions_work_over_http (GET /api/projects)
+P-0340	GET /api/projects/{id}/andon	dropped:andon-is-tenant-wide	docs/plans/slices/S06-control-plane.md §5.5 — andon_state keys on tenant_id, so there is no per-project cord
+P-0347	GET /api/projects/{id}/cockpit	replacement:projects.get	crates/actions/src/board/projects.rs::projects_get (the project with its boards)
+P-0350	GET /api/projects/{id}/conveyor-notices	replacement:events.list	crates/actions/src/handlers.rs::events_list (topic filter over the project's outbox rows)
+P-0372	GET /api/projects/{projectId}/approvals	action:approvals.list	crates/actions/src/control/approvals.rs::approvals_list (project_id filter)
+P-0446	GET /api/tools/kanban/liveness	dropped:planka-retired	docs/SPEC.md §4 (Planka not carried) + docs/plans/02-source-map/30-rm-planka-mcp-n8n.md §2
+P-0447	GET /api/tools/n8n/executions	replacement:runs.list	crates/actions/src/control/runs.rs::runs_list (the native execution list)
+P-0458	GET /health	test:conveyor-server::the_health_and_metrics_routes_are_not_licence_gated	apps/server/tests/events.rs::the_health_and_metrics_routes_are_not_licence_gated (/health)
+P-0459	GET /health/live	test:conveyor-server::the_health_and_metrics_routes_are_not_licence_gated	apps/server/tests/events.rs::the_health_and_metrics_routes_are_not_licence_gated (/health/live)
+P-0628	POST /api/execution/approvals	action:approvals.request	crates/actions/src/control/approvals.rs::approvals_request
+P-0633	POST /api/internal/andon/read-failure	dropped:n8n-read-failure-seam-retired	docs/plans/slices/S13-n8n-engine.md + docs/plans/slices/S06-control-plane.md §5.3 (a failure is run.failed → err.card)
+P-0634	POST /api/internal/assets/channel	replacement:channels.bind	crates/actions/src/control/channels.rs::channels_bind + docs/plans/02-DATA-ARCHITECTURE.md §7.1 (channels → channel_binding)
+P-0635	POST /api/internal/assets/decision	replacement:decisions.create	crates/actions/src/governance/assets.rs::decisions_create
+P-0636	POST /api/internal/assets/principle	replacement:principles.create	crates/actions/src/governance/assets.rs::principles_create
+P-0637	POST /api/internal/assets/requirement	replacement:requirements.create	crates/actions/src/governance/assets.rs::requirements_create
+P-0638	POST /api/internal/assets/trigger	replacement:schedules.upsert	crates/actions/src/handlers.rs::schedules_upsert + docs/plans/02-DATA-ARCHITECTURE.md §7.1 (scheduled_triggers → schedule)
+P-0639	POST /api/internal/cards/{cardId}/computed-checks	replacement:runs.get	docs/plans/02-DATA-ARCHITECTURE.md §7.1 (card_computed_checks → run) + crates/actions/src/control/runs.rs::runs_get
+P-0640	POST /api/internal/conveyor/flow-runs	dropped:n8n-execution-hook-retired	docs/plans/slices/S13-n8n-engine.md — the native engine records its own runs; no external hook writes flow-runs
+P-0641	POST /api/internal/suggested-schedules	dropped:suggested-schedules-dropped	docs/plans/02-DATA-ARCHITECTURE.md §7.1 (suggested_schedules — drop)
+P-0648	POST /api/katas	replacement:decisions.create	docs/design/README.md (Open a kata = a published decision on the kata project carrying the kata payload) + crates/actions/src/governance/assets.rs::decisions_create
+P-0743	POST /api/webhooks/billing/budget-threshold	dropped:billing-owns-budget	docs/SPEC.md D12 + crates/actions/src/integrations/external.rs::billing_summary (display only; billing_service owns thresholds)
+P-0745	POST /api/webhooks/mcp/incoming	dropped:mcp-channel-has-no-webhook	crates/actions/src/channel/connectors/mod.rs (the mcp connector: the agent calls /mcp, there is no webhook) + docs/SPEC.md D19
+P-0746	POST /api/webhooks/n8n/approval-request	replacement:approvals.request	crates/actions/src/control/approvals.rs::approvals_request
+P-0747	POST /api/webhooks/n8n/card-approval	replacement:approvals.decide	crates/actions/src/control/approvals.rs::approvals_decide
+P-0748	POST /api/webhooks/n8n/card-phase-lease	replacement:cards.claim	crates/actions/src/control/cards.rs::cards_claim + docs/plans/slices/S06-control-plane.md §5.3 (the claim is the lease; claim_fence closes the ABA window)
+P-0749	POST /api/webhooks/n8n/executed-activity	dropped:n8n-callbacks-retired	docs/plans/slices/S13-n8n-engine.md — run_step is the native activity trace; n8n callbacks retire
+P-0750	POST /api/webhooks/n8n/execution-event	dropped:n8n-callbacks-retired	docs/plans/slices/S13-n8n-engine.md — execution events are the native outbox/SSE
+P-0751	POST /api/webhooks/n8n/plan-event	dropped:n8n-callbacks-retired	docs/plans/slices/S13-n8n-engine.md — plan edits are pm.plan, not reports from a flow
+P-0752	POST /api/webhooks/n8n/project-coach-failed	dropped:n8n-callbacks-retired	docs/plans/slices/S13-n8n-engine.md + docs/plans/slices/S06-control-plane.md §5.3 (err.card runs on run.failed)
+P-0753	POST /api/webhooks/n8n/project-request-outline/{id}	dropped:outline-tables-dropped	parity/SUMMARY.md PENDING-S0 — outline/outline_node dropped by migration 0011
+P-0754	POST /api/webhooks/n8n/project-start-failed	dropped:conveyor-start-absorbed	parity/n8n-dispositions.tsv (conveyor.start → absorbed:projects.create) + docs/plans/slices/S06-control-plane.md amendment
+P-0755	POST /api/webhooks/n8n/report	replacement:documents.report	crates/actions/src/documents/actions.rs::documents_report
+P-0756	POST /api/webhooks/n8n/router-dedupe	dropped:n8n-callbacks-retired	docs/plans/slices/S13-n8n-engine.md — dedupe is a job dedupe_key (docs/plans/slices/S06-control-plane.md §5.3)
+P-0758	POST /api/webhooks/telegram/incoming	test:conveyor-api::a_reply_is_the_service_identitys_decision_recorded_with_its_transport	crates/api/tests/channel_inbound.rs::a_reply_is_the_service_identitys_decision_recorded_with_its_transport (/api/channels/{binding_id}/inbound, telegram)
+P-0799	@nonagentic/n8n-nodes-fr.fr.approvals.createExecutionApproval	replacement:approvals.request	crates/actions/src/control/approvals.rs::approvals.request (creates a gate on a project/card/run)
+P-0800	@nonagentic/n8n-nodes-fr.fr.approvals.getApproval	replacement:approvals.list	crates/actions/src/control/approvals.rs::approvals.list (filters by run/card/project; no by-id read)
+P-0801	@nonagentic/n8n-nodes-fr.fr.katas.openKata	replacement:process_runs.start	seed/processes/named.yaml::kata.open; docs/plans/slices/S13-n8n-engine.md section 5.8
+P-0802	@nonagentic/n8n-nodes-fr.fr.projects.listProjects	replacement:portfolio.in_flight	crates/actions/src/spine/mod.rs::portfolio.in_flight (no projects.list action; crates/api/src/board.rs::projects serves GET /api/projects)
+P-0803	@nonagentic/n8n-nodes-fr.frTool.approvals.getApproval	replacement:approvals.list	crates/actions/src/control/approvals.rs::approvals.list (filters by run/card/project; no by-id read)
+P-0804	@nonagentic/n8n-nodes-fr.frTool.approvals.listApprovals	action:approvals.list	crates/actions/src/control/approvals.rs::approvals.list
+P-0805	@nonagentic/n8n-nodes-kanban.planka.board.get	action:boards.get	crates/actions/src/board/boards.rs::boards.get
+P-0806	@nonagentic/n8n-nodes-kanban.planka.card.create	action:cards.create	crates/actions/src/board/cards.rs::cards.create
+P-0807	@nonagentic/n8n-nodes-kanban.planka.card.get	action:cards.get	crates/actions/src/board/cards.rs::cards.get
+P-0808	@nonagentic/n8n-nodes-kanban.planka.card.listInList	action:cards.list	crates/actions/src/board/cards.rs::cards.list (CardsListIn.list_id selects the lane)
+P-0809	@nonagentic/n8n-nodes-kanban.planka.card.update	action:cards.update	crates/actions/src/board/cards.rs::cards.update
+P-0810	@nonagentic/n8n-nodes-kanban.planka.comment.create	action:cards.comment	crates/actions/src/board/cards.rs::cards.comment
+P-0811	@nonagentic/n8n-nodes-kanban.planka.comment.list	replacement:cards.get	crates/actions/src/board/cards.rs::cards.get (CardView carries comments; no comment-list action)
+P-0812	@nonagentic/n8n-nodes-kanban.plankaTool.board.get	action:boards.get	crates/actions/src/board/boards.rs::boards.get
+P-0813	@nonagentic/n8n-nodes-kanban.plankaTool.card.get	action:cards.get	crates/actions/src/board/cards.rs::cards.get
+P-0814	@nonagentic/n8n-nodes-kanban.plankaTool.card.listInList	action:cards.list	crates/actions/src/board/cards.rs::cards.list (CardsListIn.list_id selects the lane)
+P-0815	@nonagentic/n8n-nodes-kanban.plankaTool.comment.list	replacement:cards.get	crates/actions/src/board/cards.rs::cards.get (CardView carries comments; no comment-list action)
+P-0816	@nonagentic/n8n-nodes-requirements.requirements.decisions.createDecision	action:decisions.create	crates/actions/src/governance/assets.rs::decisions.create
+P-0817	@nonagentic/n8n-nodes-requirements.requirements.decisions.patchDecision	action:decisions.update	crates/actions/src/governance/assets.rs::decisions.update
+P-0818	@nonagentic/n8n-nodes-requirements.requirements.decisions.projectCopyDecision	dropped:parity-summary-project-copy	parity/SUMMARY.md::The five A-hit contradictions (project-copy dropped; replacement:decisions.update)
+P-0819	@nonagentic/n8n-nodes-requirements.requirements.pmCardLedger.appendCardLedger	replacement:memory.remember	crates/actions/src/memory/remember.rs::memory.remember (card ledger -> work-package memory; parity/SUMMARY.md ledger item)
+P-0820	@nonagentic/n8n-nodes-requirements.requirements.pmCardLedger.listCardLedger	replacement:memory.recall	crates/actions/src/memory/recall.rs::memory.recall
+P-0821	@nonagentic/n8n-nodes-requirements.requirements.pmCardTypes.listCardTypes	action:card_types.list	crates/actions/src/board/card_types.rs::card_types.list
+P-0822	@nonagentic/n8n-nodes-requirements.requirements.pmProjectPhases.listProjectPhases	replacement:catalogues.list	docs/plans/02-DATA-ARCHITECTURE.md::7.2 pm_project_phases -> catalogue_entry (kind=phase); crates/actions/src/governance/catalogues.rs::catalogues.list
+P-0823	@nonagentic/n8n-nodes-requirements.requirements.pmProjects.createProjectBriefVersion	replacement:documents.compose	crates/actions/src/documents/actions.rs::documents.compose (brief alias -> project-brief output slot)
+P-0824	@nonagentic/n8n-nodes-requirements.requirements.pmProjects.getProject	action:projects.get	crates/actions/src/board/projects.rs::projects.get
+P-0825	@nonagentic/n8n-nodes-requirements.requirements.pmProjects.getProjectBriefVersion	replacement:documents.revision_get	crates/actions/src/documents/revisions.rs::documents.revision_get
+P-0826	@nonagentic/n8n-nodes-requirements.requirements.pmProjects.getProjectByPlankaBoard	replacement:boards.get	crates/actions/src/board/boards.rs::boards.get (BoardOut.project_id carries the board->project link)
+P-0827	@nonagentic/n8n-nodes-requirements.requirements.pmProjects.listProjectBriefVersions	replacement:documents.revision_list	crates/actions/src/documents/revisions.rs::documents.revision_list
+P-0828	@nonagentic/n8n-nodes-requirements.requirements.pmProjects.listProjectPhaseEvents	replacement:events.list	docs/plans/02-DATA-ARCHITECTURE.md::7.2 pm_project_phase_events -> event; crates/actions/src/handlers.rs::events.list
+P-0829	@nonagentic/n8n-nodes-requirements.requirements.pmProjects.setProjectPhase	replacement:wbs.update	docs/SPEC_V2.md::D29/D32 (phases are WBS node kinds); crates/actions/src/spine/mod.rs::wbs.update
+P-0830	@nonagentic/n8n-nodes-requirements.requirements.pmProjects.updateProject	action:projects.update	crates/actions/src/board/projects.rs::projects.update
+P-0831	@nonagentic/n8n-nodes-requirements.requirements.pmProjectTypes.createProjectType	replacement:catalogues.import	docs/plans/slices/S07-requirements-search.md section 5.4 (catalogue import); crates/actions/src/governance/catalogues.rs::catalogues.import
+P-0832	@nonagentic/n8n-nodes-requirements.requirements.pmProjectTypes.getProjectType	replacement:catalogues.list	crates/actions/src/governance/catalogues.rs::catalogues.list (kind=project_type; no single-row get)
+P-0833	@nonagentic/n8n-nodes-requirements.requirements.pmProjectTypes.getProjectTypeCardTypes	replacement:catalogues.list	crates/actions/src/governance/catalogues.rs::catalogues.list (project_type.meta.matrix)
+P-0834	@nonagentic/n8n-nodes-requirements.requirements.pmProjectTypes.listProjectTypes	replacement:catalogues.list	crates/actions/src/governance/catalogues.rs::catalogues.list (kind=project_type)
+P-0835	@nonagentic/n8n-nodes-requirements.requirements.pmProjectTypes.setProjectTypeCardTypes	replacement:catalogues.import	crates/actions/src/governance/catalogues.rs::catalogues.import (project_type.meta.matrix is imported with the catalogue)
+P-0836	@nonagentic/n8n-nodes-requirements.requirements.pmProjectTypes.updateProjectType	replacement:catalogues.import	crates/actions/src/governance/catalogues.rs::catalogues.import (catalogue rows are imported, not row-edited)
+P-0837	@nonagentic/n8n-nodes-requirements.requirements.principles.createPrinciple	action:principles.create	crates/actions/src/governance/assets.rs::principles.create
+P-0838	@nonagentic/n8n-nodes-requirements.requirements.principles.patchPrinciple	action:principles.update	crates/actions/src/governance/assets.rs::principles.update
+P-0839	@nonagentic/n8n-nodes-requirements.requirements.principles.projectCopyPrinciple	dropped:parity-summary-project-copy	parity/SUMMARY.md::The five A-hit contradictions (project-copy dropped; replacement:principles.update)
+P-0840	@nonagentic/n8n-nodes-requirements.requirements.requirements.createRequirement	action:requirements.create	crates/actions/src/governance/assets.rs::requirements.create
+P-0841	@nonagentic/n8n-nodes-requirements.requirements.requirements.patchRequirement	action:requirements.update	crates/actions/src/governance/assets.rs::requirements.update
+P-0842	@nonagentic/n8n-nodes-requirements.requirements.requirements.projectCopyRequirement	dropped:parity-summary-project-copy	parity/SUMMARY.md::The five A-hit contradictions (project-copy dropped; replacement:requirements.update)
+P-0843	@nonagentic/n8n-nodes-requirements.requirementsTool.architectureTools.generateArchitectureView	action:model_views.generate	crates/actions/src/model/model_views.rs::model_views.generate
+P-0844	@nonagentic/n8n-nodes-requirements.requirementsTool.architectureViews.createArchitectureView	action:model_views.create	crates/actions/src/model/model_views.rs::model_views.create
+P-0845	@nonagentic/n8n-nodes-requirements.requirementsTool.architectureViews.createArchitectureViewConnection	action:view_connections.create	crates/actions/src/model/connections.rs::view_connections.create
+P-0846	@nonagentic/n8n-nodes-requirements.requirementsTool.architectureViews.createArchitectureViewObject	action:view_objects.create	crates/actions/src/model/objects.rs::view_objects.create
+P-0847	@nonagentic/n8n-nodes-requirements.requirementsTool.architectureViews.getArchitectureView	action:model_views.get	crates/actions/src/model/model_views.rs::model_views.get
+P-0848	@nonagentic/n8n-nodes-requirements.requirementsTool.architectureViews.listArchitectureViews	action:model_views.list	crates/actions/src/model/model_views.rs::model_views.list
+P-0849	@nonagentic/n8n-nodes-requirements.requirementsTool.architectureViews.renderArchitectureView	action:models.render	crates/actions/src/model/exchange.rs::models.render
+P-0850	@nonagentic/n8n-nodes-requirements.requirementsTool.architectureViews.updateArchitectureView	action:model_views.update	crates/actions/src/model/model_views.rs::model_views.update
+P-0851	@nonagentic/n8n-nodes-requirements.requirementsTool.decisions.listDecisions	action:decisions.list	crates/actions/src/governance/assets.rs::decisions.list
+P-0852	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.applyChangeSet	dropped:data-arch-modeling-change-sets	docs/plans/02-DATA-ARCHITECTURE.md::7.2 modeling_change_sets drop; docs/plans/slices/S08-governance-modelling.md section 3 OUT
+P-0853	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.createChangeSet	dropped:data-arch-modeling-change-sets	docs/plans/02-DATA-ARCHITECTURE.md::7.2 modeling_change_sets drop; docs/plans/slices/S08-governance-modelling.md section 3 OUT
+P-0854	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.createModel	action:models.create	crates/actions/src/model/models.rs::models.create
+P-0855	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.getModel	action:models.get	crates/actions/src/model/models.rs::models.get
+P-0856	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.listModels	action:models.list	crates/actions/src/model/models.rs::models.list
+P-0857	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.listValidationFindings	replacement:models.get	crates/actions/src/model/models.rs::models.get (newest validation run with findings); 02-DATA-ARCHITECTURE 7.2 modeling_validation_findings -> model_validation_run
+P-0858	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.publishModelRevision	action:models.publish	crates/actions/src/model/models.rs::models.publish
+P-0859	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.reviewModelRevision	replacement:approvals.decide	docs/plans/slices/S08-governance-modelling.md::8 trap 1 (review = approval); crates/actions/src/control/approvals.rs::approvals.decide
+P-0860	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.runModelValidation	action:models.validate	crates/actions/src/model/models.rs::models.validate
+P-0861	@nonagentic/n8n-nodes-requirements.requirementsTool.modeling.sealModelRevision	replacement:models.publish	crates/actions/src/model/models.rs::models.publish (freeze the graph into a published revision; no separate seal state)
+P-0862	@nonagentic/n8n-nodes-requirements.requirementsTool.pmCardTypes.getCardType	replacement:card_types.list	crates/actions/src/board/card_types.rs::card_types.list (no card_types.get)
+P-0863	@nonagentic/n8n-nodes-requirements.requirementsTool.pmProjects.getProject	action:projects.get	crates/actions/src/board/projects.rs::projects.get
+P-0864	@nonagentic/n8n-nodes-requirements.requirementsTool.pmProjects.getProjectBriefVersion	replacement:documents.revision_get	crates/actions/src/documents/revisions.rs::documents.revision_get
+P-0865	@nonagentic/n8n-nodes-requirements.requirementsTool.pmProjects.getProjectWipLimit	replacement:boards.get	crates/actions/src/board/boards.rs::boards.get (ListOut.wip_limit is the lane instance; 02-DATA-ARCHITECTURE 7.2 pm_wip_limits is a catalogue template)
+P-0866	@nonagentic/n8n-nodes-requirements.requirementsTool.pmProjects.listProjectBriefVersions	replacement:documents.revision_list	crates/actions/src/documents/revisions.rs::documents.revision_list
+P-0867	@nonagentic/n8n-nodes-requirements.requirementsTool.pmProjects.listProjectPhaseEvents	replacement:events.list	docs/plans/02-DATA-ARCHITECTURE.md::7.2 pm_project_phase_events -> event; crates/actions/src/handlers.rs::events.list
+P-0868	@nonagentic/n8n-nodes-requirements.requirementsTool.pmProjectTypes.getProjectType	replacement:catalogues.list	crates/actions/src/governance/catalogues.rs::catalogues.list (kind=project_type)
+P-0869	@nonagentic/n8n-nodes-requirements.requirementsTool.pmProjectTypes.getProjectTypeCardTypes	replacement:catalogues.list	crates/actions/src/governance/catalogues.rs::catalogues.list (project_type.meta.matrix)
+P-0870	@nonagentic/n8n-nodes-requirements.requirementsTool.principles.listPrinciples	action:principles.list	crates/actions/src/governance/assets.rs::principles.list
+P-0871	@nonagentic/n8n-nodes-requirements.requirementsTool.requirements.listRequirements	action:requirements.list	crates/actions/src/governance/assets.rs::requirements.list
+P-0872	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.createUmlDiagram	action:model_views.create	crates/actions/src/model/model_views.rs::model_views.create (uml_diagram is model_view kind)
+P-0873	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.createUmlDiagramConnection	action:view_connections.create	crates/actions/src/model/connections.rs::view_connections.create
+P-0874	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.createUmlDiagramObject	action:view_objects.create	crates/actions/src/model/objects.rs::view_objects.create
+P-0875	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.createUmlElement	action:model_elements.create	crates/actions/src/model/elements.rs::model_elements.create
+P-0876	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.createUmlRelationship	action:model_relationships.create	crates/actions/src/model/relationships.rs::model_relationships.create
+P-0877	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.getUmlDiagram	action:model_views.get	crates/actions/src/model/model_views.rs::model_views.get
+P-0878	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.renderUmlDiagram	action:models.render	crates/actions/src/model/exchange.rs::models.render
+P-0879	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.updateUmlDiagram	action:model_views.update	crates/actions/src/model/model_views.rs::model_views.update
+P-0880	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.updateUmlElement	action:model_elements.update	crates/actions/src/model/elements.rs::model_elements.update
+P-0881	@nonagentic/n8n-nodes-requirements.requirementsTool.uml.validateUmlFragment	test:conveyor-api::a_uml_model_accepts_its_own_profile_and_refuses_archimate_kinds	crates/api/tests/model_profile.rs::a_uml_model_accepts_its_own_profile_and_refuses_archimate_kinds; pure check crates/domain/src/validate.rs::check
+P-0882	@nonagentic/n8n-nodes-workflows.n8nWorkflowsApi.execution.get	action:workflow_runs.get	crates/actions/src/workflow/runs.rs::workflow_runs.get
+P-0883	@nonagentic/n8n-nodes-workflows.n8nWorkflowsApi.execution.list	replacement:runs.list	crates/actions/src/control/runs.rs::runs.list (workflow runs are run rows; no workflow_runs.list action)
+P-0884	@nonagentic/n8n-nodes-workflows.n8nWorkflowsApi.workflow.get	action:workflows.get	crates/actions/src/workflow/actions.rs::workflows.get
+P-0885	@nonagentic/n8n-nodes-workflows.n8nWorkflowsApi.workflow.list	action:workflows.list	crates/actions/src/workflow/actions.rs::workflows.list
+P-0886	ask_fr	replacement:process_runs.start	seed/processes/named.yaml::ask_fr (the seeded human-approval process)
+P-0887	conveyor.start	action:projects.create	docs/plans/slices/S13-n8n-engine.md section 5.8; parity/n8n-dispositions.tsv::conveyor.start=absorbed:projects.create
+P-0888	err.card	test:conveyor-api::a_failed_run_blocks_the_card_comments_once_and_starts_one_coach	crates/api/tests/computed_set.rs::a_failed_run_blocks_the_card_comments_once_and_starts_one_coach
+P-0889	wip.pull	replacement:cards.move	crates/actions/src/board/pull.rs::wip_pull (selects intake cards to the WIP cap and moves each via cards.move); docs/plans/slices/S13-n8n-engine.md section 5.8
+P-0912	GET /api/boards/{id}	action:boards.get	crates/actions/src/board/boards.rs::boards.get
+P-0915	GET /api/cards/{cardId}/comments	replacement:cards.get	crates/actions/src/board/cards.rs::cards.get (CardView carries comments; no comment-list action)
+P-0916	GET /api/cards/{id}	action:cards.get	crates/actions/src/board/cards.rs::cards.get
+P-0919	GET /api/lists/{listId}/cards	action:cards.list	crates/actions/src/board/cards.rs::cards.list (CardsListIn.list_id selects the lane)
+P-0934	PATCH /api/cards/{id}	action:cards.update	crates/actions/src/board/cards.rs::cards.update
+P-0963	POST /api/cards/{cardId}/comments	action:cards.comment	crates/actions/src/board/cards.rs::cards.comment
+P-0973	POST /api/lists/{listId}/cards	action:cards.create	crates/actions/src/board/cards.rs::cards.create
+P-1051	GET /architecture/views/	action:model_views.list	crates/actions/src/model/model_views.rs::model_views_list
+P-1052	GET /architecture/views/{vid}	action:model_views.get	crates/actions/src/model/model_views.rs::model_views_get
+P-1056	GET /architecture/views/{vid}/render	action:models.render	crates/actions/src/model/exchange.rs::models_render — the view id selects what is drawn
+P-1060	GET /decisions/	action:decisions.list	crates/actions/src/governance/assets.rs::decisions_list
+P-1066	GET /health	test:conveyor-server::the_health_and_metrics_routes_are_not_licence_gated	apps/server/tests/events.rs::the_health_and_metrics_routes_are_not_licence_gated (/health)
+P-1067	GET /health/live	test:conveyor-server::the_health_and_metrics_routes_are_not_licence_gated	apps/server/tests/events.rs::the_health_and_metrics_routes_are_not_licence_gated (/health/live)
+P-1068	GET /health/ready	test:conveyor-server::the_health_and_metrics_routes_are_not_licence_gated	apps/server/tests/events.rs::the_health_and_metrics_routes_are_not_licence_gated (/health/ready)
+P-1070	GET /modeling/models/	action:models.list	crates/actions/src/model/models.rs::models_list
+P-1071	GET /modeling/models/{model_id}	action:models.get	crates/actions/src/model/models.rs::models_get
+P-1092	GET /modeling/validation-runs/{run_id}/findings	replacement:models.get	crates/actions/src/model/models.rs::models_get (latest_validation_run carries its findings)
+P-1099	GET /pm/card-types/	action:card_types.list	crates/actions/src/board/card_types.rs::card_types_list
+P-1100	GET /pm/card-types/{eid}	replacement:card_types.list	crates/actions/src/board/card_types.rs::card_types_list (one whole-catalogue read; there is no per-id get)
+P-1101	GET /pm/cards/{planka_card_id}/ledger	replacement:memory.recall	crates/actions/src/memory/recall.rs::memory_recall + parity/SUMMARY.md (the card ledger is re-keyed to the conveyor card id)
+P-1112	GET /pm/project-phases/	replacement:catalogues.list	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (pm_project_phases → catalogue_entry kind='phase')
+P-1114	GET /pm/project-types/	replacement:catalogues.list	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (pm_project_types → catalogue_entry kind='project_type')
+P-1115	GET /pm/project-types/{eid}	replacement:catalogues.list	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (pm_project_types → catalogue_entry kind='project_type')
+P-1116	GET /pm/project-types/{eid}/card-types	replacement:catalogues.list	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (pm_project_type_card_types → the matrix inside project_type.meta)
+P-1119	GET /pm/projects/{eid}	action:projects.get	crates/actions/src/board/projects.rs::projects_get
+P-1120	GET /pm/projects/{eid}/brief/versions	replacement:documents.revision_list	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (pm_project_brief_versions → revision) + crates/actions/src/documents/revisions.rs::documents_revisions_list
+P-1121	GET /pm/projects/{eid}/brief/versions/{brief_version}	replacement:documents.revision_get	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (pm_project_brief_versions → revision) + crates/actions/src/documents/revisions.rs::documents_revisions_get
+P-1125	GET /pm/projects/{eid}/phase-events	replacement:events.list	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (pm_project_phase_events → event) + crates/actions/src/handlers.rs::events_list
+P-1127	GET /pm/projects/{eid}/wip-limit	replacement:boards.get	docs/plans/02-DATA-ARCHITECTURE.md §2.3 (list.wip_limit) + crates/actions/src/board/boards.rs::boards_get
+P-1128	GET /pm/projects/by-planka-board/{planka_board_id}	replacement:projects.get	crates/workflow/src/n8n.rs::effect_of (getProjectByPlankaBoard → projects.get); the Planka key retires with Planka (docs/SPEC.md §4)
+P-1140	GET /principles/	action:principles.list	crates/actions/src/governance/assets.rs::principles_list
+P-1146	GET /requirements/	action:requirements.list	crates/actions/src/governance/assets.rs::requirements_list
+P-1163	GET /uml/diagrams/{id}	action:model_views.get	crates/actions/src/model/model_views.rs::model_views_get — a UML diagram is model_view(kind=uml_diagram)
+P-1166	GET /uml/diagrams/{id}/render	action:models.render	crates/actions/src/model/exchange.rs::models_render
+P-1174	PATCH /decisions/{did}	action:decisions.update	crates/actions/src/governance/assets.rs::decisions_update
+P-1179	PATCH /principles/{pid}	action:principles.update	crates/actions/src/governance/assets.rs::principles_update
+P-1180	PATCH /requirements/{rid}	action:requirements.update	crates/actions/src/governance/assets.rs::requirements_update
+P-1193	POST /architecture/tools/generate-view	action:model_views.generate	crates/actions/src/model/model_views.rs::model_views_generate
+P-1198	POST /architecture/views/	action:model_views.create	crates/actions/src/model/model_views.rs::model_views_create
+P-1199	POST /architecture/views/{vid}/connections	action:view_connections.create	crates/actions/src/model/connections.rs::view_connections_create
+P-1200	POST /architecture/views/{vid}/objects	action:view_objects.create	crates/actions/src/model/objects.rs::view_objects_create
+P-1202	POST /decisions/	action:decisions.create	crates/actions/src/governance/assets.rs::decisions_create
+P-1208	POST /modeling/change-sets/{change_set_id}/apply	dropped:change-sets-are-transactions	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (modeling_change_sets — drop; drafts are transactional)
+P-1210	POST /modeling/models/	action:models.create	crates/actions/src/model/models.rs::models_create
+P-1211	POST /modeling/models/{model_id}/change-sets	dropped:change-sets-are-transactions	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (modeling_change_sets — drop; drafts are transactional)
+P-1213	POST /modeling/models/{model_id}/revisions	replacement:models.publish	crates/actions/src/model/models.rs::models_publish — publish is the only writer of a revision (S08 §10.3); a separate seal step does not exist
+P-1214	POST /modeling/models/{model_id}/revisions/{rev_id}/publish	action:models.publish	crates/actions/src/model/models.rs::models_publish — freezes the current graph; the revision id is not an input
+P-1215	POST /modeling/models/{model_id}/revisions/{rev_id}/reviews	replacement:approvals.request	docs/plans/02-DATA-ARCHITECTURE.md §7.2 (modeling_reviews → approval) + crates/actions/src/control/approvals.rs::approvals_request
+P-1216	POST /modeling/models/{model_id}/validation-runs	action:models.validate	crates/actions/src/model/models.rs::models_validate
+P-1224	POST /pm/cards/{planka_card_id}/ledger	replacement:memory.remember	crates/actions/src/memory/remember.rs::memory_remember + parity/SUMMARY.md (the card ledger is re-keyed to the conveyor card id)
+P-1232	POST /pm/project-types/	replacement:catalogues.import	crates/actions/src/governance/catalogues.rs::catalogues_import — the vocabulary lands by importing seed/catalogue.json, not one-row CRUD
+P-1234	POST /pm/projects/{eid}/brief/versions	replacement:documents.compose	crates/actions/src/documents/actions.rs::documents_compose — the brief is a canonical output category; later versions are revisions
+P-1241	POST /principles/	action:principles.create	crates/actions/src/governance/assets.rs::principles_create
+P-1245	POST /requirements/	action:requirements.create	crates/actions/src/governance/assets.rs::requirements_create
+P-1254	POST /uml/diagrams	action:model_views.create	crates/actions/src/model/model_views.rs::model_views_create
+P-1255	POST /uml/diagrams/{id}/connections	action:view_connections.create	crates/actions/src/model/connections.rs::view_connections_create
+P-1256	POST /uml/diagrams/{id}/objects	action:view_objects.create	crates/actions/src/model/objects.rs::view_objects_create
+P-1257	POST /uml/elements	action:model_elements.create	crates/actions/src/model/elements.rs::model_elements_create
+P-1259	POST /uml/relationships	action:model_relationships.create	crates/actions/src/model/relationships.rs::model_relationships_create
+P-1260	POST /uml/tools/validate	replacement:models.validate	crates/actions/src/model/models.rs::models_validate — a validation is a queued run on a model, not a stateless fragment check
+P-1264	PUT /architecture/views/{vid}	action:model_views.update	crates/actions/src/model/model_views.rs::model_views_update
+P-1279	PUT /pm/project-types/{eid}	replacement:catalogues.import	crates/actions/src/governance/catalogues.rs::catalogues_import — the vocabulary lands by importing seed/catalogue.json, not one-row CRUD
+P-1280	PUT /pm/project-types/{eid}/card-types	replacement:catalogues.import	crates/actions/src/governance/catalogues.rs::catalogues_import — the matrix lives in project_type.meta of the import
+P-1281	PUT /pm/projects/{eid}	action:projects.update	crates/actions/src/board/projects.rs::projects_update
+P-1283	PUT /pm/projects/{eid}/phase	dropped:phase-write-not-built	crates/actions/src/board/views.rs::ProjectUpdateIn — project.phase_code exists but no action writes it
+P-1294	PUT /uml/diagrams/{id}	action:model_views.update	crates/actions/src/model/model_views.rs::model_views_update
+P-1297	PUT /uml/elements/{id}	action:model_elements.update	crates/actions/src/model/elements.rs::model_elements_update
+P-1300	kata.open	replacement:process_runs.start	seed/processes/named.yaml::kata.open (the seeded kata process)
