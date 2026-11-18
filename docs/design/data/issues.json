@@ -1,11 +1,32 @@
 {
   "issues": [
     {
+      "number": 363,
+      "title": "docs: retire the homepage-mirror references; add a public-history note to the delivery-system evidence",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/363",
+      "updatedAt": "2026-11-18T19:57:45Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 357,
       "title": "console: a self-gate must not offer a decision the store refuses",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/357",
-      "updatedAt": "2026-11-18T18:49:57Z",
+      "updatedAt": "2026-11-18T19:43:55Z",
       "labels": [
         {
           "name": "unit",
@@ -2523,7 +2544,7 @@
       "title": "T13 \u2014 Tool platform",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/76",
-      "updatedAt": "2026-11-18T19:14:49Z",
+      "updatedAt": "2026-11-18T19:37:06Z",
       "labels": [
         {
           "name": "unit",
