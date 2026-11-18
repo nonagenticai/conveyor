@@ -11,6 +11,8 @@
 //! docs/design/data/organisation.json  industry → department → job → release → binding
 //! docs/design/data/config.json        catalogue, capabilities, agents, procedures, prompts
 //! docs/design/data/work.json          boards, lists, cards, runs, approvals, comments, people
+//! docs/design/data/msp.json           benefits, realization, stakeholders, tranches, baselines,
+//!                                     cadence, WBS, registers and typed dependencies
 //! docs/design/data/artefacts.json     governed assets and document metadata
 //! docs/design/data/measure.json       inference aggregates (tokens, cache classes)
 //! docs/design/data/secrets.json       secret METADATA only — never a value
@@ -212,6 +214,12 @@ pub async fn run_with_pool(
     )?;
     write_file(
         &args.out,
+        "msp.json",
+        with_header(data.msp, SCHEMA, &generated_at),
+        &mut files,
+    )?;
+    write_file(
+        &args.out,
         "artefacts.json",
         with_header(data.artefacts, SCHEMA, &generated_at),
         &mut files,
@@ -309,6 +317,7 @@ pub(crate) fn snapshot_js(
         "organisation": data.organisation,
         "config": data.config,
         "work": data.work,
+        "msp": data.msp,
         "artefacts": data.artefacts,
         "measure": data.measure,
     });

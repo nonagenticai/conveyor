@@ -1111,6 +1111,7 @@ dependencies = [
  "tower",
  "tracing",
  "utoipa",
+ "uuid",
 ]
 
 [[package]]

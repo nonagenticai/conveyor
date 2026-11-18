@@ -211,7 +211,10 @@ mod tests {
                 // (0048_host_registry.sql, SPEC_V2 §10.4.1). A platform fact — no tenant column.
                 (48, "host registry".to_owned()),
                 (49, "pm job".to_owned()),
-                (50, "approval policies".to_owned())
+                (50, "approval policies".to_owned()),
+                // #305: the durable tranche-review record — the decision and the evidence a
+                // review was taken on (0051_tranche_review.sql).
+                (51, "tranche review".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

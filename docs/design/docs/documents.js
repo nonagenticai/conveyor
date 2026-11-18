@@ -114,8 +114,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "8e45c766e9b610287cebaf7bc352c2582ec7cf32f30bfd0f49afdbac2c9e86aa",
-      "bytes": 17873,
+      "sha256": "415942957fe0ca06bb470dae61088a445116abc4f025adecbe4c99c6bfc1e75c",
+      "bytes": 18510,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -171,6 +171,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "1cce823150b032a7fd913de3d6ed93f040e0ca36297b7adede9055181e93eeea",
       "bytes": 8600,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-research-cutover.md"
+    },
+    {
+      "title": "Scientific cutover — 2026-11-16, completed 2026-11-18",
+      "path": "docs/evidence/2026-11-16-scientific-cutover.html",
+      "source": "docs/evidence/2026-11-16-scientific-cutover.md",
+      "section": "Evidence",
+      "sha256": "3ff5371ed71656f5bb7f15a0d19b967ccddc168d6667b0c63c582788704d02d8",
+      "bytes": 5052,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-scientific-cutover.md"
     },
     {
       "title": "The dead w2v estate retired — 2026-11-17",
@@ -411,26 +420,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "9b038b4f0930f17dfeb6a3d2bd7a44308cffae1e3b5e874ec28b182c384300e9",
-      "bytes": 11119,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
-    },
-    {
-      "title": "V1 → SPECV2 coverage",
-      "path": "docs/evidence/v2-coverage.html",
-      "source": "docs/evidence/v2-coverage.md",
-      "section": "Evidence",
-      "sha256": "9b038b4f0930f17dfeb6a3d2bd7a44308cffae1e3b5e874ec28b182c384300e9",
-      "bytes": 11119,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
-    },
-    {
-      "title": "V1 → SPECV2 coverage",
-      "path": "docs/evidence/v2-coverage.html",
-      "source": "docs/evidence/v2-coverage.md",
-      "section": "Evidence",
-      "sha256": "9b038b4f0930f17dfeb6a3d2bd7a44308cffae1e3b5e874ec28b182c384300e9",
-      "bytes": 11119,
+      "sha256": "3ff351d29ab98031c6fa07e58bd0c96382b4e95a4e0074081019a5de06dbe444",
+      "bytes": 11148,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -537,8 +528,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/P0-programme-definition.html",
       "source": "docs/plans/P0-programme-definition.md",
       "section": "Plans",
-      "sha256": "bc9edcb4db7ae7f11f6677924b28ec68cb53040b101fe64cafedd469b9a26ec4",
-      "bytes": 13660,
+      "sha256": "538f4aa69586234a3a03c4adb93a51fb30dac859e0b6dc7681ef04988f18cd50",
+      "bytes": 13658,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
     },
     {

@@ -90,7 +90,7 @@ use serde_json::{Value, json};
 /// **#282 adds 3 internal**: the approval-policy family.
 /// **T3 adds 6 internal**: the PM job.
 /// **#154 adds 1 internal**: `analyse.site`, the analysis library's invocable read.
-const EXPECTED: [&str; 414] = [
+const EXPECTED: [&str; 428] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -118,14 +118,22 @@ const EXPECTED: [&str; 414] = [
     "benchmark_runs.trend",
     "benchmark_suites.list",
     "benefits.create",
+    "benefits.delete",
     "benefits.get",
     "benefits.link",
+    "benefits.link_list",
     "benefits.list",
+    "benefits.transition_list",
+    "benefits.transition_upsert",
+    "benefits.unlink",
+    "benefits.update",
     "billing.summary",
     "boards.get",
     "boards.set_member",
     "cadences.create",
+    "cadences.delete",
     "cadences.list",
+    "cadences.update",
     "capabilities.bind_knowledge",
     "capabilities.get",
     "capabilities.list",
@@ -415,6 +423,7 @@ const EXPECTED: [&str; 414] = [
     "refinements.list",
     "refinements.publish",
     "registers.create",
+    "registers.delete",
     "registers.get",
     "registers.list",
     "registers.update",
@@ -454,6 +463,7 @@ const EXPECTED: [&str; 414] = [
     "stakeholders.get",
     "stakeholders.list",
     "stakeholders.profile_create",
+    "stakeholders.profile_delete",
     "stakeholders.profile_list",
     "stakeholders.profile_update",
     "stakeholders.update",
@@ -470,8 +480,11 @@ const EXPECTED: [&str; 414] = [
     "trace_links.delete",
     "trace_links.list",
     "tranches.create",
+    "tranches.delete",
     "tranches.list",
     "tranches.review",
+    "tranches.review_list",
+    "tranches.update",
     "view_connections.create",
     "view_connections.delete",
     "view_connections.update",
@@ -479,6 +492,7 @@ const EXPECTED: [&str; 414] = [
     "view_objects.delete",
     "view_objects.update",
     "wbs.create",
+    "wbs.delete",
     "wbs.get",
     "wbs.list",
     "wbs.update",
@@ -558,8 +572,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 18 — they call the host agent over ssh, not a declared external service.
     // #282 adds `approval_policies.list|get|set` (internal): 392 → 395; external stays 18.
     // T3 adds the six PM actions (all internal): 386 → 392.
-    // #154 adds `analyse.site` (internal, read): 395 → 396; external stays 18.
-    assert_eq!((internal, external), (396, 18));
+    // #305 adds the fourteen MSP edit/read actions, all internal: 395 -> 409; external stays 18.
+    // #154 adds `analyse.site` (internal, read): 409 -> 410; external stays 18.
+    assert_eq!((internal, external), (410, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

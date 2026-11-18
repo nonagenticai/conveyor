@@ -40,12 +40,16 @@ operator console's; a signed-out direct hash is a sign-in gate, and a reviewer c
 explicitly with `?design=1`. The pack still loads the fixture scripts, but no public page renders
 them.
 
-**Programme definition** (`programme`, design study) is the MSP layer proposed in SPEC_V2 §8.3:
-the mandate, brief, blueprint and business case; the benefits map and the benefit profiles; the
-projects dossier; tranches with end-of-tranche reviews; stakeholder profiles; and the transition
-and measured realization of each benefit. The tab demonstrates the two distinctions the model
-depends on — a capability is not a benefit, and a tranche review is a programme decision, not a
-demo — and its controls change only the local fixture state.
+**Programme definition** (`programme`) is the MSP layer of SPEC_V2 §8.3: the definition set,
+the benefits map and benefit profiles, tranches with end-of-tranche reviews, stakeholder profiles,
+and the transition and measured realization of each benefit. Signed in, its five tabs read and
+write the programme store — `programmes.list`/`update`, `benefits.list`/`create`/`update`/`delete`/
+`link`/`link_list`/`unlink`/`transition_list`/`transition_upsert`, `tranches.list`/`create`/
+`update`/`delete`/`review_list`/`review`, `stakeholders.profile_list`/`profile_create`/
+`profile_update`/`profile_delete` and `cadences.list`/`create`/`update`/`delete`, every edit
+carrying `If-Match`. Signed out, the tabs render the published `msp` snapshot read-only;
+`?design=1` keeps the fixture study. The two distinctions hold throughout: a capability is not a
+benefit, and a tranche review is a programme decision, not a demo.
 
 **Architecture capability** (`adm`, design study) is the TOGAF ADM layer proposed in SPEC_V2
 §8.1: the Preliminary phase (principles, tailored profile, Architecture Board, maturity and
@@ -128,8 +132,11 @@ migrations, the compiled action-registry dump and `v2.js` — never a hand-writt
 the eight pack checks and `build-docs.py --check`.
 
 - **Portfolio & plan:** the computed in-flight set, programme shared configuration, typed
-  project-dependency edges, the WSJF backlog, PI cadence, capacity and per-project metering; then
-  WBS, frozen baseline vs computed forecast, one six-kind register and controlled change.
+  project-dependency edges, the WSJF backlog, PI cadence, capacity and per-project metering; the
+  Plan **WBS**, **Baseline vs forecast**, **Registers** and **Cadence** tabs read and write the
+  project's store rows signed in (`wbs.*`, `baselines.list`/`take`, `registers.*` and
+  `project_dependencies.*`), and render the published `msp` snapshot read-only signed out. The
+  earlier WSJF, capacity, metering and change-control fixtures stay the study.
 - **Organisation & jobs:** industry → ordered departments → jobs, the full job anatomy, immutable
   releases, tenant-scoped bindings and the stale-binding refusal; the authority matrix, approval
   policies, the rule → laya → generation → human decision ladder, tenant refinements and laya config.

@@ -47,6 +47,16 @@ pub enum ProposalError {
     /// The input could not be encoded as JSON for sealing.
     #[error("the action input could not be encoded: {0}")]
     Encode(String),
+    /// A destructive action declares an approval target, but this input does not yield one
+    /// (conveyor#284). Refused rather than stored: a proposal whose gate can never be satisfied
+    /// is a question a person would answer for nothing.
+    #[error("{action} declares an approval target but this input yields none: {detail}")]
+    NoTarget {
+        /// The action the proposal was for.
+        action: &'static str,
+        /// What the action's own target function said.
+        detail: String,
+    },
 }
 
 /// How long a claim on one proposal holds before another worker may retry it. The idempotency key
@@ -102,11 +112,30 @@ pub fn meta_document(
     let plaintext = serde_json::to_vec(&request.input)
         .map_err(|error| ProposalError::Encode(error.to_string()))?;
     let (ciphertext, key_id) = conveyor_store::secret::sealer()?.seal(tenant, &plaintext)?;
+    // conveyor#284: a destructive action's gate compares `approval.meta.target` with the target
+    // the invocation computes. Storing it HERE, from that same function, is what makes an
+    // approval a person grants actually authorise the call it was granted for — without it, the
+    // proposal approves cleanly and then 403s the execution it just permitted.
+    //
+    // A destructive action whose input yields no target is refused: storing an approval that can
+    // never authorise anything would ask a person to answer a question with no effect.
+    let target = match request.spec.approval_target {
+        None => None,
+        Some(compute) => {
+            Some(
+                compute(&request.input).map_err(|detail| ProposalError::NoTarget {
+                    action: request.spec.name,
+                    detail,
+                })?,
+            )
+        }
+    };
     Ok(json!({
         "conversation_id": request.conversation_id,
         "turn_id": request.turn_id,
         "action": request.spec.name,
         "effect": request.spec.effect.as_str(),
+        "target": target,
         "input": visible,
         "diff": diff(&visible),
         "sealed_input": base64::engine::general_purpose::STANDARD.encode(&ciphertext),
@@ -368,7 +397,12 @@ pub async fn execute(
             input,
             precondition: None,
             idempotency_key: Some(key.clone()),
-            approval_id: None,
+            // conveyor#284: the executor binds THE approval it was granted — not "the latest
+            // approved row". The approval is this proposal's own gate, and the invoke boundary
+            // then compares its `meta.target` with the target this input computes: an approval
+            // for another object is refused there (`403 approval_wrong_target`) rather than
+            // executing something a person did not authorise.
+            approval_id: Some(approval_id),
             actor_id: proposer_id.unwrap_or(approval_id),
             actor_kind: proposer_kind.to_owned(),
             role: proposer_role.unwrap_or(Role::Member),

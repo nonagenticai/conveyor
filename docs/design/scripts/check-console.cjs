@@ -82,6 +82,218 @@ const NOBOARD = {
   version: 1,
 };
 
+
+// The programme store's rows (#305): programme-scoped benefits, map edges, transitions,
+// tranches, reviews, stakeholders and cadence; project-scoped WBS, baselines, register,
+// dependencies; and the tenant's in-flight set.
+function freshMsp() {
+  const stamp = "2026-11-16T00:00:00Z";
+  return {
+    programme: {
+      id: "prog-1",
+      name: "conveyor buildout",
+      key: "CONV",
+      status: "active",
+      owner_user_id: null,
+      version: 1,
+      created_at: stamp,
+      updated_at: stamp,
+    },
+    benefits: [
+      {
+        id: "ben-1",
+        programme_id: "prog-1",
+        reference: "BEN-01",
+        description: "Deliver units without handoffs",
+        category: "delivery",
+        objectives: "shorter delivery cycle",
+        observable_outcome: "lead time falls",
+        kpis: "lead time",
+        baseline: 12,
+        target: 6,
+        measurement_method: "board cycle time",
+        capabilities: "delivery management",
+        operational_area: "engineering",
+        status: "tracking",
+        version: 2,
+        created_at: stamp,
+        updated_at: stamp,
+      },
+      {
+        id: "ben-2",
+        programme_id: "prog-1",
+        reference: "BEN-02",
+        description: "A benefit with no measured transition",
+        category: "delivery",
+        observable_outcome: "fewer escalations",
+        status: "tracking",
+        version: 1,
+        created_at: stamp,
+        updated_at: stamp,
+      },
+    ],
+    links: [
+      {
+        id: "bl-1",
+        programme_id: "prog-1",
+        benefit_id: "ben-1",
+        output_ref: "T1 plan spine",
+        capability_ref: "plan management",
+        operational_outcome: "the plan is managed and evidenced",
+        strategic_objective: "faster IT delivery",
+        kind: "benefit",
+        version: 3,
+        created_at: stamp,
+        updated_at: stamp,
+      },
+    ],
+    transitions: [
+      {
+        id: "bt-1",
+        programme_id: "prog-1",
+        benefit_id: "ben-1",
+        baseline_measured_at: "2026-10-01T00:00:00Z",
+        readiness: "ready",
+        enacted_at: "2026-10-15T00:00:00Z",
+        post_measured_at: null,
+        retired_at: null,
+        evidence: "baseline measured in the register",
+        version: 3,
+      },
+    ],
+    tranches: [
+      {
+        id: "tr-1",
+        programme_id: "prog-1",
+        number: 1,
+        entry_criteria: "mandate approved",
+        exit_criteria: "baseline frozen",
+        baseline_ref: "BL-1",
+        review_at: "2026-12-01T00:00:00Z",
+        state: "planned",
+        version: 2,
+      },
+      {
+        id: "tr-2",
+        programme_id: "prog-1",
+        number: 2,
+        entry_criteria: "tranche 1 reviewed",
+        exit_criteria: "benefits measured",
+        baseline_ref: "BL-2",
+        review_at: "2027-03-01T00:00:00Z",
+        state: "planned",
+        version: 1,
+      },
+    ],
+    reviews: [
+      {
+        id: "rv-1",
+        programme_id: "prog-1",
+        tranche_id: "tr-1",
+        tranche_number: 1,
+        decision: "continue",
+        evidence: { baselines: "frozen", benefit_status: "tracking", risk_register: "no high risk" },
+        created_at: "2026-11-01T00:00:00Z",
+        version: 1,
+      },
+    ],
+    stakeholders: [
+      {
+        id: "sp-1",
+        programme_id: "prog-1",
+        name: "Programme sponsor",
+        concerns: "value for money",
+        sensitivities: "review timing",
+        importance: "high",
+        influence: "high",
+        interest: "high",
+        exposure: "high",
+        support_level: "supportive",
+        support_trend: "improving",
+        engagement_target: "weekly",
+        benefits: "BEN-01",
+        disbenefits: "",
+        version: 2,
+      },
+      {
+        id: "sp-2",
+        programme_id: "prog-1",
+        name: "Operations lead",
+        importance: "medium",
+        influence: "medium",
+        support_level: "neutral",
+        version: 1,
+      },
+    ],
+    cadences: [
+      { id: "cd-1", programme_id: "prog-1", kind: "pi", period: "PI 2026.1", state: "active", version: 2 },
+      { id: "cd-2", programme_id: "prog-1", kind: "sprint", period: "Sprint 14", state: "planned", version: 1 },
+    ],
+    wbs: [
+      {
+        id: "wn-1",
+        project_id: "p-s02",
+        code: "S02.1",
+        kind: "phase",
+        title: "Skeleton phase",
+        body: "workspace, tenancy, auth",
+        acceptance: ["the tenancy gate holds"],
+        business_value: 8,
+        time_criticality: 5,
+        risk_reduction: 5,
+        job_size: 5,
+        position: 1,
+        status: "planned",
+        version: 2,
+      },
+      {
+        id: "wn-2",
+        project_id: "p-s02",
+        code: "S02.2",
+        kind: "deliverable",
+        title: "Job and SSE slice",
+        body: "jobs, events",
+        acceptance: ["the event stream resumes"],
+        position: 2,
+        status: "planned",
+        version: 1,
+      },
+    ],
+    baselines: [
+      { id: "bl-proj-1", project_id: "p-s02", kind: "scope", taken_at: "2026-11-01T00:00:00Z", version: 1 },
+    ],
+    registers: [
+      {
+        id: "ri-1",
+        project_id: "p-s02",
+        kind: "risk",
+        title: "Tenancy leak on the shared board",
+        body: "a card could be read by another tenant",
+        status: "open",
+        severity: "high",
+        probability: "low",
+        impact: 4,
+        version: 2,
+      },
+      {
+        id: "ri-2",
+        project_id: "p-s02",
+        kind: "assumption",
+        title: "One database per service",
+        status: "open",
+        severity: "medium",
+        version: 1,
+      },
+    ],
+    dependencies: [
+      { id: "dep-1", project_id: "p-s02", from_project: "p-s02", to_project: "p-noboard", kind: "blocks", status: "open" },
+    ],
+    inFlight: [
+      { id: "p-s02", key: "S02", name: "Skeleton — workspace, tenancy, auth, jobs, SSE", status: "active" },
+    ],
+  };
+}
+
 function freshState() {
   return {
     project: JSON.parse(JSON.stringify(PROJECT)),
@@ -147,6 +359,7 @@ function freshState() {
         required_decisions: 1,
       },
     ],
+    msp: freshMsp(),
     requests: [],
     listBodies: [],
     planPatches: [],
@@ -194,6 +407,14 @@ const SNAPSHOT = {
           depends_on: ["S02"],
         },
       },
+      {
+        id: "p-p0",
+        key: "P0",
+        name: "Programme definition",
+        programme_id: "prog-1",
+        status: "active",
+        meta: { track: "v1", plan: "", issues: [], depends_on: [] },
+      },
     ],
     issue_registry: {
       issues: [
@@ -220,6 +441,100 @@ const SNAPSHOT = {
         },
       ],
     },
+  },
+  msp: {
+    benefit_profiles: [
+      {
+        id: "ben-p0",
+        reference: "BEN-P0",
+        description: "A published benefit",
+        category: "delivery",
+        observable_outcome: "faster delivery",
+        status: "tracking",
+        version: 1,
+      },
+    ],
+    benefit_links: [
+      {
+        id: "bl-p0",
+        benefit_id: "ben-p0",
+        output_ref: "P0 brief",
+        capability_ref: "programme management",
+        operational_outcome: "the definition set is published",
+        strategic_objective: "trusted programme",
+        kind: "benefit",
+        version: 1,
+      },
+    ],
+    benefit_transitions: [
+      {
+        id: "bt-p0",
+        benefit_id: "ben-p0",
+        baseline_measured_at: "2026-10-01T00:00:00Z",
+        readiness: "ready",
+        version: 1,
+      },
+    ],
+    stakeholder_profiles: [
+      {
+        id: "sp-p0",
+        name: "Published sponsor",
+        importance: "high",
+        influence: "high",
+        support_level: "supportive",
+        version: 1,
+      },
+    ],
+    tranches: [
+      {
+        id: "tr-p0",
+        number: 1,
+        state: "reviewed",
+        review_at: "2026-12-01",
+        baseline_ref: "BL-P0",
+        version: 1,
+      },
+    ],
+    tranche_reviews: [
+      {
+        id: "rv-p0",
+        tranche_id: "tr-p0",
+        tranche_number: 1,
+        decision: "continue",
+        evidence: { baselines: "frozen" },
+        created_at: "2026-11-01T00:00:00Z",
+      },
+    ],
+    wbs_nodes: [
+      {
+        id: "wn-p0",
+        code: "P0.1",
+        kind: "phase",
+        title: "Published WBS node",
+        body: "definition set",
+        status: "planned",
+        version: 1,
+      },
+    ],
+    project_baselines: [
+      { id: "bl-p0", kind: "scope", taken_at: "2026-11-01T00:00:00Z", version: 1 },
+    ],
+    register_items: [
+      {
+        id: "ri-p0",
+        kind: "risk",
+        title: "Published register risk",
+        status: "open",
+        severity: "medium",
+        version: 1,
+      },
+    ],
+    cadences: [
+      { id: "cd-p0", kind: "pi", period: "PI 2026.2", state: "active", version: 1 },
+    ],
+    project_dependencies: [
+      { id: "dep-p0", from_project: "p-p0", to_project: "p-s02", kind: "needs", status: "open" },
+    ],
   },
   work: {
     boards: [{ id: "b-s02", project_id: "p-s02" }],
@@ -312,6 +627,44 @@ function startServer({ config, state, snapshot }) {
           "approvals.list",
           "process_runs.start",
           "programmes.list",
+          "programmes.update",
+          "benefits.list",
+          "benefits.create",
+          "benefits.update",
+          "benefits.delete",
+          "benefits.link",
+          "benefits.link_list",
+          "benefits.unlink",
+          "benefits.transition_list",
+          "benefits.transition_upsert",
+          "tranches.list",
+          "tranches.create",
+          "tranches.update",
+          "tranches.delete",
+          "tranches.review_list",
+          "tranches.review",
+          "stakeholders.profile_list",
+          "stakeholders.profile_create",
+          "stakeholders.profile_update",
+          "stakeholders.profile_delete",
+          "cadences.list",
+          "cadences.create",
+          "cadences.update",
+          "cadences.delete",
+          "wbs.list",
+          "wbs.create",
+          "wbs.update",
+          "wbs.delete",
+          "baselines.list",
+          "baselines.take",
+          "registers.list",
+          "registers.create",
+          "registers.update",
+          "registers.delete",
+          "project_dependencies.list",
+          "project_dependencies.create",
+          "project_dependencies.delete",
+          "portfolio.in_flight",
           "runs.cancel",
           "runs.get",
           "runs.list",
@@ -512,6 +865,378 @@ function startServer({ config, state, snapshot }) {
             ],
             next_cursor: null,
           });
+        });
+      }
+      /* ── #305: the programme store — the reads the definition and plan pages issue ─── */
+      if (pathname === "/api/actions/benefits.list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.programme_id, "prog-1", "benefits.list is programme-scoped");
+          json(res, 200, { items: state.msp.benefits, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/benefits.link_list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.programme_id, "prog-1", "benefits.link_list is programme-scoped");
+          json(res, 200, { items: state.msp.links, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/benefits.transition_list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.programme_id, "prog-1", "benefits.transition_list is programme-scoped");
+          json(res, 200, { items: state.msp.transitions, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/tranches.list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.programme_id, "prog-1", "tranches.list is programme-scoped");
+          json(res, 200, { items: state.msp.tranches, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/tranches.review_list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.programme_id, "prog-1", "tranches.review_list is programme-scoped");
+          json(res, 200, { items: state.msp.reviews, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/stakeholders.profile_list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.programme_id, "prog-1", "stakeholders.profile_list is programme-scoped");
+          json(res, 200, { items: state.msp.stakeholders, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/cadences.list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.programme_id, "prog-1", "cadences.list is programme-scoped");
+          json(res, 200, { items: state.msp.cadences, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/wbs.list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.project_id, "p-s02", "wbs.list is project-scoped");
+          json(res, 200, { items: state.msp.wbs, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/baselines.list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.project_id, "p-s02", "baselines.list is project-scoped");
+          json(res, 200, { items: state.msp.baselines, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/registers.list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.project_id, "p-s02", "registers.list is project-scoped");
+          json(res, 200, { items: state.msp.registers, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/project_dependencies.list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.project_id, "p-s02", "project_dependencies.list is project-scoped");
+          json(res, 200, { items: state.msp.dependencies, next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/portfolio.in_flight/invocations") {
+        return readBody(req, () => json(res, 200, { items: state.msp.inFlight, next_cursor: null }));
+      }
+
+      /* ── #305: the programme store — the writes the dialogs issue ──────────────────── */
+      if (pathname === "/api/actions/programmes.update/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          const row = state.msp.programme;
+          assert.equal(input.id, row.id, "programmes.update names the programme row");
+          assert.equal(req.headers["if-match"], `"${row.version}"`, "programmes.update carries If-Match");
+          if (input.name !== undefined) row.name = input.name;
+          if (input.status !== undefined) row.status = input.status;
+          row.version += 1;
+          json(res, 200, row);
+        });
+      }
+      if (pathname === "/api/actions/benefits.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.programme_id, "prog-1", "benefits.create carries its parent programme");
+          const row = Object.assign({}, input, {
+            id: `ben-${state.msp.benefits.length + 1}`,
+            version: 1,
+            created_at: "2026-11-16T00:00:00Z",
+            updated_at: "2026-11-16T00:00:00Z",
+          });
+          state.msp.benefits.push(row);
+          json(res, 201, row);
+        });
+      }
+      if (pathname === "/api/actions/benefits.update/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          const row = state.msp.benefits.find((x) => x.id === input.id);
+          assert.ok(row, "benefits.update names a real benefit");
+          assert.equal(req.headers["if-match"], `"${row.version}"`, "benefits.update carries If-Match");
+          Object.assign(row, input);
+          row.version += 1;
+          json(res, 200, row);
+        });
+      }
+      if (pathname === "/api/actions/benefits.delete/invocations") {
+        return readBody(req, (body) => {
+          const index = state.msp.benefits.findIndex((x) => x.id === body.input.id);
+          assert.ok(index >= 0, "benefits.delete names a real benefit");
+          assert.equal(req.headers["if-match"], `"${state.msp.benefits[index].version}"`, "benefits.delete carries If-Match");
+          state.msp.benefits.splice(index, 1);
+          json(res, 200, { deleted: true });
+        });
+      }
+      if (pathname === "/api/actions/benefits.link/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.programme_id, "prog-1", "benefits.link carries its parent programme");
+          for (const key of ["benefit_id", "output_ref", "capability_ref", "operational_outcome", "strategic_objective"]) {
+            assert.ok(input[key], `benefits.link names the ${key} level`);
+          }
+          const row = Object.assign({}, input, { id: `bl-${state.msp.links.length + 1}`, version: 1 });
+          state.msp.links.push(row);
+          json(res, 201, row);
+        });
+      }
+      if (pathname === "/api/actions/benefits.unlink/invocations") {
+        return readBody(req, (body) => {
+          const index = state.msp.links.findIndex((x) => x.id === body.input.id);
+          assert.ok(index >= 0, "benefits.unlink names a real edge");
+          assert.equal(req.headers["if-match"], `"${state.msp.links[index].version}"`, "benefits.unlink carries If-Match");
+          state.msp.links.splice(index, 1);
+          json(res, 200, { deleted: true });
+        });
+      }
+      if (pathname === "/api/actions/benefits.transition_upsert/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.ok(input.benefit_id, "benefits.transition_upsert names its benefit");
+          assert.ok(input.baseline_measured_at, "benefits.transition_upsert carries the measured baseline");
+          assert.ok(input.post_measured_at, "benefits.transition_upsert carries the post-transition measurement");
+          const existing = state.msp.transitions.find((x) => x.benefit_id === input.benefit_id);
+          if (existing) {
+            assert.equal(req.headers["if-match"], `"${existing.version}"`, "a transition edit carries If-Match");
+            Object.assign(existing, input);
+            existing.version += 1;
+            return json(res, 200, existing);
+          }
+          const row = Object.assign({}, input, { id: `bt-${state.msp.transitions.length + 1}`, version: 1 });
+          state.msp.transitions.push(row);
+          json(res, 201, row);
+        });
+      }
+      if (pathname === "/api/actions/tranches.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.programme_id, "prog-1", "tranches.create carries its parent programme");
+          const row = Object.assign({}, input, {
+            id: `tr-${state.msp.tranches.length + 1}`,
+            state: input.state || "planned",
+            version: 1,
+          });
+          state.msp.tranches.push(row);
+          json(res, 201, row);
+        });
+      }
+      if (pathname === "/api/actions/tranches.update/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          const row = state.msp.tranches.find((x) => x.id === input.id);
+          assert.ok(row, "tranches.update names a real tranche");
+          assert.equal(req.headers["if-match"], `"${row.version}"`, "tranches.update carries If-Match");
+          Object.assign(row, input);
+          row.version += 1;
+          json(res, 200, row);
+        });
+      }
+      if (pathname === "/api/actions/tranches.delete/invocations") {
+        return readBody(req, (body) => {
+          const index = state.msp.tranches.findIndex((x) => x.id === body.input.id);
+          assert.ok(index >= 0, "tranches.delete names a real tranche");
+          assert.equal(req.headers["if-match"], `"${state.msp.tranches[index].version}"`, "tranches.delete carries If-Match");
+          state.msp.tranches.splice(index, 1);
+          json(res, 200, { deleted: true });
+        });
+      }
+      if (pathname === "/api/actions/tranches.review/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          const tranche = state.msp.tranches.find((x) => x.id === input.id);
+          assert.ok(tranche, "tranches.review names a real tranche");
+          assert.ok(["continue", "pause", "stop"].includes(input.decision), "tranches.review records a decision");
+          const evidence = input.evidence || {};
+          for (const key of ["baselines", "benefit_status", "risk_register"]) {
+            assert.ok(evidence[key], `tranches.review carries the ${key} evidence`);
+          }
+          const review = {
+            id: `rv-${state.msp.reviews.length + 1}`,
+            tranche_id: tranche.id,
+            tranche_number: tranche.number,
+            decision: input.decision,
+            evidence,
+            created_at: "2026-11-16T00:00:00Z",
+            version: 1,
+          };
+          state.msp.reviews.push(review);
+          tranche.state = "reviewed";
+          json(res, 201, review);
+        });
+      }
+      if (pathname === "/api/actions/stakeholders.profile_create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.programme_id, "prog-1", "stakeholders.profile_create carries its parent programme");
+          const row = Object.assign({}, input, { id: `sp-${state.msp.stakeholders.length + 1}`, version: 1 });
+          state.msp.stakeholders.push(row);
+          json(res, 201, row);
+        });
+      }
+      if (pathname === "/api/actions/stakeholders.profile_update/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          const row = state.msp.stakeholders.find((x) => x.id === input.id);
+          assert.ok(row, "stakeholders.profile_update names a real profile");
+          assert.equal(req.headers["if-match"], `"${row.version}"`, "stakeholders.profile_update carries If-Match");
+          Object.assign(row, input);
+          row.version += 1;
+          json(res, 200, row);
+        });
+      }
+      if (pathname === "/api/actions/stakeholders.profile_delete/invocations") {
+        return readBody(req, (body) => {
+          const index = state.msp.stakeholders.findIndex((x) => x.id === body.input.id);
+          assert.ok(index >= 0, "stakeholders.profile_delete names a real profile");
+          assert.equal(req.headers["if-match"], `"${state.msp.stakeholders[index].version}"`, "stakeholders.profile_delete carries If-Match");
+          state.msp.stakeholders.splice(index, 1);
+          json(res, 200, { deleted: true });
+        });
+      }
+      if (pathname === "/api/actions/cadences.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.programme_id, "prog-1", "cadences.create carries its parent programme");
+          const row = Object.assign({}, input, { id: `cd-${state.msp.cadences.length + 1}`, version: 1 });
+          state.msp.cadences.push(row);
+          json(res, 201, row);
+        });
+      }
+      if (pathname === "/api/actions/cadences.update/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          const row = state.msp.cadences.find((x) => x.id === input.id);
+          assert.ok(row, "cadences.update names a real cadence");
+          assert.equal(req.headers["if-match"], `"${row.version}"`, "cadences.update carries If-Match");
+          Object.assign(row, input);
+          row.version += 1;
+          json(res, 200, row);
+        });
+      }
+      if (pathname === "/api/actions/cadences.delete/invocations") {
+        return readBody(req, (body) => {
+          const index = state.msp.cadences.findIndex((x) => x.id === body.input.id);
+          assert.ok(index >= 0, "cadences.delete names a real cadence");
+          assert.equal(req.headers["if-match"], `"${state.msp.cadences[index].version}"`, "cadences.delete carries If-Match");
+          state.msp.cadences.splice(index, 1);
+          json(res, 200, { deleted: true });
+        });
+      }
+      if (pathname === "/api/actions/wbs.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.project_id, "p-s02", "wbs.create carries its parent project");
+          const row = Object.assign({}, input, { id: `wn-${state.msp.wbs.length + 1}`, version: 1 });
+          state.msp.wbs.push(row);
+          json(res, 201, row);
+        });
+      }
+      if (pathname === "/api/actions/wbs.update/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          const row = state.msp.wbs.find((x) => x.id === input.id);
+          assert.ok(row, "wbs.update names a real node");
+          assert.equal(req.headers["if-match"], `"${row.version}"`, "wbs.update carries If-Match");
+          Object.assign(row, input);
+          row.version += 1;
+          json(res, 200, row);
+        });
+      }
+      if (pathname === "/api/actions/wbs.delete/invocations") {
+        return readBody(req, (body) => {
+          const index = state.msp.wbs.findIndex((x) => x.id === body.input.id);
+          assert.ok(index >= 0, "wbs.delete names a real node");
+          assert.equal(req.headers["if-match"], `"${state.msp.wbs[index].version}"`, "wbs.delete carries If-Match");
+          state.msp.wbs.splice(index, 1);
+          json(res, 200, { deleted: true });
+        });
+      }
+      if (pathname === "/api/actions/registers.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.project_id, "p-s02", "registers.create carries its parent project");
+          const row = Object.assign({}, input, { id: `ri-${state.msp.registers.length + 1}`, version: 1 });
+          state.msp.registers.push(row);
+          json(res, 201, row);
+        });
+      }
+      if (pathname === "/api/actions/registers.update/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          const row = state.msp.registers.find((x) => x.id === input.id);
+          assert.ok(row, "registers.update names a real register row");
+          assert.equal(req.headers["if-match"], `"${row.version}"`, "registers.update carries If-Match");
+          Object.assign(row, input);
+          row.version += 1;
+          json(res, 200, row);
+        });
+      }
+      if (pathname === "/api/actions/registers.delete/invocations") {
+        return readBody(req, (body) => {
+          const index = state.msp.registers.findIndex((x) => x.id === body.input.id);
+          assert.ok(index >= 0, "registers.delete names a real register row");
+          assert.equal(req.headers["if-match"], `"${state.msp.registers[index].version}"`, "registers.delete carries If-Match");
+          state.msp.registers.splice(index, 1);
+          json(res, 200, { deleted: true });
+        });
+      }
+      if (pathname === "/api/actions/project_dependencies.create/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.project_id, "p-s02", "project_dependencies.create carries its parent project");
+          assert.ok(input.to_project, "project_dependencies.create names the target project");
+          assert.ok(["blocks", "needs", "supersedes", "informs"].includes(input.kind), "project_dependencies.create names a typed edge");
+          const row = {
+            id: `dep-${state.msp.dependencies.length + 1}`,
+            project_id: input.project_id,
+            from_project: input.project_id,
+            to_project: input.to_project,
+            kind: input.kind,
+            status: "open",
+          };
+          state.msp.dependencies.push(row);
+          json(res, 201, row);
+        });
+      }
+      if (pathname === "/api/actions/project_dependencies.delete/invocations") {
+        return readBody(req, (body) => {
+          const index = state.msp.dependencies.findIndex((x) => x.id === body.input.id);
+          assert.ok(index >= 0, "project_dependencies.delete names a real edge");
+          state.msp.dependencies.splice(index, 1);
+          json(res, 200, { deleted: true });
+        });
+      }
+      if (pathname === "/api/actions/baselines.take/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.project_id, "p-s02", "baselines.take carries its parent project");
+          assert.ok(["scope", "schedule", "cost"].includes(input.kind), "baselines.take names the baseline kind");
+          const row = {
+            id: `bl-${state.msp.baselines.length + 1}-${input.kind}`,
+            project_id: input.project_id,
+            kind: input.kind,
+            taken_at: "2026-11-16T00:00:00Z",
+            version: 1,
+          };
+          state.msp.baselines.push(row);
+          json(res, 201, row);
         });
       }
       if (pathname === "/api/actions/runs.list/invocations") {
@@ -1195,6 +1920,56 @@ function readBody(req, done) {
       assert.match(contributeText, /Unassigned/, "an unlinked ready unit is grouped honestly");
       assert.match(contributeText, /How a unit is claimed/, "the claim protocol renders");
       assert.equal(snapshotState.requests.length, 0, "the public pack makes no API request");
+      // #305: the published msp snapshot drives the programme definition and plan spine read-only.
+      await page.click('[data-action="navigate"][data-page="programme"]');
+      await page.waitForSelector('[data-v2="tab"][data-key="programme"][data-value="Definition"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("conveyor buildout"),
+      );
+      await page.click('[data-v2="tab"][data-key="programme"][data-value="Benefits map & profiles"]');
+      await page.waitForFunction(() => document.querySelector("#main").innerText.includes("BEN-P0"));
+      assert.match(await page.locator("#main").innerText(), /A published benefit/, "the snapshot benefit renders");
+      await page.click('[data-v2="tab"][data-key="programme"][data-value="Tranches & reviews"]');
+      await page.waitForFunction(() => document.querySelector("#main").innerText.includes("BL-P0"));
+      await page.click('[data-v2="tab"][data-key="programme"][data-value="Benefits realization"]');
+      await page.waitForFunction(() => document.querySelector("#main").innerText.includes("BEN-P0"));
+      await page.click('[data-v2="tab"][data-key="programme"][data-value="Stakeholders"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Published sponsor"),
+      );
+      assert.equal(
+        await page
+          .locator(
+            '[data-v2="msp-save"], [data-v2="msp-delete"], [data-v2="msp-benefit-new"], [data-v2="msp-tranche-new"], [data-v2="msp-stakeholder-new"], [data-v2="msp-wbs-new"], [data-v2="msp-register-new"], [data-v2="msp-cadence-new"], [data-v2="msp-baseline-take"]',
+          )
+          .count(),
+        0,
+        "the snapshot programme is read-only",
+      );
+      await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#plan`);
+      await page.waitForSelector('[data-v2="tab"][data-key="plan"][data-value="WBS"]');
+      await page.click('[data-v2="tab"][data-key="plan"][data-value="WBS"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Published WBS node"),
+      );
+      await page.click('[data-v2="tab"][data-key="plan"][data-value="Baseline vs forecast"]');
+      await page.waitForFunction(() => document.querySelector("#main").innerText.includes("bl-p0"));
+      await page.click('[data-v2="tab"][data-key="plan"][data-value="Registers"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Published register risk"),
+      );
+      await page.click('[data-v2="tab"][data-key="plan"][data-value="Cadence"]');
+      await page.waitForFunction(() => document.querySelector("#main").innerText.includes("PI 2026.2"));
+      assert.equal(
+        await page
+          .locator(
+            '[data-v2="msp-save"], [data-v2="msp-delete"], [data-v2="msp-wbs-new"], [data-v2="msp-register-new"], [data-v2="msp-cadence-new"], [data-v2="msp-baseline-take"]',
+          )
+          .count(),
+        0,
+        "the snapshot plan spine is read-only",
+      );
+      assert.equal(snapshotState.requests.length, 0, "the snapshot programme pages make no API request");
       await page.close();
     }
 
@@ -1740,6 +2515,256 @@ function readBody(req, done) {
       assert.match(queueText, /Programme queue/, "the programme queue renders");
       assert.match(queueText, /outputs due/, "the queue counts the due outputs");
 
+      // ── #305: the programme definition and plan spine are the store's own rows ──────
+      const mspSent = (name) =>
+        consoleState.requests.filter((row) => row.path === `/api/actions/${name}/invocations`);
+      const mspDone = () => page.waitForFunction(() => !document.getElementById("dialog").open);
+      const mspTab = (key, value) =>
+        page.click(`[data-v2="tab"][data-key="${key}"][data-value="${value}"]`);
+
+      // Typed dependency edges live on Portfolio's Dependencies tab.
+      await page.click('[data-v2="tab"][data-key="portfolio"][data-value="Dependencies"]');
+      await page.waitForSelector('[data-v2="msp-dependency-new"]');
+      assert.match(await page.locator("#main").innerText(), /blocks/, "the typed edge renders");
+      await page.click('[data-v2="msp-dependency-new"]');
+      await page.waitForSelector("#msp-to_project");
+      await page.selectOption("#msp-to_project", "p-noboard");
+      await page.selectOption("#msp-kind", "needs");
+      await page.click('[data-v2="msp-save"][data-kind="dependency"]');
+      await mspDone();
+      assert.equal(mspSent("project_dependencies.create").length, 1, "project_dependencies.create was sent");
+      await page.waitForSelector('[data-v2="msp-delete"][data-kind="dependency"][data-id="dep-2"]');
+      await page.click('[data-v2="msp-delete"][data-kind="dependency"][data-id="dep-2"]');
+      await page.waitForSelector('[data-v2="msp-delete-save"][data-kind="dependency"]');
+      await page.click('[data-v2="msp-delete-save"]');
+      await mspDone();
+      assert.equal(mspSent("project_dependencies.delete").length, 1, "project_dependencies.delete was sent");
+      assert.ok(!consoleState.msp.dependencies.some((row) => row.id === "dep-2"), "the stub deleted the edge");
+
+      // Programme definition: five tabs read the store; each write is version-guarded.
+      await page.click('[data-action="navigate"][data-page="programme"]');
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForSelector('[data-v2="tab"][data-key="programme"][data-value="Definition"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("conveyor buildout"),
+      );
+      for (const name of [
+        "benefits.list",
+        "benefits.link_list",
+        "benefits.transition_list",
+        "tranches.list",
+        "tranches.review_list",
+        "stakeholders.profile_list",
+        "cadences.list",
+        "wbs.list",
+        "baselines.list",
+        "registers.list",
+        "project_dependencies.list",
+        "portfolio.in_flight",
+        "documents.list",
+      ]) {
+        assert.ok(mspSent(name).length > 0, `${name} was read for the programme pages`);
+      }
+      await page.click('[data-v2="msp-programme-edit"]');
+      await page.waitForSelector("#msp-name");
+      await page.fill("#msp-name", "conveyor buildout · console");
+      await page.click('[data-v2="msp-save"][data-kind="programme"]');
+      await mspDone();
+      assert.equal(mspSent("programmes.update").length, 1, "programmes.update was sent");
+      assert.equal(consoleState.msp.programme.name, "conveyor buildout · console", "the programme edit crossed the wire");
+
+      await mspTab("programme", "Benefits map & profiles");
+      await page.waitForSelector('[data-v2="msp-benefit"][data-id="ben-1"]');
+      await page.click('[data-v2="msp-benefit-new"]');
+      await page.waitForSelector("#msp-reference");
+      await page.fill("#msp-reference", "BEN-99");
+      await page.fill("#msp-description", "A new measured benefit");
+      await page.click('[data-v2="msp-save"][data-kind="benefit"]');
+      await mspDone();
+      assert.equal(mspSent("benefits.create").length, 1, "benefits.create was sent");
+      assert.ok(consoleState.msp.benefits.some((row) => row.reference === "BEN-99"), "the stub created the benefit");
+      await page.click('[data-v2="msp-benefit-edit"][data-id="ben-1"]');
+      await page.waitForSelector("#msp-description");
+      await page.fill("#msp-description", "Streamline the intake flow");
+      await page.click('[data-v2="msp-save"][data-kind="benefit"][data-id="ben-1"]');
+      await mspDone();
+      assert.equal(mspSent("benefits.update").length, 1, "benefits.update was sent");
+      assert.equal(consoleState.msp.benefits.find((row) => row.id === "ben-1").description, "Streamline the intake flow");
+      await page.click('[data-v2="msp-benefit"][data-id="ben-2"]');
+      await page.waitForSelector('[data-v2="msp-delete"][data-kind="benefit"][data-id="ben-2"]');
+      await page.click('[data-v2="msp-delete"][data-kind="benefit"][data-id="ben-2"]');
+      await page.waitForSelector('[data-v2="msp-delete-save"][data-kind="benefit"]');
+      await page.click('[data-v2="msp-delete-save"]');
+      await mspDone();
+      assert.equal(mspSent("benefits.delete").length, 1, "benefits.delete was sent");
+      assert.ok(!consoleState.msp.benefits.some((row) => row.id === "ben-2"), "the stub deleted the benefit");
+      await page.click('[data-v2="msp-benefit"][data-id="ben-1"]');
+      await page.waitForSelector('[data-v2="msp-link-new"]');
+      await page.click('[data-v2="msp-link-new"]');
+      await page.waitForSelector("#msp-output_ref");
+      await page.fill("#msp-output_ref", "T2 delivery spine");
+      await page.fill("#msp-capability_ref", "delivery management");
+      await page.fill("#msp-operational_outcome", "shorter lead time");
+      await page.fill("#msp-strategic_objective", "faster IT delivery");
+      await page.click('[data-v2="msp-save"][data-kind="link"]');
+      await mspDone();
+      assert.equal(mspSent("benefits.link").length, 1, "benefits.link was sent");
+      await page.waitForSelector('[data-v2="msp-delete"][data-kind="link"][data-id="bl-1"]');
+      await page.click('[data-v2="msp-delete"][data-kind="link"][data-id="bl-1"]');
+      await page.waitForSelector('[data-v2="msp-delete-save"][data-kind="link"]');
+      await page.click('[data-v2="msp-delete-save"]');
+      await mspDone();
+      assert.equal(mspSent("benefits.unlink").length, 1, "benefits.unlink was sent");
+      assert.ok(!consoleState.msp.links.some((row) => row.id === "bl-1"), "the stub unlinked the edge");
+
+      await mspTab("programme", "Benefits realization");
+      await page.waitForSelector('[data-v2="msp-transition"][data-id="ben-1"]');
+      await page.click('[data-v2="msp-transition"][data-id="ben-1"]');
+      await page.waitForSelector("#msp-post_measured_at");
+      await page.fill("#msp-post_measured_at", "2026-11-02");
+      await page.click('[data-v2="msp-save"][data-kind="transition"][data-id="bt-1"]');
+      await mspDone();
+      assert.equal(mspSent("benefits.transition_upsert").length, 1, "benefits.transition_upsert was sent");
+      assert.equal(
+        consoleState.msp.transitions.find((row) => row.id === "bt-1").post_measured_at,
+        "2026-11-02T00:00:00Z",
+        "the post-transition measurement crossed the wire",
+      );
+
+      await mspTab("programme", "Tranches & reviews");
+      await page.waitForSelector('[data-v2="msp-tranche-new"]');
+      await page.click('[data-v2="msp-tranche-new"]');
+      await page.waitForSelector("#msp-number");
+      await page.fill("#msp-number", "3");
+      await page.fill("#msp-entry_criteria", "tranche 2 reviewed");
+      await page.click('[data-v2="msp-save"][data-kind="tranche"]');
+      await mspDone();
+      assert.equal(mspSent("tranches.create").length, 1, "tranches.create was sent");
+      await page.click('[data-v2="msp-tranche-edit"][data-id="tr-1"]');
+      await page.waitForSelector("#msp-exit_criteria");
+      await page.fill("#msp-exit_criteria", "benefits measured against the baseline");
+      await page.click('[data-v2="msp-save"][data-kind="tranche"][data-id="tr-1"]');
+      await mspDone();
+      assert.equal(mspSent("tranches.update").length, 1, "tranches.update was sent");
+      await page.click('[data-v2="msp-review"][data-id="tr-1"]');
+      await page.waitForSelector("#msp-decision");
+      await page.selectOption("#msp-decision", "continue");
+      await page.fill("#msp-baselines", "the scope baseline is frozen");
+      await page.fill("#msp-benefit_status", "BEN-01 is tracking");
+      await page.fill("#msp-risk_register", "no high risk is open");
+      await page.click('[data-v2="msp-save"][data-kind="review"][data-id="tr-1"]');
+      await mspDone();
+      assert.equal(mspSent("tranches.review").length, 1, "tranches.review was sent");
+      assert.equal(consoleState.msp.reviews.length, 2, "the review crossed the wire");
+      await page.click('[data-v2="msp-tranche"][data-id="tr-2"]');
+      await page.waitForSelector('[data-v2="msp-delete"][data-kind="tranche"][data-id="tr-2"]');
+      await page.click('[data-v2="msp-delete"][data-kind="tranche"][data-id="tr-2"]');
+      await page.waitForSelector('[data-v2="msp-delete-save"][data-kind="tranche"]');
+      await page.click('[data-v2="msp-delete-save"]');
+      await mspDone();
+      assert.equal(mspSent("tranches.delete").length, 1, "tranches.delete was sent");
+
+      await mspTab("programme", "Stakeholders");
+      await page.waitForSelector('[data-v2="msp-stakeholder-new"]');
+      await page.click('[data-v2="msp-stakeholder-new"]');
+      await page.waitForSelector("#msp-name");
+      await page.fill("#msp-name", "Delivery manager");
+      await page.fill("#msp-importance", "high");
+      await page.click('[data-v2="msp-save"][data-kind="stakeholder"]');
+      await mspDone();
+      assert.equal(mspSent("stakeholders.profile_create").length, 1, "stakeholders.profile_create was sent");
+      await page.click('[data-v2="msp-stakeholder-edit"][data-id="sp-1"]');
+      await page.waitForSelector("#msp-concerns");
+      await page.fill("#msp-concerns", "value realised on schedule");
+      await page.click('[data-v2="msp-save"][data-kind="stakeholder"][data-id="sp-1"]');
+      await mspDone();
+      assert.equal(mspSent("stakeholders.profile_update").length, 1, "stakeholders.profile_update was sent");
+      await page.click('[data-v2="msp-stakeholder"][data-id="sp-2"]');
+      await page.waitForSelector('[data-v2="msp-delete"][data-kind="stakeholder"][data-id="sp-2"]');
+      await page.click('[data-v2="msp-delete"][data-kind="stakeholder"][data-id="sp-2"]');
+      await page.waitForSelector('[data-v2="msp-delete-save"][data-kind="stakeholder"]');
+      await page.click('[data-v2="msp-delete-save"]');
+      await mspDone();
+      assert.equal(mspSent("stakeholders.profile_delete").length, 1, "stakeholders.profile_delete was sent");
+
+      // Plan & WBS: the WBS, baseline, register and cadence tabs are the project's own rows.
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#plan`);
+      await page.waitForSelector('[data-v2="tab"][data-key="plan"][data-value="WBS"]');
+      await page.click('[data-v2="tab"][data-key="plan"][data-value="WBS"]');
+      await page.waitForSelector('[data-v2="msp-wbs-new"]');
+      assert.match(await page.locator("#main").innerText(), /Skeleton phase/, "the WBS node renders");
+      await page.click('[data-v2="msp-wbs-new"]');
+      await page.waitForSelector("#msp-kind");
+      await page.selectOption("#msp-kind", "work_package");
+      await page.fill("#msp-title", "Tenancy work package");
+      await page.click('[data-v2="msp-save"][data-kind="wbs"]');
+      await mspDone();
+      assert.equal(mspSent("wbs.create").length, 1, "wbs.create was sent");
+      await page.click('[data-v2="msp-wbs-edit"][data-id="wn-1"]');
+      await page.waitForSelector("#msp-title");
+      await page.fill("#msp-title", "Skeleton phase · renamed");
+      await page.click('[data-v2="msp-save"][data-kind="wbs"][data-id="wn-1"]');
+      await mspDone();
+      assert.equal(mspSent("wbs.update").length, 1, "wbs.update was sent");
+      await page.click('[data-v2="msp-delete"][data-kind="wbs"][data-id="wn-2"]');
+      await page.waitForSelector('[data-v2="msp-delete-save"][data-kind="wbs"]');
+      await page.click('[data-v2="msp-delete-save"]');
+      await mspDone();
+      assert.equal(mspSent("wbs.delete").length, 1, "wbs.delete was sent");
+
+      await page.click('[data-v2="tab"][data-key="plan"][data-value="Baseline vs forecast"]');
+      await page.waitForSelector('[data-v2="msp-baseline-take"][data-kind="scope"]');
+      assert.match(await page.locator("#main").innerText(), /bl-proj-1/, "the frozen baseline renders");
+      await page.click('[data-v2="msp-baseline-take"][data-kind="scope"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#toast").textContent.includes("Baseline taken"),
+      );
+      assert.equal(mspSent("baselines.take").length, 1, "baselines.take was sent");
+
+      await page.click('[data-v2="tab"][data-key="plan"][data-value="Registers"]');
+      await page.waitForSelector('[data-v2="msp-register-new"]');
+      await page.click('[data-v2="msp-register-new"]');
+      await page.waitForSelector("#msp-title");
+      await page.selectOption("#msp-kind", "assumption");
+      await page.fill("#msp-title", "The store refuses a referenced delete");
+      await page.click('[data-v2="msp-save"][data-kind="register"]');
+      await mspDone();
+      assert.equal(mspSent("registers.create").length, 1, "registers.create was sent");
+      await page.click('[data-v2="msp-register-edit"][data-id="ri-1"]');
+      await page.waitForSelector("#msp-title");
+      await page.fill("#msp-title", "Tenancy leak on the shared board · mitigated");
+      await page.click('[data-v2="msp-save"][data-kind="register"][data-id="ri-1"]');
+      await mspDone();
+      assert.equal(mspSent("registers.update").length, 1, "registers.update was sent");
+      await page.click('[data-v2="msp-delete"][data-kind="register"][data-id="ri-2"]');
+      await page.waitForSelector('[data-v2="msp-delete-save"][data-kind="register"]');
+      await page.click('[data-v2="msp-delete-save"]');
+      await mspDone();
+      assert.equal(mspSent("registers.delete").length, 1, "registers.delete was sent");
+
+      await page.click('[data-v2="tab"][data-key="plan"][data-value="Cadence"]');
+      await page.waitForSelector('[data-v2="msp-cadence-new"]');
+      await page.click('[data-v2="msp-cadence-new"]');
+      await page.waitForSelector("#msp-period");
+      await page.selectOption("#msp-kind", "demo");
+      await page.fill("#msp-period", "Demo 7");
+      await page.click('[data-v2="msp-save"][data-kind="cadence"]');
+      await mspDone();
+      assert.equal(mspSent("cadences.create").length, 1, "cadences.create was sent");
+      await page.click('[data-v2="msp-cadence-edit"][data-id="cd-1"]');
+      await page.waitForSelector("#msp-period");
+      await page.fill("#msp-period", "PI 2026.1 · extended");
+      await page.click('[data-v2="msp-save"][data-kind="cadence"][data-id="cd-1"]');
+      await mspDone();
+      assert.equal(mspSent("cadences.update").length, 1, "cadences.update was sent");
+      await page.click('[data-v2="msp-delete"][data-kind="cadence"][data-id="cd-2"]');
+      await page.waitForSelector('[data-v2="msp-delete-save"][data-kind="cadence"]');
+      await page.click('[data-v2="msp-delete-save"]');
+      await mspDone();
+      assert.equal(mspSent("cadences.delete").length, 1, "cadences.delete was sent");
+      await page.click('[data-v2="tab"][data-key="plan"][data-value="Boards"]');
+      await page.waitForSelector('[data-v2-input="plan-project"]');
+
       // back to the Plan board for the 412/401 honesty checks
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#plan`);
       await page.waitForSelector('[data-v2-input="plan-project"]');
@@ -1772,7 +2797,7 @@ function readBody(req, done) {
 
     console.log(
       "check-console: 4 servers · homepage + signed-out + snapshot 0 API requests · signed-in cards," +
-        " projects, outputs, feedback, publish, runs, gates and portfolio",
+        " projects, outputs, feedback, publish, runs, gates, programme definition, plan spine and portfolio",
     );
     console.log("check-console: 412 and 401 paths rendered; 0 unhandled page errors");
   } finally {

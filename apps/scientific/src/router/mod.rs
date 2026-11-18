@@ -167,6 +167,13 @@ pub fn router(state: Shared) -> Router {
         .route("/api/pipeline/status", get(pipeline::status))
         .route("/api/pipeline/history/{entity_id}", get(pipeline::history))
         .route("/api/pipeline/anomalies", get(pipeline::anomalies))
+        // conveyor#299: the tenant gate. It resolves the caller's tenant (licence carriers or a
+        // refused plain header) and writes the bare id back into X-Tenant-Id, so every handler's
+        // `caller_tenant` keeps reading what it always read.
+        .layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            crate::auth::authenticate,
+        ))
         .with_state(state)
 }
 
