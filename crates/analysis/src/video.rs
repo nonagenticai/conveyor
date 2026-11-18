@@ -228,9 +228,11 @@ pub fn analyse(evidence: &VideoEvidence) -> Report {
             url,
         )),
         Some(audio) => {
-            if let Some(loudness) = audio.loudness_lufs {
-                if !(-24.0..=-14.0).contains(&loudness) {
-                    findings.push(finding(
+            if let Some(loudness) = audio
+                .loudness_lufs
+                .filter(|loudness| !(-24.0..=-14.0).contains(loudness))
+            {
+                findings.push(finding(
                         "vid-audio-loudness-out-of-range",
                         Severity::Low,
                         "Audio loudness is outside −24…−14 LUFS",
@@ -239,7 +241,6 @@ pub fn analyse(evidence: &VideoEvidence) -> Report {
                         ),
                         url,
                     ));
-                }
             }
         }
     }
