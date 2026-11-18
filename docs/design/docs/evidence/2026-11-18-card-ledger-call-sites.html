@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Card ledger — the old call sites and their new shape · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-18-card-ledger-call-sites.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="card-ledger--the-old-call-sites-and-their-new-shape">Card ledger — the old call sites and their new shape</h1>
+<p>Date: 2026-11-18 · Issue: #295 · Decision: ADR 0008 · Kind: P3 call-site catalogue</p>
+<h2 id="method">Method</h2>
+<p>The available records are <code>parity/SUMMARY.md</code> §"The five A-hit contradictions" (including "The ledger is the consequential one") and the two <code>parity/parity.yaml</code> rows, P-1224 and P-1101. Those records give the surface, the invocation counts and the payload's named fields; they do <strong>not</strong> contain a per-workflow or per-call-site inventory. The catalogue therefore enumerates the <em>semantics the records name</em> and maps each to <code>cards.ledger_append</code> / <code>cards.ledger_list</code>. It does not invent 145 individual rows from a count.</p>
+<p>Recorded volume: 145 append call sites in 29 active workflows and 65 read call sites in 20 active workflows — 210 in-cluster invocations across 49 workflows. Every one of those invocations is one of the three semantics below; the counts collapse, the semantics do not.</p>
+<h2 id="catalogue">Catalogue</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>old surface</th>
+<th>recorded semantic</th>
+<th>new shape</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>POST /pm/cards/{planka_card_id}/ledger</code></td>
+<td><strong>append a claim</strong>: <code>kind: claim</code>, <code>source{list,node,execution_id}</code>, laya <code>verdict{score,accepted,reason}</code></td>
+<td><code>cards.ledger_append</code> with <code>kind: "claim"</code>, <code>source</code> stored as the <code>source</code> JSON object, <code>verdict</code> stored as the <code>verdict</code> JSON object (ADR 0008 row shape)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>POST /pm/cards/{planka_card_id}/ledger</code></td>
+<td><strong>append a fact</strong>: <code>kind: fact</code>, no verdict recorded</td>
+<td><code>cards.ledger_append</code> with <code>kind: "fact"</code>, <code>verdict</code> omitted (<code>NULL</code>); <code>source</code> defaults to <code>{}</code> when the caller has none</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>GET /pm/cards/{planka_card_id}/ledger</code></td>
+<td><strong>read one card's ledger</strong> (the <code>pmCardLedger.listCardLedger</code> call in 20 workflows)</td>
+<td><code>cards.ledger_list</code> for one conveyor card id, oldest first, optional <code>kind</code> filter, bounded <code>limit</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="named-drops">Named drops</h3>
+<table>
+<thead>
+<tr>
+<th>dropped</th>
+<th>basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>planka_card_id</code> as the path key and card identity</td>
+<td>SPEC §4 drops the identity, not the capability; the ledger is keyed by the conveyor <code>card.id</code> (ADR 0008 §2)</td>
+</tr>
+<tr>
+<td>RM's <code>pm_card_ledger</code> storage and its rows</td>
+<td><code>02-DATA-ARCHITECTURE</code> §7.2 drops the table for the key; nothing is copied at cutover (D7), so there is no backfill and no compatibility column</td>
+</tr>
+<tr>
+<td>Per-workflow / per-call-site rows (145 + 65)</td>
+<td>the records name counts, not sites; manufacturing one row per invocation would be invention</td>
+</tr>
+</tbody>
+</table>
+<h2 id="not-determinable-from-the-available-records">Not determinable from the available records</h2>
+<ul>
+<li>The body text of each workflow's claim or fact — the records describe the payload shape, not the 145 bodies.</li>
+<li>Whether any of the 145 appends used a payload variant outside <code>claim</code>/<code>fact</code>. The records say the payload is <code>kind=claim|fact</code>; no third kind is recorded, so none is catalogued.</li>
+<li>Whether the read callers ever filtered by kind or by source. The records name only a per-card read; <code>cards.ledger_list</code>'s <code>kind</code> filter is an available capability, not a recorded call site.</li>
+<li>Whether any post-cutover consumer needs the pre-cutover RM rows. ADR 0008's no-copy rule means they are not in conveyor; if a consumer needs history, that is a separate evidence question.</li>
+</ul>
+<h2 id="count">Count</h2>
+<p><strong>3 semantic sites catalogued, 3 mapped to the new actions, 0 mapped to a drop by capability (only the identity key and the RM storage are dropped), 0 unmapped, 0 invented.</strong> The recorded raw invocations (145 append + 65 read across 49 workflows) collapse onto these three semantics.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-18-card-ledger-call-sites.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

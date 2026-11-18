@@ -92,7 +92,8 @@ use serde_json::{Value, json};
 /// **#154 adds 1 internal**: `analyse.site`, the analysis library's invocable read.
 /// **#164 adds 1 internal**: `analyse.video`, the video family over executor evidence.
 /// **#303 adds 2 internal**: `benefits.retire` and `tranches.retire`, the governed retirement path.
-const EXPECTED: [&str; 431] = [
+/// **#295 adds 2 internal**: `cards.ledger_append` and `cards.ledger_list`, the claim/fact ledger.
+const EXPECTED: [&str; 433] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -154,6 +155,8 @@ const EXPECTED: [&str; 431] = [
     "cards.duplicate",
     "cards.get",
     "cards.list",
+    "cards.ledger_append",
+    "cards.ledger_list",
     "cards.move",
     "cards.release",
     "cards.remove_label",
@@ -581,7 +584,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // #154 adds `analyse.site` (internal, read): 409 -> 410; external stays 18.
     // #164 adds `analyse.video` (internal, read): 410 -> 411; external stays 18.
     // #303 adds `benefits.retire` and `tranches.retire` (internal): 411 -> 413; external stays 18.
-    assert_eq!((internal, external), (413, 18));
+    // #295 adds `cards.ledger_append` (write) and `cards.ledger_list` (read), both internal:
+    // 413 -> 415; external stays 18.
+    assert_eq!((internal, external), (415, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

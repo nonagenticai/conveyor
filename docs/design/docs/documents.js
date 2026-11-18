@@ -110,6 +110,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0007-tool-estate-conveyor-and-coding.md"
     },
     {
+      "title": "0008 — The card ledger is its own append-only table",
+      "path": "docs/decisions/0008-card-ledger.html",
+      "source": "docs/decisions/0008-card-ledger.md",
+      "section": "Decisions",
+      "sha256": "29f2cf04c0128dc652a3e64a13b43eba4456e78ac499a207b12193840966dd52",
+      "bytes": 4517,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0008-card-ledger.md"
+    },
+    {
       "title": "Web UI design",
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
@@ -189,6 +198,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "73b797dde36368a70b0638521278cc4b1ad79a7ee511a679893307fe789ac026",
       "bytes": 7049,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-w2v-retirement.md"
+    },
+    {
+      "title": "Card ledger — the old call sites and their new shape",
+      "path": "docs/evidence/2026-11-18-card-ledger-call-sites.html",
+      "source": "docs/evidence/2026-11-18-card-ledger-call-sites.md",
+      "section": "Evidence",
+      "sha256": "f64e2d4078b652db873ce41bf8872fbe0e27662ae40efd8fcaf4587bb9673ec8",
+      "bytes": 3396,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-18-card-ledger-call-sites.md"
     },
     {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",

@@ -89,13 +89,13 @@ number was used.
 | P-1247 | `POST /requirements/{rid}/project-copy` | 2 | dropped, `replacement:requirements.update` |
 
 **The ledger is the consequential one.** SPEC §4 forbids `planka_card_id` as card *identity*, and
-that is the only thing that should be dropped. What the 49 call sites actually use is an append-only
+that is the only thing that should be dropped. What the call sites actually use is an append-only
 per-card record of claims and facts — `kind: claim|fact`, `source{list,node,execution_id}`, and a
 laya verdict (`score`/`accepted`/`reason`). **That capability must exist at cutover, re-keyed to the
-conveyor's own card id.** The new schema has no home for it yet (no ledger/fact/claim action;
-`02-DATA-ARCHITECTURE` §7.2 drops `pm_card_ledger` for the key). Candidates are S15's
-`work_package_memory` (card_id, run_id, kind, source, body) or `event`. ⚠️ **This is an open design
-item for the owning slice, not a settled assignment.**
+conveyor's own card id.** The home is now decided: ADR `docs/decisions/0008-card-ledger.md` puts it
+in the new append-only `card_ledger` table, written and read by `cards.ledger_append` /
+`cards.ledger_list`; neither candidate (S15 `work_package_memory`, `event`) could carry it. The
+per-site mapping and the named drops are `docs/evidence/2026-11-18-card-ledger-call-sites.md`.
 
 **Project-copy is the other resolution.** RM's `.../project-copy` is the fork step of an
 inherit → copy-into-project → promote lifecycle (`requirements_management/src/routers/_governed.py:33`,

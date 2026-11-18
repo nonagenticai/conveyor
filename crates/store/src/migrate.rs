@@ -217,7 +217,10 @@ mod tests {
                 (51, "tranche review".to_owned()),
                 // #303: the governed retirement path for benefit profiles and tranches
                 // (0052_benefit_retire.sql).
-                (52, "benefit retire".to_owned())
+                (52, "benefit retire".to_owned()),
+                // #295 (ADR 0008): the per-card append-only claim/fact ledger
+                // (0053_card_ledger.sql).
+                (53, "card ledger".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

@@ -2,7 +2,8 @@
 //! The board action surface: projects, boards, lists, cards and their satellites.
 //!
 //! Every action is one `#[action]` declaration in [`projects`], [`boards`], [`lists`],
-//! [`cards`], [`card_types`], [`comments`], [`tasks`], [`custom_fields`] or [`labels`]; the registry, the
+//! [`cards`], [`card_types`], [`comments`], [`tasks`], [`custom_fields`], [`labels`] or
+//! [`ledger`]; the registry, the
 //! OpenAPI operation, the MCP tool and the invocation route are projections of it
 //! (S04 §5.1). Nothing here speaks SQL directly — the queries live in `crates/store`
 //! (CONTRACT §1) — and every parent id is resolved inside the caller's tenant before a
@@ -31,6 +32,7 @@ pub mod comments;
 pub mod custom_fields;
 pub mod events;
 pub mod labels;
+pub mod ledger;
 pub mod lists;
 pub mod matrix;
 pub mod projects;

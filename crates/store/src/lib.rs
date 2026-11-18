@@ -84,6 +84,8 @@ pub mod jobs;
 pub mod label;
 // T2 (SPEC_V2 §7): the decision ladder's policies, refinements, laya configs and decisions.
 pub mod ladder;
+// #295 / ADR 0008: the per-card append-only claim/fact ledger — INSERT and SELECT only.
+pub mod ledger;
 pub mod licence;
 pub mod list;
 pub mod listen;
