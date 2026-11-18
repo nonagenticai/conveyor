@@ -3,9 +3,9 @@
     {
       "number": 349,
       "title": "programme: the 8 remaining declared outputs \u2014 SPEC-V2 spec, T1\u2013T3 evidence, T0\u2013T3 closure reviews",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/349",
-      "updatedAt": "2026-11-18T11:24:55Z",
+      "updatedAt": "2026-11-18T11:46:02Z",
       "labels": [
         {
           "name": "unit",
