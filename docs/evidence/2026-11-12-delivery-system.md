@@ -3,6 +3,13 @@
 **Date:** 2026-11-12. **Unit:** conveyor#26 (resumed). **Protocol:** `docs/plans/03-DELIVERY.md`
 (PR #11, hardened by #39/PR #40).
 
+> **Public-history note (added 2026-11-18).** This record was written before this repository's
+> public history begins. The public repository was created 2026-11-12T21:43Z and its root commit
+> `96a3d47b` ("conveyor: public source snapshot (2026-11-12)") carries the state this unit
+> produced — the hardened protocol, its `/issue-sweep` routine and both repository guards are in
+> that tree. The issue and pull-request numbers and the Actions run ids below belong to the
+> pre-public repository; they are preserved as written, not renumbered, and do not resolve here.
+
 Every number below is a reading with its time and the command that produced it. Do not quote one
 without its row.
 

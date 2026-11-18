@@ -895,11 +895,12 @@ fallback. `data/issues.json` is the committed GitHub issue registry (generated b
 
 The pack has two deployments with different contracts:
 
-- **The public snapshot** (`nonagentic.ai/design`): read-only. The page load never calls GitHub or
+- **The public snapshot** (`conveyor.nonagentic.ai/design`, served by the app image;
+  `nonagentic.ai/design` 308-redirects here): read-only. The page load never calls GitHub or
   the app backend, there are no accounts, and the privacy contract is structural rows only. On a
   checkout with no snapshot it is the offline `DESIGN` study. Everything resets on reload except
   the theme preference.
-- **The operator console** (`conveyor.nonagentic.ai/design`, served by the app image): the same
+- **The operator console** (the same `conveyor.nonagentic.ai/design` origin, signed in): the same
   pack, same origin as the API. `console.js` loads `/config.json` from that origin, signs in with
   auth-code + PKCE S256 against realm `conveyor` / public client `conveyor-web` (the access token
   is held in memory, ADR 0001) and calls the API the server already serves. The Plan **Boards**
@@ -912,10 +913,10 @@ The pack has two deployments with different contracts:
   `publishable` flag), feedback intake and **Publish**. Start run and the Execution room
   (`runs.list`, `runs.get`, `runs.cancel`, `approvals.decide`) are the same actions the V1 web
   screens use; the old `projects.execute` stub is no longer rendered. Publish enqueues
-  `publish.design`, which builds the pack and opens a pull request on the homepage repository;
-  the console never merges it. Every control produces the action request it names; nothing is
-  simulated on this path. Signed out (and on any origin with no config, including `file://` and
-  the homepage) there is no API request and no write control.
+  `publish.design`, which builds the pack and opens a pull request that updates `docs/design/`
+  in the pack repository (the target is repointed in #364); the console never merges it. Every control produces the action request it names; nothing is
+  simulated on this path. Signed out (and on any origin with no config, including `file://`)
+  there is no API request and no write control.
 
 The image's web stage copies the generated documents (`docs/`) and the data directory beside the
 runtime files, so the console's Documents destination and data links resolve. The console gate is
