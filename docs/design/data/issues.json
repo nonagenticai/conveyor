@@ -1,11 +1,45 @@
 {
   "issues": [
     {
+      "number": 372,
+      "title": "ci: the issue-registry automation generates its seed from a different source than the registry it ships",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/372",
+      "updatedAt": "2026-11-18T22:22:38Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 370,
+      "title": "web: the Playwright suite is red on main for four specs",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/370",
+      "updatedAt": "2026-11-18T22:19:53Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 366,
       "title": "sheets: native XLSX import and export as conveyor actions",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/366",
-      "updatedAt": "2026-11-18T20:40:24Z",
+      "updatedAt": "2026-11-18T22:02:50Z",
       "labels": [
         {
           "name": "unit",
@@ -24,9 +58,9 @@
     {
       "number": 364,
       "title": "publish: repoint publish.design at the pack's docs/design tree",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/364",
-      "updatedAt": "2026-11-18T20:53:40Z",
+      "updatedAt": "2026-11-18T22:24:34Z",
       "labels": [
         {
           "name": "unit",
@@ -41,9 +75,9 @@
     {
       "number": 363,
       "title": "docs: retire the homepage-mirror references; add a public-history note to the delivery-system evidence",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/363",
-      "updatedAt": "2026-11-18T20:33:55Z",
+      "updatedAt": "2026-11-18T21:13:22Z",
       "labels": [
         {
           "name": "documentation",
@@ -64,7 +98,7 @@
       "title": "console: a self-gate must not offer a decision the store refuses",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/357",
-      "updatedAt": "2026-11-18T20:42:47Z",
+      "updatedAt": "2026-11-18T21:07:59Z",
       "labels": [
         {
           "name": "unit",
@@ -2454,9 +2488,9 @@
     {
       "number": 82,
       "title": "T10 \u2014 SAFe cadence and MSP tranches",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/82",
-      "updatedAt": "2026-11-18T20:43:09Z",
+      "updatedAt": "2026-11-18T21:41:19Z",
       "labels": [
         {
           "name": "unit",
