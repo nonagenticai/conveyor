@@ -24,7 +24,9 @@ async fn the_catalogue_seed_imports_every_exported_row_and_is_idempotent() {
 
     let export = catalogue_export().expect("the embedded export parses");
     let capabilities = capability_export().expect("the embedded capability seed parses");
-    assert_eq!(export.entries.len(), 39, "the export's catalogue entries");
+    // T9 (#81) adds one hand-authored `project_type` row: `architecture`, whose ADM phase
+    // nodes are `wbs_node` rows, not catalogue phases (so it declares none and derives no map).
+    assert_eq!(export.entries.len(), 40, "the export's catalogue entries");
     assert_eq!(export.card_types.len(), 74, "the export's card types");
     assert_eq!(
         capabilities.capabilities.len(),
