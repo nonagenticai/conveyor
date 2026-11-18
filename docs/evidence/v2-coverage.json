@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 41,
+    "exists": 42,
     "extend": 7,
-    "new": 15
+    "new": 14
   },
   "rows": [
     {
@@ -324,9 +324,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "lesson",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE lesson"
+        "migrations: CREATE TABLE lesson"
       ]
     },
     {
