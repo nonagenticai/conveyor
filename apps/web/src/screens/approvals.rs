@@ -50,28 +50,14 @@ fn load(ctx: AppCtx) -> LocalResource<Result<ApprovalsData, ApiError>> {
                 .output,
             "approvals",
         )?;
-        // One policy read per distinct action, not per row.
+        // One policy read per distinct action, not per row. An action with no policy row
+        // answers the strict default; a refused read is the same default, never a waiver.
         let mut policies = BTreeMap::new();
         for row in &page.items {
             if policies.contains_key(&row.gate) {
                 continue;
             }
-            let policy = client
-                .invoke(
-                    "approval_policies.get",
-                    json!({"action": row.gate}),
-                    InvokeOptions::default(),
-                )
-                .await;
-            let pair = match policy {
-                Ok(invocation) => (
-                    text(&invocation.output, "approval", "required"),
-                    text(&invocation.output, "self_approval", "forbidden"),
-                ),
-                // An action with no policy row answers the strict default; a refused read is
-                // the same default, never a waiver.
-                Err(_) => ("required".to_owned(), "forbidden".to_owned()),
-            };
+            let pair = crate::approvals::policy_for(&client, &row.gate).await;
             policies.insert(row.gate.clone(), pair);
         }
         let me = ctx.me.get().map(|me| me.principal.id).unwrap_or_default();
@@ -81,14 +67,6 @@ fn load(ctx: AppCtx) -> LocalResource<Result<ApprovalsData, ApiError>> {
             me,
         })
     })
-}
-
-fn text(output: &Value, field: &str, fallback: &str) -> String {
-    output
-        .get(field)
-        .and_then(Value::as_str)
-        .unwrap_or(fallback)
-        .to_owned()
 }
 
 fn pretty(value: &Value) -> String {
@@ -170,11 +148,8 @@ pub fn Approvals() -> impl IntoView {
                                 && row.requested_by.as_deref() == Some(me.as_str());
                             // The requester may not decide their own gate unless the tenant
                             // allows it; say why, do not hide the control.
-                            let refusal = if mine && self_approval != "allowed" {
-                                Some("You requested this gate; another person must decide it.")
-                            } else {
-                                None
-                            };
+                            let refusal =
+                                crate::approvals::self_gate_refusal(mine, &self_approval);
                             let approve_id = row.id.clone();
                             let reject_id = row.id.clone();
                             view! {
