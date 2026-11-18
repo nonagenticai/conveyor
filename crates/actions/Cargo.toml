@@ -12,6 +12,8 @@ conveyor-actions-derive = { path = "../actions-derive" }
 conveyor-auth = { path = "../auth" }
 # #161 P3: `decks.render` renders the deck model; the action layer holds no OOXML writer.
 conveyor-deck = { path = "../deck" }
+# #366: `sheets.export` and `sheets.import` — the workbook model, its writer and its reader.
+conveyor-sheets = { path = "../sheets" }
 conveyor-domain = { path = "../domain" }
 # #172 (T7): the bare-metal host client behind `ops.host_*` — the forced-command agent session
 # and the pinned host key live there, not in this crate.

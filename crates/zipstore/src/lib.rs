@@ -1,15 +1,19 @@
-//! A stored-only, deterministic ZIP32 writer.
+#![forbid(unsafe_code)]
+//! A stored-only, deterministic ZIP32 writer, and the CRC-32 ZIP headers carry.
 //!
-//! ADR 0007 §7 puts OOXML writing in this crate, and an OOXML package is a ZIP. The archive
-//! here is written by hand rather than through a compression library for one reason: the
-//! determinism gate. Every field has exactly one legal value for a given entry — stored method,
-//! no flags, no extra field, no comment, and a fixed 1980-01-01 DOS timestamp — so the same
-//! entries can only produce the same bytes. A general-purpose zip crate carrying deflate
+//! ADR 0007 §7 puts OOXML writing in this workspace, and an OOXML package is a ZIP. Two
+//! writers need it — the deck's `.pptx` and the sheet's `.xlsx` — so the writer lives here
+//! rather than in either model crate: one determinism contract, one implementation.
+//!
+//! The archive is written by hand rather than through a compression library for one reason:
+//! the determinism gate. Every field has exactly one legal value for a given entry — stored
+//! method, no flags, no extra field, no comment, and a fixed 1980-01-01 DOS timestamp — so the
+//! same entries can only produce the same bytes. A general-purpose zip crate carrying deflate
 //! settings, platform attributes or a clock would make that a property to remember instead of a
 //! property of the format this module emits.
 //!
 //! ZIP32's 4 GiB limits are a refusal rather than a panic: [`archive`] returns the name of the
-//! part that did not fit and the caller turns it into a `DeckError`.
+//! part that did not fit and the caller turns it into its own typed error.
 
 /// Local file header signature, `PK\x03\x04`.
 const LOCAL_FILE_HEADER_SIGNATURE: u32 = 0x0403_4b50;
@@ -48,7 +52,7 @@ const CRC_TABLE: [u32; 256] = {
 };
 
 /// The CRC-32 of `bytes`, as ZIP headers carry it.
-pub(crate) fn crc32(bytes: &[u8]) -> u32 {
+pub fn crc32(bytes: &[u8]) -> u32 {
     let mut crc = 0xffff_ffffu32;
     for &byte in bytes {
         let slot = ((crc ^ u32::from(byte)) & 0xff) as usize;
@@ -62,7 +66,7 @@ pub(crate) fn crc32(bytes: &[u8]) -> u32 {
 /// The result is a pure function of the entries: there is no clock, no platform attribute and
 /// no map iteration in the path. On a part whose size or offset does not fit ZIP32, the name of
 /// that part is returned so the caller can refuse it by name.
-pub(crate) fn archive(entries: &[(&str, &[u8])]) -> Result<Vec<u8>, String> {
+pub fn archive(entries: &[(&str, &[u8])]) -> Result<Vec<u8>, String> {
     let mut out = Vec::new();
     let mut directory = Vec::new();
 

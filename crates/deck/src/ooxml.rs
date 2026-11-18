@@ -202,7 +202,7 @@ pub(crate) fn package(deck: &Deck, images: &[Option<PreparedImage>]) -> Result<V
         .iter()
         .map(|part| (part.name.as_str(), part.data.as_ref()))
         .collect();
-    crate::zip::archive(&entries)
+    conveyor_zipstore::archive(&entries)
 }
 
 /// `[Content_Types].xml`: a default for the two relationship/XML extensions and PNG/JPEG media,

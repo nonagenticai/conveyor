@@ -45,7 +45,7 @@ pub const MAX_OUTPUT_BYTES: usize = 256 * 1024;
 /// `runner/v1` job reads its footage through `GET /api/jobs/{id}/inputs/{name}`, and that route
 /// resolves a document row. Without them a tenant had no way to put a video in a job at all
 /// (#185). A 10 MiB upload cap still applies, so this is for short clips and stills, not masters.
-pub const ALLOWED_CONTENT_TYPES: [&str; 11] = [
+pub const ALLOWED_CONTENT_TYPES: [&str; 12] = [
     "application/pdf",
     "application/json",
     "audio/mpeg",
@@ -57,6 +57,9 @@ pub const ALLOWED_CONTENT_TYPES: [&str; 11] = [
     "text/markdown",
     "text/plain",
     "video/mp4",
+    // #366: a workbook `sheets.export` produced in document mode. It is a ZIP container like
+    // pptx/docx, so the declared type is the caller's claim and the magic bytes are the proof.
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 ];
 
 /// The event type every document mutation emits.
