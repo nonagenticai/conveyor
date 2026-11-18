@@ -81,8 +81,9 @@
       ]
     },
     "T3": {
+      "actions": ["pm.charter", "pm.plan", "pm.get", "pm.route_gate", "pm.close", "changes.request"],
       "evidence": ["docs/SPEC_V2.md"],
-      "gap": "no PM job: no charter, WBS, baseline, staffing, gate routing or closure run"
+      "gap": null
     },
     "T4": {
       "evidence": ["docs/SPEC_V2.md"],
