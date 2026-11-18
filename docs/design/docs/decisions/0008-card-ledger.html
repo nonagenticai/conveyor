@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0008 — The card ledger is its own append-only table · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0008-card-ledger.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0008--the-card-ledger-is-its-own-append-only-table">0008 — The card ledger is its own append-only table</h1>
+<p>Status: Accepted · Date: 2026-11-18 · Issue: #295 · Resolves: <code>parity/SUMMARY.md</code> §"The five A-hit contradictions" — the open home for the P-1224/P-1101 ledger capability.</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>Home.</strong> The per-card claim/fact record lives in a new table, <code>card_ledger</code>. It is <strong>not</strong> <code>work_package_memory</code>: that table is project-scoped (<code>project_id NOT NULL</code>), carries consolidation state (<code>consolidated_at</code>, <code>supersedes_id</code>) and holds derived digest rows, so it answers "what a run learned", not "what was claimed and accepted about this card". It is <strong>not</strong> <code>event</code>: the event table is the board's outbound stream — relayed once, pruned by retention, and keyed to a mutation's doorbell — so it is a transport record, not a record a caller reads back.</p></li>
+<li><p><strong>Key.</strong> The ledger is keyed by the conveyor card id: <code>card_id uuid NOT NULL REFERENCES card(id) ON DELETE RESTRICT</code>. The old <code>planka_card_id</code> is <strong>not carried</strong>: an identity is not content (D7), and nothing is copied across the cutover. The old rows stay in the RM database; the new table starts empty, with no backfill and no compatibility column.</p></li>
+<li><p><strong>Row shape</strong> (<code>migrations/0052_card_ledger.sql</code>):</p>
+<table>
+<thead>
+<tr>
+<th>column</th>
+<th>type</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>uuid PK DEFAULT gen_random_uuid()</code></td>
+<td>the entry</td>
+</tr>
+<tr>
+<td><code>tenant_id</code></td>
+<td><code>uuid NOT NULL</code></td>
+<td>RLS anchor; bound explicitly by the store</td>
+</tr>
+<tr>
+<td><code>card_id</code></td>
+<td><code>uuid NOT NULL</code> FK <code>card</code></td>
+<td>the conveyor card</td>
+</tr>
+<tr>
+<td><code>kind</code></td>
+<td><code>text CHECK (kind IN ('claim','fact'))</code></td>
+<td>the two kinds the callers use</td>
+</tr>
+<tr>
+<td><code>body</code></td>
+<td><code>text NOT NULL</code></td>
+<td>the claim or fact itself</td>
+</tr>
+<tr>
+<td><code>source</code></td>
+<td><code>jsonb NOT NULL DEFAULT '{}'</code></td>
+<td>where it came from (<code>list</code>, <code>node</code>, <code>execution_id</code>, …)</td>
+</tr>
+<tr>
+<td><code>verdict</code></td>
+<td><code>jsonb</code></td>
+<td>the laya verdict (<code>score</code>, <code>accepted</code>, <code>reason</code>), when one exists</td>
+</tr>
+<tr>
+<td><code>created_by</code></td>
+<td><code>uuid</code></td>
+<td>the writing user; <code>NULL</code> for a service principal</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td><code>timestamptz NOT NULL DEFAULT now()</code></td>
+<td>when it was appended</td>
+</tr>
+</tbody>
+</table>
+<p>Index: <code>(tenant_id, card_id, created_at, id)</code> — one card's ledger, oldest first. Tenant RLS is the house <code>tenant_isolation</code> policy (<code>ENABLE</code> + <code>FORCE</code>, <code>USING</code> and <code>WITH CHECK</code>).</p></li>
+<li><p><strong>Actions.</strong></p>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>kind</th>
+<th>effect</th>
+<th>tenancy</th>
+<th>behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cards.ledger_append</code></td>
+<td>internal</td>
+<td>write</td>
+<td>tenant</td>
+<td>appends exactly one row and exactly one <code>event</code> (<code>card_ledger.appended</code>, topic <code>card:&lt;card_id&gt;</code>, aggregate <code>card_ledger</code>) in the same transaction (CONTRACT §7)</td>
+</tr>
+<tr>
+<td><code>cards.ledger_list</code></td>
+<td>internal, idempotent</td>
+<td>read</td>
+<td>tenant</td>
+<td>one card's entries, oldest first, optional <code>kind</code> filter, bounded <code>limit</code></td>
+</tr>
+</tbody>
+</table>
+<p>Both resolve the card in the caller's tenant first: another tenant's card is a <code>404</code>, never an empty page and never an FK acceptance.</p></li>
+<li><p><strong>Append-only by construction.</strong> There is no update action, no delete action and no mutating store function; <code>card_ledger</code> has no <code>version</code> and no <code>updated_at</code> because nothing edits a row. This is deliberately different from the grant-based append-only tables (<code>event</code>, <code>approval_decision</code>): the guarantee is the absence of a write path, recorded in the migration's header. Adding a mutating path is the change that breaks it.</p></li>
+</ol>
+<h2 id="context">Context</h2>
+<p><code>parity/parity.yaml</code> records two live surfaces: P-1224 (<code>POST /pm/cards/{planka_card_id}/ledger</code>, 29 active workflows / 145 call sites) and P-1101 (<code>GET /pm/cards/{planka_card_id}/ledger</code>, 20 / 65). SPEC §4 drops <code>planka_card_id</code> as card <em>identity</em>, not the capability: the callers write claims and facts with a <code>source</code> object and a laya verdict and read them back per card. <code>parity/SUMMARY.md</code> named <code>work_package_memory</code> and <code>event</code> as candidates and left the home open; this record closes it.</p>
+<p>The same resolution rejects the other A-hit contradictions' pattern for this row: there is no "copy" step and no inherited ledger. A claim recorded before cutover is RM history; a claim recorded after cutover is a <code>card_ledger</code> row.</p>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>No data migration: the table is new and empty. A consumer that needs historical claims reads them from RM until RM is retired (D7's normal cutover rule).</li>
+<li>The event vocabulary gains <code>card_ledger.appended</code>; a webhook may subscribe to it.</li>
+<li><code>docs/evidence/2026-11-18-card-ledger-call-sites.md</code> maps the recorded call-site semantics onto <code>cards.ledger_append</code>/<code>cards.ledger_list</code> and names the drops.</li>
+<li>A future search or digest feature must read <code>card_ledger</code>; it must not add a second claim store.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0008-card-ledger.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
