@@ -26,7 +26,7 @@ use rmcp::transport::streamable_http_server::session::local::LocalSessionManager
 use serde_json::{Value, json};
 use sqlx::PgPool;
 
-use crate::invoke::{Authority, InvokeRequest, invoke};
+use crate::invoke::{Authority, InvokeRequest, UsageContext, invoke};
 use crate::registry::registry;
 use crate::spec::ActionSpec;
 
@@ -233,7 +233,19 @@ impl ServerHandler for McpServer {
             trace_id: trace_id_of(&context),
             depth: 0,
             app_key: self.deps.app_key.clone(),
-            usage: None,
+            // S16 W7: an MCP call is an ordinary tool invocation and names its caller the same
+            // way an HTTP call does — `Other`, no ledger join key; the request id is transport
+            // correlation only. Captured only when the action declares `captures_usage`.
+            usage: Some(UsageContext {
+                caller_kind: conveyor_domain::inference::CallerKind::Other,
+                run_id: None,
+                run_step_id: None,
+                conversation_turn_id: None,
+                eval_run_id: None,
+                prompt_ref: None,
+                prompt_version: None,
+                correlation_id: request_id_of(&context),
+            }),
         };
 
         let (status, body) =
@@ -346,11 +358,22 @@ pub async fn mcp_tool_body(
         role: session.role,
         policy: session.policy.clone(),
         authority: Authority::of(session),
-        request_id,
+        request_id: request_id.clone(),
         trace_id: None,
         depth: 0,
         app_key,
-        usage: None,
+        // The `_tool` helper is another MCP entry point into the same seam (S06c); it names the
+        // caller exactly as `call_tool` does.
+        usage: Some(UsageContext {
+            caller_kind: conveyor_domain::inference::CallerKind::Other,
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: None,
+            eval_run_id: None,
+            prompt_ref: None,
+            prompt_version: None,
+            correlation_id: request_id,
+        }),
     };
     match invoke(pool, registry(), session.tenant, request).await {
         Ok(outcome) => (outcome.status, outcome.body),

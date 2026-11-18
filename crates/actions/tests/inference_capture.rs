@@ -4,10 +4,15 @@
 
 mod support;
 
+use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+use axum::Router;
+use axum::routing::post;
 use conveyor_actions::{InvokeRequest, UsageContext, invoke, registry};
 use conveyor_auth::Role;
 use conveyor_domain::inference::CallerKind;
-use serde_json::json;
+use serde_json::{Value, json};
 use uuid::Uuid;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -206,4 +211,109 @@ async fn a_call_without_a_usage_context_writes_no_row() {
         .await
         .expect("count");
     assert_eq!(rows, 0);
+}
+
+/// P1.4 — the completeness guarantee is an explicit amendment, not a retry loop.
+///
+/// A ledger write can fail while the paid model call has already succeeded. The contract is: the
+/// call keeps its success, the failure is logged, and the paid call is **never retried** merely to
+/// repair its accounting (S16 W7). Break only the ledger and prove all three.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_capture_failure_keeps_the_call_and_never_retries_the_paid_request() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+
+    let hits = Arc::new(AtomicUsize::new(0));
+    let counter = hits.clone();
+    let app = Router::new().route(
+        "/api/chat/completions",
+        post(move |axum::Json(_body): axum::Json<Value>| {
+            let counter = counter.clone();
+            async move {
+                counter.fetch_add(1, Ordering::SeqCst);
+                axum::Json(json!({
+                    "id": "chatcmpl-capture-failure",
+                    "model": "served-model",
+                    "choices": [{
+                        "index": 0,
+                        "message": {"role": "assistant", "content": "ok"},
+                        "finish_reason": "stop"
+                    }],
+                    "usage": {
+                        "prompt_tokens": 5,
+                        "completion_tokens": 2,
+                        "total_tokens": 7,
+                        "cache_creation_input_tokens": 0,
+                        "cache_read_input_tokens": 0
+                    }
+                }))
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+
+    // Only the capture target is missing: the invocation, audit and idempotency bookkeeping all
+    // still have their tables, so a successful commit proves the capture rolled back to its own
+    // savepoint instead of poisoning the caller's transaction.
+    sqlx::query("ALTER TABLE inference_call RENAME TO inference_call_unavailable")
+        .execute(&pg.super_pool)
+        .await
+        .expect("break only the ledger");
+
+    let request = InvokeRequest {
+        action: "completions.create".to_owned(),
+        input: json!({
+            "model": "alias-model",
+            "messages": [{"role": "user", "content": "hello"}],
+        }),
+        precondition: None,
+        idempotency_key: None,
+        approval_id: None,
+        actor_id: seeded.user_id,
+        actor_kind: "user".to_owned(),
+        role: Role::Admin,
+        policy: Default::default(),
+        authority: conveyor_actions::Authority::Role,
+        request_id: Some("rid-capture-failure".to_owned()),
+        trace_id: None,
+        depth: 0,
+        app_key: "conveyor-test".to_owned(),
+        usage: Some(UsageContext {
+            caller_kind: CallerKind::ProcessStep,
+            run_id: Some(Uuid::now_v7()),
+            run_step_id: None,
+            conversation_turn_id: None,
+            eval_run_id: None,
+            prompt_ref: Some("process:capture-failure".to_owned()),
+            prompt_version: Some("1:1".to_owned()),
+            correlation_id: Some("corr-capture-failure".to_owned()),
+        }),
+    };
+    let outcome = invoke(&pg.runtime, registry(), seeded.tenant, request)
+        .await
+        .expect("a capture failure must not fail the paid call");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+
+    assert_eq!(
+        hits.load(Ordering::SeqCst),
+        1,
+        "the paid model call is never retried to repair accounting"
+    );
+    let invocations: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM action_invocation WHERE action = 'completions.create'",
+    )
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count invocations");
+    assert_eq!(
+        invocations, 1,
+        "the action's own bookkeeping still commits after the capture rolled back"
+    );
 }
