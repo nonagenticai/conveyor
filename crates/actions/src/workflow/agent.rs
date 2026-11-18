@@ -626,6 +626,7 @@ pub(crate) async fn drive(
                         idempotency_key: run
                             .idempotency_prefix
                             .map(|prefix| format!("{prefix}:turn{turn}")),
+                        approval_id: None,
                         actor_id,
                         actor_kind: "service".to_owned(),
                         role: Role::KataExecutor,
@@ -672,6 +673,7 @@ pub(crate) async fn drive(
                             idempotency_key: run
                                 .idempotency_prefix
                                 .map(|prefix| format!("{prefix}:tool{index}")),
+                            approval_id: None,
                             actor_id,
                             actor_kind: "service".to_owned(),
                             role: Role::KataExecutor,

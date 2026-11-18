@@ -80,8 +80,14 @@ pub async fn manifest(
         .into_response()
 }
 
-/// The invocation body `{"input": …}`. Parsed by hand so every failure is RFC 9457.
-fn parse_body(bytes: &Bytes) -> Result<Value, ActionError> {
+/// The invocation body `{"input": …, "approval_id": "…"}`. Parsed by hand so every failure is
+/// RFC 9457.
+///
+/// `approval_id` is a property of the CALL, not of the payload (#282): a destructive action whose
+/// spec declares an approval target is refused without it, and every other action ignores it. It
+/// lives beside `input` rather than inside it because every action input is
+/// `deny_unknown_fields` — a field the engine adds could not be added to 27 schemas at once.
+fn parse_body(bytes: &Bytes) -> Result<(Value, Option<uuid::Uuid>), ActionError> {
     let value: Value = serde_json::from_slice(bytes).map_err(|error| {
         ActionError::invalid_input(vec![conveyor_actions::FieldError {
             field: "body".into(),
@@ -98,7 +104,26 @@ fn parse_body(bytes: &Bytes) -> Result<Value, ActionError> {
             },
         ]));
     };
-    Ok(input.clone())
+    let approval_id = match value.get("approval_id") {
+        None | Some(Value::Null) => None,
+        Some(Value::String(text)) => Some(text.parse::<uuid::Uuid>().map_err(|_| {
+            ActionError::invalid_input(vec![conveyor_actions::FieldError {
+                field: "approval_id".into(),
+                code: "invalid_uuid".into(),
+                detail: "approval_id must be the uuid of an approved approval".into(),
+            }])
+        })?),
+        Some(_) => {
+            return Err(ActionError::invalid_input(vec![
+                conveyor_actions::FieldError {
+                    field: "approval_id".into(),
+                    code: "invalid_type".into(),
+                    detail: "approval_id must be a uuid string".into(),
+                },
+            ]));
+        }
+    };
+    Ok((input.clone(), approval_id))
 }
 
 /// `If-Match: "<version>"` (CONTRACT §3).
@@ -177,8 +202,8 @@ pub async fn invoke_http(
         .and_then(|value| value.split('-').nth(1))
         .map(str::to_owned);
 
-    let input = match parse_body(&body) {
-        Ok(input) => input,
+    let (input, approval_id) = match parse_body(&body) {
+        Ok(parsed) => parsed,
         Err(error) => return problem(&error, &instance, &request_id),
     };
     let precondition = match parse_if_match(&headers) {
@@ -195,6 +220,7 @@ pub async fn invoke_http(
         input,
         precondition,
         idempotency_key,
+        approval_id,
         actor_id: caller.principal.user_id.as_uuid(),
         actor_kind: caller.principal.kind.as_actor_kind().to_owned(),
         role: caller.role,

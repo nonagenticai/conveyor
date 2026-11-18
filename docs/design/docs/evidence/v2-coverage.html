@@ -37,17 +37,17 @@
 <tr>
 <td><code>exists</code></td>
 <td>implemented in code and backed by real rows</td>
-<td>26</td>
+<td>28</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a partial implementation exists (a page, a table, or a prefix) that must be extended</td>
-<td>8</td>
+<td>7</td>
 </tr>
 <tr>
 <td><code>new</code></td>
 <td>absent</td>
-<td>29</td>
+<td>28</td>
 </tr>
 </tbody>
 </table>
@@ -109,8 +109,8 @@
 <td>§10.3</td>
 <td>table</td>
 <td>approval_policy</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE approval_policy</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE approval_policy</td>
 </tr>
 <tr>
 <td><code>table:wbs_node</code></td>
@@ -413,8 +413,8 @@
 <td>§10.4</td>
 <td>actions</td>
 <td>approvals</td>
-<td><code>extend</code></td>
-<td>actions: approval_policies.* absent<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request)</td>
+<td><code>exists</code></td>
+<td>actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request)</td>
 </tr>
 <tr>
 <td><code>actions:decision</code></td>

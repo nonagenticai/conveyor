@@ -27,8 +27,7 @@ use uuid::Uuid;
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
-use super::{CheckOut, SERVICE, name_of, tail_of};
-use crate::control::approvals::require_approval_tx;
+use super::{CheckOut, SERVICE, name_for_target, name_of, tail_of};
 
 /// `ops.host_status` input.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -61,9 +60,6 @@ pub struct HostRestartIn {
     pub host: String,
     /// The unit, as the host's agent config names it.
     pub unit: String,
-    /// The approved approval that authorises this exact restart.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub approval_id: Option<Uuid>,
     /// Return the request that WOULD be made and open no session.
     #[serde(default)]
     pub dry_run: bool,
@@ -284,6 +280,16 @@ async fn ops_host_logs(
     }))
 }
 
+/// `ops.host_restart_unit`'s approval target: this unit on this host, restarting (#282).
+///
+/// Built from the same two names the handler uses, so the approval the engine demands and the
+/// host the handler addresses cannot disagree.
+fn target_host_restart(input: &HostRestartIn) -> Result<String, String> {
+    let host = name_for_target("host", &input.host)?;
+    let unit = name_for_target("unit", &input.unit)?;
+    Ok(format!("host/{host}/unit/{unit}/restart"))
+}
+
 /// Restart a unit on a registered host — destructive, and gated exactly as the cluster writes
 /// are. The approval names the exact unit: `host/<host>/unit/<unit>/restart`.
 #[crate::action(
@@ -295,7 +301,8 @@ async fn ops_host_logs(
     timeout_ms = 60000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_host_restart"
 )]
 async fn ops_host_restart_unit(
     tx: &mut PgConnection,
@@ -304,18 +311,10 @@ async fn ops_host_restart_unit(
 ) -> Result<HandlerOutput<HostRestartOut>, ActionError> {
     let host = name_of("host", &input.host)?;
     let unit = name_of("unit", &input.unit)?;
-    // The gate runs on a DETERMINISTIC target, before the registry is even read and long before
-    // any session exists — a dry run is gated too, exactly as the `ops.*` cluster writes are.
-    // Gating first also keeps the refusal independent of whether the host exists.
+    // #282: the engine gated this call with `target_host_restart` before this handler ran — on a
+    // DETERMINISTIC target, before the registry is read and long before any session exists. A dry
+    // run is gated too, and the refusal is independent of whether the host exists.
     let target = format!("host/{host}/unit/{unit}/restart");
-    require_approval_tx(
-        tx,
-        &ctx,
-        "ops.host_restart_unit",
-        &target,
-        input.approval_id,
-    )
-    .await?;
     let row = registered(tx, &host).await?;
     let unit = allowlisted(&host, &row, &unit)?;
     let remote_command = vec!["restart".to_owned(), unit.to_owned()];
@@ -347,7 +346,7 @@ async fn ops_host_restart_unit(
         unit: unit.to_owned(),
         mechanism: row.mechanism,
         target,
-        approval_id: input.approval_id,
+        approval_id: ctx.approval_id,
         dry_run: input.dry_run,
         remote_command,
         checks,

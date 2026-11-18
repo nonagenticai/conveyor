@@ -87,14 +87,17 @@ use serde_json::{Value, json};
 /// 400 → **401**.
 /// **#172 adds 3 internal**: the host family — `ops.host_status|host_logs|host_restart_unit`
 /// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 401 → **404**.
-/// **T3 adds 6 internal**: the PM job — `pm.charter|plan|get|route_gate|close` and
-/// `changes.request`. 404 → **410**.
-const EXPECTED: [&str; 424] = [
+/// **#282 adds 3 internal**: the approval-policy family.
+/// **T3 adds 6 internal**: the PM job.
+const EXPECTED: [&str; 427] = [
     "actions.describe",
     "actions.list",
     "agent.run",
     "andon.engage",
     "andon.release",
+    "approval_policies.get",
+    "approval_policies.list",
+    "approval_policies.set",
     "approvals.decide",
     "approvals.list",
     "approvals.request",
@@ -565,12 +568,13 @@ fn the_registry_is_exactly_the_declared_set() {
     // #163 adds `produce.script` (internal): 382 → 383; external stays 18.
     // #172 adds the three host actions (internal; one destructive, two reads): 383 → 386;
     // external stays 18 — they call the host agent over ssh, not a declared external service.
-    // T3 adds the six PM actions (all internal): 386 → 392; external stays 18.
+    // #282 adds `approval_policies.list|get|set` (internal): 392 → 395; external stays 18.
+    // T3 adds the six PM actions (all internal): 386 → 392.
     // #305 adds the fourteen MSP edit/read actions (benefits update/delete/link_list/unlink/
     // transition_list/transition_upsert, tranches update/delete/review_list, cadences
     // update/delete, wbs.delete, registers.delete, stakeholders.profile_delete), all internal:
-    // 392 -> 406; external stays 18.
-    assert_eq!((internal, external), (406, 18));
+    // 395 -> 409; external stays 18.
+    assert_eq!((internal, external), (409, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -165,6 +165,7 @@ pub async fn channel_inbound(
             .idempotency_key
             .as_ref()
             .map(|key| format!("channel:{binding_id}:{key}")),
+        approval_id: None,
         actor_id: service_user,
         actor_kind: "service".to_owned(),
         role: Role::KataExecutor,

@@ -1,19 +1,70 @@
 {
   "issues": [
     {
-      "number": 319,
-      "title": "estate: absorb the evidence-review service into apps/scientific \u2014 the review family, its schema and its seal",
+      "number": 325,
+      "title": "docs: index the w2v retirement evidence so check-docs is green on main",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/319",
-      "updatedAt": "2026-11-17T23:07:39Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/325",
+      "updatedAt": "2026-11-18T00:24:06Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 323,
+      "title": "design-pack is red on main: P0 is 'uncovered' after its three units closed",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/323",
+      "updatedAt": "2026-11-18T00:13:01Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 321,
+      "title": "data: P0 is built, so the coverage gate stops failing on every branch",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/321",
+      "updatedAt": "2026-11-18T00:22:27Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 319,
+      "title": "estate: absorb the evidence-review service into apps/scientific \u2014 the review family, its schema and its seal",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/319",
+      "updatedAt": "2026-11-18T00:09:51Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -22,7 +73,7 @@
       "title": "delivery: a merge to main runs the sweep, because GitHub drops this repo's cron",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/314",
-      "updatedAt": "2026-11-17T23:07:00Z",
+      "updatedAt": "2026-11-17T23:22:07Z",
       "labels": [
         {
           "name": "unit",
@@ -73,7 +124,7 @@
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-17T22:55:15Z",
+      "updatedAt": "2026-11-18T00:11:27Z",
       "labels": [
         {
           "name": "unit",
@@ -248,15 +299,15 @@
       "title": "copilot: a proposed destructive action binds the approval it was granted",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/284",
-      "updatedAt": "2026-11-17T10:32:04Z",
+      "updatedAt": "2026-11-18T00:14:46Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -288,9 +339,9 @@
     {
       "number": 282,
       "title": "approvals: the destructive gate is spec-declared and policy-driven, at the invoke boundary",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/282",
-      "updatedAt": "2026-11-17T22:25:50Z",
+      "updatedAt": "2026-11-18T00:13:21Z",
       "labels": [
         {
           "name": "unit",
@@ -851,9 +902,9 @@
     {
       "number": 213,
       "title": "estate: retire the dead w2v namespace surface (17 zero-replica Deployments, their Services, and the dead routes)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/213",
-      "updatedAt": "2026-11-17T23:03:05Z",
+      "updatedAt": "2026-11-18T00:01:51Z",
       "labels": [
         {
           "name": "unit",
@@ -1492,7 +1543,7 @@
       "title": "estate: absorb the analysis service into crates/analysis \u2014 the analyse.* library",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/154",
-      "updatedAt": "2026-11-16T18:26:32Z",
+      "updatedAt": "2026-11-17T23:54:30Z",
       "labels": [
         {
           "name": "unit",
