@@ -1,11 +1,49 @@
 {
   "issues": [
     {
+      "number": 366,
+      "title": "sheets: native XLSX import and export as conveyor actions",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/366",
+      "updatedAt": "2026-11-18T20:40:24Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
+      "number": 364,
+      "title": "publish: repoint publish.design at the pack's docs/design tree",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/364",
+      "updatedAt": "2026-11-18T20:53:40Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 363,
       "title": "docs: retire the homepage-mirror references; add a public-history note to the delivery-system evidence",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/363",
-      "updatedAt": "2026-11-18T19:57:45Z",
+      "updatedAt": "2026-11-18T20:33:55Z",
       "labels": [
         {
           "name": "documentation",
@@ -24,9 +62,9 @@
     {
       "number": 357,
       "title": "console: a self-gate must not offer a decision the store refuses",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/357",
-      "updatedAt": "2026-11-18T19:43:55Z",
+      "updatedAt": "2026-11-18T20:42:47Z",
       "labels": [
         {
           "name": "unit",
@@ -196,7 +234,7 @@
       "title": "estate: absorb the evidence-review service into apps/scientific \u2014 the review family, its schema and its seal",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/319",
-      "updatedAt": "2026-11-18T18:57:01Z",
+      "updatedAt": "2026-11-18T20:00:17Z",
       "labels": [
         {
           "name": "unit",
@@ -2418,15 +2456,15 @@
       "title": "T10 \u2014 SAFe cadence and MSP tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/82",
-      "updatedAt": "2026-11-18T11:00:06Z",
+      "updatedAt": "2026-11-18T20:43:09Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T10",
