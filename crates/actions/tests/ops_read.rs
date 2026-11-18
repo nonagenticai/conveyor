@@ -17,6 +17,7 @@ fn request(tenant_role: Role, policy: conveyor_auth::ScopePolicy, input: Value) 
         input,
         precondition: None,
         idempotency_key: None,
+        approval_id: None,
         actor_id: Uuid::now_v7(),
         actor_kind: "user".to_owned(),
         role: tenant_role,

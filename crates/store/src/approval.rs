@@ -21,6 +21,7 @@ use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
+use crate::approval_policy;
 use crate::parent::{Parent, ParentError, ensure_optional_parent_tx};
 use crate::run::{RunStoreError, transition_run_tx};
 use crate::version_of;
@@ -815,9 +816,25 @@ pub async fn record_decision_tx(
             .fetch_one(&mut *conn)
             .await?;
     if requested_by == Some(decision.approver_id) {
-        return Err(ApprovalStoreError::Illegal(
-            ApprovalError::RequesterCannotDecide,
-        ));
+        // #282: §5.4 is the DEFAULT, not a hardcode. A tenant may allow the requester to decide
+        // its own gate for this action, and that decision is a row — never a caller's claim.
+        // Everything else fails closed: a missing row, an unreadable row and a corrupt value all
+        // keep the refusal, because the alternative is granting a permission nobody recorded.
+        // The gate name IS the action name for a destructive gate, which is what makes this read
+        // need no second lookup.
+        let allowed =
+            match approval_policy::allows_self_approval(&mut *conn, tenant, &row.gate).await {
+                Ok(allowed) => allowed,
+                Err(approval_policy::ApprovalPolicyStoreError::Database(error)) => {
+                    return Err(error.into());
+                }
+                Err(_) => false,
+            };
+        if !allowed {
+            return Err(ApprovalStoreError::Illegal(
+                ApprovalError::RequesterCannotDecide,
+            ));
+        }
     }
     // W1 (S06d): an eval gate is a person's act, and only a person holding `evals:approve` may
     // decide it. This check lives HERE — the one writer every decision path traverses — so

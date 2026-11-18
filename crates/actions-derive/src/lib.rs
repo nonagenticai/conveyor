@@ -45,6 +45,8 @@ struct ActionArgs {
     tenancy: LitStr,
     /// S10 §5.2: the copilot's tier (`core` / `searchable`); absent means no hint.
     agent_tier: Option<LitStr>,
+    /// The function that computes a destructive call's approval target from its input (#282).
+    approval_target: Option<LitStr>,
     /// S10 §5.3: propose this action even when its effect alone would not.
     proposal_required: Option<LitBool>,
     /// S06c: `/mcp` may run this action as a task (`tasks/get|update|cancel`).
@@ -69,6 +71,7 @@ impl Parse for ActionArgs {
         let mut proposal_required = None;
         let mut task = None;
         let mut captures_usage = None;
+        let mut approval_target = None;
 
         while !input.is_empty() {
             let key: syn::Ident = input.parse()?;
@@ -86,6 +89,7 @@ impl Parse for ActionArgs {
                 "proposal_required" => proposal_required = Some(input.parse()?),
                 "task" => task = Some(input.parse()?),
                 "captures_usage" => captures_usage = Some(input.parse()?),
+                "approval_target" => approval_target = Some(input.parse()?),
                 "scopes" => {
                     let content;
                     syn::bracketed!(content in input);
@@ -118,6 +122,7 @@ impl Parse for ActionArgs {
             proposal_required,
             task,
             captures_usage,
+            approval_target,
         })
     }
 }
@@ -455,6 +460,32 @@ pub fn action(args: TokenStream, item: TokenStream) -> TokenStream {
         .map(|value| value.value())
         .unwrap_or(false);
     let idempotent = args.idempotent;
+    // #282: a destructive action declares how its approval target is computed. The wrapper
+    // deserialises the input into the handler's own type, so the target function is typed and
+    // the spec carries a plain `fn(&Value)`.
+    let approval_target = match &args.approval_target {
+        None => quote! { ::core::option::Option::None },
+        Some(path) => {
+            let path: syn::Path = syn::parse_str(&path.value()).unwrap_or_else(|_| {
+                syn::parse_str("::conveyor_actions::approval::no_target").expect("a valid path")
+            });
+            quote! {
+                {
+                    fn __approval_target(
+                        value: &::conveyor_actions::serde_json::Value,
+                    ) -> ::core::result::Result<::std::string::String, ::std::string::String> {
+                        let typed: #input_param =
+                            ::conveyor_actions::serde_json::from_value(value.clone())
+                                .map_err(|error| error.to_string())?;
+                        #path(&typed)
+                    }
+                    ::core::option::Option::Some(
+                        __approval_target as ::conveyor_actions::ApprovalTarget,
+                    )
+                }
+            }
+        }
+    };
     let name_lit = &args.name;
 
     let expanded = quote! {
@@ -504,6 +535,7 @@ pub fn action(args: TokenStream, item: TokenStream) -> TokenStream {
                 },
                 task_capable: #task_capable,
                 captures_usage: #captures_usage,
+                approval_target: #approval_target,
                 artefact: None,
                 handler: ::conveyor_actions::HandlerRef::Internal(#handler_ident),
             }

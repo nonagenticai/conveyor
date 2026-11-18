@@ -324,6 +324,7 @@ mod tests {
             task_capable: false,
             captures_usage: false,
             artefact: None,
+            approval_target: None,
             handler: HandlerRef::Workflow,
         }
     }

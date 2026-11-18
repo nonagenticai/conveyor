@@ -172,9 +172,6 @@ pub struct RestartIn {
     pub namespace: String,
     /// The Deployment to restart.
     pub deployment: String,
-    /// The approved approval that authorises this exact restart.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub approval_id: Option<Uuid>,
     /// Return the request that WOULD be made and change nothing.
     #[serde(default)]
     pub dry_run: bool,
@@ -190,9 +187,6 @@ pub struct ScaleIn {
     pub deployment: String,
     /// The replica count to set.
     pub replicas: u32,
-    /// The approved approval that authorises this exact scale.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub approval_id: Option<Uuid>,
     /// Return the request that WOULD be made and change nothing.
     #[serde(default)]
     pub dry_run: bool,
@@ -209,9 +203,6 @@ pub struct RollbackIn {
     /// The revision to restore; defaults to the revision before the current one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub revision: Option<u32>,
-    /// The approved approval that authorises this exact rollback.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub approval_id: Option<Uuid>,
     /// Return the request that WOULD be made and change nothing.
     #[serde(default)]
     pub dry_run: bool,
@@ -270,6 +261,16 @@ pub fn limit_of(requested: Option<u32>) -> u32 {
 /// Clamp a requested log tail; a sample, never a download.
 pub fn tail_of(requested: Option<u32>) -> u32 {
     requested.unwrap_or(DEFAULT_TAIL).clamp(1, MAX_TAIL)
+}
+
+/// [`name_of`] in the shape a spec-declared approval target needs (#282).
+///
+/// The invoke boundary computes a destructive action's target **after** the input schema has
+/// already accepted the call, so this never refuses anything the schema missed — but it still
+/// returns a `Result` rather than `unwrap`-ing, because a target function that panicked would
+/// turn a caller's typo into a `500`.
+pub fn name_for_target(field: &str, value: &str) -> Result<String, String> {
+    name_of(field, value).map_err(|_| format!("{field} must be a lowercase Kubernetes name"))
 }
 
 /// Validate a Kubernetes object name before it is interpolated into an API path.

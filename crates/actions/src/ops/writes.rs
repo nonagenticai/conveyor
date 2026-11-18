@@ -19,13 +19,12 @@ use chrono::Utc;
 use serde_json::{Value, json};
 use sqlx::PgConnection;
 
-use crate::control::approvals::require_approval_tx;
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
 use super::{
-    CheckOut, RequestOut, RestartIn, RollbackIn, ScaleIn, WriteOut, client, items_of, name_of,
-    refusal,
+    CheckOut, RequestOut, RestartIn, RollbackIn, ScaleIn, WriteOut, client, items_of,
+    name_for_target, name_of, refusal,
 };
 
 /// The annotation `kubectl rollout restart` sets; a restart is exactly this annotation change.
@@ -110,6 +109,39 @@ fn target_of(operation: &str, namespace: &str, deployment: &str, level: Option<&
     }
 }
 
+// The three spec-declared targets `invoke()` computes before any handler runs (#282). Each is
+// the same string its handler builds, from the same function — that is what makes "the engine
+// gates what the handler does" true by construction rather than by two implementations agreeing.
+
+/// `ops.restart`'s approval target: this Deployment, restarting.
+fn target_restart(input: &RestartIn) -> Result<String, String> {
+    let namespace = name_for_target("namespace", &input.namespace)?;
+    let deployment = name_for_target("deployment", &input.deployment)?;
+    Ok(target_of("restart", &namespace, &deployment, None))
+}
+
+/// `ops.scale`'s approval target: this Deployment, at this replica count.
+fn target_scale(input: &ScaleIn) -> Result<String, String> {
+    let namespace = name_for_target("namespace", &input.namespace)?;
+    let deployment = name_for_target("deployment", &input.deployment)?;
+    let replicas = input.replicas.to_string();
+    Ok(target_of("scale", &namespace, &deployment, Some(&replicas)))
+}
+
+/// `ops.rollback`'s approval target: this Deployment, back to this revision (or `previous`).
+///
+/// The level is the revision asked for, or `previous` — the gate must never need a cluster read to
+/// know what it authorises.
+fn target_rollback(input: &RollbackIn) -> Result<String, String> {
+    let namespace = name_for_target("namespace", &input.namespace)?;
+    let deployment = name_for_target("deployment", &input.deployment)?;
+    let level = input
+        .revision
+        .map(|revision| revision.to_string())
+        .unwrap_or_else(|| "previous".to_owned());
+    Ok(target_of("rollback", &namespace, &deployment, Some(&level)))
+}
+
 /// `ops.restart` — a pod-template annotation change, the same one `kubectl rollout restart` makes.
 #[crate::action(
     name = "ops.restart",
@@ -120,19 +152,21 @@ fn target_of(operation: &str, namespace: &str, deployment: &str, level: Option<&
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_restart"
 )]
 async fn ops_restart(
-    tx: &mut PgConnection,
+    _tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: RestartIn,
 ) -> Result<HandlerOutput<WriteOut>, ActionError> {
     let namespace = name_of("namespace", &input.namespace)?;
     let deployment = name_of("deployment", &input.deployment)?;
-    // The gate runs on a DETERMINISTIC target: the stamp below is generated after it, because
-    // what the approval authorises is "restart this Deployment", not one annotation value.
+    // #282: the gate is the engine's now — `target_restart` below is the function it calls, and
+    // the string here is the same one by construction. The target is DETERMINISTIC: the stamp is
+    // generated after it, because what the approval authorises is "restart this Deployment", not
+    // one annotation value.
     let target = target_of("restart", &namespace, &deployment, None);
-    require_approval_tx(tx, &ctx, "ops.restart", &target, input.approval_id).await?;
     let restarted_at = Utc::now().to_rfc3339();
 
     let path = format!("{DEPLOYMENTS}/{namespace}/deployments/{deployment}");
@@ -177,7 +211,7 @@ async fn ops_restart(
         deployment,
         operation: "restart".to_owned(),
         target,
-        approval_id: input.approval_id,
+        approval_id: ctx.approval_id,
         dry_run: input.dry_run,
         request,
         checks,
@@ -194,18 +228,19 @@ async fn ops_restart(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_scale"
 )]
 async fn ops_scale(
-    tx: &mut PgConnection,
+    _tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: ScaleIn,
 ) -> Result<HandlerOutput<WriteOut>, ActionError> {
     let namespace = name_of("namespace", &input.namespace)?;
     let deployment = name_of("deployment", &input.deployment)?;
     let replicas = input.replicas.to_string();
+    // #282: `target_scale` is the function the engine gated this call with.
     let target = target_of("scale", &namespace, &deployment, Some(&replicas));
-    require_approval_tx(tx, &ctx, "ops.scale", &target, input.approval_id).await?;
 
     let path = format!("{DEPLOYMENTS}/{namespace}/deployments/{deployment}");
     let body = json!({"spec": {"replicas": input.replicas}});
@@ -235,7 +270,7 @@ async fn ops_scale(
         deployment,
         operation: "scale".to_owned(),
         target,
-        approval_id: input.approval_id,
+        approval_id: ctx.approval_id,
         dry_run: input.dry_run,
         request,
         checks,
@@ -290,10 +325,11 @@ async fn replicaset_at(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_rollback"
 )]
 async fn ops_rollback(
-    tx: &mut PgConnection,
+    _tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: RollbackIn,
 ) -> Result<HandlerOutput<WriteOut>, ActionError> {
@@ -305,8 +341,8 @@ async fn ops_rollback(
         .revision
         .map(|revision| revision.to_string())
         .unwrap_or_else(|| "previous".to_owned());
+    // #282: `target_rollback` is the function the engine gated this call with.
     let target = target_of("rollback", &namespace, &deployment, Some(&level));
-    require_approval_tx(tx, &ctx, "ops.rollback", &target, input.approval_id).await?;
 
     let current = read_deployment(&namespace, &deployment).await?;
     let current_revision = revision_of(&current).unwrap_or(0);
@@ -363,7 +399,7 @@ async fn ops_rollback(
         deployment,
         operation: "rollback".to_owned(),
         target,
-        approval_id: input.approval_id,
+        approval_id: ctx.approval_id,
         dry_run: input.dry_run,
         request,
         checks,

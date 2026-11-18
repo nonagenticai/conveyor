@@ -54,6 +54,9 @@
 pub mod actions;
 pub mod andon;
 pub mod approval;
+// #282: the tenant's decision about how one destructive action is gated — whether it needs an
+// approval at all, and whether its requester may decide it. A missing row is the strict default.
+pub mod approval_policy;
 pub mod audit;
 pub mod benchmark;
 pub mod board;

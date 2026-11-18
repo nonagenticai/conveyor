@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 27 |
-| `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
-| `new` | absent | 28 |
+| `exists` | implemented in code and backed by real rows | 29 |
+| `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 7 |
+| `new` | absent | 27 |
 
 ## Rows
 
@@ -18,7 +18,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:job_catalogue` | §10.3 | table | job_catalogue | `exists` | migrations: CREATE TABLE job_catalogue |
 | `table:job_release` | §10.3 | table | job_release | `exists` | migrations: CREATE TABLE job_release |
 | `table:job_binding` | §10.3 | table | job_binding | `exists` | migrations: CREATE TABLE job_binding |
-| `table:approval_policy` | §10.3 | table | approval_policy | `new` | migrations: no CREATE/ALTER TABLE approval_policy |
+| `table:approval_policy` | §10.3 | table | approval_policy | `exists` | migrations: CREATE TABLE approval_policy |
 | `table:wbs_node` | §10.3 | table | wbs_node | `exists` | migrations: CREATE TABLE wbs_node |
 | `table:project_baseline` | §10.3 | table | project_baseline | `exists` | migrations: CREATE TABLE project_baseline |
 | `table:programme_cadence` | §10.3 | table | programme_cadence | `exists` | migrations: CREATE TABLE programme_cadence |
@@ -56,7 +56,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:organisation` | §10.4 | actions | organisation | `exists` | actions: departments.* found (departments.create, departments.list)<br>actions: industries.* found (industries.create, industries.get, industries.list)<br>actions: job_bindings.* found (job_bindings.create, job_bindings.get, job_bindings.list…)<br>actions: job_releases.* found (job_releases.list, job_releases.publish, job_releases.retire)<br>actions: jobs.* found (jobs.list, jobs.retry) |
 | `actions:procedures` | §10.4 | actions | procedures | `extend` | actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: pko.* absent<br>actions: procedures.* found (procedures.create, procedures.get, procedures.list…) |
 | `actions:authoring` | §10.4 | actions | authoring | `new` | actions: authoring.* absent |
-| `actions:approvals` | §10.4 | actions | approvals | `extend` | actions: approval_policies.* absent<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request) |
+| `actions:approvals` | §10.4 | actions | approvals | `exists` | actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request) |
 | `actions:decision` | §10.4 | actions | decision | `new` | actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br>*V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).* |
 | `actions:PM` | §10.4 | actions | PM | `exists` | actions: pm.* found (pm.charter, pm.close, pm.get…) |
 | `actions:coach` | §10.4 | actions | coach | `new` | actions: coach.* absent |
