@@ -397,6 +397,8 @@
     "secrets.get",
     "secrets.list",
     "secrets.rotate",
+    "sheets.export",
+    "sheets.import",
     "stakeholders.create",
     "stakeholders.delete",
     "stakeholders.get",

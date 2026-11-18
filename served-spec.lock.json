@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "92d13d0ca2ddbeed5b9a889a1d8cb4ba9743eec5597a86ed15977e60a52dca53",
+    "GET /api/actions": "a6910a15dc3cad5fa4cdb31433c65b0b1aad1680517feb8149b4d214decb1925",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -420,6 +420,8 @@
     "POST /api/actions/secrets.get/invocations": "2abdf76602732364bc68748e607b13441d30abcf69703d6e37d77967352b7b0d",
     "POST /api/actions/secrets.list/invocations": "721f72cfabc23fcf73b9b000e1d3e5e116d9cfdeb8d3cf29a7dc41d005276331",
     "POST /api/actions/secrets.rotate/invocations": "ed90894591f4bab437c093ddf8fbb05aea37f1837af4d985d9e22e59e1483e44",
+    "POST /api/actions/sheets.export/invocations": "9dd8f6c9c896e6a107938eef65190f73f899c06ab5e9fde69ac66e7d1097d323",
+    "POST /api/actions/sheets.import/invocations": "cbe3ac9584784beebd7c5589f9043384c034adb46302f4007677d15ca4b0b662",
     "POST /api/actions/stakeholders.create/invocations": "d6eac4ed02ebf6e0fa29b3109088da721e9d50501558cbf29d7c7292018bf737",
     "POST /api/actions/stakeholders.delete/invocations": "dbc2439a9e88b630734c1c17f028844c511b147a8e98c418077af6ab84b1d132",
     "POST /api/actions/stakeholders.get/invocations": "f90a62a0b34ee798b9313ca8839457c4180bf90abfd93ef4832500f94f6a6957",

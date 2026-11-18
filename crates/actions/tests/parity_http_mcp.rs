@@ -5309,6 +5309,57 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             200,
         ),
+        // ── #366: the spreadsheet toolkit ─────────────────────────────────────────────────
+        // The workbook writer has no clock and no hash-map order, so the artefact is a pure
+        // function of the input and both transports carry the same bytes.
+        expecting(
+            plain(
+                "sheets.export",
+                json!({
+                    "workbook": {
+                        "sheets": [{
+                            "name": "Parity",
+                            "rows": [["region", "total"], ["north", 1200.0]]
+                        }]
+                    }
+                }),
+                None,
+            ),
+            200,
+        ),
+        {
+            use base64::Engine as _;
+            let workbook = conveyor_sheets::Workbook {
+                sheets: vec![conveyor_sheets::Sheet {
+                    name: "Parity".to_string(),
+                    rows: vec![
+                        vec![
+                            conveyor_sheets::Cell::new(conveyor_sheets::CellValue::Text(
+                                "region".to_string(),
+                            )),
+                            conveyor_sheets::Cell::new(conveyor_sheets::CellValue::Text(
+                                "total".to_string(),
+                            )),
+                        ],
+                        vec![
+                            conveyor_sheets::Cell::new(conveyor_sheets::CellValue::Text(
+                                "north".to_string(),
+                            )),
+                            conveyor_sheets::Cell::new(conveyor_sheets::CellValue::Number(1200.0)),
+                        ],
+                    ],
+                    column_widths: Vec::new(),
+                    frozen_rows: 0,
+                    merged: Vec::new(),
+                }],
+            };
+            let bytes = conveyor_sheets::to_xlsx(&workbook).expect("the parity workbook writes");
+            let encoded = base64::engine::general_purpose::STANDARD.encode(&bytes);
+            expecting(
+                plain("sheets.import", json!({ "content_base64": encoded }), None),
+                200,
+            )
+        },
         // ── #182 slice A: the tenant's own YouTube channel ────────────────────────────────
         // `client_set` runs first so both rounds and both transports see a configured client.
         // No sample can reach Google: `connect` is sampled at the validation boundary, which is
