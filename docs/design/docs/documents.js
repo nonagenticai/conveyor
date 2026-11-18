@@ -123,8 +123,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "415942957fe0ca06bb470dae61088a445116abc4f025adecbe4c99c6bfc1e75c",
-      "bytes": 18510,
+      "sha256": "64786247f5c9d1b0fabc8f56eda5f212d9dea08b63d1c02a6783f019fdc3a36f",
+      "bytes": 18536,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -132,8 +132,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "1f546834d0f436525019d309f72e69dd61dee57c2ab6b764ed89444e5c45ac41",
-      "bytes": 75944,
+      "sha256": "3f6f9d7d8464dca40aa9ddf1d5493b108d97cbece28f8bd813561d2e93065b1a",
+      "bytes": 76066,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -150,8 +150,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-12-delivery-system.html",
       "source": "docs/evidence/2026-11-12-delivery-system.md",
       "section": "Evidence",
-      "sha256": "04752e02e8bfa15e67e133d8edcdac98c67cb3d91398c0e73f531a9401c928b3",
-      "bytes": 5564,
+      "sha256": "2ddf18ce6543b39dd519e3efa9a26a97785c26155858453acf6a10a1e11d717c",
+      "bytes": 6136,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-12-delivery-system.md"
     },
     {

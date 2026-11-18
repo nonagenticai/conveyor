@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { invoke } from "./helpers";
+import { decideAsReviewer, invoke, isDevAuth } from "./helpers";
 
 // The seeded eval (dev-a, `seed.rs::measure_improve`) has one version, six cases (4 train /
 // 2 test), two metrics (`correct`, `grounded`), a completed baseline run with a result per
@@ -31,7 +31,7 @@ test("the report derives its numbers from the run's result rows", async ({ page 
   await expect(page.locator(".problem")).toHaveCount(0);
 });
 
-test("cases, sign-off and climb tabs read their real actions", async ({ page }) => {
+test("cases, sign-off and climb tabs read their real actions", async ({ page, request }) => {
   await page.goto("/evals");
   await page.getByRole("link", { name: "bug-fix judge" }).click();
   const url = page.url().replace(/\/report$/, "");
@@ -48,7 +48,31 @@ test("cases, sign-off and climb tabs read their real actions", async ({ page }) 
   await expect(page.locator("tr", { hasText: "eval_inputs" }).locator(".pill")).toHaveText("approved");
   const grading = page.locator("tr", { hasText: "eval_grading" });
   await expect(grading.locator(".pill")).toHaveText("pending");
-  await grading.getByRole("button", { name: "Approve" }).click();
+
+  // Alice requested the grading gate, so the console shows it but refuses her the decision
+  // (a sign-off is never self-allowed: its gate name is not a destructive action).
+  await expect(grading.getByRole("button", { name: "Approve" })).toBeDisabled();
+  await expect(
+    grading.getByText("You requested this gate; another person must decide it."),
+  ).toBeVisible();
+
+  // Only the dev seed has a second dev-a admin to decide it.
+  test.skip(!isDevAuth(), "the deployed suite has one OIDC principal, so nobody else can decide");
+
+  const evalId = url.split("/").pop();
+  const pending = await invoke<{
+    items: { id: string; gate: string; eval_id: string | null }[];
+  }>(request, "approvals.list", { status: "pending", limit: 100 });
+  const gradingGate = pending.items.find(
+    (row) => row.gate === "eval_grading" && row.eval_id === evalId,
+  );
+  if (!gradingGate) {
+    throw new Error("the seeded eval_grading gate is not pending");
+  }
+  await decideAsReviewer(request, "eval_signoffs.decide", gradingGate.id);
+
+  // The reviewer's decision is a write from another session; the reloaded tab is the read.
+  await page.reload();
   await expect(page.locator("tr", { hasText: "eval_grading" }).locator(".pill")).toHaveText("approved");
 
   // Climb: the seeded planned climb targets `correct`.

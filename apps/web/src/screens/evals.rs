@@ -2732,6 +2732,8 @@ fn SignoffTab(
     let eval_id = data.eval.id.clone();
     let gates = data.gates.clone();
     let ask = RwSignal::new(String::new());
+    // The caller's own principal id: a person must not approve the gate they requested.
+    let me = ctx.me.get().map(|me| me.principal.id);
 
     view! {
         <div class="panel" style="margin-top:12px">
@@ -2754,6 +2756,9 @@ fn SignoffTab(
                             .as_ref()
                             .map(|row| row.status == "pending")
                             .unwrap_or(false);
+                        let existing_requested_by = existing
+                            .as_ref()
+                            .and_then(|row| row.requested_by.clone());
                         let eval_for_request = eval_id.clone();
                         let ask_signal = ask;
                         let refresh_request = refresh;
@@ -2774,11 +2779,28 @@ fn SignoffTab(
                                 <td>{existing.as_ref().and_then(|row| row.created_at).map(|at| age(Some(at))).unwrap_or_else(|| "—".to_owned())}</td>
                                 <td>
                                     {match (existing_id.clone(), existing_pending) {
-                                        (Some(id), true) => view! {
-                                            <button class="btn small" on:click=move |_| {
-                                                decide_gate(ctx_request, refresh_request, notice_request, id.clone(), "approve")
-                                            }>"Approve"</button>
-                                        }.into_any(),
+                                        (Some(id), true) => {
+                                            let mine = me.is_some()
+                                                && existing_requested_by.as_deref() == me.as_deref();
+                                            // An eval gate name (`eval_inputs`, …) is not a policy
+                                            // action, so no `approval_policies` row can carry it:
+                                            // the store's strict default (`self_approval:
+                                            // forbidden`) is the only answer, and the disabled
+                                            // state follows from `mine` alone.
+                                            let refusal = crate::approvals::self_gate_refusal(
+                                                mine,
+                                                "forbidden",
+                                            );
+                                            let disabled = refusal.is_some();
+                                            view! {
+                                                <button class="btn small" disabled=disabled on:click=move |_| {
+                                                    decide_gate(ctx_request, refresh_request, notice_request, id.clone(), "approve")
+                                                }>"Approve"</button>
+                                                {refusal.map(|reason| view! {
+                                                    <span class="muted">{reason}</span>
+                                                })}
+                                            }.into_any()
+                                        }
                                         (Some(_), false) => view! { <span class="muted">"—"</span> }.into_any(),
                                         (None, _) => view! {
                                             <button class="btn small" on:click=move |_| {

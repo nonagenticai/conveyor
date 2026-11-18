@@ -10,19 +10,22 @@ async function as(page: Page, login: string) {
   ]);
 }
 
-test("members lists the seeded admin and invites an address", async ({ page }) => {
+test("members lists the seeded admins and invites an address", async ({ page }) => {
   await page.goto("/settings/members");
   await expect(page.getByRole("heading", { name: "Members", level: 1 })).toBeVisible();
 
-  // dev-a's seeded member is Alice, the tenant admin.
+  // dev-a seeds two admins: Alice and the reviewer.
   const aliceRow = page.locator("table.table tbody tr", { hasText: "Alice" });
   await expect(aliceRow).toHaveCount(1);
-  await expect(aliceRow.locator(".pill", { hasText: "Tenant admin" })).toHaveCount(1);
+  await expect(page.locator("table.table tbody tr", { hasText: "Reviewer" })).toHaveCount(1);
 
-  // A single member IS the tenant admin; the screen says so rather than offering a
-  // control the last-admin guard would refuse.
-  await expect(page.getByText("One member: this person is the tenant admin by default")).toBeVisible();
-  await expect(page.locator("table.table select")).toHaveCount(0);
+  // Alice is still the tenant admin, but the roster is no longer one person: her role is a real
+  // control carrying the admin label, and the sole-member sentence is gone.
+  await expect(page.getByText("One member: this person is the tenant admin by default")).toHaveCount(0);
+  const aliceRole = aliceRow.locator('select[aria-label="Member role"]');
+  await expect(aliceRole).toHaveValue("admin");
+  await expect(aliceRole.locator("option:checked")).toHaveText("Tenant admin");
+  await expect(page.locator('table.table select[aria-label="Member role"]').first()).toBeVisible();
 
   // The invite is recorded and listed; nothing is emailed. A per-run address keeps the dev
   // database's leftover pending invites from making the count assertion non-deterministic.
@@ -39,6 +42,20 @@ test("members lists the seeded admin and invites an address", async ({ page }) =
     .getByRole("button", { name: "Revoke" })
     .click();
   await expect(page.locator("table.table tbody tr", { hasText: invited })).toHaveCount(0);
+  await expect(page.locator(".problem")).toHaveCount(0);
+});
+
+test("a sole member's screen says so and offers no role control", async ({ page }) => {
+  // dev-b has one member, Bob: the sole-member rule still holds there.
+  await as(page, "bob");
+  await page.goto("/settings/members");
+  await expect(page.getByRole("heading", { name: "Members", level: 1 })).toBeVisible();
+  await expect(page.locator("table.table tbody tr", { hasText: "Bob" })).toHaveCount(1);
+
+  // A single member IS the tenant admin; the screen says so rather than offering a control the
+  // last-admin guard would refuse.
+  await expect(page.getByText("One member: this person is the tenant admin by default")).toBeVisible();
+  await expect(page.locator("table.table select")).toHaveCount(0);
   await expect(page.locator(".problem")).toHaveCount(0);
 });
 

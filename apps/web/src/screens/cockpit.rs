@@ -4,6 +4,8 @@
 //! contract is status-guarded (a quorum, not a row version). A 412 refetches; it never
 //! guesses the new version.
 
+use std::collections::BTreeMap;
+
 use leptos::prelude::*;
 use leptos_router::components::A;
 use leptos_router::hooks::use_params_map;
@@ -20,6 +22,8 @@ struct CockpitData {
     card: CardView,
     runs: Vec<RunOut>,
     approvals: Vec<ApprovalOut>,
+    /// The tenant's policy per gate: `(approval, self_approval)`.
+    policies: BTreeMap<String, (String, String)>,
 }
 
 #[component]
@@ -54,10 +58,20 @@ pub fn Cockpit() -> impl IntoView {
             .output;
         let approvals: Page<ApprovalOut> = serde_json::from_value(approvals)
             .map_err(|error| ApiError::Network(format!("approvals: {error}")))?;
+        // One policy read per distinct gate, not per row.
+        let mut policies = BTreeMap::new();
+        for approval in &approvals.items {
+            if policies.contains_key(&approval.gate) {
+                continue;
+            }
+            let pair = crate::approvals::policy_for(&client, &approval.gate).await;
+            policies.insert(approval.gate.clone(), pair);
+        }
         Ok::<CockpitData, ApiError>(CockpitData {
             card,
             runs: runs.items,
             approvals: approvals.items,
+            policies,
         })
     });
 
@@ -120,6 +134,7 @@ fn CockpitBody(
     let comments = data.card.comments;
     let runs = data.runs;
     let approvals = data.approvals;
+    let policies = data.policies;
     let card_for_actions = card.clone();
     let card_description = card.description.clone();
     let claimed_by_me = card.assignee_id.is_some() && card.assignee_id == me;
@@ -303,6 +318,19 @@ fn CockpitBody(
                                     };
                                     let pending = approval.status == "pending";
                                     let decisions = approval.decisions.clone();
+                                    let mine = me.is_some()
+                                        && approval.requested_by.as_deref() == me.as_deref();
+                                    let (.., self_approval) = policies
+                                        .get(&approval.gate)
+                                        .cloned()
+                                        .unwrap_or_else(|| {
+                                            ("required".to_owned(), "forbidden".to_owned())
+                                        });
+                                    // The requester may not decide their own gate unless the
+                                    // tenant allows it; say why, do not hide the control.
+                                    let refusal =
+                                        crate::approvals::self_gate_refusal(mine, &self_approval);
+                                    let disabled = refusal.is_some();
                                     view! {
                                         <article class="row-card">
                                             <div class="row-main">
@@ -316,8 +344,11 @@ fn CockpitBody(
                                                 <StatusPill status=approval.status/>
                                                 {pending.then(|| view! {
                                                     <span class="decision-buttons">
-                                                        <button class="btn small primary" on:click=approve>"Approve"</button>
-                                                        <button class="btn small" on:click=reject>"Reject"</button>
+                                                        <button class="btn small primary" disabled=disabled on:click=approve>"Approve"</button>
+                                                        <button class="btn small" disabled=disabled on:click=reject>"Reject"</button>
+                                                        {refusal.map(|reason| view! {
+                                                            <span class="muted">{reason}</span>
+                                                        })}
                                                     </span>
                                                 })}
                                             </div>
