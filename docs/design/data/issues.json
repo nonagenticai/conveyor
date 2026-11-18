@@ -1,6 +1,74 @@
 {
   "issues": [
     {
+      "number": 349,
+      "title": "programme: the 8 remaining declared outputs \u2014 SPEC-V2 spec, T1\u2013T3 evidence, T0\u2013T3 closure reviews",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/349",
+      "updatedAt": "2026-11-18T11:24:55Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 347,
+      "title": "programme: the 12 active T projects' inception outputs, published",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/347",
+      "updatedAt": "2026-11-18T11:20:46Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 338,
+      "title": "engine: architecture_task.READY composes its draft artefact from the agent's answer",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/338",
+      "updatedAt": "2026-11-18T10:07:16Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 333,
+      "title": "design: the public definition set carries its category and published state",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/333",
+      "updatedAt": "2026-11-18T09:45:26Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 329,
       "title": "data: T3 is built, so the registry PR stops measuring it uncovered",
       "state": "CLOSED",
@@ -122,9 +190,9 @@
     {
       "number": 307,
       "title": "engine: a capability-agent run finishes inside its budget and composes its artefact",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/307",
-      "updatedAt": "2026-11-17T22:34:42Z",
+      "updatedAt": "2026-11-18T08:16:28Z",
       "labels": [
         {
           "name": "unit",
@@ -141,7 +209,7 @@
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-18T05:12:16Z",
+      "updatedAt": "2026-11-18T07:29:02Z",
       "labels": [
         {
           "name": "unit",
@@ -173,9 +241,9 @@
     {
       "number": 303,
       "title": "programme: a governed retirement path for benefit profiles and tranches",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/303",
-      "updatedAt": "2026-11-18T01:21:12Z",
+      "updatedAt": "2026-11-18T11:20:39Z",
       "labels": [
         {
           "name": "unit",
@@ -190,9 +258,9 @@
     {
       "number": 302,
       "title": "programme: the closure gate \u2014 a project cannot close while a declared output is unpublished",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/302",
-      "updatedAt": "2026-11-18T01:06:59Z",
+      "updatedAt": "2026-11-18T08:50:21Z",
       "labels": [
         {
           "name": "unit",
@@ -237,13 +305,17 @@
     {
       "number": 296,
       "title": "parity: S14 and #29 cite the native map, not delete the contract",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/296",
-      "updatedAt": "2026-11-17T17:43:24Z",
+      "updatedAt": "2026-11-18T10:34:48Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -252,24 +324,32 @@
       "title": "parity: re-home the per-card claim/fact ledger",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/295",
-      "updatedAt": "2026-11-17T17:43:22Z",
+      "updatedAt": "2026-11-18T08:32:58Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
     {
       "number": 294,
       "title": "parity: the native acceptance map for the 218 used surfaces",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/294",
-      "updatedAt": "2026-11-17T17:43:13Z",
+      "updatedAt": "2026-11-18T10:38:32Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -293,17 +373,17 @@
     {
       "number": 285,
       "title": "console: the destructive approval flow \u2014 one helper, every call site, and the approvals screen",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/285",
-      "updatedAt": "2026-11-18T02:43:06Z",
+      "updatedAt": "2026-11-18T10:57:09Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -335,17 +415,17 @@
     {
       "number": 283,
       "title": "approvals: the 27 ungated destructive actions declare their targets, with a drift guard",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/283",
-      "updatedAt": "2026-11-17T10:33:01Z",
+      "updatedAt": "2026-11-18T11:32:06Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -517,9 +597,9 @@
     {
       "number": 260,
       "title": "P0 \u2014 the MSP rigour set: benefits, dossier, tranches and stakeholders",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/260",
-      "updatedAt": "2026-11-18T01:08:08Z",
+      "updatedAt": "2026-11-18T08:19:35Z",
       "labels": [
         {
           "name": "unit",
@@ -1291,7 +1371,7 @@
       "title": "ops: host control \u2014 a fixed-verb agent and the systemctl actions",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/172",
-      "updatedAt": "2026-11-17T20:30:47Z",
+      "updatedAt": "2026-11-18T07:36:18Z",
       "labels": [
         {
           "name": "unit",
@@ -1398,17 +1478,17 @@
     {
       "number": 164,
       "title": "estate: analyse.video \u2014 the video audit family over executor evidence",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/164",
-      "updatedAt": "2026-11-15T20:57:29Z",
+      "updatedAt": "2026-11-18T10:08:05Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "rust",
@@ -1554,9 +1634,9 @@
     {
       "number": 154,
       "title": "estate: absorb the analysis service into crates/analysis \u2014 the analyse.* library",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/154",
-      "updatedAt": "2026-11-17T23:54:30Z",
+      "updatedAt": "2026-11-18T07:42:09Z",
       "labels": [
         {
           "name": "unit",
@@ -2283,7 +2363,7 @@
       "title": "T10 \u2014 SAFe cadence and MSP tranches",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/82",
-      "updatedAt": "2026-11-17T22:45:58Z",
+      "updatedAt": "2026-11-18T11:00:06Z",
       "labels": [
         {
           "name": "unit",
@@ -2304,15 +2384,15 @@
       "title": "T9 \u2014 the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/81",
-      "updatedAt": "2026-11-17T22:45:54Z",
+      "updatedAt": "2026-11-18T10:58:07Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T9",
@@ -2409,15 +2489,15 @@
       "title": "T13 \u2014 Tool platform",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/76",
-      "updatedAt": "2026-11-17T15:38:25Z",
+      "updatedAt": "2026-11-18T10:09:44Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T13",
@@ -2917,7 +2997,7 @@
       "title": "S14: rewrite the cutover plan for independent deployment and coexistence",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/29",
-      "updatedAt": "2026-11-13T06:32:25Z",
+      "updatedAt": "2026-11-18T09:24:14Z",
       "labels": [
         {
           "name": "unit",
@@ -3270,17 +3350,17 @@
     {
       "number": 10,
       "title": "S16 \u2014 ledger coverage, compiled prompt identity, audit sources and retention",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/10",
-      "updatedAt": "2026-11-13T06:31:56Z",
+      "updatedAt": "2026-11-18T11:22:27Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S16",
