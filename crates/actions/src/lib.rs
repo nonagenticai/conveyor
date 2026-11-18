@@ -34,11 +34,13 @@ pub mod channel;
 pub mod control;
 // #161 P3: the deck toolkit — one action rendering the model to .pptx, PDF or PNG.
 pub mod deck;
+// #366: the spreadsheet toolkit — produce a .xlsx from a workbook, read one back.
 pub mod documents;
 pub mod eval;
 pub mod fixtures;
 pub mod governance;
 pub mod handlers;
+pub mod sheets;
 // S16: the inference-ledger read surface.
 pub mod inference;
 pub mod ingest;

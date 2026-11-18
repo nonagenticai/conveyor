@@ -1253,6 +1253,12 @@ fn bytes_match_type(content_type: &str, bytes: &[u8]) -> bool {
             bytes.starts_with(b"ID3")
                 || matches!(bytes.first(), Some(0xff) if bytes.get(1).is_some_and(|b| b & 0xe0 == 0xe0))
         }
+        // OOXML: a ZIP container. `pptx`/`docx` share the magic, so — exactly as with the
+        // ISO-BMFF and RIFF cases above — the declared type is the claim and the container is
+        // the proof.
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => {
+            bytes.starts_with(b"PK\x03\x04")
+        }
         _ => false,
     }
 }
