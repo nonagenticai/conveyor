@@ -242,6 +242,11 @@ async fn eval_metrics_update(
     Ok(view)
 }
 
+/// `eval_metrics.delete`'s approval target: the metric being removed.
+fn target_delete(input: &MetricDeleteIn) -> Result<String, String> {
+    Ok(format!("eval_metric/{}", input.id))
+}
+
 /// Delete a metric.
 #[crate::action(
     name = "eval_metrics.delete",
@@ -252,7 +257,8 @@ async fn eval_metrics_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_delete"
 )]
 async fn eval_metrics_delete(
     tx: &mut PgConnection,

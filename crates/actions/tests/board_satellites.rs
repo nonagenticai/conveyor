@@ -957,15 +957,24 @@ async fn custom_fields_validate_their_kind_and_upsert_one_value_per_card() {
     assert_eq!(rows, 1, "one value per (card, field)");
 
     // ── custom_fields.clear_value ────────────────────────────────────────────────────
+    // #285: clearing a value is destructive; the gate names the card's field.
+    let clear_gate = support::approved_gate(
+        &pg,
+        seeded.tenant,
+        &running,
+        "dev:alice",
+        "custom_fields.clear_value",
+        &json!({"card_id": card_id, "custom_field_id": field_id}),
+    )
+    .await;
     let before = event_count(&pg, seeded.tenant_id).await;
     let (status, _, body) = running
-        .invoke_full(
+        .invoke_approved_full(
             "custom_fields.clear_value",
             "dev:alice",
             json!({"card_id": card_id, "custom_field_id": field_id}),
             None,
-            None,
-            None,
+            clear_gate,
         )
         .await;
     assert_eq!(status, 204, "{body}");

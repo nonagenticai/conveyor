@@ -390,6 +390,24 @@ pub struct ApprovalOut {
     pub gate: String,
     pub kind: String,
     pub status: String,
+    /// The exact thing the gate authorises (`meta.target`); for an action gate this is what a
+    /// destructive call must match, and what an approver is shown (#285).
+    #[serde(default)]
+    pub target: Option<String>,
+    /// What was asked, in the requester's words.
+    #[serde(default)]
+    pub description: Option<String>,
+    /// The answer the requester proposed.
+    #[serde(default)]
+    pub proposed_answer: Option<String>,
+    /// The input the approved call will run with.
+    #[serde(default)]
+    pub proposed_input: Option<Value>,
+    /// Who posed the gate, and their label.
+    #[serde(default)]
+    pub requested_by: Option<String>,
+    #[serde(default)]
+    pub requested_by_label: Option<String>,
     #[serde(default)]
     pub required_decisions: u16,
     #[serde(default)]

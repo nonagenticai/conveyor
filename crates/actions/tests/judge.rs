@@ -127,6 +127,29 @@ async fn create_card(running: &support::Running, board: &str, lane: &str) -> Str
 }
 
 /// A published SOP whose inspection is the judge under test — the only way a step names a judge.
+/// Let a procedure step run the destructive `custom_fields.clear_value` (#285).
+///
+/// A process step carries no approval id, and a step-level gate is its own unit — so the tenant
+/// waives the action here. What these tests exercise is the judge's handling of a null output,
+/// never the approval gate.
+async fn waive_clear_value(running: &support::Running) {
+    let (status, body) = running
+        .invoke(
+            "approval_policies.set",
+            TOKEN,
+            json!({
+                "action": "custom_fields.clear_value",
+                "approval": "waived",
+                "self_approval": "forbidden",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "waive the destructive step: {body}");
+}
+
 async fn publish_sop(running: &support::Running, key: &str, inspection: Value) -> String {
     let (status, body) = running
         .invoke(
@@ -641,6 +664,7 @@ async fn a_checker_reject_reruns_the_position_with_the_reason_on_its_input() {
     let (board, lane) = board_and_lane(&pg, &seeded).await;
     let card = create_card(&running, &board, &lane).await;
     let field = create_custom_field(&running, &board).await;
+    waive_clear_value(&running).await;
     // A `204` action: the step succeeds but its output is `null`, which `non_empty` refuses.
     let sop = publish_sop(
         &running,
@@ -756,6 +780,7 @@ async fn the_reject_budget_blocks_the_run_and_starts_the_coach_once() {
     let (board, lane) = board_and_lane(&pg, &seeded).await;
     let card = create_card(&running, &board, &lane).await;
     let field = create_custom_field(&running, &board).await;
+    waive_clear_value(&running).await;
     let sop = publish_sop(
         &running,
         "judge.block",
