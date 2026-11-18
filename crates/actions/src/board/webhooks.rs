@@ -155,6 +155,11 @@ async fn webhooks_update(
     }
 }
 
+/// `webhooks.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_webhooks_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("webhook/{}", input.id))
+}
+
 /// Remove a subscription.
 #[crate::action(
     name = "webhooks.delete",
@@ -165,7 +170,8 @@ async fn webhooks_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_webhooks_delete",
 )]
 async fn webhooks_delete(
     tx: &mut PgConnection,

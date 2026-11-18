@@ -456,26 +456,29 @@ async fn the_twelve_board_actions_work_over_http() {
     );
 
     // ── projects.close: status-guarded ────────────────────────────────────────────────
+    // #283: destructive; the gate names this object.
     let (status, closed) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "projects.close",
             "dev:alice",
             json!({"id": project_id, "reason": "done"}),
-            None,
-            None,
             None,
         )
         .await;
     assert_eq!(status, 200, "{closed}");
     assert_eq!(output(&closed)["project"]["status"], "closed");
     assert_eq!(output(&closed)["project"]["meta"]["close_reason"], "done");
+    // #283: the gate fires before the handler, so even the second close — the one whose 409 is
+    // under test — has to reach the handler through an approval.
     let (status, again) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "projects.close",
             "dev:alice",
             json!({"id": project_id}),
-            None,
-            None,
             None,
         )
         .await;
@@ -872,13 +875,14 @@ async fn projects_execute_refuses_an_open_dependency() {
         "{body}"
     );
 
+    // #283: destructive; the gate names this object.
     let (status, closed) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "projects.close",
             "dev:alice",
             json!({"id": dependency_id, "reason": "dependency met for the test"}),
-            None,
-            None,
             None,
         )
         .await;

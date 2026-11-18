@@ -230,6 +230,14 @@ async fn channels_list(
     Ok(ChannelListOut { bindings })
 }
 
+/// `channels.unbind`'s approval target: what the gate authorises, computed from the input alone.
+fn target_channels_unbind(input: &ChannelUnbindIn) -> Result<String, String> {
+    Ok(format!(
+        "channel/{}/{}/{}/unbind",
+        input.tenant_id, input.channel_kind, input.route_key
+    ))
+}
+
 /// Remove one channel route from the calling tenant.
 #[crate::action(
     name = "channels.unbind",
@@ -240,7 +248,8 @@ async fn channels_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_channels_unbind",
 )]
 async fn channels_unbind(
     tx: &mut PgConnection,

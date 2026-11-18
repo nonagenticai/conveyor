@@ -215,6 +215,11 @@ async fn model_relationships_update(
     Ok(HandlerOutput::ok(relationship_out(&after)).with_etag(etag_of(version_i64(after.version))))
 }
 
+/// `model_relationships.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_model_relationships_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("model_relationship/{}", input.id))
+}
+
 /// Remove a relationship; `If-Match` is required and the removed row is returned.
 #[crate::action(
     name = "model_relationships.delete",
@@ -225,7 +230,8 @@ async fn model_relationships_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_model_relationships_delete",
 )]
 async fn model_relationships_delete(
     tx: &mut PgConnection,

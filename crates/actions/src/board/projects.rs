@@ -429,6 +429,11 @@ async fn projects_get(
     Ok(project_view(&project, &boards))
 }
 
+/// `projects.close`'s approval target: what the gate authorises, computed from the input alone.
+fn target_projects_close(input: &ProjectCloseIn) -> Result<String, String> {
+    Ok(format!("project/{}/close", input.id))
+}
+
 /// Close a project. Status-guarded, not version-guarded (CONTRACT §3).
 #[crate::action(
     name = "projects.close",
@@ -439,7 +444,8 @@ async fn projects_get(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_projects_close",
 )]
 async fn projects_close(
     tx: &mut PgConnection,

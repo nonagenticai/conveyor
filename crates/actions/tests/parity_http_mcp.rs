@@ -6604,6 +6604,37 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         sampled.difference(&registry_names).collect::<Vec<_>>()
     );
 
+    // #282/#283: a destructive action now runs only behind an approved gate, and `/mcp` has no
+    // way to carry an approval id (`mcp.rs` passes `approval_id: None`). This sweep tests
+    // TRANSPORT parity — the same body over both — and the gate has its own suite
+    // (`destructive_gate.rs`), so the tenant waives the gate for every destructive action here.
+    // Without this the sweep would compare a 403 (HTTP) with an `isError` (MCP) and prove
+    // nothing about the bodies.
+    // The `ops.*` verbs are excluded on purpose: their samples assert the refusal a call gets
+    // when no cluster is configured (403/503), so waiving their gate would send the call at a
+    // backend that does not exist and change what the sample is asserting.
+    for spec in conveyor_actions::registry::registry()
+        .iter()
+        .filter(|spec| spec.effect == conveyor_actions::Effect::Destructive)
+        .filter(|spec| !spec.name.starts_with("ops."))
+    {
+        let (status, body) = running
+            .invoke(
+                "approval_policies.set",
+                "dev:alice",
+                json!({
+                    "action": spec.name,
+                    "approval": "waived",
+                    "self_approval": "forbidden",
+                }),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 200, "waive {}: {body}", spec.name);
+    }
+
     let mut checked = 0usize;
     let total = registry_names.len();
     for sample in samples {
@@ -6964,6 +6995,24 @@ async fn a_binding_stays_in_the_callers_tenant_and_unbind_removes_it_once() {
     // CONTRACT §9: no cross-tenant write path exists.
     let (status, refused) = bind_channel(&running, Uuid::now_v7(), "parity-route").await;
     assert_eq!(status, 403, "{refused}");
+
+    // #283: unbinding is destructive, so the tenant waives its gate — this test is about the
+    // binding's tenant scoping and idempotence, not about the approval.
+    let (status, body) = running
+        .invoke(
+            "approval_policies.set",
+            "dev:alice",
+            json!({
+                "action": "channels.unbind",
+                "approval": "waived",
+                "self_approval": "forbidden",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "waive channels.unbind: {body}");
 
     let (status, removed) = unbind_channel(&running, alice.tenant_id).await;
     assert_eq!(status, 204, "{removed}");

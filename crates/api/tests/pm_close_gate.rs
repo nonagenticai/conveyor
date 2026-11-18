@@ -211,9 +211,21 @@ async fn baselined(
 }
 
 /// `pm.close` as the PM.
-async fn close(running: &support::Running, binding: Uuid, project_id: Uuid) -> (u16, Value) {
+///
+/// #283: the close is destructive, so it names an approved gate for this binding and project.
+/// The gate under test here is the CLOSURE gate — a different gate — so the approval is opened
+/// first and what the PM's close meets is still the closure refusal (or the close itself).
+async fn close(
+    pg: &support::Pg,
+    tenant: conveyor_domain::TenantId,
+    running: &support::Running,
+    binding: Uuid,
+    project_id: Uuid,
+) -> (u16, Value) {
     running
-        .invoke(
+        .invoke_gated(
+            pg,
+            tenant,
             "pm.close",
             PM,
             json!({
@@ -222,8 +234,6 @@ async fn close(running: &support::Running, binding: Uuid, project_id: Uuid) -> (
                 "closure": "The request is delivered and the project is closed.",
                 "reason": "Delivered",
             }),
-            None,
-            None,
             None,
         )
         .await
@@ -279,7 +289,7 @@ async fn a_project_closes_only_after_the_closure_gate() {
     );
 
     // ── a close while the gate is pending is refused and writes nothing ──────────────────
-    let (status, body) = close(&running, bindings.pm, project_id).await;
+    let (status, body) = close(&pg, seeded.tenant, &running, bindings.pm, project_id).await;
     assert_eq!(
         status, 409,
         "a pending closure gate must refuse the close: {body}"
@@ -316,7 +326,7 @@ async fn a_project_closes_only_after_the_closure_gate() {
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["status"], "approved", "{body}");
 
-    let (status, body) = close(&running, bindings.pm, project_id).await;
+    let (status, body) = close(&pg, seeded.tenant, &running, bindings.pm, project_id).await;
     // The close creates the closure asset, so the action is a `201 Created` (the same
     // `HandlerOutput::created` shape `pm.charter` and `pm.plan` return); the project's own
     // status is the "closed" below.

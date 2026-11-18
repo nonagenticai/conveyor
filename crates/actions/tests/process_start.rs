@@ -790,13 +790,14 @@ async fn start_refuses_a_card_on_a_blocked_project() {
         "{body}"
     );
 
+    // #283: closing is destructive; the gate names this project.
     let (status, closed) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "projects.close",
             TOKEN,
             json!({"id": dependency_id, "reason": "dependency met for the test"}),
-            None,
-            None,
             None,
         )
         .await;

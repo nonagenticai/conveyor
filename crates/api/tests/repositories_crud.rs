@@ -149,24 +149,26 @@ async fn a_repository_is_registered_linked_and_deleted() {
     let _ = bob;
 
     // Unlink, then delete: the delete also removes any link left behind.
+    // #283: destructive; the gate names this object.
     let (status, _) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            alice.tenant,
             "repositories.unlink",
             "dev:alice",
             json!({"project_id": project_id, "repository_id": repo}),
-            None,
-            None,
             None,
         )
         .await;
     assert_eq!(status, 204);
+    // #283: destructive; the gate names this object.
     let (status, body) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            alice.tenant,
             "repositories.unlink",
             "dev:alice",
             json!({"project_id": project_id, "repository_id": repo}),
-            None,
-            None,
             None,
         )
         .await;
@@ -174,14 +176,15 @@ async fn a_repository_is_registered_linked_and_deleted() {
 
     // A stale precondition must refuse the destructive act: the row is at version 1, so an
     // If-Match of 2 describes a row the caller is not looking at.
+    // #283: destructive; the gate names this object.
     let (status, body) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            alice.tenant,
             "repositories.delete",
             "dev:alice",
             json!({"id": repo}),
             Some("\"2\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 412, "a stale If-Match must not delete: {body}");
@@ -200,14 +203,15 @@ async fn a_repository_is_registered_linked_and_deleted() {
         "the refused delete left the repository in place"
     );
 
+    // #283: destructive; the gate names this object.
     let (status, _) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            alice.tenant,
             "repositories.delete",
             "dev:alice",
             json!({"id": repo}),
             Some("\"1\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204);

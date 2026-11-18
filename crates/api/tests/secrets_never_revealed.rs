@@ -91,14 +91,15 @@ async fn a_secret_is_written_read_rotated_and_never_returned() {
     assert_eq!(output(&listed)["items"].as_array().expect("items").len(), 1);
 
     // Rotate: the version moves, the value does not appear.
+    // #283: destructive; the gate names this object.
     let (status, rotated) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            alice.tenant,
             "secrets.rotate",
             "dev:alice",
             json!({"id": secret, "value": "s3cr3t-value-2"}),
             Some("\"1\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 200, "{rotated}");
@@ -170,14 +171,15 @@ async fn a_secret_is_written_read_rotated_and_never_returned() {
 
     // A stale precondition must refuse the destructive act: rotating then deleting with the OLD
     // ETag must not destroy the rotated value. (Version 2 is current after the rotation above.)
+    // #283: destructive; the gate names this object.
     let (status, body) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            alice.tenant,
             "secrets.delete",
             "dev:alice",
             json!({"id": secret}),
             Some("\"1\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 412, "a stale If-Match must not delete: {body}");
@@ -194,14 +196,15 @@ async fn a_secret_is_written_read_rotated_and_never_returned() {
     assert_eq!(status, 200, "the refused delete left the secret in place");
 
     // Delete, then it is gone.
+    // #283: destructive; the gate names this object.
     let (status, _) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            alice.tenant,
             "secrets.delete",
             "dev:alice",
             json!({"id": secret}),
             Some("\"2\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204);
