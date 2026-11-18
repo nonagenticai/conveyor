@@ -2,10 +2,10 @@
 //!
 //! `rbuild -- test -p conveyor-api --test architecture_artifacts`.
 
-#[path = "../../actions/tests/support/mod.rs"]
-mod support;
 #[path = "architecture_support/mod.rs"]
 mod arch;
+#[path = "../../actions/tests/support/mod.rs"]
+mod support;
 
 use serde_json::json;
 
@@ -107,7 +107,10 @@ async fn an_approved_artefact_is_immutable() {
     )
     .await;
     assert_eq!(status, 409, "{refused}");
-    assert_eq!(refused["type"], "architecture_approved_immutable", "{refused}");
+    assert_eq!(
+        refused["type"], "architecture_approved_immutable",
+        "{refused}"
+    );
 
     let next = arch::created(
         &f.running,

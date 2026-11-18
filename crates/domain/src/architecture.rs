@@ -12,9 +12,7 @@ use std::str::FromStr;
 use serde::{Deserialize, Serialize};
 
 /// The ADM's phase codes in order: Preliminary, then A–H.
-pub const PHASES: [&str; 9] = [
-    "preliminary", "a", "b", "c", "d", "e", "f", "g", "h",
-];
+pub const PHASES: [&str; 9] = ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"];
 
 /// The three artefact plateaus (§8.1).
 pub const PLATEAUS: [&str; 3] = ["psa", "hld", "sd"];

@@ -1965,12 +1965,7 @@ async fn seed_arch_live_contract(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> 
 }
 
 /// One compliance review row on a contract.
-async fn seed_arch_review(
-    pg: &support::Pg,
-    ctx: &Ctx,
-    project: Uuid,
-    contract: Uuid,
-) -> Uuid {
+async fn seed_arch_review(pg: &support::Pg, ctx: &Ctx, project: Uuid, contract: Uuid) -> Uuid {
     scoped(pg, ctx, async move |conn| {
         store::architecture::record_review_tx(
             conn,
@@ -5390,7 +5385,10 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(on_prepared("architecture.artifacts_get", None), 200),
         expecting(on_prepared("architecture.artifacts_entries", None), 200),
         expecting(on_prepared("architecture.artifacts_links", None), 200),
-        expecting(plain("architecture.repository_search", json!({}), None), 200),
+        expecting(
+            plain("architecture.repository_search", json!({}), None),
+            200,
+        ),
         expecting(plain("architecture.profile_get", json!({}), None), 200),
         expecting(on_prepared("architecture.board_get", None), 200),
         expecting(on_prepared("architecture.contracts_get", None), 200),

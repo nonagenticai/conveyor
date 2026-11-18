@@ -389,11 +389,8 @@ async fn architecture_artifacts_update(
         .await
         .map_err(|error| arch_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such architecture artefact"))?;
-    let expected = require_precondition_with(
-        &ctx,
-        ctx.action,
-        json!({ "version": current.version }),
-    )?;
+    let expected =
+        require_precondition_with(&ctx, ctx.action, json!({ "version": current.version }))?;
     let entries = input.entries.map(|entries| {
         entries
             .into_iter()
@@ -449,11 +446,8 @@ async fn architecture_artifacts_approve(
         .await
         .map_err(|error| arch_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such architecture artefact"))?;
-    let expected = require_precondition_with(
-        &ctx,
-        ctx.action,
-        json!({ "version": current.version }),
-    )?;
+    let expected =
+        require_precondition_with(&ctx, ctx.action, json!({ "version": current.version }))?;
     let record = store::architecture::approve_artifact_tx(
         &mut *tx,
         ctx.tenant,
@@ -487,11 +481,8 @@ async fn architecture_artifacts_supersede(
         .await
         .map_err(|error| arch_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such architecture artefact"))?;
-    let expected = require_precondition_with(
-        &ctx,
-        ctx.action,
-        json!({ "version": current.version }),
-    )?;
+    let expected =
+        require_precondition_with(&ctx, ctx.action, json!({ "version": current.version }))?;
     let record = store::architecture::supersede_artifact_tx(
         &mut *tx,
         ctx.tenant,
@@ -1070,11 +1061,8 @@ async fn architecture_contracts_approve(
         .await
         .map_err(|error| arch_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such architecture contract"))?;
-    let expected = require_precondition_with(
-        &ctx,
-        ctx.action,
-        json!({ "version": current.version }),
-    )?;
+    let expected =
+        require_precondition_with(&ctx, ctx.action, json!({ "version": current.version }))?;
     let record = store::architecture::approve_contract_tx(
         &mut *tx,
         ctx.tenant,
@@ -1107,11 +1095,8 @@ async fn architecture_contracts_supersede(
         .await
         .map_err(|error| arch_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such architecture contract"))?;
-    let expected = require_precondition_with(
-        &ctx,
-        ctx.action,
-        json!({ "version": current.version }),
-    )?;
+    let expected =
+        require_precondition_with(&ctx, ctx.action, json!({ "version": current.version }))?;
     let record = store::architecture::supersede_contract_tx(
         &mut *tx,
         ctx.tenant,
@@ -1176,7 +1161,11 @@ async fn architecture_phases_advance(
     Ok(HandlerOutput::ok(PhaseAdvanceOut {
         closed_phase: advance.closed_phase,
         next_phase: advance.next_phase,
-        artifact_ids: advance.artifact_ids.iter().map(ToString::to_string).collect(),
+        artifact_ids: advance
+            .artifact_ids
+            .iter()
+            .map(ToString::to_string)
+            .collect(),
         contract_id: advance.contract_id.map(|id| id.to_string()),
     }))
 }
@@ -1496,13 +1485,15 @@ async fn architecture_board_get(
 ) -> Result<HandlerOutput<GovernanceBodyOut>, ActionError> {
     let record = match (input.id, input.key.as_deref()) {
         (Some(id), _) => store::architecture::get_body_tx(&mut *tx, ctx.tenant, id).await,
-        (None, Some(key)) => store::architecture::get_body_by_key_tx(&mut *tx, ctx.tenant, key).await,
+        (None, Some(key)) => {
+            store::architecture::get_body_by_key_tx(&mut *tx, ctx.tenant, key).await
+        }
         (None, None) => {
             return Err(invalid(
                 "key",
                 "required",
                 "supply the body's id or its stable key",
-            ))
+            ));
         }
     }
     .map_err(|error| arch_error(error, ctx.action))?

@@ -3,10 +3,10 @@
 //!
 //! `rbuild -- test -p conveyor-api --test togaf_h_change`.
 
-#[path = "../../actions/tests/support/mod.rs"]
-mod support;
 #[path = "architecture_support/mod.rs"]
 mod arch;
+#[path = "../../actions/tests/support/mod.rs"]
+mod support;
 
 use serde_json::json;
 use uuid::Uuid;
@@ -19,21 +19,11 @@ async fn a_scope_change_produces_a_change_register_row() {
     arch::tailor(&f.running, json!({}), json!({})).await;
     let project = arch::project(&f.running, "architecture").await;
     let project_uuid = Uuid::parse_str(&project).expect("project id");
-    let contract = arch::request_contract(
-        &f.running,
-        &project,
-        "request_for_architecture",
-        "h",
-    )
-    .await;
+    let contract =
+        arch::request_contract(&f.running, &project, "request_for_architecture", "h").await;
     let contract_id = arch::id_of(&contract);
-    let change = arch::register_change(
-        &f.pg,
-        f.seeded.tenant_id,
-        project_uuid,
-        f.seeded.user_id,
-    )
-    .await;
+    let change =
+        arch::register_change(&f.pg, f.seeded.tenant_id, project_uuid, f.seeded.user_id).await;
 
     let review = arch::created(
         &f.running,
@@ -54,13 +44,8 @@ async fn a_scope_change_produces_a_change_register_row() {
 
     // A systemic finding is a kata candidate and writes no change row of its own.
     let before = arch::change_rows(&f.pg, f.seeded.tenant_id).await;
-    let kata_contract = arch::request_contract(
-        &f.running,
-        &project,
-        "statement_of_intent",
-        "h",
-    )
-    .await;
+    let kata_contract =
+        arch::request_contract(&f.running, &project, "statement_of_intent", "h").await;
     let kata = arch::created(
         &f.running,
         "architecture.reviews_record",
@@ -94,15 +79,13 @@ async fn an_unrecorded_review_refuses_the_gate() {
 
     let (status, refused) = arch::advance(&f.running, &project, "h").await;
     assert_eq!(status, 409, "{refused}");
-    assert_eq!(refused["type"], "architecture_outcome_required", "{refused}");
+    assert_eq!(
+        refused["type"], "architecture_outcome_required",
+        "{refused}"
+    );
 
-    let contract = arch::request_contract(
-        &f.running,
-        &project,
-        "request_for_architecture",
-        "h",
-    )
-    .await;
+    let contract =
+        arch::request_contract(&f.running, &project, "request_for_architecture", "h").await;
     arch::created(
         &f.running,
         "architecture.reviews_record",

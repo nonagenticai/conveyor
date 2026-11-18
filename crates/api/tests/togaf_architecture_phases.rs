@@ -2,10 +2,10 @@
 //!
 //! `rbuild -- test -p conveyor-api --test togaf_architecture_phases`.
 
-#[path = "../../actions/tests/support/mod.rs"]
-mod support;
 #[path = "architecture_support/mod.rs"]
 mod arch;
+#[path = "../../actions/tests/support/mod.rs"]
+mod support;
 
 use serde_json::json;
 
@@ -55,27 +55,40 @@ async fn phases_a_to_f_pass_in_order() {
 
     // The project is born with its nine phase nodes; the first open phase is Preliminary.
     let (status, out) = arch::advance(&f.running, &project, "preliminary").await;
-    assert_eq!(status, 409, "Preliminary's mandatory catalogue is not approved yet: {out}");
+    assert_eq!(
+        status, 409,
+        "Preliminary's mandatory catalogue is not approved yet: {out}"
+    );
     assert_eq!(out["type"], "architecture_artifact_missing", "{out}");
-    approved(&f, &project, "principles_catalog", "preliminary", "psa", "principles_catalog").await;
+    approved(
+        &f,
+        &project,
+        "principles_catalog",
+        "preliminary",
+        "psa",
+        "principles_catalog",
+    )
+    .await;
     let (status, out) = arch::advance(&f.running, &project, "preliminary").await;
     assert_eq!(status, 200, "Preliminary: {out}");
     assert_eq!(out["next_phase"], "a", "{out}");
 
     approved(&f, &project, "stakeholder_map", "a", "psa", "matrix").await;
-    arch::live_contract(
-        &f.running,
-        &project,
-        "statement_of_architecture_work",
-        "a",
-    )
-    .await;
+    arch::live_contract(&f.running, &project, "statement_of_architecture_work", "a").await;
     let (status, out) = arch::advance(&f.running, &project, "a").await;
     assert_eq!(status, 200, "A: {out}");
     assert_eq!(out["closed_phase"], "a", "{out}");
     assert_eq!(out["next_phase"], "b", "{out}");
 
-    approved(&f, &project, "business_capability_map", "b", "hld", "diagram").await;
+    approved(
+        &f,
+        &project,
+        "business_capability_map",
+        "b",
+        "hld",
+        "diagram",
+    )
+    .await;
     let (status, out) = arch::advance(&f.running, &project, "b").await;
     assert_eq!(status, 200, "B: {out}");
     assert_eq!(out["next_phase"], "c", "{out}");
@@ -124,17 +137,15 @@ async fn a_draft_artefact_refuses_the_contract() {
         json!({ "project_id": project, "artifact_type_id": artifact_type_id }),
     )
     .await;
-    let contract = arch::live_contract(
-        &f.running,
-        &project,
-        "statement_of_architecture_work",
-        "a",
-    )
-    .await;
+    let contract =
+        arch::live_contract(&f.running, &project, "statement_of_architecture_work", "a").await;
 
     let (status, refused) = arch::advance(&f.running, &project, "a").await;
     assert_eq!(status, 409, "{refused}");
-    assert_eq!(refused["type"], "architecture_artifact_missing", "{refused}");
+    assert_eq!(
+        refused["type"], "architecture_artifact_missing",
+        "{refused}"
+    );
     assert!(
         refused["detail"]
             .as_str()
@@ -181,13 +192,8 @@ async fn a_contract_change_reopens_the_gate() {
     )
     .await;
     arch::approve_artifact(&f.running, &arch::id_of(&artifact)).await;
-    let contract = arch::live_contract(
-        &f.running,
-        &project,
-        "statement_of_architecture_work",
-        "a",
-    )
-    .await;
+    let contract =
+        arch::live_contract(&f.running, &project, "statement_of_architecture_work", "a").await;
 
     let retired = arch::ok(
         &f.running,
@@ -200,7 +206,10 @@ async fn a_contract_change_reopens_the_gate() {
 
     let (status, refused) = arch::advance(&f.running, &project, "a").await;
     assert_eq!(status, 409, "{refused}");
-    assert_eq!(refused["type"], "architecture_contract_not_live", "{refused}");
+    assert_eq!(
+        refused["type"], "architecture_contract_not_live",
+        "{refused}"
+    );
     assert!(
         refused["detail"]
             .as_str()

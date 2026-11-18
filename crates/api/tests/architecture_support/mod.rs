@@ -281,11 +281,7 @@ pub async fn live_contract(
     id
 }
 
-pub async fn advance(
-    running: &support::Running,
-    project: &str,
-    phase: &str,
-) -> (u16, Value) {
+pub async fn advance(running: &support::Running, project: &str, phase: &str) -> (u16, Value) {
     call(
         running,
         "architecture.phases_advance",

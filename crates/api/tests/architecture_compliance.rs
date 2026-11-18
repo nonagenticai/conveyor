@@ -3,10 +3,10 @@
 //!
 //! `rbuild -- test -p conveyor-api --test architecture_compliance`.
 
-#[path = "../../actions/tests/support/mod.rs"]
-mod support;
 #[path = "architecture_support/mod.rs"]
 mod arch;
+#[path = "../../actions/tests/support/mod.rs"]
+mod support;
 
 use serde_json::json;
 
@@ -15,13 +15,7 @@ async fn one_level_and_a_dated_waiver() {
     let f = arch::fixture().await;
     let project = arch::raw_project(&f.pg, f.seeded.tenant_id, "Delivery").await;
     let project_id = project.to_string();
-    let contract = arch::live_contract(
-        &f.running,
-        &project_id,
-        "delivery_contract",
-        "f",
-    )
-    .await;
+    let contract = arch::live_contract(&f.running, &project_id, "delivery_contract", "f").await;
 
     let review = arch::created(
         &f.running,
@@ -50,7 +44,10 @@ async fn one_level_and_a_dated_waiver() {
         None,
     )
     .await;
-    assert_eq!(status, 409, "a second level on the same contract: {refused}");
+    assert_eq!(
+        status, 409,
+        "a second level on the same contract: {refused}"
+    );
     assert_eq!(refused["type"], "conflict", "{refused}");
 
     let (status, refused) = arch::call(

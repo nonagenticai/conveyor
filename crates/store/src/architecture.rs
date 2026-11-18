@@ -482,16 +482,86 @@ pub async fn seed_standard_tx(
     tenant: TenantId,
 ) -> Result<u64, ArchitectureStoreError> {
     let rows: [(&str, &str, &str, &str, &str, bool); 10] = [
-        ("principles_catalog", "Principles Catalog", "principles_catalog", "preliminary", "psa", true),
-        ("principle_derivation", "Principle Derivation Diagram", "diagram", "preliminary", "psa", true),
-        ("principle_realization", "Principle Realization Diagram", "diagram", "preliminary", "psa", true),
-        ("stakeholder_map", "Stakeholder Map", "matrix", "a", "psa", true),
-        ("driver_goal_objective", "Driver/Goal/Objective Catalog", "catalog", "a", "psa", true),
-        ("requirements_catalog", "Requirements Catalog", "catalog", "a", "psa", true),
-        ("solution_concept", "Solution Concept Diagram", "diagram", "a", "psa", true),
-        ("business_capability_map", "Business Capability Map", "diagram", "b", "hld", true),
-        ("data_entity_catalog", "Data Entity/Data Component Catalog", "catalog", "c", "hld", true),
-        ("technology_standards", "Technology Standards Catalog", "catalog", "d", "hld", true),
+        (
+            "principles_catalog",
+            "Principles Catalog",
+            "principles_catalog",
+            "preliminary",
+            "psa",
+            true,
+        ),
+        (
+            "principle_derivation",
+            "Principle Derivation Diagram",
+            "diagram",
+            "preliminary",
+            "psa",
+            true,
+        ),
+        (
+            "principle_realization",
+            "Principle Realization Diagram",
+            "diagram",
+            "preliminary",
+            "psa",
+            true,
+        ),
+        (
+            "stakeholder_map",
+            "Stakeholder Map",
+            "matrix",
+            "a",
+            "psa",
+            true,
+        ),
+        (
+            "driver_goal_objective",
+            "Driver/Goal/Objective Catalog",
+            "catalog",
+            "a",
+            "psa",
+            true,
+        ),
+        (
+            "requirements_catalog",
+            "Requirements Catalog",
+            "catalog",
+            "a",
+            "psa",
+            true,
+        ),
+        (
+            "solution_concept",
+            "Solution Concept Diagram",
+            "diagram",
+            "a",
+            "psa",
+            true,
+        ),
+        (
+            "business_capability_map",
+            "Business Capability Map",
+            "diagram",
+            "b",
+            "hld",
+            true,
+        ),
+        (
+            "data_entity_catalog",
+            "Data Entity/Data Component Catalog",
+            "catalog",
+            "c",
+            "hld",
+            true,
+        ),
+        (
+            "technology_standards",
+            "Technology Standards Catalog",
+            "catalog",
+            "d",
+            "hld",
+            true,
+        ),
     ];
     let mut inserted = 0_u64;
     for (position, (key, name, kind, phase, plateau, mandatory)) in rows.iter().enumerate() {
@@ -539,9 +609,9 @@ async fn insert_entries_tx(
 ) -> Result<(), ArchitectureStoreError> {
     for entry in entries {
         if entry.axis_a.trim().is_empty() {
-            return Err(ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(
-                "entry axis_a".to_owned(),
-            )));
+            return Err(ArchitectureStoreError::Illegal(
+                ArchitectureRule::MissingMandatory("entry axis_a".to_owned()),
+            ));
         }
         sqlx::query(
             "INSERT INTO architecture_artifact_entry
@@ -571,14 +641,16 @@ pub async fn create_artifact_tx(
     entries: &[NewEntry],
 ) -> Result<ArtifactRecord, ArchitectureStoreError> {
     vocab::require_phase(&new.phase_code).map_err(|_| {
-        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(
-            format!("phase {}", new.phase_code),
-        ))
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(format!(
+            "phase {}",
+            new.phase_code
+        )))
     })?;
     vocab::require_plateau(&new.plateau).map_err(|_| {
-        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(
-            format!("plateau {}", new.plateau),
-        ))
+        ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(format!(
+            "plateau {}",
+            new.plateau
+        )))
     })?;
     vocab::require_artifact_kind(&new.artifact_kind).map_err(|_| {
         ArchitectureStoreError::Illegal(ArchitectureRule::MissingMandatory(format!(
@@ -770,9 +842,7 @@ pub async fn approve_artifact_tx(
         .bind(reviewer)
         .fetch_optional(&mut *conn)
         .await?;
-    record.ok_or_else(|| {
-        ArchitectureStoreError::Illegal(ArchitectureRule::ApprovedImmutable)
-    })
+    record.ok_or_else(|| ArchitectureStoreError::Illegal(ArchitectureRule::ApprovedImmutable))
 }
 
 /// Supersede an artefact with a new draft version; the approved body is unchanged.
@@ -1139,9 +1209,8 @@ pub async fn get_body_tx(
     tenant: TenantId,
     id: Uuid,
 ) -> Result<Option<GovernanceBodyRecord>, ArchitectureStoreError> {
-    let sql = format!(
-        "SELECT {BODY_COLUMNS} FROM governance_body WHERE tenant_id = $1 AND id = $2"
-    );
+    let sql =
+        format!("SELECT {BODY_COLUMNS} FROM governance_body WHERE tenant_id = $1 AND id = $2");
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(id)
@@ -1427,7 +1496,10 @@ pub async fn materialise_adm_phases_tx(
     tenant: TenantId,
     project_id: Uuid,
 ) -> Result<Vec<Uuid>, ArchitectureStoreError> {
-    let phases: Vec<String> = vocab::PHASES.iter().map(|phase| (*phase).to_owned()).collect();
+    let phases: Vec<String> = vocab::PHASES
+        .iter()
+        .map(|phase| (*phase).to_owned())
+        .collect();
     materialise_phases_tx(conn, tenant, project_id, &phases).await
 }
 
@@ -1468,14 +1540,16 @@ pub async fn advance_phase_tx(
         .iter()
         .find(|(_, phase, _)| phase == requested)
         .cloned()
-        .ok_or_else(|| ArchitectureStoreError::Illegal(ArchitectureRule::PhaseOutOfOrder {
-            current: nodes
-                .iter()
-                .find(|(_, _, status)| status == "open")
-                .map(|(_, phase, _)| phase.clone())
-                .unwrap_or_else(|| "h".to_owned()),
-            requested: requested.to_owned(),
-        }))?;
+        .ok_or_else(|| {
+            ArchitectureStoreError::Illegal(ArchitectureRule::PhaseOutOfOrder {
+                current: nodes
+                    .iter()
+                    .find(|(_, _, status)| status == "open")
+                    .map(|(_, phase, _)| phase.clone())
+                    .unwrap_or_else(|| "h".to_owned()),
+                requested: requested.to_owned(),
+            })
+        })?;
     let first_open = nodes
         .iter()
         .find(|(_, _, status)| status == "open")
@@ -1494,11 +1568,13 @@ pub async fn advance_phase_tx(
     // PSA and HLD sets demanded both, refusing a project for artefacts its phase does not
     // require — the profile, not the gate, decides which plateaus a phase carries.
     let sets: Vec<Vec<String>> = match profile.artifact_requirements.get(requested) {
-        Some(Value::Array(items)) => vec![items
-            .iter()
-            .filter_map(Value::as_str)
-            .map(str::to_owned)
-            .collect()],
+        Some(Value::Array(items)) => vec![
+            items
+                .iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect(),
+        ],
         Some(Value::Object(plateaus)) => plateaus
             .values()
             .filter_map(Value::as_array)
@@ -1582,7 +1658,7 @@ pub async fn advance_phase_tx(
             None => {
                 return Err(ArchitectureStoreError::Illegal(
                     ArchitectureRule::ContractNotLive(kind),
-                ))
+                ));
             }
         }
     }

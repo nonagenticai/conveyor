@@ -2,10 +2,10 @@
 //!
 //! `rbuild -- test -p conveyor-api --test architecture_capability`.
 
-#[path = "../../actions/tests/support/mod.rs"]
-mod support;
 #[path = "architecture_support/mod.rs"]
 mod arch;
+#[path = "../../actions/tests/support/mod.rs"]
+mod support;
 
 use serde_json::json;
 
@@ -53,18 +53,18 @@ async fn the_profile_names_the_mandatory_set() {
     assert_eq!(read["id"], board_id, "{read}");
     assert_eq!(read["kind"], "architecture_board", "{read}");
     assert!(
-        read["charter"].as_str().unwrap_or_default().contains("PF-1"),
+        read["charter"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("PF-1"),
         "the board charter is not the row's: {read}"
     );
-    assert_eq!(read["commissioning_authority"], "P0 programme board", "{read}");
+    assert_eq!(
+        read["commissioning_authority"], "P0 programme board",
+        "{read}"
+    );
 
-    let profile = arch::ok(
-        &f.running,
-        "architecture.profile_get",
-        json!({}),
-        None,
-    )
-    .await;
+    let profile = arch::ok(&f.running, "architecture.profile_get", json!({}), None).await;
     assert_eq!(
         profile["profile"]["artifact_requirements"]["a"]["psa"][0], "stakeholder_map",
         "{profile}"
@@ -111,7 +111,10 @@ async fn a_maturity_assessment_needs_every_dimension() {
     )
     .await;
     assert_eq!(status, 422, "{refused}");
-    assert_eq!(refused["errors"][0]["code"], "assessment_incomplete", "{refused}");
+    assert_eq!(
+        refused["errors"][0]["code"], "assessment_incomplete",
+        "{refused}"
+    );
 
     let all: Vec<_> = DIMENSIONS
         .iter()
@@ -146,7 +149,10 @@ async fn a_skills_assessment_names_its_role() {
     )
     .await;
     assert_eq!(status, 422, "{refused}");
-    assert_eq!(refused["errors"][0]["code"], "assessment_incomplete", "{refused}");
+    assert_eq!(
+        refused["errors"][0]["code"], "assessment_incomplete",
+        "{refused}"
+    );
 
     let all: Vec<_> = SKILLS
         .iter()

@@ -2,10 +2,10 @@
 //!
 //! `rbuild -- test -p conveyor-api --test togaf_delivery_design_gate`.
 
-#[path = "../../actions/tests/support/mod.rs"]
-mod support;
 #[path = "architecture_support/mod.rs"]
 mod arch;
+#[path = "../../actions/tests/support/mod.rs"]
+mod support;
 
 use serde_json::{Value, json};
 use uuid::Uuid;
@@ -33,7 +33,10 @@ async fn a_delivery_project_without_a_contract_cannot_pass_design() {
 
     let (status, refused) = route(&f, project).await;
     assert_eq!(status, 409, "{refused}");
-    assert_eq!(refused["type"], "architecture_contract_missing", "{refused}");
+    assert_eq!(
+        refused["type"], "architecture_contract_missing",
+        "{refused}"
+    );
     assert_eq!(
         arch::approval_count(&f.pg, project, "design").await,
         0,
@@ -45,13 +48,8 @@ async fn a_delivery_project_without_a_contract_cannot_pass_design() {
 async fn a_superseded_contract_refuses_design() {
     let f = arch::fixture().await;
     let project = arch::raw_project(&f.pg, f.seeded.tenant_id, "Delivery").await;
-    let contract = arch::live_contract(
-        &f.running,
-        &project.to_string(),
-        "delivery_contract",
-        "f",
-    )
-    .await;
+    let contract =
+        arch::live_contract(&f.running, &project.to_string(), "delivery_contract", "f").await;
     arch::ok(
         &f.running,
         "architecture.contracts_supersede",
@@ -62,7 +60,10 @@ async fn a_superseded_contract_refuses_design() {
 
     let (status, refused) = route(&f, project).await;
     assert_eq!(status, 409, "{refused}");
-    assert_eq!(refused["type"], "architecture_contract_not_live", "{refused}");
+    assert_eq!(
+        refused["type"], "architecture_contract_not_live",
+        "{refused}"
+    );
     assert!(
         refused["detail"]
             .as_str()
@@ -81,13 +82,7 @@ async fn a_superseded_contract_refuses_design() {
 async fn a_live_contract_opens_the_design_gate() {
     let f = arch::fixture().await;
     let project = arch::raw_project(&f.pg, f.seeded.tenant_id, "Delivery").await;
-    arch::live_contract(
-        &f.running,
-        &project.to_string(),
-        "delivery_contract",
-        "f",
-    )
-    .await;
+    arch::live_contract(&f.running, &project.to_string(), "delivery_contract", "f").await;
 
     let (status, out) = route(&f, project).await;
     assert_eq!(status, 201, "{out}");

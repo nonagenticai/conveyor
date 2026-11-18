@@ -228,11 +228,7 @@ pub fn ArchitectureScreen() -> impl IntoView {
         async move {
             parse::<Page<ProjectRow>>(
                 client
-                    .invoke(
-                        "portfolio.in_flight",
-                        json!({}),
-                        InvokeOptions::default(),
-                    )
+                    .invoke("portfolio.in_flight", json!({}), InvokeOptions::default())
                     .await?
                     .output,
                 "in-flight projects",
