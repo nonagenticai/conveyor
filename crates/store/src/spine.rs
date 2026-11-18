@@ -2670,6 +2670,284 @@ pub async fn materialise_pi_tx(
     })
 }
 
+/// Record a demo credit for one completed deliverable, or return the existing one.
+///
+/// A credit needs the deliverable accepted (`wbs_node.status = 'accepted'`) and exhibiting at
+/// least one evidence ref — §5.4's `gate_evidence_missing` otherwise. The evidence is copied
+/// onto the credit, so the credit stands alone when the node later changes.
+pub async fn credit_demo_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+    deliverable_id: Uuid,
+) -> Result<Uuid, PlanStoreError> {
+    let cadence = get_cadence_tx(&mut *conn, tenant, cadence_id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "cadence row",
+        })?;
+    if cadence.kind != "demo" {
+        return Err(PlanStoreError::Illegal(PlanError::CadenceWrongKind {
+            expected: "demo",
+            actual: cadence.kind.clone(),
+        }));
+    }
+    let row: Option<(String, Value)> = sqlx::query_as(
+        "SELECT status, evidence FROM wbs_node
+          WHERE tenant_id = $1 AND id = $2 AND kind = 'deliverable'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(deliverable_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (status, evidence) = row.ok_or(PlanStoreError::NotFound {
+        what: "deliverable",
+    })?;
+    if status != "accepted" {
+        return Err(PlanStoreError::Illegal(
+            PlanError::DemoDeliverableNotComplete,
+        ));
+    }
+    if evidence.as_array().is_none_or(|refs| refs.is_empty()) {
+        return Err(PlanStoreError::Illegal(PlanError::DemoEvidenceMissing));
+    }
+    let inserted: Option<Uuid> = sqlx::query_scalar(
+        "INSERT INTO programme_demo_credit (tenant_id, cadence_id, deliverable_id, evidence)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (tenant_id, cadence_id, deliverable_id) DO NOTHING
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id)
+    .bind(deliverable_id)
+    .bind(&evidence)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match inserted {
+        Some(id) => Ok(id),
+        None => sqlx::query_scalar(
+            "SELECT id FROM programme_demo_credit
+              WHERE tenant_id = $1 AND cadence_id = $2 AND deliverable_id = $3",
+        )
+        .bind(tenant.as_uuid())
+        .bind(cadence_id)
+        .bind(deliverable_id)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(PlanStoreError::Database),
+    }
+}
+
+/// Propose a lesson for one retro finding; the table is the organisational-memory record.
+///
+/// The evidence refs are stored as given (T8 owns the independent-ref rule); the cadence is the
+/// retro the lesson came from, kept so a later review can read the finding beside its lesson.
+pub async fn propose_lesson_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+    cadence_id: Option<Uuid>,
+    finding_key: &str,
+    statement: &str,
+    evidence: &Value,
+) -> Result<Uuid, PlanStoreError> {
+    ensure_parent_tx(&mut *conn, tenant, Parent::Programme, programme_id)
+        .await
+        .map_err(PlanStoreError::Parent)?;
+    if statement.trim().is_empty() {
+        return Err(PlanStoreError::Conflict {
+            what: "lesson",
+            why: "the statement is required",
+        });
+    }
+    let independent_count = i32::try_from(
+        evidence
+            .as_array()
+            .map(|refs| refs.len())
+            .unwrap_or_default(),
+    )
+    .unwrap_or(i32::MAX);
+    sqlx::query_scalar(
+        "INSERT INTO lesson (tenant_id, programme_id, cadence_id, finding_key, statement,
+                             evidence, independent_count)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme_id)
+    .bind(cadence_id)
+    .bind(finding_key.trim())
+    .bind(statement.trim())
+    .bind(evidence)
+    .bind(independent_count)
+    .fetch_one(&mut *conn)
+    .await
+    .map_err(PlanStoreError::Database)
+}
+
+/// Open the retro cadence's one card (in the board named by `meta.board_id`), or return it.
+///
+/// The card is the coach's: its metadata names the coach as the owner kind and carries the
+/// findings the coach records. The lookup is by `meta.cadence_id`, so a second call returns the
+/// same card rather than a duplicate.
+pub async fn open_retro_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<Uuid, PlanStoreError> {
+    let cadence = get_cadence_tx(&mut *conn, tenant, cadence_id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "cadence row",
+        })?;
+    if cadence.kind != "retro" {
+        return Err(PlanStoreError::Illegal(PlanError::CadenceWrongKind {
+            expected: "retro",
+            actual: cadence.kind.clone(),
+        }));
+    }
+    let existing: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM card
+          WHERE tenant_id = $1 AND meta->>'cadence_id' = $2 LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id.to_string())
+    .fetch_optional(&mut *conn)
+    .await?;
+    if let Some(card) = existing {
+        return Ok(card);
+    }
+    let board_id: Uuid = cadence
+        .meta
+        .get("board_id")
+        .and_then(Value::as_str)
+        .and_then(|value| Uuid::parse_str(value).ok())
+        .ok_or(PlanStoreError::Illegal(PlanError::CadenceBoardMissing))?;
+    let card_type_code = cadence
+        .meta
+        .get("card_type_code")
+        .and_then(Value::as_str)
+        .ok_or(PlanStoreError::Illegal(PlanError::CadenceCardTypeMissing))?
+        .to_owned();
+    let card_type_id: Option<Uuid> =
+        sqlx::query_scalar("SELECT id FROM card_type WHERE tenant_id = $1 AND code = $2")
+            .bind(tenant.as_uuid())
+            .bind(&card_type_code)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let card_type_id =
+        card_type_id.ok_or(PlanStoreError::Illegal(PlanError::CadenceCardTypeMissing))?;
+    sqlx::query_scalar(
+        "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, description,
+                           position, meta)
+         SELECT $1, l.board_id, l.id, $3, $4, '', 0, $5
+           FROM list l
+          WHERE l.tenant_id = $1 AND l.board_id = $2 AND l.kind = 'intake'
+          LIMIT 1
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .bind(card_type_id)
+    .bind(format!("Retro — {}", cadence.period))
+    .bind(serde_json::json!({
+        "cadence_id": cadence_id,
+        "owner_kind": "coach",
+        "findings": [],
+    }))
+    .fetch_one(&mut *conn)
+    .await
+    .map_err(PlanStoreError::Database)
+}
+
+/// Record the findings the coach gathered on the retro card (`meta.findings`).
+pub async fn record_retro_findings_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+    findings: &Value,
+) -> Result<(), PlanStoreError> {
+    if findings.as_array().is_none_or(|rows| rows.is_empty()) {
+        return Err(PlanStoreError::Conflict {
+            what: "retro",
+            why: "at least one finding is required",
+        });
+    }
+    let changed = sqlx::query(
+        "UPDATE card
+            SET meta = meta || jsonb_build_object('findings', $2::jsonb),
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND meta->>'cadence_id' = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(findings)
+    .bind(cadence_id.to_string())
+    .execute(&mut *conn)
+    .await?
+    .rows_affected();
+    if changed == 0 {
+        return Err(PlanStoreError::NotFound { what: "retro card" });
+    }
+    Ok(())
+}
+
+/// Close the retro: every finding it recorded must have a lesson proposal.
+///
+/// The findings live on the coach's card; the lessons are `lesson` rows carrying the cadence and
+/// the finding key. A missing lesson is named, and nothing is written.
+pub async fn close_retro_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<(), PlanStoreError> {
+    let card: Option<(Uuid, Value)> = sqlx::query_as(
+        "SELECT id, meta FROM card WHERE tenant_id = $1 AND meta->>'cadence_id' = $2 LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id.to_string())
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (card_id, meta) = card.ok_or(PlanStoreError::NotFound { what: "retro card" })?;
+    let findings = meta
+        .get("findings")
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    for finding in &findings {
+        let key = finding
+            .get("key")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned();
+        let present: bool = sqlx::query_scalar(
+            "SELECT EXISTS (
+                SELECT 1 FROM lesson
+                 WHERE tenant_id = $1 AND cadence_id = $2 AND finding_key = $3
+            )",
+        )
+        .bind(tenant.as_uuid())
+        .bind(cadence_id)
+        .bind(&key)
+        .fetch_one(&mut *conn)
+        .await?;
+        if !present {
+            return Err(PlanStoreError::Illegal(
+                PlanError::RetroFindingWithoutLesson(key),
+            ));
+        }
+    }
+    sqlx::query(
+        "UPDATE card
+            SET meta = meta || jsonb_build_object('retro_closed', true),
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}
+
 // ── stakeholder_profile ─────────────────────────────────────────────────────────────────
 // The MSP profile: concerns, influence, exposure, support and engagement. Distinct from
 // `project_stakeholder` (0008), which records who is involved, not what they care about.
