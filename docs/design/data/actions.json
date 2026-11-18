@@ -415,6 +415,7 @@
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "tools.call",
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",

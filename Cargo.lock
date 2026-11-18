@@ -721,6 +721,7 @@ dependencies = [
  "inventory",
  "object_store",
  "openapiv3",
+ "regex",
  "reqwest",
  "rmcp",
  "rust_decimal",

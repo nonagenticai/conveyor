@@ -222,7 +222,10 @@ mod tests {
                 // (0053_card_ledger.sql).
                 (53, "card ledger".to_owned()),
                 // #81 (T9): the eleven TOGAF ADM tables (0054_architecture.sql).
-                (54, "architecture".to_owned())
+                (54, "architecture".to_owned()),
+                // #76 (T13): the tool platform — toolkit, tool, tool_binding and the append-only
+                // tool_call ledger (0055_tool_platform.sql, SPEC_V2 §11.8).
+                (55, "tool platform".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

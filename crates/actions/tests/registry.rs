@@ -94,7 +94,9 @@ use serde_json::{Value, json};
 /// **#303 adds 2 internal**: `benefits.retire` and `tranches.retire`, the governed retirement path.
 /// **#295 adds 2 internal**: `cards.ledger_append` and `cards.ledger_list`, the claim/fact ledger.
 /// **T9 adds 26 internal**: the `architecture.*` family (see the block below `approvals.request`).
-const EXPECTED: [&str; 459] = [
+/// **#76 adds 1 internal**: `tools.call`, the tool broker (it dispatches a declared external
+/// action and adds no external target).
+const EXPECTED: [&str; 460] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -513,6 +515,7 @@ const EXPECTED: [&str; 459] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "tools.call",
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
@@ -618,7 +621,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // 413 -> 415; external stays 18.
     // T9 (#81) adds the twenty-six architecture actions, all internal: 415 -> 441; external
     // stays 18 (they read and write this tenant's own repository, never an external service).
-    assert_eq!((internal, external), (441, 18));
+    // #76 adds `tools.call` (internal): 441 -> 442; external stays 18.
+    assert_eq!((internal, external), (442, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

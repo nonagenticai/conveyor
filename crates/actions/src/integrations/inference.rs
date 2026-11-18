@@ -183,7 +183,7 @@ mod tests {
                 assert_eq!(method, "POST");
                 assert_eq!(path, "/api/chat/completions");
             }
-            HandlerRef::Internal(_) | HandlerRef::Workflow => {
+            HandlerRef::Internal(_) | HandlerRef::Workflow | HandlerRef::Broker => {
                 panic!("completions.create must be a declared external action")
             }
         }
@@ -213,7 +213,7 @@ mod tests {
                 assert_eq!(method, "POST");
                 assert_eq!(path, "/api/chat/completions");
             }
-            HandlerRef::Internal(_) | HandlerRef::Workflow => {
+            HandlerRef::Internal(_) | HandlerRef::Workflow | HandlerRef::Broker => {
                 panic!("inference.chat must be a declared external action")
             }
         }

@@ -622,6 +622,11 @@ pub enum HandlerRef {
     },
     /// No handler yet: S13's engine.
     Workflow,
+    /// The tool broker (`tools.call`, SPEC_V2 §11.3; T13). The engine resolves the run's tool
+    /// binding and dispatches the pinned tool version through its declared external action. The
+    /// resolved tool's effect is **data on the version row**, so this static spec declares the
+    /// dispatcher's own effect and the broker enforces the real ceiling and destructive gate.
+    Broker,
 }
 
 impl std::fmt::Debug for HandlerRef {
@@ -635,6 +640,7 @@ impl std::fmt::Debug for HandlerRef {
                 ..
             } => write!(f, "HandlerRef::External({service} {method} {path})"),
             Self::Workflow => write!(f, "HandlerRef::Workflow"),
+            Self::Broker => write!(f, "HandlerRef::Broker"),
         }
     }
 }
@@ -1360,6 +1366,140 @@ fn validate_at(
             detail: format!("must be one of {choices:?}"),
         });
         return;
+    }
+
+    // `pattern`, the numeric bounds and the length/item bounds: the closed-schema keywords a
+    // published tool version relies on (§11.3 step 3, T13 P4). Checked here — on the same
+    // validator the actions' own contracts use — so a schema-invalid tool input is refused
+    // before the broker makes any network call. An unparseable `pattern` is accepted rather
+    // than guessed at: publication reviews the schema, and a validator that crashed on a typo
+    // would turn a data mistake into an outage.
+    if let Some(text) = value.as_str() {
+        if let Some(pattern) = schema.get("pattern").and_then(Value::as_str)
+            && let Ok(compiled) = regex::Regex::new(pattern)
+            && !compiled.is_match(text)
+        {
+            errors.push(FieldError {
+                field: if path.is_empty() {
+                    "body".into()
+                } else {
+                    path.to_owned()
+                },
+                code: "invalid_value".into(),
+                detail: format!("must match the pattern {pattern:?}"),
+            });
+        }
+        if let Some(min) = schema.get("minLength").and_then(Value::as_u64)
+            && (text.chars().count() as u64) < min
+        {
+            errors.push(FieldError {
+                field: if path.is_empty() {
+                    "body".into()
+                } else {
+                    path.to_owned()
+                },
+                code: "invalid_value".into(),
+                detail: format!("must be at least {min} characters"),
+            });
+        }
+        if let Some(max) = schema.get("maxLength").and_then(Value::as_u64)
+            && (text.chars().count() as u64) > max
+        {
+            errors.push(FieldError {
+                field: if path.is_empty() {
+                    "body".into()
+                } else {
+                    path.to_owned()
+                },
+                code: "invalid_value".into(),
+                detail: format!("must be at most {max} characters"),
+            });
+        }
+    }
+
+    if let Some(number) = value.as_f64() {
+        let bound = |key: &str| schema.get(key).and_then(Value::as_f64);
+        if let Some(min) = bound("minimum")
+            && number < min
+        {
+            errors.push(FieldError {
+                field: if path.is_empty() {
+                    "body".into()
+                } else {
+                    path.to_owned()
+                },
+                code: "invalid_value".into(),
+                detail: format!("must be at least {min}"),
+            });
+        }
+        if let Some(max) = bound("maximum")
+            && number > max
+        {
+            errors.push(FieldError {
+                field: if path.is_empty() {
+                    "body".into()
+                } else {
+                    path.to_owned()
+                },
+                code: "invalid_value".into(),
+                detail: format!("must be at most {max}"),
+            });
+        }
+        if let Some(min) = bound("exclusiveMinimum")
+            && number <= min
+        {
+            errors.push(FieldError {
+                field: if path.is_empty() {
+                    "body".into()
+                } else {
+                    path.to_owned()
+                },
+                code: "invalid_value".into(),
+                detail: format!("must be greater than {min}"),
+            });
+        }
+        if let Some(max) = bound("exclusiveMaximum")
+            && number >= max
+        {
+            errors.push(FieldError {
+                field: if path.is_empty() {
+                    "body".into()
+                } else {
+                    path.to_owned()
+                },
+                code: "invalid_value".into(),
+                detail: format!("must be less than {max}"),
+            });
+        }
+    }
+
+    if let Some(array) = value.as_array() {
+        if let Some(min) = schema.get("minItems").and_then(Value::as_u64)
+            && (array.len() as u64) < min
+        {
+            errors.push(FieldError {
+                field: if path.is_empty() {
+                    "body".into()
+                } else {
+                    path.to_owned()
+                },
+                code: "invalid_value".into(),
+                detail: format!("must have at least {min} items"),
+            });
+        }
+        if let Some(max) = schema.get("maxItems").and_then(Value::as_u64)
+            && (array.len() as u64) > max
+        {
+            errors.push(FieldError {
+                field: if path.is_empty() {
+                    "body".into()
+                } else {
+                    path.to_owned()
+                },
+                code: "invalid_value".into(),
+                detail: format!("must have at most {max} items"),
+            });
+        }
     }
 
     if let Some(object) = value.as_object() {
