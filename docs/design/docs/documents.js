@@ -173,6 +173,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-research-cutover.md"
     },
     {
+      "title": "Scientific cutover — 2026-11-16, completed 2026-11-18",
+      "path": "docs/evidence/2026-11-16-scientific-cutover.html",
+      "source": "docs/evidence/2026-11-16-scientific-cutover.md",
+      "section": "Evidence",
+      "sha256": "3ff5371ed71656f5bb7f15a0d19b967ccddc168d6667b0c63c582788704d02d8",
+      "bytes": 5052,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-scientific-cutover.md"
+    },
+    {
       "title": "The dead w2v estate retired — 2026-11-17",
       "path": "docs/evidence/2026-11-16-w2v-retirement.html",
       "source": "docs/evidence/2026-11-16-w2v-retirement.md",
