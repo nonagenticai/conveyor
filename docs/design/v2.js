@@ -493,6 +493,524 @@ window.installV2 = function (api, enterprise) {
     );
   const snapshotProjects = () => orderedProjects(list(((live || {}).programme || {}).projects));
 
+  /* ------------------------------------------------------- MSP programme store */
+  // One source, fail closed (#305 Part C): signed in the programme definition, plan spine,
+  // dependencies and in-flight rows come from the actions; signed out they come from the
+  // published snapshot (`SNAP.msp`) read-only; `?design=1` keeps the study fixtures; with no
+  // published rows the page says so and never renders a fixture on the live site.
+  const MSP0 = () => ({
+    loaded: false,
+    loading: false,
+    error: null,
+    programme: null,
+    projectId: null,
+    documents: [],
+    benefits: [],
+    links: [],
+    transitions: [],
+    tranches: [],
+    reviews: [],
+    stakeholders: [],
+    wbs: [],
+    baselines: [],
+    registers: [],
+    cadences: [],
+    dependencies: [],
+    inFlight: [],
+  });
+  const msp = () => (cs.msp = cs.msp || MSP0());
+  const mspProjectOf = (rows) =>
+    list(rows).find((p) => p.key === "P0") || list(rows)[0] || null;
+  const mspSource = () => {
+    if (consoleOn()) return Object.assign({ readOnly: false, live: true }, msp());
+    const M = ((live || {}).msp || {});
+    const projects = snapshotProjects();
+    return {
+      readOnly: true,
+      live: !!live,
+      programme: list(((live || {}).programme || {}).programme)[0] || null,
+      projectId: (mspProjectOf(projects) || {}).id || null,
+      documents: list(((live || {}).artefacts || {}).documents),
+      benefits: list(M.benefit_profiles),
+      links: list(M.benefit_links),
+      transitions: list(M.benefit_transitions),
+      tranches: list(M.tranches),
+      reviews: list(M.tranche_reviews),
+      stakeholders: list(M.stakeholder_profiles),
+      wbs: list(M.wbs_nodes),
+      baselines: list(M.programme_baselines).concat(list(M.project_baselines)),
+      registers: list(M.register_items),
+      cadences: list(M.cadences),
+      dependencies: list(M.project_dependencies),
+      inFlight: [],
+    };
+  };
+  const mspError = () => {
+    const m = msp();
+    return m.error
+      ? note(`<strong>${E(m.error.status || "Error")} · ${E(consoleError(m.error))}</strong> The row was not changed.`, "bad")
+      : "";
+  };
+  const mspField = (key, label, mode, type, value, source) => {
+    const full = mode === "area";
+    const tag = (inner) =>
+      `<label class="field${full ? " full" : ""}"><span>${E(label)}</span>${inner}</label>`;
+    if (Array.isArray(mode)) {
+      return tag(`<select id="msp-${key}">${[["", "—"]].concat(mode.map((x) => [x, x])).map(([val, text]) => `<option value="${E(val)}" ${String(value || "") === String(val) ? "selected" : ""}>${E(text)}</option>`).join("")}</select>`);
+    }
+    if (type === "benefit" || type === "project") {
+      const rows = type === "benefit" ? source.benefits : snapshotProjects().concat(consoleOn() ? consoleProjects() : []);
+      const seen = new Set();
+      return tag(`<select id="msp-${key}"><option value="">—</option>${rows.filter((row) => row.id && !seen.has(row.id) && seen.add(row.id)).map((row) => `<option value="${E(row.id)}" ${String(value || "") === String(row.id) ? "selected" : ""}>${E(type === "benefit" ? row.reference || short(row.id, 8) : row.key || short(row.id, 8))}</option>`).join("")}</select>`);
+    }
+    if (type === "int" || type === "float") {
+      return tag(`<input id="msp-${key}" type="number" step="${type === "int" ? 1 : "any"}" value="${E(value == null ? "" : value)}">`);
+    }
+    if (full) return tag(`<textarea id="msp-${key}" rows="2">${E(value == null ? "" : value)}</textarea>`);
+    return tag(`<input id="msp-${key}" value="${E(value == null ? "" : value)}">`);
+  };
+  const MSP_DEFS = {
+    programme: [["name", "Name"], ["status", "Status", ["active", "paused", "closed"]]],
+    benefit: [
+      ["reference", "Reference"], ["description", "Description", "area"], ["category", "Category"],
+      ["objectives", "Objectives", "area"], ["observable_outcome", "Observable outcome", "area"],
+      ["kpis", "KPIs", "area"], ["baseline", "Baseline"], ["target", "Target"],
+      ["measurement_method", "Measurement method", "area"], ["financial_value", "Financial value"],
+      ["cost", "Cost"], ["capabilities", "Capabilities", "area"], ["preconditions", "Preconditions", "area"],
+      ["risks", "Risks", "area"], ["owner_job_id", "Owner job id"],
+      ["benefit_owner_job_id", "Benefit owner job id"], ["operational_area", "Operational area"], ["status", "Status"],
+    ],
+    link: [
+      ["benefit_id", "Benefit", null, "benefit"], ["output_ref", "Output"], ["capability_ref", "Capability"],
+      ["operational_outcome", "Operational outcome", "area"], ["strategic_objective", "Strategic objective"],
+      ["kind", "Kind", ["benefit", "disbenefit"]],
+    ],
+    transition: [
+      ["benefit_id", "Benefit", null, "benefit"], ["baseline_measured_at", "Baseline measured (date)"],
+      ["readiness", "Readiness", "area"], ["enacted_at", "Enacted (date)"],
+      ["post_measured_at", "Post measured (date)"], ["retired_at", "Legacy retired (date)"],
+      ["evidence", "Evidence", "area"],
+    ],
+    tranche: [
+      ["number", "Number", null, "int"], ["entry_criteria", "Entry criteria", "area"],
+      ["exit_criteria", "Exit criteria", "area"], ["baseline_ref", "Baseline ref"], ["review_at", "Review at (date)"],
+    ],
+    review: [
+      ["decision", "Decision", ["continue", "pause", "stop"]],
+      ["baselines", "Evidence · baselines", "area"], ["benefit_status", "Evidence · benefit status", "area"],
+      ["risk_register", "Evidence · risk register", "area"],
+    ],
+    stakeholder: [
+      ["name", "Name"], ["project_id", "Project id"], ["concerns", "Concerns", "area"],
+      ["sensitivities", "Sensitivities", "area"], ["importance", "Importance"], ["influence", "Influence"],
+      ["interest", "Interest"], ["exposure", "Exposure"], ["support_level", "Support level"],
+      ["support_trend", "Support trend"], ["engagement_target", "Engagement target"],
+      ["benefits", "Benefits", "area"], ["disbenefits", "Disbenefits", "area"],
+    ],
+    wbs: [
+      ["kind", "Kind", ["phase", "deliverable", "work_package", "milestone"]], ["title", "Title"],
+      ["parent_id", "Parent id"], ["body", "Body", "area"], ["acceptance", "Acceptance", "area"],
+      ["business_value", "Business value", null, "int"], ["time_criticality", "Time criticality", null, "int"],
+      ["risk_reduction", "Risk reduction", null, "int"], ["job_size", "Job size", null, "int"],
+      ["position", "Position", null, "float"],
+    ],
+    register: [
+      ["kind", "Kind", ["risk", "issue", "assumption", "dependency", "benefit", "change"]],
+      ["title", "Title"], ["body", "Body", "area"], ["status", "Status"], ["severity", "Severity"],
+      ["probability", "Probability"], ["impact", "Impact", null, "int"],
+    ],
+    cadence: [
+      ["kind", "Kind", ["pi", "sprint", "demo", "retro", "refinement"]], ["period", "Period"], ["state", "State"],
+    ],
+    dependency: [["to_project", "To project", null, "project"], ["kind", "Kind", ["blocks", "needs", "supersedes", "informs"]]],
+  };
+  const mspDialog = (kind, title, row = {}, source = mspSource()) => {
+    const body = `<div class="dialog-body console-dialog-body"><div class="form-grid">${(MSP_DEFS[kind] || []).map(([key, label, mode, type]) => mspField(key, label, mode, type, row[key], source)).join("")}</div><p class="muted">Every field is sent to the action; an If-Match version guards an edit.</p></div>`;
+    const footer = `${button("Save", "msp-save", `data-kind="${E(kind)}" data-id="${E(row.id || "")}" data-version="${E(row.version == null ? "" : row.version)}"`, "primary", "check")}${btn("Close", "close-dialog")}`;
+    openDialog(title, body, footer, true);
+  };
+  const mspValue = (key) => {
+    const el = document.getElementById("msp-" + key);
+    return el ? String(el.value == null ? "" : el.value).trim() : "";
+  };
+  const mspPayload = (kind) => {
+    const payload = {};
+    for (const [key, , , type] of MSP_DEFS[kind] || []) {
+      const raw = mspValue(key);
+      if (!raw) continue;
+      const value = type === "int" ? parseInt(raw, 10) : type === "float" ? parseFloat(raw) : raw;
+      // The store's `*_at` fields are timestamptz: RFC 3339. A date-only entry is accepted and
+      // anchored at midnight UTC rather than left to fail the schema.
+      payload[key] =
+        key.endsWith("_at") && /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00Z` : value;
+    }
+    return payload;
+  };
+  async function consoleLoadMsp() {
+    const m = msp();
+    if (!consoleOn() || m.loading || m.loaded) return;
+    m.loading = true;
+    m.error = null;
+    try {
+      const programmes = await C.action("programmes.list", { page: { limit: 10 } });
+      m.programme = list(programmes.items)[0] || null;
+      // The project-scoped MSP reads need the tenant's projects. The console load may still be
+      // in flight when this page renders, so read them here rather than risking an empty
+      // project id and a silently skipped set of rows.
+      let projects = consoleProjects();
+      if (!projects.length) {
+        try {
+          const page = await C.get("/api/projects?limit=200");
+          projects = list(page.items);
+          if (!cs.loaded) cs.projects = projects;
+        } catch (_) {
+          projects = [];
+        }
+      }
+      const p0 = mspProjectOf(projects) || null;
+      m.projectId = p0 ? p0.id : null;
+      const pid = m.programme ? m.programme.id : null;
+      const projectId = m.projectId;
+      const safe = async (name, input) => {
+        try { return await C.action(name, input); } catch (error) { return { error }; }
+      };
+      const [benefits, links, transitions, tranches, reviews, stakeholders, cadences, wbs, baselines, registers, dependencies, documents, inFlight] = await Promise.all([
+        pid ? safe("benefits.list", { programme_id: pid }) : {},
+        pid ? safe("benefits.link_list", { programme_id: pid }) : {},
+        pid ? safe("benefits.transition_list", { programme_id: pid }) : {},
+        pid ? safe("tranches.list", { programme_id: pid }) : {},
+        pid ? safe("tranches.review_list", { programme_id: pid }) : {},
+        pid ? safe("stakeholders.profile_list", { programme_id: pid }) : {},
+        pid ? safe("cadences.list", { programme_id: pid }) : {},
+        projectId ? safe("wbs.list", { project_id: projectId }) : {},
+        projectId ? safe("baselines.list", { project_id: projectId }) : {},
+        projectId ? safe("registers.list", { project_id: projectId }) : {},
+        projectId ? safe("project_dependencies.list", { project_id: projectId }) : {},
+        projectId ? safe("documents.list", { project_id: projectId, page: { limit: 100 } }) : {},
+        safe("portfolio.in_flight", {}),
+      ]);
+      m.benefits = list(benefits.items);
+      m.links = list(links.items);
+      m.transitions = list(transitions.items);
+      m.tranches = list(tranches.items);
+      m.reviews = list(reviews.items);
+      m.stakeholders = list(stakeholders.items);
+      m.cadences = list(cadences.items);
+      m.wbs = list(wbs.items);
+      m.baselines = list(baselines.items);
+      m.registers = list(registers.items);
+      m.dependencies = list(dependencies.items);
+      m.documents = list(documents.items).filter((doc) => doc.status !== "deleted");
+      m.inFlight = list(inFlight.items);
+      m.loaded = true;
+    } catch (error) {
+      m.error = error;
+    } finally {
+      m.loading = false;
+      render();
+    }
+  }
+  function mspRefresh() {
+    cs.msp = null;
+    render();
+    if (consoleOn()) consoleLoadMsp();
+  }
+  async function mspWrite(name, input, etag, message) {
+    try {
+      await C.action(name, input, etag == null ? {} : { etag: String(etag) });
+      toast(message || "Saved");
+      mspRefresh();
+      return true;
+    } catch (error) {
+      msp().error = error;
+      render();
+      toast("Refused · " + consoleError(error));
+      return false;
+    }
+  }
+  async function mspSave(kind, id, version) {
+    const source = mspSource();
+    const programmeId = (source.programme || {}).id;
+    const projectId = source.projectId;
+    const payload = mspPayload(kind);
+    const etag = version === "" ? null : version;
+    let name;
+    let input;
+    if (kind === "programme") {
+      name = "programmes.update";
+      input = Object.assign({ id }, payload);
+    } else if (kind === "benefit") {
+      name = id ? "benefits.update" : "benefits.create";
+      input = id ? Object.assign({ id }, payload) : Object.assign({ programme_id: programmeId }, payload);
+    } else if (kind === "link") {
+      name = "benefits.link";
+      input = Object.assign({ programme_id: programmeId }, payload);
+    } else if (kind === "transition") {
+      name = "benefits.transition_upsert";
+      input = Object.assign({}, payload);
+      const existing = source.transitions.find((row) => row.benefit_id === payload.benefit_id);
+      if (existing) input._etag = existing.version;
+    } else if (kind === "tranche") {
+      name = id ? "tranches.update" : "tranches.create";
+      input = id ? Object.assign({ id }, payload) : Object.assign({ programme_id: programmeId }, payload);
+    } else if (kind === "review") {
+      name = "tranches.review";
+      input = { id, decision: payload.decision, evidence: { baselines: payload.baselines || "", benefit_status: payload.benefit_status || "", risk_register: payload.risk_register || "" } };
+    } else if (kind === "stakeholder") {
+      name = id ? "stakeholders.profile_update" : "stakeholders.profile_create";
+      input = id ? Object.assign({ id }, payload) : Object.assign({ programme_id: programmeId }, payload);
+    } else if (kind === "wbs") {
+      name = id ? "wbs.update" : "wbs.create";
+      input = id ? Object.assign({ id }, payload) : Object.assign({ project_id: projectId }, payload);
+    } else if (kind === "register") {
+      name = id ? "registers.update" : "registers.create";
+      input = id ? Object.assign({ id }, payload) : Object.assign({ project_id: projectId }, payload);
+    } else if (kind === "cadence") {
+      name = id ? "cadences.update" : "cadences.create";
+      input = id ? Object.assign({ id }, payload) : Object.assign({ programme_id: programmeId }, payload);
+    } else if (kind === "dependency") {
+      name = "project_dependencies.create";
+      input = Object.assign({ project_id: projectId }, payload);
+    }
+    if (!name) return false;
+    if (kind === "link" && !payload.benefit_id) {
+      toast("Choose a benefit first");
+      return false;
+    }
+    const transitionEtag = kind === "transition" && input ? input._etag : null;
+    if (input) delete input._etag;
+    return mspWrite(name, input, id ? etag : transitionEtag || null, "Saved");
+  }
+  async function mspDelete(kind, id, version) {
+    const actions = {
+      benefit: "benefits.delete",
+      link: "benefits.unlink",
+      tranche: "tranches.delete",
+      stakeholder: "stakeholders.profile_delete",
+      wbs: "wbs.delete",
+      register: "registers.delete",
+      cadence: "cadences.delete",
+      dependency: "project_dependencies.delete",
+    };
+    if (!actions[kind]) return false;
+    return mspWrite(actions[kind], { id }, version === "" ? null : version, "Deleted");
+  }
+  const mspName = (source, id) => {
+    const row = list(source.benefits).find((b) => b.id === id);
+    return row ? row.reference || short(id, 8) : short(id || "", 8);
+  };
+  const mspProjectName = (id) => {
+    const row = snapshotProjects().concat(consoleOn() ? consoleProjects() : []).find((p) => p.id === id);
+    return row ? row.key : short(id || "", 8);
+  };
+  const mspDocLink = (doc) => {
+    const raw = doc.public_url || doc.public_path || "";
+    const url = raw ? safeUrl(raw) : null;
+    return url ? `<a class="e-project-link" href="${E(url)}" target="_blank" rel="noopener">public ↗</a>` : `<span class="muted">—</span>`;
+  };
+  function mspConfirmDelete(kind, id, version) {
+    openDialog(
+      "Delete row",
+      `<div class="dialog-body console-dialog-body"><p class="muted">Delete this ${E(kind)} row? The action is version-guarded and a referenced row is refused (409).</p></div>`,
+      `${button("Delete", "msp-delete-save", `data-kind="${E(kind)}" data-id="${E(id)}" data-version="${E(version == null ? "" : version)}"`, "primary", "close")}${btn("Close", "close-dialog")}`,
+    );
+  }
+  function mspEditRow(kind, id) {
+    const source = mspSource();
+    const rows = kind === "benefit" ? source.benefits : kind === "tranche" ? source.tranches : kind === "stakeholder" ? source.stakeholders : kind === "wbs" ? source.wbs : kind === "register" ? source.registers : kind === "cadence" ? source.cadences : [];
+    const row = list(rows).find((x) => x.id === id);
+    if (!row) return toast("That row is not loaded; reload the page");
+    return mspDialog(kind, "Edit " + kind, row, source);
+  }
+  function mspDefinition(source) {
+    const p = source.programme || {};
+    return `${mspError()}${panel(
+      "Programme",
+      `${kv([
+        ["Name", E(p.name || "—")],
+        ["Key", E(p.key || p.slug || "—")],
+        ["Status", B(p.status || "active", p.status === "active" || !p.status ? "green" : "amber")],
+        ["Version", E(p.version == null ? "—" : "v" + p.version)],
+      ])}${note("The programme row is the store's row. A definition artefact is a document; the gate is its publishable state, not a local approval.")}`,
+      source.readOnly ? "" : button("Edit programme", "msp-programme-edit", "", "small", "edit"),
+    )}${panel(
+      "Definition set",
+      `${table(
+        ["Artefact", "Category", "Publishable", "Version", "Public"],
+        list(source.documents).length
+          ? list(source.documents).map((doc) => `<tr><td><strong>${E(doc.title || doc.category || short(doc.id, 8))}</strong><small class="mono">${E(short(doc.id, 12))}</small></td><td>${E(doc.category || "—")}</td><td>${B(doc.publishable ? "publishable" : "not publishable", doc.publishable ? "green" : "amber")}</td><td>${E(doc.version == null ? "—" : "v" + doc.version)}</td><td>${mspDocLink(doc)}</td></tr>`)
+          : [`<tr><td colspan="5">No definition-set document is published for this project.</td></tr>`],
+      )}${note("A definition artefact is a document row: its producer, reviewer and approver live in its own history. The public page shows only a document that is publishable.")}`,
+      B(`${list(source.documents).length} documents`),
+    )}`;
+  }
+  function mspBenefits(source) {
+    const rows = list(source.benefits);
+    const chosen = rows.find((b) => b.id === v.mspBenefit) || rows[0] || {};
+    const links = list(source.links);
+    return `${mspError()}<div class="v2-split"><div>${panel(
+      "Benefit profiles",
+      `${table(
+        ["Reference", "Benefit", "Category", "Status"],
+        rows.length
+          ? rows.map((b) => `<tr class="${b.id === chosen.id ? "selected" : ""}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="msp-benefit" data-id="${E(b.id)}">${E(b.reference || short(b.id, 8))}</button></td><td><strong>${E(b.description || "—")}</strong><small>${E(b.observable_outcome || "")}</small></td><td>${E(b.category || "—")}</td><td>${B(b.status || "—", b.status === "tracking" || b.status === "Tracking" ? "green" : "amber")}</td></tr>`)
+          : [`<tr><td colspan="4">No benefit profile is recorded.</td></tr>`],
+      )}${source.readOnly ? "" : `<div class="toolbar">${button("New benefit", "msp-benefit-new", "", "small", "plus")}</div>`}`,
+      B(`${rows.length} profiles`),
+    )}</div><div>${panel(
+      "Profile · " + E(chosen.reference || "none"),
+      chosen.id
+        ? `${kv([
+            ["Benefit", E(chosen.description || "—")],
+            ["Category", E(chosen.category || "—")],
+            ["Objectives", E(chosen.objectives || "—")],
+            ["Observable outcome", E(chosen.observable_outcome || "—")],
+            ["KPIs", E(chosen.kpis || "—")],
+            ["Baseline", E(chosen.baseline == null ? "—" : chosen.baseline)],
+            ["Target", E(chosen.target == null ? "—" : chosen.target)],
+            ["Measurement method", E(chosen.measurement_method || "—")],
+            ["Financial value", E(chosen.financial_value || "—")],
+            ["Cost", E(chosen.cost || "—")],
+            ["Capabilities", E(chosen.capabilities || "—")],
+            ["Preconditions", E(chosen.preconditions || "—")],
+            ["Risks", E(chosen.risks || "—")],
+            ["Operational area", E(chosen.operational_area || "—")],
+            ["Status", B(chosen.status || "—", chosen.status === "tracking" || chosen.status === "Tracking" ? "green" : "amber")],
+          ])}${source.readOnly ? "" : `<div class="toolbar">${button("Edit", "msp-benefit-edit", `data-id="${E(chosen.id)}"`, "small", "edit")}${button("Delete", "msp-delete", `data-kind="benefit" data-id="${E(chosen.id)}" data-version="${E(chosen.version)}"`, "small", "close")}${button("Add map edge", "msp-link-new", `data-id="${E(chosen.id)}"`, "small", "plus")}</div>`}`
+        : note("Select a benefit profile, or create the first one."),
+    )}</div></div>${panel(
+      "Benefits map",
+      `${table(
+        ["Output", "Capability", "Operational outcome", "Benefit", "Strategic objective", ""],
+        links.length
+          ? links.map((l) => `<tr><td><strong>${E(l.output_ref || "—")}</strong></td><td>${E(l.capability_ref || "—")}</td><td>${E(l.operational_outcome || "—")}</td><td class="mono">${E(mspName(source, l.benefit_id))}</td><td>${E(l.strategic_objective || "—")}</td><td>${source.readOnly ? "" : button("Unlink", "msp-delete", `data-kind="link" data-id="${E(l.id)}" data-version="${E(l.version)}"`, "small", "close")}</td></tr>`)
+          : [`<tr><td colspan="6">No benefit-map edge is recorded.</td></tr>`],
+      )}${note("Read left to right: an output enables a capability, which changes an operational outcome, which realizes a benefit under a strategic objective.")}`,
+      B(`${links.length} edges`),
+    )}`;
+  }
+  function mspTranches(source) {
+    const rows = list(source.tranches);
+    const chosen = rows.find((t) => t.id === v.mspTranche) || rows[0] || {};
+    const reviews = list(source.reviews).filter((r) => !chosen.id || r.tranche_id === chosen.id);
+    return `${mspError()}<div class="v2-split"><div>${panel(
+      "Tranches",
+      `${table(
+        ["#", "State", "Review at", "Baseline"],
+        rows.length
+          ? rows.map((t) => `<tr class="${t.id === chosen.id ? "selected" : ""}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="msp-tranche" data-id="${E(t.id)}">${E(t.number)}</button></td><td>${B(t.state || "planned", t.state === "reviewed" ? "green" : "amber")}</td><td>${E(t.review_at || "—")}</td><td>${E(t.baseline_ref || "—")}</td></tr>`)
+          : [`<tr><td colspan="4">No tranche is recorded.</td></tr>`],
+      )}${source.readOnly ? "" : `<div class="toolbar">${button("New tranche", "msp-tranche-new", "", "small", "plus")}</div>`}`,
+      B(`${rows.length} tranches`),
+    )}</div><div>${panel(
+      "Review · tranche " + E(chosen.number == null ? "—" : chosen.number),
+      chosen.id
+        ? `${kv([
+            ["Tranche", E(String(chosen.number))],
+            ["State", B(chosen.state || "planned", chosen.state === "reviewed" ? "green" : "amber")],
+            ["Entry criteria", E(chosen.entry_criteria || "—")],
+            ["Exit criteria", E(chosen.exit_criteria || "—")],
+            ["Baseline ref", E(chosen.baseline_ref || "—")],
+            ["Review at", E(chosen.review_at || "—")],
+          ])}${source.readOnly ? "" : `<div class="toolbar">${button("Edit", "msp-tranche-edit", `data-id="${E(chosen.id)}"`, "small", "edit")}${button("Record review", "msp-review", `data-id="${E(chosen.id)}"`, "small", "shield")}${button("Delete", "msp-delete", `data-kind="tranche" data-id="${E(chosen.id)}" data-version="${E(chosen.version)}"`, "small", "close")}</div>`}`
+        : note("Select a tranche, or create the first one."),
+    )}</div></div>${panel(
+      "Recorded reviews",
+      table(
+        ["Tranche", "Decision", "Evidence", "At"],
+        reviews.length
+          ? reviews.map((r) => `<tr><td>${E(String(r.tranche_number == null ? short(r.tranche_id, 8) : r.tranche_number))}</td><td>${B(r.decision || "—", r.decision === "continue" ? "green" : r.decision === "stop" ? "bad" : "amber")}</td><td><small>${E(JSON.stringify(r.evidence || {}))}</small></td><td><small>${E(r.created_at || r.reviewed_at || "—")}</small></td></tr>`)
+          : [`<tr><td colspan="4">No review is recorded. A review with no evidence is refused by the action.</td></tr>`],
+      ),
+    )}`;
+  }
+  function mspRealization(source) {
+    const rows = list(source.transitions);
+    const benefits = list(source.benefits);
+    return `${mspError()}${panel(
+      "Transition and measurement",
+      `${table(
+        ["Benefit", "Baseline measured", "Readiness", "Enacted", "Post measured", "Legacy retired", ""],
+        rows.length
+          ? rows.map((r) => `<tr><td class="mono">${E(mspName(source, r.benefit_id))}</td><td><small>${E(r.baseline_measured_at || "not measured")}</small></td><td><small>${E(typeof r.readiness === "object" ? JSON.stringify(r.readiness) : r.readiness || "—")}</small></td><td><small>${E(r.enacted_at || "—")}</small></td><td><small>${E(r.post_measured_at || "—")}</small></td><td><small>${E(r.retired_at || "—")}</small></td><td>${source.readOnly ? "" : button("Update", "msp-transition", `data-id="${E(r.benefit_id)}"`, "small", "edit")}</td></tr>`)
+          : [`<tr><td colspan="7">No transition is recorded.</td></tr>`],
+      )}${note("The baseline is measured before the transition; a benefit with no measured baseline cannot claim an improvement.")}`,
+      source.readOnly ? "" : button("Record transition", "msp-transition-new", "", "small", "run"),
+    )}${panel(
+      "Profiles",
+      table(["Reference", "Observable outcome", "Status"], benefits.length ? benefits.map((b) => `<tr><td class="mono">${E(b.reference || short(b.id, 8))}</td><td>${E(b.observable_outcome || "—")}</td><td>${B(b.status || "—", b.status === "tracking" || b.status === "Tracking" ? "green" : "amber")}</td></tr>`) : [`<tr><td colspan="3">No benefit profile is recorded.</td></tr>`]),
+    )}`;
+  }
+  function mspStakeholders(source) {
+    const rows = list(source.stakeholders);
+    const chosen = rows.find((s) => s.id === v.mspStakeholder) || rows[0] || {};
+    return `${mspError()}<div class="v2-split"><div>${panel(
+      "Stakeholders",
+      `${table(
+        ["Name", "Importance", "Influence", "Support"],
+        rows.length
+          ? rows.map((s) => `<tr class="${s.id === chosen.id ? "selected" : ""}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="msp-stakeholder" data-id="${E(s.id)}">${E(s.name || short(s.id, 8))}</button></td><td>${E(s.importance || "—")}</td><td>${E(s.influence || "—")}</td><td>${B(s.support_level || "—", s.support_level === "supportive" ? "green" : "amber")}</td></tr>`)
+          : [`<tr><td colspan="4">No stakeholder profile is recorded.</td></tr>`],
+      )}${source.readOnly ? "" : `<div class="toolbar">${button("New stakeholder", "msp-stakeholder-new", "", "small", "plus")}</div>`}`,
+      B(`${rows.length} profiles`),
+    )}</div><div>${panel(
+      "Profile · " + E(chosen.name || "none"),
+      chosen.id
+        ? `${kv([
+            ["Name", E(chosen.name || "—")],
+            ["Concerns", E(chosen.concerns || "—")],
+            ["Sensitivities", E(chosen.sensitivities || "—")],
+            ["Importance", E(chosen.importance || "—")],
+            ["Influence", E(chosen.influence || "—")],
+            ["Interest", E(chosen.interest || "—")],
+            ["Exposure", E(chosen.exposure || "—")],
+            ["Support level", E(chosen.support_level || "—")],
+            ["Support trend", E(chosen.support_trend || "—")],
+            ["Engagement target", E(chosen.engagement_target || "—")],
+            ["Benefits", E(chosen.benefits || "—")],
+            ["Disbenefits", E(chosen.disbenefits || "—")],
+          ])}${source.readOnly ? "" : `<div class="toolbar">${button("Edit", "msp-stakeholder-edit", `data-id="${E(chosen.id)}"`, "small", "edit")}${button("Delete", "msp-delete", `data-kind="stakeholder" data-id="${E(chosen.id)}" data-version="${E(chosen.version)}"`, "small", "close")}</div>`}`
+        : note("Select a stakeholder, or create the first one."),
+    )}</div></div>`;
+  }
+  const MSP_TABS = ["Definition", "Benefits map & profiles", "Tranches & reviews", "Benefits realization", "Stakeholders"];
+  function mspDefinitionBody(tab) {
+    const source = mspSource();
+    if (consoleOn() && !msp().loaded && !msp().error) {
+      return note("Loading the programme store…");
+    }
+    return (
+      tab === "Definition"
+        ? mspDefinition(source)
+        : tab === "Benefits map & profiles"
+          ? mspBenefits(source)
+          : tab === "Tranches & reviews"
+            ? mspTranches(source)
+            : tab === "Benefits realization"
+              ? mspRealization(source)
+              : mspStakeholders(source)
+    );
+  }
+  function programmeDefinitionLive() {
+    if (!msp().loaded && !msp().loading) consoleLoadMsp();
+    const tab = MSP_TABS.includes(v.tab.programme) ? v.tab.programme : "Definition";
+    return `<div class="page enterprise">${heading(
+      "Programme definition",
+      "The programme's mandate, definition artefacts, benefit profiles and map, tranches and reviews, realization and stakeholders — read from the programme store.",
+      `${route("Portfolio", "portfolio", "", "layers")}${route("Plan & WBS", "plan", "", "board")}`,
+      "PORTFOLIO & PLAN",
+    )}${consoleRibbon("The programme definition, benefits, tranches, realization and stakeholder profiles are the store's own rows.", true)}${tabs(MSP_TABS, tab, "programme")}${mspDefinitionBody(tab)}</div>`;
+  }
+  function programmeDefinitionSnapshot() {
+    const tab = MSP_TABS.includes(v.tab.programme) ? v.tab.programme : "Definition";
+    return `<div class="page enterprise">${heading(
+      "Programme definition",
+      "The programme's definition set, benefits, tranches, realization and stakeholders from the published snapshot.",
+      `${route("Portfolio", "portfolio", "", "layers")}${route("Plan & WBS", "plan", "", "board")}`,
+      "PORTFOLIO & PLAN",
+    )}${consoleRibbon("The published programme snapshot. Read-only: sign in at the app origin to operate the programme.", true)}${tabs(MSP_TABS, tab, "programme")}${mspDefinitionBody(tab)}</div>`;
+  }
+
   // Signed in, every programme surface reads the tenant's own rows; on the public pack the
   // snapshot's real rows; on a clean checkout the design study's fixtures. The ribbon says
   // which one is in front of the reader.
@@ -3695,12 +4213,13 @@ window.installV2 = function (api, enterprise) {
     "documents",
     "contribute",
     "architecture",
+    "programme",
   ]);
 
   function publicSidebar() {
     const projectCount = live ? snapshotProjects().length : 0;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Public programme<small>conveyor.nonagentic.ai/design</small></span></div><nav>
-      <div class="nav-group"><div class="nav-label">PROGRAMME</div>${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("plan", "Plan &amp; WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("documents", "Documents", "file")}${N("contribute", "Contribute", "grid")}${N("architecture", "System architecture", "model")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>${live ? "LIVE programme" : "No snapshot loaded"}</div></div>`;
+      <div class="nav-group"><div class="nav-label">PROGRAMME</div>${N("portfolio", "Portfolio", "layers")}${live ? N("programme", "Programme definition", "shield") : ""}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("plan", "Plan &amp; WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("documents", "Documents", "file")}${N("contribute", "Contribute", "grid")}${N("architecture", "System architecture", "model")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>${live ? "LIVE programme" : "No snapshot loaded"}</div></div>`;
   }
 
   function sidebar() {
@@ -3728,6 +4247,7 @@ window.installV2 = function (api, enterprise) {
   function consolePortfolio() {
     if (!cs.loaded && !cs.loading && !cs.error) consoleLoad();
     consoleLoadRegister();
+    consoleLoadMsp();
     const rows = consoleProjects();
     const index = new Map(cs.issues.map((row) => [String(row.number), row]));
     // No programme row is a real answer for a tenant: render the absence. Naming a fixture
@@ -3778,8 +4298,13 @@ window.installV2 = function (api, enterprise) {
         plan ? `<a class="e-project-link" href="${E(plan)}">plan ↗</a>` : "—"
       }</td></tr>`;
     });
-    const deps = [];
-    rows.forEach((project) =>
+    // Typed edges are the T1 aggregate (`project_dependencies`). The seed's `meta.depends_on`
+    // keys remain visible as a legacy projection when no typed edge has been recorded.
+    const typed = list(msp().dependencies);
+    const deps = typed.map(
+      (d) => `<tr><td class="mono">${E(mspProjectName(d.from_project))}</td><td>→</td><td class="mono">${E(mspProjectName(d.to_project))}</td><td>${B(d.kind || "—")}</td><td>${E(d.status || "—")}</td><td>${button("Delete", "msp-delete", `data-kind="dependency" data-id="${E(d.id)}"`, "small", "close")}</td></tr>`,
+    );
+    if (!typed.length) rows.forEach((project) =>
       list((project.meta || {}).depends_on).forEach((key) => {
         const dep = rows.find((row) => row.key === key) || null;
         deps.push(
@@ -3788,7 +4313,7 @@ window.installV2 = function (api, enterprise) {
           )}</td><td>${B(
             dep ? dep.status : "missing",
             dep && (dep.status === "closed" || dep.status === "archived") ? "green" : "amber",
-          )}</td></tr>`,
+          )}</td><td><span class="muted">seed</span></td></tr>`,
         );
       }),
     );
@@ -3811,28 +4336,32 @@ window.installV2 = function (api, enterprise) {
       ],
       ["Cards", `${rows.filter((p) => cardStats(p)).length} project boards loaded`],
     ]);
+    const programmeRow = msp().programme || programme || {};
+    const inFlightRows = list(msp().inFlight);
     const content =
       tab === "Dependencies"
         ? panel(
             "Project dependencies",
-            deps.length
-              ? `${table(["Project", "", "Depends on", "Name", "State"], deps)}${note(
-                  "The edges are the seed's <span class='mono'>meta.depends_on</span> keys joined to the tenant's projects. A project-level dependency row (typed <span class='mono'>blocks | needs | supersedes | informs</span>, cycle refused) is the T1 aggregate and does not exist yet.",
-                )}`
-              : note("No project declares a dependency."),
-            B(`${deps.length} edges`),
+            `${deps.length
+              ? table(["Project", "", "Dependency", "Kind / name", "State", ""], deps)
+              : note("No dependency edge is recorded. An edge is typed blocks · needs · supersedes · informs; a cycle is refused by the action.")}${note("The typed edges come from <span class='mono'>project_dependencies</span>; the seed's <span class='mono'>meta.depends_on</span> keys are shown only where no typed edge exists.")}`,
+            `${B(`${deps.length} edges`)}${button("New dependency", "msp-dependency-new", "", "small", "plus")}`,
           )
         : tab === "Programme"
           ? panel(
               "Programme",
-              `${summary}${programmeQueue(rows, list(cs.register.items))}${note(
-                "Shared configuration, WSJF, cadence and metering are V2 aggregates (T1/T10/T11) that do not exist yet. This page shows the rows the platform owns today.",
-              )}`,
-              B(programme ? programme.status || "active" : "no programme row", programme ? "green" : ""),
+              `${summary}${programmeQueue(rows, list(cs.register.items))}${kv([
+                ["Programme row", E(programmeRow.name || "—")],
+                ["Key", E(programmeRow.key || programmeRow.slug || "—")],
+                ["Status", B(programmeRow.status || "—", programmeRow.status === "active" ? "green" : "amber")],
+                ["Version", E(programmeRow.version == null ? "—" : "v" + programmeRow.version)],
+                ["In flight", `${inFlightRows.length} projects in the tenant's in-flight set`],
+              ])}${inFlightRows.length ? table(["Project", "Status"], inFlightRows.map((row) => `<tr><td><strong>${E(row.name || mspProjectName(row.id))}</strong><small>${E(row.key || "")}</small></td><td>${B(row.status || "—", row.status === "active" ? "green" : "amber")}</td></tr>`)) : note("portfolio.in_flight returned no project.")}${note("Programme configuration is a store row (programmes.update). The in-flight set is the tenant's portfolio configuration, read by portfolio.in_flight.")}`,
+              `${button("Edit programme", "msp-programme-edit", "", "small", "edit")}${B(programmeRow.status || "no programme row", programmeRow.status === "active" ? "green" : "")}`,
             )
           : panel(
               "In-flight portfolio",
-              `${table(["Project", "Status", "Units", "Cards", "Blockers", "Plan"], inFlight)}${note(
+              `${table(["Project", "Status", "Units", "Cards", "Blockers", "Plan"], inFlight)}${inFlightRows.length ? panel("portfolio.in_flight", table(["Project", "Key", "Status"], inFlightRows.map((row) => `<tr><td>${E(row.name || "—")}</td><td class="mono">${E(row.key || "—")}</td><td>${B(row.status || "—", row.status === "active" ? "green" : "amber")}</td></tr>`)), B(`${inFlightRows.length} in flight`)) : ""}${note(
                 "Every row is a tenant project. Units are the GitHub issues linked on the project; cards are the project's board; a card is complete when its lane kind is done or archive.",
               )}`,
               `${B(`${rows.length} projects`, "green")}${button(
@@ -3903,10 +4432,22 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------ Programme definition (MSP) */
-  // SPEC_V2 §8.3 / D62: the definition set, benefit profiles and the benefits map, tranches and
-  // their reviews, and benefits realization. Local fixtures only — no V2 table or action exists.
-  // The pages map gates every non-public destination, so the public site never renders this page.
+  // SPEC_V2 §8.3 / D62. One source, fail closed: signed in the store's actions; signed out the
+  // published snapshot read-only; `?design=1` the study fixtures; otherwise the rows are not
+  // published and no fixture is rendered on the live site.
   function programmeDefinitionPage() {
+    if (consoleOn()) return programmeDefinitionLive();
+    if (live && live.msp) return programmeDefinitionSnapshot();
+    if (studyOn()) return programmeDefinitionStudy();
+    return `<div class="page enterprise">${heading(
+      "Programme definition",
+      "The programme's definition set, benefits, tranches, realization and stakeholders.",
+      `${route("Portfolio", "portfolio", "", "layers")}`,
+      "PORTFOLIO & PLAN",
+    )}${note("The programme-definition rows are not published on this pack. This destination is part of the conveyor design study and is available after signing in at the app origin.", "bad")}</div>`;
+  }
+
+  function programmeDefinitionStudy() {
     const tab = v.tab.programme || "Definition";
     const def = F.programmeDefinition;
     const benefit = F.benefits.find((b) => b.id === v.benefit) || F.benefits[0];
@@ -4017,14 +4558,16 @@ window.installV2 = function (api, enterprise) {
           ? benefits
           : tab === "Tranches & reviews"
             ? tranches
-            : realization;
+            : tab === "Benefits realization"
+              ? realization
+              : panel("Stakeholders", note("The design study carries no stakeholder fixture. The live page reads stakeholder profiles from the programme store; the public snapshot carries the published profiles."));
 
     return `<div class="page enterprise">${heading(
       "Programme definition",
       "The programme's mandate, brief, blueprint, business case, benefits, tranches and realized outcomes — the MSP layer of SPEC_V2.",
       `${route("Portfolio", "portfolio", "", "layers")}${route("Plan & WBS", "plan", "", "board")}`,
       "PORTFOLIO & PLAN",
-    )}${ribbon("MSP programme definition and benefits realization: programme_tranche, benefit_profile, benefit_link, benefit_transition and the extended governed_asset kinds. Proposed in T1/T10; D62.")}${tabs(["Definition", "Benefits map & profiles", "Tranches & reviews", "Benefits realization"], tab, "programme")}${content}</div>`;
+    )}${note("Design study · these are fixtures, not published rows. The live page reads the programme store when signed in, and the published snapshot read-only on the public site.")}${tabs(MSP_TABS, tab, "programme")}${content}</div>`;
   }
 
   /* --------------------------------------- Architecture capability (TOGAF ADM) */
@@ -4318,33 +4861,59 @@ window.installV2 = function (api, enterprise) {
 
   /* ------------------------------------------------------------------ Plan */
   function plan() {
+    const signed = consoleOn();
+    if (signed) consoleLoadMsp();
     const work = live ? (live.work || {}) : {};
     const liveBoards = list(work.boards).length > 0;
-    // On an origin that can sign in, Boards is the first surface even before signing in: that
-    // is where the sign-in prompt is. file:// and the snapshot-less homepage keep WBS.
+    const snapshotMsp = !signed && !!(live && live.msp);
     const consoleCapable = !!(C && C.config());
-    const signed = consoleOn();
-    const tab = signed
-      ? v.tab.plan || (liveBoards || consoleCapable ? "Boards" : "WBS")
-      : "Boards";
-    const change = F.changes[0];
-    const content =
-      tab === "Boards"
-        ? planBoards(work)
-        : tab === "WBS"
-        ? `${panel("Work breakdown", `${table(["WBS", "Kind", "Deliverable / work package", "Acceptance", "Evidence", "State"], F.wbs.map((n) => `<tr><td class="mono">${E(n.id)}</td><td>${E(n.kind)}</td><td><strong>${E(n.name)}</strong></td><td>${E(n.accept)}</td><td>${E(n.evidence)}</td><td>${B(n.state, n.state === "Accepted" ? "green" : n.state === "Blocked" ? "amber" : "")}</td></tr>`))}${note("A WBS node is accepted when its acceptance criteria are met by an artefact or run — not when a checkbox is ticked.")}`, B("5 nodes"))}`
-        : tab === "Baseline vs forecast"
-          ? `<div class="v2-split"><div>${panel("Baseline B3 (frozen)", `${kv([["Approved", E(F.baseline.approved)], ["Scope", E(F.baseline.scope)], ["Schedule", E(F.baseline.schedule)], ["Cost", E(F.baseline.cost)], ["State", B(F.baseline.state, "green")]])}${note("A baseline is a frozen, approved snapshot. It is not recomputed.")}`)}</div><div>${panel("Forecast (computed)", `${kv([["Scope", "44 deliverables <strong class='e-amber'>+2</strong>"], ["Schedule", "2026-12-27 <strong class='e-amber'>+9 d</strong>"], ["Cost", "€49.4m <strong class='e-amber'>+€0.8m</strong>"], ["Risk", "medium · identity contract"], ["Run pins", "unchanged · capability@17"]])}${note("Forecast is computed from current rows. A variance is not a change until a change request is approved.")}`)}</div></div>${note("Plan ≠ evidence: a deliverable needs an artefact/run, not a tick. Baseline ≠ forecast: a forecast never rewrites the approved baseline.", "ok")}`
-          : tab === "Registers"
-            ? `${panel("One generic register", `<p class="muted">One table, six kinds — risk · issue · assumption · dependency · benefit · change. The V1 lesson: five PM tables measured zero use.</p>${table(["ID", "Kind", "Title", "Owner", "Status", "Severity", "Link"], F.registers.map((r) => `<tr><td class="mono">${E(r.id)}</td><td>${B(r.kind)}</td><td>${E(r.title)}</td><td>${E(r.owner)}</td><td>${E(r.status)}</td><td>${E(r.severity)}</td><td><small>${E(r.note)}</small></td></tr>`))}`, button("New register item", "reg-new", "", "small", "plus"))}${note("A risk can open a mitigation card; a dependency can link two projects; a benefit is measured at closure (planned vs realised).")}`
-            : `<div class="v2-split"><div>${panel("Change control · CR-018", `<h3>${E(change.title)}</h3>${kv([["Changes baseline", E(change.baseline)], ["Impact", E(change.impact)], ["Recorded rationale", change.rationale ? E(change.rationale) : "<span class='e-amber'>required for approve or return</span>"], ["Existing run pins", "unchanged · a new attempt captures B4"]])}<textarea data-v2-input="rationale" rows="3" placeholder="Record the person's rationale" aria-label="Change rationale">${E(change.rationale)}</textarea><div class="row" style="margin-top:10px">${button("Approve new baseline", "change-approve", "", "primary", "shield")}${button("Return for analysis", "change-return", "", "", "replay")}</div>${v.review === "change-blocked" ? note("<strong>422 change_rationale_required</strong> · a person's rationale is required to approve or return a change request. No baseline moved.", "bad") : v.review === "change-ok" ? note("<strong>Approved locally</strong> · baseline B4 drafted; existing runs keep B3 pins. A new sample attempt captures B4.", "ok") : ""}`)}</div><div>${panel("Impact analysis", `${kv([["Scope", "2 deliverables"], ["Schedule", "+9 days"], ["Cost", "+€0.8m"], ["Risk", "medium · identity contract"], ["Approval", "human · programme gate"]])}${note("The change approval, the baseline review and the programme gate are separate decisions.")}`)}</div></div>`;
+    const names = signed || snapshotMsp
+      ? ["Boards", "WBS", "Baseline vs forecast", "Registers", "Cadence"]
+      : ["Boards"];
+    const tab = names.includes(v.tab.plan) ? v.tab.plan : "Boards";
+    const content = tab === "Boards" ? planBoards(work) : planMspContent(tab);
     const planRibbon =
       tab === "Boards"
         ? consoleOn()
           ? `<div class="v2-ribbon live" role="note"><strong>LIVE</strong><span>Operator console · the platform's own projects, boards and cards, joined to the GitHub issue registry. Signed in as ${E(C.status().name)} · tenant ${E(C.status().tenant)}.</span><span class="v2-src">API · no snapshot</span></div>`
           : ribbon("LIVE · GitHub issues are read at publish and joined to the conveyor's own cards and runs. A unit with no real card is shown as not intaken; nothing is seeded.", liveBoards)
-        : ribbon("V2 plan spine: wbs_node, project_baseline, project_register_item (six kinds), project_dependency and change control. Proposed in T1.");
-    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: the programme's GitHub issues joined to its real cards and runs, then the WBS, a frozen baseline against a computed forecast, one six-kind register and controlled change.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${signed ? tabs(["Boards", "WBS", "Baseline vs forecast", "Registers", "Change control"], tab, "plan") : tabs(["Boards"], "Boards", "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${signed ? `${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}` : ""}<span class="muted">The WBS, baseline, registers and change control are the V2 plan spine, proposed in T1; the public site carries the programme's boards.</span></div></div>`;
+        : consoleRibbon("The plan spine reads the programme store: WBS nodes, baselines, registers and cadences. Signed out it is the published snapshot, read-only.", signed || snapshotMsp);
+    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: WBS, frozen baselines, one six-kind register and cadence. Boards join GitHub issues to the conveyor's own cards and runs.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(names, tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${signed ? `${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}` : ""}<span class="muted">Change control is T10 and stays out of this surface.${snapshotMsp ? " The published snapshot is read-only." : ""}</span></div></div>`;
+  }
+
+  function planMspContent(tab) {
+    const source = mspSource();
+    if (consoleOn() && !msp().loaded && !msp().error) return note("Loading the plan spine…");
+    if (tab === "WBS") {
+      const rows = list(source.wbs);
+      return `${mspError()}${panel("Work breakdown", `${table(
+        ["WBS", "Kind", "Deliverable / work package", "Acceptance", "State", ""],
+        rows.length ? rows.map((n) => `<tr><td class="mono">${E(n.code || short(n.id, 8))}</td><td>${E(n.kind || "—")}</td><td><strong>${E(n.title || "—")}</strong><small>${E(n.body || "")}</small></td><td>${E(typeof n.acceptance === "object" ? JSON.stringify(n.acceptance) : n.acceptance || "—")}</td><td>${B(n.status || "planned", n.status === "accepted" ? "green" : n.status === "blocked" ? "amber" : "")}</td><td>${source.readOnly ? "" : `${button("Edit", "msp-wbs-edit", `data-id="${E(n.id)}"`, "small", "edit")}${button("Delete", "msp-delete", `data-kind="wbs" data-id="${E(n.id)}" data-version="${E(n.version)}"`, "small", "close")}`}</td></tr>`)
+          : [`<tr><td colspan="6">No WBS node is recorded for the definition-set project.</td></tr>`]
+      )}${note("A node is accepted when its acceptance criteria are met by an artefact or a run — not when a checkbox is ticked.")}`, source.readOnly ? "" : button("New WBS node", "msp-wbs-new", "", "small", "plus"))}`;
+    }
+    if (tab === "Baseline vs forecast") {
+      const rows = list(source.baselines);
+      return `${mspError()}${panel("Frozen baselines", `${table(
+        ["Kind", "Taken at", "Reference", "Version"],
+        rows.length ? rows.map((b) => `<tr><td>${B(b.kind || "—")}</td><td>${E(b.taken_at || b.created_at || "—")}</td><td class="mono">${E(b.id || "—")}</td><td>${E(b.version == null ? "—" : "v" + b.version)}</td></tr>`)
+          : [`<tr><td colspan="4">No baseline is recorded. A baseline is a frozen, approved snapshot and is never recomputed.</td></tr>`]
+      )}${note("A forecast is derived from current rows; a variance is not a change until change control (T10) approves it.")}`, source.readOnly ? "" : `<div class="toolbar">${["scope", "schedule", "cost"].map((kind) => button("Take " + kind, "msp-baseline-take", `data-kind="${kind}"`, "small", "shield")).join("")}</div>`)}${panel("Forecast", `${kv([["Scope", "computed from the WBS rows"], ["Schedule", "computed from the node dates"], ["Cost", "computed from the register and job rows"]])}${note("Change control is T10 and is not part of this surface; a forecast never rewrites an approved baseline.")}`)}`;
+    }
+    if (tab === "Registers") {
+      const rows = list(source.registers);
+      return `${mspError()}${panel("One generic register", `<p class="muted">One table, six kinds — risk · issue · assumption · dependency · benefit · change.</p>${table(
+        ["Kind", "Title", "Status", "Severity", ""],
+        rows.length ? rows.map((r) => `<tr><td>${B(r.kind || "—")}</td><td><strong>${E(r.title || "—")}</strong><small>${E(r.body || "")}</small></td><td>${E(r.status || "—")}</td><td>${E(r.severity || "—")}</td><td>${source.readOnly ? "" : `${button("Edit", "msp-register-edit", `data-id="${E(r.id)}"`, "small", "edit")}${button("Delete", "msp-delete", `data-kind="register" data-id="${E(r.id)}" data-version="${E(r.version)}"`, "small", "close")}`}</td></tr>`)
+          : [`<tr><td colspan="5">No register item is recorded.</td></tr>`]
+      )}${note("A risk can open a mitigation card; a dependency can link two projects; a benefit is measured at closure.")}`, source.readOnly ? "" : button("New register item", "msp-register-new", "", "small", "plus"))}`;
+    }
+    const rows = list(source.cadences);
+    return `${mspError()}${panel("Cadence", `${table(
+      ["Kind", "Period", "State", ""],
+      rows.length ? rows.map((c) => `<tr><td>${B(c.kind || "—")}</td><td><strong>${E(c.period || "—")}</strong></td><td>${E(c.state || "—")}</td><td>${source.readOnly ? "" : `${button("Edit", "msp-cadence-edit", `data-id="${E(c.id)}"`, "small", "edit")}${button("Delete", "msp-delete", `data-kind="cadence" data-id="${E(c.id)}" data-version="${E(c.version)}"`, "small", "close")}`}</td></tr>`)
+        : [`<tr><td colspan="4">No cadence is recorded.</td></tr>`]
+    )}${note("A tranche is not a PI: the PI cadence is the delivery rhythm inside it; the review is the sponsoring group's decision to continue, pause or stop on evidence.")}`, source.readOnly ? "" : button("New cadence", "msp-cadence-new", "", "small", "plus"))}`;
   }
 
   /* The plan is a join, not a seed: the project's GitHub issues (the registry fetched at
@@ -5794,6 +6363,96 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         break;
       case "blocked":
         toast(d.msg || "Refused by the local design fixture");
+        break;
+      case "msp-programme-edit":
+        mspDialog("programme", "Edit programme", msp().programme || {}, mspSource());
+        break;
+      case "msp-benefit-new":
+        mspDialog("benefit", "New benefit profile", {}, mspSource());
+        break;
+      case "msp-benefit-edit":
+        mspEditRow("benefit", d.id);
+        break;
+      case "msp-benefit":
+        v.mspBenefit = d.id;
+        render();
+        break;
+      case "msp-link-new":
+        v.mspBenefit = d.id;
+        mspDialog("link", "Add benefit-map edge", { benefit_id: d.id }, mspSource());
+        break;
+      case "msp-transition":
+        v.mspBenefit = d.id;
+        mspDialog("transition", "Record transition", list(mspSource().transitions).find((x) => x.benefit_id === d.id) || { benefit_id: d.id }, mspSource());
+        break;
+      case "msp-transition-new":
+        mspDialog("transition", "Record transition", { benefit_id: v.mspBenefit || "" }, mspSource());
+        break;
+      case "msp-tranche":
+        v.mspTranche = d.id;
+        render();
+        break;
+      case "msp-tranche-new":
+        mspDialog("tranche", "New tranche", {}, mspSource());
+        break;
+      case "msp-tranche-edit":
+        mspEditRow("tranche", d.id);
+        break;
+      case "msp-review":
+        mspDialog("review", "Tranche review", { id: d.id }, mspSource());
+        break;
+      case "msp-stakeholder":
+        v.mspStakeholder = d.id;
+        render();
+        break;
+      case "msp-stakeholder-new":
+        mspDialog("stakeholder", "New stakeholder profile", {}, mspSource());
+        break;
+      case "msp-stakeholder-edit":
+        mspEditRow("stakeholder", d.id);
+        break;
+      case "msp-wbs-new":
+        mspDialog("wbs", "New WBS node", {}, mspSource());
+        break;
+      case "msp-wbs-edit":
+        mspEditRow("wbs", d.id);
+        break;
+      case "msp-register-new":
+        mspDialog("register", "New register item", {}, mspSource());
+        break;
+      case "msp-register-edit":
+        mspEditRow("register", d.id);
+        break;
+      case "msp-cadence-new":
+        mspDialog("cadence", "New cadence", {}, mspSource());
+        break;
+      case "msp-cadence-edit":
+        mspEditRow("cadence", d.id);
+        break;
+      case "msp-dependency-new":
+        mspDialog("dependency", "New dependency", {}, mspSource());
+        break;
+      case "msp-delete":
+        mspConfirmDelete(d.kind, d.id, d.version);
+        break;
+      case "msp-delete-save":
+        mspDelete(d.kind, d.id, d.version).then((ok) => {
+          if (ok) {
+            const modal = document.getElementById("dialog");
+            if (modal) modal.close();
+          }
+        });
+        break;
+      case "msp-save":
+        mspSave(d.kind, d.id, d.version).then((ok) => {
+          if (ok) {
+            const modal = document.getElementById("dialog");
+            if (modal) modal.close();
+          }
+        });
+        break;
+      case "msp-baseline-take":
+        mspWrite("baselines.take", { project_id: mspSource().projectId, kind: d.kind }, null, "Baseline taken · " + d.kind);
         break;
       default:
         break;

@@ -79,6 +79,11 @@ async fn approved(pg: &support::Pg, tenant: TenantId, gate: &str, target: &str) 
 /// that is *not* here and declares no target fails [`every_destructive_action_is_gated_or_listed`],
 /// which is what stops a new one being written without a decision about its gate.
 const UNGATED: &[&str] = &[
+    // #305: the MSP delete surface is destructive and declares no target yet; #283 empties the
+    // whole list by giving every action a target.
+    "benefits.delete",
+    "benefits.unlink",
+    "cadences.delete",
     "cards.archive",
     "channels.unbind",
     "comments.delete",
@@ -97,16 +102,20 @@ const UNGATED: &[&str] = &[
     "pm.close",
     "project_dependencies.delete",
     "projects.close",
+    "registers.delete",
     "repositories.delete",
     "repositories.unlink",
     "secrets.delete",
     "secrets.rotate",
     "stakeholders.delete",
+    "stakeholders.profile_delete",
     "task_lists.delete",
     "tasks.delete",
     "trace_links.delete",
+    "tranches.delete",
     "view_connections.delete",
     "view_objects.delete",
+    "wbs.delete",
     "webhooks.delete",
 ];
 

@@ -130,6 +130,107 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     .await
     .expect("secret");
 
+    // The MSP records (#305): the public window serves them, and the same redaction must apply.
+    let msp_text = format!("snapshot benefit · alice@example.com · token {token}");
+    let benefit: Uuid = sqlx::query_scalar(
+        "INSERT INTO benefit_profile (tenant_id, programme_id, reference, description, category, status)
+         VALUES ($1, $2, 'BEN-SNAP', $3, 'efficiency', 'draft') RETURNING id",
+    )
+    .bind(tenant)
+    .bind(programme)
+    .bind(&msp_text)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("benefit");
+    sqlx::query(
+        "INSERT INTO benefit_link
+            (tenant_id, programme_id, output_ref, capability_ref, operational_outcome,
+             benefit_id, strategic_objective, kind)
+         VALUES ($1, $2, 'T1 plan spine', 'WBS', 'the plan is managed', $3,
+                 'faster delivery', 'benefit')",
+    )
+    .bind(tenant)
+    .bind(programme)
+    .bind(benefit)
+    .execute(&db.super_pool)
+    .await
+    .expect("benefit link");
+    sqlx::query(
+        "INSERT INTO stakeholder_profile (tenant_id, programme_id, name, concerns)
+         VALUES ($1, $2, 'Sponsoring group', 'delivery confidence')",
+    )
+    .bind(tenant)
+    .bind(programme)
+    .execute(&db.super_pool)
+    .await
+    .expect("stakeholder profile");
+    let tranche: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
+         VALUES ($1, $2, 0, 'planned') RETURNING id",
+    )
+    .bind(tenant)
+    .bind(programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("tranche");
+    sqlx::query(
+        "INSERT INTO programme_tranche_review (tenant_id, tranche_id, decision, evidence, reviewed_by)
+         VALUES ($1, $2, 'continue', '{\"baselines\": [\"B0\"]}'::jsonb, $3)",
+    )
+    .bind(tenant)
+    .bind(tranche)
+    .bind(user)
+    .execute(&db.super_pool)
+    .await
+    .expect("tranche review");
+    sqlx::query(
+        "INSERT INTO programme_cadence (tenant_id, programme_id, kind, period)
+         VALUES ($1, $2, 'pi', 'PI-2027.1')",
+    )
+    .bind(tenant)
+    .bind(programme)
+    .execute(&db.super_pool)
+    .await
+    .expect("cadence");
+    sqlx::query(
+        "INSERT INTO wbs_node (tenant_id, project_id, kind, title)
+         VALUES ($1, $2, 'deliverable', 'Snapshot deliverable')",
+    )
+    .bind(tenant)
+    .bind(project)
+    .execute(&db.super_pool)
+    .await
+    .expect("wbs node");
+    sqlx::query(
+        "INSERT INTO project_register_item (tenant_id, project_id, kind, title)
+         VALUES ($1, $2, 'risk', 'Snapshot risk')",
+    )
+    .bind(tenant)
+    .bind(project)
+    .execute(&db.super_pool)
+    .await
+    .expect("register item");
+    let other: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name, programme_id)
+         VALUES ($1, 'SNAP2', 'Snapshot project two', $2) RETURNING id",
+    )
+    .bind(tenant)
+    .bind(programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("second project");
+    sqlx::query(
+        "INSERT INTO project_dependency (tenant_id, programme_id, from_project, to_project, kind)
+         VALUES ($1, $2, $3, $4, 'blocks')",
+    )
+    .bind(tenant)
+    .bind(programme)
+    .bind(project)
+    .bind(other)
+    .execute(&db.super_pool)
+    .await
+    .expect("dependency");
+
     let dir = std::env::temp_dir().join(format!("conveyor-snapshot-{}", Uuid::now_v7()));
     std::fs::create_dir_all(&dir).expect("snapshot dir");
     let issues_path = dir.join("issues.json");
@@ -187,6 +288,38 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
         "card bodies are not selected at all"
     );
     assert!(work.contains("Alice"), "the display name stays public");
+
+    let msp = std::fs::read_to_string(dir.join("msp.json")).expect("msp.json");
+    assert!(msp.contains("BEN-SNAP"), "the benefit profile is public");
+    assert!(
+        msp.contains("Sponsoring group"),
+        "the stakeholder profile is public"
+    );
+    assert!(msp.contains("PI-2027.1"), "the cadence row is public");
+    assert!(
+        msp.contains("Snapshot deliverable"),
+        "the WBS node is public"
+    );
+    assert!(msp.contains("Snapshot risk"), "the register item is public");
+    assert!(msp.contains("blocks"), "the typed dependency is public");
+    assert!(!msp.contains("alice@example.com"), "MSP emails are masked");
+    assert!(
+        msp.contains("***@redacted"),
+        "the MSP email is visibly masked"
+    );
+    assert!(
+        !msp.contains(&token),
+        "an MSP token-shaped string is redacted"
+    );
+    let snapshot_js = std::fs::read_to_string(dir.join("snapshot.js")).expect("snapshot.js");
+    assert!(
+        snapshot_js.contains("\"msp\""),
+        "the wrapper carries the msp section"
+    );
+    assert!(
+        !snapshot_js.contains(&token),
+        "the wrapper redacts the MSP token"
+    );
 
     let secrets = std::fs::read_to_string(dir.join("secrets.json")).expect("secrets.json");
     assert!(
