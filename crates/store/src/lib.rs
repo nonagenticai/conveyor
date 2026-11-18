@@ -54,6 +54,9 @@
 pub mod actions;
 pub mod andon;
 pub mod approval;
+// T9 (SPEC_V2 §8.1, §10.3, D63): the TOGAF ADM store — the artefact repository, the tailored
+// profile, the board, the four contract kinds, the phase gate, compliance and assessments.
+pub mod architecture;
 // #282: the tenant's decision about how one destructive action is gated — whether it needs an
 // approval at all, and whether its requester may decide it. A missing row is the strict default.
 pub mod approval_policy;

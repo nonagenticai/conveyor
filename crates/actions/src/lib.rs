@@ -20,6 +20,8 @@ pub use sqlx;
 pub mod agent_surface;
 // ADR 0007 §5: the `analyse.*` family — the analysis library's invocable surface.
 pub mod analysis;
+// T9 (SPEC_V2 §8.1, §10.3, §10.4, D63): the TOGAF ADM action family.
+pub mod architecture;
 // S17: the benchmark harness — suites, runs, cases.
 pub mod benchmark;
 pub mod board;

@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 29,
+    "exists": 41,
     "extend": 7,
-    "new": 27
+    "new": 15
   },
   "rows": [
     {
@@ -184,9 +184,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "architecture_artifact",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE architecture_artifact"
+        "migrations: CREATE TABLE architecture_artifact"
       ]
     },
     {
@@ -194,9 +194,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "architecture_artifact_entry",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE architecture_artifact_entry"
+        "migrations: CREATE TABLE architecture_artifact_entry"
       ]
     },
     {
@@ -204,9 +204,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "architecture_artifact_link",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE architecture_artifact_link"
+        "migrations: CREATE TABLE architecture_artifact_link"
       ]
     },
     {
@@ -214,9 +214,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "artifact_type",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE artifact_type"
+        "migrations: CREATE TABLE artifact_type"
       ]
     },
     {
@@ -224,9 +224,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "adm_profile",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE adm_profile"
+        "migrations: CREATE TABLE adm_profile"
       ]
     },
     {
@@ -234,9 +234,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "architecture_contract",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE architecture_contract"
+        "migrations: CREATE TABLE architecture_contract"
       ]
     },
     {
@@ -244,9 +244,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "architecture_compliance_review",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE architecture_compliance_review"
+        "migrations: CREATE TABLE architecture_compliance_review"
       ]
     },
     {
@@ -254,9 +254,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "architecture_waiver",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE architecture_waiver"
+        "migrations: CREATE TABLE architecture_waiver"
       ]
     },
     {
@@ -264,9 +264,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "governance_body",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE governance_body"
+        "migrations: CREATE TABLE governance_body"
       ]
     },
     {
@@ -274,9 +274,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "architecture_maturity",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE architecture_maturity"
+        "migrations: CREATE TABLE architecture_maturity"
       ]
     },
     {
@@ -284,9 +284,9 @@
       "spec_ref": "§10.3",
       "kind": "table",
       "concept": "architecture_skill_assessment",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "migrations: no CREATE/ALTER TABLE architecture_skill_assessment"
+        "migrations: CREATE TABLE architecture_skill_assessment"
       ]
     },
     {
@@ -422,9 +422,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "architecture",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: architecture.* absent"
+        "actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)"
       ]
     },
     {

@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "0bbe5f1f61f429072faaf61c05727adebba392eaa6477182f3898b41af79a65c",
-      "bytes": 169284,
+      "sha256": "c39d27fd284804e20f8a66ed146fd1ac3dae5024c37094b9e65bfe447e33ed8f",
+      "bytes": 169528,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -438,8 +438,8 @@
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "e7f36571229ab26353d8259e73e11a9e74764ab0e6502987a822e40edcec03f7",
-      "bytes": 11163,
+      "sha256": "ece098157e014cd59e62f051e7be1f29b8703c4db4ce6fcba130d47c1149c1c8",
+      "bytes": 11198,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -555,8 +555,8 @@
       "path": "docs/plans/T9-architecture-capability.html",
       "source": "docs/plans/T9-architecture-capability.md",
       "section": "Plans",
-      "sha256": "9d13d42b2a2da1a2cdc1f24fe0e2fd9d554574dfa3a262c1a2f5c1fbba3acfed",
-      "bytes": 18159,
+      "sha256": "fd495231d10b1963ed2776fa29ba65886227fa1d8aa3b83f66756fca16affbe8",
+      "bytes": 18554,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {
