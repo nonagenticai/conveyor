@@ -9,6 +9,7 @@ mod common;
 use axum::Router;
 use axum::http::StatusCode;
 use axum::routing::get;
+use chrono::Utc;
 use conveyor_api::Config;
 use conveyor_auth::licence::LicenceSyncClient;
 use conveyor_domain::TenantId;
@@ -852,6 +853,9 @@ fn the_default_schedule_set_is_the_maintenance_kinds() {
             "eval.run.tick",
             "eval.reap",
             "eval.prune",
+            // S16 W8: the inference ledger and the prompt audit's retention producers.
+            "inference_call.prune",
+            "prompt_audit.prune",
             "approval.expire",
             "approval.closed.emit",
             // S06d: multicast the interaction, then close the losing recipients.
@@ -1174,5 +1178,139 @@ async fn eval_prune_removes_old_traces_and_keeps_fresh_ones_in_its_tenant_only()
         count(b_old).await,
         1,
         "B's old transcript is untouched: the prune is tenant-scoped"
+    );
+}
+
+#[tokio::test]
+async fn s16_prunes_are_scheduled_and_delete_only_the_callers_tenant() {
+    use conveyor_store::prune::{INFERENCE_CALL_RETENTION_DAYS, PROMPT_AUDIT_RETENTION_DAYS};
+
+    let db = common::TestDb::fresh().await;
+    let (a, b) = tenants(&db).await;
+    schedule::seed_defaults(&db.runtime)
+        .await
+        .expect("seed the default schedules");
+
+    let seed_inference = |tenant: TenantId, age: i64| {
+        let pool = db.super_pool.clone();
+        async move {
+            sqlx::query_scalar::<_, Uuid>(
+                "INSERT INTO inference_call (tenant_id, caller_kind, model, created_at)
+                 VALUES ($1, 'other', 'stub-model', now() - make_interval(days => $2))
+                 RETURNING id",
+            )
+            .bind(tenant.as_uuid())
+            .bind(age as i32)
+            .fetch_one(&pool)
+            .await
+            .expect("seed an inference call")
+        }
+    };
+    let seed_audit = |tenant: TenantId, age: i64| {
+        let pool = db.super_pool.clone();
+        async move {
+            sqlx::query_scalar::<_, Uuid>(
+                "INSERT INTO prompt_audit
+                     (tenant_id, scope, target_model, prompt_ref, status, created_at, updated_at)
+                 VALUES ($1, '{\"surfaces\":[\"copilot\"]}', 'audit-model',
+                         'prompt_audit@1', 'succeeded',
+                         now() - make_interval(days => $2), now() - make_interval(days => $2))
+                 RETURNING id",
+            )
+            .bind(tenant.as_uuid())
+            .bind(age as i32)
+            .fetch_one(&pool)
+            .await
+            .expect("seed a prompt audit")
+        }
+    };
+
+    let a_old_call = seed_inference(a, INFERENCE_CALL_RETENTION_DAYS + 1).await;
+    let a_fresh_call = seed_inference(a, 1).await;
+    let b_old_call = seed_inference(b, INFERENCE_CALL_RETENTION_DAYS + 1).await;
+    let a_old_audit = seed_audit(a, PROMPT_AUDIT_RETENTION_DAYS + 1).await;
+    let a_fresh_audit = seed_audit(a, 1).await;
+    let b_old_audit = seed_audit(b, PROMPT_AUDIT_RETENTION_DAYS + 1).await;
+
+    // The scheduler half: both rows are now due for A and materialise exactly one job each.
+    sqlx::query(
+        "UPDATE schedule SET next_run_at = now() - interval '1 second'
+          WHERE tenant_id = $1 AND kind IN ('inference_call.prune', 'prompt_audit.prune')",
+    )
+    .bind(a.as_uuid())
+    .execute(&db.super_pool)
+    .await
+    .expect("make both S16 schedules due");
+    let created = schedule::materialise(&db.runtime, a, Utc::now())
+        .await
+        .expect("materialise the due schedules");
+    assert_eq!(
+        created.len(),
+        2,
+        "inference_call.prune and prompt_audit.prune are both installed and due"
+    );
+
+    // The dispatch half: the worker's own arms apply retention in A's tenant scope only.
+    worker::run_kind(
+        &db.runtime,
+        &config(),
+        None,
+        a,
+        "inference_call.prune",
+        &json!({}),
+    )
+    .await
+    .expect("inference_call.prune for A");
+    worker::run_kind(
+        &db.runtime,
+        &config(),
+        None,
+        a,
+        "prompt_audit.prune",
+        &json!({}),
+    )
+    .await
+    .expect("prompt_audit.prune for A");
+
+    let exists = |table: &'static str, id: Uuid| {
+        let pool = db.super_pool.clone();
+        async move {
+            let sql = format!("SELECT count(*) FROM {table} WHERE id = $1");
+            sqlx::query_scalar::<_, i64>(sqlx::AssertSqlSafe(sql))
+                .bind(id)
+                .fetch_one(&pool)
+                .await
+                .expect("count")
+        }
+    };
+    assert_eq!(
+        exists("inference_call", a_old_call).await,
+        0,
+        "A's old call is pruned"
+    );
+    assert_eq!(
+        exists("inference_call", a_fresh_call).await,
+        1,
+        "A's fresh call stays"
+    );
+    assert_eq!(
+        exists("inference_call", b_old_call).await,
+        1,
+        "B's old call is untouched: the prune ran in A's tenant scope"
+    );
+    assert_eq!(
+        exists("prompt_audit", a_old_audit).await,
+        0,
+        "A's old audit is pruned"
+    );
+    assert_eq!(
+        exists("prompt_audit", a_fresh_audit).await,
+        1,
+        "A's fresh audit stays"
+    );
+    assert_eq!(
+        exists("prompt_audit", b_old_audit).await,
+        1,
+        "B's old audit is untouched"
     );
 }
