@@ -159,6 +159,7 @@ fn run_write(
                 InvokeOptions {
                     if_match,
                     idempotency_key: None,
+                    approval_id: None,
                 },
             )
             .await;
@@ -566,6 +567,7 @@ fn BoardBody(data: BoardData, shared: BoardShared) -> impl IntoView {
                     InvokeOptions {
                         if_match: Some(view.card.version),
                         idempotency_key: None,
+                        approval_id: None,
                     },
                 )
                 .await;
@@ -1618,6 +1620,7 @@ fn move_card(
                 InvokeOptions {
                     if_match: Some(version),
                     idempotency_key: None,
+                    approval_id: None,
                 },
             )
             .await;
