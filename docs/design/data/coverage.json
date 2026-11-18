@@ -270,7 +270,7 @@
       "tranche": 0,
       "units": {
         "blocked": 5,
-        "claimed": 7,
+        "claimed": 6,
         "numbers": [
           17,
           22,
@@ -299,11 +299,10 @@
           296,
           302,
           303,
-          305,
           307,
           319
         ],
-        "open": 20,
+        "open": 19,
         "ready": 5,
         "unknown": 0
       }
