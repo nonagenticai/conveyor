@@ -220,7 +220,9 @@ mod tests {
                 (52, "benefit retire".to_owned()),
                 // #295 (ADR 0008): the per-card append-only claim/fact ledger
                 // (0053_card_ledger.sql).
-                (53, "card ledger".to_owned())
+                (53, "card ledger".to_owned()),
+                // #81 (T9): the eleven TOGAF ADM tables (0054_architecture.sql).
+                (54, "architecture".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

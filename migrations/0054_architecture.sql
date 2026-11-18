@@ -1,4 +1,4 @@
--- 0053_architecture.sql — T9: the TOGAF ADM capability (SPEC_V2 §8.1, §10.3; issue #81).
+-- 0054_architecture.sql — T9: the TOGAF ADM capability (SPEC_V2 §8.1, §10.3; issue #81).
 --
 -- Forward only: never edited after this slice closes (CONTRACT §2).
 --

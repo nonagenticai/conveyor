@@ -93,7 +93,8 @@ use serde_json::{Value, json};
 /// **#164 adds 1 internal**: `analyse.video`, the video family over executor evidence.
 /// **#303 adds 2 internal**: `benefits.retire` and `tranches.retire`, the governed retirement path.
 /// **#295 adds 2 internal**: `cards.ledger_append` and `cards.ledger_list`, the claim/fact ledger.
-const EXPECTED: [&str; 433] = [
+/// **T9 adds 26 internal**: the `architecture.*` family (see the block below `approvals.request`).
+const EXPECTED: [&str; 459] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -107,6 +108,35 @@ const EXPECTED: [&str; 433] = [
     "approvals.decide",
     "approvals.list",
     "approvals.request",
+    // T9 (#81): the TOGAF ADM capability — artefacts and their entries/links, the repository,
+    // the profile, the Board, contracts, phase advances, compliance reviews and waivers, and the
+    // two Preliminary assessments. Twenty-six internal actions.
+    "architecture.artifacts_approve",
+    "architecture.artifacts_create",
+    "architecture.artifacts_entries",
+    "architecture.artifacts_get",
+    "architecture.artifacts_link",
+    "architecture.artifacts_links",
+    "architecture.artifacts_list",
+    "architecture.artifacts_supersede",
+    "architecture.artifacts_update",
+    "architecture.board_decide",
+    "architecture.board_get",
+    "architecture.board_open",
+    "architecture.contracts_approve",
+    "architecture.contracts_get",
+    "architecture.contracts_list",
+    "architecture.contracts_request",
+    "architecture.contracts_supersede",
+    "architecture.maturity_assess",
+    "architecture.maturity_plan",
+    "architecture.phases_advance",
+    "architecture.profile_get",
+    "architecture.profile_tailor",
+    "architecture.repository_search",
+    "architecture.reviews_record",
+    "architecture.reviews_waive",
+    "architecture.skills_assess",
     "artifacts.list",
     "audit.list",
     "baselines.get",
@@ -586,7 +616,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // #303 adds `benefits.retire` and `tranches.retire` (internal): 411 -> 413; external stays 18.
     // #295 adds `cards.ledger_append` (write) and `cards.ledger_list` (read), both internal:
     // 413 -> 415; external stays 18.
-    assert_eq!((internal, external), (415, 18));
+    // T9 (#81) adds the twenty-six architecture actions, all internal: 415 -> 441; external
+    // stays 18 (they read and write this tenant's own repository, never an external service).
+    assert_eq!((internal, external), (441, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -5,7 +5,7 @@ status: planned
 depends_on: [T1, T3, P0]
 spec_sections: ["§8.1", "§8.5", "§10.3", "§10.4", "§10.5", "§12 T9", "D63"]
 adds_tables: [artifact_type, architecture_artifact, architecture_artifact_entry, architecture_artifact_link, adm_profile, architecture_contract, architecture_compliance_review, architecture_waiver, governance_body, architecture_maturity, architecture_skill_assessment]
-adds_actions: [architecture.artifacts_list, architecture.artifacts_get, architecture.artifacts_create, architecture.artifacts_update, architecture.artifacts_approve, architecture.artifacts_supersede, architecture.artifacts_link, architecture.repository_search, architecture.contracts_request, architecture.contracts_approve, architecture.contracts_supersede, architecture.phases_advance, architecture.reviews_record, architecture.reviews_waive, architecture.board_decide, architecture.maturity_assess, architecture.maturity_plan, architecture.skills_assess, architecture.profile_get, architecture.profile_tailor]
+adds_actions: [architecture.artifacts_list, architecture.artifacts_get, architecture.artifacts_entries, architecture.artifacts_links, architecture.artifacts_create, architecture.artifacts_update, architecture.artifacts_approve, architecture.artifacts_supersede, architecture.artifacts_link, architecture.repository_search, architecture.contracts_request, architecture.contracts_get, architecture.contracts_list, architecture.contracts_approve, architecture.contracts_supersede, architecture.phases_advance, architecture.reviews_record, architecture.reviews_waive, architecture.board_open, architecture.board_get, architecture.board_decide, architecture.maturity_assess, architecture.maturity_plan, architecture.skills_assess, architecture.profile_get, architecture.profile_tailor]
 adds_events: [architecture_artifact.changed, architecture_phase.closed, compliance_review.recorded, architecture_waiver.granted]
 adds_modules: [architecture]
 parity_ids: []
@@ -103,8 +103,10 @@ and plateau, and the contract kind that closes each phase. `artifact_type` is th
 capability carries fewer artefacts and the set grows with the assessed maturity.
 
 `governance_body(kind='architecture_board')` holds the board's membership, charter, commissioning
-authority and decision limits; `architecture.board.decide` records a board decision with its
-evidence. The principles catalog is an ordinary artefact (`type='principles_catalog'`) whose entries
+authority and decision limits. It is a row with a lifecycle: `architecture.board_open` opens it
+(idempotent on its stable key — a second open returns the commissioned body, never overwrites its
+charter), `architecture.board_get` reads it by id or key, and `architecture.board_decide` records a
+board decision with its evidence. The principles catalog is an ordinary artefact (`type='principles_catalog'`) whose entries
 carry statement, rationale and implications. `architecture_maturity` scores nine dimensions on 0–5
 per stage with a baseline and milestones; `architecture_skill_assessment` scores the seven skills
 categories per role.
@@ -146,9 +148,9 @@ project; absent, draft or superseded all refuse, and no approval row is written.
 ### D1 — The artefact standard and repository
 
 `artifact_type` seeded; `architecture_artifact`, `architecture_artifact_entry`,
-`architecture_artifact_link`; `architecture.artifacts.*` and `architecture.repository.search`;
-approve/supersede immutability; catalog and matrix entries queryable; diagram metadata with
-viewpoint.
+`architecture_artifact_link`; `architecture.artifacts_*` and
+`architecture.repository_search`; approve/supersede immutability; catalog and matrix entries
+queryable; diagram metadata with viewpoint.
 
 - Given a catalog with ten entries, when it is queried, then the entries are rows and the
   artefact's metadata names its owner, reviewer, version and document.

@@ -10,8 +10,9 @@ use chrono::{DateTime, Utc};
 use conveyor_store as store;
 use conveyor_store::architecture::{
     ArchitectureRule, ArchitectureStoreError, ArtifactLinkRecord, ArtifactRecord,
-    ArtifactTypeRecord, ContractRecord, MaturityRecord, NewArtifact, NewContract, NewEntry,
-    NewProfile, NewReview, NewWaiver, ProfileRecord, ReviewRecord, SkillRecord, WaiverRecord,
+    ArtifactTypeRecord, ContractRecord, EntryRecord, GovernanceBodyRecord, MaturityRecord,
+    NewArtifact, NewBody, NewContract, NewEntry, NewProfile, NewReview, NewWaiver, ProfileRecord,
+    ReviewRecord, SkillRecord, WaiverRecord,
 };
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -567,6 +568,97 @@ async fn architecture_artifacts_link(
     Ok(HandlerOutput::ok(link_out(&record)))
 }
 
+/// One catalogue or matrix entry as the actions return it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct EntryOut {
+    /// Row id.
+    pub id: String,
+    /// The artefact.
+    pub artifact_id: String,
+    /// First axis.
+    pub axis_a: String,
+    /// Second axis (empty for a catalog).
+    pub axis_b: String,
+    /// The cell's value.
+    pub value: Value,
+    /// Display order.
+    pub position: i32,
+    /// The row version.
+    pub version: i64,
+}
+
+fn entry_out(record: &EntryRecord) -> EntryOut {
+    EntryOut {
+        id: record.id.to_string(),
+        artifact_id: record.artifact_id.to_string(),
+        axis_a: record.axis_a.clone(),
+        axis_b: record.axis_b.clone(),
+        value: record.value.clone(),
+        position: record.position,
+        version: record.version,
+    }
+}
+
+/// `architecture.artifacts_entries` — the catalogue items or matrix cells of one artefact.
+#[crate::action(
+    name = "architecture.artifacts_entries",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_artifacts_entries(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ArtifactIdIn,
+) -> Result<HandlerOutput<Page<EntryOut>>, ActionError> {
+    store::architecture::get_artifact_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such architecture artefact"))?;
+    let rows = store::architecture::list_entries_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?;
+    Ok(HandlerOutput::ok(Page {
+        items: rows.iter().map(entry_out).collect(),
+        next_cursor: None,
+    }))
+}
+
+/// `architecture.artifacts_links` — the edges touching one artefact, both directions.
+#[crate::action(
+    name = "architecture.artifacts_links",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_artifacts_links(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ArtifactIdIn,
+) -> Result<HandlerOutput<Page<ArtifactLinkOut>>, ActionError> {
+    store::architecture::get_artifact_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such architecture artefact"))?;
+    let rows = store::architecture::list_links_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?;
+    Ok(HandlerOutput::ok(Page {
+        items: rows.iter().map(link_out).collect(),
+        next_cursor: None,
+    }))
+}
+
 /// `architecture.repository_search`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct RepositorySearchIn {
@@ -663,6 +755,8 @@ fn profile_out(record: &ProfileRecord) -> ProfileOut {
 /// One row of the seeded standard.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ArtifactTypeOut {
+    /// Row id — what `architecture.artifacts_create` names as `artifact_type_id`.
+    pub id: String,
     /// Stable key.
     pub key: String,
     /// Display name.
@@ -681,6 +775,7 @@ pub struct ArtifactTypeOut {
 
 fn type_out(record: &ArtifactTypeRecord) -> ArtifactTypeOut {
     ArtifactTypeOut {
+        id: record.id.to_string(),
         key: record.key.clone(),
         name: record.name.clone(),
         artifact_kind: record.artifact_kind.clone(),
@@ -896,6 +991,63 @@ async fn architecture_contracts_request(
 pub struct ContractIdIn {
     /// The contract.
     pub id: Uuid,
+}
+
+/// `architecture.contracts_get`.
+#[crate::action(
+    name = "architecture.contracts_get",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_contracts_get(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ContractIdIn,
+) -> Result<HandlerOutput<ContractOut>, ActionError> {
+    let record = store::architecture::get_contract_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such architecture contract"))?;
+    Ok(HandlerOutput::ok(contract_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// `architecture.contracts_list` — the contracts of one project, or the tenant's.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ContractListIn {
+    /// Filter by the governing project.
+    #[serde(default)]
+    pub project_id: Option<Uuid>,
+}
+
+#[crate::action(
+    name = "architecture.contracts_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_contracts_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ContractListIn,
+) -> Result<HandlerOutput<Page<ContractOut>>, ActionError> {
+    let rows = store::architecture::list_contracts_tx(&mut *tx, ctx.tenant, input.project_id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?;
+    Ok(HandlerOutput::ok(Page {
+        items: rows.iter().map(contract_out).collect(),
+        next_cursor: None,
+    }))
 }
 
 #[crate::action(
@@ -1206,6 +1358,156 @@ async fn architecture_reviews_waive(
         .await
         .map_err(|error| arch_error(error, ctx.action))?;
     Ok(HandlerOutput::created(waiver_out(&record)))
+}
+
+/// A governance body as the actions return it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct GovernanceBodyOut {
+    /// Row id.
+    pub id: String,
+    /// architecture_board | design_board | other.
+    pub kind: String,
+    /// Stable key.
+    pub key: String,
+    /// Display name.
+    pub name: String,
+    /// The charter.
+    pub charter: String,
+    /// The commissioning authority.
+    pub commissioning_authority: String,
+    /// Decision limits.
+    pub decision_limits: Value,
+    /// Members.
+    pub members: Value,
+    /// draft | active | retired.
+    pub status: String,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+fn body_out(record: &GovernanceBodyRecord) -> GovernanceBodyOut {
+    GovernanceBodyOut {
+        id: record.id.to_string(),
+        kind: record.kind.clone(),
+        key: record.key.clone(),
+        name: record.name.clone(),
+        charter: record.charter.clone(),
+        commissioning_authority: record.commissioning_authority.clone(),
+        decision_limits: record.decision_limits.clone(),
+        members: record.members.clone(),
+        status: record.status.clone(),
+        version: record.version,
+    }
+}
+
+fn default_body_kind() -> String {
+    "architecture_board".to_owned()
+}
+
+fn empty_limits() -> Value {
+    json!({})
+}
+
+fn empty_members() -> Value {
+    json!([])
+}
+
+/// `architecture.board_open` — the Board (or another governance forum) becomes a row.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BoardOpenIn {
+    /// architecture_board | design_board | other.
+    #[serde(default = "default_body_kind")]
+    pub kind: String,
+    /// Stable key.
+    pub key: String,
+    /// Display name.
+    pub name: String,
+    /// The charter.
+    #[serde(default)]
+    pub charter: String,
+    /// Who commissioned it.
+    #[serde(default)]
+    pub commissioning_authority: String,
+    /// Decision limits.
+    #[serde(default = "empty_limits")]
+    pub decision_limits: Value,
+    /// Members.
+    #[serde(default = "empty_members")]
+    pub members: Value,
+}
+
+#[crate::action(
+    name = "architecture.board_open",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_board_open(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BoardOpenIn,
+) -> Result<HandlerOutput<GovernanceBodyOut>, ActionError> {
+    let new = NewBody {
+        kind: input.kind,
+        key: input.key,
+        name: input.name,
+        charter: input.charter,
+        commissioning_authority: input.commissioning_authority,
+        decision_limits: input.decision_limits,
+        members: input.members,
+    };
+    let record = store::architecture::open_body_tx(&mut *tx, ctx.tenant, &new)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?;
+    Ok(HandlerOutput::created(body_out(&record)))
+}
+
+/// `architecture.board_get` — read the governance body by id or by its stable key.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BoardGetIn {
+    /// The body row.
+    #[serde(default)]
+    pub id: Option<Uuid>,
+    /// The body's key; used when `id` is absent.
+    #[serde(default)]
+    pub key: Option<String>,
+}
+
+#[crate::action(
+    name = "architecture.board_get",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_board_get(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BoardGetIn,
+) -> Result<HandlerOutput<GovernanceBodyOut>, ActionError> {
+    let record = match (input.id, input.key.as_deref()) {
+        (Some(id), _) => store::architecture::get_body_tx(&mut *tx, ctx.tenant, id).await,
+        (None, Some(key)) => store::architecture::get_body_by_key_tx(&mut *tx, ctx.tenant, key).await,
+        (None, None) => {
+            return Err(invalid(
+                "key",
+                "required",
+                "supply the body's id or its stable key",
+            ))
+        }
+    }
+    .map_err(|error| arch_error(error, ctx.action))?
+    .ok_or_else(|| ActionError::resource_not_found("such governance body"))?;
+    Ok(HandlerOutput::ok(body_out(&record)))
 }
 
 /// `architecture.board_decide`.

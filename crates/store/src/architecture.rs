@@ -674,6 +674,25 @@ pub async fn list_entries_tx(
         .await?)
 }
 
+/// List the edges touching an artefact, both directions, so the inspector can show what it
+/// derives from, realises, reuses and depends on — and what derives from it.
+pub async fn list_links_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    artifact_id: Uuid,
+) -> Result<Vec<ArtifactLinkRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {LINK_COLUMNS} FROM architecture_artifact_link
+          WHERE tenant_id = $1 AND (from_artifact_id = $2 OR to_artifact_id = $2)
+          ORDER BY kind, id"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(artifact_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
 /// Edit a draft artefact; an approved row is refused.
 pub async fn update_artifact_tx(
     conn: &mut PgConnection,
@@ -866,16 +885,30 @@ pub async fn search_repository_tx(
     plateau: Option<&str>,
     kind: Option<&str>,
 ) -> Result<Vec<ArtifactRecord>, ArchitectureStoreError> {
+    // The repository answers what an artefact reuses, not only what matches the text: an
+    // artefact reached by a `reuse` edge from a match is returned too, across projects, phases
+    // and plateaus. A search confined to the query's own plateau would hide exactly the
+    // enterprise artefact a solution artefact was built to reuse (D1's reuse scenario).
     let sql = format!(
-        "SELECT {ARTIFACT_COLUMNS} FROM architecture_artifact
-          WHERE tenant_id = $1
-            AND status IN ('approved', 'in_review')
-            AND ($2::text IS NULL OR title ILIKE '%' || $2 || '%'
-                 OR purpose ILIKE '%' || $2 || '%'
-                 OR meta::text ILIKE '%' || $2 || '%')
-            AND ($3::text IS NULL OR plateau = $3)
-            AND ($4::text IS NULL OR artifact_kind = $4)
-          ORDER BY artifact_version DESC, created_at DESC LIMIT 100"
+        "WITH matched AS (
+            SELECT id FROM architecture_artifact
+             WHERE tenant_id = $1
+               AND status IN ('approved', 'in_review')
+               AND ($2::text IS NULL OR title ILIKE '%' || $2 || '%'
+                    OR purpose ILIKE '%' || $2 || '%'
+                    OR meta::text ILIKE '%' || $2 || '%')
+               AND ($3::text IS NULL OR plateau = $3)
+               AND ($4::text IS NULL OR artifact_kind = $4)
+         ), reused AS (
+            SELECT l.to_artifact_id AS id FROM architecture_artifact_link l
+             WHERE l.tenant_id = $1 AND l.kind = 'reuse'
+               AND l.from_artifact_id IN (SELECT id FROM matched)
+         )
+         SELECT {ARTIFACT_COLUMNS} FROM architecture_artifact a
+          WHERE a.tenant_id = $1
+            AND a.status IN ('approved', 'in_review')
+            AND (a.id IN (SELECT id FROM matched) OR a.id IN (SELECT id FROM reused))
+          ORDER BY a.artifact_version DESC, a.created_at DESC LIMIT 100"
     );
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
@@ -1031,6 +1064,75 @@ pub async fn create_body_tx(
         .map_err(ArchitectureStoreError::Database)
 }
 
+/// Open a governance body: create it, or return the row that already holds its key.
+///
+/// The Board is a row, not a convention: `architecture.board_decide` needs a body id, and the
+/// profile's adoption cites a board decision. A second open with the same key is not an error
+/// and does not overwrite the charter — it returns the body as commissioned.
+pub async fn open_body_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewBody,
+) -> Result<GovernanceBodyRecord, ArchitectureStoreError> {
+    if !matches!(
+        new.kind.as_str(),
+        "architecture_board" | "design_board" | "other"
+    ) {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "governance body",
+            why: "the kind must be architecture_board, design_board or other",
+        });
+    }
+    if new.key.trim().is_empty() || new.name.trim().is_empty() {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "governance body",
+            why: "the key and the name are required",
+        });
+    }
+    let sql = format!(
+        "INSERT INTO governance_body
+            (tenant_id, kind, key, name, charter, commissioning_authority, decision_limits, members)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         ON CONFLICT (tenant_id, key) DO NOTHING
+         RETURNING {BODY_COLUMNS}"
+    );
+    let inserted: Option<GovernanceBodyRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(&new.kind)
+        .bind(new.key.trim())
+        .bind(new.name.trim())
+        .bind(&new.charter)
+        .bind(&new.commissioning_authority)
+        .bind(&new.decision_limits)
+        .bind(&new.members)
+        .fetch_optional(&mut *conn)
+        .await?;
+    match inserted {
+        Some(row) => Ok(row),
+        None => get_body_by_key_tx(&mut *conn, tenant, new.key.trim())
+            .await?
+            .ok_or(ArchitectureStoreError::Conflict {
+                what: "governance body",
+                why: "the key is held by a row this tenant cannot read",
+            }),
+    }
+}
+
+/// Read a governance body by its stable key.
+pub async fn get_body_by_key_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: &str,
+) -> Result<Option<GovernanceBodyRecord>, ArchitectureStoreError> {
+    let sql =
+        format!("SELECT {BODY_COLUMNS} FROM governance_body WHERE tenant_id = $1 AND key = $2");
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
 /// Read a governance body.
 pub async fn get_body_tx(
     conn: &mut PgConnection,
@@ -1132,7 +1234,7 @@ pub async fn request_contract_tx(
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          RETURNING {CONTRACT_COLUMNS}"
     );
-    sqlx::query_as(AssertSqlSafe(sql))
+    let record: ContractRecord = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(new.project_id)
         .bind(&new.kind)
@@ -1142,7 +1244,22 @@ pub async fn request_contract_tx(
         .bind(new.supersedes_id)
         .fetch_one(&mut *conn)
         .await
-        .map_err(ArchitectureStoreError::Database)
+        .map_err(ArchitectureStoreError::Database)?;
+    // The chain is two-way: the retired row names its successor, so "what replaced this
+    // contract" is a read, not a search. The successor already names its predecessor above.
+    if let Some(old) = new.supersedes_id {
+        sqlx::query(
+            "UPDATE architecture_contract
+                SET superseded_by_id = $3, updated_at = now()
+              WHERE tenant_id = $1 AND id = $2",
+        )
+        .bind(tenant.as_uuid())
+        .bind(old)
+        .bind(record.id)
+        .execute(&mut *conn)
+        .await?;
+    }
+    Ok(record)
 }
 
 /// Approve a draft contract into `live`; an existing live sibling must be superseded first.
@@ -1301,6 +1418,19 @@ pub async fn materialise_phases_tx(
     Ok(ids)
 }
 
+/// Materialise the ADM's nine phase nodes (Preliminary, then A–H) on an architecture project.
+///
+/// `projects.create` and `pm.charter` call this for `project_type_code = "architecture"`, so the
+/// phase gate has nodes to advance; a project of any other type gets none.
+pub async fn materialise_adm_phases_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<Vec<Uuid>, ArchitectureStoreError> {
+    let phases: Vec<String> = vocab::PHASES.iter().map(|phase| (*phase).to_owned()).collect();
+    materialise_phases_tx(conn, tenant, project_id, &phases).await
+}
+
 /// Advance an architecture project's current phase when the gate is satisfied.
 pub async fn advance_phase_tx(
     conn: &mut PgConnection,
@@ -1359,47 +1489,72 @@ pub async fn advance_phase_tx(
             },
         ));
     }
-    // Mandatory artefacts: the union of the phase's required type keys.
-    let mut required: Vec<String> = Vec::new();
-    if let Some(phase) = profile.artifact_requirements.get(requested) {
-        match phase {
-            Value::Array(items) => {
-                required.extend(items.iter().filter_map(|v| v.as_str()).map(str::to_owned));
-            }
-            Value::Object(plateaus) => {
-                for items in plateaus.values() {
-                    if let Some(items) = items.as_array() {
-                        required
-                            .extend(items.iter().filter_map(|v| v.as_str()).map(str::to_owned));
-                    }
+    // Mandatory artefacts: the profile names one set per phase and plateau, and the phase is
+    // satisfied when ONE plateau's set is fully approved. The union was wrong: a phase carrying
+    // PSA and HLD sets demanded both, refusing a project for artefacts its phase does not
+    // require — the profile, not the gate, decides which plateaus a phase carries.
+    let sets: Vec<Vec<String>> = match profile.artifact_requirements.get(requested) {
+        Some(Value::Array(items)) => vec![items
+            .iter()
+            .filter_map(Value::as_str)
+            .map(str::to_owned)
+            .collect()],
+        Some(Value::Object(plateaus)) => plateaus
+            .values()
+            .filter_map(Value::as_array)
+            .map(|items| {
+                items
+                    .iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_owned)
+                    .collect()
+            })
+            .collect(),
+        _ => Vec::new(),
+    };
+    let mut artifact_ids: Vec<Uuid> = Vec::new();
+    let mut satisfied = sets.is_empty();
+    let mut first_missing: Option<String> = None;
+    for set in &sets {
+        let mut ids = Vec::with_capacity(set.len());
+        let mut missing = None;
+        for key in set {
+            let id: Option<Uuid> = sqlx::query_scalar(
+                "SELECT a.id FROM architecture_artifact a
+                   JOIN artifact_type t ON t.id = a.artifact_type_id AND t.tenant_id = a.tenant_id
+                  WHERE a.tenant_id = $1 AND a.project_id = $2 AND a.phase_code = $3
+                    AND a.status = 'approved' AND t.key = $4
+                  LIMIT 1",
+            )
+            .bind(tenant.as_uuid())
+            .bind(project_id)
+            .bind(requested)
+            .bind(key)
+            .fetch_optional(&mut *conn)
+            .await?;
+            match id {
+                Some(id) => ids.push(id),
+                None => {
+                    missing = Some(key.clone());
+                    break;
                 }
             }
-            _ => {}
         }
-    }
-    let mut artifact_ids = Vec::new();
-    for key in &required {
-        let id: Option<Uuid> = sqlx::query_scalar(
-            "SELECT a.id FROM architecture_artifact a
-               JOIN artifact_type t ON t.id = a.artifact_type_id AND t.tenant_id = a.tenant_id
-              WHERE a.tenant_id = $1 AND a.project_id = $2 AND a.phase_code = $3
-                AND a.status = 'approved' AND t.key = $4
-              LIMIT 1",
-        )
-        .bind(tenant.as_uuid())
-        .bind(project_id)
-        .bind(requested)
-        .bind(key)
-        .fetch_optional(&mut *conn)
-        .await?;
-        match id {
-            Some(id) => artifact_ids.push(id),
+        match missing {
             None => {
-                return Err(ArchitectureStoreError::Illegal(
-                    ArchitectureRule::MissingMandatory(key.clone()),
-                ))
+                artifact_ids = ids;
+                satisfied = true;
+                break;
+            }
+            Some(key) => {
+                first_missing.get_or_insert(key);
             }
         }
+    }
+    if !satisfied {
+        return Err(ArchitectureStoreError::Illegal(
+            ArchitectureRule::MissingMandatory(first_missing.unwrap_or_default()),
+        ));
     }
     // The phase's contract, when the profile names one.
     let required_kind = profile
@@ -1453,9 +1608,10 @@ pub async fn advance_phase_tx(
         "artifacts": artifact_ids.iter().map(ToString::to_string).collect::<Vec<_>>(),
         "contract": contract_id.map(|id| id.to_string()),
     });
+    // $3, not $4: three binds are supplied, and Postgres refuses a gap in the parameter list.
     sqlx::query(
         "UPDATE wbs_node
-            SET status = 'accepted', evidence = $4, version = version + 1, updated_at = now()
+            SET status = 'accepted', evidence = $3, version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND status = 'open'",
     )
     .bind(tenant.as_uuid())
@@ -1785,6 +1941,10 @@ pub async fn plan_maturity_tx(
 }
 
 /// The live contract that governs a delivery project's design gate.
+///
+/// A project with a contract that is not live (draft or superseded) is refused by NAME, not by
+/// absence: the caller has to know whether to approve the draft or request a replacement, and
+/// "no live contract" alone cannot say which.
 pub async fn assert_design_contract_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -1800,12 +1960,29 @@ pub async fn assert_design_contract_tx(
                    END, approved_at DESC
           LIMIT 1"
     );
-    sqlx::query_as(AssertSqlSafe(sql))
+    let live: Option<ContractRecord> = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(project_id)
         .fetch_optional(&mut *conn)
-        .await?
-        .ok_or(ArchitectureStoreError::Illegal(
+        .await?;
+    if let Some(record) = live {
+        return Ok(record);
+    }
+    let other: Option<(String, String)> = sqlx::query_as(
+        "SELECT kind, status FROM architecture_contract
+          WHERE tenant_id = $1 AND project_id = $2
+          ORDER BY created_at DESC LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match other {
+        Some((kind, status)) => Err(ArchitectureStoreError::Illegal(
+            ArchitectureRule::ContractNotLive(format!("{kind} is {status}")),
+        )),
+        None => Err(ArchitectureStoreError::Illegal(
             ArchitectureRule::DesignContractMissing,
-        ))
+        )),
+    }
 }

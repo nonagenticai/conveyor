@@ -1176,6 +1176,31 @@ pub async fn catalogue(pool: &PgPool) -> Result<(), SeedError> {
         .execute(&mut *tx)
         .await?;
 
+        // T9 (#81): an architecture project is the only type whose ADM phase nodes
+        // `projects.create` materialises, and `projects.create` refuses a code with no active
+        // catalogue row — so the dev/test seed must carry it. The matrix moves the one card a
+        // new project is born with; the ADM phases are `wbs_node` rows, not catalogue phases.
+        sqlx::query(
+            "INSERT INTO catalogue_entry (tenant_id, kind, code, label, meta, sort)
+             VALUES ($1, 'project_type', 'architecture', 'Architecture', $2, 0)
+             ON CONFLICT (tenant_id, kind, code) DO NOTHING",
+        )
+        .bind(tenant_id)
+        .bind(serde_json::json!({
+            "phases": [],
+            "matrix": {
+                "project_start_request_analysis": {
+                    "intake": ["active", "archive"],
+                    "active": ["waiting", "done", "archive"],
+                    "waiting": ["active", "archive"],
+                    "done": ["archive"],
+                    "archive": ["intake"]
+                }
+            }
+        }))
+        .execute(&mut *tx)
+        .await?;
+
         sqlx::query(
             "INSERT INTO catalogue_entry (tenant_id, kind, code, label, meta, sort)
              VALUES ($1, 'board_template', 'standard', 'Standard board', $2, 0)

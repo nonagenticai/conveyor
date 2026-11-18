@@ -144,6 +144,9 @@ async fn projects_create(
         }
     }
 
+    // An architecture project is born with its ADM phase nodes (T9): a phase gate with no
+    // nodes to advance can never pass, so the rows are part of creating the project.
+    let materialise_adm = input.project_type_code.as_deref() == Some("architecture");
     let project = store::project::insert_project_tx(
         &mut *tx,
         ctx.tenant,
@@ -181,6 +184,15 @@ async fn projects_create(
             ActionError::internal()
         }
     })?;
+
+    if materialise_adm {
+        store::architecture::materialise_adm_phases_tx(&mut *tx, ctx.tenant, project.id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "materialise architecture phases");
+                ActionError::internal()
+            })?;
+    }
 
     insert_board_from_template(&mut *tx, &ctx, project.id, None).await?;
 

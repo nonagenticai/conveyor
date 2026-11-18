@@ -283,6 +283,7 @@ async fn pm_charter(
                 ActionError::internal()
             })?,
     };
+    let materialise_adm = input.project_type_code.as_deref() == Some("architecture");
     let project = store::project::insert_project_tx(
         &mut *tx,
         ctx.tenant,
@@ -304,6 +305,14 @@ async fn pm_charter(
         tracing::error!(%error, "pm.charter: insert project");
         ActionError::internal()
     })?;
+    if materialise_adm {
+        store::architecture::materialise_adm_phases_tx(&mut *tx, ctx.tenant, project.id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "pm.charter: materialise architecture phases");
+                ActionError::internal()
+            })?;
+    }
     insert_board_from_template(&mut *tx, &ctx, project.id, None).await?;
     insert_start_card_and_run(&mut *tx, ctx.clone(), project.id).await?;
 
@@ -572,6 +581,13 @@ async fn pm_route_gate(
                 store::architecture::ArchitectureStoreError::Database(error) => {
                     store_error(error, ctx.action)
                 }
+                store::architecture::ArchitectureStoreError::Illegal(
+                    store::architecture::ArchitectureRule::ContractNotLive(status),
+                ) => ActionError::new(
+                    409,
+                    "architecture_contract_not_live",
+                    format!("the delivery project's architecture contract is not live: {status}"),
+                ),
                 _ => ActionError::new(
                     409,
                     "architecture_contract_missing",
