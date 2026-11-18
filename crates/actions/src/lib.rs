@@ -25,6 +25,8 @@ pub mod architecture;
 // S17: the benchmark harness — suites, runs, cases.
 pub mod benchmark;
 pub mod board;
+// T13 (SPEC_V2 §11.3): the tool broker — resolve, gate, validate, dispatch and ledger one call.
+pub mod broker;
 // S15: the capability aggregate — `capabilities.*` and `capability_agents.*`.
 pub mod capability;
 // S06d: the connector standard — grants, compiled defaults, the machine floor and adapters.
@@ -79,6 +81,10 @@ pub mod registry;
 // T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine and the MSP rows.
 pub mod spec;
 pub mod spine;
+// T13 (SPEC_V2 §11.10): the job object-storage adapter — tenant-prefixed, hashed, capped.
+pub mod storage;
+// T13 (SPEC_V2 §11.3): the `tools.call` action declaration (the broker enforces it).
+pub mod tools;
 // T2 (SPEC_V2 §7): the decision ladder — `ladder.*` over `decision_policies.*`,
 // `refinements.*` and `laya_configs.*`.
 pub mod ladder;

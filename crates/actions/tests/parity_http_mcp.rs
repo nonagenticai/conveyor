@@ -5379,6 +5379,23 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             422,
         ),
+        // ── T13 (#76): the tool broker's refusal boundary ───────────────────────────────────
+        // A run outside the tenant resolves nothing, so both transports must answer the same
+        // typed `409 tool_not_ready`. The broker's happy path needs a run, a published toolkit
+        // and a binding, which is `tool_platform.rs`'s fixture rather than a parity sample; the
+        // invariant this sample protects is that the transport cannot change the refusal.
+        expecting(
+            plain(
+                "tools.call",
+                json!({
+                    "run_id": "018f3f7c-0000-7000-8000-0000000000ff",
+                    "tool": "coding.jobs.create",
+                    "input": {}
+                }),
+                None,
+            ),
+            409,
+        ),
         // ── T9: the architecture capability (#81) ─────────────────────────────────────────
         // Reads anchored on rows the fixture/prepare writes; writes on a fresh row per round.
         expecting(plain("architecture.artifacts_list", json!({}), None), 200),

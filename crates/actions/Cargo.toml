@@ -42,6 +42,9 @@ reqwest = { workspace = true }
 # position. All midpoint arithmetic still happens in `store::position` on `Decimal`.
 rust_decimal = { workspace = true }
 rmcp = { workspace = true }
+# T13 P4: a tool version's closed schema may carry `pattern`; the one validator reads it before
+# the broker makes any network call.
+regex = { workspace = true }
 schemars = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

@@ -1638,7 +1638,6 @@
       "blocked_by": [
         "T10",
         "T11",
-        "T13",
         "T14",
         "T15",
         "T16",
@@ -1688,9 +1687,9 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "migrations/0055_tool_platform.sql"
       ],
-      "gap": "table tool, table toolkit, table tool_binding, table tool_call",
+      "gap": null,
       "key": "T13",
       "measured": {
         "actions": [
@@ -1702,7 +1701,7 @@
           0
         ],
         "tables": [
-          0,
+          4,
           4
         ]
       },
@@ -1712,7 +1711,7 @@
         "T3"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 3,
       "units": {
@@ -1727,9 +1726,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T13"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -1776,7 +1773,6 @@
     },
     {
       "blocked_by": [
-        "T13",
         "T6"
       ],
       "evidence": [
@@ -1816,9 +1812,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T13"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -2079,7 +2073,6 @@
     },
     {
       "blocked_by": [
-        "T13",
         "T5"
       ],
       "evidence": [
@@ -2123,7 +2116,6 @@
     },
     {
       "blocked_by": [
-        "T13",
         "T4"
       ],
       "evidence": [
@@ -2502,10 +2494,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 31,
+        "built": 32,
         "partial": 2,
         "planned": 0,
-        "proposed": 13,
+        "proposed": 12,
         "standing": 1
       },
       "total": 48,

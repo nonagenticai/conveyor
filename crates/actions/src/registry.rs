@@ -270,7 +270,12 @@ pub fn validate(registry: &Registry) -> Result<(), RegistryError> {
                 reason,
             });
         }
-        if spec.kind == ActionKind::Internal && !matches!(spec.handler, HandlerRef::Internal(_)) {
+        // An internal action needs a compiled handler. The tool broker is one: `tools.call` is
+        // dispatched by the engine itself (`HandlerRef::Broker`), which is the same guarantee a
+        // `HandlerRef::Internal` carries — a compiled, in-process path, never a missing arm.
+        if spec.kind == ActionKind::Internal
+            && !matches!(spec.handler, HandlerRef::Internal(_) | HandlerRef::Broker)
+        {
             return Err(RegistryError::Handlerless(spec.name.to_owned()));
         }
         for scope in spec.scopes {
