@@ -399,7 +399,10 @@ async fn repositories_link(
 
 /// `repositories.unlink`'s approval target: what the gate authorises, computed from the input alone.
 fn target_repositories_unlink(input: &RepositoryLinkIn) -> Result<String, String> {
-    Ok(format!("project/{}/repository/{}/unlink", input.project_id, input.repository_id))
+    Ok(format!(
+        "project/{}/repository/{}/unlink",
+        input.project_id, input.repository_id
+    ))
 }
 
 /// Unlink a repository from a project.

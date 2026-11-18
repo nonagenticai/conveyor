@@ -779,9 +779,15 @@ async fn another_tenants_msp_rows_are_invisible() {
     // #283: bob is in ANOTHER tenant, so his gate is opened there — then his delete still has to
     // answer 404: the approval buys nothing outside the tenant that holds the object.
     let bob = support::seed(&pg, "dev-b", "bob", "Bob").await;
-    let bob_gate =
-        support::approved_gate(&pg, bob.tenant, &running, "dev:bob", "benefits.delete", &json!({"id": benefit}))
-            .await;
+    let bob_gate = support::approved_gate(
+        &pg,
+        bob.tenant,
+        &running,
+        "dev:bob",
+        "benefits.delete",
+        &json!({"id": benefit}),
+    )
+    .await;
     let (status, body) = running
         .invoke_approved(
             "benefits.delete",

@@ -612,7 +612,10 @@ pub struct PmCloseOut {
 
 /// `pm.close`'s approval target: what the gate authorises, computed from the input alone.
 fn target_pm_close(input: &PmCloseIn) -> Result<String, String> {
-    Ok(format!("job_binding/{}/project/{}/close", input.job_binding_id, input.project_id))
+    Ok(format!(
+        "job_binding/{}/project/{}/close",
+        input.job_binding_id, input.project_id
+    ))
 }
 
 #[crate::action(

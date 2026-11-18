@@ -140,7 +140,10 @@ fn declaring_targets() -> Vec<(&'static str, Value)> {
             json!({"project_id": id, "repository_id": other}),
         ),
         ("secrets.delete", json!({ "id": id })),
-        ("secrets.rotate", json!({ "id": id, "value": "not-a-real-secret" })),
+        (
+            "secrets.rotate",
+            json!({ "id": id, "value": "not-a-real-secret" }),
+        ),
         ("stakeholders.delete", json!({ "id": id })),
         ("stakeholders.profile_delete", json!({ "id": id })),
         ("task_lists.delete", json!({ "id": id })),
@@ -301,7 +304,9 @@ fn every_destructive_action_declares_a_target() {
 #[test]
 fn every_destructive_action_produces_a_target() {
     for (action, input) in declaring_targets() {
-        let spec = registry().get(action).expect("the sample action is registered");
+        let spec = registry()
+            .get(action)
+            .expect("the sample action is registered");
         let compute = spec
             .approval_target
             .unwrap_or_else(|| panic!("{action} declares no approval target"));
@@ -325,11 +330,14 @@ async fn the_target_binds_the_object_not_the_action() {
     support::set_env("OPS_TOKEN", "");
 
     for (action, input) in declaring_targets() {
-        let spec = registry().get(action).expect("the sample action is registered");
+        let spec = registry()
+            .get(action)
+            .expect("the sample action is registered");
         let compute = spec.approval_target.expect("a declared target");
         let target = compute(&input).expect("the sample input yields a target");
         // Approved, opened for the right action, naming a DIFFERENT object.
-        let approval_id = approved(&pg, seeded.tenant, action, &format!("{target}-elsewhere")).await;
+        let approval_id =
+            approved(&pg, seeded.tenant, action, &format!("{target}-elsewhere")).await;
         let error = invoke(
             &pg.runtime,
             registry(),

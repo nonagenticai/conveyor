@@ -232,7 +232,10 @@ async fn channels_list(
 
 /// `channels.unbind`'s approval target: what the gate authorises, computed from the input alone.
 fn target_channels_unbind(input: &ChannelUnbindIn) -> Result<String, String> {
-    Ok(format!("channel/{}/{}/{}/unbind", input.tenant_id, input.channel_kind, input.route_key))
+    Ok(format!(
+        "channel/{}/{}/{}/unbind",
+        input.tenant_id, input.channel_kind, input.route_key
+    ))
 }
 
 /// Remove one channel route from the calling tenant.
