@@ -6547,9 +6547,13 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     // (`destructive_gate.rs`), so the tenant waives the gate for every destructive action here.
     // Without this the sweep would compare a 403 (HTTP) with an `isError` (MCP) and prove
     // nothing about the bodies.
+    // The `ops.*` verbs are excluded on purpose: their samples assert the refusal a call gets
+    // when no cluster is configured (403/503), so waiving their gate would send the call at a
+    // backend that does not exist and change what the sample is asserting.
     for spec in conveyor_actions::registry::registry()
         .iter()
         .filter(|spec| spec.effect == conveyor_actions::Effect::Destructive)
+        .filter(|spec| !spec.name.starts_with("ops."))
     {
         let (status, body) = running
             .invoke(
