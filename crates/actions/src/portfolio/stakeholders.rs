@@ -200,6 +200,11 @@ async fn stakeholders_update(
     Ok(HandlerOutput::ok(stakeholder_out(&after)).with_etag(etag_of(version_i64(after.version))))
 }
 
+/// `stakeholders.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_stakeholders_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("stakeholder/{}", input.id))
+}
+
 /// Delete a stakeholder; `If-Match` is required and a missing row is a `404`.
 #[crate::action(
     name = "stakeholders.delete",
@@ -210,7 +215,8 @@ async fn stakeholders_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_stakeholders_delete",
 )]
 async fn stakeholders_delete(
     tx: &mut PgConnection,

@@ -74,6 +74,11 @@ async fn comments_update(
     }
 }
 
+/// `comments.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_comments_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("comment/{}", input.id))
+}
+
 /// Delete a comment.
 #[crate::action(
     name = "comments.delete",
@@ -84,7 +89,8 @@ async fn comments_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_comments_delete",
 )]
 async fn comments_delete(
     tx: &mut PgConnection,

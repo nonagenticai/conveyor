@@ -226,6 +226,11 @@ async fn models_update(
     Ok(HandlerOutput::ok(model_out(&after)).with_etag(etag_of(version_i64(after.version))))
 }
 
+/// `models.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_models_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("model/{}", input.id))
+}
+
 /// Delete a model and everything it owns.
 ///
 /// No event: §5.11 declares four model event types and deletion is not one of them, so a
@@ -239,7 +244,8 @@ async fn models_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_models_delete",
 )]
 async fn models_delete(
     tx: &mut PgConnection,

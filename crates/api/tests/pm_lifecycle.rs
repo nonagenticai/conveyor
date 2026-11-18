@@ -367,8 +367,11 @@ async fn only_pm_creates_and_closes() {
     let project_id = id_of(output(&body), "project_id");
 
     // ── and the coach cannot close it ────────────────────────────────────────────────────
+    // #283: destructive; the gate names this object.
     let (status, body) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "pm.close",
             PM,
             json!({
@@ -376,8 +379,6 @@ async fn only_pm_creates_and_closes() {
                 "project_id": project_id,
                 "closure": "The coach may not close a project.",
             }),
-            None,
-            None,
             None,
         )
         .await;

@@ -157,6 +157,11 @@ async fn task_lists_update(
     }
 }
 
+/// `task_lists.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_task_lists_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("task_list/{}", input.id))
+}
+
 /// Delete a checklist and its items.
 #[crate::action(
     name = "task_lists.delete",
@@ -167,7 +172,8 @@ async fn task_lists_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_task_lists_delete",
 )]
 async fn task_lists_delete(
     tx: &mut PgConnection,
@@ -401,6 +407,11 @@ async fn tasks_move(
     }
 }
 
+/// `tasks.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_tasks_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("task/{}", input.id))
+}
+
 /// Delete an item.
 #[crate::action(
     name = "tasks.delete",
@@ -411,7 +422,8 @@ async fn tasks_move(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_tasks_delete",
 )]
 async fn tasks_delete(
     tx: &mut PgConnection,

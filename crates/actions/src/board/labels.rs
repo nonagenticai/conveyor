@@ -143,6 +143,11 @@ async fn labels_update(
     }
 }
 
+/// `labels.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_labels_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("label/{}", input.id))
+}
+
 /// Delete a label and every card that carried it.
 #[crate::action(
     name = "labels.delete",
@@ -153,7 +158,8 @@ async fn labels_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_labels_delete",
 )]
 async fn labels_delete(
     tx: &mut PgConnection,

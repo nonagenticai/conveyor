@@ -1128,6 +1128,11 @@ async fn documents_update(
 
 // ── documents.delete ──────────────────────────────────────────────────────────────────────
 
+/// `documents.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_documents_delete(input: &DocumentIdIn) -> Result<String, String> {
+    Ok(format!("document/{}", input.id))
+}
+
 /// Delete (tombstone) a document and enqueue the object purge.
 #[crate::action(
     name = "documents.delete",
@@ -1138,7 +1143,8 @@ async fn documents_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_documents_delete",
 )]
 async fn documents_delete(
     tx: &mut PgConnection,

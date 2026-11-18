@@ -306,6 +306,11 @@ async fn repositories_list(
     }))
 }
 
+/// `repositories.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_repositories_delete(input: &RepositoryIdIn) -> Result<String, String> {
+    Ok(format!("repository/{}", input.id))
+}
+
 /// Delete one repository and every project link to it.
 #[crate::action(
     name = "repositories.delete",
@@ -316,7 +321,8 @@ async fn repositories_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_repositories_delete",
 )]
 async fn repositories_delete(
     tx: &mut PgConnection,
@@ -391,6 +397,11 @@ async fn repositories_link(
     Ok(HandlerOutput::no_content(()))
 }
 
+/// `repositories.unlink`'s approval target: what the gate authorises, computed from the input alone.
+fn target_repositories_unlink(input: &RepositoryLinkIn) -> Result<String, String> {
+    Ok(format!("project/{}/repository/{}/unlink", input.project_id, input.repository_id))
+}
+
 /// Unlink a repository from a project.
 #[crate::action(
     name = "repositories.unlink",
@@ -401,7 +412,8 @@ async fn repositories_link(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_repositories_unlink",
 )]
 async fn repositories_unlink(
     tx: &mut PgConnection,

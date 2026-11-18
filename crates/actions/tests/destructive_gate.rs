@@ -78,40 +78,11 @@ async fn approved(pg: &support::Pg, tenant: TenantId, gate: &str, target: &str) 
 /// target; #283 declares one for each name below and deletes the entry. A destructive action
 /// that is *not* here and declares no target fails [`every_destructive_action_is_gated_or_listed`],
 /// which is what stops a new one being written without a decision about its gate.
-const UNGATED: &[&str] = &[
-    // #305: the MSP delete surface is destructive and declares no target yet; #283 empties the
-    // whole list by giving every action a target.
-    "benefits.delete",
-    "benefits.unlink",
-    "cadences.delete",
-    "channels.unbind",
-    "comments.delete",
-    "custom_fields.delete",
-    "documents.delete",
-    "labels.delete",
-    "model_elements.delete",
-    "model_relationships.delete",
-    "model_views.delete",
-    "models.delete",
-    // T3 (#313) added the PM job; `pm.close` is destructive and declares no target yet.
-    "pm.close",
-    "project_dependencies.delete",
-    "projects.close",
-    "registers.delete",
-    "repositories.delete",
-    "repositories.unlink",
-    "secrets.delete",
-    "secrets.rotate",
-    "stakeholders.delete",
-    "stakeholders.profile_delete",
-    "task_lists.delete",
-    "tasks.delete",
-    "tranches.delete",
-    "view_connections.delete",
-    "view_objects.delete",
-    "wbs.delete",
-    "webhooks.delete",
-];
+/// **Empty, and it stays empty.** #282 started it with 31 names, #285 shrank it by the six the
+/// console invokes, and #283 declared a target for every one of the rest. The test below still
+/// iterates the registry: a destructive action that declares no target and is not on this list
+/// fails, which is what stops a new one being written without a decision about its gate.
+const UNGATED: &[&str] = &[];
 
 /// Every action that declares a target today, with an input each target accepts.
 ///
@@ -140,6 +111,45 @@ fn declaring_targets() -> Vec<(&'static str, Value)> {
             json!({ "version_id": other, "id": id }),
         ),
         ("trace_links.delete", json!({ "id": id })),
+        // ── #283: the rest of the registry, each naming its own object ──────────────────────
+        ("benefits.delete", json!({ "id": id })),
+        ("benefits.unlink", json!({ "id": id })),
+        ("cadences.delete", json!({ "id": id })),
+        (
+            "channels.unbind",
+            json!({"tenant_id": id, "channel_kind": "telegram", "route_key": "chat:1"}),
+        ),
+        ("comments.delete", json!({ "id": id })),
+        ("custom_fields.delete", json!({ "id": id })),
+        ("documents.delete", json!({ "id": id })),
+        ("labels.delete", json!({ "id": id })),
+        ("model_elements.delete", json!({ "id": id })),
+        ("model_relationships.delete", json!({ "id": id })),
+        ("model_views.delete", json!({ "id": id })),
+        ("models.delete", json!({ "id": id })),
+        (
+            "pm.close",
+            json!({"job_binding_id": id, "project_id": other, "closure": "closing"}),
+        ),
+        ("project_dependencies.delete", json!({ "id": id })),
+        ("projects.close", json!({ "id": id })),
+        ("registers.delete", json!({ "id": id })),
+        ("repositories.delete", json!({ "id": id })),
+        (
+            "repositories.unlink",
+            json!({"project_id": id, "repository_id": other}),
+        ),
+        ("secrets.delete", json!({ "id": id })),
+        ("secrets.rotate", json!({ "id": id, "value": "not-a-real-secret" })),
+        ("stakeholders.delete", json!({ "id": id })),
+        ("stakeholders.profile_delete", json!({ "id": id })),
+        ("task_lists.delete", json!({ "id": id })),
+        ("tasks.delete", json!({ "id": id })),
+        ("tranches.delete", json!({ "id": id })),
+        ("view_connections.delete", json!({ "id": id })),
+        ("view_objects.delete", json!({ "id": id })),
+        ("wbs.delete", json!({ "id": id })),
+        ("webhooks.delete", json!({ "id": id })),
         (
             "ops.restart",
             json!({"namespace": "conveyor", "deployment": "conveyor"}),
@@ -209,7 +219,7 @@ fn every_destructive_action_is_gated_or_listed() {
 
 /// P1.1 — a destructive call that names no approval is refused before any backend is touched.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn every_destructive_action_is_refused_without_an_approval() {
+async fn every_destructive_action_refuses_without_an_approval() {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     // An address that answers nothing: a gate that let the call through would surface as a
@@ -262,6 +272,75 @@ async fn an_approval_for_another_target_is_refused() {
     .expect_err("an approval for another deployment must not authorise this one");
     assert_eq!(error.status, 403, "{}", error.detail);
     assert_eq!(error.code, "approval_wrong_target");
+}
+
+/// P2.1 — the drift guard #283 exists for: NO destructive action is ungated, and the burn-down
+/// list that tracked them is empty rather than merely short.
+#[test]
+fn every_destructive_action_declares_a_target() {
+    let mut undecided: Vec<&str> = Vec::new();
+    for spec in registry().iter() {
+        if spec.effect != conveyor_actions::Effect::Destructive {
+            continue;
+        }
+        if spec.approval_target.is_none() {
+            undecided.push(spec.name);
+        }
+    }
+    assert!(
+        undecided.is_empty(),
+        "these destructive actions declare no approval target: {undecided:?}"
+    );
+    assert!(
+        UNGATED.is_empty(),
+        "the burn-down list must be empty once every destructive action is gated"
+    );
+}
+
+/// P1.1 — every destructive action produces a non-empty target for its documented sample input.
+#[test]
+fn every_destructive_action_produces_a_target() {
+    for (action, input) in declaring_targets() {
+        let spec = registry().get(action).expect("the sample action is registered");
+        let compute = spec
+            .approval_target
+            .unwrap_or_else(|| panic!("{action} declares no approval target"));
+        let target = compute(&input).unwrap_or_else(|detail| {
+            panic!("{action}: the sample input produced no target: {detail}")
+        });
+        assert!(
+            !target.trim().is_empty(),
+            "{action} produced an empty target"
+        );
+    }
+}
+
+/// P1.2 — the target binds the OBJECT, not the action: an approved gate whose target is another
+/// object's is refused for every destructive action in the registry, not only the four ops verbs.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_target_binds_the_object_not_the_action() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    support::set_env("OPS_API_URL", "http://127.0.0.1:1");
+    support::set_env("OPS_TOKEN", "");
+
+    for (action, input) in declaring_targets() {
+        let spec = registry().get(action).expect("the sample action is registered");
+        let compute = spec.approval_target.expect("a declared target");
+        let target = compute(&input).expect("the sample input yields a target");
+        // Approved, opened for the right action, naming a DIFFERENT object.
+        let approval_id = approved(&pg, seeded.tenant, action, &format!("{target}-elsewhere")).await;
+        let error = invoke(
+            &pg.runtime,
+            registry(),
+            seeded.tenant,
+            request(action, input, Some(approval_id)),
+        )
+        .await
+        .expect_err("an approval for another object must be refused");
+        assert_eq!(error.status, 403, "{action}: {}", error.detail);
+        assert_eq!(error.code, "approval_wrong_target", "{action}");
+    }
 }
 
 /// P1.4 — the target is a pure function of the input, so it can never drift between the approval

@@ -241,14 +241,15 @@ async fn delete_benefit_cascades_links_and_transition() {
         .await;
     assert_eq!(status, 200, "{transition}");
 
+    // #283: destructive; the gate names this object.
     let (status, deleted) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "benefits.delete",
             "dev:alice",
             json!({"id": benefit}),
             Some(etag.as_str()),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{deleted}");
@@ -325,14 +326,15 @@ async fn benefit_links_are_listable_and_removable() {
     );
     assert_eq!(output(&listed)["items"][0]["benefit_id"], benefit);
 
+    // #283: destructive; the gate names this object.
     let (status, unlinked) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "benefits.unlink",
             "dev:alice",
             json!({"id": link}),
             Some(etag.as_str()),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{unlinked}");
@@ -419,14 +421,15 @@ async fn tranche_review_persists_decision_and_evidence() {
     assert_eq!(rows[0]["evidence"]["baselines"][0], "B0");
 
     let tranche_etag = format!("\"{review_version}\"");
+    // #283: the gate fires before the handler, so the refusal under test is reached through one.
     let (status, refused) = running
-        .invoke(
+        .invoke_gated(
+            &_pg,
+            _seeded.tenant,
             "tranches.delete",
             "dev:alice",
             json!({"id": tranche}),
             Some(tranche_etag.as_str()),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 409, "{refused}");
@@ -476,14 +479,15 @@ async fn msp_deletes_and_refusals() {
     assert_eq!(output(&updated)["period"], "PI-2027.2");
     let cadence_version = headers_version(&updated);
     let cadence_etag = format!("\"{cadence_version}\"");
+    // #283: destructive; the gate names this object.
     let (status, deleted) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "cadences.delete",
             "dev:alice",
             json!({"id": cadence_id}),
             Some(cadence_etag.as_str()),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{deleted}");
@@ -522,25 +526,27 @@ async fn msp_deletes_and_refusals() {
     assert_eq!(status, 201, "{child}");
     let child_id = id_of(output(&child), "id");
     let child_etag = headers.get("etag").cloned().expect("child etag");
+    // #283: destructive; the gate names this object.
     let (status, refused) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "wbs.delete",
             "dev:alice",
             json!({"id": parent_id}),
             Some(parent_etag.as_str()),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 409, "{refused}");
+    // #283: destructive; the gate names this object.
     let (status, deleted) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "wbs.delete",
             "dev:alice",
             json!({"id": child_id}),
             Some(child_etag.as_str()),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{deleted}");
@@ -578,14 +584,15 @@ async fn msp_deletes_and_refusals() {
         )
         .await;
     assert_eq!(status, 201, "{profile}");
+    // #283: the gate fires before the handler, so the refusal under test is reached through one.
     let (status, refused) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "registers.delete",
             "dev:alice",
             json!({"id": register_id}),
             Some(register_etag.as_str()),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 409, "{refused}");
@@ -602,14 +609,15 @@ async fn msp_deletes_and_refusals() {
     assert_eq!(status, 201, "{free}");
     let free_id = id_of(output(&free), "id");
     let free_etag = headers.get("etag").cloned().expect("free register etag");
+    // #283: destructive; the gate names this object.
     let (status, deleted) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "registers.delete",
             "dev:alice",
             json!({"id": free_id}),
             Some(free_etag.as_str()),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{deleted}");
@@ -648,14 +656,15 @@ async fn msp_deletes_and_refusals() {
     assert_eq!(output(&updated)["importance"], "critical");
     let profile_version = headers_version(&updated);
     let profile_etag = format!("\"{profile_version}\"");
+    // #283: destructive; the gate names this object.
     let (status, deleted) = running
-        .invoke(
+        .invoke_gated(
+            &pg,
+            seeded.tenant,
             "stakeholders.profile_delete",
             "dev:alice",
             json!({"id": profile_id}),
             Some(profile_etag.as_str()),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{deleted}");
@@ -767,14 +776,19 @@ async fn another_tenants_msp_rows_are_invisible() {
         )
         .await;
     assert_eq!(status, 404, "{body}");
+    // #283: bob is in ANOTHER tenant, so his gate is opened there — then his delete still has to
+    // answer 404: the approval buys nothing outside the tenant that holds the object.
+    let bob = support::seed(&pg, "dev-b", "bob", "Bob").await;
+    let bob_gate =
+        support::approved_gate(&pg, bob.tenant, &running, "dev:bob", "benefits.delete", &json!({"id": benefit}))
+            .await;
     let (status, body) = running
-        .invoke(
+        .invoke_approved(
             "benefits.delete",
             "dev:bob",
             json!({"id": benefit}),
             Some(etag.as_str()),
-            None,
-            None,
+            bob_gate,
         )
         .await;
     assert_eq!(status, 404, "{body}");

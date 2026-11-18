@@ -173,6 +173,11 @@ async fn view_objects_update(
     Ok(HandlerOutput::ok(object_out(&after)).with_etag(super::etag_of(version_i64(after.version))))
 }
 
+/// `view_objects.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_view_objects_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("view_object/{}", input.id))
+}
+
 /// Remove an object and every connector that names it.
 #[crate::action(
     name = "view_objects.delete",
@@ -183,7 +188,8 @@ async fn view_objects_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_view_objects_delete",
 )]
 async fn view_objects_delete(
     tx: &mut PgConnection,

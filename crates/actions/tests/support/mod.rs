@@ -689,6 +689,40 @@ impl Running {
         (status, body)
     }
 
+    /// [`Running::invoke`] for a destructive action: opens an approved gate for exactly this
+    /// call and passes its id (#283).
+    ///
+    /// A gate request emits no event, so a test that counts events around this call sees only
+    /// the action's own.
+    pub async fn invoke_gated(
+        &self,
+        pg: &Pg,
+        tenant: TenantId,
+        action: &str,
+        token: &str,
+        input: Value,
+        if_match: Option<&str>,
+    ) -> (u16, Value) {
+        let gate = approved_gate(pg, tenant, self, token, action, &input).await;
+        self.invoke_approved(action, token, input, if_match, gate)
+            .await
+    }
+
+    /// [`Running::invoke_gated`] plus the response headers.
+    pub async fn invoke_gated_full(
+        &self,
+        pg: &Pg,
+        tenant: TenantId,
+        action: &str,
+        token: &str,
+        input: Value,
+        if_match: Option<&str>,
+    ) -> (u16, std::collections::HashMap<String, String>, Value) {
+        let gate = approved_gate(pg, tenant, self, token, action, &input).await;
+        self.invoke_approved_full(action, token, input, if_match, gate)
+            .await
+    }
+
     /// [`Running::invoke_approved`] plus the response headers.
     pub async fn invoke_approved_full(
         &self,
