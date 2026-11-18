@@ -455,6 +455,57 @@ pub struct CardsCommentIn {
     pub body: String,
 }
 
+/// `cards.ledger_append` — one claim or fact on a card (ADR 0008).
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CardLedgerAppendIn {
+    /// The card the entry belongs to.
+    pub card_id: Uuid,
+    /// `claim | fact`.
+    pub kind: String,
+    /// The claim or fact itself. Trimmed; empty is refused.
+    pub body: String,
+    /// Where it came from (`list`, `node`, `execution_id`, …). A JSON object; absent means `{}`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<Value>,
+    /// The laya verdict, for a claim (`score`, `accepted`, `reason`). A JSON object.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verdict: Option<Value>,
+}
+
+/// `cards.ledger_list` — one card's ledger, oldest first.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CardLedgerListIn {
+    /// The card whose ledger is read.
+    pub card_id: Uuid,
+    /// Restrict the page to `claim` or `fact`; absent means both.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
+    /// Page size; clamped into the contract's range.
+    #[serde(default)]
+    pub limit: Option<u32>,
+}
+
+/// One ledger row. Append-only: there is no `version` because nothing edits a row.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LedgerEntryOut {
+    /// The row id.
+    pub id: String,
+    /// The card the entry belongs to.
+    pub card_id: String,
+    /// `claim | fact`.
+    pub kind: String,
+    /// The claim or fact itself.
+    pub body: String,
+    /// Where it came from.
+    pub source: Value,
+    /// The laya verdict, when one was recorded.
+    pub verdict: Option<Value>,
+    /// The writing user, when one was recorded.
+    pub created_by: Option<String>,
+    /// When the entry was written.
+    pub created_at: DateTime<Utc>,
+}
+
 /// `cards.list` — one page of a board's active cards, optionally restricted to one lane.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CardsListIn {
@@ -1003,6 +1054,20 @@ pub fn card_out(record: &CardRecord) -> CardOut {
         version: i64::try_from(record.card.version.get()).unwrap_or(i64::MAX),
         created_at: record.created_at,
         updated_at: record.updated_at,
+    }
+}
+
+/// Map a stored ledger row.
+pub fn ledger_out(entry: &conveyor_store::ledger::LedgerEntry) -> LedgerEntryOut {
+    LedgerEntryOut {
+        id: entry.id.to_string(),
+        card_id: entry.card_id.to_string(),
+        kind: entry.kind.clone(),
+        body: entry.body.clone(),
+        source: entry.source.clone(),
+        verdict: entry.verdict.clone(),
+        created_by: entry.created_by.map(|id| id.to_string()),
+        created_at: entry.created_at,
     }
 }
 

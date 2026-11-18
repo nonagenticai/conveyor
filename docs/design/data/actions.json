@@ -58,6 +58,8 @@
     "cards.create",
     "cards.duplicate",
     "cards.get",
+    "cards.ledger_append",
+    "cards.ledger_list",
     "cards.list",
     "cards.move",
     "cards.release",

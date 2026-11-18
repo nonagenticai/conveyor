@@ -2224,6 +2224,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_card(pg, ctx, "active").await;
             ctx.push(sample.name, id);
         }
+        // #295: the ledger's write and read address one card; each round gets a fresh one.
+        "cards.ledger_append" | "cards.ledger_list" => {
+            let id = seed_card(pg, ctx, "active").await;
+            ctx.push(sample.name, id);
+        }
         "cards.unarchive" => {
             let card = seed_card(pg, ctx, "active").await;
             let archive = Uuid::parse_str(&ctx.lane("archive")).expect("archive uuid");
@@ -3135,6 +3140,26 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         on_prepared("cards.archive", Some("\"1\"")),
         on_prepared("cards.unarchive", Some("\"1\"")),
         on_prepared("cards.duplicate", None),
+        {
+            // #295: one claim with its provenance and verdict, over both transports.
+            let mut sample = on_prepared("cards.ledger_append", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "card_id": ctx.pop("cards.ledger_append"),
+                    "kind": "claim",
+                    "body": "the hero image sits above the fold",
+                    "source": {"list": "research", "node": "n-1", "execution_id": "e-1"},
+                    "verdict": {"score": 0.9, "accepted": true, "reason": "observed"}
+                })
+            });
+            sample
+        },
+        {
+            let mut sample = on_prepared("cards.ledger_list", None);
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"card_id": ctx.pop("cards.ledger_list"), "limit": 10}));
+            sample
+        },
         {
             let mut sample = on_prepared("cards.comment", None);
             sample.input =

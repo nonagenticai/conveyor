@@ -90,7 +90,8 @@ use serde_json::{Value, json};
 /// **#282 adds 3 internal**: the approval-policy family.
 /// **T3 adds 6 internal**: the PM job.
 /// **#154 adds 1 internal**: `analyse.site`, the analysis library's invocable read.
-const EXPECTED: [&str; 428] = [
+/// **#295 adds 2 internal**: `cards.ledger_append` and `cards.ledger_list`, the claim/fact ledger.
+const EXPECTED: [&str; 430] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -150,6 +151,8 @@ const EXPECTED: [&str; 428] = [
     "cards.duplicate",
     "cards.get",
     "cards.list",
+    "cards.ledger_append",
+    "cards.ledger_list",
     "cards.move",
     "cards.release",
     "cards.remove_label",
@@ -574,7 +577,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // T3 adds the six PM actions (all internal): 386 → 392.
     // #305 adds the fourteen MSP edit/read actions, all internal: 395 -> 409; external stays 18.
     // #154 adds `analyse.site` (internal, read): 409 -> 410; external stays 18.
-    assert_eq!((internal, external), (410, 18));
+    // #295 adds `cards.ledger_append` (write) and `cards.ledger_list` (read), both internal:
+    // 410 -> 412; external stays 18.
+    assert_eq!((internal, external), (412, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
