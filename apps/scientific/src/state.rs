@@ -32,6 +32,13 @@ pub struct AppState {
     pub pipeline: PipelineState,
     /// The client the tenant gate introspects licences with (same one the downstream clients use).
     pub http: reqwest::Client,
+    /// The evidence-review database. `None` when `DATABASE_URL` is absent; every review route
+    /// refuses by name rather than reading an unbound session (an unbound tenant makes every RLS
+    /// policy match nothing, which is indistinguishable from "no data").
+    pub pool: Option<sqlx::PgPool>,
+    /// Verifies `X-Actor-Token`. `None` when the actor realm is unconfigured, and every actor
+    /// token is then refused — never accepted unchecked.
+    pub actor_verifier: Option<crate::actor_jwt::ActorVerifier>,
 }
 
 pub type Shared = Arc<AppState>;
@@ -61,6 +68,16 @@ impl AppState {
             }
             None => None,
         };
+        let pool = config.database_url.as_deref().map(crate::db::connect_lazy);
+        let actor_verifier = match crate::actor_jwt::ActorVerifier::from_config(&config) {
+            Ok(verifier) => verifier,
+            Err(error) => {
+                // Fail closed and loudly: a realm is configured but its JWKS client cannot be
+                // built, so no actor token will verify. Refusing every human is correct here.
+                tracing::error!(%error, "actor verifier is misconfigured; actor tokens will be refused");
+                None
+            }
+        };
         Self {
             config: Arc::new(config),
             cache: Arc::new(cache),
@@ -71,6 +88,20 @@ impl AppState {
             objects,
             pipeline: PipelineState::default(),
             http,
+            pool,
+            actor_verifier,
         }
+    }
+
+    /// State for tests: a database and an actor verifier supplied by the harness.
+    pub fn for_tests(
+        config: Config,
+        pool: Option<sqlx::PgPool>,
+        actor_verifier: Option<crate::actor_jwt::ActorVerifier>,
+    ) -> Self {
+        let mut state = Self::new(config);
+        state.pool = pool;
+        state.actor_verifier = actor_verifier;
+        state
     }
 }

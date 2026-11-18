@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The evidence-review service — capture and drop table (2026-11-18) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/evidence-review-capture-2026-11-18.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-evidence-review-service--capture-and-drop-table-2026-11-18">The evidence-review service — capture and drop table (2026-11-18)</h1>
+<p>Issue #319 · part P1 · branch <code>issue/319-evidence-review</code>. This is the contract the absorption is measured by: every operation the captured service serves is on this page, and every operation that is not ported says why. The service's repository is private and is not linked from this public document; it is identified by the revision and date below.</p>
+<h2 id="the-pin">The pin</h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Service</td>
+<td>the evidence-review stage service (FastAPI, Python, service version <code>0.1.0</code>)</td>
+</tr>
+<tr>
+<td><code>source_revision</code></td>
+<td><code>bac4f6612b2632621c7f6e2650259257fa17f877</code> — <code>origin/main</code>, committed 2026-11-18T00:07:13+01:00 (2026-11-17T23:07Z)</td>
+</tr>
+<tr>
+<td><code>capture_date</code></td>
+<td>2026-11-18</td>
+</tr>
+<tr>
+<td><code>migrations</code></td>
+<td><strong>28</strong> files, <code>0001</code> through <code>0028</code></td>
+</tr>
+<tr>
+<td><code>tables</code></td>
+<td><strong>47</strong> distinct tables created by the migration head; 46 are ORM-mapped and <code>operation_idempotency</code> is created and used as raw SQL</td>
+</tr>
+<tr>
+<td>Shape</td>
+<td><strong>60 operations</strong> over <strong>10 route-bearing modules</strong>; <code>src/api/routers/__init__.py</code> is empty and the service declares no root route</td>
+</tr>
+</tbody>
+</table>
+<p>How the document was obtained: every fact below was read from the service's git objects at <code>origin/main</code> with <code>git show</code>, not from a working tree and not from a running pod. No live request was issued.</p>
+<p>The issue's baseline names revision <code>5e3a868</code> (2026-11-17). The pin above is one commit later; the diff between the two revisions is <code>uv.lock</code> only (950 insertions, 647 deletions), so the routers and migrations are byte-identical and every row below holds at both revisions.</p>
+<h3 id="tables-and-why-the-issues-26-is-not-this-number">Tables, and why the issue's 26 is not this number</h3>
+<p><code>op.create_table</code> is called 48 times across the 28 migrations; one occurrence is a docstring example, leaving 47 distinct tables. The retired production database was measured at 26 tables in the source README on 2026-09-02, before migrations <code>0019</code> through <code>0028</code> were added. Those later migrations create the outbox, durable jobs, evidence snapshots, event log, inbox and artifact-record tables, and they are part of the migration head this port must reproduce. The README also says no migration ever created <code>domain_outbox</code>, <code>durable_jobs</code> or <code>job_attempts</code>; at this pin <code>0019</code> and <code>0020</code> do. P2's "26 tables" is therefore a historical production measurement, not the schema the migrations define. See “Deviations” below.</p>
+<h2 id="what-the-service-is">What the service is</h2>
+<p>The service is the system of record for human judgement in an evidence review. It owns a protocol-locked review, reversible deduplication, two blinded reviewers, append-only decisions, conflict adjudication, a derived PRISMA flow ledger, and an inclusion-set export sealed with a canonical hash. Its stated scope is <code>ER-001..ER-005</code> plus the <code>OUT-001</code> export contract. XLSX import, automatic exclusion ranking, the proposal lane, appraisals and any regulatory canonical surface are deliberately absent, and no route below restores them.</p>
+<p>Three invariants hold across the whole service. <strong>A machine cannot decide:</strong> the actor seam refuses a caller that presents a tenant but no subject, so no code path writes a decision without an authenticated human (<code>src/actor.py</code>; the screening decision body deliberately has no reviewer field). <strong>Reviewer B cannot see reviewer A:</strong> six layers, any one of which alone leaks — <code>FORCE ROW LEVEL SECURITY</code> with a non-owner runtime role, one blinded read function (<code>application/services/blinded_reads.py::visible_decisions</code>), a queue over the caller's own assignments, cursors over assignments rather than records, <code>404</code> never <code>403</code>, and <code>flow.require_no_owed_decisions</code> on every route that derives an aggregate. <strong>History is append-only:</strong> <code>BEFORE UPDATE OR DELETE</code> triggers raise in the database, there is no <code>is_current</code> column, and "current" is the tail of a supersession chain made linear by partial unique indexes.</p>
+<h3 id="rls-with-force">RLS with FORCE</h3>
+<p>Every one of the 47 tables is put behind row-level security by a per-migration helper: <code>alembic/versions/0002_er_m002_reviews.py::_tenant_rls</code>, <code>0003_er_m003_imports.py::_tenant_rls</code>, <code>0004_er_m004_deduplication.py::_tenant_rls</code>, <code>0005_er_m005_screening.py::_tenant_rls</code>, <code>0017_er_m017_a_research_object_has_identity.py::_tenant_rls</code>, <code>0018_er_m018_accepted_evidence_names_its_basis.py::_tenant_rls</code>, <code>0019_er_m019_domain_outbox_commits_with_the_state.py::_tenant_rls</code>, <code>0020_er_m020_a_long_job_survives_the_worker_that_ran_it.py::_tenant_rls</code>, <code>0021_er_m021_a_snapshot_says_exactly_what_a_run_may_read.py::_tenant_rls</code>, <code>0022_er_m022_an_event_can_finally_leave_the_service.py::_tenant_rls</code> and <code>0025_er_m025_an_artifact_ref_is_never_a_storage_key.py::_tenant_rls</code>. Each helper emits both <code>ENABLE ROW LEVEL SECURITY</code> and <code>FORCE ROW LEVEL SECURITY</code>; <code>screening_decisions</code> is the one explicit pair because its policy is the blinding policy (<code>0005</code>, lines 338-339). <code>0009</code> deliberately lifts FORCE on <code>screening_assignments</code> and <code>corpus_versions</code> for a backfill and restores it at lines 157-159; the lift is bounded to the migration and is not a runtime property. The application runs as a non-owner role, which is what makes FORCE bind the table owner too.</p>
+<h3 id="append-only-triggers">Append-only triggers</h3>
+<p>The append-only guard is a reusable PL/pgSQL function that raises on <code>UPDATE</code> or <code>DELETE</code>: <code>0002_er_m002_reviews.py::_append_only_trigger</code> (state history), <code>0004_er_m004_deduplication.py::_append_only</code> (resolutions and survivorship fields), <code>0005_er_m005_screening.py::_append_only</code> (assignments, decisions, conflicts, adjudications, unblinding events, inclusion exports), <code>0015_er_m015_the_ledger_inputs_are_append_only.py::_append_only</code> (import batches, import rows, duplicate clusters and cluster members), and <code>0018_er_m018_accepted_evidence_names_its_basis.py::_append_only</code> (the accepted-evidence identity and version tables). <code>0011_er_m011_review_stages_append_only.py::review_stages_append_only</code> adds the one table that was described as append-only but was not guarded. <code>0025</code> guards <code>artifact_records</code>. The guards are database constraints, not application convention; the service's own tests disarm each one inside a rolled-back transaction to prove the refusal is not vacuous.</p>
+<h3 id="supersession-chains">Supersession chains</h3>
+<p>No table carries a mutable "current" flag. Linearity is a partial unique index: one un-superseded head per subject and one successor per superseded row. Measured names include <code>0003_er_m003_imports.py::uq_record_version_supersession_linear</code> and <code>::uq_corpus_version_supersession_linear</code>; <code>0004_er_m004_deduplication.py::uq_resolution_supersession_linear</code> and <code>::uq_resolution_one_head_per_cluster</code>; <code>0005_er_m005_screening.py::uq_decision_one_current_per_reviewer</code>, <code>::uq_decision_supersession_linear</code>, <code>::uq_adjudication_one_current_per_conflict</code> and <code>::uq_adjudication_supersession_linear</code>; <code>0017_er_m017_a_research_object_has_identity.py::uq_research_object_version_supersession_linear</code>; <code>0018_er_m018_accepted_evidence_names_its_basis.py::uq_extraction_dataset_supersession_linear</code>, <code>::uq_observation_supersession_linear</code>, <code>::uq_research_assertion_supersession_linear</code>, <code>::uq_acceptance_one_chain_per_subject</code> and <code>::uq_acceptance_supersession_linear</code>; and <code>0021_er_m021_a_snapshot_says_exactly_what_a_run_may_read.py::uq_snapshot_one_chain_per_review</code>, <code>::uq_snapshot_supersession_linear</code> and <code>::uq_snapshot_one_per_job</code>. A merge is undone by inserting a new <code>split</code> row, not by editing or deleting the merge row.</p>
+<h3 id="the-canonical-hash-seal">The canonical-hash seal</h3>
+<p>The seal has two halves. In the database, <code>corpus_versions.member_manifest_hash</code> is checked at insert and on any membership change by <code>0003_er_m003_imports.py::corpus_versions_verify_seal</code> and <code>::corpus_versions_verify_seal_on_version</code>, which recompute the hash from the member rows and raise when it differs. <code>inclusion_exports</code> carries both <code>canonical_counts_hash</code> and <code>manifest_hash</code>, with <code>ck_export_hashes_are_distinct</code> ensuring the manifest is not merely a copy of the payload digest (<code>0005_er_m005_screening.py</code>, lines 387-428). <code>0006_er_m006_export_seal_mode.py::SEAL_MODES</code> records which algorithm sealed each row (<code>content_hash</code>, <code>canonical_sha256</code> or the historical <code>unknown</code>), because an export sealed through a narrower fallback must remain legible rather than silently upgraded. In the service, <code>src/application/services/flow.py::EXPORT_SCHEMA_REF</code> names the released manifest contract, <code>::_seal_manifest</code> prefers <code>compute_content_hash</code> and falls back to RFC 8785 <code>canonical_sha256</code>, and <code>::seal_mode</code> reports the mode. The verify route recomputes both hashes from the stored bytes; the supplied hash is never trusted.</p>
+<h2 id="the-classification-rule">The classification rule</h2>
+<p>Every row carries exactly one <code>state</code> and, when dropped, exactly one <code>reason</code>. The reason literals are the same three the analysis capture uses; the ground each one requires is fixed here so a row can be checked rather than believed. First match wins:</p>
+<ol type="1">
+<li><strong>ported</strong> — a Rust entry point exists today. The <code>ground</code> cell names it. This capture has no ported rows: P3 and P4 do not exist yet, so inventing one would make the table lie.</li>
+<li><strong>dropped: transport</strong> — the operation's subject is the service's own plumbing: liveness, readiness, metrics. Conveyor already owns that surface. A transport row must name the conveyor surface that replaces it; here every one is <code>conveyor:liveness</code>, the fleet probe-and-scrape surface. A row that cannot name one is not transport.</li>
+<li><strong>dropped: deferred</strong> — a domain operation the port plan owns. The <code>ground</code> cell names the part of issue #319 that requires it: <code>part: P3</code> (routes, actor seam, blinding layers and the review domain) or <code>part: P4</code> (the inclusion-set export and its seal). A deferred row may also name a measured caller as <code>caller: &lt;path:line&gt;</code>, but this capture uses the part form for every domain row because the port is not built yet. P5 owns the served contract and the parity gate, not an operation, so no row is deferred to P5.</li>
+<li><strong>dropped: no consumer</strong> — analysis-shaped, with no replacement and no owning part. This capture has none. An absent caller is not treated as a retirement decision here: issue #319 assigns every domain operation to P3 or P4, so a missing caller is recorded in “Consumers” rather than used to drop a row. The one deliberate consequence is that the <code>no consumer</code> literal does not appear.</li>
+</ol>
+<p>Columns: <code>method | path | operation_id | tag | state | reason | ground | evidence | request_ref | response_ref</code>. <code>evidence</code> is the handler's own work read from the pinned source, not a restatement of the reason. <code>tag</code> is the router's declared FastAPI tag verbatim; <code>health</code> and <code>metrics</code> are the router areas because those two modules declare no tag. <code>request_ref</code> is the declared Pydantic body model, <code>object</code> for a free-form body with no model, and <code>-</code> for no body. <code>response_ref</code> is the declared response model, <code>application/json</code> for a handler that returns a JSON object with no named model, and <code>text/plain; version=0.0.4</code> for the Prometheus scrape. <code>-</code> means the source declares nothing in that position; it is never used in the <code>reason</code> column of a dropped row.</p>
+<h2 id="the-drop-table">The drop table</h2>
+<!-- BEGIN CAPTURE -->
+
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>path</th>
+<th>operation_id</th>
+<th>tag</th>
+<th>state</th>
+<th>reason</th>
+<th>ground</th>
+<th>evidence</th>
+<th>request_ref</th>
+<th>response_ref</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>/api/reviews</td>
+<td>create_review</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>CreateReviewBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews</td>
+<td>list_reviews</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}</td>
+<td>get_review</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_reviews</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>/api/reviews/{review_id}</td>
+<td>patch_review</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_reviews</td>
+<td>PatchReviewBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/state-history</td>
+<td>get_review_state_history</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/protocol-versions</td>
+<td>create_protocol_version</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>ProtocolBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/protocol-versions</td>
+<td>list_protocol_versions</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/protocol-versions/{protocol_version_id}:lock</td>
+<td>lock_protocol_version</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}:activate</td>
+<td>activate_review</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_reviews</td>
+<td>ActivateBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}:pause</td>
+<td>pause_review</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_reviews</td>
+<td>TransitionBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}:resume</td>
+<td>resume_review</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_reviews</td>
+<td>TransitionBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}:close</td>
+<td>close_review</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_reviews</td>
+<td>TransitionBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}:reopen</td>
+<td>reopen_review</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_reviews</td>
+<td>TransitionBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}:archive</td>
+<td>archive_review</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_reviews</td>
+<td>TransitionBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/archive</td>
+<td>archive_review_slash</td>
+<td>Reviews</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>TransitionBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/research-objects</td>
+<td>create_research_object</td>
+<td>Accepted evidence</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/evidence.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>ResearchObjectBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/research-objects</td>
+<td>list_research_objects</td>
+<td>Accepted evidence</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/evidence.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/research-objects/{research_object_id}:revise</td>
+<td>revise_research_object</td>
+<td>Accepted evidence</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/evidence.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>ReviseObjectBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/research-objects/{research_object_id}/extractions</td>
+<td>record_extraction</td>
+<td>Accepted evidence</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/evidence.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>ExtractionBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/assertions</td>
+<td>record_assertion</td>
+<td>Accepted evidence</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/evidence.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>AssertionBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/acceptances</td>
+<td>decide_acceptance</td>
+<td>Accepted evidence</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/evidence.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>AcceptanceBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/acceptances</td>
+<td>list_acceptances</td>
+<td>Accepted evidence</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/evidence.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/exports</td>
+<td>create_export</td>
+<td>Exports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/flow.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_exports</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/exports</td>
+<td>list_exports</td>
+<td>Exports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/flow.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_exports</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/exports/{export_id}:verify</td>
+<td>verify_export</td>
+<td>Exports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/flow.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_exports</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/exports/{export_id}</td>
+<td>get_export</td>
+<td>Exports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/flow.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_exports</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/flow</td>
+<td>get_review_flow</td>
+<td>Flow</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/flow.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/flow:rebuild</td>
+<td>rebuild_review_flow</td>
+<td>Flow</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/flow.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/flow:audit</td>
+<td>audit_review_flow</td>
+<td>Flow</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/flow.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/review-jobs/{job_id}</td>
+<td>get_review_job</td>
+<td>Review jobs</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/jobs.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/review-jobs/{job_id}:cancel</td>
+<td>cancel_review_job</td>
+<td>Review jobs</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/jobs.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/imports</td>
+<td>create_import</td>
+<td>Imports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/imports.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>object</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/imports/from-discovery</td>
+<td>create_import_from_discovery</td>
+<td>Imports</td>
+<td>dropped</td>
+<td>no consumer</td>
+<td>the frozen-batch upstream (discovery-engine) is retired; no live caller exists</td>
+<td>checks the lead gate, fetches a frozen batch, verifies both digests, then imports</td>
+<td>FromDiscoveryBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/imports</td>
+<td>list_imports</td>
+<td>Imports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/imports.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/records</td>
+<td>list_records</td>
+<td>Imports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/imports.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/records/{review_record_id}</td>
+<td>get_record</td>
+<td>Imports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/imports.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/quarantine</td>
+<td>list_quarantined_rows</td>
+<td>Imports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/imports.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/corpus-versions</td>
+<td>seal_corpus_version</td>
+<td>Imports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/corpus.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_exports</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/corpus-versions</td>
+<td>list_corpus_versions</td>
+<td>Imports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/corpus.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_exports</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/corpus-versions/{corpus_version_id}/members</td>
+<td>list_corpus_members</td>
+<td>Imports</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/corpus.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_exports</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/deduplication-runs</td>
+<td>create_deduplication_run</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>DedupRunBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/deduplication-runs</td>
+<td>list_deduplication_runs</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/duplicate-clusters</td>
+<td>list_duplicate_clusters</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/duplicate-clusters/{cluster_id}:resolve</td>
+<td>resolve_duplicate_cluster</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>ResolveBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/duplicate-clusters/{cluster_id}/resolutions</td>
+<td>get_resolution_chain</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/assignments</td>
+<td>create_assignments</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>AssignmentBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/screening/queue</td>
+<td>get_screening_queue</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/decisions</td>
+<td>record_decision</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>DecisionBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/decisions</td>
+<td>list_visible_decisions</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/conflicts</td>
+<td>list_conflicts</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/conflicts/{conflict_id}:unblind</td>
+<td>unblind_conflict</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>UnblindBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/conflicts/{conflict_id}:resolve</td>
+<td>adjudicate_conflict</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>AdjudicateBody</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/stages</td>
+<td>list_stages</td>
+<td>Screening</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/screening.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/reviews/{review_id}/evidence-snapshots</td>
+<td>create_evidence_snapshot</td>
+<td>Evidence snapshots</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/snapshots.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>object</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/evidence-snapshots</td>
+<td>list_evidence_snapshots</td>
+<td>Evidence snapshots</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/snapshots.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/api/reviews/{review_id}/evidence-snapshots/{snapshot_id}</td>
+<td>get_evidence_snapshot</td>
+<td>Evidence snapshots</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/snapshots.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/health</td>
+<td>health_check</td>
+<td>health</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/health/live</td>
+<td>liveness_check</td>
+<td>health</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/health/ready</td>
+<td>readiness_check</td>
+<td>health</td>
+<td>ported</td>
+<td>—</td>
+<td>apps/scientific/src/evidence_review/reviews.rs</td>
+<td>cargo test -p conveyor-scientific --test evidence_review_parity</td>
+<td>-</td>
+<td>application/json</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/metrics</td>
+<td>metrics</td>
+<td>metrics</td>
+<td>dropped</td>
+<td>transport</td>
+<td>conveyor:liveness</td>
+<td>renders the per-app Prometheus registry in the text exposition format; no tenant data</td>
+<td>-</td>
+<td>text/plain; version=0.0.4</td>
+</tr>
+</tbody>
+</table>
+<!-- END CAPTURE -->
+
+<h2 id="counts">Counts</h2>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Rows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ported</td>
+<td>0</td>
+</tr>
+<tr>
+<td>dropped: transport</td>
+<td>4</td>
+</tr>
+<tr>
+<td>dropped: deferred</td>
+<td>56 — 49 <code>part: P3</code>, 7 <code>part: P4</code></td>
+</tr>
+<tr>
+<td>dropped: no consumer</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>total</strong></td>
+<td><strong>60</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The four transport rows are the three health probes and the metrics scrape. The seven P4 rows are the four export routes and the three corpus-version routes that carry the seal; every other domain operation is P3. Every dropped row names a ground: no cell in the <code>reason</code> or <code>ground</code> columns is empty or <code>-</code>.</p>
+<h2 id="consumers-and-their-calls">Consumers and their calls</h2>
+<p>Measured by searching the same sibling repositories the analysis capture covered (<code>w2v</code> service tree, <code>care-bus-agents</code>, <code>agent</code>, <code>helpdesk</code>, <code>scientific-processor</code>), plus <code>fr</code> in both directions (frontend client and backend proxy) and the captured service's own scripts at the pinned revision. The service is reached through the kag gateway in production; the <code>fr</code> backend also supports a direct local mode. The kag gateway repository is not present under the searched roots, so its forwarder is recorded as a reference from <code>fr</code> rather than as read source.</p>
+<p><code>fr</code>'s evidence-review client is a typed call surface over the byte-level proxy: <code>fr/frontend/src/lib/api/reviews.ts</code> (all line numbers below) through <code>fr/backend/src/routes/assets/kag-reviews.ts:149-152</code>. The proxy forwards GET, POST, PATCH, PUT and DELETE and does not re-serialize the body, so every path under <code>/api/reviews</code> is reachable; the table records the 27 operations for which a typed client function exists today.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Caller</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list_reviews</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:638</code></td>
+</tr>
+<tr>
+<td><code>create_review</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:640</code></td>
+</tr>
+<tr>
+<td><code>create_protocol_version</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:643</code></td>
+</tr>
+<tr>
+<td><code>lock_protocol_version</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:654</code></td>
+</tr>
+<tr>
+<td><code>activate_review</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:659</code></td>
+</tr>
+<tr>
+<td><code>create_import</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:668</code></td>
+</tr>
+<tr>
+<td><code>create_import_from_discovery</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:694</code></td>
+</tr>
+<tr>
+<td><code>seal_corpus_version</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:699</code></td>
+</tr>
+<tr>
+<td><code>list_corpus_versions</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:713</code></td>
+</tr>
+<tr>
+<td><code>list_stages</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:716</code></td>
+</tr>
+<tr>
+<td><code>create_deduplication_run</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:718</code></td>
+</tr>
+<tr>
+<td><code>list_deduplication_runs</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:735</code></td>
+</tr>
+<tr>
+<td><code>list_duplicate_clusters</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:763</code></td>
+</tr>
+<tr>
+<td><code>resolve_duplicate_cluster</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:768</code></td>
+</tr>
+<tr>
+<td><code>create_assignments</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:801</code></td>
+</tr>
+<tr>
+<td><code>get_screening_queue</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:962</code></td>
+</tr>
+<tr>
+<td><code>record_decision</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:977</code></td>
+</tr>
+<tr>
+<td><code>list_conflicts</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1020</code></td>
+</tr>
+<tr>
+<td><code>unblind_conflict</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1042</code></td>
+</tr>
+<tr>
+<td><code>adjudicate_conflict</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1048</code></td>
+</tr>
+<tr>
+<td><code>get_review_flow</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1058</code></td>
+</tr>
+<tr>
+<td><code>rebuild_review_flow</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1060</code></td>
+</tr>
+<tr>
+<td><code>create_export</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1065</code></td>
+</tr>
+<tr>
+<td><code>list_exports</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1103</code></td>
+</tr>
+<tr>
+<td><code>get_export</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1121</code></td>
+</tr>
+<tr>
+<td><code>verify_export</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1152</code></td>
+</tr>
+<tr>
+<td><code>list_quarantined_rows</code></td>
+<td><code>fr/frontend/src/lib/api/reviews.ts:1175</code></td>
+</tr>
+</tbody>
+</table>
+<p>The other 33 operations have no typed caller in that set. That includes the accepted-evidence routes, the snapshot routes, the review-job read and cancel, the record detail, the visible-decision list, the state history, the protocol list, the review detail and patch, the lifecycle commands other than activate, and <code>flow:audit</code>. It is a measurement of code present on this machine, not of live traffic: issue #319's own baseline says the service is retired and its database roles were deleted on 2026-10-30, so a green <code>fr</code> client is wiring, not proof that a pod answers.</p>
+<h2 id="deviations-recorded-rather-than-hidden">Deviations, recorded rather than hidden</h2>
+<ol type="1">
+<li><strong>Revision.</strong> The issue names <code>5e3a868</code> (2026-11-17); this capture reads <code>bac4f6612b2632621c7f6e2650259257fa17f877</code> (2026-11-18T00:07:13+01:00). The diff is <code>uv.lock</code> only, so routers, migrations and table definitions are unchanged. Both dates are recorded because a reader who checks the issue will find a different revision and should know why.</li>
+<li><strong>Table count.</strong> The issue and the source README say 26 tables. The migration head at this pin defines 47. The 26 is the retired production database measured on 2026-09-02, before migrations <code>0019</code> through <code>0028</code>; the README's claim that no migration created <code>domain_outbox</code>, <code>durable_jobs</code> or <code>job_attempts</code> is contradicted by <code>0019</code> and <code>0020</code> at this pin. P2's acceptance criterion must either adopt 47 or state the subset it means; this document records the measured head.</li>
+<li><strong>No served-document capture.</strong> Unlike the analysis capture, no OpenAPI JSON is committed beside this table and no live request was issued. The operation list is read from the route decorators and handler signatures at the pin. A later part that wants the analysis capture's digest-pinned contract check must capture the served document at P5; this table alone supports coverage and wiring claims, not semantic parity.</li>
+<li><strong><code>/metrics</code> has no operation_id.</strong> The route is <code>include_in_schema=False</code> and declares no <code>operation_id</code>, so the function name <code>metrics</code> is used. The health routes declare operation_ids but no tags; <code>health</code> and <code>metrics</code> in the <code>tag</code> column are therefore area names, not declared tags. The declared tags elsewhere are capitalized (“Reviews”, “Accepted evidence”, “Exports”, “Flow”, “Review jobs”, “Imports”, “Screening”, “Evidence snapshots”); if the P5 parity test normalizes to lowercase, this column is the input to that normalization, not a served-document tag.</li>
+<li><strong>Port disposition.</strong> Every operation in P3/P4 is <strong>ported</strong> in this unit — 55 of the 60, each row naming the module that serves it and the check that proves it. The four transport operations (<code>health</code>, <code>health/live</code>, <code>health/ready</code>, <code>metrics</code>) are served by the conveyor's own liveness surface, as the <code>conveyor:liveness</code> ground records. <code>POST /imports/from-discovery</code> is <strong>dropped: no consumer</strong>: its frozen-batch upstream (discovery-engine) is retired, measured in P1, and no live caller sends a discovery session.</li>
+<li><strong>Response refs are conventions, not schema names.</strong> No route in this service declares a Pydantic <code>response_model</code>; every JSON handler returns <code>dict[str, Any]</code> or a <code>JSONResponse</code>. <code>application/json</code> in the <code>response_ref</code> column records that fact. A <code>-</code> records a request with no body. The parity test must treat these two conventions as declared, not infer a schema that the source does not have.</li>
+<li><strong>The format source.</strong> The brief names <code>docs/evidence/analysis-capture-2026-11-15.md</code> and <code>crates/analysis/tests/parity.rs</code>; neither exists at this worktree's base. The grammar here (markers, ten columns, one state and one reason per row) was read from the commit that introduced the analysis capture and its <code>mod capture</code> on conveyor issue #154. The P5 test named by issue #319 (<code>cargo test -p conveyor-scientific --test evidence_review_capture</code>) is the reader this document is shaped for.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/evidence-review-capture-2026-11-18.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

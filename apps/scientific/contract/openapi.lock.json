@@ -720,12 +720,12 @@
                 "type": "null"
               }
             ],
-            "description": "None when this component holds no number. A null score is NOT a low score — read `status` to learn whether it was unmeasurable (backend outage) or inapplicable (nothing to measure).",
+            "description": "None when this component holds no number. A null score is NOT a low score \u2014 read `status` to learn whether it was unmeasurable (backend outage) or inapplicable (nothing to measure).",
             "title": "Score"
           },
           "status": {
             "default": "measured",
-            "description": "'measured' — `score` is a real value. 'not_applicable' — the metric is undefined for this entity (e.g. no incoming edges), so its weight is redistributed over the applicable components. 'unavailable' — the measurement failed, so the composite is null and is never persisted.",
+            "description": "'measured' \u2014 `score` is a real value. 'not_applicable' \u2014 the metric is undefined for this entity (e.g. no incoming edges), so its weight is redistributed over the applicable components. 'unavailable' \u2014 the measurement failed, so the composite is null and is never persisted.",
             "enum": [
               "measured",
               "not_applicable",
@@ -748,7 +748,7 @@
                 "type": "null"
               }
             ],
-            "description": "None when `score` is None — there is nothing to weight.",
+            "description": "None when `score` is None \u2014 there is nothing to weight.",
             "title": "Weighted Score"
           }
         },
@@ -816,7 +816,7 @@
           },
           "degraded": {
             "default": false,
-            "description": "True exactly when `integrity_score` is null — either a component could not be measured, or no positive component was applicable at all. Read `degraded_reason` for which. An entity with nothing to cite is NOT degraded.",
+            "description": "True exactly when `integrity_score` is null \u2014 either a component could not be measured, or no positive component was applicable at all. Read `degraded_reason` for which. An entity with nothing to cite is NOT degraded.",
             "title": "Degraded",
             "type": "boolean"
           },
@@ -860,7 +860,7 @@
                 "type": "null"
               }
             ],
-            "description": "None when at least one component could not be MEASURED, or when no positive component was applicable at all. A null score is NOT a low score and is never written back to the graph. An entity that merely has nothing to cite still receives a real score — see not_applicable_components.",
+            "description": "None when at least one component could not be MEASURED, or when no positive component was applicable at all. A null score is NOT a low score and is never written back to the graph. An entity that merely has nothing to cite still receives a real score \u2014 see not_applicable_components.",
             "title": "Integrity Score"
           },
           "not_applicable_components": {
@@ -2371,6 +2371,589 @@
         ]
       }
     },
+    "/api/review-jobs/{job_id}": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (get_review_job); ported in #319.",
+        "operationId": "get_review_job",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/review-jobs/{job_id}:cancel": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (cancel_review_job); ported in #319.",
+        "operationId": "cancel_review_job",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_reviews); ported in #319.",
+        "operationId": "list_reviews",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (create_review); ported in #319.",
+        "operationId": "create_review",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (get_review); ported in #319.",
+        "operationId": "get_review",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "patch": {
+        "description": "Captured from evidence_review_service@bac4f66 (patch_review); ported in #319.",
+        "operationId": "patch_review",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/acceptances": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_acceptances); ported in #319.",
+        "operationId": "list_acceptances",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (decide_acceptance); ported in #319.",
+        "operationId": "decide_acceptance",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/archive": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (archive_review_slash); ported in #319.",
+        "operationId": "archive_review_slash",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/assertions": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (record_assertion); ported in #319.",
+        "operationId": "record_assertion",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/assignments": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (create_assignments); ported in #319.",
+        "operationId": "create_assignments",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/conflicts": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_conflicts); ported in #319.",
+        "operationId": "list_conflicts",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/conflicts/{conflict_id}:resolve": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (adjudicate_conflict); ported in #319.",
+        "operationId": "adjudicate_conflict",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/conflicts/{conflict_id}:unblind": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (unblind_conflict); ported in #319.",
+        "operationId": "unblind_conflict",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/corpus-versions": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_corpus_versions); ported in #319.",
+        "operationId": "list_corpus_versions",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (seal_corpus_version); ported in #319.",
+        "operationId": "seal_corpus_version",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/corpus-versions/{corpus_version_id}/members": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_corpus_members); ported in #319.",
+        "operationId": "list_corpus_members",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/decisions": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_visible_decisions); ported in #319.",
+        "operationId": "list_visible_decisions",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (record_decision); ported in #319.",
+        "operationId": "record_decision",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/deduplication-runs": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_deduplication_runs); ported in #319.",
+        "operationId": "list_deduplication_runs",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (create_deduplication_run); ported in #319.",
+        "operationId": "create_deduplication_run",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/duplicate-clusters": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_duplicate_clusters); ported in #319.",
+        "operationId": "list_duplicate_clusters",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/duplicate-clusters/{cluster_id}/resolutions": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (get_resolution_chain); ported in #319.",
+        "operationId": "get_resolution_chain",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/duplicate-clusters/{cluster_id}:resolve": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (resolve_duplicate_cluster); ported in #319.",
+        "operationId": "resolve_duplicate_cluster",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/evidence-snapshots": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_evidence_snapshots); ported in #319.",
+        "operationId": "list_evidence_snapshots",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (create_evidence_snapshot); ported in #319.",
+        "operationId": "create_evidence_snapshot",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/evidence-snapshots/{snapshot_id}": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (get_evidence_snapshot); ported in #319.",
+        "operationId": "get_evidence_snapshot",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/exports": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_exports); ported in #319.",
+        "operationId": "list_exports",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (create_export); ported in #319.",
+        "operationId": "create_export",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/exports/{export_id}": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (get_export); ported in #319.",
+        "operationId": "get_export",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/exports/{export_id}:verify": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (verify_export); ported in #319.",
+        "operationId": "verify_export",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/flow": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (get_review_flow); ported in #319.",
+        "operationId": "get_review_flow",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/flow:audit": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (audit_review_flow); ported in #319.",
+        "operationId": "audit_review_flow",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/flow:rebuild": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (rebuild_review_flow); ported in #319.",
+        "operationId": "rebuild_review_flow",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/imports": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_imports); ported in #319.",
+        "operationId": "list_imports",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (create_import); ported in #319.",
+        "operationId": "create_import",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/protocol-versions": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_protocol_versions); ported in #319.",
+        "operationId": "list_protocol_versions",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (create_protocol_version); ported in #319.",
+        "operationId": "create_protocol_version",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/protocol-versions/{protocol_version_id}:lock": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (lock_protocol_version); ported in #319.",
+        "operationId": "lock_protocol_version",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/quarantine": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_quarantined_rows); ported in #319.",
+        "operationId": "list_quarantined_rows",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/records": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_records); ported in #319.",
+        "operationId": "list_records",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/records/{review_record_id}": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (get_record); ported in #319.",
+        "operationId": "get_record",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/research-objects": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_research_objects); ported in #319.",
+        "operationId": "list_research_objects",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (create_research_object); ported in #319.",
+        "operationId": "create_research_object",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/research-objects/{research_object_id}/extractions": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (record_extraction); ported in #319.",
+        "operationId": "record_extraction",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/research-objects/{research_object_id}:revise": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (revise_research_object); ported in #319.",
+        "operationId": "revise_research_object",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/screening/queue": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (get_screening_queue); ported in #319.",
+        "operationId": "get_screening_queue",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/stages": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (list_stages); ported in #319.",
+        "operationId": "list_stages",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}/state-history": {
+      "get": {
+        "description": "Captured from evidence_review_service@bac4f66 (get_review_state_history); ported in #319.",
+        "operationId": "get_review_state_history",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}:activate": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (activate_review); ported in #319.",
+        "operationId": "activate_review",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}:archive": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (archive_review); ported in #319.",
+        "operationId": "archive_review",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}:close": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (close_review); ported in #319.",
+        "operationId": "close_review",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}:pause": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (pause_review); ported in #319.",
+        "operationId": "pause_review",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}:reopen": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (reopen_review); ported in #319.",
+        "operationId": "reopen_review",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/api/reviews/{review_id}:resume": {
+      "post": {
+        "description": "Captured from evidence_review_service@bac4f66 (resume_review); ported in #319.",
+        "operationId": "resume_review",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
     "/api/stats/confidence-interval": {
       "post": {
         "description": "Compute confidence intervals for aggregated effect sizes.",
@@ -2581,7 +3164,7 @@
     },
     "/health": {
       "get": {
-        "description": "Health check — queries backend services and returns aggregate status.",
+        "description": "Health check \u2014 queries backend services and returns aggregate status.",
         "operationId": "health_check",
         "parameters": [
           {
@@ -2608,7 +3191,7 @@
     },
     "/health/live": {
       "get": {
-        "description": "Liveness probe — always returns alive.",
+        "description": "Liveness probe \u2014 always returns alive.",
         "operationId": "health_liveness",
         "parameters": [
           {
@@ -2635,7 +3218,7 @@
     },
     "/health/ready": {
       "get": {
-        "description": "Readiness probe — checks critical backend dependencies.\n\nReturns 503 when a critical dependency is unhealthy, so an httpGet probe\ncan actually observe the failure.",
+        "description": "Readiness probe \u2014 checks critical backend dependencies.\n\nReturns 503 when a critical dependency is unhealthy, so an httpGet probe\ncan actually observe the failure.",
         "operationId": "health_readiness",
         "parameters": [
           {
