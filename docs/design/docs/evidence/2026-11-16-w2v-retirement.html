@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The dead w2v estate retired — 2026-11-17 · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-w2v-retirement.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-dead-w2v-estate-retired--2026-11-17">The dead w2v estate retired — 2026-11-17</h1>
+<p>Part of #213. Its single <code>blocked-by</code> (#205, the research cutover) closed on 2026-11-17 at 14:30Z; the deployment half merged the same evening as the deployment repository's PR 5323 (<code>22d4b10</code>), Flux reconciled, and this document records what changed.</p>
+<p><strong>What was wrong.</strong> The 17 Deployments in namespace <code>w2v</code> had reported <code>0/0</code> with no pod for weeks, and the 16 Services answered only those dead backends. <code>studio.nonagentic.ai</code> therefore returned <strong>503</strong> — envoy's canned <code>upstream connect error</code> — instead of a deliberate status. A host that answers 503 into nothing looks like an outage that nobody is watching; a 404 is a statement.</p>
+<h2 id="what-was-removed-and-what-deliberately-was-not">What was removed, and what deliberately was not</h2>
+<table>
+<thead>
+<tr>
+<th>Removed</th>
+<th>Count</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>services/w2v/deployments.yaml</code></td>
+<td>17 Deployments</td>
+<td><code>0/0</code>, no pod, 137–192 days old</td>
+</tr>
+<tr>
+<td><code>services/w2v/services.yaml</code></td>
+<td>16 Services</td>
+<td>every one answered only the above</td>
+</tr>
+<tr>
+<td><code>services/w2v/poddisruptionbudget.yaml</code></td>
+<td>1 PDB set</td>
+<td>over Deployments that no longer exist</td>
+</tr>
+<tr>
+<td>the <code>replicas:</code> transformer + ~800-line <code>patches:</code> block</td>
+<td>—</td>
+<td>every patch targeted a Deployment removed here</td>
+</tr>
+<tr>
+<td><code>services-istio/w2v/virtualservice.yaml</code> → VS <code>w2v</code></td>
+<td>1 VS</td>
+<td>it routed the two hosts below at the dead backends</td>
+</tr>
+<tr>
+<td><code>services-istio/w2v/destinationrule.yaml</code></td>
+<td>1 DR</td>
+<td>its only subject was <code>w2v-frontend</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Kept, and stated in the kustomization:</strong> the namespace, <code>pv-worker3.yaml</code>, <code>storage.yaml</code> (<strong>the data</strong>), the default-deny <code>networkpolicy.yaml</code>, the ConfigMaps and the Secrets, and the <code>w2v-legacy-redirect</code> VirtualService (which carries no backend — it is why <code>w2v.nonagentic.ai</code> still answers at all). This unit deletes no data; every manifest is one revert away.</p>
+<h2 id="evidence-at-completion">Evidence at completion</h2>
+<h3 id="p11--every-deployment-on-the-list-is-00-with-no-pod">P1.1 — every Deployment on the list is <code>0/0</code> with no pod</h3>
+<pre><code>$ kubectl -n w2v get deploy,pods
+NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/ai-content-generation-service   0/0     0            0           187d
+deployment.apps/analysis-service                0/0     0            0           192d
+deployment.apps/app-inspector-service           0/0     0            0           192d
+deployment.apps/bdd-playwright-service          0/0     0            0           192d
+deployment.apps/content-service                 0/0     0            0           192d
+deployment.apps/frontend-test-runner-service    0/0     0            0           192d
+deployment.apps/html-render-service             0/0     0            0           167d
+deployment.apps/redis                           0/0     0            0           192d
+deployment.apps/slide-service                   0/0     0            0           192d
+deployment.apps/tts-gateway                     0/0     0            0           138d
+deployment.apps/tts-gateway-worker              0/0     0            0           137d
+deployment.apps/tts-gateway-worker-mini1        0/0     0            0           137d
+deployment.apps/video-analyzer-service          0/0     0            0           192d
+deployment.apps/video-production-service        0/0     0            0           192d
+deployment.apps/w2v-frontend                    0/0     0            0           192d
+deployment.apps/w2v-orchestrator                0/0     0            0           192d
+deployment.apps/youtube-upload-service          0/0     0            0           192d</code></pre>
+<p>No pod lines in that output: there were none. 16 Services were live (<code>kubectl -n w2v get svc</code> → 16) and 2 VirtualServices carried the hostnames above.</p>
+<h3 id="p12--the-survivors-each-named-with-its-reason">P1.2 — the survivors, each named with its reason</h3>
+<table>
+<thead>
+<tr>
+<th>Survivor</th>
+<th>Why it stays</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>namespace <code>w2v</code></td>
+<td>still holds the PVs, the secrets and the default-deny policy</td>
+</tr>
+<tr>
+<td><code>pv-worker3.yaml</code>, <code>storage.yaml</code></td>
+<td><strong>the data</strong> — this unit deletes none</td>
+</tr>
+<tr>
+<td><code>networkpolicy.yaml</code></td>
+<td>the namespace keeps its default-deny whether or not a pod exists</td>
+</tr>
+<tr>
+<td><code>configmaps.yaml</code>, the 31 Secrets</td>
+<td>the retired fleet's configuration and credentials</td>
+</tr>
+<tr>
+<td>VS <code>w2v-legacy-redirect</code></td>
+<td>carries no backend; the only reason <code>w2v.nonagentic.ai</code> answers</td>
+</tr>
+<tr>
+<td><code>services-istio/w2v/peerauth.yaml</code></td>
+<td>namespace- and workload-scoped mTLS policy; inert over no workloads, and removing it is a decision about the namespace, not about this estate</td>
+</tr>
+</tbody>
+</table>
+<h3 id="p21--after-merge-and-reconcile">P2.1 — after merge and reconcile</h3>
+<pre><code>$ kubectl -n w2v get deploy,pods,svc
+No resources found in w2v namespace.
+$ kubectl -n w2v get vs
+NAME                  GATEWAYS                                      HOSTS                 AGE
+w2v-legacy-redirect   [&quot;istio-system/api-external-gateway&quot;,…]       [&quot;w2v.nonagentic.ai&quot;] 27d</code></pre>
+<p>Flux: <code>kustomization services</code> → <code>main@sha1:76ba6478c7c2c5c05ead2b818406569e82acb05f</code>, then <code>kustomization services-istio</code> pruned the VS.</p>
+<h3 id="p22--the-hostnames-answer-deliberately">P2.2 — the hostnames answer deliberately</h3>
+<pre><code>$ curl -sS -o /dev/null -w &#39;%{http_code}&#39; https://studio.nonagentic.ai
+404          # was 503 before the change
+$ curl -sS -o /dev/null -w &#39;%{http_code}&#39; https://w2v.nonagentic.ai
+308          # unchanged: the legacy redirect carries no backend
+$ getent hosts &lt;the namespace&#39;s in-cluster name&gt;   # from a conveyor pod
+&lt;the ingress address&gt;  &lt;the same name&gt;            # unchanged</code></pre>
+<h3 id="p23--the-namespaces-redis-is-named-by-nobody-else">P2.3 — the namespace's Redis is named by nobody else</h3>
+<pre><code>$ kubectl get deploy -A -o json | (scan every spec for redis.w2v / w2v-redis / redis.w2v.svc)
+namespaces scanned: 71
+deployments scanned: 157
+references to the w2v redis from other namespaces: none</code></pre>
+<h3 id="p31--the-docs-gate">P3.1 — the docs gate</h3>
+<pre><code>$ bash scripts/ci/no-private-refs.sh
+OK: no private infrastructure references in 2912 tracked files (9 allowlisted).</code></pre>
+<h2 id="the-gate-consequences-this-unit-produced">The gate consequences this unit produced</h2>
+<p>Removing 34 objects moved the deployment repository's non-vacuity floor: <code>build-all.sh</code> measured <strong>1925 → 1891</strong> objects, below its 1900 floor. The floor moved to 1880 with its reason recorded beside it, and the alert-coverage baseline — a ratchet, not a permanent exemption — lost its 17 now-orphaned <code>w2v/*</code> entries rather than being silenced. <code>build-all.sh</code> at the merged head: <em>13 roots, 1891 objects, 0 violations.</em></p>
+<p>A <code>clusters/**</code> merge fires no workflow by design (#3930); the PR's <code>validate</code> job ran on the pull request and passed, which is the run that matters.</p>
+<h2 id="the-third-consequence-a-dark-dns-name">The third consequence: a dark DNS name</h2>
+<p>Removing the <code>w2v</code> VirtualService left the namespace's in-cluster DNS name in the master's dnsmasq pointing at the gateway VIP with nothing behind it. The next pull request to touch <code>scripts/host-configs/**</code> surfaced it:</p>
+<pre><code>ERROR [dnsmasq] &lt;the name&gt; points at the gateway VIP (&lt;the address&gt;) but has NO VirtualService,
+no coredns-static-hosts entry, and is not in GATEWAY_VIP_NON_VS — it is a DARK name</code></pre>
+<p>That check is right, and it is the reason a removal is not finished when the manifests go: a name that still claims to exist but answers 404 is worse than a name that is gone. The record was removed in the deployment repository's PR 5325, and <code>check-host-config-consistency.py</code> then reported <em>0 error(s), 0 warning(s) across 5 hosts</em>.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-16-w2v-retirement.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
