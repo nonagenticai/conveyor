@@ -35,7 +35,7 @@ const APP_KEY: &str = "conveyor";
 const START_CARD_TYPE: &str = "project_start_request_analysis";
 const START_PROCESS_KEY: &str = "project_start_request_analysis.READY";
 /// The coach `err.card` starts (S13 §5.8).
-const COACH_PROCESS_KEY: &str = "cap.kanban_coach.handle_error";
+const COACH_PROCESS_KEY: &str = "cap.kanban_coach.handle_error.v2";
 
 fn output(body: &Value) -> &Value {
     body.get("output").unwrap_or(body)
@@ -55,6 +55,20 @@ async fn fixture() -> (support::Pg, support::Seeded, support::Running) {
     conveyor_store::seed::catalogue(&pg.owner)
         .await
         .expect("the catalogue seed");
+    // T4: `err.card` creates the coach card, so the tenant needs the catalogue's `coach` type.
+    let export = conveyor_store::seed::catalogue_export().expect("the catalogue export");
+    let coach: Vec<_> = export
+        .card_types
+        .into_iter()
+        .filter(|card_type| card_type.code == "coach")
+        .collect();
+    let mut tx = begin_scoped(&pg.owner, seeded.tenant)
+        .await
+        .expect("scoped tx");
+    conveyor_store::catalogue::import_card_types_tx(&mut tx, seeded.tenant, &coach)
+        .await
+        .expect("import the coach card type");
+    tx.commit().await.expect("commit the card type");
     let running = support::Running::start(&pg).await;
     (pg, seeded, running)
 }
@@ -362,7 +376,28 @@ async fn a_failed_run_blocks_the_card_comments_once_and_starts_one_coach() {
         "the old flow's marker is kept: {bodies:?}"
     );
 
-    // ONE live coach ROOT run on the card, pinned to the coach process.
+    // ONE coach card carries the interruption, and ONE live coach ROOT run hangs from it
+    // (T4: the coach works on its own card; the interrupted card keeps only its failure).
+    let (coach_card, interruption): (Uuid, Uuid) = sqlx::query_as(
+        "SELECT coach_card_id, id FROM coach_interruption
+          WHERE tenant_id = $1 AND interrupted_card_id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(card)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the interruption");
+    let card_type: String = sqlx::query_scalar(
+        "SELECT ct.code FROM card c
+           JOIN card_type ct ON ct.tenant_id = c.tenant_id AND ct.id = c.card_type_id
+          WHERE c.tenant_id = $1 AND c.id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(coach_card)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the coach card's type");
+    assert_eq!(card_type, "coach", "the coach card carries the coach type");
     let runs: Vec<(Option<Uuid>, i32, String, String, String)> = sqlx::query_as(
         "SELECT r.parent_run_id, r.depth, r.status, p.key, r.id::text
            FROM run r
@@ -370,24 +405,30 @@ async fn a_failed_run_blocks_the_card_comments_once_and_starts_one_coach() {
           WHERE r.tenant_id = $1 AND r.card_id = $2 AND r.parent_run_id IS NULL",
     )
     .bind(seeded.tenant_id)
-    .bind(card)
+    .bind(coach_card)
     .fetch_all(&pg.super_pool)
     .await
-    .expect("the card's root runs");
+    .expect("the coach card's root runs");
     let live: Vec<_> = runs
         .iter()
         .filter(|(_, _, status, _, _)| {
             matches!(status.as_str(), "queued" | "running" | "waiting_approval")
         })
         .collect();
-    assert_eq!(live.len(), 1, "one live root run: {runs:?}");
+    assert_eq!(
+        live.len(),
+        1,
+        "one live root run on the coach card: {runs:?}"
+    );
     let (parent, depth, _status, key, id) = live[0];
     assert!(parent.is_none(), "the coach is a ROOT run");
     assert_eq!(*depth, 0);
     assert_eq!(key.as_str(), COACH_PROCESS_KEY);
     assert_eq!(*id, coach.to_string(), "the live run is the coach we saw");
+    let _ = interruption;
 
-    // (3) Re-delivery: the same job run again changes nothing.
+    // (3) Re-delivery: the same job run again changes nothing. The per-run Idempotency-Key
+    // replays the recorded answer, so no second coach card, run or interruption exists.
     let replay = conveyor_actions::board::pull::err_card(&pg.runtime, APP_KEY, seeded.tenant, run)
         .await
         .expect("err.card replay");
@@ -395,26 +436,33 @@ async fn a_failed_run_blocks_the_card_comments_once_and_starts_one_coach() {
     assert_eq!(
         replay.coach_run_id,
         Some(coach),
-        "the replay finds the coach it started"
+        "the replay replays the coach it started"
     );
-    assert!(replay.coach_skipped, "a live coach is never started twice");
     assert_eq!(
         comment_bodies(&pg, seeded.tenant_id, card).await.len(),
         1,
         "a replay writes no second comment"
     );
-    let coach_runs: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM run r
-           JOIN process p ON p.tenant_id = r.tenant_id AND p.id = r.process_id
-          WHERE r.tenant_id = $1 AND r.card_id = $2 AND p.key = $3",
+    let coach_cards: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM card c
+           JOIN card_type ct ON ct.tenant_id = c.tenant_id AND ct.id = c.card_type_id
+          WHERE c.tenant_id = $1 AND c.board_id = $2 AND ct.code = 'coach'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::parse_str(&s.board_id).expect("board"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the coach card count");
+    assert_eq!(coach_cards, 1, "a replay creates no second coach card");
+    let interruptions: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM coach_interruption WHERE tenant_id = $1 AND interrupted_card_id = $2",
     )
     .bind(seeded.tenant_id)
     .bind(card)
-    .bind(COACH_PROCESS_KEY)
     .fetch_one(&pg.super_pool)
     .await
-    .expect("the coach run count");
-    assert_eq!(coach_runs, 1, "a replay starts no second coach");
+    .expect("the interruption count");
+    assert_eq!(interruptions, 1, "a replay creates no second interruption");
     assert_eq!(lane_kind(&pg, card).await, "waiting");
 }
 
@@ -594,7 +642,8 @@ async fn an_archived_project_card_gets_no_coach() {
     no_coach_for_project_status("archived").await;
 }
 
-/// The per-card depth cap: three terminal coach runs are history, not a reason for a fourth.
+/// The per-card depth cap: three interruptions are history, not a reason for a fourth (T4: the
+/// cap counts interruptions, because the coach run no longer hangs from the interrupted card).
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn the_coach_chain_stops_at_the_cap() {
     let (pg, seeded, running) = fixture().await;
@@ -604,8 +653,21 @@ async fn the_coach_chain_stops_at_the_cap() {
     let card = Uuid::parse_str(&card).expect("card");
     let project = Uuid::parse_str(&s.project_id).expect("project");
 
-    for _ in 0..conveyor_actions::board::pull::COACH_CHAIN_MAX {
-        failed_run_of(&pg, seeded.tenant, project, card, COACH_PROCESS_KEY).await;
+    // Three interruptions with three DIFFERENT signatures: a repeat signature escalates instead
+    // of opening a second interruption, so the cap needs three distinct faults.
+    for index in 0..conveyor_actions::board::pull::COACH_CHAIN_MAX {
+        let key = format!("coach.cap.{index}");
+        let sop = Uuid::parse_str(&support::publish_sop(&running, &key).await).expect("SOP");
+        published_process(&pg, seeded.tenant, &key, "Cap probe", None, sop).await;
+        let run = failed_run_of(&pg, seeded.tenant, project, card, &key).await;
+        let outcome =
+            conveyor_actions::board::pull::err_card(&pg.runtime, APP_KEY, seeded.tenant, run)
+                .await
+                .expect("err.card");
+        assert!(
+            !outcome.coach_skipped,
+            "interruption {index} is admitted: {outcome:?}"
+        );
     }
     // A v2 draft must not reset the count: the cap is per card and per key family.
     fork_coach_draft(&pg, seeded.tenant).await;
@@ -621,8 +683,16 @@ async fn the_coach_chain_stops_at_the_cap() {
         "the cap refuses a fourth coach: {outcome:?}"
     );
     assert_eq!(outcome.coach_run_id, None, "no run was started");
+    let interruptions: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM coach_interruption WHERE tenant_id = $1 AND interrupted_card_id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(card)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the interruption count");
     assert_eq!(
-        coach_runs_on(&pg, seeded.tenant_id, card).await,
+        interruptions,
         conveyor_actions::board::pull::COACH_CHAIN_MAX,
         "the cap holds"
     );

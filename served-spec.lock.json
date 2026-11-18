@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "a6910a15dc3cad5fa4cdb31433c65b0b1aad1680517feb8149b4d214decb1925",
+    "GET /api/actions": "486630f535cb05a4944e13b4cda817de165782c733831866c8510b1f0b03e6cb",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -130,6 +130,10 @@
     "POST /api/actions/channels.policy_set/invocations": "b6663771042d8b0fbacb43836eae2dc92dfea8287168aaf8b2e910969c64a84b",
     "POST /api/actions/channels.test/invocations": "be258442401376c0b2f4bde916a905c888cea18220426e51b0e0a8ce0aa6c1e6",
     "POST /api/actions/channels.unbind/invocations": "4568e41e502f38910cf1e50ef65b239037860e551664ef17355dc190f9286b94",
+    "POST /api/actions/coach.escalate/invocations": "402dcc4069d32f0512a12a201eb3b3d98f9f35aa67145af4d5161c7b127789c3",
+    "POST /api/actions/coach.interrupt/invocations": "c9b583ffdc04c0ca8dd58cb668811eca35bc6567d6d6ac927968648610e08cd5",
+    "POST /api/actions/coach.remedy/invocations": "bb156da1dde8266a96fc3cf2fc3a968d3ac3247721c180cca998c163c8e2646e",
+    "POST /api/actions/coach.triage/invocations": "49ac1b68a7e51853623fffddc0bc9c1e124d4f498efe96fa62457b73c4d6bdfd",
     "POST /api/actions/coding_jobs.create/invocations": "28b2d9fd9b2f5d0b10e73c12dc816f530740604a20a0dfdc1068bfc89d1a9f96",
     "POST /api/actions/coding_jobs.get/invocations": "9717271fc39999e45c683bc188c1f8ed9acec7044f8ac5c485df2d9f03990bdc",
     "POST /api/actions/comments.delete/invocations": "fdd354de480c7913428838b6f988f6b65f2174f515732d76fbb2edf96271edcc",
@@ -379,7 +383,7 @@
     "POST /api/actions/prompt_findings.decide/invocations": "2c64c27946283bde80e650542347b9b2261f401e0b4b0c37bffd7163c89973a1",
     "POST /api/actions/prompt_findings.list/invocations": "2e25a430bbde216df44c63a05e4b6427375215817cb5429f2dcf3647a199dfd1",
     "POST /api/actions/providers.list/invocations": "bdf0896aa91953f40af475c755d5c7093e675cf2216e3997da30658e6cdf9204",
-    "POST /api/actions/publish.start/invocations": "e20612089e6efdf6a005b4d6bd0b7c801166a89367bd297d0fcb25e528b369a0",
+    "POST /api/actions/publish.start/invocations": "b700da2c80bb3cd31e7bb463f93456b3b3a60d86ce5fec95378f8a2738b6bea0",
     "POST /api/actions/publish.status/invocations": "a3d4fd1049fa4767b7296bce342dbba760f1a2a1b7226951cb3c251fc9dbda78",
     "POST /api/actions/quality.score/invocations": "a39b2b7ac6ab2d092c84fb4bba6fa66db7b4e60263d82beaa29963e95148cfaf",
     "POST /api/actions/refinements.list/invocations": "0a913dd11a41ded60dd197972da5a26637e39013b135a9bd829a1ffc8082f4ee",

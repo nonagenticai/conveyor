@@ -385,6 +385,30 @@
       }
     },
     {
+      "code": "coach",
+      "label": "Coach card",
+      "definition": {
+        "rules": [
+          "one_card_per_interruption",
+          "one_triage_from_the_closed_set",
+          "at_most_one_remedy",
+          "a_repeat_signature_escalates"
+        ],
+        "inputs": [],
+        "outputs": [
+          "triage_class",
+          "remedy_class"
+        ],
+        "acceptance": [
+          "READY: the_interruption_is_admitted",
+          "DOING: one_triage_from_the_closed_set",
+          "QA: the_remedy_came_from_the_class",
+          "DONE: the_card_records_what_the_coach_did"
+        ],
+        "human_task": false
+      }
+    },
+    {
       "code": "code_quality_analysis",
       "label": "Code quality analysis",
       "definition": {

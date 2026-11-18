@@ -66,3 +66,8 @@ GRANT UPDATE (status, version, updated_at) ON job_release TO conveyor_runtime;
 -- call, and a run's retention removes the link (the FK is ON DELETE SET NULL) rather than the
 -- evidence. UPDATE and DELETE are withheld from the runtime role.
 REVOKE UPDATE, DELETE ON tool_call FROM conveyor_runtime;
+
+-- T4 (0057): `coach_remedy` is the interruption's one remedy — written once, never edited, and
+-- never erased (the card and the interruption carry the history). UPDATE and DELETE are withheld
+-- from the runtime role, so an application bug cannot rewrite what the coach decided.
+REVOKE UPDATE, DELETE ON coach_remedy FROM conveyor_runtime;

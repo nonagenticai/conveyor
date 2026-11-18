@@ -228,7 +228,10 @@ mod tests {
                 (55, "tool platform".to_owned()),
                 // #82 (T10): the lesson, the demo credit and the tranche authorisation record
                 // (0056_cadence_tranche.sql).
-                (56, "cadence tranche".to_owned())
+                (56, "cadence tranche".to_owned()),
+                // #75 (T4): the kanban coach — the interruption record with its per-signature
+                // open index, and the append-only remedy (0057_coach.sql, SPEC_V2 §6.2).
+                (57, "coach".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
