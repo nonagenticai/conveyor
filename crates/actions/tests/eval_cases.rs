@@ -73,7 +73,7 @@ fn assert_no_expected_key(value: &Value, where_: &str) {
 #[tokio::test]
 async fn eval_cases_create_update_delete_and_list_never_return_the_answer_key() {
     let pg = support::Pg::fresh().await;
-    support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     let running = support::Running::start(&pg).await;
     let (_eval_id, version_id) = eval_with_version(&running).await;
 
@@ -219,14 +219,24 @@ async fn eval_cases_create_update_delete_and_list_never_return_the_answer_key() 
     );
 
     // ── delete ──
+    // #285: a case delete is destructive. One gate covers both calls below — the same case id
+    // is the same target — so the second call reaches the handler and its 404.
+    let delete_gate = support::approved_gate(
+        &pg,
+        seeded.tenant,
+        &running,
+        TOKEN,
+        "eval_cases.delete",
+        &json!({ "version_id": version_id, "id": first }),
+    )
+    .await;
     let (status, body) = running
-        .invoke(
+        .invoke_approved(
             "eval_cases.delete",
             TOKEN,
             json!({ "version_id": version_id, "id": first }),
             None,
-            None,
-            None,
+            delete_gate,
         )
         .await;
     assert_eq!(status, 200, "{body}");
@@ -246,13 +256,12 @@ async fn eval_cases_create_update_delete_and_list_never_return_the_answer_key() 
 
     // A second delete is a 404, never a silent success.
     let (status, body) = running
-        .invoke(
+        .invoke_approved(
             "eval_cases.delete",
             TOKEN,
             json!({ "version_id": version_id, "id": first }),
             None,
-            None,
-            None,
+            delete_gate,
         )
         .await;
     assert_eq!(status, 404, "{body}");

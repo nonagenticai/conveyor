@@ -23,6 +23,9 @@ conveyor-ops = { path = "../ops" }
 # budget rules live there, free of transport, and are tested without a model.
 conveyor-produce = { path = "../produce" }
 conveyor-workflow = { path = "../workflow" }
+# `analyse.site` calls the analysis library (ADR 0007 §5). The edge is one-way and the library
+# is pure, so this adds no transport, no connection and no clock to the action surface.
+conveyor-analysis = { path = "../analysis" }
 # The three exchange actions (S08 B2) call the pure renderer; CONTRACT §1 records the edge.
 conveyor-render = { path = "../render" }
 conveyor-store = { path = "../store" }

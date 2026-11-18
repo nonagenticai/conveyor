@@ -26,6 +26,13 @@ separate catalogue entries (`§11.2` identities), so the broker never learns the
 | external — `strata_ingest`, `strata_rag` | shared ingest and retrieval | done (ADR 0005 §2); they are tool-estate members but not repository scope |
 | external — the model servers | speech, transcription, image generation, vision | **stay remote HTTP hosts bound as toolkits** (ADR 0006 §Consequences) |
 
+`analyse.*` is not a row here because it is not a deployable: it is the workspace library
+`crates/analysis` (ADR 0007 §5). Its captured contract — 92 operations, the drop table and the
+per-operation reason — lives at
+[`../evidence/analysis-capture-2026-11-15.md`](../evidence/analysis-capture-2026-11-15.md); one
+operation (`audit_seo`) is ported today, and `crates/analysis/tests/parity.rs` fails if any captured
+operation is neither ported nor dropped.
+
 Two lessons this table makes visible, both recorded rather than fixed here:
 
 - **"Merged" and "live" are different claims.** Two groups are fully absorbed in code and still

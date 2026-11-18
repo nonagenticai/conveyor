@@ -290,7 +290,8 @@ pub async fn snapshot_tx(
     let documents = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
-             SELECT id, project_id, card_id, kind, title, updated_at, created_at
+             SELECT id, project_id, card_id, kind, title, category, unit, publishable,
+                    updated_at, created_at
                FROM document
               WHERE tenant_id = $1 AND publishable AND status = 'active'
          ) t",

@@ -471,6 +471,14 @@ async fn cards_move(
     }
 }
 
+/// `cards.archive`'s approval target: this card, archived.
+///
+/// The verb is part of the string because the card survives the change — an approval to archive a
+/// card must never authorise anything else done to it (#285).
+fn target_archive(input: &IdIn) -> Result<String, String> {
+    Ok(format!("card/{}/archive", input.id))
+}
+
 /// Archive a card: place it in the board's archive lane and stamp it.
 ///
 /// CONTRACT §3 names `cards.archive` among the edits that require `If-Match`; the input is
@@ -484,7 +492,8 @@ async fn cards_move(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_archive"
 )]
 async fn cards_archive(
     tx: &mut PgConnection,

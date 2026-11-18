@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext } from "@playwright/test";
 
-import { invoke } from "./helpers";
+import { allowSelfApproval, approvedInvoke, invoke } from "./helpers";
 
 async function firstEval(
   request: APIRequestContext,
@@ -16,6 +16,10 @@ async function firstEval(
 
 /** The spec mutates the shared seed fixture; put the version back to six cases. */
 async function removeImported(request: APIRequestContext, versionId: string) {
+  // #285: a case delete is destructive, so it needs a gate. The dev seed has one principal per
+  // tenant, so the cleanup asks the tenant to let the requester decide — then goes through the
+  // real request → decide → invoke path rather than around it.
+  await allowSelfApproval(request, "eval_cases.delete");
   const cases = await invoke<{ items: { id: string; input: string }[] }>(
     request,
     "eval_cases.list",
@@ -23,7 +27,10 @@ async function removeImported(request: APIRequestContext, versionId: string) {
   );
   for (const testCase of cases.items) {
     if (testCase.input.startsWith("playwright ")) {
-      await invoke(request, "eval_cases.delete", { id: testCase.id, version_id: versionId });
+      await approvedInvoke(request, "eval_cases.delete", {
+        id: testCase.id,
+        version_id: versionId,
+      });
     }
   }
   const after = await invoke<{ items: { input: string }[] }>(request, "eval_cases.list", {

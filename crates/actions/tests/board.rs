@@ -336,14 +336,24 @@ async fn the_twelve_board_actions_work_over_http() {
     assert_eq!(stale["current"]["version"], 2);
 
     // ── cards.archive: 204, in the archive lane, stamped ──────────────────────────────
+    // #285: archiving is destructive; the gate names this card's target, computed by the
+    // action itself from this exact input.
+    let archive_gate = support::approved_gate(
+        &pg,
+        seeded.tenant,
+        &running,
+        "dev:alice",
+        "cards.archive",
+        &json!({"id": card_id}),
+    )
+    .await;
     let (status, headers, body) = running
-        .invoke_full(
+        .invoke_approved_full(
             "cards.archive",
             "dev:alice",
             json!({"id": card_id}),
             Some("\"2\""),
-            None,
-            None,
+            archive_gate,
         )
         .await;
     assert_eq!(status, 204, "{body}");
@@ -617,14 +627,23 @@ async fn the_matrix_denies_a_restore_the_project_type_does_not_allow() {
     assert_eq!(status, 201, "{card}");
     let card_id = id_of(output(&card), "id");
 
+    // #285: the archive is destructive, so the call names the gate for this card.
+    let archive_gate = support::approved_gate(
+        &pg,
+        seeded.tenant,
+        &running,
+        "dev:alice",
+        "cards.archive",
+        &json!({"id": card_id}),
+    )
+    .await;
     let (status, body) = running
-        .invoke(
+        .invoke_approved(
             "cards.archive",
             "dev:alice",
             json!({"id": card_id}),
             Some("\"1\""),
-            None,
-            None,
+            archive_gate,
         )
         .await;
     assert_eq!(status, 204, "{body}");

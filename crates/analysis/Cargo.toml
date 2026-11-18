@@ -1,0 +1,38 @@
+[package]
+name = "conveyor-analysis"
+description = "The analyse.* library: rubrics, scoring and the deterministic site scan (ADR 0007 §5)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "conveyor_analysis"
+path = "src/lib.rs"
+
+[dependencies]
+# ADR 0007 §5: a library, not a service. No `reqwest`, no `sqlx`, no `axum`. Every operation is a
+# pure function of its inputs, so a report is reproducible and a test needs no server — and
+# `crates/api/tests/externals_declared.rs` forbids the transport this crate must not have anyway.
+# It reads no clock either: the one time-dependent check (content staleness) takes the instant as
+# a parameter, which is why `chrono` is here as a type, not as a source of "now".
+scraper = "0.25"
+regex = { workspace = true }
+chrono = { workspace = true }
+# The report shape is published as a schema: `analyse.site`'s action spec derives its output type
+# from these structs, so the manifest documents what a caller receives without a second copy of
+# the shape living in `crates/actions`.
+schemars = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+url = "2"
+
+[dev-dependencies]
+serde_json = { workspace = true }
+# `tests/parity.rs` pins the served contract by digest: the capture is only evidence if the bytes it
+# describes are the bytes that were served. A dev-dependency, so the library tree stays transport-free.
+sha2 = { workspace = true }
+# The video unit's P1 gate reads the media app's parity contract (conveyor#164).
+toml = { workspace = true }

@@ -285,6 +285,10 @@ async fn approvals_list(
 /// project, the card or the run the caller names, and a standalone gate is exactly what
 /// `uq_appr_pending`'s nullable `run_id` exists to allow.
 ///
+/// A parentless gate is accepted only when it names a destructive action whose target the call
+/// computes (#285): then `meta.target`, not a parent, is the gate's identity. Without a parent
+/// and without a target nothing could ever read it, so the request is refused.
+///
 /// No terminal event is emitted (a request is not a resolution), and the requester is the
 /// authenticated principal — never a body field.
 #[crate::action(
@@ -310,13 +314,6 @@ async fn approvals_request(
     let kind = input.kind.trim();
     if kind.is_empty() {
         return Err(invalid("kind", "missing", "a gate kind is required"));
-    }
-    if input.project_id.is_none() && input.card_id.is_none() && input.run_id.is_none() {
-        return Err(invalid(
-            "project_id",
-            "missing",
-            "an approval must belong to a project, a card or a run",
-        ));
     }
     let required_decisions = input.required_decisions.unwrap_or(1);
     // The same bound the process gate parser applies (`process/step.rs`): a quorum above 255
@@ -344,6 +341,28 @@ async fn approvals_request(
     let target =
         resolve_request_target(input.action.as_deref(), input.input.as_ref(), input.target)?;
 
+    // A gate with no parent is legitimate in exactly one shape: it *is* the approval for a named
+    // destructive action, and its `meta.target` says what that call will mutate. That string is
+    // what the invoke boundary compares (`require_approval_tx`), so the gate has an identity and
+    // a reader — the approvals screen — without belonging to a project, a card or a run. The
+    // console's destructive flow (conveyor#285) requests exactly these, because the actions it
+    // gates (`documents.delete`, `models.delete`, `secrets.delete`, …) have no board to hang on.
+    //
+    // Everything else still needs a parent: a standalone gate that authorises nothing belongs to
+    // no list anybody reads, and could only ever expire.
+    if input.project_id.is_none()
+        && input.card_id.is_none()
+        && input.run_id.is_none()
+        && target.is_none()
+    {
+        return Err(invalid(
+            "project_id",
+            "missing",
+            "an approval must belong to a project, a card or a run, or name a destructive action \
+             (with its input) whose computed target it authorises",
+        ));
+    }
+
     let mut meta = serde_json::Map::new();
     for (key, value) in [
         ("description", input.description),
@@ -356,6 +375,9 @@ async fn approvals_request(
     }
     if let Some(allowed) = input.allowed_decisions {
         meta.insert("allowed_decisions".to_owned(), allowed);
+    }
+    if let Some(proposed) = input.proposed_input {
+        meta.insert("proposed_input".to_owned(), proposed);
     }
     // T3: a gate resolves its typed evidence before it is opened, so an absent, draft,
     // superseded or non-typed reference never becomes a pending gate.
@@ -766,6 +788,25 @@ pub fn approval_out(record: &store::approval::ApprovalRecord) -> ApprovalOut {
         gate: approval.gate.clone(),
         kind: approval.kind.clone(),
         status: approval.status.as_str().to_owned(),
+        target: record
+            .meta
+            .get("target")
+            .and_then(Value::as_str)
+            .map(str::to_owned),
+        description: record
+            .meta
+            .get("description")
+            .and_then(Value::as_str)
+            .map(str::to_owned),
+        proposed_answer: record
+            .meta
+            .get("proposed_answer")
+            .and_then(Value::as_str)
+            .map(str::to_owned),
+        allowed_decisions: record.meta.get("allowed_decisions").cloned(),
+        proposed_input: record.meta.get("proposed_input").cloned(),
+        requested_by: record.requested_by.map(|id| id.to_string()),
+        requested_by_label: record.requested_by_label.clone(),
         required_decisions: approval.required_decisions,
         approvals: approval.approvals,
         expires_at: approval.expires_at,

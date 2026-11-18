@@ -1122,6 +1122,66 @@ async fn a_computed_move_resolves_its_lane_by_kind() {
     assert_eq!(kind, "active", "the move resolved board.lists.active");
 }
 
+/// A computed `documents.compose` stores the previous step's DECLARED output as the document body.
+/// The live READY process uses exactly this shape (`{{steps.1.output.output}}`, the agent step's
+/// text), so a run whose model never calls a tool still delivers its artefact (#338).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_computed_compose_stores_the_previous_steps_output() {
+    let (pg, running, seeded) = fixture().await;
+    let sop = support::publish_sop(&running, "compose-from-step-sop").await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let process = create_process(
+        &running,
+        "dev-compose-from-step",
+        &sop,
+        json!([
+            {"action": "cards.comment",
+             "input_template": {"id": "{{card.id}}", "body": "the agent answer"},
+             "outputs": ["body"]},
+            {"action": "documents.compose",
+             "input_template": {
+                 "title": "Draft artefact",
+                 "body": "{{steps.1.output.body}}",
+                 "card_id": "{{card.id}}"
+             },
+             "outputs": ["id"]}
+        ]),
+    )
+    .await;
+    publish(&running, &process).await;
+    let run = start(&running, &card, "dev-compose-from-step", json!({})).await;
+
+    execute(&pg, &seeded, &run, 1, 1).await;
+    let (status, _action, _input, _out, error) = step_row(&pg, &seeded, &run, 1, 1).await;
+    assert_eq!(status, "succeeded", "{error:?}");
+
+    execute(&pg, &seeded, &run, 2, 1).await;
+    let (status, _action, _input, out, error) = step_row(&pg, &seeded, &run, 2, 1).await;
+    assert_eq!(status, "succeeded", "{error:?}");
+    let document_id = text(&out, "id");
+    assert!(
+        Uuid::parse_str(&document_id).is_ok(),
+        "step 2 carries the composed document id: {out}"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "documents.get",
+            TOKEN,
+            json!({"id": document_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let document = output(&body);
+    assert_eq!(document["title"], json!("Draft artefact"));
+    assert_eq!(document["body"], json!("the agent answer"));
+    assert_eq!(document["card_id"], json!(card));
+}
+
 /// S13 §5.5: a SOP's `eval` inspection pins one eval. A pin that names a missing eval used to
 /// pass publish and only fail after the step had parked on it `JUDGE_MAX_PARKS` times; publish
 /// refuses it now, in the same validator that refuses every other unrunnable reference.

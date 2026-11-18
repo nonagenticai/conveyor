@@ -2558,6 +2558,12 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_document_bytes(pg, ctx).await;
             ctx.push(sample.name, id);
         }
+        // ADR 0007 §5: `analyse.site` reads a stored page, so each round needs its own document
+        // with its own object.
+        "analyse.site" => {
+            let id = seed_site_document(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
         "documents.publish" | "documents.request_publish" => {
             let id = seed_document_bytes(pg, ctx).await;
             ctx.push(sample.name, id);
@@ -4023,6 +4029,42 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("documents.list", json!({"limit": 10}), None),
         on_prepared("documents.download", None),
         {
+            // ADR 0007 §5: the analysis library's one invocable operation. A fresh page each
+            // round, so the sample proves a real analysis rather than a replay of an empty
+            // fixture — and the report is deterministic, so both transports must agree on every
+            // score and every check id.
+            let mut sample = on_prepared("analyse.site", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "document_id": ctx.pop("analyse.site"),
+                    "url": "https://example.test/parity",
+                })
+            });
+            sample.expect_status = Some(200);
+            sample
+        },
+        {
+            // #164: the video family is a pure function of the supplied executor evidence — both
+            // transports must agree on every finding and every score.
+            plain(
+                "analyse.video",
+                json!({
+                    "url": "https://example.test/parity.mp4",
+                    "container": {
+                        "duration_s": 30.0,
+                        "width": 1920,
+                        "height": 1080,
+                        "fps": 30.0,
+                        "video_bitrate_kbps": 5000.0
+                    },
+                    "scenes": [{"start_s": 0.0, "end_s": 30.0, "mean_motion": 2.0}],
+                    "ocr": [],
+                    "audio": {"loudness_lufs": -16.0, "beat_count": 60}
+                }),
+                None,
+            )
+        },
+        {
             let mut sample = on_prepared("documents.update", Some("\"1\""));
             sample.input = Box::new(
                 |ctx: &Ctx| json!({"id": ctx.pop("documents.update"), "title": "Parity document (edited)"}),
@@ -5154,6 +5196,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 | "inference_endpoint.get"
                 | "prompt_audits.check"
                 | "prompt_findings.list"
+                | "analyse.video"
         ) {
             sample.deterministic = true;
         }
@@ -6912,6 +6955,47 @@ async fn seed_document_bytes(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     .execute(&pg.super_pool)
     .await
     .expect("seed a document");
+    id
+}
+
+/// One HTML page WITH its object, for the `analyse.site` sample.
+///
+/// Same contract as [`seed_document_bytes`]: `fetch_bytes` re-hashes the bytes against the row's
+/// `content_hash` and refuses a mismatch, so a fixture that wrote only one of the two would prove
+/// the refusal rather than the analysis.
+async fn seed_site_document(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    use conveyor_actions::integrations::objects::{Objects, key_for};
+    use sha2::{Digest, Sha256};
+
+    let id = Uuid::now_v7();
+    let bytes = br#"<html><head>
+        <title>Parity plumber in Leeds today</title>
+        <meta name="description" content="A local plumber covering Leeds and Wakefield with same-day call outs and fixed prices for every job we take on.">
+        <link rel="canonical" href="https://example.test/parity">
+        </head><body><h1>Parity plumber in Leeds</h1><img src="/van.jpg" alt=""></body></html>"#
+        .to_vec();
+    let hash: String = Sha256::digest(&bytes)
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
+    let key = key_for(ctx.tenant_id, id, &hash);
+    let objects = Objects::from_env().expect("the test object backend is configured");
+    objects
+        .put(&key, bytes.clone().into())
+        .await
+        .expect("store the sample page");
+    sqlx::query(
+        "INSERT INTO document (id, tenant_id, kind, title, status, object_key, content_hash, meta)
+         VALUES ($1, $2, 'document', 'Parity page', 'active', $3, $4, $5)",
+    )
+    .bind(id)
+    .bind(ctx.tenant_id)
+    .bind(&key)
+    .bind(&hash)
+    .bind(json!({"content_type": "text/html", "size_bytes": bytes.len()}))
+    .execute(&pg.super_pool)
+    .await
+    .expect("seed a page");
     id
 }
 

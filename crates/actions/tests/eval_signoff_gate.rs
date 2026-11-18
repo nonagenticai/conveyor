@@ -403,14 +403,23 @@ async fn both_signoffs_a_metric_and_a_locked_split_are_what_makes_an_eval_ready(
     // ── deleting the metric removes the grading instrument ──
     let metric_ids = metric_ids(&pg, seeded.tenant, &v2).await;
     assert_eq!(metric_ids.len(), 1, "v2 inherited v1's metric");
+    // #285: deleting a metric is destructive; the gate names this version's metric.
+    let metric_gate = support::approved_gate(
+        &pg,
+        seeded.tenant,
+        &running,
+        TOKEN,
+        "eval_metrics.delete",
+        &json!({ "version_id": v2, "id": metric_ids[0] }),
+    )
+    .await;
     let (status, body) = running
-        .invoke(
+        .invoke_approved(
             "eval_metrics.delete",
             TOKEN,
             json!({ "version_id": v2, "id": metric_ids[0] }),
             None,
-            None,
-            None,
+            metric_gate,
         )
         .await;
     assert_eq!(status, 200, "{body}");

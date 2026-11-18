@@ -89,9 +89,13 @@ use serde_json::{Value, json};
 /// (T7, SPEC_V2 §10.4.1: the per-host agent, not the cluster API). 401 → **404**.
 /// **#282 adds 3 internal**: the approval-policy family.
 /// **T3 adds 6 internal**: the PM job.
-const EXPECTED: [&str; 427] = [
+/// **#154 adds 1 internal**: `analyse.site`, the analysis library's invocable read.
+/// **#164 adds 1 internal**: `analyse.video`, the video family over executor evidence.
+const EXPECTED: [&str; 429] = [
     "actions.describe",
     "actions.list",
+    "analyse.site",
+    "analyse.video",
     "agent.run",
     "andon.engage",
     "andon.release",
@@ -570,11 +574,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 18 — they call the host agent over ssh, not a declared external service.
     // #282 adds `approval_policies.list|get|set` (internal): 392 → 395; external stays 18.
     // T3 adds the six PM actions (all internal): 386 → 392.
-    // #305 adds the fourteen MSP edit/read actions (benefits update/delete/link_list/unlink/
-    // transition_list/transition_upsert, tranches update/delete/review_list, cadences
-    // update/delete, wbs.delete, registers.delete, stakeholders.profile_delete), all internal:
-    // 395 -> 409; external stays 18.
-    assert_eq!((internal, external), (409, 18));
+    // #305 adds the fourteen MSP edit/read actions, all internal: 395 -> 409; external stays 18.
+    // #154 adds `analyse.site` (internal, read): 409 -> 410; external stays 18.
+    // #164 adds `analyse.video` (internal, read): 410 -> 411; external stays 18.
+    assert_eq!((internal, external), (411, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

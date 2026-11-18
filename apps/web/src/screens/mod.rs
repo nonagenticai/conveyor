@@ -1,4 +1,5 @@
 pub mod admin;
+pub mod approvals;
 pub mod benchmarks;
 pub mod billing;
 pub mod boards;

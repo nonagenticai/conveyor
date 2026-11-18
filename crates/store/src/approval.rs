@@ -187,6 +187,18 @@ pub struct ApprovalRecord {
     /// projection does, so the sign-off screen can list a version's gates without a second
     /// table or a join through `eval`.
     pub eval_id: Option<Uuid>,
+    /// Who posed the gate (`approval.requested_by`), when it was a person's request.
+    pub requested_by: Option<Uuid>,
+    /// That person's label — display name, else email, else empty.
+    ///
+    /// Read with the row so the approvals screen renders a name per gate without an N+1 or a
+    /// second members read (#285).
+    pub requested_by_label: Option<String>,
+    /// The gate's `meta` document, exactly as written at request time.
+    ///
+    /// Carries `target` (what a destructive gate authorises), `description`, `proposed_answer`
+    /// and `allowed_decisions` — everything the approvals screen shows about a gate (#285).
+    pub meta: Value,
 }
 
 /// One recorded decision on a gate. `approval_decision` is immutable, so this is a fact, never a
@@ -282,6 +294,9 @@ struct ApprovalRecordRow {
     version: i64,
     created_at: DateTime<Utc>,
     approvals: i64,
+    requested_by: Option<Uuid>,
+    requested_by_label: Option<String>,
+    meta: Value,
 }
 
 impl ApprovalRecordRow {
@@ -306,6 +321,9 @@ impl ApprovalRecordRow {
             approval: row.into_approval(approvals)?,
             created_at,
             eval_id: self.eval_id,
+            requested_by: self.requested_by,
+            requested_by_label: self.requested_by_label,
+            meta: self.meta,
         })
     }
 }
@@ -710,10 +728,13 @@ pub async fn list_approvals_tx(
     let rows: Vec<ApprovalRecordRow> = sqlx::query_as(
         "SELECT a.id, a.run_id, a.card_id, a.project_id, a.eval_id, a.gate, a.kind, a.status,
                 a.required_decisions, a.expires_at, a.callback_url, a.version, a.created_at,
+                a.requested_by, a.meta,
+                COALESCE(NULLIF(BTRIM(u.display_name), ''), u.email) AS requested_by_label,
                 (SELECT count(*) FROM approval_decision d
                   WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
                     AND d.decision = 'approve') AS approvals
            FROM approval a
+           LEFT JOIN app_user u ON u.id = a.requested_by
           WHERE a.tenant_id = $1
             AND ($2::text IS NULL OR a.status = $2)
             AND ($3::uuid IS NULL OR a.run_id = $3)
@@ -753,10 +774,13 @@ pub async fn get_approval_tx(
     let row: Option<ApprovalRecordRow> = sqlx::query_as(
         "SELECT a.id, a.run_id, a.card_id, a.project_id, a.eval_id, a.gate, a.kind, a.status,
                 a.required_decisions, a.expires_at, a.callback_url, a.version, a.created_at,
+                a.requested_by, a.meta,
+                COALESCE(NULLIF(BTRIM(u.display_name), ''), u.email) AS requested_by_label,
                 (SELECT count(*) FROM approval_decision d
                   WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
                     AND d.decision = 'approve') AS approvals
            FROM approval a
+           LEFT JOIN app_user u ON u.id = a.requested_by
           WHERE a.tenant_id = $1 AND a.id = $2",
     )
     .bind(tenant.as_uuid())
@@ -768,9 +792,9 @@ pub async fn get_approval_tx(
 
 /// The `meta` document of one approval row, exactly as written at request time.
 ///
-/// The read projection (`get_approval_tx`) carries the gate's state, not its free-form meta;
-/// a destructive action needs `meta.target` — the exact thing the gate authorises — so this is
-/// a second, narrow read rather than widening a projection seven call sites construct.
+/// The read projection carries `meta` too (the approvals screen renders it per row, #285); this
+/// stays as the one-column read for a caller that wants the document and nothing else — the
+/// destructive gate's `meta.target` check, which must not depend on how wide a projection grows.
 pub async fn approval_meta_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
