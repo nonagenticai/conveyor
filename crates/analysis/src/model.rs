@@ -96,6 +96,7 @@ pub enum Category {
     Brand,
     Content,
     CodeQuality,
+    Video,
 }
 
 impl Category {
@@ -111,6 +112,7 @@ impl Category {
             Category::Brand => "brand",
             Category::Content => "content",
             Category::CodeQuality => "code_quality",
+            Category::Video => "video",
         }
     }
 }

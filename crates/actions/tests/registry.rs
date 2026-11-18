@@ -90,10 +90,12 @@ use serde_json::{Value, json};
 /// **#282 adds 3 internal**: the approval-policy family.
 /// **T3 adds 6 internal**: the PM job.
 /// **#154 adds 1 internal**: `analyse.site`, the analysis library's invocable read.
-const EXPECTED: [&str; 428] = [
+/// **#164 adds 1 internal**: `analyse.video`, the video family over executor evidence.
+const EXPECTED: [&str; 429] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
+    "analyse.video",
     "agent.run",
     "andon.engage",
     "andon.release",
@@ -574,7 +576,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // T3 adds the six PM actions (all internal): 386 → 392.
     // #305 adds the fourteen MSP edit/read actions, all internal: 395 -> 409; external stays 18.
     // #154 adds `analyse.site` (internal, read): 409 -> 410; external stays 18.
-    assert_eq!((internal, external), (410, 18));
+    // #164 adds `analyse.video` (internal, read): 410 -> 411; external stays 18.
+    assert_eq!((internal, external), (411, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
