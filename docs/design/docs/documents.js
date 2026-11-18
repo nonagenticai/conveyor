@@ -173,6 +173,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-research-cutover.md"
     },
     {
+      "title": "The dead w2v estate retired — 2026-11-17",
+      "path": "docs/evidence/2026-11-16-w2v-retirement.html",
+      "source": "docs/evidence/2026-11-16-w2v-retirement.md",
+      "section": "Evidence",
+      "sha256": "73b797dde36368a70b0638521278cc4b1ad79a7ee511a679893307fe789ac026",
+      "bytes": 7049,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-w2v-retirement.md"
+    },
+    {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
       "path": "docs/evidence/D23-EVAL-CALLER.html",
       "source": "docs/evidence/D23-EVAL-CALLER.md",
