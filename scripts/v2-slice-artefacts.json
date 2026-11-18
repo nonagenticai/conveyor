@@ -105,8 +105,50 @@
       "tables": ["lesson"]
     },
     "T9": {
-      "evidence": ["docs/SPEC_V2.md"],
-      "gap": "no architecture project type and no TOGAF phase contracts"
+      "tables": [
+        "artifact_type",
+        "architecture_artifact",
+        "architecture_artifact_entry",
+        "architecture_artifact_link",
+        "adm_profile",
+        "architecture_contract",
+        "architecture_compliance_review",
+        "architecture_waiver",
+        "governance_body",
+        "architecture_maturity",
+        "architecture_skill_assessment"
+      ],
+      "actions": [
+        "architecture.artifacts_approve",
+        "architecture.artifacts_create",
+        "architecture.artifacts_entries",
+        "architecture.artifacts_get",
+        "architecture.artifacts_link",
+        "architecture.artifacts_links",
+        "architecture.artifacts_list",
+        "architecture.artifacts_supersede",
+        "architecture.artifacts_update",
+        "architecture.board_decide",
+        "architecture.board_get",
+        "architecture.board_open",
+        "architecture.contracts_approve",
+        "architecture.contracts_get",
+        "architecture.contracts_list",
+        "architecture.contracts_request",
+        "architecture.contracts_supersede",
+        "architecture.maturity_assess",
+        "architecture.maturity_plan",
+        "architecture.phases_advance",
+        "architecture.profile_get",
+        "architecture.profile_tailor",
+        "architecture.repository_search",
+        "architecture.reviews_record",
+        "architecture.reviews_waive",
+        "architecture.skills_assess"
+      ],
+      "modules": ["architecture"],
+      "evidence": ["docs/SPEC_V2.md", "docs/plans/T9-architecture-capability.md"],
+      "gap": null
     },
     "T10": {
       "evidence": ["docs/SPEC_V2.md"],

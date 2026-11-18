@@ -555,8 +555,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T9-architecture-capability.html",
       "source": "docs/plans/T9-architecture-capability.md",
       "section": "Plans",
-      "sha256": "fd495231d10b1963ed2776fa29ba65886227fa1d8aa3b83f66756fca16affbe8",
-      "bytes": 18554,
+      "sha256": "ea086f6278a33091a43d09cf46f29491e10a8b9610897a29801d7cacda96bb09",
+      "bytes": 18552,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {

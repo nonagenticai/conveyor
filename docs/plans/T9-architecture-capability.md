@@ -1,7 +1,7 @@
 ---
 slice: T9
 title: TOGAF ADM capability — artefacts, phases, contracts and governance
-status: planned
+status: built
 depends_on: [T1, T3, P0]
 spec_sections: ["§8.1", "§8.5", "§10.3", "§10.4", "§10.5", "§12 T9", "D63"]
 adds_tables: [artifact_type, architecture_artifact, architecture_artifact_entry, architecture_artifact_link, adm_profile, architecture_contract, architecture_compliance_review, architecture_waiver, governance_body, architecture_maturity, architecture_skill_assessment]
