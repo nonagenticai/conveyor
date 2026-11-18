@@ -54,6 +54,7 @@ CONVEYOR_S3_ENDPOINT="http://127.0.0.1:$PORT" \
 CONVEYOR_S3_ACCESS_KEY=conveyor \
 CONVEYOR_S3_SECRET_KEY=conveyor-dev-secret \
 CONVEYOR_S3_BUCKET="$BUCKET" \
+CONVEYOR_S3_SSE=none \
   cargo test -p conveyor-actions --test s3_wire -- --ignored --nocapture
 
 printf '\nS3_WIRE_PROVEN\n'

@@ -99,8 +99,11 @@ mod tests {
         let document = lock().expect("the embedded capture parses");
         assert_eq!(document["openapi"], "3.1.0");
         let ops = operations(&document);
-        // 17 paths, 18 operations: `/api/formal/proofs/{claim_id}` carries both GET and POST.
-        assert_eq!(ops.len(), 18);
+        // 61 paths, 73 operations: `/api/formal/proofs/{claim_id}` carries both GET and POST,
+        // and #319 adds the evidence-review family captured from `evidence_review_service@bac4f66`.
+        assert_eq!(ops.len(), 73);
+        assert!(ops.contains("POST /api/reviews/{review_id}:activate"));
+        assert!(ops.contains("GET /api/reviews/{review_id}/flow"));
         assert!(ops.contains("POST /api/stats/meta-analysis"));
         // The graph surfaces and the dead-upstream operations are not carried.
         assert!(!ops.iter().any(|op| op.contains("/api/topology")));

@@ -362,6 +362,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-capture-2026-11-15.md"
     },
     {
+      "title": "The evidence-review service — capture and drop table (2026-11-18)",
+      "path": "docs/evidence/evidence-review-capture-2026-11-18.html",
+      "source": "docs/evidence/evidence-review-capture-2026-11-18.md",
+      "section": "Evidence",
+      "sha256": "9f0b74db05893cbdb93bbbdb37b3bbb09b0e64c997c2cd79bc782bd1f78ae6ac",
+      "bytes": 33072,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/evidence-review-capture-2026-11-18.md"
+    },
+    {
       "title": "frontendtestrunnerservice absorption — evidence (2026-11-15)",
       "path": "docs/evidence/media-frontend_test_runner_service.html",
       "source": "docs/evidence/media-frontend_test_runner_service.md",
@@ -555,8 +564,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T9-architecture-capability.html",
       "source": "docs/plans/T9-architecture-capability.md",
       "section": "Plans",
-      "sha256": "fd495231d10b1963ed2776fa29ba65886227fa1d8aa3b83f66756fca16affbe8",
-      "bytes": 18554,
+      "sha256": "ea086f6278a33091a43d09cf46f29491e10a8b9610897a29801d7cacda96bb09",
+      "bytes": 18552,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {

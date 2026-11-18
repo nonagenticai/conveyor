@@ -27,7 +27,7 @@ use object_store::ObjectStore;
 // `ObjectStoreExt` (the `ObjectStore` trait keeps the low-level transport methods
 // and is what the dyn store is typed as). Both must be in scope.
 use object_store::ObjectStoreExt;
-use object_store::aws::AmazonS3Builder;
+use object_store::aws::{AmazonS3Builder, AmazonS3ConfigKey};
 use object_store::path::Path as ObjectPath;
 use std::sync::Arc;
 use std::sync::OnceLock;
@@ -35,6 +35,13 @@ use uuid::Uuid;
 
 /// The default bucket.
 pub const DEFAULT_BUCKET: &str = "conveyor-documents";
+
+/// The SSE-S3 algorithm the sealed adapter asks for (§11.10).
+pub const SSE_AES256: &str = "AES256";
+
+/// The `object_store` configuration key for the SSE algorithm (its `FromStr` accepts this
+/// spelling; parsed rather than matched on a private enum variant).
+const SSE_CONFIG_KEY: &str = "server_side_encryption";
 
 /// Why an object operation failed.
 #[derive(Debug, thiserror::Error)]
@@ -76,6 +83,24 @@ impl Objects {
     /// That leg is marked UNVERIFIED in `docs/plans/slices/S09-documents-integrations.md` until it runs
     /// against a real MinIO in the cluster.
     pub fn from_env() -> Option<Self> {
+        Self::build(false)
+    }
+
+    /// The **job storage** adapter's instance (§11.10; T13 P5).
+    ///
+    /// The same bucket and the same service credentials, with one difference: every write
+    /// requests server-side encryption (`SSE-S3`, `AES256`). `CONVEYOR_S3_SSE=none` is the
+    /// escape hatch for a deployment whose MinIO has no key management configured; the default
+    /// is encryption on, because §11.10 makes it part of the contract rather than a deployment
+    /// preference.
+    ///
+    /// The credential never leaves this process: a job reaches the adapter through the broker,
+    /// never through a client it configures.
+    pub fn from_env_sealed() -> Option<Self> {
+        Self::build(true)
+    }
+
+    fn build(sealed: bool) -> Option<Self> {
         if non_empty("CONVEYOR_S3_BACKEND").as_deref() == Some("memory") {
             // ONE shared instance per process: `from_env` is called per action, and a fresh in-memory store
             // each time would make an upload invisible to the download that follows it.
@@ -94,7 +119,7 @@ impl Objects {
         let secret = non_empty("CONVEYOR_S3_SECRET_KEY")?;
         let bucket = non_empty("CONVEYOR_S3_BUCKET").unwrap_or_else(|| DEFAULT_BUCKET.to_owned());
         let region = non_empty("CONVEYOR_S3_REGION").unwrap_or_else(|| "us-east-1".to_owned());
-        let s3 = AmazonS3Builder::new()
+        let mut s3 = AmazonS3Builder::new()
             .with_endpoint(endpoint)
             .with_bucket_name(&bucket)
             .with_access_key_id(access)
@@ -102,9 +127,16 @@ impl Objects {
             .with_region(region)
             // MinIO is plain HTTP inside the mesh, and path-style addressing is what it serves.
             .with_allow_http(true)
-            .with_virtual_hosted_style_request(false)
-            .build()
-            .ok()?;
+            .with_virtual_hosted_style_request(false);
+        if sealed {
+            let sse = non_empty("CONVEYOR_S3_SSE").unwrap_or_else(|| SSE_AES256.to_owned());
+            if !sse.eq_ignore_ascii_case("none")
+                && let Ok(key) = SSE_CONFIG_KEY.parse::<AmazonS3ConfigKey>()
+            {
+                s3 = s3.with_config(key, sse);
+            }
+        }
+        let s3 = s3.build().ok()?;
         Some(Self {
             store: Arc::new(s3),
             bucket,
