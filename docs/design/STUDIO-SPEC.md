@@ -913,8 +913,8 @@ The pack has two deployments with different contracts:
   `publishable` flag), feedback intake and **Publish**. Start run and the Execution room
   (`runs.list`, `runs.get`, `runs.cancel`, `approvals.decide`) are the same actions the V1 web
   screens use; the old `projects.execute` stub is no longer rendered. Publish enqueues
-  `publish.design`, which builds the pack and opens a pull request on the homepage repository;
-  the console never merges it. Every control produces the action request it names; nothing is
+  `publish.design`, which builds the pack and opens a pull request that updates `docs/design/`
+  in the pack repository (the target is repointed in #364); the console never merges it. Every control produces the action request it names; nothing is
   simulated on this path. Signed out (and on any origin with no config, including `file://`)
   there is no API request and no write control.
 
