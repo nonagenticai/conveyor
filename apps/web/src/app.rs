@@ -13,6 +13,7 @@ use crate::auth;
 use crate::palette::Palette;
 use crate::screens::admin::AdminScreen;
 use crate::screens::approvals::Approvals;
+use crate::screens::architecture::ArchitectureScreen;
 use crate::screens::benchmarks::{BenchmarkRunDetail, Benchmarks};
 use crate::screens::boards::{BoardIndex, BoardScreen};
 use crate::screens::cockpit::Cockpit;
@@ -145,6 +146,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/design/requirements") view=RequirementsScreen/>
                             <Route path=path!("/design/requirements/:id") view=RequirementDetail/>
                             <Route path=path!("/design/models") view=ModelsScreen/>
+                            <Route path=path!("/architecture") view=ArchitectureScreen/>
                             <Route path=path!("/design/models/:model_id") view=ModelDetail/>
                             <Route path=path!("/build/processes") view=ProcessesScreen/>
                             <Route path=path!("/build/processes/:process_id") view=ProcessDetail/>
@@ -281,6 +283,9 @@ fn Sidebar() -> impl IntoView {
                 })}
                 {move || ctx.has_action("models.list").then(|| view! {
                     <li><A href="/design/models"><span class="nav-item">"Architecture"</span></A></li>
+                })}
+                {move || ctx.has_action("architecture.profile_get").then(|| view! {
+                    <li><A href="/architecture"><span class="nav-item">"ADM"</span></A></li>
                 })}
                 <li><A href="/search"><span class="nav-item">"Search"</span></A></li>
                 {move || ctx.has_action("members.list").then(|| view! {

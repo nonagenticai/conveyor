@@ -92,9 +92,11 @@ use serde_json::{Value, json};
 /// **#154 adds 1 internal**: `analyse.site`, the analysis library's invocable read.
 /// **#164 adds 1 internal**: `analyse.video`, the video family over executor evidence.
 /// **#303 adds 2 internal**: `benefits.retire` and `tranches.retire`, the governed retirement path.
+/// **#295 adds 2 internal**: `cards.ledger_append` and `cards.ledger_list`, the claim/fact ledger.
+/// **T9 adds 26 internal**: the `architecture.*` family (see the block below `approvals.request`).
 /// **#76 adds 1 internal**: `tools.call`, the tool broker (it dispatches a declared external
 /// action and adds no external target).
-const EXPECTED: [&str; 432] = [
+const EXPECTED: [&str; 460] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -108,6 +110,35 @@ const EXPECTED: [&str; 432] = [
     "approvals.decide",
     "approvals.list",
     "approvals.request",
+    // T9 (#81): the TOGAF ADM capability — artefacts and their entries/links, the repository,
+    // the profile, the Board, contracts, phase advances, compliance reviews and waivers, and the
+    // two Preliminary assessments. Twenty-six internal actions.
+    "architecture.artifacts_approve",
+    "architecture.artifacts_create",
+    "architecture.artifacts_entries",
+    "architecture.artifacts_get",
+    "architecture.artifacts_link",
+    "architecture.artifacts_links",
+    "architecture.artifacts_list",
+    "architecture.artifacts_supersede",
+    "architecture.artifacts_update",
+    "architecture.board_decide",
+    "architecture.board_get",
+    "architecture.board_open",
+    "architecture.contracts_approve",
+    "architecture.contracts_get",
+    "architecture.contracts_list",
+    "architecture.contracts_request",
+    "architecture.contracts_supersede",
+    "architecture.maturity_assess",
+    "architecture.maturity_plan",
+    "architecture.phases_advance",
+    "architecture.profile_get",
+    "architecture.profile_tailor",
+    "architecture.repository_search",
+    "architecture.reviews_record",
+    "architecture.reviews_waive",
+    "architecture.skills_assess",
     "artifacts.list",
     "audit.list",
     "baselines.get",
@@ -156,6 +187,8 @@ const EXPECTED: [&str; 432] = [
     "cards.duplicate",
     "cards.get",
     "cards.list",
+    "cards.ledger_append",
+    "cards.ledger_list",
     "cards.move",
     "cards.release",
     "cards.remove_label",
@@ -584,8 +617,12 @@ fn the_registry_is_exactly_the_declared_set() {
     // #154 adds `analyse.site` (internal, read): 409 -> 410; external stays 18.
     // #164 adds `analyse.video` (internal, read): 410 -> 411; external stays 18.
     // #303 adds `benefits.retire` and `tranches.retire` (internal): 411 -> 413; external stays 18.
-    // #76 adds `tools.call` (internal): 413 -> 414; external stays 18.
-    assert_eq!((internal, external), (414, 18));
+    // #295 adds `cards.ledger_append` (write) and `cards.ledger_list` (read), both internal:
+    // 413 -> 415; external stays 18.
+    // T9 (#81) adds the twenty-six architecture actions, all internal: 415 -> 441; external
+    // stays 18 (they read and write this tenant's own repository, never an external service).
+    // #76 adds `tools.call` (internal): 441 -> 442; external stays 18.
+    assert_eq!((internal, external), (442, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

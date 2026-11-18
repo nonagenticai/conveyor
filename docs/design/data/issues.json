@@ -3,9 +3,9 @@
     {
       "number": 349,
       "title": "programme: the 8 remaining declared outputs \u2014 SPEC-V2 spec, T1\u2013T3 evidence, T0\u2013T3 closure reviews",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/349",
-      "updatedAt": "2026-11-18T11:24:55Z",
+      "updatedAt": "2026-11-18T11:46:02Z",
       "labels": [
         {
           "name": "unit",
@@ -322,9 +322,9 @@
     {
       "number": 295,
       "title": "parity: re-home the per-card claim/fact ledger",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/295",
-      "updatedAt": "2026-11-18T08:32:58Z",
+      "updatedAt": "2026-11-18T14:09:14Z",
       "labels": [
         {
           "name": "unit",
@@ -2489,7 +2489,7 @@
       "title": "T13 \u2014 Tool platform",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/76",
-      "updatedAt": "2026-11-18T10:09:44Z",
+      "updatedAt": "2026-11-18T12:21:53Z",
       "labels": [
         {
           "name": "unit",

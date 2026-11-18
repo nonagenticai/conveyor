@@ -26,6 +26,7 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 use crate::board::projects::{insert_board_from_template, insert_start_card_and_run};
+use crate::control::store_error;
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
@@ -282,6 +283,7 @@ async fn pm_charter(
                 ActionError::internal()
             })?,
     };
+    let materialise_adm = input.project_type_code.as_deref() == Some("architecture");
     let project = store::project::insert_project_tx(
         &mut *tx,
         ctx.tenant,
@@ -303,6 +305,14 @@ async fn pm_charter(
         tracing::error!(%error, "pm.charter: insert project");
         ActionError::internal()
     })?;
+    if materialise_adm {
+        store::architecture::materialise_adm_phases_tx(&mut *tx, ctx.tenant, project.id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "pm.charter: materialise architecture phases");
+                ActionError::internal()
+            })?;
+    }
     insert_board_from_template(&mut *tx, &ctx, project.id, None).await?;
     insert_start_card_and_run(&mut *tx, ctx.clone(), project.id).await?;
 
@@ -561,6 +571,29 @@ async fn pm_route_gate(
             "invalid_value",
             "required_decisions must be between 1 and 255",
         ));
+    }
+    // T9 (SPEC_V2 §8.1, D63): a delivery project cannot pass its design gate without the live
+    // architecture contract that governs it. The refusal writes no approval row.
+    if gate == "design" {
+        store::architecture::assert_design_contract_tx(&mut *tx, ctx.tenant, input.project_id)
+            .await
+            .map_err(|error| match error {
+                store::architecture::ArchitectureStoreError::Database(error) => {
+                    store_error(error, ctx.action)
+                }
+                store::architecture::ArchitectureStoreError::Illegal(
+                    store::architecture::ArchitectureRule::ContractNotLive(status),
+                ) => ActionError::new(
+                    409,
+                    "architecture_contract_not_live",
+                    format!("the delivery project's architecture contract is not live: {status}"),
+                ),
+                _ => ActionError::new(
+                    409,
+                    "architecture_contract_missing",
+                    "the delivery project has no live architecture contract",
+                ),
+            })?;
     }
     let evidence = resolve_evidence(
         &mut *tx,

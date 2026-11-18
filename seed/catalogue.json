@@ -3938,6 +3938,27 @@
     },
     {
       "kind": "project_type",
+      "code": "architecture",
+      "label": "Architecture",
+      "meta": {
+        "description": "TOGAF ADM project: Preliminary and A–H as WBS phase nodes, a typed artefact repository, contracts and compliance reviews (T9). Its phases are the ADM's, not catalogue process phases, so meta.phases stays empty and no process map is derived.",
+        "phases": [],
+        "card_types": [],
+        "matrix": {
+          "project_start_request_analysis": {
+            "intake": ["active", "archive"],
+            "active": ["waiting", "done", "archive"],
+            "waiting": ["active", "archive"],
+            "done": ["archive"],
+            "archive": ["intake"]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
       "code": "py2rust",
       "label": "Python → Rust rewrite",
       "meta": {

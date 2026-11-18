@@ -49,6 +49,35 @@ async fn fixture() -> Fixture {
     .fetch_one(&pg.super_pool)
     .await
     .expect("insert the project");
+    // T9 (#81): a design gate resolves only against a live architecture contract, so the
+    // fixture holds one — these tests are about the gate's EVIDENCE, not the contract rule.
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, seeded.tenant)
+        .await
+        .expect("scope");
+    let contract = conveyor_store::architecture::request_contract_tx(
+        &mut tx,
+        seeded.tenant,
+        &conveyor_store::architecture::NewContract {
+            project_id: project,
+            kind: "delivery_contract".to_owned(),
+            phase_code: "f".to_owned(),
+            title: "Delivery contract".to_owned(),
+            body: json!({}),
+            supersedes_id: None,
+        },
+    )
+    .await
+    .expect("request the governing contract");
+    conveyor_store::architecture::approve_contract_tx(
+        &mut tx,
+        seeded.tenant,
+        contract.id,
+        contract.version,
+        seeded.user_id,
+    )
+    .await
+    .expect("approve the governing contract");
+    tx.commit().await.expect("commit the contract");
     let binding = seed_pm_job(&pg, seeded.tenant_id).await;
     let running = support::Running::start(&pg).await;
     Fixture {

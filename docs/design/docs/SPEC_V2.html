@@ -1895,7 +1895,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>architecture</td>
-<td><code>architecture.artifacts.list|get|create|update|approve|supersede|link</code>, <code>architecture.repository.search</code> (reuse), <code>architecture.contracts.request|approve|supersede</code>, <code>architecture.phases.advance</code>, <code>architecture.reviews.record|waive</code>, <code>architecture.board.decide</code>, <code>architecture.maturity.assess|plan</code>, <code>architecture.skills.assess</code>, <code>architecture.profile.get|tailor</code></td>
+<td><code>architecture.artifacts_list|get|entries|links|create|update|approve|supersede|link</code>, <code>architecture.repository_search</code> (reuse), <code>architecture.contracts_request|get|list|approve|supersede</code>, <code>architecture.phases_advance</code>, <code>architecture.reviews_record|waive</code>, <code>architecture.board_open|get|decide</code>, <code>architecture.maturity_assess|plan</code>, <code>architecture.skills_assess</code>, <code>architecture.profile_get|tailor</code> — the action macro requires exactly one dot, so the family is <code>architecture.&lt;noun&gt;_&lt;verb&gt;</code>; the Board is a <code>governance_body</code> row, opened by <code>board_open</code>, read by <code>board_get</code> and decided by <code>board_decide</code></td>
 </tr>
 <tr>
 <td>organisation</td>

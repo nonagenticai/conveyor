@@ -60,6 +60,9 @@ pub mod model;
 pub mod executor;
 // T0 (SPEC_V2 §4.1–§4.4): the organisation spine's release hash and binding vocabulary.
 pub mod organisation;
+// T9 (SPEC_V2 §8.1, §10.3, D63): the TOGAF ADM's phase, plateau, artefact, contract,
+// compliance, maturity and skills vocabularies — one definition for the CHECK and the actions.
+pub mod architecture;
 pub mod output_standard;
 pub mod plan;
 // T2 (SPEC_V2 §7): the decision ladder's rungs, fail vocabulary, reproducibility pins and the

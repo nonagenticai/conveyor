@@ -1866,6 +1866,160 @@ async fn seed_parity_document(pg: &support::Pg, ctx: &Ctx) -> Uuid {
 }
 
 /// Seed the rows the sample's input will name, once per round.
+/// One artefact row for a T9 sample, at version 1.
+async fn seed_arch_artifact(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    scoped(pg, ctx, async move |conn| {
+        store::architecture::create_artifact_tx(
+            conn,
+            ctx.tenant,
+            &store::architecture::NewArtifact {
+                project_id: None,
+                artifact_type_id: None,
+                phase_code: "preliminary".to_owned(),
+                plateau: "psa".to_owned(),
+                artifact_kind: "catalog".to_owned(),
+                title: format!("Parity artefact {}", Uuid::now_v7().simple()),
+                change_initiative: None,
+                purpose: Some("parity".to_owned()),
+                stakeholders: None,
+                scope: None,
+                document_id: None,
+                contract_id: None,
+                meta: None,
+                author_id: Some(ctx.alice_user),
+            },
+            &[],
+        )
+        .await
+        .expect("seed an architecture artefact")
+        .id
+    })
+    .await
+}
+
+/// One governance body row per round (the key is unique, so two rounds never share a row).
+async fn seed_arch_board(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    scoped(pg, ctx, async move |conn| {
+        store::architecture::open_body_tx(
+            conn,
+            ctx.tenant,
+            &store::architecture::NewBody {
+                kind: "architecture_board".to_owned(),
+                key: format!("parity-board-{}", Uuid::now_v7().simple()),
+                name: "Parity Board".to_owned(),
+                charter: "parity charter".to_owned(),
+                commissioning_authority: "parity programme".to_owned(),
+                decision_limits: json!({}),
+                members: json!([]),
+            },
+        )
+        .await
+        .expect("seed a governance body")
+        .id
+    })
+    .await
+}
+
+/// One draft contract on a project.
+async fn seed_arch_contract(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    scoped(pg, ctx, async move |conn| {
+        store::architecture::request_contract_tx(
+            conn,
+            ctx.tenant,
+            &store::architecture::NewContract {
+                project_id: project,
+                kind: "delivery_contract".to_owned(),
+                phase_code: "f".to_owned(),
+                title: format!("Parity contract {}", Uuid::now_v7().simple()),
+                body: json!({}),
+                supersedes_id: None,
+            },
+        )
+        .await
+        .expect("seed a contract")
+        .id
+    })
+    .await
+}
+
+/// One live contract on a project (the design gate's precondition).
+async fn seed_arch_live_contract(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let contract = seed_arch_contract(pg, ctx, project).await;
+    scoped(pg, ctx, async move |conn| {
+        let record = store::architecture::get_contract_tx(conn, ctx.tenant, contract)
+            .await
+            .expect("read the contract")
+            .expect("the prepared contract exists");
+        store::architecture::approve_contract_tx(
+            conn,
+            ctx.tenant,
+            contract,
+            record.version,
+            ctx.alice_user,
+        )
+        .await
+        .expect("approve the contract");
+    })
+    .await;
+    contract
+}
+
+/// One compliance review row on a contract.
+async fn seed_arch_review(pg: &support::Pg, ctx: &Ctx, project: Uuid, contract: Uuid) -> Uuid {
+    scoped(pg, ctx, async move |conn| {
+        store::architecture::record_review_tx(
+            conn,
+            ctx.tenant,
+            &store::architecture::NewReview {
+                project_id: project,
+                contract_id: contract,
+                level: "compliant".to_owned(),
+                findings: json!([]),
+                evidence: json!([]),
+                outcome: None,
+                reviewed_by: ctx.alice_user,
+            },
+        )
+        .await
+        .expect("seed a compliance review")
+        .id
+    })
+    .await
+}
+
+/// The tenant's newest ADM profile, with no mandatory artefacts, so a phase can advance on its
+/// contract alone (this sample is about the gate's contract rule, not the artefact rule).
+async fn seed_arch_profile(pg: &support::Pg, ctx: &Ctx) {
+    scoped(pg, ctx, async move |conn| {
+        store::architecture::upsert_profile_tx(
+            conn,
+            ctx.tenant,
+            &store::architecture::NewProfile {
+                key: format!("parity-adm-{}", Uuid::now_v7().simple()),
+                name: "Parity ADM".to_owned(),
+                phase_set: json!(["preliminary"]),
+                artifact_requirements: json!({}),
+                contract_kinds: json!({}),
+            },
+        )
+        .await
+        .expect("seed a profile");
+    })
+    .await;
+}
+
+/// One project with its nine ADM phase nodes.
+async fn seed_arch_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let project = seed_parity_project(pg, ctx).await;
+    scoped(pg, ctx, async move |conn| {
+        store::architecture::materialise_adm_phases_tx(conn, ctx.tenant, project)
+            .await
+            .expect("materialise the phases");
+    })
+    .await;
+    project
+}
+
 async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
     match sample.name {
         // ── T1 plan spine ─────────────────────────────────────────────────────────────────
@@ -2239,6 +2393,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push(sample.name, id);
         }
         "cards.update" | "cards.move" | "cards.archive" | "cards.duplicate" | "cards.comment" => {
+            let id = seed_card(pg, ctx, "active").await;
+            ctx.push(sample.name, id);
+        }
+        // #295: the ledger's write and read address one card; each round gets a fresh one.
+        "cards.ledger_append" | "cards.ledger_list" => {
             let id = seed_card(pg, ctx, "active").await;
             ctx.push(sample.name, id);
         }
@@ -2871,6 +3030,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         "pm.get" | "pm.plan" | "pm.route_gate" => {
             let project = seed_parity_project(pg, ctx).await;
             seed_pm_approved_gate(pg, ctx, project, "charter").await;
+            if sample.name == "pm.route_gate" {
+                // T9 (#81): the sample routes the `design` gate, which the T9 rule resolves
+                // only against a live architecture contract.
+                seed_arch_live_contract(pg, ctx, project).await;
+            }
             ctx.push(sample.name, project);
         }
         "pm.close" => {
@@ -2886,6 +3050,58 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let baseline = seed_pm_approved_baseline(pg, ctx, project).await;
             ctx.push("changes.request", project);
             ctx.push("changes.request.baseline", baseline);
+        }
+        // ── T9: the architecture capability (#81) ─────────────────────────────────────────
+        "architecture.artifacts_get"
+        | "architecture.artifacts_entries"
+        | "architecture.artifacts_links"
+        | "architecture.artifacts_update"
+        | "architecture.artifacts_approve"
+        | "architecture.artifacts_supersede" => {
+            let artifact = seed_arch_artifact(pg, ctx).await;
+            ctx.push(sample.name, artifact);
+        }
+        "architecture.artifacts_link" => {
+            let from = seed_arch_artifact(pg, ctx).await;
+            let to = seed_arch_artifact(pg, ctx).await;
+            ctx.push("architecture.artifacts_link", from);
+            ctx.push("architecture.artifacts_link", to);
+        }
+        "architecture.board_get" | "architecture.board_decide" => {
+            let body = seed_arch_board(pg, ctx).await;
+            ctx.push(sample.name, body);
+        }
+        "architecture.contracts_get"
+        | "architecture.contracts_approve"
+        | "architecture.contracts_supersede" => {
+            let project = seed_parity_project(pg, ctx).await;
+            let contract = seed_arch_contract(pg, ctx, project).await;
+            ctx.push(sample.name, contract);
+        }
+        "architecture.contracts_request" => {
+            let project = seed_parity_project(pg, ctx).await;
+            ctx.push("architecture.contracts_request", project);
+        }
+        "architecture.phases_advance" => {
+            let project = seed_arch_project(pg, ctx).await;
+            seed_arch_profile(pg, ctx).await;
+            ctx.push("architecture.phases_advance", project);
+        }
+        "architecture.reviews_record" => {
+            let project = seed_parity_project(pg, ctx).await;
+            let contract = seed_arch_contract(pg, ctx, project).await;
+            ctx.push("architecture.reviews_record", project);
+            ctx.push("architecture.reviews_record", contract);
+        }
+        "architecture.reviews_waive" => {
+            let project = seed_parity_project(pg, ctx).await;
+            let contract = seed_arch_contract(pg, ctx, project).await;
+            let review = seed_arch_review(pg, ctx, project, contract).await;
+            ctx.push("architecture.reviews_waive", review);
+        }
+        "architecture.maturity_plan" => {
+            let project = seed_parity_project(pg, ctx).await;
+            ctx.push("architecture.maturity_plan", project);
         }
         _ => {}
     }
@@ -3153,6 +3369,26 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         on_prepared("cards.archive", Some("\"1\"")),
         on_prepared("cards.unarchive", Some("\"1\"")),
         on_prepared("cards.duplicate", None),
+        {
+            // #295: one claim with its provenance and verdict, over both transports.
+            let mut sample = on_prepared("cards.ledger_append", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "card_id": ctx.pop("cards.ledger_append"),
+                    "kind": "claim",
+                    "body": "the hero image sits above the fold",
+                    "source": {"list": "research", "node": "n-1", "execution_id": "e-1"},
+                    "verdict": {"score": 0.9, "accepted": true, "reason": "observed"}
+                })
+            });
+            sample
+        },
+        {
+            let mut sample = on_prepared("cards.ledger_list", None);
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"card_id": ctx.pop("cards.ledger_list"), "limit": 10}));
+            sample
+        },
         {
             let mut sample = on_prepared("cards.comment", None);
             sample.input =
@@ -5159,6 +5395,206 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 None,
             ),
             409,
+        ),
+        // ── T9: the architecture capability (#81) ─────────────────────────────────────────
+        // Reads anchored on rows the fixture/prepare writes; writes on a fresh row per round.
+        expecting(plain("architecture.artifacts_list", json!({}), None), 200),
+        expecting(on_prepared("architecture.artifacts_get", None), 200),
+        expecting(on_prepared("architecture.artifacts_entries", None), 200),
+        expecting(on_prepared("architecture.artifacts_links", None), 200),
+        expecting(
+            plain("architecture.repository_search", json!({}), None),
+            200,
+        ),
+        expecting(plain("architecture.profile_get", json!({}), None), 200),
+        expecting(on_prepared("architecture.board_get", None), 200),
+        expecting(on_prepared("architecture.contracts_get", None), 200),
+        expecting(plain("architecture.contracts_list", json!({}), None), 200),
+        {
+            let mut sample = plain("architecture.artifacts_create", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| {
+                json!({
+                    "phase_code": "preliminary",
+                    "plateau": "psa",
+                    "artifact_kind": "catalog",
+                    "title": format!("Parity artefact {}", Uuid::now_v7().simple()),
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = on_prepared("architecture.artifacts_update", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("architecture.artifacts_update"),
+                    "title": "Parity artefact updated",
+                })
+            });
+            expecting(sample, 200)
+        },
+        expecting(
+            on_prepared("architecture.artifacts_approve", Some("\"1\"")),
+            200,
+        ),
+        expecting(
+            on_prepared("architecture.artifacts_supersede", Some("\"1\"")),
+            201,
+        ),
+        {
+            let mut sample = plain("architecture.artifacts_link", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "from_artifact_id": ctx.pop("architecture.artifacts_link"),
+                    "to_artifact_id": ctx.pop("architecture.artifacts_link"),
+                    "kind": "reuse",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            // The key is unique per (tenant, key), so it is minted per ROUND.
+            let mut sample = plain("architecture.profile_tailor", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| {
+                json!({
+                    "key": format!("parity-adm-{}", Uuid::now_v7().simple()),
+                    "name": "Parity tailored ADM",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("architecture.board_open", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| {
+                json!({
+                    "kind": "architecture_board",
+                    "key": format!("parity-board-{}", Uuid::now_v7().simple()),
+                    "name": "Parity Board",
+                    "charter": "parity charter",
+                    "commissioning_authority": "parity programme",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("architecture.board_decide", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "body_id": ctx.pop("architecture.board_decide"),
+                    "decision": "approved",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("architecture.contracts_request", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("architecture.contracts_request"),
+                    "kind": "delivery_contract",
+                    "phase_code": "f",
+                    "title": "Parity delivery contract",
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(
+            on_prepared("architecture.contracts_approve", Some("\"1\"")),
+            200,
+        ),
+        expecting(
+            on_prepared("architecture.contracts_supersede", Some("\"1\"")),
+            200,
+        ),
+        {
+            let mut sample = plain("architecture.phases_advance", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("architecture.phases_advance"),
+                    "phase_code": "preliminary",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("architecture.reviews_record", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("architecture.reviews_record"),
+                    "contract_id": ctx.pop("architecture.reviews_record"),
+                    "level": "compliant",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("architecture.reviews_waive", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "review_id": ctx.pop("architecture.reviews_waive"),
+                    "owner_user_id": ctx.alice_user,
+                    "reason": "parity waiver",
+                    "reassessment_at": "2027-01-31T00:00:00Z",
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(
+            plain(
+                "architecture.maturity_assess",
+                json!({
+                    "stage": "baseline",
+                    "scores": [
+                        {"key": "architecture_process", "score": 3},
+                        {"key": "architecture_development", "score": 3},
+                        {"key": "business_linkage", "score": 3},
+                        {"key": "senior_management", "score": 3},
+                        {"key": "operating_unit_participation", "score": 3},
+                        {"key": "architecture_communication", "score": 3},
+                        {"key": "it_security", "score": 3},
+                        {"key": "architecture_governance", "score": 3},
+                        {"key": "investment_strategy", "score": 3},
+                    ],
+                }),
+                None,
+            ),
+            201,
+        ),
+        {
+            let mut sample = plain("architecture.maturity_plan", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("architecture.maturity_plan"),
+                    "milestones": ["M1 — the baseline is measured"],
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(
+            plain(
+                "architecture.skills_assess",
+                json!({
+                    "role": "solution_architect",
+                    "job_key": "architect",
+                    "scores": [
+                        {"key": "general", "score": 4},
+                        {"key": "business", "score": 4},
+                        {"key": "architecture", "score": 4},
+                        {"key": "programme_management", "score": 4},
+                        {"key": "it_knowledge", "score": 4},
+                        {"key": "technical", "score": 4},
+                        {"key": "legal", "score": 4},
+                    ],
+                }),
+                None,
+            ),
+            201,
         ),
     ];
 

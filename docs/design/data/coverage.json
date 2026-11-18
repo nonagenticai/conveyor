@@ -270,7 +270,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 4,
+        "claimed": 2,
         "numbers": [
           17,
           22,
@@ -289,11 +289,9 @@
           223,
           224,
           225,
-          295,
-          319,
-          349
+          319
         ],
-        "open": 10,
+        "open": 8,
         "ready": 5,
         "unknown": 0
       }
@@ -1689,7 +1687,7 @@
     {
       "blocked_by": [],
       "evidence": [
-        "migrations/0053_tool_platform.sql"
+        "migrations/0055_tool_platform.sql"
       ],
       "gap": null,
       "key": "T13",

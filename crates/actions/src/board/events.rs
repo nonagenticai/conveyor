@@ -45,6 +45,11 @@ pub const CARD_MOVED: &str = "card.moved";
 pub const CARD_ARCHIVED: &str = "card.archived";
 /// A card's stamp was cleared (`cards.unarchive`).
 pub const CARD_UNARCHIVED: &str = "card.unarchived";
+/// A claim or fact was appended to a card's ledger (`cards.ledger_append`, ADR 0008).
+///
+/// The aggregate is `card_ledger`, not `card`: the entry is an immutable fact, and the card row
+/// itself does not change, so `card.updated` would misstate the mutation.
+pub const CARD_LEDGER_APPENDED: &str = "card_ledger.appended";
 /// A comment was written (`cards.comment`).
 pub const COMMENT_CREATED: &str = "comment.created";
 /// A comment's body was replaced (`comments.update`).
@@ -73,7 +78,7 @@ pub const KNOWLEDGE_BOUND: &str = "knowledge.bound";
 /// Every event type a webhook subscription may name. S05's board emitters plus the slices
 /// that append their own outbox types (S19's eval events); the vocabulary is the register,
 /// so `list.changed` or a `project.*` spelling cannot be stored.
-pub const S05_EVENT_TYPES: [&str; 30] = [
+pub const S05_EVENT_TYPES: [&str; 31] = [
     CARD_CREATED,
     CARD_UPDATED,
     CARD_MOVED,
@@ -104,6 +109,7 @@ pub const S05_EVENT_TYPES: [&str; 30] = [
     WORKFLOW_RETIRED,
     MEMORY_RECORDED,
     KNOWLEDGE_BOUND,
+    CARD_LEDGER_APPENDED,
 ];
 
 /// One board event, ready to append.

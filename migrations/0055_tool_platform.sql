@@ -1,4 +1,4 @@
--- 0053_tool_platform.sql — the tool estate (SPEC_V2 §11.8; issue #76, T13).
+-- 0055_tool_platform.sql — the tool estate (SPEC_V2 §11.8; issue #76, T13).
 --
 -- Four tables and their one owner each (§11.1):
 --
