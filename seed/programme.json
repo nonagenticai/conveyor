@@ -1029,7 +1029,7 @@
       "key": "T9",
       "name": "TOGAF ADM capability",
       "description": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1044,7 +1044,7 @@
         ],
         "plan_status": "draft",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
@@ -1447,7 +1447,8 @@
           223,
           224,
           225,
-          319
+          319,
+          356
         ],
         "depends_on": [],
         "plan_status": "active",
