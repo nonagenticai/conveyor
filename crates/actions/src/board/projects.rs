@@ -446,6 +446,20 @@ async fn projects_close(
     ctx: HandlerCtx,
     input: ProjectCloseIn,
 ) -> Result<ProjectView, ActionError> {
+    // Read first: the closure gate (#302) must refuse before anything is written, and the status
+    // guard still answers 404 (absent) or 409 (already terminal) before the gate runs.
+    let current = load_project(tx, ctx.tenant, input.id).await?;
+    if matches!(current.status.as_str(), "closed" | "archived") {
+        return Err(ActionError::new(
+            409,
+            "conflict",
+            format!(
+                "project {} is {}; only an open project can be closed",
+                current.id, current.status
+            ),
+        ));
+    }
+    crate::programme::assert_closure_outputs_published(&mut *tx, ctx.tenant, input.id).await?;
     let closed =
         store::project::close_project_tx(&mut *tx, ctx.tenant, input.id, input.reason.as_deref())
             .await
@@ -453,7 +467,8 @@ async fn projects_close(
     let project = match closed {
         Some(project) => project,
         None => {
-            // Absent or already terminal: the re-read is what distinguishes 404 from 409.
+            // A concurrent close won between the read and the update: the same conflict the
+            // status guard above answers.
             let current = load_project(tx, ctx.tenant, input.id).await?;
             return Err(ActionError::new(
                 409,
