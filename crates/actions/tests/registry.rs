@@ -91,7 +91,7 @@ use serde_json::{Value, json};
 /// **T3 adds 6 internal**: the PM job.
 /// **#154 adds 1 internal**: `analyse.site`, the analysis library's invocable read.
 /// **#164 adds 1 internal**: `analyse.video`, the video family over executor evidence.
-const EXPECTED: [&str; 429] = [
+const EXPECTED: [&str; 430] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -478,6 +478,7 @@ const EXPECTED: [&str; 429] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "tools.call",
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
@@ -577,7 +578,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // #305 adds the fourteen MSP edit/read actions, all internal: 395 -> 409; external stays 18.
     // #154 adds `analyse.site` (internal, read): 409 -> 410; external stays 18.
     // #164 adds `analyse.video` (internal, read): 410 -> 411; external stays 18.
-    assert_eq!((internal, external), (411, 18));
+    // T13 adds `tools.call` (internal — the broker dispatches through a declared external
+    // action, so it adds no external target): 411 -> 412; external stays 18.
+    assert_eq!((internal, external), (412, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
