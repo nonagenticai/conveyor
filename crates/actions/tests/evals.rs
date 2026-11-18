@@ -224,7 +224,13 @@ async fn evals_create_get_list_update_and_retire_emit_one_event_each() {
     )
     .await;
     let (status, body) = running
-        .invoke_approved("evals.retire", TOKEN, json!({ "id": id }), None, retire_gate)
+        .invoke_approved(
+            "evals.retire",
+            TOKEN,
+            json!({ "id": id }),
+            None,
+            retire_gate,
+        )
         .await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(body["output"]["status"], "retired");
@@ -233,7 +239,13 @@ async fn evals_create_get_list_update_and_retire_emit_one_event_each() {
 
     // `retired` is terminal: the domain refuses the second retire, and the action says 409.
     let (status, body) = running
-        .invoke_approved("evals.retire", TOKEN, json!({ "id": id }), None, retire_gate)
+        .invoke_approved(
+            "evals.retire",
+            TOKEN,
+            json!({ "id": id }),
+            None,
+            retire_gate,
+        )
         .await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "conflict");

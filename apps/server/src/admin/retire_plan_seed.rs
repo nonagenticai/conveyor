@@ -82,11 +82,7 @@ pub async fn run(
 }
 
 /// Open a gate for one card, approve it as this principal, and archive through the real handler.
-async fn archive_one(
-    caller: &ActionCaller<'_>,
-    card: Uuid,
-    version: i64,
-) -> Result<(), CallError> {
+async fn archive_one(caller: &ActionCaller<'_>, card: Uuid, version: i64) -> Result<(), CallError> {
     let input = json!({ "id": card });
     let gate = caller
         .call(
@@ -133,13 +129,11 @@ async fn policy(caller: &ActionCaller<'_>, action: &str) -> Result<(String, Stri
     let policy = caller
         .call("approval_policies.get", json!({ "action": action }), None)
         .await?;
-    let text = |field: &str, fallback: &str| {
-        policy[field]
-            .as_str()
-            .unwrap_or(fallback)
-            .to_owned()
-    };
-    Ok((text("approval", "required"), text("self_approval", "forbidden")))
+    let text = |field: &str, fallback: &str| policy[field].as_str().unwrap_or(fallback).to_owned();
+    Ok((
+        text("approval", "required"),
+        text("self_approval", "forbidden"),
+    ))
 }
 
 async fn set_policy(
