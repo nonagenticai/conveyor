@@ -564,7 +564,10 @@ async fn seed_card_label(pg: &support::Pg, ctx: &Ctx, card: Uuid, label: Uuid) {
 /// still compares the value against the HTTP body, so a *dropped object* — the regression
 /// this test exists to catch — fails on the equality rather than escaping here.
 fn structured_content(result: &Value) -> Value {
-    result.get("structuredContent").cloned().unwrap_or(Value::Null)
+    result
+        .get("structuredContent")
+        .cloned()
+        .unwrap_or(Value::Null)
 }
 
 async fn seed_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
