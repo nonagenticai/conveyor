@@ -8,12 +8,17 @@
 //! capture, which is the only direction that can fail for the reason the check exists.
 #![forbid(unsafe_code)]
 
+pub mod actor;
+pub mod actor_jwt;
 pub mod auth;
 pub mod cache;
 pub mod clients;
 pub mod config;
 pub mod contract;
+pub mod db;
+pub mod evidence_review;
 pub mod pipeline;
+pub mod problem;
 pub mod router;
 pub mod state;
 pub mod stats;

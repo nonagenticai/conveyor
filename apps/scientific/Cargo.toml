@@ -20,13 +20,19 @@ axum = { workspace = true }
 bytes = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }
+conveyor-auth = { path = "../../crates/auth" }
+conveyor-domain = { path = "../../crates/domain" }
 conveyor-platform = { path = "../../crates/platform" }
 futures-util = { workspace = true }
+jsonwebtoken = { workspace = true }
 object_store = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+sha2 = { workspace = true }
+sqlx = { workspace = true }
 statrs = { workspace = true }
+tower = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 uuid = { workspace = true }
@@ -34,5 +40,8 @@ tracing = { workspace = true }
 utoipa = { workspace = true }
 
 [dev-dependencies]
+# The schema test proves the evidence-review migration against a real Postgres 18
+# when TEST_DATABASE_URL is supplied. Test-only: the binary's behaviour is unchanged.
+sqlx = { workspace = true }
 toml = { workspace = true }
 tower = { workspace = true }

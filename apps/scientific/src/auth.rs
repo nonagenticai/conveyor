@@ -87,17 +87,80 @@ pub async fn authenticate(
         .get("authorization")
         .and_then(|value| value.to_str().ok())
         .map(str::to_owned);
-    let tenant = match resolve(&state, &raw, authorization.as_deref()).await {
-        Ok(tenant) => tenant,
+    let resolved = match resolve(&state, &raw, authorization.as_deref()).await {
+        Ok(resolved) => resolved,
         Err(refusal) => return refusal,
     };
-    match HeaderValue::from_str(&tenant) {
+    // The evidence-review family keys every row on a `uuid` tenant. The scientific routes keep the
+    // old grammar (any `[A-Za-z0-9._-]` id), so the stricter shape is demanded only of the review
+    // paths, where a non-UUID could otherwise only fail deep inside a policy cast.
+    let review_path = request.uri().path().starts_with("/api/review");
+    let tenant = match uuid::Uuid::parse_str(&resolved.tenant) {
+        Ok(tenant) => Some(tenant),
+        Err(_) if review_path => {
+            return refuse(StatusCode::BAD_REQUEST, "INVALID_TENANT_ID", INVALID_TENANT);
+        }
+        Err(_) => None,
+    };
+    let actor = match actor_for(&state, request.headers(), tenant, &resolved).await {
+        Ok(actor) => actor,
+        Err(refusal) => return refusal,
+    };
+    match HeaderValue::from_str(&resolved.tenant) {
         Ok(value) => {
             request.headers_mut().insert("x-tenant-id", value);
+            request.extensions_mut().insert(actor);
             next.run(request).await
         }
         // Unreachable: a resolved tenant passed the grammar above. Refuse rather than panic.
         Err(_) => refuse(StatusCode::BAD_REQUEST, "INVALID_TENANT_ID", INVALID_TENANT),
+    }
+}
+
+/// The resolved credential: a proven tenant and, when the licence carried one, its subject.
+struct Resolved {
+    tenant: String,
+    subject: Option<String>,
+}
+
+/// The actor for this request.
+///
+/// **A licence bearer is a machine.** The payload carries a subject, but a machine holds the
+/// token as readily as a person does, so a proven tenant is not a proven human. The human rung is
+/// `X-Actor-Token`, a verified user token carried beside the licence (the reference's
+/// `_human_on_licence`); it names the subject and the role. Without it every actor is a machine
+/// and `require_human` refuses every decision.
+#[allow(clippy::result_large_err)]
+async fn actor_for(
+    state: &Shared,
+    headers: &axum::http::HeaderMap,
+    tenant: Option<uuid::Uuid>,
+    resolved: &Resolved,
+) -> Result<crate::actor::Actor, Response> {
+    let token = headers
+        .get("x-actor-token")
+        .and_then(|value| value.to_str().ok())
+        .map(str::trim)
+        .filter(|value| !value.is_empty());
+    match token {
+        Some(token) => {
+            let Some(verifier) = state.actor_verifier.as_ref() else {
+                // Configured header, unconfigured verifier: fail closed, never accept unchecked.
+                return Err(unauthorized(AUTHORIZATION_INVALID));
+            };
+            let actor = verifier
+                .verify(token)
+                .await
+                .map_err(IntoResponse::into_response)?;
+            Ok(match tenant {
+                Some(tenant) => actor.with_tenant(tenant),
+                None => actor,
+            })
+        }
+        None => Ok(crate::actor::Actor::machine(
+            tenant.unwrap_or(uuid::Uuid::nil()),
+            resolved.subject.clone(),
+        )),
     }
 }
 
@@ -106,7 +169,7 @@ async fn resolve(
     state: &Shared,
     raw: &str,
     authorization: Option<&str>,
-) -> Result<String, Response> {
+) -> Result<Resolved, Response> {
     // Carrier 1: the licence travels in `X-Tenant-Id: Bearer <token>` and takes precedence.
     if raw.to_ascii_lowercase().starts_with("bearer") {
         let Some(token) = bearer_value(raw) else {
@@ -134,7 +197,10 @@ async fn resolve(
         if !tenant_id_ok(&tenant) {
             return Err(unauthorized(LICENCE_MALFORMED_TENANT));
         }
-        return Ok(tenant);
+        return Ok(Resolved {
+            subject: subject_of(&payload),
+            tenant,
+        });
     }
 
     // Carrier 2: a licence in `Authorization`, with the plain `X-Tenant-Id` as an assertion.
@@ -163,7 +229,7 @@ async fn authorization_licence(
     state: &Shared,
     token: &str,
     asserted: &str,
-) -> Result<String, Response> {
+) -> Result<Resolved, Response> {
     // NO VERDICT is a 503: the licence could not be checked, which is not the caller's fault.
     let Some(payload) = introspect(state, token).await else {
         let mut response = refuse(
@@ -189,7 +255,10 @@ async fn authorization_licence(
         return Err(unauthorized(AUTHORIZATION_NO_TENANT));
     }
     if asserted.is_empty() {
-        return Ok(licence_tenant);
+        return Ok(Resolved {
+            subject: subject_of(&payload),
+            tenant: licence_tenant,
+        });
     }
     if !tenant_id_ok(asserted) {
         return Err(refuse(
@@ -199,7 +268,10 @@ async fn authorization_licence(
         ));
     }
     if asserted == licence_tenant {
-        return Ok(licence_tenant);
+        return Ok(Resolved {
+            subject: subject_of(&payload),
+            tenant: licence_tenant,
+        });
     }
     let subject = payload
         .get("subject_id")
@@ -214,7 +286,10 @@ async fn authorization_licence(
             .any(|allowed| allowed == subject)
     {
         // The vouch never re-labels the LICENCE; it authorises the ASSERTED tenant, verbatim.
-        return Ok(asserted.to_owned());
+        return Ok(Resolved {
+            subject: subject_of(&payload),
+            tenant: asserted.to_owned(),
+        });
     }
     Err(refuse(
         StatusCode::FORBIDDEN,
@@ -246,6 +321,16 @@ async fn introspect(state: &Shared, token: &str) -> Option<Value> {
             None
         }
     }
+}
+
+/// The licence's own subject, when it carries one. It proves nothing about humanity.
+fn subject_of(payload: &Value) -> Option<String> {
+    payload
+        .get("subject_id")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|subject| !subject.is_empty())
+        .map(str::to_owned)
 }
 
 fn is_active(payload: &Value) -> bool {

@@ -54,7 +54,20 @@ pub struct Config {
     /// Wall-clock budget for one introspection (`LICENSE_INTROSPECT_TIMEOUT`, seconds; the
     /// reference's 10 s default).
     pub license_introspect_timeout: Duration,
+    /// The realm whose user tokens may name the human behind a decision
+    /// (`SCIENTIFIC_PROCESSOR_ACTOR_ISSUER`). Unset ⇒ every `X-Actor-Token` is refused, which is
+    /// the reference's fail-closed rule.
+    pub actor_issuer: Option<String>,
+    pub actor_audience: Option<String>,
+    pub actor_jwks_url: Option<String>,
+    /// `azp` values admitted for an actor token (CSV). Empty ⇒ any client of the realm.
+    pub actor_azp: Vec<String>,
+    /// Role names that confer the review lead (`SCIENTIFIC_PROCESSOR_REVIEW_LEAD_ROLES`, CSV).
+    pub lead_roles: Vec<String>,
 }
+
+/// The reference's one lead role name, plus the second spelling the fleet has used.
+pub const DEFAULT_LEAD_ROLES: [&str; 2] = ["review-lead", "evidence-review-lead"];
 
 /// The MinIO/S3 endpoint and credentials, under the old service's variable names.
 #[derive(Debug, Clone, PartialEq)]
@@ -101,6 +114,18 @@ fn lookup<'a>(vars: &'a [(String, String)], name: &str) -> Option<&'a str> {
     vars.iter()
         .find(|(key, _)| key == name)
         .map(|(_, value)| value.as_str())
+}
+
+fn csv(value: Option<&str>) -> Vec<String> {
+    value
+        .map(|raw| {
+            raw.split(',')
+                .map(str::trim)
+                .filter(|part| !part.is_empty())
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 impl Config {
@@ -161,6 +186,30 @@ impl Config {
                     .filter(|seconds| *seconds > 0.0)
                     .unwrap_or(10.0),
             ),
+            actor_issuer: lookup(vars, "SCIENTIFIC_PROCESSOR_ACTOR_ISSUER")
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(str::to_owned),
+            actor_audience: lookup(vars, "SCIENTIFIC_PROCESSOR_ACTOR_AUDIENCE")
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(str::to_owned),
+            actor_jwks_url: lookup(vars, "SCIENTIFIC_PROCESSOR_ACTOR_JWKS_URL")
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(str::to_owned),
+            actor_azp: csv(lookup(vars, "SCIENTIFIC_PROCESSOR_ACTOR_AZP")),
+            lead_roles: {
+                let configured = csv(lookup(vars, "SCIENTIFIC_PROCESSOR_REVIEW_LEAD_ROLES"));
+                if configured.is_empty() {
+                    DEFAULT_LEAD_ROLES
+                        .iter()
+                        .map(|role| (*role).to_owned())
+                        .collect()
+                } else {
+                    configured
+                }
+            },
         })
     }
 
@@ -189,6 +238,35 @@ mod tests {
         assert_eq!(config.cache_ttl, Duration::from_secs(300));
         assert_eq!(config.cache_max_entries, 1000);
         assert!(config.database_url.is_none());
+        assert!(config.actor_issuer.is_none());
+        assert_eq!(
+            config.lead_roles,
+            vec!["review-lead".to_owned(), "evidence-review-lead".to_owned()]
+        );
+    }
+
+    #[test]
+    fn the_actor_rung_is_read_under_its_own_names() {
+        let config = Config::from_lookup(&vars(&[
+            (
+                "SCIENTIFIC_PROCESSOR_ACTOR_ISSUER",
+                "https://issuer/realms/x",
+            ),
+            ("SCIENTIFIC_PROCESSOR_ACTOR_AUDIENCE", "scientific"),
+            (
+                "SCIENTIFIC_PROCESSOR_ACTOR_JWKS_URL",
+                "https://issuer/certs",
+            ),
+            ("SCIENTIFIC_PROCESSOR_ACTOR_AZP", "conveyor-web, other"),
+            ("SCIENTIFIC_PROCESSOR_REVIEW_LEAD_ROLES", "head-reviewer"),
+        ]))
+        .expect("parses");
+        assert_eq!(
+            config.actor_issuer.as_deref(),
+            Some("https://issuer/realms/x")
+        );
+        assert_eq!(config.actor_azp, vec!["conveyor-web", "other"]);
+        assert_eq!(config.lead_roles, vec!["head-reviewer"]);
     }
 
     #[test]

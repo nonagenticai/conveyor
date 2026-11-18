@@ -258,6 +258,226 @@ const DECLARED_UNCAPTURABLE: &[(&str, &str)] = &[
         "GET /api/pipeline/anomalies",
         "reads object-store contents the process did not compute",
     ),
+    (
+        "POST /api/reviews/{review_id}/protocol-versions/{protocol_version_id}:lock",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "PATCH /api/reviews/{review_id}",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/state-history",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/protocol-versions",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/protocol-versions",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}:activate",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}:pause",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}:resume",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}:close",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}:reopen",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}:archive",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/archive",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/flow",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/flow:rebuild",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/flow:audit",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/exports",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/exports",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/exports/{export_id}:verify",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/exports/{export_id}",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/deduplication-runs",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/deduplication-runs",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/duplicate-clusters",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/assignments",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/screening/queue",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/decisions",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/decisions",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/conflicts",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/stages",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/imports",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/imports",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/records",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/records/{review_record_id}",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/quarantine",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/corpus-versions",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/corpus-versions",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/research-objects",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/research-objects",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/assertions",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/acceptances",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/acceptances",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/evidence-snapshots",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/evidence-snapshots",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/review-jobs/{job_id}",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/review-jobs/{job_id}:cancel",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/duplicate-clusters/{cluster_id}:resolve",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/duplicate-clusters/{cluster_id}/resolutions",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/conflicts/{conflict_id}:unblind",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/conflicts/{conflict_id}:resolve",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/corpus-versions/{corpus_version_id}/members",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/research-objects/{research_object_id}:revise",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "POST /api/reviews/{review_id}/research-objects/{research_object_id}/extractions",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
+    (
+        "GET /api/reviews/{review_id}/evidence-snapshots/{snapshot_id}",
+        "no response capture exists for the review family; evidence_review_parity replays the lifecycle and the capture names every operation",
+    ),
 ];
 
 #[test]
