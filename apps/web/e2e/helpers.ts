@@ -29,6 +29,16 @@ export function authFor(login = "alice"): Record<string, string> {
 }
 
 /**
+ * Whether this run is the dev transport, whose seed has a second dev-a admin (`dev:reviewer`).
+ *
+ * The deployed suite logs in as one OIDC principal, so a spec that needs a gate decided by
+ * somebody other than its requester can only run here.
+ */
+export function isDevAuth(): boolean {
+  return Boolean(process.env.DEV_AUTH_TOKEN);
+}
+
+/**
  * Invoke a real action. A failed call throws with the API's problem body, never a silent null.
  *
  * `approvalId` is what a destructive action needs (#282): the id travels BESIDE `input`, not
@@ -58,10 +68,10 @@ export async function invoke<T = unknown>(
 /**
  * This tenant lets a requester decide their own gate for `action` (#285's self-approval path).
  *
- * The dev seed gives each tenant ONE member, so a spec that needs a destructive action to
- * actually run has to be the tenant's policy that allows it rather than a second principal.
- * `approval: required` is kept: the gate still exists and is still decided — that is the
- * console's flow, not a bypass of it.
+ * The console disables a requester's own Approve unless the action's policy says `allowed`, so
+ * a spec that needs that control enabled sets the policy instead of borrowing a second
+ * principal. `approval: required` is kept: the gate still exists and is still decided — that
+ * is the console's flow, not a bypass of it.
  */
 export async function allowSelfApproval(
   request: APIRequestContext,
@@ -74,6 +84,28 @@ export async function allowSelfApproval(
     { action, approval: "required", self_approval: "allowed" },
     undefined,
     login,
+  );
+}
+
+/**
+ * Decide one gate as `dev:reviewer`, the seed's second dev-a admin.
+ *
+ * The store refuses a requester deciding their own gate (409) unless the action's policy allows
+ * it, and `approval_policies.set` only accepts registered destructive actions — so a card or
+ * eval gate can only ever be decided by another person. Guard the caller with [`isDevAuth`]:
+ * the deployed suite has one principal.
+ */
+export async function decideAsReviewer(
+  request: APIRequestContext,
+  action: string,
+  approvalId: string,
+): Promise<void> {
+  await invoke(
+    request,
+    action,
+    { approval_id: approvalId, decision: "approve" },
+    undefined,
+    "reviewer",
   );
 }
 

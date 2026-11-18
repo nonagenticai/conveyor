@@ -177,15 +177,24 @@ async fn attempt(
     outcome
 }
 
-/// The tenant's policy for one action; the engine's own defaults when it cannot be read.
+/// Why a caller may not decide their own gate, when the tenant forbids self-approval.
 ///
-/// A reader that cannot see the policy must not guess a waiver: `required`/`forbidden` is what
-/// the engine applies when the tenant has set no row, so the console behaves the same way.
-async fn policy(ctx: AppCtx, action: &str) -> (String, String) {
-    match ctx
+/// A screen shows the decide control **disabled and says why** — an enabled control the engine
+/// then refuses reads as a bug. The reason is one sentence so every screen says the same thing.
+pub fn self_gate_refusal(mine: bool, self_approval: &str) -> Option<&'static str> {
+    (mine && self_approval != "allowed")
+        .then_some("You requested this gate; another person must decide it.")
+}
+
+/// The tenant's policy for one gate: `(approval, self_approval)`.
+///
+/// The engine's own defaults when the tenant has no row — and when the read is refused — are
+/// `required`/`forbidden`; a reader that cannot see the policy must never guess a waiver.
+pub async fn policy_for(client: &crate::api::Client, gate: &str) -> (String, String) {
+    match client
         .invoke(
             "approval_policies.get",
-            json!({ "action": action }),
+            json!({ "action": gate }),
             InvokeOptions::default(),
         )
         .await
@@ -196,6 +205,12 @@ async fn policy(ctx: AppCtx, action: &str) -> (String, String) {
         ),
         Err(_) => ("required".to_owned(), "forbidden".to_owned()),
     }
+}
+
+/// The tenant's policy for one action, read through this context's client.
+async fn policy(ctx: AppCtx, action: &str) -> (String, String) {
+    let client = ctx.client();
+    policy_for(&client, action).await
 }
 
 fn text(output: &Value, field: &str, fallback: &str) -> String {
