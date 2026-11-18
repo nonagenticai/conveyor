@@ -139,9 +139,9 @@
     {
       "number": 305,
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-18T02:38:54Z",
+      "updatedAt": "2026-11-18T05:12:16Z",
       "labels": [
         {
           "name": "unit",
