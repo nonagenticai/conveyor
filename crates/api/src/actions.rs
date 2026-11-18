@@ -241,6 +241,7 @@ pub async fn invoke_http(
             eval_run_id: None,
             prompt_ref: None,
             prompt_version: None,
+            prompt_sha256: None,
             correlation_id: Some(request_id.clone()),
         }),
     };

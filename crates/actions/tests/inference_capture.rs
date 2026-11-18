@@ -102,6 +102,7 @@ async fn a_real_external_call_records_the_router_usage_field_for_field() {
             eval_run_id: None,
             prompt_ref: Some("process:test".to_owned()),
             prompt_version: Some("1:2".to_owned()),
+            prompt_sha256: None,
             correlation_id: Some("corr-1".to_owned()),
         }),
     };
@@ -171,10 +172,9 @@ async fn a_real_external_call_records_the_router_usage_field_for_field() {
     assert_eq!(row.prompt_ref.as_deref(), Some("process:test"));
     assert_eq!(row.prompt_version.as_deref(), Some("1:2"));
     assert!(
-        row.prompt_sha256
-            .as_deref()
-            .is_some_and(|sha| sha.len() == 64),
-        "the prompt hash is stored, never the prompt"
+        row.prompt_sha256.is_none(),
+        "a caller with no compiled prompt records no compiled hash — the messages array is the \
+         full request, and its identity is not a prompt identity (S16 W7)"
     );
     assert!(
         row.action_invocation_id.is_some(),
@@ -293,6 +293,7 @@ async fn a_capture_failure_keeps_the_call_and_never_retries_the_paid_request() {
             eval_run_id: None,
             prompt_ref: Some("process:capture-failure".to_owned()),
             prompt_version: Some("1:1".to_owned()),
+            prompt_sha256: None,
             correlation_id: Some("corr-capture-failure".to_owned()),
         }),
     };

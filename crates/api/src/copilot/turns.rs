@@ -389,8 +389,9 @@ async fn run(
 
     // SPEC D27: the copilot's system message is compiled from the tenant's catalogue, not read
     // from a constant. A tenant without the row (or with it retired) is a configuration error
-    // that fails the turn before a model call, never an empty system message.
-    let system_prompt = match conveyor_actions::prompt::compile_for_copilot(
+    // that fails the turn before a model call with the typed refusal — never an empty system
+    // message and never a generic 500 (S16 W7).
+    let compiled = match conveyor_actions::prompt::compile_for_copilot(
         &state.pool,
         tenant,
         conversation_id,
@@ -398,18 +399,20 @@ async fn run(
     )
     .await
     {
-        Ok(compiled) => compiled.text,
+        Ok(compiled) => compiled,
         Err(error) => {
+            let error = error.into_action_error("copilot.turn");
             tracing::error!(%error, "copilot: the prompt catalogue could not compile the system message");
             return End::Failed {
-                code: "internal",
-                status: 500,
-                detail: "the copilot's prompt is not configured".to_owned(),
+                code: error.code,
+                status: error.status,
+                detail: error.detail,
                 model: None,
                 tool_calls: Vec::new(),
             };
         }
     };
+    let system_prompt = compiled.text.clone();
 
     let mut messages: Vec<ChatMessage> = Vec::with_capacity(history.len() + 1);
     messages.push(ChatMessage {
@@ -437,18 +440,19 @@ async fn run(
     let mut last_model: Option<ModelRun> = None;
 
     for round in 0..MAX_ROUNDS {
-        let answer = match call_model(state, caller, turn_id, round, &messages, &tools).await {
-            Ok(answer) => answer,
-            Err(error) => {
-                return End::Failed {
-                    code: error.code,
-                    status: error.status,
-                    detail: error.detail.clone(),
-                    model: last_model,
-                    tool_calls,
-                };
-            }
-        };
+        let answer =
+            match call_model(state, caller, turn_id, round, &messages, &tools, &compiled).await {
+                Ok(answer) => answer,
+                Err(error) => {
+                    return End::Failed {
+                        code: error.code,
+                        status: error.status,
+                        detail: error.detail.clone(),
+                        model: last_model,
+                        tool_calls,
+                    };
+                }
+            };
         last_model = Some(answer.model.clone());
 
         if answer.tool_calls.is_empty() {
@@ -573,6 +577,9 @@ async fn run(
 }
 
 /// Ask the model through the registry engine.
+///
+/// The compiled system prompt is passed in so the ledger row carries the recipe's identity —
+/// key, version and the sha256 of the exact text — rather than a literal name (S16 W7).
 async fn call_model(
     state: &AppState,
     caller: &Caller,
@@ -580,6 +587,7 @@ async fn call_model(
     round: u8,
     messages: &[ChatMessage],
     tools: &[Value],
+    compiled: &conveyor_domain::prompt::CompiledPrompt,
 ) -> Result<Answer, ActionError> {
     let input = CompletionIn {
         model: None,
@@ -615,8 +623,9 @@ async fn call_model(
                 run_step_id: None,
                 conversation_turn_id: Some(turn_id),
                 eval_run_id: None,
-                prompt_ref: Some("copilot".to_owned()),
-                prompt_version: Some("1".to_owned()),
+                prompt_ref: Some(compiled.key.clone()),
+                prompt_version: Some(compiled.version.clone()),
+                prompt_sha256: Some(compiled.sha256.clone()),
                 correlation_id: Some(format!("turn:{turn_id}")),
             }),
         },

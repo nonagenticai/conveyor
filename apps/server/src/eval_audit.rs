@@ -582,6 +582,7 @@ async fn judge_controls(
                     eval_run_id,
                     prompt_ref: Some(format!("eval_audit:{}", metric.key)),
                     prompt_version: None,
+                    prompt_sha256: None,
                     correlation_id: Some(format!("eval.audit:judge:{:?}", metric.key)),
                 }),
             },

@@ -136,6 +136,12 @@ pub struct AgentConfig {
     /// `<name>@<version>`, carried so the invocation hash and the trace pin what ran.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prompt_ref: Option<String>,
+    /// The compiled recipe's version (S16 W7), filled by the executor that compiled it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_version: Option<String>,
+    /// SHA-256 of the compiled system text (S16 W7). Never the full-request hash.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_sha256: Option<String>,
     /// The run the loop executes inside (the caller's join key).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub run_id: Option<Uuid>,
@@ -380,6 +386,8 @@ pub struct Agent {
     tools: Vec<Value>,
     messages: Vec<Message>,
     prompt_ref: Option<String>,
+    prompt_version: Option<String>,
+    prompt_sha256: Option<String>,
     capability_agent_id: Option<Uuid>,
     turns: u8,
     tool_calls: u32,
@@ -399,6 +407,8 @@ impl Agent {
             tools: config.tools,
             messages: config.messages,
             prompt_ref: config.prompt_ref,
+            prompt_version: config.prompt_version,
+            prompt_sha256: config.prompt_sha256,
             capability_agent_id: config.capability_agent_id,
             turns: 0,
             tool_calls: 0,
@@ -442,6 +452,16 @@ impl Agent {
     /// The `prompt_ref` the executor resolved.
     pub fn prompt_ref(&self) -> Option<&str> {
         self.prompt_ref.as_deref()
+    }
+
+    /// The compiled prompt's version, when the executor compiled one.
+    pub fn prompt_version(&self) -> Option<&str> {
+        self.prompt_version.as_deref()
+    }
+
+    /// SHA-256 of the compiled system text, when the executor compiled one.
+    pub fn prompt_sha256(&self) -> Option<&str> {
+        self.prompt_sha256.as_deref()
     }
 
     /// The `capability_agent` the executor resolved.

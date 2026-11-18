@@ -317,15 +317,32 @@ async fn a_process_step_resolves_its_executor_and_compiles_the_prompt_from_the_r
     );
 
     // The compile is live: renaming the card changes the next compiled text and its hash.
+    // Compile with the SAME facts the executor used — the run's step, not `None` — so the
+    // comparison is against the exact text the model saw.
+    let run_step_id: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM run_step
+          WHERE tenant_id = $1 AND run_id = $2
+          ORDER BY position ASC LIMIT 1",
+    )
+    .bind(seeded.tenant_id)
+    .bind(run_id)
+    .fetch_optional(&pg.super_pool)
+    .await
+    .expect("the run's step");
     let first = conveyor_actions::prompt::compile_for_run(
         &pg.runtime,
         seeded.tenant,
         run_id,
-        None,
+        run_step_id,
         "agent@1",
     )
     .await
     .expect("first compile");
+    assert_eq!(
+        prompt_sha.as_deref(),
+        Some(first.sha256.as_str()),
+        "the ledger carries the compiled text's hash, not the full-request hash"
+    );
     sqlx::query("UPDATE card SET name = 'Renamed card' WHERE id = $1")
         .bind(Uuid::parse_str(&card).expect("card id"))
         .execute(&pg.super_pool)
@@ -335,7 +352,7 @@ async fn a_process_step_resolves_its_executor_and_compiles_the_prompt_from_the_r
         &pg.runtime,
         seeded.tenant,
         run_id,
-        None,
+        run_step_id,
         "agent@1",
     )
     .await

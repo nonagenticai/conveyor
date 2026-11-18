@@ -244,6 +244,7 @@ impl ServerHandler for McpServer {
                 eval_run_id: None,
                 prompt_ref: None,
                 prompt_version: None,
+                prompt_sha256: None,
                 correlation_id: request_id_of(&context),
             }),
         };
@@ -372,6 +373,7 @@ pub async fn mcp_tool_body(
             eval_run_id: None,
             prompt_ref: None,
             prompt_version: None,
+            prompt_sha256: None,
             correlation_id: request_id,
         }),
     };
