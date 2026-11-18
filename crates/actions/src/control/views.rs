@@ -277,8 +277,10 @@ pub struct ApprovalDecideIn {
 ///
 /// This is the agent's only path to a person, and it is how a project mid-run asks something
 /// that no `run → waiting_approval` transition produced. At least one of `project_id`,
-/// `card_id` or `run_id` is required: a gate with no parent belongs to no list anybody reads,
-/// so it could only ever expire.
+/// `card_id` or `run_id` is required — **unless** the gate names a destructive `action`, in
+/// which case its computed `target` is its identity and it stands on its own (#285). A gate
+/// with neither a parent nor a target belongs to no list anybody reads, so it could only ever
+/// expire, and is refused.
 ///
 /// `gate` and `kind` are free text on the row. The convention is a
 /// `catalogue_entry(kind='gate')` code, but nothing seeds that catalogue and every existing
@@ -330,6 +332,13 @@ pub struct ApprovalRequestIn {
     /// The input the named `action` will be invoked with; ignored without `action`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub input: Option<Value>,
+    /// What the approver is shown as the proposed change (stored in `meta.proposed_input`).
+    ///
+    /// `input` above is the input the *target* is computed from; this is the same document kept
+    /// for the approvals screen so a person can read exactly what will run (#285). Optional and
+    /// usually equal to `input`; a caller may omit it for an input it does not want to expose.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proposed_input: Option<Value>,
     /// How many distinct approvals resolve it. Defaults to one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub required_decisions: Option<u16>,
@@ -384,11 +393,39 @@ pub struct ApprovalOut {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub eval_id: Option<String>,
     /// The gate name (`catalogue_entry(kind='gate').code`).
+    ///
+    /// For an action gate this **is** the action's name: `approvals.request` refuses a request
+    /// whose `gate` disagrees with the `action` it names, so the approvals screen can render it
+    /// as the action without a second field (#285).
     pub gate: String,
     /// The gate's kind.
     pub kind: String,
     /// `pending | approved | rejected | expired | voided`.
     pub status: String,
+    /// The exact thing this gate authorises, when it names one (`meta.target`).
+    ///
+    /// A destructive call is refused unless this equals the target it computes, so this is the
+    /// string that tells an approver what they are approving.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub target: Option<String>,
+    /// What was asked, in the requester's words (`meta.description`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    /// The answer the requester proposed (`meta.proposed_answer`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proposed_answer: Option<String>,
+    /// The decisions a responder may give (`meta.allowed_decisions`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allowed_decisions: Option<Value>,
+    /// The input the approved call will run with (`meta.proposed_input`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proposed_input: Option<Value>,
+    /// Who posed the gate, when a person did.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requested_by: Option<String>,
+    /// That person's label: display name, else email.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requested_by_label: Option<String>,
     /// The quorum: this many distinct approvals resolve the gate.
     pub required_decisions: u16,
     /// Approvals recorded so far.

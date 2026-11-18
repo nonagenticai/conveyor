@@ -270,6 +270,14 @@ async fn custom_fields_set_value(
     Ok(HandlerOutput::ok(custom_field_value_out(&record)).with_etag(etag_of(record.version)))
 }
 
+/// `custom_fields.clear_value`'s approval target: one field's value on one card.
+fn target_clear_value(input: &CustomFieldValueIdIn) -> Result<String, String> {
+    Ok(format!(
+        "card/{}/custom_field/{}/clear",
+        input.card_id, input.custom_field_id
+    ))
+}
+
 /// Remove a card's value for a board field.
 #[crate::action(
     name = "custom_fields.clear_value",
@@ -280,7 +288,8 @@ async fn custom_fields_set_value(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_clear_value"
 )]
 async fn custom_fields_clear_value(
     tx: &mut PgConnection,

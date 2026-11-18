@@ -383,6 +383,12 @@ async fn evals_update(
     Ok(view)
 }
 
+/// `evals.retire`'s approval target: this eval, retired. The verb is part of the string because
+/// the eval survives the change.
+fn target_retire(input: &EvalIdIn) -> Result<String, String> {
+    Ok(format!("eval/{}/retire", input.id))
+}
+
 /// Withdraw the eval: `draft | running | climbing → retired`.
 #[crate::action(
     name = "evals.retire",
@@ -393,7 +399,8 @@ async fn evals_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_retire"
 )]
 async fn evals_retire(
     tx: &mut PgConnection,
