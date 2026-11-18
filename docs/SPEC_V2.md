@@ -1194,7 +1194,7 @@ in §11.8.
 | Family | Examples |
 |---|---|
 | programme/plan | `programmes.*`, `programme_config.*`, `governed_assets.compose\|submit\|approve` (the MSP artefacts), `tranches.*`, `tranches.review`, `project_dependencies.*`, `cadences.*`, `wbs.*`, `baselines.*`, `registers.*` |
-| benefits | `benefits.list\|get\|create\|update`, `benefits.link\|unlink`, `benefits.baseline\|transition\|measure\|close` |
+| benefits | `benefits.list\|get\|create\|update\|retire`, `benefits.link\|unlink`, `benefits.baseline\|transition\|measure\|close` |
 | architecture | `architecture.artifacts.list\|get\|create\|update\|approve\|supersede\|link`, `architecture.repository.search` (reuse), `architecture.contracts.request\|approve\|supersede`, `architecture.phases.advance`, `architecture.reviews.record\|waive`, `architecture.board.decide`, `architecture.maturity.assess\|plan`, `architecture.skills.assess`, `architecture.profile.get\|tailor` |
 | organisation | `industries.*`, `departments.*`, `jobs.create\|update\|release\|retire`, `job_releases.publish\|retire`, `job_bindings.create\|retire\|list` |
 | procedures | `procedures.ingest_sop\|ingest_process\|ingest_rdf\|draft\|validate\|publish`, `capabilities.design\|publish`, `pko.import_rdf\|edit\|publish\|pin` |

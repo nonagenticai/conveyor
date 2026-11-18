@@ -214,7 +214,10 @@ mod tests {
                 (50, "approval policies".to_owned()),
                 // #305: the durable tranche-review record — the decision and the evidence a
                 // review was taken on (0051_tranche_review.sql).
-                (51, "tranche review".to_owned())
+                (51, "tranche review".to_owned()),
+                // #303: the governed retirement path for benefit profiles and tranches
+                // (0052_benefit_retire.sql).
+                (52, "benefit retire".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
