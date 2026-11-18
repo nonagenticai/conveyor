@@ -6,7 +6,6 @@
   { "blueprint": "app_review", "phase": "analyse", "action": "analyse.assess" },
   { "blueprint": "app_review", "phase": "report", "action": "analyse.report" },
   { "blueprint": "audit_video", "phase": "extract_frames", "action": "analyse.extract_frames" },
-  { "blueprint": "audit_video", "phase": "vision_verification", "action": "analyse.video" },
   { "blueprint": "audit_video", "phase": "report", "action": "analyse.report" },
   { "blueprint": "cro_audit", "phase": "analyse", "action": "analyse.assess" },
   { "blueprint": "cro_audit", "phase": "report", "action": "analyse.report" },
