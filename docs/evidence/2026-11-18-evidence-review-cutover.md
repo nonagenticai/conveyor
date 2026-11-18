@@ -10,7 +10,7 @@ run publishes, and a proof against any other image would not be a proof of the m
 |---|---|---|
 | image | `kubectl -n scientific-processor get deploy scientific-processor -o jsonpath='{.spec.template.spec.containers[0].image}'` | `ghcr.io/nonagenticai/conveyor-scientific@sha256:54f33fad7fd4ad40b744224a5e28b3a5679e71b33fcd1765bde97cd2fa640483` |
 | published by | ci run `44375217397`, job `135052461379` | `sha-eee4e47: digest: sha256:54f33fad…640483` |
-| gitops | PR nonagenticai/gitops-production#5339 (`ed256b63`) | replica 1, digest pinned, actor env added |
+| gitops | the deployment manifest change merged as `ed256b63` | replica 1, digest pinned, actor env added |
 | pod | `kubectl -n scientific-processor get pods` | `scientific-processor-69d7f69497-9z4t8 1/1 Running 0` (0 restarts) |
 | readiness | `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18808/health/ready` | `200` — body `{"ready":true,"reason":null}` |
 | bare tenant | `curl -H 'x-tenant-id: 11111111-1111-1111-1111-111111111111' …/api/reviews` | `401` — a name is not a credential |
