@@ -1,7 +1,19 @@
 {
+  "version": 1,
   "note": "What each V2 slice (SPEC_V2 §12) must deliver, so the programme measures it instead of assuming `proposed`. A slice with `tables`/`actions`/`modules` is measured against migrations, the compiled registry dump and the tree. A behavioural slice with no named schema object carries an explicit `evidence` + `gap` row and stays curated. Credit only what the slice FIRST delivers: an artefact a V1 slice already declared is not re-credited (its extension is the concept map's `extend` verdict), and the generator refuses a cross-track duplicate. The decision-ladder TABLES are T0's (SPEC §12's T0 row) and are never T2's.",
   "slices": {
     "T0": {
+      "tables": [
+        "industry",
+        "job_catalogue",
+        "job_release",
+        "job_binding",
+        "decision",
+        "decision_option",
+        "decision_policy",
+        "decision_policy_refinement",
+        "laya_inference_config"
+      ],
       "actions": [
         "industries.create",
         "industries.get",
@@ -23,17 +35,6 @@
         "crates/domain/src/organisation.rs",
         "crates/domain/src/executor.rs",
         "crates/store/src/organisation.rs"
-      ],
-      "tables": [
-        "industry",
-        "job_catalogue",
-        "job_release",
-        "job_binding",
-        "decision",
-        "decision_option",
-        "decision_policy",
-        "decision_policy_refinement",
-        "laya_inference_config"
       ]
     },
     "T1": {
@@ -51,58 +52,15 @@
         "stakeholder_profile"
       ]
     },
-    "T10": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
-      "gap": "no backlog materialisation, PI planning, demo or inspect-and-adapt cadence"
-    },
-    "T11": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
-      "gap": "no metrics roll-ups, metering drill-down or billing reconciliation (continuous)"
-    },
-    "T12": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
-      "gap": "the one-organisation acceptance loop is not built"
-    },
-    "T13": {
-      "tables": [
-        "tool",
-        "toolkit",
-        "tool_binding",
-        "tool_call"
-      ]
-    },
-    "T14": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
-      "gap": "no estate toolkit published with a probe and a live call"
-    },
-    "T15": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
-      "gap": "no tool authoring, OpenAPI draft import or BYO tool binding"
-    },
-    "T16": {
-      "tables": [
-        "pko_release",
-        "pko_entity",
-        "pko_relation"
-      ]
-    },
-    "T17": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
-      "gap": "no tenant asset authoring intake or review queue"
-    },
     "T2": {
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "crates/domain/src/ladder.rs",
+        "crates/store/src/ladder.rs",
+        "crates/actions/src/ladder/mod.rs",
+        "crates/actions/tests/decision_ladder.rs"
+      ],
+      "gap": "slice 1 delivers the one record shape, the tenant refinement, the version pins and the gated draft application; the live laya HTTP call (reusing process/judge.rs) and decide/escalate remain follow-on work",
       "actions": [
         "decision_policies.create",
         "decision_policies.list",
@@ -116,14 +74,6 @@
         "refinements.list",
         "refinements.publish"
       ],
-      "evidence": [
-        "docs/SPEC_V2.md",
-        "crates/domain/src/ladder.rs",
-        "crates/store/src/ladder.rs",
-        "crates/actions/src/ladder/mod.rs",
-        "crates/actions/tests/decision_ladder.rs"
-      ],
-      "gap": "slice 1 delivers the one record shape, the tenant refinement, the version pins and the gated draft application; the live laya HTTP call (reusing process/judge.rs) and decide/escalate remain follow-on work",
       "modules": [
         "crates/domain/src/ladder.rs",
         "crates/store/src/ladder.rs",
@@ -131,58 +81,62 @@
       ]
     },
     "T3": {
-      "actions": [
-        "changes.request",
-        "pm.charter",
-        "pm.close",
-        "pm.get",
-        "pm.plan",
-        "pm.route_gate"
-      ],
-      "evidence": [
-        "docs/SPEC_V2.md",
-        "crates/actions/src/pm/mod.rs",
-        "migrations/0049_pm_job.sql"
-      ],
-      "modules": [
-        "crates/actions/src/pm/mod.rs"
-      ]
+      "actions": ["pm.charter", "pm.plan", "pm.get", "pm.route_gate", "pm.close", "changes.request"],
+      "evidence": ["docs/SPEC_V2.md"],
+      "gap": null
     },
     "T4": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
+      "evidence": ["docs/SPEC_V2.md"],
       "gap": "no interruption taxonomy, closed remedy set or coach card"
     },
     "T5": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
+      "evidence": ["docs/SPEC_V2.md"],
       "gap": "no kata.* action family and no measured procedure-change loop"
     },
     "T6": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
+      "evidence": ["docs/SPEC_V2.md"],
       "gap": "no development-project path over conveyor and a dependency repo"
     },
     "T7": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
+      "evidence": ["docs/SPEC_V2.md"],
       "gap": "no incident, runbook or postmortem rows and no operations tool call set"
     },
     "T8": {
-      "tables": [
-        "lesson"
-      ]
+      "tables": ["lesson"]
     },
     "T9": {
-      "evidence": [
-        "docs/SPEC_V2.md"
-      ],
+      "evidence": ["docs/SPEC_V2.md"],
       "gap": "no architecture project type and no TOGAF phase contracts"
+    },
+    "T10": {
+      "evidence": ["docs/SPEC_V2.md"],
+      "gap": "no backlog materialisation, PI planning, demo or inspect-and-adapt cadence"
+    },
+    "T11": {
+      "evidence": ["docs/SPEC_V2.md"],
+      "gap": "no metrics roll-ups, metering drill-down or billing reconciliation (continuous)"
+    },
+    "T12": {
+      "evidence": ["docs/SPEC_V2.md"],
+      "gap": "the one-organisation acceptance loop is not built"
+    },
+    "T13": {
+      "tables": ["tool", "toolkit", "tool_binding", "tool_call"]
+    },
+    "T14": {
+      "evidence": ["docs/SPEC_V2.md"],
+      "gap": "no estate toolkit published with a probe and a live call"
+    },
+    "T15": {
+      "evidence": ["docs/SPEC_V2.md"],
+      "gap": "no tool authoring, OpenAPI draft import or BYO tool binding"
+    },
+    "T16": {
+      "tables": ["pko_release", "pko_entity", "pko_relation"]
+    },
+    "T17": {
+      "evidence": ["docs/SPEC_V2.md"],
+      "gap": "no tenant asset authoring intake or review queue"
     }
-  },
-  "version": 1
+  }
 }

@@ -1,6 +1,23 @@
 {
   "issues": [
     {
+      "number": 329,
+      "title": "data: T3 is built, so the registry PR stops measuring it uncovered",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/329",
+      "updatedAt": "2026-11-18T02:37:52Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 325,
       "title": "docs: index the w2v retirement evidence so check-docs is green on main",
       "state": "CLOSED",
@@ -124,7 +141,7 @@
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-18T01:30:36Z",
+      "updatedAt": "2026-11-18T01:51:19Z",
       "labels": [
         {
           "name": "unit",

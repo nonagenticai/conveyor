@@ -1966,7 +1966,7 @@
     {
       "blocked_by": [],
       "evidence": [
-        "crates/actions/src/pm/mod.rs"
+        "docs/SPEC_V2.md"
       ],
       "gap": null,
       "key": "T3",
@@ -1976,8 +1976,8 @@
           6
         ],
         "modules": [
-          1,
-          1
+          0,
+          0
         ],
         "tables": [
           0,
