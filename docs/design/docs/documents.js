@@ -209,6 +209,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-18-card-ledger-call-sites.md"
     },
     {
+      "title": "The evidence-review cutover — deployed and proved (2026-11-18)",
+      "path": "docs/evidence/2026-11-18-evidence-review-cutover.html",
+      "source": "docs/evidence/2026-11-18-evidence-review-cutover.md",
+      "section": "Evidence",
+      "sha256": "868ac4d44b563be3f49527ca145cee0dfac9c1af91479dcdb7babce10e5c884b",
+      "bytes": 7795,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-18-evidence-review-cutover.md"
+    },
+    {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
       "path": "docs/evidence/D23-EVAL-CALLER.html",
       "source": "docs/evidence/D23-EVAL-CALLER.md",

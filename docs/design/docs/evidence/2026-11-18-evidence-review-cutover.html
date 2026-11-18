@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The evidence-review cutover — deployed and proved (2026-11-18) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-18-evidence-review-cutover.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-evidence-review-cutover--deployed-and-proved-2026-11-18">The evidence-review cutover — deployed and proved (2026-11-18)</h1>
+<p>Issue #319, part P6. The unit's code merged as <code>eee4e479</code> (PR #359) and the image it published is the one this document proves. P6 cannot precede that merge: the Deployment pins the digest the merge run publishes, and a proof against any other image would not be a proof of the merged code.</p>
+<h2 id="p61--deployed">P6.1 — deployed</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Command</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>image</td>
+<td><code>kubectl -n scientific-processor get deploy scientific-processor -o jsonpath='{.spec.template.spec.containers[0].image}'</code></td>
+<td><code>ghcr.io/nonagenticai/conveyor-scientific@sha256:54f33fad7fd4ad40b744224a5e28b3a5679e71b33fcd1765bde97cd2fa640483</code></td>
+</tr>
+<tr>
+<td>published by</td>
+<td>ci run <code>44375217397</code>, job <code>135052461379</code></td>
+<td><code>sha-eee4e47: digest: sha256:54f33fad…640483</code></td>
+</tr>
+<tr>
+<td>gitops</td>
+<td>PR gitops-production#5339 (<code>ed256b63</code>)</td>
+<td>replica 1, digest pinned, actor env added</td>
+</tr>
+<tr>
+<td>pod</td>
+<td><code>kubectl -n scientific-processor get pods</code></td>
+<td><code>scientific-processor-69d7f69497-9z4t8 1/1 Running 0</code> (0 restarts)</td>
+</tr>
+<tr>
+<td>readiness</td>
+<td><code>curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18808/health/ready</code></td>
+<td><code>200</code> — body <code>{"ready":true,"reason":null}</code></td>
+</tr>
+<tr>
+<td>bare tenant</td>
+<td><code>curl -H 'x-tenant-id: 11111111-1111-1111-1111-111111111111' …/api/reviews</code></td>
+<td><code>401</code> — a name is not a credential</td>
+</tr>
+<tr>
+<td>licence tenant</td>
+<td>every call below carried <code>x-tenant-id: Bearer &lt;licence&gt;</code></td>
+<td>the review operations answered <code>2xx</code>, so the introspected tenant was accepted</td>
+</tr>
+<tr>
+<td>human attribution</td>
+<td><code>x-actor-token: &lt;verified user JWT&gt;</code></td>
+<td>accepted; the same call without it is refused <code>403 machine_cannot_decide</code> (proved by the unit's own test and by the aborted pre-token attempts below)</td>
+</tr>
+</tbody>
+</table>
+<p>The database was migrated before the Deployment was repinned: <code>migrations/0001_evidence_review.sql</code> applied as the owner <code>scientific_processor_user</code> into <code>scientific_processor</code>, then DML granted to the non-owner runtime role <code>scientific_processor_app</code>:</p>
+<pre><code>psql &quot;$DATABASE_URL&quot; -v ON_ERROR_STOP=1 -f 0001_evidence_review.sql
+psql &quot;$DATABASE_URL&quot; -c &quot;GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO scientific_processor_app;
+                         GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO scientific_processor_app;&quot;</code></pre>
+<p>Result: <code>50</code> tables (3 pre-existing), <code>52</code> policies. The migration's notices — <code>role evidence_review_worker is absent; cross-tenant policy on … skipped</code> — are expected: that role was the retired relay's, and no relay runs. RLS smoke as the runtime role: <code>current_user = scientific_processor_app</code>, <code>SELECT count(*) FROM reviews</code> = <code>0</code> with and without a tenant binding (the table is empty; the point is that the query succeeds under the non-owner, <code>NOBYPASSRLS</code> role).</p>
+<h2 id="p62--one-review-end-to-end">P6.2 — one review, end to end</h2>
+<p>Three short-lived Keycloak users in the <code>conveyor</code> realm (<code>reviewer-a</code>, <code>reviewer-b</code>, <code>lead-reviewer</code>) and one client (<code>evidence-review-cli</code>: public, direct-grant only, audience mapper <code>conveyor</code>, realm role <code>review-lead</code> on the lead) were created through the master admin for this proof. Tokens were minted by direct grant and carried in <code>X-Actor-Token</code>; none is recorded here, and the client and users are removed after the run. Access tokens live five minutes, which the first attempt outlived — see "Aborted attempts".</p>
+<p>Every step below was issued through <code>kubectl port-forward svc/scientific-processor 18808:8808</code>, as the lead unless marked otherwise.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Step</th>
+<th>Request</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>create review</td>
+<td><code>POST /api/reviews</code></td>
+<td>201</td>
+<td><code>review_id=01a1f019-b40a-727c-aebe-8916fff5fe68</code>, state <code>draft</code>, revision 1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>protocol</td>
+<td><code>POST /api/reviews/{id}/protocol-versions</code></td>
+<td>201</td>
+<td><code>protocol_version_id=01a1f019-b63c-777f-abe0-a317b5b72f44</code>, one stage <code>title_abstract</code> (2 reviewers)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>lock</td>
+<td><code>POST …/protocol-versions/{p}:lock</code></td>
+<td>200</td>
+<td><code>locked_at</code> set; stages materialised (<code>stage_id=01a1f019-b884-713c-9f38-01a69501cdd7</code>)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>activate</td>
+<td><code>POST /api/reviews/{id}:activate</code></td>
+<td>200</td>
+<td><code>draft → configured → active</code>, revision 3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>import</td>
+<td><code>POST /api/reviews/{id}/imports?source_kind=canonical_json</code></td>
+<td>201</td>
+<td>2 records: <code>01a1f019-bfbb…</code> (randomised trial), <code>01a1f019-c013…</code> (case report)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>corpus seal</td>
+<td><code>POST /api/reviews/{id}/corpus-versions</code></td>
+<td>201</td>
+<td><code>corpus_version_id=01a1f019-c446-…</code>, member_count 2</td>
+</tr>
+<tr>
+<td>7</td>
+<td>assignments</td>
+<td><code>POST /api/reviews/{id}/assignments</code></td>
+<td>201</td>
+<td>both records to both reviewers at <code>title_abstract</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>queues</td>
+<td><code>GET /api/reviews/{id}/screening/queue?stage_id=…</code> as reviewer-a and reviewer-b</td>
+<td>200, 200</td>
+<td>each queue is the caller's own assignment only</td>
+</tr>
+<tr>
+<td>9</td>
+<td>decisions</td>
+<td><code>POST /api/reviews/{id}/decisions</code> ×4</td>
+<td>201 ×4</td>
+<td>record 1: A include, B exclude (<code>wrong_design</code>); record 2: A and B include</td>
+</tr>
+<tr>
+<td>10</td>
+<td>conflict</td>
+<td><code>GET /api/reviews/{id}/conflicts</code></td>
+<td>200</td>
+<td><code>01a1f019-d4ab-…</code>, <code>dispositions:"redacted"</code>, <code>unblinded:false</code> — the blinding layer, live</td>
+</tr>
+<tr>
+<td>11</td>
+<td>unblind</td>
+<td><code>POST …/conflicts/{c}:unblind</code> <code>{"disclose_to":[reviewer-a, reviewer-b]}</code></td>
+<td>200</td>
+<td>audit row written first; <code>disclosed_to_subject_ids</code> = 3 (lead + both reviewers)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>adjudicate</td>
+<td><code>POST …/conflicts/{c}:resolve</code> <code>{"disposition":"exclude",…}</code></td>
+<td>200</td>
+<td><code>adjudication_id=01a1f019-e371-…</code>, separation of duty held</td>
+</tr>
+<tr>
+<td>13</td>
+<td>flow</td>
+<td><code>GET /api/reviews/{id}/flow</code></td>
+<td>200</td>
+<td><code>counts</code>: identified 2, screened 2, included 1, excluded 1 (<code>wrong_design:1</code>), adjudicated 1, not_yet_screened 0; <code>canonical_counts_hash=sha256:b86896d3…c01a9b</code>; <code>projection_stale:false</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td>export</td>
+<td><code>POST /api/reviews/{id}/exports</code></td>
+<td>201</td>
+<td><code>export_id=01a1f019-ea6e-…</code>, <code>manifest_hash=sha256:6ff191c9…7a7bae</code>, <code>payload_digest=sha256:15faa18e…23f231</code>, <code>sealed_with=canonical_sha256</code>, included 1, omissions 1</td>
+</tr>
+<tr>
+<td>15</td>
+<td>verify</td>
+<td><code>GET …/exports/{e}:verify</code></td>
+<td>200</td>
+<td><code>verified:true</code>; recomputed manifest and payload hashes equal the recorded ones</td>
+</tr>
+<tr>
+<td>16</td>
+<td>read</td>
+<td><code>GET …/exports/{e}?with_payload=true</code></td>
+<td>200</td>
+<td>the sealed payload serves 1 included record and 1 omission; the counts equal step 13</td>
+</tr>
+</tbody>
+</table>
+<p>The flow ledger, the sealed manifest and the export's own counts agree, which is the invariant the whole family exists for: a published inclusion set that a later read contradicts would be the failure, and it is not present.</p>
+<h3 id="aborted-attempts-recorded">Aborted attempts, recorded</h3>
+<p>Two earlier invocations of the same script failed and wrote nothing that the final run relies on:</p>
+<ol type="1">
+<li><strong>401 <code>the presented actor token could not be verified</code> at the first call.</strong> The tokens had outlived Keycloak's five-minute access lifespan while the earlier steps were prepared. Re-minted immediately before the run.</li>
+<li><strong>A run against the same review whose assignment step failed</strong> because the script read <code>/tmp/sub-a</code> while the bootstrap writes <code>/tmp/sub-reviewer-a</code>. Requests reached the service and were refused (<code>422</code> assignment, <code>404</code> decision without an assignment); the review itself (<code>01a1f019-2c4d-…</code>) remains in the tenant with an empty corpus and no decisions, and the proof above uses a distinct review (<code>01a1f019-b40a-…</code>). Recorded rather than deleted: <code>reviews</code> is append-only in spirit and archiving it is the disposal path.</li>
+</ol>
+<h2 id="what-this-does-and-does-not-prove">What this does and does not prove</h2>
+<ul>
+<li>It proves the merged binary, the migrated schema, the non-owner RLS role, the licence tenant gate and the verified-user rung work together on a real review with two blinded reviewers, one conflict, one adjudication and one sealed export.</li>
+<li>It does not prove response equality against the retired service: no recorded responses exist (capture deviation 3). P5's parity suite proves operation coverage and the drop table; this run is the end-to-end replay.</li>
+<li>The proof identities are removed after this document is written; the Deployment keeps its actor configuration, and an unconfigured realm refuses every actor token by design.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-18-evidence-review-cutover.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
