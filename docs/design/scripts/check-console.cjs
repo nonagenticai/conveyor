@@ -544,7 +544,21 @@ const SNAPSHOT = {
   },
   config: {},
   organisation: {},
-  artefacts: {},
+  artefacts: {
+    documents: [
+      {
+        id: "doc-p0-vision",
+        project_id: "p-p0",
+        card_id: null,
+        kind: "document",
+        title: "Vision and mandate",
+        category: "vision",
+        unit: "P0",
+        updated_at: "2026-11-14T00:00:00Z",
+        created_at: "2026-11-14T00:00:00Z",
+      },
+    ],
+  },
   measure: {},
 };
 
@@ -1925,6 +1939,13 @@ function readBody(req, done) {
       await page.waitForSelector('[data-v2="tab"][data-key="programme"][data-value="Definition"]');
       await page.waitForFunction(() =>
         document.querySelector("#main").innerText.includes("conveyor buildout"),
+      );
+      const definitionText = await page.locator("#main").innerText();
+      assert.match(definitionText, /Vision and mandate/, "the definition set renders");
+      assert.doesNotMatch(
+        definitionText,
+        /not publishable/,
+        "#333: a snapshot row without the member does not invent an unpublished state",
       );
       await page.click('[data-v2="tab"][data-key="programme"][data-value="Benefits map & profiles"]');
       await page.waitForFunction(() => document.querySelector("#main").innerText.includes("BEN-P0"));

@@ -838,7 +838,7 @@ window.installV2 = function (api, enterprise) {
       `${table(
         ["Artefact", "Category", "Publishable", "Version", "Public"],
         list(source.documents).length
-          ? list(source.documents).map((doc) => `<tr><td><strong>${E(doc.title || doc.category || short(doc.id, 8))}</strong><small class="mono">${E(short(doc.id, 12))}</small></td><td>${E(doc.category || "—")}</td><td>${B(doc.publishable ? "publishable" : "not publishable", doc.publishable ? "green" : "amber")}</td><td>${E(doc.version == null ? "—" : "v" + doc.version)}</td><td>${mspDocLink(doc)}</td></tr>`)
+          ? list(source.documents).map((doc) => `<tr><td><strong>${E(doc.title || doc.category || short(doc.id, 8))}</strong><small class="mono">${E(short(doc.id, 12))}</small></td><td>${E(doc.category || "—")}</td><td>${doc.publishable === undefined ? `<span class="muted">—</span>` : B(doc.publishable ? "publishable" : "not publishable", doc.publishable ? "green" : "amber")}</td><td>${E(doc.version == null ? "—" : "v" + doc.version)}</td><td>${mspDocLink(doc)}</td></tr>`)
           : [`<tr><td colspan="5">No definition-set document is published for this project.</td></tr>`],
       )}${note("A definition artefact is a document row: its producer, reviewer and approver live in its own history. The public page shows only a document that is publishable.")}`,
       B(`${list(source.documents).length} documents`),
