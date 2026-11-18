@@ -45,13 +45,17 @@ MODULE_ALIASES = {
 # A slice with no `adds_*` declarations: its deliverable is a named artefact, so presence is
 # measured directly and the evidence path is checked. No status here is inferred from prose.
 SLICE_EVIDENCE = {
-    # P0 is the programme-definition project: its plan declares no tables/actions/modules, so
-    # its status is the plan's existence plus the definition set's publication (#121/#122).
+    # P0 is the programme-definition project: its plan declares no tables/actions/modules, so its
+    # status is the plan's existence plus the definition set's publication (#121/#122). All three
+    # units are closed (#120, #121, #122) and the set is published, so the row is `built`; leaving
+    # it `planned` made `validate` fail its "a non-built project has no open unit" assertion on
+    # main, which turned `design-pack` red on every branch (measured 2026-11-17).
     "P0": {
         "status": "built",
         "evidence": [
             "docs/plans/P0-programme-definition.md",
-            "seed/output-standard.json",
+            "docs/design/docs/plans/P0-programme-definition.html",
+            "seed/programme.json",
         ],
         "gap": None,
     },
