@@ -112,8 +112,8 @@ resolved from `seed/output-standard.json`, and its due-now and at-closure sets a
 appears in the programme queue. The class picker is generated from the standard, so #221's added
 classes appear without a code change; the seed owns its own 48 rows and a later `migrate --seed`
 restores their class and sets. An admin's publish sets the output's public bit; the live route
-serves it immediately. The homepage mirror at `nonagentic.ai/design` is the old read-only copy and
-is retired by the one-URL unit.
+serves it immediately. The old homepage mirror at `nonagentic.ai/design` was retired on
+2026-11-18: that path 308-redirects to the app-served pack, and the vendored copy is gone.
 
 The **Execution room** lists the tenant's runs (`runs.list`), renders one run's steps, tool calls,
 gates and outputs (`runs.get`), cancels a live run (`runs.cancel`) and decides a pending gate
@@ -181,12 +181,12 @@ image input, compiled by `migrate --seed` into industries, the five ordered soft
 and the catalogue positions, with one immutable release per described job. A publish never rewrites
 a seed: a seed change is a repository PR, a new image and a `migrate --seed` run.
 
-The pack is published at **https://nonagentic.ai/design/** by the `nonagentic_homepage`
-repository, which copies this directory verbatim into `dist/design/` and serves `studio.html` as
-`index.html`. Opening `studio.html` directly is still the offline entry point. The app image also
-serves the pack at `/design`: the web stage copies the generated documents (`docs/`) and the data
-directory (the placeholder snapshot and the public issue registry) beside the runtime files, so
-the console's Documents destination and data links resolve. `node
+The pack is served at **https://conveyor.nonagentic.ai/design/** by the app image;
+**https://nonagentic.ai/design/** 308-redirects there (the homepage repository's vendored copy was
+retired on 2026-11-18). Opening `studio.html` directly is still the offline entry point. The
+image's `/design` route also carries the generated documents (`docs/`) and the data directory (the
+placeholder snapshot and the public issue registry) beside the runtime files, so the console's
+Documents destination and data links resolve. `node
 docs/design/scripts/check-console.cjs` is the console gate: a signed-out pack makes zero API
 requests, a signed-in one sends the actions it renders, and the 401/412 paths are rendered.
 
