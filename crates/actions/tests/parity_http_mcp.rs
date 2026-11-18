@@ -1955,7 +1955,7 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push("benefits.link.programme", g);
             ctx.push("benefits.link.benefit", b);
         }
-        "benefits.update" | "benefits.delete" => {
+        "benefits.update" | "benefits.delete" | "benefits.retire" => {
             let g = seed_parity_programme(pg, ctx).await;
             let b = seed_parity_benefit(pg, ctx, g).await;
             ctx.push(sample.name, b);
@@ -2007,6 +2007,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let g = seed_parity_programme(pg, ctx).await;
             let profile = seed_parity_profile(pg, ctx, g).await;
             ctx.push(sample.name, profile);
+        }
+        "tranches.retire" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let t = seed_parity_tranche(pg, ctx, g).await;
+            ctx.push("tranches.retire", t);
         }
         "cadences.create" => {
             let g = seed_parity_programme(pg, ctx).await;
@@ -5516,6 +5521,16 @@ fn spine_samples() -> Vec<Sample> {
             expecting(sample, 200)
         },
         {
+            let mut sample = on_prepared("tranches.retire", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("tranches.retire"),
+                    "reason": "parity retirement",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
             let mut sample = plain("benefits.create", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| {
@@ -5546,6 +5561,16 @@ fn spine_samples() -> Vec<Sample> {
                 })
             });
             expecting(sample, 422)
+        },
+        {
+            let mut sample = on_prepared("benefits.retire", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("benefits.retire"),
+                    "reason": "parity retirement",
+                })
+            });
+            expecting(sample, 200)
         },
         {
             let mut sample = plain("cadences.create", json!({}), None);

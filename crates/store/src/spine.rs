@@ -1059,11 +1059,14 @@ pub struct TrancheRecord {
     pub baseline_ref: Option<Uuid>,
     /// The review date.
     pub review_at: Option<DateTime<Utc>>,
+    /// Why the tranche was retired; empty unless `state='retired'`.
+    pub retired_reason: String,
     /// The If-Match version.
     pub version: i64,
 }
 
-const TRANCHE_COLUMNS: &str = "id, programme_id, number, state, entry_criteria, exit_criteria, baseline_ref, review_at, version";
+const TRANCHE_COLUMNS: &str = "id, programme_id, number, state, entry_criteria, exit_criteria, \
+    baseline_ref, review_at, retired_reason, version";
 
 /// Create a tranche.
 pub async fn insert_tranche_tx(
@@ -1110,19 +1113,23 @@ pub async fn get_tranche_tx(
         .await?)
 }
 
-/// List a programme's tranches.
+/// List a programme's tranches. A retired tranche leaves the default view (#303) but remains
+/// readable by id and is returned again with `include_retired`.
 pub async fn list_tranches_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     programme_id: Uuid,
+    include_retired: bool,
 ) -> Result<Vec<TrancheRecord>, PlanStoreError> {
     let sql = format!(
         "SELECT {TRANCHE_COLUMNS} FROM programme_tranche
-          WHERE tenant_id = $1 AND programme_id = $2 ORDER BY number"
+          WHERE tenant_id = $1 AND programme_id = $2 AND ($3 OR state <> 'retired')
+          ORDER BY number"
     );
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(programme_id)
+        .bind(include_retired)
         .fetch_all(&mut *conn)
         .await?)
 }
@@ -1336,6 +1343,42 @@ pub async fn delete_tranche_tx(
     Ok(())
 }
 
+pub async fn retire_tranche_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    reason: &str,
+) -> Result<TrancheRecord, PlanStoreError> {
+    let current = get_tranche_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale { what: "tranche" });
+    }
+    if current.state == "retired" {
+        return Err(PlanStoreError::Illegal(PlanError::TrancheRetired));
+    }
+    if current.state == "in_review" {
+        return Err(PlanStoreError::Illegal(PlanError::TrancheUnderReview));
+    }
+    let sql = format!(
+        "UPDATE programme_tranche
+            SET state = 'retired', retired_reason = $4, version = version + 1,
+                updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3
+          RETURNING {TRANCHE_COLUMNS}"
+    );
+    let row: Option<TrancheRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(reason)
+        .fetch_optional(&mut *conn)
+        .await?;
+    row.ok_or(PlanStoreError::Stale { what: "tranche" })
+}
+
 // ── benefit_profile / benefit_link ─────────────────────────────────────────────────────
 
 /// A benefit profile.
@@ -1385,6 +1428,10 @@ pub struct BenefitRecord {
     pub operational_area: String,
     /// The status.
     pub status: String,
+    /// Why the profile was retired; empty unless `status='retired'`.
+    pub retired_reason: String,
+    /// The approved change request that last advanced the profile's measurement.
+    pub change_ref: Option<Uuid>,
     /// The If-Match version.
     pub version: i64,
 }
@@ -1392,7 +1439,7 @@ pub struct BenefitRecord {
 const BENEFIT_COLUMNS: &str = "id, programme_id, project_id, register_item_id, reference, \
     description, category, objectives, observable_outcome, kpis, baseline, target, \
     measurement_method, financial_value, cost, capabilities, preconditions, risks, owner_job_id, \
-    benefit_owner_job_id, operational_area, status, version";
+    benefit_owner_job_id, operational_area, status, retired_reason, change_ref, version";
 
 /// A new benefit profile.
 #[derive(Clone, Debug, Default)]
@@ -1529,19 +1576,23 @@ pub async fn get_benefit_tx(
         .await?)
 }
 
-/// List a programme's benefit profiles.
+/// List a programme's benefit profiles. A retired profile leaves the default list and map
+/// (#303) but remains readable by id and is returned again with `include_retired`.
 pub async fn list_benefits_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     programme_id: Uuid,
+    include_retired: bool,
 ) -> Result<Vec<BenefitRecord>, PlanStoreError> {
     let sql = format!(
         "SELECT {BENEFIT_COLUMNS} FROM benefit_profile
-          WHERE tenant_id = $1 AND programme_id = $2 ORDER BY created_at DESC, id DESC"
+          WHERE tenant_id = $1 AND programme_id = $2 AND ($3 OR status <> 'retired')
+          ORDER BY created_at DESC, id DESC"
     );
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(programme_id)
+        .bind(include_retired)
         .fetch_all(&mut *conn)
         .await?)
 }
@@ -1591,13 +1642,121 @@ pub struct BenefitPatch {
     pub status: Option<String>,
 }
 
-/// Edit a benefit profile, re-validating the merged measurement record (D-T1-9).
+impl BenefitPatch {
+    /// True when the patch supplies no field at all.
+    pub fn is_empty(&self) -> bool {
+        self.project_id.is_none()
+            && self.register_item_id.is_none()
+            && self.reference.is_none()
+            && self.description.is_none()
+            && self.category.is_none()
+            && self.objectives.is_none()
+            && self.observable_outcome.is_none()
+            && self.kpis.is_none()
+            && self.baseline.is_none()
+            && self.target.is_none()
+            && self.measurement_method.is_none()
+            && self.financial_value.is_none()
+            && self.cost.is_none()
+            && self.capabilities.is_none()
+            && self.preconditions.is_none()
+            && self.risks.is_none()
+            && self.owner_job_id.is_none()
+            && self.benefit_owner_job_id.is_none()
+            && self.operational_area.is_none()
+            && self.status.is_none()
+    }
+
+    /// True when the patch supplies one of the four measurement fields §8.3 makes mandatory.
+    /// Those fields are what an approval protects, so an approved profile may change them only
+    /// through an approved change request (#303 P1).
+    fn changes_measurement(&self) -> bool {
+        self.baseline.is_some()
+            || self.target.is_some()
+            || self.measurement_method.is_some()
+            || self.benefit_owner_job_id.is_some()
+    }
+}
+
+/// True when an approved `benefit_profile` gate names this profile. The issue's default
+/// (`#303` Q1) reads approval as the existing primitive; the profile's own status is the other
+/// record of the same decision, and either one protects the measurement fields.
+pub async fn benefit_is_approved_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM approval
+             WHERE tenant_id = $1 AND gate = 'benefit_profile' AND status = 'approved'
+               AND meta->>'benefit_id' = $2::text
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(benefit_id)
+    .fetch_one(&mut *conn)
+    .await
+}
+
+/// True when `change_id` names a `kind='change'` register row of this project whose `change`
+/// gate is approved. The approval is the second principal's decision, not the row's status.
+pub async fn change_is_approved_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    change_id: Uuid,
+    project_id: Option<Uuid>,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM project_register_item r
+              JOIN approval a
+                ON a.tenant_id = r.tenant_id
+               AND a.gate = 'change'
+               AND a.status = 'approved'
+               AND a.meta->>'change_id' = r.id::text
+             WHERE r.tenant_id = $1 AND r.id = $2 AND r.kind = 'change'
+               AND ($3::uuid IS NULL OR r.project_id = $3)
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(change_id)
+    .bind(project_id)
+    .fetch_one(&mut *conn)
+    .await
+}
+
+/// Append the profile to the change row's links, so the citation reads from both sides. The
+/// `NOT links @>` guard makes a repeated update idempotent; the row's version moves with it.
+async fn cite_benefit_on_change_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    change_id: Uuid,
+    benefit_id: Uuid,
+) -> Result<(), sqlx::Error> {
+    let link = serde_json::json!([{ "kind": "benefit", "id": benefit_id.to_string() }]);
+    sqlx::query(
+        "UPDATE project_register_item
+            SET links = links || $3::jsonb, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND NOT (links @> $3::jsonb)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(change_id)
+    .bind(link)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}
+
+/// Edit a benefit profile, re-validating the merged measurement record (D-T1-9); an approved
+/// profile's measurement fields additionally require an approved change request (#303 P1).
 pub async fn update_benefit_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     id: Uuid,
     expected: i64,
     patch: &BenefitPatch,
+    change_id: Option<Uuid>,
 ) -> Result<BenefitRecord, PlanStoreError> {
     let current =
         get_benefit_tx(&mut *conn, tenant, id)
@@ -1609,6 +1768,19 @@ pub async fn update_benefit_tx(
         return Err(PlanStoreError::Stale {
             what: "benefit profile",
         });
+    }
+    if current.status == "retired" {
+        return Err(PlanStoreError::Illegal(PlanError::BenefitRetired));
+    }
+    let approved =
+        current.status != "draft" || benefit_is_approved_tx(&mut *conn, tenant, id).await?;
+    if approved && patch.changes_measurement() && change_id.is_none() {
+        return Err(PlanStoreError::Illegal(PlanError::BenefitChangeRequired));
+    }
+    if let Some(change) = change_id
+        && !change_is_approved_tx(&mut *conn, tenant, change, current.project_id).await?
+    {
+        return Err(PlanStoreError::Illegal(PlanError::ChangeNotApproved));
     }
     ensure_optional_parent_tx(&mut *conn, tenant, Parent::Project, patch.project_id)
         .await
@@ -1656,6 +1828,7 @@ pub async fn update_benefit_tx(
             benefit_owner_job_id = coalesce($21, benefit_owner_job_id),
             operational_area = coalesce($22, operational_area),
             status = coalesce($23, status),
+            change_ref = coalesce($24, change_ref),
             version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3
           RETURNING {BENEFIT_COLUMNS}"
@@ -1684,11 +1857,16 @@ pub async fn update_benefit_tx(
         .bind(patch.benefit_owner_job_id)
         .bind(&patch.operational_area)
         .bind(&patch.status)
+        .bind(change_id)
         .fetch_optional(&mut *conn)
         .await?;
-    row.ok_or(PlanStoreError::Stale {
+    let record = row.ok_or(PlanStoreError::Stale {
         what: "benefit profile",
-    })
+    })?;
+    if let Some(change) = change_id {
+        cite_benefit_on_change_tx(&mut *conn, tenant, change, id).await?;
+    }
+    Ok(record)
 }
 
 /// Remove a benefit profile; its links and transitions cascade with it.
@@ -1724,6 +1902,61 @@ pub async fn delete_benefit_tx(
         });
     }
     Ok(())
+}
+
+/// Retire a benefit profile with a reason (#303 P2). A profile in an open transition is refused
+/// until that transition retires, and the row survives as the readable history.
+pub async fn retire_benefit_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected: i64,
+    reason: &str,
+) -> Result<BenefitRecord, PlanStoreError> {
+    let current =
+        get_benefit_tx(&mut *conn, tenant, id)
+            .await?
+            .ok_or(PlanStoreError::NotFound {
+                what: "benefit profile",
+            })?;
+    if current.version != expected {
+        return Err(PlanStoreError::Stale {
+            what: "benefit profile",
+        });
+    }
+    if current.status == "retired" {
+        return Err(PlanStoreError::Illegal(PlanError::BenefitRetired));
+    }
+    let open: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM benefit_transition
+             WHERE tenant_id = $1 AND benefit_id = $2 AND retired_at IS NULL
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if open {
+        return Err(PlanStoreError::Illegal(PlanError::BenefitInTransition));
+    }
+    let sql = format!(
+        "UPDATE benefit_profile
+            SET status = 'retired', retired_reason = $4, version = version + 1,
+                updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $3
+          RETURNING {BENEFIT_COLUMNS}"
+    );
+    let row: Option<BenefitRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(expected)
+        .bind(reason)
+        .fetch_optional(&mut *conn)
+        .await?;
+    row.ok_or(PlanStoreError::Stale {
+        what: "benefit profile",
+    })
 }
 
 /// A benefits-map edge.
