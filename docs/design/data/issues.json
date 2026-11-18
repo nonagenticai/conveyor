@@ -124,7 +124,7 @@
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-18T00:41:32Z",
+      "updatedAt": "2026-11-18T01:30:36Z",
       "labels": [
         {
           "name": "unit",
@@ -297,9 +297,9 @@
     {
       "number": 284,
       "title": "copilot: a proposed destructive action binds the approval it was granted",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/284",
-      "updatedAt": "2026-11-18T00:14:46Z",
+      "updatedAt": "2026-11-18T01:31:09Z",
       "labels": [
         {
           "name": "unit",
