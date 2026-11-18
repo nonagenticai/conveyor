@@ -409,7 +409,7 @@ mod tests {
         let registry = conveyor_actions::registry();
         assert_eq!(
             registry.len(),
-            429,
+            431,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -431,7 +431,7 @@ mod tests {
              (346) + #174's media.generate_image (347) + #173's produce.speech and media.transcribe \
              (349) + #160's inference_endpoint.get and inference_endpoint.set (351) + T1's 27
              plan-spine actions (378) + #170's six ops.* cluster reads (384) + #171's three
-(404) + #282's three approval-policy actions (approval_policies.list, approval_policies.get, approval_policies.set) (407) + T3's six PM actions (pm.charter|plan|get|route_gate|close, changes.request) (413) + #305's fourteen MSP edit/read actions (benefits update/delete/link_list/unlink/transition_list/transition_upsert, tranches update/delete/review_list, cadences update/delete, wbs.delete, registers.delete, stakeholders.profile_delete) (427) + #154's analyse.site (428) + #164's analyse.video (429). \
+(404) + #282's three approval-policy actions (approval_policies.list, approval_policies.get, approval_policies.set) (407) + T3's six PM actions (pm.charter|plan|get|route_gate|close, changes.request) (413) + #305's fourteen MSP edit/read actions (benefits update/delete/link_list/unlink/transition_list/transition_upsert, tranches update/delete/review_list, cadences update/delete, wbs.delete, registers.delete, stakeholders.profile_delete) (427) + #154's analyse.site (428) + #164's analyse.video (429) + #303's two retirement actions (benefits.retire, tranches.retire) (431). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );
