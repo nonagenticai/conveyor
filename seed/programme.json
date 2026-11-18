@@ -828,7 +828,7 @@
       "key": "T3",
       "name": "PM job",
       "description": "SPEC_V2 slice T3 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -842,15 +842,13 @@
         ],
         "plan_status": "draft",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 3,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request"
@@ -1381,7 +1379,7 @@
       "key": "P0",
       "name": "Programme definition — vision, blueprint, plan and project briefs",
       "description": "Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
-      "status": "draft",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/P0-programme-definition.md",
@@ -1394,7 +1392,7 @@
         "depends_on": [],
         "plan_status": "active",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
-        "measured_status": "planned",
+        "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
           "vision",
@@ -1447,25 +1445,21 @@
           154,
           164,
           193,
-          212,
-          213,
           222,
           223,
           224,
           225,
           260,
-          282,
           283,
-          284,
           285,
           294,
           295,
           296,
-          299,
           302,
           303,
           305,
-          307
+          307,
+          319
         ],
         "depends_on": [],
         "plan_status": "active",

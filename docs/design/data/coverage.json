@@ -265,8 +265,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 10,
-        "claimed": 6,
+        "blocked": 5,
+        "claimed": 7,
         "numbers": [
           17,
           22,
@@ -283,27 +283,23 @@
           154,
           164,
           193,
-          212,
-          213,
           222,
           223,
           224,
           225,
           260,
-          282,
           283,
-          284,
           285,
           294,
           295,
           296,
-          299,
           302,
           303,
           305,
-          307
+          307,
+          319
         ],
-        "open": 24,
+        "open": 20,
         "ready": 5,
         "unknown": 0
       }
@@ -1594,13 +1590,13 @@
       "track": "v2",
       "tranche": 4,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           82
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1635,13 +1631,13 @@
       "track": "v2",
       "tranche": 1,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           84
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1994,11 +1990,11 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           74
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2261,13 +2257,13 @@
       "track": "v2",
       "tranche": 4,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           81
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     }
@@ -2521,8 +2517,8 @@
       },
       "total": 48,
       "uncovered": [],
-      "with_open_units": 30,
-      "without_open_units": 18
+      "with_open_units": 29,
+      "without_open_units": 19
     },
     "screens": {
       "actions_invoked": 25,
