@@ -26,6 +26,8 @@ fn config() -> AgentConfig {
         timeout_ms: None,
         capability_agent_id: None,
         prompt_ref: None,
+        prompt_version: None,
+        prompt_sha256: None,
         run_id: None,
         run_step_id: None,
         depth: None,
@@ -320,6 +322,8 @@ fn the_resolved_ids_travel_into_the_output() {
     let (mut agent, plan) = start(AgentConfig {
         capability_agent_id: Some(agent_id),
         prompt_ref: Some("capability_agent@3".to_owned()),
+        prompt_version: None,
+        prompt_sha256: None,
         ..config()
     });
     expect_model(plan);

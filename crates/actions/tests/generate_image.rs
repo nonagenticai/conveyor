@@ -96,6 +96,7 @@ fn request(user_id: Uuid, input: Value) -> InvokeRequest {
             eval_run_id: None,
             prompt_ref: Some("agent:image".to_owned()),
             prompt_version: None,
+            prompt_sha256: None,
             correlation_id: Some("corr-image".to_owned()),
         }),
     }

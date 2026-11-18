@@ -749,6 +749,7 @@ async fn invoke_and_record(
             eval_run_id: None,
             prompt_ref: Some(format!("process:{}", process.key)),
             prompt_version: Some(format!("{}:{}", process.version, step.position)),
+            prompt_sha256: None,
             correlation_id: Some(format!(
                 "run:{}:{}:{}",
                 row.run_id, row.position, row.attempt

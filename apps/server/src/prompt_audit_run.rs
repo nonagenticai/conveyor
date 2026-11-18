@@ -14,7 +14,7 @@
 //! `error` and dead-letters — a bad answer is not retried into a different one.
 
 use conveyor_actions::invoke::{Authority, InvokeRequest, UsageContext, invoke};
-use conveyor_actions::prompt_audit::{COPILOT_SYSTEM_PROMPT, scan};
+use conveyor_actions::prompt_audit::scan;
 use conveyor_actions::registry::registry;
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
@@ -80,7 +80,31 @@ pub async fn run(
 
     let scope = AuditScope::from_value(&audit.scope)
         .map_err(|error| JobFailure::permanent(format!("audit scope: {error}")))?;
-    let items = match inventory(pool, tenant, &scope).await {
+    // W8: the copilot executes the TENANT's `copilot_system@1`, so the audit inventories that
+    // recipe's compiled text — not the built-in constant, which a tenant may have edited. The
+    // audit has no conversation, so it compiles with no run facts; the seeded recipe is one
+    // literal section, which is what makes the two texts identical.
+    let copilot_text = if scope.surfaces.contains(&Surface::Copilot) {
+        match conveyor_actions::prompt::compile_for_audit(
+            pool,
+            tenant,
+            conveyor_api::copilot::SYSTEM_PROMPT_REF,
+        )
+        .await
+        {
+            Ok(compiled) => Some(compiled.text),
+            Err(error) if matches!(error, conveyor_actions::prompt::PromptError::Store(_)) => {
+                return Err(JobFailure::retryable(format!("prompt catalogue: {error}")));
+            }
+            Err(error) => {
+                fail_audit(pool, tenant, audit_id, &error.to_string()).await;
+                return Err(JobFailure::permanent(format!("prompt_audit.run: {error}")));
+            }
+        }
+    } else {
+        None
+    };
+    let items = match inventory(pool, tenant, &scope, copilot_text.as_deref()).await {
         Ok(items) => items,
         Err(error) => {
             fail_audit(pool, tenant, audit_id, &error).await;
@@ -98,7 +122,7 @@ pub async fn run(
     // would never fix it — while a database error is retryable.
     let instruction =
         match conveyor_actions::prompt::compile_for_audit(pool, tenant, PROMPT_REF_V1).await {
-            Ok(compiled) => compiled.text,
+            Ok(compiled) => compiled,
             Err(error) if matches!(error, conveyor_actions::prompt::PromptError::Store(_)) => {
                 return Err(JobFailure::retryable(format!("prompt catalogue: {error}")));
             }
@@ -119,15 +143,16 @@ pub async fn run(
         run_step_id: None,
         conversation_turn_id: None,
         eval_run_id: None,
-        prompt_ref: Some(PROMPT_REF_V1.to_owned()),
-        prompt_version: Some("1".to_owned()),
+        prompt_ref: Some(instruction.key.clone()),
+        prompt_version: Some(instruction.version.clone()),
+        prompt_sha256: Some(instruction.sha256.clone()),
         correlation_id: Some(format!("prompt_audit:{audit_id}")),
     });
     let request = InvokeRequest {
         action: "completions.create".to_owned(),
         input: json!({
             "model": audit.target_model,
-            "messages": [                {"role": "system", "content": instruction},
+            "messages": [                {"role": "system", "content": instruction.text},
                 {"role": "user", "content": user.to_string()},
             ],
             "max_tokens": 8_000,
@@ -180,6 +205,7 @@ async fn inventory(
     pool: &PgPool,
     tenant: TenantId,
     scope: &AuditScope,
+    copilot_text: Option<&str>,
 ) -> Result<Vec<scan::SurfaceItem>, String> {
     let mut items = Vec::new();
     if scope.surfaces.contains(&Surface::Processes) {
@@ -218,8 +244,10 @@ async fn inventory(
             .await
             .map_err(|error| format!("database: {error}"))?;
     }
-    if scope.surfaces.contains(&Surface::Copilot) {
-        items.extend(scan::copilot_items(COPILOT_SYSTEM_PROMPT));
+    if scope.surfaces.contains(&Surface::Copilot)
+        && let Some(text) = copilot_text
+    {
+        items.extend(scan::copilot_items(text));
     }
     Ok(items)
 }

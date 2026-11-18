@@ -23,7 +23,7 @@ use chrono::Utc;
 use conveyor_actions::registry::registry;
 use conveyor_actions::spec::sha256_hex;
 use conveyor_actions::views::ActionManifest;
-use conveyor_actions::{ActionError, Authority, InvokeRequest, Precondition};
+use conveyor_actions::{ActionError, Authority, InvokeRequest, Precondition, UsageContext};
 use serde_json::Value;
 
 use crate::extract::{Caller, RequireLicence};
@@ -230,7 +230,20 @@ pub async fn invoke_http(
         trace_id,
         depth: 0,
         app_key: state.config.app_key.clone(),
-        usage: None,
+        // S16 W7: an ordinary HTTP call still names who called. `Other` is the one kind the
+        // schema allows to carry no join key; the request id is the transport correlation, not
+        // a ledger join. The engine records it only when the action captures usage.
+        usage: Some(UsageContext {
+            caller_kind: conveyor_domain::inference::CallerKind::Other,
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: None,
+            eval_run_id: None,
+            prompt_ref: None,
+            prompt_version: None,
+            prompt_sha256: None,
+            correlation_id: Some(request_id.clone()),
+        }),
     };
     let started = Instant::now();
     match conveyor_actions::invoke(&state.pool, registry(), caller.tenant, request).await {

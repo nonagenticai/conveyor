@@ -636,6 +636,7 @@ impl Host<'_> {
                 eval_run_id: None,
                 prompt_ref: Some(format!("workflow:{}", self.workflow_key)),
                 prompt_version: Some(format!("{}:{}", self.workflow_key, request.node_id)),
+                prompt_sha256: None,
                 correlation_id: Some(format!(
                     "run:{}:{}:{}",
                     self.run_id, request.position, request.attempt
