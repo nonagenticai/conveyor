@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "e4c28cec0136e2556a17c02f6c7bdd1816dbf98090ef90a94458035fe87a8c87",
-      "bytes": 169276,
+      "sha256": "0bbe5f1f61f429072faaf61c05727adebba392eaa6477182f3898b41af79a65c",
+      "bytes": 169284,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {

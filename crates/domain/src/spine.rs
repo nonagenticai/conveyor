@@ -122,6 +122,24 @@ pub enum PlanError {
     /// A benefit has no measured baseline, so it cannot claim a realized improvement.
     #[error("benefit_baseline_missing")]
     BenefitBaselineMissing,
+    /// An approved benefit profile's measurement fields change only through an approved change.
+    #[error("benefit_change_required")]
+    BenefitChangeRequired,
+    /// The cited change is not an approved change request of the profile's project.
+    #[error("change_not_approved")]
+    ChangeNotApproved,
+    /// A benefit profile in an open transition cannot be retired.
+    #[error("benefit_in_transition")]
+    BenefitInTransition,
+    /// The benefit profile is already retired.
+    #[error("benefit_retired")]
+    BenefitRetired,
+    /// A tranche under review cannot be retired.
+    #[error("tranche_under_review")]
+    TrancheUnderReview,
+    /// The tranche is already retired.
+    #[error("tranche_retired")]
+    TrancheRetired,
 }
 
 /// Compute the WSJF score from the four stored inputs.

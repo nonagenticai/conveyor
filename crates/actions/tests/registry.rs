@@ -91,8 +91,9 @@ use serde_json::{Value, json};
 /// **T3 adds 6 internal**: the PM job.
 /// **#154 adds 1 internal**: `analyse.site`, the analysis library's invocable read.
 /// **#164 adds 1 internal**: `analyse.video`, the video family over executor evidence.
+/// **#303 adds 2 internal**: `benefits.retire` and `tranches.retire`, the governed retirement path.
 /// **#295 adds 2 internal**: `cards.ledger_append` and `cards.ledger_list`, the claim/fact ledger.
-const EXPECTED: [&str; 431] = [
+const EXPECTED: [&str; 433] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -126,6 +127,7 @@ const EXPECTED: [&str; 431] = [
     "benefits.link",
     "benefits.link_list",
     "benefits.list",
+    "benefits.retire",
     "benefits.transition_list",
     "benefits.transition_upsert",
     "benefits.unlink",
@@ -487,6 +489,7 @@ const EXPECTED: [&str; 431] = [
     "tranches.create",
     "tranches.delete",
     "tranches.list",
+    "tranches.retire",
     "tranches.review",
     "tranches.review_list",
     "tranches.update",
@@ -580,9 +583,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // #305 adds the fourteen MSP edit/read actions, all internal: 395 -> 409; external stays 18.
     // #154 adds `analyse.site` (internal, read): 409 -> 410; external stays 18.
     // #164 adds `analyse.video` (internal, read): 410 -> 411; external stays 18.
+    // #303 adds `benefits.retire` and `tranches.retire` (internal): 411 -> 413; external stays 18.
     // #295 adds `cards.ledger_append` (write) and `cards.ledger_list` (read), both internal:
-    // 411 -> 413; external stays 18.
-    assert_eq!((internal, external), (413, 18));
+    // 413 -> 415; external stays 18.
+    assert_eq!((internal, external), (415, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
