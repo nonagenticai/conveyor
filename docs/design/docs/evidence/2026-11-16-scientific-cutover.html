@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Scientific cutover — 2026-11-16, completed 2026-11-18 · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-scientific-cutover.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="scientific-cutover--2026-11-16-completed-2026-11-18">Scientific cutover — 2026-11-16, completed 2026-11-18</h1>
+<p>Part of #212. <code>apps/scientific</code> — absorbed in #105, merged and never deployed — is now the live <code>scientific-processor</code> service. The publish row landed in #217; this document records the deployment half, the tenant gate the service needed before it could serve, and the live checks.</p>
+<h2 id="digests-deployed">Digests deployed</h2>
+<table>
+<thead>
+<tr>
+<th>Binary</th>
+<th>Image</th>
+<th>Digest</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conveyor-scientific</code></td>
+<td><code>ghcr.io/nonagenticai/conveyor-scientific</code></td>
+<td><code>sha256:d6d58c20c9aa947edbec40fa2b51eb90e3d03257597d8d3aee93d59f1bc9e6b3</code></td>
+<td>the merge-queue commit <code>cb0ca62</code> of conveyor PR #318</td>
+</tr>
+</tbody>
+</table>
+<p>An earlier image (<code>sha256:7c541031…</code>, from <code>94edb9b</code>) existed only as the swap's first pin; it predates the gate and is superseded. The package is public on ghcr (anonymous pull).</p>
+<h2 id="sequence">Sequence</h2>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Change</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1.1–P1.2</td>
+<td>Publish row <code>package: conveyor-scientific</code> / <code>bin: conveyor-scientific</code> / <code>image: conveyor-scientific</code>, never the legacy <code>scientific-processor</code> package that Flux tracks</td>
+<td>conveyor PR #217</td>
+</tr>
+<tr>
+<td>P2 (swap)</td>
+<td>Python image and the <code>alembic</code> init container removed; the Rust image digest-pinned; still 0 replicas because the port trusted a bare <code>X-Tenant-Id</code> and the namespace admits the whole pod CIDR to 8808</td>
+<td>deployment repo #5320</td>
+</tr>
+<tr>
+<td>P2 (gate)</td>
+<td>The reference's tenant gate ported at its <strong>enforce</strong> semantics and shipped in the image</td>
+<td>conveyor PR #318; #299</td>
+</tr>
+<tr>
+<td>P2 (activation)</td>
+<td>Image <code>d6d58c20…</code> pinned; replicas 0 → 1</td>
+<td>deployment repo #5326 (<code>dfa4d6db</code>)</td>
+</tr>
+<tr>
+<td>P2 (port)</td>
+<td><code>BIND_ADDR: 0.0.0.0:8808</code> pinned: the service image's generic ENV default is 8080 while every probe targets 8808</td>
+<td>deployment repo #5327 (<code>43770cd2</code>)</td>
+</tr>
+<tr>
+<td>P2 (backend)</td>
+<td>The retired embedding backend (modality-gateway, 0/0; folded into mlx-api by D57) removed from the env; the verification routes answer the reference's degraded 200</td>
+<td>deployment repo #5328 (<code>6ede450d</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Final: <code>scientific-processor</code> 1/1 Ready, 0 restarts; <code>/health</code> 200 and <code>/health/ready</code> <code>{"ready":true,"reason":null}</code>.</p>
+<h2 id="the-tenant-gate-conveyor299">The tenant gate (conveyor#299)</h2>
+<p>The reference resolved the caller through licence introspection, the <code>Authorization</code> licence carrier (enforce mode) with an on-behalf allowlist, and refused a plain header in enforce. The reference shipped in <strong>observe</strong>; this port starts at the closure target, which its zero-caller measurement allowed (a cluster-wide sweep for the service's name, its URL variable and its port matched only its own Deployment). The port also carries no introspection cache. Both deviations are recorded in <code>apps/scientific/src/auth.rs</code>.</p>
+<p>Live probes (one-shot client pod in the namespace; the licence is the Deployment's own, read from its Secret and never printed):</p>
+<table>
+<thead>
+<tr>
+<th>Probe</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>no credential</td>
+<td><code>401 AUTHENTICATION_REQUIRED</code> — "Missing tenant context: name a tenant in X-Tenant-Id or present a license token"</td>
+</tr>
+<tr>
+<td>plain <code>X-Tenant-Id</code></td>
+<td><code>401 AUTHENTICATION_REQUIRED</code> — the enforce message naming <code>AUTH_TOKENLESS_IDENTITY_MODE=enforce</code></td>
+</tr>
+<tr>
+<td><code>X-Tenant-Id: Bearer &lt;licence&gt;</code></td>
+<td><strong>200</strong> — the licence's tenant, served</td>
+</tr>
+<tr>
+<td><code>Authorization: Bearer &lt;licence&gt;</code></td>
+<td><strong>200</strong> — the second carrier, served</td>
+</tr>
+<tr>
+<td>a foreign tenant with an unvouched licence</td>
+<td><code>403 TENANT_ASSERTION_NOT_PERMITTED</code></td>
+</tr>
+<tr>
+<td>credential-less introspection outage on the Authorization carrier</td>
+<td><code>503 LICENSE_INTROSPECTION_UNAVAILABLE</code> + <code>Retry-After</code> (pinned by the suite, not forced live)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="p23--one-stats-call-recorded">P2.3 — one stats call, recorded</h2>
+<p>Request (the capture's own fixture):</p>
+<pre class="json"><code>{&quot;values&quot;:[1.0,2.0,3.0,4.0,5.0],&quot;confidence_level&quot;:0.95,&quot;method&quot;:&quot;normal&quot;}</code></pre>
+<p>Response, live (<code>POST /api/stats/confidence-interval</code>, licensed):</p>
+<pre class="json"><code>{&quot;mean&quot;:3.0,&quot;ci_lower&quot;:1.036757,&quot;ci_upper&quot;:4.963243,&quot;confidence_level&quot;:0.95,&quot;method&quot;:&quot;normal&quot;,&quot;computation_time_ms&quot;:0.0}</code></pre>
+<p>The interval is the captured golden's (<code>ci_lower</code> <code>1.036757</code>, <code>ci_upper</code> <code>4.963243</code>); only <code>computation_time_ms</code> differs, which the capture's tolerances already declare volatile.</p>
+<h2 id="p3--retired-and-archived">P3 — retired and archived</h2>
+<ul>
+<li><strong>P3.1</strong> No Deployment in the namespace runs the Python image: the container image is <code>ghcr.io/nonagenticai/conveyor-scientific@sha256:d6d58c20…</code> and <code>initContainers</code> is empty (the <code>alembic upgrade head</code> container went with the Python image).</li>
+<li><strong>P3.2</strong> <code>nonagenticai/scientific-processor</code> is <strong>archived</strong> (<code>isArchived: true</code>, 2026-11-17). The alert gate is recorded as <strong>unmeasurable rather than zero</strong>: Advanced Security (code scanning) is not enabled on that repository (<code>403</code>) and Dependabot is disabled — the same vacuity the research retirement documented, so "no High alerts" means "not scanned".</li>
+</ul>
+<h2 id="unchanged-by-this-cutover">Unchanged by this cutover</h2>
+<p>The surviving 18 operations and their captured contract; the drops asserted by name (<code>topology</code>, sandbox, <code>explain</code>) in <code>apps/scientific/src/contract.rs</code>; the existing ConfigMap/Secret names (<code>SCIENTIFIC_PROCESSOR_*</code>, so the configuration is reused); the namespace, Service, RBAC and NetworkPolicy; and the rule that the service has no database — nothing surviving writes a row.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-16-scientific-cutover.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

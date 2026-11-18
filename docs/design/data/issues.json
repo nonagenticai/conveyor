@@ -141,7 +141,7 @@
       "title": "console: the programme definition and MSP surfaces are live, public and editable",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/305",
-      "updatedAt": "2026-11-18T01:51:19Z",
+      "updatedAt": "2026-11-18T02:38:54Z",
       "labels": [
         {
           "name": "unit",
@@ -295,7 +295,7 @@
       "title": "console: the destructive approval flow \u2014 one helper, every call site, and the approvals screen",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/285",
-      "updatedAt": "2026-11-17T10:32:09Z",
+      "updatedAt": "2026-11-18T02:43:06Z",
       "labels": [
         {
           "name": "unit",
@@ -316,7 +316,7 @@
       "title": "copilot: a proposed destructive action binds the approval it was granted",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/284",
-      "updatedAt": "2026-11-18T01:31:09Z",
+      "updatedAt": "2026-11-18T02:41:03Z",
       "labels": [
         {
           "name": "unit",
@@ -358,7 +358,7 @@
       "title": "approvals: the destructive gate is spec-declared and policy-driven, at the invoke boundary",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/282",
-      "updatedAt": "2026-11-18T00:13:21Z",
+      "updatedAt": "2026-11-18T02:40:38Z",
       "labels": [
         {
           "name": "unit",
@@ -936,9 +936,9 @@
     {
       "number": 212,
       "title": "estate: deploy and cut over the absorbed scientific service",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/212",
-      "updatedAt": "2026-11-18T01:23:51Z",
+      "updatedAt": "2026-11-18T02:43:16Z",
       "labels": [
         {
           "name": "unit",
