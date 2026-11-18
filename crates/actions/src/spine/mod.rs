@@ -113,6 +113,31 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "benefit_baseline_missing",
             "a benefit with no measured baseline cannot record a post-transition measurement",
         ),
+        PlanStoreError::Illegal(PlanError::BenefitChangeRequired) => ActionError::new(
+            409,
+            "benefit_change_required",
+            "an approved profile's measurement fields change only through an approved change \
+             request",
+        ),
+        PlanStoreError::Illegal(PlanError::ChangeNotApproved) => ActionError::new(
+            409,
+            "change_not_approved",
+            "the cited change is not an approved change request of this project",
+        ),
+        PlanStoreError::Illegal(PlanError::BenefitInTransition) => ActionError::new(
+            409,
+            "benefit_in_transition",
+            "the benefit is in an open transition",
+        ),
+        PlanStoreError::Illegal(PlanError::BenefitRetired) => {
+            ActionError::new(409, "benefit_retired", "the benefit profile is retired")
+        }
+        PlanStoreError::Illegal(PlanError::TrancheUnderReview) => {
+            ActionError::new(409, "tranche_under_review", "the tranche is under review")
+        }
+        PlanStoreError::Illegal(PlanError::TrancheRetired) => {
+            ActionError::new(409, "tranche_retired", "the tranche is retired")
+        }
         PlanStoreError::Illegal(other) => invalid("input", "plan_refused", other.to_string()),
         PlanStoreError::Conflict { what, why } => ActionError::new(
             409,
@@ -547,6 +572,8 @@ pub struct TrancheOut {
     pub baseline_ref: Option<String>,
     /// The review date.
     pub review_at: Option<DateTime<Utc>>,
+    /// Why the tranche was retired; empty unless `state='retired'`.
+    pub retired_reason: String,
     /// The If-Match version.
     pub version: i64,
 }
@@ -561,6 +588,7 @@ fn tranche_out(record: &TrancheRecord) -> TrancheOut {
         exit_criteria: record.exit_criteria.clone(),
         baseline_ref: record.baseline_ref.map(|id| id.to_string()),
         review_at: record.review_at,
+        retired_reason: record.retired_reason.clone(),
         version: record.version,
     }
 }
@@ -649,6 +677,9 @@ fn tranche_review_out(record: &TrancheReviewRecord) -> TrancheReviewOut {
 pub struct TrancheListIn {
     /// The programme whose tranches are read.
     pub programme_id: Uuid,
+    /// Include retired tranches; false (the default) is the plan view.
+    #[serde(default)]
+    pub include_retired: bool,
 }
 
 /// A benefit profile as `benefits.*` returns it.
@@ -696,6 +727,10 @@ pub struct BenefitOut {
     pub operational_area: String,
     /// The status.
     pub status: String,
+    /// Why the profile was retired; empty unless `status='retired'`.
+    pub retired_reason: String,
+    /// The approved change request that last advanced the measurement.
+    pub change_ref: Option<String>,
     /// The If-Match version.
     pub version: i64,
 }
@@ -723,6 +758,8 @@ fn benefit_out(record: &BenefitRecord) -> BenefitOut {
         benefit_owner_job_id: record.benefit_owner_job_id.map(|id| id.to_string()),
         operational_area: record.operational_area.clone(),
         status: record.status.clone(),
+        retired_reason: record.retired_reason.clone(),
+        change_ref: record.change_ref.map(|id| id.to_string()),
         version: record.version,
     }
 }
@@ -825,6 +862,9 @@ pub struct BenefitLinkOut {
 pub struct BenefitListIn {
     /// The programme whose benefits are read.
     pub programme_id: Uuid,
+    /// Include retired profiles; false (the default) is the benefits map.
+    #[serde(default)]
+    pub include_retired: bool,
 }
 
 /// `benefits.update`; `If-Match` is required.
@@ -872,6 +912,8 @@ pub struct BenefitUpdateIn {
     pub operational_area: Option<String>,
     /// `draft | active | realized | disbenefit | closed`.
     pub status: Option<String>,
+    /// The approved change request that authorises a measurement change.
+    pub change_id: Option<Uuid>,
 }
 
 /// `benefits.link_list`.
@@ -1163,6 +1205,11 @@ async fn wbs_list(
     })
 }
 
+/// `wbs.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_wbs_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("wbs/{}", input.id))
+}
+
 /// Remove a WBS node; a node with children is refused.
 #[crate::action(
     name = "wbs.delete",
@@ -1173,7 +1220,8 @@ async fn wbs_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_wbs_delete",
 )]
 async fn wbs_delete(
     tx: &mut PgConnection,
@@ -1511,6 +1559,11 @@ async fn registers_list(
     })
 }
 
+/// `registers.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_registers_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("register/{}", input.id))
+}
+
 /// Remove a register item; an item a benefit profile indexes is refused.
 #[crate::action(
     name = "registers.delete",
@@ -1521,7 +1574,8 @@ async fn registers_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_registers_delete",
 )]
 async fn registers_delete(
     tx: &mut PgConnection,
@@ -1591,6 +1645,11 @@ async fn project_dependencies_create(
     Ok(HandlerOutput::created(dependency_out(&record)).with_etag(etag_of(record.version)))
 }
 
+/// `project_dependencies.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_project_dependencies_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("project_dependency/{}", input.id))
+}
+
 /// Delete a dependency edge.
 #[crate::action(
     name = "project_dependencies.delete",
@@ -1601,7 +1660,8 @@ async fn project_dependencies_create(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_project_dependencies_delete",
 )]
 async fn project_dependencies_delete(
     tx: &mut PgConnection,
@@ -1765,9 +1825,14 @@ async fn tranches_list(
     ctx: HandlerCtx,
     input: TrancheListIn,
 ) -> Result<Page<TrancheOut>, ActionError> {
-    let records = store::spine::list_tranches_tx(&mut *tx, ctx.tenant, input.programme_id)
-        .await
-        .map_err(|error| spine_error(error, ctx.action))?;
+    let records = store::spine::list_tranches_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.programme_id,
+        input.include_retired,
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
     Ok(Page {
         items: records.iter().map(tranche_out).collect(),
         next_cursor: None,
@@ -1818,6 +1883,11 @@ async fn tranches_update(
     Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
 }
 
+/// `tranches.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_tranches_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("tranche/{}", input.id))
+}
+
 /// Remove a tranche. A reviewed tranche is refused: the review is history.
 #[crate::action(
     name = "tranches.delete",
@@ -1828,7 +1898,8 @@ async fn tranches_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_tranches_delete",
 )]
 async fn tranches_delete(
     tx: &mut PgConnection,
@@ -1983,9 +2054,14 @@ async fn benefits_list(
     ctx: HandlerCtx,
     input: BenefitListIn,
 ) -> Result<Page<BenefitOut>, ActionError> {
-    let records = store::spine::list_benefits_tx(&mut *tx, ctx.tenant, input.programme_id)
-        .await
-        .map_err(|error| spine_error(error, ctx.action))?;
+    let records = store::spine::list_benefits_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.programme_id,
+        input.include_retired,
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
     Ok(Page {
         items: records.iter().map(benefit_out).collect(),
         next_cursor: None,
@@ -2095,38 +2171,52 @@ async fn benefits_update(
         ctx.action,
         serde_json::json!({ "version": current.version }),
     )?;
+    let patch = store::spine::BenefitPatch {
+        project_id: input.project_id,
+        register_item_id: input.register_item_id,
+        reference,
+        description: trimmed(input.description),
+        category: trimmed(input.category),
+        objectives: input.objectives,
+        observable_outcome: trimmed(input.observable_outcome),
+        kpis: input.kpis,
+        baseline: input.baseline,
+        target: input.target,
+        measurement_method: trimmed(input.measurement_method),
+        financial_value: trimmed(input.financial_value),
+        cost: input.cost,
+        capabilities: input.capabilities,
+        preconditions: input.preconditions,
+        risks: input.risks,
+        owner_job_id: input.owner_job_id,
+        benefit_owner_job_id: input.benefit_owner_job_id,
+        operational_area: trimmed(input.operational_area),
+        status: input.status,
+    };
+    if patch.is_empty() && input.change_id.is_none() {
+        return Err(invalid(
+            "description",
+            "invalid_value",
+            "nothing to update: supply a field or a change_id",
+        ));
+    }
     let record = store::spine::update_benefit_tx(
         &mut *tx,
         ctx.tenant,
         input.id,
         i64::try_from(expected.get()).unwrap_or(i64::MAX),
-        &BenefitPatch {
-            project_id: input.project_id,
-            register_item_id: input.register_item_id,
-            reference,
-            description: input.description,
-            category: input.category,
-            objectives: input.objectives,
-            observable_outcome: input.observable_outcome,
-            kpis: input.kpis,
-            baseline: input.baseline,
-            target: input.target,
-            measurement_method: input.measurement_method,
-            financial_value: input.financial_value,
-            cost: input.cost,
-            capabilities: input.capabilities,
-            preconditions: input.preconditions,
-            risks: input.risks,
-            owner_job_id: input.owner_job_id,
-            benefit_owner_job_id: input.benefit_owner_job_id,
-            operational_area: input.operational_area,
-            status: input.status,
-        },
+        &patch,
+        input.change_id,
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "benefit_profile", record.id, "updated").await?;
     Ok(HandlerOutput::ok(benefit_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// `benefits.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_benefits_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("benefit/{}", input.id))
 }
 
 /// Remove a benefit profile; its links and transition cascade.
@@ -2139,7 +2229,8 @@ async fn benefits_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_benefits_delete",
 )]
 async fn benefits_delete(
     tx: &mut PgConnection,
@@ -2193,6 +2284,11 @@ async fn benefits_link_list(
     })
 }
 
+/// `benefits.unlink`'s approval target: what the gate authorises, computed from the input alone.
+fn target_benefits_unlink(input: &IdIn) -> Result<String, String> {
+    Ok(format!("benefit/{}/unlink", input.id))
+}
+
 /// Remove one benefits-map edge.
 #[crate::action(
     name = "benefits.unlink",
@@ -2203,7 +2299,8 @@ async fn benefits_link_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_benefits_unlink",
 )]
 async fn benefits_unlink(
     tx: &mut PgConnection,
@@ -2317,6 +2414,108 @@ async fn benefits_transition_upsert(
     )
     .await?;
     Ok(HandlerOutput::ok(benefit_transition_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// `benefits.retire`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitRetireIn {
+    /// The profile.
+    pub id: Uuid,
+    /// Why it left the map. Required; retirement is never a delete.
+    pub reason: String,
+}
+
+#[crate::action(
+    name = "benefits.retire",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_retire(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BenefitRetireIn,
+) -> Result<HandlerOutput<BenefitOut>, ActionError> {
+    let reason = input.reason.trim();
+    if reason.is_empty() {
+        return Err(invalid("reason", "required", "a retirement needs a reason"));
+    }
+    let current = store::spine::get_benefit_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such benefit profile"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    let record = store::spine::retire_benefit_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+        reason,
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "benefit_profile", record.id, "retired").await?;
+    Ok(HandlerOutput::ok(benefit_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// `tranches.retire`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TrancheRetireIn {
+    /// The tranche.
+    pub id: Uuid,
+    /// Why it left the plan. Required; retirement is never a delete.
+    pub reason: String,
+}
+
+#[crate::action(
+    name = "tranches.retire",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn tranches_retire(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: TrancheRetireIn,
+) -> Result<HandlerOutput<TrancheOut>, ActionError> {
+    let reason = input.reason.trim();
+    if reason.is_empty() {
+        return Err(invalid("reason", "required", "a retirement needs a reason"));
+    }
+    let current = store::spine::get_tranche_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such tranche"))?;
+    let expected = require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    let record = store::spine::retire_tranche_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        i64::try_from(expected.get()).unwrap_or(i64::MAX),
+        reason,
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "programme_tranche", record.id, "retired").await?;
+    Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
 }
 
 // ── cadence and stakeholder views ───────────────────────────────────────────────────────
@@ -2639,6 +2838,11 @@ async fn cadences_update(
     Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
 }
 
+/// `cadences.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_cadences_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("cadence/{}", input.id))
+}
+
 /// Remove a cadence row.
 #[crate::action(
     name = "cadences.delete",
@@ -2649,7 +2853,8 @@ async fn cadences_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_cadences_delete",
 )]
 async fn cadences_delete(
     tx: &mut PgConnection,
@@ -2806,6 +3011,11 @@ async fn stakeholders_profile_list(
     })
 }
 
+/// `stakeholders.profile_delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_stakeholders_profile_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("stakeholder/{}/profile", input.id))
+}
+
 /// Remove a stakeholder profile.
 #[crate::action(
     name = "stakeholders.profile_delete",
@@ -2816,7 +3026,8 @@ async fn stakeholders_profile_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_stakeholders_profile_delete",
 )]
 async fn stakeholders_profile_delete(
     tx: &mut PgConnection,

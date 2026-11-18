@@ -582,14 +582,16 @@ async fn comments_are_versioned_paginated_and_announced() {
 
     // ── comments.delete: 204, no representation, one event ────────────────────────────
     let before = event_count(&pg, seeded.tenant_id).await;
+    // #283: a comment delete is destructive; the gate names this comment. A gate request emits
+    // no event, so the count below still measures the delete alone.
     let (status, headers, body) = running
-        .invoke_full(
+        .invoke_gated_full(
+            &pg,
+            seeded.tenant,
             "comments.delete",
             "dev:alice",
             json!({"id": comment_id}),
             Some("\"2\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{body}");
@@ -788,28 +790,30 @@ async fn task_lists_and_tasks_round_trip_with_one_event_each() {
 
     // ── tasks.delete, then task_lists.delete (its items must not block the FK) ────────
     let second_task_id = id_of(output(&second_task), "id");
+    // #283: destructive; the gate names this object.
     let (status, headers, _) = running
-        .invoke_full(
+        .invoke_gated_full(
+            &pg,
+            seeded.tenant,
             "tasks.delete",
             "dev:alice",
             json!({"id": second_task_id}),
             Some("\"1\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204);
     assert!(!headers.contains_key("etag"));
 
     let before = event_count(&pg, seeded.tenant_id).await;
+    // #283: destructive; the gate names this object.
     let (status, _, body) = running
-        .invoke_full(
+        .invoke_gated_full(
+            &pg,
+            seeded.tenant,
             "task_lists.delete",
             "dev:alice",
             json!({"id": second_list_id}),
             Some("\"1\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{body}");
@@ -1012,14 +1016,15 @@ async fn custom_fields_validate_their_kind_and_upsert_one_value_per_card() {
     assert_eq!(stale["current"]["kind"], "number");
 
     let before = event_count(&pg, seeded.tenant_id).await;
+    // #283: destructive; the gate names this object.
     let (status, _, body) = running
-        .invoke_full(
+        .invoke_gated_full(
+            &pg,
+            seeded.tenant,
             "custom_fields.delete",
             "dev:alice",
             json!({"id": field_id}),
             Some("\"2\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{body}");
@@ -1147,14 +1152,15 @@ async fn labels_and_board_membership_change_the_card_and_announce_themselves() {
     assert_eq!(headers.get("etag").map(String::as_str), Some("\"2\""));
     assert_eq!(output(&renamed)["color"], "#00ff00");
 
+    // #283: destructive; the gate names this object.
     let (status, _, body) = running
-        .invoke_full(
+        .invoke_gated_full(
+            &pg,
+            seeded.tenant,
             "labels.delete",
             "dev:alice",
             json!({"id": label_id}),
             Some("\"2\""),
-            None,
-            None,
         )
         .await;
     assert_eq!(status, 204, "{body}");

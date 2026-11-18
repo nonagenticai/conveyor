@@ -610,6 +610,14 @@ pub struct PmCloseOut {
     pub closure_asset_id: Uuid,
 }
 
+/// `pm.close`'s approval target: what the gate authorises, computed from the input alone.
+fn target_pm_close(input: &PmCloseIn) -> Result<String, String> {
+    Ok(format!(
+        "job_binding/{}/project/{}/close",
+        input.job_binding_id, input.project_id
+    ))
+}
+
 #[crate::action(
     name = "pm.close",
     version = 1,
@@ -619,7 +627,8 @@ pub struct PmCloseOut {
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_pm_close",
 )]
 async fn pm_close(
     tx: &mut PgConnection,

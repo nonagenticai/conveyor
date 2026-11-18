@@ -91,7 +91,10 @@ use serde_json::{Value, json};
 /// **T3 adds 6 internal**: the PM job.
 /// **#154 adds 1 internal**: `analyse.site`, the analysis library's invocable read.
 /// **#164 adds 1 internal**: `analyse.video`, the video family over executor evidence.
-const EXPECTED: [&str; 430] = [
+/// **#303 adds 2 internal**: `benefits.retire` and `tranches.retire`, the governed retirement path.
+/// **#76 adds 1 internal**: `tools.call`, the tool broker (it dispatches a declared external
+/// action and adds no external target).
+const EXPECTED: [&str; 432] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -125,6 +128,7 @@ const EXPECTED: [&str; 430] = [
     "benefits.link",
     "benefits.link_list",
     "benefits.list",
+    "benefits.retire",
     "benefits.transition_list",
     "benefits.transition_upsert",
     "benefits.unlink",
@@ -485,6 +489,7 @@ const EXPECTED: [&str; 430] = [
     "tranches.create",
     "tranches.delete",
     "tranches.list",
+    "tranches.retire",
     "tranches.review",
     "tranches.review_list",
     "tranches.update",
@@ -578,9 +583,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // #305 adds the fourteen MSP edit/read actions, all internal: 395 -> 409; external stays 18.
     // #154 adds `analyse.site` (internal, read): 409 -> 410; external stays 18.
     // #164 adds `analyse.video` (internal, read): 410 -> 411; external stays 18.
-    // T13 adds `tools.call` (internal — the broker dispatches through a declared external
-    // action, so it adds no external target): 411 -> 412; external stays 18.
-    assert_eq!((internal, external), (412, 18));
+    // #303 adds `benefits.retire` and `tranches.retire` (internal): 411 -> 413; external stays 18.
+    // #76 adds `tools.call` (internal): 413 -> 414; external stays 18.
+    assert_eq!((internal, external), (414, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

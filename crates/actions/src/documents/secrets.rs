@@ -126,6 +126,11 @@ pub struct SecretRotateIn {
     pub value: String,
 }
 
+/// `secrets.rotate`'s approval target: what the gate authorises, computed from the input alone.
+fn target_secrets_rotate(input: &SecretRotateIn) -> Result<String, String> {
+    Ok(format!("secret/{}/rotate", input.id))
+}
+
 /// Rotate a secret. The old value does not survive (there is no history row).
 #[crate::action(
     name = "secrets.rotate",
@@ -136,7 +141,8 @@ pub struct SecretRotateIn {
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_secrets_rotate",
 )]
 async fn secrets_rotate(
     tx: &mut PgConnection,
@@ -244,6 +250,11 @@ async fn secrets_list(
     }))
 }
 
+/// `secrets.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_secrets_delete(input: &SecretIdIn) -> Result<String, String> {
+    Ok(format!("secret/{}", input.id))
+}
+
 /// Delete one secret.
 #[crate::action(
     name = "secrets.delete",
@@ -254,7 +265,8 @@ async fn secrets_list(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_secrets_delete",
 )]
 async fn secrets_delete(
     tx: &mut PgConnection,

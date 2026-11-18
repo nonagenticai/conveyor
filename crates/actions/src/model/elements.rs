@@ -197,6 +197,11 @@ async fn model_elements_update(
     Ok(HandlerOutput::ok(element_out(&after)).with_etag(etag_of(version_i64(after.version))))
 }
 
+/// `model_elements.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_model_elements_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("model_element/{}", input.id))
+}
+
 /// Remove an element; `If-Match` is required and the removed row is returned.
 #[crate::action(
     name = "model_elements.delete",
@@ -207,7 +212,8 @@ async fn model_elements_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_model_elements_delete",
 )]
 async fn model_elements_delete(
     tx: &mut PgConnection,

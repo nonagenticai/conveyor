@@ -169,6 +169,11 @@ async fn custom_fields_update(
     }
 }
 
+/// `custom_fields.delete`'s approval target: what the gate authorises, computed from the input alone.
+fn target_custom_fields_delete(input: &IdIn) -> Result<String, String> {
+    Ok(format!("custom_field/{}", input.id))
+}
+
 /// Delete a field and every value recorded against it.
 #[crate::action(
     name = "custom_fields.delete",
@@ -179,7 +184,8 @@ async fn custom_fields_update(
     timeout_ms = 30000,
     effect = "destructive",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_custom_fields_delete",
 )]
 async fn custom_fields_delete(
     tx: &mut PgConnection,

@@ -557,6 +557,19 @@ async fn seed_card_label(pg: &support::Pg, ctx: &Ctx, card: Uuid, label: Uuid) {
     .await
 }
 
+/// The MCP result's structured body, with an absent value read as `null`.
+///
+/// MCP requires `structuredContent` to be an object, so rmcp >= 3.11 omits it when an
+/// action's body is `null` (measured on `cards.archive`, rmcp 3.9.0 -> 3.11.0). The caller
+/// still compares the value against the HTTP body, so a *dropped object* — the regression
+/// this test exists to catch — fails on the equality rather than escaping here.
+fn structured_content(result: &Value) -> Value {
+    result
+        .get("structuredContent")
+        .cloned()
+        .unwrap_or(Value::Null)
+}
+
 async fn seed_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     let key = format!("PR-{}", Uuid::now_v7().simple());
     scoped(pg, ctx, async |conn| {
@@ -1955,7 +1968,7 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push("benefits.link.programme", g);
             ctx.push("benefits.link.benefit", b);
         }
-        "benefits.update" | "benefits.delete" => {
+        "benefits.update" | "benefits.delete" | "benefits.retire" => {
             let g = seed_parity_programme(pg, ctx).await;
             let b = seed_parity_benefit(pg, ctx, g).await;
             ctx.push(sample.name, b);
@@ -2007,6 +2020,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let g = seed_parity_programme(pg, ctx).await;
             let profile = seed_parity_profile(pg, ctx, g).await;
             ctx.push(sample.name, profile);
+        }
+        "tranches.retire" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let t = seed_parity_tranche(pg, ctx, g).await;
+            ctx.push("tranches.retire", t);
         }
         "cadences.create" => {
             let g = seed_parity_programme(pg, ctx).await;
@@ -5533,6 +5551,16 @@ fn spine_samples() -> Vec<Sample> {
             expecting(sample, 200)
         },
         {
+            let mut sample = on_prepared("tranches.retire", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("tranches.retire"),
+                    "reason": "parity retirement",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
             let mut sample = plain("benefits.create", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| {
@@ -5563,6 +5591,16 @@ fn spine_samples() -> Vec<Sample> {
                 })
             });
             expecting(sample, 422)
+        },
+        {
+            let mut sample = on_prepared("benefits.retire", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("benefits.retire"),
+                    "reason": "parity retirement",
+                })
+            });
+            expecting(sample, 200)
         },
         {
             let mut sample = plain("cadences.create", json!({}), None);
@@ -6558,6 +6596,37 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         sampled.difference(&registry_names).collect::<Vec<_>>()
     );
 
+    // #282/#283: a destructive action now runs only behind an approved gate, and `/mcp` has no
+    // way to carry an approval id (`mcp.rs` passes `approval_id: None`). This sweep tests
+    // TRANSPORT parity — the same body over both — and the gate has its own suite
+    // (`destructive_gate.rs`), so the tenant waives the gate for every destructive action here.
+    // Without this the sweep would compare a 403 (HTTP) with an `isError` (MCP) and prove
+    // nothing about the bodies.
+    // The `ops.*` verbs are excluded on purpose: their samples assert the refusal a call gets
+    // when no cluster is configured (403/503), so waiving their gate would send the call at a
+    // backend that does not exist and change what the sample is asserting.
+    for spec in conveyor_actions::registry::registry()
+        .iter()
+        .filter(|spec| spec.effect == conveyor_actions::Effect::Destructive)
+        .filter(|spec| !spec.name.starts_with("ops."))
+    {
+        let (status, body) = running
+            .invoke(
+                "approval_policies.set",
+                "dev:alice",
+                json!({
+                    "action": spec.name,
+                    "approval": "waived",
+                    "self_approval": "forbidden",
+                }),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 200, "waive {}: {body}", spec.name);
+    }
+
     let mut checked = 0usize;
     let total = registry_names.len();
     for sample in samples {
@@ -6636,10 +6705,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                     Some(&format!("det-mcp-{}", sample.name)),
                 )
                 .await;
-            let structured = result
-                .get("structuredContent")
-                .cloned()
-                .unwrap_or_else(|| panic!("{} has no structuredContent: {result}", sample.name));
+            let structured = structured_content(&result);
             assert_outcome(&sample, status_h, &result);
             assert_eq!(
                 normalise(sample.name, structured.clone()),
@@ -6675,10 +6741,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                 Some(&key_a),
             )
             .await;
-        let structured_a = result_a
-            .get("structuredContent")
-            .cloned()
-            .unwrap_or_else(|| panic!("{} has no structuredContent: {result_a}", sample.name));
+        let structured_a = structured_content(&result_a);
         assert_outcome(&sample, status_a, &result_a);
         assert_eq!(
             normalise(sample.name, structured_a.clone()),
@@ -6701,10 +6764,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                 Some(&key_b),
             )
             .await;
-        let structured_b = result_b
-            .get("structuredContent")
-            .cloned()
-            .unwrap_or_else(|| panic!("{} has no structuredContent: {result_b}", sample.name));
+        let structured_b = structured_content(&result_b);
         let (status_b, http_b) = running
             .invoke(
                 sample.name,
@@ -6927,6 +6987,24 @@ async fn a_binding_stays_in_the_callers_tenant_and_unbind_removes_it_once() {
     // CONTRACT §9: no cross-tenant write path exists.
     let (status, refused) = bind_channel(&running, Uuid::now_v7(), "parity-route").await;
     assert_eq!(status, 403, "{refused}");
+
+    // #283: unbinding is destructive, so the tenant waives its gate — this test is about the
+    // binding's tenant scoping and idempotence, not about the approval.
+    let (status, body) = running
+        .invoke(
+            "approval_policies.set",
+            "dev:alice",
+            json!({
+                "action": "channels.unbind",
+                "approval": "waived",
+                "self_approval": "forbidden",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "waive channels.unbind: {body}");
 
     let (status, removed) = unbind_channel(&running, alice.tenant_id).await;
     assert_eq!(status, 204, "{removed}");

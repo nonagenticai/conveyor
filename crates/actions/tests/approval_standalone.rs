@@ -169,10 +169,14 @@ async fn a_standalone_gate_needs_an_action() {
     assert_eq!(error.errors[0].code, "missing");
 }
 
-/// An action that declares no target cannot be the subject of a standalone gate: the gate would
-/// carry no identity for the invoke boundary to compare (#283 declares the rest).
+/// A gate that cannot compute a target cannot stand alone: the gate would carry no identity for
+/// the invoke boundary to compare.
+///
+/// #283 gave every destructive action a target, so the old shape of this test — naming an action
+/// that declares none — no longer exists. What survives is the property: an action whose own
+/// target function REFUSES this input yields no target, and the request is a 422 naming the field.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn an_untargeted_action_cannot_open_a_standalone_gate() {
+async fn a_gate_whose_target_cannot_be_computed_is_refused() {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
 
@@ -184,25 +188,19 @@ async fn an_untargeted_action_cannot_open_a_standalone_gate() {
             seeded.user_id,
             "approvals.request",
             json!({
-                "gate": "documents.delete",
+                "gate": "ops.restart",
                 "kind": "action",
-                "action": "documents.delete",
-                "input": {"id": Uuid::nil()},
+                "action": "ops.restart",
+                // `target_restart` refuses a blank namespace before any cluster call.
+                "input": {"namespace": "", "deployment": "conveyor"},
             }),
             None,
         ),
     )
     .await
-    .expect_err("an action with no declared target authorises nothing");
+    .expect_err("an action whose target refuses the input authorises nothing");
     assert_eq!(error.status, 422, "{}", error.detail);
-    assert_eq!(error.errors[0].field, "action");
-    assert!(
-        error.errors[0]
-            .detail
-            .contains("declares no approval target"),
-        "{}",
-        error.errors[0].detail
-    );
+    assert_eq!(error.errors[0].field, "input");
 }
 
 /// The tenant's own policy still governs: `waived` means no gate is needed, so a standalone gate
