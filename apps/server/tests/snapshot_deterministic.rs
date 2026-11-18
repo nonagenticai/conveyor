@@ -130,6 +130,29 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     .await
     .expect("secret");
 
+    // The definition-set metadata (#333): the public page shows a published document's category,
+    // unit and published state; a draft's existence must stay invisible.
+    sqlx::query(
+        "INSERT INTO document (tenant_id, project_id, kind, title, body, publishable, category, unit, status)
+         VALUES ($1, $2, 'document', 'Snapshot definition artefact', 'a published body', true,
+                 'vision', 'P0', 'active')",
+    )
+    .bind(tenant)
+    .bind(project)
+    .execute(&db.super_pool)
+    .await
+    .expect("published document");
+    sqlx::query(
+        "INSERT INTO document (tenant_id, project_id, kind, title, body, publishable, category, unit)
+         VALUES ($1, $2, 'document', 'Snapshot private draft', 'a draft body', false,
+                 'vision', 'P0')",
+    )
+    .bind(tenant)
+    .bind(project)
+    .execute(&db.super_pool)
+    .await
+    .expect("draft document");
+
     // The MSP records (#305): the public window serves them, and the same redaction must apply.
     let msp_text = format!("snapshot benefit · alice@example.com · token {token}");
     let benefit: Uuid = sqlx::query_scalar(
@@ -319,6 +342,28 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     assert!(
         !snapshot_js.contains(&token),
         "the wrapper redacts the MSP token"
+    );
+
+    let artefacts = std::fs::read_to_string(dir.join("artefacts.json")).expect("artefacts.json");
+    assert!(
+        artefacts.contains("Snapshot definition artefact"),
+        "the published document is public"
+    );
+    assert!(
+        artefacts.contains("\"category\": \"vision\""),
+        "the public document carries its category: {artefacts}"
+    );
+    assert!(
+        artefacts.contains("\"unit\": \"P0\""),
+        "the public document carries its unit"
+    );
+    assert!(
+        artefacts.contains("\"publishable\": true"),
+        "the public page can tell a published row"
+    );
+    assert!(
+        !artefacts.contains("Snapshot private draft"),
+        "a draft never reaches the public artefacts"
     );
 
     let secrets = std::fs::read_to_string(dir.join("secrets.json")).expect("secrets.json");
