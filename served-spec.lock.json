@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "81377aa50e82cbdfb6aa56c37445fe74e3f8e77065feac0cb97923c7302a98e5",
+    "GET /api/actions": "fffd3e2b7d0b98c37d65a53524cd10bdbbdfdd8c669301c84c4bb1f4e6ff39dd",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -409,6 +409,7 @@
     "POST /api/actions/tasks.update/invocations": "355d54dfe9c8fe4f7d3e0b5fb4ecef8a782aa3424052b8b187dc5a6763f651ad",
     "POST /api/actions/tenants.get/invocations": "9e301d56c58cfeafcfdaadcbfb3744a1ade701a6d107123d3e7ce679cd8f9e84",
     "POST /api/actions/tenants.update_settings/invocations": "2ac6be7fed56f2314a501b6b0b8241c84a71c65aa923dcccd3bb8a4a650b0658",
+    "POST /api/actions/tools.call/invocations": "e3dd8b2bec33780a1c04168f96ea0d4465433398fd0172d6f24207bf20c0b016",
     "POST /api/actions/trace_links.create/invocations": "81c574e5c44cd253f3dadfb900d45af373ec386a92f0810015b7a8c7806d1954",
     "POST /api/actions/trace_links.delete/invocations": "7bd39285451b996c50b049f484c52facb4a9949d5f443e2cc83c6e3ed80743cf",
     "POST /api/actions/trace_links.list/invocations": "25cbadcfd3a5a2f4100b2538d1b1d1564114a8271829b3fee1a33d5f62a14aef",
