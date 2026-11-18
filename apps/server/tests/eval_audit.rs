@@ -247,6 +247,47 @@ async fn a_lenient_judge_is_reported_as_accepting_its_negatives() {
     );
 }
 
+/// P1.3 — the judge-negative probe is an eval call and joins the eval run it audits.
+#[tokio::test]
+async fn the_judge_probe_is_an_eval_call_on_the_named_run() {
+    let db = common::TestDb::fresh().await;
+    let _ = fx::stub_base();
+    let metric = fx::MetricSpec {
+        key: "quality",
+        grader_kind: "rubric",
+        grader: json!({"judge_model": "judge-model"}),
+        rubric: Some("score the candidate against the rubric"),
+    };
+    let fixture = fx::fixture_with(&db, &["classify: one"], &[metric]).await;
+
+    let audit = insert_audit(&db, &fixture, Some(fixture.run_id)).await;
+    run_audit(&db, fixture.tenant, audit).await;
+    let row = read_audit(&db, fixture.tenant, audit).await;
+    assert_eq!(row.status, "succeeded", "error: {:?}", row.error);
+
+    let rows: Vec<(String, Option<Uuid>, String)> = sqlx::query_as(
+        "SELECT caller_kind, eval_run_id, prompt_ref
+           FROM inference_call
+          WHERE prompt_ref LIKE 'eval_audit:%'
+          ORDER BY created_at",
+    )
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("the judge ledger rows");
+    assert_eq!(rows.len(), 3, "one probe per known negative: {rows:?}");
+    for (caller_kind, eval_run_id, prompt_ref) in &rows {
+        assert_eq!(
+            caller_kind, "eval",
+            "the probe is an eval call: {prompt_ref}"
+        );
+        assert_eq!(
+            *eval_run_id,
+            Some(fixture.run_id),
+            "the probe joins the run the audit names: {prompt_ref}"
+        );
+    }
+}
+
 #[tokio::test]
 async fn a_finished_audit_is_not_rerun() {
     let db = common::TestDb::fresh().await;

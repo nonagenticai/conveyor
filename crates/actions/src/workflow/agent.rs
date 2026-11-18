@@ -138,6 +138,10 @@ impl AgentRunIn {
             timeout_ms: self.timeout_ms,
             capability_agent_id: self.capability_agent_id,
             prompt_ref: self.prompt_ref,
+            // The direct input path has no compiled prompt; `resolve` fills these from the
+            // recipe it compiled. Never read from the caller's input.
+            prompt_version: None,
+            prompt_sha256: None,
             run_id: self.run_id,
             run_step_id: self.run_step_id,
             depth: self.depth,
@@ -455,6 +459,7 @@ async fn resolve_bound(
     // The resolved path has exactly one source for the system message: the catalogue (SPEC D27).
     // A caller-supplied one here would make the compiled prompt and the input two truths, so it
     // is refused rather than silently preferred either way.
+    let mut compiled_identity: Option<(String, String)> = None;
     if let Some(reference) = record.prompt_ref.as_deref() {
         if messages.iter().any(|message| message.role == "system") {
             return Err(ActionError::new(
@@ -469,6 +474,7 @@ async fn resolve_bound(
         let compiled = crate::prompt::compile_for_run(pool, tenant, run_id, run_step_id, reference)
             .await
             .map_err(|error| error.into_action_error("agent.run"))?;
+        compiled_identity = Some((compiled.version.clone(), compiled.sha256.clone()));
         messages.insert(
             0,
             AgentMessage {
@@ -494,7 +500,12 @@ async fn resolve_bound(
         run_step_id,
         depth: Some(0),
     };
-    Ok(input.into_config())
+    let mut config = input.into_config();
+    if let Some((version, sha256)) = compiled_identity {
+        config.prompt_version = Some(version);
+        config.prompt_sha256 = Some(sha256);
+    }
+    Ok(config)
 }
 
 /// The step input is malformed for the field it names.
@@ -591,6 +602,8 @@ pub(crate) async fn drive(
         .map(|name| (*name).to_owned())
         .collect();
     let prompt_ref = agent.prompt_ref().map(str::to_owned);
+    let prompt_version = agent.prompt_version().map(str::to_owned);
+    let prompt_sha256 = agent.prompt_sha256().map(str::to_owned);
 
     loop {
         let Some(remaining) = budget_remaining(started, cap_ms) else {
@@ -643,10 +656,15 @@ pub(crate) async fn drive(
                             conversation_turn_id: None,
                             eval_run_id: None,
                             prompt_ref: prompt_ref.clone(),
-                            prompt_version: prompt_ref
-                                .as_deref()
-                                .and_then(|reference| reference.split_once('@'))
-                                .map(|(_, version)| version.to_owned()),
+                            // The compiled recipe's own version when the executor compiled one;
+                            // the ref's pin otherwise. Both name the recipe, never the request.
+                            prompt_version: prompt_version.clone().or_else(|| {
+                                prompt_ref
+                                    .as_deref()
+                                    .and_then(|reference| reference.split_once('@'))
+                                    .map(|(_, version)| version.to_owned())
+                            }),
+                            prompt_sha256: prompt_sha256.clone(),
                             correlation_id: Some(format!("run:{}", run.run_id)),
                         }),
                     },
@@ -683,7 +701,20 @@ pub(crate) async fn drive(
                             trace_id: Some(format!("run:{}", run.run_id)),
                             depth: run.depth.saturating_add(1),
                             app_key: run.app_key.to_owned(),
-                            usage: None,
+                            // A tool the model names is still an invocation the run owns. If the
+                            // tool is itself a model-capturing action (the surface can include
+                            // one), the ledger must see it rather than lose a paid call.
+                            usage: Some(UsageContext {
+                                caller_kind: CallerKind::AgentRun,
+                                run_id: Some(run.run_id),
+                                run_step_id: run.run_step_id,
+                                conversation_turn_id: None,
+                                eval_run_id: None,
+                                prompt_ref: None,
+                                prompt_version: None,
+                                prompt_sha256: None,
+                                correlation_id: Some(format!("run:{}", run.run_id)),
+                            }),
                         },
                     );
                     let outcome = match tokio::time::timeout(remaining, invocation).await {

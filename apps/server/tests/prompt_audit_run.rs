@@ -163,3 +163,103 @@ async fn a_malformed_answer_fails_the_audit_with_the_error_recorded() {
         "the parse error is recorded"
     );
 }
+
+/// A stub that records each request body, so a test can read the inventory the model was sent.
+async fn stub_capturing(
+    answer: String,
+) -> (
+    String,
+    std::sync::Arc<std::sync::Mutex<Vec<serde_json::Value>>>,
+) {
+    let bodies = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+    let captured = bodies.clone();
+    let app = axum::Router::new().route(
+        "/api/chat/completions",
+        axum::routing::post(move |axum::Json(body): axum::Json<serde_json::Value>| {
+            let answer = answer.clone();
+            let captured = captured.clone();
+            async move {
+                captured.lock().expect("capture the request").push(body);
+                axum::Json(json!({
+                    "id": "chatcmpl-audit",
+                    "model": "audit-model",
+                    "choices": [{
+                        "index": 0,
+                        "message": {"role": "assistant", "content": answer},
+                        "finish_reason": "stop"
+                    }],
+                    "usage": {
+                        "prompt_tokens": 20,
+                        "completion_tokens": 10,
+                        "total_tokens": 30,
+                        "cache_creation_input_tokens": 0,
+                        "cache_read_input_tokens": 0
+                    }
+                }))
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    (base, bodies)
+}
+
+/// P3.1 — the audit inventories the tenant's compiled recipe, not the built-in constant.
+#[tokio::test]
+async fn the_inventory_carries_the_tenants_copilot_recipe() {
+    let db = common::TestDb::fresh().await;
+    let (tenant, audit_id) = seed_audit(&db).await;
+
+    let marker = "TENANT-EDITED copilot instruction: never invent a tool name";
+    let mut tx = conveyor_store::begin_scoped(&db.owner, tenant)
+        .await
+        .expect("scope");
+    let updated = sqlx::query(
+        "UPDATE prompt_section s
+            SET template = $1
+           FROM prompt p
+          WHERE p.id = s.prompt_id AND p.key = 'copilot_system' AND p.version = 1",
+    )
+    .bind(marker)
+    .execute(&mut *tx)
+    .await
+    .expect("edit the tenant's recipe");
+    assert_eq!(updated.rows_affected(), 1, "one system section edited");
+    tx.commit().await.expect("commit");
+
+    let answer = json!({
+        "findings": [{
+            "location": "copilot:SYSTEM_PROMPT",
+            "evidence": "the tenant's own sentence",
+            "pattern": "1a",
+            "why_obsolete": "the audit must read the recipe that executes",
+            "confidence": "medium",
+            "action": "flag"
+        }]
+    })
+    .to_string();
+    let (base, bodies) = stub_capturing(answer).await;
+    set_router(&base);
+
+    prompt_audit_run::run(
+        &db.runtime,
+        tenant,
+        "conveyor-test",
+        &json!({"audit_id": audit_id}),
+    )
+    .await
+    .expect("the audit run");
+
+    let bodies = bodies.lock().expect("captured requests");
+    assert_eq!(bodies.len(), 1, "one bounded model call");
+    let sent = bodies[0].to_string();
+    assert!(
+        sent.contains(marker),
+        "the inventory must carry the tenant's compiled recipe text: {sent}"
+    );
+}

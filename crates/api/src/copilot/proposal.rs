@@ -17,7 +17,9 @@
 use base64::Engine as _;
 use chrono::{DateTime, Utc};
 use conveyor_actions::spec::ActionSpec;
-use conveyor_actions::{ActionError, Authority, Confirm, Effect, InvokeRequest, invoke, registry};
+use conveyor_actions::{
+    ActionError, Authority, Confirm, Effect, InvokeRequest, UsageContext, invoke, registry,
+};
 use conveyor_auth::Role;
 use conveyor_domain::Approval;
 use conveyor_store::TenantId;
@@ -388,6 +390,11 @@ pub async fn execute(
     }
 
     let key = format!("proposal:{approval_id}");
+    // The turn that proposed this action, when it has one. An executed proposal is a real
+    // invocation: if the action captures usage, the ledger must see it (S16 W7).
+    let proposal_turn_id = proposal.meta["turn_id"]
+        .as_str()
+        .and_then(|raw| Uuid::parse_str(raw).ok());
     let outcome = invoke(
         pool,
         registry(),
@@ -415,7 +422,23 @@ pub async fn execute(
             trace_id: None,
             depth: 0,
             app_key: app_key.to_owned(),
-            usage: None,
+            usage: Some(UsageContext {
+                // `other` is the one kind the ledger allows to carry no join key; use it only
+                // when the proposal names no turn.
+                caller_kind: if proposal_turn_id.is_some() {
+                    conveyor_domain::inference::CallerKind::Copilot
+                } else {
+                    conveyor_domain::inference::CallerKind::Other
+                },
+                run_id: None,
+                run_step_id: None,
+                conversation_turn_id: proposal_turn_id,
+                eval_run_id: None,
+                prompt_ref: None,
+                prompt_version: None,
+                prompt_sha256: None,
+                correlation_id: proposal_turn_id.map(|turn| format!("turn:{turn}")),
+            }),
         },
     )
     .await?;

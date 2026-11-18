@@ -6,7 +6,7 @@
 //! rule), `actor_kind = "service"`, and the synthetic machine role. Validation, preconditions,
 //! events and audit rows are therefore the ones a real caller gets.
 
-use conveyor_actions::invoke::{Authority, InvokeRequest, invoke};
+use conveyor_actions::invoke::{Authority, InvokeRequest, UsageContext, invoke};
 use conveyor_actions::{ActionKind, registry};
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
@@ -89,7 +89,20 @@ impl<'a> ActionCaller<'a> {
                 trace_id: None,
                 depth: 0,
                 app_key: self.app_key.to_owned(),
-                usage: None,
+                // The operator CLI is an ordinary caller of the same engine. A model-capturing
+                // action invoked here must reach the ledger too; `other` is the kind the schema
+                // allows to carry no join key (S16 W7).
+                usage: Some(UsageContext {
+                    caller_kind: conveyor_domain::inference::CallerKind::Other,
+                    run_id: None,
+                    run_step_id: None,
+                    conversation_turn_id: None,
+                    eval_run_id: None,
+                    prompt_ref: None,
+                    prompt_version: None,
+                    prompt_sha256: None,
+                    correlation_id: None,
+                }),
             },
         )
         .await

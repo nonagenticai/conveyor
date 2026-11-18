@@ -26,4 +26,4 @@ jobs:
         with:
           persist-credentials: false
       - name: the signed contract and its native map
-        run: python3 scripts/check-parity.py
+        run: python3 scripts/check-parity.py --require-native

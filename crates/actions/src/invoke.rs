@@ -195,6 +195,12 @@ pub struct UsageContext {
     pub prompt_ref: Option<String>,
     /// The prompt's version within its family.
     pub prompt_version: Option<String>,
+    /// SHA-256 of the COMPILED prompt text, when the caller has a compiled recipe (S16 W7).
+    ///
+    /// This is not the hash of the request: the messages array — history, tool schemas and all —
+    /// has a different identity, and the two must never share a column. A caller with no compiled
+    /// prompt (a process template, an eval rubric) leaves this `None`.
+    pub prompt_sha256: Option<String>,
     /// The value sent as `X-Correlation-Id`.
     pub correlation_id: Option<String>,
 }
@@ -1366,10 +1372,9 @@ async fn invoke_external(
                 eval_run_id: usage.eval_run_id,
                 prompt_ref: usage.prompt_ref.clone(),
                 prompt_version: usage.prompt_version.clone(),
-                prompt_sha256: request
-                    .input
-                    .get("messages")
-                    .map(conveyor_domain::inference::prompt_sha256),
+                // The compiler's own hash, carried intact. The messages array is the full
+                // request, not the prompt; its identity stays on the invocation's input hash.
+                prompt_sha256: usage.prompt_sha256.clone(),
                 correlation_id: correlation,
                 model: captured.model,
                 served_model: captured.served_model,

@@ -50,8 +50,8 @@
 </tr>
 <tr>
 <td>P3</td>
-<td><code>parity.yaml</code> signed</td>
-<td>`yq -r '[.[]</td>
+<td>the contract and its native map</td>
+<td><code>python3 scripts/check-parity.py --require-native</code> green: the signed <code>parity/parity.yaml</code> is the capability input and <code>parity/native.tsv</code> is the acceptance gate — every <code>used</code> id carries an <code>action:</code> / <code>test:</code> / <code>replacement:</code> / <code>dropped:</code> disposition. The legacy <code>probe:</code> acceptances are reachability evidence, not the gate</td>
 </tr>
 <tr>
 <td>P4</td>
@@ -222,21 +222,23 @@ cd $HOME/Movies/conveyor
 #   export E2E_USER=&lt;the Keycloak test user&gt;     E2E_PASS=&lt;its password&gt;   (S12&#39;s suite logs in with real OIDC
 #                                                                          here: dev-auth is refused in production)
 
-# 1. Parity (R5). S00 §7 makes `acceptance` a typed REFERENCE — `test:&lt;crate&gt;::&lt;name&gt;`,
-#    `e2e:&lt;spec&gt;::&lt;name&gt;`, `probe:&lt;METHOD&gt; &lt;path&gt;` — not a shell command, so run each KIND
-#    rather than piping the strings into a shell (that would exit 127 on the first item).
-test -z &quot;$(yq -r &#39;.[] | select(.status == &quot;used&quot;) | select((.acceptance // &quot;&quot;) | test(&quot;^(test|e2e|probe):&quot;) | not) | .id&#39; parity/parity.yaml)&quot;
-cargo test --workspace                                     # every test:&lt;crate&gt;::&lt;name&gt;
+# 1. Native acceptance (R5). The gate is `parity/native.tsv`: every used id resolves to an
+#    `action:`, `test:`, `replacement:` or `dropped:` disposition, and the check refuses a
+#    missing or unknown row. The signed contract stays the capability input; the legacy
+#    `probe:` acceptances are a reachability record, NOT the acceptance gate (S00 audit §V2).
+python3 scripts/check-parity.py --require-native
+cargo test --workspace                                     # every test:&lt;crate&gt;::&lt;name&gt; behind an action
 npx playwright install chromium                                          # a clean host has no browser (S12 §6 step 0)
 BASE_URL=&quot;$BASE&quot; npx playwright test -c apps/web/playwright.config.ts   # every e2e:&lt;spec&gt;::&lt;name&gt;, against the deployed app (S12&#39;s config skips its webServer when BASE_URL is set)
+# Reachability record (optional, not the gate): the legacy probes still answer against the
+# deployed app. A probe is evidence the old surface is reachable during the window; it is not
+# what decides acceptance — the native map is.
 yq -r &#39;.[] | select(.status == &quot;used&quot;) | .acceptance | select(test(&quot;^probe:&quot;)) | sub(&quot;^probe:&quot;; &quot;&quot;)&#39; parity/parity.yaml \
   | while read -r m p; do printf &#39;%s %s %s\n&#39; &quot;$(curl -s -o /dev/null -w &#39;%{http_code}&#39; -H &quot;authorization: Bearer $TOK&quot; -X &quot;$m&quot; &quot;$BASE$p&quot;)&quot; &quot;$m&quot; &quot;$p&quot;; done \
   &gt; docs/cutover/evidence/R5-probes.txt
-test &quot;$(yq &#39;[.[] | select(.status == &quot;used&quot;) | select(.acceptance // &quot;&quot; | test(&quot;^probe:&quot;))] | length&#39; parity/parity.yaml)&quot; \
-     -eq &quot;$(wc -l &lt; docs/cutover/evidence/R5-probes.txt | tr -d &#39; &#39;)&quot;     # one row per probe acceptance; empty only when there are none
 ! grep -qE &#39;^(0[0-9][0-9]|5[0-9][0-9]) &#39; docs/cutover/evidence/R5-probes.txt   # no connect failure (000) and no 5xx
-# R5-parity-final.txt still records pass/fail per parity id — the probes above prove reachability,
-# the per-item expectation lives in that file.
+# R5-parity-final.txt records the native disposition per parity id — the probes above prove
+# reachability; the per-item expectation is the native map&#39;s `native` column.
 
 # 2. The new app is alive.
 test &quot;$(curl -s -o /dev/null -w &#39;%{http_code}&#39; &quot;$BASE/health&quot;)&quot; = 200

@@ -5,8 +5,8 @@ The contract is `parity/parity.yaml` (1,300 rows). Its signature is the sha256
 recorded in `parity/SUMMARY.md`; a change to the contract without a re-sign is a
 failure, and so is a schema, id, count or acceptance-form violation.
 
-P2's `parity/native.tsv` maps every `used` id to a native disposition; pass
-`--require-native` once that map exists (the CI job flips it when P2 lands).
+P2's `parity/native.tsv` maps every `used` id to a native disposition; the CI job passes
+`--require-native`, so the map cannot silently lose a row.
 
 Usage: check-parity.py [--require-native] [--self-test]
 """

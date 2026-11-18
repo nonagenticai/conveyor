@@ -16,7 +16,7 @@
 //! a missing row) dead-letters with the audit `failed` and the reason on the row.
 
 use conveyor_actions::eval::graders::{grade_from_judge, judge_model, judge_request};
-use conveyor_actions::invoke::{Authority, InvokeRequest, invoke};
+use conveyor_actions::invoke::{Authority, InvokeRequest, UsageContext, invoke};
 use conveyor_actions::registry::registry;
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
@@ -25,6 +25,7 @@ use conveyor_domain::eval::audit::{
     resolution_line, resolution_shortfall,
 };
 use conveyor_domain::eval::{GraderKind, grade_programmatic};
+use conveyor_domain::inference::CallerKind;
 use conveyor_store as store;
 use conveyor_store::eval::{AuditRow, EvalCase, EvalMetric, ResultRow};
 use serde_json::{Value, json};
@@ -253,8 +254,16 @@ async fn audit_work(
 
     // ── the controls: the answer key and an empty answer through the real graders ───────
     let (oracle, null, oracle_checked) = controls(&facts, &cases, &expected);
-    let (judge_checked, judge_accepted, judge_problems, judge_error) =
-        judge_controls(pool, tenant, app_key, &metrics, &cases, &expected).await?;
+    let (judge_checked, judge_accepted, judge_problems, judge_error) = judge_controls(
+        pool,
+        tenant,
+        app_key,
+        audit.target_run_id,
+        &metrics,
+        &cases,
+        &expected,
+    )
+    .await?;
     let controls = Controls {
         oracle,
         null,
@@ -490,6 +499,7 @@ async fn judge_controls(
     pool: &PgPool,
     tenant: TenantId,
     app_key: &str,
+    eval_run_id: Option<Uuid>,
     metrics: &[EvalMetric],
     cases: &[EvalCase],
     expected: &[Option<Value>],
@@ -561,7 +571,20 @@ async fn judge_controls(
                 trace_id: None,
                 depth: 1,
                 app_key: app_key.to_owned(),
-                usage: None,
+                // S16 W7: the judge-negative probe is an eval call. It names the eval run when
+                // the audit was given one; without it the caller kind still attributes the spend
+                // to the instrument (the same shape `eval_runner`'s judge seam uses).
+                usage: Some(UsageContext {
+                    caller_kind: CallerKind::Eval,
+                    run_id: None,
+                    run_step_id: None,
+                    conversation_turn_id: None,
+                    eval_run_id,
+                    prompt_ref: Some(format!("eval_audit:{}", metric.key)),
+                    prompt_version: None,
+                    prompt_sha256: None,
+                    correlation_id: Some(format!("eval.audit:judge:{:?}", metric.key)),
+                }),
             },
         )
         .await
