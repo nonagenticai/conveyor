@@ -1,6 +1,27 @@
 {
   "issues": [
     {
+      "number": 448,
+      "title": "T16 \u2014 the Procedures destination live over the intake and its gates",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/448",
+      "updatedAt": "2026-11-19T18:20:19Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "T16",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 436,
       "title": "docs: regenerate the design pack after the S14 cutover record so the registry refresh stops failing",
       "state": "CLOSED",
@@ -2982,7 +3003,7 @@
       "title": "T16 \u2014 SOP, RDF/OWL and process-document ingestion",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/85",
-      "updatedAt": "2026-11-19T18:18:22Z",
+      "updatedAt": "2026-11-19T18:40:11Z",
       "labels": [
         {
           "name": "unit",
