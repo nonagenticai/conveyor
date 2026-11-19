@@ -278,7 +278,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 2,
+        "claimed": 3,
         "numbers": [
           17,
           22,
@@ -302,11 +302,13 @@
           394,
           395,
           410,
-          421,
-          422
+          426,
+          433,
+          434,
+          435
         ],
-        "open": 14,
-        "ready": 9,
+        "open": 16,
+        "ready": 8,
         "unknown": 0
       }
     },
@@ -2166,7 +2168,7 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           78,
           170,
@@ -2174,7 +2176,7 @@
           172
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
