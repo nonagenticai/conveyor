@@ -421,7 +421,10 @@
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "toolkits.publish",
     "tools.call",
+    "tools.probe",
+    "tools.usage",
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
@@ -466,5 +469,6 @@
     "youtube.retract",
     "youtube.status",
     "youtube.upload"
-  ]
+  ],
+  "version": 1
 }

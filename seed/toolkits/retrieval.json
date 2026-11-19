@@ -1,0 +1,13 @@
+{
+  "key": "retrieval",
+  "service": "strata_rag",
+  "title": "Pinned-leaf retrieval",
+  "owner": "platform",
+  "auth_adapter": "none",
+  "licence_app": null,
+  "status": "draft",
+  "health_path": "/health",
+  "tools": [
+    { "key": "query", "action": "retrieval.query" }
+  ]
+}

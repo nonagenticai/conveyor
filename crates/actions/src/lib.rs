@@ -42,6 +42,9 @@ pub mod fixtures;
 pub mod governance;
 pub mod handlers;
 pub mod sheets;
+// T14 (#83): the estate import wave, its probe and the zero-use report — the toolkit catalogue
+// `tools.call` resolves against.
+pub mod toolkits;
 // S16: the inference-ledger read surface.
 pub mod inference;
 pub mod ingest;

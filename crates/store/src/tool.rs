@@ -338,3 +338,330 @@ pub async fn calls_for_tool(
     .await?;
     Ok(rows)
 }
+
+// ── T14 (#83): the estate import wave, its probes and the zero-use report ─────────────────────
+//
+// A published toolkit version is an immutable row set: `toolkit` + its `tool` rows. A change in
+// the manifest's content inserts the next `toolkit_version`; it never updates a published row.
+// The only in-place transition is status (draft → published → retired), which is what makes a
+// draft unbound and a retirement safe: `resolve` requires `status = 'published'` on both.
+
+/// One toolkit version.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ToolkitRow {
+    /// The row.
+    pub id: Uuid,
+    /// The callable prefix (`coding`).
+    pub key: String,
+    /// The version this row pins.
+    pub toolkit_version: i64,
+    /// The destination service alias (`coding`).
+    pub service: String,
+    /// The human title.
+    pub title: String,
+    /// Who owns the toolkit.
+    pub owner: String,
+    /// `draft | published | retired`.
+    pub status: String,
+    /// `bearer | none | sealed-profile`.
+    pub auth_adapter: String,
+    /// The licence app, when the toolkit is licence-gated.
+    pub licence_app: Option<String>,
+    /// Free-form data; carries `content_hash` and `health_path`.
+    pub meta: Value,
+}
+
+/// One tool row of a toolkit version.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ToolRow {
+    /// The row.
+    pub id: Uuid,
+    /// The version it belongs to.
+    pub toolkit_id: Uuid,
+    /// The operation key inside the toolkit.
+    pub key: String,
+    /// The registry action the broker dispatches.
+    pub handler_action: String,
+    /// `read | write | spend | destructive`.
+    pub effect: String,
+    /// `draft | published | retired`.
+    pub status: String,
+    /// The closed input schema (a copy of the action's, taken at publish time).
+    pub input_schema: Value,
+}
+
+/// A toolkit version to insert.
+pub struct NewToolkit<'a> {
+    /// The callable prefix.
+    pub key: &'a str,
+    /// The next version for this key.
+    pub toolkit_version: i64,
+    /// The human title.
+    pub title: &'a str,
+    /// The destination service alias.
+    pub service: &'a str,
+    /// `bearer | none | sealed-profile`.
+    pub auth_adapter: &'a str,
+    /// The licence app, when gated.
+    pub licence_app: Option<&'a str>,
+    /// Who owns the toolkit.
+    pub owner: &'a str,
+    /// `draft | published`.
+    pub status: &'a str,
+    /// `content_hash` and `health_path`.
+    pub meta: &'a Value,
+}
+
+/// A tool row to insert under a toolkit version.
+pub struct NewTool<'a> {
+    /// The toolkit version.
+    pub toolkit_id: Uuid,
+    /// The operation key.
+    pub key: &'a str,
+    /// The registry action.
+    pub handler_action: &'a str,
+    /// The closed input schema copied from the action.
+    pub input_schema: &'a Value,
+    /// The effect class copied from the action.
+    pub effect: &'a str,
+    /// 1..=300.
+    pub timeout_secs: i32,
+}
+
+/// The newest version of one toolkit key, whatever its status.
+pub async fn latest_toolkit(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: &str,
+) -> Result<Option<ToolkitRow>, ToolStoreError> {
+    let row: Option<ToolkitRow> = sqlx::query_as(
+        "SELECT id, key, toolkit_version, service, title, owner, status, auth_adapter,
+                licence_app, meta
+           FROM toolkit
+          WHERE tenant_id = $1 AND key = $2
+          ORDER BY toolkit_version DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .fetch_optional(conn)
+    .await?;
+    Ok(row)
+}
+
+/// Every published toolkit version, oldest key first.
+pub async fn published_toolkits(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+) -> Result<Vec<ToolkitRow>, ToolStoreError> {
+    let rows: Vec<ToolkitRow> = sqlx::query_as(
+        "SELECT id, key, toolkit_version, service, title, owner, status, auth_adapter,
+                licence_app, meta
+           FROM toolkit
+          WHERE tenant_id = $1 AND status = 'published'
+          ORDER BY key, toolkit_version",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_all(conn)
+    .await?;
+    Ok(rows)
+}
+
+/// One toolkit version by id.
+pub async fn toolkit_by_id(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<ToolkitRow>, ToolStoreError> {
+    let row: Option<ToolkitRow> = sqlx::query_as(
+        "SELECT id, key, toolkit_version, service, title, owner, status, auth_adapter,
+                licence_app, meta
+           FROM toolkit
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .fetch_optional(conn)
+    .await?;
+    Ok(row)
+}
+
+/// Insert one toolkit version and return its id.
+pub async fn insert_toolkit(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    toolkit: &NewToolkit<'_>,
+) -> Result<Uuid, ToolStoreError> {
+    let (id,): (Uuid,) = sqlx::query_as(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, auth_adapter,
+                              licence_app, owner, status, meta)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit.key)
+    .bind(toolkit.toolkit_version)
+    .bind(toolkit.title)
+    .bind(toolkit.service)
+    .bind(toolkit.auth_adapter)
+    .bind(toolkit.licence_app)
+    .bind(toolkit.owner)
+    .bind(toolkit.status)
+    .bind(toolkit.meta)
+    .fetch_one(conn)
+    .await?;
+    Ok(id)
+}
+
+/// Insert one tool row and return its id.
+pub async fn insert_tool(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    tool: &NewTool<'_>,
+) -> Result<Uuid, ToolStoreError> {
+    let (id,): (Uuid,) = sqlx::query_as(
+        "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,
+                           handler_action, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 'published')
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(tool.toolkit_id)
+    .bind(tool.key)
+    .bind(tool.input_schema)
+    .bind(tool.effect)
+    .bind(tool.timeout_secs)
+    .bind(tool.handler_action)
+    .fetch_one(conn)
+    .await?;
+    Ok(id)
+}
+
+/// Move one toolkit version's status (`draft` → `published` → `retired`).
+pub async fn set_toolkit_status(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    status: &str,
+) -> Result<(), ToolStoreError> {
+    sqlx::query(
+        "UPDATE toolkit SET status = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(status)
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
+/// Every tool row of one toolkit version, key order.
+pub async fn tools_of(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    toolkit_id: Uuid,
+) -> Result<Vec<ToolRow>, ToolStoreError> {
+    let rows: Vec<ToolRow> = sqlx::query_as(
+        "SELECT id, toolkit_id, key, handler_action, effect, status, input_schema
+           FROM tool
+          WHERE tenant_id = $1 AND toolkit_id = $2
+          ORDER BY key",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit_id)
+    .fetch_all(conn)
+    .await?;
+    Ok(rows)
+}
+
+/// Disable every binding of one toolkit version, marking the ones this probe turned off.
+///
+/// The marker matters: a binding an operator disabled by hand must not be re-enabled by a
+/// later green probe. Returns the number of bindings this call disabled.
+pub async fn disable_bindings(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    toolkit_id: Uuid,
+) -> Result<u64, ToolStoreError> {
+    let done = sqlx::query(
+        "UPDATE tool_binding
+            SET enabled = false,
+                meta = meta || jsonb_build_object('probe_disabled', true),
+                version = version + 1,
+                updated_at = now()
+          WHERE tenant_id = $1 AND toolkit_id = $2 AND enabled",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit_id)
+    .execute(conn)
+    .await?
+    .rows_affected();
+    Ok(done)
+}
+
+/// Re-enable only the bindings a failed probe disabled, clearing the marker.
+pub async fn reenable_probe_disabled(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    toolkit_id: Uuid,
+) -> Result<u64, ToolStoreError> {
+    let done = sqlx::query(
+        "UPDATE tool_binding
+            SET enabled = true,
+                meta = meta - 'probe_disabled',
+                version = version + 1,
+                updated_at = now()
+          WHERE tenant_id = $1 AND toolkit_id = $2
+            AND NOT enabled
+            AND meta @> '{\"probe_disabled\": true}'::jsonb",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit_id)
+    .execute(conn)
+    .await?
+    .rows_affected();
+    Ok(done)
+}
+
+/// One row of the zero-use report (§11.9): a published tool version and its calls in a window.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ToolUsageRow {
+    /// The toolkit key.
+    pub toolkit_key: String,
+    /// The operation key.
+    pub tool_key: String,
+    /// The toolkit's owner — who is asked about a zero-use tool.
+    pub owner: String,
+    /// The pinned version the calls were made against.
+    pub toolkit_version: i64,
+    /// Calls inside the window.
+    pub calls: i64,
+    /// The newest call inside the window, when there is one.
+    pub last_call_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+/// Every published tool version with its call count since `since`, zero-use rows included.
+pub async fn usage_since(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    since: chrono::DateTime<chrono::Utc>,
+) -> Result<Vec<ToolUsageRow>, ToolStoreError> {
+    let rows: Vec<ToolUsageRow> = sqlx::query_as(
+        "SELECT k.key AS toolkit_key, t.key AS tool_key, k.owner, k.toolkit_version,
+                count(c.id)::bigint AS calls,
+                max(c.created_at) AS last_call_at
+           FROM tool t
+           JOIN toolkit k ON k.id = t.toolkit_id AND k.tenant_id = t.tenant_id
+           LEFT JOIN tool_call c
+                  ON c.tool_id = t.id AND c.tenant_id = t.tenant_id AND c.created_at >= $2
+          WHERE t.tenant_id = $1 AND t.status = 'published' AND k.status = 'published'
+          GROUP BY k.key, t.key, k.owner, k.toolkit_version, t.id
+          ORDER BY k.key, t.key, k.toolkit_version",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .fetch_all(conn)
+    .await?;
+    Ok(rows)
+}

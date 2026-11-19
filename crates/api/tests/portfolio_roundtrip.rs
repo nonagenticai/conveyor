@@ -337,5 +337,5 @@ fn s08_owns_no_principles_or_decisions_action() {
     // two (`benchmarks:read|write`); S19 added three (`evals:read|write|approve`); S13 added two
     // (`workflows:read|write`); S15 added two (`capabilities:read|write`); T0 added two
     // (`organisation:read|write`); T7 added one (`ops:write`).
-    assert_eq!(conveyor_actions::Scope::ALL.len(), 66);
+    assert_eq!(conveyor_actions::Scope::ALL.len(), 68);
 }

@@ -219,6 +219,10 @@ fn variant_path(kind: &str, value: &str) -> syn::Result<String> {
         ("scope", "secrets:write") => "SecretsWrite",
         ("scope", "integrations:read") => "IntegrationsRead",
         ("scope", "integrations:write") => "IntegrationsWrite",
+        // T14 (SPEC_V2 §11.8–§11.9): the estate toolkit catalogue's pair. Publishing and
+        // probing are platform administration; `tools.call` stays on `runs:write`.
+        ("scope", "tools:read") => "ToolsRead",
+        ("scope", "tools:write") => "ToolsWrite",
         // T7 (SPEC_V2 §11.4): the destructive ops family's one scope, admin-only.
         ("scope", "ops:write") => "OpsWrite",
         ("scope", "processes:read") => "ProcessesRead",

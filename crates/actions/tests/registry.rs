@@ -96,7 +96,7 @@ use serde_json::{Value, json};
 /// **T9 adds 26 internal**: the `architecture.*` family (see the block below `approvals.request`).
 /// **#76 adds 1 internal**: `tools.call`, the tool broker (it dispatches a declared external
 /// action and adds no external target).
-const EXPECTED: [&str; 466] = [
+const EXPECTED: [&str; 469] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -521,7 +521,10 @@ const EXPECTED: [&str; 466] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "toolkits.publish",
     "tools.call",
+    "tools.probe",
+    "tools.usage",
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
@@ -632,7 +635,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 18 — the workbook is produced and parsed in this process.
     // #75 (T4) adds the four `coach.*` actions, all internal: 444 -> 448; external stays 18 —
     // the coach reads and writes this tenant's own rows and starts runs of its own processes.
-    assert_eq!((internal, external), (448, 18));
+    // T14 (#83) adds `toolkits.publish`, `tools.probe` and `tools.usage`, all internal:
+    // 448 -> 451; external stays 18 — they read and write this tenant's own toolkit
+    // catalogue, and the probe's destination is configuration, not a declared action.
+    assert_eq!((internal, external), (451, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
