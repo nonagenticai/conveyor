@@ -1,0 +1,13 @@
+{
+  "key": "image_gen",
+  "service": "image_gen",
+  "title": "Image generation",
+  "owner": "platform",
+  "auth_adapter": "none",
+  "licence_app": null,
+  "status": "published",
+  "health_path": "/health",
+  "tools": [
+    { "key": "generate", "action": "media.generate_image" }
+  ]
+}

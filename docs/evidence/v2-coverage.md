@@ -6,8 +6,8 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | Verdict | Meaning | Count |
 |---|---|---|
 | `exists` | implemented in code and backed by real rows | 43 |
-| `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 7 |
-| `new` | absent | 13 |
+| `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
+| `new` | absent | 12 |
 
 ## Rows
 
@@ -65,7 +65,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:operations` | §10.4 | actions | operations | `exists` | actions: ops.* found (ops.ci_status, ops.deployments, ops.events…) |
 | `actions:analysis` | §10.4 | actions | analysis | `exists` | actions: analyse.* found (analyse.site, analyse.video) |
 | `actions:production` | §10.4 | actions | production | `exists` | actions: produce.* found (produce.script) |
-| `actions:tools` | §10.4 | actions | tools | `new` | actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* absent<br>actions: tools.* absent |
+| `actions:tools` | §10.4 | actions | tools | `extend` | actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.publish)<br>actions: tools.* found (tools.probe, tools.usage) |
 | `actions:memory` | §10.4 | actions | memory | `new` | actions: lessons.* absent |
 | `actions:metrics` | §10.4 | actions | metrics | `new` | actions: metrics.* absent |
 | `destination:Organisation` | §10.5 | destination | Organisation | `exists` | docs/design/v2.js: page 'organisation' registered<br>*The page renders the tenant's live industry, department, job, release and binding rows (T0, #34/#65).* |

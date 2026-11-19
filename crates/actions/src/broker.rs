@@ -53,6 +53,18 @@ fn not_ready(detail: String) -> ActionError {
     ActionError::new(409, "tool_not_ready", detail)
 }
 
+/// A refusal that names the tool blocking the run (SPEC_V2 §11.9; T14).
+///
+/// The `409`'s `errors[]` is the wire form of the report's `blocking[]` — the same mapping
+/// `capability::readiness` uses for its GET, so a caller reads one shape whether the block came
+/// from readiness or from a probe that unbound the tool.
+fn not_ready_tool(tool: &str, detail: String) -> ActionError {
+    ActionError::new(409, "tool_not_ready", detail).with_errors(vec![field(
+        "tool",
+        format!("{tool} is not bound for this run"),
+    )])
+}
+
 fn invalid_tool_input(detail: impl Into<String>, errors: Vec<FieldError>) -> ActionError {
     ActionError::new(422, "tool_input_invalid", detail).with_errors(errors)
 }
@@ -131,10 +143,13 @@ pub(crate) async fn invoke_broker(
             ActionError::internal()
         })?
         .ok_or_else(|| {
-            not_ready(format!(
-                "run {} has no published binding for {}",
-                run.run_id, call.tool
-            ))
+            not_ready_tool(
+                &call.tool,
+                format!(
+                    "run {} has no published binding for {}",
+                    run.run_id, call.tool
+                ),
+            )
         })?;
 
     let effect = Effect::parse(&tool.effect).ok_or_else(|| {

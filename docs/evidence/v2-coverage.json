@@ -14,8 +14,8 @@
   },
   "counts": {
     "exists": 43,
-    "extend": 7,
-    "new": 13
+    "extend": 8,
+    "new": 12
   },
   "rows": [
     {
@@ -567,13 +567,13 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "tools",
-      "verdict": "new",
+      "verdict": "extend",
       "evidence": [
         "actions: tool_authoring.* absent",
         "actions: tool_bindings.* absent",
         "actions: tool_calls.* absent",
-        "actions: toolkits.* absent",
-        "actions: tools.* absent"
+        "actions: toolkits.* found (toolkits.publish)",
+        "actions: tools.* found (tools.probe, tools.usage)"
       ]
     },
     {

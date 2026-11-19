@@ -5447,6 +5447,15 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             409,
         ),
+        // ── T14 (#83): the estate import wave and its health ───────────────────────────────
+        // The publish is content-addressed, so round A creates the versions and round B finds
+        // the same content unchanged; either way both transports replay one execution by key
+        // and must answer the same body. The probe is report-only here (`dry_run`): with no
+        // `CONVEYOR_EXTERNAL_<SERVICE>_URL` in this harness every published toolkit answers
+        // `unconfigured`, which is the engine's deterministic answer without a network call.
+        expecting(plain("toolkits.publish", json!({}), None), 200),
+        expecting(plain("tools.probe", json!({"dry_run": true}), None), 200),
+        expecting(plain("tools.usage", json!({"window_days": 30}), None), 200),
         // ── T9: the architecture capability (#81) ─────────────────────────────────────────
         // Reads anchored on rows the fixture/prepare writes; writes on a fresh row per round.
         expecting(plain("architecture.artifacts_list", json!({}), None), 200),
