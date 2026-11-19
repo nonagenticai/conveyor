@@ -820,6 +820,54 @@ pub async fn conveyor_cost_tx(
     Ok(((inference + tools) * 1_000_000.0).round() / 1_000_000.0)
 }
 
+/// One window's usage, as the conveyor's own ledgers report it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct UsageSummary {
+    /// Derived spend over the window: inference from the price catalogue, tools from the ledger.
+    pub total_usd: f64,
+    /// Model calls recorded in the window.
+    pub inference_calls: i64,
+    /// Tool calls recorded in the window.
+    pub tool_calls: i64,
+}
+
+/// The ledger summary `billing.summary` serves (issue #450; SPEC_V2 §11.3, #46).
+///
+/// The Python billing service is not a conveyor dependency: the figure is the same
+/// [`conveyor_cost_tx`] derivation the reconciliation already trusts, plus the two call counts.
+/// An empty window is a zero with zero calls — never an upstream error.
+pub async fn usage_summary_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+) -> Result<UsageSummary, MetricsStoreError> {
+    let total_usd = conveyor_cost_tx(&mut *conn, tenant, since, until).await?;
+    let inference_calls: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM inference_call
+          WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?;
+    let tool_calls: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM tool_call
+          WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?;
+    Ok(UsageSummary {
+        total_usd,
+        inference_calls,
+        tool_calls,
+    })
+}
+
 // ── flow (P1.1) ─────────────────────────────────────────────────────────────────────────
 
 /// The flow metrics, all read-time aggregates over `card`, `list` and the `card.moved` outbox.

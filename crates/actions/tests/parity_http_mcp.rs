@@ -4199,7 +4199,6 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         // points at the stub; the answer is the same small document on both transports.
         plain("workers.list", json!({}), None),
         plain("providers.list", json!({}), None),
-        plain("graphs.list", json!({}), None),
         plain("artifacts.list", json!({}), None),
         plain("billing.summary", json!({}), None),
         plain("coding_jobs.create", json!({}), None),
@@ -6925,9 +6924,6 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     support::set_env("SANDBOX_NAMESPACE", "swe-bench");
     // S09's external displays: every service resolves to the same stub, whose catch-all answers any path.
     for service in [
-        "worker_management",
-        "artifacts",
-        "billing_service",
         "coding",
         "strata_rag",
         // S10: the copilot's model call.

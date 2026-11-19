@@ -248,7 +248,9 @@ async fn a_publish_is_idempotent_and_a_change_bumps_the_version() {
 
     let first = fixture.publish().await;
     let rows = outcomes(&first);
-    assert_eq!(rows.len(), 8, "one row per embedded manifest: {first}");
+    // #450 removed the three manifests whose actions are internal now (`artifacts`, `billing`,
+    // `worker_management`); a toolkit binds External handlers only.
+    assert_eq!(rows.len(), 5, "one row per embedded manifest: {first}");
     for (key, outcome, version) in &rows {
         assert_eq!(outcome, "created", "{key} on the first publish");
         assert_eq!(*version, 1, "{key} starts at version 1");

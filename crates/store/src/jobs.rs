@@ -519,6 +519,35 @@ pub async fn record_result(
     tx.commit().await
 }
 
+/// One `(kind, status)` bucket of this tenant's durable queue.
+#[derive(Debug, Clone, sqlx::FromRow)]
+pub struct JobCount {
+    /// The job kind (`licence.sync`, `document.ingest`, …).
+    pub kind: String,
+    /// `pending | running | succeeded | failed | dead`.
+    pub status: String,
+    /// How many rows are in the bucket.
+    pub count: i64,
+}
+
+/// The queue's depth per kind and status for one tenant (SPEC_V2 §11.2 — the durable queue IS
+/// the worker inventory the legacy `worker-management` service described).
+pub async fn counts_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+) -> Result<Vec<JobCount>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT kind, status, count(*)::bigint AS count
+           FROM job
+          WHERE tenant_id = $1
+          GROUP BY kind, status
+          ORDER BY kind, status",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_all(conn)
+    .await
+}
+
 fn truncate(error: &str) -> String {
     error.chars().take(MAX_ERROR_CHARS).collect()
 }
