@@ -1,6 +1,27 @@
 {
   "issues": [
     {
+      "number": 400,
+      "title": "publish: the generated snapshot exposes the WBS study tab and its commit fails DCO",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/400",
+      "updatedAt": "2026-11-19T09:35:11Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 395,
       "title": "architecture: the board approves a contract for every delivery project",
       "state": "OPEN",
@@ -56,7 +77,7 @@
       "title": "ci: run the browser suite only when UI code changes",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/392",
-      "updatedAt": "2026-11-19T07:45:52Z",
+      "updatedAt": "2026-11-19T09:06:02Z",
       "labels": [
         {
           "name": "unit",
@@ -174,7 +195,7 @@
       "title": "console: the Architecture capability screen is live \u2014 reads and writes the architecture aggregates",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/385",
-      "updatedAt": "2026-11-19T08:15:31Z",
+      "updatedAt": "2026-11-19T08:46:54Z",
       "labels": [
         {
           "name": "unit",
@@ -206,9 +227,9 @@
     {
       "number": 382,
       "title": "pack: the public snapshot carries only programme-bound projects",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/382",
-      "updatedAt": "2026-11-19T07:22:17Z",
+      "updatedAt": "2026-11-19T09:18:16Z",
       "labels": [
         {
           "name": "unit",
@@ -223,9 +244,9 @@
     {
       "number": 377,
       "title": "ci: gate.sh builds a per-worktree target instead of the guarded one",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/377",
-      "updatedAt": "2026-11-19T07:26:36Z",
+      "updatedAt": "2026-11-19T09:26:57Z",
       "labels": [
         {
           "name": "unit",
@@ -2731,7 +2752,7 @@
       "title": "T11 \u2014 Metrics, metering and maturity",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/84",
-      "updatedAt": "2026-11-19T08:22:42Z",
+      "updatedAt": "2026-11-19T08:45:13Z",
       "labels": [
         {
           "name": "unit",
@@ -2742,10 +2763,6 @@
           "color": "FBCA04"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
-        },
-        {
           "name": "T11",
           "color": "6E7781"
         }
@@ -2754,9 +2771,9 @@
     {
       "number": 83,
       "title": "T14 \u2014 Estate toolkits",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/83",
-      "updatedAt": "2026-11-19T07:49:02Z",
+      "updatedAt": "2026-11-19T09:35:50Z",
       "labels": [
         {
           "name": "unit",
