@@ -445,7 +445,8 @@
           390,
           391,
           392,
-          400
+          400,
+          459
         ],
         "depends_on": [
           "S01",
@@ -984,15 +985,13 @@
         ],
         "plan_status": "draft",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 5,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "gate": "an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable"
@@ -1105,13 +1104,14 @@
       "key": "T11",
       "name": "Metrics, metering and maturity",
       "description": "SPEC_V2 slice T11 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          84
+          84,
+          458
         ],
         "depends_on": [
           "P0"
@@ -1441,7 +1441,6 @@
           223,
           224,
           225,
-          386,
           393,
           394,
           395,
@@ -1450,7 +1449,8 @@
           433,
           434,
           435,
-          450
+          450,
+          462
         ],
         "depends_on": [],
         "plan_status": "active",
