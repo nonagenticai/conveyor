@@ -953,7 +953,7 @@ function runDetail(state, id) {
   };
 }
 
-function startServer({ config, state, snapshot, noSnapshot }) {
+function startServer({ config, state, snapshot, noSnapshot, outputs }) {
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://127.0.0.1");
     const pathname = decodeURIComponent(url.pathname);
@@ -2172,6 +2172,12 @@ function startServer({ config, state, snapshot, noSnapshot }) {
         return res.end("not found");
       }
     }
+    // #386's fixture serves its own published-output index; the committed docs/outputs.js is a
+    // placeholder (null), so the public queue would otherwise have no docs to count.
+    if (pathname === "/docs/outputs.js" && outputs) {
+      res.writeHead(200, { "Content-Type": MIME[".js"] });
+      return res.end("window.CONVEYOR_OUTPUTS = " + JSON.stringify(outputs) + ";");
+    }
     // static pack
     const target = pathname === "/" ? "studio.html" : pathname.replace(/^\/+/, "");
     const file = path.join(pack, target);
@@ -2217,6 +2223,81 @@ function readBody(req, done) {
     config: null,
     state: snapshotState,
     snapshot: SNAPSHOT,
+  });
+  // #386: three projects that isolate the closure-debt rule. C1 is closed and owes one
+  // at-closure category; C2 is closed and complete; A1 is active and owes nothing yet.
+  const closureState = freshState();
+  const closureServer = await startServer({
+    config: null,
+    state: closureState,
+    snapshot: {
+      schema: "design-snapshot/v1",
+      generated_at: "2026-11-19T00:00:00Z",
+      git_sha: "0".repeat(40),
+      tenant: "nonagentic",
+      programme: {
+        projects: [
+          {
+            id: "p-closed-owed",
+            key: "C1",
+            name: "Closed and owes a closure record",
+            status: "closed",
+            programme_id: "prog-1",
+            project_type_code: "delivery",
+            meta: {
+              tranche: 1,
+              expected_outputs: ["project-brief"],
+              closure_outputs: ["evidence", "closure-review"],
+            },
+            version: 1,
+          },
+          {
+            id: "p-closed-done",
+            key: "C2",
+            name: "Closed and complete",
+            status: "closed",
+            programme_id: "prog-1",
+            project_type_code: "delivery",
+            meta: {
+              tranche: 2,
+              expected_outputs: ["project-brief"],
+              closure_outputs: ["evidence"],
+            },
+            version: 1,
+          },
+          {
+            id: "p-active-owed",
+            key: "A1",
+            name: "Active, closure not owed yet",
+            status: "active",
+            programme_id: "prog-1",
+            project_type_code: "delivery",
+            meta: {
+              tranche: 3,
+              expected_outputs: ["project-brief"],
+              closure_outputs: ["evidence"],
+            },
+            version: 1,
+          },
+        ],
+      },
+      organisation: {},
+      config: {},
+      work: {},
+      msp: {},
+      artefacts: [],
+      measure: {},
+    },
+    outputs: {
+      schema: "design-outputs/v1",
+      outputs: [
+        { project_id: "p-closed-owed", category: "project-brief", title: "C1 brief", publishable: true },
+        { project_id: "p-closed-owed", category: "evidence", title: "C1 evidence", publishable: true },
+        { project_id: "p-closed-done", category: "project-brief", title: "C2 brief", publishable: true },
+        { project_id: "p-closed-done", category: "evidence", title: "C2 evidence", publishable: true },
+        { project_id: "p-active-owed", category: "project-brief", title: "A1 brief", publishable: true },
+      ],
+    },
   });
   const consoleState = freshState();
   const signedIn = await startServer({
@@ -2459,6 +2540,46 @@ function readBody(req, done) {
         snapshotState.requests.length,
         0,
         "the snapshot capability makes no API request",
+      );
+      await page.close();
+    }
+
+    /* 1d — #386: a closed project's unpublished at-closure output is debt. */
+    {
+      const page = await browser.newPage();
+      await page.goto(`http://127.0.0.1:${closureServer.port}/studio.html#portfolio`);
+      await page.waitForSelector(".page");
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Programme queue"),
+      );
+      const queue = page.locator("section.e-panel", { hasText: "Programme queue" });
+      const queueText = await queue.innerText();
+      assert.match(
+        queueText,
+        /0 outputs due · 1 closure output owed/,
+        "the queue badge reports the closed project's closure debt",
+      );
+      const owedRow = await queue.locator("tr", { hasText: "C1" }).innerText();
+      assert.match(owedRow, /missing: closure-review/, "the missing at-closure category is named");
+      assert.doesNotMatch(
+        owedRow,
+        /missing: evidence/,
+        "the published at-closure category is not called missing",
+      );
+      assert.doesNotMatch(
+        await queue.locator("tr", { hasText: "C2" }).innerText(),
+        /missing:/,
+        "a closed project whose closure set is published has no debt",
+      );
+      assert.doesNotMatch(
+        await queue.locator("tr", { hasText: "A1" }).innerText(),
+        /missing:/,
+        "an active project's missing at-closure output is not debt",
+      );
+      assert.equal(
+        closureState.requests.length,
+        0,
+        "the public queue reads the snapshot, not the API",
       );
       await page.close();
     }
@@ -3366,6 +3487,7 @@ function readBody(req, done) {
     homepageServer.server.close();
     signedOutServer.server.close();
     snapshotServer.server.close();
+    closureServer.server.close();
     signedIn.server.close();
   }
 })().catch((error) => {

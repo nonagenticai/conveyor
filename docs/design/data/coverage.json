@@ -37,35 +37,35 @@
       "name": "cards.release"
     },
     {
-      "line": 2513,
+      "line": 2529,
       "name": "documents.compose"
     },
     {
-      "line": 3000,
+      "line": 3016,
       "name": "documents.compose"
     },
     {
-      "line": 2795,
+      "line": 2811,
       "name": "documents.create"
     },
     {
-      "line": 2866,
+      "line": 2882,
       "name": "documents.delete"
     },
     {
-      "line": 2812,
+      "line": 2828,
       "name": "documents.download"
     },
     {
-      "line": 2845,
+      "line": 2861,
       "name": "documents.download"
     },
     {
-      "line": 2535,
+      "line": 2551,
       "name": "documents.get"
     },
     {
-      "line": 2830,
+      "line": 2846,
       "name": "documents.get"
     },
     {
@@ -81,23 +81,23 @@
       "name": "documents.list"
     },
     {
-      "line": 2763,
+      "line": 2779,
       "name": "documents.list"
     },
     {
-      "line": 2897,
+      "line": 2913,
       "name": "documents.preview"
     },
     {
-      "line": 2943,
+      "line": 2959,
       "name": "documents.return"
     },
     {
-      "line": 2684,
+      "line": 2700,
       "name": "documents.revision_get"
     },
     {
-      "line": 2645,
+      "line": 2661,
       "name": "documents.revision_list"
     },
     {
@@ -113,15 +113,15 @@
       "name": "programmes.list"
     },
     {
-      "line": 2444,
+      "line": 2460,
       "name": "projects.close"
     },
     {
-      "line": 2327,
+      "line": 2343,
       "name": "projects.create"
     },
     {
-      "line": 2335,
+      "line": 2351,
       "name": "projects.update"
     },
     {
