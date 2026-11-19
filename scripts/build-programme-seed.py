@@ -8,8 +8,11 @@ Sources (all read-only):
   * `docs/plans/slices/S*.md` frontmatter — slice id, title, status, depends_on.
   * `docs/SPEC_V2.md` §12 when present — the T0–T17 slice list; a checked-in fallback is used
     until SPEC_V2 lands on main (issue #24).
-  * `gh issue list --state all` — the unit registry. An issue maps to a project by its `S##`
-    label, its leading `S##`/`T##` title, or one of the explicit cross-cutting assignments.
+  * `docs/design/data/issues.json` — the exported unit registry the public site ships. When it
+    is present it is the ONLY issue source, so the seed and the registry agree by construction.
+    `gh issue list --state all` is the fallback for a checkout that has not fetched it. An issue
+    maps to a project by its `S##` label, its leading `S##`/`T##` title, or one of the explicit
+    cross-cutting assignments.
 
 Run from any directory:
 
@@ -35,6 +38,9 @@ PROGRAMME_KEY = "conveyor-buildout"
 REPO_URL = "https://github.com/nonagenticai/conveyor"
 STANDARD_PATH = ROOT / "seed" / "output-standard.json"
 CONSOLE_STANDARD_PATH = ROOT / "docs" / "design" / "data" / "output-standard.js"
+# The exported registry (`scripts/fetch-issues.sh`). It is the workflow's first step, so reading
+# this file — never a second live `gh` call — is what keeps the seed and the registry identical.
+ISSUES_FILE = ROOT / "docs" / "design" / "data" / "issues.json"
 
 
 def load_standard() -> dict:
@@ -316,6 +322,29 @@ def gh_issues() -> list[dict]:
     return json.loads(raw)
 
 
+def load_issues(path: Path | None) -> list[dict]:
+    """Read the unit registry ONCE.
+
+    An explicit `--issues-file` must exist (a typo is an error, not a silent live read). With
+    no argument the exported registry is used when present; only a checkout that has never
+    fetched it falls back to `gh issue list`. The workflow fetches the file immediately before
+    this script, so its seed and its registry are the same read.
+    """
+    if path is None:
+        path = ISSUES_FILE if ISSUES_FILE.exists() else None
+    if path is not None:
+        if not path.exists():
+            sys.exit(f"build-programme-seed: issue registry {path} does not exist")
+        document = json.loads(path.read_text(encoding="utf-8"))
+        rows = document.get("issues")
+        if not isinstance(rows, list):
+            sys.exit(f"build-programme-seed: {path} has no `issues` list")
+        print(f"build-programme-seed: reading {len(rows)} issues from {path}")
+        return rows
+    print("build-programme-seed: no exported issue registry; reading `gh issue list`")
+    return gh_issues()
+
+
 def explicit_project(issue_number: int) -> str | None:
     """A cross-cutting issue belongs to exactly one project, by number."""
     for key, crossed in CROSS_CUTTING.items():
@@ -371,7 +400,7 @@ def derive_status(project: dict, issues: list[dict], coverage: dict[str, dict]) 
     return "draft"
 
 
-def build() -> dict:
+def build(issues: list[dict]) -> dict:
     projects = slice_projects() + t_slice_projects()
     projects_by_key = {project["key"]: project for project in projects}
 
@@ -389,7 +418,6 @@ def build() -> dict:
         projects.append(project)
         projects_by_key[key] = project
 
-    issues = gh_issues()
     issues_by_number = {issue["number"]: issue for issue in issues}
     issues_by_project: dict[str, list[dict]] = {key: [] for key in projects_by_key}
     unmapped: list[int] = []
@@ -490,13 +518,22 @@ def main() -> None:
     parser.add_argument("--write-docs", action="store_true", help="also write the plan→project header")
     parser.add_argument("--out", default=str(ROOT / "seed/programme.json"))
     parser.add_argument(
+        "--issues-file",
+        default=None,
+        help=(
+            "the exported issue registry (default: docs/design/data/issues.json when present, "
+            "else `gh issue list`)"
+        ),
+    )
+    parser.add_argument(
         "--check",
         action="store_true",
         help="fail when the committed document differs from a fresh build (no write)",
     )
     args = parser.parse_args()
 
-    programme = build()
+    issues = load_issues(Path(args.issues_file) if args.issues_file else None)
+    programme = build(issues)
     std = load_standard()
     console_rendered = render_standard_js(std)
     out = Path(args.out)
