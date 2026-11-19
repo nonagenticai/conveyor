@@ -6015,6 +6015,15 @@ window.installV2 = function (api, enterprise) {
   // A gate is decided by a SECOND person: the requester's session cannot decide its own gate
   // (the store refuses it), so each listed gate carries its own decision control and the
   // decider's session works from the list, not from the requester's `p.gate` slot.
+  function consoleReloadProcGates() {
+    const p = procState();
+    p.gates = [];
+    p.gatesFor = null;
+    const process = procSelected(p);
+    if (process) consoleLoadProcGates(process);
+    render();
+  }
+
   async function consoleProcDecide(approvalId, decision) {
     const p = procState();
     if (!consoleOn() || !approvalId) {
@@ -6394,6 +6403,10 @@ window.installV2 = function (api, enterprise) {
                     ),
                   )
                 : note("No pending or approved gate names this process.")
+            }${
+              C.can("approvals.list")
+                ? `<div class="toolbar">${button("Reload the gates", "proc-gate-reload", "", "small", "replay")}</div>`
+                : ""
             }${note(
               "The requester cannot decide their own gate: a second person decides a listed gate, and publishing then names that approved gate. The approval id and the source are recorded on the released version. A tenant policy that waives the gate publishes without one.",
             )}${procResultPanel(p)}`,
@@ -7627,6 +7640,9 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         break;
       case "proc-gate-procedure":
         consoleProcRequestGate("procedures.publish");
+        break;
+      case "proc-gate-reload":
+        consoleReloadProcGates();
         break;
       case "proc-gate-approve":
         consoleProcDecide(d.id, "approve");
