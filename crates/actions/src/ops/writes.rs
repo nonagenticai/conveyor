@@ -23,7 +23,7 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
 use super::{
-    CheckOut, RequestOut, RestartIn, RollbackIn, ScaleIn, WriteOut, client, items_of,
+    CheckOut, FlagFlipIn, RequestOut, RestartIn, RollbackIn, ScaleIn, WriteOut, client, items_of,
     name_for_target, name_of, refusal,
 };
 
@@ -114,14 +114,14 @@ fn target_of(operation: &str, namespace: &str, deployment: &str, level: Option<&
 // gates what the handler does" true by construction rather than by two implementations agreeing.
 
 /// `ops.restart`'s approval target: this Deployment, restarting.
-fn target_restart(input: &RestartIn) -> Result<String, String> {
+pub(crate) fn target_restart(input: &RestartIn) -> Result<String, String> {
     let namespace = name_for_target("namespace", &input.namespace)?;
     let deployment = name_for_target("deployment", &input.deployment)?;
     Ok(target_of("restart", &namespace, &deployment, None))
 }
 
 /// `ops.scale`'s approval target: this Deployment, at this replica count.
-fn target_scale(input: &ScaleIn) -> Result<String, String> {
+pub(crate) fn target_scale(input: &ScaleIn) -> Result<String, String> {
     let namespace = name_for_target("namespace", &input.namespace)?;
     let deployment = name_for_target("deployment", &input.deployment)?;
     let replicas = input.replicas.to_string();
@@ -132,7 +132,7 @@ fn target_scale(input: &ScaleIn) -> Result<String, String> {
 ///
 /// The level is the revision asked for, or `previous` — the gate must never need a cluster read to
 /// know what it authorises.
-fn target_rollback(input: &RollbackIn) -> Result<String, String> {
+pub(crate) fn target_rollback(input: &RollbackIn) -> Result<String, String> {
     let namespace = name_for_target("namespace", &input.namespace)?;
     let deployment = name_for_target("deployment", &input.deployment)?;
     let level = input
@@ -155,7 +155,7 @@ fn target_rollback(input: &RollbackIn) -> Result<String, String> {
     tenancy = "tenant",
     approval_target = "target_restart"
 )]
-async fn ops_restart(
+pub(crate) async fn ops_restart(
     _tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: RestartIn,
@@ -231,7 +231,7 @@ async fn ops_restart(
     tenancy = "tenant",
     approval_target = "target_scale"
 )]
-async fn ops_scale(
+pub(crate) async fn ops_scale(
     _tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: ScaleIn,
@@ -315,6 +315,15 @@ async fn replicaset_at(
         })
 }
 
+/// A pod template with its `metadata.annotations` removed (see the rollback's read-back).
+fn without_annotations(template: &Value) -> Value {
+    let mut template = template.clone();
+    if let Some(metadata) = template.get_mut("metadata").and_then(Value::as_object_mut) {
+        metadata.remove("annotations");
+    }
+    template
+}
+
 /// `ops.rollback` — restore the pod template of an earlier revision (`kubectl rollout undo`).
 #[crate::action(
     name = "ops.rollback",
@@ -328,7 +337,7 @@ async fn replicaset_at(
     tenancy = "tenant",
     approval_target = "target_rollback"
 )]
-async fn ops_rollback(
+pub(crate) async fn ops_rollback(
     _tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: RollbackIn,
@@ -390,14 +399,193 @@ async fn ops_rollback(
             .unwrap_or(Value::Null);
         checks.push(CheckOut {
             name: "pod_template_restored".to_owned(),
-            ok: restored == template,
-            detail: format!("spec.template equals the template of revision {wanted}"),
+            // A JSON merge-patch cannot REMOVE an annotation, so a template that carries one
+            // written after the target revision (a restart's `restartedAt`, for instance) can
+            // never compare equal — while the pod spec and the labels are exactly what a
+            // rollback restores. Compare those.
+            ok: without_annotations(&restored) == without_annotations(&template),
+            detail: format!(
+                "spec.template (annotations aside) equals the template of revision {wanted}"
+            ),
         });
     }
     Ok(HandlerOutput::ok(WriteOut {
         namespace,
         deployment,
         operation: "rollback".to_owned(),
+        target,
+        approval_id: ctx.approval_id,
+        dry_run: input.dry_run,
+        request,
+        checks,
+    }))
+}
+
+/// `ops.flag_flip`'s approval target: this Deployment, this flag, this value.
+///
+/// The value is part of what the approval authorises: "set FEATURE_X=true" is a different
+/// decision from "set FEATURE_X=false", and a gate that cannot tell them apart authorises both.
+pub(crate) fn target_flag_flip(input: &FlagFlipIn) -> Result<String, String> {
+    let namespace = name_for_target("namespace", &input.namespace)?;
+    let deployment = name_for_target("deployment", &input.deployment)?;
+    let flag = input.flag.trim();
+    if !valid_env_name(flag) {
+        return Err(format!("{flag:?} is not an environment variable name"));
+    }
+    Ok(target_of(
+        "flag_flip",
+        &namespace,
+        &deployment,
+        Some(&format!("{flag}={}", input.value)),
+    ))
+}
+
+/// An environment variable's name: a letter or `_`, then letters, digits or `_`.
+fn valid_env_name(name: &str) -> bool {
+    let mut chars = name.chars();
+    match chars.next() {
+        Some(first) if first.is_ascii_alphabetic() || first == '_' => {}
+        _ => return false,
+    }
+    chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
+}
+
+/// `ops.flag_flip` — set one environment variable on one container of one Deployment.
+///
+/// A feature flag in this estate is an environment variable, so the flip is that env entry and
+/// nothing else. A JSON merge-patch replaces an array wholesale, so the patch carries the whole
+/// `containers` list as read: sending a one-element list would silently drop every other
+/// container — a destructive side effect nobody approved. The read-back names the value the API
+/// actually holds after the write.
+#[crate::action(
+    name = "ops.flag_flip",
+    version = 1,
+    kind = "internal",
+    scopes = ["ops:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "destructive",
+    confirm = "none",
+    tenancy = "tenant",
+    approval_target = "target_flag_flip"
+)]
+pub(crate) async fn ops_flag_flip(
+    _tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: FlagFlipIn,
+) -> Result<HandlerOutput<WriteOut>, ActionError> {
+    let namespace = name_of("namespace", &input.namespace)?;
+    let deployment = name_of("deployment", &input.deployment)?;
+    let flag = input.flag.trim().to_owned();
+    if !valid_env_name(&flag) {
+        return Err(ActionError::new(
+            422,
+            "action-invalid-input",
+            format!("flag: invalid_value: {flag:?} is not an environment variable name"),
+        ));
+    }
+    let target = target_flag_flip(&input)
+        .map_err(|detail| ActionError::new(422, "action-invalid-input", detail))?;
+
+    // Read the object first: the patch must carry the whole containers list, never one element.
+    let observed = read_deployment(&namespace, &deployment).await?;
+    let containers = observed
+        .get("spec")
+        .and_then(|spec| spec.get("template"))
+        .and_then(|template| template.get("spec"))
+        .and_then(|spec| spec.get("containers"))
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    if containers.is_empty() {
+        return Err(ActionError::new(
+            422,
+            "deployment_without_containers",
+            format!("deployment {deployment:?} declares no containers"),
+        ));
+    }
+    let index = match input.container.as_deref().map(str::trim) {
+        Some(name) if !name.is_empty() => containers
+            .iter()
+            .position(|container| container.get("name").and_then(Value::as_str) == Some(name))
+            .ok_or_else(|| {
+                ActionError::new(
+                    422,
+                    "container_not_found",
+                    format!("deployment {deployment:?} has no container {name:?}"),
+                )
+            })?,
+        _ => 0,
+    };
+    let container_name = containers[index]
+        .get("name")
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .to_owned();
+    let mut container = containers[index].clone();
+    let mut env = container
+        .get("env")
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    let mut found = false;
+    for entry in &mut env {
+        if entry.get("name").and_then(Value::as_str) == Some(flag.as_str()) {
+            entry["value"] = json!(input.value.as_str());
+            found = true;
+        }
+    }
+    if !found {
+        env.push(json!({"name": flag, "value": input.value.as_str()}));
+    }
+    container["env"] = Value::Array(env);
+    let mut patched = containers;
+    patched[index] = container;
+
+    let path = format!("{DEPLOYMENTS}/{namespace}/deployments/{deployment}");
+    let body = json!({"spec": {"template": {"spec": {"containers": patched}}}});
+    let request = request_out(input.dry_run, &path, &body);
+    let mut checks = Vec::new();
+    if input.dry_run {
+        checks.push(CheckOut {
+            name: "dry_run".to_owned(),
+            ok: true,
+            detail: "no write was made; the body above is what would be sent".to_owned(),
+        });
+    } else {
+        patch(&namespace, &deployment, false, &body).await?;
+        let after = read_deployment(&namespace, &deployment).await?;
+        let applied = after
+            .get("spec")
+            .and_then(|spec| spec.get("template"))
+            .and_then(|template| template.get("spec"))
+            .and_then(|spec| spec.get("containers"))
+            .and_then(Value::as_array)
+            .and_then(|containers| {
+                containers.iter().find(|container| {
+                    container.get("name").and_then(Value::as_str) == Some(container_name.as_str())
+                })
+            })
+            .and_then(|container| container.get("env"))
+            .and_then(Value::as_array)
+            .and_then(|env| {
+                env.iter()
+                    .find(|entry| entry.get("name").and_then(Value::as_str) == Some(flag.as_str()))
+            })
+            .and_then(|entry| entry.get("value"))
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned();
+        checks.push(CheckOut {
+            name: "env_value".to_owned(),
+            ok: applied == input.value,
+            detail: format!("env[{flag}] = {applied:?}"),
+        });
+    }
+    Ok(HandlerOutput::ok(WriteOut {
+        namespace,
+        deployment,
+        operation: "flag_flip".to_owned(),
         target,
         approval_id: ctx.approval_id,
         dry_run: input.dry_run,
