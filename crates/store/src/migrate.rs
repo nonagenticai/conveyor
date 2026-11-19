@@ -231,7 +231,10 @@ mod tests {
                 (56, "cadence tranche".to_owned()),
                 // #75 (T4): the kanban coach — the interruption record with its per-signature
                 // open index, and the append-only remedy (0057_coach.sql, SPEC_V2 §6.2).
-                (57, "coach".to_owned())
+                (57, "coach".to_owned()),
+                // T11 (#84): the versioned C0–C5 threshold configuration and the billing
+                // reconciliation record (0058_metrics.sql, SPEC_V2 §7.5, §15.1 D37/D50/D52).
+                (58, "metrics".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
