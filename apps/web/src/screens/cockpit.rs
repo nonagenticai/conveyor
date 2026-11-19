@@ -112,46 +112,61 @@ pub fn Cockpit() -> impl IntoView {
         });
     });
 
+    // #375: the body must survive a refetch. `match data.get()` re-created the whole subtree —
+    // the Save button included — on every new value, so an SSE refresh that landed while someone
+    // was editing detached the control under the pointer. The last good value now lives in
+    // `body`; `CockpitBody` is created once and every region inside it reads `body` reactively,
+    // so a refresh updates text and lists in place instead of remounting the screen.
+    let body = RwSignal::new(None::<CockpitData>);
+    let body_error = RwSignal::new(None::<ApiError>);
+    Effect::new(move |_| match data.get() {
+        None => {}
+        Some(Ok(next)) => {
+            body.set(Some(next));
+            body_error.set(None);
+        }
+        Some(Err(error)) => body_error.set(Some(error)),
+    });
+
     let retry = Callback::new(move |_| data.refetch());
     view! {
-        {move || match data.get() {
-            None => view! { <p class="muted">"Loading the card…"</p> }.into_any(),
-            Some(Err(error)) => view! { <ErrorPanel error=error on_retry=retry/> }.into_any(),
-            Some(Ok(cockpit)) => view! { <CockpitBody data=cockpit resource=data/> }.into_any(),
-        }}
+        <Show when=move || body.get().is_none() && body_error.get().is_none()>
+            <p class="muted">"Loading the card…"</p>
+        </Show>
+        {move || body_error.get().map(|error| view! {
+            <ErrorPanel error=error on_retry=retry/>
+        })}
+        <Show when=move || body.get().is_some() && body_error.get().is_none()>
+            <CockpitBody data=body resource=data/>
+        </Show>
     }
 }
 
+// `data` is the last fetched cockpit value, read reactively: this component is created once per
+// card, and a refetch updates its regions in place (#375).
 #[component]
 fn CockpitBody(
-    data: CockpitData,
+    data: RwSignal<CockpitData>,
     resource: LocalResource<Result<CockpitData, ApiError>>,
 ) -> impl IntoView {
     let ctx = expect_context::<AppCtx>();
     let me = ctx.me.get().map(|me| me.principal.id);
-    let card = data.card.card;
-    let labels = data.card.labels;
-    let comments = data.card.comments;
-    let runs = data.runs;
-    let approvals = data.approvals;
-    let policies = data.policies;
-    let card_for_actions = card.clone();
-    let card_description = card.description.clone();
-    let claimed_by_me = card.assignee_id.is_some() && card.assignee_id == me;
-    let card_for_claim = card_for_actions.clone();
-    let card_for_release = card_for_actions.clone();
-    let card_for_run = card_for_actions.clone();
+    // The claim controls read it in one closure and the decisions list in another; both are
+    // `move` closures created here, so each takes its own copy.
+    let me_for_decisions = me.clone();
 
     // The card edit is a small inline form: title + description under the row's own If-Match.
     // A 412 is the caller's stale read, so the screen refetches rather than guessing a version.
+    // The draft and the version it is based on are captured when the form OPENS — a refetch that
+    // lands mid-edit changes neither, which is the other half of #375.
     let can_edit = ctx.has_action("cards.update");
     let editing = RwSignal::new(false);
-    let name_draft = RwSignal::new(card_for_actions.name.clone());
-    let description_draft = RwSignal::new(card_for_actions.description.clone());
-    let edit_id = card_for_actions.id.clone();
-    let edit_version = card_for_actions.version;
+    let opening = data.get_untracked().card.card;
+    let name_draft = RwSignal::new(opening.name.clone());
+    let description_draft = RwSignal::new(opening.description.clone());
+    let base_version = RwSignal::new(opening.version);
     let save_edit = move |_| {
-        let id = edit_id.clone();
+        let current = data.get_untracked().card.card;
         let name = name_draft.get_untracked().trim().to_owned();
         let description = description_draft.get_untracked();
         if name.is_empty() {
@@ -161,9 +176,9 @@ fn CockpitBody(
             match ctx
                 .invoke(
                     "cards.update",
-                    json!({ "id": id, "name": name, "description": description }),
+                    json!({ "id": current.id, "name": name, "description": description }),
                     InvokeOptions {
-                        if_match: Some(edit_version),
+                        if_match: Some(base_version.get_untracked()),
                         idempotency_key: None,
                         approval_id: None,
                     },
@@ -178,28 +193,41 @@ fn CockpitBody(
             }
         });
     };
+    let toggle_edit = move |_| {
+        editing.update(|on| {
+            if !*on {
+                let current = data.get_untracked().card.card;
+                base_version.set(current.version);
+                name_draft.set(current.name.clone());
+                description_draft.set(current.description.clone());
+            }
+            *on = !*on;
+        });
+    };
 
     let claim = move |_| {
+        let current = data.get_untracked().card.card;
         act(
             ctx,
             resource,
             "cards.claim",
-            json!({ "card_id": card_for_claim.id.clone() }),
-            Some(card_for_claim.version),
+            json!({ "card_id": current.id }),
+            Some(current.version),
         );
     };
     let release = move |_| {
+        let current = data.get_untracked().card.card;
         act(
             ctx,
             resource,
             "cards.release",
-            json!({ "card_id": card_for_release.id.clone() }),
+            json!({ "card_id": current.id }),
             None,
         );
     };
     let new_run = move |_| {
         let ctx = ctx;
-        let card_id = card_for_run.id.clone();
+        let card_id = data.get_untracked().card.card.id;
         leptos::task::spawn_local(async move {
             match ctx
                 .invoke(
@@ -236,25 +264,30 @@ fn CockpitBody(
             <header class="screen-head">
                 <div>
                     <p class="muted"><A href="/boards">"Board"</A>" / card"</p>
-                    <h1>{card.name.clone()}</h1>
+                    <h1>{move || data.get().card.card.name.clone()}</h1>
                     <p class="muted">
-                        {card.card_type_code.clone()}
-                        " · list " {short(&card.list_id)}
-                        " · updated " {age(card.updated_at)}
+                        {move || data.get().card.card.card_type_code.clone()}
+                        " · list " {move || short(&data.get().card.card.list_id)}
+                        " · updated " {move || age(data.get().card.card.updated_at)}
                     </p>
                 </div>
                 <div class="actions">
                     {can_edit.then(|| view! {
-                        <button class="btn" on:click=move |_| editing.update(|on| *on = !*on)>
+                        <button class="btn" on:click=toggle_edit>
                             {move || if editing.get() { "Cancel" } else { "Edit" }}
                         </button>
                     })}
-                    {(!claimed_by_me).then(|| view! {
-                        <button class="btn" on:click=claim>"Claim"</button>
-                    })}
-                    {claimed_by_me.then(|| view! {
-                        <button class="btn" on:click=release>"Release"</button>
-                    })}
+                    {move || {
+                        let card = data.get().card.card;
+                        let mine = card.assignee_id.is_some() && card.assignee_id == me;
+                        if mine {
+                            view! { <button class="btn" on:click=release.clone()>"Release"</button> }
+                                .into_any()
+                        } else {
+                            view! { <button class="btn" on:click=claim.clone()>"Claim"</button> }
+                                .into_any()
+                        }
+                    }}
                     <button class="btn primary" on:click=new_run>"New run"</button>
                 </div>
             </header>
@@ -262,47 +295,60 @@ fn CockpitBody(
             <div class="grid-2">
                 <section class="panel">
                     <div class="panel-head"><h2>"The card"</h2></div>
-                    {move || if editing.get() {
-                        view! {
-                            <div class="form">
-                                <label class="filter">
-                                    <span>"Title"</span>
-                                    <input
-                                        type="text"
-                                        prop:value=move || name_draft.get()
-                                        on:input=move |event| name_draft.set(event_target_value(&event))
-                                    />
-                                </label>
-                                <label class="filter">
-                                    <span>"Description"</span>
-                                    <textarea
-                                        rows="4"
-                                        prop:value=move || description_draft.get()
-                                        on:input=move |event| description_draft.set(event_target_value(&event))
-                                    ></textarea>
-                                </label>
-                                <button class="btn primary" on:click=save_edit.clone()>"Save"</button>
-                            </div>
-                        }.into_any()
-                    } else if card_description.trim().is_empty() {
-                        view! { <p class="muted">"No description yet."</p> }.into_any()
-                    } else {
-                        view! { <p class="card-description">{card_description.clone()}</p> }.into_any()
-                    }}
+                    // The form is gated on `editing` ALONE. It must never depend on `data`, or a
+                    // refetch would re-create the Save button under the pointer (#375).
+                    <Show
+                        when=move || editing.get()
+                        fallback=move || {
+                            let description = data.get().card.card.description.clone();
+                            if description.trim().is_empty() {
+                                view! { <p class="muted">"No description yet."</p> }.into_any()
+                            } else {
+                                view! { <p class="card-description">{description}</p> }.into_any()
+                            }
+                        }
+                    >
+                        <div class="form">
+                            <label class="filter">
+                                <span>"Title"</span>
+                                <input
+                                    type="text"
+                                    prop:value=move || name_draft.get()
+                                    on:input=move |event| name_draft.set(event_target_value(&event))
+                                />
+                            </label>
+                            <label class="filter">
+                                <span>"Description"</span>
+                                <textarea
+                                    rows="4"
+                                    prop:value=move || description_draft.get()
+                                    on:input=move |event| description_draft.set(event_target_value(&event))
+                                ></textarea>
+                            </label>
+                            <button class="btn primary" on:click=save_edit.clone()>"Save"</button>
+                        </div>
+                    </Show>
                     <div class="labels">
-                        {labels.into_iter().map(|label| view! {
+                        {move || data.get().card.labels.into_iter().map(|label| view! {
                             <span class="label">{label.name}</span>
                         }).collect_view()}
                     </div>
-                    <span class="adv mono">{format!("card {} · v{}", card.id, card.version)}</span>
+                    <span class="adv mono">{move || {
+                        let card = data.get().card.card;
+                        format!("card {} · v{}", card.id, card.version)
+                    }}</span>
                 </section>
 
                 <section class="panel">
                     <div class="panel-head">
                         <h2>"Decisions"</h2>
-                        <span class="count">{approvals.iter().filter(|approval| approval.status == "pending").count()}</span>
+                        <span class="count">{move || data.get().approvals.iter().filter(|approval| approval.status == "pending").count()}</span>
                     </div>
-                    {if approvals.is_empty() {
+                    {move || {
+                        let approvals = data.get().approvals;
+                        let policies = data.get().policies;
+                        let me = me_for_decisions.clone();
+                        if approvals.is_empty() {
                         view! { <Empty message="No approval gates on this card.".to_owned()/> }.into_any()
                     } else {
                         view! {
@@ -376,16 +422,18 @@ fn CockpitBody(
                                 }).collect_view()}
                             </div>
                         }.into_any()
+                        }
                     }}
                 </section>
             </div>
-
             <section class="panel">
                 <div class="panel-head">
                     <h2>"Runs"</h2>
-                    <span class="count">{runs.len()}</span>
+                    <span class="count">{move || data.get().runs.len()}</span>
                 </div>
-                {if runs.is_empty() {
+                {move || {
+                    let runs = data.get().runs;
+                    if runs.is_empty() {
                     view! { <Empty message="No runs yet. New run creates and starts one.".to_owned()/> }.into_any()
                 } else {
                     view! {
@@ -418,15 +466,18 @@ fn CockpitBody(
                             }).collect_view()}
                         </div>
                     }.into_any()
+                    }
                 }}
             </section>
 
             <section class="panel">
                 <div class="panel-head">
                     <h2>"Comments"</h2>
-                    <span class="count">{comments.len()}</span>
+                    <span class="count">{move || data.get().card.comments.len()}</span>
                 </div>
-                {if comments.is_empty() {
+                {move || {
+                    let comments = data.get().card.comments;
+                    if comments.is_empty() {
                     view! { <Empty message="No comments.".to_owned()/> }.into_any()
                 } else {
                     view! {
@@ -442,6 +493,7 @@ fn CockpitBody(
                             }).collect_view()}
                         </div>
                     }.into_any()
+                    }
                 }}
             </section>
         </section>
