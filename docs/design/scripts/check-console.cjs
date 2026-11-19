@@ -953,7 +953,7 @@ function runDetail(state, id) {
   };
 }
 
-function startServer({ config, state, snapshot, noSnapshot, outputs }) {
+function startServer({ config, state, snapshot, outputs }) {
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://127.0.0.1");
     const pathname = decodeURIComponent(url.pathname);
@@ -2160,17 +2160,15 @@ function startServer({ config, state, snapshot, noSnapshot, outputs }) {
       return json(res, 404, { title: "Not Found", detail: `no stub route for ${pathname}` });
     }
     if (pathname === "/data/snapshot.js") {
+      res.writeHead(200, { "Content-Type": MIME[".js"] });
       if (snapshot) {
-        res.writeHead(200, { "Content-Type": MIME[".js"] });
         return res.end("window.CONVEYOR_SNAPSHOT = " + JSON.stringify(snapshot) + ";");
       }
-      // Case 1 is the no-snapshot shape, even when the working tree is a publish branch whose
-      // generated data/snapshot.js is the live payload. Letting the static pack answer here made
-      // the "no snapshot" fixture load a real one and demand the WBS tab not exist (#400).
-      if (noSnapshot) {
-        res.writeHead(404, { "Content-Type": "text/plain" });
-        return res.end("not found");
-      }
+      // Every fixture that is not the explicit with-snapshot shape sees the placeholder. On a
+      // publish branch the pack itself carries a generated, live payload; letting the static
+      // file answer made the no-snapshot fixtures load it (#400: the WBS tab; #459: the
+      // signed-out "No published snapshot is loaded" and the 401 fallback).
+      return res.end("window.CONVEYOR_SNAPSHOT = null;");
     }
     // #386's fixture serves its own published-output index; the committed docs/outputs.js is a
     // placeholder (null), so the public queue would otherwise have no docs to count.
@@ -2210,9 +2208,7 @@ function readBody(req, done) {
   });
 
   const homepage = freshState();
-  // The homepage/file:// shape is defined as "no published snapshot"; on a publish branch the
-  // generated data/snapshot.js must not turn this fixture into the with-snapshot shape (#400).
-  const homepageServer = await startServer({ config: null, state: homepage, noSnapshot: true });
+  const homepageServer = await startServer({ config: null, state: homepage });
   const signedOutState = freshState();
   const signedOutServer = await startServer({
     config: { issuer: "https://auth.example/realms/conveyor", client_id: "conveyor-web", dev_auth: false },
