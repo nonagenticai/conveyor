@@ -24,6 +24,7 @@
       >
     </header>
     <main class="doc-body"><p>⚠️ <strong>Amended 2026-11-09 (process model).</strong> The start path is <code>projects.create</code> (the fr webhook is retired, not re-pointed); the Redis bus is part of the deployed stack (<code>conveyor-redis</code>, no PVC); the trace-diff source is the process trace (<code>run_step</code>), and the <code>workflow</code> table is dropped by <code>0034</code> after this slice's dump. The decommission order is unchanged.</p>
+<p>⚠️ <strong>Executed 2026-11-18.</strong> The sweep (fr, kanban, requirements, workers — namespaces, databases, pg_cron, alerts, image automation) ran in gitops-production #5333 ahead of its 2026-11-30 gate under owner approval; the legacy n8n deployment was decommissioned after its T+14 dump. The checks below that named those objects are historical records and now assert absence.</p>
 <h1 id="s14--cutover">S14 — Cutover</h1>
 <p>Programme project: S14 · issues #18, #44</p>
 <h2 id="1-objective">1. Objective</h2>
@@ -41,7 +42,7 @@
 <tr>
 <td>P1</td>
 <td>S13 closed</td>
-<td><code>ssh -i ~/.ssh/deploy-key admin@192.0.2.10 "sudo -u postgres psql -d n8n -Atc 'select count(*) from workflow_entity where \"activeVersionId\" is not null'"</code> → <code>0</code> — <strong>S13's close deactivates every flow it replaces, so 0 is produced there, not here</strong>; <code>parity/n8n-dispositions.tsv</code> (S13's deliverable) has 348 rows</td>
+<td><strong>Historical (executed 2026-11-18):</strong> S13's close deactivated every flow it replaces, so the count was 0 before this slice; the n8n database was dumped at T+14 and deleted with its namespace (measured 2026-11-19: <code>select datname from pg_database where datname='n8n'</code> → no row). <code>parity/n8n-dispositions.tsv</code> (S13's deliverable) has 348 rows</td>
 </tr>
 <tr>
 <td>P2</td>
@@ -74,7 +75,7 @@
 <p>⚠️ <strong>P2 proves S06b's tool contract, not the one live at T0.</strong> The agent platform is developed in parallel on another machine. Before step 14, import the deployed conveyor's <code>/mcp</code> tool list into a scratch tenant and diff the resulting op keys and schemas against S06b's evidence. A difference is a cutover decision to record, never a silent pass — the agent platform is stranded by a renamed tool or a changed schema, not by a 500.</p>
 <h2 id="3-scope">3. Scope</h2>
 <p><strong>IN:</strong> archived-repo decision; repo + CI; namespace/service/DB/roles/PgBouncer/secret; ImagePolicy; ingress; Keycloak realm/clients; licence; <code>migrate --seed</code>; rehearsals R1–R4; cutover T0; the agent's conveyor registration; decommission of <code>fr</code>/<code>requirements</code>/<code>kanban</code>; dump + restore test; rollback rehearsal and runbook.</p>
-<p><strong>OUT:</strong> data migration (D7 — nothing is copied; the conveyor starts empty); <code>mcp_server</code> (stays as the gateway for the agent platform's other backends; only its <code>fr</code> toolkit retires); <code>agent</code> (it changes only its conveyor registration and credential); <code>licenses</code>/<code>billing_service</code>/<code>coding-*</code> (external, D12/D14); the <code>n8n</code> deployment's removal (flows retired at S13; the idle process stays, see §9.9); <code>kata-n8n</code>.</p>
+<p><strong>OUT:</strong> data migration (D7 — nothing is copied; the conveyor starts empty); <code>mcp_server</code> (stays as the gateway for the agent platform's other backends; only its <code>fr</code> toolkit retires); <code>agent</code> (it changes only its conveyor registration and credential); <code>licenses</code>/<code>billing_service</code>/<code>coding-*</code> (external, D12/D14); the <code>n8n</code> deployment's removal (flows retired at S13; decommissioned after its T+14 dump, see §9.9); <code>kata-n8n</code>.</p>
 <h2 id="4-source-material">4. Source material</h2>
 <table>
 <thead>
@@ -252,8 +253,8 @@ test &quot;$(curl -s -o /dev/null -w &#39;%{http_code}&#39; -X POST &quot;$BASE/
 test &quot;$(curl -s -o /tmp/andon-release.json -w &#39;%{http_code}&#39; -X POST &quot;$BASE/api/actions/andon.release/invocations&quot; -H &quot;content-type: application/json&quot; \
       -H &quot;authorization: Bearer $TOK&quot; -d &#39;{&quot;input&quot;:{}}&#39;)&quot; = 200 &amp;&amp; jq -e . /tmp/andon-release.json &gt;/dev/null
 
-# 4. The legacy n8n deployment still exists and this gauge still tracks it (idle, not decommissioned).
-test -n &quot;$(kubectl -n n8n get deploy n8n-worker -o name)&quot;
+# 4. The legacy n8n deployment is DECOMMISSIONED: the namespace and its database are gone.
+test -z &quot;$(kubectl get ns n8n --ignore-not-found -o name)&quot;   # prints nothing
 
 # 5. No path still reaches fr / RM / Planka — object absence, not belief.
 test -z &quot;$(kubectl get ns fr requirements kanban --ignore-not-found -o name)&quot;   # prints nothing
@@ -291,7 +292,7 @@ test -s docs/cutover/evidence/R4-rollback.md     # rollback executed once, timed
 <li>Rehearsal evidence is numbered <code>R1</code>–<code>R4</code>, cutover <code>R5</code>–<code>R7</code>, under <code>docs/cutover/evidence/</code>.</li>
 <li>The andon gate is the conveyor's <code>andon_state</code>; it does <strong>not</strong> rely on the fr UI, which is gone.</li>
 <li>Freeze date = the SPEC approval date (2026-11-07); <code>freeze-log.md</code> starts there.</li>
-<li>The legacy <code>n8n</code> deployment stays idle, undecommissioned (flows died at S13; DB dumped at T+14).</li>
+<li>The legacy <code>n8n</code> deployment was decommissioned after its T+14 dump (flows died at S13); measured 2026-11-19, its namespace and its database are both absent.</li>
 </ol>
 <h2 id="10-open-questions">10. Open questions</h2>
 <ol type="1">

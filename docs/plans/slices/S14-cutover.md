@@ -1,7 +1,7 @@
 ---
 slice: S14
 title: Cutover — deploy, seed, rehearse, decommission fr / RM / Planka
-status: planned
+status: executed (2026-11-18; gitops-production #5333; n8n decommissioned after its T+14 dump — measured 2026-11-19: namespace and DB absent)
 depends_on: [S00, S06b, S12, S13]
 spec_sections: ["§3 D1/D7/D8/D13/D16", "§4.5", "§8 S14", "§9", "§11 R7/R9/R11"]
 adds_tables: []
@@ -12,6 +12,8 @@ parity_ids: ALL-USED (parity/parity.yaml)
 ---
 
 ⚠️ **Amended 2026-11-09 (process model).** The start path is `projects.create` (the fr webhook is retired, not re-pointed); the Redis bus is part of the deployed stack (`conveyor-redis`, no PVC); the trace-diff source is the process trace (`run_step`), and the `workflow` table is dropped by `0034` after this slice's dump. The decommission order is unchanged.
+
+⚠️ **Executed 2026-11-18.** The sweep (fr, kanban, requirements, workers — namespaces, databases, pg_cron, alerts, image automation) ran in gitops-production #5333 ahead of its 2026-11-30 gate under owner approval; the legacy n8n deployment was decommissioned after its T+14 dump. The checks below that named those objects are historical records and now assert absence.
 
 # S14 — Cutover
 
@@ -27,7 +29,7 @@ task, and fr / requirements_management / Planka decommissioned — each dumped f
 
 | # | Precondition | Check — paste output into `R0-preflight.txt` |
 |---|---|---|
-| P1 | S13 closed | `ssh -i ~/.ssh/deploy-key admin@192.0.2.10 "sudo -u postgres psql -d n8n -Atc 'select count(*) from workflow_entity where \"activeVersionId\" is not null'"` → `0` — **S13's close deactivates every flow it replaces, so 0 is produced there, not here**; `parity/n8n-dispositions.tsv` (S13's deliverable) has 348 rows |
+| P1 | S13 closed | **Historical (executed 2026-11-18):** S13's close deactivated every flow it replaces, so the count was 0 before this slice; the n8n database was dumped at T+14 and deleted with its namespace (measured 2026-11-19: `select datname from pg_database where datname='n8n'` → no row). `parity/n8n-dispositions.tsv` (S13's deliverable) has 348 rows |
 | P2 | S06b closed | `docs/evidence/S06b-agent-task.md` exists with a `run_id`, a project id and one decided approval, plus the imported tool keys (`projects.create`, not `tool.*`) |
 | P3 | the contract and its native map | `python3 scripts/check-parity.py --require-native` green: the signed `parity/parity.yaml` is the capability input and `parity/native.tsv` is the acceptance gate — every `used` id carries an `action:` / `test:` / `replacement:` / `dropped:` disposition. The legacy `probe:` acceptances are reachability evidence, not the gate |
 | P4 | Old system frozen (D8) | `docs/cutover/freeze-log.md` exists, its freeze date is set, and every fr/RM/`kanban` commit merged since has a disposition (`absorbed` / `not-applicable` / `dropped`) |
@@ -51,7 +53,7 @@ decommission of `fr`/`requirements`/`kanban`; dump + restore test; rollback rehe
 **OUT:** data migration (D7 — nothing is copied; the conveyor starts empty); `mcp_server` (stays as the gateway for
 the agent platform's other backends; only its `fr` toolkit retires); `agent` (it changes only its conveyor
 registration and credential); `licenses`/`billing_service`/`coding-*` (external, D12/D14); the `n8n` deployment's
-removal (flows retired at S13; the idle process stays, see §9.9); `kata-n8n`.
+removal (flows retired at S13; decommissioned after its T+14 dump, see §9.9); `kata-n8n`.
 
 ## 4. Source material
 
@@ -199,8 +201,8 @@ test "$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE/api/actions/runs.c
 test "$(curl -s -o /tmp/andon-release.json -w '%{http_code}' -X POST "$BASE/api/actions/andon.release/invocations" -H "content-type: application/json" \
       -H "authorization: Bearer $TOK" -d '{"input":{}}')" = 200 && jq -e . /tmp/andon-release.json >/dev/null
 
-# 4. The legacy n8n deployment still exists and this gauge still tracks it (idle, not decommissioned).
-test -n "$(kubectl -n n8n get deploy n8n-worker -o name)"
+# 4. The legacy n8n deployment is DECOMMISSIONED: the namespace and its database are gone.
+test -z "$(kubectl get ns n8n --ignore-not-found -o name)"   # prints nothing
 
 # 5. No path still reaches fr / RM / Planka — object absence, not belief.
 test -z "$(kubectl get ns fr requirements kanban --ignore-not-found -o name)"   # prints nothing
@@ -250,7 +252,7 @@ Loki is a **24 h sample**: it can never prove completeness. Only object absence 
 6. Rehearsal evidence is numbered `R1`–`R4`, cutover `R5`–`R7`, under `docs/cutover/evidence/`.
 7. The andon gate is the conveyor's `andon_state`; it does **not** rely on the fr UI, which is gone.
 8. Freeze date = the SPEC approval date (2026-11-07); `freeze-log.md` starts there.
-9. The legacy `n8n` deployment stays idle, undecommissioned (flows died at S13; DB dumped at T+14).
+9. The legacy `n8n` deployment was decommissioned after its T+14 dump (flows died at S13); measured 2026-11-19, its namespace and its database are both absent.
 
 ## 10. Open questions
 

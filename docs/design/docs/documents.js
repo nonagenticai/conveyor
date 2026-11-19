@@ -780,8 +780,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S14-cutover.html",
       "source": "docs/plans/slices/S14-cutover.md",
       "section": "Plans",
-      "sha256": "e7d97b40dbaa00956b639db017551eff4f5d3ca137b0108b77ed865ed47305dd",
-      "bytes": 22901,
+      "sha256": "58ed33a4f895ab284e17a7d8894f0066012bb6cfb67ff5fe5fa7006406d341c4",
+      "bytes": 23511,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S14-cutover.md"
     },
     {
