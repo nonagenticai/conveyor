@@ -83,8 +83,37 @@ async fn seed_programme_links_the_registered_issues() {
     // The public repo re-created every issue, so these numbers are the PUBLIC ones. The authority
     // is `docs/design/data/issues.json` (the exported registry) → `seed/programme.json`
     // (`scripts/build-programme-seed.py`); this assertion must follow it, never the retired
-    // private numbering ([16, 41, 42, 43] / [38] before the flip).
-    assert_eq!(issues, serde_json::json!([6, 26, 27, 28, 370]));
+    // private numbering ([16, 41, 42, 43] / [38] before the flip). Derived, not hardcoded: every
+    // new S12-labelled or S12-titled unit must join the set without editing this test.
+    let registry: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../docs/design/data/issues.json"
+        ))
+        .expect("the exported issue registry"),
+    )
+    .expect("the registry is JSON");
+    let mut expected: Vec<i64> = registry["issues"]
+        .as_array()
+        .expect("issues")
+        .iter()
+        .filter(|issue| {
+            let labelled = issue["labels"].as_array().is_some_and(|labels| {
+                labels
+                    .iter()
+                    .any(|label| label["name"].as_str() == Some("S12"))
+            });
+            // `scripts/build-programme-seed.py` also links a unit by its title prefix.
+            let titled = issue["title"].as_str().is_some_and(|title| {
+                let title = title.trim_start();
+                title.starts_with("S12 ") || title.starts_with("S12:") || title.starts_with("S12 —")
+            });
+            labelled || titled
+        })
+        .filter_map(|issue| issue["number"].as_i64())
+        .collect();
+    expected.sort_unstable();
+    assert_eq!(issues, serde_json::json!(expected));
 
     let spec: serde_json::Value = sqlx::query_scalar(
         "SELECT meta -> 'issues' FROM project WHERE tenant_id = $1 AND key = 'SPEC-V2'",
