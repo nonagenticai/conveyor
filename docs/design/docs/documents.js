@@ -218,6 +218,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-18-evidence-review-cutover.md"
     },
     {
+      "title": "The console's live engine proof (A5) — 2026-11-19 (#97)",
+      "path": "docs/evidence/2026-11-19-console-live-engine.html",
+      "source": "docs/evidence/2026-11-19-console-live-engine.md",
+      "section": "Evidence",
+      "sha256": "4c48e32f1b37ed25893cc87174797043a9d4ba5fcdabf546435ad7bd971c5e69",
+      "bytes": 1882,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-19-console-live-engine.md"
+    },
+    {
       "title": "The start agent completes READY — 2026-11-19 (#383)",
       "path": "docs/evidence/2026-11-19-start-agent-ready.html",
       "source": "docs/evidence/2026-11-19-start-agent-ready.md",

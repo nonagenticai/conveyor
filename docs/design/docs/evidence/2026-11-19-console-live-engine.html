@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The console's live engine proof (A5) — 2026-11-19 (#97) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-19-console-live-engine.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-consoles-live-engine-proof-a5--2026-11-19-97">The console's live engine proof (A5) — 2026-11-19 (#97)</h1>
+<p>Measured against the deployed revision through the operator CLI — the same <code>POST /api/actions/&lt;name&gt;/invocations</code> contract the console calls. There is no headless browser token, and browser-only flows are out of scope per the issue.</p>
+<h2 id="prerequisites-measured">Prerequisites (measured)</h2>
+<ul>
+<li>Pod <code>CONVEYOR_GIT_SHA=f14b7d36…</code>, image <code>sha256:3695374…</code> (2026-11-19).</li>
+<li>The 2026-11-15 credential blocker <strong>predated #160</strong>: the tenant's inference endpoint is registered (<code>https://api.nonagentic.ai/inference-router</code>) and the calls below succeed. No entitlement change was needed.</li>
+</ul>
+<h2 id="a51--a-real-inference-call">A5.1 — a real inference call</h2>
+<p>The engine called <code>inference.chat</code> on every agent turn: 12 invocations on run <code>01a1f2ac-1e68-7687-bb8d-b17383e6644b</code>, all <code>outcome=ok</code> (<code>model=served_model=local-llm</code>), and one on the proof run below. Each ledger row carries its run and step.</p>
+<h2 id="a52--a-throwaway-project-and-its-root-run">A5.2 — a throwaway project and its root run</h2>
+<p>Project <code>A5-ENGINE-PROOF-2026-11-19D</code> (<code>project_type_code: it</code>), run <code>01a1f359-e318-747f-8324-b82b49db43bc</code>. The run has three <code>run_step</code> rows and <code>runs.list</code> lists it.</p>
+<h2 id="a53--the-first-agent-step">A5.3 — the first agent step</h2>
+<p>Step 1 <code>agent.run</code> <strong>succeeded</strong>: judge accept (score 0.8361) against <code>[brief_unchanged, scope_is_stated, answer_is_the_analysis]</code>. The resolved tool surface is <strong>empty by design</strong> — #383 (agent v4) makes the model answer in one turn; the process composes the document as step 2. The composed document is the analysis artefact; step 3 moved the card.</p>
+<h2 id="the-blocking-failure-that-was-recorded-then-fixed">The blocking failure that was recorded, then fixed</h2>
+<p>Before #383, step 1 failed <code>agent.turn_limit</code> after 12 turns of refused tool calls (run <code>01a1f2ac-1e68-7687-bb8d-b17383e6644b</code>). #383 fixed it in database content; the run above is after that fix, and its evidence is on #414.</p>
+<h2 id="result">Result</h2>
+<p>A5.1 PASS · A5.2 PASS · A5.3 PASS. The throwaway projects (A/B/C/D) are closed.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-19-console-live-engine.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
