@@ -1617,22 +1617,25 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/metrics",
+        "crates/domain/src/metrics.rs",
+        "crates/store/src/metrics.rs",
+        "migrations/0059_metrics.sql"
       ],
-      "gap": "no metrics roll-ups, metering drill-down or billing reconciliation (continuous)",
+      "gap": null,
       "key": "T11",
       "measured": {
         "actions": [
-          0,
-          0
+          8,
+          8
         ],
         "modules": [
-          0,
-          0
+          3,
+          3
         ],
         "tables": [
-          0,
-          0
+          2,
+          2
         ]
       },
       "name": "Metrics, metering and maturity",
@@ -1641,7 +1644,7 @@
         "T1"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 1,
       "units": {
@@ -1657,7 +1660,6 @@
     },
     {
       "blocked_by": [
-        "T11",
         "T15",
         "T16",
         "T17",
@@ -2509,10 +2511,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 36,
+        "built": 37,
         "partial": 2,
         "planned": 0,
-        "proposed": 8,
+        "proposed": 7,
         "standing": 1
       },
       "total": 48,

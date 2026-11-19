@@ -201,10 +201,26 @@
       "gap": null
     },
     "T11": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "actions": [
+        "metrics.flow",
+        "metrics.job",
+        "metrics.maturity",
+        "metrics.programme",
+        "metrics.reconcile",
+        "metrics.threshold_get",
+        "metrics.threshold_update",
+        "metrics.usage"
       ],
-      "gap": "no metrics roll-ups, metering drill-down or billing reconciliation (continuous)"
+      "modules": [
+        "crates/actions/src/metrics",
+        "crates/domain/src/metrics.rs",
+        "crates/store/src/metrics.rs"
+      ],
+      "tables": [
+        "metric_reconciliation",
+        "metric_threshold"
+      ],
+      "gap": null
     },
     "T12": {
       "evidence": [
