@@ -254,6 +254,23 @@ impl GitHub {
         })
     }
 
+    /// The token's own user: `login` and numeric `id`. The publish commit is attributed to this
+    /// identity by the GitHub API, so its DCO trailer has to name the same account.
+    pub async fn user_identity(&self) -> Result<(String, u64), GitHubError> {
+        let value = self
+            .send(self.request(Method::GET, "/user"), "user")
+            .await?;
+        let login = value
+            .get("login")
+            .and_then(Value::as_str)
+            .filter(|login| !login.is_empty())
+            .ok_or_else(|| GitHubError::Protocol("the token's user has no login".to_owned()))?;
+        let id = value.get("id").and_then(Value::as_u64).ok_or_else(|| {
+            GitHubError::Protocol("the token's user has no numeric id".to_owned())
+        })?;
+        Ok((login.to_owned(), id))
+    }
+
     /// The commit SHA a branch points at.
     pub async fn branch_head(&self, repo: &RepoRef, branch: &str) -> Result<String, GitHubError> {
         let value = self

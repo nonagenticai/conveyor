@@ -606,7 +606,7 @@ function runDetail(state, id) {
   };
 }
 
-function startServer({ config, state, snapshot }) {
+function startServer({ config, state, snapshot, noSnapshot }) {
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://127.0.0.1");
     const pathname = decodeURIComponent(url.pathname);
@@ -1748,9 +1748,18 @@ function startServer({ config, state, snapshot }) {
       }
       return json(res, 404, { title: "Not Found", detail: `no stub route for ${pathname}` });
     }
-    if (pathname === "/data/snapshot.js" && snapshot) {
-      res.writeHead(200, { "Content-Type": MIME[".js"] });
-      return res.end("window.CONVEYOR_SNAPSHOT = " + JSON.stringify(snapshot) + ";");
+    if (pathname === "/data/snapshot.js") {
+      if (snapshot) {
+        res.writeHead(200, { "Content-Type": MIME[".js"] });
+        return res.end("window.CONVEYOR_SNAPSHOT = " + JSON.stringify(snapshot) + ";");
+      }
+      // Case 1 is the no-snapshot shape, even when the working tree is a publish branch whose
+      // generated data/snapshot.js is the live payload. Letting the static pack answer here made
+      // the "no snapshot" fixture load a real one and demand the WBS tab not exist (#400).
+      if (noSnapshot) {
+        res.writeHead(404, { "Content-Type": "text/plain" });
+        return res.end("not found");
+      }
     }
     // static pack
     const target = pathname === "/" ? "studio.html" : pathname.replace(/^\/+/, "");
@@ -1784,7 +1793,9 @@ function readBody(req, done) {
   });
 
   const homepage = freshState();
-  const homepageServer = await startServer({ config: null, state: homepage });
+  // The homepage/file:// shape is defined as "no published snapshot"; on a publish branch the
+  // generated data/snapshot.js must not turn this fixture into the with-snapshot shape (#400).
+  const homepageServer = await startServer({ config: null, state: homepage, noSnapshot: true });
   const signedOutState = freshState();
   const signedOutServer = await startServer({
     config: { issuer: "https://auth.example/realms/conveyor", client_id: "conveyor-web", dev_auth: false },
