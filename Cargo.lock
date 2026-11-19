@@ -988,7 +988,7 @@ dependencies = [
  "conveyor-auth",
  "conveyor-domain",
  "conveyor-platform",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "jsonwebtoken",
  "metrics-exporter-prometheus",
  "reqwest",
