@@ -76,6 +76,10 @@ struct Cached {
 enum LivePath {
     /// `/design/data/snapshot.js`
     Snapshot,
+    /// `/design/data/programme.json` — the programme section, downloadable.
+    Programme,
+    /// `/design/data/programme.csv` — the same rows as CSV.
+    ProgrammeCsv,
     /// `/design/docs/outputs.js`
     Outputs,
     /// `/design/docs/output-<uuid>.html`
@@ -90,6 +94,8 @@ enum LivePath {
 fn live_path(path: &str) -> Option<LivePath> {
     match path {
         "/design/data/snapshot.js" => return Some(LivePath::Snapshot),
+        "/design/data/programme.json" => return Some(LivePath::Programme),
+        "/design/data/programme.csv" => return Some(LivePath::ProgrammeCsv),
         "/design/docs/outputs.js" => return Some(LivePath::Outputs),
         _ => {}
     }
@@ -150,6 +156,14 @@ async fn answer(state: &AppState, live: LivePath, head: bool, headers: &HeaderMa
         LivePath::Snapshot => (
             view.snapshot_js.as_bytes(),
             "application/javascript; charset=utf-8",
+        ),
+        LivePath::Programme => (
+            view.programme_json.as_bytes(),
+            "application/json; charset=utf-8",
+        ),
+        LivePath::ProgrammeCsv => (
+            view.programme_csv.as_bytes(),
+            "text/csv; charset=utf-8",
         ),
         LivePath::Outputs => (
             view.outputs_js.as_bytes(),

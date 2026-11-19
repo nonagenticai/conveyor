@@ -231,6 +231,21 @@ if (fs.existsSync(studioPath)) {
   }
 }
 
+// #433: the programme's download contract. `programme.json` is served live from the tenant's
+// rows and is never a committed file, so this asserts the page's links, not a payload.
+const v2Path = path.join(root, "v2.js");
+if (fs.existsSync(v2Path)) {
+  const v2 = fs.readFileSync(v2Path, "utf8");
+  const downloads = ['href="data/programme.json"', 'href="data/programme.csv"'].filter((href) =>
+    v2.includes(href),
+  );
+  if (downloads.length === 2) {
+    ok("v2.js links the programme downloads");
+  } else {
+    bad(`v2.js must link data/programme.json and data/programme.csv (found ${downloads.length}/2)`);
+  }
+}
+
 report();
 
 function report() {

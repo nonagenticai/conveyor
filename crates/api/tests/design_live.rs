@@ -354,6 +354,54 @@ async fn public_bytes_are_redacted_and_inert() {
     assert!(index.contains("[redacted-token]"), "{index}");
 }
 
+/// #433: the programme is downloadable — the same rows the page renders, as JSON and as CSV.
+#[tokio::test(flavor = "multi_thread")]
+async fn the_programme_is_downloadable_as_json_and_csv() {
+    let pg = support::Pg::fresh().await;
+    support::seed(&pg, "public", "alice", "Alice").await;
+    let running =
+        support::Running::start_with_config(config_with_public_tenant(&pg, "public")).await;
+
+    let response = get(&running, "/design/data/programme.json").await;
+    assert_eq!(response.status(), 200);
+    assert_eq!(
+        response
+            .headers()
+            .get("content-type")
+            .and_then(|value| value.to_str().ok()),
+        Some("application/json; charset=utf-8")
+    );
+    let body: serde_json::Value = response.json().await.expect("programme json");
+    assert_eq!(body["schema"], "design-snapshot/v1", "{body}");
+    assert!(body["generated_at"].is_string(), "{body}");
+    assert!(body["projects"].is_array(), "{body}");
+    assert!(
+        body["issue_registry"]["issues"].is_array(),
+        "the download carries the issue registry the page joins against: {body}"
+    );
+
+    let response = get(&running, "/design/data/programme.csv").await;
+    assert_eq!(response.status(), 200);
+    assert_eq!(
+        response
+            .headers()
+            .get("content-type")
+            .and_then(|value| value.to_str().ok()),
+        Some("text/csv; charset=utf-8")
+    );
+    let text = response.text().await.expect("programme csv");
+    let mut lines = text.lines();
+    assert_eq!(
+        lines.next(),
+        Some("key,name,tranche,status,blocked_by,units_open,units_claimed,issues,evidence")
+    );
+    assert_eq!(
+        lines.count(),
+        0,
+        "this tenant has no programme project, so the download is the header alone"
+    );
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn no_public_tenant_is_a_closed_window() {
     let pg = support::Pg::fresh().await;
@@ -362,6 +410,8 @@ async fn no_public_tenant_is_a_closed_window() {
 
     for path in [
         "/design/data/snapshot.js",
+        "/design/data/programme.json",
+        "/design/data/programme.csv",
         "/design/docs/outputs.js",
         "/design/docs/output-00000000-0000-0000-0000-000000000000.html",
     ] {

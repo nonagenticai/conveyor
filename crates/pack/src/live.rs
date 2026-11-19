@@ -24,7 +24,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::outputs::{PublishOutputsError, render_outputs};
-use crate::snapshot::{SnapshotError, feedback_issues, redact_text, snapshot_js};
+use crate::snapshot::{SnapshotError, feedback_issues, redact_text, section_json, snapshot_js};
 
 /// The clock an empty tenant reports: a constant, so the bytes never depend on the request time.
 pub const EMPTY_GENERATED_AT: &str = "1970-01-01T00:00:00Z";
@@ -37,6 +37,11 @@ pub struct SiteView {
     pub snapshot_js: String,
     /// `window.CONVEYOR_OUTPUTS = {…};` — the published-output index.
     pub outputs_js: String,
+    /// `/design/data/programme.json` — the programme section as the standalone file the CLI
+    /// writes, so a reader can download the same rows the page renders.
+    pub programme_json: String,
+    /// `/design/data/programme.csv` — the same projects, one line each.
+    pub programme_csv: String,
     /// One rendered page per published output, by document id.
     pub pages: HashMap<Uuid, String>,
     /// The newest published document's `updated_at`, or [`EMPTY_GENERATED_AT`].
@@ -102,6 +107,10 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
         &generated_at,
         args.git_sha,
     )?;
+    // The downloadable pair, from the same section the page renders — one header, one redaction
+    // pass, so the file and the page cannot disagree.
+    let programme_json = section_json(&data.programme, &generated_at)?;
+    let programme_csv = programme_csv(&data.programme);
 
     // Apply the snapshot's safety net to the one free text the public site renders from a
     // document row. The rows themselves come from a query that selects explicit columns.
@@ -128,9 +137,145 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
     Ok(SiteView {
         snapshot_js,
         outputs_js,
+        programme_json,
+        programme_csv,
         pages,
         generated_at,
     })
+}
+
+/// The programme's projects as CSV — the download for a reader who does not want the JSON.
+///
+/// Columns: `key,name,tranche,status,blocked_by,units_open,units_claimed,issues,evidence`.
+/// `blocked_by` names the declared dependencies that are not `closed`; unit counts come from the
+/// committed issue registry the programme section carries. Ordered by key, like the JSON.
+pub(crate) fn programme_csv(programme: &Value) -> String {
+    const HEADER: &str =
+        "key,name,tranche,status,blocked_by,units_open,units_claimed,issues,evidence";
+    let empty = Vec::new();
+    let projects = programme
+        .get("projects")
+        .and_then(Value::as_array)
+        .unwrap_or(&empty);
+    let registry = programme
+        .get("issue_registry")
+        .and_then(|registry| registry.get("issues"))
+        .and_then(Value::as_array)
+        .unwrap_or(&empty);
+    let by_number: HashMap<i64, &Value> = registry
+        .iter()
+        .filter_map(|issue| Some((issue.get("number")?.as_i64()?, issue)))
+        .collect();
+    let status_by_key: HashMap<&str, &str> = projects
+        .iter()
+        .filter_map(|project| {
+            Some((
+                project.get("key")?.as_str()?,
+                project.get("status")?.as_str()?,
+            ))
+        })
+        .collect();
+
+    let mut out = String::from(HEADER);
+    out.push('\n');
+    for project in projects {
+        let key = project.get("key").and_then(Value::as_str).unwrap_or_default();
+        let meta = project.get("meta").cloned().unwrap_or(Value::Null);
+        let strings = |field: &str| -> Vec<String> {
+            meta.get(field)
+                .and_then(Value::as_array)
+                .map(|rows| {
+                    rows.iter()
+                        .filter_map(Value::as_str)
+                        .map(str::to_owned)
+                        .collect()
+                })
+                .unwrap_or_default()
+        };
+        let numbers: Vec<i64> = meta
+            .get("issues")
+            .and_then(Value::as_array)
+            .map(|rows| rows.iter().filter_map(Value::as_i64).collect())
+            .unwrap_or_default();
+
+        let depends_on = strings("depends_on");
+        let blocked_by: Vec<&str> = depends_on
+            .iter()
+            .map(String::as_str)
+            .filter(|dependency| status_by_key.get(dependency).copied() != Some("closed"))
+            .collect();
+        let mut open = 0;
+        let mut claimed = 0;
+        for number in &numbers {
+            let Some(issue) = by_number.get(number) else {
+                continue;
+            };
+            if issue.get("state").and_then(Value::as_str) == Some("OPEN") {
+                open += 1;
+                let is_claimed = issue
+                    .get("labels")
+                    .and_then(Value::as_array)
+                    .map(|labels| {
+                        labels.iter().any(|label| {
+                            label.get("name").and_then(Value::as_str) == Some("status:claimed")
+                        })
+                    })
+                    .unwrap_or(false);
+                if is_claimed {
+                    claimed += 1;
+                }
+            }
+        }
+        let issues: Vec<String> = numbers.iter().map(|number| format!("#{number}")).collect();
+        let fields = [
+            key.to_owned(),
+            project
+                .get("name")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned(),
+            meta.get("tranche").map(tranche_text).unwrap_or_default(),
+            project
+                .get("status")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned(),
+            blocked_by.join(";"),
+            open.to_string(),
+            claimed.to_string(),
+            issues.join(";"),
+            meta.get("plan")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned(),
+        ];
+        out.push_str(
+            &fields
+                .iter()
+                .map(|field| csv_field(field))
+                .collect::<Vec<_>>()
+                .join(","),
+        );
+        out.push('\n');
+    }
+    out
+}
+
+fn tranche_text(value: &Value) -> String {
+    value
+        .as_i64()
+        .map(|number| number.to_string())
+        .or_else(|| value.as_str().map(str::to_owned))
+        .unwrap_or_default()
+}
+
+/// RFC 4180 quoting: a field with a comma, a quote or a newline is quoted and its quotes doubled.
+fn csv_field(field: &str) -> String {
+    if field.contains(|character| matches!(character, ',' | '"' | '\n' | '\r')) {
+        format!("\"{}\"", field.replace('"', "\"\""))
+    } else {
+        field.to_owned()
+    }
 }
 
 /// The newest published document's timestamp, or the empty-tenant constant.
@@ -162,6 +307,43 @@ mod tests {
     #[test]
     fn an_empty_tenant_has_a_constant_clock() {
         assert_eq!(generated_at(&[]), EMPTY_GENERATED_AT);
+    }
+
+    /// The download's shape: one header, one line per project, blockers and unit counts derived.
+    #[test]
+    fn the_programme_csv_names_the_blockers_and_counts_the_units() {
+        let programme = serde_json::json!({
+            "projects": [
+                {"key": "A", "name": "Closed, with a comma", "status": "closed",
+                 "meta": {"tranche": 1, "depends_on": [], "issues": [], "plan": "docs/a.md"}},
+                {"key": "B", "name": "Draft", "status": "draft",
+                 "meta": {"tranche": 2, "depends_on": ["A", "C"], "issues": [2, 3],
+                          "plan": "docs/b.md"}},
+                {"key": "C", "name": "Also draft", "status": "draft",
+                 "meta": {"tranche": 3, "depends_on": [], "issues": [], "plan": "docs/c.md"}},
+            ],
+            "issue_registry": {"issues": [
+                {"number": 2, "state": "OPEN", "labels": [{"name": "status:claimed"}]},
+                {"number": 3, "state": "CLOSED", "labels": []},
+            ]},
+        });
+        let csv = programme_csv(&programme);
+        let lines: Vec<&str> = csv.lines().collect();
+        assert_eq!(
+            lines[0],
+            "key,name,tranche,status,blocked_by,units_open,units_claimed,issues,evidence"
+        );
+        assert_eq!(lines.len(), 4, "header plus three projects");
+        assert_eq!(
+            lines[1],
+            "A,\"Closed, with a comma\",1,closed,,0,0,,docs/a.md",
+            "a comma is quoted; a closed dependency does not block"
+        );
+        assert_eq!(
+            lines[2],
+            "B,Draft,2,draft,C,1,1,#2;#3,docs/b.md",
+            "only the unfinished dependency blocks; the open claimed unit counts"
+        );
     }
 
     /// P2.1 of #382: an unbound project's page row and published documents are not public.

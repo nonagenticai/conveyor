@@ -493,6 +493,12 @@ output grade; S06d is 0037 in the merged lane.
 
 ## Slices
 
+> ⚠️ **This table is the build record of the 2026-11-07/08 planning passes, not live status.**
+> Live delivery status is derived once — GitHub issue state, then the design pack's coverage,
+> then the plan frontmatter (`scripts/programme_state.py`) — and published as the tracked
+> programme issue (#435, label `programme`), `https://conveyor.nonagentic.ai/design/data/programme.json`
+> and `…/programme.csv`. A "remaining" note here may be stale; the issue is not.
+
 | # | Plan | Slice | Depends on | Closes with | Status |
 |---|---|---|---|---|---|
 | S00 | [`slices/S00-usage-inventory.md`](slices/S00-usage-inventory.md) | Usage inventory → `parity.yaml` | contract | feature list signed; zero-usage dropped | **signed 2026-11-08** — 1,300 surfaces (218 used / 295 rare / 543 unused / 244 dropped) in `parity/`; `SUMMARY.md` FINAL |
