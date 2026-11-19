@@ -135,6 +135,24 @@ def render(seed: dict, issues: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def changed_projects(old_body: str, new_body: str) -> list[str]:
+    """The project keys whose row text differs. The run summary names them, so a reader can see
+    what moved without opening the issue."""
+
+    def rows(body: str) -> dict[str, str]:
+        found: dict[str, str] = {}
+        for line in body.splitlines():
+            if not line.startswith("| ") or line.count("|") < 7:
+                continue
+            key = line.split("|")[1].strip()
+            if key and key != "Key":
+                found[key] = line
+        return found
+
+    before, after = rows(old_body), rows(new_body)
+    return sorted(key for key in set(before) | set(after) if before.get(key) != after.get(key))
+
+
 def current_body(number: int) -> str:
     out = subprocess.run(
         ["gh", "issue", "view", str(number), "--repo", REPO, "--json", "body"],
@@ -217,6 +235,7 @@ def main() -> None:
         return
 
     if args.update is not None:
+        before = current_body(args.update)
         subprocess.run(
             [
                 "gh",
@@ -232,7 +251,11 @@ def main() -> None:
             text=True,
             check=True,
         )
-        print(f"build-programme-view: updated issue #{args.update}")
+        moved = changed_projects(before, body)
+        print(
+            f"build-programme-view: updated issue #{args.update}; "
+            + (f"changed: {', '.join(moved)}" if moved else "no project row changed")
+        )
         return
 
     if args.sync:
@@ -246,7 +269,8 @@ def main() -> None:
             )
             print(f"build-programme-view: created and pinned issue #{number}")
             return
-        if current_body(number).strip() == body.strip():
+        before = current_body(number)
+        if before.strip() == body.strip():
             print(f"build-programme-view: issue #{number} is current")
             return
         subprocess.run(
@@ -255,7 +279,11 @@ def main() -> None:
             text=True,
             check=True,
         )
-        print(f"build-programme-view: updated issue #{number}")
+        moved = changed_projects(before, body)
+        print(
+            f"build-programme-view: updated issue #{number}; "
+            + (f"changed: {', '.join(moved)}" if moved else "no project row changed")
+        )
         return
 
     sys.stdout.write(body)
