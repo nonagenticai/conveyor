@@ -51,6 +51,15 @@ struct FieldBrief {
     kind: String,
 }
 
+/// One active `project_type` catalogue row the New-project form may offer. `catalogues.list`
+/// returns the full row; this screen needs the code and its label.
+#[derive(Clone, Debug, Deserialize)]
+struct CatalogueEntry {
+    code: String,
+    #[serde(default)]
+    label: String,
+}
+
 /// The board screen's shared, mutable state. It lives in `BoardScreen`, above the render that
 /// the resource drives, so an appended card page and an open edit survive a re-render.
 #[derive(Clone)]
@@ -111,6 +120,25 @@ async fn load_projects(client: Client, cursor: Option<String>) -> Result<Project
         views,
         next_cursor: page.next_cursor,
     })
+}
+
+/// The tenant's active project types. The catalogue is the server's own vocabulary; the form
+/// offers what it answers instead of a guessed default (production has no `delivery` row — #389).
+async fn load_project_types(client: Client) -> Result<Vec<CatalogueEntry>, ApiError> {
+    let invocation = client
+        .invoke(
+            "catalogues.list",
+            json!({ "kind": "project_type", "include_inactive": false, "limit": 50 }),
+            InvokeOptions {
+                if_match: None,
+                idempotency_key: None,
+                approval_id: None,
+            },
+        )
+        .await?;
+    let page: Page<CatalogueEntry> = serde_json::from_value(invocation.output)
+        .map_err(|error| ApiError::Network(format!("catalogues: {error}")))?;
+    Ok(page.items)
 }
 
 async fn load_cards(
@@ -219,9 +247,24 @@ pub fn BoardIndex() -> impl IntoView {
     });
 
     let title = RwSignal::new(String::new());
-    let project_type = RwSignal::new("delivery".to_owned());
+    // #389: empty until the catalogue answers; the form never offers a code it did not read.
+    let project_type = RwSignal::new(String::new());
     let description = RwSignal::new(String::new());
     let creating = RwSignal::new(false);
+
+    let project_types = LocalResource::new(move || {
+        let _tenant = ctx.tenant.get();
+        async move { load_project_types(ctx.client()).await }
+    });
+    Effect::new(move |_| {
+        if let Some(Ok(types)) = project_types.get() {
+            if project_type.get_untracked().is_empty() {
+                if let Some(first) = types.first() {
+                    project_type.set(first.code.clone());
+                }
+            }
+        }
+    });
 
     let load_more = move |_| {
         let Some(next) = cursor.get_untracked() else {
@@ -255,11 +298,15 @@ pub fn BoardIndex() -> impl IntoView {
             return;
         }
         let kind = project_type.get_untracked().trim().to_owned();
-        let text = description.get_untracked().trim().to_owned();
-        let mut input = json!({ "title": name });
-        if !kind.is_empty() {
-            input["project_type_code"] = json!(kind);
+        if kind.is_empty() {
+            warn(
+                ctx,
+                "No active project type is available; an administrator must import the catalogue.",
+            );
+            return;
         }
+        let text = description.get_untracked().trim().to_owned();
+        let mut input = json!({ "title": name, "project_type_code": kind });
         if !text.is_empty() {
             input["description"] = json!(text);
         }
@@ -305,11 +352,51 @@ pub fn BoardIndex() -> impl IntoView {
                         </label>
                         <label class="filter">
                             <span>"Project type"</span>
-                            <input
-                                prop:value=move || project_type.get()
-                                on:input=move |event| project_type.set(event_target_value(&event))
-                                placeholder="delivery"
-                            />
+                            {move || match project_types.get() {
+                                None => view! {
+                                    <select disabled=true>
+                                        <option>"Loading project types…"</option>
+                                    </select>
+                                }
+                                .into_any(),
+                                Some(Err(error)) => view! {
+                                    <select disabled=true>
+                                        <option>{format!("Unavailable: {error}")}</option>
+                                    </select>
+                                }
+                                .into_any(),
+                                Some(Ok(types)) if types.is_empty() => view! {
+                                    <select disabled=true>
+                                        <option>"No active project type — import the catalogue"</option>
+                                    </select>
+                                }
+                                .into_any(),
+                                Some(Ok(types)) => view! {
+                                    <select on:change=move |event| project_type.set(event_target_value(&event))>
+                                        {types
+                                            .into_iter()
+                                            .map(|entry| {
+                                                let code = entry.code.clone();
+                                                let selected_code = code.clone();
+                                                let label = if entry.label.is_empty() {
+                                                    entry.code.clone()
+                                                } else {
+                                                    entry.label.clone()
+                                                };
+                                                view! {
+                                                    <option
+                                                        value=code
+                                                        selected=move || project_type.get() == selected_code
+                                                    >
+                                                        {label}
+                                                    </option>
+                                                }
+                                            })
+                                            .collect_view()}
+                                    </select>
+                                }
+                                .into_any(),
+                            }}
                         </label>
                         <label class="filter">
                             <span>"Project description"</span>
@@ -319,7 +406,11 @@ pub fn BoardIndex() -> impl IntoView {
                                 placeholder="What this project delivers"
                             />
                         </label>
-                        <button class="btn primary" type="submit" disabled=move || creating.get()>
+                        <button
+                            class="btn primary"
+                            type="submit"
+                            disabled=move || creating.get() || project_type.get().is_empty()
+                        >
                             {move || if creating.get() { "Creating…" } else { "Create project" }}
                         </button>
                     </div>
