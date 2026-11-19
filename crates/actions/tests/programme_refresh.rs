@@ -36,16 +36,17 @@ async fn a_refresh_applies_the_embedded_seed_and_a_second_is_all_skipped() {
     assert_eq!(output(&body)["created"], 49, "{body}");
     assert_eq!(output(&body)["updated"], 0, "{body}");
     assert_eq!(output(&body)["skipped"], 0, "{body}");
+    // The archived project (S06a) is skipped by design; the other 47 get their board.
     assert_eq!(
-        output(&body)["boards_created"], 48,
-        "every seeded project gets its board: {body}"
+        output(&body)["boards_created"], 47,
+        "every non-archived seeded project gets its board: {body}"
     );
 
     let projects: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM project WHERE tenant_id = $1 AND meta ? 'track'",
     )
     .bind(seeded.tenant_id)
-    .fetch_one(&pg.owner)
+    .fetch_one(&pg.super_pool)
     .await
     .expect("count the tenant's projects");
     assert_eq!(projects, 48, "the tenant owns the seeded projects");
@@ -70,7 +71,7 @@ async fn another_tenant_is_untouched() {
     assert_eq!(status, 200, "{body}");
     let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM project WHERE tenant_id = $1")
         .bind(other.tenant_id)
-        .fetch_one(&pg.owner)
+        .fetch_one(&pg.super_pool)
         .await
         .expect("count the other tenant's projects");
     assert_eq!(rows, 0, "the caller's refresh never writes another tenant");
@@ -87,12 +88,16 @@ async fn a_viewer_cannot_refresh() {
     .fetch_one(&pg.owner)
     .await
     .expect("insert the viewer");
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, seeded.tenant)
+        .await
+        .expect("scoped tx");
     sqlx::query("INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'viewer')")
         .bind(seeded.tenant_id)
         .bind(viewer_id)
-        .execute(&pg.owner)
+        .execute(&mut *tx)
         .await
         .expect("the viewer membership");
+    tx.commit().await.expect("commit the viewer membership");
     let (status, body) = running
         .invoke("programmes.refresh", "dev:viewer", json!({}), None, None, None)
         .await;
