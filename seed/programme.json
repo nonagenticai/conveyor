@@ -1275,7 +1275,7 @@
       "key": "T16",
       "name": "SOP, RDF/OWL and process-document ingestion",
       "description": "SPEC_V2 slice T16 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
