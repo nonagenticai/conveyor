@@ -59,7 +59,7 @@ serde_yaml = "0.9.34"
 include_dir = "0.7.4"
 # The evidence tools' statistics: the standard normal and Student's t, whose quantiles the old
 # service read from scipy. A hand-rolled inverse CDF would be a second source of numerical truth.
-statrs = "0.18.0"
+statrs = "0.19.1"
 # `contract/tolerances.toml` is data a test reads, not a build input: a tolerance declared in code
 # would be a tolerance the reader cannot see next to the fixture it excuses.
 toml = "1.2.1"
