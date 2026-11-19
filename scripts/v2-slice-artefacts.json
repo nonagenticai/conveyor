@@ -124,10 +124,30 @@
       "gap": "no development-project path over conveyor and a dependency repo"
     },
     "T7": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "actions": [
+        "ops.pods",
+        "ops.deployments",
+        "ops.events",
+        "ops.logs",
+        "ops.flux_status",
+        "ops.ci_status",
+        "ops.restart",
+        "ops.scale",
+        "ops.rollback",
+        "ops.flag_flip",
+        "ops.incident",
+        "ops.triage",
+        "ops.mitigate",
+        "ops.postmortem",
+        "ops.resolve"
       ],
-      "gap": "no incident, runbook or postmortem rows and no operations tool call set"
+      "modules": [
+        "ops"
+      ],
+      "evidence": [
+        "crates/actions/tests/ops.rs",
+        "crates/api/tests/ops_incident.rs"
+      ]
     },
     "T8": {
       "tables": [

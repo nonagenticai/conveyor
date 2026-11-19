@@ -102,7 +102,7 @@ use serde_json::{Value, json};
 /// **T16 (#85) adds five internal**: `procedures.ingest_sop|ingest_process|ingest_rdf`,
 /// `procedures.validate` and `procedures.review_source` — the SOP/process-document intake and its
 /// source review (no `pko.*` action exists: owner decision 2026-11-19, #413).
-const EXPECTED: [&str; 485] = [
+const EXPECTED: [&str; 491] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -408,15 +408,21 @@ const EXPECTED: [&str; 485] = [
     "ops.ci_status",
     "ops.deployments",
     "ops.events",
+    "ops.flag_flip",
     "ops.flux_status",
+    "ops.incident",
     "ops.host_logs",
     "ops.host_restart_unit",
     "ops.host_status",
     "ops.logs",
+    "ops.mitigate",
     "ops.pods",
+    "ops.postmortem",
+    "ops.resolve",
     "ops.restart",
     "ops.rollback",
     "ops.scale",
+    "ops.triage",
     "pm.charter",
     "pm.close",
     "pm.get",
@@ -664,7 +670,7 @@ fn the_registry_is_exactly_the_declared_set() {
     // `architecture.board_list`, all internal reads: 451 -> 454; external stays 18.
     // T11 (#84) adds eight `metrics.*` actions, all internal: 454 -> 462; external stays 18.
     // T16 (#85) adds five `procedures.*` actions, all internal: 462 -> 467; external stays 18.
-    assert_eq!((internal, external), (467, 18));
+    assert_eq!((internal, external), (473, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

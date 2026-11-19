@@ -37,35 +37,35 @@
       "name": "cards.release"
     },
     {
-      "line": 2514,
+      "line": 2530,
       "name": "documents.compose"
     },
     {
-      "line": 3001,
+      "line": 3017,
       "name": "documents.compose"
     },
     {
-      "line": 2796,
+      "line": 2812,
       "name": "documents.create"
     },
     {
-      "line": 2867,
+      "line": 2883,
       "name": "documents.delete"
     },
     {
-      "line": 2813,
+      "line": 2829,
       "name": "documents.download"
     },
     {
-      "line": 2846,
+      "line": 2862,
       "name": "documents.download"
     },
     {
-      "line": 2536,
+      "line": 2552,
       "name": "documents.get"
     },
     {
-      "line": 2831,
+      "line": 2847,
       "name": "documents.get"
     },
     {
@@ -81,23 +81,23 @@
       "name": "documents.list"
     },
     {
-      "line": 2764,
+      "line": 2780,
       "name": "documents.list"
     },
     {
-      "line": 2898,
+      "line": 2914,
       "name": "documents.preview"
     },
     {
-      "line": 2944,
+      "line": 2960,
       "name": "documents.return"
     },
     {
-      "line": 2685,
+      "line": 2701,
       "name": "documents.revision_get"
     },
     {
-      "line": 2646,
+      "line": 2662,
       "name": "documents.revision_list"
     },
     {
@@ -113,15 +113,15 @@
       "name": "programmes.list"
     },
     {
-      "line": 2445,
+      "line": 2461,
       "name": "projects.close"
     },
     {
-      "line": 2328,
+      "line": 2344,
       "name": "projects.create"
     },
     {
-      "line": 2336,
+      "line": 2352,
       "name": "projects.update"
     },
     {
@@ -1665,8 +1665,7 @@
         "T15",
         "T17",
         "T5",
-        "T6",
-        "T7"
+        "T6"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -2136,18 +2135,18 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/ops"
       ],
-      "gap": "no incident, runbook or postmortem rows and no operations tool call set",
+      "gap": null,
       "key": "T7",
       "measured": {
         "actions": [
-          0,
-          0
+          15,
+          15
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
           0,
@@ -2162,7 +2161,7 @@
         "T17"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 5,
       "units": {
@@ -2511,10 +2510,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 38,
+        "built": 39,
         "partial": 2,
         "planned": 0,
-        "proposed": 6,
+        "proposed": 5,
         "standing": 1
       },
       "total": 48,
