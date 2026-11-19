@@ -2116,6 +2116,10 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let g = seed_parity_programme(pg, ctx).await;
             ctx.push("benefits.list", g);
         }
+        "metrics.programme" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("metrics.programme", g);
+        }
         "benefits.link" => {
             let g = seed_parity_programme(pg, ctx).await;
             let b = seed_parity_benefit(pg, ctx, g).await;
@@ -6147,6 +6151,22 @@ fn spine_samples() -> Vec<Sample> {
                     "reason": "parity retirement",
                 })
             });
+            expecting(sample, 200)
+        },
+        expecting(plain("metrics.threshold_get", json!({}), None), 200),
+        expecting(
+            plain(
+                "metrics.threshold_update",
+                json!({"level": "C0", "metrics": {"runs.total": 0.0}}),
+                None,
+            ),
+            200,
+        ),
+        expecting(plain("metrics.maturity", json!({}), None), 200),
+        {
+            let mut sample = plain("metrics.programme", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("metrics.programme")}));
             expecting(sample, 200)
         },
         {

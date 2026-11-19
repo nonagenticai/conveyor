@@ -204,3 +204,46 @@ async fn the_fourteen_domain_tables_isolate_runtime_owner_and_superuser() {
     assert_eq!(n, 1, "no forged row was written");
     tx.rollback().await.expect("roll back");
 }
+
+/// T11 — the C0–C5 threshold configuration is tenant-isolated by the same policy as the domain.
+#[tokio::test]
+async fn metric_thresholds_are_tenant_isolated() {
+    let db = support::TestDb::fresh().await;
+    let a = support::seed_tenant(&db.super_pool, "metric-a").await;
+    let b = support::seed_tenant(&db.super_pool, "metric-b").await;
+    for (tenant, level) in [(a.tenant, "C0"), (b.tenant, "C1")] {
+        sqlx::query(
+            "INSERT INTO metric_threshold (tenant_id, level, version, metrics)
+             VALUES ($1, $2, 1, '{\"runs.total\": 0}')",
+        )
+        .bind(tenant)
+        .bind(level)
+        .execute(&db.super_pool)
+        .await
+        .expect("threshold");
+    }
+
+    let tenant_a = TenantId::from_uuid(a.tenant).expect("non-nil");
+    let mut tx = begin_scoped(&db.runtime, tenant_a).await.expect("scope A");
+    let levels: Vec<String> = sqlx::query_scalar("SELECT level FROM metric_threshold ORDER BY level")
+        .fetch_all(&mut *tx)
+        .await
+        .expect("read A");
+    assert_eq!(levels, vec!["C0"], "A sees only its own threshold");
+
+    // A forged write under A's scope fails the policy's WITH CHECK.
+    let forged = sqlx::query(
+        "INSERT INTO metric_threshold (tenant_id, level, version, metrics)
+         VALUES ($1, 'C2', 1, '{}')",
+    )
+    .bind(b.tenant)
+    .execute(&mut *tx)
+    .await;
+    assert!(forged.is_err(), "a forged tenant_id must be refused");
+    tx.rollback().await.expect("roll back");
+
+    let n = count(&db.owner, "SELECT count(*) FROM metric_threshold".to_owned()).await;
+    assert_eq!(n, 0, "the owner without a scope sees nothing (FORCE RLS)");
+    let n = count(&db.super_pool, "SELECT count(*) FROM metric_threshold".to_owned()).await;
+    assert_eq!(n, 2, "the superuser sees both rows");
+}
