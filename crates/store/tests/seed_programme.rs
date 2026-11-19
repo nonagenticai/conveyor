@@ -93,6 +93,30 @@ async fn seed_programme_links_the_registered_issues() {
         .expect("the exported issue registry"),
     )
     .expect("the registry is JSON");
+    // A cross-cutting unit belongs to exactly one project by number
+    // (`CROSS_CUTTING` in `scripts/build-programme-seed.py`), which takes precedence over its
+    // label. The seed itself is the record of that reservation, so a number another project
+    // lists is not S12's even when it carries the S12 label.
+    let seed: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../seed/programme.json"
+        ))
+        .expect("the programme seed"),
+    )
+    .expect("the seed is JSON");
+    let reserved: Vec<i64> = seed["projects"]
+        .as_array()
+        .expect("projects")
+        .iter()
+        .filter(|project| project["key"].as_str() != Some("S12"))
+        .flat_map(|project| {
+            project["meta"]["issues"]
+                .as_array()
+                .map(|issues| issues.iter().filter_map(|number| number.as_i64()).collect::<Vec<_>>())
+                .unwrap_or_default()
+        })
+        .collect();
     let mut expected: Vec<i64> = registry["issues"]
         .as_array()
         .expect("issues")
@@ -111,6 +135,7 @@ async fn seed_programme_links_the_registered_issues() {
             labelled || titled
         })
         .filter_map(|issue| issue["number"].as_i64())
+        .filter(|number| !reserved.contains(number))
         .collect();
     expected.sort_unstable();
     assert_eq!(issues, serde_json::json!(expected));
