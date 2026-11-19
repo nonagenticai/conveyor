@@ -232,6 +232,15 @@ pub enum Scope {
     IntegrationsRead,
     /// Dispatch work to an external service (`coding_jobs.create`).
     IntegrationsWrite,
+    // T14 (§11.8–§11.9): the estate toolkit catalogue. `tools.call` deliberately does NOT use
+    // this pair — a job's authority is its binding, resolved per run (`runs:write`) — but
+    // publishing a toolkit version, probing a destination and disabling bindings are platform
+    // administration, so they get a scope of their own rather than borrowing `catalogues:write`
+    // (a tenant override for the governance catalogue must not silently grant the tool estate).
+    /// Read the toolkit catalogue, its probes and its usage report.
+    ToolsRead,
+    /// Publish a toolkit version, probe a destination and unbind on failure.
+    ToolsWrite,
     // T7 — the hostile-authority surface (SPEC_V2 §11.4): restarting, scaling and rolling back
     // a workload. Admin-only, and never sufficient on its own — every `ops.*` write also names
     // an approved approval (see `control::approvals::require_approval_tx`).
@@ -293,7 +302,7 @@ pub enum Scope {
 
 impl Scope {
     /// Every scope this build knows.
-    pub const ALL: [Scope; 66] = [
+    pub const ALL: [Scope; 68] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -344,6 +353,8 @@ impl Scope {
         Scope::SecretsWrite,
         Scope::IntegrationsRead,
         Scope::IntegrationsWrite,
+        Scope::ToolsRead,
+        Scope::ToolsWrite,
         Scope::ProcessesRead,
         Scope::ProcessesWrite,
         Scope::BenchmarksRead,
@@ -415,6 +426,8 @@ impl Scope {
             Self::SecretsWrite => "secrets:write",
             Self::IntegrationsRead => "integrations:read",
             Self::IntegrationsWrite => "integrations:write",
+            Self::ToolsRead => "tools:read",
+            Self::ToolsWrite => "tools:write",
             Self::OpsWrite => "ops:write",
             Self::ProcessesRead => "processes:read",
             Self::ProcessesWrite => "processes:write",
@@ -486,6 +499,7 @@ impl Scope {
             | Self::IntegrationsRead
             | Self::WorkflowsRead
             | Self::CapabilitiesRead
+            | Self::ToolsRead
             | Self::OrganisationRead => true,
             Self::RunsWrite
             | Self::ApprovalsWrite
@@ -519,6 +533,7 @@ impl Scope {
             | Self::ListsWrite
             | Self::CardsWrite
             | Self::OrganisationWrite
+            | Self::ToolsWrite
             | Self::OpsWrite => admin,
             // ⛔ NOT the `admin` predicate: that includes `Role::KataExecutor`, a machine
             // role, and a scope a machine holds cannot be a sign-off (CONTRACT §20 trap 1).
@@ -1030,7 +1045,7 @@ mod tests {
         assert_eq!(Scope::OrganisationRead.as_str(), "organisation:read");
         assert_eq!(Scope::OrganisationWrite.as_str(), "organisation:write");
         assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
-        assert_eq!(Scope::ALL.len(), 66);
+        assert_eq!(Scope::ALL.len(), 68);
     }
 
     #[test]
