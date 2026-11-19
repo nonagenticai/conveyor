@@ -1,6 +1,65 @@
 {
   "issues": [
     {
+      "number": 377,
+      "title": "ci: gate.sh builds a per-worktree target instead of the guarded one",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/377",
+      "updatedAt": "2026-11-18T22:50:17Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 375,
+      "title": "web: the cockpit edit form can detach while SSE refreshes the card",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/375",
+      "updatedAt": "2026-11-18T22:48:57Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 373,
+      "title": "sheets: recover cell number formats on import",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/373",
+      "updatedAt": "2026-11-18T23:33:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "rust",
+          "color": "000000"
+        }
+      ]
+    },
+    {
       "number": 372,
       "title": "ci: the issue-registry automation generates its seed from a different source than the registry it ships",
       "state": "OPEN",
@@ -15,10 +74,10 @@
     },
     {
       "number": 370,
-      "title": "web: the Playwright suite is red on main for four specs",
-      "state": "OPEN",
+      "title": "web: the usage spec's tile locator is ambiguous and its ledger baseline is order-dependent",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/370",
-      "updatedAt": "2026-11-18T22:19:53Z",
+      "updatedAt": "2026-11-18T23:43:53Z",
       "labels": [
         {
           "name": "unit",
@@ -39,7 +98,7 @@
       "title": "sheets: native XLSX import and export as conveyor actions",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/366",
-      "updatedAt": "2026-11-18T22:02:50Z",
+      "updatedAt": "2026-11-18T22:49:59Z",
       "labels": [
         {
           "name": "unit",
@@ -60,7 +119,7 @@
       "title": "publish: repoint publish.design at the pack's docs/design tree",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/364",
-      "updatedAt": "2026-11-18T22:24:34Z",
+      "updatedAt": "2026-11-18T22:25:21Z",
       "labels": [
         {
           "name": "unit",
@@ -2427,15 +2486,15 @@
       "title": "T16 \u2014 SOP, RDF/OWL and process-document ingestion",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/85",
-      "updatedAt": "2026-11-17T15:38:16Z",
+      "updatedAt": "2026-11-18T23:20:19Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "T16",
@@ -2469,15 +2528,15 @@
       "title": "T14 \u2014 Estate toolkits",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/83",
-      "updatedAt": "2026-11-13T22:53:53Z",
+      "updatedAt": "2026-11-18T23:20:11Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "T14",
@@ -2637,15 +2696,15 @@
       "title": "T4 \u2014 Kanban coach",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/75",
-      "updatedAt": "2026-11-13T22:53:36Z",
+      "updatedAt": "2026-11-18T22:38:51Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T4",
@@ -3416,15 +3475,15 @@
       "title": "S19 \u2014 one ledger-derived accounting model and the Tier-3 auditor",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/13",
-      "updatedAt": "2026-11-13T06:32:00Z",
+      "updatedAt": "2026-11-18T23:20:24Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "S19",
