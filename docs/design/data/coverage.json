@@ -1665,8 +1665,7 @@
         "T15",
         "T17",
         "T5",
-        "T6",
-        "T7"
+        "T6"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -2136,18 +2135,18 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/ops"
       ],
-      "gap": "no incident, runbook or postmortem rows and no operations tool call set",
+      "gap": null,
       "key": "T7",
       "measured": {
         "actions": [
-          0,
-          0
+          15,
+          15
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
           0,
@@ -2162,7 +2161,7 @@
         "T17"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 5,
       "units": {
@@ -2511,10 +2510,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 38,
+        "built": 39,
         "partial": 2,
         "planned": 0,
-        "proposed": 6,
+        "proposed": 5,
         "standing": 1
       },
       "total": 48,
