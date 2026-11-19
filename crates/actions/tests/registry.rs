@@ -96,7 +96,7 @@ use serde_json::{Value, json};
 /// **T9 adds 26 internal**: the `architecture.*` family (see the block below `approvals.request`).
 /// **#76 adds 1 internal**: `tools.call`, the tool broker (it dispatches a declared external
 /// action and adds no external target).
-const EXPECTED: [&str; 466] = [
+const EXPECTED: [&str; 469] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -124,6 +124,7 @@ const EXPECTED: [&str; 466] = [
     "architecture.artifacts_update",
     "architecture.board_decide",
     "architecture.board_get",
+    "architecture.board_list",
     "architecture.board_open",
     "architecture.contracts_approve",
     "architecture.contracts_get",
@@ -131,6 +132,7 @@ const EXPECTED: [&str; 466] = [
     "architecture.contracts_request",
     "architecture.contracts_supersede",
     "architecture.maturity_assess",
+    "architecture.maturity_list",
     "architecture.maturity_plan",
     "architecture.phases_advance",
     "architecture.profile_get",
@@ -139,6 +141,7 @@ const EXPECTED: [&str; 466] = [
     "architecture.reviews_record",
     "architecture.reviews_waive",
     "architecture.skills_assess",
+    "architecture.skills_list",
     "artifacts.list",
     "audit.list",
     "baselines.get",
@@ -632,7 +635,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 18 — the workbook is produced and parsed in this process.
     // #75 (T4) adds the four `coach.*` actions, all internal: 444 -> 448; external stays 18 —
     // the coach reads and writes this tenant's own rows and starts runs of its own processes.
-    assert_eq!((internal, external), (448, 18));
+    // #385 adds `architecture.maturity_list`, `architecture.skills_list` and
+    // `architecture.board_list`, all internal reads: 448 -> 451; external stays 18.
+    assert_eq!((internal, external), (451, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
