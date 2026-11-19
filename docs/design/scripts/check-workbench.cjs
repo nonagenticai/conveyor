@@ -397,67 +397,21 @@ const shot = (name) =>
       "memory policy comparison shows the three arms",
     );
 
-    // 8. PKO term workspace: detail, formal view, usage, graph and refusals.
+    // 8. The knowledge-pack pairing: the procedure names its pack; no PKO store is claimed.
     await nav("procedures");
-    await vtab("procedures", "PKO editor");
+    await vtab("procedures", "Knowledge pairing");
     text = await content();
     check(
-      text.includes("Term · verify_release") &&
-        text.includes("Permitted relationships"),
-      "the PKO term inspector renders definition and permitted relations",
+      text.includes("Procedure ↔ knowledge pairing") && text.includes("capability@17"),
+      "the knowledge-pack pairing renders the procedure's pack",
     );
     check(
-      text.includes("Procedure steps using this term") &&
-        text.includes("proc-implement v7 · step 04"),
-      "term usage links to the procedure steps",
+      text.includes("strata_rag") && !text.includes("PKO release"),
+      "the pairing names the retrieval store and claims no PKO release",
     );
     check(
-      text.includes("Relationships · 2 hops"),
-      "the local relationship graph renders",
-    );
-    await v2("pko-term", '[data-id="PKO-T02"]');
-    check(
-      (await content()).includes("Term · approve_baseline"),
-      "selecting a term refreshes its detail",
-    );
-    await v2("pko-formal");
-    check(
-      (await content()).includes("entity PKO-T02") &&
-        (await content()).includes("constraints:"),
-      "the formal representation is behind progressive disclosure",
-    );
-    await v2("pko-kind", '[data-id="task"]');
-    check(
-      (await page.locator('[data-v2="pko-term"]').count()) === 2,
-      "the term table is filterable by kind",
-    );
-    await page.locator('[data-v2-input="pko-search"]').fill("approve");
-    await page.locator('[data-v2-input="pko-search"]').press("Enter");
-    check(
-      (await page.locator('[data-v2="pko-term"]').count()) === 1,
-      "the PKO term table is searchable",
-    );
-    await page.locator('[data-v2-input="pko-search"]').fill("");
-    await page.locator('[data-v2-input="pko-search"]').press("Enter");
-    await v2("pko-validate");
-    check(
-      (await toastText()).includes("422 pko_relation_invalid"),
-      "an invalid PKO relation is refused",
-    );
-    await v2("pko-add-relation");
-    check(
-      (await toastText()).includes("422 pko_relation_invalid"),
-      "adding an invalid relation is refused",
-    );
-    await v2("pko-publish-check");
-    check(
-      (await toastText()).includes("409 pko_not_ready"),
-      "publish readiness refuses an undefined term",
-    );
-    await v2("pko-edit");
-    check(
-      (await content()).includes("pko@4"),
-      "a PKO edit creates a new immutable release draft",
+      !text.toLowerCase().includes("pko store"),
+      "the study claims no PKO store",
     );
 
     // 9. Explain context: manifest, states, reasons, hash and reconstruction.
@@ -503,7 +457,7 @@ const shot = (name) =>
       [
         "Knowledge extraction",
         "Retrieval",
-        "Procedural knowledge (PKO)",
+        "Procedural knowledge",
         "Memory",
         "Scope policies",
         "Job outcomes",
@@ -583,11 +537,11 @@ const shot = (name) =>
       "a job links to its outcome evaluation",
     );
 
-    // 10. The new PKO and explain-context surfaces fit at 390px.
+    // 10. The knowledge-pack pairing and explain-context surfaces fit at 390px.
     await page.setViewportSize({ width: 390, height: 1060 });
     await nav("procedures");
-    await vtab("procedures", "PKO editor");
-    check(!(await overflow()), "the PKO workspace fits at 390px");
+    await vtab("procedures", "Knowledge pairing");
+    check(!(await overflow()), "the knowledge-pack pairing fits at 390px");
     await nav("execution");
     check(!(await overflow()), "the explain-context panel fits at 390px");
     await page.setViewportSize({ width: 1440, height: 1060 });
@@ -606,8 +560,8 @@ const shot = (name) =>
     await nav("memory");
     await page.screenshot({ path: shot("conveyor-workbench-memory.png") });
     await nav("procedures");
-    await vtab("procedures", "PKO editor");
-    await page.screenshot({ path: shot("conveyor-workbench-pko.png") });
+    await vtab("procedures", "Knowledge pairing");
+    await page.screenshot({ path: shot("conveyor-workbench-knowledge-pairing.png") });
     await nav("execution");
     await page.screenshot({ path: shot("conveyor-workbench-execution.png") });
     await nav("evals");

@@ -181,16 +181,21 @@ window.ConveyorConsole = (function () {
     const extra = { "Content-Type": "application/json" };
     if (options.etag != null) extra["If-Match"] = `"${options.etag}"`;
     const path = `/api/actions/${name}/invocations`;
+    // `approval_id` is a property of the CALL, not of the payload (#282): a destructive or
+    // gated action is released by naming the approved gate here, and the input schema stays
+    // closed. The server parses `{input, approval_id}` and never reads it from `input`.
+    const body = { input: input == null ? {} : input };
+    if (options.approvalId != null) body.approval_id = options.approvalId;
     const response = await fetch(path, {
       method: "POST",
       headers: headersFor(extra),
       credentials: "same-origin",
-      body: JSON.stringify({ input: input == null ? {} : input }),
+      body: JSON.stringify(body),
     });
-    const body = await (await handle(response, path)).json();
+    const parsed = await (await handle(response, path)).json();
     // The action route wraps the handler output in `{output}`; the pack's stub returns the bare
     // output. Unwrap the live envelope and pass a bare body through unchanged.
-    return body && typeof body === "object" && "output" in body ? body.output : body;
+    return parsed && typeof parsed === "object" && "output" in parsed ? parsed.output : parsed;
   }
 
   async function issues() {

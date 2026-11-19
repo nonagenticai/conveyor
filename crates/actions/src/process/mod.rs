@@ -57,6 +57,10 @@ pub(crate) fn process_out(
         card_type_code,
         owner_user_id: record.owner_user_id.map(|id| id.to_string()),
         outputs: record.outputs.clone(),
+        source_asset_id: record.source_asset_id,
+        knowledge_pack_ref: record.knowledge_pack_ref.clone(),
+        converter_version: record.converter_version.clone(),
+        approval_id: record.approval_id,
         steps: steps.iter().map(step_out).collect(),
         created_at: record.created_at,
         updated_at: record.updated_at,
@@ -78,6 +82,9 @@ fn step_out(step: &ProcessStepRecord) -> StepOut {
         on_result: step.on_result.clone(),
         max_attempts: step.max_attempts,
         outputs: step.outputs.clone(),
+        action_text: step.action_text.clone(),
+        pddl_preconditions: step.pddl_preconditions.clone(),
+        pddl_effects: step.pddl_effects.clone(),
     }
 }
 

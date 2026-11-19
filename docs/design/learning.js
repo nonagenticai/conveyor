@@ -1617,7 +1617,7 @@ window.installLearning = function (api, enterprise) {
     const subjects = [
       ["knowledge", "Knowledge extraction", "missing content · extraction fidelity", "extraction-suite v2", "40 cases", "Ready"],
       ["retrieval", "Retrieval", "expected-evidence recall · citation coverage", "retrieval-regression v3", "80 held-out", "Measuring"],
-      ["pko", "Procedural knowledge (PKO)", "undefined terms · invalid relations · constraints", "pko-validation v1", "24 terms", "Ready"],
+      ["pko", "Procedural knowledge", "undefined terms · invalid relations · constraints", "pko-validation v1", "24 terms", "Ready"],
       ["memory", "Memory", "recall usefulness · stale or conflicting facts", "memory-policy v2", "80 held-out", "Candidate"],
       ["scope", "Scope policies", "cross-card/project exclusion · authorised recall", "isolation-suite v1", "32 cases", "Ready"],
       ["job", "Job outcomes", "acceptance · failure · latency · cost", "architecture-v3", "80 held-out", "Baseline"],

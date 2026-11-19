@@ -243,7 +243,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><code>procedure_ref</code></td>
-<td>published procedure version(s), each pinning its PKO release</td>
+<td>published procedure version(s), each pinning the knowledge pack its steps read</td>
 <td>conveyor (<code>procedure</code>)</td>
 </tr>
 <tr>
@@ -371,7 +371,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tbody>
 <tr>
 <td><strong>Knowledge</strong></td>
-<td>domain knowledge (pinned layer kinds and packs) and procedural knowledge (the capability/procedure/PKO)</td>
+<td>domain knowledge (pinned layer kinds and packs) and procedural knowledge (the published procedure and its steps)</td>
 </tr>
 <tr>
 <td><strong>Memory</strong></td>
@@ -575,13 +575,13 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <p>A procedure is the executable form of a standard operating procedure: an ordered sequence of steps, each an action (PDDL), a tool call or a gate. Procedure design and management is a first-class conveyor feature (D47):</p>
 <ul>
 <li><strong>SOP intake.</strong> A tenant supplies SOPs — PDF, web URL or another document — singly or as a batch. A customer document is untrusted input: it enters as a <code>governed_asset(kind='sop_source')</code> with provenance, never as instructions to the system.</li>
-<li><strong>Conversion.</strong> The intake job harvests and curates the domain knowledge the SOP implies, then converts the SOP into <strong>procedural knowledge (the Procedural Knowledge Ontology, PKO)</strong> and a <strong>procedure draft whose steps are written in PDDL</strong>. The conversion job uses the web/research tools, and <code>lean4_prover</code> where a claim needs formal checking.</li>
-<li><strong>Two spaces, never mixed (D53).</strong> The <strong>action space</strong> is the procedure step written in PDDL — actions with preconditions and effects over typed facts. The <strong>procedural knowledge space</strong> is the PKO — the ontology of tasks, steps, roles, artefacts and constraints. A step references PKO terms; a PKO entity never contains an executable step.</li>
-<li><strong>PKO storage and ingestion.</strong> The PKO is relational, conveyor-owned and tenant-editable: an immutable <code>pko_release</code> pins <code>pko_entity</code> (name, label, kind, attributes, synonyms) and <code>pko_relation</code> (subject, predicate, object, cardinality) rows, layered base → industry → department → job. RDF/OWL/Turtle documents are ingest material — a converter turns them into draft rows behind the review gate; the conveyor runs no RDF store and no reasoner. The old <code>procedure_management</code> OWL/Turtle files import this way once (owner, 2026-11-11).</li>
-<li><strong>Process documents.</strong> BPMN 2.0 XML, Visio and draw.io exports ingest on the same path: the diagram becomes a procedure draft (activities → steps, gateways → gates) plus PKO rows. The diagram is a source document; the procedure is the executable artefact, and the same review gate applies.</li>
+<li><strong>Conversion.</strong> The intake job harvests and curates the domain knowledge the SOP implies, then converts the SOP into a <strong>procedure draft whose steps are written in PDDL</strong> and, when a knowledge store is paired, into a <strong>knowledge-pack import</strong> for the domain knowledge the steps read. The conversion job uses the web/research tools, and <code>lean4_prover</code> where a claim needs formal checking.</li>
+<li><strong>Two spaces, never mixed (D53).</strong> The <strong>action space</strong> is the procedure step written in PDDL — actions with preconditions and effects over typed facts. <strong>Procedural knowledge is the published procedure itself</strong>: its intent, ordered steps, actions, gates, declared outputs and failure branches. There is no separate relational ontology store; the procedure and its immutable releases carry the procedural knowledge (owner decision of 2026-11-19, which supersedes the PKO tables this section previously described and re-scoped T16 accordingly).</li>
+<li><strong>Ontology ingestion.</strong> RDF/OWL/Turtle documents are ingest material for <strong>domain</strong> knowledge: the document is imported into <code>strata_ingest</code>, the returned job id becomes the procedure's <code>knowledge_pack_ref</code>, and the conveyor runs no RDF store, no graph store and no reasoner. The old <code>procedure_management</code> OWL/Turtle files import this way once (owner, 2026-11-11; strata decision, 2026-11-19).</li>
+<li><strong>Process documents.</strong> BPMN 2.0 XML, Visio and draw.io exports ingest on the same path: the diagram becomes a procedure draft (activities → steps, gateways → gates). The diagram is a source document; the procedure is the executable artefact, and the same review gate applies.</li>
 <li><strong>Design reuse.</strong> The same pipeline designs capabilities, agents and jobs: an SOP yields a capability, a procedure, a job draft and its knowledge pins; a person reviews and publishes.</li>
-<li><strong>Knowledge pairing.</strong> The domain knowledge harvested for an SOP is stored as a pinned knowledge pack in <code>strata_rag</code> and paired with the procedural knowledge; the procedure's release names both. The conveyor uses <code>strata_ingest</code> and <code>strata_rag</code> at least to the extent the agent platform already does — document ingestion, pinned-leaf retrieval, pack storage and consolidation — and never hosts embeddings.</li>
-<li><strong>Gates.</strong> Every SOP-derived artefact is a draft behind a review gate (default: human, tenant-configurable). The ontology and the procedure are versioned and measured like any other procedure change (P5); a batch never publishes itself, and no SOP can grant a tool or widen an effect ceiling.</li>
+<li><strong>Knowledge pairing.</strong> The domain knowledge harvested for an SOP is stored as a pinned knowledge pack in <code>strata_rag</code> and named by the procedure's <code>knowledge_pack_ref</code>; the published procedure version and the pack it names are what a run pins. The conveyor uses <code>strata_ingest</code> and <code>strata_rag</code> at least to the extent the agent platform already does — document ingestion, pinned-leaf retrieval, pack storage and consolidation — and never hosts embeddings.</li>
+<li><strong>Gates.</strong> Every SOP-derived artefact is a draft behind a review gate (default: human, tenant-configurable). The procedure, its knowledge pairing and its conversion are versioned and measured like any other procedure change (P5); a batch never publishes itself, and no SOP can grant a tool or widen an effect ceiling.</li>
 </ul>
 <h3 id="57-tenant-asset-authoring--from-chat-and-documents-draft">5.7 Tenant asset authoring — from chat and documents (draft)</h3>
 <p><strong>Owner concept, 2026-11-11 (D55); the first-wave asset matrix is an open question (T17).</strong> The same intake pipeline that converts an SOP is the general authoring path: a tenant supplies <strong>chat input and documents</strong>, and the conveyor drafts <strong>every tenant-scoped asset</strong> it needs.</p>
@@ -599,15 +599,15 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>SOP (PDF, URL, document)</td>
-<td>capability, procedure (PDDL), PKO rows, knowledge pack, job draft</td>
+<td>capability, procedure (PDDL), knowledge-pack import, job draft</td>
 </tr>
 <tr>
 <td>BPMN / Visio / draw.io</td>
-<td>procedure (activities → steps, gateways → gates), PKO rows</td>
+<td>procedure (activities → steps, gateways → gates)</td>
 </tr>
 <tr>
 <td>RDF / OWL / Turtle</td>
-<td>PKO entities and relations</td>
+<td>domain knowledge pack (a <code>strata_ingest</code> import)</td>
 </tr>
 <tr>
 <td>Existing policy/procedure exports</td>
@@ -618,7 +618,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <p>Rules:</p>
 <ul>
 <li><strong>Every output is a draft behind a review gate</strong> (tenant-configurable, default human); publication is a release and a gate. A chat message or a document can never grant a tool, widen an effect ceiling, approve its own artefact or change an approval policy.</li>
-<li><strong>Asset order is dependency-ordered:</strong> industry → department → job/capability → procedure/PKO → knowledge pack → policies/templates → tools. The authoring job refuses a draft whose referenced asset is unpublished.</li>
+<li><strong>Asset order is dependency-ordered:</strong> industry → department → job/capability → procedure → knowledge pack → policies/templates → tools. The authoring job refuses a draft whose referenced asset is unpublished.</li>
 <li><strong>The authoring job family is ordinary jobs</strong> on the two executors (§4.5); the pipeline is a procedure, not a hard-coded wizard.</li>
 <li><strong>Instruments:</strong> drafts accepted vs rejected, revisions per artefact, time from intake to first published job. An authored catalogue is measured by use — an asset no procedure uses is retired (P10).</li>
 <li><strong>The chat surface does not decide.</strong> Chat input is a request; rules/laya route it; the LLM drafts; a person approves. Tenant asset creation is subject to the same decision ladder as any work (§7).</li>
@@ -1137,7 +1137,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tbody>
 <tr>
 <td><strong>Procedural</strong></td>
-<td><code>capability → procedure → step(PDDL) → action|gate</code> + the pinned PKO release (conveyor)</td>
+<td><code>capability → procedure → step(PDDL) → action|gate</code> + the pinned knowledge pack (conveyor)</td>
 <td><code>run</code>/<code>run_step</code>/<code>approval</code>/<code>action_invocation</code>/<code>event</code> (conveyor)</td>
 </tr>
 <tr>
@@ -1577,7 +1577,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </thead>
 <tbody>
 <tr>
-<td>Industry, department, job, job release, knowledge layers/kinds, packs, PKO/ontology releases, decision policies and their tenant refinements, laya inference config, model providers, tool grants, channels, conversations/turns</td>
+<td>Industry, department, job, job release, knowledge layers/kinds, packs, decision policies and their tenant refinements, laya inference config, model providers, tool grants, channels, conversations/turns</td>
 <td><strong><code>conveyor</code></strong></td>
 <td>jobs execute on it; humans and the agent front end</td>
 </tr>
@@ -1863,19 +1863,9 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>tenant-scoped laya inference</td>
 <td><code>model_ref</code>, <code>params</code>, <code>timeout_ms</code>; optional per-case override</td>
 </tr>
-<tr>
-<td><code>pko_release</code></td>
-<td>immutable PKO/ontology release</td>
-<td>content hash, layers, status; pinned by a procedure</td>
-</tr>
-<tr>
-<td><code>pko_entity</code> / <code>pko_relation</code></td>
-<td>PKO terms and edges</td>
-<td>kind, attributes, synonyms; subject/predicate/object/cardinality</td>
-</tr>
 </tbody>
 </table>
-<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case | refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier</code>; a programme-level asset is attached to the programme-definition project; the architecture contract has its own table so a phase gate never depends on a generic asset row), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and a PKO pin. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
+<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case | refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier</code>; a programme-level asset is attached to the programme-definition project; the architecture contract has its own table so a phase gate never depends on a generic asset row), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and the <code>knowledge_pack_ref</code> the procedure pins. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
 <h3 id="104-action-families">10.4 Action families</h3>
 <table>
 <thead>
@@ -1903,7 +1893,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>procedures</td>
-<td><code>procedures.ingest_sop|ingest_process|ingest_rdf|draft|validate|publish</code>, <code>capabilities.design|publish</code>, <code>pko.import_rdf|edit|publish|pin</code></td>
+<td><code>procedures.create|update|publish|retire</code>, <code>procedures.ingest_sop|ingest_process|ingest_rdf|validate|review_source</code>, <code>capabilities.design|publish</code></td>
 </tr>
 <tr>
 <td>authoring</td>
@@ -1986,7 +1976,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>Procedures</strong></td>
-<td>capability/procedure workspace, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, PDDL step editor, PKO editor (tenant-editable), knowledge-pack pairing, publish</td>
+<td>capability/procedure workspace, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, PDDL step editor, knowledge-pack pairing (the <code>knowledge_pack_ref</code> a procedure pins), publish</td>
 </tr>
 <tr>
 <td><strong>Authoring</strong></td>
@@ -2386,12 +2376,12 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>T16</strong></td>
-<td><strong>SOP, RDF/OWL and process-document ingestion</strong> — SOP intake as a governed asset; RDF/OWL/Turtle and BPMN/Visio/draw.io conversion into PKO rows and PDDL procedure drafts; the PKO tables and tenant editing; capability/agent/job design from an SOP; the review gates</td>
-<td>a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a tenant edits a PKO entity and the change is versioned; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds</td>
+<td><strong>SOP, RDF/OWL and process-document ingestion</strong> — SOP intake as a governed asset; RDF/OWL/Turtle imported as a strata knowledge pack; BPMN/Visio/draw.io conversion into PDDL procedure drafts; capability/agent/job design from an SOP; the source review and human publication gates; re-ingest versioning</td>
+<td>a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds</td>
 </tr>
 <tr>
 <td><strong>T17</strong></td>
-<td><strong>Tenant asset authoring</strong> — chat + document intake producing drafts of every tenant asset (organisation, jobs, procedures, PKO, packs, policies, templates, tool requests), the review queue, publication</td>
+<td><strong>Tenant asset authoring</strong> — chat + document intake producing drafts of every tenant asset (organisation, jobs, procedures, packs, policies, templates, tool requests), the review queue, publication</td>
 <td>a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant</td>
 </tr>
 </tbody>
@@ -2427,7 +2417,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td>Procedures</td>
 <td>capability → procedure → step</td>
-<td>+ SOP/RDF/OWL/BPMN ingestion → PKO + PDDL procedures, used to design capabilities, agents and jobs</td>
+<td>+ SOP/RDF/OWL/BPMN ingestion → PDDL procedures and knowledge packs, used to design capabilities, agents and jobs</td>
 </tr>
 <tr>
 <td>Self-contained</td>
@@ -2581,7 +2571,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td>R17</td>
 <td><strong>Authoring injection / knowledge poisoning</strong> — an SOP, document, diagram or chat message carries instructions or false doctrine into a procedure or any tenant asset</td>
-<td>every source is untrusted input; every derived artefact is a draft behind a human gate; provenance is recorded; no source can grant a tool, widen an effect ceiling or change a policy; the PKO is reviewed and versioned</td>
+<td>every source is untrusted input; every derived artefact is a draft behind a human gate; provenance is recorded; no source can grant a tool, widen an effect ceiling or change a policy; the procedure, its source and its knowledge pack are reviewed and versioned</td>
 </tr>
 <tr>
 <td>R18</td>
@@ -2598,7 +2588,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <hr />
 <h2 id="15-decisions-and-open-questions">15. Decisions and open questions</h2>
 <h3 id="151-v2-decisions-d28d61-d1d27-of-v1-stand-except-d14-and-d22-as-amended-below">15.1 V2 decisions (D28–D61; D1–D27 of V1 stand, except D14 and D22 as amended below)</h3>
-<p><strong>D28–D61 are this spec's decisions.</strong> They are written as answers because a spec that only lists questions is not reviewable; each can be accepted, amended or rejected as a unit, and the entries carrying an owner ruling are marked with its date. D33, D41, D43 and D45 carry the first review's owner rulings of 2026-11-11; D46–D48 record the procedure/SOP model, the SOP feature and the scope that review produced; <strong>D49–D55 carry the second review's owner rulings of 2026-11-11</strong> (portfolio and programme, tenant configuration, per-case laya config, metering, PKO, the legacy-kag direction and tenant asset authoring); <strong>D56–D60 carry the third review's rulings of 2026-11-11</strong> (discovery, live-estate classification and direct MinIO storage, the tool monorepo, the permanently separate agent tool path, and the AHTAPol/w2v tenant scope); <strong>D61 records the independent runtime review's recommendation</strong> — executor seam to be built in T0, external runtime deferred — and is proposed for acceptance with the rest.</p>
+<p><strong>D28–D61 are this spec's decisions.</strong> They are written as answers because a spec that only lists questions is not reviewable; each can be accepted, amended or rejected as a unit, and the entries carrying an owner ruling are marked with its date. D33, D41, D43 and D45 carry the first review's owner rulings of 2026-11-11; D46–D48 record the procedure/SOP model, the SOP feature and the scope that review produced; <strong>D49–D55 carry the second review's owner rulings of 2026-11-11</strong> (portfolio and programme, tenant configuration, per-case laya config, metering, procedural knowledge, the legacy-kag direction and tenant asset authoring); <strong>D56–D60 carry the third review's rulings of 2026-11-11</strong> (discovery, live-estate classification and direct MinIO storage, the tool monorepo, the permanently separate agent tool path, and the AHTAPol/w2v tenant scope); <strong>D61 records the independent runtime review's recommendation</strong> — executor seam to be built in T0, external runtime deferred — and is proposed for acceptance with the rest.</p>
 <table>
 <thead>
 <tr>
@@ -2735,8 +2725,8 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>D53</strong></td>
-<td><strong>PKO and process documents</strong></td>
-<td>The <strong>action space</strong> (procedure steps in PDDL) and the <strong>procedural knowledge space</strong> (the PKO) are separate concepts. The PKO is relational, conveyor-owned and tenant-editable (<code>pko_release</code>/<code>pko_entity</code>/<code>pko_relation</code>); RDF/OWL/Turtle documents are ingested and converted into draft PKO rows, never read at runtime. BPMN 2.0, Visio and draw.io exports ingest on the same path into procedure drafts and PKO rows. Every derived artefact is a draft behind a review gate (owner, 2026-11-11)</td>
+<td><strong>Procedural knowledge and process documents</strong></td>
+<td>The <strong>action space</strong> (procedure steps in PDDL) and <strong>procedural knowledge</strong> (the published procedure itself: intent, ordered steps, actions, gates, declared outputs and failure branches) are two faces of the same procedure, never a separate relational ontology. The owner decision of 2026-11-19 removed the PKO store this decision originally specified; T16's re-scope implements RDF/OWL/Turtle as a <strong>strata knowledge-pack import</strong> whose job id is the procedure's <code>knowledge_pack_ref</code> — never read at runtime by the conveyor, which runs no RDF store, no graph store and no reasoner. BPMN 2.0, Visio and draw.io exports ingest on the same path into procedure drafts. Every derived artefact is a draft behind a review gate (owner, 2026-11-11; amended 2026-11-19)</td>
 </tr>
 <tr>
 <td><strong>D54</strong></td>
@@ -2746,7 +2736,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><strong>D55</strong></td>
 <td><strong>Tenant asset authoring</strong></td>
-<td>The platform can create <strong>all tenant assets from tenant chat input and documents</strong>: organisation, jobs, capabilities, procedures, PKO, knowledge packs, project templates, policies and tool requests. Every output is a draft behind a review gate; asset creation is dependency-ordered; a chat message or document can never grant a tool, widen an effect ceiling or change an approval policy. The asset matrix and first wave ship with T17 (owner, 2026-11-11)</td>
+<td>The platform can create <strong>all tenant assets from tenant chat input and documents</strong>: organisation, jobs, capabilities, procedures, knowledge packs, project templates, policies and tool requests. Every output is a draft behind a review gate; asset creation is dependency-ordered; a chat message or document can never grant a tool, widen an effect ceiling or change an approval policy. The asset matrix and first wave ship with T17 (owner, 2026-11-11)</td>
 </tr>
 <tr>
 <td><strong>D56</strong></td>
@@ -2805,7 +2795,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <li><del>mcp_server migration.</del> <strong>Closed:</strong> the mcp server is the agent platform's own gateway; it is outside the conveyor's model (D44). There is no migration to plan.</li>
 <li><del>Agent-side tool calls.</del> <strong>Closed:</strong> the agent front end's own tool calls are its product; only calls through the conveyor broker enter the <code>tool_call</code> ledger (D41/D44).</li>
 <li><del>n8n legacy visibility.</del> <strong>Closed:</strong> n8n is reference only — a previous design that is superseded. No operations job reads its execution history; it is not a tool.</li>
-<li><del>Procedure ontology depth.</del> <strong>Resolved direction (D53):</strong> the action space (PDDL steps) and the procedural knowledge space (PKO) are separate; the PKO is relational, conveyor-owned and tenant-editable, fed by RDF/OWL ingestion. How deep the ontology goes and whether <code>lean4_prover</code> checks are mandatory for a procedure class are decided by the first T16 pilots.</li>
+<li><del>Procedure ontology depth.</del> <strong>Resolved direction (D53, amended 2026-11-19):</strong> procedural knowledge is the published procedure itself; the action space is its PDDL steps, and RDF/OWL ingestion produces a strata knowledge pack the procedure pins (<code>knowledge_pack_ref</code>) — there is no relational ontology store. How deep the procedure/step model goes and whether <code>lean4_prover</code> checks are mandatory for a procedure class are decided by the first T16 pilots.</li>
 <li><strong>Tenant asset authoring — first wave.</strong> D55 fixes the concept; which asset types ship first, the review depth per asset type, and whether a dedicated setup project type is needed are decided in T17. <em>Open.</em></li>
 <li><strong>w2v migration order.</strong> D54 fixes that the stage fleet moves into the conveyor and is rewritten in Rust; which stage migrates first and how the live fleet and the rewrite coexist are decided in <code>docs/SPEC_LEGACY_KAG.md</code>. <em>Open.</em></li>
 <li><strong>Programme shared-config keys.</strong> T1 authors the first key set; which keys a programme may lock and which a project may override is tenant policy. <em>Open.</em></li>
@@ -2934,12 +2924,12 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><strong>Action space</strong></td>
 <td>the PDDL step: an action with preconditions and effects over typed facts, inside a procedure</td>
-<td>the PKO (the knowledge that names and constrains it)</td>
+<td>a packed domain knowledge set (the procedure names its pack)</td>
 </tr>
 <tr>
-<td><strong>PKO</strong></td>
-<td>the Procedural Knowledge Ontology — relational entities and relations describing tasks, steps, roles, artefacts and constraints, ingested from SOPs, RDF/OWL and process diagrams</td>
-<td>a procedure (the executable sequence), the PDDL action space</td>
+<td><strong>Procedural knowledge</strong></td>
+<td>the published procedure itself — intent, ordered steps, actions, gates, declared outputs and failure branches — versioned and pinned by a run</td>
+<td>a separate ontology store (removed by the owner decision of 2026-11-19)</td>
 </tr>
 <tr>
 <td><strong>Decision policy refinement</strong></td>

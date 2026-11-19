@@ -232,6 +232,13 @@ pub struct StepOut {
     pub max_attempts: i32,
     /// The dot-paths this step exposes to later steps (S21 §6); empty = none.
     pub outputs: Vec<String>,
+    /// The SOP action text this step implements (T16); `None` for a hand-authored step.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub action_text: Option<String>,
+    /// The STRIPS preconditions over the procedure's typed facts (T16); empty = none.
+    pub pddl_preconditions: Value,
+    /// The STRIPS effects a completed step asserts (T16); empty = none.
+    pub pddl_effects: Value,
 }
 
 /// A process version as every read returns it.
@@ -259,6 +266,17 @@ pub struct ProcessOut {
     pub owner_user_id: Option<String>,
     /// The user-facing deliverables a person sees when the process completes (D29).
     pub outputs: Value,
+    /// The governed `sop_source` asset a converted process was derived from (T16).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_asset_id: Option<Uuid>,
+    /// The strata knowledge pack a converted process pins (T16); `""` = none.
+    pub knowledge_pack_ref: String,
+    /// The converter that produced the draft (T16); `""` = hand-authored.
+    pub converter_version: String,
+    /// The human approval that authorised the published version (T16); `None` = waived or
+    /// hand-authored.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub approval_id: Option<Uuid>,
     /// The version's steps, in position order.
     pub steps: Vec<StepOut>,
     /// Creation time.

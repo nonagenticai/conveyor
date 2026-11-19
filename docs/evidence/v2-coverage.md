@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 44 |
-| `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
-| `new` | absent | 11 |
+| `exists` | implemented in code and backed by real rows | 46 |
+| `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 6 |
+| `new` | absent | 8 |
 
 ## Rows
 
@@ -47,14 +47,11 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:project_dependency` | §10.3 | table | project_dependency | `exists` | migrations: CREATE TABLE project_dependency |
 | `table:decision_policy_refinement` | §10.3 | table | decision_policy_refinement | `exists` | migrations: CREATE TABLE decision_policy_refinement |
 | `table:laya_inference_config` | §10.3 | table | laya_inference_config | `exists` | migrations: CREATE TABLE laya_inference_config |
-| `table:pko_release` | §10.3 | table | pko_release | `new` | migrations: no CREATE/ALTER TABLE pko_release |
-| `table:pko_entity` | §10.3 | table | pko_entity | `new` | migrations: no CREATE/ALTER TABLE pko_entity |
-| `table:pko_relation` | §10.3 | table | pko_relation | `new` | migrations: no CREATE/ALTER TABLE pko_relation |
 | `actions:programme/plan` | §10.4 | actions | programme/plan | `extend` | actions: baselines.* found (baselines.get, baselines.list, baselines.take)<br>actions: cadences.* found (cadences.create, cadences.delete, cadences.list…)<br>actions: governed_assets.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.create, programmes.get, programmes.list…)<br>actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)<br>actions: registers.* found (registers.create, registers.delete, registers.get…)<br>actions: tranches.* found (tranches.create, tranches.delete, tranches.list…)<br>actions: wbs.* found (wbs.create, wbs.delete, wbs.get…) |
 | `actions:benefits` | §10.4 | actions | benefits | `exists` | actions: benefits.* found (benefits.create, benefits.delete, benefits.get…) |
 | `actions:architecture` | §10.4 | actions | architecture | `exists` | actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…) |
 | `actions:organisation` | §10.4 | actions | organisation | `exists` | actions: departments.* found (departments.create, departments.list)<br>actions: industries.* found (industries.create, industries.get, industries.list)<br>actions: job_bindings.* found (job_bindings.create, job_bindings.get, job_bindings.list…)<br>actions: job_releases.* found (job_releases.list, job_releases.publish, job_releases.retire)<br>actions: jobs.* found (jobs.list, jobs.retry) |
-| `actions:procedures` | §10.4 | actions | procedures | `extend` | actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: pko.* absent<br>actions: procedures.* found (procedures.create, procedures.get, procedures.ingest_process…) |
+| `actions:procedures` | §10.4 | actions | procedures | `exists` | actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: procedures.* found (procedures.create, procedures.get, procedures.ingest_process…) |
 | `actions:authoring` | §10.4 | actions | authoring | `new` | actions: authoring.* absent |
 | `actions:approvals` | §10.4 | actions | approvals | `exists` | actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request) |
 | `actions:decision` | §10.4 | actions | decision | `new` | actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br>*V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).* |
@@ -69,7 +66,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:memory` | §10.4 | actions | memory | `new` | actions: lessons.* absent |
 | `actions:metrics` | §10.4 | actions | metrics | `exists` | actions: metrics.* found (metrics.flow, metrics.job, metrics.maturity…) |
 | `destination:Organisation` | §10.5 | destination | Organisation | `exists` | docs/design/v2.js: page 'organisation' registered<br>*The page renders the tenant's live industry, department, job, release and binding rows (T0, #34/#65).* |
-| `destination:Procedures` | §10.5 | destination | Procedures | `extend` | docs/design/v2.js: page 'procedures' registered<br>*The page and the V1 process/SOP tables exist; SOP/RDF/OWL ingestion, PKO editing and publish gates are T16.* |
+| `destination:Procedures` | §10.5 | destination | Procedures | `exists` | docs/design/v2.js: page 'procedures' registered<br>*The page operates the T16 intake live (SOP/BPMN/RDF), the source review and the two human publication gates; signed out it renders the published procedure/process/step rows read-only (#448).* |
 | `destination:Authoring` | §10.5 | destination | Authoring | `new` | docs/design/v2.js: page 'authoring' registered<br>*A design study only: no authoring actions, no intake queue, no draft catalogue (T17).* |
 | `destination:Portfolio` | §10.5 | destination | Portfolio | `extend` | docs/design/v2.js: page 'portfolio' registered<br>*Live programme/project rows render today; shared config, WSJF backlog, cadence and capacity are fixture tabs (T1/T10).* |
 | `destination:Plan` | §10.5 | destination | Plan | `extend` | docs/design/v2.js: page 'plan' registered<br>*The live Boards tab renders real boards and cards (#57); WBS, baseline, registers and change control are T1.* |

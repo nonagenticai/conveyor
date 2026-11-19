@@ -19,8 +19,8 @@
       "note": "The page renders the tenant's live industry, department, job, release and binding rows (T0, #34/#65)."
     },
     "destination:Procedures": {
-      "verdict": "extend",
-      "note": "The page and the V1 process/SOP tables exist; SOP/RDF/OWL ingestion, PKO editing and publish gates are T16."
+      "verdict": "exists",
+      "note": "The page operates the T16 intake live (SOP/BPMN/RDF), the source review and the two human publication gates; signed out it renders the published procedure/process/step rows read-only (#448)."
     },
     "destination:Authoring": {
       "verdict": "new",
