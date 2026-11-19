@@ -239,6 +239,11 @@ async fn seed_programme_tx_is_idempotent_and_rolls_back_whole() {
 
     // A rollback publishes nothing: the caller owns the transaction.
     let other = support::seed_tenant(&db.super_pool, "progtx-rollback").await;
+    let before: i64 = sqlx::query_scalar("SELECT count(*) FROM project WHERE tenant_id = $1")
+        .bind(other.tenant)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("count the tenant's fixture rows");
     let other_tenant = conveyor_domain::TenantId::from_uuid(other.tenant).expect("non-nil tenant");
     let mut tx = conveyor_store::begin_scoped(&db.super_pool, other_tenant)
         .await
@@ -248,10 +253,13 @@ async fn seed_programme_tx_is_idempotent_and_rolls_back_whole() {
         .expect("pending run");
     assert_eq!(pending.created, 49);
     tx.rollback().await.expect("rollback");
-    let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM project WHERE tenant_id = $1")
+    let after: i64 = sqlx::query_scalar("SELECT count(*) FROM project WHERE tenant_id = $1")
         .bind(other.tenant)
         .fetch_one(&db.super_pool)
         .await
-        .expect("count projects");
-    assert_eq!(rows, 0, "a rolled-back seed leaves no project row");
+        .expect("count projects after the rollback");
+    assert_eq!(
+        after, before,
+        "a rolled-back seed adds no project row to the tenant"
+    );
 }
