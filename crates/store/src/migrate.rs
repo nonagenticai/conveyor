@@ -237,7 +237,11 @@ mod tests {
                 (58, "data model gaps".to_owned()),
                 // T11 (#84): the versioned C0–C5 threshold configuration and the billing
                 // reconciliation record (0059_metrics.sql, SPEC_V2 §7.5, §15.1 D37/D50/D52).
-                (59, "metrics".to_owned())
+                (59, "metrics".to_owned()),
+                // T16 (#85): the derived SOP/process provenance, the executable PDDL state and
+                // the publication approval (0060_procedure_ingestion.sql, SPEC_V2 §5.6; the PKO
+                // tables are deliberately absent — owner decision 2026-11-19, knowledge in strata).
+                (60, "procedure ingestion".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
