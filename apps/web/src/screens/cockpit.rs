@@ -146,9 +146,16 @@ pub fn Cockpit() -> impl IntoView {
 // card, and a refetch updates its regions in place (#375).
 #[component]
 fn CockpitBody(
-    data: RwSignal<CockpitData>,
+    data: RwSignal<Option<CockpitData>>,
     resource: LocalResource<Result<CockpitData, ApiError>>,
 ) -> impl IntoView {
+    // The parent renders this only while `body` holds a value, and a refetch never clears it.
+    // Deriving a non-optional signal here keeps every region reactive without unwrapping the
+    // `Option` at each of the reads below.
+    let data = Signal::derive(move || {
+        data.get()
+            .expect("CockpitBody is rendered only while the cockpit body is loaded")
+    });
     let ctx = expect_context::<AppCtx>();
     let me = ctx.me.get().map(|me| me.principal.id);
     // The claim controls read it in one closure and the decisions list in another; both are
