@@ -1,11 +1,41 @@
 {
   "issues": [
     {
-      "number": 422,
-      "title": "estate_toolkits: the in-flight test is a wall-clock race (CI run 135513313257)",
+      "number": 436,
+      "title": "docs: regenerate the design pack after the S14 cutover record so the registry refresh stops failing",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/436",
+      "updatedAt": "2026-11-19T16:31:02Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 435,
+      "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/422",
-      "updatedAt": "2026-11-19T12:48:08Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/435",
+      "updatedAt": "2026-11-19T15:39:52Z",
+      "labels": [
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 434,
+      "title": "console: the Operations screen reads the incident lifecycle (T7 built)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/434",
+      "updatedAt": "2026-11-19T15:36:32Z",
       "labels": [
         {
           "name": "unit",
@@ -18,19 +48,104 @@
       ]
     },
     {
-      "number": 421,
-      "title": "engine: an expired step lease survives a wedged worker and starves the queue",
+      "number": 433,
+      "title": "publish: the programme's delivery record \u2014 programme.json, CSV and one tracked issue",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/421",
-      "updatedAt": "2026-11-19T12:05:00Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/433",
+      "updatedAt": "2026-11-19T15:47:09Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 430,
+      "title": "docs(s14): record the executed cutover and the n8n decommission",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/430",
+      "updatedAt": "2026-11-19T15:35:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 427,
+      "title": "coverage: T11 still measures as proposed, so every registry refresh is born red",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/427",
+      "updatedAt": "2026-11-19T15:35:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 426,
+      "title": "pre-push gate: says PUSH BLOCKED and pushes anyway, after 30-minute runner-pod timeouts",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/426",
+      "updatedAt": "2026-11-19T14:24:16Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 422,
+      "title": "estate_toolkits: the in-flight test is a wall-clock race (CI run 135513313257)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/422",
+      "updatedAt": "2026-11-19T14:23:52Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 421,
+      "title": "engine: an expired step lease survives a wedged worker and starves the queue",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/421",
+      "updatedAt": "2026-11-19T16:22:20Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -2867,7 +2982,7 @@
       "title": "T16 \u2014 SOP, RDF/OWL and process-document ingestion",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/85",
-      "updatedAt": "2026-11-19T11:10:17Z",
+      "updatedAt": "2026-11-19T15:53:28Z",
       "labels": [
         {
           "name": "unit",
@@ -3014,15 +3129,15 @@
       "title": "T7 \u2014 Operations",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/78",
-      "updatedAt": "2026-11-19T10:27:13Z",
+      "updatedAt": "2026-11-19T16:22:00Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T7",
