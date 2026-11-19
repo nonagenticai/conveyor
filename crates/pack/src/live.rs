@@ -274,7 +274,7 @@ fn tranche_text(value: &Value) -> String {
 
 /// RFC 4180 quoting: a field with a comma, a quote or a newline is quoted and its quotes doubled.
 fn csv_field(field: &str) -> String {
-    if field.contains(|character| matches!(character, ',' | '"' | '\n' | '\r')) {
+    if field.contains([',', '"', '\n', '\r']) {
         format!("\"{}\"", field.replace('"', "\"\""))
     } else {
         field.to_owned()
