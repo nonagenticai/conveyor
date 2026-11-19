@@ -570,9 +570,18 @@ async fn create_derived_drafts(
     };
     let procedure = store::procedure::create_draft_tx(&mut *tx, ctx.tenant, &sop)
         .await
-        .map_err(|error| {
-            tracing::error!(%error, "create the derived SOP judge");
-            ActionError::internal()
+        .map_err(|error| match error {
+            store::procedure::SopStoreError::DraftExists => ActionError::new(
+                409,
+                "procedure.draft_exists",
+                format!(
+                    "the key {process_key:?} already has a draft SOP; publish it before re-ingesting"
+                ),
+            ),
+            other => {
+                tracing::error!(error = %other, "create the derived SOP judge");
+                ActionError::internal()
+            }
         })?;
 
     // A key that already exists gets the NEXT version (the version family's rule); its steps are
