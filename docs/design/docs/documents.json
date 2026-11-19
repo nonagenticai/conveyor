@@ -501,8 +501,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "c69c3716cf0a64925a4d21c7848cb0d45607c924a266b5c4b0b3688569d1998a",
-      "bytes": 250504,
+      "sha256": "aef99a3088bc2666a6598df665221afb32c6abbd9e6a93c893b6176000ffcbda",
+      "bytes": 250980,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -573,8 +573,8 @@
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "83543fdcb8dd431f9493a0beef848c1474696a2e8f69dc30b4b6cd045c2a1a5b",
-      "bytes": 23840,
+      "sha256": "3cc0009a9ce7c398071d84d23533c2dab86cef39b02fbc8d99a8ec5dcf719675",
+      "bytes": 24410,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
