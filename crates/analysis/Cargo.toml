@@ -17,7 +17,7 @@ path = "src/lib.rs"
 # `crates/api/tests/externals_declared.rs` forbids the transport this crate must not have anyway.
 # It reads no clock either: the one time-dependent check (content staleness) takes the instant as
 # a parameter, which is why `chrono` is here as a type, not as a source of "now".
-scraper = "0.25"
+scraper = "0.29"
 regex = { workspace = true }
 chrono = { workspace = true }
 # The report shape is published as a schema: `analyse.site`'s action spec derives its output type
