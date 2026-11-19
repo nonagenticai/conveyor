@@ -523,7 +523,7 @@
           "S12",
           "S13"
         ],
-        "plan_status": "planned",
+        "plan_status": "executed (2026-11-18; gitops-production",
         "status_source": "measured coverage + open GitHub issues + plan frontmatter",
         "measured_status": "partial",
         "tranche": 11,
@@ -1447,8 +1447,10 @@
           394,
           395,
           410,
-          421,
-          422
+          426,
+          433,
+          434,
+          435
         ],
         "depends_on": [],
         "plan_status": "active",
