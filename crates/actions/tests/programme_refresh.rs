@@ -44,7 +44,7 @@ async fn a_refresh_applies_the_embedded_seed_and_a_second_is_all_skipped() {
     let projects: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM project WHERE tenant_id = $1 AND meta ? 'track'",
     )
-    .bind(seeded.tenant)
+    .bind(seeded.tenant_id)
     .fetch_one(&pg.owner)
     .await
     .expect("count the tenant's projects");
@@ -69,7 +69,7 @@ async fn another_tenant_is_untouched() {
         .await;
     assert_eq!(status, 200, "{body}");
     let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM project WHERE tenant_id = $1")
-        .bind(other.tenant)
+        .bind(other.tenant_id)
         .fetch_one(&pg.owner)
         .await
         .expect("count the other tenant's projects");
@@ -88,7 +88,7 @@ async fn a_viewer_cannot_refresh() {
     .await
     .expect("insert the viewer");
     sqlx::query("INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'viewer')")
-        .bind(seeded.tenant)
+        .bind(seeded.tenant_id)
         .bind(viewer_id)
         .execute(&pg.owner)
         .await
