@@ -221,10 +221,15 @@
       ]
     },
     "T14": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "actions": [
+        "toolkits.publish",
+        "tools.probe",
+        "tools.usage"
       ],
-      "gap": "no estate toolkit published with a probe and a live call"
+      "modules": [
+        "crates/actions/src/toolkits"
+      ],
+      "gap": null
     },
     "T15": {
       "evidence": [

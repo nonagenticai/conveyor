@@ -1658,7 +1658,6 @@
     {
       "blocked_by": [
         "T11",
-        "T14",
         "T15",
         "T16",
         "T17",
@@ -1746,18 +1745,18 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/toolkits"
       ],
-      "gap": "no estate toolkit published with a probe and a live call",
+      "gap": null,
       "key": "T14",
       "measured": {
         "actions": [
-          0,
-          0
+          3,
+          3
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
           0,
@@ -1775,7 +1774,7 @@
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 4,
       "units": {
@@ -2510,10 +2509,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 35,
+        "built": 36,
         "partial": 2,
         "planned": 0,
-        "proposed": 9,
+        "proposed": 8,
         "standing": 1
       },
       "total": 48,
