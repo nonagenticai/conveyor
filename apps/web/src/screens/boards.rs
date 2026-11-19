@@ -19,7 +19,7 @@ use wasm_bindgen::JsCast;
 
 use crate::api::{ApiError, Client, InvokeOptions, Page};
 use crate::components::{Empty, ErrorPanel, age};
-use crate::models::{BoardView, CardOut, CardView, LabelOut, ListOut, ProjectOut, ProjectView};
+use crate::models::{BoardView, CardOut, CardView, LabelOut, ListOut, ProjectView};
 use crate::sse;
 use crate::state::AppCtx;
 
@@ -102,22 +102,17 @@ struct BoardCtx {
 }
 
 async fn load_projects(client: Client, cursor: Option<String>) -> Result<ProjectPage, ApiError> {
+    // #390: one page, one read. `include=boards` returns each project with its boards, so the
+    // index never issues a detail read per project.
     let path = match cursor {
-        Some(cursor) => format!("/api/projects?limit=50&cursor={cursor}"),
-        None => "/api/projects?limit=50".to_owned(),
+        Some(cursor) => format!("/api/projects?limit=50&include=boards&cursor={cursor}"),
+        None => "/api/projects?limit=50&include=boards".to_owned(),
     };
     let value = client.get(&path).await?;
-    let page: Page<ProjectOut> = serde_json::from_value(value)
+    let page: Page<ProjectView> = serde_json::from_value(value)
         .map_err(|error| ApiError::Network(format!("projects: {error}")))?;
-    let mut views = Vec::with_capacity(page.items.len());
-    for project in page.items {
-        let value = client.get(&format!("/api/projects/{}", project.id)).await?;
-        let view: ProjectView = serde_json::from_value(value)
-            .map_err(|error| ApiError::Network(format!("project: {error}")))?;
-        views.push(view);
-    }
     Ok(ProjectPage {
-        views,
+        views: page.items,
         next_cursor: page.next_cursor,
     })
 }
