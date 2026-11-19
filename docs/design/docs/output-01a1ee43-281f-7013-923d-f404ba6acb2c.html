@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T16 SOP, RDF/OWL and process-document ingestion — inception analysis · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T16 — Inception analysis</h1>
+<p>Project: T16 — SOP, RDF/OWL and process-document ingestion · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12
+Unit: #85 (this document is dependency-shaping work; blocked by T13 (#76) — T2 and P0 are built)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T2", "T13", "P0"]</p>
+<h2>Current state</h2>
+<p>T16 targets one pipeline: store a tenant document as an untrusted source, convert it into relational
+procedural knowledge and a draft executable procedure, and publish both behind a gate. Execution is built;
+ingestion and ontology are not.</p>
+<ul>
+<li><strong>Executable ordered process — <code>built</code>.</strong> <code>process</code>/<code>process_step</code> (renamed from <code>procedure*</code> by 0035)
+hold <code>agent | computed | gate | call</code> steps (<code>crates/domain/src/process.rs:StepKind</code>), authored by
+<code>processes.create</code> (<code>crates/actions/src/process/processes.rs:processes_create</code>). A step has an action,
+input template and outputs but no preconditions or effects (<code>crates/actions/src/process/views.rs:StepIn</code>).</li>
+<li><strong>SOP-as-judge — <code>built</code>.</strong> <code>procedure</code> is now the SOP a step is judged against
+(<code>migrations/0035_process_tree.sql:procedure</code>), validated at publish
+(<code>crates/domain/src/procedure.rs:validate_publish</code>), and owns the <code>procedures.*</code> family
+(<code>crates/actions/src/procedure/procedures.rs:procedures_publish</code>). Not executable.</li>
+<li><strong>Process map — <code>built</code></strong> (<code>migrations/0035_process_tree.sql:process_map</code>,
+<code>crates/actions/src/process_map/maps.rs:process_maps_create</code>); declarative, never the executor.</li>
+<li><strong>SOP source — <code>partial</code>.</strong> <code>governed_asset</code> accepts <code>sop_source</code>
+(<code>migrations/0044_plan_spine.sql:governed_asset</code>; <code>crates/domain/src/governance.rs:AssetKind</code>) but no
+action writes that kind (<code>crates/actions/src/governance/assets.rs</code>).</li>
+<li><strong>Document ingestion — <code>built</code>.</strong> <code>documents.ingest</code> hands one <code>document</code> to the ingestion capability
+(<code>crates/actions/src/documents/ingest.rs:documents_ingest</code>); <code>knowledge.query</code> retrieves pinned leaves
+(<code>crates/actions/src/knowledge/query.rs:knowledge_query</code>).</li>
+<li><strong>Capability substrate — <code>built</code></strong> (<code>migrations/0020_capability.sql:capability</code>); only list/get/bind_knowledge
+exist (<code>crates/actions/src/capability/capabilities.rs:capabilities_bind_knowledge</code>), so
+<code>capabilities.design|publish</code> are <code>absent</code>.</li>
+<li><strong>PKO — <code>absent</code>.</strong> No <code>pko_*</code> table exists; the newest migration is 0051
+(<code>migrations/0051_tranche_review.sql:programme_tranche_review</code>). §10.3 specifies
+<code>pko_release</code>/<code>pko_entity</code>/<code>pko_relation</code>; #85 builds them.</li>
+<li><strong>RDF/OWL/Turtle and BPMN/Visio/draw.io conversion — <code>absent</code>.</strong> No parser or PDDL code exists; the existing
+<code>ingest</code> modules are document submission (<code>crates/actions/src/documents/ingest.rs</code>) and OpenAPI action
+ingest (<code>crates/actions/src/ingest.rs:DiscoveredAction</code>) — neither converts a process document.</li>
+<li><strong>Tool platform — <code>absent</code>.</strong> No <code>tool*</code> table or <code>tools.*</code> action exists; T13 (#76) is <code>status:claimed</code>,
+open and unmerged (§11.8), and live conversion is blocked at that seam.</li>
+<li><strong>Ladder and approvals — <code>built</code></strong> (<code>migrations/0046_decision_ladder.sql:decision</code>,
+<code>migrations/0050_approval_policies.sql:approval_policy</code>).</li>
+</ul>
+<p>Published processes are immutable. A binding may name any process row —
+<code>crates/actions/src/organisation.rs:job_bindings_create</code> checks existence only — and the published
+version is resolved at run start (<code>crates/actions/src/process/runs.rs:resolve_version</code>). "An unreviewed source never binds" has no
+carrier yet: no artefact records its source.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Analysis question</th><th>State</th></tr></thead><tbody>
+<tr><td>conveyor <code>process</code> / <code>process_step</code></td><td>Is a draft <code>process</code> version the right carrier for the PDDL draft?</td><td><code>built</code></td></tr>
+<tr><td>conveyor <code>procedure</code> and <code>procedures.*</code></td><td>Is the SOP publish gate the review gate; is there room for intake verbs?</td><td><code>built</code></td></tr>
+<tr><td>conveyor <code>governed_asset</code>, <code>document</code>, <code>documents.ingest</code></td><td>Do provenance and strata submission exist already?</td><td><code>partial</code></td></tr>
+<tr><td>conveyor <code>process_map</code>, <code>capability</code>, <code>capability_agent</code></td><td>Do BPMN maps and SOP-derived capabilities reuse existing aggregates?</td><td><code>built</code></td></tr>
+<tr><td>wider estate, by capability: document ingestion and pinned retrieval (<code>strata_ingest</code>, <code>strata_rag</code>), web scraping, formal checking</td><td>Which capability does each conversion step call, with which effect class?</td><td>live per §11.2, unbound without T13</td></tr>
+<tr><td>upstream: RDF 1.1/Turtle, OWL 2, BPMN 2.0, PDDL, Visio and draw.io export XML</td><td>Which specification is normative, which is a serialisation to parse?</td><td>external standards</td></tr>
+<tr><td>upstream: maintained Rust parsers for RDF/XML and XML</td><td>Depend or hand-roll; licence and maintenance terms?</td><td>external</td></tr>
+</tbody></table>
+<h2>Build vs reuse</h2>
+<ul>
+<li><strong>PKO storage — build, reuse nothing.</strong> Relational rows per D53; no triple store, reasoner or SPARQL.
+RDF/OWL/Turtle are import-only: the converter emits complete rows before publish and no runtime query
+extends them.</li>
+<li><strong>Executable draft — reuse <code>process</code>/<code>process_step</code>.</strong> Add PDDL columns; do not create a second procedure
+aggregate (P1, P10). Publication stays <code>processes.publish</code>.</li>
+<li><strong>SOP intake — reuse <code>governed_asset(kind='sop_source')</code> and <code>documents.ingest</code>.</strong> Build one writer and
+the approval path; no new asset table.</li>
+<li><strong>Structural formats — build the mapping, reuse a parser crate.</strong> RDF/OWL and BPMN mappings are
+deterministic; parser licences are reviewed.</li>
+<li><strong>Prose SOP conversion — build a generation step.</strong> L2 in the ladder, not a decision; a human gate
+publishes. No reuse candidate exists.</li>
+<li><strong>Backends — reuse the T13 broker only.</strong> T16 declares toolkit needs and writes no HTTP client (§11.3);
+live conversion waits for T13.</li>
+<li><strong>Knowledge packs — reuse <code>strata_rag</code> through <code>capabilities.bind_knowledge</code>.</strong> Never host embeddings.</li>
+</ul>
+<h2>Risks</h2>
+<ul>
+<li><strong>Name collision on <code>procedures.*</code>.</strong> §10.4 lists <code>procedures.ingest_sop|…|publish</code>, but
+<code>procedures.publish</code> already publishes the SOP judge. Check:
+<code>git show origin/main:docs/design/data/actions.json | grep '"procedures\.'</code> returns six names; a
+duplicate is refused (<code>crates/actions/src/ingest.rs</code> documents <code>action-name-conflict</code>).</li>
+<li><strong>Spec prose versus schema drift.</strong> §10.3 says <code>procedure</code>/<code>procedure_step</code> gain PDDL; the executable
+tables are <code>process</code>/<code>process_step</code>. Check: <code>git grep -n 'RENAME TO process' origin/main -- migrations</code>.</li>
+<li><strong>Unvalidated PDDL.</strong> A publish with an unsatisfiable precondition breaks a run. Check: (to create at
+#85) a publish-refusal test with a malformed precondition.</li>
+<li><strong>Untrusted SOP as instruction.</strong> SOP text reaching a prompt path is the injection surface. Check:
+(to create at #85) a fixture ordering the converter to publish; output must be draft rows.</li>
+<li><strong>Absent tool seam.</strong> A direct backend call violates §11.3. Check:
+<code>git grep -n 'CREATE TABLE tool' origin/main -- migrations</code> returns nothing.</li>
+<li><strong>Speculative aggregates (P10).</strong> Three PKO tables with no consumer are dead weight. Check: each is read
+by the bound-run path and by one metric.</li>
+<li><strong>Edit rewrites history.</strong> An in-place edit of a published PKO entity changes what a published procedure
+was validated against. Check: (to create at #85) an update on a published release is refused.</li>
+</ul>
+<h2>Open questions</h2>
+<ol>
+<li>Does the procedure land as a <code>process</code> draft, or as an intermediate artefact producing one?</li>
+<li>Which PDDL fragment: STRIPS with typing, or an ADL subset, and who owns the grammar?</li>
+<li>Is the SOP judge one row per derived process, or a shared tenant library row?</li>
+<li>Do intake verbs stay in <code>procedures.*</code>, or move to a new family?</li>
+<li>One card per document or per batch; how much Visio export is BPMN-equivalent?</li>
+</ol>
+<h2>Links</h2>
+<ul>
+<li>Project brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-5092-73e3-ae1b-107a29485e4b.html</li>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/85 · dependency https://github.com/nonagenticai/conveyor/issues/76</li>
+<li>Spec: §4.6, §5.6–§5.7, §8.1, §10.3, §10.4, §11, §12 T16 (gate); P0 standard <code>docs/plans/P0-programme-definition.md</code> §5</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SOP, RDF/OWL and process-document ingestion · conveyor output · published 2026-11-19T23:09:55.325875457+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

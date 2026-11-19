@@ -1,0 +1,86 @@
+{
+  "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
+  "files": [
+    {
+      "bytes": 108957,
+      "path": "architecture.json",
+      "records": 78,
+      "sha256": "d3f7e5240384a16e90caf0bbf22b6fe29a36acc81caff6f1e12eab02bd13e72b"
+    },
+    {
+      "bytes": 71578,
+      "path": "artefacts.json",
+      "records": 165,
+      "sha256": "858b70817a0b6565396c46758c5f23b1697e013283addef0825ca80ee8b863b4"
+    },
+    {
+      "bytes": 1831700,
+      "path": "config.json",
+      "records": 2255,
+      "sha256": "a60cbea62482570228654de5da25096b3225fd2e4dbb95bf15265514283bea2f"
+    },
+    {
+      "bytes": 109,
+      "path": "evidence.json",
+      "records": 0,
+      "sha256": "9ebf290027ff6c23555e5e7169e442c8c3927a453d4e41d1aeb0821e5e803603"
+    },
+    {
+      "bytes": 110,
+      "path": "feedback.json",
+      "records": 0,
+      "sha256": "87629072c6864e68af58f397728bb19fde86008dc11174eea204fee4c1aedffd"
+    },
+    {
+      "bytes": 1349,
+      "path": "measure.json",
+      "records": 0,
+      "sha256": "709f904e9006e31ec34d886c6fa0507f83c61f93d7df682cd1dbd91d7be47c25"
+    },
+    {
+      "bytes": 27605,
+      "path": "msp.json",
+      "records": 33,
+      "sha256": "e8f1942f949254f5d0a2f0ddb4fd5cef8cd86d383f9702987f3a0c1825034ab2"
+    },
+    {
+      "bytes": 16712,
+      "path": "organisation.json",
+      "records": 34,
+      "sha256": "5d3d31ce21cd298852cd5e0989bbb87623137657cbb98617c8d69d7802970a74"
+    },
+    {
+      "bytes": 179147,
+      "path": "programme.json",
+      "records": 49,
+      "sha256": "b48924efc0a5f4e5f2c9edee121d4769be6cfa7271d934003d44d711bf8e6f28"
+    },
+    {
+      "bytes": 225,
+      "path": "secrets.json",
+      "records": 0,
+      "sha256": "05004183c233d6313dc40e036f51a60cd8518d481dd3a99e852f73be50d4bd0d"
+    },
+    {
+      "bytes": 2519420,
+      "path": "snapshot.js",
+      "records": 0,
+      "sha256": "a081ecc520840d132928d94648316b981b34d3a1a60c2b454278407ce44496be"
+    },
+    {
+      "bytes": 1088862,
+      "path": "work.json",
+      "records": 1908,
+      "sha256": "a4c72ef11eaaa6850bc7da6f0832755543b1cbd3608f04d1106a95338964c100"
+    }
+  ],
+  "generated_at": "2026-11-19T23:09:55.325875457+00:00",
+  "git_sha": "205b1b2e7a6c7e771298122c5c5cd546ed5e4689",
+  "migration": {
+    "description": "procedure ingestion",
+    "version": 60
+  },
+  "redaction": "no secret values, no encryption key ids, no emails, no OIDC subjects, no session or licence tokens",
+  "schema": "design-snapshot/v1",
+  "tenant": "nonagentic"
+}

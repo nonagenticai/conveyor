@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S06a — mcp_server signed channel — both directions · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S06a — mcp_server signed channel — both directions</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 6 · <strong>Measured status:</strong> archived · <strong>Plan:</strong> <code>docs/plans/slices/S06a-mcp-server-channel.md</code>
+<strong>Dependencies:</strong> S04, S05, S06 · <strong>Issues:</strong> none</p>
+<h2>Outcome</h2>
+<p><code>agent</code> reaches its backend only through <code>mcp_server</code>, and that binding is two HMAC-signed HTTP endpoints. This
+slice makes the conveyor speak both byte-compatibly: same path, grammar and five response words inbound; same three
+events, fields and 204 contract outbound.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — both directions verbatim: <code>POST /api/webhooks/mcp/incoming</code> (receiver) and
+<code>POST {MCP_EVENTS_URL}/api/channels/fr/events</code> (sender); HMAC; the five-command grammar (questions ride as
+approvals — no second concept); the five response words; the three event types; inbound 200/400/401/413/503, outbound 204/401/413/503; the emitter job; a stub receiver and a suite replaying Python-captured
+fixtures.</p>
+<p><strong>OUT</strong> — <code>agent</code> (untouched, SPEC §4.5); <code>mcp_server</code>'s 48 tools, catalog, runs and 36 tables (it stays); the
+conveyor's own MCP surface (S10); every other fr caller (S13).</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>nonagenticai_mcp_server/src/external/signing.py</code></td><td><code>sign</code>, <code>verify</code>, <code>_digest</code>, <code>SKEW_SECONDS</code></td><td>the algorithm exactly</td><td>nothing</td></tr>
+<tr><td><code>nonagenticai_mcp_server/src/external/fr.py</code></td><td><code>INBOUND_PATH</code>, <code>TEXT_LIMIT=4000</code>, <code>START_PASSTHROUGH</code>, <code>_send</code></td><td>envelope, grammar, client codes</td><td>httpx, the tool layer</td></tr>
+<tr><td><code>nonagenticai_mcp_server/src/routers/fr_channel.py</code></td><td><code>EVENT_TYPES</code>, <code>MAX_BODY_BYTES=65536</code>, <code>_approval</code>, <code>_message</code>, <code>_record</code>, <code>events</code></td><td>204 semantics, tombstone, first-report-wins</td><td><code>mcp_runs</code>, activity rows</td></tr>
+<tr><td>`nonagenticai…</td><td></td><td></td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S04, S05, S06.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-api --test mcp_channel --test mcp_channel_stub --test mcp_channel_conformance
+cargo clippy --workspace --all-targets -- -D warnings
+# property c — a Rust-signed vector verifies with the REAL Python verifier, not a re-implementation
+(cd $HOME/Movies/nonagenticai_mcp_server &amp;&amp; python3 -c 'import json,sys;from src.external.signing import _digest;v=json.load(open("$HOME/Movies/conveyor…
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`development`, `architecture`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>mcp_server signed channel — both directions · conveyor output · published 2026-11-19T23:09:55.325875457+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Architecture waiver — the register at 2026-11-19 · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Architecture waiver</h1>
+<p>Project: T9 — TOGAF ADM capability · Tranche: 4 · Plan: <code>docs/SPEC_V2.md</code> §8.1 / <code>docs/plans/T9-architecture-capability.md</code>
+Measured at: main@f14b7d36, 2026-11-19 · Record: the <code>architecture_waiver</code> register · Owner: the programme architect · Reviewer: the Architecture Board</p>
+<p>This document records the waiver register's state, not a proposal to accept a deviation. A waiver is
+a row created by <code>architecture.reviews_waive</code> against a recorded compliance review; the action refuses
+a waiver without an accepting owner and a reassessment date, and the board cannot waive a deviation it
+owns. At this date the register holds no row.</p>
+<h2>Deviation</h2>
+<p>None accepted at 2026-11-19. No compliance review has yet found a deviation from a live contract: the
+first review — T9's own Phase G review against the live Statement of Architecture Work — is recorded
+after the console unit (#385) lands, because its D6 clause is the one being exercised. Until that
+review records a deviation and an owner accepts it, there is nothing to waive, and inventing a
+deviation to fill this document would be the opposite of a waiver's purpose.</p>
+<p>The capability's known limitations are not waivers. The seeded standard ships ten artefact types and
+no action adds one; phases E–H have no mandatory types; the board row's <code>status</code> stays <code>draft</code> while
+its decision is an approval row; an identical duplicate maturity assessment group exists from a
+read-back. Each is recorded where it belongs — in <code>adm-profile</code>, <code>artifact-standard</code>,
+<code>maturity-assessment</code> and the evidence row — as a gap with the action that would close it, because a
+gap that is disclosed is not a deviation from a contract that never required the missing thing.</p>
+<h2>Accepting owner</h2>
+<p>None. No row exists, so no accepting owner is named. When a deviation is accepted, the row names the
+asset owner whose authority covers the deviation — and the board may not accept a deviation it owns
+— with the scope of that authority. A session cannot take this decision: the authority matrix puts
+every gate decision with the human owner, and <code>architecture.reviews_waive</code> records the decision only
+against a review that another seat recorded.</p>
+<h2>Reason and impact</h2>
+<p>None accepted: no additional cost, risk or schedule impact has been signed off through this register.
+When a waiver is granted, the row carries the reason the deviation is needed, the additional cost,
+the risk, and the reassessment date; a deviation without those is refused by the action, not merely
+discouraged by this document.</p>
+<h2>Reassessment</h2>
+<p>The register is reviewed at each Phase G compliance review and at each tranche review. The next
+scheduled review is T9's Phase G review against the live Statement of Architecture Work — contract
+<code>01a1f2c2-0e1a-787f-9011-46b424d1ec71</code>, status <code>live</code>, version 2 — recorded through
+<code>architecture.reviews_record</code> after #385. A waiver that is in force at a tranche review is re-read
+there: an expired reassessment date ends it, and a deviation that recurs becomes a decision record,
+not a second waiver.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-19T23:09:55.325875457+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

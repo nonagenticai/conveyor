@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>SPEC-V2 — Specification · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>SPEC-V2 — Specification</h1>
+<p>Project: SPEC-V2 · Track: programme · Tranche: 0 · Plan: docs/SPEC_V2.md
+Unit: #349 (the unit that publishes this output)
+Measured at: main@856cb8e53756b40170353802d9d5c97fdc024ac4, 2026-11-18 · Project row: closed</p>
+<h2>Context</h2>
+<p>This specification binds the adoption of V2 as the conveyor's organisational operating model and delivery plan. <code>docs/SPEC_V2.md</code> is the design record holding the model, the architecture, the tool estate and the T0–T17 slices with their gates. This document is that record's binding summary, not a copy; where wording differs, the design record governs.</p>
+<p>It binds the model, architecture and ownership constraints, the tool contract and the plan's acceptance. It does not bind the V1 build — <code>docs/SPEC.md</code> remains binding for its slices, which V2 does not re-open (§1.1) — the individual slice contracts, or the separately governed legacy rewrites (§12). It reports no result: the project row is closed, and this states what the slices must prove, not that they proved it.</p>
+<p>Boundary: in scope is the design record and its adoption; out of scope is building the slices.</p>
+<h2>Requirements</h2>
+<p>Each requirement is binding and testable; its source section names the evidence.</p>
+<p><strong>Principles (§3).</strong>
+R1 One record per fact; seams join by pinned reference (§3, §10.1).
+R2 Rule → laya → generation → human; an LLM never selects, routes, classifies, approves or transitions state (§3, §7.1).
+R3 No work without a card, no transition without an action, no completion without evidence (§3, §5.4).
+R4 The executor never approves its own work (§3, §5.4).
+R5 Measurement before adoption: a procedure, prompt, job or code change needs a pinned instrument (§3, §9.3).
+R6 Meta-jobs are ordinary jobs on the same primitives (§3, §6).
+R7 Self-development is gated; the system cannot change its own gates or instruments (§3, §9.3).
+R8 Missing configuration fails closed before the first call or action (§3, §4.4).
+R9 Every model call is ledgered and budgeted; over budget refuses (§3, §7.5).
+R10 No speculative aggregate: a table needs a named procedure and a metric; zero use retires it (§3, §14 R1).
+R11 Policies, thresholds and approval kinds are versioned tenant rows, never code values (§3, §7.2).</p>
+<p><strong>Model invariants (§4–§7).</strong>
+R12 Exactly one industry and one or more ordered departments per job; cross-industry departments refused; sibling conflicts are compile errors; knowledge layers base → industry → department → region → job, <code>required</code> tightened only down (§4.1).
+R13 A binding pins <code>job_key</code>, <code>release_hash</code> and a frozen snapshot; a release change is a new binding and gate; stale pins refuse <code>409 job_binding_stale</code> before any model call (§4.4).
+R14 <code>procedure</code> and <code>internal_agent</code> only, behind one extensible <code>Executor</code> contract (D61, proposed); no external executor; the agent platform is a front end whose outage pauses no run (§4.5, §10.6).
+R15 Tenant → computed portfolio / programme → project → WBS → card → run → step; dependencies are typed edges, cycles refused; lifecycle, card state and run state stay distinct (§5.1, §5.3).
+R16 One approval primitive; a gate needs evidence; dual control means two distinct approvers excluding executor, assignee and requester; every gate has a negative test; never-refused gates are flagged; default human (§5.4).
+R17 One register, six kinds; a change names impact and rationale; a benefit is baselined before transition and measured at closure (§5.5, §8.3; the transition rule's D63 material is proposed).
+R18 SOP, RDF/OWL and process documents are untrusted inputs producing drafts only; the action space and the PKO never mix; no source grants tools or widens ceilings (§5.6).
+R19 Laya decides the named cases over authored options (§7.3); every decision records policy, refinement and laya config versions, answer, probabilities and confidence; below threshold is an outcome (§7.2).
+R20 Required knowledge with no leaves blocks before the first step; packs pin <code>key@version</code>; work-package memory is hot rows plus one digest; lessons need two independent references and review; prompts compile byte-identically and are never stored (§7.6, §7.7).
+R21 Backend calls pass the broker only: closed schemas, registered destinations, sealed credentials, one <code>tool_call</code> row; effect classes read/write/destructive/spend; ceilings narrow only; writes verify and are idempotent; a failing probe unbinds (§11.1, §11.3, §11.4).</p>
+<p><strong>Architecture constraints (§10).</strong>
+R22 The conveyor owns its whole model and joins internally; the agent platform reaches it over MCP only; §10.2 bounds the seams; each action is one <code>ActionSpec</code>; one binary, one Postgres, no new port, no Redis, no hosted model, in-process broker; host operations await §10.4.1 (§10.1–§10.6).</p>
+<p><strong>Delivery plan (§12).</strong>
+R23 Each T0–T17 slice is gated as stated and proved locally before done; dependencies hold; T0–T3 plus T13 ship first; T12 is V2's acceptance; no V1 slice re-opens.</p>
+<h2>Design</h2>
+<p>The design is platform-first: V2 extends the one Rust application and one Postgres V1 runs, adding tables and actions only — same binary, namespace and port; no Redis, no hosted model, no new runtime. Every action is one <code>ActionSpec</code> served over HTTP, MCP and OpenAPI (§10.4, §10.6). The units are job, card, approval and run, reusing V1's board, document and event primitives (§2).</p>
+<p>The conveyor-owned catalogue — industry, ordered departments, job — compiles into an immutable, content-hashed release carrying charter, bindings, prompt recipe, knowledge and memory pins, tool grants, decision options, limits and gates. A tenant-scoped binding pins one release and one executor; nothing is imported (§4.1–§4.4), and jobs are curated from the derivation chain rather than mass-generated (§4.3).</p>
+<p>Two implementations of one <code>Executor</code> contract: a deterministic procedure, and an internal agent prompted from knowledge, episodic memory, the PDDL request and the curated tool list (§4.5, §7.7).</p>
+<p>The portfolio is a computed read model; the programme carries shared configuration and the dependency graph; project types are templates over WBS nodes and gates; one register serves six kinds (§5.1–§5.5). Meta-jobs are ordinary catalogue entries with charters, closed decision sets and data-driven authority (§6). Options, policies and refinements are rows; laya decides, and the LLM drafts only through a gated action (§7.1–§7.5).</p>
+<p>Five tool definitions have one owner each — tool, toolkit, binding, grant, call; the broker is the only call path, with effect classes and a ledger (§11.1–§11.4). There is no second tool control plane (§11.7); bytes go directly to tenant-prefixed shared storage (§11.10).</p>
+<p>Constraining decisions: D28–D63 (§15.1) — D33 ownership, D38 pinned bindings, D41/D44 one tool path, D46/D61 the executor seam, D49–D51 configuration, D53 PKO separation, D57 storage, D62–D63 the MSP and TOGAF implementations; D61–D63 remain proposed.</p>
+<h2>Acceptance</h2>
+<p>This section names how the requirements are proved. It reports no result: no check below is claimed to have passed in this document.</p>
+<table><thead><tr><th>#</th><th>Acceptance scenario</th><th>Proves</th><th>Gate source</th></tr></thead><tbody>
+<tr><td>A1</td><td>A job is created, a release published and a binding pins its hash; a retired binding refuses <code>409 job_binding_stale</code>; a test-only third executor registers without editing the run path (D61, proposed).</td><td>R11–R14, R22</td><td>§12 T0</td></tr>
+<tr><td>A2</td><td>A baseline, change request and refused self-approval; WSJF recomputes; the portfolio lists in-flight work; a dependency cycle and a benefit lacking baseline, target, method or owner are refused.</td><td>R15–R17</td><td>§12 T1</td></tr>
+<tr><td>A3</td><td>Rule, laya and human decisions share one audit shape; a tenant refinement changes a threshold without code; a generated draft cannot transition a card.</td><td>R2, R11, R19</td><td>§12 T2</td></tr>
+<tr><td>A4</td><td>PM cannot self-approve; one failure yields one coach card and a repeat escalates; a kata measures on a held-out instrument and cannot adopt itself; a development project keeps its gates; an unapproved destructive action and a one-reference lesson are refused.</td><td>R3–R7, R16</td><td>§12 T3–T8</td></tr>
+<tr><td>A5</td><td>Subject to D62–D63 acceptance (§15.1): an architecture phase needs its mandatory artefacts and a live contract; an evidence-free tranche review is refused; a benefit without a measured baseline cannot be reported.</td><td>R5, R16, R17</td><td>§12 T9–T10</td></tr>
+<tr><td>A6</td><td>Every metric and metering level recomputes from rows; maturity moves only on recorded-threshold evidence; billing reconciliation is exact or an incident; a never-refused gate is flagged.</td><td>R1, R5, R9, R10</td><td>§12 T11</td></tr>
+<tr><td>A7</td><td>Coding calls pass the broker and are ledgered; invalid input is refused before the backend; an unapproved destructive call is refused; storage carries no key in the prompt; every toolkit has a probe and a live call; BYO is narrowed; SOP and catalogue authoring publish behind human gates.</td><td>R8, R18, R21</td><td>§12 T13–T17</td></tr>
+<tr><td>A8</td><td>One tenant runs request → PM → delivery → coach → kata → development → deploy → incident → lesson, audited and within budget; one benefit is baselined and measured with its delta attributed.</td><td>R1–R23</td><td>§12 T12</td></tr>
+</tbody></table>
+<p>The eval and benchmark instruments (§9.3, §9.4) are the measurement mechanisms this acceptance relies on: a change is judged on a held-out, versioned instrument frozen for the measurement. This specification is the design record's binding summary; the programme's acceptance — the measured C0–C5 maturity and the T12 organisation loop — is measured in the programme's live rows and published evidence, not asserted here.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SPEC V2 — the organisational operating model · conveyor output · published 2026-11-19T23:09:55.325875457+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

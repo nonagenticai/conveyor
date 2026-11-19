@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S19 — Eval builder · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S19 — Eval builder</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 8 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S19-eval-builder.md</code>
+<strong>Dependencies:</strong> S02, S03, S04, S06, S09, S10, S11, S16 · <strong>Issues:</strong> #13, #31</p>
+<h2>Outcome</h2>
+<p>The <code>claude-api</code> <code>build-eval</code> and <code>eval-audit</code> methods become an ordinary product surface: a person
+defines <strong>one</strong> flow, builds an input set, signs off the inputs, chooses metrics and a grader,
+signs off the grading, runs a pilot and then a baseline, and reads a report — all against rows, not
+a <code>.claude/hillclimb/&lt;flow&gt;/</code> directory of <code>results.jsonl</code>, <code>traces/</code> and <code>report.html</code>.</p>
+<h2>Boundary</h2>
+<p><strong>IN.</strong> The ten tables (§2.19); the <code>approval.eval_id</code> column and <code>uq_appr_eval_pending</code> index;
+the thirty-three actions, three scopes and seven events; the four jobs; the three built-in
+versioned prompts; screens <strong>15–20</strong> declared for S12. Parts A (define, inputs, sign-off), B (run,
+grade, capture) and C (report, audit, interop).</p>
+<p><strong>OUT.</strong> Any UI — screens are declared here so S12 may not invent them. Building a model call of
+its own: the runner invokes a registered action and never reconstructs a request, which is
+<code>build-eval.md</code>'s <em>"reimplementing the app"</em> failure. Hosting a model, embeddings or a second
+runtime (D22). The hillclimb loop and the cost search — <strong>S20</strong>.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>…/claude-api/shared/evals/build-eval.md</code> (the installed skill)</td><td>Steps 0–4, the two sign-offs, the four runner properties, the row/trace/<code>_state</code> field set</td><td>the <strong>method and the field set verbatim</strong></td><td>its file layout as a requirement — the rows are the record, the files are the export</td></tr>
+<tr><td><code>…/claude-api/shared/evals/eval-audit.md</code></td><td>§1–§6 and the Tier-3 auditor prompt</td><td>the checks as <strong>construction requirements</strong>, and §6's "observations and suggestions, severity first" as the report's voice</td><td>the assumption that an agent runs the…</td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S02, S03, S04, S06, S09, S10, S11, S16.</p>
+<h2>Acceptance</h2>
+<p>⚠️ <strong>Rust tests, not <code>psql</code> probes, and <code>rbuild</code>, not <code>cargo</code>.</strong> Since 2026-11-09 the tests run on the build host
+against a throwaway Postgres it creates and migrates itself (CONTRACT §16), so a local <code>psql</code> against compose
+<code>:5439</code> observes a different database and proves nothing; "ten tables RLS-forced" and "0026 in the ledger" are
+therefore ordinary <code>#[test]</code>s.</p>
+<p>Verify: the gate script above (its executable acceptance)</p>
+<h2>Capabilities</h2>
+<p><code>testing</code>, <code>analysis</code></p>
+<h2>Gaps</h2>
+<ul>
+<li>None recorded beyond the inception units themselves.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Eval builder · conveyor output · published 2026-11-19T23:09:55.325875457+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

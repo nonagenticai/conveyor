@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S20 — Eval hillclimb · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S20 — Eval hillclimb</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 9 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S20-eval-hillclimb.md</code>
+<strong>Dependencies:</strong> S19 · <strong>Issues:</strong> #14</p>
+<h2>Outcome</h2>
+<p>The <code>eval-hillclimb</code> and <code>cost-hillclimb</code> methods become a loop over one eval: a goal, a stopping
+condition, a fixed train/test split, and rounds that each propose a change, run the full set,
+and are kept or reverted on the <strong>held-out</strong> number.</p>
+<h2>Boundary</h2>
+<p><strong>IN.</strong> One table (§2.20); the six actions, two events and screen <strong>21</strong> declared for S12; the
+round protocol (analyze → apply → run → record → keep or revert) as one action per round; the
+goal/guardrail model; the stopping conditions; the stall-triage round; the paired comparison with
+exact McNemar and its refusal rule; the cost-search mode and its adoption gates; the final report.</p>
+<p><strong>OUT.</strong> Any UI — screen 21 is declared here for S12. A model loop of its own: the analyzer is an
+<code>agent</code> principal over <code>/mcp</code> (D19/D22) or a person writing <code>change.md</code> directly — the conveyor
+hosts no second runtime.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>…/claude-api/shared/evals/eval-hillclimb.md</code></td><td>Steps 0.5–5, §4.5's bucket table, the failure modes</td><td>the <strong>wall</strong>, the <strong>stopping rules</strong>, the <strong>bucket vocabulary</strong> and the revert rules verbatim</td><td><code>.claude/hillclimb/&lt;flow&gt;/</code> as the state store — <code>eval_climb</code> is</td></tr>
+<tr><td><code>…/claude-api/shared/evals/cost-hillclimb.md</code></td><td>the search order, the adoption gates, the stopping rules</td><td>the order (caching health → prompt audit → model × effort → prompt climb → joint confirm) and "gates registered before round 1"</td><td>its file-based measurement disci…</td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S19.</p>
+<h2>Acceptance</h2>
+<p>⚠️ <strong>Rust tests, not <code>psql</code> probes, and <code>rbuild</code>, not <code>cargo</code></strong> — the tests run on the build host against a
+throwaway Postgres it migrates itself (CONTRACT §16), so a local <code>psql</code> against compose <code>:5439</code> observes a
+different database.</p>
+<p>Verify: the gate script above (its executable acceptance)</p>
+<h2>Capabilities</h2>
+<p><code>kaizen</code></p>
+<h2>Gaps</h2>
+<ul>
+<li>None recorded beyond the inception units themselves.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Eval hillclimb · conveyor output · published 2026-11-19T23:09:55.325875457+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

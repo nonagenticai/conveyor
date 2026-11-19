@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T12 One organisation loop — architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T12 — Architecture design</h1>
+<p>Project: T12 — One organisation loop · Track: v2 · Tranche: 13 · Plan: docs/SPEC_V2.md §12
+Unit: #88 (this document is dependency-shaping work; T12 depends on every T slice and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = all T slices + P0</p>
+<h2>Context and boundary</h2>
+<p>T12 is V2's acceptance. Its own surface is the acceptance harness plus assembly-only fixture rows where a refusal needs one. <strong>It adds no second store</strong>: no table, read model, event stream, migration or action family. Every fact is read from its owning slice, joined by pinned refs (<code>migrations/0002_domain.sql:303</code> <code>trace_link</code>).</p>
+<p>T12 proves T3–T8, T11, T13, the architecture capability (T9) and the cadence (T10); it does not build them. An absent stage fails its scenario. P6/P7 live halves wait on the deployment slice #8 (S14); #18 is closed; origin/main is observed at <code>b439d506</code>. A green run that cannot name the proving row is not evidence.</p>
+<h2>Aggregates, tables and actions</h2>
+<table><thead><tr><th>Aggregate</th><th>Owner</th><th>Table or symbol</th><th>Actions driven</th><th>State</th></tr></thead><tbody>
+<tr><td>WBS, baseline, benefits</td><td>T1/T10</td><td><code>migrations/0044_plan_spine.sql:28</code> <code>wbs_node</code>, <code>:70</code> <code>project_baseline</code>, <code>:264</code> <code>benefit_profile</code></td><td><code>pm.*</code>, <code>benefits.*</code></td><td>built</td></tr>
+<tr><td>Job position, binding, decision</td><td>T0/T2</td><td><code>migrations/0040_organisation.sql:72</code> <code>job_catalogue</code>, <code>:162</code> <code>job_binding</code>, <code>:290</code> <code>decision</code>; <code>migrations/0046_decision_ladder.sql:17</code></td><td><code>jobs.*</code>, <code>job_bindings.*</code>, <code>ladder.*</code></td><td>built</td></tr>
+<tr><td>Card, run, approval, audit, evidence</td><td>V1</td><td><code>migrations/0002_domain.sql:114</code> <code>card</code>, <code>:166</code> <code>run</code>, <code>:196</code> <code>approval</code>; <code>migrations/0001_platform.sql:167</code> <code>audit_event</code>; <code>migrations/0041_runner.sql:21</code>; <code>migrations/0024_s16_inference_audit.sql:10</code></td><td><code>cards.*</code>, <code>runs.*</code>, <code>approvals.*</code></td><td>built</td></tr>
+<tr><td>Coach, kata, development, lessons</td><td>T4/T5/T6/T8</td><td>no table; <code>seed/processes/named.yaml:110</code> <code>kata.open</code></td><td><code>coach.*</code>, <code>kata.*</code>, <code>dev.*</code>, <code>lessons.*</code></td><td>planned</td></tr>
+<tr><td>Incident and architecture</td><td>T7/T9</td><td>no incident or <code>architecture_artifact</code> table; <code>migrations/0048_host_registry.sql:24</code> <code>host_registry</code></td><td><code>ops.*</code>, <code>architecture.*</code></td><td>partial / planned</td></tr>
+</tbody></table>
+<p>Its only writes are fixtures and the actions under test.</p>
+<h2>Decisions</h2>
+<p><strong>D1 — Drive the action registry, not HTTP.</strong> The harness calls <code>conveyor_actions::invoke</code>, following <code>apps/server/tests/organisation_gate.rs:1</code>. Alternative: a black-box HTTP suite. Consequence: registry, wire and store proved in one process; UI not.</p>
+<p><strong>D2 — One ordered scenario per part on one seeded tenant; no loop table.</strong> Assertions join project → <code>wbs_node</code> → card → run → <code>runner_artefact</code> → approval → <code>audit_event</code>. Alternative: independent tests; a <code>loop_run</code> aggregate. Consequence: observable transitions; P1 holds by construction; P10 cannot pass until a conveyor-side budget refusal exists (the analysis records <code>budget_exceeded</code> absent); a missing join is a finding.</p>
+<p><strong>D3 — Budget is derived, never stored.</strong> P10 sums <code>inference_call</code> at call grain with a pinned price version. Alternative: stored cost. Consequence: exposes the absent refusal rather than masking it.</p>
+<p><strong>D4 — Live halves are separate, visibly blocked tests.</strong> Not-run with #8, never skipped. Alternative: a pretending test. Consequence: honest evidence while #8 is open.</p>
+<h2>Acceptance</h2>
+<p>The gate, verbatim from <code>seed/programme.json</code> T12 and <code>docs/SPEC_V2.md</code> §12:</p>
+<blockquote>
+<p>one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area</p>
+</blockquote>
+<p>#88's P1–P11 names align. #88 adds <strong>P12</strong> (buildout under the capability), not in the quoted gate and marked issue-only below; its baseline is <code>5cf3d75</code>/2026-11-13, this document's <code>61edfcf8</code>/2026-11-18.</p>
+<table><thead><tr><th>Clause (part)</th><th>Scenario</th><th>Verify</th></tr></thead><tbody>
+<tr><td>request → PM (P1)</td><td>governed project with charter, WBS, baseline; PM approval refused</td><td><code>apps/server/tests/organisation_loop.rs::request_to_pm</code> (to create)</td></tr>
+<tr><td>PM → delivery (P2)</td><td>each card names binding, inputs, acceptance, one live run</td><td><code>apps/server/tests/organisation_loop.rs::pm_to_delivery_jobs</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>)</td></tr>
+<tr><td>delivery → coach (P3)</td><td>one coach card, one triage, one remedy; repeat escalates</td><td><code>apps/server/tests/organisation_loop.rs::delivery_to_one_coach_card</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>)</td></tr>
+<tr><td>coach → kata (P4)</td><td>six Gets, evidence set, prediction; second kata refused</td><td><code>apps/server/tests/organisation_loop.rs::coach_escalation_opens_kata</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>)</td></tr>
+<tr><td>kata → development (P5)</td><td>dev project or config change; no self-approval</td><td><code>apps/server/tests/organisation_loop.rs::kata_adoption_to_development_project</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>)</td></tr>
+<tr><td>development → deploy (P6)</td><td>lane, CI, review, merge, digest deploy, rollback, health</td><td><code>apps/server/tests/organisation_loop.rs::development_project_deploy_and_live_verify</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>; live half gated by #8)</td></tr>
+<tr><td>deploy → incident (P7)</td><td>one incident card; approved <code>ops:write</code> after a dry run</td><td><code>apps/server/tests/organisation_loop.rs::deploy_failure_to_incident</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>; live half gated by #8)</td></tr>
+<tr><td>incident → lesson (P8)</td><td>two refs and review promote; one-off stays a runbook change</td><td><code>apps/server/tests/organisation_loop.rs::incident_to_promoted_lesson</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>)</td></tr>
+<tr><td>all audited (P9)</td><td>one <code>audit_event</code> per transition with tenant, actor kind, evidence ref</td><td><code>apps/server/tests/organisation_loop.rs::every_loop_transition_audited</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>)</td></tr>
+<tr><td>within budget (P10)</td><td>over-budget refused <code>429 budget_exceeded</code> before the call; cost from ledger</td><td><code>apps/server/tests/organisation_loop.rs::loop_within_budget</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>)</td></tr>
+<tr><td>architecture + benefit (P11)</td><td>P11 has two halves: the architecture project passes Preliminary and A–F with its artefacts approved and its contract live (a delivery project without a contract is refused), and a benefit is baselined before its transition with an attributable post-transition delta</td><td><code>apps/server/tests/organisation_loop.rs::architecture_and_benefits_acceptance</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>)</td></tr>
+<tr><td>issue-only (P12)</td><td>Preliminary rows live; every T project carries its contract</td><td><code>apps/server/tests/organisation_loop.rs::the_buildout_runs_under_the_capability</code> (to create at <code>apps/server/tests/organisation_loop.rs</code>)</td></tr>
+</tbody></table>
+<p>No test is claimed to pass; a grep is not evidence.</p>
+<h2>Architecture artefacts</h2>
+<h3>PSA set at inception</h3>
+<p><strong>Principles applied (SPEC_V2 §3).</strong></p>
+<table><thead><tr><th>Principle</th><th>Application</th></tr></thead><tbody>
+<tr><td>P1 one record per fact</td><td>joins owner rows; no loop store</td></tr>
+<tr><td>P2 rule → laya → generation → human</td><td>asserts L0/L1/L3 rows; L2 has no transition</td></tr>
+<tr><td>P3 / P4</td><td>card, action, evidence; the executor never approves its own work</td></tr>
+<tr><td>P9 / P10</td><td>every call ledgered and budgeted; zero new tables and migrations</td></tr>
+</tbody></table>
+<p><strong>Requirements:</strong> R1 loop (§12, §9.4); R2 audit (§8.5); R3 budget (§7.5); R4 benefit (§8.3); R5 no second store (§10.1, P1).</p>
+<p><strong>Stakeholder map</strong> (R responsible, A accountable, C consulted, I informed).</p>
+<table><thead><tr><th>Stakeholder</th><th>Traceability</th><th>Audit</th><th>Budget</th><th>Benefit</th><th>Gate integrity</th></tr></thead><tbody>
+<tr><td>Tenant sponsor</td><td>A</td><td>I</td><td>A</td><td>A</td><td>A</td></tr>
+<tr><td>PM job</td><td>R</td><td>C</td><td>C</td><td>I</td><td>C</td></tr>
+<tr><td>Coach and kata jobs</td><td>R</td><td>C</td><td>I</td><td>C</td><td>C</td></tr>
+<tr><td>Delivery and ops jobs</td><td>R</td><td>R</td><td>R</td><td>I</td><td>C</td></tr>
+<tr><td>BCM</td><td>I</td><td>I</td><td>C</td><td>R/A</td><td>I</td></tr>
+</tbody></table>
+<p><strong>Driver / goal / objective.</strong></p>
+<table><thead><tr><th>Driver</th><th>Goal</th><th>Objective</th></tr></thead><tbody>
+<tr><td>V2 is unproven until one loop runs</td><td>one traceable organisation loop</td><td>P1–P10 green against one sha</td></tr>
+<tr><td>Benefits are claimed, not measured</td><td>one baseline → transition → delta</td><td>one benefit row with both measurements</td></tr>
+<tr><td>Acceptance could become a parallel system</td><td>acceptance joins owner rows</td><td>zero new tables and migrations</td></tr>
+</tbody></table>
+<p><strong>Solution concept — catalogue of edges.</strong></p>
+<table><thead><tr><th>Source</th><th>Edge</th><th>Target</th></tr></thead><tbody>
+<tr><td>tenant request</td><td>becomes → decomposes into</td><td>project → charter approval → <code>wbs_node</code></td></tr>
+<tr><td><code>wbs_node</code> / card</td><td>assigned → bound → executed</td><td>card → <code>job_binding</code> → run → <code>runner_artefact</code> / <code>inference_call</code></td></tr>
+<tr><td>interruption</td><td>becomes → escalates</td><td>coach card → kata</td></tr>
+<tr><td>kata</td><td>proposes</td><td>development project → deploy</td></tr>
+<tr><td>deploy failure</td><td>opens → promotes</td><td>incident card → lesson</td></tr>
+<tr><td>every transition</td><td>recorded in</td><td><code>audit_event</code></td></tr>
+</tbody></table>
+<h3>Typed catalogue</h3>
+<p><strong>T12 acceptance coverage catalogue</strong> — type <code>catalog</code>; phase: programme acceptance; plateau: <code>psa</code>; status: <code>draft</code>; version <code>1</code>; owner: T12 inception; author: T12 inception, 2026-11-18; reviewer: this review, recorded on #347; review date: 2026-11-18.</p>
+<p>Purpose: map each clause to one scenario and owner. Stakeholders: tenant sponsor, PM, coach, kata, delivery/ops, BCM, Architecture Board. Scope: acceptance of V2 in one tenant. Project: T12 (#88). Published document: this architecture design, as the project's <code>architecture</code> document, to be published on #88. Links: derives from SPEC_V2 §12 T12; realises §9.4; depends on T3–T17 (#74–#87), P0 and the deployment slice #8; reuses #88.</p>
+<table><thead><tr><th>ID</th><th>Item</th><th>Description of use</th><th>Verify</th></tr></thead><tbody>
+<tr><td>A1</td><td>request→PM (T3)</td><td>project, charter, WBS, baseline</td><td><code>request_to_pm</code></td></tr>
+<tr><td>A2</td><td>PM→delivery (T3)</td><td>cards with binding and acceptance</td><td><code>pm_to_delivery_jobs</code></td></tr>
+<tr><td>A3</td><td>delivery→coach (T4)</td><td>one interruption card</td><td><code>delivery_to_one_coach_card</code></td></tr>
+<tr><td>A4</td><td>coach→kata (T5)</td><td>six Gets and evidence</td><td><code>coach_escalation_opens_kata</code></td></tr>
+<tr><td>A5</td><td>kata→development (T5/T6)</td><td>adoption cannot self-approve</td><td><code>kata_adoption_to_development_project</code></td></tr>
+<tr><td>A6</td><td>development→deploy (T6)</td><td>lane, CI, review, rollback</td><td><code>development_project_deploy_and_live_verify</code></td></tr>
+<tr><td>A7</td><td>deploy→incident (T7)</td><td>incident card and gated mitigation</td><td><code>deploy_failure_to_incident</code></td></tr>
+<tr><td>A8</td><td>incident→lesson (T8)</td><td>two refs and review</td><td><code>incident_to_promoted_lesson</code></td></tr>
+<tr><td>A9</td><td>audit coverage (V1/T11)</td><td>one row per transition</td><td><code>every_loop_transition_audited</code></td></tr>
+<tr><td>A10</td><td>budget (T11)</td><td>derived cost and refusal</td><td><code>loop_within_budget</code></td></tr>
+<tr><td>A11</td><td>benefit (T1/T10)</td><td>baseline and measured delta</td><td><code>architecture_and_benefits_acceptance</code></td></tr>
+<tr><td>A12</td><td>buildout, issue-only (P0/T9)</td><td>live contracts and Preliminary rows</td><td><code>the_buildout_runs_under_the_capability</code></td></tr>
+</tbody></table>
+<h2>Migration and rollout</h2>
+<p>No migration, schema change, seed change or deploy. The harness is one new file family under <code>apps/server/tests/</code>, plus a fixture if required. It lands only after its blocked-by slices merge; until then no green suite may be claimed.</p>
+<p>Order: T0–T17 merge except T12 → harness PR → <code>rbuild --gate</code> → one non-draft PR → merge. P6/P7 live halves re-run after #8 and are recorded, not assumed. Rollback: delete the file family; no production state. Forward-only: no shim, no flag.</p>
+<h2>Links</h2>
+<ul>
+<li>Brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-2e2f-71fa-8714-2c4802220b43.html</li>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/88</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §12 (T12 row), §9.4, §8.1, §8.3, §8.5, §7.5, §5.4, §10.1, §3</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>One organisation loop · conveyor output · published 2026-11-19T23:09:55.325875457+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

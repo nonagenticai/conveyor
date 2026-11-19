@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Statement of Architecture Work · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Statement of Architecture Work</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Record:</strong> <code>01a1f2c2-0e1a-787f-9011-46b424d1ec71</code> · <strong>Decision:</strong> <code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code></p>
+<p>The Phase A contract of the T9 architecture capability, as the live repository holds it: read back on 2026-11-19 at main@f14b7d36. This records a live contract, not a proposal. The row: id 01a1f2c2-0e1a-787f-9011-46b424d1ec71, kind <code>statement_of_architecture_work</code>, phase <code>a</code>, title "Statement of Architecture Work — the TOGAF ADM capability (T9)", status <code>live</code>, version 2, approved 2026-11-19.</p>
+<h2>Assignment</h2>
+<p>Deliver the TOGAF ADM capability as rows and actions in the one workspace: the artefact standard and repository, the Preliminary capability, the architecture project and its phase gates, delivery compliance, change management, and its console surface.</p>
+<p>This is the contract the adopted profile names for Phase A: the statement of architecture work opens the phase with what the work is, and is distinct from the designs produced under it. It is the contract the phase gate resolves against — a phase cannot advance without its contract live.</p>
+<h2>Scope</h2>
+<p>The eleven tables of migration 0054 and the 26 <code>architecture.*</code> actions that expose them; the four ADM contract kinds (<code>statement_of_architecture_work</code>, <code>delivery_contract</code>, <code>statement_of_intent</code>, <code>request_for_architecture</code>); the seeded ten-type artefact standard; the Architecture Board; the maturity and skills baselines; and the Architecture capability screen (D6). The design is <code>docs/plans/T9-architecture-capability.md</code>.</p>
+<p>Out of scope, per that design: TOGAF certification and full ADM conformance; an ArchiMate editor or live metamodel; a renderer that derives a diagram from the model; an automatic conformance verdict; a portfolio optimiser.</p>
+<p>Recorded as found: the seeded standard ships exactly ten artefact types and no action adds a type. The standard a project designs against is fixed at the seed; widening it is a migration and a seed change, not a decision this contract can take at runtime.</p>
+<h2>Responsibilities</h2>
+<p>The programme architect (the maintainer sessions under the owner's authority) delivers and evidences each deliverable; the Architecture Board reviews and approves; the programme owner accepts the capability.</p>
+<p>The roles are positions, not persons. The board's charter bounds its decisions: it approves principles catalogues, ADM profiles, architecture contracts and waivers; it cannot approve a gate it requested or waive a deviation it owns; quorum is the chair. The maintainer sessions hold the programme architect position under the owner's authority and do not approve their own work.</p>
+<h2>Acceptance criteria</h2>
+<p>The six clauses of the contract body, each with its <code>Verify:</code> gate from the design's deliverable set.</p>
+<p><strong>D1 — the artefact standard and repository.</strong> A catalog's entries are rows, an approved artefact is immutable and a supersede writes version 2, and a reuse link is searchable across plateaus. <code>Verify:</code> <code>cargo test -p conveyor-api --test architecture_artifacts a_catalog_is_queryable_rows</code>; <code>crates/api/tests/architecture_artifacts.rs::an_approved_artefact_is_immutable</code>; <code>::reuse_is_searchable_across_plateaus</code>.</p>
+<p><strong>D2 — the Preliminary capability.</strong> The tailored profile names each phase's mandatory set by plateau, the board is a governance body row, and a maturity assessment carries all nine dimensions and a skills assessment all seven categories. <code>Verify:</code> <code>cargo test -p conveyor-api --test architecture_capability the_profile_names_the_mandatory_set</code>; <code>::a_maturity_assessment_needs_every_dimension</code>; <code>::a_skills_assessment_names_its_role</code>.</p>
+<p><strong>D3 — the architecture project and phase gates.</strong> An approved artefact set and a live contract advance a phase, a draft artefact refuses the advance naming the artefact, and a contract change re-opens the gate. <code>Verify:</code> <code>cargo test -p conveyor-api --test togaf_architecture_phases phases_a_to_f_pass_in_order</code>; <code>crates/api/tests/togaf_architecture_phases.rs::a_draft_artefact_refuses_the_contract</code>; <code>::a_contract_change_reopens_the_gate</code>.</p>
+<p><strong>D4 — delivery compliance.</strong> A design gate without a live contract refuses, a superseded contract refuses naming its status, and one compliance level per review and a dated waiver without an owner are refused. <code>Verify:</code> <code>cargo test -p conveyor-api --test togaf_delivery_design_gate</code>; <code>crates/api/tests/togaf_delivery_design_gate.rs::a_superseded_contract_refuses_design</code>; <code>crates/api/tests/architecture_compliance.rs::one_level_and_a_dated_waiver</code>.</p>
+<p><strong>D5 — change management.</strong> A review's exactly-one outcome is a change row or a kata candidate, and a review with no verdict cannot close the phase. <code>Verify:</code> <code>cargo test -p conveyor-api --test togaf_h_change</code>; <code>crates/api/tests/togaf_h_change.rs::a_scope_change_produces_a_change_register_row</code> (the kata assertion sits inside it; the named <code>a_systemic_finding_produces_a_kata_candidate</code> does not exist at <code>main@f14b7d36</code> — a gap); <code>::an_unrecorded_review_refuses_the_gate</code>.</p>
+<p><strong>D6 — the console surface.</strong> The Architecture destination renders its tabs from the live aggregates and each interaction records state. The live console is <code>apps/web/src/screens/architecture.rs</code> (four tabs reading the registered actions, the phase-advance refusal; route <code>/architecture</code>), merged in <code>c8204432</code> and exercised by its own screens' tests. The design pack's page is a study; #385 renders it from the published snapshot, gated by <code>node docs/design/scripts/check-v2.cjs</code>.</p>
+<p>Recorded as found: no phase advance has been exercised on a real architecture project. D2 and D3 pass in tests, but no architecture project has yet closed a phase in the live service; the first real advance will be the gate's first live use.</p>
+<h2>Contract</h2>
+<p>The contract row is live at version 2, approved 2026-11-19, phase <code>a</code>. The approval chain:</p>
+<ol>
+<li>The owner approved, in one bundle: the principles catalogue PF-1 and the tailored ADM profile (v3); the three Preliminary artefacts; this Phase A contract; and the maturity and skills baselines.</li>
+<li>The decision was recorded through the operator path at the owner's instruction, as approval row 01a1f2c8-e26f-79ce-a082-5526648a47c5 (kind <code>architecture_board</code>, status <code>approved</code>, 2026-11-19).</li>
+<li>The session that produced the work did not judge it: the approval row is another actor's recorded decision on the evidence.</li>
+<li>The live state was read back on 2026-11-19: status <code>live</code>, version 2, approved at 2026-11-19T07:50:28.603416Z.</li>
+</ol>
+<p>A contract change is a new version and re-opens its gate; the approved version's body is immutable, so the assignment, scope, responsibilities and acceptance criteria above stand unless superseded.</p>
+<p>Recorded as found: the Architecture Board row (<code>conveyor-architecture-board</code>) stands at status <code>draft</code>, version 1, while the owner's decision on it is an approved approval row. The approving act is the approval row, not a board status transition; the two records have not been reconciled, and the governance body row has not moved out of <code>draft</code>.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-19T23:09:55.325875457+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

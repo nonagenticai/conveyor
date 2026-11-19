@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Architecture — T1 Plan spine · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Architecture — T1 Plan spine</h1>
+<p><strong>Project:</strong> T1 — Plan spine · <strong>Track:</strong> v2 · <strong>Tranche:</strong> 1 · <strong>Plan:</strong> <code>docs/SPEC_V2.md</code> §12
+<strong>Unit:</strong> #72 (blocked by #46 and by P0; this design is dependency-shaping work)
+<strong>Measured at:</strong> <code>main@cc88052</code>, 2026-11-16 · <strong>Project row:</strong> <code>active</code>, <code>meta.depends_on = ["T0", "P0"]</code></p>
+<h2>Context and boundary</h2>
+<p>T1 gives a project four things it does not have today: a <strong>baseline</strong> that does not move, a
+<strong>change request</strong> with an impact block and a person's decision, a <strong>WSJF score</strong> recomputed from
+four typed inputs, and a <strong>portfolio</strong> view of the in-flight set. It adds the <strong>dependency graph</strong>
+that the programme gate can read and that refuses a cycle at creation. It also adds the <strong>MSP
+programme-definition rows</strong> — tranches, benefits, benefit links, transitions and stakeholder
+profiles — so that a benefit is a measurement record and a tranche review is an approval with
+evidence.</p>
+<p>The boundary is the T1 row of SPEC_V2 §12 and issue #72's Out of scope:</p>
+<ul>
+<li><strong>In:</strong> the tables and actions above, the requester/executor exclusion on approvals, the ten
+T1 acceptance scenarios, and the tests that prove them against real Postgres.</li>
+<li><strong>Out:</strong> the decision ladder (T2), the PM job (T3), cadence materialisation and PI planning (T10),
+the benefits-realization procedure (T10), metrics (T11), and any migration or retirement of the
+V1 <code>outline</code> tree. The Portfolio page's WSJF-backlog, cadence and capacity tabs stay fixtures;
+only the in-flight set becomes live.</li>
+</ul>
+<p>The engine already provides the pattern every new action follows: a declared <code>ActionSpec</code>, a
+tenant-scoped transaction, If-Match on edits, an outbox event, and the generated HTTP/MCP/OpenAPI
+surface (<code>crates/actions/src/spec.rs</code>, <code>crates/actions/src/invoke.rs</code>). T1 adds rows and actions; it
+does not add a second execution path.</p>
+<h2>Aggregates, tables, actions</h2>
+<h3>Tables (one migration set, <code>0044_plan_spine.sql</code>)</h3>
+<table><thead><tr><th>Table</th><th>Shape</th><th>Why</th></tr></thead><tbody>
+<tr><td><code>wbs_node</code></td><td><code>id, tenant_id, project_id, parent_id, position numeric, kind ∈ phase|deliverable|work_package|milestone, title, body, status ∈ open|accepted|cancelled, acceptance jsonb, evidence jsonb, card_id, business_value int, time_criticality int, risk_reduction int, job_size int, meta, version</code></td><td>The project's tree; the four WSJF inputs live here (§8.2, §10.3). <code>position</code> is numeric for sibling order; acceptance is by artefact/run, not a checkbox</td></tr>
+<tr><td><code>project_baseline</code></td><td><code>id, tenant_id, project_id, kind ∈ scope|schedule|cost|management|governance|boundary, snapshot jsonb, taken_at, taken_by, approved_by, version</code></td><td>A frozen approved snapshot; append-only. The snapshot holds the WBS/register/budget facts as they were at the take</td></tr>
+<tr><td><code>project_register_item</code></td><td><code>id, tenant_id, project_id, kind ∈ risk|issue|assumption|dependency|benefit|change, code, title, body, owner_job_id, status, severity, probability, impact int, links jsonb, baseline_ref, meta, version</code></td><td>One register replaces five PM tables (§5.5). A <code>change</code> carries the impact block and the baseline it changes</td></tr>
+<tr><td><code>project_dependency</code></td><td><code>id, tenant_id, programme_id, from_project, to_project, kind ∈ blocks|needs|supersedes|informs, status, meta, version</code>; UNIQUE <code>(tenant_id, from_project, to_project, kind)</code></td><td>Edges, not prose (§5.1). The cycle check runs in the same transaction as the insert</td></tr>
+<tr><td><code>programme_cadence</code></td><td><code>id, tenant_id, programme_id, kind ∈ pi, period, state, meta, version</code></td><td>T1 stores the cadence row; T10 materialises its cards. No scheduler is built here</td></tr>
+<tr><td><code>programme_tranche</code></td><td><code>id, tenant_id, programme_id, number, state, entry_criteria jsonb, exit_criteria jsonb, baseline_ref, review_at, version</code></td><td>The unit the programme manages and reviews together (§8.3)</td></tr>
+<tr><td><code>benefit_profile</code></td><td><code>id, tenant_id, programme_id, project_id, register_item_id, reference, description, category, objectives, observable_outcome, kpis jsonb, baseline jsonb, target jsonb, measurement_method, financial_value, cost jsonb, capabilities jsonb, preconditions jsonb, risks jsonb, owner_job_id, benefit_owner_job_id, operational_area, status, version</code></td><td>The six field groups of §8.3 are mandatory; the row is the measurement record</td></tr>
+<tr><td><code>benefit_link</code></td><td><code>id, tenant_id, programme_id, output_ref, capability_ref, operational_outcome, benefit_id, strategic_objective, kind ∈ benefit|disbenefit, meta, version</code></td><td>A benefits-map edge names all five levels; an incomplete edge is refused</td></tr>
+<tr><td><code>benefit_transition</code></td><td><code>id, tenant_id, benefit_id, baseline_measured_at, readiness jsonb, enacted_at, post_measured_at, retired_at, evidence jsonb, version</code></td><td>Transition and realization are per-benefit records (§8.3)</td></tr>
+<tr><td><code>stakeholder_profile</code></td><td><code>id, tenant_id, programme_id, project_id, name, concerns, sensitivities, importance, influence, interest, exposure, support_level, support_trend, engagement_target, benefits jsonb, disbenefits jsonb, version</code></td><td>The MSP stakeholder profile, distinct from V1's <code>project_stakeholder</code> (who is involved)</td></tr>
+<tr><td><code>programme_baseline</code></td><td><code>id, tenant_id, programme_id, kind ∈ management|governance|boundary, snapshot jsonb, taken_at, taken_by, approved_by, version</code></td><td>The baseline trio the next tranche is managed against (§8.3)</td></tr>
+<tr><td><code>governed_asset</code> (reused)</td><td>extend <code>kind</code> to <code>charter | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case | refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier</code></td><td>The MSP narrative artefacts are governed assets on the programme-definition project, not new tables (§10.3). The existing lifecycle and approval path carry them</td></tr>
+</tbody></table>
+<p>Every table is tenant-scoped with the existing <code>app_current_tenant()</code> default, carries <code>version</code>
+for If-Match, and is added to the store's scope. No V1 table is altered; <code>outline</code> and
+<code>outline_node</code> stay untouched.</p>
+<h3>Actions</h3>
+<table><thead><tr><th>Family</th><th>Actions</th><th>Notes</th></tr></thead><tbody>
+<tr><td><code>wbs.*</code></td><td><code>create</code>, <code>update</code>, <code>move</code>, <code>accept</code>, <code>list</code>, <code>get</code></td><td><code>accept</code> requires evidence; <code>move</code> uses the <code>position</code> midpoint helper; the four WSJF inputs are edited, the score is never written</td></tr>
+<tr><td><code>baselines.*</code></td><td><code>take</code>, <code>get</code>, <code>list</code></td><td><code>take</code> snapshots the current WBS/register/budget facts and freezes them; there is no update</td></tr>
+<tr><td><code>registers.*</code></td><td><code>create</code>, <code>update</code>, <code>get</code>, <code>list</code></td><td>A <code>change</code> requires the scope/schedule/cost/risk impact block and a <code>baseline_ref</code>; the approval records the rationale</td></tr>
+<tr><td><code>project_dependencies.*</code></td><td><code>create</code>, <code>delete</code>, <code>list</code></td><td><code>create</code> refuses a cycle with <code>409 dependency_cycle</code>; the insert and the check are one transaction</td></tr>
+<tr><td><code>portfolio.*</code></td><td><code>in_flight</code></td><td>A read model over <code>project</code> and <code>programme</code>; no row; the tenant's in-flight set defaults to <code>active,paused</code></td></tr>
+<tr><td><code>cadences.*</code></td><td><code>create</code>, <code>update</code>, <code>list</code></td><td>T1 stores the cadence row; the materialisation that reads it is T10's, not built here</td></tr>
+<tr><td><code>tranches.*</code></td><td><code>create</code>, <code>update</code>, <code>get</code>, <code>list</code>, <code>review</code></td><td><code>review</code> requires baselines, benefit status and the risk register as evidence; the decision is continue, pause or stop</td></tr>
+<tr><td><code>benefits.*</code></td><td><code>create</code>, <code>update</code>, <code>get</code>, <code>list</code>, <code>link</code>, <code>unlink</code>, <code>baseline</code>, <code>transition</code>, <code>measure</code>, <code>close</code></td><td><code>create</code> refuses a profile missing baseline, target, method or owner; <code>link</code> refuses an edge missing one of the five levels; <code>baseline</code> is the writer of <code>benefit_transition.baseline_measured_at</code>; <code>close</code> records the post-transition measurement</td></tr>
+<tr><td><code>governed_assets.*</code></td><td><code>compose</code>, <code>submit</code>, <code>approve</code></td><td>The MSP narrative artefacts (<code>benefits_strategy</code>, <code>benefits_realization_plan</code>, <code>projects_dossier</code>, the mandate/brief/blueprint/case) use the existing governed-asset lifecycle with the extended kinds</td></tr>
+<tr><td><code>stakeholders.*</code></td><td><code>profile_create</code>, <code>profile_update</code>, <code>profile_list</code></td><td>The MSP profile; V1's <code>stakeholder</code> family is not extended</td></tr>
+<tr><td><code>approvals.*</code></td><td><code>decide</code> (changed)</td><td>The requester/executor cannot decide the gate that judges their work; the rule applies to every gate, not only T1's</td></tr>
+</tbody></table>
+<p>The one cross-cutting change is in <code>approvals.decide</code>: the pending row's <code>requested_by</code> and the
+run's/card's executor are compared with <code>ctx.actor_id</code> before the decision is written. The existing
+<code>(approval_id, approver_id)</code> unique index remains the second half of dual control.</p>
+<h2>Decisions</h2>
+<table><thead><tr><th>#</th><th>Decision</th><th>Rationale</th></tr></thead><tbody>
+<tr><td>D-T1-1</td><td><code>wbs_node</code> is a new table; the V1 <code>outline</code> tree is untouched and not backfilled</td><td>The V1 tree has no typed WSJF inputs, no baseline and no acceptance-by-artefact; a new project-scoped table is smaller and reversible. The V1 <code>outline</code> kind <code>wbs</code> is a <strong>name</strong>, not this model</td></tr>
+<tr><td>D-T1-2</td><td>A baseline is an immutable JSON snapshot plus <code>taken_at</code>/<code>taken_by</code>/<code>approved_by</code>; later rows never update it</td><td>A baseline that is a copy of current rows is a forecast. Existing runs keep their pins</td></tr>
+<tr><td>D-T1-3</td><td>A change request is <code>project_register_item(kind='change')</code> with a required impact block and <code>baseline_ref</code>; the approval records the rationale</td><td>One register, one gate; a direct row edit is not the change path</td></tr>
+<tr><td>D-T1-4</td><td>The WSJF score is computed on read from four typed non-negative integers; <code>job_size &gt; 0</code>; no score column</td><td>Arithmetic, not opinion; a stored score would go stale</td></tr>
+<tr><td>D-T1-5</td><td><code>project_dependency</code> is the edge source; the programme gate reads it when present and falls back to <code>meta.depends_on</code> only for unmigrated seed rows</td><td>One fact per concept (P1), with a bounded transition. The fallback is tested</td></tr>
+<tr><td>D-T1-6</td><td>A cycle is refused in the creating transaction by a recursive reachability query</td><td>A post-hoc check is a race; the transaction is the guarantee</td></tr>
+<tr><td>D-T1-7</td><td>The portfolio is a read model with no row; the in-flight set is tenant configuration, default <code>active,paused</code></td><td>P10: no speculative aggregate. The set is policy (P11), not a constant</td></tr>
+<tr><td>D-T1-8</td><td>The requester/executor exclusion lives in <code>approvals.decide</code>, for every gate</td><td>A UI check is not a rule (P3); the existing gate is the one primitive</td></tr>
+<tr><td>D-T1-9</td><td>A benefit profile's six groups are mandatory; a missing baseline/target/method/owner is <code>422 benefit_profile_incomplete</code></td><td>The row is the measurement record; a wish is not a benefit</td></tr>
+<tr><td>D-T1-10</td><td>A tranche review requires baselines, benefit status and risk-register evidence; the decision is continue/pause/stop</td><td>A review with no evidence is refused (§8.3). A re-baseline goes through change control, never the review</td></tr>
+<tr><td>D-T1-11</td><td>T1 stores the MSP rows; the cadence materialisation and the benefits-realization procedure are T10</td><td>Scope is the T1 row; building T10 here would exceed one PR</td></tr>
+</tbody></table>
+<h2>Acceptance</h2>
+<p>The ten scenarios of issue #72 are the build's acceptance, mapped to tests:</p>
+<table><thead><tr><th>Scenario</th><th>Test</th><th>What it proves</th></tr></thead><tbody>
+<tr><td>P1.1</td><td><code>plan_spine.rs::a_baseline_does_not_move_when_rows_change</code></td><td>Take a baseline, change WBS/register rows, read the frozen snapshot</td></tr>
+<tr><td>P1.2</td><td><code>plan_spine.rs::a_change_request_without_impact_is_refused</code></td><td>The impact block and baseline ref are mandatory; with them, the approver's rationale is recorded</td></tr>
+<tr><td>P1.3</td><td><code>approval_dual.rs::the_requester_cannot_decide_their_own_gate</code></td><td>The requester's decision is refused; the gate stays pending</td></tr>
+<tr><td>P2.1</td><td><code>plan_spine.rs::wsjf_recomputes_when_an_input_changes</code></td><td>Change one input; the read score changes; no score column exists</td></tr>
+<tr><td>P3.1</td><td><code>plan_spine.rs::the_portfolio_lists_only_the_in_flight_set</code></td><td><code>active</code>/<code>paused</code> listed; <code>closed</code>/<code>archived</code> not</td></tr>
+<tr><td>P4.1</td><td><code>plan_spine.rs::a_two_node_dependency_cycle_is_refused</code></td><td>A→B then B→A refused</td></tr>
+<tr><td>P4.2</td><td><code>plan_spine.rs::a_deep_dependency_cycle_leaves_no_row</code></td><td>A→B, A→C, B→D, C→D, D→A refused with no partial row</td></tr>
+<tr><td>P5.1</td><td><code>plan_spine.rs::a_benefit_without_baseline_target_method_or_owner_is_refused</code></td><td>The profile refusal and the absence of a register row</td></tr>
+<tr><td>P5.2</td><td><code>plan_spine.rs::a_benefit_map_edge_names_its_five_levels</code></td><td>An incomplete edge refused; a complete edge stored</td></tr>
+<tr><td>P5.3</td><td><code>plan_spine.rs::a_tranche_review_without_evidence_is_refused</code></td><td>The refusal, then a review with evidence recording continue/pause/stop</td></tr>
+</tbody></table>
+<p>Each test runs against real Postgres 18 in the repository's test harness; no engine run is needed.
+The gate is the issue's <code>Verify:</code> command per scenario plus the repo's <code>rbuild --gate</code> and
+<code>clippy --workspace --all-targets -- -D warnings</code> at the exact head.</p>
+<h2>Architecture artefacts</h2>
+<p>The Preliminary-phase PSA set at inception:</p>
+<p><strong>Principles applied.</strong> P1 (one record per fact: the edge table is the dependency source, the
+gate's fallback is bounded), P3 (no transition without an action; every new state change is an
+action), P4 (the executor never approves its own work; the requester exclusion), P10 (no portfolio
+row), P11 (the in-flight set and approval policies are tenant rows, not code constants).</p>
+<p><strong>Requirements.</strong> §5.3 (baseline ≠ forecast; plan ≠ evidence), §5.4 (gates and dual control),
+§5.5 (the register), §8.2 (WSJF arithmetic), §8.3 (MSP rows and refusals), §10.3 (the tables) and
+§12 T1 (the slice gate).</p>
+<p><strong>Stakeholder map.</strong> The programme's sponsoring group (tranche authorisation and benefit
+approval), the SRO (benefit ownership and the coherent capability), the BCM (each benefit and its
+transition), the PM (WBS, baseline, change control) and the project delivery teams (the WBS rows
+they accept). The conveyor's own buildout runs under the same positions; T1 makes those positions
+rows, not prose.</p>
+<p><strong>Driver, goal and objective.</strong> The driver is a programme that cannot answer what it promised,
+what changed and which benefit the work serves. The goal is a plan spine where the promise is
+frozen, the change is controlled, the priority is arithmetic and the benefit is measured. The
+objective for this project is the ten-scenario gate above.</p>
+<p><strong>Solution concept.</strong> Reuse the engine's aggregate/action/tenancy patterns; add one migration set,
+one plan-spine action family, the dependency edge table and the MSP rows; change only the approval
+decision rule; prove every scenario locally against Postgres. No new subsystem, no external
+service, no engine run.</p>
+<p><strong>HLD/SD status at inception.</strong> This is the High-Level Design. The detailed design (column-level
+constraints, the recursive CTE, the baseline snapshot's exact payload, the console screens) lands
+in the T1 build units; the decision record above is the boundary this design must not cross. The
+project operates under the live blueprint and T0's contracts; a deviation is a decision record
+(§8.1), not a silent fork.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-19T23:09:55.325875457+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

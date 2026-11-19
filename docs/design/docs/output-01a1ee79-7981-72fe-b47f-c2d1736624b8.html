@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T2 Decision ladder — closure review · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T2 — Closure review</h1>
+<p>Project: T2 — Decision ladder · Track: v2 · Tranche: 2 · Plan: docs/SPEC_V2.md §12
+Unit: #349 (the unit that publishes this output)
+Measured at: main@07fcad894dc660ac20e6b5ec6f321750b91c880f, 2026-11-18 · Project row: closed</p>
+<h2>Outcome vs acceptance</h2>
+<p>The acceptance set is the <code>docs/SPEC_V2.md</code> §12 row T2. Each verdict rests on recorded <code>ci</code> run <strong>44116377789</strong> at the merge sha <code>39363ba8</code> (success, 2026-11-17), where the named tests and the <code>compile_fail</code> doctest passed; the five <code>ladder</code>-family files' only commit is <code>39363ba8</code> (the separately cited <code>crates/actions/src/documents/actions.rs</code> was changed later by <code>94edb9b0</code> and <code>07fcad89</code>), present at <code>main@07fcad89</code>.</p>
+<table><thead><tr><th>Gate clause</th><th>Evidence</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>A rule, a laya decision and a human decision produce the same audit shape</td><td><code>crates/actions/tests/decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape</code>; one <code>DecisionOut</code> projection over the <code>decision</code> columns added by <code>0046_decision_ladder.sql</code></td><td>pass</td></tr>
+<tr><td>A tenant refinement changes a threshold without a code change</td><td><code>...::a_refinement_changes_a_threshold_without_a_code_change</code>; <code>crates/store/src/ladder.rs:effective_policy_tx</code> resolves the tenant refinement over the platform policy</td><td>pass</td></tr>
+<tr><td>Every decision pins the refinement and laya config versions</td><td><code>...::every_decision_pins_the_refinement_and_laya_config_versions</code>; <code>crates/domain/src/ladder.rs:Pins</code>/<code>missing_pins</code>; the positive-version CHECKs in <code>0046_decision_ladder.sql</code></td><td>pass</td></tr>
+<tr><td>A generated draft cannot transition a card</td><td><code>crates/domain/src/ladder.rs</code> <code>compile_fail</code> doctest (<code>GeneratedDraft</code> has no conversion to <code>Move</code>); <code>...::a_generated_draft_cannot_transition_a_card</code>; <code>documents.update</code> answers <code>409 draft_requires_gate</code></td><td>pass</td></tr>
+</tbody></table>
+<p>Pins are mandatory on the rung that uses them — rule to policy, laya to policy and laya config (absent config is <code>422 pins_incomplete</code>), human to approval — so the third clause passes as tested; no upstream call consumes the pin.</p>
+<p>The row's scope also names a <strong>laya client</strong> and <strong>policy evaluation</strong>. No ladder client landed: the estate's <code>laya.judge</code> client (<code>crates/actions/src/process/judge.rs</code>) exists and registers <code>/v1/systemone</code>, but it is not wired to <code>ladder.evaluate</code>; the ladder takes a caller-supplied <code>confidence</code>, the module has no HTTP client, and pinned <code>laya_inference_config</code> rows never call a model — an L1 row is an evaluated injected answer. Policy evaluation is partial: threshold and below-threshold action are evaluated, but <code>fail_policy</code> is stored and never consulted, and <code>conveyor_domain::ladder::unavailable</code> has no caller. The published <code>evidence</code> output records these and three further gaps.</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>migrations/0046_decision_ladder.sql</code> — <code>decision</code> gains <code>rung</code>, <code>answer</code>, <code>option_set_version</code>, the three version pins, <code>actor_kind</code>, <code>actor_id</code>, <code>approval_id</code>; <code>decision_rung_check</code> admits exactly <code>rule|laya|human</code>; positive-version CHECKs, an <code>approval</code> FK, two unique indexes. The five tables are T0's (<code>migrations/0040_organisation.sql</code>).</li>
+<li><code>crates/domain/src/ladder.rs</code> — <code>Rung</code>, <code>FailPolicy</code>, <code>FailAction</code>, <code>Outcome</code>, <code>Pins</code>, <code>evaluate</code>, <code>below_threshold</code>, <code>unavailable</code>, <code>missing_pins</code>, <code>GeneratedDraft</code> and its <code>compile_fail</code> doctest (line 350).</li>
+<li><code>crates/store/src/ladder.rs</code> — <code>effective_policy_tx</code>, one <code>record_decision_tx</code> insert for all three rungs with the pin refusal, <code>publish_refinement_tx</code>, <code>insert_laya_config_tx</code>.</li>
+<li><code>crates/actions/src/ladder/mod.rs</code> — 11 actions: <code>decision_policies.create|update|list</code>, <code>refinements.publish|list</code>, <code>laya_configs.create|list</code>, <code>ladder.record|evaluate|list|apply_draft</code>; <code>ladder.apply_draft</code> needs an accepted L1/L3 decision and refuses one from another card. <code>crates/actions/src/documents/actions.rs:documents_update</code> refuses a generated draft (<code>409 draft_requires_gate</code>).</li>
+<li>Tests: the four scenarios in <code>crates/actions/tests/decision_ladder.rs</code>, the <code>compile_fail</code> doctest, and <code>crates/store/tests/s07_schema.rs::the_migration_ledger_is_gapless_apart_from_the_reserved_six</code>.</li>
+<li>CI: run <strong>44116377789</strong> (<code>ci</code> workflow, push, success, 2026-11-17T15:37Z) on <code>39363ba8</code>; the <code>checks</code> job ran fmt, <code>clippy -D warnings</code>, nextest (<code>2730 tests run: 2730 passed, 6 skipped</code>) and <code>cargo test --doc</code>, including the ladder doctest.</li>
+<li>Programme record: issue #73 CLOSED on 2026-11-17T15:37:01Z by PR #286 (merge <code>39363ba8</code>); the live project row is <code>closed</code> (version 8, measured today), and <code>seed/programme.json</code> carries <code>status: closed</code> at <code>main@07fcad89</code>.</li>
+<li>Published evidence: <a href="https://conveyor.nonagentic.ai/design/docs/output-01a1ee6e-c100-7635-98bd-a37f75c50e78.html">evidence</a> (measured at <code>main@856cb8e5</code>).</li>
+</ul>
+<h2>Open items</h2>
+<ol>
+<li>Ladder laya call — owner: a T2 follow-up (unclaimed). Next step: call <code>/v1/systemone</code> with the pinned <code>laya_inference_config</code>, record answer and probabilities, keep injected confidence for tests.</li>
+<li>Unavailable branch — same owner. Next step: consult <code>fail_policy</code> when the model is unavailable and record <code>gate_unavailable</code> instead of <code>422 confidence_missing</code> (§7.2).</li>
+<li>Human rung binding — owner: an approval/ladder follow-up sharing T3's <code>approvals.decide</code> semantics. Next step: decide whether <code>ladder.record</code> must require a decided approval whose approver is the actor; today a pending approval id satisfies the pin.</li>
+<li>Authored option sets — owner: T4 and T5, the first consumers of §7.3's closed sets. Next step: a reusable, versioned option-set surface; today options are per-decision rows with a caller-supplied or defaulted version, and <code>decision_options.*</code> is absent.</li>
+<li>Coverage lag — owner: the coverage generator (<code>scripts/build-v2-coverage.py</code>). Next step: key <code>actions:decision</code> on <code>ladder.*</code>, retire the <code>scripts/v2-coverage-overrides.json</code> override that pins it to <code>new</code>, and regenerate; the row still reports <code>new</code> although its evidence line lists the ladder actions.</li>
+</ol>
+<p>None is claimed by an open issue, branch or merged follow-up commit (<code>gh issue list --state all</code>, <code>git ls-remote --heads origin</code>, <code>git log origin/main --grep</code>).</p>
+<h2>Decision</h2>
+<p>T2 is CLOSED, measured today: the live project row is <code>closed</code> (version 8); issue #73 closed on PR #286 (merge <code>39363ba8</code>); all four gate clauses pass on merged code with green CI at that sha. The reason is the gate met as written, with the evidence's own limit that the laya wire call and an approval-bound human rung remain unproven. T2 closed on 2026-11-17, before the closure gate (#302) existed (#302 opened 2026-11-17T19:15Z, merged 2026-11-18 as <code>18e06aca</code>), so no declared output was required. This durable review records the per-clause verdicts, the artefacts and CI behind them, the five open items and the close; publishing it satisfies T2's <code>closure-review</code> output. No re-open is warranted; the gaps are carried as open items.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-19T23:09:55.325875457+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
