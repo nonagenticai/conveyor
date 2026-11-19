@@ -105,7 +105,12 @@ async fn create_secret(running: &support::Running) {
 }
 
 /// Review, approve the gate and publish the derived process (and then its judge).
-async fn publish_derived(running: &support::Running, process_id: &str, procedure_id: &str, asset_id: &str) {
+async fn publish_derived(
+    running: &support::Running,
+    process_id: &str,
+    procedure_id: &str,
+    asset_id: &str,
+) {
     let (status, body) = running
         .invoke(
             "procedures.review_source",
@@ -212,7 +217,10 @@ async fn a_reingest_creates_a_new_draft_version() {
     let (pg, running) = fixture().await;
     let (base, draft_content) = stub_inference().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
-    draft_content.lock().await.clone_from(&draft_with("verify_stock"));
+    draft_content
+        .lock()
+        .await
+        .clone_from(&draft_with("verify_stock"));
 
     let (status, first) = running
         .invoke(
@@ -234,7 +242,10 @@ async fn a_reingest_creates_a_new_draft_version() {
     .await;
 
     // The changed source: a second ingest of the same process key.
-    draft_content.lock().await.clone_from(&draft_with("verify_stock_again"));
+    draft_content
+        .lock()
+        .await
+        .clone_from(&draft_with("verify_stock_again"));
     let (status, second) = running
         .invoke(
             "procedures.ingest_sop",
@@ -271,7 +282,10 @@ async fn the_published_procedure_keeps_its_source_and_pack() {
     create_secret(&running).await;
     let (base, draft_content) = stub_inference().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
-    draft_content.lock().await.clone_from(&draft_with("verify_stock"));
+    draft_content
+        .lock()
+        .await
+        .clone_from(&draft_with("verify_stock"));
 
     let store_one = "0199c3c6-0000-7000-8000-000000000001";
     let (status, first) = running
@@ -314,14 +328,20 @@ async fn the_published_procedure_keeps_its_source_and_pack() {
         rows[0].source_asset_id.as_deref(),
         Some(field(&first, "source_asset_id"))
     );
-    assert_eq!(rows[0].knowledge_pack_ref, field(&first, "knowledge_pack_ref"));
+    assert_eq!(
+        rows[0].knowledge_pack_ref,
+        field(&first, "knowledge_pack_ref")
+    );
     assert!(rows[0].knowledge_pack_ref.starts_with(store_one));
     // The new draft names the new ones.
     assert_eq!(
         rows[1].source_asset_id.as_deref(),
         Some(field(&second, "source_asset_id"))
     );
-    assert_eq!(rows[1].knowledge_pack_ref, field(&second, "knowledge_pack_ref"));
+    assert_eq!(
+        rows[1].knowledge_pack_ref,
+        field(&second, "knowledge_pack_ref")
+    );
     assert!(rows[1].knowledge_pack_ref.starts_with(store_two));
     assert_ne!(rows[0].knowledge_pack_ref, rows[1].knowledge_pack_ref);
 }

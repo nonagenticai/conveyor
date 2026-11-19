@@ -199,5 +199,6 @@ pub async fn convert(request: &ConvertRequest<'_>) -> Result<ModelDraft, ActionE
     let content = document["choices"][0]["message"]["content"]
         .as_str()
         .ok_or_else(|| ActionError::upstream_failed(SERVICE, 502))?;
-    serde_json::from_str::<ModelDraft>(content).map_err(|_| ActionError::upstream_failed(SERVICE, 502))
+    serde_json::from_str::<ModelDraft>(content)
+        .map_err(|_| ActionError::upstream_failed(SERVICE, 502))
 }

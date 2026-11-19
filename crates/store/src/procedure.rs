@@ -227,7 +227,12 @@ pub async fn create_draft_tx(
         .bind(&input.outputs)
         .bind(input.source_asset_id)
         .bind(&input.knowledge_pack_ref)
-        .bind(input.action_text.as_deref().filter(|text| !text.trim().is_empty()))
+        .bind(
+            input
+                .action_text
+                .as_deref()
+                .filter(|text| !text.trim().is_empty()),
+        )
         .fetch_one(&mut *conn)
         .await
     {

@@ -784,7 +784,11 @@ pub async fn insert_steps_tx(
             .bind(step.child_process_key.as_deref())
             // The PDDL half is NOT NULL in the schema; a caller that declares nothing (the
             // domain default is JSON null) is normalised here, never sent as SQL NULL.
-            .bind(step.action_text.as_deref().filter(|text| !text.trim().is_empty()))
+            .bind(
+                step.action_text
+                    .as_deref()
+                    .filter(|text| !text.trim().is_empty()),
+            )
             .bind(if step.pddl_preconditions.is_null() {
                 Value::Array(Vec::new())
             } else {

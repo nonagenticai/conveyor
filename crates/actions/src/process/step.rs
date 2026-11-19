@@ -235,23 +235,16 @@ pub async fn execute_step(
             }
         };
         if !preconditions.is_empty() {
-            let state = match store::process::current_pddl_state_tx(
-                &mut tx,
-                tenant,
-                context.id,
-                position,
-            )
-            .await
-            {
-                Ok(state) => state,
-                Err(error) => {
-                    return abandon(
-                        tx,
-                        StepFailure::retryable(format!("database: {error}")),
-                    )
-                    .await;
-                }
-            };
+            let state =
+                match store::process::current_pddl_state_tx(&mut tx, tenant, context.id, position)
+                    .await
+                {
+                    Ok(state) => state,
+                    Err(error) => {
+                        return abandon(tx, StepFailure::retryable(format!("database: {error}")))
+                            .await;
+                    }
+                };
             let atoms = match conveyor_domain::pddl::parse_state("pddl_state", &state) {
                 Ok(atoms) => atoms,
                 Err(error) => {
@@ -262,8 +255,7 @@ pub async fn execute_step(
                     .await;
                 }
             };
-            if let Err(detail) =
-                conveyor_domain::pddl::check_preconditions(&atoms, &preconditions)
+            if let Err(detail) = conveyor_domain::pddl::check_preconditions(&atoms, &preconditions)
             {
                 let next = claim_then(
                     &mut tx,
@@ -273,9 +265,7 @@ pub async fn execute_step(
                     attempt,
                     None,
                     Some(PreparedFailure {
-                        message: format!(
-                            "pddl_precondition_false: step {position}: {detail}"
-                        ),
+                        message: format!("pddl_precondition_false: step {position}: {detail}"),
                     }),
                     next_position,
                 )
@@ -1772,10 +1762,7 @@ async fn record_pddl_state(
     step: &ProcessStepRecord,
     recorded: &RunStepRecord,
 ) -> Result<(), StepFailure> {
-    let effects = match conveyor_domain::pddl::parse_effects(
-        "pddl_effects",
-        &step.pddl_effects,
-    ) {
+    let effects = match conveyor_domain::pddl::parse_effects("pddl_effects", &step.pddl_effects) {
         Ok(effects) => effects,
         Err(error) => {
             return Err(StepFailure::permanent(format!(
@@ -1797,17 +1784,12 @@ async fn record_pddl_state(
     if !declares_pddl {
         return Ok(());
     }
-    let before = store::process::current_pddl_state_tx(
-        conn,
-        tenant,
-        recorded.run_id,
-        recorded.position,
-    )
-    .await
-    .map_err(|error| StepFailure::retryable(format!("database: {error}")))?;
-    let atoms = conveyor_domain::pddl::parse_state("pddl_state", &before).map_err(|error| {
-        StepFailure::permanent(format!("pddl.invalid: {}", error.detail))
-    })?;
+    let before =
+        store::process::current_pddl_state_tx(conn, tenant, recorded.run_id, recorded.position)
+            .await
+            .map_err(|error| StepFailure::retryable(format!("database: {error}")))?;
+    let atoms = conveyor_domain::pddl::parse_state("pddl_state", &before)
+        .map_err(|error| StepFailure::permanent(format!("pddl.invalid: {}", error.detail)))?;
     let after = conveyor_domain::pddl::apply_effects(&atoms, &effects);
     store::process::set_run_step_pddl_state_tx(
         conn,

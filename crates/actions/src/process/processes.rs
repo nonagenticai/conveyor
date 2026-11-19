@@ -179,9 +179,9 @@ async fn publication_gate_tx(
             tracing::error!(%error, "read the publication approval's decisions");
             ActionError::internal()
         })?;
-    let human = decisions.iter().any(|decision| {
-        decision.decision == "approve" && decision.decided_by_kind == "human"
-    });
+    let human = decisions
+        .iter()
+        .any(|decision| decision.decision == "approve" && decision.decided_by_kind == "human");
     if !human {
         return Err(ActionError::new(
             403,
@@ -195,20 +195,19 @@ async fn publication_gate_tx(
 }
 
 /// T16 P4: refuse a draft whose PDDL cannot be executed, before the prompt audit runs.
-fn validate_pddl_steps(steps: &[conveyor_store::process::ProcessStepRecord]) -> Result<(), ActionError> {
+fn validate_pddl_steps(
+    steps: &[conveyor_store::process::ProcessStepRecord],
+) -> Result<(), ActionError> {
     for (index, step) in steps.iter().enumerate() {
-        conveyor_domain::pddl::parse_preconditions(
-            "pddl_preconditions",
-            &step.pddl_preconditions,
-        )
-        .and_then(|_| conveyor_domain::pddl::parse_effects("pddl_effects", &step.pddl_effects))
-        .map_err(|error| {
-            ActionError::new(
-                422,
-                "pddl.invalid",
-                format!("step {}: {}", index + 1, error.detail),
-            )
-        })?;
+        conveyor_domain::pddl::parse_preconditions("pddl_preconditions", &step.pddl_preconditions)
+            .and_then(|_| conveyor_domain::pddl::parse_effects("pddl_effects", &step.pddl_effects))
+            .map_err(|error| {
+                ActionError::new(
+                    422,
+                    "pddl.invalid",
+                    format!("step {}: {}", index + 1, error.detail),
+                )
+            })?;
     }
     Ok(())
 }

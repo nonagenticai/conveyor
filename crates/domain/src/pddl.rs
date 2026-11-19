@@ -167,9 +167,9 @@ fn is_predicate(value: &str) -> bool {
 
 fn is_arg(value: &str) -> bool {
     !value.is_empty()
-        && value.chars().all(|c| {
-            c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | ':')
-        })
+        && value
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | ':'))
 }
 
 /// Parse a precondition array (`["a", "not b"]`).
@@ -197,10 +197,7 @@ pub fn parse_effects(field: &'static str, value: &Value) -> Result<Effects, Pddl
         ));
     };
     let mut effects = Effects::default();
-    for (key, target) in [
-        ("add", &mut effects.add),
-        ("delete", &mut effects.delete),
-    ] {
+    for (key, target) in [("add", &mut effects.add), ("delete", &mut effects.delete)] {
         let Some(list) = object.get(key) else {
             continue;
         };
@@ -311,7 +308,8 @@ mod tests {
 
     #[test]
     fn literals_are_canonicalised_and_negation_is_understood() {
-        let literal = parse_literal("pddl_preconditions", "  inspect( dock-1 , truck-2 ) ").unwrap();
+        let literal =
+            parse_literal("pddl_preconditions", "  inspect( dock-1 , truck-2 ) ").unwrap();
         assert_eq!(literal.atom, "inspect(dock-1,truck-2)");
         assert!(!literal.negated);
         let negated = parse_literal("pddl_preconditions", "not blocked").unwrap();
@@ -321,7 +319,14 @@ mod tests {
 
     #[test]
     fn malformed_literals_are_refused_by_name() {
-        for raw in ["", "not ", "Inspect()", "inspect(", "in spect", "inspect(a,,b)"] {
+        for raw in [
+            "",
+            "not ",
+            "Inspect()",
+            "inspect(",
+            "in spect",
+            "inspect(a,,b)",
+        ] {
             assert!(
                 parse_literal("pddl_preconditions", raw).is_err(),
                 "{raw:?} must be refused"
@@ -342,11 +347,7 @@ mod tests {
     #[test]
     fn effects_add_then_delete() {
         let state = parse_state("state", &json!(["a", "b"])).unwrap();
-        let effects = parse_effects(
-            "e",
-            &json!({"add": ["c", "a"], "delete": ["b"]}),
-        )
-        .unwrap();
+        let effects = parse_effects("e", &json!({"add": ["c", "a"], "delete": ["b"]})).unwrap();
         assert_eq!(apply_effects(&state, &effects), vec!["a", "c"]);
     }
 

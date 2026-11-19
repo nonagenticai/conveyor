@@ -165,10 +165,12 @@ pub(crate) fn validated_steps(steps: &[StepIn]) -> Result<Vec<StepInput>, Action
                 // The stored shape is an array of LITERAL STRINGS, never the parsed objects:
                 // the column is what the executor and every reader see, and the domain type is
                 // an implementation detail of this validation.
-                serde_json::json!(parsed
-                    .iter()
-                    .map(conveyor_domain::pddl::literal_text)
-                    .collect::<Vec<_>>())
+                serde_json::json!(
+                    parsed
+                        .iter()
+                        .map(conveyor_domain::pddl::literal_text)
+                        .collect::<Vec<_>>()
+                )
             }
         };
         let effects = match step.pddl_effects.as_ref() {
@@ -176,9 +178,15 @@ pub(crate) fn validated_steps(steps: &[StepIn]) -> Result<Vec<StepInput>, Action
                 serde_json::json!({"add": [], "delete": []})
             }
             Some(value) => {
-                let parsed =
-                    conveyor_domain::pddl::parse_effects("pddl_effects", value)
-                .map_err(|error| invalid(&format!("steps[{index}].pddl_effects"), "invalid_value", error.detail))?;
+                let parsed = conveyor_domain::pddl::parse_effects("pddl_effects", value).map_err(
+                    |error| {
+                        invalid(
+                            &format!("steps[{index}].pddl_effects"),
+                            "invalid_value",
+                            error.detail,
+                        )
+                    },
+                )?;
                 parsed.to_json()
             }
         };

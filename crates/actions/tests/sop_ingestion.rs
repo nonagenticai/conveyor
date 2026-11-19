@@ -98,7 +98,13 @@ fn draft(steps: Vec<Value>, requested_tools: &[&str]) -> String {
 fn receiving_draft() -> String {
     draft(
         vec![
-            step("procedures.list", "verify_stock", &[], &["stock_verified"], &[]),
+            step(
+                "procedures.list",
+                "verify_stock",
+                &[],
+                &["stock_verified"],
+                &[],
+            ),
             step(
                 "processes.list",
                 "put_away",
@@ -296,12 +302,11 @@ async fn a_pdf_sop_becomes_a_pddl_procedure_draft() {
 
     // The draft is a draft: neither row is published.
     assert_eq!(process_row(&pg, &process_id).await.0, "draft");
-    let procedure_status: String =
-        sqlx::query_scalar("SELECT status FROM procedure WHERE id = $1")
-            .bind(uuid::Uuid::parse_str(&procedure_id).expect("procedure id"))
-            .fetch_one(&pg.super_pool)
-            .await
-            .expect("the procedure row");
+    let procedure_status: String = sqlx::query_scalar("SELECT status FROM procedure WHERE id = $1")
+        .bind(uuid::Uuid::parse_str(&procedure_id).expect("procedure id"))
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("the procedure row");
     assert_eq!(procedure_status, "draft");
 
     // The steps are PDDL: action text plus ground-literal preconditions and effects.
@@ -382,7 +387,10 @@ async fn an_owl_file_becomes_a_knowledge_pack() {
     .fetch_one(&pg.super_pool)
     .await
     .expect("the pko-table count");
-    assert_eq!(pko_tables, 0, "no PKO table may exist (#413 owner decision)");
+    assert_eq!(
+        pko_tables, 0,
+        "no PKO table may exist (#413 owner decision)"
+    );
     // The external_ref above is the proof the stub was reached; its counter covers only the
     // catch-all routes, not `/api/ingest/jobs`.
     let _ = &stub;
@@ -574,10 +582,13 @@ async fn a_human_approval_publishes_the_procedure() {
         .await;
     assert_eq!(status, 200, "{body}");
 
-    let (process_status, _source, _pack, recorded_approval) =
-        process_row(&pg, &process_id).await;
+    let (process_status, _source, _pack, recorded_approval) = process_row(&pg, &process_id).await;
     assert_eq!(process_status, "published");
-    assert_eq!(recorded_approval, Some(approval), "the approval is recorded");
+    assert_eq!(
+        recorded_approval,
+        Some(approval),
+        "the approval is recorded"
+    );
     let events: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM event WHERE type = 'process.published' AND aggregate_id = $1",
     )
@@ -918,9 +929,13 @@ async fn an_sop_cannot_grant_a_tool() {
     let (base, draft_content) = stub_inference().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
     draft_content.lock().await.clone_from(&draft(
-        vec![
-            step("procedures.list", "verify_stock", &[], &["stock_verified"], &[]),
-        ],
+        vec![step(
+            "procedures.list",
+            "verify_stock",
+            &[],
+            &["stock_verified"],
+            &[],
+        )],
         &["shell.exec"],
     ));
     let (status, body) = running

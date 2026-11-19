@@ -289,7 +289,8 @@ async fn submit_to_strata(
     media_type: &str,
     store_id: Uuid,
 ) -> Result<(Uuid, String), ActionError> {
-    let token = match store::secret::open_named_tx(&mut *tx, ctx.tenant, INGEST_TOKEN_SECRET).await {
+    let token = match store::secret::open_named_tx(&mut *tx, ctx.tenant, INGEST_TOKEN_SECRET).await
+    {
         Ok(bytes) => String::from_utf8(bytes).map_err(|_| {
             ActionError::new(
                 422,
@@ -337,7 +338,8 @@ async fn submit_to_strata(
         )
     })?;
     let document_id = Uuid::now_v7();
-    let key = crate::integrations::objects::key_for(ctx.tenant.as_uuid(), document_id, &content_hash);
+    let key =
+        crate::integrations::objects::key_for(ctx.tenant.as_uuid(), document_id, &content_hash);
     objects
         .put(&key, bytes.to_vec().into())
         .await
@@ -472,14 +474,15 @@ fn model_steps(draft: &ModelDraft) -> Result<Vec<DraftStep>, ActionError> {
         } else {
             &step.effects
         };
-        let effects = conveyor_domain::pddl::parse_effects("pddl_effects", effects_value)
-        .map_err(|error| {
-            invalid(
-                &format!("draft.steps[{index}].effects"),
-                "invalid_value",
-                error.detail,
-            )
-        })?;
+        let effects = conveyor_domain::pddl::parse_effects("pddl_effects", effects_value).map_err(
+            |error| {
+                invalid(
+                    &format!("draft.steps[{index}].effects"),
+                    "invalid_value",
+                    error.detail,
+                )
+            },
+        )?;
         out.push(DraftStep {
             action: step.action.trim().to_owned(),
             action_text: if step.action_text.trim().is_empty() {
@@ -575,13 +578,17 @@ async fn create_derived_drafts(
     // A key that already exists gets the NEXT version (the version family's rule); its steps are
     // replaced by this conversion, never merged with the previous draft's.
     let inputs = step_inputs(steps, procedure.id);
-    let process = match store::process::get_process_by_key_tx(&mut *tx, ctx.tenant, process_key, None)
-        .await
-        .map_err(|error| {
-            tracing::error!(%error, "read the derived key's latest version");
-            ActionError::internal()
-        })?
-    {
+    let process = match store::process::get_process_by_key_tx(
+        &mut *tx,
+        ctx.tenant,
+        process_key,
+        None,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "read the derived key's latest version");
+        ActionError::internal()
+    })? {
         Some(latest) => {
             let forked = store::process::fork_version_tx(
                 &mut *tx,
@@ -888,14 +895,13 @@ async fn procedures_ingest_process(
         }
         None => String::new(),
     };
-    let draft =
-        crate::procedure::convert::bpmn::parse(&bytes).map_err(|error| {
-            ActionError::new(
-                422,
-                "converter.invalid",
-                format!("the diagram could not be read: {}", error.detail),
-            )
-        })?;
+    let draft = crate::procedure::convert::bpmn::parse(&bytes).map_err(|error| {
+        ActionError::new(
+            422,
+            "converter.invalid",
+            format!("the diagram could not be read: {}", error.detail),
+        )
+    })?;
     let steps: Vec<DraftStep> = draft
         .steps
         .iter()
@@ -1046,9 +1052,7 @@ async fn procedures_validate(
     let mut checks = Vec::new();
     for (index, step) in steps.iter().enumerate() {
         conveyor_domain::pddl::parse_preconditions("pddl_preconditions", &step.pddl_preconditions)
-            .and_then(|_| {
-                conveyor_domain::pddl::parse_effects("pddl_effects", &step.pddl_effects)
-            })
+            .and_then(|_| conveyor_domain::pddl::parse_effects("pddl_effects", &step.pddl_effects))
             .map_err(|error| {
                 ActionError::new(
                     422,
@@ -1064,7 +1068,10 @@ async fn procedures_validate(
             ));
         }
     }
-    checks.push(format!("{} steps carry a SOP judge and valid PDDL", steps.len()));
+    checks.push(format!(
+        "{} steps carry a SOP judge and valid PDDL",
+        steps.len()
+    ));
 
     // P5.2: the SOP may ASK for a tool; the request is never granted and the draft is refused
     // until it is removed. The agent's `allowed_actions` is empty by construction.
@@ -1079,7 +1086,9 @@ async fn procedures_validate(
                 ActionError::new(
                     422,
                     "source.missing",
-                    format!("the draft was derived from source {source_id}, which no longer exists"),
+                    format!(
+                        "the draft was derived from source {source_id}, which no longer exists"
+                    ),
                 )
             })?;
         let requested: Vec<String> = serde_json::from_value(
