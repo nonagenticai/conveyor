@@ -161,10 +161,7 @@ async fn answer(state: &AppState, live: LivePath, head: bool, headers: &HeaderMa
             view.programme_json.as_bytes(),
             "application/json; charset=utf-8",
         ),
-        LivePath::ProgrammeCsv => (
-            view.programme_csv.as_bytes(),
-            "text/csv; charset=utf-8",
-        ),
+        LivePath::ProgrammeCsv => (view.programme_csv.as_bytes(), "text/csv; charset=utf-8"),
         LivePath::Outputs => (
             view.outputs_js.as_bytes(),
             "application/javascript; charset=utf-8",

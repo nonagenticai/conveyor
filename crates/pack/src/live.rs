@@ -151,8 +151,7 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
 /// committed issue registry the programme section carries; `plan` is the project's plan path.
 /// Ordered by key, like the JSON.
 pub(crate) fn programme_csv(programme: &Value) -> String {
-    const HEADER: &str =
-        "key,name,tranche,status,blocked_by,units_open,units_claimed,issues,plan";
+    const HEADER: &str = "key,name,tranche,status,blocked_by,units_open,units_claimed,issues,plan";
     let empty = Vec::new();
     let projects = programme
         .get("projects")
@@ -180,7 +179,10 @@ pub(crate) fn programme_csv(programme: &Value) -> String {
     let mut out = String::from(HEADER);
     out.push('\n');
     for project in projects {
-        let key = project.get("key").and_then(Value::as_str).unwrap_or_default();
+        let key = project
+            .get("key")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
         let meta = project.get("meta").cloned().unwrap_or(Value::Null);
         let strings = |field: &str| -> Vec<String> {
             meta.get(field)
@@ -336,13 +338,11 @@ mod tests {
         );
         assert_eq!(lines.len(), 4, "header plus three projects");
         assert_eq!(
-            lines[1],
-            "A,\"Closed, with a comma\",1,closed,,0,0,,docs/a.md",
+            lines[1], "A,\"Closed, with a comma\",1,closed,,0,0,,docs/a.md",
             "a comma is quoted; a closed dependency does not block"
         );
         assert_eq!(
-            lines[2],
-            "B,Draft,2,draft,C,1,1,#2;#3,docs/b.md",
+            lines[2], "B,Draft,2,draft,C,1,1,#2;#3,docs/b.md",
             "only the unfinished dependency blocks; the open claimed unit counts"
         );
     }
