@@ -420,9 +420,12 @@ async fn an_in_flight_run_finishes_after_the_unbind() {
     fixture.publish().await;
     fixture.bind("coding", "write").await;
 
-    // The destination answers slowly, so the call is past resolution and inside the dispatch
-    // when the unbind lands.
-    fixture.stub.delay(400);
+    // The destination answers slowly, and the unbind waits for it to have RECEIVED the call:
+    // the stub counts a hit before its delay, so a hit proves the broker already resolved the
+    // binding and is inside the dispatch. A wall-clock guess instead (the first version of this
+    // test slept 120 ms) fails on a loaded CI runner, where the request has not reached the
+    // broker yet and the unbind lands first — which would be the `409` this test must not see.
+    fixture.stub.delay(600);
     let call = fixture.running.invoke(
         "tools.call",
         "dev:alice",
@@ -432,7 +435,14 @@ async fn an_in_flight_run_finishes_after_the_unbind() {
         None,
     );
     let unbind = async {
-        tokio::time::sleep(Duration::from_millis(120)).await;
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(15);
+        while fixture.stub.hits() == 0 && tokio::time::Instant::now() < deadline {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+        }
+        assert!(
+            fixture.stub.hits() >= 1,
+            "the call must reach the destination before the unbind"
+        );
         let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
             .await
             .expect("a scoped write");
