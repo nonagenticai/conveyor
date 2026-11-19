@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Tailored ADM profile · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Tailored ADM profile</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> adopted, version 3, 2026-11-19 · <strong>Artefact:</strong> ADM-1, <code>adm_profile</code>, key <code>conveyor-software-delivery</code> · <strong>Record:</strong> profile row <code>01a1f2c1-14c1-74c5-a078-eef117c4f82c</code> · <strong>Board decision:</strong> <code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code></p>
+<p>The profile the programme runs its architecture under, adopted as a row and recorded here. It names the phase set, the mandatory artefact set for each phase and plateau, and the four contract kinds. The row was adopted at version 3 on 2026-11-19T07:50:26.220655Z by the board decision above; this document is its readable copy, not a proposal.</p>
+<h2>Phases</h2>
+<p>The phase set is <code>preliminary</code> and <code>a</code> through <code>h</code>: the full ADM, tailored for software delivery — Preliminary once per organisation, A–H per architecture initiative. An architecture project carries a row per phase; the phase gate is <code>architecture.phases_advance</code>, which closes a phase on its mandatory set and its contract, refuses naming the missing artefact or the contract's state, and writes no approval row.</p>
+<table><thead><tr><th>Phase</th><th>Runs when</th><th>Closes on</th></tr></thead><tbody>
+<tr><td>Preliminary</td><td>once, before the first architecture project</td><td>the capability baseline accepted</td></tr>
+<tr><td>A — Vision</td><td>every architecture initiative</td><td>the approved Statement of Architecture Work</td></tr>
+<tr><td>B — Business</td><td>every initiative whose PSA is approved</td><td>its mandatory artefact set (no contract kind in the adopted row)</td></tr>
+<tr><td>C — Information systems</td><td>when B changed the data or application view</td><td>its mandatory artefact set (no contract kind in the adopted row)</td></tr>
+<tr><td>D — Technology</td><td>when the solution changes the platform or its deployment</td><td>its mandatory artefact set (no contract kind in the adopted row)</td></tr>
+<tr><td>E — Opportunities and solutions</td><td>every initiative that proceeds past D</td><td>its mandatory artefact set (no contract kind in the adopted row)</td></tr>
+<tr><td>F — Migration planning</td><td>every initiative that will deliver</td><td>the delivery contract</td></tr>
+<tr><td>G — Implementation governance</td><td>per delivery project under a live contract</td><td>the compliance review (a review row; the row's G kind is <code>statement_of_intent</code>)</td></tr>
+<tr><td>H — Change management</td><td>at closure and on every change request</td><td>exactly one typed outcome: a change, or a kata candidate</td></tr>
+</tbody></table>
+<p>No phase is skippable in this profile: each closes on its mandatory set, and where the adopted row names a contract kind (A, F, G, H) on that contract too. B–E carry no contract kind in the capability yet, so their closures are their mandatory sets.</p>
+<h2>Artefacts by phase and plateau</h2>
+<p>The adopted row's <code>artifact_requirements</code>, recorded exactly:</p>
+<table><thead><tr><th>Phase</th><th>Plateau</th><th>Mandatory types</th></tr></thead><tbody>
+<tr><td>Preliminary</td><td><code>psa</code></td><td><code>principles_catalog</code>; <code>principle_derivation</code>; <code>principle_realization</code></td></tr>
+<tr><td>A</td><td><code>psa</code></td><td><code>stakeholder_map</code>; <code>driver_goal_objective</code>; <code>requirements_catalog</code>; <code>solution_concept</code></td></tr>
+<tr><td>B</td><td><code>hld</code></td><td><code>business_capability_map</code></td></tr>
+<tr><td>C</td><td><code>hld</code></td><td><code>data_entity_catalog</code></td></tr>
+<tr><td>D</td><td><code>hld</code></td><td><code>technology_standards</code></td></tr>
+</tbody></table>
+<p>The plateau rule is the design's: the PSA is the project-start set; the HLD adds the business, data, application and technology views; the SD adds process, interface, migration and platform detail. A delivery project's brief names the plateau its own architecture inception satisfies — PSA for every project, HLD for one that changes the blueprint, SD for one that changes the estate.</p>
+<p>The Preliminary set is real, not named: its three artefacts are approved at version 2 with their entries and links. The Phase A set is recorded but not yet populated — the only Phase A row today is the SAW, which is a contract, not an artefact.</p>
+<p><strong>What the profile does not yet have.</strong> The standard ships ten types and none of the 26 <code>architecture.*</code> actions adds one: <code>artifact_type</code> is written only by <code>seed_standard_tx</code> in <code>crates/store/src/architecture.rs</code>, and the profile tailoring action changes which seeded types a phase requires, not what types exist. A new type is a store change and a release.</p>
+<p>Phases E–H carry no mandatory types yet. Their phase rows exist in the set, but no seeded type names E, F, G or H and the adopted row names no contract kind for E. An advance of Phase E therefore passes an empty requirement set with nothing to satisfy, and F–H close only where the row's kind applies. A phase that can be passed without a refusal is the profile's largest gap.</p>
+<p>The P0 table is the target, not the current state. The design names for these phases business service/function and value-stream catalogues; business interaction and actor/role matrices; footprint and functional-decomposition diagrams; data-entity/business-function and application/data matrices; conceptual and logical data diagrams; application portfolio and interface catalogues; technology portfolios; the application/technology matrix; platform-decomposition and environments diagrams; gap analysis, candidate solutions and work packages; project context and benefits diagrams; roadmap, increments, dependencies and cost/benefit; the compliance review; and the change record. None of those types is seeded. The adopted row is a correct but partial encoding — ten types against that table — and it grows by seeding, not by tailoring. The profile row and the artefact standard are aggregates of their own rather than artefacts in the repository, so the Preliminary mandatory set names only the three artefact types that record the baseline.</p>
+<h2>Contracts</h2>
+<p>Four contract kinds, each bound to a phase by the profile row:</p>
+<table><thead><tr><th>Kind</th><th>Phase</th><th>What it records</th></tr></thead><tbody>
+<tr><td><code>statement_of_architecture_work</code></td><td>A</td><td>assignment, scope, responsibilities and acceptance criteria; opens Phase A</td></tr>
+<tr><td><code>delivery_contract</code></td><td>F</td><td>the delivery commitments and the method by which compliance will be assessed</td></tr>
+<tr><td><code>statement_of_intent</code></td><td>G</td><td>intended use, ownership and measures of effectiveness at completion</td></tr>
+<tr><td><code>request_for_architecture</code></td><td>H</td><td>further architecture work when the current architecture no longer meets its purpose</td></tr>
+</tbody></table>
+<p>The Phase A SAW is live: <code>01a1f2c2-0e1a-787f-9011-46b424d1ec71</code>, version 2, approved 2026-11-19T07:50:28.603416Z. Its six acceptance criteria: D1, an approved artefact is immutable, a supersede writes version 2, and reuse is searchable across plateaus; D2, the profile names each phase's mandatory set by plateau and the baselines carry their nine and seven dimensions; D3, an approved artefact set and a live contract advance a phase, a draft artefact refuses the advance naming it, and a contract change re-opens the gate; D4, a design gate without a live contract refuses, a superseded contract refuses naming its status, and a review takes one compliance level and a waiver a dated owner; D5, a review's exactly-one outcome is a change row or a kata candidate; D6, the Architecture destination renders its tabs from the live aggregates. Its scope is the eleven tables of <code>migrations/0054_architecture.sql</code> and the 26 <code>architecture.*</code> actions in <code>crates/actions/src/architecture.rs</code>.</p>
+<p>Contract discipline: a contract change is a new version and re-opens its gate, and an approved body is immutable. A delivery design gate resolves only against a live approved contract trace-linked to the delivery project — absent, draft and superseded all refuse and write no approval row. Only the Phase A SAW exists as a contract row today; the other three kinds are defined by the profile and instantiate when an initiative reaches F, G or H.</p>
+<h2>Adoption</h2>
+<p>The row is <code>adopted</code> at version 3, adopted 2026-11-19T07:50:26.220655Z by decision <code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code>. It was adopted in the owner's single bundle with the principles catalogue, the three Preliminary artefacts, the Phase A SAW and the two baselines; the session recorded the bundle at his instruction and did not judge its own work. The maturity baseline (<code>01a1f2c2-3e8c-730f-906d-cd2baf65722a</code>) scores all nine dimensions with the capability "under development", and the skills baseline (<code>9ce8e8d6-d665-47b6-bde7-4dcf33411686</code>) records all seven categories for six positions, two of them unstaffed — recorded gaps, not zeros that disappear.</p>
+<p>The profile is reviewed at each tranche review against those baselines. A mandatory artefact no project produced, or a phase that never refused, is evidence that the profile is mis-tailored; the correction is a new version and a board decision, never a silent edit. The growth path is explicit: seed the P0 table's remaining types, assign mandatory sets to E–H, and raise each phase's set toward the design target.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-19T21:34:44.863943980+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

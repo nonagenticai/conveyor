@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Architecture maturity assessment · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Architecture maturity assessment</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) · <strong>Date:</strong> 2026-11-17 · <strong>Owner:</strong> the
+programme architect · <strong>Reviewer:</strong> the Architecture Board (charter proposed in PF-1; rows are T9's)
+· <strong>Artefact:</strong> MA-1, <code>architecture_maturity</code>, Preliminary baseline.</p>
+<h2>Dimensions</h2>
+<p>The nine TOGAF maturity dimensions, scored 0–5: 0 none, 1 initial, 2 under development, 3 defined,
+4 managed, 5 measured. Every score names its evidence; a dimension with no evidence is scored no
+higher than 1 and says so. The assessment is a review judgement, not an instrument reading — the
+evidence is what a reviewer can open today.</p>
+<h2>Scores</h2>
+<table><thead><tr><th>#</th><th>Dimension</th><th>Score</th><th>Stage</th><th>Evidence for the score</th></tr></thead><tbody>
+<tr><td>1</td><td>Architecture process</td><td><strong>2</strong></td><td>under development</td><td>The ADM is specified (<code>docs/SPEC_V2.md</code> §8.1) and this profile proposes it, but no <code>architecture</code> project type, phase WBS rows or phase gate exists; T9 is proposed (#81).</td></tr>
+<tr><td>2</td><td>Architecture development</td><td><strong>1</strong></td><td>initial</td><td>P0's artefacts exist as published documents; there is no typed <code>architecture_artifact</code> repository, no entry rows and no artefact links. The typed-metadata discipline is proposed (AS-1), not yet enforced.</td></tr>
+<tr><td>3</td><td>Business linkage</td><td><strong>2</strong></td><td>under development</td><td>The business case's benefit map and the MSP definition set (issue #260) name the outputs→capability→outcome→benefit paths; no benefit baseline has been measured, so no improvement can yet be demonstrated.</td></tr>
+<tr><td>4</td><td>Senior-management involvement</td><td><strong>2</strong></td><td>under development</td><td>The owner is the sponsor and the decision-maker: the ADRs, the owner rulings and the public programme record evidence it. There is no sponsoring-group forum, no board rows and no recorded tranche review.</td></tr>
+<tr><td>5</td><td>Operating-unit participation</td><td><strong>1</strong></td><td>initial</td><td>There is one operating unit (the conveyor programme itself). The organisation seed's 22 catalogue positions exist, but no job release is bound to a running project: the organisation is design, not operation.</td></tr>
+<tr><td>6</td><td>Architecture communication</td><td><strong>2</strong></td><td>under development</td><td>The public site, the published output set, the stable output URLs and the Feedback/Discuss links make the design readable; there is no board, no stakeholder engagement plan in operation, and the stakeholder profiles are a draft (#260).</td></tr>
+<tr><td>7</td><td>IT security</td><td><strong>3</strong></td><td>defined</td><td>Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned (<code>no-private-refs</code>, secret-scan, and GitHub code scanning's CodeQL checks on every PR) and the public page neutralises author markup. Defined by code and CI, not by a security review cycle.</td></tr>
+<tr><td>8</td><td>Architecture governance</td><td><strong>1</strong></td><td>initial</td><td>The principles and profile are proposed by this document; board, contracts and waivers are rows T9 will add. A deviation is handled by a decision record today, not a governed waiver.</td></tr>
+<tr><td>9</td><td>IT investment and acquisition strategy</td><td><strong>2</strong></td><td>under development</td><td>ADR 0005 fixes the absorption sequence; the business case carries the cost/risk posture and the licensing frame; there is no formal investment appraisal cycle or portfolio-level benefits tracking yet.</td></tr>
+</tbody></table>
+<p>Baseline mean <strong>1.8 / 5</strong>. The low scores are the honest reading of a programme that has specified
+its architecture capability and adopted its baseline but has not yet built the rows that enforce it.</p>
+<h2>Baseline</h2>
+<ul>
+<li><strong>Dated:</strong> 2026-11-17, at <code>main@4ac0ede</code> (the #221 merge) plus the #245 branch head.</li>
+<li><strong>Scope:</strong> the conveyor programme's own architecture capability, not the estate's other services.</li>
+<li><strong>Method:</strong> a review judgement against evidence a reviewer can open; the evidence column is the
+record. The next assessment re-scores the same nine dimensions against the same method.</li>
+<li><strong>What is not claimed:</strong> this is not a TOGAF certification and not an external audit.</li>
+</ul>
+<h2>Milestones</h2>
+<p>The development plan a tranche review can hold the capability to:</p>
+<table><thead><tr><th>Milestone</th><th>Target</th><th>Evidence that closes it</th></tr></thead><tbody>
+<tr><td>M1 — the rows exist</td><td>next tranche</td><td>T9 lands <code>adm_profile</code>, <code>artifact_type</code>, <code>architecture_artifact</code> and <code>architecture_contract</code>; dimensions 1, 2 and 8 re-scored</td></tr>
+<tr><td>M2 — the board is convened</td><td>after M1</td><td><code>governance_body(kind='architecture_board')</code> + charter, membership and decision limits; a record of one board decision</td></tr>
+<tr><td>M3 — the first governed contract</td><td>after M2</td><td>one delivery project's design gate resolves against a live <code>architecture_contract</code>; a phase advance refuses a missing artefact</td></tr>
+<tr><td>M4 — the first governed waiver</td><td>after M3</td><td>an <code>architecture_waiver</code> with an accepting owner, reason, cost/risk and reassessment date; no hand-applied deviation</td></tr>
+<tr><td>M5 — measured, not asserted</td><td>end of the second tranche</td><td>every dimension's score cites a row or a measured result; dimension 6's stakeholder engagement has run a cycle; dimension 3's first benefit baseline is measured (or kata'd)</td></tr>
+<tr><td>M6 — the capability reviews itself</td><td>each tranche review</td><td>a principles/gate that never refused is flagged; the profile's mandatory set grows with the score</td></tr>
+</tbody></table>
+<p><strong>Gap recorded as a kata.</strong> The scores above are a judgement; there is no instrument that computes
+them. The missing measurement — a maturity scoring action over the nine dimensions with dated rows
+and a baseline — is a system issue, recorded as a kata candidate on the kata project. Until it
+exists, MA-1 is a dated review, and the date is its honesty.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-19T21:34:44.863943980+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

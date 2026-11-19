@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S21 — Message construction (the compiled prompt) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S21 — Message construction (the compiled prompt)</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 9 · <strong>Measured status:</strong> partial · <strong>Plan:</strong> <code>docs/plans/slices/S21-message-construction.md</code>
+<strong>Dependencies:</strong> S11, S13, S15, S16 · <strong>Issues:</strong> #15</p>
+<h2>Outcome</h2>
+<p>A prompt is compiled at run time from the procedure and the other system, tenant and project sources, stored in Postgres, with the compiled text's SHA-256 as its provenance key.</p>
+<h2>Boundary</h2>
+<p>In scope: the recipe (<code>prompt</code>/<code>prompt_section</code>), the pure compile pipeline, provenance and the PDDL evaluation. Out of scope: authored prompt templates; the V1 seam is built and is not re-opened.</p>
+<h2>Reuse sources</h2>
+<p>V1's <code>prompt</code> and <code>prompt_section</code> tables (<code>migrations/0030_prompt_catalogue.sql</code>) and <code>conveyor_domain::prompt::compile</code> over <code>PromptFacts</code>; the sources in <code>crates/</code>.</p>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S11, S13, S15, S16.</p>
+<h2>Acceptance</h2>
+<ul>
+<li>A step whose recipe requires <code>procedure</code> and whose run has none fails by name, before a model call.</li>
+<li>The same recipe and the same facts compile byte-identically (hash equality is the test).</li>
+<li>Changing the card changes the hash; changing an unrelated tenant's card does not.</li>
+<li>An over-budget section refuses with the measured size, never truncates.</li>
+<li>The prompt audit can name the compiled text it audited by <code>(prompt_ref, prompt_sha256)</code>.</li>
+</ul>
+<p>Verify: the gate above is the acceptance evidence</p>
+<h2>Capabilities</h2>
+<p><code>meta_prompt</code>, <code>workflow_engineering</code></p>
+<h2>Gaps</h2>
+<ul>
+<li>None recorded beyond the inception units themselves.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>S21 · conveyor output · published 2026-11-19T21:34:44.863943980+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

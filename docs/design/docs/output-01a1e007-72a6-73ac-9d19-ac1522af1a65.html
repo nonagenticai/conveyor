@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S06c — MCP tasks — a long-running project asks for input · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S06c — MCP tasks — a long-running project asks for input</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 7 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S06c-mcp-tasks.md</code>
+<strong>Dependencies:</strong> S04, S05, S06, S06b · <strong>Issues:</strong> none</p>
+<h2>Outcome</h2>
+<p>At the end, an MCP client that declares <code>io.modelcontextprotocol/tasks</code> calls <code>projects.execute</code>, receives
+<code>resultType:"task"</code>, polls <code>tasks/get</code> through a project that waits on an approval, answers it with <code>tasks/update</code>,
+and reads a terminal result — with no Python service in the path and no new table.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — <code>enable_tasks()</code>; <code>get_task</code>/<code>update_task</code>/<code>cancel_task</code> backed by Postgres; <code>projects.execute</code>; a project
+execution run; run↔task and approval↔input-request mapping; idempotent answers; cancel; TTL; actor provenance; the
+protocol tests.</p>
+<p><strong>OUT</strong> — the agent's client-side support for tasks on an <strong>external</strong> MCP server (separate plan: today its gate is
+<code>auth_kind=none</code>, <code>agent/.../connectors/runtime.rs:743-757</code>); decommissioning <code>mcp_server</code>; SSE/push; a progress
+percentage (none exists and none is added); any new table.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>rmcp-3.9.0/src/model/task.rs</code>, <code>src/model/mrtr.rs</code>, <code>src/handler/server.rs</code></td><td><code>Task</code>, <code>DetailedTask</code>, <code>TaskPayload</code>, <code>InputRequests</code>, <code>CallToolResponse::Task</code>, the three hooks, <code>validate_tasks_capability</code></td><td>the types and the gating</td><td>the in-memory <code>TaskManager</code> (Postgres is the store)</td></tr>
+<tr><td><code>nonagenticai_mcp_server/src/tasks/{extension,mapping,models}.py</code></td><td>the wire shapes, status map, <code>-32602</code> rule</td><td>the contract, exactly</td><td>its run store and driver</td></tr>
+<tr><td><code>nonagenticai_mcp_server/src/storage/task_inputs.py</code></td><td>idempotent update, rejec…</td><td></td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S04, S05, S06, S06b.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env
+cargo test -p conveyor-store run
+cargo test -p conveyor-actions projects
+cargo test -p conveyor-actions --test mcp_tasks_contract
+cargo test -p conveyor-api --test mcp_tasks
+cargo test -p conveyor-api --test approval_dual
+cargo test -p conveyor-actions --test parity_http_mcp
+cargo clippy --workspace --all-targets -- -D warnings
+cargo run -q -p conveyor-server -- --print-openapi --check-lock
+# no task-capable action beyond projects.execute
+test "$(gre…
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`development`, `architecture`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>MCP tasks — a long-running project asks for input · conveyor output · published 2026-11-19T21:34:44.863943980+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

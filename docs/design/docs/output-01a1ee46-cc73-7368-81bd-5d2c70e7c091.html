@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T7 Operations — architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T7 — Architecture design</h1>
+<p>Project: T7 — Operations · Track: v2 · Tranche: 5 · Plan: docs/SPEC_V2.md §12
+Unit: #78 (this document is dependency-shaping work; blocked-by T2, T4, T13 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T2", "T4", "T13", "P0"]</p>
+<h2>Context and boundary</h2>
+<p>T7 owns incident lifecycle and gated writes: open → triage → mitigate → resolve → postmortem, with runbooks as published procedures. It composes built surfaces — the ops read/write handlers (<code>crates/actions/src/ops/reads.rs</code>, <code>crates/actions/src/ops/writes.rs</code>), the host family (<code>crates/actions/src/ops/host.rs</code>), the invoke gate (<code>crates/actions/src/control/approvals.rs:enforce_destructive_gate</code>), andon (<code>crates/actions/src/control/andon.rs:ANDON_ENGAGED</code>) the executable processes (<code>migrations/0035_process_tree.sql:process</code>) and the SOP text (<code>migrations/0035_process_tree.sql:procedure</code>) — on T2 (severity/runbook selection), T4, T13 (#76) and T14 (#83). Out of scope: T11 metrics, the tool catalogue, T6 rollouts, cluster manifests. Boundaries: same binary and port (8930), no second Kubernetes client, no cluster-admin or shell, no second approval store, no <code>runbook</code> table, no flag service.</p>
+<h2>Aggregates, tables and actions</h2>
+<p><strong>Rows.</strong></p>
+<ul>
+<li><code>incident</code> (to create at #78, §9.2): <code>card_id</code>, <code>service</code>, <code>severity</code>, <code>detected_at</code>, <code>mitigated_at</code>, <code>resolved_at</code>, <code>mitigation_approval_id</code>, <code>mitigation_run_id</code>, <code>runbook_procedure_id</code>, <code>postmortem_asset_id</code>; the card is the work surface, this row the sole record of state.</li>
+<li>Built: <code>card</code>/<code>card_type</code> (<code>migrations/0002_domain.sql:card</code>), <code>process</code>/<code>process_step</code> (<code>migrations/0035_process_tree.sql:process</code>), <code>approval</code>/<code>approval_policy</code> (<code>migrations/0002_domain.sql:approval</code>, <code>migrations/0050_approval_policies.sql:approval_policy</code>), <code>governed_asset</code> (<code>crates/domain/src/governance.rs:AssetKind::Postmortem</code>) and <code>host_registry</code> (<code>migrations/0048_host_registry.sql:host_registry</code>).</li>
+<li><code>tool_call</code> (to create at T13, #76): the ledger for a toolkit-mediated mitigation.</li>
+</ul>
+<p><strong>Invariants.</strong> I1 one incident per card, <code>card_type.code = 'incident'</code>. I2 severity from the tenant set; an unresolved severity refuses triage (P8), and an unpublished runbook refuses the run. I3 a write mitigation records an approved approval whose target equals the write target. I4 resolution requires <code>mitigated_at</code> and an evidence ref; it never deletes evidence. I5 a postmortem requires <code>resolved_at</code>, is <code>kind = postmortem</code>, and links the incident. I6 the incident row is the only record of severity and timestamps; <code>card.meta</code> holds no copy. I7 writes are namespace-scoped; a destructive action without the tenant's approvals is refused before the backend call.</p>
+<p><strong>Actions — existing, each resolves in <code>docs/design/data/actions.json:actions</code>:</strong> <code>ops.pods</code>, <code>ops.deployments</code>, <code>ops.events</code>, <code>ops.logs</code>, <code>ops.flux_status</code>, <code>ops.ci_status</code>, <code>ops.restart</code>, <code>ops.scale</code>, <code>ops.rollback</code>, <code>ops.host_status</code>, <code>ops.host_logs</code>, <code>ops.host_restart_unit</code>, <code>approvals.request</code>, <code>approvals.decide</code>, <code>approval_policies.set</code>, <code>andon.engage</code>, <code>andon.release</code>, <code>ladder.evaluate</code>, <code>cards.create</code>, <code>cards.update</code>, <code>procedures.publish</code>.</p>
+<p><strong>Actions — (to create at #78):</strong> <code>ops.incident</code>, <code>ops.triage</code>, <code>ops.mitigate</code>, <code>ops.resolve</code>, <code>ops.postmortem</code> (§9.2, §10.4); <code>ops.incidents.list|get</code> (§10.5); <code>ops.flag_flip</code> (§12 T7 gate).</p>
+<p><strong>Events.</strong> <code>incident.opened|triaged|mitigated|resolved|postmortemed</code> (to create at #78); built <code>andon.engaged</code>/<code>andon.released</code>; T13's <code>tool.called</code>.</p>
+<h2>Decisions</h2>
+<p><strong>D1 — incident as a card satellite with typed columns.</strong> Alternative: all fields in <code>card.meta</code>. Consequence: constraints and T11's MTTA/MTTR aggregate over columns; P10 because the metric reads it. Severity and runbook selection stay T2 decisions and a runbook is a published procedure; alternative: an ops policy table and <code>runbook</code> rows. Consequence: thresholds live in <code>decision_policy_refinement</code>, pinned by decision id; T7 stores outcomes, never policy values (P11).</p>
+<p><strong>D2 — <code>approval_policy</code> gains <code>required_decisions</code> (default 2 for destructive ops), and a live call requires dry-run evidence on the approval.</strong> Alternative: a code constant and caller discipline. Consequence: §6.5 dual control becomes tenant configuration; the invoke gate requires <code>meta.evidence[]</code> to name a dry-run invocation of the same target; one approval authorises the pair.</p>
+<p><strong>D3 — flag flip patches one registry-declared ConfigMap key.</strong> Alternative: a <code>feature_flag</code> table. Consequence: no second config store; an undeclared key refuses before the API call; <code>configmaps</code> RBAC is a prerequisite.</p>
+<p><strong>D4 — the postmortem is a governed asset; detection enters through built webhooks/schedules, CI failure or a person.</strong> Alternative: a labelled document and an alert manager. Consequence: the postmortem inherits the governance lifecycle and feeds the kata/lesson loop (§9.4); the gate scenario names its entry.</p>
+<h2>Acceptance</h2>
+<p>Gate, verbatim (§12 T7): "an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable".</p>
+<ul>
+<li><strong>A1 — the whole lifecycle, on the deployed connector.</strong> Verify: <code>crates/api/tests/ops_live.rs::an_injected_pod_failure_is_mitigated_end_to_end</code> (to create at #78; needs the deployed ops connector), and at stub level <code>crates/api/tests/ops_incident.rs::an_incident_resolves_with_a_linked_postmortem</code> (to create at #78): <code>mitigation_approval_id</code> approved and equal to the write target, <code>resolved_at</code> after <code>mitigated_at</code>, a kind=postmortem asset linked; <code>::a_postmortem_before_resolution_is_refused</code> refuses the premature asset.</li>
+<li><strong>A2 — an unapproved destructive action is refused; the tenant sets the quorum.</strong> Verify: <code>crates/actions/tests/destructive_gate.rs</code> is the built surface; <code>crates/actions/tests/ops.rs::a_destructive_action_without_approval_never_reaches_the_cluster</code> and <code>::the_tenant_policy_sets_the_quorum</code> (to create at #78).</li>
+<li><strong>A3 — the four verbs are callable.</strong> Verify: <code>crates/actions/tests/ops_write.rs</code> covers restart, scale and rollback today; <code>crates/actions/tests/ops.rs::the_four_write_verbs_are_callable_and_read_back</code> and <code>::an_undeclared_verb_is_refused</code> (to create at #78) cover all four, including flag flip.</li>
+</ul>
+<h2>Architecture artefacts</h2>
+<h3>PSA set at inception</h3>
+<p><strong>Principles applied (SPEC_V2 §3).</strong> P1 one record per fact. P2 rule → laya → human — severity and runbook selection are laya; an LLM never selects or approves. P4 the executor never approves — dual control, approver ≠ requester. P8 fail closed on missing severity, runbook or policy. P10 one new table, read by T11's metric. P11 decision counts, thresholds, flag keys and windows are tenant rows.</p>
+<p><strong>Requirements.</strong> R1 an incident is a card plus one typed row (§9.2). R2 triage sets severity and selects a published runbook through T2 (§6.5). R3 mitigation is a gated destructive write with dry run, approval and read-back (§11.4). R4 resolution and the governed-asset postmortem are evidence-linked (§9.2, §9.4). R5 the four verbs are callable (§12 T7). R6 namespace-scoped, never cluster-admin (§9.2).</p>
+<p><strong>Stakeholder map (stakeholder × concern).</strong></p>
+<table><thead><tr><th>Stakeholder</th><th>Authority to write</th><th>Evidence</th><th>Time to mitigate</th><th>Blast radius</th><th>Approval policy</th><th>Learning</th></tr></thead><tbody>
+<tr><td>Platform owner</td><td>final, break-glass</td><td>audit per call</td><td>MTTR target</td><td>service scope</td><td>sets policy</td><td>postmortems</td></tr>
+<tr><td>On-call commander</td><td>requests approval</td><td>read-first trail</td><td>owns the clock</td><td>one namespace</td><td>subject to policy</td><td>incident summary</td></tr>
+<tr><td>Operations job</td><td>executes, never approves</td><td>run + tool call</td><td>triage speed</td><td>one workload</td><td>cannot widen</td><td>runbook change</td></tr>
+<tr><td>Tenant admin</td><td>none by default</td><td>policy history</td><td>—</td><td>tenant config</td><td>configures rows</td><td>trends</td></tr>
+<tr><td>Security reviewer</td><td>refuses cluster-admin</td><td>no evidence deletion</td><td>—</td><td>cross-tenant</td><td>audits waivers</td><td>escalates a kata</td></tr>
+</tbody></table>
+<p><strong>Driver → goal → objective.</strong> Driver: incidents run from chat and kubectl, so record, approval and learning sit outside the model. Goal: operations closes detect → triage → mitigate → resolve → learn inside the card/run/approval primitives. Objective: the §12 gate passes on an injected pod failure; writes are refused without the tenant policy; every incident ends in a postmortem or a recorded reason.</p>
+<p><strong>Solution concept.</strong> Detection opens a card and an incident row → <code>ops.triage</code> asks T2 for severity and a published procedure → steps read pods, logs, events, Flux and CI → a write step calls <code>ops.restart</code>/<code>:ops.scale</code>/<code>:ops.rollback</code> under one approved target with a recorded dry run → <code>ops.resolve</code> records mitigation and evidence → <code>ops.postmortem</code> composes the asset; a systemic finding becomes a kata or a runbook change. Andon stops the line; only a person releases it.</p>
+<h3>Typed artefact — action catalogue</h3>
+<p><strong>Type:</strong> catalogue · <strong>Phase/plateau:</strong> A / PSA · <strong>Status:</strong> draft · <strong>Version:</strong> 1 · <strong>Owner:</strong> T7 delivery (#78) · <strong>Reviewer:</strong> this review, recorded on #347 · <strong>Review date:</strong> 2026-11-18 · <strong>Project:</strong> T7 — Operations · <strong>Purpose/stakeholders/scope:</strong> the T7 action surface, effect class and gate; for builders, reviewers and operations; scope §10.4 · <strong>Published document:</strong> T7 architecture document (to be published on #78) · <strong>Links:</strong> derives from §10.4 and §11.4; realises R3 and R5; reuses <code>crates/actions/src/ops/</code>.</p>
+<table><thead><tr><th>Action</th><th>Effect</th><th>Gate</th><th>Record</th><th>State</th></tr></thead><tbody>
+<tr><td>ops.incident</td><td>write</td><td>none</td><td>incident row + card</td><td>(to create)</td></tr>
+<tr><td>ops.triage</td><td>write</td><td>T2 decision</td><td>severity + procedure pin</td><td>(to create)</td></tr>
+<tr><td>ops.mitigate</td><td>write</td><td>linked approval + evidence</td><td>approval id + run id</td><td>(to create)</td></tr>
+<tr><td>ops.resolve</td><td>write</td><td>evidence ref</td><td>timestamps</td><td>(to create)</td></tr>
+<tr><td>ops.postmortem</td><td>write</td><td>resolved + approval</td><td>governed asset</td><td>(to create)</td></tr>
+<tr><td>ops.flag_flip</td><td>destructive</td><td>approval + dry run + dual control</td><td>checks[]</td><td>(to create)</td></tr>
+<tr><td>ops.restart / ops.scale / ops.rollback</td><td>destructive</td><td>approval + dry run + dual control</td><td>checks[]</td><td>built</td></tr>
+<tr><td>ops.pods / logs / events / flux_status / ci_status</td><td>read</td><td>none</td><td>audit</td><td>built</td></tr>
+<tr><td>andon.engage / andon.release</td><td>write</td><td>person release</td><td>event</td><td>built</td></tr>
+</tbody></table>
+<h2>Migration and rollout</h2>
+<p>S0 waits on the T2, T4 and T13 gates. S1 ships <code>migrations/0052_ops_incident.sql</code> (to create at #78): the <code>incident</code> table, the <code>approval_policy.required_decisions</code> column, and the incident card-type seed. S2 lands the actions and events. S3 seeds <code>proc-incident</code> and the six runbooks as procedure drafts, published through the existing gate, and adds the Operations screen. S4 extends the invoke gate with dry-run evidence. S5 proves the gate scenario in a disposable namespace. S6 wires postmortem → kata/lesson. Rollback: the migration is additive; actions retire rather than delete; a bad write is reverted with <code>ops.rollback</code> under its own approval, a bad deploy with its revision; incident rows are never deleted.</p>
+<h2>Links</h2>
+<ul>
+<li>Project brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-8f7e-756f-bd44-fe52a0fbc56d.html</li>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/78 · dependencies #76 (T13), #83 (T14)</li>
+<li>Spec: §12 T7 (gate), §9.2, §6.5, §5.4, §11.4, §10.4/§10.4.1, §10.5, §8.1, §9.4, §3 (P1, P2, P4, P5, P8, P10, P11)</li>
+<li>Coverage row: <code>docs/evidence/v2-coverage.md</code> — <code>destination:Operations</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Operations · conveyor output · published 2026-11-19T21:34:44.863943980+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

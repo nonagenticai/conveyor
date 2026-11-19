@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S17 — Native benchmark harness · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S17 — Native benchmark harness</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 5 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S17-benchmark-harness.md</code>
+<strong>Dependencies:</strong> S02, S03, S04, S09 · <strong>Issues:</strong> #11</p>
+<h2>Outcome</h2>
+<p><code>conveyor-bench</code> is absorbed: the conveyor becomes the whole measurement loop — seed the SWE-bench subset,
+produce a patch per instance for an arm, run the graded test in a sandbox, parse the log with a ported
+swebench parser, resolve it, store the verdict, and compare runs. At the end, a 50-instance run is an ordinary
+tenant-scoped record with two controls that make its number publishable, and <strong>no Python exists in the build or
+the image</strong>.</p>
+<h2>Boundary</h2>
+<p><strong>IN.</strong> Four tables (§2.18); the hashed seed artifact and its seeder; the pure grader (verdict ladder + the 12
+repo parsers) and the exact McNemar; the k8s Job sandbox adapter; the <code>gold</code>, <code>empty</code> and <code>baseline</code> arms; the
+single run driver and its reaper; the eight actions, two scopes and two events; screens <strong>13</strong> (benchmarks) and
+<strong>14</strong> (improvement, data contract only) <strong>declared</strong> for S12.</p>
+<p><strong>OUT.</strong> The <code>conveyor</code> arm — it measures a capability-agent/procedure version and belongs to <strong>S18</strong>, which
+waits for S13 and S15; this slice ships its columns and refuses it (<code>409 arm_not_ready</code>).</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>conveyor-bench/src/conveyor_bench/grader.py</code> (<code>47-241</code>)</td><td><code>runner_script</code>, <code>job_name</code>, <code>build_manifests</code>, <code>grade_log</code>'s ladder</td><td>the ladder <strong>verbatim</strong>, the runner script verbatim, the 1 MiB ConfigMap cap</td><td><code>make_test_spec</code> at run time — the eval script is generated at seed time by the Rust port</td></tr>
+<tr><td><code>conveyor-bench/src/conveyor_bench/baseline.py</code></td><td><code>SYS_DEFAULT</code>, the edit contract, <code>parse_reply</code>, <code>apply_reply</code>, the difflib writer</td><td>the prompt byte-for-byte and the refusal rules (zero/multiple anchors)</td><td>any Python implementation…</td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S02, S03, S04, S09.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+cd $HOME/Movies/conveyor
+step() { printf '\n=== %s ===\n' "$1"; }
+
+# Rust runs on m1 (CONTRACT §16): `~/.local/bin/cargo` refuses inside a Cargo project on mini3.
+step "fmt + clippy"
+rbuild -- fmt --all -- --check
+rbuild -- clippy --workspace --all-targets -- -D warnings
+
+step "the served spec matches the lock"
+rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock &gt;/dev/null
+
+Verify: `bash
+set -euo pipefail
+cd $HOME/Movies/conveyor
+step() { printf '\n=== %s ===\n' "$1"; }
+
+# Rust runs on m1 (CONTRACT §16): `
+
+## Capabilities
+
+`testing`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Native benchmark harness · conveyor output · published 2026-11-19T21:34:44.863943980+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

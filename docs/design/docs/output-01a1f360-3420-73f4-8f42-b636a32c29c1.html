@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Compliance review — T9 against the live Statement of Architecture Work · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Compliance review</h1>
+<p>Project: T9 — TOGAF ADM capability · Tranche: 4 · Phase: G (implementation governance) · Contract: the Phase A Statement of Architecture Work <code>01a1f2c2-0e1a-787f-9011-46b424d1ec71</code> (status <code>live</code>, version 2)
+Measured at: main@36b9b60d, 2026-11-19 · Recorded review: approval <code>01a1f357-69eb-7716-811e-ce22ea93d496</code> · Reviewer: an independent session that did not author T9's documents</p>
+<p>This is the Phase G review of T9's delivery against its governing contract. The review was recorded
+through <code>architecture.reviews_record</code> by a reviewer session that did not author the documents; the
+compliance level is that reviewer's recorded verdict, not a new decision.</p>
+<h2>Relationship</h2>
+<p><strong>Compliant.</strong> The delivery meets every clause of the live Statement of Architecture Work. Three
+findings are recorded rather than hidden: D3 is proven by tests and has not been exercised on a live
+architecture project; D5's plan-named selector does not exist, while its substance is covered by a
+differently named test; and the reviewer's D6 evidence cited the public snapshot, which had not rolled
+— D6's criterion is the app's Architecture screen and is unaffected.</p>
+<p>The six levels are the contract's own vocabulary: irrelevant, consistent, compliant, conformant,
+fully conformant, non-conformant. <code>Compliant</code> means each clause is met with its evidence present;
+<code>fully conformant</code> would claim the delivery was verified against every artefact of the organisation's
+architecture in operation, which a first delivery of the capability cannot.</p>
+<h2>Findings</h2>
+<table><thead><tr><th>Criterion</th><th>Verdict</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>D1 — the artefact standard and repository</td><td>pass</td><td><code>crates/api/tests/architecture_artifacts.rs::a_catalog_is_queryable_rows</code>, <code>::an_approved_artefact_is_immutable</code>, <code>::reuse_is_searchable_across_plateaus</code> at <code>origin/main</code>; live <code>architecture.artifacts_list</code> returns the three approved artefacts and <code>architecture.artifacts_entries</code> returns the catalogue's ten entries</td></tr>
+<tr><td>D2 — the Preliminary capability</td><td>pass</td><td>live <code>architecture.profile_get</code> returns the adopted profile (<code>conveyor-software-delivery</code>, nine phases, ten-type standard); <code>architecture.board_get</code> returns the board row; the maturity and skills baselines are recorded rows, cited from their live read-back (the service exposes the write actions only in the deployed image)</td></tr>
+<tr><td>D3 — the architecture project and phase gates</td><td>pass</td><td><code>crates/api/tests/togaf_architecture_phases.rs::phases_a_to_f_pass_in_order</code>, <code>::a_draft_artefact_refuses_the_contract</code>, <code>::a_contract_change_reopens_the_gate</code>; <strong>finding:</strong> no live phase advance has been run on a real architecture project</td></tr>
+<tr><td>D4 — delivery compliance</td><td>pass</td><td><code>crates/api/tests/togaf_delivery_design_gate.rs</code>, <code>crates/api/tests/architecture_compliance.rs::one_level_and_a_dated_waiver</code>; the governing contract is <code>live</code> at version 2</td></tr>
+<tr><td>D5 — change management</td><td>pass</td><td><code>crates/api/tests/togaf_h_change.rs</code> covers the change row, the kata candidate and the <code>409 architecture_outcome_required</code> refusal; <strong>finding:</strong> the plan's named selector <code>a_systemic_finding_produces_a_kata_candidate</code> does not exist — the substance sits inside <code>a_scope_change_produces_a_change_register_row</code></td></tr>
+<tr><td>D6 — the console surface</td><td>pass</td><td><code>apps/web/src/screens/architecture.rs</code> is routed at <code>/architecture</code>, invokes the live actions and renders the phase-advance refusal; <strong>finding:</strong> the reviewer wrote that the public snapshot carried an <code>architecture</code> section, which was not yet true — the pack's section is delivered by PR #401 and its image roll is pending; D6 is unaffected because its criterion is the app's screen</td></tr>
+</tbody></table>
+<h2>Waivers</h2>
+<p>None accepted. The waiver register holds no row at this date; the register's state and the rule that a
+waiver needs an accepting owner and a reassessment date are recorded in the <code>waiver</code> output of the
+same set. The capability's known limitations — ten fixed artefact types with no type-create action,
+no mandatory sets for phases E–H, the board row's <code>draft</code> status, the duplicate maturity assessment
+group, and the unlinked PF-1 document — are gaps disclosed in the capability's own documents, not
+deviations from a contract clause.</p>
+<h2>Decision</h2>
+<p>Compliant, with no conditions attached. The reviewer's row is the durable record; this document
+renders it. The open items that outlive the review — the artefact type growth, the board lifecycle
+transition, the duplicate assessment group, PF-1's document link and the pending image roll — are
+carried in T9's closure review with an owner and a next step. The review does not grant a new
+approval: the project's closure is the owner's act, recorded in the closure review.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-19T21:34:44.863943980+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

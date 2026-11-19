@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S16 — Inference ledger and prompt audit · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S16 — Inference ledger and prompt audit</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 7 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S16-inference-audit.md</code>
+<strong>Dependencies:</strong> S02, S03, S04, S10, S11 · <strong>Issues:</strong> #10</p>
+<h2>Outcome</h2>
+<p>Every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token
+counts and the provider's prompt-cache classes, so "what did this cost and was it cached" is a query rather than a
+guess.</p>
+<h2>Boundary</h2>
+<p><strong>IN.</strong> The three tables (§2.17); the engine capture seam; the <strong>eight</strong> actions; the two scopes and four events;
+the <code>prompt_audit.run</code> and <code>prompt_audit.sweep</code> jobs with the built-in prompt; the <strong>two triggers</strong> — a manual
+<code>prompt_audits.start</code>, and a configurable <em>after N executions</em> policy the sweep enforces against <code>inference_call</code>
+itself; the <strong>draft check that becomes part of publishing</strong> (<code>prompt_audits.check</code>, called by S11's publish); the
+two screens <strong>declared</strong> for S12.</p>
+<p><strong>OUT.</strong> Building any UI — the screens belong to S12 and are listed here so S12 may not invent them.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>…/claude-api/shared/prompt-audit.md</code> (the installed skill)</td><td>Steps 0–7, the four groups, the keep list, the Step 5 report columns</td><td>the <strong>method and the column set verbatim</strong></td><td>its file-editing affordances — the conveyor's surfaces are rows, not files</td></tr>
+<tr><td><code>…/claude-api/shared/prompt-caching.md</code></td><td>§Silent invalidators, §Automatic vs explicit breakpoints</td><td>the invalidation signals Group 4 measures</td><td>the API-level advice; this slice calls the router, not a provider</td></tr>
+<tr><td><code>inference-router/src/models/schemas.py</code></td><td>the <code>Usage</code> model (it…</td><td></td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S02, S03, S04, S10, S11.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+# CONTRACT §16: Rust runs on m1 through rbuild; mini3's cargo refuses inside a Cargo project.
+# 1. the three tables exist with RLS forced (a policy without FORCE reads zero rows and proves nothing)
+test "$(psql "$DATABASE_URL" -tAc "SELECT count(*) FROM pg_class WHERE relname IN
+  ('inference_call','prompt_audit','prompt_audit_finding') AND relrowsecurity AND relforcerowsecurity")" -eq 3
+# 2.
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`development`, `testing`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Inference ledger and prompt audit · conveyor output · published 2026-11-19T21:34:44.863943980+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

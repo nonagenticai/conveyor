@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S06 — Control plane — claims, runs, approvals, andon, comms and notifications · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S06 — Control plane — claims, runs, approvals, andon, comms and notifications</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 5 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S06-control-plane.md</code>
+<strong>Dependencies:</strong> S03, S04, S05 · <strong>Issues:</strong> #4</p>
+<h2>Outcome</h2>
+<p>Claims, runs, approvals, andon and notifications become one durable control plane: one conditional <code>UPDATE</code> per claim, one <code>job</code> row per period, one <code>message</code> plus N <code>delivery</code> rows per notification.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — the 6 tables of <code>02-DATA-ARCHITECTURE §2.6</code>; 17 actions; job kinds for 11 of fr's 14 timers (§5.3); SSE <code>run:{id}</code>, <code>approval:{id}</code>, <code>tenant</code>; Telegram in/out; andon and its gauge.</p>
+<p><strong>OUT</strong> — the signed mcp_server channel (<code>S06a</code>: HMAC, payloads, ±300 s); MCP tool surfacing (<code>S10</code>); <code>project_request.timeout</code> (<code>S07</code>); UI (<code>S12</code>: screens only, §5.6); <code>audience</code> screens (PENDING-S0).</p>
+<p><strong>UI surface declared for S12:</strong> <code>run queue</code> — <code>runs.list</code> (status, card, attempt, age, assignee) over <code>run</code>, on the queued partial index.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>SPEC.md</code> §4.5; <code>02-source-map/20-fr.md</code> (fr <code>6f7c5097</code>) Workers, <code>approvals</code>/<code>conveyor</code>/<code>admin</code>/<code>schedules</code></td><td>both signed directions; the 14 <code>runOnce</code> handlers; <code>andon_state</code>; <code>wip_slot</code>; <code>engagement_deliveries</code></td><td>handlers as job kinds; seam shape</td><td>the timers; the HMAC (S06a)</td></tr>
+<tr><td><code>02-source-map/10-agent-patterns.md</code> (<code>agent</code> <code>83b8de7e</code>) <code>lease.rs</code>, <code>provision/outbox.rs</code></td><td>conditional <code>UPDATE … RETURNING 1</code>; <code>lease_until</code>+<code>lease_token</code>; enqueue in-tx, send outside</td><td>the fence pair</td><td>per-process <code>owner()</code></td></tr>
+<tr><td>`02-source-map/30-rm-…</td><td></td><td></td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S03, S04, S05.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-api --test golden_path --test claim_race --test run_retry \
+  --test approval_dual --test approval_expire --test andon --test delivery_retry \
+  --test telegram_reply --test notifications --test sse_control
+test -z "$(rg -n 'setInterval' crates apps || true)"            # empty
+</code></pre>
+<p>Verify: the gate script above (its executable acceptance)</p>
+<h2>Capabilities</h2>
+<p><code>architecture</code>, <code>development</code></p>
+<h2>Gaps</h2>
+<ul>
+<li>None recorded beyond the inception units themselves.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Control plane — claims, runs, approvals, andon, comms and notifications · conveyor output · published 2026-11-19T21:34:44.863943980+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

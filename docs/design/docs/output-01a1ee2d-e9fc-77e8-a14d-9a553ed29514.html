@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T4 Kanban coach — inception analysis · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T4 — Inception analysis</h1>
+<p>Project: T4 — Kanban coach · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12
+Unit: #75 (blocked-by T3 and P0; this analysis is dependency-shaping work)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T3", "P0"]</p>
+<h2>Current state</h2>
+<p>T4's published brief records the project as <code>proposed</code>, tranche 4, blocked by T3 and P0, with scope "the V2 slice as defined in SPEC_V2 §12". Migration files for the named dependencies exist at <code>origin/main</code> (<code>migrations/0044_plan_spine.sql</code>, <code>migrations/0046_decision_ladder.sql</code>, <code>migrations/0049_pm_job.sql</code>), but no gate evidence for T3 was read for this analysis, so the dependency is recorded, not verified.</p>
+<table><thead><tr><th>Claim</th><th>State</th><th>Citation</th></tr></thead><tbody>
+<tr><td>A capability row describes the coach as protector of flow, owning blocked cards, human interaction and the rework limit</td><td>built</td><td><code>seed/capability.json:"kanban_coach"</code></td></tr>
+<tr><td>A coach job key exists in the organisation seed</td><td>built</td><td><code>seed/organisation.json:"kanban_coach"</code></td></tr>
+<tr><td>A failure handler moves the card, writes one comment and starts the coach</td><td>built</td><td><code>crates/actions/src/board/pull.rs:err_card</code></td></tr>
+<tr><td>The handler refuses a coach about a coach, skips when a live root run holds the card, and caps the coach chain at three runs per card</td><td>built</td><td><code>crates/actions/src/board/pull.rs:COACH_ERROR_PROCESS</code>, <code>crates/actions/src/board/pull.rs:COACH_CHAIN_MAX</code></td></tr>
+<tr><td>The coach is a seeded process: one agent step then a child call to <code>kata.open</code></td><td>built</td><td><code>seed/processes/named.yaml:cap.kanban_coach.handle_error</code></td></tr>
+<tr><td>A human-question route exists inside the same capability</td><td>built</td><td><code>seed/processes/named.yaml:ask_fr</code></td></tr>
+<tr><td>The failure handler is wired to the worker's error-card kind</td><td>built</td><td><code>apps/server/src/worker.rs:err_card</code></td></tr>
+<tr><td>A seed test asserts the coach's kata call resolves</td><td>built</td><td><code>apps/server/tests/catalogue_install.rs:one_command_installs_a_runnable_tenant_from_a_fresh_database</code></td></tr>
+<tr><td>A closed triage set (<code>transient | conveyor_defect | job_defect | project_decision | external</code>) as typed rows</td><td>absent</td><td><code>err_card</code> writes a comment, a card move and a run; its outcome carries only the coach run id and a skip flag (<code>crates/actions/src/board/pull.rs:err_card</code>)</td></tr>
+<tr><td>A closed remedy set (<code>retry | move | repull | block | ask | note</code>) as an applied action</td><td>absent</td><td>the agent's allowed actions are read/comment only (<code>seed/processes/named.yaml:cap.kanban_coach.handle_error</code>); no coach action resolves in <code>docs/design/data/actions.json</code></td></tr>
+<tr><td>Per-signature uniqueness and a same-signature escalation window</td><td>absent</td><td>the guard counts root coach runs per card, not per signature (<code>crates/actions/src/board/pull.rs:err_card</code>)</td></tr>
+<tr><td>One coach card per interruption</td><td>partial</td><td>the coach is a root <code>run</code> attached to the interrupted card (<code>migrations/0002_domain.sql:run</code>), not a separate <code>card</code> (<code>migrations/0002_domain.sql:card</code>)</td></tr>
+<tr><td><code>coach.interrupt|triage|remedy|escalate</code></td><td>proposed (#75)</td><td>declared in SPEC_V2 §10.4; not present in <code>docs/design/data/actions.json</code></td></tr>
+<tr><td>Six-Gets kata execution</td><td>planned (T5, #75)</td><td>only the seed process exists (<code>seed/processes/named.yaml</code>)</td></tr>
+</tbody></table>
+<p>The measured V1 lesson is recorded in the handler: a serial chain of terminal coach runs reached 278 on 2026-11-15 because the live-run guard cannot see terminal runs (<code>crates/actions/src/board/pull.rs:err_card</code>). SPEC_V2 §6.2 records the companion finding: the old open-ended coach LLM rung fixed "0 of 22 blocks".</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Analysis question</th><th>Finding</th></tr></thead><tbody>
+<tr><td>Inside the repo: failure path</td><td>Can T4 extend the coach without a second failure handler?</td><td>Yes. <code>err_card</code> is the single interruption entry point and already holds the recursion guard; extend it, never fork it.</td></tr>
+<tr><td>Inside the repo: process and agent seam</td><td>Can the coach run without a new runtime?</td><td>Yes. <code>capability_agent</code> (<code>migrations/0020_capability.sql:capability_agent</code>) plus a seeded process; a change is a new release.</td></tr>
+<tr><td>Inside the repo: decision ladder</td><td>Can triage class and remedy be one decision?</td><td>Yes in principle. A <code>decision</code> table exists (<code>migrations/0040_organisation.sql:decision</code>) and T2 owns its semantics; the closed sets become options and the remedy a policy-bound consequence.</td></tr>
+<tr><td>Inside the repo: work primitives</td><td>Do card, run, approval and event exist?</td><td>Yes: <code>card</code>, <code>run</code>, <code>approval</code> (<code>migrations/0002_domain.sql</code>); <code>event</code> (<code>migrations/0001_platform.sql</code>).</td></tr>
+<tr><td>Wider estate, capability <code>fr</code></td><td>Is the flow product a source?</td><td>No. The P0 reuse map excludes <code>fr</code>; nothing is borrowed at runtime.</td></tr>
+<tr><td>Wider estate, capability conveyor V1</td><td>Is the V1 board/pull contract reusable?</td><td>Yes. The reuse map names conveyor V1 as the primary source and requires extension, not a fork.</td></tr>
+<tr><td>Upstream</td><td>Is there an implementation to adopt?</td><td>No. The P0 reuse map has no row for coach, kanban, flow, board or cards; the practice is encoded from SPEC_V2 §6.2.</td></tr>
+</tbody></table>
+<h2>Build vs reuse</h2>
+<table><thead><tr><th>Candidate</th><th>Decision</th><th>Boundary and constraint</th></tr></thead><tbody>
+<tr><td>Interruption capture</td><td>reuse <code>err_card</code> and extend it</td><td>one handler; the coach gets no second failure subscription</td></tr>
+<tr><td>Coach job (process and agent)</td><td>reuse the seed seam</td><td>a new process release; the agent keeps read/narrate scope</td></tr>
+<tr><td>Triage and remedy choice</td><td>reuse the T2 ladder</td><td>closed option sets; no second decision store</td></tr>
+<tr><td>Triage row (<code>coach_interruption</code>)</td><td>build (to create)</td><td>one row per interruption; owned by T4</td></tr>
+<tr><td><code>coach.*</code> actions</td><td>build (to create)</td><td>one <code>ActionSpec</code> each, projected to HTTP, MCP and CLI; no bespoke route</td></tr>
+<tr><td>Remedy execution</td><td>reuse existing actions</td><td><code>cards.move</code>, <code>cards.comment</code>, <code>cards.update</code>, <code>approvals.request</code>, <code>process_runs.start</code>; the coach does not become a work capability</td></tr>
+<tr><td>Kata candidate</td><td>reuse <code>kata.open</code></td><td>T4 hands off; six Gets are T5</td></tr>
+</tbody></table>
+<p>Licence and contract: the P0 reuse map states no software licence; its constraints are architectural, contractual and publication-related. No private host, path, credential or unowned runtime dependency may enter the public repository, and every mutation is one action on one Postgres store.</p>
+<h2>Risks</h2>
+<table><thead><tr><th>Risk</th><th>What breaks</th><th>Check</th></tr></thead><tbody>
+<tr><td>The signature is produced by the LLM</td><td>the same failure acquires two signatures and duplicates return</td><td>deterministic signature stored on the row plus a partial unique index; two identical failures produce one open row</td></tr>
+<tr><td>The coach is given write scope beyond the remedy set</td><td>it becomes a work capability and the board churns</td><td>authority test: the coach binding cannot claim or move a card outside <code>coach.remedy</code></td></tr>
+<tr><td>Coach cards land on the project board</td><td>the board becomes unreadable (measured V1 duplicate-coach problem)</td><td>board reads exclude coach cards; card count before and after an injected failure</td></tr>
+<tr><td>A per-card chain cap hides per-signature loops</td><td>an alternating-failure loop evades the cap</td><td>repeat one signature with other interruptions interleaved; escalation must still fire</td></tr>
+<tr><td>Concurrent failure handlers race</td><td>two coach cards for one interruption</td><td>insert under the partial unique index in one transaction; concurrent test</td></tr>
+<tr><td>A gate that never refuses</td><td>escalation becomes a no-op</td><td>negative test: a second same-signature block must not open a coach card</td></tr>
+</tbody></table>
+<h2>Open questions</h2>
+<ol>
+<li>Which fields make the signature stable: process key, error kind, normalised first line, card id?</li>
+<li>Which board and list holds a coach card without polluting a project board?</li>
+<li>Is the escalation window and retry cap a T2 <code>decision_policy</code> or a coach-specific policy row?</li>
+<li>Does the coach apply a remedy only through <code>coach.remedy</code>, or may it compose <code>cards.*</code> directly?</li>
+<li>Which classes count as systemic enough to open a kata, and who owns that threshold?</li>
+<li>How many coach runs per tenant per hour before the coach itself is throttled?</li>
+</ol>
+<h2>Links</h2>
+<ul>
+<li>Brief: <a href="https://conveyor.nonagentic.ai/design/docs/output-01a1e008-72c7-739a-91db-069cc13ab139.html">T4 — Kanban coach</a></li>
+<li>Issue: <a href="https://github.com/nonagenticai/conveyor/issues/75">#75</a></li>
+<li>Coverage row: <code>docs/SPEC_V2.md</code> §12 row T4; role definition §6.2; improvement loop §9.4</li>
+<li>Inception standard: <code>docs/plans/P0-programme-definition.md</code> §5</li>
+<li>Architecture design: the sibling <code>architecture-design</code> output, published on this project</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kanban coach · conveyor output · published 2026-11-19T21:34:44.863943980+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

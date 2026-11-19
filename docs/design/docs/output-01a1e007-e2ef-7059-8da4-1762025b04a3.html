@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S18 — Kata continuous improvement · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S18 — Kata continuous improvement</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 9 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S18-kata-improvement.md</code>
+<strong>Dependencies:</strong> S13, S15, S17 · <strong>Issues:</strong> #12, #30</p>
+<h2>Outcome</h2>
+<p>The benchmark becomes the kata loop's measuring instrument. A <code>conveyor</code>-arm run measures one pinned
+<code>capability_agent</code> or <code>procedure</code> version against the suite; two such runs are compared with S17's exact McNemar;
+one of them is promoted as the suite's <strong>baseline</strong>; and the improvement iteration — start a candidate, wait,
+compare, keep or revert — is a durable job that invokes exactly the actions a person would.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — the <code>conveyor</code> arm's producer (start one conveyor run per instance through the ordinary action surface,
+poll for the patch), the version pinning on the run, <code>benchmark_runs.trend</code>, the improvement job, the baseline /
+regression semantics, and screen 14's data contract.</p>
+<p><strong>OUT</strong> — a new agent runtime or a second model loop (the arm calls S13's <code>agent.run</code> exactly as a card run
+does); automatic code changes (the loop proposes and measures; a person or the kata's own procedures apply); any
+new table or event; a second benchmark driver.</p>
+<p>The producer is a <strong>consumer of the public surface</strong>, and that is a constraint, not a style note.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>crates/actions/src/procedure/step.rs</code></td><td>how a step invokes an action internally with a resolved template</td><td>the invocation path</td><td>a second executor</td></tr>
+<tr><td><code>docs/plans/01-CONTRACT.md</code> §17</td><td>the executor slot, the caps, the readiness rules</td><td>the rules</td><td>—</td></tr>
+<tr><td><code>slices/S15-capability-knowledge-memory.md</code></td><td><code>capability_agent</code>, <code>prompt_ref</code>, readiness</td><td>the shape</td><td>S15's build</td></tr>
+<tr><td><code>slices/S17-benchmark-harness.md</code></td><td>the arms, the compare/refusal, <code>promote</code></td><td>the API</td><td>the harness build</td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S13, S15, S17.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env
+cd $HOME/Movies/conveyor
+
+# the arm refuses before S13/S15 data exists, and runs when it does
+cargo test -p conveyor-server --test benchmark_arm
+# two versions of one subject compare with an exact McNemar delta
+cargo test -p conveyor-api --test benchmark_trend
+# the improvement job performs the same calls a person does
+cargo test -p conveyor-server --test benchmark_improvement
+# the workspace is still green and the lock still matches
+cargo run -q -p…
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`kaizen`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kata continuous improvement · conveyor output · published 2026-11-19T21:34:44.863943980+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

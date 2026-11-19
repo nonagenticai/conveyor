@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S14 — Cutover — deploy, seed, rehearse, decommission fr / RM / Planka · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S14 — Cutover — deploy, seed, rehearse, decommission fr / RM / Planka</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 11 · <strong>Measured status:</strong> partial · <strong>Plan:</strong> <code>docs/plans/slices/S14-cutover.md</code>
+<strong>Dependencies:</strong> S00, S06b, S12, S13 · <strong>Issues:</strong> #8, #29</p>
+<h2>Outcome</h2>
+<p>At the end, <code>conveyor</code> is the only live conveyor service: created (the programme's first git step), deployed, seeded,
+rehearsed against the frozen old system, switched at the <strong>agent's conveyor registration</strong>, proven by a real <code>agent</code>
+task, and fr / requirements_management / Planka decommissioned — each dumped first, with a timed rollback rehearsed.</p>
+<h2>Boundary</h2>
+<p><strong>IN:</strong> archived-repo decision; repo + CI; namespace/service/DB/roles/PgBouncer/secret; ImagePolicy; ingress;
+Keycloak realm/clients; licence; <code>migrate --seed</code>; rehearsals R1–R4; cutover T0; the agent's conveyor registration;
+decommission of <code>fr</code>/<code>requirements</code>/<code>kanban</code>; dump + restore test; rollback rehearsal and runbook.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>SPEC.md</code> §4.5, §8 S14, §9, §11 R7/R9/R11</td><td>the channel contract, the cutover order, the three risks</td><td>the sequence and gates</td><td>—</td></tr>
+<tr><td><code>01-CONTRACT.md</code> §2, §9, §10, §13, §14</td><td>roles, licence, compose/port rules, "no <code>git init</code> before repo creation"</td><td>the values in §5</td><td>—</td></tr>
+<tr><td><code>02-source-map/40-live-state.md</code></td><td>Loki <code>24h</code>; n8n 348/332; Planka test-only; fr 86 domain tables (90 relations)</td><td>the evidence classes</td><td>"no traffic" as proof</td></tr>
+<tr><td><code>02-source-map/30-rm-planka-mcp-n8n.md</code> §2, §3</td><td>the old <code>mcp_server</code> channel (historical, supers…</td><td></td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S00, S06b, S12, S13.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cd $HOME/Movies/conveyor
+# Export before running; nothing here hard-codes a credential or a host.
+#   export KUBECONFIG=&lt;the k3s kubeconfig&gt;       BASE=https://conveyor.nonagentic.ai
+#   export TOK=&lt;super_admin bearer&gt;              CARD=&lt;a seeded active card id&gt;
+#   export C=$HOME/Movies/gitops-production
+#   export E2E_USER=&lt;the Keycloak test user&gt;     E2E_PASS=&lt;its password&gt;   (S12's suite logs in with…
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`change_management`, `development`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Cutover — deploy, seed, rehearse, decommission fr / RM / Planka · conveyor output · published 2026-11-19T21:34:44.863943980+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

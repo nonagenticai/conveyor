@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Inception analysis — T1 Plan spine · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Inception analysis — T1 Plan spine</h1>
+<p><strong>Project:</strong> T1 — Plan spine · <strong>Track:</strong> v2 · <strong>Tranche:</strong> 1 · <strong>Plan:</strong> <code>docs/SPEC_V2.md</code> §12
+<strong>Unit:</strong> #72 (blocked by #46 and by P0; this analysis is dependency-shaping work, not a build claim)
+<strong>Measured at:</strong> <code>main@cc88052</code>, 2026-11-16 · <strong>Project row:</strong> <code>active</code>, <code>meta.depends_on = ["T0", "P0"]</code></p>
+<h2>Current state</h2>
+<p>T1 is the plan spine: a project carries a frozen baseline, a controlled change request, a
+recomputing WSJF score, an in-flight portfolio view, a dependency graph that refuses cycles, and the
+MSP programme-definition rows that make a benefit a measurement record rather than prose. The
+current repository has the scaffolding around those things but none of the spine itself.</p>
+<table><thead><tr><th>Capability</th><th>State today</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>Programme and project aggregates</td><td><strong>Built.</strong> <code>programme</code> and <code>project</code> exist; <code>project.programme_id</code> relates them; project status is <code>draft/active/paused/closed/archived</code>.</td><td><code>migrations/0002_domain.sql:18</code> (<code>programme</code>), <code>:33</code> (<code>project</code>)</td></tr>
+<tr><td>V1 outline tree</td><td><strong>Built, different shape.</strong> <code>outline</code> and <code>outline_node</code> are the V1 requirements outline; they are not a WBS with WSJF inputs or acceptance-by-artefact.</td><td><code>migrations/0007_requirements.sql:43,61</code></td></tr>
+<tr><td>Project actions</td><td><strong>Built.</strong> create/get/update/close/execute; <code>projects.update</code> merges <code>meta</code> and preserves the seed-owned keys (<code>depends_on</code>, <code>plan_status</code>).</td><td><code>crates/actions/src/board/projects.rs:75,410,434,476</code>; meta merge at <code>:558-588</code></td></tr>
+<tr><td>Programme gate</td><td><strong>Built on JSON, not edges.</strong> <code>project.meta.depends_on</code> is read by <code>assert_dependencies_met</code>; a dependency is met only when its project is <code>closed</code> or <code>archived</code>; a key naming no project fails closed.</td><td><code>crates/actions/src/programme.rs:31,49</code>; called at <code>crates/actions/src/process/runs.rs:301</code> and <code>crates/actions/src/board/projects.rs:676</code></td></tr>
+<tr><td>Approvals</td><td><strong>Partial.</strong> <code>approvals.request</code> records <code>requested_by</code>; <code>approvals.decide</code> writes the decision under <code>required_decisions</code> and the <code>(approval_id, approver_id)</code> index stops one approver deciding twice.</td><td><code>crates/actions/src/control/approvals.rs:280-342</code> (request), <code>:50-100</code> (decide), <code>:342</code> (<code>requested_by</code>)</td></tr>
+<tr><td>Refused self-approval</td><td><strong>Absent.</strong> <code>approvals.decide</code> uses <code>ctx.actor_id</code> as the approver and never compares it with the pending row's <code>requested_by</code>. A requester can decide their own gate.</td><td><code>crates/actions/src/control/approvals.rs:83</code>; no <code>requested_by</code> comparison in the decide path</td></tr>
+<tr><td>Baseline, change request, registers</td><td><strong>Absent.</strong> No <code>project_baseline</code> or <code>project_register_item</code> anywhere in <code>crates/</code>, <code>migrations/</code> or tests.</td><td><code>git grep -n 'project_baseline|project_register_item' -- crates migrations</code> → 0</td></tr>
+<tr><td>WSJF</td><td><strong>Absent.</strong> No WSJF code; the only occurrence is the programme gate text. The four typed inputs have no home.</td><td><code>git grep -n 'WSJF' -- crates migrations</code> → 0</td></tr>
+<tr><td>Portfolio in-flight set</td><td><strong>Absent.</strong> <code>programmes.list/get</code> and <code>project_stakeholder</code> exist; there is no computed portfolio read model and no in-flight rule.</td><td><code>crates/actions/src/portfolio/programmes.rs:60,107,200</code>; <code>migrations/0008_s08_portfolio.sql:36</code> (<code>project_stakeholder</code>)</td></tr>
+<tr><td>Dependency edges and cycle refusal</td><td><strong>Absent.</strong> <code>project_dependency</code> does not exist; dependency order lives in <code>meta.depends_on</code>, which cannot express edge kinds and cannot detect a cycle at creation.</td><td><code>git grep -n 'project_dependency' -- crates migrations</code> → 0</td></tr>
+<tr><td>MSP rows</td><td><strong>Absent.</strong> No <code>programme_tranche</code>, <code>benefit_profile</code>, <code>benefit_link</code>, <code>benefit_transition</code>, <code>stakeholder_profile</code> or <code>programme_baseline</code>.</td><td><code>docs/evidence/v2-coverage.md</code> rows all <code>new</code>; grep → 0</td></tr>
+<tr><td>T0 organisation spine</td><td><strong>Built and closed.</strong> Jobs, releases, bindings and the organisation tables are in <code>migrations/0040_organisation.sql</code>; T0 is <code>closed</code> in the live programme.</td><td>live <code>projects.get</code> T0; <code>migrations/0040_organisation.sql</code></td></tr>
+</tbody></table>
+<p>The practical consequence: today a project can be created and a card can run, but the programme
+cannot answer "what did we promise, what changed, why is this work before that work, and which
+benefit does it serve?" The gate proves order only through a JSON list written by the seed; the
+approval record proves a decision only if the requester is not the decider, which is not checked.</p>
+<h2>Reuse sources</h2>
+<p>Every T1 table and action is a new row in the existing engine, not a new subsystem. The reusable
+pieces, and the question each answers for the design:</p>
+<table><thead><tr><th>Source</th><th>What is reusable</th><th>Question for the architecture</th></tr></thead><tbody>
+<tr><td><code>migrations/0002_domain.sql:18,33,196,231</code></td><td><code>programme</code>, <code>project</code>, <code>approval</code>, <code>approval_decision</code> — the aggregates and the one gate primitive</td><td>Does the baseline hang off <code>project</code> or off a new <code>project_baseline</code> row? What does a change request reference?</td></tr>
+<tr><td><code>crates/actions/src/control/approvals.rs</code></td><td>request/decide/list, <code>required_decisions</code>, <code>approval_decision</code>, the dual-control unique index</td><td>Where is the requester/executor exclusion enforced, and does it apply to V1 gates too?</td></tr>
+<tr><td><code>crates/actions/src/programme.rs</code></td><td><code>assert_dependencies_met</code>, the <code>409 blocked_by</code> branch, the fail-closed rule</td><td>Do the new edges replace <code>meta.depends_on</code> or run beside it during the transition?</td></tr>
+<tr><td><code>crates/actions/src/board/projects.rs:476</code></td><td>the <code>projects.update</code> meta merge and its seed-key preservation</td><td>Does a project edit write plan facts through <code>projects.update</code> or a new <code>projects.plan</code> action?</td></tr>
+<tr><td><code>migrations/0007_requirements.sql:43,61</code></td><td>V1's <code>outline</code>/<code>outline_node</code> tree and its ordering</td><td>Is <code>wbs_node</code> a replacement, a sibling, or a view? The open question defaults to a new table with no backfill.</td></tr>
+<tr><td><code>migrations/0008_s08_portfolio.sql:36</code></td><td><code>project_stakeholder</code> (who is involved)</td><td>How does the MSP <code>stakeholder_profile</code> (concerns, influence, support, engagement) relate without duplicating it?</td></tr>
+<tr><td><code>crates/actions/tests/</code> and <code>crates/api/tests/approval_dual.rs</code></td><td>the real-Postgres test harness, fixture builders, the dual-control test shape</td><td>Which of the ten T1 scenarios are pure action tests and which need the API layer?</td></tr>
+<tr><td><code>crates/store/src/</code></td><td>the tenant-scoped transaction helpers, paging, version/If-Match</td><td>Do the new reads use <code>begin_scoped_read_only</code> and the existing page type?</td></tr>
+<tr><td><code>seed/programme.json</code> + <code>meta.depends_on</code></td><td>the programme's declared order and the 48-project seed</td><td>How does the new edge table get populated without inventing a second programme list?</td></tr>
+</tbody></table>
+<p>The wider estate was checked for a plan-spine implementation: SPEC_V2 §11.2 names no
+project/portfolio/baseline service among the tools the conveyor binds, and the legacy fr/RM and
+Planka surfaces are replaced at cutover (S14), not imported (SPEC_V2 §11.2 and §14). There is nothing to import;
+the reuse is the engine, not a dependency.</p>
+<h2>Build vs reuse</h2>
+<p><strong>Build the spine in the conveyor.</strong> The plan-spine rows are tenant-scoped facts that every later
+slice reads; a separate service would create a second source of truth for the same projects and
+would have to reimplement the approval and tenancy primitives. The build is five new tables/migrations
+and two action families, exercised through the existing action layer.</p>
+<p>The alternatives considered and rejected:</p>
+<ol>
+<li><strong>Port a WBS from the V1 <code>outline</code> tree.</strong> Rejected as the primary model. <code>outline_node</code> is a
+requirements outline with no typed WSJF inputs, no baseline, and no acceptance-by-artefact. A
+new <code>wbs_node</code> with a project-scoped tree and the four typed integers is smaller than a
+migration of V1 rows, and it leaves <code>outline</code> untouched (open question 1's default).</li>
+<li><strong>Keep <code>meta.depends_on</code> as the only dependency model.</strong> Rejected. It is a JSON list on one
+project, cannot name an edge kind or a status, and cannot refuse a cycle at creation. The new
+<code>project_dependency</code> edge table becomes the source; the gate can read it after the transition,
+with the JSON list retained as the seed's declared order until the seed is migrated.</li>
+<li><strong>Store the WSJF score.</strong> Rejected. The spec is explicit: the four inputs are stored, the score
+is computed on read. Storing it would make a stale score look like a fact.</li>
+<li><strong>Build the T10 cadence and benefits-realization procedures here.</strong> Rejected. T1 owns the rows
+and the gates; the cadence materialisation, PI planning and the realization procedure are T10.
+The benefit profile's six field groups are T1 because the row is the measurement record.</li>
+</ol>
+<h2>Risks</h2>
+<table><thead><tr><th>Risk</th><th>Why it matters</th><th>Control</th></tr></thead><tbody>
+<tr><td>Two dependency sources</td><td><code>meta.depends_on</code> and <code>project_dependency</code> can disagree, and the gate could read the wrong one</td><td>Design one adapter: the gate reads the edge table when present, falls back to <code>meta.depends_on</code> only for unmigrated seed rows; a test asserts the fallback ordering</td></tr>
+<tr><td>Baseline semantics</td><td>A "baseline" that is a copy of current rows is a forecast, not a freeze</td><td>The baseline stores an immutable snapshot and a taken-at/approved-by; later row changes never update it; a test changes the rows after the take and reads the frozen snapshot</td></tr>
+<tr><td>Change-request bypass</td><td>A row edit that skips the register makes the baseline meaningless</td><td>The change is a <code>project_register_item(kind='change')</code> with a required impact block; a direct edit is not the change path; the architecture names which actions write the register</td></tr>
+<tr><td>Self-approval</td><td>A requester deciding their own gate defeats every later gate</td><td>Enforce in the domain/action, not the UI; extend <code>approval_dual.rs</code>; the negative test is the acceptance</td></tr>
+<tr><td>Overlap with V1 outline</td><td>Two trees with similar names confuse the model and the console</td><td><code>wbs_node</code> is a new, project-scoped table; <code>outline</code> is untouched and out of the T1 page; the open question is recorded, not silently resolved</td></tr>
+<tr><td>MSP scope creep</td><td>Building T10's cadence or realization procedure inside T1 expands the unit past one PR</td><td>T1 builds the rows and the refusal rules; T10 builds the cadence and realization procedures; the boundary is in the issue's Out of scope</td></tr>
+<tr><td>Benefit profiles without baselines</td><td>A profile with invented numbers would poison the programme's benefit track</td><td>The six-group profile is a mandatory record; the refusal test is P5.1; a missing baseline is a gap, never a default</td></tr>
+<tr><td>The engine is not required</td><td>T1's tests are local Postgres; no A5 run is needed</td><td>The unit proves every scenario with real Postgres integration tests, as the issue's Deployment prerequisite says</td></tr>
+</tbody></table>
+<h2>What this analysis changes for the build</h2>
+<p>The build order follows the dependencies inside the spine: the baseline and register first (P1),
+then the WSJF inputs on the WBS row (P2), then the portfolio read (P3), then the edge table and its
+cycle refusal (P4), then the MSP rows and their refusals (P5). The approval requester exclusion is
+the one cross-cutting change: it must land in the approval action before P1's change-request gate
+is meaningful. The T1 build remains blocked by #46 (ADR 0005's absorption sequence) and by P0; this
+analysis and the architecture beside it are the project's inception artefacts, not a claim on its
+build units.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-19T21:34:44.863943980+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

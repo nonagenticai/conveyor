@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-11-19T21:34:44.863943980+00:00",
+  "inference": {
+    "by_caller": [
+      {
+        "caller_kind": "agent_run",
+        "calls": 604,
+        "total_tokens": 9457017
+      },
+      {
+        "caller_kind": "other",
+        "calls": 5,
+        "total_tokens": 1451
+      }
+    ],
+    "by_model": [
+      {
+        "cache_hits": 0,
+        "calls": 81,
+        "completion_tokens": 9429,
+        "model": "claude-sonnet-5-5",
+        "prompt_tokens": 961089,
+        "total_tokens": 970518
+      },
+      {
+        "cache_hits": 0,
+        "calls": 3,
+        "completion_tokens": 0,
+        "model": "image_gen",
+        "prompt_tokens": 0,
+        "total_tokens": 0
+      },
+      {
+        "cache_hits": 0,
+        "calls": 525,
+        "completion_tokens": 74844,
+        "model": "local-llm",
+        "prompt_tokens": 8413106,
+        "total_tokens": 8487950
+      }
+    ],
+    "totals": {
+      "cache_hit_calls": 0,
+      "cache_miss_calls": 606,
+      "cache_write_calls": 0,
+      "calls": 609,
+      "completion_tokens": 84273,
+      "non_ok_calls": 0,
+      "prompt_tokens": 9374195,
+      "total_tokens": 9458468,
+      "unknown_cache_calls": 3
+    }
+  },
+  "note": "tokens are stored; cost is derived by the app from the pinned price version and is not stored in the ledger",
+  "schema": "design-snapshot/v1"
+}

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T4 Kanban coach — architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T4 — Architecture design</h1>
+<p>Project: T4 — Kanban coach · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12
+Unit: #75 (this design is dependency-shaping work; blocked-by T3 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T3", "P0"]</p>
+<h2>Context and boundary</h2>
+<p>T4 owns the path from one interruption to one bounded response: capture from the existing failure handler, one coach card, a triage decision over closed sets, at most one remedy, escalation to a human when the same signature repeats, and a kata candidate when the class is systemic. It is an ordinary job under SPEC_V2 §6, not a subsystem: its authority and scope are data on its binding, not branches in code.</p>
+<p>It must fit the blueprint: one Rust application split into pure domain types, one SQL store, per-aggregate action modules, and HTTP/API/auth/event/render crates assembled by <code>apps/server</code>; every mutation is an <code>ActionSpec</code> projected to HTTP, OpenAPI, MCP and the CLI; events are written in the same transaction as the state change; no new port, same binary, same Postgres database (SPEC_V2 §10.6).</p>
+<p>It must not duplicate:</p>
+<ul>
+<li>the run state machine — <code>run</code> already exists (<code>migrations/0002_domain.sql:run</code>);</li>
+<li>the decision ladder and its policies — T2 owns their semantics; T4 consumes a decision row;</li>
+<li>PM charter, gates and closure — T3;</li>
+<li>the six-Gets kata — T5; T4 only emits a candidate through the existing <code>kata.open</code> process;</li>
+<li>lessons (T8), flow metrics (T11) and operations remedies (T7).</li>
+</ul>
+<h2>Aggregates, tables and actions</h2>
+<table><thead><tr><th>Aggregate</th><th>Table</th><th>Invariants</th><th>Actions (registry)</th><th>Events</th></tr></thead><tbody>
+<tr><td>Coach interruption</td><td><code>coach_interruption</code> (to create, T4, #75)</td><td>at most one open row per <code>(tenant_id, source_card_id, signature)</code>; <code>triage_class</code> ∈ the five-value closed set; <code>remedy</code> ∈ the six-value closed set; exactly one remedy per row; <code>signature</code> immutable; <code>status ∈ open | remedied | escalated | closed</code></td><td><code>coach.interrupt</code>, <code>coach.triage</code>, <code>coach.remedy</code>, <code>coach.escalate</code> (to create, SPEC_V2 §10.4 coach row, #75)</td><td><code>coach.interrupted</code>, <code>coach.triaged</code>, <code>coach.remedied</code>, <code>coach.escalated</code> (to create, SPEC_V2 §6.2)</td></tr>
+<tr><td>Coach card</td><td><code>card</code> (exists, <code>migrations/0002_domain.sql:card</code>)</td><td>one coach card per interruption; a child (<code>parent_card_id</code>) of the interrupted card on the same board in its <code>waiting</code> lane, with a <code>coach_interruption</code> card type; excluded from flow and WIP reads while open; closed only when the interruption closes</td><td><code>cards.create</code>, <code>cards.update</code>, <code>cards.comment</code> (exist in <code>docs/design/data/actions.json</code>)</td><td>existing card events</td></tr>
+<tr><td>Coach run</td><td><code>run</code> (exists, <code>migrations/0002_domain.sql:run</code>)</td><td>one live root run per card; the coach is a root run and never parents a coach run</td><td><code>process_runs.start</code> (exists)</td><td>existing run events</td></tr>
+<tr><td>Triage decision</td><td><code>decision</code> (exists, <code>migrations/0040_organisation.sql:decision</code>; T2 owns its ladder semantics)</td><td>pins its decision policy and refinement versions; options are exactly the closed sets; confidence below the policy threshold yields <code>ask</code>, never a guess</td><td>written by <code>coach.triage</code> (to create)</td><td>existing decision event</td></tr>
+<tr><td>Escalation</td><td><code>approval</code> (exists, <code>migrations/0002_domain.sql:approval</code>)</td><td>an escalation is one approval to a human; it opens no coach card</td><td><code>approvals.request</code> (exists)</td><td>existing approval events</td></tr>
+<tr><td>Coach agent</td><td><code>capability_agent</code> (exists, <code>migrations/0020_capability.sql:capability_agent</code>)</td><td>the agent scope is read and narrate; it cannot call <code>coach.remedy</code></td><td>seeded process <code>cap.kanban_coach.handle_error</code> (exists)</td><td>existing agent events</td></tr>
+<tr><td>Kata candidate</td><td>seed process <code>kata.open</code> (exists)</td><td>at most one kata child run per systemic interruption; six Gets are T5</td><td>child <code>call</code> step (exists in the seed)</td><td>existing run events</td></tr>
+</tbody></table>
+<p>The interruption row references the source card, the source run, the coach card, the coach run, the decision and the escalation approval. No column is added to <code>card</code> or <code>run</code>; the new fact has one owner, the new table (P1, one record per fact). Every write is one transaction containing the row change and its <code>event</code> (<code>migrations/0001_platform.sql:event</code>).</p>
+<h2>Decisions</h2>
+<p><strong>D-T4-1 — Triage and remedy are one ladder decision over two closed sets, not prose and not an LLM choice.</strong> Alternative: the coach agent selects the remedy, which is V1's open rung and measured "0 of 22 blocks" (SPEC_V2 §6.2). Consequence: the build seeds five class options and six remedy options and a decision policy; below-threshold confidence produces <code>ask</code>. Trace: SPEC_V2 §6.2, §12 T4.</p>
+<p><strong>D-T4-2 — The signature is deterministic and stored; uniqueness is a partial unique index on <code>(tenant_id, source_card_id, signature)</code> where <code>status = 'open'</code>.</strong> Alternative A: an LLM-derived signature — non-deterministic and unindexable. Alternative B: counting coach runs per card, which is today's <code>COACH_CHAIN_MAX</code> and was evaded to 278 runs (<code>crates/actions/src/board/pull.rs:err_card</code>). Consequence: a migration adds the index; the existing cap remains as a second, coarser guard. Trace: SPEC_V2 §6.2 recursion guard, §12 T4.</p>
+<p><strong>D-T4-3 — The coach card is a child of the interrupted card on that card's own board, in the board's <code>waiting</code> lane, with a <code>coach_interruption</code> card type.</strong> Alternative A: a dedicated coach board — refused because <code>board.project_id</code> is NOT NULL (<code>migrations/0002_domain.sql:board</code>) and the organisation seed carries no board schema, so a coach board would require a new tenant-wide project. Alternative B: a root run only — refused by "exactly one coach card". Consequence: the measured unreadable board is prevented by the per-signature uniqueness (D-T4-2) and by excluding <code>coach_interruption</code> cards from flow and WIP reads, not by a separate board. Trace: SPEC_V2 §6.2.</p>
+<p><strong>D-T4-4 — A repeat same-signature interruption escalates to a human approval and opens no coach card; a coach about a coach is refused at the handler.</strong> Alternative: a second coach card, the duplicate-card failure. Consequence: escalation is <code>approvals.request</code>; the refusal predicate stays in <code>err_card</code> and keys off <code>COACH_ERROR_PROCESS</code>. Trace: SPEC_V2 §6.2, §6.6, §5.4.</p>
+<p><strong>D-T4-5 — A systemic class is handed to the existing <code>kata.open</code> process; six Gets remain T5.</strong> Alternative: implement kata in T4, duplicating T5 and breaking the tranche boundary. Consequence: today the seed calls <code>kata.open</code> <strong>unconditionally</strong> as step 2 of <code>cap.kanban_coach.handle_error</code> (<code>seed/processes/named.yaml:cap.kanban_coach.handle_error</code>); the seed release moves that handoff behind the triage decision — <code>coach.triage</code> starts the child run when the class is <code>conveyor_defect</code> or <code>job_defect</code>, and the unconditional child step is removed. T4 asserts exactly one kata child run per systemic interruption and none for the other three classes. Trace: SPEC_V2 §12 T4 and T5.</p>
+<p><strong>D-T4-6 — The coach's action scope is the remedy set only; the agent keeps read/narrate scope.</strong> Alternative: grant the agent write actions, which is the measured failed rung. Consequence: the remedy step is a system step after the decision, not an agent tool call; the agent attaches only the diagnosis narrative. Trace: SPEC_V2 §6.2 "never do the work", §6.7 authority matrix.</p>
+<h2>Acceptance</h2>
+<p>The project's measured gate is: "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata" (SPEC_V2 §12, row T4). Each scenario maps to one clause; <code>(to create at ...)</code> marks a check the T4 build unit adds. This design claims no test has run.</p>
+<ol>
+<li><strong>Exactly one coach card and one remedy.</strong> Given a card whose run fails once, when the failure handler runs, then one open interruption row, one coach card and one applied remedy exist, and a redelivery adds none. <code>Verify: cargo test --test coach_injected_failure</code> (to create at <code>apps/server/tests/coach_injected_failure.rs</code>).</li>
+<li><strong>A repeat signature escalates.</strong> Given a second failure with the same signature inside the window, when the handler runs, then no new coach card exists and one approval is open. <code>Verify: cargo test --test coach_repeat_signature</code> (to create at <code>apps/server/tests/coach_repeat_signature.rs</code>).</li>
+<li><strong>No coach card about a coach card.</strong> The refusal predicate already exists at <code>crates/actions/src/board/pull.rs:COACH_ERROR_PROCESS</code>; the behavioural test is <code>Verify: cargo test --test coach_no_self_reference</code> (to create at <code>apps/server/tests/coach_no_self_reference.rs</code>); the structural check is <code>rg -n 'no coach about a coach' crates/actions/src/board/pull.rs</code>.</li>
+<li><strong>A systemic class opens a kata.</strong> Given a triage class marked systemic, when the coach process runs, then exactly one <code>kata.open</code> child run exists. <code>Verify: cargo test --test coach_kata_handoff</code> (to create at <code>apps/server/tests/coach_kata_handoff.rs</code>). The seed wiring has a test at <code>apps/server/tests/catalogue_install.rs:one_command_installs_a_runnable_tenant_from_a_fresh_database</code>; it is not run for this design.</li>
+<li><strong>The closed sets refuse.</strong> An unknown class or remedy is refused with 422 and writes no row. <code>Verify: cargo test --test coach_closed_sets</code> (to create at <code>apps/server/tests/coach_closed_sets.rs</code>).</li>
+<li><strong>Uniqueness under concurrency.</strong> Two concurrent handlers for one interruption produce one row. <code>Verify: cargo test --test coach_concurrent_signature</code> (to create at <code>apps/server/tests/coach_concurrent_signature.rs</code>).</li>
+</ol>
+<h2>Architecture artefacts</h2>
+<h3>The PSA set at inception</h3>
+<ul>
+<li><strong>Principles applied.</strong> P2 — an LLM never selects, routes, classifies or approves: the triage class
+and the remedy are a decision-ladder record, never a generated choice. P3 — no work without a
+card, no transition without an action, no completion without evidence: each remedy is an action
+and each interruption carries its evidence. P4 — the executor never approves its own work: an
+escalation is an approval to a human, approver ≠ executor. P6 — the coach is an ordinary job on
+the same catalogue, card, run and approval primitives. P10 — no speculative aggregate: the one
+new table exists because this procedure writes it and the repeat/escalation measure reads it.
+P11 — the closed symptom sets, the escalation window and the chain cap are versioned tenant rows
+with platform defaults, not code constants.</li>
+<li><strong>Requirements.</strong> SPEC_V2 §6.2 (the coach role, the interruption taxonomy and the closed remedy
+set), §6.7 (the authority matrix: the coach never does the work), §9.4 (the kata handoff),
+§5.4 (gates and dual control), §10.4 (the action and event names), §12 row T4 (the measured gate).</li>
+<li><strong>Stakeholder map.</strong> The delivery team whose card was interrupted (the remedy must preserve its
+work); the PM (flow and WIP); the kata owner (a systemic class); the human approver (escalation);
+the programme's governance and audit (every remedy is an action with an event).</li>
+<li><strong>Driver, goal and objective.</strong> Driver: a failure with no bounded response either stalls the card
+or produces a serial chain of coach runs (278 terminal coach runs measured on 2026-11-15 because
+the live-run guard cannot see terminal runs — recorded at
+<code>crates/actions/src/board/pull.rs:err_card</code>). Goal: every interruption yields exactly one coach
+card and at most one remedy, and a repeat signature escalates instead of repeating. Objective:
+repeat interruptions convert into a kata candidate — a measured change — rather than repeated
+advice.</li>
+<li><strong>Solution concept.</strong> Capture at the existing failure handler; one <code>coach_interruption</code> row keyed
+by a deterministic signature; a triage decision over two closed sets through the T2 ladder; one
+remedy applied through existing actions; escalation as an approval; a systemic class handed to
+<code>kata.open</code>. No new runtime, port or store.</li>
+</ul>
+<h3>The typed artefact</h3>
+<p><strong>T4-AM-01 — Coach interruption/remedy matrix.</strong> Type: matrix.</p>
+<ul>
+<li>Owner: the T4 delivery lane, issue #75.</li>
+<li>Reviewer: the independent reviewer recorded on #347.</li>
+<li>Review date: 2026-11-18.</li>
+<li>Version: 1. Status: draft.</li>
+<li>Project: T4 — Kanban coach.</li>
+<li>Purpose: fix the closed triage and remedy sets and which remedy each class may use. Stakeholders: the coach job, the PM, the kata job, a human approver and the governance audit. Scope: one tenant's coach loop; excludes the six Gets (T5) and flow metrics (T11).</li>
+<li>Axes: axis_a = triage class (<code>transient</code>, <code>conveyor_defect</code>, <code>job_defect</code>, <code>project_decision</code>, <code>external</code>); axis_b = remedy (<code>retry</code>, <code>move</code>, <code>repull</code>, <code>block</code>, <code>ask</code>, <code>note</code>). Each cell carries one value: <code>default</code>, <code>allowed</code> or <code>refused</code>; a blank cell is deliberate absence.</li>
+<li>Cells (5 classes × 6 remedies):</li>
+</ul>
+<table><thead><tr><th>Class \ Remedy</th><th>retry</th><th>move</th><th>repull</th><th>block</th><th>ask</th><th>note</th></tr></thead><tbody>
+<tr><td><code>transient</code></td><td>default</td><td>refused</td><td>allowed</td><td>refused</td><td>refused</td><td>allowed</td></tr>
+<tr><td><code>conveyor_defect</code></td><td>refused</td><td>refused</td><td>refused</td><td>default</td><td>allowed</td><td>allowed</td></tr>
+<tr><td><code>job_defect</code></td><td>refused</td><td>refused</td><td>refused</td><td>allowed</td><td>default</td><td>allowed</td></tr>
+<tr><td><code>project_decision</code></td><td>refused</td><td>allowed</td><td>refused</td><td>allowed</td><td>default</td><td>allowed</td></tr>
+<tr><td><code>external</code></td><td>refused</td><td>refused</td><td>refused</td><td>default</td><td>allowed</td><td>allowed</td></tr>
+</tbody></table>
+<ul>
+<li>Reading: a <code>transient</code> interruption retries by default; a <code>conveyor_defect</code> or <code>external</code> class blocks by default; a <code>job_defect</code> or <code>project_decision</code> asks a person by default. <code>ask</code> is also the below-threshold fallback for every class. The two systemic classes (<code>conveyor_defect</code>, <code>job_defect</code>) additionally open exactly one kata child run; the other three never do.</li>
+<li>Links: derives from SPEC_V2 §6.2 and §12 T4; realises capability <code>kanban_coach</code>; reuses <code>crates/actions/src/board/pull.rs:err_card</code>.</li>
+<li>Storage: until T9's <code>architecture_artifact</code> repository lands, the artefact is a <code>document</code> row with <code>meta.artifact_type = matrix</code>, <code>meta.phase</code> and <code>meta.plateau = psa</code>, as the P0 artefact standard permits.</li>
+</ul>
+<h2>Migration and rollout</h2>
+<ul>
+<li><strong>Migration</strong> <code>0052_t4_coach.sql</code> (to create): <code>coach_interruption</code> with CHECK constraints on class, remedy and status; partial unique index <code>(tenant_id, source_card_id, signature) WHERE status = 'open'</code>; an index on <code>(tenant_id, status, created_at)</code>. Additive only; <code>card</code> and <code>run</code> gain no column.</li>
+<li><strong>Seed</strong>: a new release of <code>cap.kanban_coach.handle_error</code> adding the remedy step after triage and removing the unconditional <code>kata.open</code> child step (D-T4-5); a new <code>capability_agent</code> release with read/narrate scope (<code>documents.compose|get|list</code>, <code>cards.get|comment</code>); a <code>coach_interruption</code> card type and the coach-card exclusion in the board reads. The seed never updates a published row — a change is a new release.</li>
+<li><strong>Actions</strong>: <code>coach.*</code> as <code>ActionSpec</code>s in a new <code>crates/actions/src/coach/</code> module (to create), projected to HTTP, MCP and the CLI; no new route prefix.</li>
+<li><strong>Order</strong>: migration, actions, seed release, bind the coach job on a test tenant, inject one failure, verify the four gate clauses, then enable for other tenants.</li>
+<li><strong>Rollback</strong>: retire the coach binding so new runs refuse 409 <code>job_binding_stale</code>; in-flight runs finish; interruption rows remain as history. No new port and no second store (§10.6).</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Brief: <a href="https://conveyor.nonagentic.ai/design/docs/output-01a1e008-72c7-739a-91db-069cc13ab139.html">T4 — Kanban coach</a></li>
+<li>Issues: <a href="https://github.com/nonagenticai/conveyor/issues/75">#75</a>; review recorded on <a href="https://github.com/nonagenticai/conveyor/issues/347">#347</a></li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §6.2, §6.7, §9.4, §10.4, §12 T4</li>
+<li>Inception standard: <code>docs/plans/P0-programme-definition.md</code> §5</li>
+<li>Registry: <code>docs/design/data/actions.json</code></li>
+<li>Sibling: the <code>inception-analysis</code> output, published on this project</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kanban coach · conveyor output · published 2026-11-19T21:34:44.863943980+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
