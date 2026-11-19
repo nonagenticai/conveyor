@@ -5851,11 +5851,6 @@ window.installV2 = function (api, enterprise) {
   const procSource = async (kind) => {
     const fileEl = $(`[data-v2-input="proc-${kind}-file"]`);
     const file = fileEl && fileEl.files && fileEl.files[0];
-    if (kind === "url") {
-      const url = procInput("proc-sop-url");
-      if (!url) throw new Error("A URL source needs an address.");
-      return { kind: "url", url };
-    }
     if (file) {
       const bytes = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -5872,8 +5867,14 @@ window.installV2 = function (api, enterprise) {
       };
     }
     const text = procInput(`proc-${kind}-text`);
-    if (!text) throw new Error("Paste the document, attach a file, or give a URL.");
-    return { kind: kind === "sop" ? "text" : kind, media_type: "text/plain", text };
+    if (text) {
+      return { kind: kind === "sop" ? "text" : kind, media_type: "text/plain", text };
+    }
+    // The action's SourceIn carries `kind: "url"`; the field is the fallback when no file or
+    // text was supplied, so a document behind an address is ingest material too.
+    const url = procInput(`proc-${kind}-url`);
+    if (url) return { kind: "url", url };
+    throw new Error("Paste the document, attach a file, or give a URL.");
   };
 
   async function consoleProcIngest(kind) {
