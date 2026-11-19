@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 42,
+    "exists": 43,
     "extend": 7,
-    "new": 14
+    "new": 13
   },
   "rows": [
     {
@@ -506,9 +506,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "coach",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: coach.* absent"
+        "actions: coach.* found (coach.escalate, coach.interrupt, coach.remedy…)"
       ]
     },
     {

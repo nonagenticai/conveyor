@@ -5710,6 +5710,47 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample.deterministic = true;
         }
     }
+    // ── T4: the kanban coach (SPEC_V2 §6.2, issue #75) ────────────────────────────────────
+    // The coach's behaviour is proved by `crates/actions/tests/coach.rs`; these four samples
+    // prove that both transports answer an unknown run/interruption with the SAME body. A real
+    // interruption needs a failed run and a coach card per round, which this sweep's fixture
+    // does not carry — and the refusal path still runs the schema, the declared scopes and the
+    // /mcp RBAC filter, which is what transport parity means here.
+    out.extend([
+        expecting(
+            plain("coach.interrupt", json!({"run_id": Uuid::now_v7()}), None),
+            404,
+        ),
+        expecting(
+            plain(
+                "coach.triage",
+                json!({
+                    "interruption_id": Uuid::now_v7(),
+                    "triage_class": "transient",
+                    "confidence": 0.9,
+                    "narrative": "parity",
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "coach.remedy",
+                json!({"interruption_id": Uuid::now_v7()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "coach.escalate",
+                json!({"interruption_id": Uuid::now_v7(), "reason": "parity"}),
+                None,
+            ),
+            404,
+        ),
+    ]);
     out
 }
 

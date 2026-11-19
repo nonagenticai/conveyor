@@ -146,7 +146,7 @@ pub async fn wip_pull(
 /// It is a **root** run, not a child: the failed run is terminal, so `uq_run_live`'s root slot
 /// is free. The old flow's coach child could not start under the card-wide index; since `0035`
 /// the index is root-only and a coach for a dead run has no live parent to hang from.
-pub const COACH_ERROR_PROCESS: &str = "cap.kanban_coach.handle_error";
+pub const COACH_ERROR_PROCESS: &str = "cap.kanban_coach.handle_error.v2";
 
 /// The most coach root runs one card may accumulate before `err.card` stops starting them
 /// (SPEC_V2 §1.4 · §12 T4's depth cap). Three failures are enough to show the coach is not
@@ -308,28 +308,37 @@ pub async fn err_card(
         .await
         .map_err(|error| store_error(error, action))?
         .map(|project| project.status);
-    let prior_coaches = store::run::count_root_runs_for_card_process_key_tx(
-        &mut tx,
-        tenant,
-        card_id,
-        COACH_ERROR_PROCESS,
-    )
-    .await
-    .map_err(|error| match error {
-        store::run::RunStoreError::Database(error) => store_error(error, action),
-        other => {
-            tracing::error!(error = %other, "err.card: count the card's coach runs");
+    // T4: the cap counts INTERRUPTIONS, not coach runs. Since T4 the coach runs on its own
+    // card, so a per-card run count would read zero forever and never cap anything.
+    let prior_interruptions =
+        store::coach::count_interruptions_for_card_tx(&mut tx, tenant, card_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(error = %error, "err.card: count the card's interruptions");
+                ActionError::internal()
+            })?;
+    // T4 P3: a coach card is terminal for the interruption path. The failed run's process key
+    // still carries the same answer for a coach run started before T4 (the #188 guard); the
+    // card type covers the coach card itself.
+    let is_coach_card = store::coach::is_coach_card_tx(&mut tx, tenant, card_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(error = %error, "err.card: read the card type");
             ActionError::internal()
-        }
-    })?;
-    let coach_refusal = if failed_process_key.as_deref() == Some(COACH_ERROR_PROCESS) {
+        })?;
+    let coach_refusal = if is_coach_card {
+        Some("the card is a coach card")
+    } else if failed_process_key
+        .as_deref()
+        .is_some_and(|key| key.starts_with(store::run::COACH_PROCESS_FAMILY))
+    {
         Some("no coach about a coach")
     } else if project_status
         .as_deref()
         .is_some_and(|status| matches!(status, "closed" | "archived"))
     {
         Some("the card's project is closed")
-    } else if prior_coaches >= COACH_CHAIN_MAX {
+    } else if prior_interruptions >= COACH_CHAIN_MAX {
         Some("the coach chain reached its cap")
     } else {
         None
@@ -405,29 +414,39 @@ pub async fn err_card(
     invoke(pool, registry(), tenant, request).await?;
     outcome.commented = true;
 
-    // (c) The coach, as a root run. The failed run is terminal, so the root slot is free.
+    // (c) The coach, through the one admission path (T4). `coach.interrupt` creates the coach
+    // card, records the interruption (or escalates a repeat instead) and starts the coach run on
+    // the coach card. The failed run is terminal, so the coach card's root slot is free.
     if !outcome.coach_skipped {
         let request = service_request(
             app_key,
-            "process_runs.start",
-            json!({
-                "card_id": card_id,
-                "process_key": COACH_ERROR_PROCESS,
-            }),
+            "coach.interrupt",
+            json!({ "run_id": run_id }),
             format!("err.card:coach:{run_id}"),
         );
         let started = invoke(pool, registry(), tenant, request).await?;
-        let coach = started
-            .body
-            .get("output")
-            .and_then(|output| output.get("id"))
+        let output = started.body.get("output").cloned().unwrap_or(Value::Null);
+        // A repeat signature is a legitimate answer with NO run: the interruption escalated to a
+        // human instead of starting a second coach. T4 P2.
+        let escalated = output
+            .get("escalated")
+            .and_then(Value::as_bool)
+            .unwrap_or(false);
+        match output
+            .get("coach_run_id")
             .and_then(Value::as_str)
             .and_then(|id| Uuid::parse_str(id).ok())
-            .ok_or_else(|| {
-                tracing::error!(%run_id, "err.card: process_runs.start returned no run id");
-                ActionError::internal()
-            })?;
-        outcome.coach_run_id = Some(coach);
+        {
+            Some(coach) => outcome.coach_run_id = Some(coach),
+            None if escalated => {
+                outcome.coach_skipped = true;
+                tracing::info!(%run_id, "err.card: the signature repeated; escalated to a human");
+            }
+            None => {
+                tracing::error!(%run_id, "err.card: coach.interrupt returned no coach run id");
+                return Err(ActionError::internal());
+            }
+        }
     }
 
     Ok(outcome)

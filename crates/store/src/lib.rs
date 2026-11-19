@@ -70,6 +70,7 @@ pub mod capability;
 pub mod card;
 pub mod catalogue;
 pub mod channel;
+pub mod coach;
 pub mod comment;
 pub mod copilot;
 pub mod custom_field;

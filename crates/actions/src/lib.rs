@@ -31,6 +31,7 @@ pub mod broker;
 pub mod capability;
 // S06d: the connector standard — grants, compiled defaults, the machine floor and adapters.
 pub mod channel;
+pub mod coach;
 pub mod control;
 // #161 P3: the deck toolkit — one action rendering the model to .pptx, PDF or PNG.
 pub mod deck;

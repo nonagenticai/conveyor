@@ -31,12 +31,13 @@ async fn one_command_installs_a_runnable_tenant_from_a_fresh_database() {
         .find(|(slug, _)| slug == "dev-a")
         .map(|(_, counts)| counts)
         .expect("dev-a was installed");
-    // 280 card-type processes + 53 named, and the SOPs/agents/maps they need.
-    assert_eq!(dev_a.processes, 333, "{dev_a:?}");
+    // 280 card-type processes + 54 named (T4, #75, adds `cap.kanban_coach.handle_error.v2`),
+    // and the SOPs/agents/maps they need.
+    assert_eq!(dev_a.processes, 334, "{dev_a:?}");
     assert_eq!(dev_a.maps, 3, "{dev_a:?}");
-    // 70 type agents + 53 named ones (an agent is shared by every process of its card type),
+    // 70 type agents + 54 named ones (an agent is shared by every process of its card type),
     // and one SOP per process plus the mechanical `.system` SOP a gate or call step needs.
-    assert_eq!(dev_a.agents, 123, "{dev_a:?}");
+    assert_eq!(dev_a.agents, 124, "{dev_a:?}");
     assert!(dev_a.sops >= 403, "{dev_a:?}");
 
     let tenant: Uuid = sqlx::query_scalar("SELECT id FROM tenant WHERE slug = 'dev-a'")

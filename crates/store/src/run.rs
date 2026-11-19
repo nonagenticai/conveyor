@@ -1170,6 +1170,13 @@ pub async fn enqueue_run_execute_tx(
 /// dispatcher cannot spell it differently.
 pub const ERR_CARD_KIND: &str = "err.card";
 
+/// The process-key **family** of the kanban coach (SPEC_V2 §6.2; T4, issue #75).
+///
+/// The guard is keyed on the family, never a process row id: a coach v2 forked from the published
+/// v1 is a different row, and an id comparison stopped recognising the coach once before
+/// (PR #188 audit finding F1). A failed run of any member of this family opens no interruption.
+pub const COACH_PROCESS_FAMILY: &str = "cap.kanban_coach.";
+
 /// Enqueue the `err.card` handler for a run that just failed.
 ///
 /// The old n8n `err.card` flow was the estate's error trigger: a failed execution moved the
@@ -1198,11 +1205,39 @@ pub async fn enqueue_run_failed_trigger_tx(
     if node.parent_run_id.is_some() {
         return Ok(None);
     }
+    // T4 (SPEC_V2 §6.2): a failed coach run is terminal for the interruption path. Refused at
+    // the ENQUEUE choke point, so no err.card job exists at all for it (P3.2) — the handler's
+    // own refusal stays as the defence for a job queued before this guard existed. The identity
+    // is the process KEY family: a coach v2 forked from v1 is a different row, and an id compare
+    // would stop recognising the coach (PR #188 audit finding F1).
+    let coach_family = process_key_of_run_tx(&mut *conn, tenant, run_id)
+        .await
+        .map_err(|error| match error {
+            RunStoreError::Database(error) => error,
+            other => sqlx::Error::Protocol(other.to_string()),
+        })?;
+    if coach_family
+        .as_deref()
+        .is_some_and(|key| key.starts_with(COACH_PROCESS_FAMILY))
+    {
+        return Ok(None);
+    }
     // The old error trigger read the card out of the failed execution and stopped when there was
     // none. A project-scoped run has no card to move or comment on, so it has no err.card.
     let Some(card_id) = node.run.card_id else {
         return Ok(None);
     };
+    // T4: a coach CARD is equally terminal (its runs start the coach process, but a card type
+    // check keeps the rule true for any process the card carries).
+    if crate::coach::is_coach_card_tx(&mut *conn, tenant, card_id)
+        .await
+        .map_err(|error| match error {
+            crate::coach::CoachStoreError::Database(error) => error,
+            other => sqlx::Error::Protocol(other.to_string()),
+        })?
+    {
+        return Ok(None);
+    }
     let payload = serde_json::json!({
         "run_id": run_id,
         "card_id": card_id,

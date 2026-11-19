@@ -51,7 +51,7 @@ use super::events::card_event;
     confirm = "none",
     tenancy = "tenant"
 )]
-async fn cards_create(
+pub(crate) async fn cards_create(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: CardCreateIn,

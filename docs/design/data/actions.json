@@ -107,6 +107,10 @@
     "channels.policy_set",
     "channels.test",
     "channels.unbind",
+    "coach.escalate",
+    "coach.interrupt",
+    "coach.remedy",
+    "coach.triage",
     "coding_jobs.create",
     "coding_jobs.get",
     "comments.delete",
@@ -462,6 +466,5 @@
     "youtube.retract",
     "youtube.status",
     "youtube.upload"
-  ],
-  "version": 1
+  ]
 }
