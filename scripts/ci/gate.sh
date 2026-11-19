@@ -2,6 +2,7 @@
 # The public local gate: the same checks the repository's CI runs.
 #
 #   bash scripts/ci/gate.sh
+#   bash scripts/ci/gate.sh --print-route     # print the build route and exit
 #
 # Requires: the toolchain from rust-toolchain.toml, cargo-nextest, and Docker with a running
 # daemon. cargo-audit and betterleaks are optional and reported as skipped when absent.
@@ -11,8 +12,44 @@ cd "$(git rev-parse --show-toplevel)"
 need() {
   command -v "$1" >/dev/null 2>&1 || { echo "missing $1: $2" >&2; exit 1; }
 }
-need docker "install Docker and start the daemon"
+
+# --- build route ----------------------------------------------------------------------
+# A bare `cargo` gives every worktree its own multi-GB `target/` (48 GB measured on
+# `.worktrees/issue-366`, 2026-11-18). The sanctioned local route is `cargo-guard.py`: one
+# `<repo>/target/claude` per repository (derived from `--git-common-dir`, so every worktree
+# and session shares it), a free-disk floor and bounded build slots. `--print-target` is the
+# guard's own way for a repo script to find that target. Without the guard the gate still
+# uses the same one and says so — it never silently builds a second cache.
+GUARD="${CARGO_GUARD:-$HOME/.claude/scripts/cargo-guard.py}"
+guarded=0
+if [ -x "$GUARD" ] && TARGET="$("$GUARD" --print-target 2>/dev/null)"; then
+  CARGO_RUN=("$GUARD")
+  guarded=1
+  ROUTE="cargo-guard (free-disk floor + build slots)"
+elif common="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"; then
+  TARGET="$(dirname "$common")/target/claude"
+  CARGO_RUN=(cargo)
+  ROUTE="plain cargo — cargo-guard NOT installed: no disk floor, no build slots"
+else
+  echo "cannot resolve the repository root; run this inside the git checkout" >&2
+  exit 1
+fi
+export CARGO_TARGET_DIR="$TARGET"
+echo "==> build route: $ROUTE; target $TARGET"
+
+if [ "${1:-}" = "--print-route" ]; then
+  exit 0
+fi
+
 need cargo "install Rust from https://rustup.rs"
+
+# Check the guard's floor before any service starts: this is the cheapest guarded command
+# and it compiles nothing.
+if [ "$guarded" = 1 ]; then
+  "${CARGO_RUN[@]}" metadata --no-deps --format-version 1 >/dev/null
+fi
+
+need docker "install Docker and start the daemon"
 command -v cargo-nextest >/dev/null 2>&1 \
   || { echo "missing cargo-nextest: cargo install cargo-nextest --locked" >&2; exit 1; }
 
@@ -52,7 +89,7 @@ echo "==> cargo fmt"
 cargo fmt --all -- --check
 
 echo "==> cargo clippy"
-cargo clippy --all-targets --locked -- -D warnings
+"${CARGO_RUN[@]}" clippy --all-targets --locked -- -D warnings
 
 echo "==> cargo audit"
 if command -v cargo-audit >/dev/null 2>&1; then
@@ -62,8 +99,8 @@ else
 fi
 
 echo "==> cargo nextest"
-cargo nextest run --no-tests=fail --color never --locked
-cargo test --doc --locked
+"${CARGO_RUN[@]}" nextest run --no-tests=fail --color never --locked
+"${CARGO_RUN[@]}" test --doc --locked
 
 echo "==> no private references"
 bash scripts/ci/no-private-refs.sh
