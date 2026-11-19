@@ -1203,6 +1203,24 @@ pub async fn get_body_by_key_tx(
         .await?)
 }
 
+/// List the governance bodies, optionally one kind, by key.
+pub async fn list_bodies_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kind: Option<&str>,
+) -> Result<Vec<GovernanceBodyRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {BODY_COLUMNS} FROM governance_body
+          WHERE tenant_id = $1 AND ($2::text IS NULL OR kind = $2)
+          ORDER BY kind, key"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(kind)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
 /// Read a governance body.
 pub async fn get_body_tx(
     conn: &mut PgConnection,
@@ -1969,6 +1987,50 @@ pub async fn assess_skills_tx(
         }
     }
     Ok(rows)
+}
+
+/// List the maturity rows, newest assessment first; optionally one group or one stage.
+pub async fn list_maturity_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    assessment_id: Option<Uuid>,
+    stage: Option<&str>,
+) -> Result<Vec<MaturityRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {MATURITY_COLUMNS} FROM architecture_maturity
+          WHERE tenant_id = $1
+            AND ($2::uuid IS NULL OR assessment_id = $2)
+            AND ($3::text IS NULL OR stage = $3)
+          ORDER BY assessed_at DESC, assessment_id, dimension"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(assessment_id)
+        .bind(stage)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// List the skills rows, newest assessment first, then role and category.
+pub async fn list_skills_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    assessment_id: Option<Uuid>,
+    role: Option<&str>,
+) -> Result<Vec<SkillRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {SKILL_COLUMNS} FROM architecture_skill_assessment
+          WHERE tenant_id = $1
+            AND ($2::uuid IS NULL OR assessment_id = $2)
+            AND ($3::text IS NULL OR role = $3)
+          ORDER BY assessed_at DESC, role, category"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(assessment_id)
+        .bind(role)
+        .fetch_all(&mut *conn)
+        .await?)
 }
 
 /// Record the maturity development plan as WBS milestones under the capability's project.

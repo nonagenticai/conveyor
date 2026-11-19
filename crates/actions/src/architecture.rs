@@ -6,6 +6,8 @@
 //!
 //! Writes are `projects:write` (admin/kata_executor); reads are `projects:read` (open).
 
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
 use conveyor_store as store;
 use conveyor_store::architecture::{
@@ -1501,6 +1503,43 @@ async fn architecture_board_get(
     Ok(HandlerOutput::ok(body_out(&record)))
 }
 
+/// `architecture.board_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BoardListIn {
+    /// architecture_board | design_board | other; every kind when omitted.
+    #[serde(default)]
+    pub kind: Option<String>,
+}
+
+#[crate::action(
+    name = "architecture.board_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_board_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BoardListIn,
+) -> Result<HandlerOutput<Page<GovernanceBodyOut>>, ActionError> {
+    let rows = store::architecture::list_bodies_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.kind.as_deref(),
+    )
+    .await
+    .map_err(|error| arch_error(error, ctx.action))?;
+    Ok(HandlerOutput::ok(Page {
+        items: rows.iter().map(body_out).collect(),
+        next_cursor: None,
+    }))
+}
+
 /// `architecture.board_decide`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct BoardDecideIn {
@@ -1761,5 +1800,128 @@ async fn architecture_maturity_plan(
     .map_err(|error| arch_error(error, ctx.action))?;
     Ok(HandlerOutput::created(MaturityPlanOut {
         node_ids: ids.iter().map(ToString::to_string).collect(),
+    }))
+}
+
+/// `architecture.maturity_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MaturityListIn {
+    /// One assessment group; every group when omitted.
+    #[serde(default)]
+    pub assessment_id: Option<Uuid>,
+    /// One stage; every stage when omitted.
+    #[serde(default)]
+    pub stage: Option<String>,
+}
+
+#[crate::action(
+    name = "architecture.maturity_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_maturity_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: MaturityListIn,
+) -> Result<HandlerOutput<Page<MaturityOut>>, ActionError> {
+    let rows = store::architecture::list_maturity_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.assessment_id,
+        input.stage.as_deref(),
+    )
+    .await
+    .map_err(|error| arch_error(error, ctx.action))?;
+    let mut out: Vec<MaturityOut> = Vec::new();
+    let mut index_of: HashMap<Uuid, usize> = HashMap::new();
+    for row in rows {
+        let index = match index_of.get(&row.assessment_id) {
+            Some(index) => *index,
+            None => {
+                out.push(MaturityOut {
+                    assessment_id: row.assessment_id.to_string(),
+                    stage: row.stage.clone(),
+                    dimensions: Vec::new(),
+                });
+                index_of.insert(row.assessment_id, out.len() - 1);
+                out.len() - 1
+            }
+        };
+        out[index].dimensions.push(ScoreOut {
+            key: row.dimension,
+            score: row.score,
+        });
+    }
+    Ok(HandlerOutput::ok(Page {
+        items: out,
+        next_cursor: None,
+    }))
+}
+
+/// `architecture.skills_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SkillsListIn {
+    /// One assessment group; every group when omitted.
+    #[serde(default)]
+    pub assessment_id: Option<Uuid>,
+    /// One role; every role when omitted.
+    #[serde(default)]
+    pub role: Option<String>,
+}
+
+#[crate::action(
+    name = "architecture.skills_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_skills_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: SkillsListIn,
+) -> Result<HandlerOutput<Page<SkillsOut>>, ActionError> {
+    let rows = store::architecture::list_skills_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.assessment_id,
+        input.role.as_deref(),
+    )
+    .await
+    .map_err(|error| arch_error(error, ctx.action))?;
+    let mut out: Vec<SkillsOut> = Vec::new();
+    let mut index_of: HashMap<(Uuid, String), usize> = HashMap::new();
+    for row in rows {
+        let key = (row.assessment_id, row.role.clone());
+        let index = match index_of.get(&key) {
+            Some(index) => *index,
+            None => {
+                out.push(SkillsOut {
+                    assessment_id: row.assessment_id.to_string(),
+                    role: row.role.clone(),
+                    categories: Vec::new(),
+                });
+                index_of.insert(key, out.len() - 1);
+                out.len() - 1
+            }
+        };
+        out[index].categories.push(ScoreOut {
+            key: row.category,
+            score: row.proficiency,
+        });
+    }
+    Ok(HandlerOutput::ok(Page {
+        items: out,
+        next_cursor: None,
     }))
 }

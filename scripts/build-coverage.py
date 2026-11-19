@@ -140,10 +140,14 @@ SCREEN_OVERRIDES = {
         "evidence": ["docs/design/v2.js"],
         "gap": None,
     },
+    # The Architecture capability destination is live (issue #385): signed in its four tabs
+    # read the architecture aggregates through the registered actions and write through them;
+    # signed out it renders the published `architecture` snapshot read-only, and the design
+    # study stays behind `?design=1`.
     "adm": {
-        "status": "proposed",
+        "status": "live",
         "evidence": ["docs/design/v2.js"],
-        "gap": "design study; the ADM rows and actions are T9",
+        "gap": None,
     },
 }
 

@@ -172,3 +172,109 @@ async fn a_skills_assessment_names_its_role() {
         "{out}"
     );
 }
+
+#[tokio::test]
+async fn maturity_list_returns_every_assessment_dimension() {
+    let f = arch::fixture().await;
+    let all: Vec<_> = DIMENSIONS
+        .iter()
+        .map(|key| json!({ "key": key, "score": 3 }))
+        .collect();
+    let assessed = arch::created(
+        &f.running,
+        "architecture.maturity_assess",
+        json!({ "stage": "baseline", "scores": all }),
+        None,
+    )
+    .await;
+    let group = assessed["assessment_id"].as_str().expect("group").to_owned();
+
+    let listed = arch::ok(&f.running, "architecture.maturity_list", json!({}), None).await;
+    let items = listed["items"].as_array().expect("items");
+    assert_eq!(items.len(), 1, "{listed}");
+    assert_eq!(items[0]["assessment_id"], group, "{listed}");
+    assert_eq!(items[0]["stage"], "baseline", "{listed}");
+    assert_eq!(
+        items[0]["dimensions"].as_array().expect("dimensions").len(),
+        9,
+        "{listed}"
+    );
+
+    let filtered = arch::ok(
+        &f.running,
+        "architecture.maturity_list",
+        json!({ "assessment_id": group, "stage": "other" }),
+        None,
+    )
+    .await;
+    assert!(
+        filtered["items"].as_array().expect("items").is_empty(),
+        "the stage filter did not apply: {filtered}"
+    );
+}
+
+#[tokio::test]
+async fn skills_list_returns_one_entry_per_role() {
+    let f = arch::fixture().await;
+    let group = "018f0000-0000-7000-8000-000000000385";
+    let all: Vec<_> = SKILLS
+        .iter()
+        .map(|key| json!({ "key": key, "score": 4 }))
+        .collect();
+    for role in ["solution_architect", "delivery_lead"] {
+        arch::created(
+            &f.running,
+            "architecture.skills_assess",
+            json!({
+                "assessment_id": group,
+                "role": role,
+                "job_key": "architect",
+                "scores": all,
+            }),
+            None,
+        )
+        .await;
+    }
+
+    let listed = arch::ok(&f.running, "architecture.skills_list", json!({}), None).await;
+    let items = listed["items"].as_array().expect("items");
+    assert_eq!(items.len(), 2, "{listed}");
+    for item in items {
+        assert_eq!(item["assessment_id"], group, "{listed}");
+        assert_eq!(
+            item["categories"].as_array().expect("categories").len(),
+            7,
+            "{listed}"
+        );
+    }
+
+    let one = arch::ok(
+        &f.running,
+        "architecture.skills_list",
+        json!({ "role": "delivery_lead" }),
+        None,
+    )
+    .await;
+    let items = one["items"].as_array().expect("items");
+    assert_eq!(items.len(), 1, "{one}");
+    assert_eq!(items[0]["role"], "delivery_lead", "{one}");
+}
+
+#[tokio::test]
+async fn board_list_returns_the_opened_body() {
+    let f = arch::fixture().await;
+    let opened = arch::open_board(&f.running).await;
+    let id = arch::id_of(&opened);
+
+    let listed = arch::ok(
+        &f.running,
+        "architecture.board_list",
+        json!({ "kind": "architecture_board" }),
+        None,
+    )
+    .await;
+    let items = listed["items"].as_array().expect("items");
+    assert_eq!(items.len(), 1, "{listed}");
+    assert_eq!(items[0]["id"], id, "{listed}");
+    assert_eq!(items[0]["key"], "architecture-board", "{listed}");
+}
