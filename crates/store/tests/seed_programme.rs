@@ -113,7 +113,12 @@ async fn seed_programme_links_the_registered_issues() {
         .flat_map(|project| {
             project["meta"]["issues"]
                 .as_array()
-                .map(|issues| issues.iter().filter_map(|number| number.as_i64()).collect::<Vec<_>>())
+                .map(|issues| {
+                    issues
+                        .iter()
+                        .filter_map(|number| number.as_i64())
+                        .collect::<Vec<_>>()
+                })
                 .unwrap_or_default()
         })
         .collect();
