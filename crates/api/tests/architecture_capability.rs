@@ -187,7 +187,10 @@ async fn maturity_list_returns_every_assessment_dimension() {
         None,
     )
     .await;
-    let group = assessed["assessment_id"].as_str().expect("group").to_owned();
+    let group = assessed["assessment_id"]
+        .as_str()
+        .expect("group")
+        .to_owned();
 
     let listed = arch::ok(&f.running, "architecture.maturity_list", json!({}), None).await;
     let items = listed["items"].as_array().expect("items");

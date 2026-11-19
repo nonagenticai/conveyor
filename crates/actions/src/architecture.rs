@@ -1527,13 +1527,9 @@ async fn architecture_board_list(
     ctx: HandlerCtx,
     input: BoardListIn,
 ) -> Result<HandlerOutput<Page<GovernanceBodyOut>>, ActionError> {
-    let rows = store::architecture::list_bodies_tx(
-        &mut *tx,
-        ctx.tenant,
-        input.kind.as_deref(),
-    )
-    .await
-    .map_err(|error| arch_error(error, ctx.action))?;
+    let rows = store::architecture::list_bodies_tx(&mut *tx, ctx.tenant, input.kind.as_deref())
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?;
     Ok(HandlerOutput::ok(Page {
         items: rows.iter().map(body_out).collect(),
         next_cursor: None,
