@@ -5468,8 +5468,18 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         ),
         expecting(plain("architecture.profile_get", json!({}), None), 200),
         expecting(on_prepared("architecture.board_get", None), 200),
+        expecting(
+            plain(
+                "architecture.board_list",
+                json!({"kind": "architecture_board"}),
+                None,
+            ),
+            200,
+        ),
         expecting(on_prepared("architecture.contracts_get", None), 200),
         expecting(plain("architecture.contracts_list", json!({}), None), 200),
+        expecting(plain("architecture.maturity_list", json!({}), None), 200),
+        expecting(plain("architecture.skills_list", json!({}), None), 200),
         {
             let mut sample = plain("architecture.artifacts_create", json!({}), None);
             sample.input = Box::new(|_ctx: &Ctx| {

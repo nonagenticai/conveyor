@@ -36,6 +36,9 @@ pub struct SnapshotData {
     pub msp: Value,
     /// `artefacts.json` data: governed assets and document metadata.
     pub artefacts: Value,
+    /// `architecture.json` data: the TOGAF ADM capability's rows — profiled standard, artefacts
+    /// with their entries and links, contracts, the board, and the two assessment baselines.
+    pub architecture: Value,
     /// `measure.json` data: inference aggregates (no prompt or response bodies exist).
     pub measure: Value,
     /// Secret **metadata** — never a value, never a key id.
@@ -488,6 +491,90 @@ pub async fn snapshot_tx(
     )
     .await?;
 
+    let adm_profiles = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.key), '[]'::jsonb) FROM (
+             SELECT id, key, name, phase_set, artifact_requirements, contract_kinds, status,
+                    adopted_at, board_decision_id, version
+               FROM adm_profile WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let artifact_standard = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.phase_code, t.plateau, t.position, t.key), '[]'::jsonb) FROM (
+             SELECT id, key, name, artifact_kind, phase_code, plateau, mandatory, position
+               FROM artifact_type WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let mut architecture_artifacts = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.phase_code, t.plateau, t.title, t.id), '[]'::jsonb) FROM (
+             SELECT a.id, a.project_id, a.artifact_type_id, a.phase_code, a.plateau,
+                    a.artifact_kind, a.title, a.status, a.artifact_version, a.change_initiative,
+                    a.purpose, a.stakeholders, a.scope, a.document_id, a.contract_id, a.meta,
+                    a.version, a.created_at, a.updated_at,
+                    COALESCE((SELECT jsonb_agg(to_jsonb(e) ORDER BY e.position, e.axis_a)
+                                FROM architecture_artifact_entry e
+                               WHERE e.tenant_id = a.tenant_id AND e.artifact_id = a.id),
+                             '[]'::jsonb) AS entries
+               FROM architecture_artifact a WHERE a.tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let architecture_links = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.kind, t.from_artifact_id), '[]'::jsonb) FROM (
+             SELECT id, from_artifact_id, to_artifact_id, kind, version
+               FROM architecture_artifact_link WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let mut architecture_contracts = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.phase_code, t.kind, t.created_at, t.id), '[]'::jsonb) FROM (
+             SELECT id, project_id, kind, phase_code, title, body, status, approval_id,
+                    approved_by, approved_at, supersedes_id, superseded_by_id, version,
+                    created_at, updated_at
+               FROM architecture_contract WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let architecture_board = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.key), '[]'::jsonb) FROM (
+             SELECT id, kind, key, name, charter, commissioning_authority, decision_limits,
+                    members, status, version, created_at, updated_at
+               FROM governance_body
+              WHERE tenant_id = $1 AND kind = 'architecture_board'
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let architecture_maturity = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.assessed_at DESC, t.assessment_id, t.dimension), '[]'::jsonb) FROM (
+             SELECT id, assessment_id, stage, dimension, score, assessed_at, evidence
+               FROM architecture_maturity WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let architecture_skills = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.assessed_at DESC, t.role, t.category), '[]'::jsonb) FROM (
+             SELECT id, assessment_id, role, job_key, category, proficiency, assessed_at, evidence
+               FROM architecture_skill_assessment WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
     // ⛔ The public pack is the PROGRAMME's view (SPEC_V2 §5; the console already filters its
     // project list the same way — `docs/design/v2.js:4193`). A project outside a programme is a
     // session fixture — a proof, a scratch reproduction — never programme work, and its boards,
@@ -529,6 +616,18 @@ pub async fn snapshot_tx(
                 .and_then(Value::as_str)
                 .is_none_or(|id| bound_projects.contains(id))
         });
+    }
+    // The architecture rows follow the same programme boundary: an artefact or contract tied to a
+    // project outside the programme is not the public capability's story; a row with no project is
+    // programme-level and stays (as documents do).
+    for row_set in [&mut architecture_artifacts, &mut architecture_contracts] {
+        if let Some(rows) = row_set.as_array_mut() {
+            rows.retain(|row| {
+                row.get("project_id")
+                    .and_then(Value::as_str)
+                    .is_none_or(|id| bound_projects.contains(id))
+            });
+        }
     }
 
     Ok(SnapshotData {
@@ -575,6 +674,16 @@ pub async fn snapshot_tx(
             "project_dependencies": project_dependencies
         }),
         artefacts: json!({"governed_assets": assets, "documents": documents}),
+        architecture: json!({
+            "profiles": adm_profiles,
+            "standard": artifact_standard,
+            "artifacts": architecture_artifacts,
+            "links": architecture_links,
+            "contracts": architecture_contracts,
+            "board": architecture_board,
+            "maturity": architecture_maturity,
+            "skills": architecture_skills
+        }),
         measure: json!({
             "inference": {
                 "totals": inference_totals,

@@ -83,6 +83,182 @@ const NOBOARD = {
 };
 
 
+// The architecture capability's live rows (#385): the tailored profile and its standard, the
+// artefacts with their entries and links, the contracts, the board and the two assessment
+// baselines. Shaped exactly as the actions return them, so the page is tested against the
+// contract and not against a simplified fixture.
+const LIVE_ADM = (() => {
+  const stamp = "2026-11-16T00:00:00Z";
+  const artifacts = [
+    {
+      id: "art-live-1",
+      project_id: "p-s02",
+      artifact_type_id: "at-live-1",
+      phase_code: "Preliminary",
+      plateau: "psa",
+      artifact_kind: "principles_catalog",
+      title: "Live principles catalog",
+      status: "approved",
+      artifact_version: 3,
+      author_id: "u-1",
+      reviewer_id: "u-1",
+      reviewed_at: stamp,
+      change_initiative: "",
+      purpose: "the principles",
+      stakeholders: [],
+      scope: "tenant",
+      document_id: "d-live",
+      contract_id: null,
+      supersedes_id: null,
+      superseded_by_id: null,
+      meta: {},
+      version: 4,
+    },
+    {
+      id: "art-live-2",
+      project_id: "p-s02",
+      artifact_type_id: "at-live-2",
+      phase_code: "B",
+      plateau: "hld",
+      artifact_kind: "catalog",
+      title: "Live business catalog",
+      status: "draft",
+      artifact_version: 1,
+      author_id: "u-1",
+      reviewer_id: null,
+      reviewed_at: null,
+      change_initiative: "",
+      purpose: "the business services",
+      stakeholders: [],
+      scope: "tenant",
+      document_id: null,
+      contract_id: "con-live-1",
+      supersedes_id: null,
+      superseded_by_id: null,
+      meta: {},
+      version: 1,
+    },
+  ];
+  return {
+    profile: {
+      id: "prof-live-1",
+      key: "software-delivery",
+      name: "Live tailored ADM profile",
+      phase_set: ["Preliminary", "A", "B"],
+      artifact_requirements: { B: { hld: ["at-live-2"] } },
+      contract_kinds: { B: "business_contract" },
+      status: "adopted",
+      adopted_at: stamp,
+      board_decision_id: "bd-live-1",
+      version: 2,
+    },
+    standard: [
+      {
+        id: "at-live-1",
+        key: "principles_catalog",
+        name: "Principles catalog",
+        artifact_kind: "principles_catalog",
+        phase_code: "Preliminary",
+        plateau: "psa",
+        mandatory: true,
+        position: 1,
+      },
+      {
+        id: "at-live-2",
+        key: "business_service_catalog",
+        name: "Business service catalog",
+        artifact_kind: "catalog",
+        phase_code: "B",
+        plateau: "hld",
+        mandatory: true,
+        position: 2,
+      },
+    ],
+    artifacts,
+    entries: {
+      "art-live-1": [
+        {
+          id: "e-live-1",
+          artifact_id: "art-live-1",
+          axis_a: "P-01",
+          axis_b: "",
+          value: { statement: "One record per fact" },
+          position: 1,
+          version: 1,
+        },
+      ],
+      "art-live-2": [
+        {
+          id: "e-live-2",
+          artifact_id: "art-live-2",
+          axis_a: "SVC-01",
+          axis_b: "",
+          value: "Release management",
+          position: 1,
+          version: 1,
+        },
+      ],
+    },
+    links: [
+      {
+        id: "lk-live-1",
+        from_artifact_id: "art-live-1",
+        to_artifact_id: "art-live-2",
+        kind: "derivation",
+        version: 1,
+      },
+    ],
+    contracts: [
+      {
+        id: "con-live-1",
+        project_id: "p-s02",
+        kind: "business_contract",
+        phase_code: "B",
+        title: "Live business contract",
+        body: {},
+        status: "live",
+        approval_id: null,
+        approved_by: "u-1",
+        approved_at: stamp,
+        supersedes_id: null,
+        superseded_by_id: null,
+        version: 1,
+      },
+    ],
+    boards: [
+      {
+        id: "board-live-1",
+        kind: "architecture_board",
+        key: "architecture-board",
+        name: "Live Architecture Board",
+        charter: "Support the roadmap",
+        commissioning_authority: "programme board",
+        decision_limits: ["no budget authority"],
+        members: ["programme architect"],
+        status: "active",
+        version: 1,
+      },
+    ],
+    maturity: [
+      {
+        assessment_id: "mat-live-1",
+        stage: "baseline",
+        dimensions: [
+          { key: "Architecture process", score: 3 },
+          { key: "Architecture governance", score: 2 },
+        ],
+      },
+    ],
+    skills: [
+      {
+        assessment_id: "skl-live-1",
+        role: "programme architect",
+        categories: [{ key: "Architecture skills", score: 4 }],
+      },
+    ],
+  };
+})();
+
 // The programme store's rows (#305): programme-scoped benefits, map edges, transitions,
 // tranches, reviews, stakeholders and cadence; project-scoped WBS, baselines, register,
 // dependencies; and the tenant's in-flight set.
@@ -559,6 +735,177 @@ const SNAPSHOT = {
       },
     ],
   },
+  // The published architecture capability (#385): the adopted profile, the standard, the
+  // artefacts with their entries, the links, the contracts, the board and the two baselines.
+  architecture: {
+    profiles: [
+      {
+        id: "prof-pub-1",
+        key: "software-delivery",
+        name: "Published tailored ADM profile",
+        phase_set: ["Preliminary", "A", "B"],
+        artifact_requirements: { B: { hld: ["at-pub-2"] } },
+        contract_kinds: { B: "business_contract" },
+        status: "adopted",
+        adopted_at: "2026-11-12T00:00:00Z",
+        board_decision_id: "bd-pub-1",
+        version: 1,
+      },
+    ],
+    standard: [
+      {
+        id: "at-pub-1",
+        key: "principles_catalog",
+        name: "Principles catalog",
+        artifact_kind: "principles_catalog",
+        phase_code: "Preliminary",
+        plateau: "psa",
+        mandatory: true,
+        position: 1,
+      },
+      {
+        id: "at-pub-2",
+        key: "business_service_catalog",
+        name: "Business service catalog",
+        artifact_kind: "catalog",
+        phase_code: "B",
+        plateau: "hld",
+        mandatory: true,
+        position: 2,
+      },
+    ],
+    artifacts: [
+      {
+        id: "art-pub-1",
+        project_id: "p-p0",
+        artifact_type_id: "at-pub-1",
+        phase_code: "Preliminary",
+        plateau: "psa",
+        artifact_kind: "principles_catalog",
+        title: "Published principles catalog",
+        status: "approved",
+        artifact_version: 3,
+        change_initiative: "",
+        purpose: "the principles",
+        stakeholders: [],
+        scope: "tenant",
+        document_id: "doc-p0-vision",
+        contract_id: null,
+        meta: {},
+        version: 4,
+        entries: [
+          {
+            id: "e-pub-1",
+            artifact_id: "art-pub-1",
+            axis_a: "P-01",
+            axis_b: "",
+            value: { statement: "One record per fact" },
+            position: 1,
+            version: 1,
+          },
+        ],
+      },
+      {
+        id: "art-pub-2",
+        project_id: "p-p0",
+        artifact_type_id: "at-pub-2",
+        phase_code: "B",
+        plateau: "hld",
+        artifact_kind: "catalog",
+        title: "Published business catalog",
+        status: "approved",
+        artifact_version: 2,
+        change_initiative: "",
+        purpose: "the business services",
+        stakeholders: [],
+        scope: "tenant",
+        document_id: null,
+        contract_id: "con-pub-1",
+        meta: {},
+        version: 3,
+        entries: [
+          {
+            id: "e-pub-2",
+            artifact_id: "art-pub-2",
+            axis_a: "SVC-01",
+            axis_b: "",
+            value: "Release management",
+            position: 1,
+            version: 1,
+          },
+        ],
+      },
+    ],
+    links: [
+      {
+        id: "lk-pub-1",
+        from_artifact_id: "art-pub-1",
+        to_artifact_id: "art-pub-2",
+        kind: "derivation",
+        version: 1,
+      },
+    ],
+    contracts: [
+      {
+        id: "con-pub-1",
+        project_id: "p-p0",
+        kind: "business_contract",
+        phase_code: "B",
+        title: "Published business contract",
+        body: {},
+        status: "live",
+        approval_id: null,
+        approved_by: "u-1",
+        approved_at: "2026-11-12T00:00:00Z",
+        supersedes_id: null,
+        superseded_by_id: null,
+        version: 1,
+      },
+    ],
+    board: [
+      {
+        id: "board-pub-1",
+        kind: "architecture_board",
+        key: "architecture-board",
+        name: "Published Architecture Board",
+        charter: "Support the roadmap",
+        commissioning_authority: "programme board",
+        decision_limits: ["no budget authority"],
+        members: ["programme architect"],
+        status: "active",
+        version: 1,
+      },
+    ],
+    maturity: [
+      {
+        assessment_id: "mat-pub-1",
+        stage: "baseline",
+        dimension: "Architecture process",
+        score: 2,
+        assessed_at: "2026-11-10T00:00:00Z",
+        evidence: "review",
+      },
+      {
+        assessment_id: "mat-pub-1",
+        stage: "baseline",
+        dimension: "Architecture governance",
+        score: 1,
+        assessed_at: "2026-11-10T00:00:00Z",
+        evidence: "review",
+      },
+    ],
+    skills: [
+      {
+        assessment_id: "skl-pub-1",
+        role: "programme architect",
+        job_key: null,
+        category: "Architecture skills",
+        proficiency: 3,
+        assessed_at: "2026-11-10T00:00:00Z",
+        evidence: "assessment",
+      },
+    ],
+  },
   measure: {},
 };
 
@@ -630,6 +977,14 @@ function startServer({ config, state, snapshot }) {
       }
       if (pathname === "/api/actions" && req.method === "GET") {
         const names = [
+          "architecture.profile_get",
+          "architecture.artifacts_list",
+          "architecture.artifacts_entries",
+          "architecture.artifacts_links",
+          "architecture.contracts_list",
+          "architecture.board_list",
+          "architecture.maturity_list",
+          "architecture.skills_list",
           "cards.create",
           "cards.move",
           "cards.comment",
@@ -773,6 +1128,62 @@ function startServer({ config, state, snapshot }) {
           ],
           next_cursor: null,
         });
+      }
+      if (pathname === "/api/actions/architecture.profile_get/invocations") {
+        return readBody(req, () =>
+          json(res, 200, { profile: LIVE_ADM.profile, standard: LIVE_ADM.standard }),
+        );
+      }
+      if (pathname === "/api/actions/architecture.artifacts_list/invocations") {
+        return readBody(req, () =>
+          json(res, 200, { items: LIVE_ADM.artifacts, next_cursor: null }),
+        );
+      }
+      if (pathname === "/api/actions/architecture.artifacts_entries/invocations") {
+        return readBody(req, (body) => {
+          assert.ok(body.input && body.input.id, "artifacts_entries names an artefact");
+          json(res, 200, { items: LIVE_ADM.entries[body.input.id] || [], next_cursor: null });
+        });
+      }
+      if (pathname === "/api/actions/architecture.artifacts_links/invocations") {
+        return readBody(req, (body) => {
+          assert.ok(body.input && body.input.id, "artifacts_links names an artefact");
+          const id = body.input.id;
+          json(res, 200, {
+            items: LIVE_ADM.links.filter(
+              (row) => row.from_artifact_id === id || row.to_artifact_id === id,
+            ),
+            next_cursor: null,
+          });
+        });
+      }
+      if (pathname === "/api/actions/architecture.contracts_list/invocations") {
+        return readBody(req, () =>
+          json(res, 200, { items: LIVE_ADM.contracts, next_cursor: null }),
+        );
+      }
+      if (pathname === "/api/actions/architecture.board_list/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(
+            body.input && body.input.kind,
+            "architecture_board",
+            "board_list asks for the architecture board",
+          );
+          json(res, 200, {
+            items: LIVE_ADM.boards.filter((row) => row.kind === body.input.kind),
+            next_cursor: null,
+          });
+        });
+      }
+      if (pathname === "/api/actions/architecture.maturity_list/invocations") {
+        return readBody(req, () =>
+          json(res, 200, { items: LIVE_ADM.maturity, next_cursor: null }),
+        );
+      }
+      if (pathname === "/api/actions/architecture.skills_list/invocations") {
+        return readBody(req, () =>
+          json(res, 200, { items: LIVE_ADM.skills, next_cursor: null }),
+        );
       }
       if (pathname === "/api/actions/cards.create/invocations") {
         return readBody(req, (body) => {
@@ -1991,6 +2402,53 @@ function readBody(req, done) {
         "the snapshot plan spine is read-only",
       );
       assert.equal(snapshotState.requests.length, 0, "the snapshot programme pages make no API request");
+      // #385: the architecture capability reads the published snapshot read-only. A pasted
+      // hash is a fresh load: the pack reads its destination at boot.
+      await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#adm`);
+      await page.reload();
+      await page.waitForSelector(".page");
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Published tailored ADM profile"),
+      );
+      const snapshotAdm = await page.locator("#main").innerText();
+      assert.match(
+        snapshotAdm,
+        /Published Architecture Board/,
+        "the published board renders on the capability tab",
+      );
+      assert.match(
+        snapshotAdm,
+        /Architecture process/,
+        "the newest published maturity baseline renders",
+      );
+      assert.match(
+        await page.locator("#main .v2-ribbon").first().innerText(),
+        /LIVE/,
+        "the capability ribbon names the snapshot source",
+      );
+      assert.equal(
+        await page
+          .locator(
+            '[data-v2="adm-advance"], [data-v2="adm-approve"], [data-v2="adm-h-change"], [data-v2="adm-h-kata"], [data-v2="adm-review"], [data-v2="adm-review-second"], [data-v2="adm-waiver"], [data-v2="adm-waiver-ok"]',
+          )
+          .count(),
+        0,
+        "the published capability carries no write control",
+      );
+      await page.click('[data-v2="tab"][data-value="Artefact repository"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Published principles catalog"),
+      );
+      assert.match(
+        await page.locator("#main").innerText(),
+        /One record per fact/,
+        "the published artefact's entries render",
+      );
+      assert.equal(
+        snapshotState.requests.length,
+        0,
+        "the snapshot capability makes no API request",
+      );
       await page.close();
     }
 
@@ -2816,9 +3274,80 @@ function readBody(req, done) {
       await page.close();
     }
 
+    /* 2b — the architecture capability: the tenant's live rows, entries on selection, no writes. */
+    {
+      const page = await browser.newPage();
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(String(error)));
+      consoleState.failProjects = 0;
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#adm`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Live tailored ADM profile"),
+      );
+      const liveAdm = await page.locator("#main").innerText();
+      assert.match(liveAdm, /Live Architecture Board/, "the live board renders");
+      assert.match(liveAdm, /Architecture governance/, "the live maturity baseline renders");
+      assert.match(liveAdm, /API · no snapshot/, "the ribbon names the live source");
+      for (const action of [
+        "architecture.profile_get",
+        "architecture.artifacts_list",
+        "architecture.contracts_list",
+        "architecture.board_list",
+        "architecture.maturity_list",
+        "architecture.skills_list",
+      ]) {
+        assert.ok(
+          consoleState.requests.some(
+            (row) => row.path === `/api/actions/${action}/invocations`,
+          ),
+          `${action} was read`,
+        );
+      }
+      await page.click('[data-v2="tab"][data-value="Artefact repository"]');
+      await page.waitForSelector('[data-v2="adm-artifact"][data-id="art-live-2"]');
+      assert.match(
+        await page.locator("#main").innerText(),
+        /Live principles catalog/,
+        "the repository lists the tenant's artefacts",
+      );
+      await page.click('[data-v2="adm-artifact"][data-id="art-live-2"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Release management"),
+      );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/architecture.artifacts_entries/invocations",
+        ),
+        "selecting an artefact reads its entries",
+      );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/architecture.artifacts_links/invocations",
+        ),
+        "selecting an artefact reads its links",
+      );
+      assert.match(
+        await page.locator("#main").innerText(),
+        /derivation/,
+        "the artefact's links render",
+      );
+      assert.equal(
+        await page
+          .locator(
+            '[data-v2="adm-advance"], [data-v2="adm-approve"], [data-v2="adm-h-change"], [data-v2="adm-h-kata"], [data-v2="adm-review"], [data-v2="adm-waiver"]',
+          )
+          .count(),
+        0,
+        "the live capability carries no write control this unit",
+      );
+      assert.deepEqual(errors, [], "no page error on the live capability: " + errors.join("; "));
+      await page.close();
+    }
+
     console.log(
       "check-console: 4 servers · homepage + signed-out + snapshot 0 API requests · signed-in cards," +
-        " projects, outputs, feedback, publish, runs, gates, programme definition, plan spine and portfolio",
+        " projects, outputs, feedback, publish, runs, gates, programme definition, plan spine, portfolio and architecture",
     );
     console.log("check-console: 412 and 401 paths rendered; 0 unhandled page errors");
   } finally {

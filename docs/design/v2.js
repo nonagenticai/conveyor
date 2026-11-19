@@ -109,6 +109,19 @@ window.installV2 = function (api, enterprise) {
   // exactly what it was. Nothing is simulated on this path: every control is an action.
   const C = window.ConveyorConsole || null;
   const consoleOn = () => !!(C && C.signedIn());
+  const consoleAdmState = () => ({
+    loaded: false,
+    loading: false,
+    profile: { data: null, loaded: false, loading: false, error: null },
+    standard: { items: [], loaded: false, loading: false, error: null },
+    artifacts: { items: [], loaded: false, loading: false, error: null },
+    contracts: { items: [], loaded: false, loading: false, error: null },
+    boards: { items: [], loaded: false, loading: false, error: null },
+    maturity: { items: [], loaded: false, loading: false, error: null },
+    skills: { items: [], loaded: false, loading: false, error: null },
+    entries: {},
+    links: {},
+  });
   const cs = {
     loaded: false,
     loading: false,
@@ -130,6 +143,7 @@ window.installV2 = function (api, enterprise) {
     runDetail: {},
     runDetailLoading: null,
     loadingAll: false,
+    adm: consoleAdmState(),
   };
   const consoleIssueUrl = (number) =>
     `https://github.com/nonagenticai/conveyor/issues/${encodeURIComponent(number)}`;
@@ -161,6 +175,7 @@ window.installV2 = function (api, enterprise) {
     cs.runDetail = {};
     cs.runDetailLoading = null;
     cs.loadingAll = false;
+    cs.adm = consoleAdmState();
   }
 
   async function consoleLoad() {
@@ -1152,6 +1167,84 @@ window.installV2 = function (api, enterprise) {
     if (!consoleOn()) return;
     if (projectId) consoleLoadOutputs(projectId);
     consoleLoadRegister();
+  }
+
+  /* ------------------------------------------------- architecture capability (ADM) */
+  // The screen's four tabs read the tenant's own aggregates: the tailored profile with its
+  // standard, the artefacts, the contracts, the board and the two assessment baselines. Each
+  // read settles on its own, so one refused call leaves the rest of the screen standing and
+  // names the call that failed instead of blanking the page.
+  async function consoleLoadAdm() {
+    if (!consoleOn() || cs.adm.loading || cs.adm.loaded) return;
+    cs.adm.loading = true;
+    const reads = [
+      ["profile", "architecture.profile_get", {}],
+      ["artifacts", "architecture.artifacts_list", {}],
+      ["contracts", "architecture.contracts_list", {}],
+      ["boards", "architecture.board_list", { kind: "architecture_board" }],
+      ["maturity", "architecture.maturity_list", {}],
+      ["skills", "architecture.skills_list", {}],
+    ];
+    const results = await Promise.allSettled(
+      reads.map(([, name, input]) => C.action(name, input)),
+    );
+    results.forEach((result, index) => {
+      const key = reads[index][0];
+      const error = result.status === "rejected" ? result.reason : null;
+      const value = result.status === "fulfilled" ? result.value : null;
+      // `profile_get` answers the profile and its standard together; each keeps its own state
+      // so a panel can name exactly the read that refused.
+      if (key === "profile") {
+        cs.adm.profile = {
+          data: error ? null : (value && value.profile) || null,
+          loaded: !error,
+          loading: false,
+          error,
+        };
+        cs.adm.standard = {
+          items: error ? [] : list(value && value.standard),
+          loaded: !error,
+          loading: false,
+          error,
+        };
+        return;
+      }
+      cs.adm[key] = {
+        items: error ? [] : list(value && value.items),
+        loaded: !error,
+        loading: false,
+        error,
+      };
+    });
+    cs.adm.loaded = true;
+    cs.adm.loading = false;
+    render();
+  }
+
+  // The inspector's rows and edges, one artefact at a time. Both reads are cached together;
+  // a failed read keeps its error so the panel says which call refused.
+  async function consoleLoadAdmEntries(artifactId) {
+    if (!consoleOn() || !artifactId || cs.adm.entries[artifactId]) return;
+    cs.adm.entries[artifactId] = { items: [], loaded: false, loading: true, error: null };
+    const [entries, links] = await Promise.allSettled([
+      C.action("architecture.artifacts_entries", { id: artifactId }),
+      C.action("architecture.artifacts_links", { id: artifactId }),
+    ]);
+    const entriesError = entries.status === "rejected" ? entries.reason : null;
+    cs.adm.entries[artifactId] = {
+      items: entriesError ? [] : list(entries.value && entries.value.items),
+      loaded: !entriesError,
+      loading: false,
+      error: entriesError,
+    };
+    const linksError = links.status === "rejected" ? links.reason : null;
+    cs.adm.links[artifactId] = {
+      items: linksError ? [] : list(links.value && links.value.items),
+      loaded: !linksError,
+      loading: false,
+      error: linksError,
+    };
+    render();
   }
 
   /* ------------------------------------------------------------- execution room */
@@ -4202,7 +4295,9 @@ window.installV2 = function (api, enterprise) {
 
   /* ------------------------------------------------------------------ sidebar */
   // The public site carries the programme. The V2 design destinations are the operator
-  // console's; they are not announced signed-out and a direct hash gets a sign-in gate.
+  // console's; they are not announced signed-out and a direct hash gets a sign-in gate. The
+  // destinations that can read a published snapshot (`programme`, `adm`) stay in this set and
+  // gate themselves when the snapshot does not carry their rows.
   const PUBLIC_PAGES = new Set([
     "portfolio",
     "projects",
@@ -4214,6 +4309,7 @@ window.installV2 = function (api, enterprise) {
     "contribute",
     "architecture",
     "programme",
+    "adm",
   ]);
 
   function publicSidebar() {
@@ -4571,11 +4667,599 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* --------------------------------------- Architecture capability (TOGAF ADM) */
-  // SPEC_V2 §8.1 / D63: the Preliminary capability, the ADM phase rail with typed artefacts, the
-  // artefact repository and the board/compliance register. Local fixtures only — no V2 table or
-  // action exists. The pages map gates every non-public destination, so the public site never
-  // renders this page.
+  // SPEC_V2 §8.1 / D63. Same rule as the programme definition: signed in, the four tabs read
+  // the tenant's own rows through the architecture actions; signed out, the published snapshot
+  // read-only; `?design=1` keeps the study fixtures. No control on the live or snapshot path
+  // writes — the card that adds the controls adds the actions with them.
+  const ADM_TABS = ["Capability", "ADM phases", "Artefact repository", "Board & compliance"];
+  const admPhaseOrder = (code) => {
+    const value = String(code || "");
+    if (value === "Preliminary") return 0;
+    if (/^[A-H]$/.test(value)) return 1 + value.charCodeAt(0) - 65;
+    return 20;
+  };
+  const admWhen = (value) => (value ? String(value).slice(0, 10) : "—");
+  const admTone = (status) => {
+    const value = String(status || "").toLowerCase();
+    if (value === "approved" || value === "live" || value === "closed" || value === "active") {
+      return "green";
+    }
+    if (value === "draft" || value === "in_review" || value === "in progress") return "amber";
+    return "";
+  };
+  const admText = (value, n = 200) => {
+    if (value == null || value === "") return "—";
+    if (Array.isArray(value)) {
+      return value.length
+        ? short(
+            value
+              .map((row) => (row && typeof row === "object" ? JSON.stringify(row) : String(row)))
+              .join(" · "),
+            n,
+          )
+        : "—";
+    }
+    if (typeof value === "object") {
+      const parts = Object.entries(value).map(([key, row]) => {
+        const text = Array.isArray(row)
+          ? row.length
+            ? row.join(", ")
+            : "—"
+          : row && typeof row === "object"
+            ? JSON.stringify(row)
+            : row;
+        return `${key}: ${text}`;
+      });
+      return parts.length ? short(parts.join(" · "), n) : "—";
+    }
+    return String(value);
+  };
+  const admScore = (value) => {
+    const score = Number(value);
+    return Number.isFinite(score)
+      ? B(String(score), score >= 4 ? "green" : score >= 2 ? "" : "amber")
+      : "—";
+  };
+  const admShortId = (value) => `<span class="mono">${E(short(value || "", 8) || "—")}</span>`;
+  const architectureCapabilityHeading = () =>
+    heading(
+      "Architecture capability",
+      "The TOGAF ADM as a capability and a project: principles, the tailored profile, the typed artefact repository, the phase contracts, the board, compliance and waivers — SPEC_V2 §8.1.",
+      `${route("Programme definition", "programme", "", "shield")}${route("System architecture", "architecture", "", "model")}`,
+      "GOVERN & DESIGN",
+    );
+
+  // One body over the four tabs, shared by the live and the snapshot reads once each source
+  // has normalized its rows. `errors` names a failed read per section; `entriesFor` and
+  // `linksFor` answer the inspector's cached state for one artefact.
+  function architectureAdmBody(model) {
+    const {
+      profile,
+      standard,
+      artifacts,
+      contracts,
+      boards,
+      maturity,
+      skills,
+      errors = {},
+      entriesFor,
+      linksFor,
+    } = model;
+    const tab = ADM_TABS.includes(v.tab.adm) ? v.tab.adm : "Capability";
+    const failure = (what, error) =>
+      error
+        ? note(`<strong>${E(what)} read refused</strong> · ${E(consoleError(error))}`, "bad")
+        : "";
+    const artName = (id) => {
+      const row = list(artifacts).find((item) => item.id === id);
+      return row ? row.title : short(id || "", 8);
+    };
+    const phases = (() => {
+      const codes = new Set();
+      list(standard).forEach((row) => codes.add(row.phase_code));
+      list(artifacts).forEach((row) => codes.add(row.phase_code));
+      list(contracts).forEach((row) => codes.add(row.phase_code));
+      return [...codes]
+        .filter(Boolean)
+        .sort(
+          (a, b) => admPhaseOrder(a) - admPhaseOrder(b) || String(a).localeCompare(String(b)),
+        )
+        .map((code) => {
+          const types = list(standard).filter((row) => row.phase_code === code);
+          const rows = list(artifacts).filter((row) => row.phase_code === code);
+          const deals = list(contracts).filter((row) => row.phase_code === code);
+          const required = types.filter((row) => row.mandatory);
+          const approved = new Set(
+            rows.filter((row) => row.status === "approved").map((row) => row.artifact_type_id),
+          );
+          const approvedCount = required.filter((row) => approved.has(row.id)).length;
+          const liveDeal = deals.find((row) => row.status === "live") || null;
+          // A phase is closed only when its mandatory set is approved and its contract is
+          // live — the store's own rule, never the contract alone.
+          const closed = !!liveDeal && approvedCount === required.length;
+          const plateaus = [...new Set(types.concat(rows).map((row) => row.plateau).filter(Boolean))];
+          return {
+            code,
+            plateau: plateaus.join(" · ") || "—",
+            required: required.length,
+            approved: approvedCount,
+            missing: required
+              .filter((row) => !approved.has(row.id))
+              .map((row) => row.name || row.key || "unnamed artefact"),
+            contract: liveDeal
+              ? `${liveDeal.kind} · live`
+              : deals[0]
+                ? `${deals[0].kind} · ${deals[0].status}`
+                : "—",
+            state: closed
+              ? "Closed"
+              : approvedCount > 0 || deals.length || rows.length
+                ? "In progress"
+                : "Planned",
+          };
+        });
+    })();
+
+    const board = list(boards)[0] || null;
+    const principles =
+      list(artifacts).find((row) => row.artifact_kind === "principles_catalog") || null;
+    const principleState = principles ? entriesFor(principles) : null;
+    const capability = `<div class="v2-split"><div>${panel(
+      `Principles catalog${
+        principles ? ` · <span class="mono">${E(short(principles.id, 8))}</span>` : ""
+      }`,
+      errors.artifacts
+        ? failure("artefacts", errors.artifacts)
+        : !principles
+          ? note("No principles catalog is recorded in this repository yet.")
+          : principleState.error
+            ? failure("principles entries", principleState.error)
+            : !principleState.loaded
+              ? `${note(
+                  principleState.loading
+                    ? "Reading the principles catalog's entries…"
+                    : "Its entries load when the artefact is selected.",
+                )}${
+                  principleState.loading
+                    ? ""
+                    : button(
+                        "Read the principles catalog",
+                        "adm-artifact",
+                        `data-id="${E(principles.id)}"`,
+                        "small",
+                        "model",
+                      )
+                }`
+              : principleState.items.length
+                ? `${table(
+                    ["Principle", "Statement"],
+                    principleState.items.map(
+                      (row) =>
+                        `<tr><td class="mono">${E(admText(row.axis_a, 40))}</td><td>${E(
+                          admText(row.value, 200),
+                        )}</td></tr>`,
+                    ),
+                  )}${note("The principles catalog is an ordinary artefact: its entries are rows and the board approves the version.")}`
+                : note("The principles catalog carries no entries yet."),
+      principles ? B(`v${principles.artifact_version || 0}`, "green") : "",
+    )}</div><div>${panel(
+      "Tailored ADM profile",
+      errors.profile
+        ? failure("profile", errors.profile)
+        : !profile
+          ? note("No tailored ADM profile is recorded in this tenant yet.")
+          : `${kv([
+              ["Profile", E(profile.name)],
+              ["Key", `<span class="mono">${E(profile.key)}</span>`],
+              ["Phases", E(admText(profile.phase_set))],
+              ["Requirements", E(admText(profile.artifact_requirements, 240))],
+              ["Contracts", E(admText(profile.contract_kinds))],
+              ["Status", B(profile.status || "—", admTone(profile.status))],
+              ["Adopted", E(admWhen(profile.adopted_at))],
+              ["Board decision", E(short(profile.board_decision_id, 8) || "—")],
+              ["Standard", `${list(standard).length} artefact types`],
+              ["Version", E(profile.version)],
+            ])}${note("The profile is the tenant's tailoring: which phases run, which artefact types are mandatory per phase and plateau, and which contract closes each phase.")}${failure("standard", errors.standard)}`,
+      profile ? B(profile.status || "—", admTone(profile.status)) : "",
+    )}${panel(
+      "Architecture Board",
+      errors.boards
+        ? failure("board", errors.boards)
+        : !board
+          ? note("No architecture board is recorded in this tenant yet.")
+          : `${kv([
+              ["Body", E(board.name)],
+              ["Key", `<span class="mono">${E(board.key || "—")}</span>`],
+              ["Charter", E(admText(board.charter))],
+              ["Commissioning authority", E(admText(board.commissioning_authority))],
+              ["Decision limits", E(admText(board.decision_limits))],
+              ["Membership", E(admText(board.members))],
+              ["Status", B(board.status || "—", admTone(board.status))],
+            ])}${note("The board is a governance body with authority rows, not a meeting. It cannot approve a delivery gate it requested and cannot waive a deviation it owns.")}`,
+      board ? B(`${board.key || "board"} · v${board.version}`, "green") : "",
+    )}</div></div>` +
+      `<div class="v2-split"><div>${panel(
+        "Maturity · the newest assessment",
+        errors.maturity
+          ? failure("maturity", errors.maturity)
+          : !maturity || !list(maturity.dimensions).length
+            ? note("No maturity assessment is recorded in this tenant yet.")
+            : `${table(
+                ["Dimension", "Score"],
+                list(maturity.dimensions).map(
+                  (row) =>
+                    `<tr><td>${E(row.key)}</td><td>${admScore(row.score)}</td></tr>`,
+                ),
+              )}${note("Scale 0–5: none, initial, under development, defined, managed, measured. The baseline is dated evidence, not an assertion.")}`,
+        maturity ? B(maturity.stage || "assessment") : "",
+      )}</div><div>${panel(
+        "Skills · the newest assessment",
+        errors.skills
+          ? failure("skills", errors.skills)
+          : !list(skills).length
+            ? note("No skills assessment is recorded in this tenant yet.")
+            : `${table(
+                ["Role", "Category", "Proficiency"],
+                list(skills).map(
+                  (row) =>
+                    `<tr><td><small>${E(row.role)}</small></td><td>${E(row.key)}</td><td>${admScore(
+                      row.score,
+                    )}</td></tr>`,
+                ),
+              )}${note("The Architecture Skills Framework assesses proficiency per role. The development plan is a Preliminary-phase output.")}`,
+        B(`${list(skills).length} categories`),
+      )}</div></div>`;
+
+    const phase = phases.find((row) => row.code === v.admPhase) || phases[0] || null;
+    const phasesTab = `<div class="v2-split"><div>${panel(
+      "Phase rail",
+      errors.standard || errors.artifacts || errors.contracts
+        ? `${failure("standard", errors.standard)}${failure("artefacts", errors.artifacts)}${failure("contracts", errors.contracts)}`
+        : phases.length
+          ? `${table(
+              ["Phase", "Plateau", "Mandatory", "Approved", "Contract", "State"],
+              phases.map(
+                (row) =>
+                  `<tr data-v2="adm-phase" data-id="${E(row.code)}" style="cursor:pointer"><td><button type="button" class="btn small" data-v2="adm-phase" data-id="${E(row.code)}">${E(row.code)}</button></td><td>${E(row.plateau)}</td><td>${row.required}</td><td>${row.approved}</td><td><small>${E(row.contract)}</small></td><td>${B(row.state, admTone(row.state))}</td></tr>`,
+              ),
+            )}${note("Each phase closes on an approved mandatory set and a live contract; a phase cannot be skipped. The set is the standard filtered by the profile.")}`
+          : note("The standard and the repository carry no phase code yet."),
+    )}</div><div>${panel(
+      `Phase · ${phase ? E(phase.code) : "—"}`,
+      !phase
+        ? note("No phase is recorded yet.")
+        : `${kv([
+            ["Plateau", E(phase.plateau)],
+            ["Mandatory artefacts", `${phase.approved} approved of ${phase.required}`],
+            ["Contract", E(phase.contract)],
+            ["State", B(phase.state, admTone(phase.state))],
+          ])}${
+            phase.missing.length
+              ? `<h4>Missing mandatory set</h4><ul>${phase.missing
+                  .slice(0, 12)
+                  .map((name) => `<li>${E(name)}</li>`)
+                  .join("")}${
+                  phase.missing.length > 12
+                    ? `<li>… ${phase.missing.length - 12} more</li>`
+                    : ""
+                }</ul>`
+              : ""
+          }${note("A phase closes only when every artefact the profile marks mandatory is approved and its contract is live. This screen records nothing; the write controls are the next unit.")}`,
+    )}${panel(
+      "Contracts across the ADM",
+      errors.contracts
+        ? failure("contracts", errors.contracts)
+        : list(contracts).length
+          ? `${table(
+              ["ID", "Contract", "Phase", "Version", "State", "Approved by"],
+              list(contracts).map(
+                (row) =>
+                  `<tr><td>${admShortId(row.id)}</td><td><strong>${E(row.kind)}</strong><small>${E(
+                    admText(row.title),
+                  )}</small></td><td>${E(row.phase_code)}</td><td>${E(
+                    row.version,
+                  )}</td><td>${B(row.status, admTone(row.status))}</td><td><small>${E(
+                    short(row.approved_by, 8) || "—",
+                  )}</small></td></tr>`,
+              ),
+            )}${note("The Statement of Architecture Work is distinct from the designs produced under it; a contract change is a new version and re-opens its gate.")}`
+          : note("No architecture contract is recorded in this tenant yet."),
+    )}</div></div>`;
+
+    const typeFilter = v.admType || "all";
+    const kinds = ["all", "catalog", "matrix", "diagram"].concat(
+      [...new Set(list(artifacts).map((row) => row.artifact_kind).filter(Boolean))].filter(
+        (kind) => !["catalog", "matrix", "diagram"].includes(kind),
+      ),
+    );
+    const visible = list(artifacts).filter(
+      (row) => typeFilter === "all" || row.artifact_kind === typeFilter,
+    );
+    const art = list(artifacts).find((row) => row.id === v.adm) || list(artifacts)[0] || null;
+    const entryState = art ? entriesFor(art) : null;
+    const hasAxisB = !!(entryState && entryState.items.some((row) => row.axis_b));
+    const entryBlock = !art
+      ? note("No artefact is recorded in this repository yet.")
+      : !entryState || entryState.error
+        ? failure("artefact entries", entryState && entryState.error)
+        : !entryState.loaded
+          ? `${note(
+              entryState.loading
+                ? "Reading this artefact's entries…"
+                : "Its entries load when the artefact is selected.",
+            )}${
+              entryState.loading
+                ? ""
+                : button(
+                    "Read this artefact",
+                    "adm-artifact",
+                    `data-id="${E(art.id)}"`,
+                    "small",
+                    "model",
+                  )
+            }`
+          : entryState.items.length
+            ? `${table(
+                hasAxisB ? ["Axis A", "Axis B", "Value"] : ["Axis A", "Value"],
+                entryState.items.map(
+                  (row) =>
+                    `<tr><td class="mono">${E(admText(row.axis_a, 60))}</td>${
+                      hasAxisB ? `<td class="mono">${E(admText(row.axis_b, 60))}</td>` : ""
+                    }<td>${E(admText(row.value, 200))}</td></tr>`,
+                ),
+              )}${note("A catalog's rows are entries; a matrix's cells carry both axes.")}`
+            : `${kv([
+                ["Document", E(short(art.document_id, 8) || "—")],
+                ["Metadata", E(admText(art.meta))],
+              ])}${note("No entries are recorded on this artefact yet.")}`;
+    const linkState = art ? linksFor(art) : null;
+    const links = linkState && linkState.items ? linkState.items : [];
+    const linksBlock =
+      linkState && linkState.error
+        ? failure("artefact links", linkState.error)
+        : !linkState || !linkState.loaded
+          ? note(linkState && linkState.loading ? "Reading this artefact's links…" : "Its links load with its entries.")
+          : links.length
+            ? table(
+                ["Kind", "Direction", "Other artefact"],
+                links.map((row) => {
+                  const outgoing = row.from_artifact_id === art.id;
+                  const other = outgoing ? row.to_artifact_id : row.from_artifact_id;
+                  return `<tr><td class="mono">${E(row.kind)}</td><td>${
+                    outgoing ? "out" : "in"
+                  }</td><td><strong>${E(artName(other))}</strong></td></tr>`;
+                }),
+              )
+            : note("No links are recorded on this artefact.");
+    const artifactsTab =
+      `<div class="toolbar"><span class="mono muted">TYPE</span>${kinds
+        .map(
+          (kind) =>
+            `<button class="btn ${typeFilter === kind ? "selected" : ""}" data-v2="adm-type" data-id="${E(
+              kind,
+            )}">${E(kind)}</button>`,
+        )
+        .join("")}</div>` +
+      `<div class="v2-split"><div>${panel(
+        "Artefact repository",
+        errors.artifacts
+          ? failure("artefacts", errors.artifacts)
+          : `${
+              visible.length
+                ? table(
+                    ["ID", "Artefact", "Type", "Phase", "Plateau", "State", "Version"],
+                    visible.map(
+                      (row) =>
+                        `<tr data-v2="adm-artifact" data-id="${E(row.id)}" style="cursor:pointer" class="${
+                          art && row.id === art.id ? "selected" : ""
+                        }"><td><button type="button" class="btn small" data-v2="adm-artifact" data-id="${E(
+                          row.id,
+                        )}">${E(short(row.id, 8))}</button></td><td><strong>${E(
+                          row.title,
+                        )}</strong></td><td>${B(
+                          row.artifact_kind,
+                          row.artifact_kind === "catalog" ||
+                            row.artifact_kind === "principles_catalog"
+                            ? "purple"
+                            : row.artifact_kind === "matrix"
+                              ? ""
+                              : "amber",
+                        )}</td><td><small>${E(row.phase_code)}</small></td><td>${E(
+                          row.plateau,
+                        )}</td><td>${B(row.status, admTone(row.status))}</td><td>${E(
+                          row.artifact_version,
+                        )}</td></tr>`,
+                    ),
+                  )
+                : note("No artefact matches this type.")
+            }${note("A catalog is queried, a matrix is joined, a diagram is a document with a viewpoint. The repository answers what an artefact derives from, realizes and reuses.")}`,
+        B(`${list(artifacts).length} artefacts`),
+      )}</div><div>${panel(
+        `Artefact · ${art ? `<span class="mono">${E(short(art.id, 8))}</span>` : "—"}`,
+        !art
+          ? note("Select an artefact to inspect it.")
+          : `${kv([
+              ["Title", E(art.title)],
+              ["Type", B(art.artifact_kind, "purple")],
+              ["Phase", E(art.phase_code)],
+              ["Plateau", E(art.plateau)],
+              ["Status", B(art.status, admTone(art.status))],
+              ["Version", E(art.artifact_version)],
+              ["Purpose", E(admText(art.purpose))],
+              ["Scope", E(admText(art.scope))],
+              ["Document", E(short(art.document_id, 8) || "—")],
+              ["Contract", E(short(art.contract_id, 8) || "—")],
+            ])}${entryBlock}`,
+      )}${art ? panel("Links · derivation, realization, reuse, dependency", linksBlock) : ""}</div></div>`;
+
+    const boardTab = `<div class="v2-split"><div>${panel(
+      "Architecture boards",
+      errors.boards
+        ? failure("board", errors.boards)
+        : list(boards).length
+          ? `${table(
+              ["Key", "Body", "Kind", "Status", "Commissioning authority", "Members", "Version"],
+              list(boards).map(
+                (row) =>
+                  `<tr><td class="mono">${E(row.key)}</td><td><strong>${E(
+                    row.name,
+                  )}</strong></td><td>${E(row.kind)}</td><td>${B(
+                    row.status,
+                    admTone(row.status),
+                  )}</td><td><small>${E(
+                    admText(row.commissioning_authority),
+                  )}</small></td><td><small>${E(admText(row.members))}</small></td><td>${E(
+                    row.version,
+                  )}</td></tr>`,
+              ),
+            )}${note("The board supports the roadmap, assesses changes against it, applies the principles and commissions solution architectures.")}`
+          : note("No architecture board is recorded in this tenant yet."),
+    )}</div><div>${panel(
+      `Board · ${board ? `<span class="mono">${E(board.key || "")}</span>` : "—"}`,
+      !board
+        ? note("No board row is loaded.")
+        : `${kv([
+            ["Body", E(board.name)],
+            ["Kind", E(board.kind)],
+            ["Charter", E(admText(board.charter))],
+            ["Commissioning authority", E(admText(board.commissioning_authority))],
+            ["Decision limits", E(admText(board.decision_limits))],
+            ["Membership", E(admText(board.members))],
+            ["Status", B(board.status, admTone(board.status))],
+            ["Version", E(board.version)],
+          ])}${note("The board cannot approve a delivery gate it requested and cannot waive a deviation it owns. This screen reads the rows; the decision controls are the next unit.")}`,
+    )}</div></div>`;
+
+    return tab === "Capability"
+      ? capability
+      : tab === "ADM phases"
+        ? phasesTab
+        : tab === "Artefact repository"
+          ? artifactsTab
+          : boardTab;
+  }
+
+  // Signed in: the tenant's rows. The reads fire once; every later render draws the cache.
+  function architectureCapabilityLive() {
+    if (!cs.adm.loaded && !cs.adm.loading) consoleLoadAdm();
+    const artifacts = list(cs.adm.artifacts.items);
+    const selected = artifacts.find((row) => row.id === v.adm) || artifacts[0] || null;
+    if (cs.adm.loaded && selected) consoleLoadAdmEntries(selected.id);
+    const skillItems = list(cs.adm.skills.items);
+    const firstAssessment = skillItems[0] ? skillItems[0].assessment_id : null;
+    const skills = skillItems
+      .filter((row) => row.assessment_id === firstAssessment)
+      .flatMap((row) =>
+        list(row.categories).map((cat) => ({ role: row.role, key: cat.key, score: cat.score })),
+      );
+    const model = {
+      profile: cs.adm.profile.data,
+      standard: cs.adm.standard.items,
+      artifacts,
+      contracts: cs.adm.contracts.items,
+      boards: cs.adm.boards.items,
+      maturity: list(cs.adm.maturity.items)[0] || null,
+      skills,
+      errors: {
+        profile: cs.adm.profile.error,
+        standard: cs.adm.standard.error,
+        artifacts: cs.adm.artifacts.error,
+        contracts: cs.adm.contracts.error,
+        boards: cs.adm.boards.error,
+        maturity: cs.adm.maturity.error,
+        skills: cs.adm.skills.error,
+      },
+      entriesFor: (art) =>
+        cs.adm.entries[art.id] || { items: [], loaded: false, loading: false, error: null },
+      linksFor: (art) =>
+        cs.adm.links[art.id] || { items: [], loaded: false, loading: false, error: null },
+    };
+    const tab = ADM_TABS.includes(v.tab.adm) ? v.tab.adm : "Capability";
+    return `<div class="page enterprise">${architectureCapabilityHeading()}${consoleRibbon(
+      "The tailored profile, the artefact repository, the phase contracts, the board and the two baselines are the tenant's own rows.",
+      true,
+    )}${tabs(ADM_TABS, tab, "adm")}${
+      cs.adm.loaded
+        ? architectureAdmBody(model)
+        : note(
+            "Reading the architecture capability · the profile and its standard, the artefacts, the contracts, the board, the maturity and the skills assessment.",
+          )
+    }</div>`;
+  }
+
+  // Signed out: the published snapshot's `architecture` section, read-only and with no call.
+  function architectureCapabilitySnapshot() {
+    const A = (live && live.architecture) || {};
+    const profiles = list(A.profiles);
+    const maturityGroups = (() => {
+      const groups = [];
+      const index = new Map();
+      list(A.maturity).forEach((row) => {
+        if (!index.has(row.assessment_id)) {
+          index.set(row.assessment_id, groups.length);
+          groups.push({ assessment_id: row.assessment_id, stage: row.stage || "", dimensions: [] });
+        }
+        groups[index.get(row.assessment_id)].dimensions.push({
+          key: row.dimension,
+          score: row.score,
+        });
+      });
+      return groups;
+    })();
+    const skillRows = list(A.skills);
+    const firstSkills = skillRows[0] ? skillRows[0].assessment_id : null;
+    const skills = skillRows
+      .filter((row) => row.assessment_id === firstSkills)
+      .map((row) => ({ role: row.role, key: row.category, score: row.proficiency }));
+    const links = list(A.links);
+    const artifacts = list(A.artifacts);
+    const model = {
+      profile: profiles.find((row) => row.status === "adopted") || profiles[0] || null,
+      standard: list(A.standard),
+      artifacts,
+      contracts: list(A.contracts),
+      boards: list(A.board),
+      maturity: maturityGroups[0] || null,
+      skills,
+      errors: {},
+      entriesFor: (art) => ({
+        items: list(art && art.entries),
+        loaded: true,
+        loading: false,
+        error: null,
+      }),
+      linksFor: (art) => ({
+        items: art
+          ? links.filter(
+              (row) => row.from_artifact_id === art.id || row.to_artifact_id === art.id,
+            )
+          : [],
+        loaded: true,
+        loading: false,
+        error: null,
+      }),
+    };
+    const tab = ADM_TABS.includes(v.tab.adm) ? v.tab.adm : "Capability";
+    return `<div class="page enterprise">${architectureCapabilityHeading()}${consoleRibbon(
+      "The published architecture snapshot: the tailored profile, the artefact repository, the contracts, the board and the baselines. Read-only: sign in at the app origin to operate the capability.",
+      true,
+    )}${tabs(ADM_TABS, tab, "adm")}${architectureAdmBody(model)}</div>`;
+  }
+
   function architectureCapabilityPage() {
+    if (consoleOn()) return architectureCapabilityLive();
+    if (designStudy) return architectureCapabilityStudy();
+    if (live && live.architecture) return architectureCapabilitySnapshot();
+    return `<div class="page enterprise">${architectureCapabilityHeading()}${note(
+      "The architecture-capability rows are not published on this pack. This destination is part of the conveyor design study and is available after signing in at the app origin.",
+      "bad",
+    )}</div>`;
+  }
+
+  // SPEC_V2 §8.1 / D63: the Preliminary capability, the ADM phase rail with typed artefacts, the
+  // artefact repository and the board/compliance register. The `?design=1` reviewer study —
+  // local fixtures only, kept byte-for-byte behind that explicit mode.
+  function architectureCapabilityStudy() {
     const cap = F.architectureCapability;
     const tab = v.tab.adm || "Capability";
     const gate = v.admGate;

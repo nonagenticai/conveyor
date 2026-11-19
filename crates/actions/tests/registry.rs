@@ -96,7 +96,7 @@ use serde_json::{Value, json};
 /// **T9 adds 26 internal**: the `architecture.*` family (see the block below `approvals.request`).
 /// **#76 adds 1 internal**: `tools.call`, the tool broker (it dispatches a declared external
 /// action and adds no external target).
-const EXPECTED: [&str; 469] = [
+const EXPECTED: [&str; 472] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -124,6 +124,7 @@ const EXPECTED: [&str; 469] = [
     "architecture.artifacts_update",
     "architecture.board_decide",
     "architecture.board_get",
+    "architecture.board_list",
     "architecture.board_open",
     "architecture.contracts_approve",
     "architecture.contracts_get",
@@ -131,6 +132,7 @@ const EXPECTED: [&str; 469] = [
     "architecture.contracts_request",
     "architecture.contracts_supersede",
     "architecture.maturity_assess",
+    "architecture.maturity_list",
     "architecture.maturity_plan",
     "architecture.phases_advance",
     "architecture.profile_get",
@@ -139,6 +141,7 @@ const EXPECTED: [&str; 469] = [
     "architecture.reviews_record",
     "architecture.reviews_waive",
     "architecture.skills_assess",
+    "architecture.skills_list",
     "artifacts.list",
     "audit.list",
     "baselines.get",
@@ -638,7 +641,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // T14 (#83) adds `toolkits.publish`, `tools.probe` and `tools.usage`, all internal:
     // 448 -> 451; external stays 18 — they read and write this tenant's own toolkit
     // catalogue, and the probe's destination is configuration, not a declared action.
-    assert_eq!((internal, external), (451, 18));
+    // #385 adds `architecture.maturity_list`, `architecture.skills_list` and
+    // `architecture.board_list`, all internal reads: 451 -> 454; external stays 18.
+    assert_eq!((internal, external), (454, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
