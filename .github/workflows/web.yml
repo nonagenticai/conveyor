@@ -137,7 +137,9 @@ jobs:
             sleep 1
           done
           curl -sf -H 'authorization: Bearer dev:alice' http://127.0.0.1:8930/health/ready
-          curl -sf -H 'authorization: Bearer dev:alice' http://127.0.0.1:8930/api/actions | head -c 200 >/dev/null
+          # -o /dev/null, not `| head`: under `pipefail` head closing the pipe makes curl exit 23
+          # ("write error") even though the API answered — measured on the first run.
+          curl -sf -H 'authorization: Bearer dev:alice' http://127.0.0.1:8930/api/actions -o /dev/null
 
       - name: install the web dependencies and a browser
         run: |
