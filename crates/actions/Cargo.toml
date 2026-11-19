@@ -77,3 +77,6 @@ conveyor-bus = { path = "../bus" }
 conveyor-api = { path = "../api" }
 axum = { workspace = true }
 tower = { workspace = true }
+# #412: the metered-drain tests build a slow SSE-style body from a channel, so the drop of the
+# reader is observable as a failed send rather than inferred.
+tokio-stream = { workspace = true }

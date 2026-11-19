@@ -232,9 +232,12 @@ mod tests {
                 // #75 (T4): the kanban coach — the interruption record with its per-signature
                 // open index, and the append-only remedy (0057_coach.sql, SPEC_V2 §6.2).
                 (57, "coach".to_owned()),
+                // #413: SPEC §10.3's PDDL action text on procedure and process_step (the table
+                // 0035 renamed from procedure_step), and the card's WBS node pin.
+                (58, "data model gaps".to_owned()),
                 // T11 (#84): the versioned C0–C5 threshold configuration and the billing
-                // reconciliation record (0058_metrics.sql, SPEC_V2 §7.5, §15.1 D37/D50/D52).
-                (58, "metrics".to_owned())
+                // reconciliation record (0059_metrics.sql, SPEC_V2 §7.5, §15.1 D37/D50/D52).
+                (59, "metrics".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

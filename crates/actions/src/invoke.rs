@@ -1041,6 +1041,57 @@ fn media_units(
     }
 }
 
+/// What an external call yields once its body is read: the status and the whole body, or the
+/// transport error that stopped it.
+type ExternalResponse = Result<(reqwest::StatusCode, bytes::Bytes), reqwest::Error>;
+
+/// Send a METERED request (inference, imagegen, audio) and read its body in a task of its own.
+///
+/// The provider has already prefilled the prompt when the request is in flight, and the router
+/// books a zero cost event for an attempt whose client leaves. Keeping the send and the body read
+/// in a detached task means an elapsed action timeout or a dropped caller future (a cancelled
+/// run) drains the response to its terminal byte, so the usage is booked; the caller still gets
+/// its timeout. `Err(())` is that timeout (or a task that died without answering).
+async fn send_metered(
+    builder: reqwest::RequestBuilder,
+    timeout: Duration,
+) -> Result<ExternalResponse, ()> {
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    tokio::spawn(async move {
+        let out = match builder.send().await {
+            Ok(response) => {
+                let status = response.status();
+                // The whole body, not just the headers: the router books usage on the terminal
+                // chunk, so stopping early would defeat the drain.
+                response.bytes().await.map(|body| (status, body))
+            }
+            Err(error) => Err(error),
+        };
+        let _ = tx.send(out);
+    });
+    match tokio::time::timeout(timeout, rx).await {
+        // The receiver is dropped and the task drains; the action still reports its timeout.
+        Err(_) | Ok(Err(_)) => Err(()),
+        Ok(Ok(out)) => Ok(out),
+    }
+}
+
+/// Send an UNMETERED request under the action timeout. A timeout abandons the call: there is no
+/// provider work already paid for, and a background spend is not wanted.
+async fn send_once(
+    builder: reqwest::RequestBuilder,
+    timeout: Duration,
+) -> Result<ExternalResponse, ()> {
+    match tokio::time::timeout(timeout, builder.send()).await {
+        Err(_) => Err(()),
+        Ok(Err(error)) => Ok(Err(error)),
+        Ok(Ok(response)) => {
+            let status = response.status();
+            Ok(response.bytes().await.map(|body| (status, body)))
+        }
+    }
+}
+
 async fn invoke_external(
     pool: &PgPool,
     spec: &crate::spec::ActionSpec,
@@ -1270,11 +1321,18 @@ async fn invoke_external(
         builder = builder.header(reqwest::header::ACCEPT, "application/json");
     }
 
-    let result = tokio::time::timeout(
-        Duration::from_millis(u64::from(spec.timeout_ms)),
-        builder.send(),
-    )
-    .await;
+    // A METERED call (inference, imagegen, audio) is already prefilled by the provider when it is
+    // in flight, and the router books a ZERO cost event for an attempt whose client leaves — so a
+    // timeout or a cancelled run that drops this future loses tokens somebody served to nobody's
+    // bill. Measured 2026-11-19 on tenant `nonagentic-conveyor`: two cancelled `inference.chat`
+    // calls left ~62k vLLM prompt tokens with no billing row and put
+    // `LocalLlmMeteringCoverageLow` at 0.75. Unmetered actions keep the old behaviour.
+    let timeout = Duration::from_millis(u64::from(spec.timeout_ms));
+    let result = if spec.captures_usage {
+        send_metered(builder, timeout).await
+    } else {
+        send_once(builder, timeout).await
+    };
 
     let elapsed = started.elapsed().as_millis().min(i32::MAX as u128) as i32;
     // Clones, because the closure below captures them and the success path still needs
@@ -1303,7 +1361,7 @@ async fn invoke_external(
         }
     };
 
-    let response = match result {
+    let (status, body) = match result {
         Err(_) => return failure(ActionError::timeout(spec.name, spec.timeout_ms), false).await,
         Ok(Err(error)) => {
             tracing::warn!(%error, action = spec.name, "external call failed");
@@ -1311,9 +1369,8 @@ async fn invoke_external(
         }
         Ok(Ok(response)) => response,
     };
-    let status = response.status();
     if status.is_client_error() {
-        let detail = response.text().await.unwrap_or_default();
+        let detail = String::from_utf8_lossy(&body).to_string();
         // The upstream's body is logged, never echoed: an inference or ingest service can put a
         // prompt, a credential or an internal URL in its error text, and the problem body is
         // served to the caller.
@@ -1333,7 +1390,7 @@ async fn invoke_external(
     if status.is_server_error() {
         return failure(ActionError::upstream_failed(service, status.as_u16()), true).await;
     }
-    let output: Value = match response.json().await {
+    let output: Value = match serde_json::from_slice(&body) {
         Ok(value) => value,
         Err(error) => {
             tracing::warn!(%error, action = spec.name, "external response was not JSON");
@@ -1820,5 +1877,92 @@ mod tests {
             body["instance"],
             "/api/actions/members.set_role/invocations"
         );
+    }
+
+    /// What a fake upstream's body recorded about its own life (#412).
+    #[derive(Default)]
+    struct Tail {
+        finished: std::sync::atomic::AtomicBool,
+        dropped: std::sync::atomic::AtomicBool,
+    }
+
+    /// A fake upstream whose body arrives one chunk per `gap`, recording whether the last chunk
+    /// was written (the reader stayed to the end) or the body was dropped first (the reader left).
+    async fn slow_upstream(gap: Duration, chunks: usize) -> (String, std::sync::Arc<Tail>) {
+        use std::sync::atomic::Ordering;
+        let tail = std::sync::Arc::new(Tail::default());
+        let state = tail.clone();
+        let app = axum::Router::new().route(
+            "/slow",
+            axum::routing::get(move || {
+                let seen = state.clone();
+                async move {
+                    let (tx, rx) =
+                        tokio::sync::mpsc::channel::<Result<bytes::Bytes, std::io::Error>>(8);
+                    tokio::spawn(async move {
+                        for i in 0..chunks {
+                            tokio::time::sleep(gap).await;
+                            // A closed receiver is the reader leaving: the body was dropped
+                            // before its end, which is exactly what the drain must prevent.
+                            if tx.send(Ok(bytes::Bytes::from_static(b"{}"))).await.is_err() {
+                                seen.dropped.store(true, Ordering::SeqCst);
+                                return;
+                            }
+                            if i + 1 == chunks {
+                                seen.finished.store(true, Ordering::SeqCst);
+                            }
+                        }
+                    });
+                    (
+                        [(axum::http::header::CONTENT_TYPE, "application/json")],
+                        axum::body::Body::from_stream(tokio_stream::wrappers::ReceiverStream::new(
+                            rx,
+                        )),
+                    )
+                }
+            }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        tokio::spawn(async move {
+            let _ = axum::serve(listener, app).await;
+        });
+        (format!("http://{addr}"), tail)
+    }
+
+    /// #412 P1.1 — the timeout is the caller's; the request is not torn down with it.
+    #[tokio::test]
+    async fn a_metered_call_drains_its_body_after_the_action_timeout() {
+        use std::sync::atomic::Ordering;
+        let (base, tail) = slow_upstream(Duration::from_millis(60), 5).await;
+        let builder = reqwest::Client::new().get(format!("{base}/slow"));
+        let out = send_metered(builder, Duration::from_millis(50)).await;
+        assert!(out.is_err(), "the caller still reports its timeout");
+        tokio::time::sleep(Duration::from_millis(600)).await;
+        assert!(
+            tail.finished.load(Ordering::SeqCst),
+            "the body must be read to its last chunk after the timeout"
+        );
+        assert!(
+            !tail.dropped.load(Ordering::SeqCst),
+            "the body must not be dropped"
+        );
+    }
+
+    /// #412 P1.3 — an unmetered call is abandoned when its caller leaves (no background spend).
+    #[tokio::test]
+    async fn an_unmetered_call_is_abandoned_when_its_caller_leaves() {
+        use std::sync::atomic::Ordering;
+        let (base, tail) = slow_upstream(Duration::from_millis(60), 5).await;
+        let builder = reqwest::Client::new().get(format!("{base}/slow"));
+        let handle = tokio::spawn(send_once(builder, Duration::from_secs(30)));
+        tokio::time::sleep(Duration::from_millis(90)).await;
+        handle.abort();
+        tokio::time::sleep(Duration::from_millis(500)).await;
+        assert!(
+            tail.dropped.load(Ordering::SeqCst),
+            "the body must be abandoned"
+        );
+        assert!(!tail.finished.load(Ordering::SeqCst));
     }
 }

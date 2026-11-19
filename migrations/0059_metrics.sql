@@ -1,4 +1,4 @@
--- 0058_metrics.sql — T11: the maturity threshold configuration and the reconciliation record
+-- 0059_metrics.sql — T11: the maturity threshold configuration and the reconciliation record
 -- (SPEC_V2 §7.5, §11.9, §15.1 D37/D50/D52; issue #84).
 --
 -- ⛔ NO METRIC IS STORED (D37). Every value the `metrics.*` actions return is computed at read
